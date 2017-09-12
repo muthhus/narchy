@@ -265,16 +265,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         this.tree = new ConcurrentRTree<>(
                 new RTree<TaskRegion>(model) {
 
-                    @Override
-                    public boolean add(TaskRegion tr) {
-                        if (super.add(tr)) {
-                            //new insertion
-                            Task task = tr.task;
-                            Activate.activate(task, task.priElseZero(), nar);
-                            return true;
-                        }
-                        return false;
-                    }
+//                    @Override
+//                    public boolean add(TaskRegion tr) {
+//                        if (super.add(tr)) {
+//                            //new insertion
+//                            Task task = tr.task;
+//                            Activate.activate(task, task.priElseZero(), nar);
+//                            return true;
+//                        }
+//                        return false;
+//                    }
                 });
     }
 
@@ -317,7 +317,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         final Task ete = eternal != null ? eternal.strongest() : null;
 
-        if (start!=ETERNAL) {
+        if (start != ETERNAL) {
             int s = size();
             if (s > 0) {
 
@@ -396,7 +396,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 if (a.during(start, end) && !b.during(start, end))
                     return a; //only 'a' is for that time
 
-                if (template!=null) {
+                if (template != null) {
                     //choose if either one (but not both or neither) matches template's time
                     boolean at = (a.term().equals(template));
                     boolean bt = (b.term().equals(template));
@@ -409,7 +409,17 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
                 //otherwise interpolate
                 Task c = Revision.merge(a, b, start, nar);
-                return c != null ? c : a;
+                if (c!=null) {
+//                    if (c.equals(a))
+//                        return a;
+//                    if (c.equals(b))
+//                        return b;
+
+                    return c;
+                } else {
+                    return a;
+                }
+
         }
     }
 
@@ -536,33 +546,44 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         boolean isSignal = x instanceof SignalTask;
 
-        TaskRegion tr;
         if (isSignal) {
             SignalTask sx = (SignalTask) x;
-            if (sx.stretchKey == Signal.Pending) {
-                //set the stretcher
-                sx.stretchKey = new MyTaskStretcher(tr = new TaskRegion(x));
-            } else if (sx.stretchKey instanceof MyTaskStretcher) {
+            if (sx.stretchKey instanceof MyTaskStretcher) {
                 //ignore, it is already present; this actually should never be reached if the Signal works right
                 return;
-            } else {
-                //throw new UnsupportedOperationException(sx + " either stretching or it isn't");
-                tr = new TaskRegion(x);
             }
-        } else {
-            tr = new TaskRegion(x);
         }
 
+  TaskRegion tr;
+
+            if (isSignal) {
+                SignalTask sx = (SignalTask) x;
+                if (sx.stretchKey == Signal.Pending) {
+                    //set the stretcher
+                    sx.stretchKey = new MyTaskStretcher(tr = new TaskRegion(x));
+                } else {
+                    //throw new UnsupportedOperationException(sx + " either stretching or it isn't");
+                    tr = new TaskRegion(x);
+                }
+            } else {
+                tr = new TaskRegion(x);
+            }
+
+        final boolean[] added = {false};
         ((ConcurrentRTree<TaskRegion>) tree).withWriteLock((t) -> {
+
 
             final int capacity = this.capacity;
             if (size() < capacity) {
-                t.add(tr);
+                added[0] = t.add(tr);
             } else {
-                addAfterCompressing(t, tr, n, capacity);
-                assert (size() <= capacity * 2) : "size=" + size() + " cap=" + capacity;
+                added[0] = addAfterCompressing(t, tr, n, capacity);
             }
         });
+
+        if (added[0]) {
+            Activate.activate(x, x.priElseZero(), nar);
+        }
 
     }
 
@@ -570,7 +591,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * assumes called with writeLock
      */
     @NotNull
-    private static void addAfterCompressing(Space<TaskRegion> tree, TaskRegion inputRegion, NAR nar, int cap) {
+    private static boolean addAfterCompressing(Space<TaskRegion> tree, TaskRegion inputRegion, NAR nar, int cap) {
 
 
         long now = nar.time();
@@ -601,25 +622,30 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         compressNode(tree, tree.root(), deleteVictim, mergeVictim);
 
-        //decide to remove or merge:
-        @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
 
 
         boolean merged = false;
+        @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
         if (toMerge != null) {
-            Task mergedTask = null;
-            if ((mergedTask = compressMerge(tree, toMerge, taskStrength, inputStrength, regionWeakness, now, nar)) != null) {
+            if (compressMerge(tree, toMerge, taskStrength, inputStrength, regionWeakness, now, nar) != null) {
                 merged = true; //the result has already been added in compressMerge
             }
         }
 
         @Nullable TaskRegion toRemove = deleteVictim.the;
         if (!merged && toRemove != null) {
-            tree.remove(toRemove); //evicted
+            boolean removed = tree.remove(toRemove); //evicted
+            assert(removed): "unable to remove the victim: " + toRemove;
         }
 
-        if (tree.size() < cap)
-            tree.add(inputRegion);
+        if (tree.size() < cap) {
+            if (tree.add(inputRegion)) {
+                assert (tree.size() <= cap + 2) : "size=" + tree.size() + " cap=" + cap;
+                return true;
+            }
+        }
+
+        return false;
 
         //nar.input(toActivate);
 
@@ -747,7 +773,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             return (1 / ((1 + awayFromNow)))
                     * (1 + (r.end - r.start) / awayFromNow) /* range, divided by the distance to emulate vanishing perspective proportion to distance */
-                    * (/*1 +*/ (r.confMin + r.confMax)/2f); /* conf */
+                    * (/*1 +*/ (r.confMin + r.confMax) / 2f); /* conf */
 
 
             //maximize confidence, minimize frequency variability, minimize distance to now

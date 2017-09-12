@@ -556,6 +556,10 @@ public enum Op implements $ {
     public static final char STAMP_STARTER = ':';
 
 
+    /** bitvector of non-variable terms which can not be part of a goal term */
+    public static final int NonGoalable = or(IMPL);
+
+
     public final boolean allowsBool;
 
     /**

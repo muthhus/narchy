@@ -3,25 +3,18 @@ package nars.experiment.arkanoid;
 
 import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
-import jcog.learn.ql.HaiQAgent;
 import nars.*;
-import nars.concept.ActionConcept;
-import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
-import nars.experiment.NAgentY;
 import nars.gui.Vis;
-import nars.term.Term;
 import nars.video.BufferedImageBitmap2D;
 import nars.video.CameraSensor;
 import nars.video.Scale;
 import nars.video.SwingBitmap2D;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 
-public class Arkancide extends NAgentY {
+public class Arkancide extends NAgentX {
 
-    static boolean numeric = true;
+    static boolean numeric = false;
     static boolean cam = true;
 
     public final FloatParam ballSpeed = new FloatParam(0.2f, 0.04f, 6f);
@@ -37,7 +30,7 @@ public class Arkancide extends NAgentY {
 
 
     final Arkanoid noid;
-    private final ActionConcept left, right;
+    //private final ActionConcept left, right;
 
     private float prevScore;
 
@@ -67,7 +60,7 @@ public class Arkancide extends NAgentY {
 
             return a;
 
-        }, 25);
+        }, 50);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -87,11 +80,9 @@ public class Arkancide extends NAgentY {
     }
 
 
-
     public Arkancide(NAR nar, boolean cam, boolean numeric) throws Narsese.NarseseException {
-        //super(nar);
-        super(nar, HaiQAgent::new);
-
+        super(nar);
+        //super(nar, HaiQAgent::new);
 
 
         noid = new Arkanoid(true) {
@@ -175,22 +166,27 @@ public class Arkancide extends NAgentY {
 //
 //        });///.resolution(0.1f);
 
-        left = actionToggle($.p("L"), d -> {
-            if (d)
-                noid.paddle.move(-paddleSpeed);
-//                return d;
-//            } else {
-//                return 0;
-//            }
+        Param.DEBUG = true;
+        nar.onTask((t) -> {
+            if (!t.isInput() && (t.isGoal() || t.isEternal())) {
+                System.err.println(t.proof());
+            }
         });
-        right = actionToggle($.p("R"), d -> {
-            if (d)
-                noid.paddle.move(+paddleSpeed);
-//                return d;
-//            } else {
-//                return 0;
-//            }
+
+        actionBipolar($.the("X"), (dx) -> {
+            if (noid.paddle.move(dx * 4 * paddleSpeed))
+                return dx;
+            else
+                return 0;
         });
+//        actionToggle($.p("L"), d -> {
+//            if (d)
+//                noid.paddle.move(-paddleSpeed);
+//        });
+//        actionToggle($.p("R"), d -> {
+//            if (d)
+//                noid.paddle.move(+paddleSpeed);
+//        });
 
         //nar.truthResolution.setValue(0.05f);
 

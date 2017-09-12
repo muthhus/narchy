@@ -50,7 +50,7 @@ public class ConcurrentRTree<T> implements Space<T> {
 
     public ConcurrentRTree(RTree<T> tree, boolean async) {
         this.tree = tree;
-        ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
+        ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
         this.readLock = lock.readLock();
         this.writeLock = lock.writeLock();
         if (async) {

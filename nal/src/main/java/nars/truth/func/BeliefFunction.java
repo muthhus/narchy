@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import static nars.$.t;
+import static nars.truth.TruthFunctions.abduction;
 
 /**
  * http://aleph.sagemath.org/?q=qwssnn
@@ -35,7 +36,7 @@ public enum BeliefFunction implements TruthOperator {
     @AllowOverlap StructuralAbduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
-            return TruthFunctions.abduction(defaultTruth(m), B, minConf);
+            return abduction(defaultTruth(m), B, minConf);
         }
     },
 
@@ -114,7 +115,7 @@ public enum BeliefFunction implements TruthOperator {
     Abduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return TruthFunctions.abduction(T, B, minConf);
+            return abduction(T, B, minConf);
         }
     },
 
@@ -122,10 +123,10 @@ public enum BeliefFunction implements TruthOperator {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             if (B.isNegative()) {
-                Truth x = TruthFunctions.abduction(T, B.neg(), minConf);
+                Truth x = abduction(T, B.neg(), minConf);
                 return x != null ? x.neg() : null;
             } else {
-                return TruthFunctions.abduction(T, B, minConf);
+                return abduction(T, B, minConf);
             }
         }
     },
@@ -333,7 +334,7 @@ public enum BeliefFunction implements TruthOperator {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
             if (B == null) return null;
-            return TruthFunctions.abduction(B, $.t(1f, defaultConfidence(m)), minConf);
+            return abduction(B, $.t(1f, defaultConfidence(m)), minConf);
         }
     },
 

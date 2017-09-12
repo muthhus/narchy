@@ -445,7 +445,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
 //                } else {
 
                 Op xo = x.op();
-                boolean xConst = xo!=NEG && !u.matchType(xo); //exception for NEG
+                boolean xConst = xo!=NEG && !u.matchType(xo); //HACK exception for NEG
                 if (!xConst) {
                     //try to resolve an already assigned and thus resolvable to constant
                     @Nullable Term xx = u.xy(x);

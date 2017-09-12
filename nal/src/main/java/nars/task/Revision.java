@@ -276,7 +276,6 @@ public class Revision {
         assert (bs != ETERNAL);
         Interval bi = new Interval(bs, b.end());
 
-        Interval timeOverlap = ai.intersection(bi);
 
         //            float ae = a.evi();
 //            float aa = ae * (1 + ai.length());
@@ -298,7 +297,8 @@ public class Revision {
         factor *= stampDiscount; if (factor < Prioritized.EPSILON) return null;
 
         float intermvalDistance = dtDiff(a.term(), b.term());
-        factor *= (1f/(1f+intermvalDistance/nar.dur()));  if (factor < Prioritized.EPSILON) return null;
+        int dur = nar.dur();
+        factor *= (1f/(1f+intermvalDistance/ dur));  if (factor < Prioritized.EPSILON) return null;
 
 //            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
 //            float confMax = Util.lerp(temporalOverlap, Math.max(w2c(ae),w2c(be)),  1f);
@@ -328,25 +328,9 @@ public class Revision {
         Interval uu = ai.union(bi);
         long u = uu.length();
         long s = ai.length() + bi.length();
-
-//            Truth startTruth = table.truth(start, now, dur);
-//            if (startTruth == null)
-//                return null;
-//
-//            Truth endTruth = table.truth(end, now, dur);
-//            if (endTruth == null)
-//                return null;
-
-
-//            //the degree to which start truth and endtruth deviate from a horizontal line is the evidence reduction factor
-//            //this is because the resulting task is analogous to the horizontal line the endpoint values deviate from
-//            float diff = Math.abs(startTruth.freq() - endTruth.freq());
-//            if (diff > 0)
-//                factor *= (1f - diff);
-
-
-        if (timeOverlap == null && u > 0) {
-            if (u - s > nar.dur() * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS)
+//        Interval timeOverlap = ai.intersection(bi);
+        /*if (timeOverlap == null && u > 0) */{
+            if (u - s <= dur * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS)
                 factor *= (1f + s) / (1f + u);
         }
 
@@ -419,21 +403,21 @@ public class Revision {
 
 
         long start, end;
-        if (cc.op() == CONJ) {
-            long mid = Util.lerp(aProp, b.mid(), a.mid());
-            long range = cc.op() == CONJ ?
-                    cc.dtRange() :
-                    (Util.lerp(aProp, b.range(), a.range()));
-            start = mid - range / 2;
-            end = start + range;
-        } else {
-            if (timeOverlap == null) {
-                start = end = Util.lerp(aProp, b.mid(), a.mid());
-            } else {
+//        if (cc.op() == CONJ) {
+//            long mid = Util.lerp(aProp, b.mid(), a.mid());
+//            long range = cc.op() == CONJ ?
+//                    cc.dtRange() :
+//                    (Util.lerp(aProp, b.range(), a.range()));
+//            start = mid - range / 2;
+//            end = start + range;
+//        } else {
+//            if (u > s) {
+//                start = end = Util.lerp(aProp, b.mid(), a.mid());
+//            } else {
                 start = uu.a;
                 end = uu.b;
-            }
-        }
+//            }
+//        }
 
 
         NALTask t = new NALTask(cc, a.punc(),

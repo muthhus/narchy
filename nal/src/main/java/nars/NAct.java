@@ -353,10 +353,14 @@ public interface NAct {
      */
     @NotNull
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        Term pt = $.p(s, $.the("\"+\""));
-        Term nt = $.p(s, $.the("\"-\""));
+        Term pt =
+                //$.inh( $.the("\"+\""), s);
+            $.p(s, $.the("\"+\""));
+        Term nt =
+                //$.inh($.the("\"-\""), s);
+            $.p(s, $.the("\"-\""));
 
-        float gg[] = new float[2];
+        final float gg[] = new float[2];
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
             boolean p;
             p = c.term().equals(pt);
@@ -367,18 +371,28 @@ public interface NAct {
             if (!p) {
                 assert(gg[0] == gg[0]); //assert that positive has been set in this cycle
                 float balance = update.valueOf((gg[0] - gg[1]));
+
                 float pp, nn;
                 if (balance > 0) {
                     pp = +balance; //0.5f + (balance/2f);
-                    nn = 0;
+                    nn = 0; //-pp; // 0;
+                    if (pp > 0.5f) {
+                        nn = (pp - 0.5f);
+                        pp = 0.5f;
+                    }
                 } else {
                     nn = -balance; //0.5f + (-balance/2f);
-                    pp = 0;
+                    pp = 0; //-nn; //0;
+                    if (nn > 0.5f) {
+                        pp = (nn - 0.5f);
+                        nn = 0.5f;
+                    }
                 }
                 gg[0] = gg[1] = Float.NaN; //reset for next cycle
-                float conf = nar().confDefault(GOAL);
-                ((GoalActionAsyncConcept)nar().concept(pt)).feedback($.t(pp, conf));
-                ((GoalActionAsyncConcept)nar().concept(nt)).feedback($.t(nn, conf));
+                NAR n = nar();
+                float conf = n.confDefault(GOAL);
+                ((GoalActionAsyncConcept) n.concept(pt)).feedback($.t(pp+0.5f, conf));
+                ((GoalActionAsyncConcept) n.concept(nt)).feedback($.t(nn+0.5f, conf));
             }
         };
 
@@ -386,6 +400,7 @@ public interface NAct {
         GoalActionAsyncConcept n = new GoalActionAsyncConcept(nt, this, u);
         addAction(p);
         addAction(n);
+
         //        return actionUnipolar(s, (f) -> {
 //            if (f != f)
 //                return Float.NaN;

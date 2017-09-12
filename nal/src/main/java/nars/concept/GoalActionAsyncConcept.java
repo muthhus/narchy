@@ -8,6 +8,7 @@ import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 import java.util.function.LongSupplier;
@@ -98,8 +99,8 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
         this.nar = nar;
 
-        long pStart = now;
-        long pEnd = now + dur;
+        long pStart = now - dur/2;
+        long pEnd = now + dur/2;
         LongSupplier stamper = nar.time::nextStamp;
 
         Truth goal = this.goals().truth(pStart, pEnd, nar);
@@ -197,7 +198,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
     }
 
-    public void feedback(Truth f) {
+    public void feedback(@Nullable Truth f) {
         Task fb = feedback.set(term, f, nar.time::nextStamp, nar.time(), nar.dur(), nar);
         nar.input(fb);
     }

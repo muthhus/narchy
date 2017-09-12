@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.PI;
+import static nars.Op.IMPL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
 
@@ -114,9 +115,11 @@ public class Line1D {
             n.goalConfidence(0.5f);
 
             //n.start();
-            n.run(100);
+            n.run(1000);
             n.concepts().collect(Collectors2.toSortedSet()).forEach(x -> {
-                System.out.println(x);
+                if (x.op()==IMPL) {
+                    x.print();
+                }
             });
 
 

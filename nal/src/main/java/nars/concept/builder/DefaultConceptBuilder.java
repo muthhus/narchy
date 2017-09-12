@@ -275,9 +275,14 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                     new DynamicBeliefTable(t, newTemporalBeliefTable(t), dmt, true) :
                     newBeliefTable(t, true);
 
-            BeliefTable goals = dmt != null ?
-                    new DynamicBeliefTable(t, newTemporalBeliefTable(t), dmt, true) :
-                    newBeliefTable(t, false);
+            BeliefTable goals;
+            if (goalable(t)) {
+                goals = dmt != null ?
+                        new DynamicBeliefTable(t, newTemporalBeliefTable(t), dmt, true) :
+                        newBeliefTable(t, false);
+            } else {
+                goals = BeliefTable.Empty;
+            }
 
             return new DynamicConcept(t, beliefs, goals, nar);
         } else {
@@ -291,12 +296,16 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         //return new HijackTemporalBeliefTable(tCap);
         //return new RTreeBeliefTable(tCap);
         Op o = c.op();
-        if (beliefOrGoal && o.beliefable || !beliefOrGoal && o.goalable) {
+        if ((beliefOrGoal && o.beliefable) || (!beliefOrGoal && goalable(c))) {
             DefaultBeliefTable b = new DefaultBeliefTable(newTemporalBeliefTable(c));
             return b;
         }
 
         return BeliefTable.Empty;
+    }
+
+    static boolean goalable(Term c) {
+        return !c.hasAny(Op.NonGoalable) && c.op().goalable;
     }
 
     @Override
@@ -401,7 +410,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             super(merge, 3);
         }
 
-        @Override protected Random random() {
+        @Override
+        protected Random random() {
             return nar.random();
         }
     }

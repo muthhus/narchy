@@ -46,7 +46,7 @@ public class BeliefActionConcept extends ActionConcept {
     public Stream<Task> update(long now, int dur, NAR nar) {
 
         long nowStart = now;
-        long nowEnd = now;
+        long nowEnd = now + dur;
 
         Truth belief;
         if (nar.random().nextFloat() < curiosity) {

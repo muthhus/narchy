@@ -84,14 +84,14 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
         Task x = sensor.update(nar, time, dur);
 
-//        if (x != null) {
-//            feedback(x, beliefs(), time, nar);
-//        }
+        if (x != null) {
+            feedback(x, false, beliefs(), time, nar);
+        }
 
         return x;
     }
 
-    public static void feedback(Task x, @NotNull BeliefTable beliefs, long time, NAR nar) {
+    public static void feedback(Task x, boolean deleteIfIncorrect, @NotNull BeliefTable beliefs, long time, NAR nar) {
         float xFreq = x.freq();
         float xConf = x.conf();
 
@@ -108,7 +108,9 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
             if (y instanceof SignalTask)
                 return; //ignore previous signaltask
 
-            float coherence = 1f - TruthFunctions.freqSimilarity(xFreq, y.freq());
+            float coherence = 1f -
+                    Math.abs(xFreq - y.freq());
+                    //TruthFunctions.freqSimilarity(xFreq, y.freq());
 
             float confidence = y.conf() / xConf; //allow > 1
 
@@ -122,7 +124,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
                 //punish
                 v = factor * confidence * (1f - coherence);
                 nar.emotion.value(Cause.Purpose.Inaccurate, cc, v);
-                y.delete();
+                if (deleteIfIncorrect)
+                    y.delete();
             }
 
         });
