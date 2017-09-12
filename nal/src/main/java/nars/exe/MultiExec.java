@@ -1,15 +1,16 @@
 package nars.exe;
 
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.Loop;
 import jcog.Util;
 import jcog.event.On;
 import nars.NAR;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
 
@@ -22,29 +23,85 @@ public class MultiExec extends Exec {
 
     private static final long LAG_REPORT_THRESH_ms = 0;
 
-    //private ForkJoinTask lastCycle;
-    private final ForkJoinPool passive;
-    private final Worker[] workers;
+    private final Passive passive;
+    private final Worker[] active;
+
+    //private final ForkJoinPool passive;
+
+    /**
+     * https://github.com/conversant/disruptor/wiki
+     */
+    static class Passive implements Executor {
+
+        public static final Logger logger = LoggerFactory.getLogger(Passive.class);
+
+        private final BlockingQueue<Runnable> q;
+        private final ExecutorService calcThreads;
+
+        public Passive(int nThreads, int queueSize) {
+            q = new DisruptorBlockingQueue<>(queueSize);
+
+            calcThreads = Executors.newFixedThreadPool(nThreads);
+            for (int i = 0; i < nThreads; i++) {
+                calcThreads.execute(() -> {
+                    int idle = 0;
+                    while (true) {
+                        //try {
+                            Runnable r = q.poll(); //100L, TimeUnit.MILLISECONDS);
+                            if (r != null) {
+                                idle = 0;
+                                work(r);
+                            } else {
+                                Util.pauseNext(idle++);
+                            }
+//                        } catch (InterruptedException e) {
+//                            Thread.yield();
+//                        }
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void execute(@NotNull Runnable command) {
+            try {
+                q.put(command);
+            } catch (InterruptedException e) {
+                logger.error("{} {}", command, e);
+            }
+        }
+
+        void work(Runnable r) {
+            try {
+                r.run();
+            } catch (Throwable t) {
+                logger.error("{} {}", r, t);
+            }
+        }
+    }
+
+    //private final Worker[] workers;
     private final int num;
     private On onCycle;
 
 
-    public MultiExec(IntFunction<Worker> workers, int numWorkers, int passive) {
+    public MultiExec(IntFunction<Worker> active, int numWorkers, int passive) {
         this(
-                Util.map(0, numWorkers, workers, Worker[]::new),
-                new ForkJoinPool(passive, defaultForkJoinWorkerThreadFactory,
-                        null, true /* async */)
+                Util.map(0, numWorkers, active, Worker[]::new),
+                passive
+                //new ForkJoinPool(passive, defaultForkJoinWorkerThreadFactory,
+                       // null, true /* async */)
         );
     }
 
-    public MultiExec(Worker[] workers, ForkJoinPool passive) {
-        this.num = workers.length;
+    public MultiExec(Worker[] active, int passiveThreads) {
+        this.num = active.length;
         assert (num > 0);
-        this.workers = workers;
-        this.passive = passive;
+        this.active = active;
+        this.passive = new Passive(passiveThreads, 512);
         //this.working = Executors.newFixedThreadPool(num);
 
-        for (Worker s : workers) {
+        for (Worker s : active) {
             s.passive = passive;
         }
     }
@@ -53,7 +110,7 @@ public class MultiExec extends Exec {
     public synchronized void start(NAR nar) {
         super.start(nar);
 
-        for (Worker w : workers) {
+        for (Worker w : active) {
             w.start(nar, 0);
         }
 
@@ -69,7 +126,7 @@ public class MultiExec extends Exec {
     @Override
     public void add(@NotNull ITask x) {
         int sub = worker(x);
-        workers[sub].add(x);
+        active[sub].add(x);
     }
 
     public int worker(@NotNull ITask x) {
@@ -86,7 +143,7 @@ public class MultiExec extends Exec {
     @Override
     public synchronized void stop() {
 
-        for (Worker w : workers)
+        for (Worker w : active)
             w.stop();
 
         super.stop();
@@ -97,11 +154,14 @@ public class MultiExec extends Exec {
     }
 
 
-
     public void cycle() {
-        while (!passive.awaitQuiescence(10, TimeUnit.MILLISECONDS) ) {
-            Thread.yield();
+        Runnable r;
+        while ((r = passive.q.poll()) != null) {
+            passive.work(r);
         }
+//        while (!passive.awaitQuiescence(10, TimeUnit.MILLISECONDS)) {
+//            Thread.yield();
+//        }
     }
 
 //            int waitCycles = 0;
@@ -152,7 +212,7 @@ public class MultiExec extends Exec {
 
     @Override
     public Stream<ITask> stream() {
-        return Stream.of(workers).flatMap(Worker::stream);
+        return Stream.of(active).flatMap(Worker::stream);
     }
 
     public static class Worker extends Exec {
@@ -175,7 +235,7 @@ public class MultiExec extends Exec {
                 @Override
                 public boolean next() {
                     //System.out.println(Thread.currentThread() + " " + model);
-                    ((Runnable)model).run(); //HACK
+                    ((Runnable) model).run(); //HACK
                     return true;
                 }
             };

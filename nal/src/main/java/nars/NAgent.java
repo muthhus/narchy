@@ -438,7 +438,10 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         this.now = nar.time();
 
-        eventFrame.emit(this);
+//        if (nar.exe.concurrent())
+//            eventFrame.emitAsync(this, nar.exe); //not safe for use with some features, ex: bipolar currently demands a specific ordering sequence for processing its two concpets
+//        else
+            eventFrame.emit(this);
 
 
         if (trace)

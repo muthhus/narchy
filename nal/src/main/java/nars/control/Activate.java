@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.function.Consumer;
 
-import static java.util.Collections.emptyList;
 import static nars.Op.INT;
 
 /**
@@ -40,7 +39,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //        if (n.exe.concurrent()) {
 //            n.exe.execute(() -> activate(t, activationApplied, n, true));
 //        } else {
-            activate(t, activationApplied, n, true);
+        activate(t, activationApplied, n, true);
 //        }
     }
 
@@ -64,9 +63,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         if (process) {
 //            if (n.exe.concurrent())
-//                n.eventTaskProcess.emitAsync(/*post*/t, n.exe);
+//                n.eventTask.emitAsync(/*post*/t, n.exe);
 //            else
-            n.eventTask.emit(t);
+                n.eventTask.emit(t);
         }
         //}
     }
@@ -85,7 +84,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 new PLinkUntilDeleted<>(t, activation)
                 //new PLink<>(t, activation)
         );
-
 
 
 //            if (origin instanceof CompoundConcept) {
@@ -204,7 +202,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
             activateSubterms(tasklink, localSubConcepts,
                     1f
-                        /*decayed*/);
+                    /*decayed*/);
 
 
             for (int j = 0; j < termlSize; j++) {
@@ -330,7 +328,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             //case VAR_DEP:
             //case VAR_INDEP:
             //case VAR_QUERY:
-              //  break; //OK
+            //  break; //OK
             default:
                 if (!o.conceptualizable)
                     return;
@@ -341,7 +339,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         if (b.size() == 0)
             return;
-
 
 
         if (--layersRemain <= 0) // || !b.op().conceptualizable || b.isAny(VAR_QUERY.bit | VAR_PATTERN.bit))
