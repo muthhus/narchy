@@ -20,6 +20,8 @@ import java.util.function.IntPredicate;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
+import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Created by me on 9/30/16.
@@ -89,8 +91,8 @@ public interface NAct {
      * push-buttons like keyboard keys. by default with no desire the state is off.   the off procedure will not be called immediately.
      */
     @Nullable
-    default GoalActionConcept actionTriState(@NotNull Term s, @NotNull IntConsumer i) {
-        return actionTriState(s, (v) -> {
+    default void actionTriState(@NotNull Term s, @NotNull IntConsumer i) {
+        actionTriState(s, (v) -> {
             i.accept(v);
             return true;
         });
@@ -101,25 +103,22 @@ public interface NAct {
      * initial state is neutral.
      */
     @Nullable
-    default GoalActionConcept actionTriState(@NotNull Term cc, @NotNull IntPredicate i) {
+    default void actionTriState(@NotNull Term cc, @NotNull IntPredicate i) {
         //final int[] state = {0};
-        GoalActionConcept m = new GoalActionConcept(cc, this, (b, d) -> {
+        //new GoalActionConcept(cc, this, (b, d) -> {
+        actionBipolar(cc, (float f) -> {
+
+            f = f / 2f + 0.5f;
+
             //radius of center dead zone; diameter = 2x this
-
-
+            float deadZoneFreqRadius = 1f / 6;
             int s;
-            if (d == null) {
+            if (f > 0.5f + deadZoneFreqRadius)
+                s = +1;
+            else if (f < 0.5f - deadZoneFreqRadius)
+                s = -1;
+            else
                 s = 0;
-            } else {
-                float f = d.freq();
-                float deadZoneFreqRadius = 1f / 6;
-                if (f > 0.5f + deadZoneFreqRadius)
-                    s = +1;
-                else if (f < 0.5f - deadZoneFreqRadius)
-                    s = -1;
-                else
-                    s = 0;
-            }
 
             if (i.test(s)) {
 
@@ -127,28 +126,23 @@ public interface NAct {
                 //            state[0] = Math.min(Math.max(curState + deltaState, -1), +1);
                 //
                 //            //float f = curState != state[0] ? (deltaState > 0 ? 1f : 0f) : 0.5f /* had no effect */;
-                float f;
                 switch (s) { //state[0]) {
                     case -1:
-                        f = 0f;
-                        break;
+                        return -1f;
                     case 0:
-                        f = 0.5f;
-                        break;
+                        return 0f;
                     case +1:
-                        f = 1f;
-                        break;
+                        return +1f;
                     default:
                         throw new RuntimeException();
                 }
 
-                return $.t(f, nar().confDefault(BELIEF));
             }
 
-            return b;
+            return Float.NaN;
         });
         //m.resolution(1f);
-        return addAction(m);
+        //return addAction(m);
     }
 
     default <A extends ActionConcept> A addAction(A c) {
@@ -342,16 +336,295 @@ public interface NAct {
     default GoalActionConcept action(@NotNull Term s, @NotNull GoalActionConcept.MotorFunction update) {
         return addAction(new GoalActionConcept(s, this, update));
     }
-
-    /**
-     * the supplied value will be in the range -1..+1. if the predicate returns false, then
-     * it will not allow feedback through. this can be used for situations where the action
-     * hits a limit or boundary that it did not pass through.
-     * <p>
-     * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
-     */
-    @NotNull
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+        actionBipolarGreedy(s, update);
+        //actionBipolarMutex3(s, update);
+    }
+
+    default void actionBipolarGreedy(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+        Term pt =
+                //$.inh( $.the("\"+\""), s);
+                $.p(s, $.the("\"+\""));
+        Term nt =
+                //$.inh($.the("\"-\""), s);
+                $.p(s, $.the("\"-\""));
+
+        final float ff[] = new float[2];
+        final float cc[] = new float[2];
+        @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
+
+            boolean p = c.term().equals(pt);
+            float f0, c0;
+
+            NAR n = nar();
+
+            float minConf =
+                    //n.confMin.floatValue();
+                     n.confDefault(GOAL) * 0.25f;
+                     //n.confDefault(BELIEF);
+
+            float cur = curiosity().floatValue();
+            if (cur > 0 && n.random().nextFloat() <= cur) {
+                f0 = 0.5f + 0.5f * n.random().nextFloat();
+                c0 = minConf;
+
+            } else {
+                f0 = g != null ? g.freq() : 0f;
+                if (f0 < 0.5f)
+                    f0 = 0f;
+                c0 = g != null ? g.conf() : minConf;
+            }
+
+
+
+            int ip = p ? 0 : 1;
+            ff[ip] = f0;
+            cc[ip] = c0;
+
+            float conf = Util.mean(cc[0], cc[1]);
+
+            if (!p) {
+
+                if (!Util.equals(cc[0], cc[1], Param.TRUTH_EPSILON)) {
+                    int winner = cc[0] > cc[1] ? 0 : 1;
+
+                    float x = (ff[winner] - 0.5f)*2f; //skip negative half, expand to full range
+                    float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
+                    @Nullable Truth w = y==y ? $.t(
+                            (winner == 0 ? y : -y) / 2f + 0.5f, //un-map to unipolar frequency range
+                            conf) : null;
+                    Truth l = $.t(0, conf);
+                    if (w == null) {
+                        w = l;
+                    }
+                    ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w);
+                    ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l);
+                } else {
+                    ((GoalActionAsyncConcept) n.concept(pt)).feedback($.t(0, conf) /*null*/);
+                    ((GoalActionAsyncConcept) n.concept(nt)).feedback($.t(0, conf) /*null*/);
+                }
+            }
+        };
+
+        GoalActionAsyncConcept p = new GoalActionAsyncConcept(pt, this, u);
+        GoalActionAsyncConcept n = new GoalActionAsyncConcept(nt, this, u);
+
+        addAction(p);
+        addAction(n);
+
+        float cm =
+                //0.01f;
+                2 * nar().confMin.floatValue(); //HACK wont change if the parameter changes during runtime
+        nar().believe(p.term(), 0f, cm);
+        nar().believe(n.term(), 0f, cm);
+        nar().goal(p.term(), 0f, cm);
+        nar().goal(n.term(), 0f, cm);
+
+    }
+
+    default void actionBipolarMutex3(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+        Term pt =
+                //$.inh( $.the("\"+\""), s);
+                $.p(s, $.the("\"+\""));
+        Term nt =
+                //$.inh($.the("\"-\""), s);
+                $.p(s, $.the("\"-\""));
+
+        final float ff[] = new float[2];
+        final float cc[] = new float[2];
+        @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
+
+            boolean p = c.term().equals(pt);
+            float f0, c0;
+
+            NAR n = nar();
+
+            float cur = curiosity().floatValue();
+            if (cur > 0 && n.random().nextFloat() <= cur) {
+                f0 = n.random().nextFloat();
+                c0 = n.confDefault(BELIEF);
+            } else {
+                f0 = g != null ? g.freq() : 0f;
+                c0 = g != null ? g.conf() : n.confMin.floatValue();
+            }
+
+//            if (f0 < 0.5f)
+//                f0 = 0f;
+
+            int ip = p ? 0 : 1;
+            ff[ip] = f0;
+            cc[ip] = c0;
+
+            if (!p) {
+
+                float e0 = c2w(cc[0]);
+                float e1 = c2w(cc[1]);
+                float x =
+                        Util.clamp((ff[0] - ff[1]), -1, +1);
+                //Util.clamp((ff[0] * e0 - ff[1] * e1)/(e0+e1), -1, +1);
+
+                float y = update.valueOf(x);
+                if (y == y) {
+
+                    float momentum = 1f;
+
+                    Truth r;
+                    r = $.t(y / 2f + 0.5f, w2c(momentum * (e0 + e1)));
+
+
+                    ((GoalActionAsyncConcept) n.concept(pt)).feedback(r);
+                    ((GoalActionAsyncConcept) n.concept(nt)).feedback(r.neg());
+                } else {
+                    ((GoalActionAsyncConcept) n.concept(pt)).feedback(null);
+                    ((GoalActionAsyncConcept) n.concept(nt)).feedback(null);
+                }
+            }
+
+        };
+
+        GoalActionAsyncConcept p = new GoalActionAsyncConcept(pt, this, u);
+        GoalActionAsyncConcept n = new GoalActionAsyncConcept(nt, this, u);
+
+        addAction(p);
+        addAction(n);
+
+        float cm =
+                //0.01f;
+                2 * nar().confMin.floatValue(); //HACK wont change if the parameter changes during runtime
+        nar().believe(p.term(), 0f, cm);
+        nar().believe(n.term(), 0f, cm);
+        nar().goal(p.term(), 0f, cm);
+        nar().goal(n.term(), 0f, cm);
+
+    }
+
+    default void actionBipolarMutex2(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+        Term pt =
+                //$.inh( $.the("\"+\""), s);
+                $.p(s, $.the("\"+\""));
+        Term nt =
+                //$.inh($.the("\"-\""), s);
+                $.p(s, $.the("\"-\""));
+
+        final float ff[] = new float[2];
+        @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
+            boolean p;
+            p = c.term().equals(pt);
+            float gf = g != null ?
+                    (g.expectation() - 0.5f) * 2f : 0f
+                    //(g.freq() - 0.5f) * 2f : 0f
+                    //g.freq() : 0f
+                    //(g.freq() > 0.5f ? (g.freq() - 0.5f)*2f : 0f) : 0f
+                    ;
+
+            NAR n = nar();
+
+            float cur = curiosity().floatValue();
+            if (cur > 0 && n.random().nextFloat() <= cur) {
+                gf = n.random().nextFloat();
+            }
+
+            ff[p ? 0 : 1] = gf;
+
+
+            if (!p) {
+                assert (ff[0] == ff[0]); //assert that positive has been set in this cycle
+
+                float dx =
+                        Math.abs(ff[0]) + Math.abs(ff[1]);
+                //(float) Math.sqrt(ff[0] * (1f-ff[1]));
+                float x;
+                if (Util.equals(0, dx, Param.TRUTH_EPSILON)) {
+                    x = ff[0] > ff[1] ? 1f : 0f;
+                } else {
+                    x = (((ff[0]) / dx) - 0.5f) * 2f;
+                    x = Util.clamp(x, -1, +1);
+                }
+
+                float y = update.valueOf(x);
+                if (y != y)
+                    y = 0;
+                else {
+//                    float momentum = 0.5f;
+//                    y *= momentum;
+                }
+
+//                //y = Util.clamp(y, -1f/2, +1f/2);
+//
+//                float pp, nn;
+//                if (y > 0) {
+//                    pp = +y; //0.5f + (balance/2f);
+//                    nn = 1f-pp; //-pp; // 0;
+////                    if (pp > 0.5f) {
+////                        nn = -(pp - 0.5f);
+////                        pp = 0.5f;
+////                    }
+//                } else {
+//                    nn = -y; //0.5f + (-balance/2f);
+//                    pp = 1f-nn; //-nn; //0;
+////                    if (nn > 0.5f) {
+////                        pp = -(nn - 0.5f);
+////                        nn = 0.5f;
+////                    }
+//                }
+//
+////                pp = Util.clamp(pp, -0.5f, +0.5f) + 0.5f;
+////                nn = Util.clamp(nn, -0.5f, +0.5f) + 0.5f;
+//
+//                pp = Util.clamp(pp, 0f, +1);
+//                //if (pp < Param.TRUTH_EPSILON) pp = 0; else pp = pp/2f + 0.5f;
+//                nn = Util.clamp(nn, 0f, +1);
+//                //if (nn < Param.TRUTH_EPSILON) nn = 0; else nn = nn/2f + 0.5f;
+
+
+                float pp, nn;
+                if (y > 0) {
+                    pp = y / 2f + 0.5f;
+                    nn = 1f - pp;
+                } else {
+                    nn = -y / 2f + 0.5f;
+                    pp = 1f - nn;
+                }
+                //float sf = Util.equals(x, 0f, Param.TRUTH_EPSILON) ? 0f : (y/x);
+//                float pp = ff[0] * sf;
+//                float nn = ff[1] * sf;
+                ff[0] = ff[1] = Float.NaN; //reset for next cycle
+                float conf =
+                        //(cc[0] + cc[1])/2f;
+                        n.confDefault(GOAL);
+                //if (conf >= n.confMin.floatValue()) {
+                ((GoalActionAsyncConcept) n.concept(pt)).feedback($.t(pp, conf));
+                ((GoalActionAsyncConcept) n.concept(nt)).feedback($.t(nn, conf));
+                //}
+            }
+        };
+
+        GoalActionAsyncConcept p = new GoalActionAsyncConcept(pt, this, u);
+        GoalActionAsyncConcept n = new GoalActionAsyncConcept(nt, this, u);
+        addAction(p);
+        addAction(n);
+
+        //        return actionUnipolar(s, (f) -> {
+//            if (f != f)
+//                return Float.NaN;
+//            else {
+//                float y = (f - 0.5f) * 2f;
+//                return (update.valueOf(y) / 2) + 0.5f;
+//            }
+//        });
+
+//        addAction(new BeliefActionConcept(s, nar(), (t) -> {
+//            float f;
+//            if (t == null)
+//                f = 0f;
+//            else
+//                f = (t.freq()-0.5f)*2f;
+//            update.valueOf( f );
+//        }));
+    }
+
+
+    default void actionBipolarMutex(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         Term pt =
                 //$.inh( $.the("\"+\""), s);
                 $.p(s, $.the("\"+\""));
@@ -367,8 +640,8 @@ public interface NAct {
             ff[p ? 0 : 1] = g != null ?
                     //(g.expectation() - 0.5f)*2f: 0f
                     //(g.freq() - 0.5f) * 2f : 0f
-                    //g.freq() : 0f
-                    (g.freq() > 0.5f ? (g.freq() - 0.5f)*2f : 0f) : 0f
+                    g.freq() : 0f
+            //(g.freq() > 0.5f ? (g.freq() - 0.5f)*2f : 0f) : 0f
             ;
 
             NAR n = nar();
@@ -385,7 +658,8 @@ public interface NAct {
                 if (cur > 0 && n.random().nextFloat() <= cur) {
                     //x = Util.clamp(x + (n.random().nextFloat())*4f - 2f, -1f, +1f);
                     //x = n.random().nextFloat() * 2f - 1f;
-                    x = (n.random().nextBoolean() ? +1 : -1f) * (0.5f + Util.clamp((float) Math.abs(n.random().nextGaussian()), 0f, 0.5f));
+                    x = Util.clamp((float) n.random().nextGaussian(), -1f, +1f);
+                    //x = (n.random().nextBoolean() ? +1 : -1f) * (0.5f + Util.clamp((float) Math.abs(n.random().nextGaussian()), 0f, 0.5f));
                 } else {
                     x = (ff[0] - ff[1]);
 
@@ -403,11 +677,11 @@ public interface NAct {
 
 
                 float y = update.valueOf(x);
-                if (y!=y)
+                if (y != y)
                     y = 0;
                 else {
-                    float momentum = 0.5f;
-                    y *= momentum;
+//                    float momentum = 0.5f;
+//                    y *= momentum;
                 }
 
                 //y = Util.clamp(y, -1f/2, +1f/2);
@@ -433,9 +707,11 @@ public interface NAct {
 //                nn = Util.clamp(nn, -0.5f, +0.5f) + 0.5f;
 
                 pp = Util.clamp(pp, 0f, +1);
-                if (pp < Param.TRUTH_EPSILON) pp = 0; else pp = pp/2f + 0.5f;
+                if (pp < Param.TRUTH_EPSILON) pp = 0;
+                else pp = pp / 2f + 0.5f;
                 nn = Util.clamp(nn, 0f, +1);
-                if (nn < Param.TRUTH_EPSILON) nn = 0; else nn = nn/2f + 0.5f;
+                if (nn < Param.TRUTH_EPSILON) nn = 0;
+                else nn = nn / 2f + 0.5f;
 
                 ff[0] = ff[1] = Float.NaN; //reset for next cycle
                 float conf =

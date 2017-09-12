@@ -113,11 +113,11 @@ public class Line1DSimplest extends NAgent {
 
         actionBipolar($.the("y"), v -> {
             if (v == v) {
-//                o.setValue(
-//                        Util.unitize(o.floatValue() + v * speed.floatValue())
-//                );
+                o.setValue(
+                        Util.unitize(o.floatValue() + v * speed.floatValue())
+                );
 
-                o.setValue( (v/2f)+0.5f );
+//                o.setValue( (v/2f)+0.5f );
 
             }
 

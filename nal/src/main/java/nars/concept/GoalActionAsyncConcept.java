@@ -1,7 +1,5 @@
 package nars.concept;
 
-import jcog.Util;
-import jcog.data.FloatParam;
 import nars.*;
 import nars.task.SignalTask;
 import nars.term.Term;
@@ -11,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
-import java.util.function.LongSupplier;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
@@ -24,9 +21,7 @@ import static nars.Op.GOAL;
 public class GoalActionAsyncConcept extends ActionConcept {
 
 
-
-    public final Signal feedback;
-
+    public final Signal feedBelief, feedGoal;
 
 
     @NotNull
@@ -45,9 +40,10 @@ public class GoalActionAsyncConcept extends ActionConcept {
 //        this.action = new Signal(GOAL, n.truthResolution).pri(() -> n.priDefault(GOAL));
         //((SensorBeliefTable) goals).sensor = action;
 
-        this.feedback = new Signal(BELIEF, resolution).pri(() -> n.priDefault(BELIEF));
+        this.feedBelief = new Signal(BELIEF, resolution).pri(() -> n.priDefault(BELIEF));
         //((SensorBeliefTable) beliefs).sensor = feedback;
 
+        this.feedGoal = new Signal(GOAL, resolution).pri(() -> n.priDefault(GOAL));
 
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create
@@ -195,7 +191,13 @@ public class GoalActionAsyncConcept extends ActionConcept {
     }
 
     public void feedback(@Nullable Truth f) {
-        Task fb = feedback.set(term, f, nar.time::nextStamp, nar.time(), nar.dur(), nar);
+        long now = nar.time();
+        int dur = nar.dur();
+
+        Task fg = feedGoal.set(term, f, nar.time::nextStamp, now - dur, dur, nar);
+        nar.input(fg);
+
+        Task fb = feedBelief.set(term, f, nar.time::nextStamp, now, dur, nar);
         nar.input(fb);
     }
 

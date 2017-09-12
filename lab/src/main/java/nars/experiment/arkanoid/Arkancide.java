@@ -177,7 +177,7 @@ public class Arkancide extends NAgentX {
             if (noid.paddle.move(dx * paddleSpeed))
                 return dx;
             else
-                return 0;
+                return Float.NaN;
         });
 //        actionToggle($.p("L"), d -> {
 //            if (d)

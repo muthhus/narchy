@@ -158,7 +158,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 //                    taskStart = now;
 
                 //if (taskStart != ETERNAL) {
-                if (taskStart != ETERNAL && occ[0] < taskStart) {
+                if (occ[0]!=ETERNAL && taskStart != ETERNAL && occ[0] < taskStart) {
 
                     long taskDur = occ[1] - occ[0];
                     occ[0] = taskStart;

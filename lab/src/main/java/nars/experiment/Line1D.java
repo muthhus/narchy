@@ -41,6 +41,7 @@ public class Line1D {
 //                        new TaskExecutor(256, 0.5f)
 //                );
 //
+            Param.DEBUG = true;
             NAR n = NARS.threadSafe();
 
             //new STMTemporalLinkage(n, 2, false);
@@ -109,10 +110,10 @@ public class Line1D {
             };
             exp.floatValueOf(n);
             exp.agent.durations.setValue(2);
-            n.termVolumeMax.set(10);
+            n.termVolumeMax.set(16);
             n.time.dur(4);
-            n.beliefConfidence(0.5f);
-            n.goalConfidence(0.5f);
+//            n.beliefConfidence(0.5f);
+//            n.goalConfidence(0.5f);
 
             //n.start();
             n.run(100000);

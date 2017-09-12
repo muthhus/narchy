@@ -23,8 +23,8 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
-    float fwdSpeed = 1f;
-    float rotSpeed = 0.2f;
+    float fwdSpeed = 10f;
+    float rotSpeed = 0.4f;
 
     public static void main(String[] args) {
 
@@ -63,22 +63,23 @@ public class FZero extends NAgentX {
 //                .resolution(0.05f);
 
 
-        actionUnipolar(p("fwd"), (f) -> {
+        actionBipolar(the("fwd"), (f) -> {
             //if (f > 0) {
             //accelerator
             //if (f > 0.5f)
-                fz.vehicleMetrics[0][6] += (f) * (fwdSpeed - 0.5f);
+            if (f > 0)
+                fz.vehicleMetrics[0][6] = /*+=*/ (f) * (fwdSpeed);
+            else
+                fz.vehicleMetrics[0][6] *= 1 - (-f);
 //            else {
 //                float brake = 0.5f - f;
 //                fz.vehicleMetrics[0][6] *= (1f - brake);
 //            }
             return f;
         });//.resolution.setValue(0.02f);
-        //throttle stabilizer (eternal goal)
-        nar.goal(p("fwd"), 0f, 0.01f);
 
         actionBipolar($.the("x"), (x) -> {
-            fz.playerAngle += (x) * rotSpeed;
+            fz.playerAngle += (x) * Math.pow(rotSpeed, 3);
             return x;
         });
 //        actionUnipolar(p("left"), (r) -> {
@@ -93,10 +94,9 @@ public class FZero extends NAgentX {
 //        });//.resolution.setValue(0.01f);
 
 
-
         //yaw stabilizer (eternal goal)
-//        nar.goal(p($.the("x"),$.the("\"+\"")), 0f, 0.01f);
-//        nar.goal(p($.the("x"),$.the("\"-\"")), 0f, 0.01f);
+        nar.goal(p($.the("x"), $.the("\"+\"")), 0.5f, 0.1f);
+        nar.goal(p($.the("x"), $.the("\"-\"")), 0.5f, 0.1f);
 
         //keyboard-ish controls:
 //actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );
