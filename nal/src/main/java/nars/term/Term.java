@@ -186,11 +186,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
     @Nullable
     default Term transform(Compound parent, @NotNull CompoundTransform t) {
-//        if (size() > 0) {
-//            return transform(t); //recurse
-//        } else {
-            return t.apply(parent, this);
-  //      }
+        return t.apply(parent, this);
     }
 
     @Nullable

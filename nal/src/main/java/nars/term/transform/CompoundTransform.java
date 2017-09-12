@@ -23,7 +23,7 @@ import static nars.Op.VAR_QUERY;
         return subterm;
     };
 
-    @Nullable Term apply(@Nullable Compound parent, @NotNull Term subterm);
+    @Nullable Term apply(@Nullable Compound parent, Term subterm);
 
     /** enable predicate determined by the superterm, tested before processing any subterms */
     default boolean testSuperTerm(@NotNull Compound c) {

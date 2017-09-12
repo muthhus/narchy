@@ -829,7 +829,8 @@ public interface Compound extends Term, IPair, TermContainer {
 
             Term x = srcSubs.sub(i);
             Term y = x.transform(this, t);
-            y = t.apply(null, y);
+//            if (y==x)
+//                y = t.apply(null, y);
 
             if (Term.invalidBoolSubterm(y, boolFilter)) {
                 return null;
@@ -839,7 +840,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 EllipsisMatch xx = (EllipsisMatch) y;
                 int xxs = xx.size();
                 for (int j = 0; j < xxs; j++) {
-                    @Nullable Term k = t.apply(null, xx.sub(j)); //.transform(this, t);
+                    @Nullable Term k = xx.sub(j).transform(this, t);
                     if (Term.invalidBoolSubterm(k, boolFilter)) {
                         return null;
                     } else {
@@ -880,8 +881,12 @@ public interface Compound extends Term, IPair, TermContainer {
         }
     }
     @Nullable
-    default Term transform(Compound parent, @NotNull CompoundTransform t) {
-        return transform(t);
+    default Term transform(Compound parent, CompoundTransform t) {
+        Term x = transform(t);
+        if (x == null)
+            return null;
+
+        return t.apply(null, x);
         //return t.apply(parent, this); //transform(dt(), t); //recurse
     }
 

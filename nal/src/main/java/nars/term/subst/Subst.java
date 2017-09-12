@@ -42,7 +42,7 @@ public interface Subst extends CompoundTransform {
     void clear();
 
     @Override
-    default @Nullable Term apply(@Nullable Compound parent, @NotNull Term x) {
+    default @Nullable Term apply(@Nullable Compound parent, Term x) {
         if (x instanceof Bool || x instanceof Intlike)//assert (!(x instanceof Bool));
             return x;
 
@@ -50,7 +50,7 @@ public interface Subst extends CompoundTransform {
         if (y != null) {
             return y; //an assigned substitution, whether a variable or other type of term
         } else {
-            return x;//.transform(this); //recurse
+            return x;
         }
     }
 

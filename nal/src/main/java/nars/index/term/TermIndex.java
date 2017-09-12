@@ -197,7 +197,7 @@ public abstract class TermIndex implements TermContext {
     @Nullable public static Term retemporalize(@NotNull Term x, Retemporalize r) {
 
         Term y = x.transform(r.dt(x), r);
-        return y.normalize();
+        return y!=null ? y.normalize() :  null;
 
 //        if (x.size() == 0)
 //            return x;
