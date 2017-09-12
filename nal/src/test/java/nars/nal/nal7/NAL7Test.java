@@ -169,12 +169,19 @@ public class NAL7Test extends AbstractNALTest {
                   $.50 (c). 5 %1.0;.90% {5: 3}
          */
         test
-                .log()
                 .inputAt(1, "(a). :|:") //try to ignore this
                 .inputAt(2, "(b). :|:")
                 .inputAt(5, "(c). :|:")
                 .mustBelieve(cycles, "((b) &&+3 (c))", 1.00f, 0.81f, 2, 5)
                 .mustNotOutput(cycles, "(c)", BELIEF, 7)
+        ;
+    }
+    @Test
+    public void testDropAnyEventSimple2() {
+        test
+            .inputAt(1, "((happy &&+4120 (i)) &&+1232 (--,(i)))! :|:")
+            .mustGoal(cycles, "(happy &&+4120 (i))", 1f, 0.81f, 1, 4121)
+            .mustNotOutput(cycles, "((i)&&happy)", GOAL, 1)
         ;
     }
 

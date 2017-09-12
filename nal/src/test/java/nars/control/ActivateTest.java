@@ -1,6 +1,7 @@
 package nars.control;
 
 import jcog.pri.PLink;
+import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
@@ -43,10 +44,11 @@ public class ActivateTest {
         HashBag<String> premiseHits = new HashBag();
         Activate cf = new Activate(c, 1f);
 
+        Term A = $.the("a");
         for (int i = 0; i < 500; i++) {
             cf.run(nar).forEach(p -> {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
-                if (p.termLink instanceof Atom)
+                if (p.termLink instanceof Atom || !A.equals(p.termLink.sub(0)))
                     return ; //ignore
                 String tls = p.termLink.toString();
 
@@ -141,6 +143,15 @@ public class ActivateTest {
         testTemplates("(&&,<#x --> lock>,(<$y --> key> ==> open($y,#x)))",
                 "[(($1-->key) &&+- (#2-->lock)), ((($1-->key) &&+- (#2-->lock)) ==>+- open($1,#2)), (#2-->lock), ($1,#2), key, open($1,#2), open, ($1-->key), lock]");
 
+    }
+
+    @Test public void testTemplateDiffRaw() throws Narsese.NarseseException {
+        testTemplates("(x-y)",
+                "[(x-y), y, x]");
+    }
+    @Test public void testTemplateDiffRaw2() throws Narsese.NarseseException {
+        testTemplates("((a,b)-y)",
+                "[((a,b)-y), (a,b), y]");
     }
 
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {

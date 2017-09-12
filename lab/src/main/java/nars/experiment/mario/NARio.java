@@ -15,7 +15,7 @@ import javax.swing.*;
 import static nars.$.$;
 import static nars.$.p;
 
-public class NARio extends NAgentY {
+public class NARio extends NAgentX {
 
     private final MarioComponent mario;
 
@@ -23,8 +23,8 @@ public class NARio extends NAgentY {
     private final SensorConcept vx;
 
     public NARio(NAR nar) throws Narsese.NarseseException {
-        //super( nar);
-        super(nar, HaiQAgent::new);
+        super( nar);
+        //super(nar, HaiQAgent::new);
 
         //Param.ANSWER_REPORTING = false;
         //Param.DEBUG = true;
@@ -107,7 +107,7 @@ public class NARio extends NAgentY {
 
         actionBipolar($.the("x"), (x) -> {
             float thresh = 0.33f;
-            float thresh2 = 0.75f;
+            float thresh2 = 0.9f;
             if (x <= -thresh) {
                mario.scene.key(Mario.KEY_LEFT, true);
                mario.scene.key(Mario.KEY_RIGHT, false);
@@ -128,6 +128,25 @@ public class NARio extends NAgentY {
                return x;
            }
         });
+        actionBipolar($.the("y"), (x) -> {
+            float thresh = 0.33f;
+            if (x <= -thresh) {
+               mario.scene.key(Mario.KEY_DOWN, true);
+               mario.scene.key(Mario.KEY_JUMP, false);
+               //return -1f;
+               return x;
+           } else if (x >= +thresh) {
+               mario.scene.key(Mario.KEY_JUMP, true);
+               mario.scene.key(Mario.KEY_DOWN, false);
+               //return +1f;
+               return x;
+           } else {
+               mario.scene.key(Mario.KEY_JUMP, false);
+               mario.scene.key(Mario.KEY_DOWN, false);
+               //return 0f;
+               return x;
+           }
+        });
 //        actionToggle(p("left"), (n) -> {
 //            //if (n) mario.scene.key(Mario.KEY_RIGHT, false); //mutex
 //            mario.scene.key(Mario.KEY_LEFT, n);
@@ -136,12 +155,12 @@ public class NARio extends NAgentY {
 //            //if (n) mario.scene.key(Mario.KEY_LEFT, false); //mutex
 //            mario.scene.key(Mario.KEY_RIGHT, n);
 //        });
-        actionToggle(p("jmp"), (n) -> {
-            mario.scene.key(Mario.KEY_JUMP, n);
-        });
-        actionToggle(p("down"), (n) -> {
-            mario.scene.key(Mario.KEY_DOWN, n);
-        });
+//        actionToggle(p("jmp"), (n) -> {
+//            mario.scene.key(Mario.KEY_JUMP, n);
+//        });
+//        actionToggle(p("down"), (n) -> {
+//            mario.scene.key(Mario.KEY_DOWN, n);
+//        });
         //actionToggle($("speed"), (b) -> mario.scene.key(Mario.KEY_SPEED, b));
 
 //        actionTriState($("x"), i -> {
@@ -269,7 +288,7 @@ public class NARio extends NAgentY {
 
             return x;
 
-        }, 16);
+        }, 24);
 
 
 

@@ -85,7 +85,8 @@ public class Line1D {
 
                     }).start();
                     a.nar.onTask(t -> {
-                        if (!t.isInput() && t instanceof DerivedTask /*&& t.isGoal()*/) {
+                        if (!t.isInput() && t instanceof DerivedTask
+                            && t.isGoal()) {
                             System.err.println(t.proof());
                         }
                     });

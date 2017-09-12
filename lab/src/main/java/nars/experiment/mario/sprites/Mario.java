@@ -610,7 +610,7 @@ public class Mario extends Sprite
         xDeathPos = (int) x;
         yDeathPos = (int) y;
         world.paused = true;
-        deathTime = 1;
+        deathTime = 20;
         Art.stopMusic();
         //world.sound.play(Art.samples[Art.SAMPLE_MARIO_DEATH], this, 1, 1, 1);
     }

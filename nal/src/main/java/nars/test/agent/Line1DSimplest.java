@@ -34,11 +34,14 @@ public class Line1DSimplest extends NAgent {
 
 
     public Line1DSimplest(NAR n) {
-        super("", n);
+        super( n);
 
 
         in = senseNumber($.p("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
                 this.i
+        );
+        senseNumber($.p("o"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
+                this.o
         );
 //        in = senseNumber(
 //                //$.inh($.the("i"), id),

@@ -2,6 +2,7 @@ package nars.concept.dynamic;
 
 import jcog.Util;
 import jcog.list.FasterList;
+import jcog.math.RecycledSummaryStatistics;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -12,8 +13,11 @@ import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 import static nars.Op.*;
 import static nars.time.Tense.*;
@@ -28,8 +32,9 @@ abstract public class DynamicTruthModel {
     public DynTruth eval(Term superterm, boolean beliefOrGoal, long start, long end, boolean stamp, NAR n) {
 
         int sdt = superterm.dt();
-        if (sdt == XTERNAL)
-            sdt = DTERNAL;
+        if (sdt == XTERNAL) {
+            sdt = matchDT(superterm, beliefOrGoal, start, end, n);
+        }
 
         Term[] inputs = components(superterm);
         assert (inputs.length > 0) : this + " yielded no dynamic components for superterm " + superterm;
@@ -118,6 +123,44 @@ abstract public class DynamicTruthModel {
 
 //        //if (template instanceof Compound) {
         return commit(d);
+    }
+
+    /** returns an appropriate dt by sampling the existing beliefs
+     * in the table (if any exist).  if no dt can be calculated, return
+     * dt=0 (parallel)*/
+    private int matchDT(Term term, boolean beliefOrGoal, long start, long end, NAR n) {
+
+        final int MAX_TASKS_FOR_COMPLETE_ITERATION = 8;
+
+        assert(term.op().temporal);
+
+        Concept c = n.concept(term);
+        if (c != null) {
+            @NotNull BeliefTable table = beliefOrGoal ? c.beliefs() : c.goals();
+            int s = table.size();
+            if (s > 0) {
+                final int[] count = {0};
+                final long[] sum = {0};
+
+                Consumer<Task> tx = x -> {
+                    int xdt = x.dt();
+                    if (xdt != DTERNAL) {
+                        sum[0] += (xdt);
+                        count[0]++;
+                    }
+                };
+
+                if (s < MAX_TASKS_FOR_COMPLETE_ITERATION)
+                    table.forEachTask(tx);
+                else
+                    table.forEachTask(false, start, end, tx); //just the matching subrange, should be cheaper if # of tasks is high
+
+                if (count[0] > 0) {
+                    return (int)(sum[0] / count[0]);
+                }
+            }
+        }
+        return 0;
     }
 
     /**
