@@ -77,7 +77,8 @@ public class Builder {
             }
 
             int s = subterms.length;
-            assert (o.maxSize >= s) : "subterm overflow: " + o + ' ' + Arrays.toString(subterms);
+            assert (o.maxSize >= s) :
+                    "subterm overflow: " + o + ' ' + Arrays.toString(subterms);
 
             assert (o.minSize <= s || hasEllipsis(subterms)) : "subterm underflow: " + o + ' ' + Arrays.toString(subterms);
 

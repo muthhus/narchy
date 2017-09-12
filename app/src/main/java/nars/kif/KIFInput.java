@@ -360,11 +360,11 @@ public class KIFInput implements Runnable {
                             "_" + t.toString().substring(1)));
         });
 
-        conditionTerm = new MapSubst(remap).transform(conditionTerm);
+        conditionTerm = conditionTerm.replace(remap);
         if (conditionTerm == null)
             return null;
 
-        actionTerm = new MapSubst(remap).transform(actionTerm);
+        actionTerm = actionTerm.replace(remap);
         if (actionTerm == null)
             return null;
 

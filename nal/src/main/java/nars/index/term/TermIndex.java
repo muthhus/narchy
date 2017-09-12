@@ -196,8 +196,8 @@ public abstract class TermIndex implements TermContext {
     /* TODO move to Term instance method */
     @Nullable public static Term retemporalize(@NotNull Term x, Retemporalize r) {
 
-//        if (x.size() == 0)
-//            return x;
+        if (x.size() == 0)
+            return x;
 
         Term y = x.transform(r.dt(x), r);
         if (y == null || y.size() == 0) {

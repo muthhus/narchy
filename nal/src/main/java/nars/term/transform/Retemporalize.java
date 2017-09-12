@@ -3,6 +3,7 @@ package nars.term.transform;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,8 +23,9 @@ abstract public class Retemporalize implements CompoundTransform {
     public final Term apply(@Nullable Compound parent, @NotNull Term x) {
         if (x.hasAny(Op.TemporalBits)) {
             return x.transform(dt(x), this);
+        } else {
+            return x;
         }
-        return x;
     }
 
     abstract public int dt(@NotNull Term x);

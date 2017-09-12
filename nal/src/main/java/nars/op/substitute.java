@@ -39,7 +39,7 @@ public class substitute extends Functor {
         }else if (input.equals(x)) { //direct replacement
             result = y;
         } else {
-            result = new MapSubst1(x, y).transform(input);
+            result = input.transform(new MapSubst1(x, y));
         }
 
         if (!(result instanceof Bool && !result.equals(input))) {

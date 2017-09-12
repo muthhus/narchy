@@ -56,13 +56,13 @@ public abstract class TermVector implements TermContainer {
         final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
 
         final int vol = meta[4] + 1;
-        this.volume = (short)( vol );
+        this.structure = meta[5];
 
         int varTot = vD + vI + vQ ;
         final int cmp = vol - varTot - vP;
         this.complexity = (short)(cmp);
+        this.volume = (short)( vol );
 
-        this.structure = meta[5];
     }
 
 

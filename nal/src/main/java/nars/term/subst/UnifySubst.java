@@ -5,9 +5,7 @@ import nars.Op;
 import nars.Param;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
 import java.util.function.Predicate;
 
 /** not thread safe, use 1 per thread (do not interrupt matchAll) */
@@ -47,7 +45,12 @@ public class UnifySubst extends Unify {
         //try {
 
 
-            Term aa = resolve(a, xy);
+        //try {
+
+        //        } catch (InvalidTermException e) {
+//            return null;
+//        }
+            Term aa = a.transform(new MapSubst(xy));
             if (aa!=null)
                 target.test(aa);
 
@@ -77,16 +80,5 @@ public class UnifySubst extends Unify {
         //return matches < maxMatches; //determines how many
     }
 
-
-    @Nullable static Term resolve(@NotNull Term t, @NotNull Map<Term,Term> subs) {
-        //try {
-
-            return /*subs.isEmpty() ?
-                    t : *//* no change necessary */
-                    new MapSubst(subs).transform(t);
-//        } catch (InvalidTermException e) {
-//            return null;
-//        }
-    }
 
 }

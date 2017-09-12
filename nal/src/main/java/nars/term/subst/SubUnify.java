@@ -71,8 +71,8 @@ public class SubUnify extends Unify {
     public void onMatch(Term[][] match) {
 
         if (transformed != null) {
-            Term result = transform(transformed);
-            if (!(result instanceof Bool)) {
+            Term result = transformed.transform(this);//transform(transformed);
+            if (result!=null && !(result instanceof Bool)) {
                 if (!result.equals(transformed)) {
                     if (
                         //xy.forEachVersioned(parent.xy::tryPut)

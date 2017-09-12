@@ -16,8 +16,9 @@ import nars.task.NALTask;
 import nars.task.Revision;
 import nars.task.SignalTask;
 import nars.task.Tasked;
-import nars.task.util.TaskLinkRegion;
 import nars.task.util.TaskRegion;
+import nars.task.util.TaskRegionLink;
+import nars.task.util.TasksRegion;
 import nars.task.util.TimeRange;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -102,9 +103,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     final class MyTaskStretcher implements Consumer<Task> {
 
-        public final TaskLinkRegion region;
+        public final TaskRegionLink region;
 
-        public MyTaskStretcher(TaskLinkRegion region) {
+        public MyTaskStretcher(TaskRegionLink region) {
             this.region = region;
         }
 
@@ -334,7 +335,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             SignalTask sx = (SignalTask) x;
             if (sx.stretchKey == Signal.Pending) {
                 //set the stretcher
-                TaskLinkRegion taskRegion =  new TaskLinkRegion(x);
+                TaskRegionLink taskRegion =  TaskRegionLink.link(x);
                 sx.stretchKey = new MyTaskStretcher(taskRegion);
                 tr = taskRegion;
             } else {

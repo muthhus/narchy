@@ -32,11 +32,10 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
 
     //protected static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_IDEAL, FPS_MIN, FPS_IDEAL);
-    protected static final GameAnimatorControl a = new GameAnimatorControl(FPS_IDEAL);
+    protected static final GameAnimatorControl a;
 
 
     public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
-
     public static final GLU glu = new GLU();
     public static final GLUT glut = new GLUT();
 
@@ -61,6 +60,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 //        sharedDrawable = GLDrawableFactory.getFactory(cfg.getGLProfile()).createDummyAutoDrawable(null, true, cfg, null);
 //        sharedDrawable.display(); // triggers GLContext object creation and native realization.
 //        Draw.init(sharedDrawable.getGL().getGL2());
+        a = new GameAnimatorControl(FPS_IDEAL);
         a.start();
     }
 

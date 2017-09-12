@@ -10,6 +10,7 @@ import nars.task.UnaryTask;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Int;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -112,13 +113,13 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         int talSampled = Math.min(tasklinks.size(), TASKLINKS_SAMPLED);
         if (talSampled == 0)
-            return Collections.emptyList();
+            return null;
 
         List<PriReference<Task>> taskl = $.newArrayList(talSampled);
-        tasklinks.sample(talSampled, ((Consumer<PriReference<Task>>) taskl::add));
+        tasklinks.sample(talSampled, ((Consumer<PriReference>) taskl::add));
         if (taskl.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
-            return emptyList();
+            return null;
         }
 
 
@@ -187,7 +188,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         } else {
             int tlSampled = Math.min(termlinks.size(), TERMLINKS_SAMPLED);
             terml = $.newArrayList(tlSampled);
-            termlinks.sample(tlSampled, ((Consumer<PriReference<Term>>) terml::add));
+            termlinks.sample(tlSampled, ((Consumer<PriReference>) terml::add));
         }
 
         int tasklSize = taskl.size();
@@ -225,30 +226,33 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         if (Param.MUTATE_INT_CONTAINING_TERMS_RATE > 0) {
             Term t = x.term();
-            if (t.hasAny(INT) && t.subterms().OR(xx -> xx instanceof Int) && rng.nextFloat() <= Param.MUTATE_INT_CONTAINING_TERMS_RATE) {
+            if (t.hasAny(INT)) {
+                TermContainer ts = t.subterms();
+                if (ts.OR(xx -> xx instanceof Int) && rng.nextFloat() <= Param.MUTATE_INT_CONTAINING_TERMS_RATE) {
 
-                Term[] xx = t.subterms().toArray();
-                boolean changed = false;
-                for (int i = 0; i < xx.length; i++) {
-                    Term y = xx[i];
-                    if (y instanceof Int) {
-                        int shift =
-                                rng.nextInt(3) - 1;
-                                //nar.random().nextInt(5) - 2;
-                        if (shift != 0) {
-                            int yy = ((Int) y).id;
-                            int j =
-                                    Math.max(0 /* avoid negs for now */, yy + shift);
-                            if (yy != j) {
-                                xx[i] = Int.the(j);
-                                changed = true;
+                    Term[] xx = ts.toArray();
+                    boolean changed = false;
+                    for (int i = 0; i < xx.length; i++) {
+                        Term y = xx[i];
+                        if (y instanceof Int) {
+                            int shift =
+                                    rng.nextInt(3) - 1;
+                            //nar.random().nextInt(5) - 2;
+                            if (shift != 0) {
+                                int yy = ((Int) y).id;
+                                int j =
+                                        Math.max(0 /* avoid negs for now */, yy + shift);
+                                if (yy != j) {
+                                    xx[i] = Int.the(j);
+                                    changed = true;
+                                }
                             }
                         }
                     }
-                }
-                if (changed)
-                    return t.op().the(t.dt(), xx);
+                    if (changed)
+                        return t.op().the(t.dt(), xx);
 
+                }
             }
 
         }
@@ -272,7 +276,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
 
             localSubConcept.tasklinks().putAsync(
-                    new PLinkUntilDeleted<>(task, tfaEach)
+                    new PLinkUntilDeleted(task, tfaEach)
             );
 //                localSubConcept.termlinks().putAsync(
 //                        new PLink(task.term(), tfaEach)

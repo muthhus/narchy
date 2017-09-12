@@ -127,7 +127,7 @@ abstract public class DynamicTruthModel {
 
     /** returns an appropriate dt by sampling the existing beliefs
      * in the table (if any exist).  if no dt can be calculated, return
-     * dt=0 (parallel)*/
+     * a standard value (ex: 0 or DTERNAL) */
     private int matchDT(Term term, boolean beliefOrGoal, long start, long end, NAR n) {
 
         final int MAX_TASKS_FOR_COMPLETE_ITERATION = 8;
@@ -160,7 +160,7 @@ abstract public class DynamicTruthModel {
                 }
             }
         }
-        return 0;
+        return DTERNAL;
     }
 
     /**

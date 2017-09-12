@@ -133,9 +133,9 @@ public class NALTask extends Pri implements Task {
                 );
             }
 
-            Truth t = truth();
+            DiscreteTruth t = this.truth;
             if (t != null)
-                h = Util.hashCombine(t.hashCode(), h);
+                h = Util.hashCombine(t.hash, h);
         }
 
         this.hash = h;
@@ -176,7 +176,7 @@ public class NALTask extends Pri implements Task {
 
     @Nullable
     @Override
-    public Truth truth() {
+    public final Truth truth() {
         return truth;
     }
 
@@ -294,7 +294,25 @@ public class NALTask extends Pri implements Task {
         return t;
     }
 
+    @Override
+    public final float freq() {
+        return truth.freq;
+    }
 
+    @Override
+    public final float conf() {
+        return truth.conf;
+    }
+
+    @Override
+    public final float evi() {
+        return truth.evi();
+    }
+
+    @Override
+    public final float eviEternalized() {
+        return truth.eviEternalized();
+    }
 
     @Override
     public double coord(boolean maxOrMin, int dimension) {
@@ -302,9 +320,9 @@ public class NALTask extends Pri implements Task {
             case 0:
                 return maxOrMin ? end : start;
             case 1:
-                return freq();
+                return truth.freq;
             case 2:
-                return conf();
+                return truth.conf;
             default:
                 throw new UnsupportedOperationException();
         }

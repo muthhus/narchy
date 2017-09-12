@@ -1,10 +1,8 @@
 package nars;
 
-import com.google.common.collect.Iterables;
 import jcog.data.FloatParam;
 import jcog.event.On;
 import jcog.pri.mix.control.MixContRL;
-import nars.concept.ActionConcept;
 import nars.control.Derivation;
 import nars.control.NARService;
 import nars.derive.Deriver;
@@ -13,7 +11,6 @@ import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex2;
-import nars.op.Implier;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -37,7 +34,6 @@ import spacegraph.widget.meter.Plot2D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -197,62 +193,8 @@ abstract public class NAgentX extends NAgent {
         NInner nin = new NInner(n);
         nin.start();
 
-        chart(a);
-        chart(n, a);
-        window(/*row*/(
-
-                causePlot(a)
-
-                //mixPlot(a, m, HISTORY),
-
-
-//                        row(
-////                                new Plot2D(HISTORY, Plot2D.Line)
-////                                        .on(a::onFrame),
-//                                new Plot2D(HISTORY, Plot2D.Line)
-//                                        .add("happy", () -> m.lastScore)
-//                                        .on(a::onFrame)
-//                        )
-
-////                        new MatrixView(m.traffic, 4, (x, gl) -> {
-////                            Draw.colorGrays(gl, x);
-////                            return 0;
-////                        }),
-//                        MatrixView.get((ArrayTensor) m.agentIn, 4, (x, gl) -> {
-//                            Draw.colorGrays(gl, x);
-//                            return 0;
-//                        }),
-
-
-////                        new MatrixView(new RingBufferTensor(m.agentIn, 2), 2, (x, gl) -> {
-////                                    Draw.colorGrays(gl, x);
-////                                    return 0;
-////                                })
-
-
-////                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.W),
-////                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.y, false),
-////
-////                        row(
-////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[0].q),
-////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[1].q),
-////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[2].q),
-////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[3].q)
-////                        ),
-
-                // //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
-
-//                        MatrixView.get(m.mixControl, 4, (x, gl) -> {
-//                            Draw.colorBipolar(gl, (x - 0.5f) * 2f);
-//                            return 0;
-//                        })
-        ), 600, 600);
 
         //init();
-
-        NARLoop loop =
-                a.nar.startFPS(fps);
-
 
 
 //        n.onCycle(nn -> {
@@ -309,8 +251,65 @@ abstract public class NAgentX extends NAgent {
 //        }), 100, 100);
 
 
-        //get ready
-        System.gc();
+        //launch in separate thread cuz JOGL startup is slow
+        new Thread(() -> {
+            chart(a);
+            chart(n, a);
+            window(/*row*/(
+
+                    causePlot(a)
+
+                    //mixPlot(a, m, HISTORY),
+
+
+                    //                        row(
+                    ////                                new Plot2D(HISTORY, Plot2D.Line)
+                    ////                                        .on(a::onFrame),
+                    //                                new Plot2D(HISTORY, Plot2D.Line)
+                    //                                        .add("happy", () -> m.lastScore)
+                    //                                        .on(a::onFrame)
+                    //                        )
+
+                    ////                        new MatrixView(m.traffic, 4, (x, gl) -> {
+                    ////                            Draw.colorGrays(gl, x);
+                    ////                            return 0;
+                    ////                        }),
+                    //                        MatrixView.get((ArrayTensor) m.agentIn, 4, (x, gl) -> {
+                    //                            Draw.colorGrays(gl, x);
+                    //                            return 0;
+                    //                        }),
+
+
+                    ////                        new MatrixView(new RingBufferTensor(m.agentIn, 2), 2, (x, gl) -> {
+                    ////                                    Draw.colorGrays(gl, x);
+                    ////                                    return 0;
+                    ////                                })
+
+
+                    ////                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.W),
+                    ////                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.y, false),
+                    ////
+                    ////                        row(
+                    ////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[0].q),
+                    ////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[1].q),
+                    ////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[2].q),
+                    ////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[3].q)
+                    ////                        ),
+
+                    // //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
+
+                    //                        MatrixView.get(m.mixControl, 4, (x, gl) -> {
+                    //                            Draw.colorBipolar(gl, (x - 0.5f) * 2f);
+                    //                            return 0;
+                    //                        })
+            ), 600, 600);
+
+            //get ready
+            System.gc();
+
+            NARLoop loop = a.nar.startFPS(fps);
+
+        }).start();
 
         return n;
     }
@@ -651,7 +650,7 @@ abstract public class NAgentX extends NAgent {
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(@Nullable String id, C bc) throws Narsese.NarseseException {
-        return senseCamera(id!=null ? $(id) : null, bc);
+        return senseCamera(id != null ? $(id) : null, bc);
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(@Nullable Term id, C bc) {

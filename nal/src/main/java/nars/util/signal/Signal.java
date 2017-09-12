@@ -48,7 +48,7 @@ public class Signal extends AtomicReference<SignalTask> {
         this.resolution = resolution;
     }
 
-    public Task set(@NotNull Term term, @Nullable Truthed nextTruth, LongSupplier stamper, long now, int dur, NAR nar) {
+    public Task set(@NotNull Term term, @Nullable Truth nextTruth, LongSupplier stamper, long now, int dur, NAR nar) {
 
 
         //int halfDur = Math.max(1, nar.dur() / 2);
@@ -66,7 +66,7 @@ public class Signal extends AtomicReference<SignalTask> {
 
             SignalTask next;
 
-            @Nullable PreciseTruth tt = nextTruth!=null ? nextTruth.truth().ditherFreqConf(resolution.asFloat(), nar.confMin.floatValue(), 1f) : null;
+            @Nullable PreciseTruth tt = nextTruth!=null ? nextTruth.ditherFreqConf(resolution.asFloat(), nar.confMin.floatValue(), 1f) : null;
 
             if (tt == null) {
 

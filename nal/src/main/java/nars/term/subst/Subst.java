@@ -3,17 +3,19 @@ package nars.term.subst;
 import jcog.list.FasterList;
 import nars.Op;
 import nars.derive.match.EllipsisMatch;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.atom.Intlike;
 import nars.term.container.TermContainer;
+import nars.term.transform.CompoundTransform;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.Null;
 
 
-public interface Subst {
+public interface Subst extends CompoundTransform {
 
     /**
      * can be used to determine if this subst will have any possible effect on any transforms to any possible term,
@@ -39,64 +41,16 @@ public interface Subst {
 
     void clear();
 
-    /**
-     * copy in
-     * @NotNull commented out for performance
-     * @return whether all puts were successful
-     */
-    @NotNull
-    default Term transform(/*@NotNull*/ Term x) {
-
+    @Override
+    default @Nullable Term apply(@Nullable Compound parent, @NotNull Term x) {
         if (x instanceof Bool || x instanceof Intlike)//assert (!(x instanceof Bool));
             return x;
 
         Term y = xy(x);
-        if (y != null)
+        if (y != null) {
             return y; //an assigned substitution, whether a variable or other type of term
-
-        TermContainer subs = x.subterms();
-        int len = subs.size();
-
-        if (len == 0)
-            return x;
-
-        FasterList<Term> next = new FasterList<>(len);
-
-        Op op = x.op();
-
-        boolean filterTrueFalse = !op.allowsBool; //early prefilter for True/False subterms
-
-        for (int i = 0; i < len; i++) {
-            Term t = subs.sub(i);
-            Term u = transform(t);
-            if (!addTransformed(u, next, filterTrueFalse))
-                return Null;
-        }
-
-//        int ns = next.size();
-//        if (ns > op.maxSize)
-//            return null;
-//        if (op.statement && ns < op.minSize) {
-////
-////            if (ns != 1 || next.sub(0).op()!=VAR_PATTERN) //exclude special single-element pattern variables
-//                return null;
-//        }
-
-        if (!subs.equalTerms(next))
-            return op.the(x.dt(), next.array(Term[]::new));
-        else
-            return x;
-    }
-
-    static boolean addTransformed(Term u, FasterList<Term> next, boolean filterTrueFalse) {
-
-        if (u instanceof EllipsisMatch) {
-
-            return ((EllipsisMatch) u).forEachWhile(x -> addTransformed(x, next, filterTrueFalse));
-
         } else {
-
-            return !Term.invalidBoolSubterms(u, filterTrueFalse) && next.add(u);
+            return x;//.transform(this); //recurse
         }
     }
 

@@ -11,7 +11,7 @@ import static nars.truth.TruthFunctions.c2w;
  * truth rounded to a fixed size precision
  * to support hashing and equality testing
  */
-public class DiscreteTruth implements Truth {
+public final class DiscreteTruth implements Truth {
 
     /**
      * truth component resolution of a 16-bit encoding
@@ -19,7 +19,7 @@ public class DiscreteTruth implements Truth {
     static final int hashDiscreteness16 = Short.MAX_VALUE - 1;
 
     public final float freq, conf;
-    private final int hash;
+    public final int hash;
 
     public DiscreteTruth(float f, float c) {
         this(f, c, Param.TRUTH_EPSILON);
@@ -96,7 +96,7 @@ public class DiscreteTruth implements Truth {
         return
             (this == that)
                     ||
-            ((that instanceof DiscreteTruth) ? (hash == that.hashCode()) :
+            ((that instanceof DiscreteTruth) ? (hash == ((DiscreteTruth)that).hash) :
                     equals((Truth) that, Param.TRUTH_EPSILON));
     }
 

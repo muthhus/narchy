@@ -60,15 +60,15 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
             this.subs = Term.EmptyArray;
     }
 
-    /**
-     * @param op if null, indicates construction of a subterms vector
-     */
-    public NewCompound(@Nullable Op op, @NotNull TermContainer subterms) {
-        this(op, subterms.size());
-        for (int i = 0; i < (size = subs.length); i++) /* (has been set in superconstructor)*/
-            subs[i] = subterms.sub(i);
-
-    }
+//    /**
+//     * @param op if null, indicates construction of a subterms vector
+//     */
+//    public NewCompound(@Nullable Op op, @NotNull TermContainer subterms) {
+//        this(op, subterms.size());
+//        for (int i = 0; i < (size = subs.length); i++) /* (has been set in superconstructor)*/
+//            subs[i] = subterms.sub(i);
+//
+//    }
 
     @Override
     public int size() {

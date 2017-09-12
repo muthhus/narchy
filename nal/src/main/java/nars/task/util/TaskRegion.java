@@ -5,6 +5,15 @@ import nars.task.Tasked;
 
 public interface TaskRegion extends HyperRegion, Tasked {
 
+    /**
+     * relative to time sameness (1)
+     */
+    float FREQ_SAMENESS_IMPORTANCE = 0.2f;
+    /**
+     * relative to time sameness (1)
+     */
+    float CONF_SAMENESS_IMPORTANCE = 0.05f;
+
     @Override
     boolean equals(Object obj);
 
@@ -32,12 +41,12 @@ public interface TaskRegion extends HyperRegion, Tasked {
 
     default float freqCost() {
         float d = (float) range(1);
-        return 1 + d * timeCost() * TaskLinkRegion.FREQ_SAMENESS_IMPORTANCE;
+        return 1 + d * timeCost() * FREQ_SAMENESS_IMPORTANCE;
     }
 
     default float confCost() {
         float d = (float) range(2);
-        return 1 + d * timeCost() * TaskLinkRegion.CONF_SAMENESS_IMPORTANCE;
+        return 1 + d * timeCost() * CONF_SAMENESS_IMPORTANCE;
     }
 
 
@@ -54,7 +63,7 @@ public interface TaskRegion extends HyperRegion, Tasked {
             TaskRegion er = (TaskRegion) r;
             if (r.contains(this))
                 return er;
-            else return new TaskLinkRegion(
+            else return new TasksRegion(
                     Math.min(start(), er.start()), Math.max(end(), er.end()),
                     (float)Math.min(coord(false, 1), er.coord(false, 1)),
                         (float)Math.max(coord(true, 1), er.coord(true, 1)),
@@ -105,7 +114,7 @@ public interface TaskRegion extends HyperRegion, Tasked {
                 return false;
             if ((coord(false,1) > t.coord(false,1)) || (coord(true,1) < t.coord(true, 1)))
                 return false;
-            if ((coord(false,2)> t.coord(false, 2)) || (coord(true, 2) < t.coord(true,2)))
+            if ((coord(false,2) > t.coord(false, 2)) || (coord(true, 2) < t.coord(true,2)))
                 return false;
             return true;
         }

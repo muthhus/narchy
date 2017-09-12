@@ -171,7 +171,7 @@ public class Premise extends UnaryTask {
                 Unify u = unify(taskTerm, beliefTerm, nar, matchTTL);
                 if (u != null) {
                     if (beliefHasVars) {
-                        beliefTerm = u.transform(beliefTerm);
+                        beliefTerm = beliefTerm.transform(u);
                         if (beliefTerm instanceof Bool)
                             return null;
 
@@ -182,6 +182,9 @@ public class Premise extends UnaryTask {
                 ttlMax += matchTTL[0]; //changed if consumed in match (this value will be negative
             }
         }
+
+        if (beliefTerm == null)
+            beliefTerm = beliefTermRaw; //HACK
 
         beliefTerm = beliefTerm.unneg(); //HACK ?? assert(beliefTerm.op()!=NEG);
 

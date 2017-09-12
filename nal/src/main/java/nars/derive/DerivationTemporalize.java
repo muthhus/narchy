@@ -94,24 +94,24 @@ public class DerivationTemporalize extends Temporalize {
     void knowDerivedAmbient(Subst d, Term x) {
         knowAmbient(x);
         if (knowTransformed) {
-            Term x2 = d.transform(x);
+            Term x2 = x.transform(d);//d.transform(x);
             if (!x2.equals(x) && !(x2 instanceof Bool))
                 knowAmbient(x2);
         }
     }
 
-    void knowDerivedAbsolute(Subst d, Term term, long start, long end) {
-        if (term.op() == IMPL && (!fullyEternal())) {
+    void knowDerivedAbsolute(Subst d, Term x, long start, long end) {
+        if (x.op() == IMPL && (!fullyEternal())) {
             //only know an impl as ambient if there is already non-eternal events detected
-            knowDerivedAmbient(d, term);
+            knowDerivedAmbient(d, x);
             return;
         }
 
-        knowAbsolute(term, start, end);
+        knowAbsolute(x, start, end);
 
         if (knowTransformed) {
-            Term t2 = d.transform(term);
-            if (!t2.equals(term) && !(t2 instanceof Bool)) {
+            Term t2 = x.transform(d);//d.transform(term);
+            if (!t2.equals(x) && !(t2 instanceof Bool)) {
                 knowAbsolute(t2, start, end);
             }
         }

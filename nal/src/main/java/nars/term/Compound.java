@@ -27,6 +27,7 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.derive.AbstractPred;
+import nars.derive.match.EllipsisMatch;
 import nars.index.term.NewCompound;
 import nars.index.term.TermContext;
 import nars.op.mental.AliasConcept;
@@ -157,8 +158,6 @@ public interface Compound extends Term, IPair, TermContainer {
         }
         return false;
     }
-
-
 
 
     @Override
@@ -500,7 +499,7 @@ public interface Compound extends Term, IPair, TermContainer {
                     return false;
             }
         } else
-            return op.commutative && size()>1;
+            return op.commutative && size() > 1;
     }
 
 
@@ -656,12 +655,13 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     /* collects any contained events within a conjunction*/
-    @Override default void events(Consumer<ObjectLongPair<Term>> events, long offset, int level) {
+    @Override
+    default void events(Consumer<ObjectLongPair<Term>> events, long offset, int level) {
         Op o = op();
         if (o == CONJ) {
             int dt = dt();
 
-            if ( !(dt==0&&level>0) && dt!=DTERNAL && dt!=XTERNAL) {
+            if (!(dt == 0 && level > 0) && dt != DTERNAL && dt != XTERNAL) {
 
                 boolean reverse;
                 if (dt < 0) {
@@ -674,12 +674,12 @@ public interface Compound extends Term, IPair, TermContainer {
                 long t = offset;
                 for (int i = 0; i < s; i++) {
                     Term st = tt.sub(reverse ? (s - 1 - i) : i);
-                    st.events(events, t, level+1); //recurse
+                    st.events(events, t, level + 1); //recurse
                     t += dt + st.dtRange();
                 }
 
                 //if (dt!=0 || level==0) //allow dt==0 case to proceed below and add the (&| event as well as its components (which are precisely known)
-                    return;
+                return;
             }
 
         }
@@ -797,24 +797,10 @@ public interface Compound extends Term, IPair, TermContainer {
         return y;
     }
 
-    @Nullable
-    default Term transform(@NotNull CompoundTransform t) {
-        Compound src = this;
-        if (t.testSuperTerm(src)) {
-            return transform(src.op(), src.dt(), t);
-        } else {
-            return src;
-        }
-
-    }
 
     @Nullable
     default Term transform(int newDT, @NotNull CompoundTransform t) {
-        if (this.dt() == newDT)
-            return transform(t); //no dt change, use non-DT changing method that has early fail
-        else {
-            return transform(op(), newDT, t);
-        }
+        return transform(op(), newDT, t);
     }
 
     @Nullable
@@ -823,35 +809,45 @@ public interface Compound extends Term, IPair, TermContainer {
         if (!t.testSuperTerm(this))
             return this;
 
-        boolean filterTrueFalse = !op.allowsBool;
+        boolean boolFilter = !op.allowsBool;
 
         @NotNull TermContainer srcSubs = this.subterms(); //for faster access, generally
+
         int s = srcSubs.size(), subtermMods = 0;
+
         NewCompound target = new NewCompound(op, s);
+
         for (int i = 0; i < s; i++) {
 
-            Term x = srcSubs.sub(i), y;
-
-            y = t.apply(this, x);
-
-            if (y == null)
+            Term x = srcSubs.sub(i);
+            Term y = x.transform(this, t);
+            if (Term.invalidBoolSubterm(y, boolFilter)) {
                 return null;
-
-            if (y.size() > 0) {
-                y = ((Compound)y).transform(t); //recurse
             }
 
-            if (y == null)
-                return null;
+            if (y instanceof EllipsisMatch) {
+                EllipsisMatch xx = (EllipsisMatch) y;
+                int xxs = xx.size();
+                for (int j = 0; j < xxs; j++) {
+                    @Nullable Term k = xx.sub(j).transform(this, t);
+                    if (Term.invalidBoolSubterm(k, boolFilter)) {
+                        return null;
+                    } else {
+                        target.add(k);
+                    }
+                }
+                subtermMods += xxs;
+            } else {
+                if (!y.equals(x)) {
+                    subtermMods++;
+                } else {
+                    y = x;
+                }
 
-            if (y != x) {
-                if (Term.invalidBoolSubterms(y, filterTrueFalse))
-                    return null;
-
-                subtermMods++;
+                target.add(y);
             }
 
-            target.add(y);
+
         }
 
         //TODO does it need to recreate the container if the dt has changed because it may need to be commuted ... && (superterm.dt()==dt) but more specific for the case: (XTERNAL -> 0 or DTERNAL)
@@ -867,10 +863,11 @@ public interface Compound extends Term, IPair, TermContainer {
             //else
             //return Op.compound(op, target.theArray(), false).dt(dt); //HACK
 
-        } else if (dt != this.dt())
+        } else if (dt != this.dt()) {
             return this.dt(dt);
-        else
+        } else {
             return this;
+        }
     }
 
 
@@ -951,7 +948,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     @NotNull
     default Term conceptual() {
-      Term term = unneg().eternal();
+        Term term = unneg().eternal();
 
 
         //atemporalizing can reset normalization state of the result instance

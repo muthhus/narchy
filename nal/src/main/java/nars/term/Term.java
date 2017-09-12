@@ -129,6 +129,7 @@ public interface Term extends Termlike, Comparable<Term> {
     default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, Term parent) {
         return whileTrue.test(this);
     }
+
     default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue) {
         return recurseTerms(parentsMust, whileTrue, this);
     }
@@ -168,8 +169,28 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     @Nullable
+    default Term transform(@NotNull CompoundTransform t) {
+        return transform(dt(), t);
+    }
+
+
+    @Nullable
     default Term transform(int newDT, @NotNull CompoundTransform t) {
-        return this;
+//         if (y.size() > 0) {
+//                    y = y.transform(t); //recurse
+//                } else {
+        return t.apply(null, this);
+//                }
+        //return this;
+    }
+
+    @Nullable
+    default Term transform(Compound parent, @NotNull CompoundTransform t) {
+        if (size() > 0) {
+            return transform(t); //recurse
+        } else {
+            return t.apply(parent, this);
+        }
     }
 
     @Nullable
@@ -348,7 +369,7 @@ public interface Term extends Termlike, Comparable<Term> {
     /**
      * equlity has already been tested prior to calling this
      *
-     * @param y     another term
+     * @param y       another term
      * @param ignored the unification context
      * @return whether unification succeeded
      */
@@ -788,7 +809,9 @@ public interface Term extends Termlike, Comparable<Term> {
         events(events, dt, 0);
     }
 
-    /** dont call directly */
+    /**
+     * dont call directly
+     */
     default void events(Consumer<ObjectLongPair<Term>> events, long dt, int level) {
         events.accept(PrimitiveTuples.pair(this, dt));
     }
@@ -828,8 +851,8 @@ public interface Term extends Termlike, Comparable<Term> {
     /**
      * if filterTrueFalse is false, only filters Null's
      */
-    static boolean invalidBoolSubterms(@NotNull Term u, boolean filterTrueFalse) {
-        return u instanceof Bool && (filterTrueFalse || (u == Null));
+    static boolean invalidBoolSubterm(Term u, boolean filterTrueFalse) {
+        return u == null || ((u instanceof Bool) && (filterTrueFalse || (u == Null)));
     }
 
     default Term dt(int dt) {
@@ -841,13 +864,15 @@ public interface Term extends Termlike, Comparable<Term> {
     /**
      * return null if none, cheaper than using an empty iterator
      */
-    @Nullable default Set<Term> varsUnique(@Nullable Op type, @Nullable Set<Term> exceptIfHere) {
+    @Nullable
+    default Set<Term> varsUnique(@Nullable Op type, @Nullable Set<Term> exceptIfHere) {
         return null;
     }
 
 
-
-    /** TODO override in Compound implementations for accelerated root comparison without root() instantiation */
+    /**
+     * TODO override in Compound implementations for accelerated root comparison without root() instantiation
+     */
     default boolean eternalEquals(Term x) {
         return eternal().equals(x.eternal());
     }
@@ -894,7 +919,8 @@ public interface Term extends Termlike, Comparable<Term> {
             } else
                 s = new MapSubst(m);
 
-            return s.transform(this);
+            //return s.transform(this);
+            return transform(s);
         }
     }
 
@@ -902,7 +928,7 @@ public interface Term extends Termlike, Comparable<Term> {
         if (size() == 0) {
             return equals(from) ? to : this; //atom substitution
         } else {
-            return new MapSubst1(from, to).transform(this);
+            return transform(new MapSubst1(from, to));
         }
     }
 

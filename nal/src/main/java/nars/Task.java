@@ -386,12 +386,12 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask, TaskRegion 
 
 
         if (a == ETERNAL)
-            return t.evi();
+            return this.evi();
         else if (when == ETERNAL)
-            return t.eviEternalized();
+            return this.eviEternalized();
         else {
 
-            float cw = t.evi();
+            float cw = this.evi();
             long z = end();
             //assert (z >= a) : this + " has mismatched start/end times";
 
@@ -425,7 +425,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask, TaskRegion 
                 assert (dur > 0);
 
                 float ete = eternalizable();
-                float ecw = ete > 0 ? t.eviEternalized() * ete : 0;
+                float ecw = ete > 0 ? this.eviEternalized() * ete : 0;
                 float dcw = cw - ecw; //delta to eternalization
                 cw = ecw + Param.evidenceDecay(dcw, durAdjusted, dist); //decay
 
