@@ -2,7 +2,7 @@ package nars.table;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
-import jcog.data.sorted.TopN;
+import jcog.sort.TopN;
 import jcog.pri.Prioritized;
 import jcog.tree.rtree.*;
 import jcog.util.Top;

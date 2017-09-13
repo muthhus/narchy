@@ -2,7 +2,7 @@ package spacegraph.audio;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
-import jcog.event.ArrayTopic;
+import jcog.event.ListTopic;
 import jcog.event.Topic;
 import jcog.math.OneDHaar;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
@@ -44,7 +44,7 @@ public class WaveCapture implements Runnable {
     /**
      * called when next sample buffer is ready
      */
-    final Topic<WaveCapture> nextReady = new ArrayTopic();
+    final Topic<WaveCapture> nextReady = new ListTopic();
 
     /** holds the normalized value of the latest data */
     public float[] dataNorm = new float[freqSamplesPerFrame];

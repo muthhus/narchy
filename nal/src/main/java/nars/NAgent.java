@@ -2,7 +2,7 @@ package nars;
 
 import jcog.Loop;
 import jcog.data.FloatParam;
-import jcog.event.ArrayTopic;
+import jcog.event.ListTopic;
 import jcog.event.On;
 import jcog.event.Topic;
 import jcog.list.FasterList;
@@ -89,6 +89,8 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     public long now;
 
     public float rewardSum;
+
+    private final Topic<NAgent> eventFrame = new ListTopic();
 
     /**
      * range: -1..+1
@@ -590,9 +592,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     public final float alpha() {
         return nar.confDefault(BELIEF);
     }
-
-
-    private final Topic<NAgent> eventFrame = new ArrayTopic();
 
     @Override
     public On onFrame(Consumer each) {

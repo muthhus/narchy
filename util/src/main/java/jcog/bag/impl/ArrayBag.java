@@ -1,8 +1,7 @@
 package jcog.bag.impl;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import jcog.bag.Bag;
-import jcog.data.sorted.SortedArray;
+import jcog.sort.SortedArray;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;

@@ -2,7 +2,7 @@ package jcog.net.attn;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jcog.Util;
-import jcog.event.ArrayTopic;
+import jcog.event.ListTopic;
 import jcog.event.Topic;
 import jcog.net.UDPeer;
 import org.eclipse.collections.api.tuple.Pair;
@@ -41,8 +41,8 @@ public class MeshMap<K,V> extends UDPeer /* implements Map<K,V>*/ {
         this.model = m;
     }
 
-    final Topic<MeshMap<K,V>> onStart = new ArrayTopic<>();
-    final Topic<Pair<K,V>> onRecv = new ArrayTopic<>();
+    final Topic<MeshMap<K,V>> onStart = new ListTopic<>();
+    final Topic<Pair<K,V>> onRecv = new ListTopic<>();
 
 
     @Override

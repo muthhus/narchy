@@ -6,7 +6,7 @@ import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
 import javafx.scene.image.WritableImage;
 import jcog.data.Range;
-import jcog.event.ArrayTopic;
+import jcog.event.ListTopic;
 import jcog.event.Topic;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class WebCam {
     // private ShortBuffer audioSamples;
     public com.github.sarxos.webcam.Webcam webcam;
 
-    public final Topic<WebcamEvent> eventChange = new ArrayTopic();
+    public final Topic<WebcamEvent> eventChange = new ListTopic();
 
 
     @Range(min = 0, max = 1)

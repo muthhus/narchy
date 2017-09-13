@@ -5,7 +5,7 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import jcog.Util;
 import jcog.data.MutableInteger;
-import jcog.event.ArrayTopic;
+import jcog.event.ListTopic;
 import jcog.event.On;
 import jcog.event.Topic;
 import jcog.list.FasterList;
@@ -100,14 +100,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     @NotNull
     protected final Random random;
 
-    public final transient Topic<NAR> eventClear = new ArrayTopic<>();
+    public final transient Topic<NAR> eventClear = new ListTopic<>();
 
-    public final transient ArrayTopic<NAR> eventCycle = new ArrayTopic<>();
+    public final transient Topic<NAR> eventCycle = new ListTopic<>();
 
     /**
      * a task has been processed or re-processed (priority changed)
      */
-    public final transient Topic<Task> eventTask = new ArrayTopic<>();
+    public final transient Topic<Task> eventTask = new ListTopic<>();
 
     /**
      * scoped to this NAR so it can be reset by it

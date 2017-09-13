@@ -1,4 +1,4 @@
-package jcog.data.sorted;
+package jcog.sort;
 
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 

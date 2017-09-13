@@ -1,4 +1,4 @@
-package jcog.data.sorted;
+package jcog.sort;
 
 import jcog.Util;
 import org.apache.commons.lang3.ArrayUtils;

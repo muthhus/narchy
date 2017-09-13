@@ -2,7 +2,7 @@ package nars.term;
 
 import jcog.Texts;
 import jcog.Util;
-import jcog.data.sorted.SortedList;
+import jcog.sort.SortedList;
 import jcog.list.FasterList;
 import nars.Op;
 import nars.term.atom.Atom;

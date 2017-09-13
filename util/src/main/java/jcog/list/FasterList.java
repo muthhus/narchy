@@ -1,6 +1,7 @@
 package jcog.list;
 
 import jcog.Util;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.impl.list.mutable.FastList;
@@ -27,7 +28,8 @@ import java.util.function.Supplier;
  */
 public class FasterList<X> extends FastList<X> {
 
-    static final Object[] ZERO_SIZED_ARRAY = new Object[0];
+    static final Object[] ZERO_SIZED_ARRAY = ArrayUtils.EMPTY_OBJECT_ARRAY;
+    private static final int INITIAL_SIZE_IF_GROWING_FROM_EMPTY = 8;
 
 
     public FasterList() {
@@ -63,17 +65,7 @@ public class FasterList<X> extends FastList<X> {
         super(x);
     }
 
-    /**
-     * quickly remove the final elements without nulling them by setting the size pointer
-     * this directly manipulates the 'size' value that the list uses to add new items at. use with caution
-     * if index==-1, then size will be zero, similar to calling clear(),
-     * except the array items will not be null
-     * <p>
-     * returns the next value
-     */
-    public final void popTo(int index) {
-        this.size = index + 1;
-    }
+
 
 
     @Override
@@ -109,7 +101,9 @@ public class FasterList<X> extends FastList<X> {
         return items[index];
         //}
     }
-    @Nullable public final X getSafe(int index) {
+
+    @Nullable
+    public final X getSafe(int index) {
         if (index >= 0 && index < this.size) {
             return items[index];
         } else {
@@ -156,16 +150,18 @@ public class FasterList<X> extends FastList<X> {
     public void compact() {
         Object[] i = items;
         int s = size;
-        if (i.length!=s) {
+        if (i.length != s) {
             items = Arrays.copyOf(items, size);
         }
     }
 
-    /** returns the array directly, or reconstructs it for the target type for the exact size required */
+    /**
+     * returns the array directly, or reconstructs it for the target type for the exact size required
+     */
     public final X[] array(IntFunction<X[]> arrayBuilder) {
         Object[] i = items;
         int s = size;
-        if (i.length!=s || i.getClass()==Object[].class) {
+        if (i.length != s || i.getClass() == Object[].class) {
             X[] x = arrayBuilder.apply(s);
             if (s > 0)
                 System.arraycopy(items, 0, x, 0, s);
@@ -330,7 +326,7 @@ public class FasterList<X> extends FastList<X> {
 //    }
 
     @Override
-    public final void forEach(Consumer c) {
+    public void forEach(Consumer c) {
         int s = size;
         X[] ii = items;
         for (int i = 0; i < s; i++) {
@@ -342,7 +338,7 @@ public class FasterList<X> extends FastList<X> {
 
 
     public final void clearFast() {
-        popTo(-1);
+        setSize(0);
     }
 
 
@@ -362,6 +358,35 @@ public class FasterList<X> extends FastList<X> {
             return r;
         }
         return null;
+    }
+
+    @Override
+    public boolean add(X newItem) {
+        if (this.items.length == this.size) {
+            this.ensureCapacityForAdd();
+        }
+        this.items[this.size++] = newItem;
+        return true;
+    }
+
+    private void ensureCapacityForAdd() {
+        this.items = (X[])(
+                (this.items.length == 0) ?
+                        new Object[INITIAL_SIZE_IF_GROWING_FROM_EMPTY]
+                        :
+                        this.copyItemsWithNewCapacity(sizePlusFiftyPercent(this.size))
+        );
+    }
+
+    static private int sizePlusFiftyPercent(int oldSize) {
+        int result = oldSize + (oldSize / 2) + 1;
+        return result < oldSize ? (Integer.MAX_VALUE - 8) : result;
+    }
+
+    private Object[] copyItemsWithNewCapacity(int newCapacity) {
+        Object[] newItems = new Object[newCapacity];
+        System.arraycopy(this.items, 0, newItems, 0, Math.min(this.size, newCapacity));
+        return newItems;
     }
 
     public final boolean addIfNotNull(@Nullable Supplier<X> x) {
@@ -442,14 +467,16 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
-    /** after procedure executes on a cell, it nullifies the cell. equivalent to:
+    /**
+     * after procedure executes on a cell, it nullifies the cell. equivalent to:
      * forEach(p) ... clear()
      * but faster
+     *
      * @param procedure
      */
     public void clear(Consumer<? super X> procedure) {
         int s = this.size;
-        for (int i = 0; i < s; i++ ) {
+        for (int i = 0; i < s; i++) {
             procedure.accept(this.items[i]);
             this.items[i] = null;
         }
@@ -457,7 +484,7 @@ public class FasterList<X> extends FastList<X> {
     }
 
     @Override
-    public void clear()     {
+    public void clear() {
         int s = size;
         if (s > 0) {
             Arrays.fill(this.items, 0, size, null);
@@ -466,12 +493,14 @@ public class FasterList<X> extends FastList<X> {
     }
 
     public void reverse() {
-        if (size>1) {
-            Util.reverse(items, 0, size-1);
+        if (size > 1) {
+            Util.reverse(items, 0, size - 1);
         }
     }
 
-    /** forcibly sets the size */
+    /**
+     * forcibly sets the size
+     */
     public void setSize(int s) {
         this.size = s;
     }

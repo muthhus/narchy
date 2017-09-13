@@ -22,7 +22,7 @@ public interface Topic<V> {
 
     void disable(Consumer<V> o);
 
-    void delete();
+    void clear();
 
     //List<Consumer<V>> all();
 

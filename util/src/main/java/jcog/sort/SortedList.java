@@ -1,4 +1,4 @@
-package jcog.data.sorted;
+package jcog.sort;
 
 //package net.sourceforge.nite.other;
 
@@ -31,8 +31,7 @@ public class SortedList<E extends Comparable> extends FasterList<E> {
 //        this.comparator = c;
 //    }
 
-    public SortedList() {
-    }
+
 
     public SortedList(int capacity) {
         super(capacity);
@@ -65,7 +64,7 @@ public class SortedList<E extends Comparable> extends FasterList<E> {
         int low = 0;
 
 
-        int s = size();
+        int s = size;
         if (s == 0)
             return super.add(o);
 
