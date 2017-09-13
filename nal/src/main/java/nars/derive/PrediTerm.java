@@ -22,4 +22,12 @@ public interface PrediTerm<X> extends Term, Predicate<X> {
         return f.apply(this);
     }
 
+    /** returns null on success; returns this instance on the test failure. go figure */
+    default PrediTerm<X> exec(X context, TrieExecutor.CPU cpu) {
+        if (!test(context))
+            return this;
+        else
+            return null;
+    }
+
 }

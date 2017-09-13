@@ -75,7 +75,7 @@ public class ActiveQuestionTask extends NALTask implements Consumer<Task> {
            byte tp = t.punc();
             if ((punc == QUESTION && tp == BELIEF || punc == QUEST && tp == GOAL)) {
                 MySubUnify u = new MySubUnify(random, ttl);
-                u.unifyAll(term(), t.term());
+                u.unify(term(), t.term(), true);
                 if (u.match) {
                     onAnswer(t);
                 }

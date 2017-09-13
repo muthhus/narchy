@@ -149,10 +149,6 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
 
-    public final boolean unifyAll(@NotNull Term x, @NotNull Term y) {
-        return unify(x, y, true);
-    }
-
     /**
      * unifies the next component, which can either be at the start (true, false), middle (false, false), or end (false, true)
      * of a matching context

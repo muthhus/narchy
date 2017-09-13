@@ -5,7 +5,7 @@ import nars.control.Derivation;
 import nars.derive.AndCondition;
 import nars.derive.Fork;
 import nars.derive.PrediTerm;
-import nars.derive.op.MatchTerm;
+import nars.derive.op.UnifyTerm;
 import org.fusesource.jansi.Ansi;
 
 public class DebugDerivationPredicate extends InstrumentedDerivationPredicate {
@@ -26,7 +26,7 @@ public class DebugDerivationPredicate extends InstrumentedDerivationPredicate {
         } else {
 
             Ansi.Color fg;
-            if (p instanceof MatchTerm) {
+            if (p instanceof UnifyTerm) {
                 fg = Ansi.Color.MAGENTA;
             } else {
                 fg = Ansi.Color.YELLOW;

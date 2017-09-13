@@ -357,7 +357,7 @@ public class Premise extends UnaryTask {
 //            return true; //keep trying
 
         }, startTTL);
-        u.unifyAll(q, a);
+        u.unify(q, a, true);
 
         ttl[0] = -(startTTL - u.ttl); //how much consumed
 

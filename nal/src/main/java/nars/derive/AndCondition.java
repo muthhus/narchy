@@ -40,7 +40,7 @@ public final class AndCondition<D> extends AbstractPred<D> {
 
     @Override
     public PrediTerm<D> transform(Function<PrediTerm<D>, PrediTerm<D>> f) {
-        return new AndCondition( Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache));
+        return new AndCondition(Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache));
     }
 
 
@@ -65,7 +65,7 @@ public final class AndCondition<D> extends AbstractPred<D> {
 
     AndCondition(@NotNull PrediTerm<D>[] p) {
         super($.p((Term[]) p));
-        assert(p.length >= 2): "unnecessary use of AndCondition";
+        assert (p.length >= 2) : "unnecessary use of AndCondition";
         this.cache = p;
     }
 
@@ -131,5 +131,20 @@ public final class AndCondition<D> extends AbstractPred<D> {
             throw new RuntimeException("element missing for removal");
 
         return AndCondition.the(Lists.newArrayList(x));
+    }
+
+    @Override
+    public PrediTerm exec(D d, TrieExecutor.CPU c) {
+
+        for (int i = 0, cacheLength = cache.length; i < cacheLength; i++) {
+            PrediTerm p = cache[i];
+
+            //if p.exec returns the same value (stored in 'q') and not a different or null, this is the signal that p.test FAILED
+            PrediTerm q = p.exec(d, c);
+            if (q == p)
+                break;
+        }
+
+        return null;
     }
 }

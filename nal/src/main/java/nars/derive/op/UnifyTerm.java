@@ -8,11 +8,11 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 5/26/16.
  */
-abstract public class MatchTerm extends AbstractPred<Derivation> {
+abstract public class UnifyTerm extends AbstractPred<Derivation> {
 
     @NotNull public final Term pattern;
 
-    MatchTerm(@NotNull Term id, @NotNull Term pattern) {
+    UnifyTerm(@NotNull Term id, @NotNull Term pattern) {
         super(id);
         this.pattern = pattern;
     }

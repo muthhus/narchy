@@ -61,7 +61,7 @@ public class Derivation extends Unify implements TermContext {
      * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
      */
     @Nullable
-    private PrediTerm forEachMatch;
+    public PrediTerm forEachMatch;
 
     /**
      * cached values ==========================================
@@ -359,34 +359,6 @@ public class Derivation extends Unify implements TermContext {
         this.concPunc = punc;
         this.single = single;
         //this.concEvidence = evidence;
-    }
-
-    /**
-     * only one thread should be in here at a time
-     */
-    public final void unifyAll(@NotNull Term x, @NotNull Term y, @Nullable PrediTerm<Derivation> eachMatch) {
-
-        boolean finish = (this.forEachMatch = eachMatch) != null;
-//        if (!finish) {
-//            //before the start
-//        }
-
-        try {
-
-//            x.recurseTerms(t -> {
-//                assert (!(t instanceof UnnormalizedVariable));
-//            });
-//            y.recurseTerms(t -> {
-//                assert (!(t instanceof UnnormalizedVariable));
-//            });
-
-            unify(x, y, finish);
-        } finally {
-            this.forEachMatch = null;
-        }
-//        if (finish) {
-//            //after the end
-//        }
     }
 
     @Override

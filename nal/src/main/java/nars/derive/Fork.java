@@ -61,7 +61,13 @@ public class Fork extends AbstractPred<Derivation> {
         }
     }
 
-//    @Override
+    @Override
+    public PrediTerm<Derivation> exec(Derivation d, TrieExecutor.CPU c) {
+        c.fork(d, cache);
+        return null;
+    }
+
+    //    @Override
 //    public void appendJavaProcedure(@NotNull StringBuilder s) {
 //        //s.append("/* " + this + "*/");
 //        for (ProcTerm p : terms()) {

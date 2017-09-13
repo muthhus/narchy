@@ -2,10 +2,8 @@ package nars.derive;
 
 import jcog.list.FasterIntArrayList;
 import jcog.list.FasterList;
-import jcog.math.ByteShuffler;
 import nars.control.Derivation;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -20,15 +18,15 @@ import java.util.Arrays;
 public class TrieExecutor extends AbstractPred<Derivation> {
 
 
-    static final class CPU {
-        static final int stackLimit = 128;
+    static final class CPU<D> {
+        static final int stackLimit = 32;
         final FasterIntArrayList ver = new FasterIntArrayList(stackLimit);
-        final FasterList<PrediTerm<Derivation>> stack = new FasterList(stackLimit);
+        final FasterList<PrediTerm<D>> stack = new FasterList<>(stackLimit);
 
-        /**
-         * call to lazily revert the derivation versioning right before it's necessary
-         */
-        void sync(Derivation d) {
+//        /**
+//         * call to lazily revert the derivation versioning right before it's necessary
+//         */
+//        void sync(Derivation d) {
 //            int ss = stack.size();
 //            int vv = ver.size();
 //            if (ss == vv)
@@ -37,14 +35,14 @@ public class TrieExecutor extends AbstractPred<Derivation> {
 //
 //            assert (vv > ss);
 //            d.revert(ver.pop(vv - ss)); //reduce the version stack to meet the instruction stack
-        }
+//        }
 
-        void queue(Derivation d, Fork f) {
+        void fork(Derivation d, PrediTerm<Derivation>[] f) {
 
-            //sync(d);
-            assert (ver.size() == stack.size());
+//            sync(d);
+            //assert (ver.size() == stack.size());
 
-            int branches = f.cache.length;
+            int branches = f.length;
             int stackStart = stack.size();
             int stackEnd = stackStart + branches;
             if (stackEnd < stackLimit) {
@@ -52,7 +50,7 @@ public class TrieExecutor extends AbstractPred<Derivation> {
 
                 //FAST
                 Object[] stackData = stack.array();
-                System.arraycopy(f.cache, 0, stackData, stackStart, branches);
+                System.arraycopy(f, 0, stackData, stackStart, branches);
                 stack.setSize(stackEnd);
 
                 d.shuffler.shuffle(d.random, stackData, stackStart, stackEnd);
@@ -75,7 +73,7 @@ public class TrieExecutor extends AbstractPred<Derivation> {
 
     }
 
-    final static ThreadLocal<CPU> cpu = ThreadLocal.withInitial(CPU::new);
+    final static ThreadLocal<CPU<Derivation>> cpu = ThreadLocal.withInitial(CPU::new);
 
     private final PrediTerm<Derivation> root;
 
@@ -95,47 +93,22 @@ public class TrieExecutor extends AbstractPred<Derivation> {
         ver.clearFast();
 
         PrediTerm<Derivation> cur = root;
-        cycle: do {
-            if (cur instanceof OpSwitch) {
-                @Nullable PrediTerm<Derivation> next = ((OpSwitch) cur).branch(d);
-                if (next != null) {
-                    cur = next;
-                } //else the switch has no path for the current context, so continue
-            }
+        while (true) {
 
-            if (cur instanceof Fork) {
-                c.queue(d, (Fork) cur);
-            } else if (cur instanceof AndCondition) {
-                //c.sync(d);
-                //int preAnd = d.now();
-                @NotNull PrediTerm[] cache = ((AndCondition) cur).cache;
-                for (int i = 0, cacheLength = cache.length; i < cacheLength; i++) {
-                    PrediTerm<Derivation> p = cache[i];
-                    if (p instanceof Fork) {
-                        assert (i == cacheLength - 1) : "fork must occurr only in the final AND condition";
-                        c.queue(d, (Fork) p);
-                    } else {
-                        if (!p.test(d)) {
-                            break;
-                        }
-                    }
-                }
+            PrediTerm<Derivation> next = cur.exec(d, c);
 
-                //d.revert(preAnd);
-
-                //continue; the and has reached the end
-
+            if (next == cur) {
+                break; //termination signal
+            } else if (next == null) {
+                cur = stack.removeLastElseNull();
+                if (cur == null)
+                    break;
+                d.revert(ver.pop());
             } else {
-                //c.sync(d);
-                cur.test(d);
+                cur = next;
             }
 
-            cur = stack.removeLastElseNull();
-            if (cur == null)
-                break;
-            d.revert(ver.pop());
-
-        } while (d.live());
+        }// while (d.live());
 
         return true;
     }

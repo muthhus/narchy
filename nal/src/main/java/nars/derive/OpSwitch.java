@@ -15,15 +15,15 @@ import java.util.function.Function;
  */
 public final class OpSwitch extends AbstractPred<Derivation> {
 
-    public final EnumMap<Op,PrediTerm<Derivation>> cases;
+    public final EnumMap<Op, PrediTerm<Derivation>> cases;
     public final PrediTerm[] swtch;
     public final int subterm;
 
-    OpSwitch(int subterm, @NotNull EnumMap<Op,PrediTerm<Derivation>> cases) {
+    OpSwitch(int subterm, @NotNull EnumMap<Op, PrediTerm<Derivation>> cases) {
         super(/*$.impl*/ $.p($.the("op" + subterm), $.p(cases.entrySet().stream().map(e -> $.p($.quote(e.getKey().toString()), e.getValue())).toArray(Term[]::new))));
 
         swtch = new PrediTerm[24]; //check this range
-        cases.forEach((k,v) -> swtch[k.id] = v);
+        cases.forEach((k, v) -> swtch[k.id] = v);
         this.subterm = subterm;
         this.cases = cases;
     }
@@ -31,7 +31,7 @@ public final class OpSwitch extends AbstractPred<Derivation> {
     @Override
     public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
         EnumMap<Op, PrediTerm<Derivation>> e2 = cases.clone();
-        e2.replaceAll( ((k, v)-> v.transform(f) ));
+        e2.replaceAll(((k, v) -> v.transform(f)));
         return new OpSwitch(subterm, e2);
     }
 
@@ -40,7 +40,7 @@ public final class OpSwitch extends AbstractPred<Derivation> {
     public boolean test(@NotNull Derivation m) {
 
         PrediTerm p = branch(m);
-        if (p!=null)
+        if (p != null)
             p.test(m);
 
         return true;
@@ -50,4 +50,10 @@ public final class OpSwitch extends AbstractPred<Derivation> {
     public PrediTerm<Derivation> branch(@NotNull Derivation m) {
         return swtch[((subterm == 0) ? m.termSub0op : m.termSub1op)];
     }
+
+    @Override
+    public PrediTerm<Derivation> exec(Derivation d, TrieExecutor.CPU cpu) {
+        return branch(d);
+    }
+
 }

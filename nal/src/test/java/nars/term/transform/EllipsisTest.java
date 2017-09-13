@@ -136,7 +136,7 @@ public class EllipsisTest {
                     }
                 };
 
-                f.unifyAll(x, y);
+                f.unify(x, y, true);
 
 //                assertTrue(f.toString() + " " + matched,
 //                        matched.get());
@@ -403,7 +403,7 @@ public class EllipsisTest {
                 }
             };
 
-            f.unifyAll(X, Y);
+            f.unify(X, Y, true);
 
             results.forEach(System.out::println);
             assertEquals(expect, results.size());

@@ -46,7 +46,12 @@ public final class UnifyOneSubterm extends UnificationPrototype {
     }
 
 
-    public static final class UnifySubterm extends MatchTerm {
+    /** this will be called prior to UnifySubtermThenConclude.
+     * so as part of an And condition, it is legitimate for this
+     * to return false and interrupt the procedure when unification fails
+     * in the first stage.
+     */
+    public static final class UnifySubterm extends UnifyTerm {
 
         /** which premise component, 0 (task) or 1 (belief) */
         private final int subterm;
@@ -57,16 +62,15 @@ public final class UnifyOneSubterm extends UnificationPrototype {
         }
 
         @Override
-        public final boolean test(@NotNull Derivation p) {
-            return p.unify(super.pattern, term(p) /* current term */, false);
+        public final boolean test(@NotNull Derivation d) {
+            return d.use(Param.TTL_UNIFY) && pattern.unify(subterm == 0 ? d.taskTerm : d.beliefTerm, d);
         }
 
-        final @NotNull Term term(@NotNull Derivation p) {
-            return subterm == 0 ? p.taskTerm : p.beliefTerm;
-        }
     }
 
-    public static final class UnifySubtermThenConclude extends MatchTerm {
+    /** returns false if the deriver is noticed to have depleted TTL,
+     *  thus interrupting all further work being done by it. */
+    public static final class UnifySubtermThenConclude extends UnifyTerm {
 
         /** which premise component, 0 (task) or 1 (belief) */
         private final int subterm;
@@ -79,16 +83,16 @@ public final class UnifyOneSubterm extends UnificationPrototype {
         }
 
         @Override
-        public final boolean test(@NotNull Derivation p) {
-            p.use(Param.TTL_UNIFY);
-                //return false;
+        public final boolean test(@NotNull Derivation d) {
+            if (!d.use(Param.TTL_UNIFY))
+                return false;
 
-            //int now = p.now();
-            p.unifyAll(super.pattern, subterm == 0 ? p.taskTerm : p.beliefTerm /* current term */, eachMatch);
-            //return p.revertAndContinue(now);
+            Term target = subterm == 0 ? d.taskTerm : d.beliefTerm;
+            d.forEachMatch = eachMatch;
+            d.unify(pattern, target /* current term */, true);
+            d.forEachMatch = null;
 
-            //return p.live();
-            return true;
+            return d.live();
         }
     }
 
