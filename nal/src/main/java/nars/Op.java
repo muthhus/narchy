@@ -1258,16 +1258,12 @@ public enum Op implements $ {
         switch (op) {
 
             case SIM:
+                if (subject instanceof Bool || predicate instanceof Bool)
+                    return $.the(subject.equals(predicate));
                 if (subject.eternalEquals(predicate))
                     return True;
-                if (subject instanceof Bool || predicate instanceof Bool)
-                    return False;
                 break;
 
-            case ATOM:
-                break;
-            case NEG:
-                break;
             case INH:
 
                 if (subject == predicate)
@@ -1296,22 +1292,6 @@ public enum Op implements $ {
                 break;
 
 
-            case SECTe:
-                break;
-            case SECTi:
-                break;
-            case DIFFe:
-                break;
-            case DIFFi:
-                break;
-            case PROD:
-                break;
-            case CONJ:
-                break;
-            case SETi:
-                break;
-            case SETe:
-                break;
             case IMPL:
 
                 //special case for implications: reduce to --predicate if the subject is False
@@ -1361,26 +1341,9 @@ public enum Op implements $ {
 
 
                 break;
-            case VAR_DEP:
-                break;
-            case VAR_INDEP:
-                break;
-            case VAR_QUERY:
-                break;
-            case VAR_PATTERN:
-                break;
-            case INT:
-                break;
-            case BOOL:
-                break;
-            case INSTANCE:
-                break;
-            case PROPERTY:
-                break;
-            case INSTANCE_PROPERTY:
-                break;
-            case DISJ:
-                break;
+
+            default:
+                throw new UnsupportedOperationException();
         }
 
         boolean subjConj = subject.op() == CONJ;
@@ -1389,11 +1352,13 @@ public enum Op implements $ {
         //factor out any common subterms iff concurrent
         if (concurrent(dt)) {
 
-            //first layer only, not recursively
+
+            Predicate<Term> del = op==IMPL ? Op.nonEventDelimeter : Op.recursiveCommonalityDelimeter;
+
             if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
-                    (subject.equals(predicate) ||
-                            subject.containsRecursively(predicate, nonEventDelimeter) ||
-                            predicate.containsRecursively(subject, nonEventDelimeter)))
+                    (/*subject.equals(predicate) ||*/
+                            subject.containsRecursively(predicate, del) ||
+                            predicate.containsRecursively(subject, del)))
                 //(!(su instanceof Variable) && predicate.contains(su)))
                 return Null; //cyclic
 

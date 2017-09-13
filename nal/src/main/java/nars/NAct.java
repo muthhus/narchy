@@ -345,10 +345,10 @@ public interface NAct {
     default void actionBipolarGreedy(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         Term pt =
                 //$.inh( $.the("\"+\""), s);
-                $.p(s, $.the("\"+\""));
+                $.p(s, s.neg());
         Term nt =
                 //$.inh($.the("\"-\""), s);
-                $.p(s, $.the("\"-\""));
+                $.p(s.neg(), s);
 
         /** default "resting" frequency; generally some value [0..0.5]
          *  this controls effective temperature of the activity
@@ -357,7 +357,7 @@ public interface NAct {
          *  while if resting at 0.5 it is already at threshold ready
          *  to fire.
          * */
-        final float restFreq = 0f;
+        final float restFreq = 0.5f;
 
         final float ff[] = new float[2];
         final float cc[] = new float[2];
@@ -405,7 +405,7 @@ public interface NAct {
                     @Nullable Truth w = y==y ? $.t(
                             (winner == 0 ? y : -y) / 2f + 0.5f, //un-map to unipolar frequency range
                             conf) : null;
-                    Truth l = $.t(0, conf);
+                    Truth l = $.t(restFreq, conf);
                     if (w == null) {
                         w = l;
                     }
@@ -433,7 +433,7 @@ public interface NAct {
 //        nar().goal(p.term(), restFreq, cm);
 //        nar().goal(n.term(), restFreq, cm);
 
-        float resolution = 0.05f;
+        float resolution = 0.01f;
         p.resolution(resolution);
         n.resolution(resolution);
     }
@@ -441,10 +441,10 @@ public interface NAct {
     default void actionBipolarMutex3(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         Term pt =
                 //$.inh( $.the("\"+\""), s);
-                $.p(s, $.the("\"+\""));
+                $.p(s, s.neg());
         Term nt =
                 //$.inh($.the("\"-\""), s);
-                $.p(s, $.the("\"-\""));
+                $.p(s.neg(), s);
 
         final float ff[] = new float[2];
         final float cc[] = new float[2];

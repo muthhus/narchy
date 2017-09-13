@@ -11,6 +11,8 @@ import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Bool;
+import nars.term.var.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -122,12 +124,14 @@ abstract public class DynamicTruthModel {
         return commit(d);
     }
 
-    /** returns an appropriate dt by sampling the existing beliefs
+    /**
+     * returns an appropriate dt by sampling the existing beliefs
      * in the table (if any exist).  if no dt can be calculated, return
-     * a standard value (ex: 0 or DTERNAL) */
+     * a standard value (ex: 0 or DTERNAL)
+     */
     private int matchDT(Term term, boolean beliefOrGoal, long start, long end, NAR n) {
 
-        assert(term.op().temporal);
+        assert (term.op().temporal);
 
         Concept c = n.concept(term);
         if (c != null) {
@@ -152,7 +156,7 @@ abstract public class DynamicTruthModel {
                     table.forEachTask(false, start, end, tx); //just the matching subrange, should be cheaper if # of tasks is high
 
                 if (count[0] > 0) {
-                    return (int)(sum[0] / count[0]);
+                    return (int) (sum[0] / count[0]);
                 }
             }
         }
@@ -239,9 +243,18 @@ abstract public class DynamicTruthModel {
     public static class Difference extends DynamicTruthModel {
         private final Term[] components;
 
-        public Difference(Term x, Term y) {
+        public Difference(Term[] xy) {
             super();
-            this.components = new Term[]{x, y};
+
+//            assert (!(xy[0] instanceof Bool) && !(xy[1] instanceof Bool));
+//            assert (!(xy[0] instanceof Variable) && !(xy[1] instanceof Variable)) :
+//                    xy[0] + " or " + xy[1] + " is a variable";
+
+            this.components = xy;
+        }
+
+        public Difference(Term x, Term y) {
+            this(new Term[]{x, y});
         }
 
         @NotNull

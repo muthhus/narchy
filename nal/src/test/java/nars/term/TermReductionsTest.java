@@ -106,6 +106,17 @@ public class TermReductionsTest extends NarseseTest {
 
     }
 
+    @Test public void testCyclicalNAL1_and_NAL2() {
+
+        assertInvalidTerms("((#1~swan)-->#1)");
+        assertInvalidTerms(
+                    "((swimmer~swan)-->swimmer)",
+                    "((x|y)-->x)",
+                    "(y<->(x|y))",
+                    "(#1<->(#1|y))"
+        );
+    }
+
     @Test
     public void testIntersectIntReductionToZero() {
         assertInvalidTerms("(|,{P,Q},{R,S})");

@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 
+import static jcog.Util.unitize;
 import static nars.Op.*;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -104,8 +105,8 @@ public abstract class Param extends Services<Term,NAR> {
     /** cost of a termutate permutation */
     public static final int TTL_MUTATE = 1;
 
-    /** cost of attempting a derivation */
-    public static final int TTL_DERIVE_EVAL = 1;
+    /** cost of substitution/evaluating a derived term */
+    public static final int TTL_DERIVE_EVAL = 0;
 
     /** cost of a successful task derivation */
     public static final int TTL_DERIVE_TASK_SUCCESS = 2;
@@ -172,25 +173,28 @@ public abstract class Param extends Services<Term,NAR> {
     public float derivePriority(Term t, Truth tr, byte punc, @NotNull Derivation d) {
         //float p = 1f / (1f + ((float)t.complexity())/termVolumeMax.floatValue());
 
+        float p = d.premisePri;
         int dCompl = t.complexity();
         int pCompl = d.parentComplexity;
-        float p =
-                ((float)pCompl) / (dCompl + pCompl); //1 - (proportion of its complexity / (its complexity + parent complexity) )
+        float relGrowth =
+                unitize(((float)dCompl) / (dCompl + pCompl)); //1 - (proportion of its complexity / (its complexity + parent complexity) )
 
+        p *= 1f - 0.5f * relGrowth;
 
         if (/* belief or goal */ tr!=null) {
 
-            //prefer confidence
-            p *= Util.unitize(  (tr.conf()) / (w2c(d.premiseEvi)) );
+            //prefer confidence, relative to the premise which formed it
+            float relConf = unitize(tr.conf() / d.premiseConf);
+            p *= relConf;
 
             //prefer polarized
             //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));
         } else {
-            p *= 0.25f;
+            p *= 0.5f;
         }
 
         //return p;
-        return p * d.premisePri;
+        return p;
     }
 
 

@@ -1,5 +1,6 @@
 package nars.concept.builder;
 
+import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
@@ -21,6 +22,7 @@ import nars.table.*;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
@@ -28,9 +30,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 import static nars.Op.*;
 
@@ -100,9 +104,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
 
 
-    private BaseConcept newTask(@NotNull Term t) {
+    private BaseConcept newTaskConcept(final Term t) {
         DynamicTruthModel dmt = null;
 
+        final TermContainer ts = t.subterms();
         switch (t.op()) {
 
             case INH:
@@ -135,13 +140,15 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                                     ////
                                     ////                                            Int.unroll(subj).forEachRemaining(dsi -> lx.add(INH.the(dsi, pred)));
                                     //                                } else {
-                                    lx.add(INH.the(csi, pred));
+                                    Term x = INH.the(csi, pred);
+                                    assert(!(x instanceof Bool) && !(x instanceof Variable));
+                                    lx.add(x);
                                     //                                }
                                 }
                             }
 
-                            boolean valid = true;
-                            if (lx.size() > 1 && valid) {
+
+                            if (lx.size() > 1 && validUnwrappableSubterms(lx)) {
                                 Term[] x = lx.toArray(Term[]::new);
                                 switch (so) {
                                     case INT:
@@ -196,10 +203,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             Term[] x = new Term[s];
                             boolean valid = true;
                             for (int i = 0; i < s; i++) {
-                                if ((x[i] = INH.the(subj, cpred.sub(i))) == null) {
+                                Term y;
+                                if (!validUnwrappableSubterm.test(y = INH.the(subj, cpred.sub(i)))) {
                                     valid = false;
                                     break;
                                 }
+                                x[i] = y;
                             }
 
                             if (valid) {
@@ -239,17 +248,18 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
             case CONJ:
                 //allow variables onlyif they are not themselves direct subterms of this
-                if (validUnwrappableSubterms(t.subterms())) {
-                    dmt = new DynamicTruthModel.Intersection(t.subterms().theArray());
+                if (validUnwrappableSubterms(ts)) {
+                    dmt = new DynamicTruthModel.Intersection(ts.theArray());
                 }
                 break;
 
             case DIFFe:
-                dmt = new DynamicTruthModel.Difference(t.sub(0), t.sub(1));
+                if (validUnwrappableSubterms(ts))
+                    dmt = new DynamicTruthModel.Difference(ts.theArray());
                 break;
 
             case NEG:
-                throw new RuntimeException("negation terms must not be conceptualized");
+                throw new RuntimeException("negation terms can not be conceptualized as something separate from that which they negate");
         }
 
         if (dmt != null) {
@@ -308,8 +318,17 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         }
     }
 
+
+    final static Predicate<Term> validUnwrappableSubterm = x -> !(x instanceof Bool) && !(x.unneg() instanceof Variable);
+
     private static boolean validUnwrappableSubterms(@NotNull TermContainer subterms) {
-        return !subterms.OR(x -> x.unneg() instanceof Variable);
+        return subterms.AND(validUnwrappableSubterm);
+    }
+    private static boolean validUnwrappableSubterms(@NotNull List<Term> subterms) {
+        for (Term t : subterms)
+            if (!validUnwrappableSubterm.test(t))
+                return false;
+        return true;
     }
 
     @Override
@@ -340,7 +359,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             c = new BaseConcept(t, BeliefTable.Empty, BeliefTable.Empty, QuestionTable.Empty, QuestionTable.Empty,
                     newLinkBags(t));
         } else {
-            c = newTask(t);
+            c = newTaskConcept(t);
         }
 
         c.state(awake);

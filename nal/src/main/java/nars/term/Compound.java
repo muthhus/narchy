@@ -984,10 +984,7 @@ public interface Compound extends Term, IPair, TermContainer {
         //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
 
         term = term.normalize();
-        if (term == null) return Null;
-
-        return term.unneg();
-
+        return term == null ? Null : term.unneg();
     }
 
 

@@ -193,6 +193,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
     }
 
+
     public void feedback(@Nullable Truth f) {
         long now = nar.time();
         int dur = nar.dur();

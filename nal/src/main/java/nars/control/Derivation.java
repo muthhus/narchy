@@ -28,6 +28,7 @@ import java.util.Map;
 import static nars.Op.Null;
 import static nars.op.substituteIfUnifies.substituteIfUnifiesAny;
 import static nars.time.Tense.ETERNAL;
+import static nars.truth.TruthFunctions.w2c;
 
 
 /**
@@ -55,7 +56,7 @@ public class Derivation extends Unify implements TermContext {
     public Premise premise;
 
 
-    public float premiseEvi;
+    public float premiseConf;
 
     /**
      * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
@@ -335,7 +336,7 @@ public class Derivation extends Unify implements TermContext {
         float premiseEvidence = task.isBeliefOrGoal() ? taskTruth.evi() : 0;
         if (beliefTruth != null)
             premiseEvidence = Math.max(premiseEvidence, beliefTruth.evi());
-        this.premiseEvi = premiseEvidence;
+        this.premiseConf = w2c(premiseEvidence);
 
         this.premisePri = p.priElseZero();
 

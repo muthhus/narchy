@@ -85,23 +85,9 @@ public class Conclusion extends AbstractPred<Derivation> {
         int volMax = nar.termVolumeMax.intValue();
 
         // 1. SUBSTITUTE
-        Term b1 =
-                pattern.transform(p);
-        if (b1 == null)
-            return true;
-                //p.transform(this.pattern);
-//        if (b1.vars(null) > 0) {
-//            Term b2 = d.transform(b1);
-//                        if (!b1.equals(b2))
-//                            System.out.println("second transform");
-//            b1 = b2;
-//        }
+        Term c1 = pattern.transform(p);
 
-        //assert (b1.varPattern() == 0) : b1 + " has pattern variables";
-        if (b1.varPattern() > 0)
-            return true;
-
-        if (!b1.op().conceptualizable)
+        if (c1 == null || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
             return true;
 
         /// 2. EVAL ----
@@ -110,9 +96,8 @@ public class Conclusion extends AbstractPred<Derivation> {
         p.use(Param.TTL_DERIVE_EVAL);
         nar.emotion.derivationEval.increment();
 
-        Term c1 = b1.eval(p); //TODO cache pure eval terms
-        if (!c1.op().conceptualizable || c1.volume() > volMax)
-            return true;
+//        Term c1 = c1.eval(p); //TODO cache pure eval terms
+
 
 
         // 4. TEMPORALIZE --

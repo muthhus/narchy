@@ -1,10 +1,12 @@
 package nars.derive;
 
 import nars.Op;
+import nars.control.Derivation;
 import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
 import nars.derive.mutate.Choose1;
 import nars.derive.mutate.Choose2;
+import nars.index.term.TermContext;
 import nars.op.mental.AliasConcept;
 import nars.term.Compound;
 import nars.term.GenericCompoundDT;
@@ -12,6 +14,7 @@ import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import nars.term.transform.CompoundTransform;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,10 +54,21 @@ abstract public class PatternCompound extends GenericCompoundDT {
         return commutative;
     }
 
-//    @Override
-//    public final int structure() {
-//        return structureNecessary;
-//    }
+
+    /** invoked by derivation Conclusion; combines substitution and evaluation in one step */
+    @Override public @Nullable Term transform(@NotNull CompoundTransform t) {
+        Term y = super.transform(op, dt, t);
+        if (t instanceof Derivation) {
+            return (y != null && y!=this) ? y.eval((Derivation) t) : null;
+        } else {
+            return y;
+        }
+    }
+
+    @Override
+    public Term eval(TermContext index) {
+        return this; //no evaluations should be applied to patterns
+    }
 
     /**
      * slightly modified from general compound unification

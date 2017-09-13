@@ -9,6 +9,7 @@ import nars.concept.Concept;
 import nars.task.UnaryTask;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -152,6 +153,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             for (Termed localSub : localTemplates) {
 
                 localSub = local(localSub, rng); //for special Termed instances, ex: RotatedInt etc
+                if (localSub instanceof Bool)
+                    continue; //unlucky mutation
 
                 float d;
                 if (localSub.op().conceptualizable) {
@@ -173,7 +176,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 }
 
                 termlinks.putAsync(
-                        new PLink(localSub.term(), d)
+                    new PLink(localSub.term(), d)
                 );
             }
         } else {

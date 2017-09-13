@@ -103,7 +103,8 @@ public class Emotivation extends Emotion {
             //float p0 = t.priSafe(0);
             float cost = Param.inputCost(t, nar);
 
-            ((NALTask)t).causeAppend(nar.taskCauses.get(t));
+            //((NALTask)t).causeAppend(nar.taskCauses.get(t));
+
             if (cost != 0) {
                 value(Cause.Purpose.Input, t.cause(), cost);
             }

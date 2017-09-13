@@ -98,7 +98,7 @@ public abstract class TermIndex implements TermContext {
     @Nullable
     public final Concept concept(@NotNull Term term, boolean createIfMissing) {
 
-        assert (term.op() != NEG); //term = term.unneg();
+        assert(term.op().conceptualizable); //term = term.unneg();
 
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {
@@ -110,6 +110,7 @@ public abstract class TermIndex implements TermContext {
 
         Concept cc = (Concept) c;
         if (cc.isDeleted()) {
+            cc.activate(0, nar);
             cc.state(conceptBuilder.init());
         }
         commit(cc);
