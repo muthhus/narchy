@@ -23,12 +23,12 @@ import static nars.derive.match.Ellipsis.hasEllipsis;
  */
 public class Builder {
 
-    public static class Subterms {
+    public static final class Subterms {
 
-        private static final Function<Term[], TermContainer> HeapSubtermBuilder =
+        public static final Function<Term[], TermContainer> HeapSubtermBuilder =
                 TermVector::the;
 
-        private static final Function<Term[], TermContainer> CaffeineSubtermBuilder =
+        public static final Function<Term[], TermContainer> CaffeineSubtermBuilder =
                 new Function<>() {
 
                     final Cache<NewCompound, TermContainer> cache =
@@ -43,12 +43,12 @@ public class Builder {
                     }
                 };
 
-        public static Function<Term[], TermContainer> HijackSubtermBuilder =
+        public static final Function<Term[], TermContainer> HijackSubtermBuilder =
                 new Function<>() {
 
                     final HijackMemoize<NewCompound, TermContainer> cache
                             = new HijackMemoize<>((x) -> HeapSubtermBuilder.apply(x.subs),
-                            64453 /* prime */, 3);
+                            64453 /* prime */, 2);
 
                     @Override
                     public TermContainer apply(Term[] o) {
@@ -67,7 +67,7 @@ public class Builder {
 
     public static class Compound {
 
-        public static BiFunction<Op, Term[], Term> HeapCompoundBuilder = (o, subterms) -> {
+        public static final BiFunction<Op, Term[], Term> HeapCompoundBuilder = (o, subterms) -> {
             assert (!o.atomic): o + " is atomic, with subterms: " + Arrays.toString(subterms);
 
             if (!o.allowsBool) {
@@ -93,12 +93,12 @@ public class Builder {
         };
 
 
-        public static BiFunction<Op, Term[], Term> HijackCompoundBuilder =
+        public static final BiFunction<Op, Term[], Term> HijackCompoundBuilder =
                 new BiFunction<>() {
 
                     final HijackMemoize<NewCompound, Term> cache
                             = new HijackMemoize<>((x) -> HeapCompoundBuilder.apply(x.op, x.subs),
-                            128 * 1024, 3);
+                            64453 /* prime */, 2);
 
                     @Override
                     public Term apply(Op o, Term[] subterms) {

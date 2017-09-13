@@ -5,7 +5,6 @@ import jcog.Util;
 import jcog.data.sorted.SortedList;
 import jcog.list.FasterList;
 import nars.Op;
-import nars.index.term.TermIndex;
 import nars.term.atom.Atom;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
@@ -397,7 +396,7 @@ public enum Terms {
 
     @Nullable
     public static <T extends Term> T normalizedOrNull(@Nullable Term t) {
-        return (T) normalizedOrNull(t, TermIndex.retemporalizeXTERNALToDTERNAL);
+        return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
     }
 
     @Nullable
@@ -406,7 +405,7 @@ public enum Terms {
         if (t.isTemporal()) {
             //the compound indicated a potential dt, but the premise was actually atemporal;
             // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
-            return TermIndex.retemporalize(t, r); //retemporalize does normalize at the end
+            return t.temporalize(r);
         } else {
             return t.normalize();
         }

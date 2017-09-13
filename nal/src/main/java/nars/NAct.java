@@ -360,7 +360,7 @@ public interface NAct {
 
             float minConf =
                     //n.confMin.floatValue();
-                     n.confDefault(GOAL) * 0.25f;
+                     n.confDefault(GOAL) * 1f;
                      //n.confDefault(BELIEF);
 
             float cur = curiosity().floatValue();

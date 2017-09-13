@@ -1,15 +1,14 @@
 package nars.perf;
 
+import org.openjdk.jmh.profile.HotspotMemoryProfiler;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.Options;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.openjdk.jmh.runner.options.TimeValue;
-import org.openjdk.jmh.runner.options.VerboseMode;
+import org.openjdk.jmh.runner.options.*;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * Created by me on 12/11/15.
@@ -17,23 +16,23 @@ import java.util.Collection;
 public enum JmhBenchmark {
 	;
 
-	public static void perf(Class c, int iterations, int batchSize) throws RunnerException {
-		perf(c.getSimpleName(), iterations, batchSize);
+	public static void perf(Class c, Consumer<ChainedOptionsBuilder> config) throws RunnerException {
+		perf(c.getSimpleName(), config);
 	}
 
-	public static void perf(String include, int iterations, int batchSize) throws RunnerException {
-		Options opt = new OptionsBuilder()
+	public static void perf(String include, Consumer<ChainedOptionsBuilder> config) throws RunnerException {
+		ChainedOptionsBuilder opt = new OptionsBuilder()
 				.include(include)
 				.shouldDoGC(true)
-				.warmupIterations(0)
-				.measurementIterations(iterations)
-				.measurementBatchSize(batchSize)
-				.threads(1)
-				.forks(1)
+				.warmupIterations(1)
+//				.measurementIterations(iterations)
+//				.measurementBatchSize(batchSize)
+				//.threads(1)
+				//.forks(1)
 				.resultFormat(ResultFormatType.TEXT)
-				.verbosity(VerboseMode.EXTRA) //VERBOSE OUTPUT
+				//.verbosity(VerboseMode.EXTRA) //VERBOSE OUTPUT
 
-			    .addProfiler(StackProfiler2.class)
+			    //.addProfiler(StackProfiler2.class)
 
 //			    .addProfiler(PausesProfiler.class, "period=10" /*uS */)
 //        		.addProfiler(SafepointsProfiler.class)
@@ -60,11 +59,12 @@ public enum JmhBenchmark {
 				//.addProfiler(CompilerProfiler.class)
 
 
-				.timeout(TimeValue.seconds(100))
+				.timeout(TimeValue.seconds(500))
+		;
 
-				.build();
+		config.accept(opt);
 
-		Collection<RunResult> result = new Runner(opt).run();
+		Collection<RunResult> result = new Runner(opt.build()).run();
 		result.forEach(r -> {
 			r.getSecondaryResults().forEach((k,v)->{
 				if (v instanceof StackProfiler2.StackResult) {

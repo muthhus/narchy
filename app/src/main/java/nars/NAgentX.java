@@ -10,7 +10,8 @@ import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
-import nars.index.term.map.CaffeineIndex2;
+import nars.index.term.HijackTermIndex;
+import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -18,6 +19,7 @@ import nars.term.Term;
 import nars.time.RealTime;
 import nars.truth.Truth;
 import nars.video.*;
+import org.apache.commons.math3.primes.Primes;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
@@ -129,7 +131,7 @@ abstract public class NAgentX extends NAgent {
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8
                 , "motivation.nal");
 
-        int THREADS = 2;
+        int THREADS = 3;
         NAR n = new NARS()
                 .exe(
                         new MultiExec((i) ->
@@ -147,9 +149,9 @@ abstract public class NAgentX extends NAgent {
                                 ), THREADS, 2))
                 .time(clock)
                 .index(
-                        //new CaffeineIndex(64 * 1024)
-                        new CaffeineIndex2(64 * 1024)
-                        //new HijackTermIndex(64 * 1024,  3)
+                        new CaffeineIndex(128 * 1024)
+                        //new CaffeineIndex2(64 * 1024)
+                        //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
                 )
                 .get();
 
@@ -167,7 +169,7 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 1f * priFactor;
-        n.termVolumeMax.setValue(17);
+        n.termVolumeMax.setValue(24);
 
         //n.dtDither.setValue(0.25f);
         //n.dtMergeOrChoose.setValue(true);

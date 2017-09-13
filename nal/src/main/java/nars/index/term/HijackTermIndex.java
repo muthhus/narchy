@@ -1,5 +1,6 @@
 package nars.index.term;
 
+import jcog.Loop;
 import jcog.Util;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
@@ -11,39 +12,49 @@ import nars.concept.PermanentConcept;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.term.Term;
 import nars.term.Termed;
+import org.HdrHistogram.IntCountsHistogram;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
 
+import static nars.truth.TruthFunctions.w2c;
+
 /**
  * Created by me on 2/20/17.
  */
-public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
+public class HijackTermIndex extends MaplikeTermIndex {
 
     private final PLinkHijackBag<Termed> table;
     //private final Map<Term,Termed> permanent = new ConcurrentHashMap<>(1024);
-    private Thread updateThread;
-    private boolean running;
 
-    private final long updatePeriodMS;
+    private final Loop updater;
+    final IntCountsHistogram conceptScores = new IntCountsHistogram(1000, 2);
 
-    /** current update index */
+    private final int updatePeriodMS;
+
+    /**
+     * current update index
+     */
     private int visit;
 
-    /** how many items to visit during update */
+    /**
+     * how many items to visit during update
+     */
     private final int updateBatchSize;
     private final float initial = 0.5f;
     private final float getBoost = 0.02f;
     private final float forget = 0.05f;
+    private long now;
+    private int dur;
 
     public HijackTermIndex(int capacity, int reprobes) {
         super();
 
         updateBatchSize = 4096; //1 + (capacity / (reprobes * 2));
         updatePeriodMS = 100;
-
+        updater = Loop.of(this::update);
 
         this.table = new PLinkHijackBag<>(capacity, reprobes) {
 
@@ -81,10 +92,9 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
     @Override
     public void start(NAR nar) {
         super.start(nar);
-        running = true;
-        updateThread = new Thread(this);
-        updateThread.start();
+        updater.runMS(updatePeriodMS);
     }
+
 
     @Override
     public void commit(Concept c) {
@@ -101,7 +111,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
             if (createIfMissing) {
                 Termed kc = conceptBuilder.apply(key);
-                if (kc!=null) {
+                if (kc != null) {
                     PriReference<Termed> inserted = table.put(new PLink<>(kc, initial));
                     if (inserted != null) {
                         return kc;
@@ -156,42 +166,73 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         //permanent.remove(entry);
     }
 
-    @Override
-    public void run() {
-        while (running) {
 
-            AtomicReferenceArray<PriReference<Termed>> tt = table.map.get();
+    /** performs an iteration update */
+    private void update() {
 
-            int c = tt.length();
+        AtomicReferenceArray<PriReference<Termed>> tt = table.map.get();
 
-            int visit = this.visit;
+        int c = tt.length();
+
+        now = nar.time();
+        dur = nar.dur();
+
+        int visit = this.visit;
+        try {
             int n = updateBatchSize;
 
-            for (int i = 0; i < n; i++ , visit++) {
+            for (int i = 0; i < n; i++, visit++) {
 
                 if (visit >= c) visit = 0;
 
                 PriReference<Termed> x = tt.get(visit);
-                if (x!=null)
+                if (x != null)
                     update(x);
             }
-
+        } finally {
             this.visit = visit;
-
-            //Util.pause(updatePeriodMS);
-            Util.sleep(updatePeriodMS);
+            Util.decode(conceptScores, "", 200, (x,v)->{
+                System.out.println(x + "\t" + v);
+            });
+            conceptScores.reset();
         }
+
     }
 
     protected void update(PriReference<Termed> x) {
 
         //TODO better update function based on Concept features
-        Termed c = x.get();
-        if (!(c instanceof PermanentConcept)) {
-            float decayRate = c.complexity() / ((float)Param.COMPOUND_VOLUME_MAX);
-                    // / (1f + c.beliefs().priSum() + c.goals().priSum());
-            x.priMult(1f - forget * Util.unitize(decayRate));
+        Termed tc = x.get();
+        if (tc instanceof PermanentConcept)
+            return; //dont touch
+
+        Concept c = (Concept)tc;
+        int score = (int)(score(c)*1000f);
+
+        float cutoff = 0.25f;
+        if (conceptScores.getTotalCount() > updateBatchSize/4) {
+            float percentile = (float) conceptScores.getPercentileAtOrBelowValue(score)/100f;
+            if (percentile < cutoff)
+                forget(x, c, (float) cutoff * (1 - percentile));
         }
+
+        conceptScores.recordValue(score);
     }
 
+    protected float score(Concept c) {
+        float beliefConf = w2c((float) c.beliefs().stream().mapToDouble(t -> t.evi(now, dur)).average().orElse(0));
+        float goalConf =  w2c((float) c.goals().stream().mapToDouble(t -> t.evi(now, dur)).average().orElse(0));
+        float talCap = c.tasklinks().size() / (1f + c.tasklinks().capacity());
+        float telCap = c.termlinks().size() / (1f + c.termlinks().capacity());
+        return Util.or(((talCap+telCap)/2f), (beliefConf + goalConf)/2f) /
+                (1 + ((c.complexity() + c.volume())/2f)/nar.termVolumeMax.intValue());
+    }
+
+    protected void forget(PriReference<Termed> x, Concept c, float amount) {
+        //shrink link bag capacity in proportion to the forget amount
+        c.tasklinks().setCapacity(Math.round(c.tasklinks().capacity() * (1f-amount)));
+        c.termlinks().setCapacity(Math.round(c.termlinks().capacity() * (1f-amount)));
+
+        x.priMult(1f - amount);
+    }
 }

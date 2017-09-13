@@ -1,7 +1,6 @@
 package nars.task.util;
 
 import nars.*;
-import nars.index.term.TermIndex;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
@@ -42,7 +41,7 @@ public class TaskRule extends TaskMatch {
         super(nar);
 
         this.input = $.$(input);
-        this.outputRaw = TermIndex.termRaw(output);
+        this.outputRaw = (Compound) Narsese.term(output, false);
 
         VariableNormalization varNorm = new VariableNormalization(outputRaw.size() /* est */, 0);
 

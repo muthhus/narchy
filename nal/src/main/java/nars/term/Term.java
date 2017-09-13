@@ -40,6 +40,7 @@ import nars.term.subst.MapSubst1;
 import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
+import nars.term.transform.Retemporalize;
 import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
@@ -934,5 +935,11 @@ public interface Term extends Termlike, Comparable<Term> {
     default Term negIf(boolean negate) {
         return negate ? NEG.the(this) : this;
     }
+
+    @Nullable default Term temporalize(Retemporalize r) {
+        Term y = transform(r.dt(this), r);
+        return y!=null ? y.normalize() : null;
+    }
+
 }
 

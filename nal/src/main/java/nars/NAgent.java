@@ -552,9 +552,9 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     }
 
 
-    public Supplier<Task> goal(@NotNull Term term, Truth truth) {
-        return prediction(term, GOAL, new DiscreteTruth(truth.freq(), truth.conf()));
-    }
+//    public Supplier<Task> goal(@NotNull Term term, Truth truth) {
+//        return prediction(term, GOAL, new DiscreteTruth(truth.freq(), truth.conf()));
+//    }
 
     public Supplier<Task> question(@NotNull Term term) {
         return prediction(term, QUESTION, null);
@@ -566,18 +566,22 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
     public Supplier<Task> prediction(@NotNull Term _term, byte punct, DiscreteTruth truth) {
         Term term = _term.normalize();
+
+            long now = nar.time();
+            //long start = now;
+            //long end = now + Math.round(predictAheadDurs.floatValue() * nar.dur());
+            long start = ETERNAL, end = ETERNAL;
+
+            NALTask t = new NALTask(term, punct, truth, now,
+                    start, end,
+                    new long[]{nar.time.nextStamp()});
+
         return () -> {
 
 //        if (truth == null && !(punct == QUESTION || punct == QUEST))
 //            return null; //0 conf or something
 
-            long now = nar.time();
-            long start = now;
-            long end = now + Math.round(predictAheadDurs.floatValue() * nar.dur());
 
-            NALTask t = new NALTask(term, punct, truth, now,
-                    start, end,
-                    new long[]{nar.time.nextStamp()});
             return t;
         };
     }

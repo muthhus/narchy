@@ -42,3 +42,6 @@ nal/vis.xml
 
 on/.git
 .clover
+jmh-result*
+narchy.ipr
+narchy.iws

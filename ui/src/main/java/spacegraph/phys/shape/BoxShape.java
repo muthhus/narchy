@@ -69,11 +69,6 @@ public class BoxShape extends SimpleBoxShape {
 	}
 
 	@Override
-	public BroadphaseNativeType getShapeType() {
-		return BroadphaseNativeType.BOX_SHAPE_PROXYTYPE;
-	}
-
-	@Override
 	public v3 localGetSupportingVertex(v3 vec, v3 out) {
 		v3 halfExtents = getHalfExtentsWithoutMargin(out);
 		
@@ -155,11 +150,6 @@ public class BoxShape extends SimpleBoxShape {
 	}
 
 	@Override
-	public void getAabb(Transform t, v3 aabbMin, v3 aabbMax) {
-		AabbUtil2.transformAabb(getHalfExtentsWithoutMargin(), getMargin(), t, aabbMin, aabbMax);
-	}
-
-	@Override
 	public void calculateLocalInertia(float mass, v3 inertia) {
 
 		v3 halfExtents = getHalfExtentsWithMargin(new v3());
@@ -184,21 +174,6 @@ public class BoxShape extends SimpleBoxShape {
 
 		tmp.negate(planeNormal);
 		localGetSupportingVertex(tmp, planeSupport);
-	}
-
-	@Override
-	public int getNumPlanes() {
-		return 6;
-	}
-
-	@Override
-	public int getNumVertices() {
-		return 8;
-	}
-
-	@Override
-	public int getNumEdges() {
-		return 12;
 	}
 
 	@Override
@@ -307,34 +282,4 @@ public class BoxShape extends SimpleBoxShape {
 		return "Box";
 	}
 
-	@Override
-	public int getNumPreferredPenetrationDirections() {
-		return 6;
-	}
-
-	@Override
-	public void getPreferredPenetrationDirection(int index, v3 penetrationVector) {
-		switch (index) {
-			case 0:
-				penetrationVector.set(1f, 0f, 0f);
-				break;
-			case 1:
-				penetrationVector.set(-1f, 0f, 0f);
-				break;
-			case 2:
-				penetrationVector.set(0f, 1f, 0f);
-				break;
-			case 3:
-				penetrationVector.set(0f, -1f, 0f);
-				break;
-			case 4:
-				penetrationVector.set(0f, 0f, 1f);
-				break;
-			case 5:
-				penetrationVector.set(0f, 0f, -1f);
-				break;
-			default:
-				assert (false);
-		}
-	}
 }

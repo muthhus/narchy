@@ -121,7 +121,7 @@ public class Recog2D extends NAgentX {
 
         //nar.log();
 
-        outs = new Outputs(ii -> $.p(Atomic.the("s" + ii), id), maxImages, this, goalInfluence);
+        outs = new Outputs(ii -> $.the("s" + ii), maxImages, this, goalInfluence);
         train = new Training(
                 //sensors,
                 Lists.newArrayList(
@@ -310,11 +310,11 @@ public class Recog2D extends NAgentX {
         NAgentX.runRT((n) -> {
 
             Recog2D a = new Recog2D(n);
-            a.nar.truthResolution.setValue(0.1f);
-            a.nar.termVolumeMax.setValue(24);
+            a.nar.truthResolution.setValue(0.05f);
+            a.nar.termVolumeMax.setValue(12);
             return a;
 
-        }, 7);
+        }, 15);
     }
 
     public static class Training {

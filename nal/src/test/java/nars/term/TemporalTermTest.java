@@ -3,8 +3,8 @@ package nars.term;
 import nars.*;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.index.term.TermIndex;
 import nars.term.container.TermContainer;
+import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -866,7 +866,7 @@ public class TemporalTermTest {
         String st = "((--,(happy)) && (--,((--,(o))&&(happy))))";
         Compound t = $.$(st);
         assertEquals("((--,((--,(o))&&(happy)))&&(--,(happy)))", t.toString());
-        Term xe = TermIndex.retemporalize(t, TermIndex.retemporalizeXTERNALToDTERNAL);
+        Term xe = t.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
         assertEquals("((--,((--,(o))&&(happy)))&&(--,(happy)))", xe.toString());
 
         //TODO this will require a refactor allowing arbitrary function mapping matched dt source value to a target dt
@@ -880,10 +880,10 @@ public class TemporalTermTest {
         Compound u = $.$(su);
         assertEquals("((--,((--,(o)) &&+- (happy))) &&+- (--,(happy)))", u.toString());
 
-        Term ye = TermIndex.retemporalize(u, TermIndex.retemporalizeXTERNALToDTERNAL);
+        Term ye = u.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
         assertEquals("((--,((--,(o))&&(happy)))&&(--,(happy)))", ye.toString());
 
-        Term yz = TermIndex.retemporalize(u, TermIndex.retemporalizeXTERNALToZero);
+        Term yz = u.temporalize(Retemporalize.retemporalizeXTERNALToZero);
         assertEquals("((--,((--,(o))&|(happy)))&|(--,(happy)))", yz.toString());
 
     }

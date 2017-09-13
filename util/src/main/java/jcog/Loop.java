@@ -25,6 +25,15 @@ abstract public class Loop implements Runnable {
 
     public final DescriptiveStatistics frameTime = new DescriptiveStatistics(windowLength); //in millisecond
 
+    public static Loop of(Runnable iteration) {
+        return new Loop() {
+            @Override public boolean next() {
+                iteration.run();
+                return true;
+            }
+        };
+    }
+
     /**
      * < 0: paused
      * 0: loop at full speed
@@ -66,8 +75,14 @@ abstract public class Loop implements Runnable {
         return thread.get() != null;
     }
 
-    public final void runFPS(float fps) {
+    public final Loop runFPS(float fps) {
         setPeriodMS((int) (1000f / fps));
+        return this;
+    }
+
+    public final Loop runMS(int periodMS) {
+        setPeriodMS(periodMS);
+        return this;
     }
 
     public final boolean setPeriodMS(int nextPeriodMS) {

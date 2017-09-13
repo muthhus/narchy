@@ -10,7 +10,6 @@ import nars.Task;
 import nars.concept.Concept;
 import nars.derive.time.Event;
 import nars.derive.time.Temporalize;
-import nars.index.term.TermIndex;
 import nars.table.BeliefTable;
 import nars.task.ITask;
 import nars.task.UnaryTask;
@@ -19,6 +18,7 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.Unify;
 import nars.term.subst.UnifySubst;
+import nars.term.transform.Retemporalize;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -129,7 +129,7 @@ public class Premise extends UnaryTask {
 
                     if (!(nar.nal() >= 7 || !beliefTerm.isTemporal())) {
                         //HACK HACK HACK this is temporary until Temporalize correctly differnetiates between && and &| etc
-                        beliefTerm = TermIndex.retemporalize(beliefTerm, TermIndex.retemporalizeAllToDTERNAL);
+                        beliefTerm = beliefTerm.temporalize(Retemporalize.retemporalizeAllToDTERNAL);
 
                         if (beliefTerm == null)
                             beliefTerm = beliefTermRaw; //HACK

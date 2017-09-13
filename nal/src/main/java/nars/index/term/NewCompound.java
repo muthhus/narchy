@@ -139,7 +139,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
             volume += x.volume();
 
         ArrayPool<byte[]> bytePool = ArrayPool.bytes();
-        byte[] bbTmp = bytePool.getMin(volume * 32 /* estimate */);
+        byte[] bbTmp = bytePool.getMin(volume * 16 /* estimate */);
         try {
 
             this.bytes = bbTmp;

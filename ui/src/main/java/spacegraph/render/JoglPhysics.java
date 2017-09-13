@@ -171,10 +171,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
 
     }
 
-    @Override
-    public void windowDestroyed(WindowEvent windowEvent) {
-        super.windowDestroyed(windowEvent);
-    }
 
     /**
      * supplies the physics engine set of active physics objects at the beginning of each cycle

@@ -412,14 +412,10 @@ public class StackProfiler2 implements InternalProfiler {
             int topStacks = 0;
             Map<Thread.State, HashBag<StackRecord>> sum = new EnumMap<>(Thread.State.class);
             for (StackResult r : results) {
-                for (Map.Entry<Thread.State, HashBag<StackRecord>> entry : r.stacks.entrySet()) {
-                    if (!sum.containsKey(entry.getKey())) {
-                        sum.put(entry.getKey(), new HashBag<StackRecord>());
-                    }
-                    HashBag<StackRecord> sumSet = sum.get(entry.getKey());
-                    HashBag<StackRecord> b = entry.getValue();
-                    b.forEachWithOccurrences(sumSet::addOccurrences);
-                }
+                r.stacks.forEach((key, value) -> {
+                    HashBag<StackRecord> sumSet = sum.computeIfAbsent(key, (x) -> new HashBag<StackRecord>());
+                    value.forEachWithOccurrences(sumSet::addOccurrences);
+                });
                 topStacks = r.topStacks;
             }
             return new StackResult(sum, topStacks);

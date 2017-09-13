@@ -8,9 +8,9 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
-import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.transform.Retemporalize;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -102,10 +102,10 @@ public enum TermGraph {
                                 return;
                             }
 
-                            s = TermIndex.retemporalize(s, TermIndex.retemporalizeXTERNALToZero);
+                            s = s.temporalize(Retemporalize.retemporalizeXTERNALToZero);
                             if (s == null)
                                 return;
-                            p = TermIndex.retemporalize(p, TermIndex.retemporalizeXTERNALToZero);
+                            p = p.temporalize(Retemporalize.retemporalizeXTERNALToZero);
                             if (p == null)
                                 return;
 

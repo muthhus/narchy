@@ -320,10 +320,6 @@ public class DecisionTree<K, V> {
             return super.add(newItem);
         }
 
-        @Override
-        public void add(int index, Node element) {
-            super.add(index, element);
-        }
 
         public Stream<Node<V>> recurse() {
             return Stream.concat(

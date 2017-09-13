@@ -2,38 +2,80 @@
 package nars.perf;
 
 import nars.$;
+import nars.Builder;
 import nars.NAR;
 import nars.NARS;
+import nars.term.Term;
+import nars.term.container.TermContainer;
 import nars.test.DeductiveChainTest;
 import nars.test.DeductiveMeshTest;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
 
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+
 import static nars.perf.JmhBenchmark.perf;
 
-@State(Scope.Benchmark)
+@State(Scope.Thread)
+@AuxCounters(AuxCounters.Type.EVENTS)
 public class NARBenchmark {
 
-    NAR n;
+    @Param({"6"})
+    String nalLevel;
+
+    @Param({"8000"})
+    String cycles;
+
+    @Param({"heap", "hijack", "caffeine"})
+    String subtermBuilder;
+
+    @Param({"12", "24" })
+    String termVolumeMax;
+
+    public long concepts;
+    private NAR n;
 
     @Setup
-    public void prepare() {
+    public void start() {
+        Function<Term[], TermContainer> h = null;
+        switch (subtermBuilder) {
+            case "heap": h = Builder.Subterms.HeapSubtermBuilder; break;
+            case "hijack": h = Builder.Subterms.HijackSubtermBuilder; break;
+            case "caffeine": h = Builder.Subterms.CaffeineSubtermBuilder; break;
+        }
+        Builder.Subterms.the = h;
 
-        n = new NARS().get();
+        n = NARS.tmp();
+        n.nal(Integer.parseInt(nalLevel));
+        n.termVolumeMax.setValue(Integer.parseInt(termVolumeMax));
+
         //n.inputActivation.setValue(0.5f);
         //n.derivedActivation.setValue(0.5f);
         //n.nal(4);
-
-        new DeductiveMeshTest(n, 16, 16);
-        new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
     }
 
+    @TearDown
+    public void end() {
+        concepts = n.terms.size();
+    }
+
+
+//    @Benchmark
+//    @BenchmarkMode({Mode.AverageTime})
+//    public void deductiveChainTest1() {
+//        new DeductiveChainTest(n, 8, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
+//        n.run(Integer.parseInt(cycles));
+//    }
 
     @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    public void deductiveChainTest1() {
-        n.run(2000);
+    @BenchmarkMode({Mode.AverageTime})
+    public void deductiveMeshTest1() {
+        new DeductiveMeshTest(n, 8, 8);
+        n.run(Integer.parseInt(cycles));
     }
+
+
 
 //    @Benchmark
 //    @BenchmarkMode(value = Mode.AverageTime)
@@ -61,7 +103,13 @@ public class NARBenchmark {
 
 
     public static void main(String[] args) throws RunnerException {
-        perf(NARBenchmark.class, 1, 1);
+        perf(NARBenchmark.class,(o)->{
+            o.warmupIterations(1);
+            o.measurementIterations(2);
+            //o.threads(4);
+            o.forks(1);
+
+        });
     }
 
 }

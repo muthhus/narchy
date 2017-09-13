@@ -6,9 +6,9 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.control.Cause;
-import nars.index.term.TermIndex;
 import nars.task.NALTask;
 import nars.term.Term;
+import nars.term.transform.Retemporalize;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -261,7 +261,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
                     dur, nar.confMin.floatValue());
             if (aProj != null) {
 
-                Term at = normalizedOrNull(answer.term(), TermIndex.retemporalizeXTERNALToZero);
+                Term at = normalizedOrNull(answer.term(), Retemporalize.retemporalizeXTERNALToZero);
                 if (at == null)
                     return null;
 

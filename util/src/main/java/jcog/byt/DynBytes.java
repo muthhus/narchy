@@ -17,12 +17,14 @@ public class DynBytes implements ByteArrayDataOutput, Appendable, AbstractBytes 
 
     /**
      * must remain final for global consistency
+     * might as well be 1.0, if it's already compressed to discover what this is, just keep it
      */
-    private final static float minCompressionRatio = 0.9f;
+    private final static float minCompressionRatio = 1f;
+
     /**
      * must remain final for global consistency
      */
-    private final static int MIN_COMPRESSION_BYTES = 64;
+    private final static int MIN_COMPRESSION_BYTES = 72;
 
     static final int MIN_GROWTH_BYTES = 64;
 
@@ -76,7 +78,7 @@ public class DynBytes implements ByteArrayDataOutput, Appendable, AbstractBytes 
                 compressed, from);
 
 
-        if (compressedLength < (int) (len * minCompressionRatio)) {
+        if (compressedLength < (len * minCompressionRatio)) {
 
             if (from > 0)
                 System.arraycopy(this.bytes, 0, compressed, 0, from); //copy prefix
