@@ -51,18 +51,18 @@ public class FocusExec extends Exec implements Runnable {
     final CurveBag<Premise> premises = new ConcurrentCurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
             new ConcurrentHashMap<>(), null, MAX_PREMISES);
 
-    final CurveBag<Task> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
-            null, MAX_TASKS) {
-        @Override
-        public void onRemove(@NotNull Task value) {
-            ignore(value);
-        }
-
-        @Override
-        public void onReject(@NotNull Task value) {
-            ignore(value);
-        }
-    };
+//    final CurveBag<Task> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
+//            null, MAX_TASKS) {
+//        @Override
+//        public void onRemove(@NotNull Task value) {
+//            ignore(value);
+//        }
+//
+//        @Override
+//        public void onReject(@NotNull Task value) {
+//            ignore(value);
+//        }
+//    };
 
 
     public final Bag concepts =
@@ -92,7 +92,7 @@ public class FocusExec extends Exec implements Runnable {
     protected synchronized void clear() {
         next.clear();
         premises.clear();
-        tasks.clear();
+//        tasks.clear();
         concepts.clear();
     }
 
@@ -125,11 +125,13 @@ public class FocusExec extends Exec implements Runnable {
     public void run() {
 
         if (Param.TRACE) {
-            System.out.println("tasks=" + tasks.size() + " concepts=" + concepts.size() + " premises=" + premises.size());
+            System.out.println(
+                    //"tasks=" + tasks.size() +
+                    " concepts=" + concepts.size() + " premises=" + premises.size());
             if (!concepts.isEmpty())
                 concepts.print();
-            if (tasks.isEmpty())
-                logger.warn("no tasks");
+//            if (tasks.isEmpty())
+//                logger.warn("no tasks");
             if (concepts.isEmpty())
                 logger.warn("no concepts");
         }
@@ -145,19 +147,18 @@ public class FocusExec extends Exec implements Runnable {
 //            tasks.print();
 //            System.out.println();
 
-            tasks.commit(null).sample((x) -> {
-                NALTask tt = (NALTask) x;
-                next.add(tt);
-                boolean save =
-                        //tt.isInput();
-                        false;
-                return --maxTasks[0] > 0 ?
-                        (save ? Bag.BagSample.Next : Bag.BagSample.Remove)
-                        :
-                        (save ? Bag.BagSample.Stop : Bag.BagSample.RemoveAndStop);
-            });
-
-            execute(next);
+//            tasks.commit(null).sample((x) -> {
+//                NALTask tt = (NALTask) x;
+//                next.add(tt);
+//                boolean save =
+//                        //tt.isInput();
+//                        false;
+//                return --maxTasks[0] > 0 ?
+//                        (save ? Bag.BagSample.Next : Bag.BagSample.Remove)
+//                        :
+//                        (save ? Bag.BagSample.Stop : Bag.BagSample.RemoveAndStop);
+//            });
+//            execute(next);
 
             concepts.commit().sample(subCycleConcepts, (Predicate<ITask>) (next::add));
 
@@ -178,11 +179,14 @@ public class FocusExec extends Exec implements Runnable {
     }
 
     protected void execute(ITask x) {
+
         Iterable<? extends ITask> y = null;
+
         try {
+
             y = x.run(nar);
 
-        } catch (UnsupportedOperationException e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
         } catch (Throwable e) {
             if (Param.DEBUG) {
@@ -207,20 +211,20 @@ public class FocusExec extends Exec implements Runnable {
 
     @Override
     public Stream<ITask> stream() {
-        return Stream.concat(Stream.concat(concepts.stream(),
+        return /*Stream.concat*/(Stream.concat(concepts.stream(),
                 premises.stream()
-        ), tasks.stream()).filter(Objects::nonNull);
+        )/*, tasks.stream()*/).filter(Objects::nonNull);
     }
 
 
     @Override
     public void add(@NotNull ITask x) {
         if (x instanceof Task) {
-            if (x.isInput()) {
+            //if (x.isInput()) {
                 execute(x); //execute immediately
-            } else {
-                tasks.putAsync((Task) x); //buffer
-            }
+//            } else {
+//                tasks.putAsync((Task) x); //buffer
+//            }
         } else if (x instanceof Premise) {
 
             premises.putAsync((Premise) x);
