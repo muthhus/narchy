@@ -58,11 +58,7 @@ public final class UnifyOneSubterm extends UnificationPrototype {
 
         @Override
         public final boolean test(@NotNull Derivation p) {
-            if (!p.unify(super.pattern, term(p) /* current term */, false)) {
-                return false;
-            } else {
-                return p.live();
-            }
+            return p.unify(super.pattern, term(p) /* current term */, false);
         }
 
         final @NotNull Term term(@NotNull Derivation p) {
@@ -84,14 +80,15 @@ public final class UnifyOneSubterm extends UnificationPrototype {
 
         @Override
         public final boolean test(@NotNull Derivation p) {
-            if (!p.use(Param.TTL_UNIFY))
-                return false;
+            p.use(Param.TTL_UNIFY);
+                //return false;
 
-            int now = p.now();
+            //int now = p.now();
             p.unifyAll(super.pattern, subterm == 0 ? p.taskTerm : p.beliefTerm /* current term */, eachMatch);
-            return p.revertAndContinue(now);
+            //return p.revertAndContinue(now);
 
             //return p.live();
+            return true;
         }
     }
 

@@ -343,9 +343,11 @@ public class Derivation extends Unify implements TermContext {
                 Cause.zip(task, belief) :
                 task.cause();
 
-        deriver.test(this);
-
-        return derivations.values();
+        try {
+            deriver.test(this);
+        } finally {
+            return derivations.values();
+        }
     }
 
 

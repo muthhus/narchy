@@ -381,7 +381,7 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
             case QUEST:
                 return quests;
             default:
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("what kind of punctuation is: '" + punc + "'");
         }
     }
 

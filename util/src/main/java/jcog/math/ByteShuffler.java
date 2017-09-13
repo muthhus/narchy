@@ -36,16 +36,27 @@ public class ByteShuffler {
 
     public void shuffle(Random rng, Object[] a, int from, int to) {
         int len = to - from;
+
+        if (len == 2) {
+            //special fast case
+            if (rng.nextBoolean()) {
+                Object x = a[from];
+                a[from] = a[to];
+                a[to] = x;
+            }
+            return;
+        }
+
         assert(len >= 2 && len < 127);
 
         long rndInt = 0; //generate one 64 bit random long every 8 cycles
         int generate = 0;
-        for (int i=0; i < len; i++) {
+        for (int i=from; i < to; i++) {
             if ((generate++ & 8) == 0)
                 rndInt = rng.nextLong();
             else
                 rndInt >>= 8;
-            int j = ((int)(rndInt & 0xff)) % len;
+            int j = from + ((int)(rndInt & 0xff)) % len;
             if (i!=j) {
                 Object x = a[i];
                 a[i] = a[j];

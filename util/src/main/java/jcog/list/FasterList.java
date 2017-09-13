@@ -341,7 +341,7 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
-    public void clearFast() {
+    public final void clearFast() {
         popTo(-1);
     }
 

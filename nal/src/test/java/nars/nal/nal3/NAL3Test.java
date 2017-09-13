@@ -233,8 +233,8 @@ public class NAL3Test extends AbstractNALTest {
 
         TestNAR tester = test;
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
-        tester.askAt(cycles/2,"<swan --> (-,swimmer,bird)>"); //.en("Is swan a type of nonbird swimmer?");
-        tester.mustBelieve(cycles, "<swan --> (-,swimmer,bird)>", 0.10f ,0.73f); //.en("A swan is not a type of nonbird swimmer.");
+        tester.askAt(cycles/2,"<swan --> (swimmer - bird)>"); //.en("Is swan a type of nonbird swimmer?");
+        tester.mustBelieve(cycles, "<swan --> (swimmer - bird)>", 0.10f ,0.73f); //.en("A swan is not a type of nonbird swimmer.");
 
     }
 

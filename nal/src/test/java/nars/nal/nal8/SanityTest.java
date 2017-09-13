@@ -57,7 +57,7 @@ public class SanityTest {
              return f1;
         });
         n.onTask(t -> {
-            if (t instanceof DerivedTask) {
+            if (t instanceof DerivedTask && t.isBeliefOrGoal()) {
                 derived.add((DerivedTask)t);
             }
         });

@@ -7,6 +7,8 @@ import nars.control.Derivation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 /**
  * stackless recursive virtual machine which
  * feedback controls for obeying AIKR.  the goal was to
@@ -19,7 +21,7 @@ public class TrieExecutor extends AbstractPred<Derivation> {
 
 
     static final class CPU {
-        static final int stackLimit = 64;
+        static final int stackLimit = 128;
         final FasterIntArrayList ver = new FasterIntArrayList(stackLimit);
         final FasterList<PrediTerm<Derivation>> stack = new FasterList(stackLimit);
 
@@ -28,42 +30,44 @@ public class TrieExecutor extends AbstractPred<Derivation> {
          */
         void sync(Derivation d) {
             int ss = stack.size();
-            if (ss == 0) {
-                //special case, just reset to zero
-                ver.popTo(0);
-                d.revert(0);
-            } else {
-                int sizeDelta = ver.size() - ss;
-                if (sizeDelta > 0) {
-                    //reduce the version stack to meet the instruction stack
-                    d.revert(ver.pop(sizeDelta));
-                }
-            }
+            int vv = ver.size();
+            if (ss == vv)
+                return;
+
+
+            assert (vv > ss);
+            //reduce the version stack to meet the instruction stack
+            d.revert(ver.pop(vv - ss));
+
+
+            //assert (ver.size() == stack.size());
         }
 
-        void loadFork(Derivation d, Fork f) {
+        void queue(Derivation d, Fork f) {
 
             sync(d);
+            assert (ver.size() == stack.size());
 
             int branches = f.cache.length;
-            ByteShuffler b = d.shuffler;
-
             int stackStart = stack.size();
-            final int HEADROOM = 2;
-            int stackEnd = Math.min(stackLimit - HEADROOM, stackStart + branches);
-            if (stackEnd > stackStart) {
+            int stackEnd = stackStart + branches;
+            if (stackEnd < stackLimit) {
                 int before = d.now();
 
-
+                //FAST
                 Object[] stackData = stack.array();
+                System.arraycopy(f.cache, 0, stackData, stackStart, branches);
+                stack.popTo(stackEnd - 1);
+                d.shuffler.shuffle(d.random, stackData, stackStart, stackEnd);
 
-                for (PrediTerm p : f.cache) {
-                    push(before, p);
-                }
-//            System.arraycopy(f.cache, 0, stackData, stackStart, stackEnd-stackStart);
-//            stack.popTo(stackEnd);
+                //assert (stack.size() == ver.size() + branches);
 
-                b.shuffle(d.random, stackData, stackStart, stackEnd);
+                //FAST
+                int[] va = ver.array();
+                Arrays.fill(va, stackStart, stackEnd, before);
+                ver.popTo(stackEnd - 1);
+
+                //assert (ver.size() == stack.size());
             }
         }
 
@@ -74,7 +78,7 @@ public class TrieExecutor extends AbstractPred<Derivation> {
 
     }
 
-    static final ThreadLocal<CPU> cpu = ThreadLocal.withInitial(CPU::new);
+    final static ThreadLocal<CPU> cpu = ThreadLocal.withInitial(CPU::new);
 
     private final PrediTerm<Derivation> root;
 
@@ -94,22 +98,29 @@ public class TrieExecutor extends AbstractPred<Derivation> {
         ver.clearFast();
 
         PrediTerm<Derivation> cur = root;
-        do {
+        cycle: do {
             if (cur instanceof Fork) {
-                c.loadFork(d, (Fork) cur);
+                c.queue(d, (Fork) cur);
             } else if (cur instanceof AndCondition) {
                 c.sync(d);
+                //int preAnd = d.now();
                 @NotNull PrediTerm[] cache = ((AndCondition) cur).cache;
                 for (int i = 0, cacheLength = cache.length; i < cacheLength; i++) {
                     PrediTerm<Derivation> p = cache[i];
                     if (p instanceof Fork) {
                         assert (i == cacheLength - 1) : "fork must occurr only in the final AND condition";
-                        c.loadFork(d, (Fork) p);
+                        c.queue(d, (Fork) p);
                     } else {
-                        if (!p.test(d))
+                        if (!p.test(d)) {
                             break;
+                        }
                     }
                 }
+
+                //d.revert(preAnd);
+
+                //continue; the and has reached the end
+
             } else if (cur instanceof OpSwitch) {
                 @Nullable PrediTerm<Derivation> next = ((OpSwitch) cur).branch(d);
                 if (next != null) {
@@ -122,9 +133,10 @@ public class TrieExecutor extends AbstractPred<Derivation> {
             }
 
             cur = stack.removeLastElseNull();
-            if (cur == null) break;
+            if (cur == null)
+                break;
 
-        } while (d.tick());
+        } while (d.live());
 
         return true;
     }

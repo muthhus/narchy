@@ -199,6 +199,10 @@ public class Conclusion extends AbstractPred<Derivation> {
         //5. VALIDATE FOR TASK TERM
 
         byte punc = p.concPunc;
+
+        assert(punc!=0):
+                "no punctuation assigned, wtf";
+
         Task t = Task.tryTask(c2, punc, truth, (C, tr) -> {
 
             if (tr != null) { //beliefs and goals

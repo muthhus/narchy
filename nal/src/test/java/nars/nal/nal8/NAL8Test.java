@@ -268,13 +268,13 @@ public class NAL8Test extends AbstractNALTest {
         ;
     }
 
-    @Test
-    public void testInsanity() {
-        test
-            .goal("happy", Tense.Present, 1f, 0.9f)
-            .believe("(must ==>+1 happy)", Tense.Present, 0f, 0.15f)
-            .mustNotOutput(cycles, "must", GOAL, (t) -> true);
-    }
+//    @Test
+//    public void testInsanity() {
+//        test
+//            .goal("happy", Tense.Present, 1f, 0.9f)
+//            .believe("(must ==>+1 happy)", Tense.Present, 0f, 0.15f)
+//            .mustNotOutput(cycles, "must", GOAL, (t) -> true);
+//    }
 
     @Test
     public void testConditionalGoalConjunctionDecomposePositivePostconditionGoal() {
