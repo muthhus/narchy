@@ -40,6 +40,7 @@ public class ByteShuffler {
         if (len == 2) {
             //special fast case
             if (rng.nextBoolean()) {
+                to--;
                 Object x = a[from];
                 a[from] = a[to];
                 a[to] = x;

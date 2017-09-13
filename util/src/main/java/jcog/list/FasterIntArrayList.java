@@ -45,4 +45,9 @@ public class FasterIntArrayList extends IntArrayList {
         this.size -= n;
         return this.items[size-1];
     }
+
+    /** forcibly sets the size */
+    public void setSize(int s) {
+        this.size = s;
+    }
 }

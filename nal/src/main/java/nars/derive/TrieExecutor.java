@@ -29,23 +29,19 @@ public class TrieExecutor extends AbstractPred<Derivation> {
          * call to lazily revert the derivation versioning right before it's necessary
          */
         void sync(Derivation d) {
-            int ss = stack.size();
-            int vv = ver.size();
-            if (ss == vv)
-                return;
-
-
-            assert (vv > ss);
-            //reduce the version stack to meet the instruction stack
-            d.revert(ver.pop(vv - ss));
-
-
-            //assert (ver.size() == stack.size());
+//            int ss = stack.size();
+//            int vv = ver.size();
+//            if (ss == vv)
+//                return;
+//
+//
+//            assert (vv > ss);
+//            d.revert(ver.pop(vv - ss)); //reduce the version stack to meet the instruction stack
         }
 
         void queue(Derivation d, Fork f) {
 
-            sync(d);
+            //sync(d);
             assert (ver.size() == stack.size());
 
             int branches = f.cache.length;
@@ -57,7 +53,8 @@ public class TrieExecutor extends AbstractPred<Derivation> {
                 //FAST
                 Object[] stackData = stack.array();
                 System.arraycopy(f.cache, 0, stackData, stackStart, branches);
-                stack.popTo(stackEnd - 1);
+                stack.setSize(stackEnd);
+
                 d.shuffler.shuffle(d.random, stackData, stackStart, stackEnd);
 
                 //assert (stack.size() == ver.size() + branches);
@@ -65,16 +62,16 @@ public class TrieExecutor extends AbstractPred<Derivation> {
                 //FAST
                 int[] va = ver.array();
                 Arrays.fill(va, stackStart, stackEnd, before);
-                ver.popTo(stackEnd - 1);
+                ver.setSize(stackEnd);
 
                 //assert (ver.size() == stack.size());
             }
         }
 
-        void push(int before, PrediTerm x) {
-            ver.add(before);
-            stack.add(x);
-        }
+//        void push(int before, @NotNull PrediTerm x) {
+//            ver.add(before);
+//            stack.add(x);
+//        }
 
     }
 
@@ -99,10 +96,17 @@ public class TrieExecutor extends AbstractPred<Derivation> {
 
         PrediTerm<Derivation> cur = root;
         cycle: do {
+            if (cur instanceof OpSwitch) {
+                @Nullable PrediTerm<Derivation> next = ((OpSwitch) cur).branch(d);
+                if (next != null) {
+                    cur = next;
+                } //else the switch has no path for the current context, so continue
+            }
+
             if (cur instanceof Fork) {
                 c.queue(d, (Fork) cur);
             } else if (cur instanceof AndCondition) {
-                c.sync(d);
+                //c.sync(d);
                 //int preAnd = d.now();
                 @NotNull PrediTerm[] cache = ((AndCondition) cur).cache;
                 for (int i = 0, cacheLength = cache.length; i < cacheLength; i++) {
@@ -121,20 +125,15 @@ public class TrieExecutor extends AbstractPred<Derivation> {
 
                 //continue; the and has reached the end
 
-            } else if (cur instanceof OpSwitch) {
-                @Nullable PrediTerm<Derivation> next = ((OpSwitch) cur).branch(d);
-                if (next != null) {
-                    cur = next;
-                    continue;
-                } //else the switch has no path for the current context, so continue
             } else {
-                c.sync(d);
+                //c.sync(d);
                 cur.test(d);
             }
 
             cur = stack.removeLastElseNull();
             if (cur == null)
                 break;
+            d.revert(ver.pop());
 
         } while (d.live());
 

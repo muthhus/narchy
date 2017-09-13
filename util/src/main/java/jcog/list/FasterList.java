@@ -471,4 +471,8 @@ public class FasterList<X> extends FastList<X> {
         }
     }
 
+    /** forcibly sets the size */
+    public void setSize(int s) {
+        this.size = s;
+    }
 }

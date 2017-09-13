@@ -39,13 +39,14 @@ public enum TrieDeriver {
 
     public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
 
-        final TermTrie<Term, PremiseRule> trie = new RuleTrie(nar);
-        r.forEach(trie::put);
+        final TermTrie<Term, PremiseRule> trie = new RuleTrie(nar, r);
 
         List<PrediTerm<Derivation>> bb = subtree(trie.root);
         PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
 
-        return new TrieExecutor(Fork.fork(roots).transform(each));
+        PrediTerm<Derivation> tf = Fork.fork(roots).transform(each);
+        //return tf;
+        return new TrieExecutor(tf);
     }
 
 
@@ -477,9 +478,10 @@ public enum TrieDeriver {
 
         private final NAR nar;
 
-        public RuleTrie(NAR nar) {
+        public RuleTrie(NAR nar, PremiseRuleSet r) {
             super();
             this.nar = nar;
+            r.forEach(this::put);
         }
 
         @Override
