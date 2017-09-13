@@ -1,9 +1,9 @@
 package nars.control;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
+import jcog.util.AtomicFloat;
 import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
@@ -111,14 +111,14 @@ public class Cause<X> {
     }
 
     /** the AtomicDouble this inherits holds the accumulated value which is periodically (every cycle) committed  */
-    public static class Traffic extends AtomicDouble {
+    public static class Traffic extends AtomicFloat {
         /** current, ie. the last commited value */
         public float current;
 
         public double total;
 
         public void commit() {
-            double next = getAndSet(0);
+            double next = getAndSet(0f);
             this.total += next;
             this.current = (float) next; //smooth(current, (float)next, momentum);
         }

@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
@@ -30,7 +31,7 @@ import static jcog.bag.impl.HijackBag.Mode.*;
  * 1=capacity
  * this saves the space otherwise necessary for 2 additional AtomicInteger instances
  */
-public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
+public abstract class HijackBag<K, V> implements Bag<K, V> {
 
      private static final AtomicIntegerFieldUpdater<HijackBag> sizeUpdater =
         AtomicIntegerFieldUpdater.newUpdater(HijackBag.class, "size");
@@ -39,11 +40,17 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      private static final AtomicReferenceFieldUpdater<HijackBag,AtomicReferenceArray> mapUpdater =
         AtomicReferenceFieldUpdater.newUpdater(HijackBag.class, AtomicReferenceArray.class, "map");
 
+
+    /** id unique to this bag instance, for use in treadmill */
+    private final int id;
+
     volatile int size, capacity;
 
     /** TODO make non-public */
     public volatile AtomicReferenceArray<V> map;
 
+    private static final Treadmill mutex = new Treadmill();
+    private static final AtomicInteger serial = new AtomicInteger(0);
 
 
 
@@ -76,7 +83,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
     protected HijackBag(int reprobes) {
-        super(concurrency);
+        this.id = serial.incrementAndGet();
         this.reprobes = reprobes;
         this.map = EMPTY_ARRAY;
         resize(reprobes);
@@ -106,7 +113,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     public static <Y> void forEach(@NotNull AtomicReferenceArray<Y> map, @NotNull Predicate<Y> accept, @NotNull Consumer<? super Y> e) {
         for (int c = map.length(), j = 0; j < c; j++) {
-            Y v = map.get(j);
+            Y v = map
+                    //.get(j);
+                    .getPlain(j);
             if (v != null && accept.test(v)) {
                 e.accept(v);
             }
@@ -115,7 +124,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     public static <Y> void forEach(AtomicReferenceArray<Y> map, @NotNull Consumer<? super Y> e) {
         for (int c = map.length(), j = -1; ++j < c; ) {
-            Y v = map.get(j);
+            Y v = map
+                    //.get(j);
+                    .getPlain(j);
             if (v != null) {
                 e.accept(v);
             }
@@ -227,6 +238,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
             incomingPri = Float.POSITIVE_INFINITY; /* shouldnt be used */
         }
 
+        int mutexTicket = -1;
         V toAdd = null, toRemove = null, toReturn = null;
         try {
 
@@ -234,8 +246,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
             if (start < 0)
                 start += c; //Fair wraparound: ex, -1 -> (c-1)
 
-            if (mode != GET)
-                start(hash);
+            if (mode != GET) {
+                mutexTicket = mutex.start(id, hash);
+            }
 
             probing:
             for (int i = start, probe = reprobes; probe > 0; probe--) {
@@ -309,8 +322,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         } catch (Throwable t) {
             t.printStackTrace(); //should not happen
         } finally {
-            if (mode != GET)
-                end(hash);
+            if (mode != GET) {
+                mutex.end(mutexTicket);
+            }
         }
 
         if (toRemove != null) {
@@ -471,7 +485,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         //boolean modified = false;
         int seen = 0;
         while (seen++ < c) {
-            V v = map.get(i);
+            V v = map
+                    //.get(i);
+                    .getPlain(i);
             float p;
             if (v != null && ((p = pri(v)) == p /* not deleted*/)) {
                 next = each.next(v);
@@ -584,7 +600,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
         int len = a.length();
         for (int i = 0; i < len; i++) {
-            V f = a.get(i);
+            V f = a
+                    //.get(i);
+                    .getPlain(i);
             if (f == null)
                 continue;
 
