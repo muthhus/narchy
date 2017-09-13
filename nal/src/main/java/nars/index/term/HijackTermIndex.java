@@ -170,7 +170,7 @@ public class HijackTermIndex extends MaplikeTermIndex {
     /** performs an iteration update */
     private void update() {
 
-        AtomicReferenceArray<PriReference<Termed>> tt = table.map.get();
+        AtomicReferenceArray<PriReference<Termed>> tt = table.map;
 
         int c = tt.length();
 

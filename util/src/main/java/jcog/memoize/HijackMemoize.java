@@ -15,6 +15,7 @@ import java.lang.ref.SoftReference;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static jcog.Texts.n4;
 
@@ -22,14 +23,18 @@ import static jcog.Texts.n4;
  * TODO add an instrumentation wrapper to collect statistics
  * about cache efficiency and also processing time of the calculations
  */
-public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.HalfWeakPair<K, V>> implements Memoize<K, V> {
+public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Computation<K, V>> implements Memoize<K, V> {
 
     private final Random rng = new XorShift128PlusRandom();
+
+    public interface Computation<K,V> extends Priority, Supplier<V> {
+        K key();
+    }
 
     public static class HalfWeakPair<K, V> extends
             SoftReference<V>
             ///*WeakReference*/SoftReference<V>
-            implements Priority {
+            implements Computation<K,V> {
 
         public final K key;
         private final int hash;
@@ -41,6 +46,13 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
             this.hash = key.hashCode();
             this.pri = pri;
         }
+
+
+        @Override
+        public final K key() {
+            return key;
+        }
+
 
         @Override
         public boolean equals(Object obj) {
@@ -157,6 +169,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
     @Override
     public void setCapacity(int i) {
         super.setCapacity(i);
+        resize(i);
 
         float boost = i > 0 ?
                 //0.02f
@@ -192,13 +205,13 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
     @NotNull
     @Override
-    public HijackBag<K, HalfWeakPair<K, V>> commit(@Nullable Consumer<HalfWeakPair<K, V>> update) {
+    public HijackBag<K, Computation<K, V>> commit(@Nullable Consumer<Computation<K, V>> update) {
         return this;
     }
 
     @Nullable
     public V getIfPresent(@NotNull Object k) {
-        HalfWeakPair<K, V> exists = get(k);
+        Computation<K, V> exists = get(k);
         if (exists != null) {
             V e = exists.get();
             if (e != null) {
@@ -212,7 +225,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
     @Nullable
     public V removeIfPresent(@NotNull K k) {
-        @Nullable HalfWeakPair<K, V> exists = remove(k);
+        @Nullable Computation<K, V> exists = remove(k);
         if (exists != null) {
             return exists.get();
         }
@@ -235,7 +248,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
 
     @Override
-    protected boolean replace(float incoming, HalfWeakPair<K, V> existing) {
+    protected boolean replace(float incoming, Computation<K, V> existing) {
         if (!super.replace(incoming, existing)) {
             existing.priSub(CACHE_DENY_DAMAGE);
             return false;
@@ -250,18 +263,18 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
     @NotNull
     @Override
-    public K key(HalfWeakPair<K, V> value) {
-        return value.key;
+    public K key(Computation<K, V> value) {
+        return value.key();
     }
 
 
     @Override
-    protected Consumer<HalfWeakPair<K, V>> forget(float rate) {
+    protected Consumer<Computation<K, V>> forget(float rate) {
         return null;
     }
 
     @Override
-    public void onRemove(@NotNull HijackMemoize.HalfWeakPair<K, V> value) {
+    public void onRemove(@NotNull HijackMemoize.Computation<K, V> value) {
         value.delete();
         evict.inc();
     }

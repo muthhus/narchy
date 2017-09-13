@@ -1,19 +1,22 @@
 package jcog.bag.impl;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.util.Treadmill;
 import jcog.list.FasterList;
 import jcog.pri.Prioritized;
 import jcog.pri.op.PriForget;
+import jcog.util.AtomicFloat;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -30,24 +33,43 @@ import static jcog.bag.impl.HijackBag.Mode.*;
  */
 public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
-    /**
-     * value index in the additional slots of the superclass Treadmill
-     */
-    final static int tSIZE = 0;
-    final static int tCAPACITY = 1;
+     private static final AtomicIntegerFieldUpdater<HijackBag> sizeUpdater =
+        AtomicIntegerFieldUpdater.newUpdater(HijackBag.class, "size");
+     private static final AtomicIntegerFieldUpdater<HijackBag> capUpdater =
+        AtomicIntegerFieldUpdater.newUpdater(HijackBag.class, "capacity");
+     private static final AtomicReferenceFieldUpdater<HijackBag,AtomicReferenceArray> mapUpdater =
+        AtomicReferenceFieldUpdater.newUpdater(HijackBag.class, AtomicReferenceArray.class, "map");
 
-    public static final AtomicReferenceArray EMPTY_ARRAY = new AtomicReferenceArray(0);
+    volatile int size, capacity;
+
+    /** TODO make non-public */
+    public volatile AtomicReferenceArray<V> map;
+
+
+
+
+    /**
+     * when size() reaches this proportion of space(), and space() < capacity(), grows
+     */
+    static final float loadFactor = 0.75f;
+
+    /** how quickly the current space grows towards the full capacity, using LERP */
+    static final float growthLerpRate = 0.5f;
+
+    final static float PRESSURE_THRESHOLD = 0.05f;
+
+    static final AtomicReferenceArray EMPTY_ARRAY = new AtomicReferenceArray(0);
 
     public final int reprobes;
-    public transient final AtomicReference<AtomicReferenceArray<V>> map;
 
-    public final AtomicDouble pressure = new AtomicDouble();
+
+    public final AtomicFloat pressure = new AtomicFloat();
+
 
     public float mass;
     private float min;
     private float max;
 
-    private static final float PRESSURE_THRESHOLD = 0.05f;
 
     protected HijackBag(int initialCapacity, int reprobes) {
         this(reprobes);
@@ -55,9 +77,10 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
     protected HijackBag(int reprobes) {
-        super(concurrency, 2 /* size, capacity */);
+        super(concurrency);
         this.reprobes = reprobes;
-        this.map = new AtomicReference<>(EMPTY_ARRAY);
+        this.map = EMPTY_ARRAY;
+        resize(reprobes);
     }
 
     protected Random random() {
@@ -70,7 +93,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
     public static <X, Y> void forEachActive(@NotNull HijackBag<X, Y> bag, @NotNull Consumer<? super Y> e) {
-        forEachActive(bag, bag.map.get(), e);
+        forEachActive(bag, bag.map, e);
     }
 
     public static <X, Y> void forEachActive(@NotNull HijackBag<X, Y> bag, @NotNull AtomicReferenceArray<Y> map, @NotNull Consumer<? super Y> e) {
@@ -105,31 +128,14 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
         int newCapacity = Math.max(_newCapacity, reprobes);
 
-        if (xGetAndSet(tCAPACITY, newCapacity) != newCapacity) {
 
-            final AtomicReferenceArray<V>[] prev = new AtomicReferenceArray[1];
 
-            //ensures sure only the thread successful in changing the map instance is the one responsible for repopulating it,
-            //in the case of 2 simultaneous threads deciding to allocate a replacement:
-            AtomicReferenceArray<V> next = newCapacity != 0 ? new AtomicReferenceArray<>(newCapacity) : EMPTY_ARRAY;
-            if (next == this.map.updateAndGet((x) -> {
-                if (x.length() != newCapacity) {
-                    prev[0] = x;
-                    return next;
-                } else return x;
-            })) {
+        if (capUpdater.getAndSet(this, newCapacity) != newCapacity) {
 
-                List<V> removed = new FasterList<>();
-
-                //copy items from the previous map into the new map. they will be briefly invisibile while they get transferred.  TODO verify
-                forEachActive(this, prev[0], (b) -> {
-                    if (put(b) == null)
-                        removed.add(b);
-                });
-
-                commit(null);
-
-                removed.forEach(this::_onRemoved);
+            int s = space();
+            if (newCapacity < s /* must shrink */) {
+                s = newCapacity;
+                resize(s);
             }
 
 
@@ -139,10 +145,37 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         //return false;
     }
 
+    protected void resize(int newSpace) {
+        final AtomicReferenceArray<V>[] prev = new AtomicReferenceArray[1];
+
+        //ensures sure only the thread successful in changing the map instance is the one responsible for repopulating it,
+        //in the case of 2 simultaneous threads deciding to allocate a replacement:
+        AtomicReferenceArray<V> next = newSpace != 0 ? new AtomicReferenceArray<>(newSpace) : EMPTY_ARRAY;
+        if (next == mapUpdater.updateAndGet(this, (x) -> {
+            if (x.length() != newSpace) {
+                prev[0] = x;
+                return next;
+            } else return x;
+        })) {
+
+            List<V> lost = new FasterList<>();
+
+            //copy items from the previous map into the new map. they will be briefly invisibile while they get transferred.  TODO verify
+            forEachActive(this, prev[0], (b) -> {
+                if (put(b) == null)
+                    lost.add(b);
+            });
+
+            commit(null);
+
+            lost.forEach(this::_onRemoved);
+        }
+    }
+
 
     @Override
     public void clear() {
-        AtomicReferenceArray<V> x = reset();
+        AtomicReferenceArray<V> x = reset(reprobes);
         if (x != null) {
             forEachActive(this, x, this::_onRemoved);
         }
@@ -150,12 +183,12 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
     @Nullable
-    private AtomicReferenceArray<V> reset() {
+    private AtomicReferenceArray<V> reset(int space) {
 
-        if (!xCompareAndSet(tSIZE, 0, 0)) {
-            AtomicReferenceArray<V> newMap = new AtomicReferenceArray<>(capacity());
+        if (!sizeUpdater.compareAndSet(this, 0, 0)) {
+            AtomicReferenceArray<V> newMap = new AtomicReferenceArray<>(space);
 
-            AtomicReferenceArray<V> prevMap = map.getAndSet(newMap);
+            AtomicReferenceArray<V> prevMap = mapUpdater.getAndSet(this, newMap);
 
             commit();
 
@@ -165,17 +198,23 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         return null;
     }
 
+    /**
+     * the current capacity, which is less than or equal to the value returned by capacity()
+     */
+    public int space() {
+        return map.length();
+    }
+
     enum Mode {
         GET, PUT, REMOVE
     }
 
     private V update(@NotNull Object k, @Nullable V incoming /* null to remove */, Mode mode, @Nullable MutableFloat overflowing) {
 
-        AtomicReferenceArray<V> map = this.map.get();
+        final AtomicReferenceArray<V> map = this.map;
         int c = map.length();
         if (c == 0)
             return null;
-
 
 
         final int hash = k.hashCode(); /*hash(x)*/
@@ -394,7 +433,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
         int c = capacity();
         int s = size();
-        if (((float)Math.abs(c - s)) / c < PRESSURE_THRESHOLD)
+        if (((float) Math.abs(c - s)) / c < PRESSURE_THRESHOLD)
             pressurize(pri(v));
 
         V x = update(k, v, PUT, overflowing);
@@ -411,7 +450,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     @Override
     public int capacity() {
-        return xGet(tCAPACITY);
+        return capacity;
     }
 
     @Override
@@ -421,7 +460,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         if (s <= 0)
             return this;
 
-        AtomicReferenceArray<V> map = this.map.get();
+        final AtomicReferenceArray<V> map = this.map;
         int c = map.length();
         if (c == 0)
             return this;
@@ -435,10 +474,10 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         while (seen++ < c) {
             V v = map.get(i);
             float p;
-            if (v != null && ((p= pri(v))==p /* not deleted*/)) {
+            if (v != null && ((p = pri(v)) == p /* not deleted*/)) {
                 next = each.next(v);
                 if (next.remove) {
-                    if (map.compareAndSet(i, v,null)) {
+                    if (map.compareAndSet(i, v, null)) {
                         //modified = true;
                         //else: already removed
 
@@ -461,7 +500,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     @Override
     public int size() {
-        return Math.max(0, xGet(tSIZE));
+        return Math.max(0, size);
     }
 
     @Override
@@ -483,7 +522,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     @Override
     public Stream<V> stream() {
-        AtomicReferenceArray<V> map = this.map.get();
+        final AtomicReferenceArray<V> map = this.map;
         return IntStream.range(0, map.length()).mapToObj(map::get).filter(Objects::nonNull);
     }
 
@@ -493,13 +532,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      */
     @Override
     public float depressurize() {
-        float pv = (float) pressure.getAndSet(0);
-        if (pv >= 0) {
-            return pv;
-        } else {
-            pressure.set(0);
-            return 0;
-        }
+        return pressure.getAndSet(0f);
     }
 
     @Override
@@ -538,47 +571,47 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
 
 //        try {
-            if (update != null) {
-                update(update);
-            }
+        if (update != null) {
+            update(update);
+        }
 
-            float mass = 0;
-            float min = Float.POSITIVE_INFINITY;
-            float max = Float.NEGATIVE_INFINITY;
+        float mass = 0;
+        float min = Float.POSITIVE_INFINITY;
+        float max = Float.NEGATIVE_INFINITY;
 
-            int count = 0;
+        int count = 0;
 
-            AtomicReferenceArray<V> a = map.get();
+        AtomicReferenceArray<V> a = map;
 
-            int len = a.length();
-            for (int i = 0; i < len; i++) {
-                V f = a.get(i);
-                if (f == null)
-                    continue;
+        int len = a.length();
+        for (int i = 0; i < len; i++) {
+            V f = a.get(i);
+            if (f == null)
+                continue;
 
-                float p = pri(f);
-                if (p == p) {
-                    mass += p;
-                    if (p > max) max = p;
-                    if (p < min) min = p;
-                    count++;
-                } else {
-                    if (a.compareAndSet(i, f, null)) {
-                        _onRemoved(f); //TODO this may call onRemoved unnecessarily if the map has changed (ex: resize)
-                    }
+            float p = pri(f);
+            if (p == p) {
+                mass += p;
+                if (p > max) max = p;
+                if (p < min) min = p;
+                count++;
+            } else {
+                if (a.compareAndSet(i, f, null)) {
+                    _onRemoved(f); //TODO this may call onRemoved unnecessarily if the map has changed (ex: resize)
                 }
             }
+        }
 
-            //assert(size() == count);
-            xSet(tSIZE, count);
+        //assert(size() == count);
+        sizeUpdater.lazySet(this, count);
 
-            this.mass = mass;
-            if (count > 0) {
-                this.min = min;
-                this.max = max;
-            } else {
-                this.min = this.max = 0;
-            }
+        this.mass = mass;
+        if (count > 0) {
+            this.min = min;
+            this.max = max;
+        } else {
+            this.min = this.max = 0;
+        }
 
 //        } finally {
 //            //   busy.set(false);
@@ -588,12 +621,27 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
     private void _onAdded(V x) {
-        xIncrementAndGet(tSIZE);
+
+        int s = sizeUpdater.incrementAndGet(this);
+
         onAdd(x);
+
+        //grow if load is reached
+        int sp = space();
+        int cp = capacity();
+        if (sp < cp && s >= (int)(loadFactor * sp)) {
+
+            int ns = Util.lerp(growthLerpRate, sp, cp);
+            if ((cp - ns)/((float)cp) >= loadFactor)
+                ns = cp; //just grow to full capacity, it is close enough
+
+            if (ns!=sp)
+                resize(ns);
+        }
     }
 
     private int _onRemoved(V x) {
-        int s = xDecrementAndGet(tSIZE);
+        int s = sizeUpdater.decrementAndGet(this);
         onRemove(x);
         return s;
     }

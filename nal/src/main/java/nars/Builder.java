@@ -48,7 +48,7 @@ public class Builder {
 
                     final HijackMemoize<NewCompound, TermContainer> cache
                             = new HijackMemoize<>((x) -> HeapSubtermBuilder.apply(x.subs),
-                            64453 /* prime */, 2);
+                            128*1024+7 /* ~prime */, 4);
 
                     @Override
                     public TermContainer apply(Term[] o) {
@@ -98,12 +98,12 @@ public class Builder {
 
                     final HijackMemoize<NewCompound, Term> cache
                             = new HijackMemoize<>((x) -> HeapCompoundBuilder.apply(x.op, x.subs),
-                            64453 /* prime */, 2);
+                            128*1024+7 /* ~prime */, 3);
 
                     @Override
                     public Term apply(Op o, Term[] subterms) {
                         return cache.apply(
-                                new NewCompound(o, subterms).commit()
+                            new NewCompound(o, subterms).commit()
                         );
                     }
                 };

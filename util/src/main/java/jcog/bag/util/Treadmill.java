@@ -43,8 +43,8 @@ public class Treadmill extends AtomicIntegerArray {
         return getAndSet( slots + index, value );
     }
 
-    public void xIncrementAndGet(int index) {
-        incrementAndGet(slots + index);
+    public int xIncrementAndGet(int index) {
+        return incrementAndGet(slots + index);
     }
 
     public int xDecrementAndGet(int index) {

@@ -30,35 +30,48 @@ public class HijackBagTest {
         }
     }
 
+    static PLink<String> p(String s, float pri) {
+        return new PLink<>(s, pri);
+    }
+
+    @Test public void testGrowToCapacity() {
+        int cap = 16;
+        int reprobes = 3;
+        DefaultHijackBag<String> b = new DefaultHijackBag<String>(max, cap, reprobes);
+        assertEquals(0, b.size());
+        assertEquals(reprobes, b.space());
+        assertEquals(cap, b.capacity());
+
+        b.put(p("x",0.5f));
+        //still hasnt resized
+        assertEquals(1, b.size());
+        assertEquals(reprobes, b.space());
+
+        b.put(p("y",0.25f));
+        //resize should have triggered
+        assertEquals(10, b.space());
+
+        for (int i = 0; i < 9; i++)
+            b.put(p("z" + i, 0.5f));
+        assertEquals(b.capacity(), b.space());
+
+        //limit reached, nothing added will grow any further
+        for (int i = 0; i < 64; i++)
+            b.put(p("w" + i, 0.8f));
+        assertEquals(b.capacity(), b.space());
+        assertEquals(b.capacity(), b.size());
+
+        //now try shrinking
+        b.setCapacity(cap/2);
+        assertEquals(cap/2, b.capacity());
+        assertEquals(cap/2, b.space());
+        assertTrue(cap/2 >= b.size());
+
+    }
+
     @Test public void testRemoveByKey() {
         BagTest.testRemoveByKey(new DefaultHijackBag(plus, 2, 3));
     }
-
-
-
-//    @Test
-//    public void testScalePutArray() {
-//        testScalePutHalfs(0.5f, new ArrayBag<>(2, max, new HashMap<>(2)), 1f, 0.5f);
-//        testScalePutHalfs(0.75f, new ArrayBag<>(2, plus, new HashMap<>(2)), 1f, 0.5f);
-//        testScalePut2(new ArrayBag(2, plus, new HashMap<>(2)));
-//
-//    }
-//    @Test
-//    public void testScalePutHijaMax() {
-//        //second scale has no effect being smaller than the first one
-//        BagTest.testScalePutHalfs(0.5f, new DefaultHijackBag(max, 2, 1), 1f, 0.5f);
-//        BagTest.testScalePutHalfs(0.5f, new DefaultHijackBag(max, 2, 2), 1f, 0.5f);
-//
-//        BagTest.testScalePutHalfs(0.75f, new DefaultHijackBag(plus, 2, 2), 1f, 0.5f);
-//    }
-//    @Test
-//    public void testScalePutHija3() {
-//        BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 1));
-//    }
-//    @Test
-//    public void testScalePutHija4() {
-//        BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 2));
-//    }
 
     @Test
     public void testBasicInsertionRemovalHijack() {
@@ -117,19 +130,19 @@ public class HijackBagTest {
         b.setCapacity(dimensionality * 2);
 
         BagTest.populate(b, rng, dimensionality*5, dimensionality, 0f, 1f, 0.5f);
-        System.out.println("under capacity");
+        //System.out.println("under capacity");
         b.print();
         assertApproximatelySized(b, dimensionality, 0.5f);
 
         b.setCapacity(dimensionality/2*2);
 
-        System.out.println("half capacity");
+        //System.out.println("half capacity");
         b.print();
 
         assertApproximatelySized(b, dimensionality/2*2, 0.5f);
 
         BagTest.populate(b, rng, dimensionality*3, dimensionality, 0f, 1f, 0.5f);
-        System.out.println("under capacity, refilled");
+        //System.out.println("under capacity, refilled");
         b.print();
 
         //test
@@ -153,4 +166,31 @@ public class HijackBagTest {
         System.out.println(bSize + "  === " + expected + ", diff=" + error);
         assertTrue(error < closeness);
     }
+
+
+
+//    @Test
+//    public void testScalePutArray() {
+//        testScalePutHalfs(0.5f, new ArrayBag<>(2, max, new HashMap<>(2)), 1f, 0.5f);
+//        testScalePutHalfs(0.75f, new ArrayBag<>(2, plus, new HashMap<>(2)), 1f, 0.5f);
+//        testScalePut2(new ArrayBag(2, plus, new HashMap<>(2)));
+//
+//    }
+//    @Test
+//    public void testScalePutHijaMax() {
+//        //second scale has no effect being smaller than the first one
+//        BagTest.testScalePutHalfs(0.5f, new DefaultHijackBag(max, 2, 1), 1f, 0.5f);
+//        BagTest.testScalePutHalfs(0.5f, new DefaultHijackBag(max, 2, 2), 1f, 0.5f);
+//
+//        BagTest.testScalePutHalfs(0.75f, new DefaultHijackBag(plus, 2, 2), 1f, 0.5f);
+//    }
+//    @Test
+//    public void testScalePutHija3() {
+//        BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 1));
+//    }
+//    @Test
+//    public void testScalePutHija4() {
+//        BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 2));
+//    }
+
 }

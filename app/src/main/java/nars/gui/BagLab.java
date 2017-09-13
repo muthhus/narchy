@@ -73,7 +73,7 @@ public class BagLab  {
         int h = c / w;
         return new MatrixView(w, h, (x,y, gl) -> {
             try {
-                Object m = bag.map.get();
+                Object m = bag.map;
                 float p = -1;
                 if (m != null) {
                     int i = y * w + x;

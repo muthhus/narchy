@@ -93,10 +93,10 @@ public abstract class Param extends Services<Term,NAR> {
                     32;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(196);
+    public final MutableInteger matchTTL = new MutableInteger(128);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
-    public static final float BELIEF_MATCH_TTL_FRACTION = 0.15f;
+    public static final float BELIEF_MATCH_TTL_FRACTION = 0.25f;
 
     /** cost of attempting a unification */
     public static final int TTL_UNIFY = 1;
@@ -186,7 +186,7 @@ public abstract class Param extends Services<Term,NAR> {
             //prefer polarized
             //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));
         } else {
-            p *= 0.5f;
+            p *= 0.25f;
         }
 
         //return p;

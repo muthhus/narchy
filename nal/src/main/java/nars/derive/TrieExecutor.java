@@ -101,9 +101,8 @@ public class TrieExecutor extends AbstractPred<Derivation> {
                 break; //termination signal
             } else if (next == null) {
                 cur = stack.removeLastElseNull();
-                if (cur == null)
+                if (cur == null || !d.revertAndContinue(ver.pop()))
                     break;
-                d.revert(ver.pop());
             } else {
                 cur = next;
             }

@@ -11,7 +11,7 @@ import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.index.term.HijackTermIndex;
-import nars.index.term.map.CaffeineIndex;
+import nars.index.term.map.CaffeineIndex2;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -150,8 +150,8 @@ abstract public class NAgentX extends NAgent {
                 .time(clock)
                 .index(
                         //new CaffeineIndex(128 * 1024)
-                        //new CaffeineIndex2(64 * 1024)
-                        new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
+                        new CaffeineIndex2(64 * 1024)
+                        //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
                 )
                 .get();
 
