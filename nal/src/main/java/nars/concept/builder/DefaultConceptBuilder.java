@@ -98,24 +98,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     }
 
-    @Nullable
-    final Concept newConcept(@NotNull Term t) {
 
-
-        if (t.volume() > nar.termVolumeMax.intValue()) {
-//            if (Param.DEBUG)
-//                throw new UnsupportedOperationException("tried to conceptualize concept too large");
-            return null;
-        }
-
-        boolean validForTask = Task.taskContentValid(t, (byte) 0, null /*nar -- checked above */, true);
-        if (!validForTask) {
-            return new BaseConcept(t, BeliefTable.Empty, BeliefTable.Empty, QuestionTable.Empty, QuestionTable.Empty,
-                    newLinkBags(t));
-        } else {
-            return newTask(t);
-        }
-    }
 
     private BaseConcept newTask(@NotNull Term t) {
         DynamicTruthModel dmt = null;
@@ -326,7 +309,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     }
 
     private static boolean validUnwrappableSubterms(@NotNull TermContainer subterms) {
-        return !subterms.OR(x -> x instanceof Variable);
+        return !subterms.OR(x -> x.unneg() instanceof Variable);
     }
 
     @Override
@@ -337,17 +320,30 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @Override
     @Nullable
-    public Termed apply(@NotNull Term term) {
+    public Termed apply(@NotNull Term t) {
 
         //already a concept, or non-conceptualizable:  assume it is from here
-        if (!term.op().conceptualizable) {
-            return term;
+        if (!t.op().conceptualizable) {
+            return t;
         }
 
-        Concept c = newConcept(term);
-        if (c != null) {
-            c.state(awake);
+
+        if (t.volume() > nar.termVolumeMax.intValue()) {
+//            if (Param.DEBUG)
+//                throw new UnsupportedOperationException("tried to conceptualize concept too large");
+            return null;
         }
+
+        boolean validForTask = Task.taskContentValid(t, (byte) 0, null /*nar -- checked above */, true);
+        Concept c;
+        if (!validForTask) {
+            c = new BaseConcept(t, BeliefTable.Empty, BeliefTable.Empty, QuestionTable.Empty, QuestionTable.Empty,
+                    newLinkBags(t));
+        } else {
+            c = newTask(t);
+        }
+
+        c.state(awake);
         return c;
     }
 

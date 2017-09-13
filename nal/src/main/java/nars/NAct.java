@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
@@ -349,6 +350,15 @@ public interface NAct {
                 //$.inh($.the("\"-\""), s);
                 $.p(s, $.the("\"-\""));
 
+        /** default "resting" frequency; generally some value [0..0.5]
+         *  this controls effective temperature of the activity
+         *  since less truthpolation "effort" is required to raise
+         *  0 frequency to a threshold positive frequency (>0.5),
+         *  while if resting at 0.5 it is already at threshold ready
+         *  to fire.
+         * */
+        final float restFreq = 0f;
+
         final float ff[] = new float[2];
         final float cc[] = new float[2];
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
@@ -358,21 +368,23 @@ public interface NAct {
 
             NAR n = nar();
 
-            float minConf =
-                    //n.confMin.floatValue();
-                     n.confDefault(GOAL) * 1f;
-                     //n.confDefault(BELIEF);
 
             float cur = curiosity().floatValue();
-            if (cur > 0 && n.random().nextFloat() <= cur) {
-                f0 = 0.5f + 0.5f * n.random().nextFloat();
-                c0 = minConf;
+            Random rng = n.random();
 
+            if (cur > 0 && rng.nextFloat() <= cur) {
+
+                f0 = 0.5f + 0.5f * rng.nextFloat();
+
+                float curiConf =
+                    //n.confMin.floatValue();
+                     n.confDefault(GOAL) * 0.5f;
+                     //n.confDefault(BELIEF);
+
+                c0 = curiConf;
             } else {
-                f0 = g != null ? g.freq() : 0f;
-                if (f0 < 0.5f)
-                    f0 = 0f;
-                c0 = g != null ? g.conf() : minConf;
+                f0 = g != null ? g.freq() : restFreq;
+                c0 = g != null ? g.conf() : (2*n.confMin.floatValue());
             }
 
 
@@ -388,7 +400,7 @@ public interface NAct {
                 if (!Util.equals(cc[0], cc[1], Param.TRUTH_EPSILON)) {
                     int winner = cc[0] > cc[1] ? 0 : 1;
 
-                    float x = (ff[winner] - 0.5f)*2f; //skip negative half, expand to full range
+                    float x = Math.max(0,(ff[winner] - 0.5f))*2f; //skip negative half, expand to full range
                     float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
                     @Nullable Truth w = y==y ? $.t(
                             (winner == 0 ? y : -y) / 2f + 0.5f, //un-map to unipolar frequency range
@@ -400,8 +412,8 @@ public interface NAct {
                     ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w);
                     ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l);
                 } else {
-                    ((GoalActionAsyncConcept) n.concept(pt)).feedback($.t(0, conf) /*null*/);
-                    ((GoalActionAsyncConcept) n.concept(nt)).feedback($.t(0, conf) /*null*/);
+                    ((GoalActionAsyncConcept) n.concept(pt)).feedback($.t(restFreq, conf) /*null*/);
+                    ((GoalActionAsyncConcept) n.concept(nt)).feedback($.t(restFreq, conf) /*null*/);
                 }
             }
         };
@@ -412,14 +424,18 @@ public interface NAct {
         addAction(p);
         addAction(n);
 
-        float cm =
-                //0.01f;
-                2 * nar().confMin.floatValue(); //HACK wont change if the parameter changes during runtime
-        nar().believe(p.term(), 0f, cm);
-        nar().believe(n.term(), 0f, cm);
-        nar().goal(p.term(), 0f, cm);
-        nar().goal(n.term(), 0f, cm);
 
+//        float cm =
+//                //0.01f;
+//                2 * nar().confMin.floatValue(); //HACK wont change if the parameter changes during runtime
+//        nar().believe(p.term(), restFreq, cm);
+//        nar().believe(n.term(), restFreq, cm);
+//        nar().goal(p.term(), restFreq, cm);
+//        nar().goal(n.term(), restFreq, cm);
+
+        float resolution = 0.05f;
+        p.resolution(resolution);
+        n.resolution(resolution);
     }
 
     default void actionBipolarMutex3(@NotNull Term s, @NotNull FloatToFloatFunction update) {

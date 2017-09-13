@@ -186,18 +186,14 @@ public abstract class STMClustered extends TaskService {
             final int[] subterms = {0};
             final int[] currentVolume = {0};
             return tasks.stream().
-                    filter(x -> {
-                        return !x.get().isDeleted();
-                    })
+                    filter(x -> !x.get().isDeleted())
                     .collect(Collectors.groupingBy(tx -> {
 
                         Task x = tx.get();
-                        if (x == null)
-                            return -1;
 
                         int v = x.volume();
 
-                        if ((subterms[0] >= maxComponentsPerTerm) || (currentVolume[0] + v > maxVolume)) {
+                        if ((subterms[0] >= maxComponentsPerTerm) || (currentVolume[0] + v >= maxVolume)) {
                             //next group
                             group[0]++;
                             subterms[0] = 1;

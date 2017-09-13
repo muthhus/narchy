@@ -522,12 +522,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
     @Nullable
     default Concept concept(@NotNull NAR n, boolean conceptualize) {
         Term t = term();
-        Concept c = conceptualize ? n.conceptualize(t) : n.concept(t);
-        if (c != null) {
-            return c;
-        }
-
-        return null;
+        return conceptualize ? n.conceptualize(t) : n.concept(t);
 //        if (!(c instanceof TaskConcept)) {
 //            throw new InvalidTaskException
 //                    //System.err.println

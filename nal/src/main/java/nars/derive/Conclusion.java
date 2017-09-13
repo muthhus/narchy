@@ -82,6 +82,8 @@ public class Conclusion extends AbstractPred<Derivation> {
         //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
 
+        int volMax = nar.termVolumeMax.intValue();
+
         // 1. SUBSTITUTE
         Term b1 =
                 pattern.transform(p);
@@ -109,7 +111,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         nar.emotion.derivationEval.increment();
 
         Term c1 = b1.eval(p); //TODO cache pure eval terms
-        if (!c1.op().conceptualizable)
+        if (!c1.op().conceptualizable || c1.volume() > volMax)
             return true;
 
 
@@ -128,6 +130,8 @@ public class Conclusion extends AbstractPred<Derivation> {
             try {
                 occ = new long[]{ETERNAL, ETERNAL};
                 t1 = solveTime(p, c1, occ, confGain);
+
+
 //                if (t1!=null && occ[0] == 7) {
 //                    //FOR A SPECIFIC TEST TEMPORAR
 //                    System.err.println("wtf");
@@ -141,7 +145,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             }
 
             //invalid or impossible temporalization; could not determine temporal attributes. seems this can happen normally
-            if (t1 == null || !t1.op().conceptualizable/*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
+            if (t1 == null || t1.volume() > volMax || !t1.op().conceptualizable/*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
 //                            throw new InvalidTermException(c1.op(), c1.dt(), "temporalization failure"
 //                                    //+ (Param.DEBUG ? rule : ""), c1.toArray()
 //                            );
@@ -268,7 +272,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         return pp;
     };
 
-    private static Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] confGain) {
+    @Nullable private static Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] confGain) {
         DerivationTemporalize dt = d.temporalize;
         if (dt == null) {
             d.temporalize = dt = new DerivationTemporalize(d); //cache in derivation

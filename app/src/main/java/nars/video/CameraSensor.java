@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.LongSupplier;
 
 /**
  * manages reading a camera to a pixel grid of SensorConcepts
@@ -35,6 +36,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     transient int w, h;
     transient float conf;
+    private long stamp;
 
 
     public CameraSensor(@Nullable Term root, P src, NAgent a) {
@@ -182,6 +184,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         src.update(1);
 
         NAR nar = a.nar;
+        stamp = nar.time.nextStamp();
 
         long now = a.now;
         int dur = nar.dur();
@@ -244,8 +247,16 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //            return ()->nextStamp;
 //        }
 
+
+        @Override
+        protected LongSupplier nextStamp(@NotNull NAR nar) {
+            return CameraSensor.this::nextStamp;
+        }
     }
 
+    private long nextStamp() {
+        return stamp;
+    }
 
 
 //    /** links only to the 'id' of the image, and N random neighboring pixels */

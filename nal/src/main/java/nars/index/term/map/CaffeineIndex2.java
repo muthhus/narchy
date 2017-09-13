@@ -203,6 +203,8 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
     @Override
     public Termed get(Term x, boolean createIfMissing) {
 
+        if (x.volume() > nar.termVolumeMax.intValue())
+            return null; //quick check to avoid creating a vector for a term that will be invalid anyway
 
         assert (!(x instanceof Variable)) : "variables should not be stored in index";
 

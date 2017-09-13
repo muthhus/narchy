@@ -137,7 +137,7 @@ public class MySTMClustered extends STMClustered {
             float deltaT = now - lastIteration;
             lastIteration = now;
 
-            int inputs = Math.round(in.gain() * 0.5f /* swing: 0.5..+1 */ * inputsPerDur * deltaT / dur);
+            int inputs = Math.round( ((in.gain() * 0.5f)+0.5f) /* swing: 0.5..+1 */ * inputsPerDur * deltaT / dur);
             if (inputs > 0) {
                 cluster(inputs, minGroupSize, maxGroupSize, nar);
             }
@@ -154,14 +154,13 @@ public class MySTMClustered extends STMClustered {
 
     private void cluster(int limit, int minGroupSize, int maxGroupSize, NAR nar) {
 
-        Map<Term, Task> vv = new HashMap();
+        int maxVol = nar.termVolumeMax.intValue()-2;
 
+        Map<Term, Task> vv = new HashMap();
         net.nodeStream()
                 .filter(x -> x.size() >= minGroupSize)
                 .sorted(Comparator.comparingDouble(x -> x.localError() / (x.size())))
                 .filter(n -> {
-
-
                     //TODO wrap all the coherence tests in one function call which the node can handle in a synchronized way because the results could change in between each of the sub-tests:
 
 
@@ -194,12 +193,11 @@ public class MySTMClustered extends STMClustered {
 //                    }
 
                     float finalFreq = freq;
-                    int maxVol = nar.termVolumeMax.intValue();
 
                     //if temporal clustering is close enough, allow up to maxGroupSize in &&, otherwise lmiit to 2
                     int gSize = ((n.range(0) <= dur && n.range(1) <= dur)) ? maxGroupSize : 2;
 
-                    return n.chunk(gSize, maxVol - 1).map(tt -> {
+                    return n.chunk(gSize, maxVol).map(tt -> {
 
                         //Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
 
@@ -210,8 +208,7 @@ public class MySTMClustered extends STMClustered {
                         final long[] start = {Long.MAX_VALUE};
                         tt.forEach(_z -> {
                             Task z = _z.get();
-                            if (z == null)
-                                return;
+
                             long zs = z.start();
                             long ze = z.end();
                             if (start[0] > zs) start[0] = zs;
