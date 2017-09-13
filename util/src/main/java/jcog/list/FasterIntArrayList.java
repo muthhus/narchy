@@ -37,4 +37,12 @@ public class FasterIntArrayList extends IntArrayList {
         popTo(-1);
     }
 
+    public int pop() {
+        return this.items[--this.size];
+    }
+
+    public int pop(int n) {
+        this.size -= n;
+        return this.items[size-1];
+    }
 }

@@ -39,14 +39,13 @@ public enum TrieDeriver {
 
     public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
 
-        //return Collections.unmodifiableList(premiseRules);
         final TermTrie<Term, PremiseRule> trie = new RuleTrie(nar);
         r.forEach(trie::put);
 
-        List<PrediTerm> bb = subtree(trie.root);
+        List<PrediTerm<Derivation>> bb = subtree(trie.root);
         PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
 
-        return Fork.fork(roots).transform(each);
+        return new TrieExecutor(Fork.fork(roots).transform(each));
     }
 
 
@@ -214,7 +213,7 @@ public enum TrieDeriver {
 
     }
 
-    protected static List<PrediTerm> compileSwitch(List<PrediTerm> bb) {
+    protected static List<PrediTerm<Derivation>> compileSwitch(List<PrediTerm<Derivation>> bb) {
 
         bb = factorSubOpToSwitch(bb, 0, 2);
         bb = factorSubOpToSwitch(bb, 1, 2);
@@ -286,10 +285,10 @@ public enum TrieDeriver {
 //    }
 
     @NotNull
-    private static List<PrediTerm> factorSubOpToSwitch(@NotNull List<PrediTerm> bb, int subterm, int minToCreateSwitch) {
+    private static List<PrediTerm<Derivation>> factorSubOpToSwitch(@NotNull List<PrediTerm<Derivation>> bb, int subterm, int minToCreateSwitch) {
         if (!bb.isEmpty()) {
-            Map<PatternOp, PrediTerm> cases = $.newHashMap(8);
-            List<PrediTerm> removed = $.newArrayList(); //in order to undo
+            Map<PatternOp, PrediTerm<Derivation>> cases = $.newHashMap(8);
+            List<PrediTerm<Derivation>> removed = $.newArrayList(); //in order to undo
             bb.removeIf(p -> {
                 if (p instanceof AndCondition) {
                     AndCondition ac = (AndCondition) p;
@@ -350,14 +349,14 @@ public enum TrieDeriver {
 
 
     @NotNull
-    static List<PrediTerm> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
+    static List<PrediTerm<Derivation>> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
 
 
-        List<PrediTerm> bb = $.newArrayList(node.childCount());
+        List<PrediTerm<Derivation>> bb = $.newArrayList(node.childCount());
 
         node.forEach(n -> {
 
-            List<PrediTerm> conseq = subtree(n);
+            List<PrediTerm<Derivation>> conseq = subtree(n);
 
             int nStart = n.start();
             int nEnd = n.end();

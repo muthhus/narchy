@@ -1,10 +1,9 @@
 package nars.perf;
 
 import com.google.common.collect.Lists;
-import nars.NAR;
 import nars.NARS;
-import nars.Narsese;
 import nars.nal.nal1.NAL1Test;
+import org.junit.Ignore;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
@@ -18,6 +17,7 @@ import java.util.function.Supplier;
  * Created by me on 4/24/17.
  */
 @State(Scope.Benchmark)
+@Ignore
 public class NARTestBenchmark {
 
 //    @Setup public void prepare() {

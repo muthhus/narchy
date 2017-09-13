@@ -33,4 +33,25 @@ public class ByteShuffler {
 
         return copy ? Arrays.copyOfRange(order, 0, len) : order;
     }
+
+    public void shuffle(Random rng, Object[] a, int from, int to) {
+        int len = to - from;
+        assert(len >= 2 && len < 127);
+
+        long rndInt = 0; //generate one 64 bit random long every 8 cycles
+        int generate = 0;
+        for (int i=0; i < len; i++) {
+            if ((generate++ & 8) == 0)
+                rndInt = rng.nextLong();
+            else
+                rndInt >>= 8;
+            int j = ((int)(rndInt & 0xff)) % len;
+            if (i!=j) {
+                Object x = a[i];
+                a[i] = a[j];
+                a[j] = x;
+            }
+        }
+    }
+
 }

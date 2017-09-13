@@ -149,9 +149,9 @@ abstract public class NAgentX extends NAgent {
                                 ), THREADS, 2))
                 .time(clock)
                 .index(
-                        new CaffeineIndex(128 * 1024)
+                        //new CaffeineIndex(128 * 1024)
                         //new CaffeineIndex2(64 * 1024)
-                        //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
+                        new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
                 )
                 .get();
 
@@ -169,16 +169,16 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 1f * priFactor;
-        n.termVolumeMax.setValue(24);
+        n.termVolumeMax.setValue(28);
 
         //n.dtDither.setValue(0.25f);
         //n.dtMergeOrChoose.setValue(true);
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
-        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 3, true, 10f);
+        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, true, 32f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-        Inperience inp = new Inperience(n, 16, 0.03f);
+        Inperience inp = new Inperience(n, 16, 0.1f);
         //Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 32);
 
 
@@ -192,8 +192,8 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-        NInner nin = new NInner(n);
-        nin.start();
+//        NInner nin = new NInner(n);
+//        nin.start();
 
 
         //init();

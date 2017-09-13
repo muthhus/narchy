@@ -5,6 +5,7 @@ import nars.Op;
 import nars.control.Derivation;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
 import java.util.function.Function;
@@ -38,10 +39,15 @@ public final class OpSwitch extends AbstractPred<Derivation> {
     @Override
     public boolean test(@NotNull Derivation m) {
 
-        PrediTerm p = swtch[((subterm == 0) ? m.termSub0op : m.termSub1op)];
+        PrediTerm p = branch(m);
         if (p!=null)
             p.test(m);
 
         return true;
+    }
+
+    @Nullable
+    public PrediTerm<Derivation> branch(@NotNull Derivation m) {
+        return swtch[((subterm == 0) ? m.termSub0op : m.termSub1op)];
     }
 }

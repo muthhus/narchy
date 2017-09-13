@@ -9,6 +9,7 @@ import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.test.DeductiveChainTest;
 import nars.test.DeductiveMeshTest;
+import org.junit.Ignore;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
 
@@ -19,6 +20,7 @@ import static nars.perf.JmhBenchmark.perf;
 
 @State(Scope.Thread)
 @AuxCounters(AuxCounters.Type.EVENTS)
+@Ignore
 public class NARBenchmark {
 
     @Param({"6"})

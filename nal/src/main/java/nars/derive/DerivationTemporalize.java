@@ -94,9 +94,9 @@ public class DerivationTemporalize extends Temporalize {
     void knowDerivedAmbient(Subst d, Term x) {
         knowAmbient(x);
         if (knowTransformed) {
-            Term x2 = x.transform(d);//d.transform(x);
-            if (!x2.equals(x) && !(x2 instanceof Bool))
-                knowAmbient(x2);
+            Term y = x.transform(d);
+            if (y!=null && !y.equals(x) && !(y instanceof Bool))
+                knowAmbient(y);
         }
     }
 
@@ -110,9 +110,9 @@ public class DerivationTemporalize extends Temporalize {
         knowAbsolute(x, start, end);
 
         if (knowTransformed) {
-            Term t2 = x.transform(d);//d.transform(term);
-            if (!t2.equals(x) && !(t2 instanceof Bool)) {
-                knowAbsolute(t2, start, end);
+            Term y = x.transform(d);
+            if (y!=null && !y.equals(x) && !(y instanceof Bool)) {
+                knowAbsolute(y, start, end);
             }
         }
     }

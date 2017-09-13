@@ -11,6 +11,8 @@ import nars.gui.Vis;
 import nars.video.CameraSensor;
 import org.jetbrains.annotations.NotNull;
 
+import static java4k.gradius4k.Gradius4K.*;
+import static java4k.gradius4k.Gradius4K.VK_UP;
 import static nars.term.atom.Atomic.the;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.col;
@@ -18,12 +20,13 @@ import static spacegraph.layout.Grid.col;
 /**
  * Created by me on 4/30/17.
  */
-public class Gradius extends NAgentY {
+public class Gradius extends NAgentX {
 
     private final Gradius4K g;
 
     public Gradius(NAR nar) {
-        super("G", nar, HaiQAgent::new);
+        //super("g", nar, HaiQAgent::new);
+        super("g", nar);
 
         this.g = new Gradius4K();
 
@@ -41,11 +44,11 @@ public class Gradius extends NAgentY {
         float width = g.getWidth();
         float height = g.getHeight();
         @NotNull ScalarConcepts yPos = senseNumber(the("Y"),
-                ()->g.player[Gradius4K.OBJ_Y] / height,
+                ()->g.player[OBJ_Y] / height,
                 4, ScalarConcepts.FuzzyNeedle
         ).resolution(0.1f);
         @NotNull ScalarConcepts xPos = senseNumber(the("X"),
-                ()->g.player[Gradius4K.OBJ_X] / width,
+                ()->g.player[OBJ_X] / width,
                 4, ScalarConcepts.FuzzyNeedle
         ).resolution(0.1f);
         window(
@@ -95,15 +98,38 @@ public class Gradius extends NAgentY {
         /*nar.believe($.inh(*///$.sete(
 
         actionToggle($.p("fire"),
-                (b) -> g.keys[Gradius4K.VK_SHOOT] = b).term();
-        actionToggle($.p("up"),
-                (b) -> g.keys[Gradius4K.VK_UP] = b).term();
-        actionToggle($.p("down"),
-                (b) -> g.keys[Gradius4K.VK_DOWN] = b).term();
-        actionToggle($.p("left"),
-                (b) -> g.keys[Gradius4K.VK_LEFT] = b).term();
-        actionToggle($.p("right"),
-                (b) -> g.keys[Gradius4K.VK_RIGHT] = b).term();
+                (b) -> g.keys[VK_SHOOT] = b).term();
+
+        actionBipolar($.the("y"), (dy) -> {
+            float thresh = 0.33f;
+            if (dy < -thresh) {
+                g.keys[VK_UP] = false; g.keys[VK_DOWN] = true;
+            } else if (dy > +thresh) {
+                g.keys[VK_UP] = true; g.keys[VK_DOWN] = false;
+            } else {
+                g.keys[VK_UP] = false; g.keys[VK_DOWN] = false;
+            }
+            return dy;
+        });
+         actionBipolar($.the("x"), (dx) -> {
+            float thresh = 0.33f;
+            if (dx < -thresh) {
+                g.keys[VK_LEFT] = false; g.keys[VK_RIGHT] = true;
+            } else if (dx > +thresh) {
+                g.keys[VK_LEFT] = true; g.keys[VK_RIGHT] = false;
+            } else {
+                g.keys[VK_LEFT] = false; g.keys[VK_RIGHT] = false;
+            }
+            return dx;
+        });
+//        actionToggle($.p("up"),
+//                (b) -> ).term();
+//        actionToggle($.p("down"),
+//                (b) -> g.keys[VK_DOWN] = b).term();
+//        actionToggle($.p("left"),
+//                (b) -> g.keys[VK_LEFT] = b).term();
+//        actionToggle($.p("right"),
+//                (b) -> g.keys[VK_RIGHT] = b).term();
 
 //        actionTriState($.p(Atomic.the("dx")), (dh) -> {
 //            g.keys[Gradius4K.VK_LEFT] = false;

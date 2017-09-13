@@ -1,11 +1,13 @@
 package nars.perf;
 
-import org.openjdk.jmh.profile.HotspotMemoryProfiler;
+import org.junit.Ignore;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.*;
+import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
+import org.openjdk.jmh.runner.options.OptionsBuilder;
+import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -13,6 +15,7 @@ import java.util.function.Consumer;
 /**
  * Created by me on 12/11/15.
  */
+@Ignore
 public enum JmhBenchmark {
 	;
 
