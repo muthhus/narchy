@@ -26,7 +26,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
     }
 
     @Override
-    protected Task merge(@NotNull Task existing, @NotNull Task incoming, @Nullable MutableFloat overflowing) {
+    protected Task merge(Task existing, Task incoming, @Nullable MutableFloat overflowing) {
         float inc = incoming.priElseZero();
         float before = existing.priElseZero();
         existing.priMax(incoming.priElseZero());

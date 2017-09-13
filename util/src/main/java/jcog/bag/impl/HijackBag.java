@@ -1,6 +1,5 @@
 package jcog.bag.impl;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.util.Treadmill;
@@ -145,7 +144,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         //return false;
     }
 
-    protected void resize(int newSpace) {
+    protected final void resize(int newSpace) {
         final AtomicReferenceArray<V>[] prev = new AtomicReferenceArray[1];
 
         //ensures sure only the thread successful in changing the map instance is the one responsible for repopulating it,
@@ -209,7 +208,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         GET, PUT, REMOVE
     }
 
-    private V update(@NotNull Object k, @Nullable V incoming /* null to remove */, Mode mode, @Nullable MutableFloat overflowing) {
+    private V update(/*@NotNull*/ Object k, @Nullable V incoming /* null to remove */, Mode mode, @Nullable MutableFloat overflowing) {
 
         final AtomicReferenceArray<V> map = this.map;
         int c = map.length();
@@ -358,7 +357,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      * if returns null, the merge is considered failed and will try inserting/merging
      * at a different probe location
      */
-    protected abstract V merge(@NotNull V existing, @NotNull V incoming, @Nullable MutableFloat overflowing);
+    protected abstract V merge(V existing, V incoming, @Nullable MutableFloat overflowing);
 
     /**
      * can override in subclasses for custom replacement policy.
@@ -379,7 +378,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     @Nullable
     @Override
-    public V remove(@NotNull K k) {
+    public V remove( K k) {
         return update(k, null, REMOVE, null);
     }
 
@@ -422,7 +421,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     /**
      */
     @Override
-    public final V put(@NotNull V v,  /* TODO */ @Nullable MutableFloat overflowing) {
+    public final V put(/*@NotNull*/ V v,  /* TODO */ @Nullable MutableFloat overflowing) {
 
 //        float p = pri(v);
 //        if (p != p)
@@ -444,7 +443,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
 
     @Override
-    public @Nullable V get(@NotNull Object key) {
+    public @Nullable V get(/*@NotNull*/ Object key) {
         return update(key, null, GET, null);
     }
 
@@ -455,7 +454,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     @Override
     @NotNull
-    public HijackBag<K, V> sample(@NotNull Bag.BagCursor<? super V> each) {
+    public HijackBag<K, V> sample(/*@NotNull*/ Bag.BagCursor<? super V> each) {
         final int s = size();
         if (s <= 0)
             return this;
@@ -532,7 +531,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      */
     @Override
     public float depressurize() {
-        return pressure.getAndSet(0f);
+        return Math.max(0,pressure.getAndSet(0f));  //max() in case it becomes negative
     }
 
     @Override

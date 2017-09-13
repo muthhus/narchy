@@ -91,7 +91,7 @@ public class UniExec extends Exec implements Runnable {
                     }
 
                     @Override
-                    public float pri(@NotNull ITask key) {
+                    public float pri( ITask key) {
                         if (key instanceof Activate)
                             return activationFactor * key.priElseZero();
                         else if (key instanceof Premise)

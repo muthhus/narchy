@@ -18,7 +18,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PriReference<X>> {
     }
 
     @Override
-    public final float pri(@NotNull PriReference<X> key) {
+    public final float pri( PriReference<X> key) {
         return key.pri();
     }
 
@@ -68,7 +68,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PriReference<X>> {
 
 
     @Override
-    protected PriReference<X> merge(@NotNull PriReference<X> existing, @NotNull PriReference<X> incoming, MutableFloat overflowing) {
+    protected PriReference<X> merge(PriReference<X> existing, PriReference<X> incoming, MutableFloat overflowing) {
         float overflow = existing.priAddOverflow(incoming.priElseZero() );
         if (overflow > 0) {
             //pressurize(-overflow);

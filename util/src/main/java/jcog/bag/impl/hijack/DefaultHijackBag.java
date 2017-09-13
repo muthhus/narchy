@@ -23,7 +23,7 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PriReference<K>> {
     }
 
     @Override
-    protected PriReference<K> merge(@NotNull PriReference<K> existing, @NotNull PriReference<K> incoming, MutableFloat overflowing) {
+    protected PriReference<K> merge( PriReference<K> existing,  PriReference<K> incoming, MutableFloat overflowing) {
         float overflow = merge.merge(existing, incoming); //modify existing
         if (overflow > 0) {
             //pressurize(-overflow);

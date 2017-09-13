@@ -9,6 +9,7 @@ import jcog.pri.Priority;
 import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
 import jcog.table.SortedListTable;
+import jcog.util.AtomicFloat;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     /**
      * inbound pressure sum since last commit
      */
-    public final AtomicDouble pressure = new AtomicDouble();
+    public final AtomicFloat pressure = new AtomicFloat();
 
     public float mass;
 
@@ -85,13 +86,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
      */
     @Override
     public float depressurize() {
-        float pv = (float) pressure.getAndSet(0);
-        if (pv >= 0) {
-            return pv;
-        } else {
-            pressure.set(0);
-            return 0;
-        }
+        return Math.max(0,pressure.getAndSet(0f)); //max() in case it becomes negative
     }
 
     @Override
@@ -639,10 +634,10 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     @Override
     @Deprecated
     public Bag<X, Y> commit() {
-        double p = this.pressure.getAndSet(0);
+        float p = this.pressure.getAndSet(0f);
         if (p >= Prioritized.EPSILON) {
             return commit(PriForget.forget(size(), capacity(),
-                    (float) p, mass, PriForget.DEFAULT_TEMP, Prioritized.EPSILON, PriForget::new));
+                    p, mass, PriForget.DEFAULT_TEMP, Prioritized.EPSILON, PriForget::new));
         }
         return this;
     }
@@ -771,7 +766,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
 
     @Override
-    public float pri(@NotNull Y key) {
+    public float pri(Y key) {
         return key.pri();
         //throw new UnsupportedOperationException("TODO currently this bag works with PLink.pri() directly");
     }

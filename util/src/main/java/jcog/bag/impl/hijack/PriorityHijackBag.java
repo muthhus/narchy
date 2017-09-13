@@ -22,7 +22,7 @@ abstract public class PriorityHijackBag<K,V extends Priority> extends HijackBag<
 
 
     @Override
-    protected V merge(@NotNull V existing, @NotNull V incoming, @Nullable MutableFloat overflowing) {
+    protected V merge(V existing, V incoming, @Nullable MutableFloat overflowing) {
         float overflow = existing.priAddOverflow(incoming.priElseZero());
         if (overflow > 0) {
             //pressurize(-overflow);
@@ -32,7 +32,7 @@ abstract public class PriorityHijackBag<K,V extends Priority> extends HijackBag<
     }
 
     @Override
-    public float pri(@NotNull V key) {
+    public float pri(V key) {
         return key.pri();
     }
 

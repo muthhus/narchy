@@ -59,7 +59,7 @@ public class HijackBagTest {
         for (int i = 0; i < 64; i++)
             b.put(p("w" + i, 0.8f));
         assertEquals(b.capacity(), b.space());
-        assertEquals(b.capacity(), b.size());
+        assertTrue(Math.abs(b.capacity() - b.size()) <= 2); //close to capacity
 
         //now try shrinking
         b.setCapacity(cap/2);

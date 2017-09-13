@@ -4,6 +4,7 @@ import jcog.Texts;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.MwCounter;
+import jcog.pri.PLink;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.random.XorShift128PlusRandom;
@@ -23,41 +24,69 @@ import static jcog.Texts.n4;
  * TODO add an instrumentation wrapper to collect statistics
  * about cache efficiency and also processing time of the calculations
  */
-public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Computation<K, V>> implements Memoize<K, V> {
+public class HijackMemoize<X, Y> extends PriorityHijackBag<X, HijackMemoize.Computation<X, Y>> implements Memoize<X, Y> {
 
     private final Random rng = new XorShift128PlusRandom();
 
-    public interface Computation<K,V> extends Priority, Supplier<V> {
-        K key();
+    public interface Computation<X, Y> extends Priority, Supplier<Y> {
+        /** 'x', the parameter to the function */
+        X x();
     }
 
-    public static class HalfWeakPair<K, V> extends
-            SoftReference<V>
-            ///*WeakReference*/SoftReference<V>
-            implements Computation<K,V> {
+    public static class StrongPair<X, Y> extends PLink<Y> implements Computation<X,Y> {
 
-        public final K key;
+        public final X x;
+        private final int hash;
+
+        public StrongPair(X x, Y y, float pri) {
+            super(y, pri);
+            this.x = x;
+            this.hash = x.hashCode();
+        }
+
+        @Override
+        public boolean equals(@NotNull Object obj) {
+            StrongPair h = (StrongPair) obj;
+            return hash == h.hash && x.equals(h.x);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+
+        @Override
+        public X x() {
+            return x;
+        }
+    }
+
+    public static class SoftPair<X, Y> extends SoftReference<Y>
+            ///*WeakReference*/SoftReference<V>
+            implements Computation<X, Y> {
+
+        public final X x;
         private final int hash;
         private float pri;
 
-        public HalfWeakPair(@NotNull K key, @NotNull V value, float pri) {
-            super(value);
-            this.key = key;
-            this.hash = key.hashCode();
+        public SoftPair(@NotNull X x, @NotNull Y y, float pri) {
+            super(y);
+            this.x = x;
+            this.hash = x.hashCode();
             this.pri = pri;
         }
 
 
         @Override
-        public final K key() {
-            return key;
+        public final X x() {
+            return x;
         }
 
 
         @Override
         public boolean equals(Object obj) {
-            HalfWeakPair h = (HalfWeakPair) obj;
-            return hash == h.hash && key.equals(h.key);
+            SoftPair h = (SoftPair) obj;
+            return hash == h.hash && x.equals(h.x);
         }
 
         @Override
@@ -85,7 +114,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Comp
 
         @Override
         public String toString() {
-            return '$' + n4(pri) + ' ' + key;
+            return '$' + n4(pri) + ' ' + x;
         }
 
         @Override
@@ -96,13 +125,13 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Comp
         }
 
         @Override
-        public V get() {
-            V v = super.get();
-            if (v == null) {
+        public Y get() {
+            Y y = super.get();
+            if (y == null) {
                 this.pri = Float.NaN;
                 return null;
             }
-            return v;
+            return y;
         }
 
 
@@ -110,7 +139,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Comp
         public float pri() {
             float p = pri;
             if (p==p) {
-                V x = get();
+                Y x = get();
                 if (x != null)
                     return pri;
             }
@@ -128,7 +157,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Comp
     float CACHE_HIT_BOOST;
     float CACHE_DENY_DAMAGE; //damage taken by a cell in rejecting an attempted hijack
 
-    final Function<K, V> func;
+    final Function<X, Y> func;
 
     final MwCounter
             hit = new MwCounter(),  //existing item retrieved
@@ -140,7 +169,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Comp
     //hit + miss + reject = total insertions
 
 
-    public HijackMemoize(@NotNull Function<K, V> f, int initialCapacity, int reprobes) {
+    public HijackMemoize(@NotNull Function<X, Y> f, int initialCapacity, int reprobes) {
         super(reprobes);
         setCapacity(initialCapacity);
         this.func = f;
@@ -161,7 +190,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Comp
      * easier items will introduce lower priority, allowing
      * harder items to sustain longer
      */
-    public float value(@NotNull K k) {
+    public float value(@NotNull X x) {
         return 0.5f;
         //return reprobes * 2 * CACHE_HIT_BOOST;
     }
@@ -205,15 +234,15 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Comp
 
     @NotNull
     @Override
-    public HijackBag<K, Computation<K, V>> commit(@Nullable Consumer<Computation<K, V>> update) {
+    public HijackBag<X, Computation<X, Y>> commit(@Nullable Consumer<Computation<X, Y>> update) {
         return this;
     }
 
     @Nullable
-    public V getIfPresent(@NotNull Object k) {
-        Computation<K, V> exists = get(k);
+    public Y getIfPresent(@NotNull Object k) {
+        Computation<X, Y> exists = get(k);
         if (exists != null) {
-            V e = exists.get();
+            Y e = exists.get();
             if (e != null) {
                 exists.priAdd(CACHE_HIT_BOOST);
                 hit.inc();
@@ -224,8 +253,8 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Comp
     }
 
     @Nullable
-    public V removeIfPresent(@NotNull K k) {
-        @Nullable Computation<K, V> exists = remove(k);
+    public Y removeIfPresent(@NotNull X x) {
+        @Nullable Computation<X, Y> exists = remove(x);
         if (exists != null) {
             return exists.get();
         }
@@ -234,21 +263,24 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Comp
 
     @Override
     @Nullable
-    public V apply(@NotNull K k) {
-        V v = getIfPresent(k);
-        if (v == null) {
-            v = func.apply(k);
-            HalfWeakPair h = new HalfWeakPair(k, v, 0.5f);
-            //new PLink<>(key, value)
-            //new WeakPLink<>(key, value)
-            ((put(h) != null) ? miss : reject).inc();
+    public Y apply(@NotNull X x) {
+        Y y = getIfPresent(x);
+        if (y == null) {
+            y = func.apply(x);
+            ((put(computation(x, y)) != null) ? miss : reject).inc();
         }
-        return v;
+        return y;
     }
 
+    /** produces the memoized computation instance for insertion into the bag.
+     * here it can choose the implementation to use: strong, soft, weak, etc.. */
+    @NotNull public Computation<X, Y> computation(@NotNull X x, Y y) {
+        //return new SoftPair<>(x, y, 0.5f);
+        return new StrongPair<>(x, y, 0.5f);
+    }
 
     @Override
-    protected boolean replace(float incoming, Computation<K, V> existing) {
+    protected boolean replace(float incoming, Computation<X, Y> existing) {
         if (!super.replace(incoming, existing)) {
             existing.priSub(CACHE_DENY_DAMAGE);
             return false;
@@ -263,18 +295,18 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Comp
 
     @NotNull
     @Override
-    public K key(Computation<K, V> value) {
-        return value.key();
+    public X key(Computation<X, Y> value) {
+        return value.x();
     }
 
 
     @Override
-    protected Consumer<Computation<K, V>> forget(float rate) {
+    protected Consumer<Computation<X, Y>> forget(float rate) {
         return null;
     }
 
     @Override
-    public void onRemove(@NotNull HijackMemoize.Computation<K, V> value) {
+    public void onRemove(@NotNull HijackMemoize.Computation<X, Y> value) {
         value.delete();
         evict.inc();
     }

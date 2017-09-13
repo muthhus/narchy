@@ -313,9 +313,9 @@ public interface Bag<K, V> extends Table<K, V> {
     /**
      * returns the priority of a value, or NaN if such entry is not present
      */
-    float pri(@NotNull V key);
+    float pri(V key);
 
-    default float pri(@NotNull Object key, float ifMissing) {
+    default float pri( Object key, float ifMissing) {
         V x = get(key);
         if (x == null)
             return ifMissing;
@@ -329,12 +329,9 @@ public interface Bag<K, V> extends Table<K, V> {
         //return priSafe(key, -1) >= 0;
     }
 
-    default float priElseZero(@NotNull V key) {
-        return priElse(key, 0);
-    }
 
 
-    default float priElse(@NotNull V key, float valueIfMissing) {
+    default float priElse(V key, float valueIfMissing) {
         float p = pri(key);
         return (p == p) ? p : valueIfMissing;
     }
@@ -594,9 +591,9 @@ public interface Bag<K, V> extends Table<K, V> {
 
     @Nullable Bag EMPTY = new Bag() {
 
-        @NotNull
+        
         @Override
-        public Bag sample(@NotNull Bag.BagCursor each) {
+        public Bag sample( Bag.BagCursor each) {
             return this;
         }
 
@@ -610,19 +607,19 @@ public interface Bag<K, V> extends Table<K, V> {
         }
 
         @Override
-        public float pri(@NotNull Object key) {
+        public float pri( Object key) {
             return 0;
         }
 
 
         @Nullable
         @Override
-        public Object remove(@NotNull Object x) {
+        public Object remove( Object x) {
             return null;
         }
 
         @Override
-        public Object put(@NotNull Object b, @Nullable MutableFloat overflowing) {
+        public Object put( Object b, @Nullable MutableFloat overflowing) {
             return null;
         }
 
@@ -631,14 +628,14 @@ public interface Bag<K, V> extends Table<K, V> {
             return 0;
         }
 
-        @NotNull
+        
         @Override
         public Iterator iterator() {
             return Collections.emptyIterator();
         }
 
         @Override
-        public boolean contains(@NotNull Object it) {
+        public boolean contains( Object it) {
             return false;
         }
 
@@ -658,7 +655,7 @@ public interface Bag<K, V> extends Table<K, V> {
             return this;
         }
 
-        @NotNull
+        
         @Override
         public Bag commit(Consumer update) {
             return this;
@@ -667,12 +664,12 @@ public interface Bag<K, V> extends Table<K, V> {
 
         @Nullable
         @Override
-        public Object get(@NotNull Object key) {
+        public Object get( Object key) {
             return null;
         }
 
         @Override
-        public void forEachKey(@NotNull Consumer each) {
+        public void forEachKey( Consumer each) {
 
         }
 
