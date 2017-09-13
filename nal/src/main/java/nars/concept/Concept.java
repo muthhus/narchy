@@ -59,7 +59,7 @@ public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
     Activate activate(float pri, NAR n);
 
 
-    void delete(@NotNull NAR nar);
+    void delete(NAR nar);
 
     default boolean isDeleted() {
         return state() == ConceptState.Deleted;
@@ -178,15 +178,15 @@ public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
     /**
      * returns the previous state
      */
-    ConceptState state(@NotNull ConceptState c);
+    ConceptState state(ConceptState c);
 
     /** should not include itself, although this will be included with these templates on activation */
-    @NotNull Collection<Termed> templates(NAR nar);
+    Collection<Termed> templates();
 
 
     void process(Task task, @NotNull NAR n);
 
-    float value(@NotNull Task t, float activation, long when, NAR n);
+    float value(Task t, float activation, long when, NAR n);
 
     Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests);
 

@@ -357,7 +357,7 @@ public interface NAct {
          *  while if resting at 0.5 it is already at threshold ready
          *  to fire.
          * */
-        final float restFreq = 0.5f;
+        final float restFreq = 0f;
 
         final float ff[] = new float[2];
         final float cc[] = new float[2];

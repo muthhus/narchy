@@ -219,7 +219,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
                         Term abbreviatedTerm = abbreviated.term();
 
-                        AliasConcept ac = AliasConcept.get(id, a, nar);
+                        AliasConcept ac = AliasConcept.get(id, a);
                         Concept alias = aliasConcept ?
                                 nar.on(ac) : null;
                         nar.terms.set(abbreviated, ac); //set the abbreviated term to resolve to the abbreviation

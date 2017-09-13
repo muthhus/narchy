@@ -135,7 +135,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
 
 
-        Collection<Termed> localTemplates = id.templates(nar);
+        Collection<Termed> localTemplates = id.templates();
 
 
         List<Concept> localSubConcepts;
@@ -323,67 +323,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         throw new UnsupportedOperationException();
     }
 
-    public static void templates(Set<Termed> tc, Term root, NAR nar, int layersRemain) {
-
-        Term b = root.unneg();
-
-        Op o = b.op();
-        switch (o) {
-            //case VAR_DEP:
-            //case VAR_INDEP:
-            //case VAR_QUERY:
-            //  break; //OK
-            default:
-                if (!o.conceptualizable)
-                    return;
-        }
-
-        if (!tc.add(b))
-            return; //already added
-
-        if (b.size() == 0)
-            return;
-
-
-        if (--layersRemain <= 0) // || !b.op().conceptualizable || b.isAny(VAR_QUERY.bit | VAR_PATTERN.bit))
-            return;
-
-        int lb = layers(b);
-        layersRemain = Math.min(lb, layersRemain);
-
-        for (Term bb : b.subterms()) {
-
-            templates(tc, bb, nar, layersRemain);
-
-//            @Nullable Concept c = nar.conceptualize(b);
-//
-//            Iterable<? extends Termed> e = null;
-//            if (c != null) {
-////                    if (layersRemain > 0) {
-//                e = c.subterms();
-////                        if (e.size() == 0) {
-////                            //System.out.println(c);
-////                            //HACK TODO determine if good
-////                            //c.termlinks().sample(ctpl.size(), (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
-////                        }
-////                    }
-//            } else /*if (!b.equals(id))*/ {
-//
-////                    if (layersRemain > 0) {
-//                e = b.subterms();
-////                        if (e.size() == 0) {
-////                            //System.out.println(" ? " + e);
-////                            //e.termlinks().sample(10, (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
-////                        }
-////                    }
-//
-//
-//            }
-
-        }
-    }
-
-//    protected int premise(Derivation d, Premise p, Consumer<DerivedTask> x, int ttlPerPremise) {
+    //    protected int premise(Derivation d, Premise p, Consumer<DerivedTask> x, int ttlPerPremise) {
 //        int ttl = p.run(d, ttlPerPremise);
 //        //TODO record ttl usage
 //        return ttl;
@@ -392,55 +332,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     @Override
     public final Term term() {
         return id.term();
-    }
-
-    public static int layers(@NotNull Termed host) {
-        switch (host.op()) {
-
-            case PROD:
-                return 2;
-
-            case SETe:
-            case SETi:
-
-//            case IMGe:
-//            case IMGi:
-//                return 1;
-
-            case DIFFe:
-            case DIFFi:
-            case SECTi:
-            case SECTe:
-                return 2;
-
-            case CONJ:
-                return 2;
-
-            case SIM:
-                return 3;
-
-            case INH:
-                return 3;
-
-            case IMPL:
-                return 4;
-
-
-//                int s = host.size();
-//                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {
-//                    int vars = host.vars();
-//                    return (vars > 0) ? 3 : 2;
-//                } else {
-//                    return 2;
-//                    //return (vars > 0) ? 2 : 1; //prevent long conjunctions from creating excessive templates
-//                }
-
-
-            default:
-                throw new UnsupportedOperationException("unhandled operator type: " + host.op());
-
-
-        }
     }
 
 }

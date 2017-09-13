@@ -1,6 +1,7 @@
 package nars.util.data;
 
 import jcog.tree.rtree.RTree;
+import jcog.tree.rtree.Spatialization;
 import jcog.tree.rtree.rect.RectDouble2D;
 import nars.NAR;
 import nars.Task;
@@ -12,7 +13,7 @@ import java.util.function.Consumer;
 public class TimeMap extends RTree<Task> implements Consumer<Task> {
 
     public TimeMap() {
-        super((task) -> new RectDouble2D(task.start(), task.end(), task.hashCode(), task.hashCode()));
+        super((task) -> new RectDouble2D(task.start(), task.end(), task.hashCode(), task.hashCode()), 2, 8, Spatialization.DefaultSplits.AXIAL);
     }
 
     public TimeMap(@NotNull NAR n) {

@@ -900,8 +900,8 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
      * of the Task and the reason for it.
      */
     @NotNull
-    default Task log(@Nullable Object entry) {
-        if (!(entry == null || !Param.DEBUG_TASK_LOG))
+    default Task log( Object entry) {
+        if (Param.DEBUG_TASK_LOG)
             getOrCreateLog().add(entry);
         return this;
     }
@@ -1107,6 +1107,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
      * TODO see if this can be made faster
      */
     default long distanceTo(long start, long end) {
+        assert (start != ETERNAL);
 
         if (start == end) {
             return distanceTo(start);
@@ -1114,7 +1115,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
             long s = this.start();
             if (s == ETERNAL) return 0;
 
-            assert (start != ETERNAL);
 
             long e = this.end();
 

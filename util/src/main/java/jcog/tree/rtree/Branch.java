@@ -37,7 +37,7 @@ import java.util.stream.Stream;
  */
 public final class Branch<T> implements Node<T, Node<T,?>> {
 
-    private final Node<T, ?>[] child;
+    public final Node<T, ?>[] child;
 
     private short childDiff;
     private HyperRegion region;
@@ -108,7 +108,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
      * @return Node that the entry was added to
      */
     @Override
-    public Node<T, ?> add(@NotNull final T t, Nodelike<T> parent, Spatialization<T> model) {
+    public Node<T, ?> add(final T t, Nodelike<T> parent, Spatialization<T> model) {
         assert (childDiff == 0);
 
         final HyperRegion tRect = model.region(t);

@@ -165,8 +165,9 @@ public interface Space<T> extends Nodelike<T> {
      * @return whether the item was added, or false if it wasn't (ex: duplicate or some other prohibition)
      */
     default boolean remove(@NotNull final T x) {
-        return remove(x, model().region(x));
+        return remove(x, x instanceof HyperRegion ? (HyperRegion)x : model().region(x));
     }
+
 
     /** removes, deferred if necessary until un-busy */
     default void removeAsync(T x) {

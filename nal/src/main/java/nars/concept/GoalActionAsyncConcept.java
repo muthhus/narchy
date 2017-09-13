@@ -198,8 +198,8 @@ public class GoalActionAsyncConcept extends ActionConcept {
         long now = nar.time();
         int dur = nar.dur();
 
-        Task fg = feedGoal.set(term, f, nar.time::nextStamp, now, dur, nar);
-        nar.input(fg);
+//        Task fg = feedGoal.set(term, f, nar.time::nextStamp, now, dur, nar);
+//        nar.input(fg);
 
         Task fb = feedBelief.set(term, f, nar.time::nextStamp, now, dur, nar);
         nar.input(fb);

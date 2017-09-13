@@ -52,10 +52,6 @@ public class RTree<T> implements Space<T> {
     public final Spatialization<T> model;
 
 
-    public RTree(@Nullable final Function<T, HyperRegion> spatialize) {
-        this(spatialize, 2, 8, Spatialization.DefaultSplits.AXIAL);
-    }
-
     public RTree(@Nullable Function<T, HyperRegion> spatialize, final int mMin, final int mMax, final Spatialization.DefaultSplits splitType) {
         this(new Spatialization<>(spatialize, splitType, mMin, mMax));
     }

@@ -1,7 +1,6 @@
 package nars.op.mental;
 
 import jcog.bag.Bag;
-import nars.NAR;
 import nars.Op;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
@@ -78,12 +77,12 @@ public final class AliasConcept extends BaseConcept {
     public final Compound abbr;
 
     @NotNull
-    static public AliasConcept get(@NotNull String compressed, @NotNull Concept decompressed, @NotNull NAR nar) {
-        AliasConcept a = new AliasConcept(compressed, decompressed, nar);
+    static public AliasConcept get(@NotNull String compressed, @NotNull Concept decompressed) {
+        AliasConcept a = new AliasConcept(compressed, decompressed);
         return a;
     }
 
-    AliasConcept(@NotNull String abbreviation, Concept decompressed, @NotNull NAR nar) {
+    AliasConcept(@NotNull String abbreviation, Concept decompressed) {
         super(new AliasAtom(abbreviation, decompressed.term()),
                 decompressed.beliefs(), decompressed.goals(), decompressed.questions(), decompressed.quests(),
                 new Bag[]{decompressed.termlinks(), decompressed.tasklinks()});
@@ -94,14 +93,14 @@ public final class AliasConcept extends BaseConcept {
 //            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
 //            if (additionalTerms.length > 0)
 //                tl = ArrayUtils.addAll(tl, additionalTerms);
-        this.templates = decompressed.templates(nar);
+        this.templates = decompressed.templates();
 
         //rewriteLinks(nar);
     }
 
 
     @Override
-    public Collection<Termed> templates(NAR nar) {
+    public Collection<Termed> templates() {
         return templates;
 //        @Nullable Concept c = nar.conceptualize(abbr);
 //        return c == null ? null : c.templates(nar);

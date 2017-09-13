@@ -159,7 +159,7 @@ public class ActivateTest {
         //n.believe(term + ".");
         Concept c = n.conceptualize($(term));
         Activate a = new Activate(c, 0.5f);
-        Collection<Termed> t = c.templates(n);
+        Collection<Termed> t = c.templates();
         assertEquals(expect, t.toString());
     }
 }

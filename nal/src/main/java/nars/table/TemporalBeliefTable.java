@@ -23,9 +23,12 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
      * will be infinity) so it can exit early if it will not rank
      */
     static float temporalTaskPriority(Task t, long start, long end, int dur) {
+        if (t.isDeleted())
+            return Float.NEGATIVE_INFINITY;
+
         float fdur = dur;
         return
-                t.evi() * //raw because time is considered below. this covers cases where the task eternalizes
+                (1f + t.conf()) * //raw because time is considered below. this covers cases where the task eternalizes
                 //t.conf(now, dur) *
                 //t.evi(now, dur) *
                 (1f + t.range()/ fdur)/(1+ t.distanceTo(start, end)/fdur);

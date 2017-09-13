@@ -252,7 +252,7 @@ public class NALTask extends Pri implements Task {
     }
 
     @Override
-    public void meta(Object key, Object value) {
+    public synchronized void meta(Object key, Object value) {
         //synchronized (this) {
         if (meta == null) {
             meta = UnifiedMap.newWithKeysValues(key, value); /* for compactness */

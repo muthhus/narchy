@@ -1,19 +1,19 @@
 package jcog.event;
 
 import jcog.list.FasterList;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
-/**  arraylist implementation, thread safe */
+/**  arraylist implementation, thread safe.  creates an array copy on each update
+ *   for fastest possible iteration during emitted events. */
 public class ListTopic<V> extends FasterList<Consumer<V>> implements Topic<V> {
 
-    static final Consumer[] EMPTY_CONSUMER_ARRAY = new Consumer[0];
-
-    private Consumer[] copy = EMPTY_CONSUMER_ARRAY;
+    private Consumer[] copy = EMPTY;
 
     public ListTopic() {
-        super();
+        super(4);
     }
 
     @Override
@@ -42,14 +42,12 @@ public class ListTopic<V> extends FasterList<Consumer<V>> implements Topic<V> {
         }
     }
 
-    void commit() {
-        if (size == 0)
-            copy = EMPTY_CONSUMER_ARRAY;
-        else {
-            copy = toArray(new Consumer[size]);
-        }
+    private final void commit() {
+        this.copy = (size == 0) ? EMPTY :
+                                  toArray(new Consumer[size]);
     }
 
+    private static final Consumer[] EMPTY = new Consumer[0];
 
 
 }

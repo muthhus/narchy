@@ -46,15 +46,12 @@ public interface Node<L, V> extends Nodelike<L> {
      */
     boolean isLeaf();
 
-    default FasterList<V> childMinList(FloatFunction<V> rank, int limit) {
-        return new FasterList(streamNodes().sorted(new FloatFunctionComparator(rank)).limit(limit).toArray());
-    }
+    Stream<L> stream();
 
     default Stream<V> streamNodes() {
         return IntStream.range(0, size()).mapToObj(this::get);
     }
 
-    Stream<L> stream();
 
     default FasterList<V> toList() {
         int s = size();
@@ -66,27 +63,13 @@ public interface Node<L, V> extends Nodelike<L> {
         return f;
     }
 
-    default V childMin(FloatFunction<V> rank) {
-        V min = null;
-        double minVal = Double.POSITIVE_INFINITY;
-        int size = size();
-        for (int i = 0; i < size; i++) {
-            V c = get(i);
-            double val = rank.floatValueOf(c);
-            if (val < minVal) {
-                min = c;
-                minVal = val;
-            }
-        }
-        return min;
-    }
-
+    /** gets contained child i */
     V get(int i);
 
     /**
      * @return Rect - the bounding rectangle for this node
      */
-    @NotNull HyperRegion region();
+    /*@NotNull */HyperRegion region();
 
     /**
      * Add t to the index
@@ -97,7 +80,7 @@ public interface Node<L, V> extends Nodelike<L> {
      * @param model
      * @return null if Leaf merged it with existing item
      */
-    @Nullable Node<L, ?> add(@NotNull L l, @Nullable Nodelike<L> parent, @NotNull Spatialization<L> model);
+    @Nullable Node<L, ?> add(/*@NotNull */L l, @Nullable Nodelike<L> parent, /*@NotNull */Spatialization<L> model);
 
     /**
      * Remove t from the index
@@ -180,5 +163,22 @@ public interface Node<L, V> extends Nodelike<L> {
 
     double perimeter(Spatialization<L> model);
 
+//    default FasterList<V> childMinList(FloatFunction<V> rank, int limit) {
+//        return new FasterList(streamNodes().sorted(new FloatFunctionComparator(rank)).limit(limit).toArray());
+//    }
+//    default V childMin(FloatFunction<V> rank) {
+//        V min = null;
+//        double minVal = Double.POSITIVE_INFINITY;
+//        int size = size();
+//        for (int i = 0; i < size; i++) {
+//            V c = get(i);
+//            double val = rank.floatValueOf(c);
+//            if (val < minVal) {
+//                min = c;
+//                minVal = val;
+//            }
+//        }
+//        return min;
+//    }
 
 }

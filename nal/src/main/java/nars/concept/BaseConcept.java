@@ -2,6 +2,7 @@ package nars.concept;
 
 import com.google.common.collect.Lists;
 import jcog.bag.Bag;
+import jcog.list.FasterList;
 import jcog.pri.PriReference;
 import nars.*;
 import nars.concept.builder.ConceptBuilder;
@@ -26,22 +27,40 @@ import static java.util.Collections.emptyList;
 import static nars.Op.*;
 import static nars.concept.state.ConceptState.Deleted;
 
-/** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
+/**
+ * concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks
+ */
 public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike {
 
-    @NotNull public final Term term;
-    @NotNull public final BeliefTable beliefs;
-    @NotNull public final BeliefTable goals;
-    @NotNull public final QuestionTable quests;
-    @NotNull public final QuestionTable questions;
-    @NotNull public final Bag<Task,PriReference<Task>> taskLinks;
-    @NotNull public final Bag<Term,PriReference<Term>> termLinks;
-    @NotNull public transient ConceptState state = Deleted;
+    @NotNull
+    public final Term term;
+    @NotNull
+    public final BeliefTable beliefs;
+    @NotNull
+    public final BeliefTable goals;
+    @NotNull
+    public final QuestionTable quests;
+    @NotNull
+    public final QuestionTable questions;
+    @NotNull
+    public final Bag<Task, PriReference<Task>> taskLinks;
+    @NotNull
+    public final Bag<Term, PriReference<Term>> termLinks;
+    @NotNull
+    public transient ConceptState state = Deleted;
+    private Collection<Termed> templates;
 
+    public BaseConcept(@NotNull Term term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder conceptBuilder) {
+        this(term,
+                beliefs != null ? beliefs : conceptBuilder.newBeliefTable(term, true),
+                goals != null ? goals : conceptBuilder.newBeliefTable(term, false),
+                conceptBuilder.newQuestionTable(term, true), conceptBuilder.newQuestionTable(term, false), conceptBuilder.newLinkBags(term));
+    }
 
     /**
      * Constructor, called in Memory.getConcept only
-     *  @param term      A term corresponding to the concept
+     *
+     * @param term      A term corresponding to the concept
      * @param termLinks
      * @param taskLinks
      */
@@ -49,6 +68,8 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
                        @NotNull BeliefTable beliefs, @NotNull BeliefTable goals,
                        @NotNull QuestionTable questions, @NotNull QuestionTable quests,
                        @NotNull Bag[] bags) {
+        super(0);
+        assert (term.op().conceptualizable);
         this.term = term;
         this.termLinks = bags[0];
         this.taskLinks = bags[1];
@@ -57,22 +78,16 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
         this.questions = questions;
         this.quests = quests;
         this.state = Deleted;
-    }
 
-    public BaseConcept(@NotNull Term term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder conceptBuilder) {
-        this(term,
-                beliefs!=null ? beliefs : conceptBuilder.newBeliefTable(term, true),
-                goals!=null ? goals : conceptBuilder.newBeliefTable(term, false),
-                conceptBuilder.newQuestionTable(term, true), conceptBuilder.newQuestionTable(term, false), conceptBuilder.newLinkBags(term));
-        assert(term.op().conceptualizable);
+        templates = TermLinks.templates(term);
     }
 
 
     @Override
     public Activate activate(float pri, NAR n) {
         //store per 'self' term allowing a schizo NAR to assign different activations to each 'personality'
-        Activate a = (Activate)computeIfAbsent(n.self(), (s) ->
-            new Activate(BaseConcept.this, 0 )
+        Activate a = (Activate) computeIfAbsent(n.self(), (s) ->
+                new Activate(BaseConcept.this, 0)
         );
         //TODO forget based on dt
         a.priAdd(pri);
@@ -96,48 +111,28 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
 
 
     @Override
-    public @NotNull Bag<Task,PriReference<Task>> tasklinks() {
+    public @NotNull Bag<Task, PriReference<Task>> tasklinks() {
         return taskLinks;
     }
 
     @NotNull
     @Override
-    public Bag<Term,PriReference<Term>> termlinks() {
+    public Bag<Term, PriReference<Term>> termlinks() {
         return termLinks;
     }
 
     final static Term TEMPLATE_KEY = $.the("templates");
 
     @Override
-    public Collection<Termed> templates(NAR nar) {
-
-        if (term.size() == 0) return emptyList();
-
-        return (Collection<Termed>)computeIfAbsent(TEMPLATE_KEY, (x) -> {
-
-            Set<Termed> tc =
-                    //new UnifiedSet<>(id.volume() /* estimate */);
-                    new HashSet(term.volume());
-
-            Activate.templates(tc, term, nar, Activate.layers(term) );
-
-            if (!tc.isEmpty())
-                return Lists.newArrayList(tc); //store as list for compactness and fast iteration
-            else
-                return emptyList();
-
-            //id.termlinks().sample(2, (PriReference<Term> x) -> templatize.accept(x.get()));
-
-            //                templateConcepts = Concept.EmptyArray;
-            //                templateConceptsCount = 0;
-        });
+    public Collection<Termed> templates() {
+        return templates;
     }
 
     /**
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     public BaseConcept(@NotNull Term term, @NotNull NAR n) {
-        this(term,  n.terms.conceptBuilder);
+        this(term, n.terms.conceptBuilder);
     }
 
 
@@ -193,7 +188,7 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
 
     @Override
     public final boolean equals(Object obj) {
-        return this == obj || (obj instanceof Concept && term.equals(((Concept)obj).term()));
+        return this == obj || (obj instanceof Concept && term.equals(((Concept) obj).term()));
     }
 
     @Override
@@ -211,8 +206,12 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
         return term.size();
     }
 
-    /** first-level only */
-    @Deprecated @Override public boolean contains(@NotNull Termlike t) {
+    /**
+     * first-level only
+     */
+    @Deprecated
+    @Override
+    public boolean contains(@NotNull Termlike t) {
         return term.contains(t);
     }
 
@@ -368,7 +367,6 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
     }
 
 
-
     @Nullable
     public TaskTable table(byte punc) {
         switch (punc) {
@@ -411,7 +409,8 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
         clear();
     }
 
-    @Override public Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests) {
+    @Override
+    public Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests) {
         List<Stream<Task>> s = new LinkedList<>();
         if (includeBeliefs) s.add(beliefs.stream());
         if (includeGoals) s.add(goals.stream());

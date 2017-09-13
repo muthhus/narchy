@@ -39,26 +39,27 @@ public class ConcurrentRTree<T> implements Space<T> {
 
     public final Space<T> tree;
 
-    final QueueLock<T> toAdd, toRemove;
+//  TODO move this to a subclass
+//    final QueueLock<T> toAdd, toRemove;
+//        if (async) {
+//            toAdd = new QueueLock<>(new DisruptorBlockingQueue<T>(8), this::add);
+//            toRemove = new QueueLock<>(new DisruptorBlockingQueue<T>(8), this::remove);
+//        } else {
+//            toAdd = toRemove = null;
+//        }
 
     private final Lock readLock;
     public final Lock writeLock;
 
-    public ConcurrentRTree(RTree<T> tree) {
-        this(tree, false);
-    }
 
-    public ConcurrentRTree(RTree<T> tree, boolean async) {
+
+    public ConcurrentRTree(RTree<T> tree) {
         this.tree = tree;
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
         this.readLock = lock.readLock();
         this.writeLock = lock.writeLock();
-        if (async) {
-            toAdd = new QueueLock<>(new DisruptorBlockingQueue<T>(8), this::add);
-            toRemove = new QueueLock<>(new DisruptorBlockingQueue<T>(8), this::remove);
-        } else {
-            toAdd = toRemove = null;
-        }
+
+
     }
 
 
@@ -119,17 +120,17 @@ public class ConcurrentRTree<T> implements Space<T> {
      */
     @Override
     public void addAsync(@NotNull T t) {
-        if (toAdd!=null)
-            toAdd.accept(t);
-        else
+//        if (toAdd!=null)
+//            toAdd.accept(t);
+//        else
             add(t);
     }
 
     @Override
     public void removeAsync(@NotNull T t) {
-        if (toRemove!=null)
-            toRemove.accept(t);
-        else
+//        if (toRemove!=null)
+//            toRemove.accept(t);
+//        else
             remove(t);
     }
 
