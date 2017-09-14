@@ -1258,7 +1258,11 @@ public enum Util {
             weight_sum += weight.valueOf(i);
         }
         return decideRoulette(count, weight, weight_sum, rng);
+    }
 
+    public static int decideSoftmax(int count, IntToFloatFunction weight, float temperature, Random random) {
+        return decideRoulette(count, (i)->
+                (float) Math.exp(weight.valueOf(i) / temperature), random);
     }
 
     /**

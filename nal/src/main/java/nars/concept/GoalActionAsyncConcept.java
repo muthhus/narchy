@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
+import java.util.function.LongSupplier;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
@@ -194,15 +195,16 @@ public class GoalActionAsyncConcept extends ActionConcept {
     }
 
 
-    public void feedback(@Nullable Truth f) {
+    public void feedback(@Nullable Truth f, @Nullable Truth g) {
+
         long now = nar.time();
         int dur = nar.dur();
+        LongSupplier stamper = nar.time::nextStamp;
 
-//        Task fg = feedGoal.set(term, f, nar.time::nextStamp, now, dur, nar);
-//        nar.input(fg);
-
-        Task fb = feedBelief.set(term, f, nar.time::nextStamp, now, dur, nar);
-        nar.input(fb);
+        nar.input(
+            feedGoal.set(term, g, stamper, now-dur/2, dur, nar),
+            feedBelief.set(term, f, stamper, now+dur/2, dur, nar)
+        );
     }
 
 

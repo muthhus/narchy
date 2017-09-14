@@ -178,6 +178,7 @@ public class PremiseRule extends GenericCompound {
 
 
         put(TaskPunctuation.class, rank--);
+        put(TaskBeliefOccurrence.class, rank--);
 
         put(TaskBeliefOp.class, rank--);
         put(SubTermStructure.class, rank--);
@@ -185,7 +186,6 @@ public class PremiseRule extends GenericCompound {
         put(TaskBeliefHas.class, rank--);
 
 
-        put(TaskBeliefOccurrence.class, rank--);
 
         put(TaskPolarity.class, rank--); //includes both positive or negative
         put(BeliefPolarity.class, rank--);
@@ -218,9 +218,10 @@ public class PremiseRule extends GenericCompound {
 //        if (b instanceof TermNotEquals) return TermNotEquals.class;
 
         if (b == TaskBeliefOccurrence.bothEvents) return TaskBeliefOccurrence.class;
-//        if (b == TaskBeliefOccurrence.afterOrEternal) return TaskBeliefOccurrence.class;
+
+        if (b == TaskBeliefOccurrence.after) return TaskBeliefOccurrence.class;
+        if (b == TaskBeliefOccurrence.afterOrEternals) return TaskBeliefOccurrence.class;
         if (b == TaskBeliefOccurrence.eventsOrEternals) return TaskBeliefOccurrence.class;
-//        if (b == TaskBeliefOccurrence.beliefDTSimultaneous) return TaskBeliefOccurrence.class;
 
         if (b instanceof SubTermStructure) return SubTermStructure.class;
 
@@ -467,6 +468,12 @@ public class PremiseRule extends GenericCompound {
                         //NOTE THIS SHOULD ACTUALLY BE CALLED dtBeforeAfterOrEternal or something
                         case "dtEventsOrEternals":
                             pres.add(TaskBeliefOccurrence.eventsOrEternals);
+                            break;
+                        case "dtAfter":
+                            pres.add(TaskBeliefOccurrence.after);
+                            break;
+                        case "dtAfterOrEternals":
+                            pres.add(TaskBeliefOccurrence.afterOrEternals);
                             break;
 
 

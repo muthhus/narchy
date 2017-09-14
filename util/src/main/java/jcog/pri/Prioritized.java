@@ -43,7 +43,7 @@ public interface Prioritized extends Deleteable {
     /**
      * default minimum difference necessary to indicate a significant modification in budget float number components
      */
-    float EPSILON = 0.0001f;
+    float EPSILON = 0.00001f;
     /**
      * decending order (highest first)
      */

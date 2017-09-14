@@ -16,6 +16,7 @@ import java.nio.channels.SelectionKey;
 
 /**
  * generic UDP server & utilities
+ * TODO Datagram TLS http://openjdk.java.net/jeps/219
  */
 public class UDP extends Loop {
 
