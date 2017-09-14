@@ -70,7 +70,7 @@ public class Audio implements Runnable {
 
     }
 
-    public void record(String path) throws LineUnavailableException, java.io.FileNotFoundException {
+    public void record(String path) throws java.io.FileNotFoundException {
 
         //if (rec != null) //...
 

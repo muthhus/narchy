@@ -21,7 +21,7 @@ import spacegraph.net.vnc.rfb.codec.ClientEventType;
 public class KeyButtonEventEncoder extends MessageToByteEncoder<KeyButtonEvent> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, KeyButtonEvent msg, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, KeyButtonEvent msg, ByteBuf out) {
         ByteBuf buf = ctx.alloc().buffer(8);
         try {
             buf.writeByte(ClientEventType.KEY_EVENT);

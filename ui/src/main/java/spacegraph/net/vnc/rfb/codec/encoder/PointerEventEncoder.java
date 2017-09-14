@@ -21,7 +21,7 @@ import spacegraph.net.vnc.rfb.codec.ClientEventType;
 public class PointerEventEncoder extends MessageToByteEncoder<PointerEvent> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, PointerEvent msg, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, PointerEvent msg, ByteBuf out) {
         ByteBuf buf = ctx.alloc().buffer(6);
         try {
             buf.writeByte(ClientEventType.POINTER_EVENT);

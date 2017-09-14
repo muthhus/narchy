@@ -312,10 +312,10 @@ public class FX {
     public interface AppLaunch {
         void start(Application app, Stage stage) throws Exception;
         // Remove default keyword if you need to run in Java7 and below
-        default void init(Application app) throws Exception {
+        default void init(Application app) {
         }
 
-        default void stop(Application app) throws Exception {
+        default void stop(Application app) {
         }
     }
 

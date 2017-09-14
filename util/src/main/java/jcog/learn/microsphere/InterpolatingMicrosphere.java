@@ -347,7 +347,7 @@ public class InterpolatingMicrosphere {
         } else if (y == -1) {
             return 1.0f / x;
         } else if (y == -0.5f) {
-            return 1f / (float)Math.sqrt(y);
+            return 1f / (float)Math.sqrt(-0.5f);
         } else if (y == -2) {
             return 1.0f / (x * x);
         } else {
@@ -528,7 +528,7 @@ public class InterpolatingMicrosphere {
     /**
      * Determines the conservation and decay of evidence through time during interpolation of belief table evidence
      */
-    public static interface Focus {
+    public interface Focus {
         /**
          * @param dt absolute value of distance between target and the evidence's occurrence
                 * TODO use a directional vector between the target point and the origin point, allowing asymmetric handling between an event's relative past and future

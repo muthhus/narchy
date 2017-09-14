@@ -24,7 +24,7 @@ import java.util.List;
 public class ClientCutTextEncoder extends MessageToMessageEncoder<ClientCutText> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ClientCutText msg, List<Object> out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, ClientCutText msg, List<Object> out) {
         byte[] text = msg.getText().getBytes(StandardCharsets.ISO_8859_1);
         ByteBuf buf = ctx.alloc().buffer(8 + text.length);
         buf.writeByte(ClientEventType.CLIENT_CUT_TEXT);

@@ -24,7 +24,7 @@ public class HaiQAgent extends HaiQ {
     float perceptionForget;
     public FloatSupplier perceptionError;
     public float lastPerceptionError;
-    private int states;
+    private final int states;
 
     //float aeForget = 1f;
 

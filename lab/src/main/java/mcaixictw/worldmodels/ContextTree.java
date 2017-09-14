@@ -361,7 +361,8 @@ public class ContextTree extends Worldmodel {
 	 * 
 	 * @param symlist
 	 */
-	public void update(BooleanArrayList symlist) {
+	@Override
+    public void update(BooleanArrayList symlist) {
 		// Update the symbol list
 //		for (int i = 0; i < symlist.size(); i++) {
 //			update(symlist.get(i));
@@ -376,7 +377,8 @@ public class ContextTree extends Worldmodel {
 	 * 
 	 * @param symlist
 	 */
-	public void updateHistory(BooleanArrayList symlist) {
+	@Override
+    public void updateHistory(BooleanArrayList symlist) {
 		// System.out.println("update history: " + Util.toString(symlist));
 		history.addAll(symlist);
 	}
@@ -395,7 +397,8 @@ public class ContextTree extends Worldmodel {
 		remove(sym, history, history.size());
 	}
 
-	public void revert(int numSymbols) {
+	@Override
+    public void revert(int numSymbols) {
 
 		//int hs = history.size(); assert (hs >= numSymbols);
 
@@ -414,7 +417,8 @@ public class ContextTree extends Worldmodel {
 	 * 
 	 * @param newsize
 	 */
-	public void revertHistory(int newsize) {
+	@Override
+    public void revertHistory(int newsize) {
 
 		assert (newsize <= history.size());
 
@@ -433,7 +437,8 @@ public class ContextTree extends Worldmodel {
 	 * @param bits
 	 * @return
 	 */
-	public BooleanArrayList genRandomSymbols(int bits) {
+	@Override
+    public BooleanArrayList genRandomSymbols(int bits) {
 		BooleanArrayList result = genRandomSymbolsAndUpdate(bits);
 		// restore the context tree to it's original state
 		revert(bits);
@@ -447,7 +452,8 @@ public class ContextTree extends Worldmodel {
 	 * the context tree statistics and update the context tree with the newly
 	 * generated bits. last predicted symbol has the highest index.
 	 */
-	public BooleanArrayList genRandomSymbolsAndUpdate(int bits) {
+	@Override
+    public BooleanArrayList genRandomSymbolsAndUpdate(int bits) {
 		BooleanArrayList result = new BooleanArrayList(bits);
 		for (int i = 0; i < bits; i++) {
 			boolean sampledSymbol = false;
@@ -466,7 +472,8 @@ public class ContextTree extends Worldmodel {
 	 * @param symbols
 	 * @return
 	 */
-	public double predict(BooleanArrayList symbols) {
+	@Override
+    public double predict(BooleanArrayList symbols) {
 
 		double logProbBefore = logBlockProbability();
 
@@ -517,13 +524,15 @@ public class ContextTree extends Worldmodel {
 	 * @param n
 	 * @return
 	 */
-	public boolean nthHistorySymbol(int n) {
+	@Override
+    public boolean nthHistorySymbol(int n) {
 //		assert (n >= 0);
 //		assert (n < history.size());
 		return history.get(history.size() - (n + 1));
 	}
 
-	public int historySize() {
+	@Override
+    public int historySize() {
 		return history.size();
 	}
 

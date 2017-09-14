@@ -381,7 +381,7 @@ public class P extends GamePanel {
 						}
 						if (i == 0) {
 							j = 2 * linesInShape;
-							solids[0][j + X] = solids[i][X];
+							solids[0][j + X] = solids[0][X];
 							solids[i][j + Y] = solids[i][Y];
 							// solidsX[i][n + 1] = 0;
 							// solidsY[i][n + 1] = 0;
@@ -817,7 +817,7 @@ public class P extends GamePanel {
 	}
 
 	// to run in window, uncomment below
-	public static void main(String[] args) throws Throwable {
+	public static void main(String[] args) {
 		javax.swing.JFrame frame = new javax.swing.JFrame("Porta 4K");
 		frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
 		P applet = new P();

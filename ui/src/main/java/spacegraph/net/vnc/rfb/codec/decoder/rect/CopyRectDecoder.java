@@ -28,7 +28,7 @@ public class CopyRectDecoder implements FrameRectDecoder {
     }
 
     @Override
-    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 
         if (!in.isReadable(4)) {
             return false;

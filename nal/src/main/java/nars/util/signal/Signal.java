@@ -38,7 +38,7 @@ public class Signal extends AtomicReference<SignalTask> {
     final byte punc;
 
     private static final int lookAheadDurs = 0;
-    private SignalTask last = null;
+    private SignalTask last;
 
 
     public Signal(byte punc, FloatSupplier resolution) {

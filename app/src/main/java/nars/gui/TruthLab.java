@@ -37,7 +37,7 @@ public class TruthLab extends Grid {
 
     long start, end;
     boolean showBeliefs = true;
-    private static boolean truthOrProjectedTaskTruth = false;
+    private static final boolean truthOrProjectedTaskTruth = false;
 
     public TruthLab(NAR n, Compound... x) {
         super(VERTICAL);

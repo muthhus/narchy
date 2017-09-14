@@ -367,8 +367,9 @@ public interface Compound extends Term, IPair, TermContainer {
             return false;
 
 
-        int xs;
-        if ((xs = size()) != ty.size())
+        //int xs;
+        TermContainer xsubs = subterms();
+        if ((/*xs = */xsubs.size()) != ty.size())
             return false;
 
 //            if (vars(subst.type) == 0)
@@ -382,7 +383,6 @@ public interface Compound extends Term, IPair, TermContainer {
 //            }
 //        }
 
-        TermContainer xsubs = subterms();
         TermContainer ysubs = y.subterms();
 
         if (op() == CONJ) { //non-commutive, temporal CONJ
@@ -983,7 +983,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    @NotNull
+    @Nullable
     default Term eternal() {
         return temporalize(Retemporalize.retemporalizeAllToXTERNAL);
 //        if (!this.hasAny(Op.TemporalBits))
@@ -1061,6 +1061,8 @@ public interface Compound extends Term, IPair, TermContainer {
     @NotNull
     default Term conceptual() {
         Term term = unneg().eternal();
+        if (term == null)
+            return Null;
 
 
         //atemporalizing can reset normalization state of the result instance

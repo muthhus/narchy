@@ -8,7 +8,6 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -68,7 +67,7 @@ public class Fork extends AbstractPred<Derivation> {
     }
 
     @Override
-    public PrediTerm<Derivation> exec(Derivation d, TrieExecutor.CPU c) {
+    public PrediTerm<Derivation> exec(Derivation d, CPU c) {
         c.fork(d, cache);
         return null;
     }

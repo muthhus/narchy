@@ -647,7 +647,7 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
         }
     }
     
-    public void drawHUD() throws Exception {
+    public void drawHUD() {
         offg.setColor(Color.RED);
         
         if (rockList.isEmpty() == true) {

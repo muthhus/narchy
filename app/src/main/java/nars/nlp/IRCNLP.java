@@ -54,7 +54,7 @@ public class IRCNLP extends IRC {
 //    final ArrayBag<String, PriReference<String>> out = new PLinkArrayBag<>(16, PriMerge.max, new ConcurrentHashMap());
 //    final ArrayBag<String, PriReference<String>> prevOut = new PLinkArrayBag<>(512, PriMerge.max, new ConcurrentHashMap());
 
-    public IRCNLP(NAR nar, String nick, String server, String... channels) throws Exception {
+    public IRCNLP(NAR nar, String nick, String server, String... channels) {
         super(nick, server, channels);
 
         this.nar = nar;
@@ -212,7 +212,7 @@ public class IRCNLP extends IRC {
 //
 //    }
 
-    void hear(String text, String src) throws Narsese.NarseseException {
+    void hear(String text, String src) {
 
         Hear.hear(nar, text, src, (t) -> {
             return new Hear(nar, Hear.tokenize(t.toLowerCase()), src, 200);
@@ -223,12 +223,12 @@ public class IRCNLP extends IRC {
     }
 
     @Override
-    public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
+    public void onPrivateMessage(PrivateMessageEvent event) {
         //hear(event.getMessage(), event.getUser().toString());
     }
 
     @Override
-    public void onGenericMessage(GenericMessageEvent event) throws Exception {
+    public void onGenericMessage(GenericMessageEvent event) {
 
         if (event instanceof MessageEvent) {
             MessageEvent pevent = (MessageEvent) event;

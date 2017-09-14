@@ -17,10 +17,10 @@ public class Agent {
 		lastUpdatePercept = false;
 	}
 
-	private int actions; // number of actions
-	private int actionBits; // number of bits to represent an action
-	private int obsBits; // number of bits to represent an observation
-	private int rewBits; // number of bits to represent a reward
+	private final int actions; // number of actions
+	private final int actionBits; // number of bits to represent an action
+	private final int obsBits; // number of bits to represent an observation
+	private final int rewBits; // number of bits to represent a reward
 	private Worldmodel model; // Context Tree representing the agent's beliefs
 	private int timeCycle; // How many time cycles the agent has been alive
 	private int totalReward; // The total reward received by the agent

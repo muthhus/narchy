@@ -17,17 +17,17 @@ import java.io.File;
  */
 public class BomberMenu extends JPanel {
     /** main frame pointer */
-    private BomberMain main;
+    private final BomberMain main;
     /** image button objects */
-    private BomberImageButton[] imageButtons;
+    private final BomberImageButton[] imageButtons;
     /** current selection */
     private int selection = P2;
 
     /** background image object */
     private static Image backgroundImg;
     /** button images */
-    private static Image[] buttonImagesDown;
-    private static Image[] buttonImagesUp;
+    private static final Image[] buttonImagesDown;
+    private static final Image[] buttonImagesUp;
     /** rendering hints */
     private static Object hints;
     /** options enumeration */

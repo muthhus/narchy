@@ -92,6 +92,7 @@ public class Top2<T> extends AbstractCollection<T> implements Consumer<T> {
         }
     }
 
+    @Override
     public boolean isEmpty() {
         return a == null;
     }

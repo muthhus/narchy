@@ -184,17 +184,17 @@ public interface $ {
     }
 
     @NotNull
-    public static Term p(@NotNull Collection<? super Term> t) {
+    static Term p(@NotNull Collection<? super Term> t) {
         return $.p(t.toArray(new Term[t.size()]));
     }
 
     @NotNull
-    public static Term p(@NotNull Term... t) {
+    static Term p(@NotNull Term... t) {
         return (t.length == 0) ? ZeroProduct : PROD.the(DTERNAL, t);
     }
 
     @NotNull
-    public static Term p(@NotNull TermContainer t) {
+    static Term p(@NotNull TermContainer t) {
         return p((Term[]) t.toArray());
     }
 
@@ -694,18 +694,18 @@ public interface $ {
      * conjunction sequence (2-ary)
      */
     @Nullable
-    public static Term seq(Term x, int dt, Term y) {
+    static Term seq(Term x, int dt, Term y) {
         return CONJ.the(dt, x, y); //must be a vector, not set
     }
 
 
     @NotNull
-    public static <K, V> Map<K, V> newHashMap() {
+    static <K, V> Map<K, V> newHashMap() {
         return newHashMap(0);
     }
 
     @NotNull
-    public static <K, V> Map<K, V> newHashMap(int capacity) {
+    static <K, V> Map<K, V> newHashMap(int capacity) {
         return new HashMap<>(capacity);
 
         //return new UnifiedMap(capacity);
@@ -717,18 +717,18 @@ public interface $ {
         //return new LinkedHashMap(capacity);
     }
 
-    public static @NotNull <X> List<X> newArrayList() {
+    static @NotNull <X> List<X> newArrayList() {
         return new FasterList<>(0);
         //return new ArrayList();
     }
 
     @NotNull
-    public static <X> List<X> newArrayList(int capacity) {
+    static <X> List<X> newArrayList(int capacity) {
         return new FasterList(capacity);
         //return new ArrayList(capacity);
     }
 
-    public static @NotNull <X> Set<X> newHashSet(int capacity) {
+    static @NotNull <X> Set<X> newHashSet(int capacity) {
 //        if (capacity < 4) {
 //            return new UnifiedSet(0);
 //        } else {

@@ -32,7 +32,8 @@ public class WorldModelSettings extends Settings {
 		facContextTree = parseBoolean("factorial-tree", facContextTree, file);
 	}
 
-	public void loadDefaultSettings() {
+	@Override
+    public void loadDefaultSettings() {
 		this.depth = 10;
 		this.facContextTree = true;
 	}

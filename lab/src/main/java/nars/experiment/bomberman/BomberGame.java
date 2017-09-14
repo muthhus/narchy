@@ -20,11 +20,11 @@ import java.io.File;
 public class BomberGame extends JPanel
 implements ActionListener {
     /** main frame object */
-    private BomberMain main;
+    private final BomberMain main;
     /** game over flag */
     private boolean gameOver;
     /** map object */
-    private BomberMap map;
+    private final BomberMap map;
     /** winner */
     private int winner = -1;
     /** timer */
@@ -35,7 +35,7 @@ implements ActionListener {
     /** rendering hints */
     private static Object hints;
     /** end game images */
-    private static Image[] images;
+    private static final Image[] images;
     /** total number of players */
     public static int totalPlayers = 4;
     /** players alive */

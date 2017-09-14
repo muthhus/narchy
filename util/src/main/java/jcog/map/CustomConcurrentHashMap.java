@@ -148,7 +148,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
         private final String name;
         Strength(String name) { this.name = name; }
         String getName() { return name; }
-    };
+    }
 
 
     /** The strength of ordinary references */
@@ -175,7 +175,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * membership. Note that the performance of hash maps is heavily
      * dependent on the quality of hash functions.
      */
-    public static interface Equivalence<K> {
+    public interface Equivalence<K> {
         /**
          * Returns true if the given objects are considered equal.
          * This function must obey an equivalence relation:
@@ -202,14 +202,18 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
     static final class EquivalenceUsingIdentity
         implements Equivalence<Object>, Serializable {
         private static final long serialVersionUID = 7259069246764182397L;
+        @Override
         public final boolean equal(Object a, Object b) { return a == b; }
+        @Override
         public final int hash(Object a) { return System.identityHashCode(a); }
     }
 
     static final class EquivalenceUsingEquals
         implements Equivalence<Object>, Serializable {
         private static final long serialVersionUID = 7259069247764182397L;
+        @Override
         public final boolean equal(Object a, Object b) { return a.equals(b); }
+        @Override
         public final int hash(Object a) { return a.hashCode(); }
     }
 
@@ -231,7 +235,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * A function computing a mapping from the given key to a value,
      * or {@code null} if there is no mapping.
      */
-    public static interface MappingFunction<K,V> {
+    public interface MappingFunction<K,V> {
         /**
          * Returns a value for the given key, or null if there is no
          * mapping. If this function throws an (unchecked) exception,
@@ -252,7 +256,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * current value to a new value, or {@code null} if there is
      * no mapping.
      */
-    public static interface RemappingFunction<K,V> {
+    public interface RemappingFunction<K,V> {
         /**
          * Returns a new value for the given key and its current, or
          * null if there is no mapping.
@@ -267,7 +271,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * An object that may be subject to cleanup operations when
      * removed from a {@link java.lang.ref.ReferenceQueue}
      */
-    static interface Reclaimable {
+    interface Reclaimable {
         /**
          * The action taken upon removal of this object
          * from a ReferenceQueue.
@@ -278,7 +282,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
     /**
      * A factory for Nodes.
      */
-    static interface NodeFactory extends Serializable {
+    interface NodeFactory extends Serializable {
         /**
          * Creates and returns a Node using the given parameters.
          *
@@ -306,7 +310,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * Otherwise we'd encounter almost as many unchecked casts when
      * nodes are used across sets, etc.
      */
-    static interface Node extends Reclaimable {
+    interface Node extends Reclaimable {
         /**
          * Returns the key established during the creation of this node.
          * Note: This method is named "get" rather than "getKey"
@@ -688,6 +692,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * @return {@code true} if this map contains the specified key
      * @throws NullPointerException if the specified key is null
      */
+    @Override
     public boolean containsKey(Object key) {
         if (key == null)
             throw new NullPointerException();
@@ -707,6 +712,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * there is no mapping
      * @throws NullPointerException if the specified key is null
      */
+    @Override
     public V get(Object key) {
         if (key == null)
             throw new NullPointerException();
@@ -759,6 +765,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      *         {@code null} if there was no mapping for {@code key}
      * @throws NullPointerException if the specified key or value is null
      */
+    @Override
     public V put(K key, V value) {
         return doPut(key, value, false);
     }
@@ -770,6 +777,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      *         or {@code null} if there was no mapping for the key
      * @throws NullPointerException if the specified key or value is null
      */
+    @Override
     public V putIfAbsent(K key, V value) {
         return doPut(key, value, true);
     }
@@ -781,6 +789,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      *
      * @param m mappings to be stored in this map
      */
+    @Override
     public void putAll(Map<? extends K, ? extends V> m) {
         for (Map.Entry<? extends K, ? extends V> e : m.entrySet())
             put(e.getKey(), e.getValue());
@@ -791,6 +800,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      *
      * @throws NullPointerException if any of the arguments are null
      */
+    @Override
     public V replace(K key, V value) {
         if (key == null || value == null)
             throw new NullPointerException();
@@ -819,6 +829,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      *         or {@code null} if there was no mapping for the key
      * @throws NullPointerException if the specified key or value is null
      */
+    @Override
     public boolean replace(K key, V oldValue, V newValue) {
         if (key == null || oldValue == null || newValue == null)
             throw new NullPointerException();
@@ -852,6 +863,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      *         {@code null} if there was no mapping for {@code key}
      * @throws NullPointerException if the specified key is null
      */
+    @Override
     public V remove(Object key) {
         if (key == null)
             throw new NullPointerException();
@@ -897,6 +909,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      *
      * @throws NullPointerException if the specified key is null
      */
+    @Override
     public boolean remove(Object key, Object value) {
         if (key == null)
             throw new NullPointerException();
@@ -986,6 +999,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      *
      * @return {@code true} if this map contains no key-value mappings
      */
+    @Override
     public final boolean isEmpty() {
         final Segment[] segs = this.segments;
         for (int i = 0; i < segs.length; ++i) {
@@ -1005,6 +1019,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      *
      * @return the number of key-value mappings in this map
      */
+    @Override
     public final int size() {
         long sum = 0;
         final Segment[] segs = this.segments;
@@ -1028,6 +1043,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      *         specified value
      * @throws NullPointerException if the specified value is null
      */
+    @Override
     public final boolean containsValue(Object value) {
         if (value == null)
             throw new NullPointerException();
@@ -1054,6 +1070,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
     /**
      * Removes all of the mappings from this map.
      */
+    @Override
     public final void clear() {
         Segment[] segs = this.segments;
         for (int i = 0; i < segs.length; ++i) {
@@ -1316,8 +1333,11 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             this.key = key;
             this.value = value;
         }
+        @Override
         public K getKey() { return key; }
+        @Override
         public V getValue() { return value; }
+        @Override
         public V setValue(V value) {
             if (value == null) throw new NullPointerException();
             V v = this.value;
@@ -1339,6 +1359,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
 
     final class KeyIterator extends HashIterator
         implements Iterator<K> {
+        @Override
         public K next() {
             return super.nextKey();
         }
@@ -1350,6 +1371,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
 
     final class ValueIterator extends HashIterator
         implements Iterator<V> {
+        @Override
         public V next() {
             return super.nextValue();
         }
@@ -1357,54 +1379,68 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
 
     final class EntryIterator extends HashIterator
         implements Iterator<Map.Entry<K,V>> {
+        @Override
         public Map.Entry<K,V> next() {
             return super.nextEntry();
         }
     }
 
     final class KeySetView extends AbstractSet<K> {
+        @Override
         public Iterator<K> iterator() {
             return new KeyIterator();
         }
+        @Override
         public int size() {
             return CustomConcurrentHashMap.this.size();
         }
+        @Override
         public boolean isEmpty() {
             return CustomConcurrentHashMap.this.isEmpty();
         }
+        @Override
         public boolean contains(Object o) {
             return CustomConcurrentHashMap.this.containsKey(o);
         }
+        @Override
         public boolean remove(Object o) {
             return CustomConcurrentHashMap.this.remove(o) != null;
         }
+        @Override
         public void clear() {
             CustomConcurrentHashMap.this.clear();
         }
     }
 
     final class Values extends AbstractCollection<V> {
+        @Override
         public Iterator<V> iterator() {
             return new ValueIterator();
         }
+        @Override
         public int size() {
             return CustomConcurrentHashMap.this.size();
         }
+        @Override
         public boolean isEmpty() {
             return CustomConcurrentHashMap.this.isEmpty();
         }
+        @Override
         public boolean contains(Object o) {
             return CustomConcurrentHashMap.this.containsValue(o);
         }
+        @Override
         public void clear() {
             CustomConcurrentHashMap.this.clear();
         }
     }
 
     final class EntrySet extends AbstractSet<Map.Entry<K,V>> {
+        @Override
         public Iterator<Map.Entry<K,V>> iterator() {
             return new EntryIterator();
         }
+        @Override
         public boolean contains(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
@@ -1413,6 +1449,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             return v != null &&
                 valueEquivalence.equal(v, e.getValue());
         }
+        @Override
         public boolean remove(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
@@ -1420,12 +1457,15 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             return CustomConcurrentHashMap.this.remove(e.getKey(),
                                                        e.getValue());
         }
+        @Override
         public int size() {
             return CustomConcurrentHashMap.this.size();
         }
+        @Override
         public boolean isEmpty() {
             return CustomConcurrentHashMap.this.isEmpty();
         }
+        @Override
         public void clear() {
             CustomConcurrentHashMap.this.clear();
         }
@@ -1447,6 +1487,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * construction of the iterator, and may (but is not guaranteed to)
      * reflect any modifications subsequent to construction.
      */
+    @Override
     public Set<K> keySet() {
         Set<K> ks = keySet;
         return (ks != null) ? ks : (keySet = new KeySetView());
@@ -1468,6 +1509,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * construction of the iterator, and may (but is not guaranteed to)
      * reflect any modifications subsequent to construction.
      */
+    @Override
     public Collection<V> values() {
         Collection<V> vs = values;
         return (vs != null) ? vs : (values = new Values());
@@ -1489,6 +1531,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * construction of the iterator, and may (but is not guaranteed to)
      * reflect any modifications subsequent to construction.
      */
+    @Override
     public Set<Map.Entry<K,V>> entrySet() {
         Set<Map.Entry<K,V>> es = entrySet;
         return (es != null) ? es : (entrySet = new EntrySet());
@@ -1598,7 +1641,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
      * or weak references can give unpredictable results.
      */
     public static class KeySet<K> extends AbstractSet<K>
-        implements Set<K>, Serializable {
+        implements Serializable {
 
         final CustomConcurrentHashMap<K,K> cchm;
 
@@ -1638,6 +1681,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
          * @param o element whose presence in this set is to be tested
          * @return {@code true} if this set contains the specified element
          */
+        @Override
         public boolean contains(Object o) {
             return cchm.containsKey(o);
         }
@@ -1649,6 +1693,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
          *
          * @return an Iterator over the elements in this set
          */
+        @Override
         public Iterator<K> iterator() {
             return cchm.keyIterator();
         }
@@ -1662,6 +1707,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
          * @return {@code true} if this set did not already contain
          * the specified element
          */
+        @Override
         public boolean add(K e) {
             return cchm.doPut(e, e, true) != null;
         }
@@ -1673,6 +1719,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
          * @param o object to be removed from this set, if present
          * @return {@code true} if the set contained the specified element
          */
+        @Override
         public boolean remove(Object o) {
             return cchm.remove(o) != null;
         }
@@ -1682,6 +1729,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
          *
          * @return {@code true} if this set contains no elements
          */
+        @Override
         public boolean isEmpty() {
             return cchm.isEmpty();
         }
@@ -1691,6 +1739,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
          *
          * @return the number of elements in this set (its cardinality)
          */
+        @Override
         public int size() {
             return cchm.size();
         }
@@ -1698,6 +1747,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
         /**
          * Removes all of the elements from this set.
          */
+        @Override
         public void clear() {
             cchm.clear();
         }
@@ -1750,6 +1800,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             this.queue = q;
             setDaemon(true);
         }
+        @Override
         public void run() {
             ReferenceQueue<Object> q = queue;
             for (;;) {
@@ -1773,6 +1824,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(x, getReclamationQueue());
             this.outer = outer;
         }
+        @Override
         public final void onReclamation() {
             clear();
             outer.onReclamation();
@@ -1786,6 +1838,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(x, getReclamationQueue());
             this.outer = outer;
         }
+        @Override
         public final void onReclamation() {
             clear();
             outer.onReclamation();
@@ -1803,7 +1856,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             this.locator = locator;
             this.key = key;
         }
+        @Override
         public final Object get() { return key; }
+        @Override
         public final int getLocator() { return locator; }
     }
 
@@ -1813,8 +1868,11 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
         StrongKeySelfValueNode(int locator, Object key) {
             super(locator, key);
         }
+        @Override
         public final Object getValue() { return key; }
+        @Override
         public final void setValue(Object value) { }
+        @Override
         public final void onReclamation() { }
     }
 
@@ -1823,7 +1881,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
         TerminalStrongKeySelfValueNode(int locator, Object key) {
             super(locator, key);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -1835,13 +1895,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class StrongKeySelfValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -1862,8 +1925,11 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key);
             this.value = value;
         }
+        @Override
         public final Object getValue() { return value; }
+        @Override
         public final void setValue(Object value) { this.value = value; }
+        @Override
         public final void onReclamation() { }
     }
 
@@ -1873,7 +1939,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                          Object key, Object value) {
             super(locator, key, value);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -1886,13 +1954,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class StrongKeyStrongValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -1915,10 +1986,13 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key);
             this.value = ((Integer)value).intValue();
         }
+        @Override
         public final Object getValue() { return Integer.valueOf(value); }
+        @Override
         public final void setValue(Object value) {
             this.value = ((Integer)value).intValue();
         }
+        @Override
         public final void onReclamation() { }
     }
 
@@ -1928,7 +2002,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                          Object key, Object value) {
             super(locator, key, value);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -1941,13 +2017,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class StrongKeyIntValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -1974,13 +2053,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             if (value != null)
                 this.valueRef = new EmbeddedWeakReference(value, this);
         }
+        @Override
         public final void onReclamation() {
             cchm.removeIfReclaimed(this);
         }
+        @Override
         public final Object getValue() {
             EmbeddedWeakReference vr = valueRef;
             return (vr == null) ? null : vr.get();
         }
+        @Override
         public final void setValue(Object value) {
             if (value == null)
                 valueRef = null;
@@ -1996,7 +2078,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                        CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2010,13 +2094,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class StrongKeyWeakValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2042,13 +2129,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             if (value != null)
                 this.valueRef = new EmbeddedSoftReference(value, this);
         }
+        @Override
         public final void onReclamation() {
             cchm.removeIfReclaimed(this);
         }
+        @Override
         public final Object getValue() {
             EmbeddedSoftReference vr = valueRef;
             return (vr == null) ? null : vr.get();
         }
+        @Override
         public final void setValue(Object value) {
             if (value == null)
                 valueRef = null;
@@ -2064,7 +2154,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                        CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2078,13 +2170,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class StrongKeySoftValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2109,7 +2204,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             this.locator = locator;
             this.cchm = cchm;
         }
+        @Override
         public final int getLocator() { return locator; }
+        @Override
         public final void onReclamation() {
             clear();
             cchm.removeIfReclaimed(this);
@@ -2122,7 +2219,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                              CustomConcurrentHashMap cchm) {
             super(locator, key, cchm);
         }
+        @Override
         public final Object getValue() { return get(); }
+        @Override
         public final void setValue(Object value) { }
     }
 
@@ -2132,7 +2231,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                      CustomConcurrentHashMap cchm) {
             super(locator, key, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2145,13 +2246,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class WeakKeySelfValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2174,7 +2278,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, cchm);
             this.value = value;
         }
+        @Override
         public final Object getValue() { return value; }
+        @Override
         public final void setValue(Object value) { this.value = value; }
     }
 
@@ -2185,7 +2291,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                        CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2199,13 +2307,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class WeakKeyStrongValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2227,7 +2338,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, cchm);
             this.value = ((Integer)value).intValue();
         }
+        @Override
         public final Object getValue() { return Integer.valueOf(value); }
+        @Override
         public final void setValue(Object value) {
             this.value = ((Integer)value).intValue();
         }
@@ -2240,7 +2353,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                     CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2254,13 +2369,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class WeakKeyIntValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2283,10 +2401,12 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             if (value != null)
                 this.valueRef = new EmbeddedWeakReference(value, this);
         }
+        @Override
         public final Object getValue() {
             EmbeddedWeakReference vr = valueRef;
             return (vr == null) ? null : vr.get();
         }
+        @Override
         public final void setValue(Object value) {
             if (value == null)
                 valueRef = null;
@@ -2302,7 +2422,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                      CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2316,13 +2438,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class WeakKeyWeakValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2346,10 +2471,12 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             if (value != null)
                 this.valueRef = new EmbeddedSoftReference(value, this);
         }
+        @Override
         public final Object getValue() {
             EmbeddedSoftReference vr = valueRef;
             return (vr == null) ? null : vr.get();
         }
+        @Override
         public final void setValue(Object value) {
             if (value == null)
                 valueRef = null;
@@ -2365,7 +2492,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                      CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2379,13 +2508,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class WeakKeySoftValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2410,7 +2542,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             this.locator = locator;
             this.cchm = cchm;
         }
+        @Override
         public final int getLocator() { return locator; }
+        @Override
         public final void onReclamation() {
             clear();
             cchm.removeIfReclaimed(this);
@@ -2423,7 +2557,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                              CustomConcurrentHashMap cchm) {
             super(locator, key, cchm);
         }
+        @Override
         public final Object getValue() { return get(); }
+        @Override
         public final void setValue(Object value) { }
     }
 
@@ -2433,7 +2569,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                      CustomConcurrentHashMap cchm) {
             super(locator, key, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2446,13 +2584,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class SoftKeySelfValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2475,7 +2616,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, cchm);
             this.value = value;
         }
+        @Override
         public final Object getValue() { return value; }
+        @Override
         public final void setValue(Object value) { this.value = value; }
     }
 
@@ -2486,7 +2629,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                        CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2500,13 +2645,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class SoftKeyStrongValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2528,7 +2676,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, cchm);
             this.value = ((Integer)value).intValue();
         }
+        @Override
         public final Object getValue() { return Integer.valueOf(value); }
+        @Override
         public final void setValue(Object value) {
             this.value = ((Integer)value).intValue();
         }
@@ -2541,7 +2691,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                             CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2555,13 +2707,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class SoftKeyIntValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2584,10 +2739,12 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             if (value != null)
                 this.valueRef = new EmbeddedWeakReference(value, this);
         }
+        @Override
         public final Object getValue() {
             EmbeddedWeakReference vr = valueRef;
             return (vr == null) ? null : vr.get();
         }
+        @Override
         public final void setValue(Object value) {
             if (value == null)
                 valueRef = null;
@@ -2603,7 +2760,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                      CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2617,13 +2776,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class SoftKeyWeakValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2647,10 +2809,12 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             if (value != null)
                 this.valueRef = new EmbeddedSoftReference(value, this);
         }
+        @Override
         public final Object getValue() {
             EmbeddedSoftReference vr = valueRef;
             return (vr == null) ? null : vr.get();
         }
+        @Override
         public final void setValue(Object value) {
             if (value == null)
                 valueRef = null;
@@ -2666,7 +2830,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                      CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2680,13 +2846,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class SoftKeySoftValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2705,7 +2874,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
         IntKeyNode(int locator, Object key) {
             this.key = ((Integer)key).intValue();
         }
+        @Override
         public final Object get() { return Integer.valueOf(key); }
+        @Override
         public final int getLocator() { return spreadHash(key); }
     }
 
@@ -2715,8 +2886,11 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
         IntKeySelfValueNode(int locator, Object key) {
             super(locator, key);
         }
+        @Override
         public final Object getValue() { return Integer.valueOf(key); }
+        @Override
         public final void setValue(Object value) { }
+        @Override
         public final void onReclamation() { }
     }
 
@@ -2725,7 +2899,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
         TerminalIntKeySelfValueNode(int locator, Object key) {
             super(locator, key);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2737,13 +2913,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class IntKeySelfValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2764,8 +2943,11 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key);
             this.value = value;
         }
+        @Override
         public final Object getValue() { return value; }
+        @Override
         public final void setValue(Object value) { this.value = value; }
+        @Override
         public final void onReclamation() { }
     }
 
@@ -2775,7 +2957,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                          Object key, Object value) {
             super(locator, key, value);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2788,13 +2972,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class IntKeyStrongValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2815,10 +3002,13 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key);
             this.value = ((Integer)value).intValue();
         }
+        @Override
         public final Object getValue() { return Integer.valueOf(value); }
+        @Override
         public final void setValue(Object value) {
             this.value = ((Integer)value).intValue();
         }
+        @Override
         public final void onReclamation() { }
     }
 
@@ -2828,7 +3018,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                          Object key, Object value) {
             super(locator, key, value);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2841,13 +3033,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class IntKeyIntValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2872,13 +3067,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             if (value != null)
                 this.valueRef = new EmbeddedWeakReference(value, this);
         }
+        @Override
         public final void onReclamation() {
             cchm.removeIfReclaimed(this);
         }
+        @Override
         public final Object getValue() {
             EmbeddedWeakReference vr = valueRef;
             return (vr == null) ? null : vr.get();
         }
+        @Override
         public final void setValue(Object value) {
             if (value == null)
                 valueRef = null;
@@ -2894,7 +3092,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                        CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2908,13 +3108,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class IntKeyWeakValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -2940,13 +3143,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             if (value != null)
                 this.valueRef = new EmbeddedSoftReference(value, this);
         }
+        @Override
         public final void onReclamation() {
             cchm.removeIfReclaimed(this);
         }
+        @Override
         public final Object getValue() {
             EmbeddedSoftReference vr = valueRef;
             return (vr == null) ? null : vr.get();
         }
+        @Override
         public final void setValue(Object value) {
             if (value == null)
                 valueRef = null;
@@ -2962,7 +3168,9 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
                                        CustomConcurrentHashMap cchm) {
             super(locator, key, value, cchm);
         }
+        @Override
         public final Node getLinkage() { return null; }
+        @Override
         public final void setLinkage(Node linkage) { }
     }
 
@@ -2976,13 +3184,16 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
             super(locator, key, value, cchm);
             this.linkage = linkage;
         }
+        @Override
         public final Node getLinkage() { return linkage; }
+        @Override
         public final void setLinkage(Node linkage) { this.linkage = linkage; }
     }
 
     static final class IntKeySoftValueNodeFactory
-        implements NodeFactory, Serializable {
+        implements NodeFactory {
         private static final long serialVersionUID = 7249069346764182397L;
+        @Override
         public final Node newNode(int locator,
                                   Object key, Object value,
                                   CustomConcurrentHashMap cchm,
@@ -3051,6 +3262,7 @@ public class CustomConcurrentHashMap<K,V> extends AbstractMap<K,V>
         try {
             return java.security.AccessController.doPrivileged
             (new java.security.PrivilegedExceptionAction<sun.misc.Unsafe>() {
+                @Override
                 public sun.misc.Unsafe run() throws Exception {
                     Class<sun.misc.Unsafe> k = sun.misc.Unsafe.class;
                     for (java.lang.reflect.Field f : k.getDeclaredFields()) {

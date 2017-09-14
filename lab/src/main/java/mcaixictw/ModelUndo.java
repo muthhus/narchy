@@ -12,10 +12,10 @@ public class ModelUndo {
 		lastUpdatePercept = agent.lastUpdatePercept();
 	}
 
-	private int age;
-	private int reward;
-	private int historySize;
-	private boolean lastUpdatePercept;
+	private final int age;
+	private final int reward;
+	private final int historySize;
+	private final boolean lastUpdatePercept;
 
 	public int age() {
 		return age;

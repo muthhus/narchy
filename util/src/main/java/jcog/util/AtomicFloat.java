@@ -38,6 +38,7 @@ public class AtomicFloat extends AtomicInteger {
         this.set(floatToIntBits(newValue));
     }
 
+    @Override
     public float floatValue() {
         return intBitsToFloat(get());
     }
@@ -51,7 +52,9 @@ public class AtomicFloat extends AtomicInteger {
                                       floatToIntBits(update));
     }
 
+    @Override
     public double doubleValue() { return (double) floatValue(); }
+    @Override
     public int intValue()       { return Math.round(floatValue());  }
 
     public float addAndGet(float x) {

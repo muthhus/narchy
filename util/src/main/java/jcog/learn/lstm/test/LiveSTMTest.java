@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 public class LiveSTMTest {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         final int seqPeriod = 12;
 

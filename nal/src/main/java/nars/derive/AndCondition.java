@@ -3,6 +3,7 @@ package nars.derive;
 import com.google.common.collect.Lists;
 import jcog.Util;
 import nars.$;
+import nars.Param;
 import nars.control.Derivation;
 import nars.derive.constraint.MatchConstraint;
 import nars.derive.op.UnifyOneSubterm;
@@ -152,9 +153,11 @@ public final class AndCondition<D> extends AbstractPred<D> {
     }
 
     @Override
-    public PrediTerm exec(D d, TrieExecutor.CPU c) {
+    public PrediTerm exec(D d, CPU c) {
 
-        for (int i = 0, cacheLength = cache.length; i < cacheLength; i++) {
+        int i;
+        final int cacheLength = cache.length;
+        for (i = 0; i < cacheLength; i++) {
             PrediTerm p = cache[i];
 
             //if p.exec returns the same value (stored in 'q') and not a different or null, this is the signal that p.test FAILED
@@ -162,6 +165,8 @@ public final class AndCondition<D> extends AbstractPred<D> {
             if (q == p)
                 break;
         }
+
+        ((Derivation)d).use((1+i) * Param.TTL_AND_PREDICATE);
 
         return null;
     }

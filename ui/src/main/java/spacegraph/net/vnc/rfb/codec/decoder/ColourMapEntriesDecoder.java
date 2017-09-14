@@ -31,7 +31,7 @@ class ColourMapEntriesDecoder implements FrameDecoder {
     }
 
     @Override
-    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (state == State.INIT) {
             if (!in.isReadable(12)) {
                 return false;

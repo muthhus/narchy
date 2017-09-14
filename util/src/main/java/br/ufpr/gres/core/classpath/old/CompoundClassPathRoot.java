@@ -56,7 +56,7 @@ public class CompoundClassPathRoot implements ClassPathRoot, Iterable<ClassPathR
     }
 
     @Override
-    public URL getResource(String name) throws MalformedURLException {
+    public URL getResource(String name) {
         try {
             return findRootForResource(name);
         } catch (final IOException exception) {

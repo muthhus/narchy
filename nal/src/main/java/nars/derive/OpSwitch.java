@@ -61,7 +61,7 @@ public final class OpSwitch extends AbstractPred<Derivation> {
     }
 
     @Override
-    public PrediTerm<Derivation> exec(Derivation d, TrieExecutor.CPU cpu) {
+    public PrediTerm<Derivation> exec(Derivation d, CPU cpu) {
         return branch(d);
     }
 

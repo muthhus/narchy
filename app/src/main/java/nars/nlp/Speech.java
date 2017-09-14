@@ -27,8 +27,9 @@ public class Speech extends NARService {
      */
     final TreeBasedTable<Long, Term, TruthAccumulator> vocalize = TreeBasedTable.create();
     private final Consumer<Term> speak;
-    private float durationsPerWord, energy;
-    private float expectationThreshold = 0.5f;
+    private final float durationsPerWord;
+    private float energy;
+    private final float expectationThreshold = 0.5f;
     private NAR nar;
 
     public Speech(NAR nar, float durationsPerWord, Consumer<Term> speak) {

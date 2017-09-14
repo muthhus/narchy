@@ -347,7 +347,7 @@ public class Key extends Globals {
 					Key.Message(K_ESCAPE);
 					break;
 				case Defines.key_menu :
-					Menu.Keydown(key);
+					Menu.Keydown(K_ESCAPE);
 					break;
 				case Defines.key_game :
 				case Defines.key_console :

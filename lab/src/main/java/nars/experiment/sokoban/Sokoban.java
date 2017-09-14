@@ -605,7 +605,7 @@ public class Sokoban extends Applet {
         return "Sokoban 1.0, Written by Yossie Silverman.";
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         JFrame w = new JFrame("Sokoban");
         w.setContentPane(new Sokoban());
         w.setSize(500, 500);

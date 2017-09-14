@@ -436,6 +436,12 @@ public class Derivation extends Unify implements TermContext {
         super.clear();
     }
 
+    public int getAndSetTTL(int next) {
+        int before = this.ttl;
+        this.ttl = next;
+        return before;
+    }
+
     //    /**
 //     * experimental memoization of transform results
 //     */

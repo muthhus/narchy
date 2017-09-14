@@ -22,7 +22,7 @@ public class BmpFont extends Surface {
     }
 
     private int base;  // Base Display List For The Font
-    private int[] textures = new int[2];  // Storage For Our Font Texture
+    private final int[] textures = new int[2];  // Storage For Our Font Texture
 
     private float cnt1;    // 1st Counter Used To Move Text & For Coloring
     private float cnt2;    // 2nd Counter Used To Move Text & For Coloring
@@ -30,7 +30,7 @@ public class BmpFont extends Surface {
 
     private ByteBuffer stringBuffer = ByteBuffer.allocate(256);
 
-    public void loadGLTextures(GL gl) throws IOException {
+    public void loadGLTextures(GL gl) {
 
         String tileNames [] =
             {"font.png"/*, "bumps.png"*/};
@@ -132,14 +132,10 @@ public class BmpFont extends Surface {
         //gl.glEnable(GL2.GL_DEPTH_TEST);    // Enables Depth Testing
     }
 
-    boolean init = false;
+    boolean init;
     public void init(GL2 gl) {
 
-        try {
-            loadGLTextures(gl);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        loadGLTextures(gl);
 
         buildFont(gl);
 
@@ -160,6 +156,7 @@ public class BmpFont extends Surface {
         gl.glEnable(GL2.GL_TEXTURE_2D);      // Enable 2D Texture Mapping
     }
 
+    @Override
     public void paint(GL2 gl) {
 
         if (!init) {

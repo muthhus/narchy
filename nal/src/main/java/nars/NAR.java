@@ -1263,7 +1263,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         Term y = xt.conceptual();
 
         if (y instanceof Bool)
-            throw new RuntimeException("failed to find conceptual root of " + y);
+            return null; //throw new RuntimeException("failed to find conceptual root of " + x);
+
 
         return terms.concept(y, createIfMissing);
     }
@@ -1436,7 +1437,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public @NotNull NAR inputBinary(@NotNull File input) throws IOException, FileNotFoundException {
+    public @NotNull NAR inputBinary(@NotNull File input) throws IOException {
         return inputBinary(new BufferedInputStream(new FileInputStream(input), 64 * 1024));
     }
 
@@ -1446,7 +1447,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException, FileNotFoundException {
+    public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException {
         FileOutputStream ff = new FileOutputStream(f, append);
         outputBinary(ff, each);
         ff.close();

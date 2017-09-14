@@ -14,9 +14,9 @@ public class CoinFlipEnv extends Environment {
 		this.coinFlipP = coinFlipP;
 	}
 
-	private double coinFlipP;
-	private int obs = 0;
-	private int rew = 0;
+	private final double coinFlipP;
+	private int obs;
+	private int rew;
 
 	@Override
 	public void performAction(int action) {

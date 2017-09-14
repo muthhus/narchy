@@ -236,7 +236,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
             short maxErrorNeighborID = -1;
             //if (e has edges for maxErrorID..)
             final double[] maxError = {Double.NEGATIVE_INFINITY};
-            short _maxErrorNeighbour[] = new short[]{-1};
+            short _maxErrorNeighbour[] = {-1};
             e.edgesOf(maxErrorID, (otherNodeID) -> {
 
                 Node otherNode = node[otherNodeID];

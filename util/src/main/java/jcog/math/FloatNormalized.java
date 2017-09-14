@@ -17,7 +17,7 @@ public class FloatNormalized implements FloatSupplier {
     static final float epsilon = Float.MIN_NORMAL;
 
     /** relaxation rate: brings min and max closer to each other in proportion to the value. if == 0, disables */
-    private float relax = 0;
+    private float relax;
 
 
     public FloatNormalized(DoubleSupplier in) {

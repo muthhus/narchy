@@ -46,7 +46,7 @@ class RfbClient38Decoder extends ReplayingDecoder<RfbClient38Decoder.State> impl
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         switch (state()) {
             case SEC_TYPES:
                 int numberOfSecurtiyTypes = in.readUnsignedByte();

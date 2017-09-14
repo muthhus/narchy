@@ -24,7 +24,7 @@ public class BellDecoder implements FrameDecoder {
     }
 
     @Override
-    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         if (!in.isReadable(1)) {
             return false;
         }

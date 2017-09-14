@@ -33,10 +33,14 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     public GenericCompoundDT(Compound base, int dt) {
         super(base);
 
-        if (!(dt==XTERNAL || dt==DTERNAL || Math.abs(dt) <  Param.DT_ABS_LIMIT))
+
+
+        if (!(dt==XTERNAL || Math.abs(dt) <  Param.DT_ABS_LIMIT))
             throw new InvalidTermException(base.op(), dt, base.subterms(), "exceeded DT limit");
 
-        if (Param.DEBUG) {
+        if (Param.DEBUG_EXTRA) {
+
+            assert(getClass()!=GenericCompoundDT.class /* a subclass */ || dt!=DTERNAL);
 
             Op op = base.op();
 
@@ -46,7 +50,7 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
             if (op.temporal && (op != CONJ && size != 2))
                 throw new InvalidTermException(op, dt, "Invalid dt value for operator", subterms.toArray());
 
-            if (dt != XTERNAL && op().commutative && size() == 2) {
+            if (dt != XTERNAL && op.commutative && size == 2) {
                 if (sub(0).compareTo(sub(1)) > 0)
                     throw new RuntimeException("invalid ordering");
             }
@@ -75,12 +79,12 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     }
 
     @Override
-    public @NotNull Term eternal() {
+    public Term eternal() {
         return Compound.super.eternal();
     }
 
     @Override
-    public @NotNull Term conceptual() {
+    public Term conceptual() {
         return Compound.super.conceptual();
     }
 

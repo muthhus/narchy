@@ -3531,7 +3531,7 @@ public class Formula implements Comparable {
      * ***************************************************************
      * Parse formulae into TPTP format
      */
-    public void tptpParse(boolean query, KB kb) throws ParseException, IOException {
+    public void tptpParse(boolean query, KB kb) {
         tptpParse(query, kb, null);
     }
 

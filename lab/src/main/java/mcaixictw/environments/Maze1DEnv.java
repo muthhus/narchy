@@ -18,9 +18,9 @@ import mcaixictw.Util;
 public class Maze1DEnv extends Environment {
 	private final int REWARD_POSITION = 2;
 	private final int size;
-	private int reward = 0;
-	private int observation = 0;
-	private int position = 0;
+	private int reward;
+	private int observation;
+	private int position;
 
 	public Maze1DEnv(int size) {
 		this.size = size;

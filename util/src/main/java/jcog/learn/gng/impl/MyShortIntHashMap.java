@@ -97,20 +97,16 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
             return;
 
         SentinelValues sv = this.sentinelValues;
-        {
-            if (sv != null && sv.containsZeroKey) {
-                if (!toKeep.accept(sv.zeroValue)) {
-                    removeKey((short) 0);
-                    sv = this.sentinelValues; //because it may have changed
-                }
+        if (sv != null && sv.containsZeroKey) {
+            if (!toKeep.accept(sv.zeroValue)) {
+                removeKey((short) 0);
+                sv = this.sentinelValues; //because it may have changed
             }
         }
-        {
-            if (sv != null && sv.containsOneKey) {
-                if (!toKeep.accept(sv.oneValue)) {
-                    removeKey((short) 1);
-                    sv = this.sentinelValues; //because it may have changed
-                }
+        if (sv != null && sv.containsOneKey) {
+            if (!toKeep.accept(sv.oneValue)) {
+                removeKey((short) 1);
+                sv = this.sentinelValues; //because it may have changed
             }
         }
 
@@ -154,6 +150,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         return n > 1 ? Integer.highestOneBit(n - 1) << 1 : 1;
     }
 
+    @Override
     protected int getOccupiedWithData() {
         return this.occupiedWithData;
     }
@@ -163,29 +160,35 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean isEmpty() {
         SentinelValues s = this.sentinelValues;
         return this.occupiedWithData == 0 && (s == null || s.size() == 0);
     }
 
+    @Override
     public final int size() {
         SentinelValues s = this.sentinelValues;
         return this.occupiedWithData + (s == null ? 0 : s.size());
     }
 
 
+    @Override
     protected void setSentinelValuesNull() {
         this.sentinelValues = null;
     }
 
+    @Override
     protected int getEmptyValue() {
         return 0;
     }
 
+    @Override
     protected int getTableSize() {
         return this.values.length;
     }
 
+    @Override
     protected int getValueAtIndex(int index) {
         return this.values[index];
     }
@@ -300,6 +303,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     }
     */
 
+    @Override
     public void clear() {
         this.sentinelValues = null;
         this.occupiedWithData = 0;
@@ -322,6 +326,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public final void put(short key, int value) {
         if (isEmptyKey(key)) {
             this.putForEmptySentinel(value);
@@ -364,6 +369,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     }
 
 
+    @Override
     protected void removeEmptyKey() {
         if (this.sentinelValues.containsOneKey) {
             this.sentinelValues.containsZeroKey = false;
@@ -374,11 +380,13 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
     }
 
+    @Override
     protected void addRemovedKeyValue(int value) {
         this.sentinelValues.containsOneKey = true;
         this.sentinelValues.oneValue = value;
     }
 
+    @Override
     protected void removeRemovedKey() {
         if (this.sentinelValues.containsZeroKey) {
             this.sentinelValues.containsOneKey = false;
@@ -390,14 +398,17 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     }
 
 
+    @Override
     public void putAll(ShortIntMap map) {
         map.forEachKeyValue(new ShortIntProcedure() {
+            @Override
             public void value(short key, int value) {
                 MyShortIntHashMap.this.put(key, value);
             }
         });
     }
 
+    @Override
     public final void removeKey(short key) {
         if (isEmptyKey(key)) {
             if (this.sentinelValues != null && this.sentinelValues.containsZeroKey) {
@@ -416,10 +427,12 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         }
     }
 
+    @Override
     public void remove(short key) {
         this.removeKey(key);
     }
 
+    @Override
     public int removeKeyIfAbsent(short key, int value) {
         int index;
         if (isEmptyKey(key)) {
@@ -450,6 +463,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         }
     }
 
+    @Override
     public int getIfAbsentPut(short key, int value) {
         if (isEmptyKey(key)) {
             SentinelValues sv1 = this.sentinelValues;
@@ -490,6 +504,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         return _sentinel;
     }
 
+    @Override
     public int getIfAbsentPut(short key, IntFunction0 function) {
         int index;
         if (isEmptyKey(key)) {
@@ -530,6 +545,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         }
     }
 
+    @Override
     public <P> int getIfAbsentPutWith(short key, IntFunction<? super P> function, P parameter) {
         int index;
         if (isEmptyKey(key)) {
@@ -570,6 +586,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         }
     }
 
+    @Override
     public int getIfAbsentPutWithKey(short key, ShortToIntFunction function) {
         int index;
         if (isEmptyKey(key)) {
@@ -610,6 +627,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         }
     }
 
+    @Override
     public int addToValue(short key, int toBeAdded) {
         if (isEmptyKey(key)) {
             if (this.sentinelValues == null) {
@@ -681,6 +699,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         this.copyKeysOnWrite = false;
     }
 
+    @Override
     public int updateValue(short key, int initialValueIfAbsent, IntToIntFunction function) {
         if (isEmptyKey(key)) {
             if (this.sentinelValues == null) {
@@ -727,6 +746,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public MyShortIntHashMap withKeyValue(short key1, int value1) {
         this.put(key1, value1);
         return this;
@@ -753,13 +773,16 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         return this;
     }
 
+    @Override
     public MyShortIntHashMap withoutKey(short key) {
         this.removeKey(key);
         return this;
     }
 
+    @Override
     public MyShortIntHashMap withoutAllKeys(ShortIterable keys) {
         keys.forEach(new ShortProcedure() {
+            @Override
             public void value(short key) {
                 MyShortIntHashMap.this.removeKey(key);
             }
@@ -789,10 +812,12 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 //        return ShortIntMaps.immutable.ofAll(this);
 //    }
 
+    @Override
     public int get(short key) {
         return this.getIfAbsent(key, 0);
     }
 
+    @Override
     public int getIfAbsent(short key, int ifAbsent) {
         return !isEmptyKey(key) && !isRemovedKey(key) ? (this.occupiedWithSentinels == 0 ? this.fastGetIfAbsent(key, ifAbsent) : this.slowGetIfAbsent(key, ifAbsent)) : this.getForSentinel(key, ifAbsent);
     }
@@ -830,6 +855,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         return this.keys[index] == key ? this.values[index] : ifAbsent;
     }
 
+    @Override
     public int getOrThrow(short key) {
         if (isEmptyKey(key)) {
             if (this.sentinelValues != null && this.sentinelValues.containsZeroKey) {
@@ -853,10 +879,12 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         }
     }
 
+    @Override
     public boolean containsKey(short key) {
         return isEmptyKey(key) ? this.sentinelValues != null && this.sentinelValues.containsZeroKey : (!isRemovedKey(key) ? this.keys[this.probe(key)] == key : this.sentinelValues != null && this.sentinelValues.containsOneKey);
     }
 
+    @Override
     public void forEachKey(ShortProcedure procedure) {
         SentinelValues s = this.sentinelValues;
         if (s != null) {
@@ -880,6 +908,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
     }
 
+    @Override
     public void forEachKeyValue(ShortIntProcedure procedure) {
         SentinelValues s = this.sentinelValues;
         if (s != null) {
@@ -1138,6 +1167,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         //return !isEmptyKey(key) && !isRemovedKey(key);
     }
 
+    @Override
     protected boolean isNonSentinelAtIndex(int index) {
         short k = this.keys[index];
         return isNonSentinel(keys[index]);
@@ -1157,12 +1187,12 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
     }
 
     @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
+    public void writeExternal(ObjectOutput out) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+    public void readExternal(ObjectInput in) {
         throw new UnsupportedOperationException();
     }
 
@@ -1187,6 +1217,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         private KeyValuesView() {
         }
 
+        @Override
         public void each(Procedure<? super ShortIntPair> procedure) {
             if (MyShortIntHashMap.this.sentinelValues != null) {
                 if (MyShortIntHashMap.this.sentinelValues.containsZeroKey) {
@@ -1206,6 +1237,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
         }
 
+        @Override
         public void forEachWithIndex(ObjectIntProcedure<? super ShortIntPair> objectIntProcedure) {
             int index = 0;
             if (MyShortIntHashMap.this.sentinelValues != null) {
@@ -1229,6 +1261,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
         }
 
+        @Override
         public <P> void forEachWith(Procedure2<? super ShortIntPair, ? super P> procedure, P parameter) {
             if (MyShortIntHashMap.this.sentinelValues != null) {
                 if (MyShortIntHashMap.this.sentinelValues.containsZeroKey) {
@@ -1248,6 +1281,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
         }
 
+        @Override
         public Iterator<ShortIntPair> iterator() {
             return new MyShortIntHashMap.KeyValuesView.InternalKeyValuesIterator();
         }
@@ -1261,6 +1295,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
             public InternalKeyValuesIterator() {
             }
 
+            @Override
             public ShortIntPair next() {
                 if (!this.hasNext()) {
                     throw new NoSuchElementException("next() called, but the iterator is exhausted");
@@ -1282,7 +1317,6 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
                     short[] keys;
                     for (keys = MyShortIntHashMap.this.keys; !MyShortIntHashMap.isNonSentinel(keys[this.position]); ++this.position) {
-                        ;
                     }
 
                     ShortIntPair result = PrimitiveTuples.pair(keys[this.position], MyShortIntHashMap.this.values[this.position]);
@@ -1291,10 +1325,12 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
                 }
             }
 
+            @Override
             public void remove() {
                 throw new UnsupportedOperationException("Cannot call remove() on " + this.getClass().getSimpleName());
             }
 
+            @Override
             public boolean hasNext() {
                 return this.count != MyShortIntHashMap.this.size();
             }
@@ -1424,10 +1460,12 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         private KeySetIterator() {
         }
 
+        @Override
         public boolean hasNext() {
             return this.count < MyShortIntHashMap.this.size();
         }
 
+        @Override
         public short next() {
             if (!this.hasNext()) {
                 throw new NoSuchElementException("next() called, but the iterator is exhausted");
@@ -1452,7 +1490,6 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
                 short[] keys;
                 for (keys = MyShortIntHashMap.this.keys; !MyShortIntHashMap.isNonSentinel(keys[this.position]); ++this.position) {
-                    ;
                 }
 
                 this.lastKey = keys[this.position];
@@ -1461,6 +1498,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
             }
         }
 
+        @Override
         public void remove() {
             if (!this.canRemove) {
                 throw new IllegalStateException();
@@ -1496,10 +1534,12 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         private InternalIntIterator() {
         }
 
+        @Override
         public boolean hasNext() {
             return this.count < MyShortIntHashMap.this.size();
         }
 
+        @Override
         public int next() {
             if (!this.hasNext()) {
                 throw new NoSuchElementException("next() called, but the iterator is exhausted");
@@ -1524,7 +1564,6 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
                 short[] keys;
                 for (keys = MyShortIntHashMap.this.keys; !MyShortIntHashMap.isNonSentinel(keys[this.position]); ++this.position) {
-                    ;
                 }
 
                 this.lastKey = keys[this.position];
@@ -1534,6 +1573,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
             }
         }
 
+        @Override
         public void remove() {
             if (!this.canRemove) {
                 throw new IllegalStateException();
@@ -1551,6 +1591,7 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
         public boolean containsOneKey;
 
 
+        @Override
         public int size() {
             return (this.containsZeroKey ? 1 : 0) + (this.containsOneKey ? 1 : 0);
         }

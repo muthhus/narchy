@@ -33,7 +33,8 @@ public abstract class Settings implements Cloneable {
 
 	public abstract void loadDefaultSettings();
 
-	public abstract Settings clone();
+	@Override
+    public abstract Settings clone();
 
 	/**
 	 * parse occurrence of the form "parameter = true" and return the value on

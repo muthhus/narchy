@@ -14,16 +14,16 @@ import java.awt.*;
  */
 public class BomberBomb extends Thread {
     /** map object */
-    private BomberMap map;
+    private final BomberMap map;
     /** position */
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
     /** frame count */
     private int frame;
     /** alive flag */
     private boolean alive = true;
     /** owner */
-    private int owner;
+    private final int owner;
     /** count down : 3000 ms */
     private int countDown = 3900;
     /** bomb sprite image handles */

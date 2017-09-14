@@ -244,7 +244,7 @@ public class Board extends JPanel implements MouseListener, PlayerListener
 		player1.takeTurn();
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		Board b = new Board(new HumanPlayer("Human1"), new HumanPlayer("Human2"), 8, 8);
                 //Board b = new Board(new MinimaxPlayer("CPU1"), new MinimaxPlayer("CPU1"), 16, 16);
 

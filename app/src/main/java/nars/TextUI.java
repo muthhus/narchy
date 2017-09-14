@@ -110,7 +110,7 @@ public class TextUI {
         public final FloatParam guiUpdateFPS;
         private final Terminal terminal;
         private TerminalScreen screen;
-        private Thread thread = null;
+        private Thread thread;
 
         public TextGUI(NAR nar, Terminal terminal, float fps) {
             super(nar);
@@ -389,7 +389,7 @@ public class TextUI {
         private class EmotionDashboard extends Panel {
             private final TextBox stats;
             private final On on;
-            private AtomicBoolean busy = new AtomicBoolean(false);
+            private final AtomicBoolean busy = new AtomicBoolean(false);
 
             public EmotionDashboard() {
                 super(new BorderLayout());

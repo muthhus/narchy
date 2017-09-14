@@ -92,7 +92,7 @@ public class Util {
 		return 31 - Integer.numberOfLeadingZeros(states);
 	}
 
-	public static boolean DebugOutput = false;
+	public static boolean DebugOutput;
 
 	public static BooleanArrayList rand(int length) {
 		BooleanArrayList b = new BooleanArrayList();

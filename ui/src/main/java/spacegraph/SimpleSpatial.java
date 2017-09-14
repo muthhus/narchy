@@ -2,6 +2,7 @@ package spacegraph;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
+import jcog.list.FasterList;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
@@ -22,6 +23,10 @@ import static spacegraph.math.v3.v;
 public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
 
+    public Dynamic body;
+
+    @Nullable
+    private final List<TypedConstraint> constraints = null; //new FasterList();
 
     /** physics motion state */
     //public final Motion motion = new Motion();
@@ -69,10 +74,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         return x!=null ? x.toString() : super.toString();
     }
 
-    public Dynamic body;
 
-    @Nullable
-    private List<TypedConstraint> constraints = null;
 
     public SimpleSpatial color(float r, float g, float b) {
         return color(r, g, b, 1f);

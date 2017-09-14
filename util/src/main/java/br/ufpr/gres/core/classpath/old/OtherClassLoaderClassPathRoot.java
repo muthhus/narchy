@@ -41,13 +41,13 @@ public class OtherClassLoaderClassPathRoot implements ClassPathRoot {
     }
 
     @Override
-    public InputStream getData(final String name) throws IOException {
+    public InputStream getData(final String name) {
         // TODO will this work for archives? Need to consider remote hetrogenous os
         return this.loader.getResourceAsStream(name.replace(".", "/") + ".class");
     }
 
     @Override
-    public URL getResource(final String name) throws MalformedURLException {
+    public URL getResource(final String name) {
         return this.loader.getResource(name);
     }
 

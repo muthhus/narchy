@@ -22,7 +22,7 @@ import java.util.List;
 class ServerCutTextDecoder implements FrameDecoder {
 
     @Override
-    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 
         if (!in.isReadable(8)) {
             return false;

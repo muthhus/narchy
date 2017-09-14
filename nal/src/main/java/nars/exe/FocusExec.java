@@ -40,16 +40,17 @@ public class FocusExec extends Exec implements Runnable {
     public int subCycles = 1;
     final int subCycleConcepts = 1;
     final int subCyclePremises = subCycleConcepts * 3;
-    final int subCycleTasks = subCyclePremises * 3;
 
     final int MAX_PREMISES = subCyclePremises * 2;
-    final int MAX_TASKS = subCycleTasks * 4;
-    final int MAX_CONCEPTS = 16;
+    final int MAX_CONCEPTS = 32;
 
     final Random random = new XorShift128PlusRandom(1);
 
-    final CurveBag<Premise> premises = new ConcurrentCurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
-            new ConcurrentHashMap<>(), null, MAX_PREMISES);
+    final CurveBag<Premise> premises =
+            new ConcurrentCurveBag
+            //new CurveBag
+                    <>(Param.premiseMerge /* TODO make separate premise merge param */,
+                new ConcurrentHashMap<>(), null, MAX_PREMISES);
 
 //    final CurveBag<Task> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
 //            null, MAX_TASKS) {
@@ -66,9 +67,11 @@ public class FocusExec extends Exec implements Runnable {
 
 
     public final Bag concepts =
-            new ConcurrentCurveBag<>(Param.conceptActivate,
-                    //new ConcurrentHashMap<>(),
-                    new ConcurrentHashMapUnsafe<>(),
+            new ConcurrentCurveBag
+            //new CurveBag
+                <>(Param.conceptActivate,
+                    new ConcurrentHashMap<>(),
+                    //new ConcurrentHashMapUnsafe<>(),
                     random, MAX_CONCEPTS);
     //new DefaultHijackBag(Param.conceptMerge, MAX_CONCEPTS, 3);
 
@@ -141,8 +144,7 @@ public class FocusExec extends Exec implements Runnable {
 
             //if (tasks.capacity() <= tasks.size())
 
-            final int[] maxTasks = {subCycleTasks};
-
+            //final int[] maxTasks = {subCycleTasks};
 //            System.out.println(nar.time());
 //            tasks.print();
 //            System.out.println();

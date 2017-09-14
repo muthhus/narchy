@@ -313,6 +313,10 @@ public abstract class Unify extends Versioning implements Subst {
         return this.size();
     }
 
+    public void addTTL(int x) {
+        this.ttl += x;
+    }
+
 //    public final boolean revert(int then) {
 //        versioning.revert(then);
 //        return live();

@@ -22,7 +22,7 @@ import spacegraph.net.vnc.rfb.codec.PixelFormat;
 public class PixelFormatEncoder extends MessageToByteEncoder<PixelFormat> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, PixelFormat pf, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, PixelFormat pf, ByteBuf out) {
         out.writeByte(ClientEventType.SET_PIXEL_FORMAT);
         out.writeZero(3); // padding
         out.writeByte(pf.getBitPerPixel());

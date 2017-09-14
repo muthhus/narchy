@@ -69,7 +69,7 @@ public class Jake2Agent extends NAgentY implements Runnable {
             if (p.deadflag > 0) {
                 //Cmd.ExecuteString("map " + nextMap());
                 //Cmd.ExecuteString("begin");
-                jake2.client.Menu.Event(Key.K_ENTER, true, 0);
+                Key.Event(Key.K_ENTER, true, 0);
                 return;
             }
 
@@ -161,7 +161,7 @@ public class Jake2Agent extends NAgentY implements Runnable {
         new Thread(this).start();
     }
 
-    float state = 0;
+    float state;
 
     @Override
     protected float act() {

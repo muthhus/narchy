@@ -123,7 +123,7 @@ public abstract class ConsoleAgent extends NAgentX {
 
         NAgentX.runRT((n) -> {
             @NotNull ConsoleAgent a = new ConsoleAgent(n) {
-                float prevSim = 0;
+                float prevSim;
 
                 @Override
                 protected float act() {
@@ -252,19 +252,19 @@ public abstract class ConsoleAgent extends NAgentX {
         }
 
         @Override
-        public Appendable append(char c) throws IOException {
+        public Appendable append(char c) {
             //ignore
             return this;
         }
 
         @Override
-        public Appendable append(CharSequence csq) throws IOException {
+        public Appendable append(CharSequence csq) {
             //ignore
             return this;
         }
 
         @Override
-        public Appendable append(CharSequence csq, int start, int end) throws IOException {
+        public Appendable append(CharSequence csq, int start, int end) {
             //ignore
             return this;
         }

@@ -3,12 +3,15 @@ package nars.nlp;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import org.jetbrains.annotations.NotNull;
+import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
+
+import java.io.IOException;
 
 /**
  * $0.9;0.9;0.99$
@@ -37,7 +40,7 @@ public class IRCAgent extends IRC {
 
     boolean trace;
 
-    public IRCAgent(NAR nar, String nick, String server, String... channels) throws Exception {
+    public IRCAgent(NAR nar, String nick, String server, String... channels) {
         super(nick, server, channels);
 
         this.nar = nar;
@@ -152,17 +155,17 @@ public class IRCAgent extends IRC {
 //
 //    }
 
-    void hear(String text, String src) throws Narsese.NarseseException {
+    void hear(String text, String src) {
         Hear.hear(nar, text, src, hearTwenglish ? wordDelayMS : -1);
     }
 
     @Override
-    public void onPrivateMessage(PrivateMessageEvent event) throws Exception {
+    public void onPrivateMessage(PrivateMessageEvent event) {
         //hear(event.getMessage(), event.getUser().toString());
     }
 
     @Override
-    public void onGenericMessage(GenericMessageEvent event) throws Exception {
+    public void onGenericMessage(GenericMessageEvent event) {
 
         if (event instanceof MessageEvent) {
             MessageEvent pevent = (MessageEvent) event;
@@ -198,7 +201,7 @@ public class IRCAgent extends IRC {
     }
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         //Param.DEBUG = true;
 
@@ -302,7 +305,13 @@ public class IRCAgent extends IRC {
 
         //new NARWeb(n, 8080);
 
-        bot.start();
+        try {
+            bot.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (IrcException e) {
+            e.printStackTrace();
+        }
 
 
 //        nar.run(1);

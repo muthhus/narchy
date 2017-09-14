@@ -20,64 +20,64 @@ public class PrologImpl extends UnicastRemoteObject
     }
 
     @Override
-    public void clearTheory() throws RemoteException {
+    public void clearTheory() {
         imp.clearTheory();
     }
 
     @Override
-    public Theory getTheory() throws RemoteException{
+    public Theory getTheory() {
         return imp.getTheory();
     }
 
     @Override
-    public void setTheory(Theory theory) throws InvalidTheoryException, RemoteException {
+    public void setTheory(Theory theory) throws InvalidTheoryException {
         imp.setTheory(theory);
     }
 
     @Override
-    public void addTheory(Theory theory) throws InvalidTheoryException, RemoteException {
+    public void addTheory(Theory theory) throws InvalidTheoryException {
         imp.addTheory(theory);
     }
 
 
     @Override
-    public Solution solve(Term g) throws RemoteException {
+    public Solution solve(Term g) {
         return imp.solve(g);
     }
 
     @Override
-    public Solution solve(String g) throws MalformedGoalException, RemoteException{
+    public Solution solve(String g) throws MalformedGoalException {
         return imp.solve(g);
     }
 
     @Override
-    public boolean hasOpenAlternatives() throws java.rmi.RemoteException {
+    public boolean hasOpenAlternatives() {
         return imp.hasOpenAlternatives();
     }
 
     @Override
-    public Solution solveNext() throws NoMoreSolutionException, RemoteException {
+    public Solution solveNext() throws NoMoreSolutionException {
         return imp.solveNext();
     }
 
     @Override
-    public void solveHalt() throws RemoteException {
+    public void solveHalt() {
         imp.solveHalt();
     }
 
     @Override
-    public void solveEnd() throws RemoteException{
+    public void solveEnd() {
         imp.solveEnd();
     }
 
 
     @Override
-    public void loadLibrary(String className) throws InvalidLibraryException, RemoteException {
+    public void loadLibrary(String className) throws InvalidLibraryException {
         imp.addLibrary(className);
     }
 
     @Override
-    public void unloadLibrary(String className) throws InvalidLibraryException, RemoteException {
+    public void unloadLibrary(String className) throws InvalidLibraryException {
         imp.removeLibrary(className);
     }
 

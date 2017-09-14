@@ -613,7 +613,7 @@ public class a extends Applet implements Runnable {
 								if (level > 8) {
 									object = new int[32];
 									queue.add(object);
-									object[OBJ_TYPE] = j;
+									object[OBJ_TYPE] = MAP_RADIO;
 									object[OBJ_FLOOR] = i;
 									object[OBJ_X] = x + 72;
 									object[OBJ_Y] = 43 + (i << 5);

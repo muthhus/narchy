@@ -23,7 +23,7 @@ import java.util.Arrays;
 public class PreferedEncodingEncoder extends MessageToByteEncoder<PreferedEncoding> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, PreferedEncoding enc, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, PreferedEncoding enc, ByteBuf out) {
         out.writeByte(ClientEventType.SET_ENCODINGS);
         out.writeZero(1); // padding
         out.writeShort(enc.getEncodings().length);

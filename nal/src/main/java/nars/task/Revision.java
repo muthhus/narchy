@@ -365,8 +365,8 @@ public class Revision {
         Term at = a.term();
         Term bt = b.term();
 
-        Term atEternal = at.eternal();
-        assert(bt.eternalEquals(atEternal));
+        Term atConceptual = at.conceptual();
+        //if (Param.DEBUG) assert(bt.conceptual().equals(atConceptual)): at + " and " + bt + " may not belong in the same concept";
 
         for (int i = 0; i < Param.MAX_TERMPOLATE_RETRIES; i++) {
             Term t;
@@ -375,8 +375,8 @@ public class Revision {
                 i = Param.MAX_TERMPOLATE_RETRIES; //no need to retry
             } else {
                 t = intermpolate(at, bt, aProp, nar);
-                if (!t.eternalEquals(atEternal))
-                    continue;
+                //if (!t.eternalEquals(atConceptual))
+                  //  continue;
             }
 
 

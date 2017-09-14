@@ -85,7 +85,7 @@ public class ProtocolHandler extends MessageToMessageDecoder<Object> {
     }
 
     @Override
-    protected void decode(final ChannelHandlerContext ctx, Object msg, List<Object> out) throws Exception {
+    protected void decode(final ChannelHandlerContext ctx, Object msg, List<Object> out) {
 
         if (msg instanceof ImageRect) {
             render.render((ImageRect) msg, voidCallback);
@@ -205,7 +205,7 @@ public class ProtocolHandler extends MessageToMessageDecoder<Object> {
     }
 
     @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
         logger.trace("user event: {}", evt);
         if (evt instanceof ProtocolState) {
             ProtocolState uvent = (ProtocolState) evt;

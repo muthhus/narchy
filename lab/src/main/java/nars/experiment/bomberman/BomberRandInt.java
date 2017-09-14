@@ -16,9 +16,9 @@ package nars.experiment.bomberman; /**
  */
 public class BomberRandInt {
     /** lowest integer in the range */
-    private int low;
+    private final int low;
     /** highest integer in the range */
-    private int high;
+    private final int high;
 
     /** stack size */
     private static final int BUFFER_SIZE = 101;

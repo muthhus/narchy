@@ -48,7 +48,7 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
     public final Bag<Term, PriReference<Term>> termLinks;
     @NotNull
     public transient ConceptState state = Deleted;
-    private Collection<Termed> templates;
+    private final Collection<Termed> templates;
 
     public BaseConcept(@NotNull Term term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder conceptBuilder) {
         this(term,

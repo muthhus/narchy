@@ -37,7 +37,8 @@ public class FactorialContextTree extends ContextTree {
 	// ctwTrees = null;
 	// }
 
-	protected void update(boolean sym) {
+	@Override
+    protected void update(boolean sym) {
 		int m_currentlyActiveTree = addedSymbolCount % ctwTrees.size();
 		assert (historySize() != 0 || m_currentlyActiveTree == 0);
 
@@ -70,7 +71,8 @@ public class FactorialContextTree extends ContextTree {
 		}
 	}
 
-	public void revert() {
+	@Override
+    public void revert() {
 		assert (addedSymbolCount > 0);
 		assert (historySize() > 0);
 
@@ -123,7 +125,8 @@ public class FactorialContextTree extends ContextTree {
 		return result;
 	}
 
-	public String prettyPrint() {
+	@Override
+    public String prettyPrint() {
 		String result = "";
 		result += "History: ";
 		for (int i = 0; i < historySize(); ++i) {

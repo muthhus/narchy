@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class PrologAgent extends Prolog {
     
-    private String theoryText;
+    private final String theoryText;
     private String goalText;
     
   

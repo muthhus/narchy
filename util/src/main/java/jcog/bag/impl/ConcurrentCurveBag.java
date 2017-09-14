@@ -17,14 +17,16 @@ public class ConcurrentCurveBag<X extends Priority> extends CurveBag<X> {
     public ConcurrentCurveBag(@NotNull PriMerge mergeFunction, @NotNull Map<X, X> map, Random rng, int cap) {
         super(mergeFunction, map, rng, cap);
 
-        this.toPut = new QueueLock<X>(new DisruptorBlockingQueue(16), super::putAsync) {
+        this.toPut = new QueueLock<X>(new DisruptorBlockingQueue(cap), super::putAsync) {
             @Override
             protected void batchFinished(int batchSize) {
 //                if (batchSize > 1) {
 //                    System.out.println("batchsize="+batchSize);
 //                }
-                synchronized (items) {
-                    ConcurrentCurveBag.super.ensureSorted();
+                if (mustSort) {
+                    synchronized (items) {
+                        ConcurrentCurveBag.super.ensureSorted();
+                    }
                 }
             }
         };
@@ -39,4 +41,6 @@ public class ConcurrentCurveBag<X extends Priority> extends CurveBag<X> {
     public void putAsync(@NotNull X b) {
         toPut.accept(b);
     }
+
+
 }

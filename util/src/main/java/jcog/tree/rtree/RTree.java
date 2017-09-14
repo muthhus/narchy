@@ -61,6 +61,7 @@ public class RTree<T> implements Space<T> {
         clear();
     }
 
+    @Override
     public Stream<T> stream() {
         return root.stream();
     }

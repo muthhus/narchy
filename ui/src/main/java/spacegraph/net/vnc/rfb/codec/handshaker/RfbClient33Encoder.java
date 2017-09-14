@@ -22,7 +22,7 @@ import spacegraph.net.vnc.rfb.codec.handshaker.event.SharedEvent;
 public class RfbClient33Encoder extends MessageToByteEncoder<HandshakeEvent> implements RfbClientEncoder {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, HandshakeEvent msg, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, HandshakeEvent msg, ByteBuf out) {
         if (msg instanceof SharedEvent) {
             out.writeBoolean(((SharedEvent) msg).isShared());
         }

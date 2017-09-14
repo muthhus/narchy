@@ -328,7 +328,7 @@ public class Twenglish {
      * returns a list of all tasks that it was able to parse for the input
      */
     @NotNull
-    public List<TaskBuilder> parse(String source, @NotNull NAR n, String s) throws Narsese.NarseseException {
+    public List<TaskBuilder> parse(String source, @NotNull NAR n, String s) {
 
 
         List<TaskBuilder> results = $.newArrayList();

@@ -38,8 +38,8 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
     private final On on;
 
 
-    BaseConcept cc = null; //cached concept
-    float cp = 0; //cached priority
+    BaseConcept cc; //cached concept
+    float cp; //cached priority
     private int dur; //cached dur
     private long now; //cached time
     private String termString; //cached string
@@ -58,9 +58,9 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
      */
     int projections = 32;
 
-    private boolean showTaskLinks = false;
+    private final boolean showTaskLinks = true;
     @Deprecated
-    private boolean showEternal = true;
+    private final boolean showEternal = true;
 
     long[] range;
 
@@ -397,16 +397,14 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
             }
 
 
-            {
-                float mid = (end + start) / 2f;
-                float W = Math.max((end - start), pw);
-                float x = mid - W / 2;
-                float y = freq - ph/2;
-                gl.glColor4f(r, g, b, alpha); //, 0.7f + 0.2f * q);
-                Draw.rect(gl,
-                        x, y,
-                        W, ph);
-            }
+            float mid = (end + start) / 2f;
+            float W = Math.max((end - start), pw);
+            float x = mid - W / 2;
+            float y = freq - ph/2;
+            gl.glColor4f(r, g, b, alpha); //, 0.7f + 0.2f * q);
+            Draw.rect(gl,
+                    x, y,
+                    W, ph);
 
 
         });

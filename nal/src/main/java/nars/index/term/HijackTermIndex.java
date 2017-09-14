@@ -220,7 +220,7 @@ public class HijackTermIndex extends MaplikeTermIndex {
         if (conceptScores.getTotalCount() > updateBatchSize / 4) {
             float percentile = (float) conceptScores.getPercentileAtOrBelowValue(score) / 100f;
             if (percentile < cutoff)
-                forget(x, c, (float) cutoff * (1 - percentile));
+                forget(x, c, cutoff * (1 - percentile));
         }
 
         conceptScores.recordValue(score);

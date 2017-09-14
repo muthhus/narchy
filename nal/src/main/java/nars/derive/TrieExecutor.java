@@ -1,16 +1,14 @@
 package nars.derive;
 
-import jcog.Util;
 import jcog.data.graph.AdjGraph;
 import jcog.list.FasterIntArrayList;
 import jcog.list.FasterList;
 import nars.control.Derivation;
-import nars.term.Compound;
-import nars.term.Term;
-import nars.term.transform.CompoundTransform;
-import org.jetbrains.annotations.Nullable;
+import nars.derive.op.UnifyTerm;
 
-import java.util.Arrays;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 
 /**
  * stackless recursive virtual machine which
@@ -23,91 +21,16 @@ import java.util.Arrays;
 public class TrieExecutor extends AbstractPred<Derivation> {
 
 
-    static final class CPU<D> {
-        static final int stackLimit = 32;
-        final FasterIntArrayList ver = new FasterIntArrayList(stackLimit);
-        final FasterList<PrediTerm<D>> stack = new FasterList<>(stackLimit);
-
-//        /**
-//         * call to lazily revert the derivation versioning right before it's necessary
-//         */
-//        void sync(Derivation d) {
-//            int ss = stack.size();
-//            int vv = ver.size();
-//            if (ss == vv)
-//                return;
-//
-//
-//            assert (vv > ss);
-//            d.revert(ver.pop(vv - ss)); //reduce the version stack to meet the instruction stack
-//        }
-
-        void fork(Derivation d, PrediTerm<Derivation>[] f) {
-
-//            sync(d);
-            //assert (ver.size() == stack.size());
-
-            int branches = f.length;
-            int stackStart = stack.size();
-            int stackEnd = stackStart + branches;
-            if (stackEnd < stackLimit) {
-                int before = d.now();
-
-                //FAST
-                Object[] stackData = stack.array();
-                System.arraycopy(f, 0, stackData, stackStart, branches);
-                stack.setSize(stackEnd);
-
-                d.shuffler.shuffle(d.random, stackData, stackStart, stackEnd);
-
-                //assert (stack.size() == ver.size() + branches);
-
-                //FAST
-                int[] va = ver.array();
-                Arrays.fill(va, stackStart, stackEnd, before);
-                ver.setSize(stackEnd);
-
-                //assert (ver.size() == stack.size());
-            }
-        }
-
-//        void push(int before, @NotNull PrediTerm x) {
-//            ver.add(before);
-//            stack.add(x);
-//        }
-
-    }
-
     final static ThreadLocal<CPU<Derivation>> cpu = ThreadLocal.withInitial(CPU::new);
 
     private final PrediTerm<Derivation> root;
 
-
     public TrieExecutor(PrediTerm<Derivation> root) {
         super(root);
-        this.root = network(root);
-//
-//        value.writeGML(System.out);
-//        System.out.println();
+        this.root = root;
+
     }
 
-    public PrediTerm<Derivation> network(PrediTerm<Derivation> x) {
-        if (x instanceof Fork) {
-//            CompoundTransform ct = (parent, subterm) -> {
-//                if (subterm instanceof Fork) {
-//
-//                }
-//                return subterm;
-//            };
-//            Choice c = new Choice(Util.map(y -> (AbstractPred)y.transform(ct),
-//                    AbstractPred[]::new, ((Fork)x).cache));
-//
-//            return c;
-            return x;
-        } else {
-            return x;
-        }
-    }
 
     class Choice extends Fork {
 
@@ -127,38 +50,110 @@ public class TrieExecutor extends AbstractPred<Derivation> {
     class Path {
 
     }
-    final AdjGraph<Choice,Path> value = new AdjGraph(true);
+    final AdjGraph<PrediTerm,Path> value = new AdjGraph(true);
 
 
     @Override
     public boolean test(Derivation d) {
 
         CPU c = cpu.get();
-        FasterList<PrediTerm<Derivation>> stack = c.stack;
-        FasterIntArrayList ver = c.ver;
 
+        FasterList<PrediTerm<Derivation>> stack = c.stack;
         stack.clearFast();
+
+        FasterIntArrayList ver = c.ver;
         ver.clearFast();
 
         PrediTerm<Derivation> cur = root;
         while (true) {
 
-            PrediTerm<Derivation> next = cur.exec(d, c);
+            PrediTerm<Derivation> next = exec(cur, d, c);
 
             if (next == cur) {
                 break; //termination signal
             } else if (next == null) {
-                cur = stack.removeLastElseNull();
-                if (cur == null || !d.revertAndContinue(ver.pop()))
+                if ((cur = stack.removeLastElseNull()) == null || !d.revertAndContinue(ver.pop()))
                     break;
             } else {
                 cur = next;
             }
 
-        }// while (d.live());
+        }
 
         return true;
     }
 
+    protected PrediTerm<Derivation> exec(PrediTerm<Derivation> cur, Derivation d, CPU<Derivation> c) {
+//        //custom instrumentation, to be moved to subclass
+//        if (cur instanceof Fork || cur instanceof UnifyTerm) {
+//            int to = value.addNode(cur);
+//            c.stack.forEach(cause -> {
+//               int from = value.addNode(cause);
+//               value.edge(from, to, ()->new Path());
+//            });
+//            if (Math.random() < 0.001f) {
+//                try {
+//                    value.writeGML(new PrintStream(new FileOutputStream("/tmp/x.gml")));
+//                } catch (FileNotFoundException e) { }
+//                //value.writeGML(System.out);
+//            }
+//        }
+
+        PrediTerm<Derivation> next = cur.exec(d, c);
+
+
+        return next;
+    }
+
 
 }
+/*
+        final int[] serial = {1};
+        TrieDeriver.forEach(null, root, (from, to) -> {
+            ;
+
+            int t = value.addNode(node(to));
+
+            if (from!=null) {
+                int f = value.addNode(node(from));
+                value.setEdge(f, t, new Path());
+            }
+        });
+
+//
+        try {
+            value.writeGML(new PrintStream(new FileOutputStream("/tmp/x.gml")));
+            System.out.println();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    @NotNull
+    public Term node(PrediTerm from) {
+        Term f;
+        if (from instanceof AndCondition || from instanceof Fork || from instanceof OpSwitch) {
+            f = from;
+        } else {
+            f = $.p(from, $.the(System.identityHashCode(from)));
+        }
+        return f;
+    }
+//    public PrediTerm<Derivation> network(PrediTerm<Derivation> x) {
+//        if (x instanceof Fork) {
+////            CompoundTransform ct = (parent, subterm) -> {
+////                if (subterm instanceof Fork) {
+////
+////                }
+////                return subterm;
+////            };
+////            Choice c = new Choice(Util.map(y -> (AbstractPred)y.transform(ct),
+////                    AbstractPred[]::new, ((Fork)x).cache));
+////
+////            return c;
+//            return x;
+//        } else {
+//            return x;
+//        }
+//    }
+
+ */

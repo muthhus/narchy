@@ -15,11 +15,11 @@ public class UCTNode {
         children = new IntObjectHashMap();
     }
 
-    private IntObjectHashMap<UCTNode> children; // stores the children
-    private boolean isChanceNode; // true if this node is a chance node
+    private final IntObjectHashMap<UCTNode> children; // stores the children
+    private final boolean isChanceNode; // true if this node is a chance node
     private double mean; // the expected reward of this node
     private int visits; // number of times the search node has been visited
-    private double explorationRatio = 1.41; // Exploration-Exploitation
+    private final double explorationRatio = 1.41; // Exploration-Exploitation
     // constant
 
     /**

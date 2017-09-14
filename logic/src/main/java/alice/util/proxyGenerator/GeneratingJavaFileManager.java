@@ -14,7 +14,7 @@ class GeneratingJavaFileManager extends ForwardingJavaFileManager<JavaFileManage
 
   @Override
   public JavaFileObject getJavaFileForOutput(Location location, String className, JavaFileObject.Kind kind,
-                                             FileObject sibling) throws IOException {
+                                             FileObject sibling) {
     return gcf;
   }
 }

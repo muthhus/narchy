@@ -28,14 +28,16 @@ public class UCTSettings extends Settings {
 		mcSimulations = parseInt("mc-simulations", mcSimulations, file);
 	}
 
-	public void loadDefaultSettings() {
+	@Override
+    public void loadDefaultSettings() {
 		horizon = 1;
 		mcSimulations = 100;
 		recycleUCT = true;
 		// updateCTinMC = true;
 	}
 
-	public UCTSettings clone() {
+	@Override
+    public UCTSettings clone() {
 		UCTSettings s = new UCTSettings();
 		s.setHorizon(horizon);
 		s.setMcSimulations(mcSimulations);

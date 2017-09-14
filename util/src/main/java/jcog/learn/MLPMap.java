@@ -124,7 +124,7 @@ public class MLPMap {
         return error;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         float[][] train = {new float[]{0, 0}, new float[]{0, 1}, new float[]{1, 0}, new float[]{1, 1}};
 

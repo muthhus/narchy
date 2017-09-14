@@ -46,7 +46,7 @@ class RfbClient33Decoder extends ReplayingDecoder<RfbClient33Decoder.State> impl
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         switch (state()) {
             case SEC_TYPES:
                 int type = in.readInt();

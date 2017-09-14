@@ -28,7 +28,7 @@ public class DesktopSizeRectDecoder implements FrameRectDecoder {
     }
 
     @Override
-    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         out.add(new DesktopSizeRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight()));
         return true;
     }

@@ -484,7 +484,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
                 boolean allowMerge;
 
-                if (inputStrength == inputStrength) {
+                if (inputStrength != inputStrength) {
                     allowMerge = true;
                 } else {
                     float strengthRemoved = taskStrength.floatValueOf(at) + taskStrength.floatValueOf(bt);

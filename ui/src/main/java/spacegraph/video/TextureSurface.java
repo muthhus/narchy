@@ -22,7 +22,7 @@ public class TextureSurface extends Surface {
 
     Texture texture;
 
-    public boolean mipmap = false;
+    public boolean mipmap;
 
     //TODO use a PPM uncompressed format for transferring from CPU to GPU
 
@@ -81,7 +81,7 @@ public class TextureSurface extends Surface {
                     mipmap,
                     false,
                     false,
-                    buffer, (TextureData.Flusher)null
+                    buffer, null
             );
         }
 

@@ -18,6 +18,7 @@
 
 package jcog.data.graph;
 
+import br.ufpr.gres.util.StringUtils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import jcog.TriConsumer;
@@ -43,7 +44,7 @@ public class AdjGraph<V, E> implements Graph<V, E>, java.io.Serializable {
 // =================== private fields ============================
 // ===============================================================
 
-    int serial = 0;
+    int serial;
 
     public V node(int i) {
         return antinodes.get(i).v;
@@ -301,9 +302,16 @@ public class AdjGraph<V, E> implements Graph<V, E>, java.io.Serializable {
         return existing != null ? existing : ifMissing;
     }
 
-    public E edge(V s, V p, Supplier<E> ifMissing) {
+
+    public E edge(int s, int p, Supplier<E> ifMissing) {
         @Nullable E existing = edge(s, p);
-        return existing != null ? existing : ifMissing.get();
+        if (existing != null)
+            return existing;
+        else {
+            E ee = ifMissing.get();
+            setEdge(s, p, ee);
+            return ee;
+        }
     }
 
     public boolean removeEdge(V i, V j) {
@@ -368,11 +376,13 @@ public class AdjGraph<V, E> implements Graph<V, E>, java.io.Serializable {
         out.println("graph [ directed " + (directed ? "1" : "0"));
 
         for (Node<V> k : nodes.keySet())
-            out.println("node [ id " + k.id + " label \"" + k.v + "\" ]");
+            out.println("node [ id " + k.id + " label \"" +
+                    k.v.toString().replace('\"','\'') + "\" ]");
 
         eachNode((a, b, e) -> {
             out.println(
-                    "edge [ source " + a.id + " target " + b.id + " label \"" + e + "\" ]");
+                    "edge [ source " + a.id + " target " + b.id + " label \"" +
+                            e.toString().replace('\"','\'') + "\" ]");
         });
 
         out.println("]");

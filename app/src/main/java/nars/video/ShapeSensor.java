@@ -37,7 +37,7 @@ public class ShapeSensor implements Runnable {
     private final Term id;
     private final NAR nar;
     //GrayF32 img = null;
-    GrayU8 img = null;
+    GrayU8 img;
 
     final static boolean debug = true;
 
@@ -47,9 +47,9 @@ public class ShapeSensor implements Runnable {
 
     static ImagePanel  gui = debug ? new ImagePanel(400,200) : null;
 
-    private float R = 1f;
-    private float G = 1f;
-    private float B = 1f;
+    private final float R = 1f;
+    private final float G = 1f;
+    private final float B = 1f;
 
     public ShapeSensor(Term id, Bitmap2D input, NAgent a) {
         this.id = id;
@@ -207,7 +207,7 @@ public class ShapeSensor implements Runnable {
     }
 
     private void believe(long now, Term term, Truth truth) {
-        float pri = nar.priDefault(BELIEF);;
+        float pri = nar.priDefault(BELIEF);
         in.input((Task)new NALTask(term, BELIEF, truth, now, now, now, nar.time.nextInputStamp() ).pri(pri));
     }
 

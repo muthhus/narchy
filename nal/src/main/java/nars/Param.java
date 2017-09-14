@@ -39,6 +39,8 @@ public abstract class Param extends Services<Term,NAR> {
 
     /** freq coherence below which a contradictory sensor belief is dis-valued, and above which it is valued */
     public static final float SENSOR_FEEDBACK_FREQ_THRESHOLD = 0.9f;
+    ;
+
 
     /**
      * controls interpolation policy:
@@ -60,6 +62,7 @@ public abstract class Param extends Services<Term,NAR> {
      * it is enabled for unit tests automatically regardless of the value here.
      */
     public static boolean DEBUG;
+    public static boolean DEBUG_EXTRA;
     public static boolean TRACE;
 
 
@@ -94,31 +97,34 @@ public abstract class Param extends Services<Term,NAR> {
                     32;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(128);
+    public final MutableInteger matchTTL = new MutableInteger(1024);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.25f;
 
     /** cost of attempting a unification */
-    public static final int TTL_UNIFY = 1;
+    public static final int TTL_UNIFY = 5;
+
+    /** base cost spent per each AND predicate condition */
+    public static int TTL_AND_PREDICATE = 1;
 
     /** cost of a termutate permutation */
-    public static final int TTL_MUTATE = 1;
+    public static final int TTL_MUTATE = 5;
 
     /** cost of substitution/evaluating a derived term */
-    public static final int TTL_DERIVE_EVAL = 0;
+    public static final int TTL_DERIVE_EVAL = 5;
 
     /** cost of a successful task derivation */
-    public static final int TTL_DERIVE_TASK_SUCCESS = 2;
+    public static final int TTL_DERIVE_TASK_SUCCESS = 25;
 
     /** cost of a repeat (of another within the premise's batch) task derivation */
-    public static final int TTL_DERIVE_TASK_REPEAT = 1;
+    public static final int TTL_DERIVE_TASK_REPEAT = 20;
 
     /** cost of a task derived, but too similar to one of its parents */
-    public static final int TTL_DERIVE_TASK_SAME = 2;
+    public static final int TTL_DERIVE_TASK_SAME = 20;
 
     /** cost of a failed/aborted task derivation */
-    public static final int TTL_DERIVE_TASK_FAIL = 1;
+    public static final int TTL_DERIVE_TASK_FAIL = 15;
 
     /** number between 0 and 1 controlling the proportion of activation going
      * forward (compound to subterms) vs. reverse (subterms to parent compound).
@@ -179,7 +185,7 @@ public abstract class Param extends Services<Term,NAR> {
         float relGrowth =
                 unitize(((float)dCompl) / (dCompl + pCompl)); //1 - (proportion of its complexity / (its complexity + parent complexity) )
 
-        p *= 1f - 0.5f * relGrowth;
+        p *= 1f - 0.5f * Util.sqr(relGrowth);
 
         if (/* belief or goal */ tr!=null) {
 

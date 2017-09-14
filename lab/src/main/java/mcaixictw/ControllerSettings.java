@@ -22,12 +22,14 @@ public class ControllerSettings extends Settings {
 		return result;
 	}
 
-	public void parseSettings(File file) {
+	@Override
+    public void parseSettings(File file) {
 		exploration = parseDouble("exploration", exploration, file);
 		exploreDecay = parseDouble("explore-decay", exploreDecay, file);
 	}
 
-	public void loadDefaultSettings() {
+	@Override
+    public void loadDefaultSettings() {
 		this.exploration = 0.1;
 		exploreDecay = 0.999;
 	}

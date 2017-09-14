@@ -24,7 +24,7 @@ import java.util.function.IntFunction;
  * iterate it in sequence and stop at the first null (this is the
  * end).
  */
-public class ArraySharingList<C> extends FasterList<C> implements Iterable<C> {
+public class ArraySharingList<C> extends FasterList<C> {
 
     private final IntFunction<C[]> arrayBuilder;
     protected transient C[] array;
@@ -53,6 +53,7 @@ public class ArraySharingList<C> extends FasterList<C> implements Iterable<C> {
 //            add((C) objectInput.readObject());
 //    }
 
+    @Override
     public final boolean add(C x) {
         if (super.add(x)) {
             change.set(true);
@@ -63,11 +64,13 @@ public class ArraySharingList<C> extends FasterList<C> implements Iterable<C> {
 
 
 
+    @Override
     public final void add(int index, C element) {
         super.add(index, element);
         change.set(true);
     }
 
+    @Override
     public boolean addAll(int index, Collection<? extends C> source) {
         if (super.addAll(index, source)) {
             change.set(true);
@@ -77,6 +80,7 @@ public class ArraySharingList<C> extends FasterList<C> implements Iterable<C> {
     }
 
 
+    @Override
     public final C remove(int index) {
         C removed = super.remove(index);
         if (removed!=null) {
@@ -85,6 +89,7 @@ public class ArraySharingList<C> extends FasterList<C> implements Iterable<C> {
         return removed;
     }
 
+    @Override
     public final boolean remove(Object x) {
         if (super.remove(x)) {
             change.set(true);
@@ -93,11 +98,13 @@ public class ArraySharingList<C> extends FasterList<C> implements Iterable<C> {
         return false;
     }
 
+    @Override
     public final boolean isEmpty() {
         C[] cc = getCachedNullTerminatedArray();
         return cc == null || cc[0] == null;
     }
 
+    @Override
     public final void clear() {
         if (!isEmpty()) {
             super.clear();
@@ -107,6 +114,7 @@ public class ArraySharingList<C> extends FasterList<C> implements Iterable<C> {
         }
     }
 
+    @Override
     public final int size() {
         C[] a = getCachedNullTerminatedArray();
         return a == null ? 0 : a.length - 1;

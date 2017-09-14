@@ -14,18 +14,18 @@ import java.awt.*;
  */
 public class BomberBonus extends Thread {
     /** map object */
-    private BomberMap map;
+    private final BomberMap map;
     /** position */
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
     /** frame count */
     private int frame;
     /** alive flag */
     private boolean alive = true;
     /** bonus type */
-    private int type;
+    private final int type;
     /** bomb sprite image handles */
-    private Image[] images;
+    private final Image[] images;
     /** rendering hints */
     private static Object hints;
 

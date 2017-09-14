@@ -108,11 +108,7 @@ public class ClassPath {
     }
 
     public URL findResource(final String name) {
-        try {
-            return this.root.getResource(name);
-        } catch (final IOException exception) {
-            return null;
-        }
+        return this.root.getResource(name);
     }
 
     public static Collection<String> getClassPathElementsAsPaths() {

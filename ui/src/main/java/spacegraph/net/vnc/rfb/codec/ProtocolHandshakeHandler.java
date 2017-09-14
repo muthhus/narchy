@@ -50,7 +50,7 @@ public class ProtocolHandshakeHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelActive(final ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(final ChannelHandlerContext ctx) {
         ctx.pipeline().addBefore(ctx.name(), "rfb-version-decoder", new ProtocolVersionDecoder());
     }
 

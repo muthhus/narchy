@@ -22,7 +22,7 @@ public class BomberPlayer extends Thread {
     /** player's own bomb grid (must have for synchronization) */
     public boolean[][] bombGrid;
     /** input key queue */
-    private BomberKeyQueue keyQueue;
+    private final BomberKeyQueue keyQueue;
     /** bomb key is down or not */
     private boolean bombKeyDown;
     /** direction keys down */
@@ -40,7 +40,7 @@ public class BomberPlayer extends Thread {
     /** whether a key is pressed or not */
     private boolean keyPressed;
     /** the player's input keys */
-    private int[] keys;
+    private final int[] keys;
     /** total bombs the player has */
     public int totalBombs = 1;
     /** total bombs the player used */
@@ -77,7 +77,7 @@ public class BomberPlayer extends Thread {
     private static final int BOMB = 4;
     private static final int EXPLODING = 4;
     /** all player sprite images */
-    private static Image[][][] sprites;
+    private static final Image[][][] sprites;
     /** rendering hints */
     private static Object hints;
 

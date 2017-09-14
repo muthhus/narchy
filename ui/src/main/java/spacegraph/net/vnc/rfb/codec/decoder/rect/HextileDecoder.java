@@ -68,7 +68,7 @@ public class HextileDecoder extends RawRectDecoder {
 
 
     @Override
-    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    public boolean decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
 
         if (state == State.INIT) {
             imageRect = new HextileImageRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());

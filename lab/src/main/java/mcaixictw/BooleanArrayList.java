@@ -51,11 +51,13 @@ public final class BooleanArrayList extends BitSet {
 
 
 
+    @Override
     public int size() {
         return size;
     }
 
 
+    @Override
     public boolean isEmpty() {
         return size == 0;
     }
@@ -66,6 +68,7 @@ public final class BooleanArrayList extends BitSet {
     }
 
 
+    @Override
     public void clear() {
         if (this != null) {
             super.clear();
@@ -592,11 +595,13 @@ public final class BooleanArrayList extends BitSet {
         private int lastIndex = -1;
 
 
+        @Override
         public boolean hasNext() {
             return currentIndex != size();
         }
 
 
+        @Override
         public boolean next() {
             if (!hasNext()) {
                 throw new NoSuchElementException();
@@ -607,6 +612,7 @@ public final class BooleanArrayList extends BitSet {
         }
 
 
+        @Override
         public void remove() {
             if (lastIndex == -1) {
                 throw new IllegalStateException();

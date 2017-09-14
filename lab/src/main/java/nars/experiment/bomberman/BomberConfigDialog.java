@@ -21,15 +21,15 @@ import java.awt.event.KeyEvent;
 public class BomberConfigDialog extends JDialog
 implements ActionListener {
     /** temporary key datas used for manipulation */
-    private int[][] keys;
+    private final int[][] keys;
     /** keys being set offset values */
     private final int[] keysBeingSet = { -1, -1 };
     /** waiting for key flag */
     private boolean waitingForKey;
     /** the buttons that allow the user to set the keys */
-    private JButton[][] buttons;
+    private final JButton[][] buttons;
     /** the text fields that display the keys */
-    private JTextField[][] keyFields;
+    private final JTextField[][] keyFields;
 
     /**
      * Constructs the dialog.
@@ -198,7 +198,7 @@ implements ActionListener {
      */
     private class GetKeyDialog extends JDialog {
         /** points to itself */
-        private JDialog me;
+        private final JDialog me;
         /**
          * Constructs a new dialog.
          * @param owner dialog's owner

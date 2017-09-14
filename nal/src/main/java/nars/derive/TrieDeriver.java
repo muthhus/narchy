@@ -20,6 +20,7 @@ import java.io.PrintStream;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -213,6 +214,74 @@ public enum TrieDeriver {
 
 
     }
+
+    static void forEach(@Nullable PrediTerm in, PrediTerm x, @NotNull BiConsumer<PrediTerm, PrediTerm> out) {
+        out.accept(in, x);
+
+        /*if (p instanceof IfThen) {
+
+            IfThen it = (IfThen) p;
+
+            TermTrie.indent(indent);
+            out.println(Util.className(p) + " (");
+            print(it.cond, out, indent + 2);
+
+            TermTrie.indent(indent);
+            out.println(") ==> {");
+
+            print(it.conseq, out, indent + 2);
+            TermTrie.indent(indent);
+            out.println("}");
+
+        } *//*else if (p instanceof If) {
+
+            indent(indent); out.println(Util.className(p) + " {");
+            {
+                If it = (If) p;
+                print(it.cond, out, indent + 2);
+            }
+            indent(indent); out.println("}");
+
+        }  else */
+        if (x instanceof AndCondition) {
+            //TermTrie.indent(indent);
+            //out.println("and {");
+            AndCondition ac = (AndCondition) x;
+            for (PrediTerm y : ac.cache) {
+                forEach(x, y, out);
+            }
+        } else if (x instanceof Fork) {
+            //TermTrie.indent(indent);
+            //out.println(Util.className(p) + " {");
+            Fork ac = (Fork) x;
+            for (PrediTerm y : ac.cache) {
+                forEach(x, y, out);
+            }
+//            TermTrie.indent(indent);
+//            out.println("}");
+
+        } else if (x instanceof OpSwitch) {
+            OpSwitch sw = (OpSwitch) x;
+            //TermTrie.indent(indent);
+            //out.println("SubTermOp" + sw.subterm + " {");
+            for (PrediTerm y : sw.cases.values()) {
+                if (y == null) continue;
+
+                //TermTrie.indent(indent + 2);
+                //out.println('"' + Op.values()[i].toString() + "\": {");
+                //print(b, out, indent + 4);
+                forEach(x, y, out);
+                //TermTrie.indent(indent + 2);
+                //out.println("}");
+
+            }
+//            TermTrie.indent(indent);
+//            out.println("}");
+        } else if (x instanceof UnifyOneSubterm.UnifySubtermThenConclude) {
+            forEach(x, ((UnifyOneSubterm.UnifySubtermThenConclude) x).eachMatch, out);
+        }
+    }
+
 
     protected static List<PrediTerm<Derivation>> compileSwitch(List<PrediTerm<Derivation>> bb) {
 

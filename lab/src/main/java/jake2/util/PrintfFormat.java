@@ -3210,5 +3210,5 @@ public class PrintfFormat {
 	/** Character position.  Used by the constructor. */
 	private int cPos;
 	/** Character position.  Used by the constructor. */
-	private DecimalFormatSymbols dfs;
+	private final DecimalFormatSymbols dfs;
 }

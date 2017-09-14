@@ -45,7 +45,7 @@ import java.util.function.Consumer;
  * @param <E>
  * @author Andreas Hollmann
  */
-public abstract class SortedArray<E> extends AbstractCollection<E> implements Iterable<E> {
+public abstract class SortedArray<E> extends AbstractCollection<E> {
 
 
     public static final int binarySearchThreshold = 8;
@@ -61,6 +61,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
         return list;
     }
 
+    @Override
     public int size() {
         return size;
     }
@@ -105,6 +106,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
         return i != -1 && remove(i) != null;
     }
 
+    @Override
     public void clear() {
         this.list = (E[]) ArrayUtils.EMPTY_OBJECT_ARRAY;
         this.size = 0;
@@ -208,6 +210,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
     }
 
 
+    @Override
     public final boolean isEmpty() {
         return size == 0;
     }

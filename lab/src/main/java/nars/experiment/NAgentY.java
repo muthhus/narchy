@@ -27,7 +27,7 @@ abstract public class NAgentY extends NAgentX {
 
     final AgentService.AgentBuilder spec;
 
-    private AgentService agent = null;
+    private AgentService agent;
 
     public NAgentY(NAR nar, IntIntToObjectFunc<Agent> ctl) {
         this("", nar, ctl);
@@ -95,6 +95,7 @@ abstract public class NAgentY extends NAgentX {
         public void enable() {
             believe(1);
         }
+        @Override
         public void clear() {
             believe(0);
         }
