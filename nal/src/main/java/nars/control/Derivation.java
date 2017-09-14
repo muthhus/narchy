@@ -123,7 +123,7 @@ public class Derivation extends Unify implements TermContext {
     public PrediTerm<Derivation> deriver;
     public final ByteShuffler shuffler = new ByteShuffler(64);
     public boolean single;
-    public final Map<Task,Task> derivations = new LinkedHashMap();
+    public final Map<Task, Task> derivations = new LinkedHashMap();
     public DerivationTemporalize temporalize;
     public int parentComplexity;
 
@@ -172,7 +172,7 @@ public class Derivation extends Unify implements TermContext {
         final Functor substitute = new substitute() {
             @Override
             protected boolean onChange(Term from, Term x, Term y, Term to) {
-                assert(Derivation.this.xy.tryPut(x, y));
+                assert (Derivation.this.xy.tryPut(x, y));
                 return true;
             }
         };
@@ -287,7 +287,6 @@ public class Derivation extends Unify implements TermContext {
         this.belief = belief;
 
 
-
 //        int ttv = taskTerm.vars();
 //        if (ttv > 0 && bt.vars() > 0) {
 //            bt = bt.normalize(ttv); //shift variables up to be unique compared to taskTerm's
@@ -340,15 +339,15 @@ public class Derivation extends Unify implements TermContext {
 
         this.premisePri = p.priElseZero();
 
-        this.parentCause = belief!=null ?
+        this.parentCause = belief != null ?
                 Cause.zip(task, belief) :
                 task.cause();
 
-        try {
-            deriver.test(this);
-        } finally {
-            return derivations.values();
-        }
+
+        deriver.test(this);
+
+        return derivations.values();
+
     }
 
 
@@ -422,7 +421,6 @@ public class Derivation extends Unify implements TermContext {
     public int ttl() {
         return ttl;
     }
-
 
 
     public void reset() {

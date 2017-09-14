@@ -398,8 +398,8 @@ public interface NAct {
 
                 //curiosity applied to winner, how ironic
                 if (cur > 0 && rng.nextFloat() <= cur) {
-                    ff[winner] = rng.nextFloat(); //bipolar
-                                 //0.5f + 0.5f * rng.nextFloat(); //unipolar, >=0.5
+                    ff[winner] = //rng.nextFloat(); //bipolar
+                                 0.5f + 0.5f * rng.nextFloat(); //unipolar, [0.5,1.0]
                     cc[winner] = restConf;
                 }
 

@@ -63,10 +63,10 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     /**
      * lookahead time in durations (multiples of duration)
      */
-    public final FloatParam predictAheadDurs = new FloatParam(8, 1, 32);
+    public final FloatParam predictAheadDurs = new FloatParam(16, 1, 32);
 
 
-    public final FloatParam predictorProbability = new FloatParam(1f);
+    public final FloatParam predictorProbability = new FloatParam(0.5f);
     private final CauseChannel<Task> predict;
 
 
@@ -256,7 +256,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
                 ((FasterList) predictors).addAll(
 
                         question($.impl(action, happy)),
-                        question($.impl(notAction, happy)),
+                        question($.impl(notAction, happy))
                         //question(impl(action, what)),
                         //question(impl(notAction, what)),
 
@@ -275,7 +275,8 @@ abstract public class NAgent extends DurService implements NSense, NAct {
                         //                            //ETERNAL)
 
                         //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
-                        quest($.parallel(what, action))
+
+                        //quest($.parallel(what, action))
 
                         //quest((Compound)$.parallel(varQuery(1), happy.term(), (Compound) (action.term())), now)
 

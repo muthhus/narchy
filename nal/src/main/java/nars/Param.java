@@ -6,6 +6,7 @@ import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.pri.op.PriMerge;
 import jcog.util.FloatFloatToFloatFunction;
+import nars.control.Cause;
 import nars.control.Derivation;
 import nars.task.Tasked;
 import nars.task.TruthPolation;
@@ -23,7 +24,6 @@ import java.util.concurrent.Executor;
 
 import static jcog.Util.unitize;
 import static nars.Op.*;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * NAR Parameters
@@ -100,28 +100,28 @@ public abstract class Param extends Services<Term,NAR> {
     public final MutableInteger matchTTL = new MutableInteger(1024);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
-    public static final float BELIEF_MATCH_TTL_FRACTION = 0.25f;
+    public static final float BELIEF_MATCH_TTL_FRACTION = 0.2f;
 
     /** cost of attempting a unification */
     public static final int TTL_UNIFY = 5;
 
     /** base cost spent per each AND predicate condition */
-    public static int TTL_AND_PREDICATE = 1;
+    public static int TTL_PREDICATE = 1;
 
     /** cost of a termutate permutation */
-    public static final int TTL_MUTATE = 5;
+    public static final int TTL_MUTATE = 2;
 
     /** cost of substitution/evaluating a derived term */
     public static final int TTL_DERIVE_EVAL = 5;
 
     /** cost of a successful task derivation */
-    public static final int TTL_DERIVE_TASK_SUCCESS = 25;
+    public static final int TTL_DERIVE_TASK_SUCCESS = 10;
 
     /** cost of a repeat (of another within the premise's batch) task derivation */
-    public static final int TTL_DERIVE_TASK_REPEAT = 20;
+    public static final int TTL_DERIVE_TASK_REPEAT = 15;
 
     /** cost of a task derived, but too similar to one of its parents */
-    public static final int TTL_DERIVE_TASK_SAME = 20;
+    public static final int TTL_DERIVE_TASK_SAME = 15;
 
     /** cost of a failed/aborted task derivation */
     public static final int TTL_DERIVE_TASK_FAIL = 15;
@@ -131,6 +131,19 @@ public abstract class Param extends Services<Term,NAR> {
      * when calculated, the total activation will sum to 1.0.
      * so 0.5 is equal amounts for both. */
     public static final float TERMLINK_BALANCE = 0.5f;
+
+    public final float[] value = new float[Cause.Purpose.values().length];
+
+    protected void valueDefaults() {
+        value[Cause.Purpose.Input.ordinal()] = -0.01f;
+        value[Cause.Purpose.Process.ordinal()] = +0.02f;
+
+        value[Cause.Purpose.Accurate.ordinal()] = +1f;
+        value[Cause.Purpose.Inaccurate.ordinal()] = -1f;
+
+        value[Cause.Purpose.Answer.ordinal()] = +0.5f;
+        value[Cause.Purpose.Action.ordinal()] = +1f;
+    }
 
     /** how many durations above which to dither dt relations to dt=0 (parallel)
      *  set to zero to disable dithering.  typically the value will be 0..~1.0.
@@ -271,7 +284,7 @@ public abstract class Param extends Services<Term,NAR> {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 30;
+    public static final int CAUSE_CAPACITY = 20;
 
     public final static int UnificationStackMax = 72; //how many assignments can be stored in the 'versioning' maps
 

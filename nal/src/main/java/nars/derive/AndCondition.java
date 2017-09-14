@@ -166,7 +166,7 @@ public final class AndCondition<D> extends AbstractPred<D> {
                 break;
         }
 
-        ((Derivation)d).use((1+i) * Param.TTL_AND_PREDICATE);
+        ((Derivation)d).use((1+i) * Param.TTL_PREDICATE);
 
         return null;
     }

@@ -45,7 +45,7 @@ public class Conclusion extends AbstractPred<Derivation> {
      * destination of any derived tasks; also may be used to communicate backpressure
      * from the recipient.
      */
-    private final CauseChannel<Task> channel;
+    public final CauseChannel<Task> channel;
 
     private final static Logger logger = LoggerFactory.getLogger(Conclusion.class);
     private final Term pattern;

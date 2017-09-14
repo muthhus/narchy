@@ -58,11 +58,10 @@ public class TrieExecutor extends AbstractPred<Derivation> {
 
         CPU c = cpu.get();
 
-        FasterList<PrediTerm<Derivation>> stack = c.stack;
-        stack.clearFast();
+        c.ready(d);
 
+        FasterList<PrediTerm<Derivation>> stack = c.stack;
         FasterIntArrayList ver = c.ver;
-        ver.clearFast();
 
         PrediTerm<Derivation> cur = root;
         while (true) {

@@ -176,17 +176,14 @@ public class PremiseRule extends GenericCompound {
         put("PatternOp1", rank--);
         put("PatternOp0", rank--);
 
-
         put(TaskPunctuation.class, rank--);
-        put(TaskBeliefOccurrence.class, rank--);
 
         put(TaskBeliefOp.class, rank--);
-        put(SubTermStructure.class, rank--);
-
         put(TaskBeliefHas.class, rank--);
 
+        put(SubTermStructure.class, rank--);
 
-
+        put(TaskBeliefOccurrence.class, rank--);
         put(TaskPolarity.class, rank--); //includes both positive or negative
         put(BeliefPolarity.class, rank--);
 

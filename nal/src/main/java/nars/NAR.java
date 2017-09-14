@@ -274,17 +274,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         for (int i = 0; i < valueSummary.length; i++)
             valueSummary[i] = new RecycledSummaryStatistics();
 
-        value[Cause.Purpose.Input.ordinal()] = -0.05f;
-        value[Cause.Purpose.Process.ordinal()] = +0.05f;
+        valueDefaults();
 
-        value[Cause.Purpose.Accurate.ordinal()] = +1f;
-        value[Cause.Purpose.Inaccurate.ordinal()] = -1.0f;
-
-        value[Cause.Purpose.Answer.ordinal()] = +1f;
-        value[Cause.Purpose.Action.ordinal()] = +2f;
-
-
-        //Cause.updates(this);
 
         this.emotion = new Emotion(this);
 
@@ -295,6 +286,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         exe.start(this);
     }
+
 
 
     public void setEmotion(Emotion emotion) {
@@ -1622,7 +1614,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * table of values influencing reasoner heuristics
      */
     public final FasterList<Cause> causes = new FasterList(256);
-    public final float[] value = new float[Cause.Purpose.values().length];
     public final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[value.length];
 
     /**

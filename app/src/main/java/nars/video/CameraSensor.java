@@ -24,7 +24,7 @@ import java.util.function.LongSupplier;
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAgent>, Iterable<CameraSensor<P>.PixelConcept> {
 
 
-    public static final int RADIX = 1;
+    public static final int RADIX = 0;
 
     public final List<PixelConcept> pixels;
     public final CauseChannel<Task> in;
