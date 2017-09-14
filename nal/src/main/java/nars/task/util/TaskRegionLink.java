@@ -11,7 +11,7 @@ public class TaskRegionLink extends TasksRegion {
     @NotNull
     public final Task task;
 
-    TaskRegionLink(Task task, float freq, float conf) {
+    protected TaskRegionLink(Task task, float freq, float conf) {
         super(task.start(), task.end(), freq, freq, conf, conf);
         this.task = task;
     }

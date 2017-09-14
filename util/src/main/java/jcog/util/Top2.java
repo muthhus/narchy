@@ -9,11 +9,12 @@ import java.util.AbstractCollection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @see TopKSelector (guava)
  */
-public final class Top2<T> extends AbstractCollection<T>  {
+public class Top2<T> extends AbstractCollection<T> implements Consumer<T> {
 
     private final FloatFunction<T> rank;
     public T a, b;
@@ -26,6 +27,14 @@ public final class Top2<T> extends AbstractCollection<T>  {
     public Top2(FloatFunction<T> rank, Iterable<T> from) {
         this(rank);
         from.forEach(this::add);
+    }
+
+    /**
+     * resets the best values, effectively setting a the minimum entry requirement
+     */
+    public Top2 min(float min) {
+        this.aa = this.bb = min;
+        return this;
     }
 
     @Override
@@ -50,7 +59,7 @@ public final class Top2<T> extends AbstractCollection<T>  {
     public List<T> toList() {
         if (a != null && b != null) {
             return Lists.newArrayList(a, b);
-        } else if (b == null && a!=null) {
+        } else if (b == null && a != null) {
             return Collections.singletonList(a);
         } else {
             return Collections.emptyList();
@@ -69,7 +78,7 @@ public final class Top2<T> extends AbstractCollection<T>  {
         else if (b == null)
             return Iterators.singletonIterator(a);
         else
-            return Iterators.forArray(a,b);
+            return Iterators.forArray(a, b);
     }
 
     @Override
@@ -85,5 +94,10 @@ public final class Top2<T> extends AbstractCollection<T>  {
 
     public boolean isEmpty() {
         return a == null;
+    }
+
+    @Override
+    public final void accept(T t) {
+        add(t);
     }
 }

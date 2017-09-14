@@ -57,10 +57,6 @@ abstract public class SortedListTable<X, Y> extends ArrayListTable<X, Y> impleme
         return items.remove(removed, this);
     }
 
-    @Override
-    protected final void listAdd(Y i) {
-        items.add(i, this);
-    }
 
     @Override
     protected final void listClear() {

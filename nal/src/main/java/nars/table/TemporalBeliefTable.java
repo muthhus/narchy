@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static nars.truth.TruthFunctions.w2c;
+
 
 public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
@@ -26,12 +28,12 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         if (t.isDeleted())
             return Float.NEGATIVE_INFINITY;
 
-        float fdur = dur;
+        //float fdur = dur;
         return
-                (1f + t.conf()) * //raw because time is considered below. this covers cases where the task eternalizes
+                (t.evi(start, end, dur)) *
                 //t.conf(now, dur) *
                 //t.evi(now, dur) *
-                (1f + t.range()/ fdur)/(1+ t.distanceTo(start, end)/fdur);
+                (1f + t.range()/dur); ///(1+t.distanceTo(start, end)))); ///fdur;
     }
 
     /** finds or generates the strongest match to the specified parameters.

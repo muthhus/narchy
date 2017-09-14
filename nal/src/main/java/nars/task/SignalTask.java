@@ -2,8 +2,10 @@ package nars.task;
 
 
 import nars.Task;
+import nars.table.TemporalBeliefTable;
 import nars.term.Term;
 import nars.truth.Truth;
+import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -16,7 +18,9 @@ public class SignalTask extends NALTask {
     /** because this is an input task, its hash and equality will not depend on this value so it is free to change to represent a growing duration */
     public long slidingEnd;
 
-    public Consumer<Task> stretchKey;
+    /** true passed to update the task with a new futur endpoint,
+     * false parameter signals the stretching end which the table may need to do any finalization */
+    public BooleanProcedure stretchKey;
 
     public SignalTask(@NotNull Term t, byte punct, @NotNull Truth truth, long start, long end, long stamp) {
         super(t, punct, truth, start, start, end,

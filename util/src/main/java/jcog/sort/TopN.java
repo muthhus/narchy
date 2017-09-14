@@ -2,7 +2,9 @@ package jcog.sort;
 
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 
-public class TopN<E> extends SortedArray<E> {
+import java.util.function.Consumer;
+
+public class TopN<E> extends SortedArray<E> implements Consumer<E>  {
 
     private final FloatFunction<E> rank;
     float minSeen = Float.POSITIVE_INFINITY;
@@ -12,23 +14,33 @@ public class TopN<E> extends SortedArray<E> {
         this.rank = (x) -> -rank.floatValueOf(x); //descending
     }
 
+//    /**
+//     * resets the best values, effectively setting a the minimum entry requirement
+//     * untested
+//     */
+//    public TopN min(float min) {
+//        this.minSeen = min;
+//        return this;
+//    }
+
     @Override
     protected float add(E element, float elementRank, FloatFunction<E> cmp, int size) {
         if (size() == list.length && elementRank < minSeen)
             return Float.NaN; //insufficient
 
-        return super.add(element, elementRank, cmp, size);
+        float r = super.add(element, elementRank, cmp, size);
+        if (r==r) {
+            //added
+            if (elementRank < minSeen)
+                minSeen = elementRank;
+        }
+        return r;
     }
 
     @Override
     public boolean add(E e) {
         float r = add(e, rank);
-        if (r == r) {
-            if (r < minSeen)
-                minSeen = r;
-            return true;
-        }
-        return false;
+        return r == r;
     }
 
     @Override
@@ -39,5 +51,10 @@ public class TopN<E> extends SortedArray<E> {
     @Override
     protected E[] newArray(int oldSize) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public final void accept(E e) {
+        add(e);
     }
 }

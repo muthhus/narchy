@@ -73,7 +73,7 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
 //        return null;
 //    }
 
-    protected abstract void listAdd(V i);
+
 
 
     /**

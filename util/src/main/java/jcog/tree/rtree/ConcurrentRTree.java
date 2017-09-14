@@ -20,15 +20,14 @@ package jcog.tree.rtree;
  * #L%
  */
 
-import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.tree.rtree.util.Stats;
-import jcog.util.QueueLock;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -173,6 +172,15 @@ public class ConcurrentRTree<T> implements Space<T> {
         readLock.lock();
         try {
             x.accept(tree);
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    public <Y> Y read(Function<Space<T>,Y> x) {
+        readLock.lock();
+        try {
+            return x.apply(tree);
         } finally {
             readLock.unlock();
         }
@@ -377,13 +385,4 @@ public class ConcurrentRTree<T> implements Space<T> {
         return tree.contains(t, model);
     }
 
-    public void withWriteLock(Consumer<Space<T>> o) {
-        writeLock.lock();
-        try {
-            o.accept(tree);
-        } finally {
-            writeLock.unlock();
-        }
-
-    }
 }
