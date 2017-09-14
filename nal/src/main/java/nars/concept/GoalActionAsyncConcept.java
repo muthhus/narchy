@@ -202,8 +202,8 @@ public class GoalActionAsyncConcept extends ActionConcept {
         LongSupplier stamper = nar.time::nextStamp;
 
         nar.input(
-            feedGoal.set(term, g, stamper, now-dur/2, dur, nar),
-            feedBelief.set(term, f, stamper, now+dur/2, dur, nar)
+            feedGoal.set(term, g, stamper, now, dur, nar),
+            feedBelief.set(term, f, stamper, now, dur, nar)
         );
     }
 

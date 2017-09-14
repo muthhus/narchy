@@ -22,7 +22,6 @@ import java.util.function.IntPredicate;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static nars.truth.TruthFunctions.c2w;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Created by me on 9/30/16.
@@ -373,21 +372,14 @@ public interface NAct {
             float cur = curiosity().floatValue();
             Random rng = n.random();
 
-            if (cur > 0 && rng.nextFloat() <= cur) {
+            float restConf =
+                    //n.confMin.floatValue();
+                    n.confDefault(GOAL) * 0.9f;
+            //n.confDefault(BELIEF);
 
-                f0 = rng.nextFloat(); //bipolar
-                    //0.5f + 0.5f * rng.nextFloat();
 
-                float curiConf =
-                        //n.confMin.floatValue();
-                        n.confDefault(GOAL) * 0.5f;
-                //n.confDefault(BELIEF);
-
-                c0 = curiConf;
-            } else {
-                f0 = g != null ? g.freq() : restFreq;
-                c0 = g != null ? g.conf() : (1 * n.confMin.floatValue());
-            }
+            f0 = g != null ? g.freq() : restFreq;
+            c0 = g != null ? g.conf() : n.confMin.floatValue();
 
 
             int ip = p ? 0 : 1;
@@ -399,17 +391,24 @@ public interface NAct {
 
                 int winner =
                         //Util.decideRoulette(2, (i) -> cc[i], n.random());
-                        Util.decideSoftmax(2, (i) -> cc[i], 0.5f, n.random());
+                        Util.decideSoftmax(2, (i) -> c2w(cc[i]), 0.3f, n.random());
                         //cc[0] > cc[1] ? 0 : 1; //GREEDY
 
                 int loser = 1 - winner;
+
+                //curiosity applied to winner, how ironic
+                if (cur > 0 && rng.nextFloat() <= cur) {
+                    ff[winner] = rng.nextFloat(); //bipolar
+                                 //0.5f + 0.5f * rng.nextFloat(); //unipolar, >=0.5
+                    cc[winner] = restConf;
+                }
 
                 float x = Math.max(0, (ff[winner] - 0.5f)) * 2f; //skip negative half, expand to full range
                 float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
 
                 float conf =
                         cc[winner];
-                        //Util.max(cc[0], cc[1]);
+                //Util.max(cc[0], cc[1]);
 
                 Truth w = y == y ? $.t(
                         (winner == 0 ? y : -y) / 2f + 0.5f, //un-map to unipolar frequency range
@@ -422,7 +421,7 @@ public interface NAct {
                     w = l = //null;
                             $.t(restFreq, conf);
                 }
-                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, w);
+                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, null);
                 ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, null);
             }
         };
