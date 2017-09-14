@@ -4,16 +4,18 @@ import jcog.list.FasterList;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Termed;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Collections.emptyList;
+import static nars.Op.*;
 
 public enum TermLinks {
     ;
+
 
     public static Collection<Termed> templates(Term term) {
 
@@ -25,14 +27,18 @@ public enum TermLinks {
                     //new UnifiedSet<>(id.volume() /* estimate */);
                     new HashSet<>(term.volume());
 
-            TermLinks.addTemplates(term, tc, layers(term));
+            TermLinks.addTemplates(term, tc, 1 + layers(term));
 
             int tcs = tc.size();
+
             if (tcs > 0)
                 return new FasterList<>(tc.toArray(new Termed[tcs])); //store as list for compactness and fast iteration
-        }
+            else
+                return emptyList();
+        } else {
 
-        return emptyList();
+            return List.of(term);
+        }
     }
 
     /** recurses */
@@ -57,11 +63,10 @@ public enum TermLinks {
         if (b.size() == 0)
             return;
 
-
         if (--layersRemain <= 0) // || !b.op().conceptualizable || b.isAny(VAR_QUERY.bit | VAR_PATTERN.bit))
             return;
 
-        int lb = layers(b);
+        int lb = 1 + layers(b);
         layersRemain = Math.min(lb, layersRemain);
 
         for (Term bb : b.subterms()) {
@@ -100,7 +105,7 @@ public enum TermLinks {
         switch (host.op()) {
 
             case PROD:
-                return 2;
+                return 1;
 
             case SETe:
             case SETi:
@@ -113,19 +118,19 @@ public enum TermLinks {
             case DIFFi:
             case SECTi:
             case SECTe:
-                return 2;
+                return 1;
 
             case CONJ:
                 return 2;
 
             case SIM:
-                return 3;
+                return 2;
 
             case INH:
                 return 3;
 
             case IMPL:
-                return 4;
+                return 3;
 
 
 //                int s = host.size();

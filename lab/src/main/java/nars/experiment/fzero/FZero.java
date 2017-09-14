@@ -78,7 +78,7 @@ public class FZero extends NAgentX {
         });//.resolution.setValue(0.02f);
 
         actionBipolar($.the("x"), (x) -> {
-            fz.playerAngle += (x) * Math.pow(rotSpeed, 3);
+            fz.playerAngle += (x) * Math.pow(rotSpeed, 1);
             return x;
         });
 //        actionUnipolar(p("left"), (r) -> {

@@ -69,7 +69,9 @@ public class Emotivation extends Emotion {
         super.onAnswer(question, answer);
 
         //reward answer for answering the question
-        value(Cause.Purpose.Answer, answer.cause(), answer.conf() * question.priSafe(0));
+        float str = answer.conf() * question.priSafe(0);
+        value(Cause.Purpose.Answer, question.cause(), -str);
+        value(Cause.Purpose.Answer, answer.cause(), str);
     }
 
     /**

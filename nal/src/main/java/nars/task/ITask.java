@@ -29,7 +29,7 @@ public interface ITask extends Priority {
     /**
      * note: the first null in the returned array will break the iteration because it means its the end of the list (all following it should also be null)
      */
-    @Nullable Iterable<? extends ITask> run(@NotNull NAR n);
+    @Nullable Iterable<? extends ITask> run(NAR n);
 
     /**
      * special signal a task can return to signal it should be deleted after execution

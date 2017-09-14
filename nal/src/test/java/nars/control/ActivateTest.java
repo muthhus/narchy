@@ -153,6 +153,16 @@ public class ActivateTest {
         testTemplates("((a,b)-y)",
                 "[((a,b)-y), (a,b), y]");
     }
+    @Test public void testTemplateSimProd1() throws Narsese.NarseseException {
+        testTemplates("((a,b)<->#1)",
+                "[(a,b), a, ((a,b)<->#1), b]");
+        testTemplates("(c<->a)",
+                "[(a<->c), a, c]");
+    }
+  @Test public void testTemplatesAreEternal() throws Narsese.NarseseException {
+        testTemplates("((x ==>+1 y),(x ==>+2 y))",
+                "[((x ==>+- y),(x ==>+- y)), (x ==>+- y)]");
+    }
 
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {
         NAR n = NARS.tmp(1);

@@ -402,7 +402,8 @@ public enum Terms {
 
     @Nullable
     public static Term normalizedOrNull(@Nullable Term t, Retemporalize r) {
-        return t.temporalize(r).normalize();
+        Term tt = t.temporalize(r);
+        return tt!=null ? tt.normalize() : null;
     }
 
 

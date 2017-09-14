@@ -31,6 +31,7 @@ public class NAL4NewTest extends AbstractNALTest {
     public void testCompositionFromProductSim() throws nars.Narsese.NarseseException {
 
         test
+                .log()
                 .believe("(soda <-> deadly)", 1.0f, 0.9f)
                 .ask("((soda,food) <-> #x)")
                 .mustBelieve(CYCLES, "((soda,food) <-> (deadly,food))", 1.0f, 0.81f);

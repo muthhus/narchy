@@ -141,27 +141,27 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         List<Concept> localSubConcepts;
         if (!localTemplates.isEmpty()) {
             float subDecay = decayed / localTemplates.size();
-            float balance = Param.TERMLINK_BALANCE;
             Term thisTerm = id.term();
 
             localSubConcepts = $.newArrayList(); //temporary for this function call only, so as not to retain refs to Concepts
 
             Random rng = nar.random();
-            float activationFactor = 1f; //priElseZero();
+            float balance = Param.TERMLINK_BALANCE;
             float subDecayReverse = subDecay * (1f - balance);
             float subDecayForward = subDecay * balance;
             for (Termed localSub : localTemplates) {
 
-                localSub = local(localSub, rng); //for special Termed instances, ex: RotatedInt etc
+                localSub = mutateTermlink(localSub, rng); //for special Termed instances, ex: RotatedInt etc
                 if (localSub instanceof Bool)
                     continue; //unlucky mutation
 
                 float d;
-                if (localSub.op().conceptualizable) {
+                Term localSubTerm = localSub.term();
+                if (!localSubTerm.equals(thisTerm) && localSubTerm.op().conceptualizable) {
 
                     Concept localSubConcept = nar.conceptualize(localSub);
                     if (localSubConcept != null) {
-                        localSubConcept.activate(activationFactor * subDecay, nar);
+                        localSubConcept.activate( subDecay, nar);
 
                         localSubConcept.termlinks().putAsync(
                                 new PLink(thisTerm, subDecayReverse)
@@ -169,14 +169,10 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                         localSubConcepts.add(localSubConcept);
                     }
 
-                    d = subDecayForward;
-
-                } else {
-                    d = subDecay; //full subdecay to the non-concept subterm
                 }
 
                 termlinks.putAsync(
-                    new PLink(localSub.term(), d)
+                    new PLink(localSubTerm, subDecayForward)
                 );
             }
         } else {
@@ -185,10 +181,10 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
 
         List<PriReference<Term>> terml;
-        if (termlinks.isEmpty()) {
+        int tlSampled = Math.min(termlinks.size(), TERMLINKS_SAMPLED);
+        if (tlSampled == 0) {
             return null;
         } else {
-            int tlSampled = Math.min(termlinks.size(), TERMLINKS_SAMPLED);
             terml = $.newArrayList(tlSampled);
             termlinks.sample(tlSampled, ((Consumer<PriReference>) terml::add));
         }
@@ -224,7 +220,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     /**
      * preprocess termlink
      */
-    private static Termed local(Termed x, Random rng) {
+    private static Termed mutateTermlink(Termed x, Random rng) {
 
         if (Param.MUTATE_INT_CONTAINING_TERMS_RATE > 0) {
             Term t = x.term();

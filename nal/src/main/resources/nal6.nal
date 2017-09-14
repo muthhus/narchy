@@ -11,16 +11,24 @@
     //nature of such a rule."
 
     //If after S M happens, and after M P happens, so P happens after S
-    (M ==> P), (S ==> M), neq(S,P) |- (S ==>+- P), (Belief:Deduction)
-        (S ==> M), (M ==> P), neq(S,P) |- (S ==>+- P), (Belief:Deduction)
+    (M ==> P), (S ==> M) |- (S ==>+- P), (Belief:Deduction)
+        (S ==> M), (M ==> P) |- (S ==>+- P), (Belief:Deduction)
 
-    (M ==> S), (M ==> P), neq(S,P) |- (S ==>+- P), (Belief:Abduction)
+    (M ==> S), (M ==> P) |- (S ==>+- P), (Belief:Abduction)
+        (M ==> P), (M ==> S) |- (S ==>+- P), (Belief:Abduction)
 
-    (P ==> M), (S ==> M), neq(S,P) |- (P ==>+- S), (Belief:Induction)
+    (P ==> M), (S ==> M) |- (P ==>+- S), (Belief:Induction)
+        (S ==> M), (P ==> M) |- (P ==>+- S), (Belief:Induction)
 
-    (P ==> M), (M ==> S), neq(S,P) |- (S ==>+- P), (Belief:Exemplification)
-        //(M ==> S), (P ==> M), neq(S,P) |- (S ==>+- P), (Belief:Exemplification)
+    (P ==> M), (M ==> S) |- (S ==>+- P), (Belief:Exemplification)
+        (M ==> S), (P ==> M) |- (S ==>+- P), (Belief:Exemplification)
 
+    //the comparison rules here emulates what Comparison did in generating <=> which are modeled here as a pair of opposing ==>
+    //untested
+//    (P ==> M), (S ==> M) |- (S ==>+- P), (Belief:Comparison)
+//        (P ==> M), (S ==> M) |- (P ==>+- S), (Belief:Comparison)
+//    (M ==> P), (M ==> S) |- (S ==>+- P), (Belief:Comparison)
+//        (M ==> P), (M ==> S) |- (P ==>+- S), (Belief:Comparison)
 
 
 // Contraposition (structural)
@@ -28,7 +36,7 @@
 // original:	    ( --S ==> P),   P |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
 // original:	    ( --S ==> P), --S |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
 
-    ( (--,%S) ==> P), P, task(".") |- ( (--,%P) ==>+- S),       (Belief:Contraposition)
+    ( --S ==> P), P, task(".") |- ( --P ==>+- S), (Belief:Contraposition)
 
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////

@@ -96,8 +96,8 @@ final class CPU<D> {
 
 
         //<custom implemenation which wraps the new items in equally budgeted Budgeted instances
-        float baseRate = 0.5f;
-        float totalTTLConsumption = 2f;
+        float baseRate = 0.25f;
+        float totalTTLConsumption = 3f;
 
         final int input = Math.round(d.ttl * totalTTLConsumption);
         int num = end - start;
