@@ -115,9 +115,10 @@ public class PatrickTests extends AbstractNALTest {
         //Param.TRACE = true;
 
         tt.truthTolerance(0.05f);
-        tt.nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
-        tt.nar.time.dur(2);
-        //tt.nar.truthResolution.setValue(0.1f);
+        //tt.nar.truthResolution.setValue(0.2f);
+        //tt.nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
+        tt.nar.time.dur(5);
+
         //tt.nar.termVolumeMax.setValue(18);
 
 //        tt.nar.onCycle(()->{

@@ -628,7 +628,7 @@ public class TemporalizeTest {
         Map<Term, Time> h = new HashMap();
         Event e = t.solve(r, h);
         assertNotNull(e);
-        assertEquals("((b &&+5 c) &&+5 d)@[5..15]->a", e.toString());
+        assertEquals("((b &&+5 c) &&+5 d)@[6..16]", e.toString());
         assertEquals(6, e.start(h).abs());
     }
 

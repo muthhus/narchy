@@ -396,20 +396,13 @@ public enum Terms {
 
     @Nullable
     @Deprecated public static <T extends Term> T normalizedOrNull(@Nullable Term t) {
-        //return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
-        return (T) t.normalize();
+        return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
+        //return (T) t.normalize();
     }
 
     @Nullable
     public static Term normalizedOrNull(@Nullable Term t, Retemporalize r) {
-
-        if (t.isTemporal()) {
-            //the compound indicated a potential dt, but the premise was actually atemporal;
-            // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
-            return t.temporalize(r);
-        } else {
-            return t.normalize();
-        }
+        return t.temporalize(r).normalize();
     }
 
 

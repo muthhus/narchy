@@ -584,28 +584,28 @@ public class Temporalize implements ITemporalize {
                 }
 
 
-                //HACK try this trick: fully anonymous match
-                if (!constraints.isEmpty()) {
-                    Term xRoot = x.eternal();
-                    if (x.equals(xRoot)) {
-                        int xRootStr = xRoot.structure();
-                        int xRootVol = xRoot.volume();
-                        for (Term y : constraints.keySet()) {
-                            if (y.hasAll(xRootStr) && y.volume() >= xRootVol && y.eternalEquals(xRoot)) {
-                                Event e = solve(y, trail);
-                                if (e != null) {
-                                    if (e.term.op() == NEG)
-                                        e = e.neg();
-                                    return e;
-//                                    return (e.term.op() == NEG ^ o == NEG) ?
-//                                            e.neg()  //negate, because the root term will always be unneg
-//                                            :
-//                                            e;
-                                }
-                            }
-                        }
-                    }
-                }
+//                //HACK try this trick: fully anonymous match
+//                if (!constraints.isEmpty()) {
+//                    Term xRoot = x.eternal();
+//                    if (x.equals(xRoot)) {
+//                        int xRootStr = xRoot.structure();
+//                        int xRootVol = xRoot.volume();
+//                        for (Term y : constraints.keySet()) {
+//                            if (y.hasAll(xRootStr) && y.volume() >= xRootVol && y.eternalEquals(xRoot)) {
+//                                Event e = solve(y, trail);
+//                                if (e != null) {
+//                                    if (e.term.op() == NEG)
+//                                        e = e.neg();
+//                                    return e;
+////                                    return (e.term.op() == NEG ^ o == NEG) ?
+////                                            e.neg()  //negate, because the root term will always be unneg
+////                                            :
+////                                            e;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
 
 //                {
 //                    /* failed to find the sequential case: >=2 or more, so dt=DTERNAL or dt=0 */
