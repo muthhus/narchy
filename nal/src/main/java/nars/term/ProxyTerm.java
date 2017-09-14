@@ -5,6 +5,7 @@ import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import nars.term.transform.CompoundTransform;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
@@ -58,6 +59,16 @@ public class ProxyTerm<T extends Term> implements Term {
     @Override
     public int structure() {
         return ref.structure();
+    }
+
+    @Override
+    public @Nullable Term transform(@NotNull CompoundTransform t, Compound parent) {
+        return ref.transform(t, parent);
+    }
+
+    @Override
+    public @Nullable Term transform(int newDT, @NotNull CompoundTransform t) {
+        return ref.transform(newDT, t);
     }
 
     @Override public boolean equals(Object o) {

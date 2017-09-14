@@ -921,7 +921,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
             Term x = srcSubs.sub(i);
 
-            Term y = x.transform(t); //x instanceof Compound ? x.transform(t) : t.apply(this, x);
+            Term y = x.transform(t, this); //x instanceof Compound ? x.transform(t) : t.apply(this, x);
 //            if (y==x)
 //                y = t.apply(null, y);
 
@@ -933,7 +933,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 EllipsisMatch xx = (EllipsisMatch) y;
                 int xxs = xx.size();
                 for (int j = 0; j < xxs; j++) {
-                    @Nullable Term k = xx.sub(j).transform(t);
+                    @Nullable Term k = xx.sub(j).transform(t, this);
                     if (Term.invalidBoolSubterm(k, boolFilter)) {
                         return null;
                     } else {
