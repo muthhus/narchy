@@ -211,10 +211,10 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         return dt;
     }
 
-    @Override
-    public @Nullable Term transform(Op op, int dt, @NotNull CompoundTransform t) {
-        return Compound.super.transform(op, dt, t);
-    }
+//    @Override
+//    public @Nullable Term transform(Op op, int dt, @NotNull CompoundTransform t) {
+//        return Compound.super.transform(op, dt, t);
+//    }
 
     @Override
     @Nullable

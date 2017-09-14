@@ -897,8 +897,14 @@ public interface Compound extends Term, IPair, TermContainer {
         return transform(op(), newDT, t);
     }
 
+    @Override
     @Nullable
-    default Term transform(Op op, int dt, @NotNull CompoundTransform t) {
+    default Term transform(@NotNull CompoundTransform t, Compound parent) {
+        return transform(t); //ignore parent
+    }
+
+    @Nullable
+    private Term transform(Op op, int dt, @NotNull CompoundTransform t) {
 
         if (!t.testSuperTerm(this))
             return this;
@@ -914,7 +920,8 @@ public interface Compound extends Term, IPair, TermContainer {
         for (int i = 0; i < s; i++) {
 
             Term x = srcSubs.sub(i);
-            Term y = x.transform(this, t);
+
+            Term y = x.transform(t); //x instanceof Compound ? x.transform(t) : t.apply(this, x);
 //            if (y==x)
 //                y = t.apply(null, y);
 
@@ -926,7 +933,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 EllipsisMatch xx = (EllipsisMatch) y;
                 int xxs = xx.size();
                 for (int j = 0; j < xxs; j++) {
-                    @Nullable Term k = xx.sub(j).transform(this, t);
+                    @Nullable Term k = xx.sub(j).transform(t);
                     if (Term.invalidBoolSubterm(k, boolFilter)) {
                         return null;
                     } else {
@@ -953,29 +960,22 @@ public interface Compound extends Term, IPair, TermContainer {
 //            //same concurrency, just change dt, keep subterms
 //            return src.dt(dt);
 //        }
+        Term y;
         if (subtermMods > 0 || op != this.op()/* || dt != src.dt()*/) {
 
             //if (target.internable())
-            return op.the(dt, target.theArray());
+            y = op.the(dt, target.theArray());
             //else
             //return Op.compound(op, target.theArray(), false).dt(dt); //HACK
 
         } else if (dt != this.dt()) {
-            return this.dt(dt);
+            y = this.dt(dt);
         } else {
-            return this;
+            y = this;
         }
+        return y!=null ? t.apply(null, y) : null;
     }
-    @Override
-    @Nullable
-    default Term transform(Compound parent, CompoundTransform t) {
-        Term x = transform(t);
-        if (x == null)
-            return null;
 
-        return t.apply(null, x);
-        //return t.apply(parent, this); //transform(dt(), t); //recurse
-    }
 
     @Override
     default boolean eternalEquals(Term x) {

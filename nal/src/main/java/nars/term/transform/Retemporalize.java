@@ -25,11 +25,17 @@ abstract public class Retemporalize implements CompoundTransform {
     @Nullable
     @Override
     public final Term apply(@Nullable Compound parent, @NotNull Term x) {
-        if (x.hasAny(Op.TemporalBits)) {
+
+        if (parent!=null && x.hasAny(Op.TemporalBits)) {
             return x.transform(dt(x), this);
-        } else {
-            return x;
         }
+
+        if (parent == null) {
+            return x.dt(dt(x));
+        }
+
+        return x;
+
     }
 
     abstract public int dt(@NotNull Term x);

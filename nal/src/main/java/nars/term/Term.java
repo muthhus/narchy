@@ -174,6 +174,10 @@ public interface Term extends Termlike, Comparable<Term> {
     default Term transform(@NotNull CompoundTransform t) {
         return t.apply(null, this);
     }
+    @Nullable
+    default Term transform(@NotNull CompoundTransform t, Compound parent) {
+        return t.apply(parent, this);
+    }
 
 
     @Nullable
@@ -182,10 +186,6 @@ public interface Term extends Termlike, Comparable<Term> {
         return t.apply(null, this);
     }
 
-    @Nullable
-    default Term transform(Compound parent, @NotNull CompoundTransform t) {
-        return t.apply(parent, this);
-    }
 
     @Nullable
     default Term transform(@NotNull ByteList path, int depth, Term replacement) {

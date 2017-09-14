@@ -1353,12 +1353,12 @@ public enum Op implements $ {
         if (concurrent(dt)) {
 
 
-            Predicate<Term> del = op==IMPL ? Op.nonEventDelimeter : Op.recursiveCommonalityDelimeter;
+            Predicate<Term> del = op == IMPL ? Op.nonEventDelimeter : Op.recursiveCommonalityDelimeter;
 
             if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
                     (/*subject.equals(predicate) ||*/
                             subject.containsRecursively(predicate, del) ||
-                            predicate.containsRecursively(subject, del)))
+                                    predicate.containsRecursively(subject, del)))
                 //(!(su instanceof Variable) && predicate.contains(su)))
                 return Null; //cyclic
 
@@ -1427,13 +1427,12 @@ public enum Op implements $ {
                 }
 
             }
-        }
 
-        if (subjConj && predConj) {
-            //filter duplicate events
-            int pre = subject.dtRange();
-            int edt = pre + (dt != DTERNAL ? dt : 0);
+
             if (subjConj && predConj) {
+                //filter duplicate events
+                int pre = subject.dtRange();
+                int edt = pre + (dt != DTERNAL ? dt : 0);
 
                 Set<ObjectLongPair<Term>> se = new HashSet();
                 subject.events(se::add);
