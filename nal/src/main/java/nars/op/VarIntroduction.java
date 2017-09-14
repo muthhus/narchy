@@ -31,19 +31,12 @@ public abstract class VarIntroduction {
         if (x.volume() < 2 || !x.hasAny(ConjOrStatementBits))
             return null;
 
-        if (!(x.isNormalized())) {
-            Compound cc = compoundOrNull(normalizedOrNull(x));
-            if (cc == null)
-                return null;
-            x = cc;
-        }
+        boolean inputWasNormalized = x.isNormalized();
 
         List<Term> selections = select(x);
         if (selections == null) return null;
         int sels = selections.size();
         if (sels == 0) return null;
-
-
 
         if (maxSubstitutions >= sels) {
             //
@@ -56,7 +49,7 @@ public abstract class VarIntroduction {
         }
 
 
-        Map<Term,Term> substs = new HashMap<>(1, 1f);
+        Map<Term, Term> substs = new HashMap<>(1, 1f);
 
         int varOffset = x.vars(); //ensure the variables dont collide with existing variables
         boolean found = false;
@@ -74,6 +67,11 @@ public abstract class VarIntroduction {
 
         Term y = x.replace(substs);
         if (!y.equals(x)) {
+            if (inputWasNormalized) {
+                y = y.normalize();
+                if (y == null) return null;
+            }
+
             return Tuples.pair(y, substs);
         } else {
             return null;
@@ -101,18 +99,17 @@ public abstract class VarIntroduction {
     }
 
 
-
-
     @Nullable
     abstract protected FasterList<Term> select(Term input);
 
 
-    /** provides the next terms that will be substituted in separate permutations; return null to prevent introduction */
+    /**
+     * provides the next terms that will be substituted in separate permutations; return null to prevent introduction
+     */
     abstract protected Term next(@NotNull Term input, @NotNull Term selection, int order);
     /*{
         return $.varQuery("c" + iteration);
     }*/
-
 
 
 //    @Nullable

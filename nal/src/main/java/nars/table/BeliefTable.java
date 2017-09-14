@@ -252,28 +252,27 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
             long now = nar.time();
 
-            if (start == ETERNAL) {
-                start = end = now;
-            }
-
 
             Truth aProj = answer.truth(start, end,
                     dur, nar.confMin.floatValue());
             if (aProj != null) {
 
-                Term at = normalizedOrNull(answer.term(), Retemporalize.retemporalizeXTERNALToZero);
-                if (at == null)
+                final Task aa = answer;
+                Task a = Task.tryTask(answer.term(), answer.punc(), aProj, (content, truth) -> {
+                    return new NALTask(
+                            content,
+                            aa.punc(),
+                            truth, now, start, end,
+                            (question != null) ?
+                                    Stamp.zip(aa.stamp(), question.stamp(), 0.5f) : aa.stamp());
+
+                });
+                if (a == null)
                     return null;
 
-                NALTask a = new NALTask(
-                        at,
-                        answer.punc(),
-                        aProj, now, start, end,
-                        (question != null) ?
-                                Stamp.zip(answer.stamp(), question.stamp(), 0.5f) : answer.stamp());
                 a.setPri(answer.priElseZero());
                 if (question != null)
-                    a.cause = Cause.zip(question, answer);
+                    ((NALTask)a).cause = Cause.zip(question, answer);
 
 
                 //            if (Param.DEBUG)

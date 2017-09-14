@@ -525,11 +525,12 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events_neg_pos() {
 
         test
-                .inputAt(1, "--a. :|:")
-                .inputAt(2, "b. :|:")
-                .mustBelieve(cycles, "(--a &&+1 b)", 1.00f, 0.81f, 1, 2)
-                .mustBelieve(cycles, "(--a ==>+1 b)", 1.00f, 0.45f, 1)
-                .mustBelieve(cycles, "(b ==>-1 a)", 0.00f, 0.45f, 2)
+                .log()
+                .inputAt(1, "--b. :|:")
+                .inputAt(2, "a. :|:")
+                .mustBelieve(cycles, "(--b &&+1 a)", 1.00f, 0.81f, 1, 2) //i
+                .mustBelieve(cycles, "(--b ==>+1 a)", 1.00f, 0.45f, 1) //in
+                .mustBelieve(cycles, "(a ==>-1 b)", 0.00f, 0.45f, 2) //ab
         ;
     }
 

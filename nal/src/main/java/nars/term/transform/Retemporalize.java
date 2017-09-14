@@ -13,6 +13,7 @@ abstract public class Retemporalize implements CompoundTransform {
 
 
     public static final Retemporalize retemporalizeAllToDTERNAL = new RetemporalizeAll(DTERNAL);
+    public static final Retemporalize retemporalizeAllToXTERNAL = new RetemporalizeAll(XTERNAL);
     public static final Retemporalize retemporalizeXTERNALToDTERNAL = new RetemporalizeNonXternal(DTERNAL);
     public static final Retemporalize retemporalizeXTERNALToZero = new RetemporalizeNonXternal(0);
 
@@ -44,7 +45,7 @@ abstract public class Retemporalize implements CompoundTransform {
 
         @Override
         public int dt(@NotNull Term x) {
-            return targetDT;
+            return x.op().temporal ? targetDT : DTERNAL;
         }
     }
 
@@ -59,6 +60,8 @@ abstract public class Retemporalize implements CompoundTransform {
 
         @Override
         public int dt(@NotNull Term x) {
+            if (!x.op().temporal) return DTERNAL;
+
             int dt = x.dt();
             return (dt == XTERNAL) ? dtIfXternal : dt;
         }

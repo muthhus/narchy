@@ -34,9 +34,11 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
         Caffeine<Term, Termed> builder = Caffeine.newBuilder().removalListener(this);
         if (capacity > 0) {
-            //builder.maximumSize(capacity);
-            builder.maximumWeight(capacity*10);
-            builder.weigher(w);
+            builder.maximumSize(capacity);
+
+//            builder.maximumWeight(capacity*10);
+//            builder.weigher(w);
+
         } else
             builder.softValues();
 

@@ -1259,14 +1259,14 @@ public enum Op implements $ {
 
             case SIM:
                 if (subject instanceof Bool || predicate instanceof Bool)
-                    return $.the(subject.equals(predicate));
+                    return $.the(subject==predicate );
                 if (subject.eternalEquals(predicate))
                     return True;
                 break;
 
             case INH:
 
-                if (subject == predicate)
+                if (subject.equals(predicate))
                     return True;
                 if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
                     return False;

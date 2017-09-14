@@ -84,20 +84,14 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         int volMax = nar.termVolumeMax.intValue();
 
-        // 1. SUBSTITUTE
+        // 1. SUBSTITUTE and EVAL
+        p.use(Param.TTL_DERIVE_EVAL);
         Term c1 = pattern.transform(p);
 
         if (c1 == null || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
             return true;
 
-        /// 2. EVAL ----
-
-
-        p.use(Param.TTL_DERIVE_EVAL);
         nar.emotion.derivationEval.increment();
-
-//        Term c1 = c1.eval(p); //TODO cache pure eval terms
-
 
 
         // 4. TEMPORALIZE --
@@ -151,7 +145,7 @@ public class Conclusion extends AbstractPred<Derivation> {
                     taskStart = now;
 
                 //if (taskStart != ETERNAL) {
-                if (occ[0]!=ETERNAL && taskStart != ETERNAL && occ[0] < taskStart) {
+                if (occ[0] != ETERNAL && taskStart != ETERNAL && occ[0] < taskStart) {
 
                     long taskDur = occ[1] - occ[0];
                     occ[0] = taskStart;
@@ -166,6 +160,10 @@ public class Conclusion extends AbstractPred<Derivation> {
             occ = Tense.ETERNAL_RANGE;
             c2 = c1;
         }
+
+        c2 = c2.normalize();
+        if (c2 == null)
+            return true;
 
         // 3. VAR INTRO
         if (varIntro) {
@@ -182,14 +180,16 @@ public class Conclusion extends AbstractPred<Derivation> {
 //                m.forEach(d.xy::tryPut); //store the mapping so that temporalization can resolve with it
 //            }
 
+
             c2 = v;
+
         }
 
         //5. VALIDATE FOR TASK TERM
 
         byte punc = p.concPunc;
 
-        assert(punc!=0):
+        assert (punc != 0) :
                 "no punctuation assigned, wtf";
 
         Task t = Task.tryTask(c2, punc, truth, (C, tr) -> {
@@ -233,7 +233,6 @@ public class Conclusion extends AbstractPred<Derivation> {
         }
 
 
-
         float priority = nar.derivePriority(t.term(), t.truth(), punc, p);
         assert (priority == priority);
 
@@ -253,11 +252,12 @@ public class Conclusion extends AbstractPred<Derivation> {
 
     final static BiFunction<Task, Task, Task> DUPLICATE_DERIVATION_MERGE = (pp, tt) -> {
         pp.priMax(tt.pri());
-        ((NALTask)pp).causeMerge(tt);
+        ((NALTask) pp).causeMerge(tt);
         return pp;
     };
 
-    @Nullable private static Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] confGain) {
+    @Nullable
+    private static Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] confGain) {
         DerivationTemporalize dt = d.temporalize;
         if (dt == null) {
             d.temporalize = dt = new DerivationTemporalize(d); //cache in derivation

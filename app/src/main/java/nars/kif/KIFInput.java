@@ -81,7 +81,7 @@ public class KIFInput implements Runnable {
 
     @Override
     public void run() {
-        Set<Compound> beliefs = new TreeSet();
+        Set<Term> beliefs = new TreeSet();
         while (formulaIterator.hasNext()) {
 
             Formula x = formulaIterator.next();
@@ -89,7 +89,7 @@ public class KIFInput implements Runnable {
                 break;
             }
 
-            Compound y = compoundOrNull(formulaToTerm(x));
+            Term y = formulaToTerm(x);
 
             if (y != null)
                 beliefs.add(y);
@@ -103,7 +103,7 @@ public class KIFInput implements Runnable {
         //nar.input( beliefs.stream().map(x -> task(x)) );
 
 //        long[] stamp = { new Random().nextLong() };
-        for (Compound x : beliefs) {
+        for (Term x : beliefs) {
             //output.println(x + ".");
 
 //            try {
@@ -183,7 +183,7 @@ public class KIFInput implements Runnable {
                         System.err.println("instance expects 2 arguments");
                     } else {
                         try {
-                            y = compoundOrNull(Narsese.term("(" + args.get(0) + " --> [" + args.get(1) + "])", false));
+                            y = Narsese.term("(" + args.get(0) + " --> [" + args.get(1) + "])", false);
                         } catch (Narsese.NarseseException e) {
                             e.printStackTrace();
                         }
@@ -233,7 +233,7 @@ public class KIFInput implements Runnable {
 //            case "forall":
 //                y = args.get(1)
             case "exists":
-                y = compoundOrNull(args.get(1)); //skip over the first parameter, since depvar is inherently existential
+                y = args.get(1); //skip over the first parameter, since depvar is inherently existential
                 break;
             case "=>":
                 y = impl(args.get(0), args.get(1), true);

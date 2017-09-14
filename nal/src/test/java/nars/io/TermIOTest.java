@@ -143,7 +143,7 @@ public class TermIOTest {
     @Test
     public void testTaskSerialization() throws Narsese.NarseseException {
         assertEqualSerialize(nar.inputAndGet("<a-->b>."));
-        assertEqualSerialize(nar.inputAndGet("<a-->(b==>c)>!"));
+        assertEqualSerialize(nar.inputAndGet("<a-->(b,c)>!"));
         assertEqualSerialize(nar.inputAndGet("<a-->(b==>c)>?"));
         assertEqualSerialize(nar.inputAndGet("$0.1 (b-->c)! %1.0;0.8%"));
         assertEqualSerialize(nar.inputAndGet("$0.1 (b-->c)! :|: %1.0;0.8%"));

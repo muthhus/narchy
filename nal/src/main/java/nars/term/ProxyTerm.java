@@ -70,6 +70,20 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
 
+    @Override
+    public @NotNull Term eternal() {
+        return ref.eternal();
+    }
+
+    @Override
+    public @NotNull Term conceptual() {
+        return ref.conceptual();
+    }
+
+    @Override
+    public boolean eternalEquals(Term x) {
+        return ref.eternalEquals(x);
+    }
 
     @Override
     public boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent) {

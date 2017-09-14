@@ -587,17 +587,20 @@ public class Temporalize implements ITemporalize {
                 //HACK try this trick: fully anonymous match
                 if (!constraints.isEmpty()) {
                     Term xRoot = x.eternal();
-                    int xRootStr = xRoot.structure();
                     if (x.equals(xRoot)) {
+                        int xRootStr = xRoot.structure();
+                        int xRootVol = xRoot.volume();
                         for (Term y : constraints.keySet()) {
-                            int xRootVol = xRoot.volume();
-                            if (y.hasAll(xRootStr) && y.volume() >= xRootVol && y.eternal().equals(xRoot)) {
+                            if (y.hasAll(xRootStr) && y.volume() >= xRootVol && y.eternalEquals(xRoot)) {
                                 Event e = solve(y, trail);
                                 if (e != null) {
-                                    return (e.term.op() == NEG ^ o == NEG) ?
-                                            e.neg()  //negate, because the root term will always be unneg
-                                            :
-                                            e;
+                                    if (e.term.op() == NEG)
+                                        e = e.neg();
+                                    return e;
+//                                    return (e.term.op() == NEG ^ o == NEG) ?
+//                                            e.neg()  //negate, because the root term will always be unneg
+//                                            :
+//                                            e;
                                 }
                             }
                         }

@@ -66,7 +66,7 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
 
     @Override
     public Term dt(int dt) {
-        return Compound.super.dt(dt);
+        return dt == this.dt ? this : Compound.super.dt(dt);
     }
 
     @Override
@@ -77,6 +77,16 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     @Override
     public @NotNull Term eternal() {
         return Compound.super.eternal();
+    }
+
+    @Override
+    public @NotNull Term conceptual() {
+        return Compound.super.conceptual();
+    }
+
+    @Override
+    public boolean eternalEquals(Term x) {
+        return Compound.super.eternalEquals(x);
     }
 
     @Override
@@ -192,23 +202,33 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return hashDT;
     }
 
     @Override
-    public int dt() {
+    public final int dt() {
         return dt;
+    }
+
+    @Override
+    public @Nullable Term transform(Op op, int dt, @NotNull CompoundTransform t) {
+        return Compound.super.transform(op, dt, t);
     }
 
     @Override
     @Nullable
     public final Term transform(int newDT, @NotNull CompoundTransform t) {
-        return Compound.super.transform(op(), newDT, t);
+        return Compound.super.transform(newDT, t);
     }
 
     @Override
-    public Term term() {
+    public @Nullable Term transform(@NotNull CompoundTransform t) {
+        return Compound.super.transform(t);
+    }
+
+    @Override
+    public final Term term() {
         return this;
     }
 

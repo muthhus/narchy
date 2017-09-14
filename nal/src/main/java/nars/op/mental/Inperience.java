@@ -317,7 +317,7 @@ public class Inperience extends LeakOut {
     }
 
     @Nullable
-    public static Compound reify(@NotNull Task s, Term self) {
+    public static Term reify(@NotNull Task s, Term self) {
 
         Truth tr = s.truth();
         Term[] arg = new Term[1 + 1];
@@ -334,7 +334,7 @@ public class Inperience extends LeakOut {
 
         try {
             Term ff = $.func(reify(s.punc()), arg);
-            return Terms.compoundOrNull(ff.negIf(false));
+            return ff.negIf(false);
 
         } catch (RuntimeException e) {
             logger.error(" {}", e);

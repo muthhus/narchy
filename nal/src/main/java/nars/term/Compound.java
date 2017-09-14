@@ -35,6 +35,7 @@ import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
+import nars.term.transform.Retemporalize;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.list.primitive.ByteList;
@@ -977,77 +978,83 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
+    default boolean eternalEquals(Term x) {
+        return structure()==x.structure() && volume()==x.volume() && op()==x.op() && eternal().equals(x.eternal());
+    }
+
+    @Override
     @NotNull
     default Term eternal() {
-        if (!this.hasAny(Op.TemporalBits))
-            return this;
-
-        TermContainer subs = this.subterms();
-        Term[] s = subs.toArray();
-
-        //1. determine if any subterms (excluding the term itself) get rewritten
-        boolean subsChanged = false;
-        if (subs.hasAny(Op.TemporalBits)) {
-
-            //atemporalize subterms first
-
-            int cs = s.length;
-            for (int i = 0; i < cs; i++) {
-
-                Term xi = s[i];
-
-                Term yi = xi.eternal();
-                if (yi instanceof Bool)
-                    return Null;
-                if (!xi.equals(yi)) {
-                    s[i] = yi;
-                    subsChanged = true;
-                }
-
-            }
-        }
-
-
-        //2. anonymize the term itself if anything has changed.
-        Op o = this.op();
-        int dt = this.dt();
-        int nextDT = !o.temporal ? dt : DTERNAL;
-
-        if (o.temporal)
-            nextDT = XTERNAL;
-
-        if (o.temporal && s.length == 2) {
-
-
-//            if (s.length s[0].equals(s[1])) {
-//                s = new Term[]{s[0], s[0] /* repeated */};
-//                subsChanged = true;
-//            } else
-            if (o.commutative) {
-                if (s[0].compareTo(s[1]) > 0) { //lexical sort
-                    Term x = s[0];
-                    s[0] = s[1];
-                    s[1] = x;
-                    subsChanged = true;
-                }
-            }
-        }
-
-        boolean dtChanging = (nextDT != dt);
-
-        if (!subsChanged && !dtChanging) {
-            return this; //no change is necessary
-        }
-        if (!subsChanged) {
-            s = subs.theArray(); //re-use the instance from the input
-        }
-
-        Term y =
-                subsChanged ? o.the(nextDT, s) : this.dt(nextDT);
-        if (y == null)
-            return Null;
-
-        return y;
+        return temporalize(Retemporalize.retemporalizeAllToXTERNAL);
+//        if (!this.hasAny(Op.TemporalBits))
+//            return this;
+//
+//        TermContainer subs = this.subterms();
+//        Term[] s = subs.toArray();
+//
+//        //1. determine if any subterms (excluding the term itself) get rewritten
+//        boolean subsChanged = false;
+//        if (subs.hasAny(Op.TemporalBits)) {
+//
+//            //atemporalize subterms first
+//
+//            int cs = s.length;
+//            for (int i = 0; i < cs; i++) {
+//
+//                Term xi = s[i];
+//
+//                Term yi = xi.eternal();
+//                if (yi instanceof Bool)
+//                    return Null;
+//                if (!xi.equals(yi)) {
+//                    s[i] = yi;
+//                    subsChanged = true;
+//                }
+//
+//            }
+//        }
+//
+//
+//        //2. anonymize the term itself if anything has changed.
+//        Op o = this.op();
+//        int dt = this.dt();
+//        int nextDT = !o.temporal ? dt : DTERNAL;
+//
+//        if (o.temporal)
+//            nextDT = XTERNAL;
+//
+//        if (o.temporal && s.length == 2) {
+//
+//
+////            if (s.length s[0].equals(s[1])) {
+////                s = new Term[]{s[0], s[0] /* repeated */};
+////                subsChanged = true;
+////            } else
+//            if (o.commutative) {
+//                if (s[0].compareTo(s[1]) > 0) { //lexical sort
+//                    Term x = s[0];
+//                    s[0] = s[1];
+//                    s[1] = x;
+//                    subsChanged = true;
+//                }
+//            }
+//        }
+//
+//        boolean dtChanging = (nextDT != dt);
+//
+//        if (!subsChanged && !dtChanging) {
+//            return this; //no change is necessary
+//        }
+//        if (!subsChanged) {
+//            s = subs.theArray(); //re-use the instance from the input
+//        }
+//
+//        Term y =
+//                subsChanged ? o.the(nextDT, s) : this.dt(nextDT);
+//        if (y == null)
+//            return Null;
+//
+//        return y;
     }
 
     @Override

@@ -172,18 +172,14 @@ public interface Term extends Termlike, Comparable<Term> {
 
     @Nullable
     default Term transform(@NotNull CompoundTransform t) {
-        return transform(dt(), t);
+        return t.apply(null, this);
     }
 
 
     @Nullable
     default Term transform(int newDT, @NotNull CompoundTransform t) {
-//         if (y.size() > 0) {
-//                    y = y.transform(t); //recurse
-//                } else {
+        assert(newDT == DTERNAL);
         return t.apply(null, this);
-//                }
-        //return this;
     }
 
     @Nullable
@@ -802,14 +798,14 @@ public interface Term extends Termlike, Comparable<Term> {
      * TODO override in Compound implementations for accelerated root comparison without root() instantiation
      */
     default boolean eternalEquals(Term x) {
-        return eternal().equals(x.eternal());
+        return equals(x);
     }
 
     /**
      * returns this term in a form which can identify a concept, or Null if it can't
      */
     default @NotNull Term conceptual() {
-        return this; //root().unneg();
+        return this;
     }
 
     /**
@@ -869,8 +865,7 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     @Nullable default Term temporalize(Retemporalize r) {
-        Term y = transform(r.dt(this), r);
-        return y!=null ? y.normalize() : null;
+        return transform(r.dt(this), r);
     }
 
 }

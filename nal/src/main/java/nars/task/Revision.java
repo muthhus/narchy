@@ -33,9 +33,9 @@ public class Revision {
 
     @Nullable
     public static Truth revise(@NotNull Truthed a, @NotNull Truthed b, float factor, float minEvi) {
-        float w1 = a.evi();
-        float w2 = b.evi();
-        float w = (w1 + w2) * factor;
+        float w1 = a.evi() * factor;
+        float w2 = b.evi() * factor;
+        float w = (w1 + w2);
         return w <= minEvi ?
                 null :
                 new PreciseTruth(
@@ -297,7 +297,7 @@ public class Revision {
 
         float intermvalDistance = dtDiff(a.term(), b.term());
         int dur = nar.dur();
-        factor *= (1f/(1f+intermvalDistance/ dur));  if (factor < Prioritized.EPSILON) return null;
+        factor *= (1f/(1f+intermvalDistance/ dur)); if (factor < Prioritized.EPSILON) return null;
 
 //            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
 //            float confMax = Util.lerp(temporalOverlap, Math.max(w2c(ae),w2c(be)),  1f);
@@ -327,18 +327,20 @@ public class Revision {
         Interval uu = ai.union(bi);
         long u = uu.length();
         long s = ai.length() + bi.length();
-//        Interval timeOverlap = ai.intersection(bi);
-        /*if (timeOverlap == null && u > 0) */
-        if (u - s <= dur * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS)
-            factor *= (1f + s) / (1f + u);
+        long start = uu.a;
+        long end = uu.b;
+        /** account for how much the merge stretches the truth beyond the range of the inputs */
+        if (u > s && u - s <= dur * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS) {
+            factor *= (Math.max(1f,s) / Math.max(1f,u)); if (factor < Prioritized.EPSILON) return null;
+        }
 
 
         float confMin = nar.confMin.floatValue();
-        Truth rawTruth = revise(a, b, 1, c2w(confMin));
+        Truth rawTruth = revise(a, b, factor, c2w(confMin));
         if (rawTruth == null)
             return null;
 
-        Truth newTruth1 = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), confMin, factor);
+        Truth newTruth1 = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), confMin, 1);
         if (newTruth1 == null)
             return null;
 
@@ -354,19 +356,17 @@ public class Revision {
 
         assert (a.punc() == b.punc());
 
-        float aw = a.isQuestOrQuestion() ? 0 : a.conf(); //question
-        float bw = b.conf();
-
+        float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
+        float bw = b.evi();
         float aProp = aw / (aw + bw);
 
-        boolean negated = false;
         Term cc = null;
 
         Term at = a.term();
         Term bt = b.term();
 
-        Term conceptTerm = at.conceptual();
-        //assert(conceptTerm.equals(bt.conceptual()));
+        Term atEternal = at.eternal();
+        assert(bt.eternalEquals(atEternal));
 
         for (int i = 0; i < Param.MAX_TERMPOLATE_RETRIES; i++) {
             Term t;
@@ -375,7 +375,7 @@ public class Revision {
                 i = Param.MAX_TERMPOLATE_RETRIES; //no need to retry
             } else {
                 t = intermpolate(at, bt, aProp, nar);
-                if (!t.conceptual().equals(conceptTerm))
+                if (!t.eternalEquals(atEternal))
                     continue;
             }
 
@@ -386,7 +386,8 @@ public class Revision {
                 cc = ccp.getOne();
                 assert (cc.isNormalized());
 
-                negated = ccp.getTwo();
+                if (ccp.getTwo())
+                    newTruth1 = newTruth1.neg();
                 break;
             }
         }
@@ -395,9 +396,7 @@ public class Revision {
             return null;
 
 
-        if (negated) {
-            rawTruth = rawTruth.neg();
-        }
+
 
 
         //        if (cc.op() == CONJ) {
@@ -411,8 +410,7 @@ public class Revision {
 //            if (u > s) {
 //                start = end = Util.lerp(aProp, b.mid(), a.mid());
 //            } else {
-        long start = uu.a;
-        long end = uu.b;
+
 //            }
 //        }
 

@@ -330,7 +330,7 @@ public abstract class NQuadsRDF {
             return null;
 
         try {
-            Compound term = /*$.inst*/ compoundOrNull($.inh($.p(subject, object), predicate));
+            Term term = /*$.inst*/ $.inh($.p(subject, object), predicate);
             if (term == null)
                 throw new NullPointerException();
             Task t = new TaskBuilder(term, BELIEF, $.t(1f, nar.confDefault(BELIEF))).apply(nar);

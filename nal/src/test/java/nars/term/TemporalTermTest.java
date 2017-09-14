@@ -99,7 +99,8 @@ public class TemporalTermTest {
         }
     }
 
-    @Test public void testEventsWithRepeatParallel() throws Narsese.NarseseException {
+    @Test
+    public void testEventsWithRepeatParallel() throws Narsese.NarseseException {
 
         assertEquals("[a:0, b:0]",
                 $("(a&|b)").events().toString());
@@ -872,6 +873,40 @@ public class TemporalTermTest {
         //TODO this will require a refactor allowing arbitrary function mapping matched dt source value to a target dt
 //        Term xz = $.terms.retemporalize(t, $.terms.retemporalizeZero);
 //        assertEquals("((--,((--,(o))&|(happy)))&|(--,(happy)))", xz.toString());
+    }
+
+    @Test
+    public void testConceptual() throws Narsese.NarseseException {
+        assertConceptual("((--,(nario,zoom)) &&+- happy)", "((--,(nario,zoom)) && happy)");
+        assertConceptual("((--,(nario,zoom)) &&+- happy)", "--((--,(nario,zoom)) && happy)");
+        assertConceptual("((--,(nario,zoom)) &&+- happy)", "((--,(nario,zoom)) &&+- happy)");
+        assertConceptual("(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))", "(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))");
+
+
+
+        String c = "((--,(nario,zoom)) &&+- (vx &&+- vy))";
+        assertConceptual(
+                //WRONG:"((--,(nario,zoom)) &&+- (vx &&+- vy))"
+                c, "((vx &&+97 vy) &&+156 (--,(nario,zoom)))");
+        assertConceptual(
+                c, "((vx &&+97 vy) &&+100 (--,(nario,zoom)))");
+        assertConceptual(
+                "(((--,(nario,zoom)) &&+- vx) &&+- vy)", "((vx &&+97 vy) &&-100 (--,(nario,zoom)))");
+//        assertConceptual(
+//                c, "((vx &&-97 vy) &&-16 (--,(nario,zoom)))");
+//        assertConceptual(
+//                c, "((vx &&+97 vy) &&-16 (--,(nario,zoom)))");
+//        assertConceptual(
+//                c, "((vx && vy) && (--,(nario,zoom)))");
+//        assertConceptual(
+//                c, "((vx && vy) &&+- (--,(nario,zoom)))");
+//        assertConceptual(
+//                c, "--((vx &| vy) &&+1 (--,(nario,zoom)))");
+
+    }
+
+    static void assertConceptual(String cexp, String c) throws Narsese.NarseseException {
+        assertEquals(cexp, $(c).conceptual().toString());
     }
 
     @Test
