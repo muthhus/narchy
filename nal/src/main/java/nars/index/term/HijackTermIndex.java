@@ -6,7 +6,6 @@ import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import nars.NAR;
-import nars.Param;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.index.term.map.MaplikeTermIndex;
@@ -58,6 +57,10 @@ public class HijackTermIndex extends MaplikeTermIndex {
 
         this.table = new PLinkHijackBag<>(capacity, reprobes) {
 
+            {
+                resize(capacity); //immediately expand to full capacity
+            }
+
             @NotNull
             @Override
             public Termed key(PriReference<Termed> value) {
@@ -87,6 +90,7 @@ public class HijackTermIndex extends MaplikeTermIndex {
 //                assert(!(value.get() instanceof PermanentConcept));
 //            }
         };
+
     }
 
     @Override
@@ -95,32 +99,33 @@ public class HijackTermIndex extends MaplikeTermIndex {
         updater.runMS(updatePeriodMS);
     }
 
-
-    @Override
-    public void commit(Concept c) {
-        get(c.term(), false); //get boost
-    }
+//    @Override
+//    public void commit(Concept c) {
+//        get(c.term(), false); //get boost
+//    }
 
     @Override
     public @Nullable Termed get(@NotNull Term key, boolean createIfMissing) {
         @Nullable PriReference<Termed> x = table.get(key);
         if (x != null) {
-            x.priAdd(getBoost);
-            return x.get(); //cache hit
-        } else {
+            Termed y = x.get();
+            if (y != null) {
+                x.priAdd(getBoost);
+                return y; //cache hit
+            }
+        }
 
-            if (createIfMissing) {
-                Termed kc = conceptBuilder.apply(key);
-                if (kc != null) {
-                    PriReference<Termed> inserted = table.put(new PLink<>(kc, initial));
-                    if (inserted != null) {
-                        return kc;
+        if (createIfMissing) {
+            Termed kc = conceptBuilder.apply(key);
+            if (kc != null) {
+                PriReference<Termed> inserted = table.put(new PLink<>(kc, initial));
+                if (inserted != null) {
+                    return kc;
 //                        Termed ig = inserted.get();
 //                        if (ig.term().equals(kc.term()))
 //                            return ig;
-                    } else {
-                        return null;
-                    }
+                } else {
+                    return null;
                 }
             }
         }
@@ -167,7 +172,9 @@ public class HijackTermIndex extends MaplikeTermIndex {
     }
 
 
-    /** performs an iteration update */
+    /**
+     * performs an iteration update
+     */
     private void update() {
 
         AtomicReferenceArray<PriReference<Termed>> tt = table.map;
@@ -191,7 +198,7 @@ public class HijackTermIndex extends MaplikeTermIndex {
             }
         } finally {
             this.visit = visit;
-            Util.decode(conceptScores, "", 200, (x,v)->{
+            Util.decode(conceptScores, "", 200, (x, v) -> {
                 System.out.println(x + "\t" + v);
             });
             conceptScores.reset();
@@ -206,12 +213,12 @@ public class HijackTermIndex extends MaplikeTermIndex {
         if (tc instanceof PermanentConcept)
             return; //dont touch
 
-        Concept c = (Concept)tc;
-        int score = (int)(score(c)*1000f);
+        Concept c = (Concept) tc;
+        int score = (int) (score(c) * 1000f);
 
         float cutoff = 0.25f;
-        if (conceptScores.getTotalCount() > updateBatchSize/4) {
-            float percentile = (float) conceptScores.getPercentileAtOrBelowValue(score)/100f;
+        if (conceptScores.getTotalCount() > updateBatchSize / 4) {
+            float percentile = (float) conceptScores.getPercentileAtOrBelowValue(score) / 100f;
             if (percentile < cutoff)
                 forget(x, c, (float) cutoff * (1 - percentile));
         }
@@ -221,17 +228,17 @@ public class HijackTermIndex extends MaplikeTermIndex {
 
     protected float score(Concept c) {
         float beliefConf = w2c((float) c.beliefs().stream().mapToDouble(t -> t.evi(now, dur)).average().orElse(0));
-        float goalConf =  w2c((float) c.goals().stream().mapToDouble(t -> t.evi(now, dur)).average().orElse(0));
+        float goalConf = w2c((float) c.goals().stream().mapToDouble(t -> t.evi(now, dur)).average().orElse(0));
         float talCap = c.tasklinks().size() / (1f + c.tasklinks().capacity());
         float telCap = c.termlinks().size() / (1f + c.termlinks().capacity());
-        return Util.or(((talCap+telCap)/2f), (beliefConf + goalConf)/2f) /
-                (1 + ((c.complexity() + c.volume())/2f)/nar.termVolumeMax.intValue());
+        return Util.or(((talCap + telCap) / 2f), (beliefConf + goalConf) / 2f) /
+                (1 + ((c.complexity() + c.volume()) / 2f) / nar.termVolumeMax.intValue());
     }
 
     protected void forget(PriReference<Termed> x, Concept c, float amount) {
         //shrink link bag capacity in proportion to the forget amount
-        c.tasklinks().setCapacity(Math.round(c.tasklinks().capacity() * (1f-amount)));
-        c.termlinks().setCapacity(Math.round(c.termlinks().capacity() * (1f-amount)));
+        c.tasklinks().setCapacity(Math.round(c.tasklinks().capacity() * (1f - amount)));
+        c.termlinks().setCapacity(Math.round(c.termlinks().capacity() * (1f - amount)));
 
         x.priMult(1f - amount);
     }

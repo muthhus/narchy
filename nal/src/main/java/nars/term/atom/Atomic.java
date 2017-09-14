@@ -4,6 +4,7 @@ import jcog.Texts;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
+import nars.index.term.TermContext;
 import nars.term.Term;
 import nars.term.Termlike;
 import org.jetbrains.annotations.NotNull;
@@ -60,6 +61,10 @@ public interface Atomic extends Term {
         return new Atom(id);
     }
 
+    @Override
+    default Term evalSafe(TermContext index, int remain) {
+        return this;
+    }
 
     @NotNull
     @Override

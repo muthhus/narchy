@@ -104,7 +104,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     @Override
     public List<Premise> run(NAR nar) {
         nar.emotion.conceptFires.increment();
-        nar.terms.commit(id); //index cache update
+        //nar.terms.commit(id); //index cache update
 
         final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
 

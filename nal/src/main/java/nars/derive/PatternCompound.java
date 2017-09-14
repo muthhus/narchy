@@ -66,7 +66,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
     }
 
     @Override
-    public Term eval(TermContext index) {
+    public Term evalSafe(TermContext index, int remain) {
         return this; //no evaluations should be applied to patterns
     }
 

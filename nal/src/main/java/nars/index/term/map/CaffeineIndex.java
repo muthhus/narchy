@@ -2,69 +2,35 @@ package nars.index.term.map;
 
 import com.github.benmanes.caffeine.cache.*;
 import nars.Param;
+import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 
-public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<Term,Termed> {
-
-
-//    @NotNull
-//    public final Cache<Termed, Termed> atomics;
-//    @NotNull
-//    private final Map<Termed,Termed> atomics;
-
+public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<Term,Termed>, Executor {
 
     /** holds compounds and subterm vectors */
     @NotNull public final Cache<Term, Termed> concepts;
 
-
-
-
-
-//    private static final Weigher<Term, Termed> weigher = (k, v) -> {
-//
-//        if (v instanceof PermanentConcept) {
-//            return 0; //special concept implementation: dont allow removal
-//        }
-//
-//        //        float beliefCost = (v instanceof CompoundConcept) ?
-////                    (1f - maxConfidence((CompoundConcept)v)) : //discount factor for belief/goal confidence
-////                    0;
-//
-//        //return v.complexity();
-//        return v.volume();
-//
-//        //return Math.round( 1f + 100 * c * beliefCost);
-//        //return Math.round( 1f + 10 * (c*c) * (0.5f + 0.5f * beliefCost));
-//    };
-
-
     final static Weigher<? super Term, ? super Termed> w = (k,v) -> {
         if (v instanceof PermanentConcept) return 0;
         else return
-                (v.complexity() + v.volume())/2;
+                (v.complexity() + v.volume());
                 //v.complexity();
                 //v.volume();
     };
 
-    public CaffeineIndex(long capacity) {
-        this(capacity, null /*MoreExecutors.directExecutor()*/);
-    }
-
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(long capacity, @Nullable Executor exe) {
+    public CaffeineIndex(long capacity) {
         super();
 
-        //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
         Caffeine<Term, Termed> builder = Caffeine.newBuilder().removalListener(this);
         if (capacity > 0) {
@@ -74,20 +40,12 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         } else
             builder.softValues();
 
-        if (Param.DEBUG)
-            builder.recordStats();
+//        if (Param.DEBUG)
+//            builder.recordStats();
 
-
-        if (exe!=null) {
-            builder.executor(exe);
-        }
-
-
+        builder.executor(this);
 
         this.concepts = builder.build();
-
-        //else
-          //  this.subterms = null;
 
     }
 
@@ -184,7 +142,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
 //    @Override
 //    public void commit(Concept c) {
-//        //concepts.getIfPresent(c.term());
+//        concepts.getIfPresent(c.term());
 //    }
 
     //    protected Termed theCompoundCreated(@NotNull Compound x) {
@@ -224,4 +182,11 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     }
 
 
+    @Override
+    public final void execute(@NotNull Runnable command) {
+        if (nar!=null)
+            nar.exe.execute(command);
+        else
+            command.run();
+    }
 }

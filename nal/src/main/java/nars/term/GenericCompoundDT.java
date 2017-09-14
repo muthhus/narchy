@@ -186,6 +186,10 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     }
 
 
+    @Override
+    public int subtermTimeSafe(@NotNull Term x) {
+        return Compound.super.subtermTimeSafe(x);
+    }
 
     @Override
     public int hashCode() {

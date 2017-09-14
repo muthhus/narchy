@@ -52,12 +52,12 @@ public abstract class TermIndex implements TermContext {
 
     abstract public void clear();
 
-    /**
-     * called when a concept has been modified, ie. to trigger persistence
-     */
-    public void commit(Concept c) {
-        //by default does nothing
-    }
+//    /**
+//     * called when a concept has been modified, ie. to trigger persistence
+//     */
+//    public void commit(Concept c) {
+//        //by default does nothing
+//    }
 
     public void start(NAR nar) {
         this.nar = nar;
@@ -113,7 +113,7 @@ public abstract class TermIndex implements TermContext {
             cc.activate(0, nar);
             cc.state(conceptBuilder.init());
         }
-        commit(cc);
+
         return cc;
     }
 

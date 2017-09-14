@@ -8,6 +8,7 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 
@@ -30,7 +31,12 @@ public class Fork extends AbstractPred<Derivation> {
 
     @Override
     public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
-        return fork(Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache));
+        return fork(transformedBranches(f));
+        //return f.apply(this);
+    }
+
+    public PrediTerm[] transformedBranches(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
+        return Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache);
     }
 
     @Override
@@ -66,6 +72,8 @@ public class Fork extends AbstractPred<Derivation> {
         c.fork(d, cache);
         return null;
     }
+
+
 
     //    @Override
 //    public void appendJavaProcedure(@NotNull StringBuilder s) {

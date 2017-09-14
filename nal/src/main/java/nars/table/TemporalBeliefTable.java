@@ -29,11 +29,13 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
             return Float.NEGATIVE_INFINITY;
 
         //float fdur = dur;
+        //float range = t.range();
         return
-                (t.evi(start, end, dur)) *
+                t.evi(start, end, dur)
                 //t.conf(now, dur) *
                 //t.evi(now, dur) *
-                (1f + t.range()/dur); ///(1+t.distanceTo(start, end)))); ///fdur;
+                //* range == 0 ? 1f : (float) (1f + Math.sqrt(t.range()) / dur); ///(1+t.distanceTo(start, end)))); ///fdur
+        ;
     }
 
     /** finds or generates the strongest match to the specified parameters.

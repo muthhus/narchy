@@ -167,9 +167,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
         //beliefFeedback != null ? beliefFeedback : belief; //latch
 
 
-//        if (fb != null) {
-//            SensorConcept.feedback(fb, beliefs(), now, nar);
-//        }
+
 //
 //        Task fg;
 //        boolean latchGoal = false; //experimental
@@ -201,10 +199,16 @@ public class GoalActionAsyncConcept extends ActionConcept {
         int dur = nar.dur();
         LongSupplier stamper = nar.time::nextStamp;
 
+        Task fg;
+        Task fb;
         nar.input(
-            feedGoal.set(term, g, stamper, now, dur, nar),
-            feedBelief.set(term, f, stamper, now, dur, nar)
+            fg = feedGoal.set(term, g, stamper, now, dur, nar),
+            fb = feedBelief.set(term, f, stamper, now, dur, nar)
         );
+
+        if (fb != null) {
+            SensorConcept.feedback(fb, true, beliefs(), now, nar);
+        }
     }
 
 

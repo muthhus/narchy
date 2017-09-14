@@ -40,7 +40,25 @@ public final class AndCondition<D> extends AbstractPred<D> {
 
     @Override
     public PrediTerm<D> transform(Function<PrediTerm<D>, PrediTerm<D>> f) {
-        return new AndCondition(Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache));
+        PrediTerm[] yy = transformedConditions(f);
+        if (yy!=cache)
+            return new AndCondition(yy);
+        else
+            return this;
+    }
+
+    public PrediTerm[] transformedConditions(Function<PrediTerm<D>, PrediTerm<D>> f) {
+        final boolean[] changed = {false};
+        PrediTerm[] yy = Util.map(x -> {
+            PrediTerm<D> y = x.transform(f);
+            if (y != x)
+                changed[0] = true;
+            return y;
+        }, new PrediTerm[cache.length], cache);
+        if (!changed[0])
+            return cache;
+        else
+            return yy;
     }
 
 

@@ -1,9 +1,14 @@
 package nars.derive;
 
+import jcog.Util;
+import jcog.data.graph.AdjGraph;
 import jcog.list.FasterIntArrayList;
 import jcog.list.FasterList;
 import nars.control.Derivation;
-import org.jetbrains.annotations.NotNull;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.transform.CompoundTransform;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -77,10 +82,53 @@ public class TrieExecutor extends AbstractPred<Derivation> {
 
     private final PrediTerm<Derivation> root;
 
+
     public TrieExecutor(PrediTerm<Derivation> root) {
         super(root);
-        this.root = root;
+        this.root = network(root);
+//
+//        value.writeGML(System.out);
+//        System.out.println();
     }
+
+    public PrediTerm<Derivation> network(PrediTerm<Derivation> x) {
+        if (x instanceof Fork) {
+//            CompoundTransform ct = (parent, subterm) -> {
+//                if (subterm instanceof Fork) {
+//
+//                }
+//                return subterm;
+//            };
+//            Choice c = new Choice(Util.map(y -> (AbstractPred)y.transform(ct),
+//                    AbstractPred[]::new, ((Fork)x).cache));
+//
+//            return c;
+            return x;
+        } else {
+            return x;
+        }
+    }
+
+    class Choice extends Fork {
+
+        private final int id;
+
+        protected Choice(PrediTerm[] branches) {
+            super(branches);
+            id = value.addNode(this);
+        }
+
+        @Override
+        public String toString() {
+            return id + "(to=" + cache.length + ")";
+        }
+    }
+
+    class Path {
+
+    }
+    final AdjGraph<Choice,Path> value = new AdjGraph(true);
+
 
     @Override
     public boolean test(Derivation d) {

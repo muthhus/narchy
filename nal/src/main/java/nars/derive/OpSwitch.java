@@ -31,8 +31,17 @@ public final class OpSwitch extends AbstractPred<Derivation> {
     @Override
     public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
         EnumMap<Op, PrediTerm<Derivation>> e2 = cases.clone();
-        e2.replaceAll(((k, v) -> v.transform(f)));
-        return new OpSwitch(subterm, e2);
+        final boolean[] changed = {false};
+        e2.replaceAll(((k, x) -> {
+            PrediTerm<Derivation> y = x.transform(f);
+            if (y != x)
+                changed[0] = true;
+            return y;
+        }));
+        if (!changed[0])
+            return this;
+        else
+            return new OpSwitch(subterm, e2);
     }
 
 

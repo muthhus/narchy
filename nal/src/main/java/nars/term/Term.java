@@ -125,6 +125,7 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
 
+    /** BiPredicate param: child,parent */
     boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent);
 
     default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, Term parent) {
@@ -486,79 +487,9 @@ public interface Term extends Termlike, Comparable<Term> {
      * @return DTERNAL if the subterm was not found
      */
     default int subtermTimeSafe(@NotNull Term x) {
-        if (equals(x))
-            return 0;
-
-        Op op = op();
-        if (!op.temporal) {
-            return DTERNAL;
-        }
-
-        if (!impossibleSubTerm(x)) {
-
-
-            //TODO do shuffled search to return different equivalent results wherever they may appear
-
-
-            int dt = dt();
-            if (dt == XTERNAL) //unknown
-                return DTERNAL;
-
-            @NotNull TermContainer yy = subterms();
-
-            if (op == IMPL) {
-                //only two options
-                Term s0 = yy.sub(0);
-                if (s0.equals(x)) {
-                    return 0;
-                }
-                int s1offset = s0.dtRange() + (dt == DTERNAL ? 0 : dt);
-                Term s1 = yy.sub(1);
-                if (s1.equals(x)) {
-                    return s1offset; //the subject's dtrange + the dt between points to the start of the predicate
-                }
-                if (s0.op() == CONJ) {
-                    int s0d = s0.subtermTimeSafe(x);
-                    if (s0d != DTERNAL)
-                        return s0d;
-                }
-                if (s1.op() == CONJ) {
-                    int s1d = s1.subtermTimeSafe(x);
-                    if (s1d != DTERNAL)
-                        return s1d + s1offset;
-                }
-
-            } else if (op == CONJ) {
-                boolean reverse;
-                int idt;
-                if (dt == DTERNAL || dt == 0) {
-                    idt = 0; //parallel or eternal, no dt increment
-                    reverse = false;
-                } else {
-                    idt = dt;
-                    if (idt < 0) {
-                        idt = -idt;
-                        reverse = true;
-                    } else {
-                        reverse = false;
-                    }
-                }
-
-                int ys = yy.size();
-                int offset = 0;
-                for (int yi = 0; yi < ys; yi++) {
-                    Term yyy = yy.sub(reverse ? ((ys - 1) - yi) : yi);
-                    int sdt = yyy.subtermTimeSafe(x);
-                    if (sdt != DTERNAL)
-                        return sdt + offset;
-                    offset += idt + yyy.dtRange();
-                }
-            }
-
-        }
-
-        return DTERNAL;
+        return equals(x) ? 0 : DTERNAL;
     }
+
 
     /**
      * total span across time represented by a sequence conjunction compound
@@ -772,6 +703,7 @@ public interface Term extends Termlike, Comparable<Term> {
         return this;
     }
 
+    /** for safety, dont override this method. override evalSafe */
     default Term eval(TermContext index) {
         return evalSafe(index, Param.MAX_EVAL_RECURSION);
     }

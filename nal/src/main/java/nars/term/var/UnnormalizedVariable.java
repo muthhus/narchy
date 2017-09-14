@@ -105,10 +105,10 @@ public class UnnormalizedVariable extends AtomicToString implements Variable {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public Term evalSafe(TermContext index, int remain) {
-        throw new UnsupportedOperationException();
-    }
+//    @Override
+//    public Term evalSafe(TermContext index, int remain) {
+//        throw new UnsupportedOperationException();
+//    }
 
     @Override
     public void append(ByteArrayDataOutput out) {

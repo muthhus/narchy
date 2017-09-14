@@ -48,7 +48,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     private int capacity;
 
     /** max fraction of the fully capacity table to compute in a single truthpolation */
-    static final float TRUTHPOLATED_MAX_FRACTION = 0.25f;
+    static final float TRUTHPOLATED_MAX_FRACTION = 0.2f;
 
     public static final float PRESENT_AND_FUTURE_BOOST = 1.5f;
 
@@ -159,9 +159,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task()));
 
 
+                int maxTruths = Math.min(s, Math.round(capacity * TRUTHPOLATED_MAX_FRACTION));
                 TopN<TaskRegion> tt = scan(
-                        new TopN<>(new TaskRegion[Math.min(s, Math.round(capacity * TRUTHPOLATED_MAX_FRACTION))], strongestTask),
-                        start, end, 1);
+                        new TopN<>(new TaskRegion[maxTruths], strongestTask),
+                        start, end, maxTruths);
                 if (!tt.isEmpty()) {
 
                     //                Iterable<? extends Tasked> ii;
@@ -213,7 +214,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         FloatFunction<Task> ts = taskStrength(template, start, end, dur);
         FloatFunction<TaskRegion> strongestTask = t -> +ts.floatValueOf(t.task());
 
-        Top2<TaskRegion> tt = scan(new Top2(strongestTask), start, end, 1);
+        Top2<TaskRegion> tt = scan(new Top2(strongestTask), start, end, 2);
         switch (tt.size()) {
 
             case 0:
