@@ -13,6 +13,7 @@ public class NAL1MultistepTest extends AbstractNALTest {
 
     @Test public void multistepInh2() {
         test.nar.nal(1);
+        test.nar.log();
         new DeductiveChainTest(test, 2, 1000, inh);
     }
 

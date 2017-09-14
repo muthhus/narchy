@@ -4,11 +4,6 @@ import jcog.data.graph.AdjGraph;
 import jcog.list.FasterIntArrayList;
 import jcog.list.FasterList;
 import nars.control.Derivation;
-import nars.derive.op.UnifyTerm;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
 /**
  * stackless recursive virtual machine which
@@ -50,7 +45,8 @@ public class TrieExecutor extends AbstractPred<Derivation> {
     class Path {
 
     }
-    final AdjGraph<PrediTerm,Path> value = new AdjGraph(true);
+
+    final AdjGraph<PrediTerm, Path> value = new AdjGraph(true);
 
 
     @Override
@@ -64,20 +60,25 @@ public class TrieExecutor extends AbstractPred<Derivation> {
         FasterIntArrayList ver = c.ver;
 
         PrediTerm<Derivation> cur = root;
+        //System.out.println(d.time);
         while (true) {
 
+            //System.out.println("\t" + d.ttl + " " + stack.size());
             PrediTerm<Derivation> next = exec(cur, d, c);
 
             if (next == cur) {
                 break; //termination signal
             } else if (next == null) {
-                if ((cur = stack.removeLastElseNull()) == null || !d.revertAndContinue(ver.pop()))
+                if ((cur = stack.removeLastElseNull()) == null)
+                    break;
+                if (!d.revertAndContinue(ver.pop()))
                     break;
             } else {
                 cur = next;
             }
 
         }
+        //System.out.println(d.time + " \t" + d.ttl + " " + stack.size());
 
         return true;
     }

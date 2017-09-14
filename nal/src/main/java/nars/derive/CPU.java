@@ -3,15 +3,19 @@ package nars.derive;
 import jcog.Util;
 import jcog.list.FasterIntArrayList;
 import jcog.list.FasterList;
+import jcog.map.CustomConcurrentHashMap;
 import jcog.pri.Pri;
 import nars.control.Derivation;
 import nars.derive.op.UnifyOneSubterm;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
 import java.util.Arrays;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static jcog.map.CustomConcurrentHashMap.IDENTITY;
+import static jcog.map.CustomConcurrentHashMap.STRONG;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -19,7 +23,7 @@ import static nars.time.Tense.ETERNAL;
  */
 final class CPU<D> {
 
-    static final int stackLimit = 32;
+    static final int stackLimit = 64;
     final FasterIntArrayList ver = new FasterIntArrayList(stackLimit);
     final FasterList<PrediTerm> stack = new FasterList<>(stackLimit);
 
@@ -71,7 +75,7 @@ final class CPU<D> {
         ver.clearFast();
 
         long now = d.time;
-        final int UPDATE_DURATIONS = 1;
+        final int UPDATE_DURATIONS = 2;
         long lastRefresh = CPU.lastRefresh.get();
         if (lastRefresh == ETERNAL || now - lastRefresh >= d.dur * UPDATE_DURATIONS) {
             if (CPU.lastRefresh.compareAndSet(lastRefresh, now)) {
@@ -92,8 +96,8 @@ final class CPU<D> {
 
 
         //<custom implemenation which wraps the new items in equally budgeted Budgeted instances
-        float baseRate = 0.3f;
-        float totalTTLConsumption = 0.8f;
+        float baseRate = 0.5f;
+        float totalTTLConsumption = 2f;
 
         final int input = Math.round(d.ttl * totalTTLConsumption);
         int num = end - start;
@@ -135,7 +139,9 @@ final class CPU<D> {
         //</custom implemenation>
     }
 
-    final static Map<PrediTerm, Float> valueCache = new ConcurrentHashMapUnsafe<>();
+    final static Map<PrediTerm, Float> valueCache = new CustomConcurrentHashMap(
+            STRONG, IDENTITY, STRONG, IDENTITY, 512
+    );
     static final AtomicLong lastRefresh = new AtomicLong(ETERNAL);
     //TODO final static Map<PrediTerm,Function<Derivation,Float>> valueCalculationCache = new ConcurrentHashMap<>();
 
