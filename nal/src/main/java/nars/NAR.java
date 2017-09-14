@@ -1733,12 +1733,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     /**
-     * estimate the value of a cause trace
+     * estimate the priority factor determined by the current value of priority-affecting causes
      */
-    protected float evaluate(Task x, short[] causes) {
+    protected float privaluate(Task x, short[] causes) {
 
-        int numCauses = causes.length;
-        if (numCauses == 0) return 0;
+        int totalCauses = causes.length;
+        if (totalCauses == 0) return 0;
 
         float boost = 0;
         for (short c : causes) {
@@ -1748,11 +1748,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                 continue;
             }
 
-            boost += cause.value();
+            if (cause.privaluate)
+                boost += cause.value();
         }
 
 
-        return boost / numCauses;
+        return boost / totalCauses;
     }
 
     public Cause newCause(Object x) {

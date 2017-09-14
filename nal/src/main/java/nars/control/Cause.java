@@ -29,7 +29,10 @@ public class Cause<X> {
 
     private float value;
 
-        /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
+    /** flag indicating whether the value should be included in aggregations that adjust priority of items */
+    public boolean privaluate = true;
+
+    /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
     public float value() {
         return value;
     }

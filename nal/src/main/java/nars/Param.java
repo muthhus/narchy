@@ -97,7 +97,7 @@ public abstract class Param extends Services<Term,NAR> {
                     32;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(8048);
+    public final MutableInteger matchTTL = new MutableInteger(384);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.2f;
@@ -135,11 +135,11 @@ public abstract class Param extends Services<Term,NAR> {
     public final float[] value = new float[Cause.Purpose.values().length];
 
     protected void valueDefaults() {
-        value[Cause.Purpose.Input.ordinal()] = -0.02f;
+        value[Cause.Purpose.Input.ordinal()] = -0.01f;
         value[Cause.Purpose.Process.ordinal()] = +0.01f;
 
         value[Cause.Purpose.Accurate.ordinal()] = +0.5f;
-        value[Cause.Purpose.Inaccurate.ordinal()] = -2f;
+        value[Cause.Purpose.Inaccurate.ordinal()] = -1f;
 
         value[Cause.Purpose.Answer.ordinal()] = +0.5f;
         value[Cause.Purpose.Action.ordinal()] = +1f;
@@ -284,9 +284,9 @@ public abstract class Param extends Services<Term,NAR> {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 30;
+    public static final int CAUSE_CAPACITY = 16;
 
-    public final static int UnificationStackMax = 72; //how many assignments can be stored in the 'versioning' maps
+    public final static int UnificationStackMax = 32; //how many assignments can be stored in the 'versioning' maps
 
     public static final int UnificationVariableCapInitial = 8;
 

@@ -6,7 +6,6 @@ import jcog.Util;
 import nars.concept.Concept;
 import nars.control.Cause;
 import nars.task.ITask;
-import nars.task.NALTask;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,7 +69,7 @@ public class Emotivation extends Emotion {
 
         //reward answer for answering the question
         float str = answer.conf() * question.priSafe(0);
-        value(Cause.Purpose.Answer, question.cause(), -str);
+        //value(Cause.Purpose.Answer, question.cause(), -str);
         value(Cause.Purpose.Answer, answer.cause(), str);
     }
 
@@ -79,20 +78,18 @@ public class Emotivation extends Emotion {
      */
     public void evaluate(Task x) {
 
-        float gain = nar.evaluate(x, x.cause());
+        float gain = nar.privaluate(x, x.cause());
         assert (gain == gain);
         if (gain != 0) {
 
             float amp = Util.tanhFast(gain) + 1f; //[0..+2]
-            amp = Math.max(amp, 0.1f);
+            //amp = Math.max(amp, 0.1f);
 
-//            amp *= amp; //sharpen, psuedo-logarithmic x^4
-//            amp *= amp;
-
-            x.priMult(amp);
-        } /* else {
-            return x.pri();
-        } */
+            x.priMult(
+                //amp
+                amp*amp
+            );
+        }
     }
 
     @Override

@@ -23,12 +23,12 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
-    float fwdSpeed = 10f;
-    float rotSpeed = 0.4f;
+    float fwdSpeed = 5f;
+    float rotSpeed = 0.2f;
 
     public static void main(String[] args) {
 
-        float fps = 15f;
+        float fps = 10f;
 
         NAgentX.runRT((n) -> {
 

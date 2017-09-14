@@ -161,7 +161,7 @@ public class ActivateTest {
     }
   @Test public void testTemplatesAreEternal() throws Narsese.NarseseException {
         testTemplates("((x ==>+1 y),(x ==>+2 y))",
-                "[((x ==>+- y),(x ==>+- y)), (x ==>+- y)]");
+                "[((x ==>+- y),(x ==>+- y)), (x ==>+- y), x, y]");
     }
 
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {
