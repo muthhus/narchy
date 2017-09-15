@@ -163,50 +163,49 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
     }
 
 
-    public final float add(final E element, FloatFunction<E> cmp) {
+    public final int add(final E element, FloatFunction<E> cmp) {
         float elementRank = cmp.floatValueOf(element);
 
-        return add(element, elementRank, cmp, this.size);
+        return add(element, elementRank, cmp);
     }
 
-    protected float add(E element, float elementRank, FloatFunction<E> cmp, int size) {
-        if (size < binarySearchThreshold)
-            return addLinear(element, elementRank, cmp, size);
+    public int add(E element, float elementRank, FloatFunction<E> cmp) {
+        int s = size;
+        if (s < binarySearchThreshold)
+            return addLinear(element, elementRank, cmp, s);
         else
-            return addBinary(element, elementRank, cmp, size);
+            return addBinary(element, elementRank, cmp, s);
     }
 
-    public float addBinary(E element, float elementRank, FloatFunction<E> cmp, int size) {
+    public int addBinary(E element, float elementRank, FloatFunction<E> cmp, int size) {
         // use the binary search
         final int index = this.findInsertionIndex(elementRank, 0, size - 1, new int[1], cmp);
 
         return insert(element, index, elementRank, cmp, size);
     }
 
-    private float insert(E element, int index, float elementRank, FloatFunction<E> cmp, int size) {
+    private int insert(E element, int index, float elementRank, FloatFunction<E> cmp, int size) {
         final E last = list[size - 1];
 
         boolean added;
         if (index == size || Util.fastCompare(cmp.floatValueOf(last), elementRank) < 0) {
-            added = addEnd(element);
+            return addEnd(element);
         } else {
-            added = (index == -1 ? addEnd(element) : addInternal(index, element));
+            return (index == -1 ? addEnd(element) : addInternal(index, element));
         }
-
-        return added ? elementRank : Float.NaN;
     }
 
-    public float addLinear(E element, float elementRank, FloatFunction<E> cmp, int size) {
+    public int addLinear(E element, float elementRank, FloatFunction<E> cmp, int size) {
         Object[] l = this.list;
         if (size > 0 && l.length > 0) {
             for (int i = 0; i < size; i++) {
                 final E current = (E) l[i];
                 if (0 <= Util.fastCompare(cmp.floatValueOf(current), elementRank)) {
-                    return addInternal(i, element) ? elementRank : Float.NaN;
+                    return addInternal(i, element);
                 }
             }
         }
-        return addEnd(element) ? elementRank : Float.NaN; //add to end
+        return addEnd(element);
     }
 
 
@@ -219,7 +218,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
         return true;
     }
 
-    public boolean addEnd(E e) {
+    public int addEnd(E e) {
         int s = this.size;
         Object[] l = this.list;
         if (l.length == s) {
@@ -227,11 +226,11 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
                 int newLen = Math.max(l.length, s);
                 l = resize(newLen);
             } else {
-                return false;
+                return -1;
             }
         }
         l[this.size++] = e;
-        return true;
+        return s;
     }
 
     protected Object[] resize(int newLen) {
@@ -241,11 +240,11 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
         return list;
     }
 
-    public boolean addInternal(int index, E e) {
+    public int addInternal(int index, E e) {
         int s = this.size;
         if (index > -1 && index < s) {
             this.addAtIndex(index, e);
-            return true;
+            return index;
         } else if (index == s) {
             return this.addEnd(e);
         }
@@ -288,7 +287,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
 //    }
 
     protected static int grow(int oldSize) {
-        return oldSize + 2;
+        return (int) Math.ceil(oldSize * 1.5f);
         //return oldSize == 0 ? 4 : oldSize * 2;
     }
 

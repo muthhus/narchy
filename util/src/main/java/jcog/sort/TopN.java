@@ -24,12 +24,12 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E>  {
 //    }
 
     @Override
-    protected float add(E element, float elementRank, FloatFunction<E> cmp, int size) {
-        if (size() == list.length && elementRank < minSeen)
-            return Float.NaN; //insufficient
+    public int add(E element, float elementRank, FloatFunction<E> cmp) {
+        if (size == list.length && elementRank < minSeen)
+            return -1; //insufficient
 
-        float r = super.add(element, elementRank, cmp, size);
-        if (r==r) {
+        int r = super.add(element, elementRank, cmp);
+        if (r>=0) {
             //added
             if (elementRank < minSeen)
                 minSeen = elementRank;
@@ -39,8 +39,8 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E>  {
 
     @Override
     public boolean add(E e) {
-        float r = add(e, rank);
-        return r == r;
+        int r = add(e, rank);
+        return r >= 0;
     }
 
     @Override

@@ -108,8 +108,7 @@ public class ArrayBagTest {
         a.put(new PLink("x", 0.1f));
         a.put(new PLink("y", 0.2f));
         a.commit(null);
-        a.print();
-        System.out.println();
+        a.print(); System.out.println();
         assertEquals(2, a.size());
 
         assertEquals(0.1f, a.priMin(), 0.01f);

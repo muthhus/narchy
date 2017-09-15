@@ -106,7 +106,6 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     private LinkedList<Y> update(@Nullable Y toAdd, @Nullable Consumer<Y> update) {
 
         int s = size();
-        int c = capacity();
         if (s == 0 && toAdd == null) {
             this.min = this.max = this.mass = 0;
             return null;
@@ -125,6 +124,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
         boolean rejection = false;
         if (toAdd != null) {
+            int c = capacity();
             if (s < c) {
                 //room to add an item
                 items.add(toAdd, this);
@@ -154,23 +154,15 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         }
 
         boolean trashEmpty = trash.isEmpty();
-
-        if (!mustSort && s > 1 && (toAdd != null || (!trashEmpty && !rejection))) {
-            //bag has changed, update:
-            mustSort = true;
-        }
-
         return trashEmpty ? null : trash;
     }
 
 
     protected void ensureSorted() {
-        if (!mustSort)
-            return;
-
-        mustSort = false;
-
-        sort();
+        if (mustSort) {
+            sort();
+            mustSort = false;
+        }
     }
 
     protected void sort() {
@@ -451,10 +443,6 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         if (capacity == 0)
             return null;
 
-        final float p = incoming.pri();
-        if (p != p)
-            return null; //already deleted
-
 //        if (p < Pri.EPSILON) {
 //            if (atCap)
 //                return null; //automatically refuse sub-ther
@@ -462,74 +450,26 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
         X key = key(incoming);
 
-        final boolean[] added = {false};
         final @Nullable List<Y>[] trash = new List[1];
         Y inserted;
 
         synchronized (items) {
 
-            if (capacity == 0) //check again inside the synch
+            if (capacity == 0) //check again, this time inside the synch
                 return null;
 
             inserted = map.compute(key, (kk, existing) -> {
+                Y v;
                 if (existing != null) {
-                    if (existing == incoming) {
-                        //no change
-                        if (overflow != null)
-                            overflow.setValue(p);
-                    } else {
-
-
-                        int s = size();
-                        boolean atCap = s == capacity;
-
-                        int posBefore = items.indexOf(existing, this);
-                        assert(posBefore!=-1);
-
-                        float priBefore = existing.priElseZero();
-                        float oo = mergeFunction.merge(existing /* HACK */, incoming);
-
-                        float delta = existing.priElseZero() - priBefore;
-
-                        if (Math.abs(delta) > Pri.EPSILON) {
-                            items.adjust(posBefore, delta, this);
-
-                            updateRange(delta);
-
-                            if (delta >= Prioritized.EPSILON) {
-                                if (atCap) {
-                                    pressurize(delta);
-                                }
-                            }
-                        }
-
-                        if (oo > Pri.EPSILON && overflow != null)
-                            overflow.add(oo);
-
-
-                    }
-
-                    return existing;
-
+                    v = merge(existing, incoming, overflow);
                 } else {
-
-                    if (size() == capacity) {
-                        pressurize(p);
-
-                        @Nullable LinkedList<Y> trsh = update(incoming, null);
-                        if (trsh != null) {
-                            trash[0] = trsh;
-                            if (trsh.getLast() == incoming)
-                                return null;
-                        }
+                    if (insert(incoming, trash)) {
+                        v = incoming; //success
                     } else {
-                        items.add(incoming, this);
-                        updateRange(p);
+                        v = null;
                     }
-
-                    added[0] = true;
-                    return incoming; //success
                 }
+                return v;
             });
 
 
@@ -538,11 +478,9 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                 //this should be done in a synchronized block along with what happens above
                 trash[0].forEach(x -> {
                     if (x != incoming)
-                        map.remove(key(x));
+                        mapRemove(x);
                 });
             }
-
-            //ensureSorted();
         }
 
         //this can be done outside critical section
@@ -555,10 +493,11 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
         if (inserted == null) {
             onReject(incoming);
-        } else if (added[0]) {
+        } else if (inserted == incoming) {
             onAdd(inserted);
+        } else {
+            //was a merge
         }
-
 
         return inserted;
 
@@ -616,6 +555,63 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
     }
 
+    public boolean insert(@NotNull Y incoming, @Nullable List<Y>[] trash) {
+        if (size() == capacity) {
+            pressurize(pri(incoming));
+
+            @Nullable LinkedList<Y> trsh = update(incoming, null);
+            if (trsh != null) {
+                trash[0] = trsh; //what was displaced
+                if (trsh.getLast() == incoming)
+                    return false; //rejected this one
+            }
+        } else {
+            float p = pri(incoming);
+            int i = items.add(incoming, -p, this); assert(i >= 0);
+            updateRange(p);
+        }
+        return true;
+    }
+
+    public Y merge(Y existing, @NotNull Y incoming, @Nullable MutableFloat overflow) {
+        if (existing == incoming) {
+            //no change
+        } else {
+
+
+            int s = size();
+            boolean atCap = s == capacity;
+
+            int posBefore = items.indexOf(existing, this);
+            assert(posBefore!=-1);
+
+            float priBefore = existing.priElseZero();
+            float oo = mergeFunction.merge(existing /* HACK */, incoming);
+
+            float delta = existing.priElseZero() - priBefore;
+
+            if (Math.abs(delta) > Pri.EPSILON) {
+                items.adjust(posBefore, delta, this);
+
+                updateRange(delta);
+
+                if (delta >= Prioritized.EPSILON) {
+                    if (atCap) {
+                        pressurize(delta);
+                    }
+                }
+            }
+
+            if (oo > Pri.EPSILON && overflow != null)
+                overflow.add(oo);
+        }
+        return existing;
+    }
+
+    public Y mapRemove(Y x) {
+        return map.remove(key(x));
+    }
+
     private void updateRange(float deltaMass) {
         mass += deltaMass;
         min = pri(items.last());
@@ -655,14 +651,11 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
         @Nullable List<Y> trash = null;
         synchronized (items) {
-            if (size() == 0)
-                return;
-
             trash = update(null, update);
 
             if (trash != null) {
                 trash.forEach(t -> {
-                    map.remove(key(t));
+                    mapRemove(t);
                 });
             }
             ensureSorted();
@@ -690,44 +683,6 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
             return 32;
     }
 
-//    /**
-//     * returns whether the items list was detected to be sorted
-//     */
-//    private boolean updateBudget(@NotNull Consumer<Y> each) {
-////        int dirtyStart = -1;
-//        boolean sorted = true;
-//
-//
-//        int s = size();
-//        Object[] l = items.array();
-//        //@NotNull PLink<V> beneath = l[i]; //compares with self below to avoid a null check in subsequent iterations
-//        float pAbove = Float.POSITIVE_INFINITY;
-//        for (int i = s - 1; i >= 0; ) {
-//            Y b = (Y) l[i];
-//
-//            float p;
-//            if (b == null) {
-//                p = -2; //sort nulls to the end of the end
-//            } else {
-//                p = b.priSafe(-2);
-//                if (p >= 0) {
-//                    each.accept(b);
-//                    p = b.priSafe(-2);
-//                }
-//            }
-//
-//            if (pAbove - p < -Priority.EPSILON) {
-//                sorted = false;
-//            }
-//
-//            pAbove = p;
-//            i--;
-//        }
-//
-//
-//        return sorted;
-//    }
-
 
     public @Nullable Y remove(boolean topOrBottom) {
         @Nullable Y x = topOrBottom ? top() : bottom();
@@ -744,7 +699,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         synchronized (items) {
             //map is possibly shared with another bag. only remove the items from it which are present in items
             items.forEach(x -> {
-                map.remove(key(x));
+                mapRemove(x);
                 onRemove(x);
             });
             items.clear();

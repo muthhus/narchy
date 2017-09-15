@@ -37,7 +37,7 @@ public class AgentTest {
 
         final float minRatio = 3f;
 
-        int cycles = 10000;
+        int cycles = 100;
 
         float nextReward = 0;
         IntIntHashMap acts = new IntIntHashMap();

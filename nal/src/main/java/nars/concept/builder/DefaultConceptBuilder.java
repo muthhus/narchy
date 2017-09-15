@@ -1,6 +1,5 @@
 package nars.concept.builder;
 
-import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
@@ -26,6 +25,7 @@ import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,21 +84,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                     new MyDefaultHijackBag(Param.tasklinkMerge)
             };
         }
-
-
-//        public <X> Bag<X, PriReference<X>> newBag(@NotNull Map m, PriMerge blend) {
-//            return new DefaultHijackBag<>(blend, reprobes);
-//        }
-//        public <X> X withBags(Term t, BiFunction<Bag<Term, PriReference<Term>>, Bag<Task, PriReference<Task>>, X> f) {
-//
-//            Bag<Term, PriReference<Term>> termlink =
-//                    new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
-//            //BloomBag<Term> termlink = new BloomBag<Term>(32, IO::termToBytes);
-//
-//            Bag<Task, PriReference<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
-//
-//            return f.apply(termlink, tasklink);
-//        }
 
     }
 
@@ -398,7 +383,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //            return new HashMap(defaultInitialCap, 1f);
             //   if (volume < 16) {
             return new ConcurrentHashMap(0, loadFactor);
-            //return new ConcurrentHashMapUnsafe(0);
+
 //            } else if (volume < 32) {
 //                return new SynchronizedHashMap(0, loadFactor);
 //                //return new TrieMap();
