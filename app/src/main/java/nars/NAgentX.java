@@ -399,7 +399,7 @@ abstract public class NAgentX extends NAgent {
 
         int s = nar.causes.size();
 
-        FloatParam gain = new FloatParam(10f, 0f, 10f);
+        FloatParam gain = new FloatParam(1f, 0f, 10f);
 
         BitmapMatrixView bmp = new BitmapMatrixView((i) ->
                 gain.floatValue() * nar.causes.get(i).value(),

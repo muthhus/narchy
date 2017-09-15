@@ -66,17 +66,11 @@ public abstract class Param extends Services<Term,NAR> {
     public static boolean TRACE;
 
 
-//
-//    /** belief projection lookahead time in premise formation, in multiples of duration */
-//    public static final int PREDICTION_HORIZON = 4;
-
-    /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
-    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS = 2;
 
     public static final PriMerge termlinkMerge = PriMerge.max;
     public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
     public static final PriMerge premiseMerge = PriMerge.max;
-    public static final PriMerge taskMerge = PriMerge.max;
+    //public static final PriMerge taskMerge = PriMerge.max;
     public static final PriMerge conceptActivate = PriMerge.plus;
 
 
@@ -118,13 +112,13 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int TTL_DERIVE_TASK_SUCCESS = 10;
 
     /** cost of a repeat (of another within the premise's batch) task derivation */
-    public static final int TTL_DERIVE_TASK_REPEAT = 15;
+    public static final int TTL_DERIVE_TASK_REPEAT = 10;
 
     /** cost of a task derived, but too similar to one of its parents */
-    public static final int TTL_DERIVE_TASK_SAME = 15;
+    public static final int TTL_DERIVE_TASK_SAME = 10;
 
     /** cost of a failed/aborted task derivation */
-    public static final int TTL_DERIVE_TASK_FAIL = 15;
+    public static final int TTL_DERIVE_TASK_FAIL = 10;
 
     /** number between 0 and 1 controlling the proportion of activation going
      * forward (compound to subterms) vs. reverse (subterms to parent compound).
@@ -132,16 +126,24 @@ public abstract class Param extends Services<Term,NAR> {
      * so 0.5 is equal amounts for both. */
     public static final float TERMLINK_BALANCE = 0.5f;
 
+//
+//    /** belief projection lookahead time in premise formation, in multiples of duration */
+//    public static final int PREDICTION_HORIZON = 4;
+
+    /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
+    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS = 1;
+
+
     public final float[] value = new float[Cause.Purpose.values().length];
 
     protected void valueDefaults() {
         value[Cause.Purpose.Input.ordinal()] = -0.01f;
         value[Cause.Purpose.Process.ordinal()] = +0.01f;
 
-        value[Cause.Purpose.Accurate.ordinal()] = +0.5f;
+        value[Cause.Purpose.Accurate.ordinal()] = +1f;
         value[Cause.Purpose.Inaccurate.ordinal()] = -1f;
 
-        value[Cause.Purpose.Answer.ordinal()] = +0.5f;
+        value[Cause.Purpose.Answer.ordinal()] = +1f;
         value[Cause.Purpose.Action.ordinal()] = +1f;
     }
 
@@ -284,7 +286,7 @@ public abstract class Param extends Services<Term,NAR> {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 16;
+    public static final int CAUSE_CAPACITY = 24;
 
     public final static int UnificationStackMax = 32; //how many assignments can be stored in the 'versioning' maps
 

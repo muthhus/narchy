@@ -110,9 +110,10 @@ public class Line1D {
                 }
             };
             exp.floatValueOf(n);
-            exp.agent.durations.setValue(2);
-            n.termVolumeMax.set(16);
-            n.time.dur(4);
+            exp.agent.durations.setValue(1);
+            n.truthResolution.setValue(0.1f);
+            n.termVolumeMax.set(9);
+            n.time.dur(1);
 //            n.beliefConfidence(0.5f);
 //            n.goalConfidence(0.5f);
 
@@ -153,7 +154,7 @@ public class Line1D {
     static class Line1DExperiment implements FloatFunction<NAR> {
 
 
-        float tHz = 0.001f; //in time units
+        float tHz = 0.005f; //in time units
         float yResolution = 0.05f; //in 0..1.0
         float periods = 16;
 
