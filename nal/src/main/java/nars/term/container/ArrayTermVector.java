@@ -19,7 +19,7 @@ import static nars.Op.Null;
 public class ArrayTermVector extends TermVector {
 
     @NotNull
-    public final Term[] terms;
+    private Term[] terms;
 
     public ArrayTermVector(@NotNull Collection<Term> terms) {
         this(terms.toArray(new Term[terms.size()]));
@@ -33,25 +33,52 @@ public class ArrayTermVector extends TermVector {
     @Override
     public final boolean equals(@NotNull Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof TermContainer)) return false;
 
-        TermContainer c = (TermContainer) obj;
-        if (hash!=c.hashCodeSubTerms())
-            return false;
+        @NotNull final Term[] x = this.terms;
+        if (obj instanceof ArrayTermVector) {
+            //special case for ArrayTermVector fast compare and sharing
+            ArrayTermVector c = (ArrayTermVector) obj;
+            Term[] y = c.terms;
+            if (x == y)
+                return true;
 
-        int s = terms.length;
-        if (s != c.size())
-            return false;
-        for (int i = 0; i < s; i++) {
-            if (!terms[i].equals(c.sub(i))) {
+            if (hash != c.hash)
                 return false;
+
+            int s = x.length;
+            if (s != y.length)
+                return false;
+            for (int i = 0; i < s; i++) {
+                Term xx = x[i];
+                Term yy = y[i];
+                if (xx == yy) {
+                    continue;
+                } else if (!xx.equals(yy)) {
+                    return false;
+                } else {
+                    x[i] = yy; //share
+                }
             }
-            /*else {
-                //share the ref
-                terms[i] = y;
-            }*/
+
+            terms = y; //share since array is equal
+
+            return true;
+
+        } else if (obj instanceof TermContainer) {
+
+            TermContainer c = (TermContainer) obj;
+            if (hash != c.hashCodeSubTerms())
+                return false;
+
+            int s = x.length;
+            if (s != c.size())
+                return false;
+            for (int i = 0; i < s; i++)
+                if (!x[i].equals(c.sub(i)))
+                    return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
 

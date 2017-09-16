@@ -407,8 +407,8 @@ public interface NAct {
                 float winnerBase = Math.max(0, (ff[winner] - 0.5f));
                 float x =
                         //winnerBase + loserBoost;
-                        Util.or(winnerBase, loserBoost);
-                        //winnerBase * 2f; //skip negative half, expand to full range
+                        //Util.or(winnerBase, loserBoost);
+                        winnerBase * 2f; //skip negative half, expand to full range
                 float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
 
                 float conf =

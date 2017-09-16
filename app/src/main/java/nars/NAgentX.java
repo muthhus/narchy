@@ -112,8 +112,8 @@ abstract public class NAgentX extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
 
-        Builder.Subterms.the = Builder.Subterms.WeakSubtermBuilder.get();
-        Builder.Compound.the = Builder.Compound.CaffeineCompoundBuilder.get();
+        //Builder.Subterms.the = Builder.Subterms.WeakSubtermBuilder.get();
+        //Builder.Compound.the = Builder.Compound.CaffeineCompoundBuilder.get();
 
         float durFPS =
                 fps;

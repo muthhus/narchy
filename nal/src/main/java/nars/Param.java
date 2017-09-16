@@ -216,8 +216,8 @@ public abstract class Param extends Services<Term,NAR> {
             decayRate *= 0.5f;
         }
 
-        //return p;
-        return Util.lerp(1f, decayRate, t.originality()) * d.premisePri; //more lenient derivation budgeting priority reduction in proportion to lack of originality
+        return decayRate * d.premisePri;
+        //return Util.lerp(1f, decayRate, t.originality()) * d.premisePri; //more lenient derivation budgeting priority reduction in proportion to lack of originality
     }
 
 

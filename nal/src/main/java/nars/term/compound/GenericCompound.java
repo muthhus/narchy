@@ -17,7 +17,7 @@ public class GenericCompound implements Compound {
      * subterm vector
      */
     @NotNull
-    protected final TermContainer subterms;
+    private TermContainer subterms;
 
 
     /**
@@ -105,7 +105,24 @@ public class GenericCompound implements Compound {
 
     @Override
     public final boolean equals(@Nullable Object that) {
-        return Compound.equals(this, that);
+        if (this==that) return true;
+
+        if (Compound.equals(this, that)) {
+            if (that instanceof GenericCompound) {
+                equivalent((GenericCompound)that);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /** data sharing */
+    private void equivalent(GenericCompound that) {
+        subterms = ((GenericCompound) that).subterms;
+        if (normalized ^ that.normalized) {
+            //one of them is normalized so both must be
+            this.normalized = that.normalized = true;
+        }
     }
 
 
