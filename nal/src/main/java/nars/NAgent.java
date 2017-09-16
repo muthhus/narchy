@@ -208,21 +208,27 @@ abstract public class NAgent extends DurService implements NSense, NAct {
             //this.curiosityAttention = reinforcementAttention / actions.size();
 
             /** set the sensor budget policy */
-
             {
-                Task happyEternal = nar.goal(happy.term()); /* eternal */
+                Task e = nar.goal($.conj(happy.term(),sad.term().neg())); /* eternal */
                 predictors.add(() -> {
-                    happyEternal.priMax(nar.priDefault(GOAL));
-                    return happyEternal;
+                    e.priMax(nar.priDefault(GOAL));
+                    return e;
                 });
             }
-            {
-                Task sadEternal = nar.goal(sad.term().neg()); /* eternal */
-                predictors.add(() -> {
-                    sadEternal.priMax(nar.priDefault(GOAL));
-                    return sadEternal;
-                });
-            }
+//            {
+//                Task happyEternal = nar.goal(happy.term()); /* eternal */
+//                predictors.add(() -> {
+//                    happyEternal.priMax(nar.priDefault(GOAL));
+//                    return happyEternal;
+//                });
+//            }
+//            {
+//                Task sadEternal = nar.goal(sad.term().neg()); /* eternal */
+//                predictors.add(() -> {
+//                    sadEternal.priMax(nar.priDefault(GOAL));
+//                    return sadEternal;
+//                });
+//            }
 
             //temporal happy
 //            predictors.add(

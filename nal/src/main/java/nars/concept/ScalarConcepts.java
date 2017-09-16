@@ -205,9 +205,11 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
         int i = 0;
         for (Term s : states) {
             final int ii = i++;
-            sensors.add(new SensorConcept(s, nar, ()->truther.truth(asFloat(), ii, numStates),
+            SensorConcept sc = new SensorConcept(s, nar, () -> truther.truth(asFloat(), ii, numStates),
                     (x) -> $.t(x, nar.confDefault(BELIEF))
-            ));
+            );
+            nar.on(sc);
+            sensors.add(sc);
         }
 
 

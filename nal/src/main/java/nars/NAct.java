@@ -446,9 +446,6 @@ public interface NAct {
 //        nar().goal(p.term(), restFreq, cm);
 //        nar().goal(n.term(), restFreq, cm);
 
-        float resolution = 0.01f;
-        p.resolution(resolution);
-        n.resolution(resolution);
     }
 
 //    default void actionBipolarMutex3(@NotNull Term s, @NotNull FloatToFloatFunction update) {

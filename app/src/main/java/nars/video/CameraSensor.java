@@ -160,7 +160,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     public CameraSensor resolution(float resolution) {
         this.resolution = resolution;
-        pixels.forEach(p -> p.resolution(resolution));
         return this;
     }
 
@@ -180,7 +179,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     public void accept(NAgent a) {
 
 
-        resolution( Util.round((0.5f * (Util.tanhFast(in.value())+1)) * 0.5f, 0.02f) );
+        resolution( Util.round((0.5f * (Util.tanhFast(-in.value())+1)) * 0.5f, 0.02f) );
 
 
         src.update(1);
@@ -220,6 +219,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         PixelConcept(Term cell, int x, int y, NAR nar) {
             super(cell, nar, null, brightnessTruth);
             setSignal(() -> Util.unitize(src.brightness(x, y)));
+            this.resolution = ()->CameraSensor.this.resolution;
 
             //            this.x = x;
 //            this.y = y;

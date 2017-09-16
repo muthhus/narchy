@@ -41,12 +41,12 @@ public abstract class PixelBag implements Bitmap2D {
     public final float[][] pixels;
 
     /* > 0 */
-    float minZoomOut = 0.01f;
+    float minZoomOut = 0.05f;
 
     /**
      * increase >1 to allow zoom out beyond input size (ex: thumbnail size)
      */
-    float maxZoomOut = 1.5f;
+    float maxZoomOut = 1.25f;
 
     public boolean vflip;
     public List<ActionConcept> actions;
@@ -54,7 +54,7 @@ public abstract class PixelBag implements Bitmap2D {
     private float fg = 1f;
     private float fb = 1f;
     float minClarity = 1f, maxClarity = 1f;
-    private final boolean inBoundsOnly = true;
+    private final boolean inBoundsOnly = false;
 
 
     public static PixelBag of(Supplier<BufferedImage> bb, int px, int py) {

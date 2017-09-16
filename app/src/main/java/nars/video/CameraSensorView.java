@@ -63,12 +63,12 @@ public class CameraSensorView extends BitmapMatrixView implements BitmapMatrixVi
         Truth d = s.goals().truth(now, now+dur, nar);
         float R = bf*0.75f, G = bf*0.75f, B = bf*0.75f;
         if (d!=null) {
-            float f = d.freq();
+            float f = d.expectation();
             //float c = d.conf();
             if (f > 0.5f) {
-                G += 0.25f * f;
+                G += 0.25f * (f - 0.5f)*2f;
             } else {
-                R += 0.25f * f;
+                R += 0.25f * (0.5f - f)*2f;
             }
         }
 

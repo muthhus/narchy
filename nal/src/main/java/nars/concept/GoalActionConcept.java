@@ -89,12 +89,6 @@ public class GoalActionConcept extends ActionConcept {
         return v;
     }
 
-    public GoalActionConcept resolution(float r) {
-        resolution.setValue(r);
-        return this;
-    }
-
-
     @Override public Stream<Task> update(long now, int dur, NAR nar) {
 
 
@@ -125,7 +119,7 @@ public class GoalActionConcept extends ActionConcept {
 ////            if (cc > 0) {
 //
             float f =
-                    Util.round(nar.random().nextFloat(), resolution.floatValue());
+                    Util.round(nar.random().nextFloat(), resolution.asFloat());
 ////                    ((float)Math.sin(
 ////                        hashCode() /* for phase shift */
 ////                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;

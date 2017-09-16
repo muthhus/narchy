@@ -68,8 +68,7 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E>  {
     @Override
     public E remove(int index) {
         E e = super.remove(index);
-        if (size == 0)
-            minSeen = Float.NEGATIVE_INFINITY;
+        minSeen = Float.POSITIVE_INFINITY;
         return e;
     }
 

@@ -137,7 +137,7 @@ public abstract class Param extends Services<Term,NAR> {
     public final float[] value = new float[Cause.Purpose.values().length];
 
     protected void valueDefaults() {
-        value[Cause.Purpose.Input.ordinal()] = -1f;
+        value[Cause.Purpose.Input.ordinal()] = -0.2f;
         value[Cause.Purpose.Process.ordinal()] = +0.1f; //knowledge for its own sake has some value but it should satisfy other values to compensate for the input cost
 
         value[Cause.Purpose.Accurate.ordinal()] = +1f;
@@ -191,31 +191,33 @@ public abstract class Param extends Services<Term,NAR> {
         //return 0;
     }
 
-    public float derivePriority(Term t, Truth tr, byte punc, @NotNull Derivation d) {
+    public float derivePriority(Task t, @NotNull Derivation d) {
         //float p = 1f / (1f + ((float)t.complexity())/termVolumeMax.floatValue());
 
-        float p = d.premisePri;
+        float decayRate = 1f;
+
         int dCompl = t.complexity();
         int pCompl = d.parentComplexity;
         float relGrowth =
                 unitize(((float)dCompl) / (dCompl + pCompl)); //1 - (proportion of its complexity / (its complexity + parent complexity) )
 
-        p *= 1f - 0.5f * Util.sqr(relGrowth);
+        decayRate *= 1f - 0.5f * Util.sqr(relGrowth);
 
+        Truth tr = t.truth();
         if (/* belief or goal */ tr!=null) {
 
             //prefer confidence, relative to the premise which formed it
             float relConf = unitize(tr.conf() / d.premiseConf);
-            p *= relConf;
+            decayRate *= relConf;
 
             //prefer polarized
             //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));
         } else {
-            p *= 0.5f;
+            decayRate *= 0.5f;
         }
 
         //return p;
-        return p;
+        return Util.lerp(1f, decayRate, t.originality()) * d.premisePri; //more lenient derivation budgeting priority reduction in proportion to lack of originality
     }
 
 

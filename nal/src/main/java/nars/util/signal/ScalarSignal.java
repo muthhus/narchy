@@ -1,7 +1,7 @@
 package nars.util.signal;
 
 import jcog.Util;
-import jcog.data.FloatParam;
+import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Task;
 import nars.task.SignalTask;
@@ -45,7 +45,7 @@ public class ScalarSignal extends Signal implements  DoubleSupplier {
 
 
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Term t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, FloatParam resolution) {
+    public ScalarSignal(@NotNull NAR n, @NotNull Term t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, FloatSupplier resolution) {
         super(BELIEF, resolution);
 
         pri(()->n.priDefault(BELIEF));

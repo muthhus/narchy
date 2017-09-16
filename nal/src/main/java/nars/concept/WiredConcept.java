@@ -1,6 +1,7 @@
 package nars.concept;
 
 import jcog.data.FloatParam;
+import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Param;
 import nars.table.BeliefTable;
@@ -25,11 +26,12 @@ import org.jetbrains.annotations.NotNull;
  * */
 public class WiredConcept extends BaseConcept implements PermanentConcept {
 
-    public final FloatParam resolution = new FloatParam(Param.TRUTH_EPSILON);
+    public static final FloatSupplier DEFAULT_RESOLUTION = () -> 0.01f;
+    public FloatSupplier resolution;
 
     protected WiredConcept(@NotNull Term term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
         super(term, beliefs, goals, n.terms.conceptBuilder);
-        resolution.setValue(n.truthResolution);
+        resolution = DEFAULT_RESOLUTION;
     }
 
 

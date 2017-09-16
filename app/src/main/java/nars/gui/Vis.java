@@ -399,10 +399,16 @@ public class Vis {
             plot1.add("Dex", a::dexterity, 0f, 1f);
 
             plot4.add("Hpy", () -> {
-                return a.happy.signal.asFloat();
+                return a.happy.beliefs().freq(a.now, a.nar);
+            }, 0, 1f);
+            plot4.add("WantHpy", () -> {
+                return a.happy.goals().freq(a.now, a.nar);
             }, 0, 1f);
             plot4.add("Sad", () -> {
-                return a.sad.signal.asFloat();
+                return a.sad.beliefs().freq(a.now, a.nar);
+            }, 0, 1f);
+            plot4.add("WantSad", () -> {
+                return a.sad.goals().freq(a.now, a.nar);
             }, 0, 1f);
 
 //            plot4.add("Hapy", nar.emotion.happy::getSum);

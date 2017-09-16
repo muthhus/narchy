@@ -82,7 +82,9 @@
 //      If after M, P usually happens, and M happens, it means P is expected to happen
 
     B, (A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePB, Goal:DeciDeduction)
+        B, (A ==> C), time(urgent),  notImpl(B) |- varIntro(subIfUnifiesAny(C,A,B)), (Belief:DeductionRecursivePB, Goal:DeciDeduction)
     B, (--A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
+        B, (--A ==> C), time(urgent),  notImpl(B) |- varIntro(subIfUnifiesAny(C,A,B)), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
 
     B, (C ==> A), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionRecursivePB, Goal:DeciInduction)
 

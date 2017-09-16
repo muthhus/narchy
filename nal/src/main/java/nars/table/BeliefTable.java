@@ -290,6 +290,11 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return answer;
     }
 
+    default double freq(long now, NAR n) {
+        Truth t = truth(now, n);
+        return t == null ? Float.NaN : t.freq();
+    }
+
 
 //    /** 2-element array containing running min/max range accumulator */
 //    void range(long[] t);

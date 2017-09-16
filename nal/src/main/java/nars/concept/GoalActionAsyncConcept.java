@@ -83,12 +83,6 @@ public class GoalActionAsyncConcept extends ActionConcept {
         return v;
     }
 
-    public GoalActionAsyncConcept resolution(float r) {
-        resolution.setValue(r);
-        return this;
-    }
-
-
     @Override
     public Stream<Task> update(long now, int dur, NAR nar) {
 

@@ -70,7 +70,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @Override
     public Bag[] newLinkBags(Term t) {
         int v = t.volume();
-        if (/*v > 3 && */v < 16) {
+        //if (/*v > 3 && */v < 16) {
             Map sharedMap = newBagMap(v);
             Random rng = nar.random();
             @NotNull Bag<Term, PriReference<Term>> termbag =
@@ -78,12 +78,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             @NotNull Bag<Task, PriReference<Task>> taskbag =
                     new CurveBag<>(Param.tasklinkMerge, sharedMap, rng, 0);
             return new Bag[]{termbag, taskbag};
-        } else {
-            return new Bag[]{
-                    new MyDefaultHijackBag(Param.termlinkMerge),
-                    new MyDefaultHijackBag(Param.tasklinkMerge)
-            };
-        }
+//        } else {
+//            return new Bag[]{
+//                    new MyDefaultHijackBag(Param.termlinkMerge),
+//                    new MyDefaultHijackBag(Param.tasklinkMerge)
+//            };
+//        }
 
     }
 

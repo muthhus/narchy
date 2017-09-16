@@ -91,7 +91,6 @@ public class MIDI {
                 else
                     return null;
             });
-            c.resolution.setValue(0.1f);
             nar.on(c);
 
             //c.beliefs().capacity(1, c.beliefs().capacity());
