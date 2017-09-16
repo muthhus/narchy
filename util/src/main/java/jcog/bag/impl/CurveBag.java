@@ -30,7 +30,7 @@ public class CurveBag<X extends Priority> extends PriArrayBag<X> {
     }
 
     @Override
-    protected int sampleStart(int size) {
+    protected int sampleStart(Random random, int size) {
         if (size == 1 || random==null)
             return 0;
         else {
@@ -40,7 +40,7 @@ public class CurveBag<X extends Priority> extends PriArrayBag<X> {
             if (diff > Prioritized.EPSILON * size) {
                 float i = random.nextFloat(); //uniform
                 //normalize to the lack of dynamic range
-                i = Util.lerp(diff, i /* flat */, (i*i) /* curved */);
+                i = Util.lerp(diff, i /* flat */, (i*i*i) /* curved */);
                 int j = (int)(i * (size-0.5f));
                 if (j == size) j--;
                 return j;

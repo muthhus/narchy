@@ -32,9 +32,11 @@ public class Cause<X> {
     /** flag indicating whether the value should be included in aggregations that adjust priority of items */
     public boolean privaluate = true;
 
+    public float valueBias = 0;
+
     /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
     public float value() {
-        return value;
+        return value + valueBias;
     }
 
     /** value and momentum indices correspond to the possible values in Purpose enum */
@@ -50,9 +52,9 @@ public class Cause<X> {
             causes.get(i).commit(summary);
         }
 
-        final float LIMIT = +2f;
+        final float LIMIT = +1f;
         final float momentum = 0.95f;
-        final float speed = 0.5f;
+        final float speed = 1f;
 
         int p = value.length;
         for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {

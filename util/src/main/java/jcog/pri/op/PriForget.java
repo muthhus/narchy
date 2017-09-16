@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  */
 public class PriForget<P extends Priority> implements Consumer<P> {
 
-    public static final float DEFAULT_TEMP = 0.5f;
+    public static final float DEFAULT_TEMP = 0.9f;
     public final float avgToBeRemoved;
 
     public PriForget(float avgToBeRemoved) {

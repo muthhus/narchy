@@ -1,6 +1,7 @@
 package jcog.sort;
 
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -56,5 +57,24 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E>  {
     @Override
     public final void accept(E e) {
         add(e);
+    }
+
+    public E pop() {
+        int s = size();
+        if (s == 0) return null;
+        return removeFirst();
+    }
+
+    @Override
+    public E remove(int index) {
+        E e = super.remove(index);
+        if (size == 0)
+            minSeen = Float.NEGATIVE_INFINITY;
+        return e;
+    }
+
+    @Override
+    public void removeFast(int index) {
+        throw new UnsupportedOperationException();
     }
 }

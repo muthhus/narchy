@@ -56,7 +56,8 @@ public final class Conclude extends ProxyTerm implements Function<NAR,Conclusion
     @Override
     public Conclusion apply(@NotNull NAR nar) {
         CauseChannel<Task> input = nar.newChannel(rule);
-        input.privaluate = false; //disable priority affect, since feedback is applied in other more direct ways (ex: deriver backpressure)
+        //input.privaluate = false; //disable priority affect, since feedback is applied in other more direct ways (ex: deriver backpressure)
+        input.valueBias = 0;//-0.1f;
         return new Conclusion(this, input);
     }
 

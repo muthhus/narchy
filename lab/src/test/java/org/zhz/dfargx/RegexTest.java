@@ -6,6 +6,7 @@ import org.zhz.dfargx.automata.DFA;
 import org.zhz.dfargx.automata.NFA;
 import org.zhz.dfargx.node.Node;
 
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,21 +16,56 @@ import java.util.regex.Pattern;
  */
 public class RegexTest {
 
-    //"([ab]([^cd]*\\w+(abc|abcd){2,5})+)?.*"
     @Test
-    public void testProcessing() {
+    public void testParsePar() {
+        long pre = System.nanoTime();
+        String regex = "(a|b)";
+        testRegex(pre, regex);
+    }
+    @Test
+    public void testParseSeq() {
+        long pre = System.nanoTime();
+        String regex = "ab";
+        testRegex(pre, regex);
+    }
+    @Test
+    public void testParseParSeq() {
+        long pre = System.nanoTime();
+        String regex = "(a|b)c";
+        testRegex(pre, regex);
+    }
+      @Test
+    public void testParseMerge1() {
+        long pre = System.nanoTime();
+        String regex = "((ac)|(bc))";
+        testRegex(pre, regex);
+    }
+    @Test
+    public void testParse1() {
         long pre = System.nanoTime();
         String regex = "(a*b|ab*)";
+        testRegex(pre, regex);
+    }
+
+    static void testRegex(long pre, String regex) {
         SyntaxTree tree = new SyntaxTree(regex);
         Node root = tree.getRoot();
         System.out.println("For regex: " + regex);
         System.out.println("Syntax tree: ");
         TreePrinter.getInstance().printTree(root);
+
         NFA nfa = new NFA(root);
-        System.out.println("NFA has " + nfa.getStateList().size() + " states");
-        DFA dfa = new DFA(nfa.getStateList());
-        System.out.println("DFA has " + dfa.getTransitionTable().length + " states");
+        System.out.println("NFA has " + nfa.states.size() + " states");
+        nfa.states.forEach(System.out::println);
+        System.out.println();
+
+        DFA dfa = new DFA(nfa.states);
+        System.out.println("DFA has " + dfa.transitions.length + " states");
         System.out.println("Cost " + (System.nanoTime() - pre)/1E6 + " ms to compile");
+//        for (int[] row : dfa.transitions) {
+//            System.out.println(Arrays.toString(row));
+//        }
+
     }
 
     @Test

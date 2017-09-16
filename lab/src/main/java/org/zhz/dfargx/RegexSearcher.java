@@ -31,8 +31,8 @@ public class RegexSearcher extends DFA implements Enumeration<MatchedText> {
     }
 
     public RegexSearcher(String regex) {
-        super(new NFA(new SyntaxTree(regex).getRoot()).getStateList());
-        transitionTable = getTransitionTable();
+        super(new NFA(new SyntaxTree(regex).getRoot()).states);
+        transitionTable = transitions;
         is = getInitState();
         fs = getFinalStates();
         rs = getRejectedState();

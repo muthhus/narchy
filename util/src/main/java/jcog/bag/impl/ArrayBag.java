@@ -1,12 +1,12 @@
 package jcog.bag.impl;
 
 import jcog.bag.Bag;
-import jcog.sort.SortedArray;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
+import jcog.sort.SortedArray;
 import jcog.table.SortedListTable;
 import jcog.util.AtomicFloat;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -85,7 +85,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
      */
     @Override
     public float depressurize() {
-        return Math.max(0,pressure.getAndSet(0f)); //max() in case it becomes negative
+        return Math.max(0, pressure.getAndSet(0f)); //max() in case it becomes negative
     }
 
     @Override
@@ -273,7 +273,6 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     }
 
 
-
     static boolean cmpGT(float o1, float o2) {
         return (o1 < o2);
     }
@@ -341,7 +340,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 //        return this;
 //    }
 
-    @Nullable protected Random random() {
+    @Nullable
+    protected Random random() {
         return null;
     }
 
@@ -349,9 +349,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     /**
      * size > 0
      */
-    protected int sampleStart(int size) {
+    protected int sampleStart(@Nullable Random rng, int size) {
         if (size > 1) {
-            Random rng = random();
             if (rng != null)
                 return rng.nextInt(size);
         }
@@ -368,60 +367,53 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     @Override
     public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each) {
 
-
-        final Object[] ii = items.array();
-        int s0 = ii.length;
-        if (s0 == 0) return this; //to be safe
-
-        int s = Math.min(s0, size());
-        if (s == 0) return this;
-
-        int i = sampleStart(s);
-
-        BagSample next = BagSample.Next;
-
-        /*
-        sampled items will be limited to the current array.  if the array has resized by
-        an insertion from another thread, it will not be available in this sampling
-         */
-
         Random rng = random();
-        boolean direction = rng == null || rng.nextBoolean();
-        int nulls = 0; //# of nulls encountered. when this reaches the array length we know it is empty
-        while (!next.stop && nulls < s0) {
-            Y x = (Y) ii[i];
+        boolean direction =
+            true; //must always go down otherwise if it reverses then in curvebag's bias for early items, it will prioritize the last items yuk
+            //rng == null || rng.nextBoolean();
 
-            if (x != null) {
-                next = each.next(x);
-                if (next.remove) {
+        newItemsArray:
+        while (true) {
+            SortedArray<Y> itemsSampling = items;
+            final Object[] ii = itemsSampling.array();
+            int s = Math.min(ii.length, size());
+            if (s == 0) return this;
 
-                    //if removed and the bag's array has been changed to a new array while processing:
-                    if (remove(key(x)) != null && items.array() != ii) {
-                        //set it in this array to not encounter it again
-                        ii[i] = null;
-                        nulls++;
-                    }
-                    //modified = true;
-                } else {
-                    nulls = 0; //reset null count
+            int i = sampleStart(rng, s);
+
+
+            /*
+            sampled items will be limited to the current array.  if the array has resized by
+            an insertion from another thread, it will not be available in this sampling
+             */
+
+            while (size() > 0) {
+
+                if (items.array() != ii) //resized, due to another thread
+                    continue newItemsArray;
+
+                Y x = (Y) ii[i];
+
+                if (x != null) {
+                    BagSample next = each.next(x);
+                    if (next.remove)
+                        remove(key(x));
+
+                    if (next.stop)
+                        return this;
                 }
-            } else {
-                nulls++;
+
+                if (direction) {
+                    if (++i == s) i = 0;
+                } else {
+                    if (--i == -1) i = s - 1;
+                }
             }
 
-            if (direction) {
-                i++;
-                if (i == s) i = 0;
-            } else {
-                i--;
-                if (i == -1) i = s - 1;
-            }
+            return this;
         }
 
-//        if (modified) {
-//            commit(null);
-//        }
-        return this;
+        //return this;
     }
 
     @Nullable
@@ -556,8 +548,10 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     }
 
     public boolean insert(@NotNull Y incoming, @Nullable List<Y>[] trash) {
+        float p = pri(incoming);
+        pressurize(p);
+
         if (size() == capacity) {
-            pressurize(pri(incoming));
 
             @Nullable LinkedList<Y> trsh = update(incoming, null);
             if (trsh != null) {
@@ -566,8 +560,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                     return false; //rejected this one
             }
         } else {
-            float p = pri(incoming);
-            int i = items.add(incoming, -p, this); assert(i >= 0);
+            int i = items.add(incoming, -p, this);
+            assert (i >= 0);
             updateRange(p);
         }
         return true;
@@ -583,7 +577,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
             boolean atCap = s == capacity;
 
             int posBefore = items.indexOf(existing, this);
-            assert(posBefore!=-1);
+            assert (posBefore != -1);
 
             float priBefore = existing.priElseZero();
             float oo = mergeFunction.merge(existing /* HACK */, incoming);
@@ -825,7 +819,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
                 while (true) {
                     while (i < cLenMin1 && cmpLT((Priority) c[++i], tempV)) ;
-                    while (j > 0 && /* <- that added */ cmpGT((Priority)c[--j], tempV)) ;
+                    while (j > 0 && /* <- that added */ cmpGT((Priority) c[--j], tempV)) ;
                     if (j < i) {
                         break;
                     }

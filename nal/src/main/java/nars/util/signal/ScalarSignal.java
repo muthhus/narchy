@@ -1,5 +1,6 @@
 package nars.util.signal;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Task;
@@ -81,8 +82,8 @@ public class ScalarSignal extends Signal implements  DoubleSupplier {
         //int timeSinceLastInput = (int) (now - lastInputTime);
 
 
-        float next = value.floatValueOf(term);
-        Truth truth = (next == next) ? truthFloatFunction.valueOf(this.currentValue = next) : null;
+        float next = Util.round(value.floatValueOf(term), resolution.asFloat());
+        Truth truth = (next == next) ? truthFloatFunction.valueOf(Util.unitize(this.currentValue = next)) : null;
 
 //        Task current = get();
 //        long currentEnd = current!=null ? current.end() : ETERNAL;

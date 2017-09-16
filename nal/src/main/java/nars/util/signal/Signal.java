@@ -26,8 +26,8 @@ public class Signal extends AtomicReference<SignalTask> {
 
 
     /**
-     * quantizes the output truth, ie. truth epsilon,
-     * (does not process the value of the input signal)
+     * quantizes the input value
+     * quantization of the output value, ie. truth epsilon is separately applied according to the NAR's parameter
      */
     public final FloatSupplier resolution;
 
@@ -50,7 +50,7 @@ public class Signal extends AtomicReference<SignalTask> {
 
     public Task set(@NotNull Term term, @Nullable Truth nextTruth, LongSupplier stamper, long now, int dur, NAR nar) {
 
-        @Nullable PreciseTruth tt = nextTruth != null ? nextTruth.ditherFreqConf(resolution.asFloat(), nar.confMin.floatValue(), 1f) : null;
+        @Nullable PreciseTruth tt = nextTruth != null ? nextTruth.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f) : null;
 
 
         SignalTask toInput;

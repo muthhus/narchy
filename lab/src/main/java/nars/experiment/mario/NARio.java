@@ -52,7 +52,14 @@ public class NARio extends NAgentX {
         cc.addActions($.the("nario"), this, false, false, true);
         cc.actions.forEach(a -> a.resolution.setValue(0.25f));
         cc.setClarity(0.8f, 0.95f);
-        CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
+        CameraSensor<PixelBag> sc = addCamera(new CameraSensor<>($("nario") /*"(nario,local)"*/, cc, this));
+//            @Override
+//            public void accept(NAgent a) {
+//
+//
+//                super.accept(a);
+//            }
+//        });
         sc.resolution(0.03f);
 
         //new ShapeSensor($.the("shape"), new BufferedImageBitmap2D(()->mario.image),this);

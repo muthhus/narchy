@@ -5,6 +5,8 @@ import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
+import jcog.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Random;
@@ -15,13 +17,14 @@ import static jcog.pri.op.PriMerge.max;
 import static jcog.pri.op.PriMerge.plus;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by me on 2/9/17.
  */
 public class HijackBagTest {
 
-    @Test public void testSamplingFlatHijack() {
+    @Test public void testPutMinMaxAndUniquenesses() {
         for (int reprobes : new int[] { 2, 4, 8 }) {
             for (int capacity : new int[] { 2, 4, 8, 16, 32, 64, 128 }) {
                 testPutMinMaxAndUniqueness(
@@ -43,15 +46,13 @@ public class HijackBagTest {
         assertEquals(cap, b.capacity());
 
         b.put(p("x",0.5f));
-        //still hasnt resized
         assertEquals(1, b.size());
-        assertEquals(reprobes, b.space());
-
-        b.put(p("y",0.25f));
-        //resize should have triggered
         assertEquals(10, b.space());
 
-        for (int i = 0; i < 9; i++)
+        b.put(p("y",0.25f));
+        assertEquals(10, b.space());
+
+        for (int i = 0; i <12; i++)
             b.put(p("z" + i, 0.5f));
         assertEquals(b.capacity(), b.space());
 
@@ -117,6 +118,38 @@ public class HijackBagTest {
         //a.print();
     }
 
+    @Test public void testHijackSampling() {
+        for (int cap : new int[] { 63, 37 }) {
+            int rep = 3;
+            int batch = 4;
+            float extraSpace = 5f;
+            final Random rng = new XorShift128PlusRandom(1);
+            DefaultHijackBag bag = new DefaultHijackBag(plus, (int) Math.ceil(cap * extraSpace), rep) {
+
+                {
+                    resize(capacity());
+                }
+
+                @Override
+                public void onRemove(@NotNull Object value) {
+                    fail();
+                }
+
+                @Override
+                public void onReject(@NotNull Object value) {
+                    fail();
+                }
+
+                @Override
+                protected Random random() {
+                    return rng;
+                }
+            };
+            testBagSamplingDistribution(bag, batch, cap);
+            bag.print();
+        }
+
+    }
 
     @Test
     public void testHijackResize() {

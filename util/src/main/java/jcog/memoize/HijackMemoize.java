@@ -170,8 +170,7 @@ public class HijackMemoize<X, Y> extends PriorityHijackBag<X, HijackMemoize.Comp
 
 
     public HijackMemoize(@NotNull Function<X, Y> f, int initialCapacity, int reprobes) {
-        super(reprobes);
-        setCapacity(initialCapacity);
+        super(initialCapacity, reprobes);
         this.func = f;
     }
 
@@ -225,6 +224,11 @@ public class HijackMemoize<X, Y> extends PriorityHijackBag<X, HijackMemoize.Comp
     public void set(float boost, float cut) {
         this.CACHE_HIT_BOOST = boost;
         this.CACHE_DENY_DAMAGE = cut;
+    }
+
+    @Override
+    protected boolean attemptRegrowForSize(int s) {
+        return false;
     }
 
     @Override

@@ -18,7 +18,7 @@ public class CaffeineMemoize<K, V> implements Memoize<K, V> {
         this.func = compute;
     }
 
-    public static <K, V> Memoize<K, V> build(Function<K, V> compute, int capacity, boolean stats) {
+    public static <K, V> CaffeineMemoize<K, V> build(Function<K, V> compute, int capacity, boolean stats) {
         Caffeine<Object, Object> b = Caffeine.newBuilder();
 
         if (capacity < 1)

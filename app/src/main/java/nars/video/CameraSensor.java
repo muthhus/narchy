@@ -179,7 +179,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     @Override
     public void accept(NAgent a) {
 
-        //frameStamp();
+
+        resolution( Util.round((0.5f * (Util.tanhFast(in.value())+1)) * 0.5f, 0.02f) );
+
 
         src.update(1);
 

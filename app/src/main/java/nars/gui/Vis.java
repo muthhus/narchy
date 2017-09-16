@@ -398,17 +398,11 @@ public class Vis {
 
             plot1.add("Dex", a::dexterity, 0f, 1f);
 
-            //plot4.add("Hapy", a.happy, 0f, 1f);
-            plot4.add("Hapy (Value)", () -> {
+            plot4.add("Hpy", () -> {
                 return a.happy.signal.asFloat();
             }, 0, 1f);
-            plot4.add("Hapy (Task)", () -> {
-                @Nullable Task t = a.happy.sensor.get();
-                if (t == null)
-                    return Float.NaN;
-                else
-                    return t.freq();
-
+            plot4.add("Sad", () -> {
+                return a.sad.signal.asFloat();
             }, 0, 1f);
 
 //            plot4.add("Hapy", nar.emotion.happy::getSum);

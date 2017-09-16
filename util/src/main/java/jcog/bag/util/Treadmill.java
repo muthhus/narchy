@@ -6,14 +6,14 @@ import java.util.concurrent.locks.AbstractQueuedLongSynchronizer;
 
 /** striping via 64bit (pair of 32bit codes) global exclusion locking via busy spin
  *  on a linear probed atomic array of fixed size */
-public class Treadmill extends AtomicLongArray {
+public class Treadmill extends AtomicLongArray implements SpinMutex {
 
     final AtomicInteger mod = new AtomicInteger(0);
 
-    protected final static int concurrency = Runtime.getRuntime().availableProcessors() + 1;
+
 
     public Treadmill() {
-        this(concurrency);
+        this(Runtime.getRuntime().availableProcessors());
     }
 
     /** extra space for additional usage */
@@ -21,10 +21,8 @@ public class Treadmill extends AtomicLongArray {
         super(slots);
     }
 
-    public final int start(int context, int key) {
-        long hash = (context << 32) | key;
-        if (hash == 0) hash = 1; //reserve 0
-
+    @Override
+    public int start(long hash) {
         final int slots = length();
 
         while (true) {
@@ -55,6 +53,7 @@ public class Treadmill extends AtomicLongArray {
         }
     }
 
+    @Override
     public final void end(int slot) {
         set(slot, 0);
     }

@@ -82,12 +82,16 @@ public class Emotivation extends Emotion {
         assert (gain == gain);
         if (gain != 0) {
 
-            float amp = Util.tanhFast(gain) + 1f; //[0..+2]
+            float amp =
+                    //Util.tanhFast(gain) + 1f; //[0..+2]
+                    0.5f + (Util.tanhFast(gain)/2f);
+
             //amp = Math.max(amp, 0.1f);
 
             x.priMult(
                 //amp
-                amp*amp
+                //amp*amp
+                amp
             );
         }
     }

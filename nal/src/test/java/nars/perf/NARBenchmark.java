@@ -43,8 +43,8 @@ public class NARBenchmark {
         Function<Term[], TermContainer> h = null;
         switch (subtermBuilder) {
             case "heap": h = Builder.Subterms.HeapSubtermBuilder; break;
-            case "hijack": h = Builder.Subterms.HijackSubtermBuilder; break;
-            case "caffeine": h = Builder.Subterms.CaffeineSubtermBuilder; break;
+            case "hijack": h = Builder.Subterms.HijackSubtermBuilder.get(); break;
+            case "caffeine": h = Builder.Subterms.CaffeineSubtermBuilder.get(); break;
         }
         Builder.Subterms.the = h;
 

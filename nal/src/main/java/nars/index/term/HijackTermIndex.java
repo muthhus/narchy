@@ -68,6 +68,11 @@ public class HijackTermIndex extends MaplikeTermIndex {
             }
 
             @Override
+            protected boolean attemptRegrowForSize(int s) {
+                return false;
+            }
+
+            @Override
             protected boolean replace(float incoming, PriReference<Termed> existing) {
 
                 boolean existingPermanent = existing.get() instanceof PermanentConcept;
@@ -98,6 +103,8 @@ public class HijackTermIndex extends MaplikeTermIndex {
         super.start(nar);
         updater.runMS(updatePeriodMS);
     }
+
+
 
 //    @Override
 //    public void commit(Concept c) {

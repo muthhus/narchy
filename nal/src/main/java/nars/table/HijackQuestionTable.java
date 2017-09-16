@@ -14,8 +14,7 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
 
 
     public HijackQuestionTable(int cap, int reprobes) {
-        super(reprobes);
-        setCapacity(cap);
+        super(cap, reprobes);
     }
 
 

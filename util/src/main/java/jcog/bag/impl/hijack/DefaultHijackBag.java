@@ -18,8 +18,8 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PriReference<K>> {
     protected final PriMerge merge;
 
     public DefaultHijackBag(PriMerge merge, int capacity, int reprobes) {
-        this(merge, reprobes);
-        setCapacity(capacity);
+        super(capacity, reprobes);
+        this.merge = merge;
     }
 
     @Override
@@ -32,10 +32,7 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PriReference<K>> {
         return existing;
     }
 
-    public DefaultHijackBag(PriMerge merge, int reprobes) {
-        super(reprobes);
-        this.merge = merge;
-    }
+
 
 
     @Override

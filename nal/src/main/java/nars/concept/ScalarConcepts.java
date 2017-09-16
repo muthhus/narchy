@@ -16,6 +16,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static nars.Op.BELIEF;
+
 /**
  * manages a set of N 'digit' concepts whose beliefs represent components of an
  * N-ary (N>=1) discretization of a varying scalar (ie: 32-bit floating point) signal.
@@ -43,7 +45,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
 
 
     /**
-     * decides the truth value of a 'digit'
+     * decides the truth value of a 'digit'. returns frequency float
      *
      * @param conceptIndex the 'digit' concept
      * @param x            the value being input
@@ -51,7 +53,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
      */
     @FunctionalInterface
     public interface ScalarEncoder {
-        Truth truth(float x, int digit, int maxDigits, NAR nar);
+        float truth(float x, int digit, int maxDigits);
     }
 
     private final FloatSupplier input;
@@ -82,7 +84,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
      * [ ] = freq 0
      * [x] = freq 1,
      */
-    public final static ScalarEncoder Fluid = (v, i, indices, n) -> {
+    public final static ScalarEncoder Fluid = (v, i, indices) -> {
 
         float vv = v * indices;
 
@@ -96,12 +98,18 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
             f = vv - which;
         }
 
-        return $.t(f, n.confDefault(Op.BELIEF));
+        return f;
 
     };
+    public final static ScalarEncoder Mirror = (v, i, indices) -> {
+        assert (indices == 2);
+        return i == 0 ? v : 1 - v;
+    };
 
-    /** hard */
-    public final static ScalarEncoder Needle = (v, i, indices, n) -> {
+    /**
+     * hard
+     */
+    public final static ScalarEncoder Needle = (v, i, indices) -> {
 
         float vv = v * indices;
 
@@ -115,7 +123,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
             f = 1f;
         }
 
-        return $.t(f, n.confDefault(Op.BELIEF));
+        return f;
 
     };
 
@@ -127,18 +135,18 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
      * + + +    + + +     + + +
      * TODO need to analyze the interaction of the produced frequency values being reported by all concepts.
      */
-    public final static ScalarEncoder FuzzyNeedle = (v, i, indices, n) -> {
+    public final static ScalarEncoder FuzzyNeedle = (v, i, indices) -> {
 
         float dr = 1f / (indices - 1);
 
-        return $.t(Math.max(0, (1f - Math.abs((i * dr) - v) / dr)), n.confDefault(Op.BELIEF));
+        return Math.max(0, (1f - Math.abs((i * dr) - v) / dr));
     };
 
 
     /**
      * TODO not quite working yet. it is supposed to recursively subdivide like a binary number, and each concept represents the balance corresponding to each radix's progressively increasing sensitivity
      */
-    public final static ScalarEncoder FuzzyBinary = (v, i, indices, n) -> {
+    public final static ScalarEncoder FuzzyBinary = (v, i, indices) -> {
 
         //float nearness[] = new float[n];
 
@@ -151,8 +159,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
 
         //System.out.println(v + " " + b + "/" + dv + " = " + (b/dv));
 
-        Truth tt = $.t(b / (dv), n.confDefault(Op.BELIEF));
-        return tt;
+        return b / (dv);
     };
 
     /**
@@ -188,7 +195,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
 
         assert (numStates > 1);
 
-        this.conf = nar.confDefault(Op.BELIEF);
+        this.conf = nar.confDefault(BELIEF);
         this.input = input;
         this.in = nar.newCauseChannel(this);
         //output.amplitude(1f / numStates);
@@ -198,8 +205,8 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
         int i = 0;
         for (Term s : states) {
             final int ii = i++;
-            sensors.add(new SensorConcept(s, nar, this,
-                    (x) -> truther.truth(x, ii, numStates, nar)
+            sensors.add(new SensorConcept(s, nar, ()->truther.truth(asFloat(), ii, numStates),
+                    (x) -> $.t(x, nar.confDefault(BELIEF))
             ));
         }
 

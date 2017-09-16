@@ -88,7 +88,6 @@ public class Line1DCalibrate {
 
         a.speed.setValue(yResolution);
 
-        a.happy.resolution.setValue(0.01f);
 //            a.up.resolution.setValue(yResolution);
 //            a.down.resolution.setValue(yResolution);
         a.in.resolution(yResolution);

@@ -438,9 +438,6 @@ public abstract class STMClustered extends TaskService {
         TasksNode nearest;
         synchronized (net) {
             nearest = tt.nearest();
-        }
-
-        synchronized (net) {
             nearest.transfer(tt);
         }
 

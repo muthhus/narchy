@@ -21,8 +21,8 @@ import java.util.function.Consumer;
  */
 public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements TaskTable {
 
-    public TaskHijackBag(int reprobes) {
-        super(reprobes);
+    public TaskHijackBag(int cap, int reprobes) {
+        super(cap, reprobes);
     }
 
     @Override

@@ -1,10 +1,8 @@
 package nars;
 
-import com.google.common.collect.Iterables;
 import jcog.data.FloatParam;
 import jcog.event.On;
 import jcog.pri.mix.control.MixContRL;
-import nars.concept.ActionConcept;
 import nars.control.Derivation;
 import nars.control.NARService;
 import nars.derive.Deriver;
@@ -12,8 +10,7 @@ import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
-import nars.index.term.map.CaffeineIndex;
-import nars.op.Implier;
+import nars.index.term.map.CaffeineIndex2;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -37,7 +34,6 @@ import spacegraph.widget.meter.Plot2D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -116,8 +112,8 @@ abstract public class NAgentX extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
 
-        Builder.Subterms.the = Builder.Subterms.HijackSubtermBuilder;
-        Builder.Compound.the = Builder.Compound.HijackCompoundBuilder;
+        Builder.Subterms.the = Builder.Subterms.WeakSubtermBuilder.get();
+        Builder.Compound.the = Builder.Compound.CaffeineCompoundBuilder.get();
 
         float durFPS =
                 fps;
@@ -151,8 +147,8 @@ abstract public class NAgentX extends NAgent {
                                 ), THREADS, 2))
                 .time(clock)
                 .index(
-                        new CaffeineIndex(96 * 1024)
-                        //new CaffeineIndex2(64 * 1024)
+                        //new CaffeineIndex(96 * 1024)
+                        new CaffeineIndex2(64 * 1024)
                         //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
                 )
                 .get();
@@ -521,7 +517,7 @@ abstract public class NAgentX extends NAgent {
                     ),
 
                     grid(
-                            Vis.beliefCharts(16, nar, a.happy),
+                            Vis.beliefCharts(16, nar, a.reward),
                             new WindowButton("agent", () -> (a)),
                             new WindowButton("actionShort", () -> Vis.beliefCharts(a.nar.dur() * 4, a.actions.keySet(), a.nar)),
                             new WindowButton("actionMed", () -> Vis.beliefCharts(a.nar.dur() * 32, a.actions.keySet(), a.nar)),

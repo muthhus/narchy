@@ -2,8 +2,9 @@ package nars.exe;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
+import jcog.pri.Prioritized;
+import jcog.sort.TopN;
 import nars.NAR;
-import nars.Task;
 import nars.control.Activate;
 import nars.control.Premise;
 import nars.task.ITask;
@@ -24,14 +25,14 @@ import static jcog.bag.Bag.BagSample.*;
  */
 public class UniExec extends Exec implements Runnable {
 
-    public static final int BATCH_SIZE = 128;
-    public static final int CAPACITY = 1024;
+    public static final int BATCH_SIZE = 256;
+    public static final int CAPACITY = 16*1024+1;
 
     Bag<ITask, ITask> plan;
 
     int workRemaining;
 
-    float activationFactor = 0.25f;
+    float activationFactor = 0.05f;
     float premiseFactor = 0.5f;
 
     @Override
@@ -41,10 +42,10 @@ public class UniExec extends Exec implements Runnable {
 
     @Override
     public void add(@NotNull ITask input) {
-        if (nar != null && input.isInput())
-            execute(input);
-        else
-            plan.put(input);
+//        if (nar != null && input.isInput())
+//            execute(input);
+//        else
+            plan.putAsync(input);
     }
 
 
@@ -84,20 +85,27 @@ public class UniExec extends Exec implements Runnable {
     public synchronized void start(NAR nar) {
 
         plan =
-                new PriorityHijackBag<>(4) {
+                new PriorityHijackBag<>(CAPACITY,2) {
+
+                    @Override
+                    public void setCapacity(int _newCapacity) {
+                        super.setCapacity(_newCapacity);
+                        resize(capacity());
+                    }
+
                     @Override
                     public ITask key(ITask value) {
                         return value;
                     }
 
                     @Override
-                    public float pri( ITask key) {
-                        if (key instanceof Activate)
-                            return activationFactor * key.priElseZero();
-                        else if (key instanceof Premise)
-                            return premiseFactor * key.priElseZero();
+                    protected boolean replace(float incoming, float existing) {
+                        return hijackGreedy(incoming, existing);
+                    }
 
-                        return super.pri(key);
+                    @Override
+                    public float pri( ITask key) {
+                        return UniExec.this.pri(key);
                     }
 
                     @Override
@@ -112,16 +120,16 @@ public class UniExec extends Exec implements Runnable {
 
                     @Override
                     public void onRemove(@NotNull ITask value) {
-                        if (value instanceof Task) {
-                            ignore((Task) value);
-                        }
+//                        if (value instanceof Task) {
+//                            ignore((Task) value);
+//                        }
                     }
 
                     @Override
                     public void onReject(@NotNull ITask value) {
-                        if (value instanceof Task) {
-                            ignore((Task) value);
-                        }
+//                        if (value instanceof Task) {
+//                            ignore((Task) value);
+//                        }
                     }
 
                     @Override
@@ -136,11 +144,22 @@ public class UniExec extends Exec implements Runnable {
 //                        };
                     }
                 };
-        plan.setCapacity(CAPACITY);
 //            new ConcurrentCurveBag(this,
 //                new ConcurrentHashMapUnsafe<>(1024), nar.random(), 1024);
 
         super.start(nar);
+    }
+
+    public float pri(ITask key) {
+        if (key instanceof Activate) {
+            float v = key.pri(); if (v!=v) return Float.NaN;
+            return activationFactor * v;
+        } else if (key instanceof Premise) {
+            float v = key.pri(); if (v!=v) return Float.NaN;
+            return premiseFactor * v;
+        }
+
+        return key.pri();
     }
 
     @Override
@@ -166,7 +185,26 @@ public class UniExec extends Exec implements Runnable {
     @Override
     public synchronized void run() {
         workRemaining = BATCH_SIZE;
-        plan.commit().sample(this::execute);
+        plan/*.commit()*/.sample(this::top);
+    }
+
+    final int WINDOW_SIZE = 32;
+    final int WINDOW_RATIO = 8;
+    private final TopN<ITask> top = new TopN<>(new ITask[WINDOW_SIZE], this::pri);
+    int windowTTL = WINDOW_RATIO;
+
+    private BagSample top(ITask x) {
+
+        top.add(x);
+
+        if (--windowTTL <= 0) {
+            windowTTL = WINDOW_RATIO;
+            ITask t = top.pop();
+            if (t!=null)
+                execute(t);
+        }
+
+        return BagSample.Next;
     }
 
 //    public static void main(String... args) {

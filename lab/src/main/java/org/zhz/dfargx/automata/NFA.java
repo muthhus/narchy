@@ -6,7 +6,7 @@ import org.zhz.dfargx.node.*;
 import java.util.List;
 import java.util.Stack;
 
-import static org.zhz.dfargx.automata.NFAStateFactory.create;
+import static org.zhz.dfargx.automata.NFAState.create;
 
 /**
  * Created on 2015/5/10.
@@ -15,12 +15,12 @@ public class NFA     { // only able to accept wfs accessing order, this class co
 
     private final Stack<NFAState> stateStack;
 
-    final List<NFAState> stateList;
+    public final List<NFAState> states;
 
     public NFA(Node root) {
         super();
 
-        stateList = new FasterList();
+        states = new FasterList();
         NFAState initState = newState();
         NFAState finalState = newState();
         stateStack = new Stack<>();
@@ -31,7 +31,7 @@ public class NFA     { // only able to accept wfs accessing order, this class co
 
     private NFAState newState() {
         NFAState nfaState = create();
-        stateList.add(nfaState);
+        states.add(nfaState);
         return nfaState;
     }
 
@@ -41,10 +41,6 @@ public class NFA     { // only able to accept wfs accessing order, this class co
             dfs(node.left());
             dfs(node.right());
         }
-    }
-
-    public List<NFAState> getStateList() {
-        return stateList;
     }
 
     public void visit(LChar lChar) {

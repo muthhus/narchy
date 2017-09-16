@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TermutatorTest {
 
-    final int TTL = 128;
+    final int TTL = 256;
 
     final Unify unifier = new Unify(Op.VAR_PATTERN, new XorShift128PlusRandom(1),
             Param.UnificationStackMax, TTL) {

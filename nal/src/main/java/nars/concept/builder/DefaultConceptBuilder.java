@@ -403,7 +403,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     private class MyDefaultHijackBag extends DefaultHijackBag {
         public MyDefaultHijackBag(PriMerge merge) {
-            super(merge, 3);
+            super(merge, 0,5);
         }
 
         @Override

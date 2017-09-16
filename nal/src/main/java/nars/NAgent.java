@@ -10,6 +10,7 @@ import jcog.math.FloatPolarNormalized;
 import jcog.math.RecycledSummaryStatistics;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
+import nars.concept.ScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
 import nars.control.DurService;
@@ -57,7 +58,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
      * the general reward signal for this agent
      */
     @NotNull
-    public final SensorConcept happy;
+    public final ScalarConcepts reward;
 
 
     /**
@@ -83,6 +84,8 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
     public final AtomicBoolean enabled = new AtomicBoolean(true);
     private final CauseChannel<Task> rewardIn;
+    public final SensorConcept happy;
+    public final SensorConcept sad;
 
     public boolean trace;
 
@@ -95,7 +98,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     /**
      * range: -1..+1
      */
-    public float reward;
+    public float rewardCurrent;
     private Loop loop;
     public NAR nar;
     private int dur;
@@ -118,32 +121,16 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         this.id = id;
         this.now = ETERNAL; //not started
 
-        this.happy = new SensorConcept(
+        this.reward = senseNumber(new FloatPolarNormalized(() -> rewardCurrent), ScalarConcepts.Mirror,
                 id == null ?
                         $.the("happy") : //generally happy
                         $.p(id, $.the("happy")), //happy in this environment
-                nar,
-
-                //new FloatNormalized(()->reward),
-                new FloatPolarNormalized(() -> reward),
-                (x) -> $.t(x, alpha())
-
-                //new FloatPolarNormalized(() -> reward),
-
-                //() -> reward /* -1..+1 */,
-                //(x) -> t(0.5f * (Util.tanhFast(x * 2) + 1), alpha())
-
-//                (x) -> {
-//                    if (x > 0.5f + Param.TRUTH_EPSILON) {
-//                        return t(1f, alpha() * (x - 0.5f) * 2f);
-//                    } else if (x < 0.5f - Param.TRUTH_EPSILON) {
-//                        return t(0f, alpha() * (0.5f - x) * 2f);
-//                    } else {
-//                        return t(0.5f, alpha());
-//                    }
-//                }
+                id == null ?
+                        $.the("sad") : //generally sad
+                        $.p(id, $.the("sad")) //sad in this environment
         );
-        //nar.goal(happy, 1f, nar.confDefault(GOAL)); //ETERNAL <- not safe to use yet
+        happy = this.reward.sensors.get(0);
+        sad = this.reward.sensors.get(1);
 
         //fireHappy = Activation.get(happy, 1f, new ConceptFire(happy, 1f);
 
@@ -196,7 +183,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         //sendInfluxDB("localhost", 8089);
 
-        return id + " rwrd=" + n2(reward) +
+        return id + " rwrd=" + n2(rewardCurrent) +
                 " dex=" + /*n4*/(dexterity()) +
                 //"\t" + Op.cache.summary() +
                 /*" var=" + n4(varPct(nar)) + */ "\t" + nar.terms.summary() + " " +
@@ -222,12 +209,20 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
             /** set the sensor budget policy */
 
-            @NotNull Term happy = this.happy.term();
-            Task happyEternal = nar.goal(happy); /* eternal */
-            predictors.add(()->{
-                happyEternal.priMax(nar.priDefault(GOAL));
-                return happyEternal;
-            });
+            {
+                Task happyEternal = nar.goal(happy.term()); /* eternal */
+                predictors.add(() -> {
+                    happyEternal.priMax(nar.priDefault(GOAL));
+                    return happyEternal;
+                });
+            }
+            {
+                Task sadEternal = nar.goal(sad.term().neg()); /* eternal */
+                predictors.add(() -> {
+                    sadEternal.priMax(nar.priDefault(GOAL));
+                    return sadEternal;
+                });
+            }
 
             //temporal happy
 //            predictors.add(
@@ -255,8 +250,10 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
                 ((FasterList) predictors).addAll(
 
-                        question($.impl(action, happy)),
-                        question($.impl(notAction, happy))
+                        question($.impl(action, happy.term())),
+                        question($.impl(notAction, happy.term())),
+                        question($.impl(action, sad.term())),
+                        question($.impl(notAction, sad.term()))
                         //question(impl(action, what)),
                         //question(impl(notAction, what)),
 
@@ -396,23 +393,19 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         this.now = nar.time();
 
-        float r = reward = doAct();
+        float r = rewardCurrent = doAct();
         if (r == r) {
             rewardSum += r;
         }
 
         this.now = nar.time();
 
-        rewardIn.input(
-            /*Stream.of(*/happy.update(now, dur, nar)/*, fireHappy)*/
-        );
-
 
         this.now = nar.time();
 
         sensors.forEach((s, c) -> {
             //nar.exe.execute(() -> {
-                c.input(s.update(now, dur, nar));
+            c.input(s.update(now, dur, nar));
             //});
         });
 
@@ -420,7 +413,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         if (nar.random().nextFloat() < predictorProbability.floatValue() * predict.gain()) {
             //nar.exe.execute(() -> {
-                predict.input(predictions(now));
+            predict.input(predictions(now));
             //});
         }
 
@@ -428,7 +421,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         actions.forEach((a, c) -> {
             //nar.exe.execute(() -> {
-                c.input(a.update(now, dur, nar));
+            c.input(a.update(now, dur, nar));
             //});
         });
 
@@ -439,8 +432,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 //        if (nar.exe.concurrent())
 //            eventFrame.emitAsync(this, nar.exe); //not safe for use with some features, ex: bipolar currently demands a specific ordering sequence for processing its two concpets
 //        else
-            eventFrame.emit(this);
-
+        eventFrame.emit(this);
 
         if (trace)
             logger.info(summary());
@@ -570,14 +562,14 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     public Supplier<Task> prediction(@NotNull Term _term, byte punct, DiscreteTruth truth) {
         Term term = _term.normalize();
 
-            long now = nar.time();
-            //long start = now;
-            //long end = now + Math.round(predictAheadDurs.floatValue() * nar.dur());
-            long start = ETERNAL, end = ETERNAL;
+        long now = nar.time();
+        //long start = now;
+        //long end = now + Math.round(predictAheadDurs.floatValue() * nar.dur());
+        long start = ETERNAL, end = ETERNAL;
 
-            NALTask t = new NALTask(term, punct, truth, now,
-                    start, end,
-                    new long[]{nar.time.nextStamp()});
+        NALTask t = new NALTask(term, punct, truth, now,
+                start, end,
+                new long[]{nar.time.nextStamp()});
 
         return () -> {
 

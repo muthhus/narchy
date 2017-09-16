@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class DFA {
 
-    private final int[][] transitionTable;
+    public final int[][] transitions;
     private int is; // init state
     private int rs; // rejected state
     private boolean[] fs; // final states
@@ -19,11 +19,7 @@ public class DFA {
     public DFA(List<NFAState> nfaStateList) {
         is = rs = -1;
         fs = null;
-        this.transitionTable = convert(nfaStateList);
-    }
-
-    public int[][] getTransitionTable() {
-        return transitionTable;
+        this.transitions = convert(nfaStateList);
     }
 
     public int getRejectedState() {
@@ -101,7 +97,7 @@ public class DFA {
 
     private static void dfsClosure(NFAState state, Set<NFAState> closure) {
         closure.add(state);
-        state.getDirectTable().forEach(next -> dfsClosure(next, closure));
+        state.directTable.forEach(next -> dfsClosure(next, closure));
     }
 
     private static Set<NFAState> traceReachable(Set<NFAState> closure, char ch, Map<NFAState, Set<NFAState>> closureMap) {
@@ -173,11 +169,7 @@ public class DFA {
                             int targetGroup = groupFlags.get(targetState);
                             targetGroupTable.put((int) ch, targetGroup);
                         }
-                        Set<Integer> stateIDSet = invertMap.get(targetGroupTable);
-                        if (stateIDSet == null) {
-                            stateIDSet = new HashSet<>();
-                            invertMap.put(targetGroupTable, stateIDSet);
-                        }
+                        Set<Integer> stateIDSet = invertMap.computeIfAbsent(targetGroupTable, k -> new HashSet<>());
                         stateIDSet.add(sid);
                     }
                 }

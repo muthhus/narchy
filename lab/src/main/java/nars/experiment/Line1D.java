@@ -69,7 +69,7 @@ public class Line1D {
                                                 () -> (float) a.i.floatValue(),
                                                 a.o,
                                                 //a.out.feedback.current!=null ? a.out.feedback.current.freq() : 0f,
-                                                () -> a.reward
+                                                () -> a.rewardCurrent
                                                 //() -> a.rewardSum
                                                 )
                                                 ,
@@ -185,8 +185,6 @@ public class Line1D {
 
 
             agent.speed.setValue(yResolution);
-
-            agent.happy.resolution.setValue(0.01f);
 
             agent.in.resolution(yResolution);
 //            for (GoalActionConcept g : new GoalActionConcept[]{agent.up, agent.down})
@@ -322,7 +320,7 @@ public class Line1D {
 
         public Line1DTrainer(Line1DSimplest a) {
             this.a = a;
-            this.lastReward = a.reward;
+            this.lastReward = a.rewardCurrent;
 
             NAR n = a.nar;
             a.speed.setValue(0.02f);
@@ -346,7 +344,7 @@ public class Line1D {
 
 
                 //System.out.println(a.reward);
-                if (a.reward > rewardThresh)
+                if (a.rewardCurrent > rewardThresh)
                     consecutiveCorrect++;
                 else
                     consecutiveCorrect = 0; //start over
@@ -374,7 +372,7 @@ public class Line1D {
 
                     if (lag > 1) { //skip the step after a new target has been selected which can make it seem worse
 
-                        float worsening = lastReward - a.reward;
+                        float worsening = lastReward - a.rewardCurrent;
                         if (step > trainingRounds && worsening > worsenThreshold) {
                             //print tasks suspected of faulty logic
                             current.forEach(x -> {
@@ -387,7 +385,7 @@ public class Line1D {
 
                 }
 
-                lastReward = a.reward;
+                lastReward = a.rewardCurrent;
 
                 current.clear();
             });

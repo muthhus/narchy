@@ -35,7 +35,7 @@ abstract public class NAgentY extends NAgentX {
 
     public NAgentY(String id, NAR nar, IntIntToObjectFunc<Agent> ctl) {
         super(id, nar);
-        spec = new AgentService.AgentBuilder(ctl, () -> reward);
+        spec = new AgentService.AgentBuilder(ctl, () -> rewardCurrent);
     }
 
     @Override

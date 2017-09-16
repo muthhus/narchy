@@ -12,12 +12,8 @@ import org.jetbrains.annotations.Nullable;
 abstract public class PriorityHijackBag<K,V extends Priority> extends HijackBag<K, V> {
 
 
-    protected PriorityHijackBag(int reprobes) {
-        super(reprobes);
-    }
     protected PriorityHijackBag(int cap, int reprobes) {
-        this(reprobes);
-        setCapacity(cap);
+        super(cap, reprobes);
     }
 
 

@@ -77,8 +77,8 @@ public abstract class Param extends Services<Term,NAR> {
     /** used on premise formation  */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
             //UtilityFunctions::aveGeo;
-            UtilityFunctions::aveAri;
-            //Util::or; //potentially explosive
+            //UtilityFunctions::aveAri;
+            Util::or; //potentially explosive
             //Util::and;
             //Math::min;
             //Math::max;
@@ -91,7 +91,7 @@ public abstract class Param extends Services<Term,NAR> {
                     32;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(384);
+    public final MutableInteger matchTTL = new MutableInteger(256);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.2f;
@@ -137,8 +137,8 @@ public abstract class Param extends Services<Term,NAR> {
     public final float[] value = new float[Cause.Purpose.values().length];
 
     protected void valueDefaults() {
-        value[Cause.Purpose.Input.ordinal()] = -0.01f;
-        value[Cause.Purpose.Process.ordinal()] = +0.01f;
+        value[Cause.Purpose.Input.ordinal()] = -1f;
+        value[Cause.Purpose.Process.ordinal()] = +0.1f; //knowledge for its own sake has some value but it should satisfy other values to compensate for the input cost
 
         value[Cause.Purpose.Accurate.ordinal()] = +1f;
         value[Cause.Purpose.Inaccurate.ordinal()] = -1f;
@@ -351,7 +351,7 @@ public abstract class Param extends Services<Term,NAR> {
      * values of 0 means all budget is transferred to subterms,
      * values of 1 means no budget is transferred
      */
-    public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
+    public final FloatParam momentum = new FloatParam(0.25f, 0, 1f);
 
     /**
      * dt > 0

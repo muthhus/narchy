@@ -19,7 +19,6 @@ import spacegraph.SpaceGraph;
 import spacegraph.widget.console.ConsoleSurface;
 import spacegraph.widget.console.ConsoleTerminal;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -89,7 +88,7 @@ public abstract class ConsoleAgent extends NAgentX {
 //        });
 
 
-        senseNumberDifference($.func((Atomic) id, Atomic.the("joy")), happy);
+        senseNumberDifference($.func((Atomic) id, Atomic.the("joy")), reward);
 
         CauseChannel<Task> s = nar.newCauseChannel(this + "_HumanKeys");
         onFrame(() -> {

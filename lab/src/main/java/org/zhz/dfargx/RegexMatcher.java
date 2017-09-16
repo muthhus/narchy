@@ -26,9 +26,9 @@ public class RegexMatcher extends DFA {
     }
 
     public RegexMatcher(String regex) {
-        super(new NFA(new SyntaxTree(regex).getRoot()).getStateList());
+        super(new NFA(new SyntaxTree(regex).getRoot()).states);
 
-        transitionTable = getTransitionTable();
+        transitionTable = transitions;
         is = getInitState();
         fs = getFinalStates();
         rs = getRejectedState();

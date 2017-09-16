@@ -124,10 +124,10 @@ public class FZero extends NAgentX {
                 //DQN::new,
                 HaiQAgent::new,
                 //() -> Util.tanhFast(a.dexterity())) //reward function
-                () -> dexterity() * Util.tanhFast(reward) /* - lag */) //reward function
+                () -> dexterity() * Util.tanhFast(rewardCurrent) /* - lag */) //reward function
 
                 .in(this::dexterity)
-                .in(new FloatNormalized(() -> reward).relax(0.01f))
+                .in(new FloatNormalized(() -> rewardCurrent).relax(0.01f))
                 .in(new FloatNormalized(
                         ((Emotivation) nar.emotion).cycleDTRealMean::getValue)
                         .relax(0.01f)

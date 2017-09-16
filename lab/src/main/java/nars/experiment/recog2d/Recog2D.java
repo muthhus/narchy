@@ -13,7 +13,6 @@ import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
 import nars.term.Termed;
-import nars.term.atom.Atomic;
 import nars.time.Tense;
 import nars.truth.Truth;
 import nars.video.CameraSensor;
@@ -148,7 +147,7 @@ public class Recog2D extends NAgentX {
                 row(beliefTableCharts(nar, out.keySet(), 256)),
 
                 row(p = new Plot2D(history, Plot2D.Line).add("Reward", () ->
-                                reward
+                                rewardCurrent
                         //tv.errorSum()
                 )),
                 //row(s = new Plot2D(history, Plot2D.BarWave).add("Rward", () -> rewardValue)),

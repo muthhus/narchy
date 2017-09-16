@@ -11,13 +11,12 @@ import jcog.random.XorShift128PlusRandom;
 import jcog.tensor.ArrayTensor;
 import jcog.tensor.Tensor;
 import org.apache.commons.math3.random.EmpiricalDistribution;
+import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.function.Consumer;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static jcog.Texts.n4;
 import static org.junit.Assert.*;
@@ -104,18 +103,40 @@ public class BagTest {
     }
 
 
-    public static Tensor samplingPriDist(@NotNull Bag b, int batches, int batchSize, int bins) {
+    public static Tensor samplingPriDist(@NotNull Bag<PLink<String>, PLink<String>> b, int batches, int batchSize, int bins) {
 
         assert(bins > 1);
 
+        Set<String> hit = new TreeSet();
+        Frequency hits = new Frequency();
         ArrayTensor f = new ArrayTensor(bins);
-        //DoubleHistogram d = new DoubleHistogram(5);
         assertFalse(b.isEmpty());
         for (int i = 0; i < batches; i++) {
-            b.sample(batchSize, (Consumer) x -> f.data[Util.bin(b.pri(x), bins)]++ /*d.recordValue(b.pri(x)*/);
+            b.sample(batchSize, x -> {
+                f.data[Util.bin(b.pri(x), bins)]++;
+                String s = x.get();
+                hits.addValue(s);
+                hit.add(s);
+            });
         }
+
         int total = batches * batchSize;
         assertEquals(total, Util.sum(f.data), 0.001f);
+
+        if (hits.getUniqueCount() != b.size()) {
+
+            System.out.println(hits.getUniqueCount() + " != " + b.size());
+
+            Set<String> items = b.stream().map(PLink::get).collect(Collectors.toSet());
+            items.removeAll(hit);
+            System.out.println("not hit: " + items);
+
+            System.out.println(hits);
+            fail("all elements must have been sampled at least once");
+        }
+
+        //System.out.println(hits);
+
         return f.scale(1f / total);
     }
 
@@ -133,6 +154,73 @@ public class BagTest {
             assertTrue(((ArrayBag) a).listCopy().isEmpty());
             assertTrue(((ArrayBag) a).keySet().isEmpty());
         }
+
+    }
+
+
+    static void testBagSamplingDistribution(Bag<PLink<String>, PLink<String>> bag, float batchSizeProp) {
+        testBagSamplingDistribution(bag, batchSizeProp, bag.capacity());
+    }
+
+    static void testBagSamplingDistribution(Bag<PLink<String>, PLink<String>> bag, float batchSizeProp, int cap) {
+
+        assert(cap > 0);
+
+        fillLinear(bag, cap);
+
+        //bag.forEach(System.out::println);
+
+        int batchSize = (int)Math.ceil(batchSizeProp * cap);
+        int batches = cap * 1000 / batchSize;
+
+        Tensor f1 = samplingPriDist(bag, batches, batchSize, Math.max(2, cap/2));
+
+        String h = "cap=" + cap + " total=" + (batches * batchSize);
+        System.out.println(h + ":\n\t" + f1.tsv2());
+        System.out.println();
+
+        float[] ff = f1.get();
+
+        //monotonically increasing
+
+        float orderThresh = 0.05f; //TODO minimize this
+        for (int j = 0; j < ff.length; j++) {
+            for (int i = j+1; i < ff.length; i++) {
+                float diff = ff[j] - ff[i];
+                boolean unordered = diff > orderThresh;
+                if (unordered) {
+                    fail("sampling distribution not ordered. contents=" + bag.toString());
+                }
+            }
+        }
+
+
+        for (int lows : ff.length > 4 ? new int[] { 0, 1} : new int[] { 0 }  ) {
+            for (int highs : ff.length > 4 ? new int[] { ff.length-1, ff.length-2} : new int[] { ff.length-1 }  ) {
+                final float MIN_RATIO = 2f; //should be higher
+                float maxMinRatio = ff[highs] / ff[lows];
+                assertTrue(maxMinRatio + " ratio between max and min",
+                        maxMinRatio > MIN_RATIO
+                );
+            }
+        }
+
+
+        //TODO verify the histogram resulting from the above execution is relatively flat:
+        //ex: [0.21649484536082475, 0.2268041237113402, 0.28865979381443296, 0.26804123711340205]
+        //the tests below assume that it begins with a relatively flat distribution
+//        System.out.println(Arrays.toString(bag.priHistogram(4)));
+//        System.out.println(Arrays.toString(bag.priHistogram(8)));
+
+
+//        System.out.print("Sampling: " );
+//        printDist(samplingPriDistribution((CurveBag) n.core.concepts, 1000));
+//        System.out.print("Priority: " );
+//        EmpiricalDistribution pri;
+//        printDist(pri = getSamplingPriorityDistribution(n.core.concepts, 1000));
+//
+//        List<SummaryStatistics> l = pri.getBinStats();
+//        assertTrue(l.get(0).getN() < l.get(l.size() - 1).getN());
 
     }
 
@@ -214,15 +302,20 @@ public class BagTest {
     /**
      * fill it exactly to capacity
      */
-    public static void fillLinear(Bag<PLink<String>, PLink<String>> bag) {
+    public static void fillLinear(Bag<PLink<String>, PLink<String>> bag, int c) {
         assertTrue(bag.isEmpty());
-        int c = bag.capacity();
-        for (int i = 0; i < c; i++) {
-            float a = (float) (i) / c;
-            float b = (float) (i + 1) / c;
-            bag.put(new PLink("x" + i, (a+b)/2f)); //midpoint
+
+        //insert biggest items first
+        for (int i = c-1; i >= 0; i--) {
+            PLink p = new PLink(i + "x", (i + 0.5f) / c);
+            PLink inserted = bag.put(p); //midpoint
+            if (inserted==null) {
+                bag.print();
+                bag.put(p);
+                fail();
+            }
         }
-        bag.commit();
+        bag.commit(null);
         assertEquals(c, bag.size());
         assertEquals(0.5f / c, bag.priMin(), 0.03f);
         assertEquals(1 - 1f/(c*2f), bag.priMax(), 0.03f); //no pressure should have been applied because capacity was only reached after the last put

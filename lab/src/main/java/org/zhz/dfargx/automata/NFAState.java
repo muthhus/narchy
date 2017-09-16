@@ -10,7 +10,8 @@ import java.util.Set;
  */
 public class NFAState {
 
-    private final Set<NFAState> directTable;
+    private static int nextID;
+    public final Set<NFAState> directTable;
     public final CharObjectHashMap<Set<NFAState>> transitions;
     private final int id;
 
@@ -20,9 +21,21 @@ public class NFAState {
         this.id = id;
     }
 
+    public static NFAState create() {
+        return new NFAState(nextID++);
+    }
+
+
+    @Override
+    public String toString() {
+        return id + "{" +
+                "direct*" + directTable.size() +
+                (transitions.isEmpty() ? "" : ", transi*" + transitions.keySet() )+
+                '}';
+    }
+
     public void transitionRule(char ch, NFAState state) {
-        Set<NFAState> stateSet = transitions.getIfAbsentPut(ch, HashSet::new);
-        stateSet.add(state);
+        transitions.getIfAbsentPut(ch, HashSet::new).add(state);
     }
 
     public void directRule(NFAState state) {
@@ -46,14 +59,4 @@ public class NFAState {
         return id; //Objects.hash(id);
     }
 
-    public Set<NFAState> getDirectTable() {
-        return directTable;
-    }
-
-    @Override
-    public String toString() {
-        return "NFAState{" +
-                "id=" + id +
-                '}';
-    }
 }

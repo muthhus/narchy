@@ -46,8 +46,9 @@ public enum TrieDeriver {
         PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
 
         PrediTerm<Derivation> tf = Fork.fork(roots).transform(each);
-        //return tf;
-        return new TrieExecutor(tf);
+
+        return tf;
+        //return new TrieExecutor(tf);
     }
 
 
