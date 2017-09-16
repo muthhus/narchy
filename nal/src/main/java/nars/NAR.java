@@ -1082,7 +1082,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                     .a(tv.pri() > 0.75f ? Ansi.Attribute.NEGATIVE_ON : Ansi.Attribute.NEGATIVE_OFF)
                     .fg(Prioritized.budgetSummaryColor(tv))
                     .a(
-                            tv.toString(this, true)
+                            tv.toString(true)
                     )
                     .reset()
                     .toString();

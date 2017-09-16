@@ -49,19 +49,17 @@ public class Stats {
         for (int i = 0; i <= maxDepth; i++) {
             out.print(i + ": " + branchesAtDepth[i] + "  ");
         }
-        out.println("\n   Leaves (" + leafCount + " total)");
-        out.print("      ");
+        out.print("\n\tLeaves (" + leafCount + "): ");
         for (int i = 0; i <= maxDepth; i++) {
             out.print(i + ": " + leavesAtDepth[i] + "  ");
         }
-        out.println("\n   Entries (" + entryCount + " total)");
-        out.print("      ");
+        out.print("\n\tEntries (" + entryCount + "): ");
         for (int i = 0; i <= maxDepth; i++) {
             out.print(i + ": " + entriesAtDepth[i] + "  ");
         }
-        out.printf("\n   Leaf Fill Percentage: %.2f%%\n", getLeafFillPercentage());
-        out.printf("   Entries per Leaf: %.2f\n", getEntriesPerLeaf());
-        out.println("   Max Depth: " + maxDepth);
+        out.printf("\n\tLeaf Fill Percentage: %.2f%%", getLeafFillPercentage());
+        out.printf("\tEntries per Leaf: %.2f", getEntriesPerLeaf());
+        out.println("\tMax Depth: " + maxDepth);
         out.println();
     }
 

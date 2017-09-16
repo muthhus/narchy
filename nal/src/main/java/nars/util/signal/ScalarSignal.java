@@ -144,6 +144,8 @@ public class ScalarSignal extends Signal implements  DoubleSupplier {
     }
 
 
+
+
     /** provides an immediate truth assessment with the last known signal value */
     @Nullable public final Truth truth() {
         Task t = get();

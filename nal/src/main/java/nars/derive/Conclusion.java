@@ -74,35 +74,20 @@ public class Conclusion extends AbstractPred<Derivation> {
         NAR nar = p.nar;
 
         nar.emotion.derivationTry.increment();
+        p.use(Param.TTL_DERIVE_TRY);
 
-        if (minNAL > nar.nal())  //HACK
-            return true;
-
-        //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
-        //  which is already determined bythe constructed term's growing complexity) in m.budget()
-
-
-        int volMax = nar.termVolumeMax.intValue();
-
-        // 1. SUBSTITUTE and EVAL
-        p.use(Param.TTL_DERIVE_EVAL);
-        Term c1 = pattern.transform(p);
-
-        if (c1 == null || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
-            return true;
+        Term c1 = pattern.transform(p); //SUBSTITUTE and EVAL
 
         nar.emotion.derivationEval.increment();
 
-
-        // 4. TEMPORALIZE --
-
-        Truth truth = p.concTruth;
+        int volMax = nar.termVolumeMax.intValue();
+        if (c1 == null || c1 == pattern || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
+            return true;
 
         @NotNull final long[] occ;
         final float[] confGain = {1f}; //flat by default
 
         Term c2;
-        long now = p.time;
         if (p.temporal) {
 
             Term t1;
@@ -142,7 +127,7 @@ public class Conclusion extends AbstractPred<Derivation> {
                 long taskStart = p.task.start();
 
                 if (p.temporal && taskStart == ETERNAL)
-                    taskStart = now;
+                    taskStart = p.time;
 
                 //if (taskStart != ETERNAL) {
                 if (occ[0] != ETERNAL && taskStart != ETERNAL && occ[0] < taskStart) {
@@ -187,31 +172,19 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         //5. VALIDATE FOR TASK TERM
 
-        byte punc = p.concPunc;
+        byte punc = p.concPunc; assert (punc != 0) : "no punctuation assigned";
 
-        assert (punc != 0) :
-                "no punctuation assigned, wtf";
-
-        Task t = Task.tryTask(c2, punc, truth, (C, tr) -> {
-
-            if (tr != null) { //beliefs and goals
-                tr = tr.ditherFreqConf(p.truthResolution, p.confMin, confGain[0]);
-                if (tr == null)
-                    return null; //HACK
-            }
+        Task t = Task.tryTask(c2, punc, p.concTruth, (C, tr) -> {
 
             long start = occ[0];
             long end = occ[1];
-            //assert (end >= start);
-            if (end < start) {
-                long e = end;
-                end = start;
-                start = e;
-            }
+            assert (end >= start);
 
             short[] cause = ArrayUtils.addAll(p.parentCause, channel.id);
 
             long[] evi = p.single ? p.evidenceSingle() : p.evidenceDouble();
+
+            long now = p.time;
 
             DerivedTask derived =
                     Param.DEBUG ?

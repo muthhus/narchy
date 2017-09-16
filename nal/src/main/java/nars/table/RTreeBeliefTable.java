@@ -43,14 +43,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     public static final int MAX_TASKS_PER_LEAF = 3;
     public static final Spatialization.DefaultSplits SPLIT =
             Spatialization.DefaultSplits.AXIAL;
-            //Spatialization.DefaultSplits.LINEAR; //<- probably doesnt work here
+    //Spatialization.DefaultSplits.LINEAR; //<- probably doesnt work here
 
     private int capacity;
 
-    /** max fraction of the fully capacity table to compute in a single truthpolation */
+    /**
+     * max fraction of the fully capacity table to compute in a single truthpolation
+     */
     static final float TRUTHPOLATED_MAX_FRACTION = 0.2f;
 
-    public static final float PRESENT_AND_FUTURE_BOOST = 1.5f;
+    public static final float PRESENT_AND_FUTURE_BOOST = 1.25f;
 
 
     private transient NAR nar;
@@ -117,7 +119,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         @Override
         public void value(boolean updateOrFinish) {
-            ((ConcurrentRTree<TaskRegion>)(tree)).write((treeRW) -> {
+            ((ConcurrentRTree<TaskRegion>) (tree)).write((treeRW) -> {
 
                 boolean removed = treeRW.remove(MyTaskStretcher.this);
 
@@ -357,11 +359,24 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             tr = x;//new TaskLinkRegion(x);
         }
 
-        final boolean added = tree.add(tr);
+        final boolean[] added = new boolean[1];
+        ((ConcurrentRTree<TaskRegion>) tree).write(treeRW -> {
 
-        ensureCapacity(added ? tr : null, nar);
+            added[0] = treeRW.add(tr);
 
-        if (added) {
+            @Nullable TaskRegion tr1 = added[0] ? tr : null;
+            int cap = this.capacity;
+            if (treeRW.size() > cap) {
+                //int excess = tree.size() - cap; //hard limit
+                for (int e = 0; treeRW.size() > cap /*&& e < excess*/; e++) {
+                    compress(treeRW, tr1, nar, cap);
+                }
+                assert (treeRW.size() <= cap);
+            }
+        });
+
+
+        if (added[0]) {
             float pri = x.pri();
             if (pri != pri) {
                 //somehow it was added then immediately removed during compression
@@ -378,19 +393,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         }
 
-    }
-
-    void ensureCapacity(@Nullable TaskRegion tr, NAR n) {
-        int cap = this.capacity;
-        if (tree.size() > cap) {
-            ((ConcurrentRTree) tree).write(treeRW -> {
-                //int excess = tree.size() - cap; //hard limit
-                for (int e = 0; tree.size() > cap /*&& e < excess*/; e++) {
-                    compress((ConcurrentRTree) tree, tr, n, cap);
-                }
-                assert (tree.size() <= cap);
-            });
-        }
     }
 
     /**
@@ -438,18 +440,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         //3.
         for (TaskRegion d : deleteVictimArray) {
-            if (d!=null) {
+            if (d != null) {
                 if (tryDelete(treeRW, d))
                     if (treeRW.size() <= cap) return;
             } else {
                 break;
             }
         }
-
-        if (startSize == tree.size()) {
-            System.out.println("wtf");
-        }
-
     }
 
 
@@ -485,18 +482,20 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 boolean allowMerge;
 
                 if (inputStrength != inputStrength) {
-                    allowMerge = true;
-                } else {
-                    float strengthRemoved = taskStrength.floatValueOf(at) + taskStrength.floatValueOf(bt);
-                    float strengthAdded = taskStrength.floatValueOf(c) + inputStrength;
-                    allowMerge = strengthAdded >= strengthRemoved;
+                    //allowMerge = true;
+                    inputStrength = 0; //stricter
                 }
+
+                float strengthRemoved = taskStrength.floatValueOf(at) + taskStrength.floatValueOf(bt);
+                float strengthAdded = taskStrength.floatValueOf(c) + inputStrength;
+                allowMerge = strengthAdded >= strengthRemoved;
+
 
                 if (allowMerge) {
 
                     //already has write lock so just use non-async methods
-                    treeRW.remove(a);
-                    treeRW.remove(b);
+                    tryDelete(treeRW, a);
+                    tryDelete(treeRW, b);
                     treeRW.add(c); //new TaskLinkRegion(c));
 
                     return c;
@@ -706,7 +705,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     public void print(PrintStream out) {
-        forEachTask(out::println);
+        forEachTask(t -> out.println(t.toString(true)));
         tree.stats().print(out);
     }
 }

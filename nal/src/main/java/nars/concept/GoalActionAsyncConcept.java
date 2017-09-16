@@ -201,7 +201,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
         );
 
         if (fb != null) {
-            SensorConcept.feedback(fb, true, beliefs(), now, nar);
+            SensorConcept.feedback(fb, false, beliefs(), now, nar);
         }
     }
 

@@ -67,33 +67,18 @@ public abstract class TermVector implements TermContainer {
 
 
     @NotNull
-    public static TermVector1 the(@NotNull Term the) {
-        return new TermVector1(the);
-    }
-
-    @NotNull
-    public static TermVector the2(@NotNull Term[] xy) {
-        return new TermVector2(xy);
-    }
-
-    @NotNull
     public static TermContainer the(@NotNull Term... t) {
         switch (t.length) {
             case 0:
                 return TermContainer.NoSubterms;
-            case 1:
-                return the(t[0]);
-            case 2:
-                return the2(t);
+            //case 1:
+                //return new TermVector1(t[0]);
+            //case 2:
+                //return new TermVector2(t);
             default:
                 return new ArrayTermVector(t);
         }
     }
-
-    protected static TermContainer the(@NotNull Collection<? extends Term> t) {
-        return Op.subterms(t.toArray(new Term[t.size()]));
-    }
-
 
 
     @Override

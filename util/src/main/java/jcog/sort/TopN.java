@@ -26,14 +26,14 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E>  {
 
     @Override
     public int add(E element, float elementRank, FloatFunction<E> cmp) {
-        if (size == list.length && elementRank < minSeen)
-            return -1; //insufficient
+//        if (size == list.length && elementRank < minSeen)
+//            return -1; //insufficient
 
         int r = super.add(element, elementRank, cmp);
         if (r>=0) {
-            //added
-            if (elementRank < minSeen)
-                minSeen = elementRank;
+//            //added
+//            if (elementRank < minSeen)
+//                minSeen = elementRank;
         }
         return r;
     }

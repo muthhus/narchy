@@ -284,10 +284,10 @@ public class Revision {
 
         float factor = 1f;
 
-        //relate high frequency difference with low confidence
-        float freqDiscount =
-                0.5f + 0.5f * TruthFunctions.freqSimilarity(a.freq(), b.freq());
-        factor *= freqDiscount; if (factor < Prioritized.EPSILON) return null;
+//        //relate high frequency difference with low confidence
+//        float freqDiscount =
+//                0.5f + 0.5f * TruthFunctions.freqSimilarity(a.freq(), b.freq());
+//        factor *= freqDiscount; if (factor < Prioritized.EPSILON) return null;
 
         //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
@@ -330,7 +330,7 @@ public class Revision {
         long start = uu.a;
         long end = uu.b;
         /** account for how much the merge stretches the truth beyond the range of the inputs */
-        if (u > s && u - s <= dur * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS) {
+        if (u > s && u - s > dur * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS) {
             factor *= (Math.max(1f,s) / Math.max(1f,u)); if (factor < Prioritized.EPSILON) return null;
         }
 
@@ -356,8 +356,8 @@ public class Revision {
 
         assert (a.punc() == b.punc());
 
-        float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
-        float bw = b.evi();
+        float aw = a.isQuestOrQuestion() ? 0 : a.conf(start, end, dur); //question
+        float bw = b.conf(start, end, dur);
         float aProp = aw / (aw + bw);
 
         Term cc = null;

@@ -6,7 +6,7 @@ import nars.index.term.tree.TermKey;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.term.container.TermVector;
+import nars.term.container.TermVector1;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -25,7 +25,7 @@ public class UnitCompound1Test {
     public void testUnitCompound1() {
         Atomic x = Atomic.the("x");
         UnitCompound1 u = new UnitCompound1(PROD, x);
-        Compound g = new GenericCompound(PROD, TermVector.the(x));
+        Compound g = new GenericCompound(PROD, new TermVector1(x));
         assertEquals(g.hashCode(), u.hashCode());
         assertEquals(u, g);
         assertEquals(g, u);
@@ -65,7 +65,7 @@ public class UnitCompound1Test {
 //        System.out.println(u.sub(0));
         assertEquals(UnitCompound1.class, u.getClass());
 
-        GenericCompound g = new GenericCompound(NEG, TermVector.the(x));
+        GenericCompound g = new GenericCompound(NEG, new TermVector1(x));
         assertNotSame(u, g);
         assertEquals(u, g);
         assertEquals(g, u);

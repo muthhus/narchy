@@ -3,7 +3,6 @@ package nars.term;
 import nars.*;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.term.container.TermContainer;
 import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +14,6 @@ import java.util.TreeSet;
 
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
-import static nars.term.container.TermContainer.theTermArray;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 import static org.junit.Assert.*;
@@ -304,18 +302,13 @@ public class TemporalTermTest {
         testParse("(goto(a) &&+5 at(SELF,b))");
     }
 
-    @NotNull
-    TermContainer the(@NotNull Op op, int dt, @NotNull Term... tt) {
-        return Op.subterms(theTermArray(op, dt, tt));
-    }
-
     @Test
     public void testCommutiveTemporalityDepVar0() throws Narsese.NarseseException {
         Term t0 = n.term("((SELF,#1)-->at)").term();
         Term t1 = n.term("goto(#1)").term();
         assertEquals(
-                the(Op.CONJ, DTERNAL, t0, t1),
-                the(Op.CONJ, DTERNAL, t1, t0)
+                Op.subterms(Terms.sorted(t0, t1)),
+                Op.subterms(Terms.sorted(t1, t0))
         );
     }
 

@@ -70,11 +70,15 @@
         //(M ==> S), (M ==> (||,S,A..+)) |- (M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
     (M ==> C), C, belief("&&") |- (M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
-        ((--,%M) ==> C), C, belief("&&") |- ((--,%M) ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
+          (M ==> C), D, belief("&&") |- (M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D, strict)), (Belief:StructuralDeduction)
+        (--M ==> C), C, belief("&&") |- (--M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
+          (--M ==> C), D, belief("&&") |- (--M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D, strict)), (Belief:StructuralDeduction)
         //(M ==> (&&,(--,%S),A..+)), M |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
     (C ==> M), C, belief("&&") |- (dropAnyEvent(C) ==>+- M), (Belief:StructuralDeduction)
-        (C ==> (--,%M)), C, belief("&&") |- (dropAnyEvent(C) ==>+- (--,%M)), (Belief:StructuralDeduction)
-        //((&&,(--,%S),A..+) ==> M), M |- ((&&,A..+) ==>+- M), (Belief:StructuralDeduction)
+          (C ==> M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D, strict) ==>+- M), (Belief:StructuralDeduction)
+        (C ==> --M), C, belief("&&") |- (dropAnyEvent(C) ==>+- --M), (Belief:StructuralDeduction)
+          (C ==> --M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D, strict) ==>+- --M), (Belief:StructuralDeduction)
+                //((&&,(--,%S),A..+) ==> M), M |- ((&&,A..+) ==>+- M), (Belief:StructuralDeduction)
 
 
 
@@ -105,7 +109,9 @@
 
     //answering
     Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Z), Y, Z, strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+        Z, (X==>Y), task("?") |- subIfUnifiesAny(Y, X, Z, strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
     Z, (X==>Y), task("?") |- subIfUnifiesAny((Z ==>+- Y), X, Z, strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
+        Z, (X==>Y), task("?") |- subIfUnifiesAny(X, Y, Z, strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
 
     //strong unification
     //(Y==>X),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Deduction)

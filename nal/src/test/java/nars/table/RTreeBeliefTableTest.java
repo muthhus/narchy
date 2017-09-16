@@ -27,27 +27,42 @@ public class RTreeBeliefTableTest {
         assertEquals(0, r.size());
 
         Term x = X.term();
-        Task a = $.belief(x, 1f, 0.9f).time(1).apply(n); a.pri(0.5f);
-        r.add(a, X, n);
+        float freq = 1f;
+        float conf = 0.9f;
+        int creationTime = 1;
+        int start = 1, end = 1;
+
+        Task a = add(r, x, freq, conf, start, end, n);
         assertEquals(1, r.size());
 
-        r.add(a, X, n);
-        assertEquals(1, r.size()); //no change for inserted duplicate
+        r.add(a, X, n); assertEquals(1, r.size()); //no change for inserted duplicate
 
-        Task b = $.belief(x, 0f, 0.9f).time(3).apply(n); b.pri(0.5f);
-        r.add(b, X, n);
+        Task b = add(r, x, 0f, 0.5f, 1, 1, n); //WEAKer
         assertEquals(2, r.size());
 
-        Task c = $.belief(x, 0.1f, 0.9f).time(3).apply(n); c.pri(0.5f);
-        r.add(c, X, n);
+        Task c = add(r, x, 0.1f, 0.9f, 2, 2, n);
         assertEquals(3, r.size());
 
-        Task d = $.belief(x, 0.1f, 0.9f).time(0,3, 4).apply(n); d.pri(0.5f);
-        r.add(d, X, n);
-        r.print(System.out);
-        assertEquals(4, r.size()); //no change for inserted duplicate
+        Task d = add(r, x, 0.1f, 0.9f, 3, 4, n);
+        assertEquals(4, r.size());
 
+        System.out.println("at capacity");
         r.print(System.out);
+
+        //try capacity limit
+        Task e = add(r, x, 0.3f, 0.9f, 3, 4, n);
+        assertEquals(4, r.size()); //capacity limit unaffected
+
+        System.out.println("after capacity compress inserting " + e.toString(true));
+        r.print(System.out);
+    }
+
+    @NotNull
+    public Task add(RTreeBeliefTable r, Term x, float freq, float conf, int start, int end, NAR n) {
+        Task a = $.belief(x, freq, conf).time(start, start, end).apply(n);
+        a.pri(0.5f);
+        r.add(a, (BaseConcept) n.concept(x), n);
+        return a;
     }
 
 

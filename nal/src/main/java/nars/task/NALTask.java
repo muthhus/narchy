@@ -242,7 +242,7 @@ public class NALTask extends Pri implements Task {
     @Override
     @Deprecated
     public String toString() {
-        return appendTo(null, null).toString();
+        return appendTo(null).toString();
     }
 
 

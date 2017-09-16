@@ -717,20 +717,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    @NotNull
-    static Term[] theTermArray(@NotNull Op op, int dt, @NotNull Term... tt) {
-        return mustSortAndUniquify(op, dt, tt.length) ?
-                Terms.sorted(tt) :
-                tt;
-    }
-
-    /**
-     * non-zero or non-iternal dt disqualifies any reason for needing a TermSet
-     */
-    static boolean mustSortAndUniquify(@NotNull Op op, int dt, int num) {
-        return num > 1 && op.commutative && (concurrent(dt));
-    }
-
     default boolean isTemporal() {
         return OR(Term::isTemporal);
     }
@@ -969,8 +955,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        }
 
         //lexic sorted so that the formed termutator has a canonical representation, preventing permuted duplicates in the termute chain
-        SortedSet<Term> xs = /*toSorted*/toSortedSet();
-        SortedSet<Term> ys = y./*toSorted*/toSortedSet();
+        SortedSet<Term> xs = toSortedSet();
+        SortedSet<Term> ys = y.toSortedSet();
         ////xs.removeIf(s -> !subst.matchType(s) && ys.remove(s));
 
         xs.removeIf(x -> {
@@ -1002,7 +988,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         } else if (yss == xss) {
 
             u.termutes.add(new CommutivePermutations(
-                    TermVector.the(xs), TermVector.the(ys)
+                    Op.subterms(xs), Op.subterms(ys)
             ));
             return true;
         } else /* yss!=xss */ {

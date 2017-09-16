@@ -63,7 +63,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
         for (int i = 0; i < indent; i++)
             sb.append("  ");
-        task.appendTo(sb, null, true);
+        task.appendTo(sb, true);
         sb.append("\n  ");
 
 
@@ -510,13 +510,13 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
     @Nullable
     default Appendable appendTo(Appendable sb) throws IOException {
-        sb.append(appendTo(null, null));
+        sb.append(appendTo(null));
         return sb;
     }
 
     @Nullable
-    default Appendable toString(NAR memory, boolean showStamp) {
-        return appendTo(new StringBuilder(), memory, showStamp);
+    default Appendable toString(boolean showStamp) {
+        return appendTo(new StringBuilder(32), showStamp);
     }
 
     @Nullable
@@ -654,27 +654,15 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         return nearestBetween(start(), end(), when);
     }
 
-    @NotNull
-    default Appendable toString(/**@Nullable*/NAR memory) {
-        return appendTo(null, memory);
-
-    }
-
-    default @Nullable StringBuilder appendTo(@Nullable StringBuilder sb, /**@Nullable*/NAR memory) {
-        return appendTo(sb, memory, false);
+    default @Nullable StringBuilder appendTo(@Nullable StringBuilder sb /**@Nullable*/) {
+        return appendTo(sb, false);
     }
 
     @NotNull
     @Deprecated
     default String toStringWithoutBudget() {
-        return toStringWithoutBudget(null);
-    }
-
-    @NotNull
-    @Deprecated
-    default String toStringWithoutBudget(NAR memory) {
         StringBuilder b = new StringBuilder();
-        appendTo(b, memory, true, false,
+        appendTo(b, true, false,
                 false, //budget
                 false//log
         );
@@ -684,16 +672,16 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
     @NotNull
     @Deprecated
-    default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/NAR memory, boolean showStamp) {
+    default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/boolean showStamp) {
         boolean notCommand = punc() != Op.COMMAND;
-        return appendTo(buffer, memory, true, showStamp && notCommand,
+        return appendTo(buffer, true, showStamp && notCommand,
                 notCommand, //budget
                 showStamp //log
         );
     }
 
     @NotNull
-    default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/@Nullable NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
+    default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
 
         String contentName;
         if (term) {
@@ -821,9 +809,13 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         return term().dt();
     }
 
-    default float conf(long when, int dur) {
-        float cw = evi(when, dur);
+    default float conf(long start, long end, int dur) {
+        float cw = evi(start, end, dur);
         return cw == cw ? w2c(cw) : Float.NaN;
+    }
+
+    default float conf(long when, int dur) {
+        return conf(when, when, dur);
     }
 
     @Nullable

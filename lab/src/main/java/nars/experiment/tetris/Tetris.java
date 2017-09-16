@@ -785,7 +785,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
             n.concepts().forEach(c -> {
                 System.out.println(c);
                 c.tasks().forEach(t -> {
-                    System.out.println("\t" + t.toString(n, true));
+                    System.out.println("\t" + t.toString(true));
                 });
                 System.out.println();
             });

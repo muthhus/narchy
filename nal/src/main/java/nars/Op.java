@@ -705,7 +705,7 @@ public enum Op implements $ {
     }
 
     @NotNull
-    public static TermContainer subterms(@NotNull Term... s) {
+    public static TermContainer subterms(Term... s) {
         return Builder.Subterms.the.apply(s);
     }
 
@@ -1596,6 +1596,10 @@ public enum Op implements $ {
 
     public static boolean goalable(Term c) {
         return !c.hasAny(Op.NonGoalable);// && c.op().goalable;
+    }
+
+    public static TermContainer subterms(@NotNull Collection<? extends Term> t) {
+        return subterms(t.toArray(new Term[t.size()]));
     }
 
     @NotNull

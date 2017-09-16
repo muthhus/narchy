@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 200;
+    final int cycles = 400;
 
     @Before
     public void nal() {
@@ -52,7 +52,7 @@ public class NAL6Test extends AbstractNALTest {
         tester.believe("<<$x --> swan> ==> <$x --> bird>>", 1.00f, 0.80f); //en("If something is a swan, then it is a bird.");
         tester.believe("<<$y --> swan> ==> <$y --> swimmer>>", 0.80f, 0.9f); //en("If something is a swan, then it is a swimmer.");
         tester.mustBelieve(cycles, "<<$1 --> swan> ==> (&&,<$1 --> bird>,<$1 --> swimmer>)>", 0.80f, 0.72f); //en("I believe that if something is a swan, then usually, it is both a bird and a swimmer.");
-        tester.mustBelieve(cycles, "<<$1 --> swimmer> ==> <$1 --> bird>>", 0.80f, 0.52f); //en("I guess if something is a swimmer, then it is a bird.");
+        tester.mustBelieve(cycles, "<<$1 --> swimmer> ==> <$1 --> bird>>", 1f, 0.37f); //en("I guess if something is a swimmer, then it is a bird.");
         tester.mustBelieve(cycles, "<<$1 --> bird> ==> <$1 --> swimmer>>", 0.80f, 0.42f); //en("I guess if something is a bird, then it is a swimmer.");
 //        tester.mustBelieve(cycles, "<<$1 --> bird> <=> <$1 --> swimmer>>", 0.80f, 0.42f); //en("I guess something is a bird, if and only if it is a swimmer.");
         //tester.mustBelieve(cycles, "<<$1 --> swan> ==> (&&,(--,<$1 --> bird>),(--,<$1 --> swimmer>))>", 0.00f, 0.72f); //en("I believe that if something is a swan, then it is a bird or a swimmer.");
@@ -215,9 +215,9 @@ public class NAL6Test extends AbstractNALTest {
     public void variable_elimination6() {
 
         TestNAR tester = test;
-        tester.believe("<(&&,<$x --> flyer>,<$x --> [chirping]>, <($x, worms) --> food>) ==> <$x --> bird>>"); //en("If something can fly, chirp, and eats worms, then it is a bird.");
-        tester.believe("<{Tweety} --> flyer>"); //en("Tweety can fly.");
-        tester.mustBelieve(cycles, "<(&&,<{Tweety} --> [chirping]>,<({Tweety},worms) --> food>) ==> <{Tweety} --> bird>>", 1.00f, 0.81f); //en("If Tweety can chirp and eats worms, then it is a bird.");
+        tester.believe("((&&, flyer:{$x}, ($x --> [chirping]), food($x, worms)) ==> bird:$x)"); //en("If something can fly, chirp, and eats worms, then it is a bird.");
+        tester.believe("flyer:{Tweety}"); //en("Tweety can fly.");
+        tester.mustBelieve(cycles*2, "((({Tweety} --> [chirping]) && food({Tweety},worms)) ==> bird:{Tweety})", 1.00f, 0.81f); //en("If Tweety can chirp and eats worms, then it is a bird.");
     }
 
 
@@ -305,6 +305,13 @@ public class NAL6Test extends AbstractNALTest {
 
     @Test
     public void variable_introduction2() {
+        /*
+        originally: https://github.com/opennars/opennars/blob/clocktower2/nars_logic/src/test/java/nars/nal/nal6/NAL6Test.java
+        mustBelieve(cycles, "<<gull --> $1> ==> <swan --> $1>>", 0.80f, 0.45f); //en("I guess what can be said about gull usually can also be said about swan.");
+        mustBelieve(cycles, "<<swan --> $1> ==> <gull --> $1>>", 1.00f, 0.39f); //en("I guess what can be said about swan can also be said about gull.");
+        mustBelieve(cycles, "<<gull --> $1> <=> <swan --> $1>>", 0.80f, 0.45f); //en("I guess gull and swan share most properties.");
+        mustBelieve(cycles, "(&&,<gull --> #1>,<swan --> #1>)", 0.80f, 0.81f); //en("Gull and swan have some common property.");
+         */
 
         TestNAR tester = test;
         tester.believe("<gull --> swimmer>"); //en("A gull is a swimmer.");
@@ -518,9 +525,9 @@ public class NAL6Test extends AbstractNALTest {
     public void strong_unification_simple() {
 
         TestNAR tester = test;
-        tester.believe("<<($a,$b) --> pair> ==> <$a --> $b>>", 1.00f, 0.90f);
-        tester.believe("<(x,y) --> pair>", 1.00f, 0.90f);
-        tester.mustBelieve(cycles, "<x --> y>", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
+        tester.believe("(pair($a,$b) ==> ($a --> $b))", 1.00f, 0.90f);
+        tester.believe("pair(x,y)", 1.00f, 0.90f);
+        tester.mustBelieve(cycles*4, "(x --> y)", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
     }
 
     @Test
@@ -537,9 +544,9 @@ public class NAL6Test extends AbstractNALTest {
     public void strong_unification() {
 
         TestNAR tester = test;
-        tester.believe("<<($a,is,$b) --> sentence> ==> <$a --> $b>>", 1.00f, 0.90f);
-        tester.believe("<(bmw,is,car) --> sentence>", 1.00f, 0.90f);
-        tester.mustBelieve(cycles, "<bmw --> car>", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
+        tester.believe("(sentence($a,is,$b) ==> ($a --> $b))", 1.00f, 0.90f);
+        tester.believe("sentence(bmw,is,car)", 1.00f, 0.90f);
+        tester.mustBelieve(cycles*2, "car:bmw", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
 
     }
 

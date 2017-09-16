@@ -106,7 +106,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int TTL_MUTATE = 2;
 
     /** cost of substitution/evaluating a derived term */
-    public static final int TTL_DERIVE_EVAL = 5;
+    public static final int TTL_DERIVE_TRY = 5;
 
     /** cost of a successful task derivation */
     public static final int TTL_DERIVE_TASK_SUCCESS = 10;
@@ -131,7 +131,7 @@ public abstract class Param extends Services<Term,NAR> {
 //    public static final int PREDICTION_HORIZON = 4;
 
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
-    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS = 1;
+    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS = 3;
 
 
     public final float[] value = new float[Cause.Purpose.values().length];

@@ -8,8 +8,8 @@ import nars.index.term.map.MapTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.$.v;
 import static nars.Op.VAR_PATTERN;
+import static nars.Op.concurrent;
 
 /**
  * Index which specifically holds the term components of a deriver ruleset.
@@ -76,7 +77,9 @@ public class PatternTermIndex extends MapTermIndex {
         }
 
 
-        TermContainer v = (changed ? TermVector.the(TermContainer.theTermArray(x.op(), x.dt(), bb)) : s);
+        TermContainer v = (changed ? Op.subterms(bb.length > 1 && x.op().commutative && (concurrent(x.dt())) ?
+                Terms.sorted(bb) :
+                bb) : s);
 
         Ellipsis e = Ellipsis.firstEllipsis(v);
         return e != null ?

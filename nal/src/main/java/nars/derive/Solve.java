@@ -25,7 +25,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
     }
 
 
-    final boolean test(@NotNull Derivation m, byte punc) {
+    final boolean test(@NotNull Derivation p, byte punc) {
 
         boolean single;
         Truth t;
@@ -41,38 +41,40 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
                 Truth bt;
                 if (single) {
-                    if (m.belief!=null)
+                    if (p.belief!=null)
                         return false;
                     bt = null;
                 } else {
-                    if ((bt = (beliefProjected ? m.beliefTruth : m.beliefTruthRaw))==null)
+                    if ((bt = (beliefProjected ? p.beliefTruth : p.beliefTruthRaw))==null)
                         return false; //double premise requiring a belief, but belief is null
                 }
 
-                if (!f.allowOverlap() && (single ? m.cyclic : m.overlap))
+                if (!f.allowOverlap() && (single ? p.cyclic : p.overlap))
                     return false;
 
                 //truth function is single premise so set belief truth to be null to prevent any negations below:
-                float confMin = m.confMin;
+                float confMin = p.confMin;
 
                 if ((t = f.apply(
-                        m.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
+                        p.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
                         bt,
-                        m.nar, confMin
+                        p.nar, confMin
                 ))==null)
                     return false;
 
-                //dithering is applied in Conclusion after negation and evidence gain
+                t = t.ditherFreqConf(p.truthResolution, confMin, 1f);
+                if (t == null)
+                    return false;
 
                 break;
 
             case QUEST:
             case QUESTION:
                 //a truth function so check cyclicity
-                if (m.cyclic)
+                if (p.cyclic)
                     return false;
 
-                byte tp = m.taskPunct;
+                byte tp = p.taskPunct;
                 if ((tp == QUEST) || (tp == GOAL))
                     punc = QUEST; //use QUEST in relation to GOAL or QUEST task
 
@@ -89,7 +91,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
 //            ev = Stamp.uncyclic(ev);
 //        }
 
-        m.truth(
+        p.truth(
             t,
             punc,
             single

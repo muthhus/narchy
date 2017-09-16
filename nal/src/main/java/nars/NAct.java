@@ -357,7 +357,7 @@ public interface NAct {
          *  while if resting at 0.5 it is already at threshold ready
          *  to fire.
          * */
-        final float restFreq = 0f;
+        final float restFreq = 0.5f;
 
         final float ff[] = new float[2];
         final float cc[] = new float[2];
@@ -406,9 +406,9 @@ public interface NAct {
                 float loserBoost = (0.5f - Math.min(0.5f, ff[loser]));
                 float winnerBase = Math.max(0, (ff[winner] - 0.5f));
                 float x =
+                        winnerBase * 2f; //skip negative half, expand to full range
                         //winnerBase + loserBoost;
                         //Util.or(winnerBase, loserBoost);
-                        winnerBase * 2f; //skip negative half, expand to full range
                 float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
 
                 float conf =

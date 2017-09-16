@@ -1,5 +1,6 @@
 package nars.nal.nal5;
 
+import nars.Narsese;
 import nars.test.TestNAR;
 import nars.util.AbstractNALTest;
 import org.junit.Before;
@@ -12,7 +13,7 @@ import static nars.time.Tense.ETERNAL;
 //@RunWith(Parameterized.class)
 public class NAL5Test extends AbstractNALTest {
 
-    final int cycles = 300;
+    final int cycles = 500;
 
     @Before
     public void nal() {
@@ -639,4 +640,21 @@ public class NAL5Test extends AbstractNALTest {
         ;
     }
 
+    @Test public void testAnswerSubstUnifyDed() throws Narsese.NarseseException {
+        test
+                .log()
+                .ask("animal:bird")
+                .believe("(animal:$x ==> alive($x))")
+                .mustBelieve(cycles, "alive(bird)", 1.0f, 0.81f)
+        ;
+    }
+    @Test public void testAnswerSubstUnifyInd() throws Narsese.NarseseException {
+        test
+                .ask("animal:bird")
+                .believe("(alive($x) ==> animal:$x)")
+                .mustBelieve(cycles, "alive(bird)", 1.0f, 0.45f)
+        ;
+    }
+
 }
+

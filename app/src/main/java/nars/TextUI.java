@@ -373,7 +373,7 @@ public class TextUI {
                     );
                 }
 
-                String label = t.toString(nar).toString();
+                String label = t.toString().toString();
                 //getLabel(listBox, index, item);
                 int cols = graphics.getSize().getColumns() - 1;
                 label = TerminalTextUtils.fitString(label, cols);

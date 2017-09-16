@@ -30,12 +30,21 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
         //float fdur = dur;
         //float range = t.range();
+//        return
+//                t.evi(start, end, dur)
+//                //t.conf(now, dur) *
+//                //t.evi(now, dur) *
+//                //* range == 0 ? 1f : (float) (1f + Math.sqrt(t.range()) / dur); ///(1+t.distanceTo(start, end)))); ///fdur
+//        ;
+        float fdur = dur;
         return
-                t.evi(start, end, dur)
+                t.conf() *
+                //(1f + t.conf()) * //raw because time is considered below. this covers cases where the task eternalizes
+                //t.evi(start,end,dur) *
                 //t.conf(now, dur) *
                 //t.evi(now, dur) *
-                //* range == 0 ? 1f : (float) (1f + Math.sqrt(t.range()) / dur); ///(1+t.distanceTo(start, end)))); ///fdur
-        ;
+                //(1f / (1 + t.distanceTo(start, end)/fdur));
+                (((float)Math.sqrt(1+t.range()/fdur)) / ((1 + Math.abs((start+end)/2 - t.mid()))/fdur));
     }
 
     /** finds or generates the strongest match to the specified parameters.

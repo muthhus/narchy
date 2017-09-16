@@ -5,7 +5,7 @@ import nars.Op;
 import nars.term.atom.Atomic;
 import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
+import nars.term.container.TermVector1;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -107,8 +107,8 @@ public class TermContainerTest {
     @Test
     public void testEqualityOfVector1() {
         Term a = Atomic.the("a");
-        TermContainer x = TermVector.the(a);
-        TermContainer y = TermVector.the(a);
+        TermContainer x = new TermVector1(a);
+        TermContainer y = new TermVector1(a);
         assertEquals(x, y);
 
         TermContainer z = new ArrayTermVector(a);
