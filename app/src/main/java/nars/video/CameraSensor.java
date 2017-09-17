@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAgent>, Iterable<CameraSensor<P>.PixelConcept> {
 
 
-    public static final int RADIX = 8;
+    public static final int RADIX = 1;
 
     public final List<PixelConcept> pixels;
     public final CauseChannel<Task> in;
@@ -34,6 +34,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     transient int w, h;
     transient float conf;
+    private int lastPixel;
     //private long stamp;
 
 
@@ -196,7 +197,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     public void accept(NAgent a) {
 
 
-        resolution( Util.round((0.5f * (Util.tanhFast(-in.value())+1)) * 0.5f, 0.02f) );
 
 
         src.update(1);
@@ -207,8 +207,30 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         long now = a.now;
         int dur = nar.dur();
 
+        float value = in.value();
+        resolution( Util.round((0.5f * (Util.tanhFast(-value)+1)), 0.01f) );
+
+        int actualPixels = pixels.size();
+        int pixelsSize = actualPixels;
+        int start = 0, end = pixelsSize;
+        int lp = this.lastPixel;
+        this.lastPixel = 0;
+        if (value < 0) {
+            //frame-rate timeslicing
+            float fraction = 1f-Util.tanhFast(-value);
+            if (fraction < 0.99f) {
+                pixelsSize = Math.round( Util.sqr(fraction) * pixelsSize);
+                assert(pixelsSize < actualPixels);
+
+                start = lp;
+                this.lastPixel = end = (start + pixelsSize) % actualPixels; //for progressive fractional wrap-around
+                //System.out.println(value + " " + fraction + " "+ start + " " + end);
+            }
+
+        }
+
         this.conf = nar.confDefault(Op.BELIEF);
-        for (int i = 0, pixelsSize = pixels.size(); i < pixelsSize; i++) {
+        for (int i = start; i < end; i++) {
             PixelConcept p = pixels.get(i);
             @Nullable Task t = p.update(now, dur, nar);
             if (t!=null) {

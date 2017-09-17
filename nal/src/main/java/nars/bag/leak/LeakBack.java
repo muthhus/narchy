@@ -1,5 +1,6 @@
 package nars.bag.leak;
 
+import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Task;
 import nars.control.CauseChannel;
@@ -9,6 +10,9 @@ import nars.control.CauseChannel;
 abstract public class LeakBack extends TaskLeak {
 
     final static float INITIAL_RATE = 1f;
+
+    //HACK
+    public final FloatParam amp = new FloatParam(0.001f, 0, 1f);
 
     private final CauseChannel<Task> out;
 
@@ -22,12 +26,12 @@ abstract public class LeakBack extends TaskLeak {
     }
 
     @Override
-    protected void run(NAR nar) {
+    protected void run(NAR nar, long dt) {
 
         float g = out.gain();
-        inputRate( g );
+        inputRate( g * amp.floatValue() );
         //System.out.println(this + " " + g);
 
-        super.run(nar);
+        super.run(nar, dt);
     }
 }

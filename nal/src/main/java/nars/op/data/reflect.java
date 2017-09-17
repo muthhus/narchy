@@ -146,9 +146,13 @@ public class reflect {
 
         @Override
         protected float leak(Task next) {
+            filter.unlearn(0.01f);
+
             Term x = next.term().conceptual();
             Term r = $.func(REFLECT_OP, x).eval(n).normalize();
-            if (r!=null && r.size() > 0 && r.volume() <= n.termVolumeMax.intValue()) {
+            if (x.equals(r)) //can happen
+                return 0f;
+            if (r != null && r.size() > 0 && r.volume() <= n.termVolumeMax.intValue()) {
                 Task y = Task.clone(next, r);
                 if (y != null) {
                     logger.info("+ {}", y);
@@ -172,7 +176,7 @@ public class reflect {
         public ReflectSimilarToTaskTerm(int cap, NAR n) {
             super(cap, n);
             this.filter = new StableBloomFilter<>(
-                    1024, 1,
+                    16 * 1024, 1,
                     new BytesHashProvider<>(IO::termToBytes));
             this.n = n;
         }
@@ -196,11 +200,11 @@ public class reflect {
         @Override
         protected float leak(Task next) {
 
-            filter.unlearn(0.01f);
+            filter.unlearn(0.001f);
 
             Term x = next.term().conceptual();
             Term reflectionSim = $.sim($.func(REFLECT_OP, x), x).eval(n).normalize();
-            if (reflectionSim!=null && reflectionSim.size() > 0 && reflectionSim.volume() <= n.termVolumeMax.intValue()) {
+            if (reflectionSim != null && reflectionSim.size() > 0 && reflectionSim.volume() <= n.termVolumeMax.intValue()) {
                 NALTask t = new NALTask(reflectionSim, BELIEF, $.t(1f, n.confDefault(BELIEF)), n.time(), ETERNAL, ETERNAL, n.time.nextInputStamp());
                 t.pri(n.priDefault(BELIEF));
                 feedback(t);

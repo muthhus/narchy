@@ -4,6 +4,7 @@ import jcog.bag.Bag;
 import jcog.data.FloatParam;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.time.Tense.ETERNAL;
@@ -19,30 +20,20 @@ import static nars.time.Tense.ETERNAL;
  */
 public abstract class DtLeak<X, Y> extends Leak<X, Y> {
 
+    float RATE_THRESH = 0.5f;
 
     @NotNull
     public final FloatParam rate /* items per dt */;
-    @NotNull
-    public final FloatParam minBudget;
+
 
     protected long lastLeak = ETERNAL;
+    private float lastBudget;
 
     protected DtLeak(@NotNull Bag<X, Y> bag, @NotNull FloatParam rate) {
-        this(bag, rate, new FloatParam(1));
-    }
-
-    /**
-     * rate = max successful leaks per duration
-     *
-     * @param bag
-     * @param rate
-     * @param minBudget
-     */
-    protected DtLeak(@NotNull Bag<X, Y> bag, @NotNull FloatParam rate, FloatParam minBudget) {
         super(bag);
         this.rate = rate;
-        this.minBudget = minBudget;
     }
+
 
     private final AtomicBoolean busy = new AtomicBoolean(false);
 
@@ -61,29 +52,7 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
                     this.lastLeak = last = now;
                 }
 
-                float dt = Math.max(0, (now - last) / ((float) dur));
-
-                float budget = rate.floatValue() * dt;
-                float minBudget = this.minBudget.floatValue();
-                if (budget >= minBudget) {
-
-                    final float[] spent = {0};
-                    bag.sample((v) -> {
-                        float cost = receive(v);
-                        assert(cost <= minBudget);
-                        float spe = spent[0] + cost;
-                        if (spe < budget) {
-                            spent[0] = spe;
-                            return Bag.BagSample.Remove; //continue
-                        } else {
-                            return Bag.BagSample.RemoveAndStop;
-                        }
-                    });
-
-                    if (spent[0] > 0) {
-                        this.lastLeak = now; //only set time if some cost was spent
-                    }
-                }
+                commit(now, now - last, dur);
 
             }
         } finally {
@@ -91,6 +60,39 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
         }
     }
 
+    public void commit(long now, long last, int dur) {
+
+        //durations delta
+        float durDT = Math.max(0, (now - last) / ((float) dur));
+
+        float nextBudget = rate.floatValue() * durDT + lastBudget;
+        //System.out.println(this + " " + rate + " " + durDT + " " + nextBudget + " { " + lastBudget );
+
+        if (nextBudget < RATE_THRESH) {
+            return; //wait longer
+        }
+
+        this.lastLeak = now;
+
+        final float[] budget = {nextBudget};
+
+        bag.sample((v) -> {
+
+            float cost = receive(v);
+            budget[0] -= cost;
+
+            float remain = budget[0];
+
+            if (remain < 1) {
+                if (remain <= 0 || ThreadLocalRandom.current().nextFloat() > remain)
+                    return Bag.BagSample.RemoveAndStop;
+            }
+
+            return Bag.BagSample.Remove; //continue
+        });
+
+        this.lastBudget = Math.min(0, budget[0]); //only store deficit, which will be added to the next. otherwise if positive is also stored, it can explode
+    }
 
     /**
      * returns a cost value, in relation to the bag sampling parameters, which is subtracted

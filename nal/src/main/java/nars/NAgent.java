@@ -390,7 +390,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
 
     @Override
-    protected void run(NAR nar) {
+    protected void run(NAR nar, long dt) {
         if (!enabled.get())
             return;
 
@@ -402,9 +402,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         if (r == r) {
             rewardSum += r;
         }
-
-        this.now = nar.time();
-
 
         this.now = nar.time();
 

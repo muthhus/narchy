@@ -81,10 +81,7 @@ public class Implier extends DurService {
     }
 
     @Override
-    protected void run(NAR nar) {
-
-
-
+    protected void run(NAR nar, long dt) {
 
         desire.clear();
         belief.clear();

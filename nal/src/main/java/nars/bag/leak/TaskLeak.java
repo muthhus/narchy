@@ -62,8 +62,8 @@ public abstract class TaskLeak extends DurService {
     }
 
     @Override
-    protected void run(NAR nar) {
-        in.commit(nar.time(), nar.dur());
+    protected void run(NAR nar, long dt) {
+        in.commit(nar.time(), dt, nar.dur());
     }
 
     public final void accept(NAR nar, Task t) {

@@ -182,7 +182,7 @@ abstract public class NAgentX extends NAgent {
         MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 3, true, 32f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 8);
+        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.005f, 8);
 
         Inperience inp = new Inperience(n, 8);
 
@@ -429,13 +429,14 @@ abstract public class NAgentX extends NAgent {
                         } else {
                             g = 0.75f * Math.min(1f, +v); r = 0;
                         }
-                        b = 0;
-                        //b = Math.max(r, g) * Math.min(1f, c.purpose[Cause.Purpose.Input.ordinal()].current/1f);
 
                         float t = Util.sum(p->Math.abs(p.last), c.purpose);
+
+                        b = Math.max(r, g) * t;
+
                         i.updateMomentum(
                                 //0.01f + Util.sqr(Util.tanhFast(v)+1),
-                                v*t, 0.04f,
+                                Math.signum(v) *(1+Math.abs(v))*(t), 0.05f,
                                 r, g, b);
 
                     }, builder);

@@ -92,7 +92,7 @@ public class TextUI {
             new NoteFS("/tmp/nal", nar);
 
             InterNAR i = new InterNAR(nar, 8, 0);
-            i.recv.amplitude(0.1f);
+            i.recv.preAmp(0.1f);
             i.runFPS(2);
         } catch (Exception e) {
             e.printStackTrace();

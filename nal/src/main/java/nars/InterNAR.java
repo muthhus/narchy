@@ -53,7 +53,7 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
 
 
     InterNAR pri(float priFactor) {
-        recv.amplitude = priFactor;
+        recv.preAmp = priFactor;
         return InterNAR.this;
     }
 

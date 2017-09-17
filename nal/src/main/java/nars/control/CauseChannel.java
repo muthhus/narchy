@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public class CauseChannel<X extends Priority> extends Cause<X> implements Consumer<X> {
 
     /** linear gain control */
-    public float bias, amplitude = 1;
+    public float preBias, preAmp = 1;
 
 //    /** in-bound traffic statistics */
 //    public final AtomicSummaryStatistics traffic = new AtomicSummaryStatistics();
@@ -56,22 +56,22 @@ public class CauseChannel<X extends Priority> extends Cause<X> implements Consum
 
         //traffic.accept(p);
 
-        if (bias!=0 || amplitude!=1) {
-            x.setPri(bias + p * amplitude);
+        if (preBias !=0 || preAmp !=1) {
+            x.setPri(preBias + p * preAmp);
         }
 
         target.accept(x);
     }
 
-    public CauseChannel set(float bias, float amplitude) {
-        return amplitude(amplitude).bias(bias);
+    public CauseChannel pre(float bias, float amplitude) {
+        return preAmp(amplitude).preBias(bias);
     }
-    public CauseChannel bias(float bias) {
-        this.bias = bias;
+    public CauseChannel preBias(float bias) {
+        this.preBias = bias;
         return this;
     }
-    public CauseChannel amplitude(float amp) {
-        this.amplitude = amp;
+    public CauseChannel preAmp(float amp) {
+        this.preAmp = amp;
         return this;
     }
 
