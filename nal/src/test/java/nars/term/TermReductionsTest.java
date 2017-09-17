@@ -106,14 +106,15 @@ public class TermReductionsTest extends NarseseTest {
 
     }
 
-    @Test public void testCyclicalNAL1_and_NAL2() {
+    @Test
+    public void testCyclicalNAL1_and_NAL2() {
 
         assertInvalidTerms("((#1~swan)-->#1)");
         assertInvalidTerms(
-                    "((swimmer~swan)-->swimmer)",
-                    "((x|y)-->x)",
-                    "(y<->(x|y))",
-                    "(#1<->(#1|y))"
+                "((swimmer~swan)-->swimmer)",
+                "((x|y)-->x)",
+                "(y<->(x|y))",
+                "(#1<->(#1|y))"
         );
     }
 
@@ -862,7 +863,7 @@ public class TermReductionsTest extends NarseseTest {
                 "((a) ==>+1 (a))",
                 "((a) &&+1 (a))",
 
-            /*"((a) &&+1 (a))",*/ //<-- conjunction case is special, see repeating conjunction simplification test
+                /*"((a) &&+1 (a))",*/ //<-- conjunction case is special, see repeating conjunction simplification test
         }) {
             Term t = $(x);
             assertTrue(x + " :: " + t, t instanceof Compound);
@@ -985,10 +986,17 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testReducibleImpl() throws Narsese.NarseseException {
 
+        assertInvalidTerms("(--x ==> (--y && --x))");
+    }
+
+    @Test
+    public void testReducibleImplParallel() throws Narsese.NarseseException {
+        assertEquals("(x ==>+0 y)",
+                $("(x ==>+0 (y &| x))"));
+
         assertEquals("(--x ==>+0 --y)",
                 $("(--x ==>+0 (--y &| --x))"));
 
-        assertInvalidTerms("(--x ==> (--y && --x))");
     }
 
     @Test
@@ -1137,6 +1145,7 @@ public class TermReductionsTest extends NarseseTest {
 
         assertEquals("(((c,d) &&+4 (a,b)) ==>-1 (b,c))", x.toString());
     }
+
     @Test
     public void testConjImplReductionNegImpl() throws Narsese.NarseseException {
         Term a = $("((a,b) ==>-1 (b,c))");

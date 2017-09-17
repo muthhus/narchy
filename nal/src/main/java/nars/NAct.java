@@ -368,7 +368,7 @@ public interface NAct {
 
             float restConf =
                     //n.confMin.floatValue();
-                    n.confDefault(GOAL);
+                    n.confDefault(GOAL) * 0.5f;
             //n.confDefault(BELIEF);
 
 
@@ -385,7 +385,7 @@ public interface NAct {
 
                 int winner =
                         //Util.decideRoulette(2, (i) -> cc[i], n.random());
-                        Util.decideSoftmax(2, (i) -> c2w(cc[i]), 0.3f, n.random());
+                        Util.decideSoftmax(2, (i) -> c2w(cc[i]), 0.6f, n.random());
                         //cc[0] > cc[1] ? 0 : 1; //GREEDY
 
                 int loser = 1 - winner;
@@ -400,9 +400,11 @@ public interface NAct {
                 float loserBoost = (0.5f - Math.min(0.5f, ff[loser]));
                 float winnerBase = Math.max(0, (ff[winner] - 0.5f));
                 float x =
-                        //winnerBase * 2f; //skip negative half, expand to full range
+                        //(ff[winner] - 0.5f) * 2f;
+                        winnerBase * 2f; //skip negative half, expand to full range
                         //winnerBase + loserBoost;
-                        Util.or(winnerBase, loserBoost);
+                        //Util.unitize(Util.max(winnerBase, loserBoost));
+                        //Util.unitize(Util.or(winnerBase, loserBoost));
                 float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
 
                 float conf =

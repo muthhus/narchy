@@ -1757,14 +1757,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return boost / totalCauses;
     }
 
-    public Cause newCause(Object x) {
-        synchronized (causes) {
-            short next = (short) (causes.size());
-            Cause c = new Cause(next, x);
-            causes.add(c);
-            return c;
-        }
-    }
+
 
     public CauseChannel<Task> newChannel(Object x) {
         return newChannel(x, this::input);

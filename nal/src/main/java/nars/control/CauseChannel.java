@@ -77,10 +77,4 @@ public class CauseChannel<X extends Priority> extends Cause<X> implements Consum
         return this;
     }
 
-    public float factor() {
-        return Util.tanhFast(value());
-    }
-    public float gain() {
-         return factor()+1;
-    }
 }

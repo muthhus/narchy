@@ -3,7 +3,7 @@ package spacegraph.widget.meter;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jogamp.opengl.GL2;
-import jcog.bag.util.Bagregate;
+import jcog.Util;
 import jcog.list.CircularArrayList;
 import jcog.list.FasterList;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +12,7 @@ import spacegraph.render.Draw;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -21,11 +22,10 @@ import java.util.function.Function;
 public class TreeChart<X> extends Surface {
 
 
-    protected int limit = -1;
+    private boolean sort = false;
 
 
     enum LayoutOrient {
-
         VERTICAL, HORIZONTAL
     }
 
@@ -41,7 +41,7 @@ public class TreeChart<X> extends Surface {
     final Cache<X, ItemVis<X>> cache;
 
     public TreeChart() {
-        cache = Caffeine.newBuilder().maximumSize(1024).build();
+        cache = Caffeine.newBuilder().maximumSize(1024).build(); //TODO just use LRUHashMap or something
     }
 
 
@@ -49,11 +49,14 @@ public class TreeChart<X> extends Surface {
     protected void paint(GL2 gl) {
         super.paint(gl);
 
-
         double totalArea = width * height;
         for (ItemVis v : children) {
-            v.paint(gl, v.area / totalArea);
+            v.paint(gl, v.area * totalArea);
         }
+    }
+
+    public void update(Iterable<? extends X> children, BiConsumer<X, ItemVis<X>> update) {
+        update(1, 1, children, update, i -> new ItemVis<>(i, i.toString()));
     }
 
     public void update(double width, double height, Iterable<? extends X> children, BiConsumer<X, ItemVis<X>> update) {
@@ -61,47 +64,61 @@ public class TreeChart<X> extends Surface {
     }
 
 
-    public void update(double width, double height, Iterable<? extends X> nextChildren, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> itemBuilder) {
+    public void update(double width, double height, Iterable<? extends X> next, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> itemBuilder) {
         this.width = width;
         this.height = height;
         left = 0.0;
         top = 0.0;
 
 
-        CircularArrayList<ItemVis<X>> newChildren = new CircularArrayList<>(limit + 1);
+        CircularArrayList<ItemVis<X>> display = //sort ? new TreeSet<>() : new FasterList();
+                new CircularArrayList<>(((Collection) next).size());
 
-        final int[] i = {limit < 0 ? Integer.MAX_VALUE : limit};
 
-        if (nextChildren instanceof Bagregate)
-            ((Bagregate) nextChildren).update(); //HACK
-
-        nextChildren.forEach(item -> {
-            if (item == null || i[0]-- <= 0)
+        final float[] weight = {0};
+        next.forEach(item -> {
+            if (item == null)
                 return; //TODO return false to stop the iteration
 
             ItemVis<X> e = cache.get(item, itemBuilder);
             if (e != null) {
                 update.accept(item, e);
-                newChildren.add(e);
+                float a = e.requestedArea();
+                if (a > 0) {
+                    weight[0] += a;
+                    display.add(e);
+                }
             }
         });
 
-        int size = newChildren.size();
+        display.sort(ItemVis::compareTo);
+
+
+        int size = display.size();
         if (size > 0) {
             heightLeft = this.height;
             widthLeft = this.width;
             layoutOrient = width > height ? LayoutOrient.VERTICAL : LayoutOrient.HORIZONTAL;
-            scaleArea(newChildren);
-            squarify(newChildren, new CircularArrayList(size), minimumSide());
+
+            float areaNormalization = (float) ((width * height) / weight[0]);
+            display.forEach(c -> {
+                c.area = c.requestedArea() * areaNormalization;
+                //assert (c.area > Pri.EPSILON);
+            });
+
+            squarify(display, new CircularArrayList(size), minimumSide());
+            this.children = display;
+        } else {
+            this.children = Collections.emptyList();
         }
-        this.children = newChildren;
 
     }
 
 
-    private void squarify(CircularArrayList<ItemVis<X>> children, Collection<ItemVis> row, double w) {
-        CircularArrayList<ItemVis<X>> remainPoped = new CircularArrayList(children);
-        ItemVis c = remainPoped.poll();//.pop();]
+    private void squarify(Collection<ItemVis<X>> display, Collection<ItemVis> row, double w) {
+
+        CircularArrayList<ItemVis<X>> remaining = new CircularArrayList(display);
+        ItemVis c = remaining.poll();
         if (c == null)
             return;
 
@@ -112,14 +129,14 @@ public class TreeChart<X> extends Surface {
 
         if (row.isEmpty() || (worstRow > worstConcat || isDoubleEqual(worstRow, worstConcat))) {
 
-            if (remainPoped.isEmpty()) {
+            if (remaining.isEmpty()) {
                 layoutrow(concatRow, w);
             } else {
-                squarify(remainPoped, concatRow, w);
+                squarify(remaining, concatRow, w);
             }
         } else {
             layoutrow(row, w);
-            squarify(children, Collections.emptyList(), minimumSide());
+            squarify(display, Collections.emptyList(), minimumSide());
         }
     }
 
@@ -153,15 +170,19 @@ public class TreeChart<X> extends Surface {
         for (ItemVis item : row) {
             totalArea += item.area;
         }
+//        assert(totalArea > 0);
 
         if (layoutOrient == LayoutOrient.VERTICAL) {
 
 
             double rowWidth = totalArea / w;
+            //assert(rowWidth > 0);
             double topItem = 0;
 
             for (ItemVis item : row) {
                 float area = item.area;
+                //assert(area > 0);
+
                 item.top = (float) (top + topItem);
                 item.left = (float) left;
                 item.width = (float) rowWidth;
@@ -180,10 +201,12 @@ public class TreeChart<X> extends Surface {
         } else {
 
             double rowHeight = totalArea / w;
+            //assert(rowHeight > 0);
             double rowLeft = 0;
 
             for (ItemVis item : row) {
                 float area = item.area;
+
                 item.top = (float) top;
                 item.left = (float) (left + rowLeft);
                 item.height = (float) rowHeight;
@@ -217,17 +240,6 @@ public class TreeChart<X> extends Surface {
         return Math.min(heightLeft, widthLeft);
     }
 
-    private void scaleArea(Collection<ItemVis<X>> children) {
-        float areaGiven = (float) (width * height);
-        float areaTotalTaken = 0.0f;
-        for (ItemVis child : children) {
-            areaTotalTaken += child.area;
-        }
-        float ratio = areaTotalTaken / areaGiven;
-        for (ItemVis child : children) {
-            child.mulArea(1f / ratio);
-        }
-    }
 
     public static class WeightedString {
         public final String label;
@@ -283,37 +295,36 @@ public class TreeChart<X> extends Surface {
     /**
      * @author Tadas Subonis <tadas.subonis@gmail.com>
      */
-    public static final class ItemVis<X> {
+    public static class ItemVis<X> implements Comparable<ItemVis> {
 
         public final String label;
         public final X item;
+        private final static AtomicInteger serial = new AtomicInteger(0);
+        private final int id;
         public float left;
         public float top;
         public float width;
         public float height;
-        public float area;
+        public float area, weight;
         private float r;
         private float g;
         private float b;
 
         public ItemVis(X item, String label) {
+            this.id = serial.incrementAndGet();
             this.item = item;
             this.label = label;
         }
 
-
-        //    public void update(X item, String label, float weight) {
-        //        this.item = item;
-        //        this.label = label;
-        //        this.area= weight;
-        //        this.r = -1; //auto
-        //    }
-
         public void update(float weight, float r, float g, float b) {
-            this.area = weight;
+            this.weight = weight;
             this.r = r;
             this.g = g;
             this.b = b;
+        }
+
+        public float requestedArea() {
+            return Math.abs(weight);
         }
 
         @Override
@@ -326,17 +337,6 @@ public class TreeChart<X> extends Surface {
                     '}';
         }
 
-        void setArea(float area) {
-            this.area = area;
-        }
-
-        void mulArea(float factor) {
-            this.area *= factor;
-        }
-
-        //    boolean isContainer() {
-        //        return item.isContainer();
-        //    }
 
         @Override
         public boolean equals(Object o) {
@@ -390,6 +390,20 @@ public class TreeChart<X> extends Surface {
             }
 
 
+        }
+
+        @Override
+        public int compareTo(@NotNull TreeChart.ItemVis o) {
+            if (this == o) return 0;
+            int i = Util.fastCompare(o.weight, weight);
+            if (i == 0)
+                return Integer.compare(id, o.id);
+            else
+                return i;
+        }
+
+        public void updateMomentum(float w, float speed, float r, float g, float b) {
+            update( Util.lerp(speed, this.weight, w), r, g, b);
         }
     }
 

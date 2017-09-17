@@ -39,6 +39,13 @@ public class Cause<X> {
         return value + valueBias;
     }
 
+    public float factor() {
+        return Util.tanhFast(value());
+    }
+    public float gain() {
+         return factor()+1;
+    }
+
     /** value and momentum indices correspond to the possible values in Purpose enum */
     public static void update(FasterList<Cause> causes, float[] value, RecycledSummaryStatistics[] summary) {
 
@@ -97,7 +104,7 @@ public class Cause<X> {
 
 
     public enum Purpose {
-        /** neg: accepted for input */
+        /** neg: accepted for input, or pre-input spam */
         Input,
 
         /** pos: activated in concept to some degree */

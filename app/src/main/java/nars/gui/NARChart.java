@@ -13,8 +13,8 @@ abstract public class NARChart<X extends Prioritized> extends BagChart<X> implem
     long now;
     int dur;
 
-    public NARChart(Iterable<X> b, int count, NAR nar) {
-        super(b, count);
+    public NARChart(Iterable<X> b, NAR nar) {
+        super(b);
         this.now = nar.time();
         this.nar = nar;
         on = nar.onCycle(this);

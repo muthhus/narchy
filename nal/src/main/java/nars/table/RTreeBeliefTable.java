@@ -52,7 +52,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      */
     static final float TRUTHPOLATED_MAX_FRACTION = 0.01f;
 
-    public static final float PRESENT_AND_FUTURE_BOOST = 1.25f;
+    public static final float PRESENT_AND_FUTURE_BOOST = 2f;
 
 
     private transient NAR nar;

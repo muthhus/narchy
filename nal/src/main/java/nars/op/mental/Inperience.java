@@ -5,7 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.bag.leak.TaskLeak;
+import nars.bag.leak.LeakBack;
 import nars.control.CauseChannel;
 import nars.task.NALTask;
 import nars.term.Compound;
@@ -36,7 +36,7 @@ import static nars.time.Tense.ETERNAL;
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
  * "Imperience": http://www.merrell-wolff.org/sites/default/files/M127.pdf
  */
-public class Inperience extends TaskLeak {
+public class Inperience extends LeakBack {
 
     public static final Logger logger = LoggerFactory.getLogger(Inperience.class);
 
@@ -70,7 +70,6 @@ public class Inperience extends TaskLeak {
      */
     @NotNull
     public final FloatParam freqMax = new FloatParam(0.1f);
-    final CauseChannel<Task> out;
 
 //    float beliefFactor = 1f;
 //    float questionFactor = 0.5f;
@@ -128,14 +127,13 @@ public class Inperience extends TaskLeak {
 
 //
 
-    public Inperience(@NotNull NAR n, int capacity, float rate) {
-        super(capacity, rate, n);
+    public Inperience(@NotNull NAR n, int capacity) {
+        super(capacity, n);
 //        super(
 //            new CurveBag(PriMerge.max, new ConcurrentHashMap<>(capacity), n.random(), capacity), rate, n
 //        );
         this.nar = n;
 
-        out = nar.newCauseChannel(this);
 
 //        n.eventConceptProcess.on(p -> {
 //            Task belief = p.belief();
@@ -267,7 +265,7 @@ public class Inperience extends TaskLeak {
                 end = next.end();
             }
 
-            out.input( (Task)
+            feedback( (Task)
                 new NALTask(r, BELIEF,
                     new DiscreteTruth(1, nar.confDefault(Op.BELIEF)),
                     now, start, end, next.stamp()

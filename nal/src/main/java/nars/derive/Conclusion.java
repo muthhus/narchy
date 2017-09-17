@@ -5,6 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.control.Cause;
 import nars.control.CauseChannel;
 import nars.control.Derivation;
 import nars.op.DepIndepVarIntroduction;
@@ -13,8 +14,8 @@ import nars.task.DerivedTask;
 import nars.task.NALTask;
 import nars.term.InvalidTermException;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.time.Tense;
-import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -196,13 +197,12 @@ public class Conclusion extends AbstractPred<Derivation> {
         });
 
         if (t == null) {
-            p.use(Param.TTL_DERIVE_TASK_FAIL);
-            return true;
+            return spam(p, Param.TTL_DERIVE_TASK_FAIL, c2, nar, 0);
         }
 
         if (same(t, p.task, p.truthResolution) || (p.belief != null && same(t, p.belief, p.truthResolution))) {
-            p.use(Param.TTL_DERIVE_TASK_SAME);
-            return true; //created a duplicate of the task
+            //created a duplicate of the task
+            return spam(p, Param.TTL_DERIVE_TASK_SAME, t, nar,0);
         }
 
 
@@ -214,13 +214,20 @@ public class Conclusion extends AbstractPred<Derivation> {
         if (Param.DEBUG)
             t.log(rule);
 
-        if (p.derivations.merge(t, t, DUPLICATE_DERIVATION_MERGE) == t) {
-            p.use(Param.TTL_DERIVE_TASK_SUCCESS);
+        if (p.derivations.merge(t, t, DUPLICATE_DERIVATION_MERGE) != t) {
+            spam(p, Param.TTL_DERIVE_TASK_REPEAT, t, nar, 0);
         } else {
-            p.use(Param.TTL_DERIVE_TASK_REPEAT);
+            p.use(Param.TTL_DERIVE_TASK_SUCCESS);
         }
 
         return true;
+    }
+
+    private boolean spam(@NotNull Derivation p, int cost, Termed t, NAR nar, float factor) {
+        p.use(cost);
+        if (factor > 0)
+            channel.purpose[Cause.Purpose.Input.ordinal()].addAndGet(Param.inputCost(t, nar)*factor);
+        return true; //just does
     }
 
     final static BiFunction<Task, Task, Task> DUPLICATE_DERIVATION_MERGE = (pp, tt) -> {

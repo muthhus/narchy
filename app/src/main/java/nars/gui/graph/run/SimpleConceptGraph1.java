@@ -42,7 +42,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
     public static class TaskTreeChart extends NARChart<ITask> {
 
         public TaskTreeChart(@NotNull Iterable<ITask> b, int limit, NAR nar) {
-            super(new Bagregate(b, limit, 1f), limit, nar);
+            super(new Bagregate(b, limit, 1f), nar);
         }
 
         @Override

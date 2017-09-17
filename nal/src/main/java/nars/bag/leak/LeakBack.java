@@ -10,7 +10,7 @@ abstract public class LeakBack extends TaskLeak {
 
     final static float INITIAL_RATE = 1f;
 
-    public final CauseChannel<Task> out;
+    private final CauseChannel<Task> out;
 
     public LeakBack(int capacity, NAR nar) {
         super(capacity, INITIAL_RATE, nar);
@@ -25,8 +25,8 @@ abstract public class LeakBack extends TaskLeak {
     protected void run(NAR nar) {
 
         float g = out.gain();
-        System.out.println(this + " " + g);
         inputRate( g );
+        //System.out.println(this + " " + g);
 
         super.run(nar);
     }

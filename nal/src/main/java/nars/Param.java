@@ -11,10 +11,10 @@ import nars.control.Derivation;
 import nars.task.Tasked;
 import nars.task.TruthPolation;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
-import nars.util.UtilityFunctions;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -166,7 +166,7 @@ public abstract class Param extends Services<Term,NAR> {
      * inputting a task
      * (from now until the time of concept processing)
      * this may be balanced by a future positive value (ie. on concept processing) */
-    public static float inputCost(Task t, NAR nar) {
+    public static float inputCost(Termed t, NAR nar) {
 
 //        //prefer simple
         float c = ((t.complexity()+t.volume())/2f);//

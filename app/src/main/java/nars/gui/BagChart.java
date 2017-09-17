@@ -38,10 +38,9 @@ abstract public class BagChart<X extends Prioritized> extends TreeChart<X> imple
 //        this(b, -1);
 //    }
 
-    public BagChart(@NotNull Iterable<X> b, int limit) {
+    public BagChart(@NotNull Iterable<X> b) {
         super();
         this.input = b;
-        this.limit = limit;
         update();
     }
 

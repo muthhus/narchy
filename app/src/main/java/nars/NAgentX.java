@@ -3,6 +3,7 @@ package nars;
 import jcog.data.FloatParam;
 import jcog.event.On;
 import jcog.pri.mix.control.MixContRL;
+import nars.control.Cause;
 import nars.control.Derivation;
 import nars.control.NARService;
 import nars.derive.Deriver;
@@ -20,6 +21,7 @@ import nars.term.Term;
 import nars.time.RealTime;
 import nars.truth.Truth;
 import nars.video.*;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
@@ -33,6 +35,7 @@ import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.meta.WindowButton;
 import spacegraph.widget.meter.BitmapMatrixView;
 import spacegraph.widget.meter.Plot2D;
+import spacegraph.widget.meter.TreeChart;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -178,11 +181,12 @@ abstract public class NAgentX extends NAgent {
         MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 3, true, 32f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-        Inperience inp = new Inperience(n, 8, 0.05f);
         Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 8);
 
-        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(n, 4, 0.1f);
-        reflect.ReflectTaskClone refTask = new reflect.ReflectTaskClone(n, 8, 0.2f);
+        Inperience inp = new Inperience(n, 8);
+
+        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
+        reflect.ReflectTaskClone refTask = new reflect.ReflectTaskClone(8, n);
 
         NAgent a = init.apply(n);
         //a.trace = true;
@@ -259,9 +263,10 @@ abstract public class NAgentX extends NAgent {
         new Thread(() -> {
             chart(a);
             chart(n, a);
+            window( valueChart(a), 800, 600);
             window(/*row*/(
 
-                    causePlot(a)
+                    valuePlot(a)
 
                     //mixPlot(a, m, HISTORY),
 
@@ -394,7 +399,55 @@ abstract public class NAgentX extends NAgent {
     }
 
 
-    private static Surface causePlot(NAgent a) {
+    private static Surface valueChart(NAgent a) {
+        final Function<Cause,TreeChart.ItemVis<Cause>> builder = (i) -> {
+            String str = i.toString();
+            if (str.startsWith("class nars."))
+                str = str.substring("class nars.".length()); //skip default toString
+
+            if (str.startsWith("class "))
+                str = str.substring(5); //skip default toString
+
+            return new TreeChart.ItemVis<Cause>(i, StringUtils.abbreviate(str, 26)) {
+                @Override
+                public float requestedArea() {
+                    return 0.1f + super.requestedArea();
+                }
+            };
+        };
+        return new TreeChart<Cause>() {
+            final On<NAgent> on;
+            {
+
+                on = a.onFrame(() -> {
+                    update(1, 1, a.nar.causes, (c, i) -> {
+                        float v = c.value();
+                        float r, g, b;
+                        if (v < 0) {
+                            r = 0.75f * Math.min(1f, -v); g = 0;
+                        } else {
+                            g = 0.75f * Math.min(1f, +v); r = 0;
+                        }
+                        //b = 0.5f;
+                        b = Math.max(r, g) * Math.min(1f, c.purpose[Cause.Purpose.Input.ordinal()].current/1f);
+
+                        i.updateMomentum(
+                                //0.01f + Util.sqr(Util.tanhFast(v)+1),
+                                v, 0.02f,
+                                r, g, b);
+
+                    }, builder);
+                });
+            }
+
+            @Override
+            public void stop() {
+                super.stop();
+                on.off();
+            }
+        };
+    }
+    private static Surface valuePlot(NAgent a) {
         NAR nar = a.nar;
 
         int s = nar.causes.size();
@@ -406,7 +459,7 @@ abstract public class NAgentX extends NAgent {
                 s, Math.max(1, (int) Math.sqrt(s)),
                 Draw::colorBipolar) {
 
-            public final On<NAgent> on;
+            final On<NAgent> on;
 
             {
                 on = a.onFrame(() -> {

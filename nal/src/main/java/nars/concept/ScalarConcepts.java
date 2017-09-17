@@ -197,7 +197,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
 
         this.conf = nar.confDefault(BELIEF);
         this.input = input;
-        this.in = nar.newCauseChannel(this);
+        this.in = nar.newCauseChannel(id);
         //output.amplitude(1f / numStates);
 
         this.sensors = $.newArrayList(numStates);

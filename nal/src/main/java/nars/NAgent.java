@@ -83,7 +83,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     public final List<Supplier<Task>> predictors = $.newArrayList();
 
     public final AtomicBoolean enabled = new AtomicBoolean(true);
-    private final CauseChannel<Task> rewardIn;
+
     public final SensorConcept happy;
     public final SensorConcept sad;
 
@@ -139,7 +139,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         if (id == null) id = $.quote(getClass().toString());
 
-        this.rewardIn = nar.newCauseChannel(id + " reward");
         this.predict = nar.newCauseChannel(id + " predict");
     }
 

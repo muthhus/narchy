@@ -15,7 +15,7 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
 
     public CircularArrayList(Collection<E> c) {
         this(c.size());
-        c.addAll(this);
+        addAll(c);
     }
 
     public CircularArrayList(int capacity) {

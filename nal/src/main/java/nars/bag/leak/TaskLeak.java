@@ -41,11 +41,15 @@ public abstract class TaskLeak extends DurService {
                     return TaskLeak.this.leak(t);
             }
         };
-        ons.add(n.onTask((t) -> {
-            accept(n, t);
-        }));
     }
 
+    @Override
+    protected void start(NAR nar) {
+        super.start(nar);
+        ons.add(nar.onTask((t) -> {
+            accept(nar, t);
+        }));
+    }
 
     public TaskLeak inputRate(float r) {
         in.rate.setValue(r);

@@ -147,8 +147,8 @@ public class reflect {
         @Override
         protected float leak(Task next) {
             Term x = next.term().conceptual();
-            Term r = $.func(REFLECT_OP, x).eval(n);
-            if (r.size() > 0 && r.volume() <= n.termVolumeMax.intValue()) {
+            Term r = $.func(REFLECT_OP, x).eval(n).normalize();
+            if (r!=null && r.size() > 0 && r.volume() <= n.termVolumeMax.intValue()) {
                 Task y = Task.clone(next, r);
                 if (y != null) {
                     logger.info("+ {}", y);
@@ -199,9 +199,10 @@ public class reflect {
             filter.unlearn(0.01f);
 
             Term x = next.term().conceptual();
-            Term reflectionSim = $.sim($.func(REFLECT_OP, x), x).eval(n);
-            if (reflectionSim.size() > 0 && reflectionSim.volume() <= n.termVolumeMax.intValue()) {
+            Term reflectionSim = $.sim($.func(REFLECT_OP, x), x).eval(n).normalize();
+            if (reflectionSim!=null && reflectionSim.size() > 0 && reflectionSim.volume() <= n.termVolumeMax.intValue()) {
                 NALTask t = new NALTask(reflectionSim, BELIEF, $.t(1f, n.confDefault(BELIEF)), n.time(), ETERNAL, ETERNAL, n.time.nextInputStamp());
+                t.pri(n.priDefault(BELIEF));
                 feedback(t);
                 logger.info("+ {}", reflectionSim);
                 return 1;

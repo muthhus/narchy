@@ -11,7 +11,7 @@ public class ConceptBagChart extends NARChart<PriReference<Concept>> {
 
 
     public ConceptBagChart(Iterable<PriReference<Concept>> b, int count, NAR nar) {
-        super(b, count, nar);
+        super(b, nar);
     }
 
 
