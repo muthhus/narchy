@@ -8,11 +8,11 @@ public interface TaskRegion extends HyperRegion, Tasked {
     /**
      * relative to time sameness (1)
      */
-    float FREQ_SAMENESS_IMPORTANCE = 0.2f;
+    float FREQ_SAMENESS_IMPORTANCE = 0.5f;
     /**
      * relative to time sameness (1)
      */
-    float CONF_SAMENESS_IMPORTANCE = 0.05f;
+    float CONF_SAMENESS_IMPORTANCE = 0.1f;
 
     @Override
     boolean equals(Object obj);

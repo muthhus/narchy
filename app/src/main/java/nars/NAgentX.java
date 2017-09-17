@@ -11,7 +11,9 @@ import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
+import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
+import nars.op.mental.Reflector;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
 import nars.term.Term;
@@ -147,7 +149,7 @@ abstract public class NAgentX extends NAgent {
                                 ), THREADS, 2))
                 .time(clock)
                 .index(
-                        new CaffeineIndex(16 * 1024)
+                        new CaffeineIndex(32 * 1024)
                         //new CaffeineIndex2(64 * 1024)
                         //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
                 )
@@ -157,6 +159,7 @@ abstract public class NAgentX extends NAgent {
 
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
+        n.termVolumeMax.setValue(30);
 
         n.beliefConfidence(0.9f);
         n.goalConfidence(0.9f);
@@ -167,7 +170,6 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 1f * priFactor;
-        n.termVolumeMax.setValue(28);
 
         //n.dtDither.setValue(0.25f);
         //n.dtMergeOrChoose.setValue(true);
@@ -176,9 +178,9 @@ abstract public class NAgentX extends NAgent {
         MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 3, true, 32f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-        Inperience inp = new Inperience(n, 16, 0.1f);
-        //Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 32);
-
+        Inperience inp = new Inperience(n, 8, 0.1f);
+        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 8);
+        Reflector ref = new Reflector(n, 4, 0.1f);
 
         NAgent a = init.apply(n);
         //a.trace = true;
@@ -691,7 +693,7 @@ abstract public class NAgentX extends NAgent {
         }
     }
 
-//    private static class CorePanel extends Surface{
+    //    private static class CorePanel extends Surface{
 //
 //        public CorePanel(Default2.GraphPremiseBuilder c, NAR nar) {
 //            super();

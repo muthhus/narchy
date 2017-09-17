@@ -200,7 +200,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
         if (size > 0 && l.length > 0) {
             for (int i = 0; i < size; i++) {
                 final E current = (E) l[i];
-                if (0 <= Util.fastCompare(cmp.floatValueOf(current), elementRank)) {
+                if (elementRank < cmp.floatValueOf(current)) {
                     return addInternal(i, element);
                 }
             }
@@ -259,23 +259,29 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
         int oldSize = this.size;
         E[] list = this.list;
         if (list.length == oldSize) {
-            if (!grows()) {
-                return; //didnt rank
-            }
+            if (grows()) {
 
-            this.size++;
-            E[] newItems = newArray(oldSize); //new Object[this.sizePlusFiftyPercent(oldSize)];
-            if (index > 0) {
-                System.arraycopy(list, 0, newItems, 0, index);
+                this.size++;
+                E[] newItems = newArray(oldSize); //new Object[this.sizePlusFiftyPercent(oldSize)];
+                if (index > 0) {
+                    System.arraycopy(list, 0, newItems, 0, index);
+                }
+                System.arraycopy(list, index, newItems, index + 1, oldSize - index);
+                this.list = list = newItems;
+            } else {
+                displace(list[index]);
             }
-            System.arraycopy(list, index, newItems, index + 1, oldSize - index);
-            this.list = list = newItems;
 
         } else {
             this.size++;
             System.arraycopy(list, index, list, index + 1, oldSize - index);
         }
         list[index] = element;
+    }
+
+    /** called when the lowest value has been kicked out of the list by a higher ranking insertion */
+    protected void displace(E e) {
+
     }
 
     /**
@@ -317,7 +323,9 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
         return list.length;
     }
 
-    /** called when an item's sort order may have changed */
+    /**
+     * called when an item's sort order may have changed
+     */
     public void adjust(int index, float delta, FloatFunction<E> cmp) {
         float cur = cmp.floatValueOf(list[index]);
 
@@ -331,7 +339,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
 
         //TODO only if decreased
         int s = this.size;
-        if (delta < 0 && index < s -1) {
+        if (delta < 0 && index < s - 1) {
             float f = cmp.floatValueOf(list[index + 1]);
             if (f < cur)
                 reinsert = true;
@@ -339,12 +347,12 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
 
         if (reinsert) {
             int next = this.findInsertionIndex(cur, 0, s - 1, new int[1], cmp);
-            if (next == index-1) {
+            if (next == index - 1) {
                 //swap with above
-                swap(index, index-1);
-            } else if (next == index+1 ) {
+                swap(index, index - 1);
+            } else if (next == index + 1) {
                 //swap with below
-                swap(index, index+1);
+                swap(index, index + 1);
             } else {
                 //remove and insert somewhere else
                 E i = remove(index);
@@ -354,7 +362,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
     }
 
     private void swap(int a, int b) {
-        assert(a!=b);
+        assert (a != b);
         E[] l = this.list;
         E x = l[b];
         l[b] = l[a];

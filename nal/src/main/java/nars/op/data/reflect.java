@@ -5,6 +5,7 @@
 package nars.op.data;
 
 import nars.$;
+import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
@@ -90,6 +91,8 @@ public class reflect  {
             return t;
         }
         switch (t.op()) {
+            //case NEG: return t; //wont work
+            case PROD: return t;
             //case INH: return sop(t, "inheritance");
             //case SIM:  return sop(t, "similarity");
             default: return sop(t.op().toString(), t.subterms());

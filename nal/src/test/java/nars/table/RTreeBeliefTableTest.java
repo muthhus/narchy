@@ -1,6 +1,7 @@
 package nars.table;
 
 import jcog.math.MultiStatistics;
+import jcog.meter.event.CSVOutput;
 import nars.*;
 import nars.concept.BaseConcept;
 import nars.task.DerivedTask;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static jcog.Texts.n2;
+import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -67,22 +69,32 @@ public class RTreeBeliefTableTest {
 
 
     @Test public void testAccuracyFlat() {
-        testAccuracy(1, 1,20, (t) -> 0.5f); //flat
+
+        testAccuracy(1, 1,20, 8, (t) -> 0.5f); //flat
     }
     @Test public void testAccuracySineDur1() {
-        testAccuracy(1, 1,20, (t) -> (float)(Math.sin(t/5f)/2f+0.5f));
+
+        testAccuracy(1, 1,20, 8, (t) -> (float)(Math.sin(t/5f)/2f+0.5f));
     }
     @Test public void testAccuracySineDur1Ext() {
-        testAccuracy(1, 1,50, (t) -> (float)(Math.sin(t/5f)/2f+0.5f));
+        testAccuracy(1, 1,50, 8, (t) -> (float)(Math.sin(t/1f)/2f+0.5f));
     }
     @Test public void testAccuracySineDur() {
-        testAccuracy(2, 4,50, (t) -> (float)(Math.sin(t/5f)/2f+0.5f));
-    }
-    @Test public void testAccuracySqrWave() {
-        testAccuracy(1, 3, 20, (t) -> (Math.sin(t)/2f+0.5f) >= 0.5 ? 1f : 0f);
+        testAccuracy(2, 2,50, 8, (t) -> (float)(Math.sin(t/5f)/2f+0.5f));
     }
 
-    static void testAccuracy(int dur, int period, int end, LongToFloatFunction func) {
+
+    static final LongToFloatFunction stepFunction = (t) -> (Math.sin(t) / 2f + 0.5f) >= 0.5 ? 1f : 0f;
+
+    @Test public void testAccuracySawtoothWave() {
+        //this step function when sampled poorly will appear as a triangle sawtooth
+        testAccuracy(1, 3, 15, 5, stepFunction);
+    }
+    @Test public void testAccuracySquareWave() {
+        testAccuracy(1, 1, 5, 5, stepFunction);
+    }
+
+    static void testAccuracy(int dur, int period, int end, int cap, LongToFloatFunction func) {
 
         NAR n = NARS.shell();
 
@@ -92,23 +104,28 @@ public class RTreeBeliefTableTest {
 
         //1. populate
 
-        n.log();
+        //n.log();
 
         BaseConcept c = (BaseConcept) n.conceptualize(term);
         @NotNull BeliefTable cb = true ? c.beliefs() : c.goals();
+        cb.setCapacity(0, cap);
+
+
         //int numTasks = 0;
-        long time=0;
-        while (time < end) {
-            n.input($.task(term, BELIEF, func.valueOf(time), 0.9f).time(time).setPriThen(0.5f).apply(n));
-            time += period;
+        System.out.println("points:");
+        long time;
+        while ((time = n.time()) < end) {
+            float f = func.valueOf(time);
+            System.out.print(time + "=" + f + "\t");
+            n.input($.task(term, BELIEF, f, 0.9f).time(time).setPriThen(0.5f).apply(n));
             n.run(period);
             //numTasks++;
         }
+        System.out.println();
 
-        //n.run(1);
 
 
-        c.beliefs().print();
+
         MultiStatistics<Task> m = new MultiStatistics<Task>()
             .classify("input", (t) -> t.isInput())
             .classify("derived", (t) -> t instanceof DerivedTask)
@@ -118,23 +135,38 @@ public class RTreeBeliefTableTest {
             .value("freqErr", (t) -> Math.abs( ((t.freq()-0.5f)*2f) - func.valueOf(t.mid())) )
             .add(c.beliefs());
 
+        System.out.println();
         m.print();
-
-
         System.out.println();
 
+        c.beliefs().print();
+
         //2. validate and calculate error
+        CSVOutput csv = new CSVOutput(System.out, "time", "actual", "approx");
+
         double errSum = 0;
-        for (long i = 0; i < end; i++) {
-            float expected = func.valueOf(i);
+        int start = 0;
+        for (long i = start; i < end; i++) {
+            float actual = func.valueOf(i);
+
             Truth actualTruth = n.beliefTruth(term, i);
-            float actual = actualTruth != null ? actualTruth.freq() : 0.5f;
-            float err = Math.abs(actual - expected);
-            System.out.println(n2(i) + "\t" + /*n2(err) + "\t" + */ n2(expected) + "\t" + n2(actual));
+            float approx, err;
+            if (actualTruth!=null) {
+                approx = actualTruth.freq();
+                err = Math.abs(approx - actual);
+            } else {
+                approx = Float.NaN;
+                err = 1f;
+            }
+
             errSum += err;
+
+            csv.out(i, actual, approx);
+            //System.out.println(n2(i) + "\t" + /*n2(err) + "\t" + */ n2(expected) + "\t" + n2(actual));
         }
-        double avgErr = errSum / end;
-        System.err.println(avgErr + " avg point error");
+        double avgErr = errSum / (end-start+1);
+        System.out.println();
+        System.out.println(n4(avgErr) + " avg freq err per point");
         assertTrue(avgErr < 0.1f);
     }
 

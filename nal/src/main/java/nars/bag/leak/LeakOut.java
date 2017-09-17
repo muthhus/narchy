@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 abstract public class LeakOut extends TaskLeak {
 
-    protected LeakOut(NAR nar, int capacity, float rate) {
+    public LeakOut(NAR nar, int capacity, float rate) {
         super(
                 //new PLinkArrayBag<>(capacity, PriMerge.max, new ConcurrentHashMap<>())
                 new ConcurrentCurveBag<>(PriMerge.max, new ConcurrentHashMap(capacity), nar.random(), capacity)

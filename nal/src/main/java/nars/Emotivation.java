@@ -84,7 +84,8 @@ public class Emotivation extends Emotion {
 
             float amp =
                     //Util.tanhFast(gain) + 1f; //[0..+2]
-                    0.5f + (Util.tanhFast(gain)/2f);
+                    //0.5f + (Util.tanhFast(gain)/2f);
+                    1f + Util.tanhFast(gain)*0.75f;
 
             //amp = Math.max(amp, 0.1f);
 

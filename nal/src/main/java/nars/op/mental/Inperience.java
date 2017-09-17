@@ -109,10 +109,10 @@ public class Inperience extends LeakOut {
     public static final Atomic want = the("want");
     public static final Atomic wonder = the("wonder");
     public static final Atomic evaluate = the("evaluate");
-    public static final Atomic anticipate = the("anticipate");
+    public static final Atomic reflect = the("reflect");
 
     public static final ImmutableSet<Atomic> operators = Sets.immutable.of(
-            believe, want, wonder, evaluate, anticipate);
+            believe, want, wonder, evaluate, reflect);
 
     static final Atomic[] NON_INNATE_BELIEF_ATOMICs = {
             the("remind"),

@@ -50,7 +50,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * max fraction of the fully capacity table to compute in a single truthpolation
      */
-    static final float TRUTHPOLATED_MAX_FRACTION = 0.2f;
+    static final float TRUTHPOLATED_MAX_FRACTION = 0.01f;
 
     public static final float PRESENT_AND_FUTURE_BOOST = 1.25f;
 
@@ -161,10 +161,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task()));
 
 
-                int maxTruths = Math.min(s, Math.round(capacity * TRUTHPOLATED_MAX_FRACTION));
+                int maxTruths = (int) Math.min(s, Math.max(2, Math.ceil(capacity * TRUTHPOLATED_MAX_FRACTION)));
                 TopN<TaskRegion> tt = scan(
                         new TopN<>(new TaskRegion[maxTruths], strongestTask),
                         start, end, maxTruths);
+
+
                 if (!tt.isEmpty()) {
 
                     //                Iterable<? extends Tasked> ii;
@@ -361,18 +363,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         final boolean[] added = new boolean[1];
         ((ConcurrentRTree<TaskRegion>) tree).write(treeRW -> {
+            ensureCapacity(treeRW, null);
 
             added[0] = treeRW.add(tr);
 
-            @Nullable TaskRegion tr1 = added[0] ? tr : null;
-            int cap = this.capacity;
-            if (treeRW.size() > cap) {
-                //int excess = tree.size() - cap; //hard limit
-                for (int e = 0; treeRW.size() > cap /*&& e < excess*/; e++) {
-                    compress(treeRW, tr1, nar, cap);
-                }
-                assert (treeRW.size() <= cap);
-            }
+            if (added[0])
+                ensureCapacity(treeRW, tr);
         });
 
 
@@ -395,6 +391,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     }
 
+    void ensureCapacity(Space<TaskRegion> treeRW, TaskRegion inputRegion) {
+        int cap = this.capacity;
+        if (treeRW.size() <= cap)
+            return;
+
+        for (int e = 0; treeRW.size() > cap /*&& e < excess*/; e++)
+            compress(treeRW, e == 0 ? inputRegion : null /** only limit by inputRegion first */, nar, cap);
+        assert (treeRW.size() <= cap);
+    }
+
     /**
      * results in at least 1 less task being present in the table
      * assumes called with writeLock
@@ -406,7 +412,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         int dur = nar.dur();
 
 
-        FloatFunction<Task> taskStrength = taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, dur);
+        FloatFunction<Task> taskStrength =
+                //taskStrength(now-dur/2, now+dur/2, dur);
+                taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, dur);
         FloatFunction<TaskRegion> weakestTask = (t -> -taskStrength.floatValueOf(t.task()));
 
         float inputStrength = inputRegion != null ? taskStrength.floatValueOf(inputRegion.task()) : Float.POSITIVE_INFINITY;
@@ -482,13 +490,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 boolean allowMerge;
 
                 if (inputStrength != inputStrength) {
-                    //allowMerge = true;
-                    inputStrength = 0; //stricter
+                    allowMerge = true;
+                } else {
+                    float strengthRemoved = taskStrength.floatValueOf(at) + taskStrength.floatValueOf(bt);
+                    float strengthAdded = taskStrength.floatValueOf(c) + inputStrength;
+                    allowMerge = strengthAdded >= strengthRemoved;
                 }
-
-                float strengthRemoved = taskStrength.floatValueOf(at) + taskStrength.floatValueOf(bt);
-                float strengthAdded = taskStrength.floatValueOf(c) + inputStrength;
-                allowMerge = strengthAdded >= strengthRemoved;
 
 
                 if (allowMerge) {

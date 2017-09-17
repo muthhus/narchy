@@ -834,7 +834,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         if (targetStart == targetEnd)
             t = targetStart;
         else
-            t = distanceTo(targetStart) < distanceTo(targetEnd) ? targetStart : targetEnd;
+            t = distanceTo(targetStart) <= distanceTo(targetEnd) ? targetStart : targetEnd;
         return evi(t, dur);
     }
 

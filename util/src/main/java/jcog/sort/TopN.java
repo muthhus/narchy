@@ -1,13 +1,14 @@
 package jcog.sort;
 
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public class TopN<E> extends SortedArray<E> implements Consumer<E>  {
+public class TopN<E> extends SortedArray<E> implements Consumer<E> {
 
     private final FloatFunction<E> rank;
+
+    E min = null;
     float minSeen = Float.POSITIVE_INFINITY;
 
     public TopN(E[] target, FloatFunction<E> rank) {
@@ -26,14 +27,18 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E>  {
 
     @Override
     public int add(E element, float elementRank, FloatFunction<E> cmp) {
-//        if (size == list.length && elementRank < minSeen)
-//            return -1; //insufficient
+        if (size == list.length) {
+//            assert (last() == min):
+//                    last() + "=last but min=" + min;
+
+            if (elementRank >= minSeen) {
+                return -1; //insufficient
+            }
+        }
 
         int r = super.add(element, elementRank, cmp);
-        if (r>=0) {
-//            //added
-//            if (elementRank < minSeen)
-//                minSeen = elementRank;
+        if (r >= 0) {
+            update();
         }
         return r;
     }
@@ -68,8 +73,17 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E>  {
     @Override
     public E remove(int index) {
         E e = super.remove(index);
-        minSeen = Float.POSITIVE_INFINITY;
+        update();
         return e;
+    }
+
+
+    private void update() {
+        E nextMin = last();
+        if (min != nextMin) {
+            this.min = nextMin;
+            minSeen = nextMin == null ? Float.POSITIVE_INFINITY : rank.floatValueOf(last());
+        }
     }
 
     @Override

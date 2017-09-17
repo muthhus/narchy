@@ -554,6 +554,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
         ObjectBooleanPair<Term> b = Task.tryContent(term, punc, false);
+        if (b == null)
+            return null;
+
         term = b.getOne();
         if (b.getTwo())
             freq = 1f - freq;

@@ -24,7 +24,7 @@ import java.util.function.LongSupplier;
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAgent>, Iterable<CameraSensor<P>.PixelConcept> {
 
 
-    public static final int RADIX = 0;
+    public static final int RADIX = 4;
 
     public final List<PixelConcept> pixels;
     public final CauseChannel<Task> in;
@@ -36,7 +36,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     transient int w, h;
     transient float conf;
-    private long stamp;
+    //private long stamp;
 
 
     public CameraSensor(@Nullable Term root, P src, NAgent a) {
@@ -52,7 +52,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                 (float) (1f / (Math.sqrt(Math.min(w, h))))
         );
 
-        pixels = encode(RadixProduct(root, w, h, RADIX), a.nar);
+        pixels = encode(
+                RadixProduct(root, w, h, RADIX)
+                //RadixRecurse(root, w, h, RADIX)
+            , a.nar);
 
         a.onFrame(this);
 
@@ -82,10 +85,17 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     private static Int2Function<Term> RadixProduct(@Nullable Term root, int width, int height, int radix) {
         return (x, y) -> {
             Term coords = radix > 1 ?
-                    //$.pRecurse( zipCoords(coord(x, width), coord(y, height)) ) :
                     $.p(zipCoords(coord(x, width), coord(y, height))) :
                     //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
                     //new Term[]{coord('x', x, width), coord('y', y, height)} :
+                    $.p(x, y);
+            return root==null ? coords : $.inh( coords, root);
+        };
+    }
+    private static Int2Function<Term> RadixRecurse(@Nullable Term root, int width, int height, int radix) {
+        return (x, y) -> {
+            Term coords = radix > 1 ?
+                    $.pRecurse( zipCoords(coord(x, width), coord(y, height)) ) :
                     $.p(x, y);
             return root==null ? coords : $.inh( coords, root);
         };
@@ -104,11 +114,14 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
             //'p';
 
             if (i >= sx && i >= sy) {
-                xy = Atomic.the(levelPrefix + x[ix++].toString() + y[iy++]);
+                //xy = Atomic.the(levelPrefix + x[ix++].toString() + y[iy++]);
+                xy = $.p($.the(x[ix++]), $.the(levelPrefix), $.the(y[iy++]));
             } else if (i >= sx) {
-                xy = Atomic.the(levelPrefix + x[ix++].toString() + "_");
+                //xy = Atomic.the(levelPrefix + x[ix++].toString() + "_");
+                xy = $.p($.the(levelPrefix), $.the(x[ix++]));
             } else { //if (i < y.length) {
-                xy = Atomic.the(levelPrefix + "_" + y[iy++]);
+                //xy = Atomic.the(levelPrefix + "_" + y[iy++]);
+                xy = $.p( $.the(y[iy++]), $.the(levelPrefix));
             }
             r[i] = xy;
         }
@@ -185,7 +198,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         src.update(1);
 
         NAR nar = a.nar;
-        stamp = nar.time.nextStamp();
+        //stamp = nar.time.nextStamp();
 
         long now = a.now;
         int dur = nar.dur();
@@ -250,15 +263,15 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //        }
 
 
-        @Override
-        protected LongSupplier nextStamp(@NotNull NAR nar) {
-            return CameraSensor.this::nextStamp;
-        }
+//        @Override
+//        protected LongSupplier nextStamp(@NotNull NAR nar) {
+//            return CameraSensor.this::nextStamp;
+//        }
     }
 
-    private long nextStamp() {
+    /*private long nextStamp() {
         return stamp;
-    }
+    }*/
 
 
 //    /** links only to the 'id' of the image, and N random neighboring pixels */

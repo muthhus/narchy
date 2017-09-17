@@ -379,7 +379,7 @@ public interface NAct {
 
 
             f0 = g != null ? g.freq() : restFreq;
-            c0 = g != null ? g.conf() : n.confMin.floatValue();
+            c0 = g != null ? g.conf() : restConf; //n.confMin.floatValue();
 
 
             int ip = p ? 0 : 1;
@@ -412,8 +412,9 @@ public interface NAct {
                 float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
 
                 float conf =
-                        cc[winner];
-                //Util.max(cc[0], cc[1]);
+                        //cc[winner];
+                        //Util.max(cc[0], cc[1]);
+                        nar().confDefault(BELIEF);
 
                 Truth w = y == y ? $.t(
                         (winner == 0 ? y : -y) / 2f + 0.5f, //un-map to unipolar frequency range

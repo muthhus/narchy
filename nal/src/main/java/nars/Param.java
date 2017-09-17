@@ -38,8 +38,10 @@ public abstract class Param extends Services<Term,NAR> {
     public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.5f;
 
     /** freq coherence below which a contradictory sensor belief is dis-valued, and above which it is valued */
-    public static final float SENSOR_FEEDBACK_FREQ_THRESHOLD = 0.9f;
-    ;
+    public static final float SENSOR_FEEDBACK_FREQ_THRESHOLD = 0.75f;
+
+    public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
+
 
 
     /**
@@ -131,7 +133,7 @@ public abstract class Param extends Services<Term,NAR> {
 //    public static final int PREDICTION_HORIZON = 4;
 
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
-    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS = 3;
+    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS = 2;
 
 
     public final float[] value = new float[Cause.Purpose.values().length];
@@ -156,8 +158,6 @@ public abstract class Param extends Services<Term,NAR> {
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
     public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;
 
-//    public final FloatParam valuePositiveDecay = new FloatParam(0.9f, 0, 1f);
-//    public final FloatParam valueNegativeDecay = new FloatParam(0.9f, 0, 1f);
 
     /** pessimistic positive value measuring the computational cost of
      * inputting a task

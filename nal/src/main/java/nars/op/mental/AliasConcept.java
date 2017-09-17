@@ -1,6 +1,7 @@
 package nars.op.mental;
 
 import jcog.bag.Bag;
+import jcog.list.FasterList;
 import nars.Op;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
@@ -93,7 +94,8 @@ public final class AliasConcept extends BaseConcept {
 //            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
 //            if (additionalTerms.length > 0)
 //                tl = ArrayUtils.addAll(tl, additionalTerms);
-        this.templates = decompressed.templates();
+        this.templates =
+                new FasterList(decompressed.templates()).with(term);
 
         //rewriteLinks(nar);
     }
@@ -102,8 +104,6 @@ public final class AliasConcept extends BaseConcept {
     @Override
     public Collection<Termed> templates() {
         return templates;
-//        @Nullable Concept c = nar.conceptualize(abbr);
-//        return c == null ? null : c.templates(nar);
     }
 
     //
