@@ -350,13 +350,7 @@ public interface NAct {
                 //$.inh($.the("\"-\""), s);
                 $.p(s.neg(), s);
 
-        /** default neutral "resting" frequency; generally some value [0..0.5]
-         *  this controls effective temperature of the activity
-         *  since less truthpolation "effort" is required to raise
-         *  0 frequency to a threshold positive frequency (>0.5),
-         *  while if resting at 0.5 it is already at threshold ready
-         *  to fire.
-         * */
+        /** default neutral "resting" frequency; generally some value [0..0.5] */
         final float restFreq = 0.5f;
 
         final float ff[] = new float[2];

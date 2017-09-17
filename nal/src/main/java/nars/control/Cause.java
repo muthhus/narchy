@@ -53,7 +53,7 @@ public class Cause<X> {
         }
 
         final float LIMIT = +1f;
-        final float momentum = 0.95f;
+        final float momentum = 0.98f;
         final float speed = 1f;
 
         int p = value.length;

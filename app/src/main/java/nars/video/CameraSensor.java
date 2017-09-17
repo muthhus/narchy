@@ -24,7 +24,7 @@ import java.util.function.LongSupplier;
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAgent>, Iterable<CameraSensor<P>.PixelConcept> {
 
 
-    public static final int RADIX = 8;
+    public static final int RADIX = 6;
 
     public final List<PixelConcept> pixels;
     public final CauseChannel<Task> in;
@@ -47,10 +47,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         numPixels = w * h;
 
         this.in = a.nar.newCauseChannel(this);
-        this.in.amplitude(  //shared amongst all pixels
-                //1f/((float)Math.sqrt(w*h))
-                (float) (1f / (Math.sqrt(Math.min(w, h))))
-        );
+
 
         pixels = encode(
                 RadixProduct(root, w, h, RADIX)
@@ -85,7 +82,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     private static Int2Function<Term> RadixProduct(@Nullable Term root, int width, int height, int radix) {
         return (x, y) -> {
             Term coords = radix > 1 ?
-                    $.p(zipCoords(coord(x, width), coord(y, height))) :
+                    $.p(zipCoords(coord(x, width, radix), coord(y, height, radix))) :
                     //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
                     //new Term[]{coord('x', x, width), coord('y', y, height)} :
                     $.p(x, y);
@@ -95,7 +92,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     private static Int2Function<Term> RadixRecurse(@Nullable Term root, int width, int height, int radix) {
         return (x, y) -> {
             Term coords = radix > 1 ?
-                    $.pRecurse( zipCoords(coord(x, width), coord(y, height)) ) :
+                    $.pRecurse( zipCoords(coord(x, width, radix), coord(y, height, radix)) ) :
                     $.p(x, y);
             return root==null ? coords : $.inh( coords, root);
         };
@@ -136,10 +133,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     }
 
     @NotNull
-    public static Term[] coord(int n, int max) {
+    public static Term[] coord(int n, int max, int radix) {
         //return $.pRecurseIntersect(prefix, $.radixArray(n, radix, max));
         //return $.pRecurse($.radixArray(n, radix, max));
-        return $.radixArray(n, 2, max);
+        return $.radixArray(n, radix, max);
     }
 
 

@@ -131,7 +131,7 @@ abstract public class NAgentX extends NAgent {
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8
                 , "motivation.nal");
 
-        int THREADS = 3;
+        int THREADS = 2;
         NAR n = new NARS()
                 .exe(
                         new MultiExec((i) ->
@@ -165,7 +165,7 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.9f);
 
 
-        float priFactor = 0.5f;
+        float priFactor = 0.1f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
@@ -178,9 +178,9 @@ abstract public class NAgentX extends NAgent {
         MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 3, true, 32f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-        Inperience inp = new Inperience(n, 8, 0.1f);
-        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.05f, 8);
-        Reflector ref = new Reflector(n, 4, 0.01f);
+        Inperience inp = new Inperience(n, 8, 0.05f);
+        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.005f, 8);
+        Reflector ref = new Reflector(n, 4, 0.005f);
 
         NAgent a = init.apply(n);
         //a.trace = true;
