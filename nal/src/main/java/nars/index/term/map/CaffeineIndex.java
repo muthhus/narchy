@@ -136,7 +136,8 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         assert(!(x instanceof Variable)): "variables should not be stored in index";
 
         if (createIfMissing) {
-            return concepts.get(x, conceptBuilder);
+            //return concepts.get(x, conceptBuilder);
+            return concepts.asMap().compute(x, conceptBuilder);
         } else {
             return concepts.getIfPresent(x);
         }

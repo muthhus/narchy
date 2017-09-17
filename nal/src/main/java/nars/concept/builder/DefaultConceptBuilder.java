@@ -324,7 +324,14 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @Override
     @Nullable
-    public Termed apply(@NotNull Term t) {
+    public Termed apply(@NotNull Term t, Termed prev) {
+        if (prev!=null) {
+            if (prev instanceof Concept) {
+                Concept c = ((Concept)prev);
+                if (!c.isDeleted())
+                    return c;
+            }
+        }
 
         //already a concept, or non-conceptualizable:  assume it is from here
         if (!t.op().conceptualizable) {

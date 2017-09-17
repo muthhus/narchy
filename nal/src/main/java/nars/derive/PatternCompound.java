@@ -104,7 +104,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
             } else if (commutative) {
                 return xsubs.unifyCommute(ysubs, subst);
             } else {
-                return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);
+                return xsubs.unifyLinear(ysubs, subst);
             }
 
         }
@@ -129,7 +129,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
         @Override
         public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
-            return y.hasAll(structureNecessary) && op() == y.op() && matchEllipsis(y.subterms(), subst);
+            return /*y.hasAll(structureNecessary) && */op() == y.op() && matchEllipsis(y.subterms(), subst);
         }
 
 

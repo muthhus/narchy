@@ -23,7 +23,7 @@ public class NullTermIndex extends MapTermIndex {
         if (exist!=null)
             return exist;
         else if (createIfMissing)
-            return conceptBuilder.apply(x);
+            return conceptBuilder.apply(x, null);
         else
             return null;
     }

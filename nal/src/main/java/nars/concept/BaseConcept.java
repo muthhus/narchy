@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 import static nars.Op.*;
 import static nars.concept.state.ConceptState.Deleted;
+import static nars.concept.state.ConceptState.New;
 
 /**
  * concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks
@@ -77,7 +78,7 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
         this.goals = goals;
         this.questions = questions;
         this.quests = quests;
-        this.state = Deleted;
+        this.state = New;
 
         templates = TermLinks.templates(term);
     }

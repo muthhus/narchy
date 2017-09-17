@@ -940,11 +940,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                     if (!sub(j).unify(Y.sub(j), u))
                         return false;
 
-                    if (--i == 0)
+                    if (--i == -1)
                         break;
 
-                    if (direction) if (++j == s) j = 0;
-                    else if (--j == -1) j = s-1;
+                    if (direction) { if (++j == s) j = 0;}
+                    else { if (--j == -1) j = s-1; }
                 }
                 return true;
         }

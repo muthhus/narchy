@@ -131,7 +131,7 @@ abstract public class NAgentX extends NAgent {
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8
                 , "motivation.nal");
 
-        int THREADS = 2;
+        int THREADS = 3;
         NAR n = new NARS()
                 .exe(
                         new MultiExec((i) ->
@@ -149,7 +149,7 @@ abstract public class NAgentX extends NAgent {
                                 ), THREADS, 2))
                 .time(clock)
                 .index(
-                        new CaffeineIndex(32 * 1024)
+                        new CaffeineIndex(64 * 1024)
                         //new CaffeineIndex2(64 * 1024)
                         //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
                 )

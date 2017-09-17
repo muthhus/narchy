@@ -2,9 +2,10 @@ package nars.op.mental;
 
 import jcog.bag.Bag;
 import jcog.list.FasterList;
-import nars.Op;
+import nars.NAR;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
+import nars.concept.state.ConceptState;
 import nars.index.term.TermContext;
 import nars.term.Compound;
 import nars.term.Term;
@@ -31,7 +32,8 @@ public final class AliasConcept extends BaseConcept {
 
     public static class AliasAtom extends Atom {
 
-        public final Term target;
+        //TODO encapsulate
+        public Term target;
 
         protected AliasAtom(@NotNull String id, Term target) {
             super(id);
@@ -77,15 +79,15 @@ public final class AliasConcept extends BaseConcept {
 
 
     @NotNull
-    public final Compound abbr;
+    public final Concept abbr;
 
     AliasConcept(@NotNull String abbreviation, Concept decompressed) {
         super(new AliasAtom(abbreviation, decompressed.term()),
                 decompressed.beliefs(), decompressed.goals(), decompressed.questions(), decompressed.quests(),
                 new Bag[]{decompressed.termlinks(), decompressed.tasklinks()});
 
-        this.abbr = (Compound) decompressed.term();
-        put(Abbreviation.class, abbr);
+        this.abbr = decompressed;
+        put(Abbreviation.class, decompressed.term());
 
 //            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
 //            if (additionalTerms.length > 0)
@@ -100,6 +102,28 @@ public final class AliasConcept extends BaseConcept {
     @Override
     public Collection<Termed> templates() {
         return templates;
+    }
+
+    @Override
+    public boolean isDeleted() {
+        return abbr.isDeleted() || super.isDeleted();
+    }
+
+    @Override
+    public void delete(@NotNull NAR nar) {
+        //unreference the target. this avoids creating a GC nightmare
+        ((AliasAtom)term).target = ((AliasAtom)term);
+        if (!abbr.isDeleted()) {
+            nar.terms.set(abbr.term(), abbr); //restore abbr's entry in the index
+
+            //dont delete the bags and tables as invoking the super method would,
+            // since they may be held by the abbreviated concept if it still exists
+            state(ConceptState.Deleted);
+            clear();
+        } else {
+            super.delete(nar);
+        }
+
     }
 
     //

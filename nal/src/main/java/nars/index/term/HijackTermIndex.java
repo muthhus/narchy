@@ -123,7 +123,7 @@ public class HijackTermIndex extends MaplikeTermIndex {
         }
 
         if (createIfMissing) {
-            Termed kc = conceptBuilder.apply(key);
+            Termed kc = conceptBuilder.apply(key, null);
             if (kc != null) {
                 PriReference<Termed> inserted = table.put(new PLink<>(kc, initial));
                 if (inserted != null) {

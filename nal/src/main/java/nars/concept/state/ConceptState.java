@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class ConceptState extends Atom {
 
+
+
     protected ConceptState(@NotNull String id) {
         super(id);
     }
@@ -23,24 +25,8 @@ public abstract class ConceptState extends Atom {
     public abstract int questionCap(boolean questionOrQuest);
 
 
-    public static final ConceptState Deleted = new ConceptState("deleted") {
-
-
-        @Override
-        public int linkCap(Concept compoundConcept, boolean termOrTask) {
-            return 0;
-        }
-
-        @Override
-        public int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
-            return 0;
-        }
-
-        @Override
-        public int questionCap(boolean questionOrQuest) {
-            return 0;
-        }
-    };
+    public static final ConceptState New = new EmptyConceptState("new");
+    public static final ConceptState Deleted = new EmptyConceptState("deleted");
 
     /**
      * used by Null concept builder, used by built-in static Functors, and other shared/ system facilities
@@ -64,4 +50,26 @@ public abstract class ConceptState extends Atom {
         }
     };
 
+    private static class EmptyConceptState extends ConceptState {
+
+
+        public EmptyConceptState(String name) {
+            super(name);
+        }
+
+        @Override
+        public int linkCap(Concept compoundConcept, boolean termOrTask) {
+            return 0;
+        }
+
+        @Override
+        public int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
+            return 0;
+        }
+
+        @Override
+        public int questionCap(boolean questionOrQuest) {
+            return 0;
+        }
+    }
 }

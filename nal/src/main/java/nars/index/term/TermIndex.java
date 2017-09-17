@@ -7,6 +7,7 @@ import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
+import nars.concept.state.ConceptState;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -109,7 +110,17 @@ public abstract class TermIndex implements TermContext {
         }
 
         Concept cc = (Concept) c;
-        if (cc.isDeleted()) {
+
+        @NotNull ConceptState s = cc.state();
+
+        if (s == ConceptState.Deleted) {
+            if (createIfMissing)
+                throw new RuntimeException("TermIndex impl should not return a deleted concept without trying to create a new one");
+            else
+                return null;
+        }
+
+        if (s == ConceptState.New) {
             cc.activate(0, nar);
             cc.state(conceptBuilder.init());
         }

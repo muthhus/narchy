@@ -53,7 +53,7 @@ public class MapTermIndex extends MaplikeTermIndex {
 
         if (createIfMissing) {
 
-            return concepts.computeIfAbsent(x, conceptBuilder);
+            return concepts.compute(x, conceptBuilder);
         } else {
             return concepts.get(x);
         }

@@ -10,12 +10,12 @@ import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * Created by me on 3/23/16.
  */
-public interface ConceptBuilder extends Function<Term, Termed> {
+public interface ConceptBuilder extends BiFunction<Term, Termed, Termed> {
 
     @NotNull ConceptState init();
     @NotNull ConceptState awake();
@@ -32,9 +32,10 @@ public interface ConceptBuilder extends Function<Term, Termed> {
     ConceptBuilder Null = new ConceptBuilder() {
 
         @Override
-        public Termed apply(Term term) {
+        public Termed apply(Term term, Termed termed) {
             return term;
         }
+
 
         @Override
         public @NotNull ConceptState init() {

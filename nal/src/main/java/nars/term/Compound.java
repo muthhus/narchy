@@ -385,7 +385,7 @@ public interface Compound extends Term, IPair, TermContainer {
             return xsubs.unifyCommute(ysubs, subst);
         } else {
             //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
-            return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);
+            return xsubs.unifyLinear(ysubs, subst);
         }
 
 

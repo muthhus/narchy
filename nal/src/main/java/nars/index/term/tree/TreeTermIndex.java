@@ -199,7 +199,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     }
 
     protected @NotNull Termed _get(@NotNull TermKey k, @NotNull Term finalT) {
-        return concepts.putIfAbsent(k, () -> conceptBuilder.apply(finalT));
+        return concepts.putIfAbsent(k, () -> conceptBuilder.apply(finalT, null));
     }
 
     @NotNull

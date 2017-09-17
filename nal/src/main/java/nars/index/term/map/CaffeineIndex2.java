@@ -215,7 +215,7 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
 
                 TermContainerToOpMap<Termed> t = new TermContainerToOpMap<>(k);
 
-                Termed p = conceptBuilder.apply(x);
+                Termed p = conceptBuilder.apply(x, null /* HACK */);
 
                 if (p != null)
                     t.compareAndSet(op.id, null, p);
