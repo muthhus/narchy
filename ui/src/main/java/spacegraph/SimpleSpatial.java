@@ -2,7 +2,6 @@ package spacegraph;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
-import jcog.list.FasterList;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;

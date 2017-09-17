@@ -14,8 +14,6 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static nars.truth.TruthFunctions.w2c;
-
 
 public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 

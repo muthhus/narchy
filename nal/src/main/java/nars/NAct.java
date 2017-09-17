@@ -338,8 +338,83 @@ public interface NAct {
     }
 
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        actionBipolarGreedy(s, update);
+        actionBipolarExpectation(s, update);
+        //actionBipolarGreedy(s, update);
         //actionBipolarMutex3(s, update);
+    }
+
+    default void actionBipolarExpectation(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+        Term pt =
+                //$.inh( $.the("\"+\""), s);
+                $.p(s, s.neg());
+        Term nt =
+                //$.inh($.the("\"-\""), s);
+                $.p(s.neg(), s);
+        final float exp[] = new float[2];
+        final float cc[] = new float[2];
+        @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
+
+            boolean p = c.term().equals(pt);
+            float f0, c0;
+
+            NAR n = nar();
+
+
+            float cur = curiosity().floatValue();
+            Random rng = n.random();
+
+            float restConf =
+                    //n.confMin.floatValue();
+                    n.confDefault(GOAL) * 0.9f;
+            //n.confDefault(BELIEF);
+
+
+            int ip = p ? 0 : 1;
+            exp[ip] = g!=null ? g.expectation() : 0f;
+            cc[ip] = g != null ? g.conf() : 0; //n.confMin.floatValue();;
+
+
+            if (!p) {
+
+                int winner =
+                        //Util.decideRoulette(2, (i) -> cc[i], n.random());
+                        Util.decideSoftmax(2, (i) -> c2w(cc[i]), 0.6f, n.random());
+                //cc[0] > cc[1] ? 0 : 1; //GREEDY
+
+                int loser = 1 - winner;
+
+                //curiosity applied to winner, how ironic
+                if (cur > 0 && rng.nextFloat() <= cur) {
+                    exp[winner] = //rng.nextFloat(); //bipolar
+                            0.5f + 0.5f * rng.nextFloat(); //unipolar, [0.5,1.0]
+                    cc[winner] = nar().confDefault(GOAL);
+                }
+
+                float x = (Math.max(0.5f, exp[winner]) - 0.5f) * 2f;
+                float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
+
+//                float conf =
+//                        //cc[winner];
+//                        //Util.max(cc[0], cc[1]);
+//                        nar().confDefault(BELIEF);
+
+                //inverse expectation
+                float conf = 0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
+
+                Truth l = $.t(0f, conf);
+                Truth w = y == y ? $.t(1, conf) : l;
+
+                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, null);
+                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, null);
+            }
+        };
+
+        GoalActionAsyncConcept p = new GoalActionAsyncConcept(pt, this, u);
+        GoalActionAsyncConcept n = new GoalActionAsyncConcept(nt, this, u);
+
+        addAction(p);
+        addAction(n);
+
     }
 
     default void actionBipolarGreedy(@NotNull Term s, @NotNull FloatToFloatFunction update) {
@@ -386,14 +461,14 @@ public interface NAct {
                 int winner =
                         //Util.decideRoulette(2, (i) -> cc[i], n.random());
                         Util.decideSoftmax(2, (i) -> c2w(cc[i]), 0.6f, n.random());
-                        //cc[0] > cc[1] ? 0 : 1; //GREEDY
+                //cc[0] > cc[1] ? 0 : 1; //GREEDY
 
                 int loser = 1 - winner;
 
                 //curiosity applied to winner, how ironic
                 if (cur > 0 && rng.nextFloat() <= cur) {
                     ff[winner] = //rng.nextFloat(); //bipolar
-                                 0.5f + 0.5f * rng.nextFloat(); //unipolar, [0.5,1.0]
+                            0.5f + 0.5f * rng.nextFloat(); //unipolar, [0.5,1.0]
                     cc[winner] = restConf;
                 }
 
@@ -402,9 +477,9 @@ public interface NAct {
                 float x =
                         //(ff[winner] - 0.5f) * 2f;
                         winnerBase * 2f; //skip negative half, expand to full range
-                        //winnerBase + loserBoost;
-                        //Util.unitize(Util.max(winnerBase, loserBoost));
-                        //Util.unitize(Util.or(winnerBase, loserBoost));
+                //winnerBase + loserBoost;
+                //Util.unitize(Util.max(winnerBase, loserBoost));
+                //Util.unitize(Util.or(winnerBase, loserBoost));
                 float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
 
                 float conf =

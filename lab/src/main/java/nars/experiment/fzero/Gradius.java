@@ -1,18 +1,15 @@
 package nars.experiment.fzero;
 
 import java4k.gradius4k.Gradius4K;
-import jcog.learn.ql.HaiQAgent;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.concept.ScalarConcepts;
-import nars.experiment.NAgentY;
 import nars.gui.Vis;
 import nars.video.CameraSensor;
 import org.jetbrains.annotations.NotNull;
 
 import static java4k.gradius4k.Gradius4K.*;
-import static java4k.gradius4k.Gradius4K.VK_UP;
 import static nars.term.atom.Atomic.the;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.col;

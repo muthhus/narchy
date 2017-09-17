@@ -1,9 +1,7 @@
 package nars.concept;
 
-import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
 import nars.NAR;
-import nars.Param;
 import nars.table.BeliefTable;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

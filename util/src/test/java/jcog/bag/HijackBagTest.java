@@ -15,9 +15,7 @@ import java.util.TreeSet;
 import static jcog.bag.BagTest.*;
 import static jcog.pri.op.PriMerge.max;
 import static jcog.pri.op.PriMerge.plus;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Created by me on 2/9/17.

@@ -2,7 +2,6 @@ package jcog.bag.util;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLongArray;
-import java.util.concurrent.locks.AbstractQueuedLongSynchronizer;
 
 /** striping via 64bit (pair of 32bit codes) global exclusion locking via busy spin
  *  on a linear probed atomic array of fixed size */

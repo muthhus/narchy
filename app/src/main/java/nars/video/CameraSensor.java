@@ -6,7 +6,6 @@ import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.LongSupplier;
 
 /**
  * manages reading a camera to a pixel grid of SensorConcepts

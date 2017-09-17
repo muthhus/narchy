@@ -1,6 +1,9 @@
 package nars.kif;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;

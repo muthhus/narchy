@@ -7,10 +7,8 @@ import jcog.map.CustomConcurrentHashMap;
 import jcog.pri.Pri;
 import nars.control.Derivation;
 import nars.derive.op.UnifyOneSubterm;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
 import java.util.Arrays;
-import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 

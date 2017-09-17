@@ -1,14 +1,10 @@
 package nars.task;
 
 
-import nars.Task;
-import nars.table.TemporalBeliefTable;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Consumer;
 
 /**
  * Created by me on 2/12/17.

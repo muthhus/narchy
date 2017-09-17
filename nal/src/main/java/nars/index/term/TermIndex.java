@@ -1,17 +1,13 @@
 package nars.index.term;
 
-import nars.Builtin;
 import nars.NAR;
-import nars.Narsese;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
 import nars.concept.state.ConceptState;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -20,9 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintStream;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-
-import static nars.Op.NEG;
-import static nars.time.Tense.DTERNAL;
 
 /**
  *

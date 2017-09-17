@@ -2,7 +2,6 @@ package jcog.rule;
 
 import jcog.list.FasterList;
 import org.eclipse.collections.impl.bag.mutable.primitive.ShortHashBag;
-import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.eclipse.collections.impl.map.mutable.primitive.ShortObjectHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.ShortHashSet;
 

@@ -26,7 +26,6 @@ import java.util.stream.StreamSupport;
 
 import static nars.$.*;
 import static nars.Op.BELIEF;
-import static nars.term.Terms.compoundOrNull;
 
 /**
  * Created by me on 6/4/15.

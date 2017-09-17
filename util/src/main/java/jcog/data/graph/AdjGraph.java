@@ -18,12 +18,10 @@
 
 package jcog.data.graph;
 
-import br.ufpr.gres.util.StringUtils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import jcog.TriConsumer;
 import jcog.util.TriFunction;
-import org.eclipse.collections.impl.factory.primitive.IntSets;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;

@@ -1,7 +1,6 @@
 package alice.util.proxyGenerator;
 
 import javax.tools.*;
-import java.io.IOException;
 
 class GeneratingJavaFileManager extends ForwardingJavaFileManager<JavaFileManager> {
 	

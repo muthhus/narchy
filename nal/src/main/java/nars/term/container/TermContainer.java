@@ -6,7 +6,6 @@ import nars.derive.mutate.CommutivePermutations;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
-import nars.term.Terms;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
@@ -27,7 +26,6 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static nars.Op.concurrent;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 

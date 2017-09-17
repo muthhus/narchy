@@ -8,7 +8,6 @@ import nars.concept.BaseConcept;
 import nars.control.Cause;
 import nars.task.NALTask;
 import nars.term.Term;
-import nars.term.transform.Retemporalize;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +18,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 
 /**

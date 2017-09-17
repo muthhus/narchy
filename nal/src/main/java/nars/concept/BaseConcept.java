@@ -1,8 +1,6 @@
 package nars.concept;
 
-import com.google.common.collect.Lists;
 import jcog.bag.Bag;
-import jcog.list.FasterList;
 import jcog.pri.PriReference;
 import nars.*;
 import nars.concept.builder.ConceptBuilder;
@@ -17,13 +15,14 @@ import nars.term.Termlike;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static java.util.Collections.emptyList;
 import static nars.Op.*;
 import static nars.concept.state.ConceptState.Deleted;
 import static nars.concept.state.ConceptState.New;

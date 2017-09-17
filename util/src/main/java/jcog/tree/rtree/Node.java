@@ -22,9 +22,6 @@ package jcog.tree.rtree;
 
 import jcog.list.FasterList;
 import jcog.tree.rtree.util.Stats;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.eclipse.collections.impl.block.comparator.primitive.FloatFunctionComparator;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;

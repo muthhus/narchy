@@ -2,7 +2,6 @@ package nars.index.term.map;
 
 import com.github.benmanes.caffeine.cache.*;
 import nars.Param;
-import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.term.Term;
 import nars.term.Termed;

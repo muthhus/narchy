@@ -1,7 +1,5 @@
 package jcog.util;
 
-import com.google.common.util.concurrent.AtomicDouble;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Float.floatToIntBits;

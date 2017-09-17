@@ -2,7 +2,6 @@ package nars.op;
 
 import jcog.list.FasterList;
 import nars.$;
-import nars.term.Compound;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -15,8 +14,6 @@ import java.util.Map;
 import java.util.Random;
 
 import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
-import static nars.term.Terms.compoundOrNull;
-import static nars.term.Terms.normalizedOrNull;
 
 /**
  * a generalized variable introduction model that can transform tasks

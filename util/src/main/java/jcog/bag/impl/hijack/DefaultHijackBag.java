@@ -4,7 +4,6 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 

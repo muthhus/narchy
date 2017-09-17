@@ -19,7 +19,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static nars.$.*;
+import static nars.$.$;
+import static nars.$.newArrayList;
+import static nars.$.t;
 import static nars.Op.*;
 import static nars.time.Tense.*;
 

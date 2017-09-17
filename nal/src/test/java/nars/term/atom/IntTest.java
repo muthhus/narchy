@@ -5,7 +5,6 @@ import nars.*;
 import nars.term.Term;
 import nars.test.TestNAR;
 import nars.time.Tense;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 

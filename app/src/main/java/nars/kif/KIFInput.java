@@ -36,7 +36,6 @@ import java.util.stream.IntStream;
 
 import static nars.Op.VAR_INDEP;
 import static nars.rdfowl.NQuadsRDF.equi;
-import static nars.term.Terms.compoundOrNull;
 
 /**
  * http://sigmakee.cvs.sourceforge.net/viewvc/sigmakee/sigma/suo-kif.pdf

@@ -3,7 +3,6 @@ package jcog.bag.impl.hijack;
 import jcog.bag.impl.HijackBag;
 import jcog.pri.Priority;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**

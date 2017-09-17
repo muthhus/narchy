@@ -1,19 +1,16 @@
 
 package nars.perf;
 
-import nars.$;
 import nars.Builder;
 import nars.NAR;
 import nars.NARS;
 import nars.term.Term;
 import nars.term.container.TermContainer;
-import nars.test.DeductiveChainTest;
 import nars.test.DeductiveMeshTest;
 import org.junit.Ignore;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
 
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static nars.perf.JmhBenchmark.perf;

@@ -27,10 +27,7 @@ import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
-import spacegraph.phys.collision.broad.BroadphaseNativeType;
-import spacegraph.phys.math.AabbUtil2;
 import spacegraph.phys.math.ScalarUtil;
-import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
 
 /**

@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Collections.emptyList;
-import static nars.Op.*;
 
 public enum TermLinks {
     ;

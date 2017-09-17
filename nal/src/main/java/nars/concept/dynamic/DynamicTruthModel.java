@@ -11,8 +11,6 @@ import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Bool;
-import nars.term.var.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

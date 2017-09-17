@@ -1,13 +1,11 @@
 package nars.term.container;
 
 import com.google.common.base.Joiner;
-import nars.Op;
 import nars.Param;
 import nars.term.Term;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Consumer;
 

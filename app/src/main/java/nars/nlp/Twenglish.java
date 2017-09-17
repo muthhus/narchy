@@ -20,7 +20,6 @@ import jcog.io.Twokenize;
 import jcog.io.Twokenize.Span;
 import nars.$;
 import nars.NAR;
-import nars.Narsese;
 import nars.task.TaskBuilder;
 import nars.term.Term;
 import nars.term.atom.Atomic;

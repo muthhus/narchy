@@ -1,7 +1,6 @@
 package jcog.event;
 
 import jcog.list.FasterList;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;

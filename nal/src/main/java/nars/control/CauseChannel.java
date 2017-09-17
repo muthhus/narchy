@@ -1,7 +1,5 @@
 package nars.control;
 
-import jcog.Util;
-import jcog.math.AtomicSummaryStatistics;
 import jcog.pri.Priority;
 import org.jetbrains.annotations.Nullable;
 

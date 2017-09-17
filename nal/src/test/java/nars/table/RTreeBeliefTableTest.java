@@ -11,7 +11,6 @@ import org.eclipse.collections.api.block.function.primitive.LongToFloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
 import static org.junit.Assert.assertEquals;

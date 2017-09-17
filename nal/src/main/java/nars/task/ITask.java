@@ -2,7 +2,6 @@ package nars.task;
 
 import jcog.pri.Priority;
 import nars.NAR;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**

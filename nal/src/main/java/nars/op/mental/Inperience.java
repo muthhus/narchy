@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.bag.leak.LeakBack;
-import nars.control.CauseChannel;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;

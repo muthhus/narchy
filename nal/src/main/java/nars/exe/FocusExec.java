@@ -1,7 +1,6 @@
 package nars.exe;
 
 import jcog.bag.Bag;
-import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
 import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
@@ -13,7 +12,6 @@ import nars.control.CycleService;
 import nars.control.NARService;
 import nars.control.Premise;
 import nars.task.ITask;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

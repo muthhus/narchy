@@ -1,6 +1,5 @@
 package nars.nal.nal5;
 
-import nars.Narsese;
 import nars.test.TestNAR;
 import nars.util.AbstractNALTest;
 import org.junit.Before;

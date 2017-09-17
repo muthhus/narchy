@@ -126,11 +126,15 @@ public class Cause<X> {
     /** the AtomicDouble this inherits holds the accumulated value which is periodically (every cycle) committed  */
     public static class Traffic extends AtomicFloat {
         /** current, ie. the last commited value */
+
+        public float last;
+
         public float current;
 
         public double total;
 
         public void commit() {
+            this.last = this.current;
             double next = getAndSet(0f);
             this.total += next;
             this.current = (float) next; //smooth(current, (float)next, momentum);

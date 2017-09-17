@@ -1,8 +1,8 @@
 package nars.table;
 
 import com.google.common.collect.Streams;
-import jcog.sort.SortedArray;
 import jcog.pri.Prioritized;
+import jcog.sort.SortedArray;
 import nars.NAR;
 import nars.Param;
 import nars.Task;

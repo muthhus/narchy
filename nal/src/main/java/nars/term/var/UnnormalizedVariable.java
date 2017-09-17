@@ -3,7 +3,6 @@ package nars.term.var;
 import com.google.common.io.ByteArrayDataOutput;
 import nars.$;
 import nars.Op;
-import nars.index.term.TermContext;
 import nars.term.Term;
 import nars.term.atom.AtomicToString;
 import nars.term.subst.Unify;

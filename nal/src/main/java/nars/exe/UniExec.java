@@ -2,7 +2,6 @@ package nars.exe;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
-import jcog.pri.Prioritized;
 import jcog.sort.TopN;
 import nars.NAR;
 import nars.control.Activate;

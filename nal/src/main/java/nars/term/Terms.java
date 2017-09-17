@@ -2,8 +2,8 @@ package nars.term;
 
 import jcog.Texts;
 import jcog.Util;
-import jcog.sort.SortedList;
 import jcog.list.FasterList;
+import jcog.sort.SortedList;
 import nars.Op;
 import nars.term.atom.Atom;
 import nars.term.atom.Bool;

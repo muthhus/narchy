@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.On;
 import jcog.pri.mix.control.MixContRL;
@@ -428,12 +429,13 @@ abstract public class NAgentX extends NAgent {
                         } else {
                             g = 0.75f * Math.min(1f, +v); r = 0;
                         }
-                        //b = 0.5f;
-                        b = Math.max(r, g) * Math.min(1f, c.purpose[Cause.Purpose.Input.ordinal()].current/1f);
+                        b = 0;
+                        //b = Math.max(r, g) * Math.min(1f, c.purpose[Cause.Purpose.Input.ordinal()].current/1f);
 
+                        float t = Util.sum(p->Math.abs(p.last), c.purpose);
                         i.updateMomentum(
                                 //0.01f + Util.sqr(Util.tanhFast(v)+1),
-                                v, 0.02f,
+                                v*t, 0.04f,
                                 r, g, b);
 
                     }, builder);

@@ -7,7 +7,6 @@ import com.jogamp.opengl.util.texture.TextureIO;
 import spacegraph.Surface;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import static spacegraph.SpaceGraph.window;

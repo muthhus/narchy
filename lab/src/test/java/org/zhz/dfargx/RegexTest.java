@@ -6,7 +6,6 @@ import org.zhz.dfargx.automata.DFA;
 import org.zhz.dfargx.automata.NFA;
 import org.zhz.dfargx.node.Node;
 
-import java.util.Arrays;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
