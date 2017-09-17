@@ -351,7 +351,7 @@ public interface NAct {
                 $.p(s.neg(), s);
 
         /** default neutral "resting" frequency; generally some value [0..0.5] */
-        final float restFreq = 0.5f;
+        final float restFreq = 0f;
 
         final float ff[] = new float[2];
         final float cc[] = new float[2];
@@ -368,7 +368,7 @@ public interface NAct {
 
             float restConf =
                     //n.confMin.floatValue();
-                    n.confDefault(GOAL) * 0.9f;
+                    n.confDefault(GOAL);
             //n.confDefault(BELIEF);
 
 
@@ -385,7 +385,7 @@ public interface NAct {
 
                 int winner =
                         //Util.decideRoulette(2, (i) -> cc[i], n.random());
-                        Util.decideSoftmax(2, (i) -> c2w(cc[i]), 0.5f, n.random());
+                        Util.decideSoftmax(2, (i) -> c2w(cc[i]), 0.3f, n.random());
                         //cc[0] > cc[1] ? 0 : 1; //GREEDY
 
                 int loser = 1 - winner;
@@ -400,9 +400,9 @@ public interface NAct {
                 float loserBoost = (0.5f - Math.min(0.5f, ff[loser]));
                 float winnerBase = Math.max(0, (ff[winner] - 0.5f));
                 float x =
-                        winnerBase * 2f; //skip negative half, expand to full range
+                        //winnerBase * 2f; //skip negative half, expand to full range
                         //winnerBase + loserBoost;
-                        //Util.or(winnerBase, loserBoost);
+                        Util.or(winnerBase, loserBoost);
                 float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
 
                 float conf =

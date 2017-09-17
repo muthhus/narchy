@@ -356,7 +356,7 @@ public abstract class Param extends Services<Term,NAR> {
      * values of 0 means all budget is transferred to subterms,
      * values of 1 means no budget is transferred
      */
-    public final FloatParam momentum = new FloatParam(0.25f, 0, 1f);
+    public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
 
     /**
      * dt > 0
