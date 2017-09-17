@@ -12,4 +12,6 @@ public interface CountingLeakySet<E> extends LeakySet<E> {
      */
     void remove(E element);
 
+    boolean addIfMissing(E element);
+
 }

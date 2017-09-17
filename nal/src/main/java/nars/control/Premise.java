@@ -26,8 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Set;
 
 import static nars.Op.BELIEF;
+import static nars.control.Activate.activateSubterms;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -44,12 +46,14 @@ public class Premise extends UnaryTask {
     public final Task taskLink;
     public final Term termLink;
 
-    public Premise(@Nullable Task tasklink, @Nullable Term termlink, float pri) {
+    public final Set<Concept> links;
+
+    public Premise(@Nullable Task tasklink, @Nullable Term termlink, float pri, Set<Concept> links) {
         super(Tuples.pair(tasklink, termlink), pri);
         this.taskLink = tasklink;
         this.termLink = termlink;
+        this.links = links;
     }
-
 
 
     /**
@@ -80,8 +84,9 @@ public class Premise extends UnaryTask {
 
         Task taskLink = this.taskLink;
         final Task task = taskLink;
-        if (task == null)
+        if (task == null || task.isDeleted())
             return null;
+
 
         NAR nar = d.nar;
 
@@ -97,6 +102,11 @@ public class Premise extends UnaryTask {
             return null;
         }
 
+
+        activateSubterms(this.taskLink, links,
+                1f
+                /*decayed*/);
+        links.clear();
 
         //float taskPri = task.priElseZero();
 
@@ -214,7 +224,7 @@ public class Premise extends UnaryTask {
 
                 match = answerTable.answer(task.start(), task.end(), dur, task, beliefTerm, nar);
                 if (match != null) {
-                    assert (task.isQuest() || match.punc()==BELIEF): "quest answered with a belief but should be a goal";
+                    assert (task.isQuest() || match.punc() == BELIEF) : "quest answered with a belief but should be a goal";
 
                     @Nullable Task answered = task.onAnswered(match, nar);
                     if (answered != null) {
@@ -228,8 +238,7 @@ public class Premise extends UnaryTask {
                 long focusStart, focusEnd;
                 if (focus == ETERNAL) {
                     focusStart = focusEnd = ETERNAL;
-                }
-                else {
+                } else {
                     focusStart = focus - dur;
                     focusEnd = focus + dur;
                 }
@@ -321,8 +330,6 @@ public class Premise extends UnaryTask {
     }
 
 
-
-
     /**
      * unify any (and only) query variables which may be present in
      * the 'a' term with any non-query terms in the 'q' term
@@ -372,4 +379,7 @@ public class Premise extends UnaryTask {
 //            return null;
     }
 
+    public void merge(@NotNull Premise incoming) {
+        links.addAll(incoming.links);
+    }
 }

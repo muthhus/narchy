@@ -76,6 +76,10 @@ abstract public class PatternCompound extends GenericCompoundDT {
     @Override
     public boolean unify(@NotNull Term y, @NotNull Unify subst) {
 
+        if (y instanceof AliasConcept.AliasAtom) {
+            return unify(((AliasConcept.AliasAtom) y).target, subst);
+        }
+
         if (
                 y.hasAll(structureNecessary) &&
                 op == y.op() &&
@@ -103,9 +107,6 @@ abstract public class PatternCompound extends GenericCompoundDT {
                 return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);
             }
 
-        } else if (y instanceof AliasConcept.AliasAtom) {
-            Term abbreviated = ((AliasConcept.AliasAtom) y).target;
-            return abbreviated.equals(this) || unify(abbreviated, subst);
         }
 
         return false;

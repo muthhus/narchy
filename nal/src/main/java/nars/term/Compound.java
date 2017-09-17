@@ -356,12 +356,6 @@ public interface Compound extends Term, IPair, TermContainer {
         if (Term.super.unify(ty, subst))
             return true;
 
-        if (ty instanceof AliasConcept.AliasAtom) {
-            Term abbreviated = ((AliasConcept.AliasAtom) ty).target;
-            return abbreviated.equals(this) || unify(abbreviated, subst);
-        }
-
-
         Op op = op();
         if (op != ty.op())
             return false;

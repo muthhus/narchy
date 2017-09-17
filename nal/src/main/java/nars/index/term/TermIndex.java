@@ -47,7 +47,7 @@ public abstract class TermIndex implements TermContext {
     public abstract void set(@NotNull Term src, Termed target);
 
     public final void set(@NotNull Termed t) {
-        set(t instanceof Term ? (Term) t : t.term(), t);
+        set(t.term(), t);
     }
 
     abstract public void clear();

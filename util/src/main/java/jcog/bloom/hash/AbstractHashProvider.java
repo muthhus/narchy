@@ -2,6 +2,8 @@ package jcog.bloom.hash;
 
 import jcog.bloom.Murmur3Hash;
 
+import java.util.function.Function;
+
 /**
  * Created by jeff on 16/05/16.
  */

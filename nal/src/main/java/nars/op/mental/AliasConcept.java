@@ -39,36 +39,38 @@ public final class AliasConcept extends BaseConcept {
         }
 
         @Override
-        public int structure() {
-            return target.structure() | Op.ATOM.bit;
-        }
-
-        @Override
         public Term evalSafe(TermContext index, int remain) {
-            return target.evalSafe(index, remain);
+            Term e = target.evalSafe(index, remain);
+            if (e != target)
+                return e; //if a dynamic result, return that
+            else
+                return this; //otherwise if constant, return this
         }
 
 
-        @Override
-        public boolean equals(Object u) {
-            return super.equals(u) || super.equals(target);
-        }
+//        @Override
+//        public boolean equals(Object u) {
+//            return super.equals(u) || super.equals(target);
+//        }
 
         @Override
         public boolean unify(@NotNull Term y, @NotNull Unify subst) {
 
-            Term tt = target;
+            if (super.unify(y, subst))
+                return true;
+
+            Term target = this.target;
             if (y instanceof AliasAtom) {
                 //try to unify with y's abbreviated
 //                if (tt.unify( ((AliasConcept)y).abbr.term(), subst ))
 //                    return true;
 
                 //if this is constant (no variables) then all it needs is equality test
-                return tt.unify(((AliasAtom) y).target, subst);
+                return target.unify(((AliasAtom) y).target, subst);
             }
 
             //try to unify with 'y'
-            return tt.unify(y, subst);
+            return target.unify(y, subst);
         }
 
     }
@@ -76,12 +78,6 @@ public final class AliasConcept extends BaseConcept {
 
     @NotNull
     public final Compound abbr;
-
-    @NotNull
-    static public AliasConcept get(@NotNull String compressed, @NotNull Concept decompressed) {
-        AliasConcept a = new AliasConcept(compressed, decompressed);
-        return a;
-    }
 
     AliasConcept(@NotNull String abbreviation, Concept decompressed) {
         super(new AliasAtom(abbreviation, decompressed.term()),

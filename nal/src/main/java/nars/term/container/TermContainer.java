@@ -906,6 +906,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     default boolean unifyLinear(TermContainer Y, @NotNull Unify u) {
+
         /**
          * a branch for comparing a particular permutation, called from the main next()
          */
@@ -932,12 +933,18 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 //TODO unify variables last after matching all constants by saving them to a secondary list as they are encountered in the below loop
 
                 //begin at random offset to shuffle the order of the match sequence
-                int j = u.random.nextInt(s);
-                for (int i = s - 1; i >= 0; i--) {
+                int jj = u.random.nextInt();
+                int j = Math.abs(jj) % s;
+                boolean direction = (jj & 1) == 0;
+                for (int i = s - 1; ;) {
                     if (!sub(j).unify(Y.sub(j), u))
                         return false;
-                    if (i > 0 && ++j == s)
-                        j = 0;
+
+                    if (--i == 0)
+                        break;
+
+                    if (direction) if (++j == s) j = 0;
+                    else if (--j == -1) j = s-1;
                 }
                 return true;
         }

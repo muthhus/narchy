@@ -50,7 +50,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     /**
      * whether to use a (strong, proxying) alias atom concept
      */
-    boolean aliasConcept;
+    boolean aliasConcept = true;
 
     private static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
 
@@ -66,7 +66,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
     public Abbreviation(@NotNull NAR nar, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(nar);
-        bag = new DtLeak<Compound, PLink<Compound>>(new ArrayBag<Compound, PLink<Compound>>(PriMerge.plus, new ConcurrentHashMap<>(capacity)) {
+        bag = new DtLeak<>(new ArrayBag<Compound, PLink<Compound>>(PriMerge.plus, new ConcurrentHashMap<>(capacity)) {
             @Nullable @Override public Compound key(@NotNull PLink<Compound> l) {
                 return l.get();
             }
@@ -74,10 +74,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
             @Override
             protected float onOut(@NotNull PLink<Compound> b) {
-                if (abbreviate(b.get(), b, nar))
-                    return 1f;
-                else
-                    return 0f;
+                return abbreviate(b.get(), b, nar) ? 1f : 0f;
             }
         };
         bag.setCapacity(capacity);
@@ -142,8 +139,6 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     }
 
 
-
-
     @NotNull
     protected String newSerialTerm() {
 
@@ -190,58 +185,55 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
     protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Prioritized b, NAR nar) {
 
-        String id;
-//            id = newCanonicalTerm(abbreviated);
-//            if (id == null)
-        id = newSerialTerm();
+        @Nullable Concept a = nar.concept(abbreviated);
+        if (a != null && !(a instanceof AliasConcept)) {
+
+            final boolean[] succ = {false};
+            a.computeIfAbsent(Abbreviation.class, (ac) -> {
+                String id = newSerialTerm();
+                Compound abbreviation = newRelation(abbreviated, id);
+                if (abbreviation == null)
+                    return null; //maybe could happen
 
 
-        Compound abbreviation = newRelation(abbreviated, id);
 
-        Term[] aa;
-        if (abbreviation != null) {
+                Task abbreviationTask = Task.tryTask(abbreviation, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
+                        (te, tr) -> {
 
-            @Nullable Concept a = nar.concept(abbreviated);
-            if (a != null) {
-
-                assert(a.term() instanceof Compound);
-
-                if (a.putIfAbsent(Abbreviation.class, id) == null) {
-
-                    Task abbreviationTask = Task.tryTask(abbreviation, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
-                            (te, tr) -> {
-
-                        NALTask ta = new NALTask(
-                                te, BELIEF, tr,
-                                nar.time(), ETERNAL, ETERNAL,
-                                new long[]{nar.time.nextStamp()}
-                        );
-
-                        Term abbreviatedTerm = abbreviated.term();
-
-                        AliasConcept ac = AliasConcept.get(id, a);
-                        Concept alias = aliasConcept ?
-                                nar.on(ac) : null;
-                        nar.terms.set(abbreviated, ac); //set the abbreviated term to resolve to the abbreviation
-
-                        Termed aliasTerm = alias != null ? alias : Atomic.the(id);
-                        ta.meta(Abbreviation.class, new Term[]{abbreviatedTerm, aliasTerm.term()});
-                        ta.log("Abbreviate"); //, abbreviatedTerm, aliasTerm
-                        ta.setPri(b);
-
-                        nar.input(ta);
-                        logger.info("+ {}", ta);
-
-                        return ta;
-
-                        //if (abbreviation != null) {
-
-                        //logger.info("{} <=== {}", alias, abbreviatedTerm);
-
-                    });
+                            NALTask ta = new NALTask(
+                                    te, BELIEF, tr,
+                                    nar.time(), ETERNAL, ETERNAL,
+                                    new long[]{nar.time.nextStamp()}
+                            );
 
 
-                    //abbreviationTask.priority();
+                            AliasConcept a1 = new AliasConcept(id, a);
+                            Concept alias = aliasConcept ?
+                                    nar.on(a1) : null;
+
+                            Term abbreviatedTerm = abbreviated.term();
+                            nar.terms.set(abbreviatedTerm, a1); //set the abbreviated term to resolve to the abbreviation
+
+                            Termed aliasTerm = alias != null ? alias : Atomic.the(id);
+                            ta.meta(Abbreviation.class, new Term[]{abbreviatedTerm, aliasTerm.term()});
+                            ta.log("Abbreviate"); //, abbreviatedTerm, aliasTerm
+                            ta.setPri(b);
+
+                            nar.runLater(()->nar.input(ta));
+                            logger.info("+ {}", ta);
+
+                            succ[0] = true;
+
+                            return ta;
+
+                            //if (abbreviation != null) {
+
+                            //logger.info("{} <=== {}", alias, abbreviatedTerm);
+
+                        });
+
+
+                //abbreviationTask.priority();
 //        if (srcCopy == null) {
 //            delete();
 //        } else {
@@ -255,9 +247,13 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 //
 //        return this;
 
-                    return true;
-                }
-            }
+
+                return id;
+
+            });
+
+            return succ[0];
+
         }
 
         return false;

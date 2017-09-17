@@ -112,9 +112,10 @@ public class FZero extends NAgentX {
 //        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
         @NotNull ScalarConcepts ang = senseNumber(the("ang"), () ->
                         (float) (0.5f + 0.5f * MathUtils.normalizeAngle(fz.playerAngle, 0) / (Math.PI)),
-                8,
-                ScalarConcepts.Needle
-        ).resolution(0.2f);
+                5,
+                //ScalarConcepts.Needle
+                ScalarConcepts.Fluid
+        ).resolution(0.1f);
         window(
                 Vis.conceptBeliefPlots(this, ang, 4), 500, 500);
 

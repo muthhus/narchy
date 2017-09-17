@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -190,7 +191,7 @@ public class TrieDeriverTest {
         Term b = n.term(belief);
         assertNotNull(b);
 
-        Iterable<? extends ITask> derived = new Premise(t, b, 0.5f) {
+        Iterable<? extends ITask> derived = new Premise(t, b, 0.5f, Collections.emptySet()) {
             @Override protected Derivation derivation(@NotNull NAR n) {
                 return n.derivation(d);
             }

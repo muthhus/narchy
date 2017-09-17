@@ -369,8 +369,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
         Random rng = random();
         boolean direction =
-            true; //must always go down otherwise if it reverses then in curvebag's bias for early items, it will prioritize the last items yuk
-            //rng == null || rng.nextBoolean();
+                true; //must always go down otherwise if it reverses then in curvebag's bias for early items, it will prioritize the last items yuk
+        //rng == null || rng.nextBoolean();
 
         newItemsArray:
         while (true) {
@@ -435,14 +435,10 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         if (capacity == 0)
             return null;
 
-//        if (p < Pri.EPSILON) {
-//            if (atCap)
-//                return null; //automatically refuse sub-ther
-//        }
-
         X key = key(incoming);
 
         final @Nullable List<Y>[] trash = new List[1];
+
         Y inserted;
 
         synchronized (items) {
@@ -453,7 +449,11 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
             inserted = map.compute(key, (kk, existing) -> {
                 Y v;
                 if (existing != null) {
-                    v = merge(existing, incoming, overflow);
+                    if (existing != incoming) {
+                        v = merge(existing, incoming, overflow);
+                    } else {
+                        v = existing;
+                    }
                 } else {
                     if (insert(incoming, trash)) {
                         v = incoming; //success
@@ -567,39 +567,40 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         return true;
     }
 
-    public Y merge(Y existing, @NotNull Y incoming, @Nullable MutableFloat overflow) {
-        if (existing == incoming) {
-            //no change
-        } else {
+    protected final Y merge(Y existing, Y incoming, @Nullable MutableFloat overflow) {
 
+        int s = size();
+        boolean atCap = s == capacity;
 
-            int s = size();
-            boolean atCap = s == capacity;
+        int posBefore = items.indexOf(existing, this);
+        assert (posBefore != -1);
 
-            int posBefore = items.indexOf(existing, this);
-            assert (posBefore != -1);
+        float priBefore = existing.priElseZero();
 
-            float priBefore = existing.priElseZero();
-            float oo = mergeFunction.merge(existing /* HACK */, incoming);
+        float oo = merge(existing, incoming);
 
-            float delta = existing.priElseZero() - priBefore;
+        float delta = existing.priElseZero() - priBefore;
 
-            if (Math.abs(delta) > Pri.EPSILON) {
-                items.adjust(posBefore, delta, this);
+        if (Math.abs(delta) > Pri.EPSILON) {
+            items.adjust(posBefore, delta, this);
 
-                updateRange(delta);
+            updateRange(delta);
 
-                if (delta >= Prioritized.EPSILON) {
-                    if (atCap) {
-                        pressurize(delta);
-                    }
+            if (delta >= Prioritized.EPSILON) {
+                if (atCap) {
+                    pressurize(delta);
                 }
             }
-
-            if (oo > Pri.EPSILON && overflow != null)
-                overflow.add(oo);
         }
+
+        if (oo > Pri.EPSILON && overflow != null)
+            overflow.add(oo);
+
         return existing;
+    }
+
+    protected float merge(Y existing, Y incoming) {
+        return mergeFunction.merge(existing, incoming);
     }
 
     public Y mapRemove(Y x) {

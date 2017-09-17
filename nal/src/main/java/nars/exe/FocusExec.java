@@ -13,8 +13,7 @@ import nars.control.CycleService;
 import nars.control.NARService;
 import nars.control.Premise;
 import nars.task.ITask;
-import nars.task.NALTask;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -50,7 +49,15 @@ public class FocusExec extends Exec implements Runnable {
             new ConcurrentCurveBag
             //new CurveBag
                     <>(Param.premiseMerge /* TODO make separate premise merge param */,
-                new ConcurrentHashMap<>(), null, MAX_PREMISES);
+                new ConcurrentHashMap<>(), null, MAX_PREMISES) {
+
+                @Override
+                protected float merge(Premise existing, Premise incoming) {
+                    existing.merge(incoming);
+                    return super.merge(existing, incoming);
+                }
+
+            };
 
 //    final CurveBag<Task> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
 //            null, MAX_TASKS) {
@@ -69,7 +76,7 @@ public class FocusExec extends Exec implements Runnable {
     public final Bag concepts =
             new ConcurrentCurveBag
             //new CurveBag
-                <>(Param.conceptActivate,
+                <>(Param.activateMerge,
                     new ConcurrentHashMap<>(),
                     //new ConcurrentHashMapUnsafe<>(),
                     random, MAX_CONCEPTS);

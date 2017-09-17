@@ -198,7 +198,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
 
                 .input("a:b! :|:")
                 .inputAt(10, "(( c:d &&+5 e:f ) ==>+0 a:b).")
-                .mustGoal(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f, 0, 5)
+                .mustGoal(cycles, "( c:d &&+5 e:f)", 1.0f, 0.45f, 0, 5)
                 .mustNotOutput(cycles, "( c:d &&+5 e:f)", GOAL, ETERNAL)
         ;
     }
@@ -210,7 +210,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
 
                 .input("a:b! :|:")
                 .input("(( c:d &&+5 e:f ) ==>+5 a:b).")
-                .mustGoal(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f, 0, 5)
+                .mustGoal(cycles, "( c:d &&+5 e:f)", 1.0f, 0.45f, 0, 5)
         ;
     }
 
@@ -221,7 +221,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
 
                 .input("a:b!")
                 .inputAt(10, "(( c:d &&+5 e:f ) ==> a:b).")
-                .mustGoal(cycles, "( c:d &&+5 e:f)", 1.0f, 0.81f, ETERNAL)
+                .mustGoal(cycles, "( c:d &&+5 e:f)", 1.0f, 0.45f, ETERNAL)
                 .mustNotOutput(cycles, "( c:d &&+5 e:f)", GOAL, 0)
         ;
     }
@@ -243,7 +243,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
                 .log()
                 .input("reachable(SELF,{t002})! :|:")
                 .inputAt(5, "((on($1,#2) &&+0 at(SELF,#2)) ==>+0 reachable(SELF,$1)).")
-                .mustGoal(cycles, "(on({t002},#1) &&+0 at(SELF,#1))", 1.0f, 0.81f, 0)
+                .mustGoal(cycles, "(on({t002},#1) &&+0 at(SELF,#1))", 1.0f, 0.45f, 0)
                 .mustNotOutput(cycles, "(at(SELF,#1) &&+0 on({t002},#1))", GOAL, t -> t == ETERNAL || t == 5);
 
     }

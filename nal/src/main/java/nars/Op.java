@@ -4,6 +4,7 @@ package nars;
 import jcog.list.FasterList;
 import nars.derive.match.Ellipsislike;
 import nars.index.term.TermContext;
+import nars.op.mental.AliasConcept;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
@@ -1353,14 +1354,31 @@ public enum Op implements $ {
         if (concurrent(dt)) {
 
 
-            Predicate<Term> del = op == IMPL ? Op.nonEventDelimeter : Op.recursiveCommonalityDelimeter;
+            Predicate<Term> delim = op == IMPL ? Op.nonEventDelimeter : Op.recursiveCommonalityDelimeter;
 
-            if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
-                    (/*subject.equals(predicate) ||*/
-                            subject.containsRecursively(predicate, del) ||
-                                    predicate.containsRecursively(subject, del)))
-                //(!(su instanceof Variable) && predicate.contains(su)))
-                return Null; //cyclic
+            if ((subject.varPattern() == 0 && predicate.varPattern() == 0)) {
+                if ((containEachOther(subject, predicate, delim))) {
+                    //(!(su instanceof Variable) && predicate.contains(su)))
+                    return Null; //cyclic
+                }
+                boolean sa = subject instanceof AliasConcept.AliasAtom;
+                if (sa) {
+                    Term sd = ((AliasConcept.AliasAtom) subject).target;
+                    if (sd.equals(predicate) || containEachOther(sd, predicate, delim))
+                        return Null;
+                }
+                boolean pa = predicate instanceof AliasConcept.AliasAtom;
+                if (pa) {
+                    Term pd = ((AliasConcept.AliasAtom) predicate).target;
+                    if (pd.equals(subject) || containEachOther(pd, subject, delim))
+                        return Null;
+                }
+                if (sa && pa) {
+                    if (containEachOther(((AliasConcept.AliasAtom) subject).target, ((AliasConcept.AliasAtom) predicate).target, delim))
+                        return Null;
+                }
+
+            }
 
 //            if (subject.varPattern() == 0 && predicate.varPattern() == 0 &&
 //                    !(subject instanceof Variable) && !(predicate instanceof Variable) &&
@@ -1479,6 +1497,17 @@ public enum Op implements $ {
 
 
         return compound(op, dt, subject, predicate).negIf(!polarity);
+    }
+
+    private static boolean containEachOther(@NotNull Term x, @NotNull Term y, Predicate<Term> delim) {
+        int xv = x.volume();
+        int yv = y.volume();
+        if (xv == yv)
+            return x.containsRecursively(y, delim) || y.containsRecursively(x, delim);
+        else if (xv > yv)
+            return x.containsRecursively(y, delim);
+        else
+            return y.containsRecursively(y, delim);
     }
 
     @Nullable

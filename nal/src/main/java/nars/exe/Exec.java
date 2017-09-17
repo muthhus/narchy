@@ -5,8 +5,10 @@ import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.control.Activate;
+import nars.control.Premise;
 import nars.task.ITask;
 import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
@@ -92,12 +94,15 @@ abstract public class Exec implements Executor, PriMerge {
     @Override
     public float merge(Priority existing, Prioritized incoming) {
         if (existing instanceof Activate) {
-            return PriMerge.plus.merge(existing, incoming);
-        } else {
+            return Param.activateMerge.merge(existing, incoming);
+        } else if (existing instanceof Premise) {
+            ((Premise)existing).merge((Premise)incoming);
+            return Param.premiseMerge.merge(existing, incoming);
+        }else {
             if (existing instanceof NALTask) {
                 ((NALTask)existing).causeMerge((NALTask) incoming);
             }
-            return PriMerge.max.merge(existing, incoming);
+            return Param.taskMerge.merge(existing, incoming);
         }
 
     }

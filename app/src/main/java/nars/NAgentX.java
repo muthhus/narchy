@@ -179,8 +179,8 @@ abstract public class NAgentX extends NAgent {
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
         Inperience inp = new Inperience(n, 8, 0.1f);
-        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 8);
-        Reflector ref = new Reflector(n, 4, 0.1f);
+        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.05f, 8);
+        Reflector ref = new Reflector(n, 4, 0.01f);
 
         NAgent a = init.apply(n);
         //a.trace = true;

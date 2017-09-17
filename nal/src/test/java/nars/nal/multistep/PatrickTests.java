@@ -45,6 +45,7 @@ public class PatrickTests extends AbstractNALTest {
          */
 
         TestNAR tt = test;
+        tt.nar.truthResolution.setValue(0.1f);
         tt
 //.log()
                 .believe("(((REPRESENT,_,$3):$1 && (REPRESENT,_,$4):$2) ==> REPRESENT:(($1,$2),($3,$4)))")
@@ -55,7 +56,7 @@ public class PatrickTests extends AbstractNALTest {
 //.askAt(1250,"REPRESENT:((eats,cat),?what)")
                 .askAt(500, "REPRESENT:((cat,eats),(?x, ?y))")
 
-                .mustBelieve(1000, "REPRESENT((eats,cat),(EATING,ANIMAL))", 1f, 0.73f);
+                .mustBelieve(2000, "REPRESENT((eats,cat),(EATING,ANIMAL))", 1f, 0.7f);
         //.mustBelieve(2500, "REPRESENT:((eats, cat),(EATING,ANIMAL))", 1f, 0.73f);
 
     }

@@ -29,6 +29,7 @@ import nars.Op;
 import nars.Param;
 import nars.index.term.StaticTermIndex;
 import nars.index.term.TermContext;
+import nars.op.mental.AliasConcept;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicToString;
 import nars.term.atom.Bool;
@@ -63,7 +64,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static nars.Op.*;
+import static nars.Op.NEG;
+import static nars.Op.Null;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -370,8 +372,12 @@ public interface Term extends Termlike, Comparable<Term> {
     default boolean unify(/*@NotNull */Term y, Unify u) {
         if (y instanceof Variable)
             return y.unify(this, u);
-        else
+        else if (y instanceof AliasConcept.AliasAtom) {
+            Term abbreviated = ((AliasConcept.AliasAtom) y).target;
+            return unify(abbreviated, u);
+        } else {
             return equals(y);
+        }
     }
 
 

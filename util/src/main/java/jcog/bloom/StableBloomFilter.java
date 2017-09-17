@@ -76,7 +76,7 @@ public class StableBloomFilter<E> implements CountingLeakySet<E> {
 
 
     public void unlearn(float rate) {
-        int unlearnedCells = Math.round(numberOfCells * rate);
+        int unlearnedCells = (int) Math.ceil(numberOfCells * rate);
         unlearn(unlearnedCells);
     }
     public void unlearn(int unlearnedCells) {

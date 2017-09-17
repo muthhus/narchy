@@ -71,9 +71,12 @@ public abstract class Param extends Services<Term,NAR> {
 
     public static final PriMerge termlinkMerge = PriMerge.max;
     public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
-    public static final PriMerge premiseMerge = PriMerge.max;
-    //public static final PriMerge taskMerge = PriMerge.max;
-    public static final PriMerge conceptActivate = PriMerge.plus;
+
+    /** for pending tasks to be processed */
+    public static final PriMerge taskMerge = PriMerge.max;
+
+    public static final PriMerge activateMerge = PriMerge.plus;
+    public static final PriMerge premiseMerge = PriMerge.plus;
 
 
     /** used on premise formation  */
@@ -93,7 +96,7 @@ public abstract class Param extends Services<Term,NAR> {
                     32;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(256);
+    public final MutableInteger matchTTL = new MutableInteger(384);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.2f;
