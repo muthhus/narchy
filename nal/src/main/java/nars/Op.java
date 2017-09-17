@@ -201,7 +201,8 @@ public enum Op implements $ {
 
             if (dt == DTERNAL || dt == 0) {
 
-                return implInConjReduction(junctionFlat(dt, tt));
+                Term f = junctionFlat(dt, tt);
+                return implInConjReduction(f);
 
             } else {
                 //sequence or parallel
@@ -1057,10 +1058,15 @@ public enum Op implements $ {
             other = conj.sub(1 - whichImpl);
         } else {
             //more than 2; group them as one term
-            @NotNull TreeSet<Term> ss = conj.subterms().toSortedSet();
+            TermContainer cs = conj.subterms();
+            @NotNull TreeSet<Term> ss = cs.toSortedSet();
             assert (ss.remove(implication)) : "must have removed something";
 
-            other = xo.the(conjDT, Terms.sorted(ss) /* assumes commutive since > 2 */);
+            Term[] css = Terms.sorted(ss);
+            if (conj.dt() == conjDT && cs.equalTerms(css))
+                return conj; //prevent recursive loop
+            else
+                other = xo.the(conjDT, css /* assumes commutive since > 2 */);
         }
 
 
@@ -1240,12 +1246,11 @@ public enum Op implements $ {
 
     final static int EVENT_DELIMETER_OP = Op.or(Op.PROD, Op.CONJ);
     public static final Predicate<Term> recursiveCommonalityDelimeter =
-            c -> c.op().in(EVENT_DELIMETER_OP);
+            c -> !c.op().in(EVENT_DELIMETER_OP);
     public static final Predicate<Term> nonEventDelimeter =
-            c -> !c.op().temporal;
+            c -> c.op()!=CONJ || concurrent(c.dt()); //!c.op().temporal || concurrent(c.dt());
 
     private static final int InvalidImplicationSubj = or(IMPL);
-    //private static final int InvalidImplicationPred = or(EQUI);
 
     @NotNull
     static Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
@@ -1507,7 +1512,7 @@ public enum Op implements $ {
         else if (xv > yv)
             return x.containsRecursively(y, delim);
         else
-            return y.containsRecursively(y, delim);
+            return y.containsRecursively(x, delim);
     }
 
     @Nullable

@@ -5,12 +5,11 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.bag.leak.LeakOut;
+import nars.bag.leak.TaskLeak;
 import nars.control.CauseChannel;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.transform.CompoundTransform;
 import nars.truth.DiscreteTruth;
@@ -37,7 +36,7 @@ import static nars.time.Tense.ETERNAL;
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
  * "Imperience": http://www.merrell-wolff.org/sites/default/files/M127.pdf
  */
-public class Inperience extends LeakOut {
+public class Inperience extends TaskLeak {
 
     public static final Logger logger = LoggerFactory.getLogger(Inperience.class);
 
@@ -71,7 +70,7 @@ public class Inperience extends LeakOut {
      */
     @NotNull
     public final FloatParam freqMax = new FloatParam(0.1f);
-    final CauseChannel<Task> in;
+    final CauseChannel<Task> out;
 
 //    float beliefFactor = 1f;
 //    float questionFactor = 0.5f;
@@ -130,13 +129,13 @@ public class Inperience extends LeakOut {
 //
 
     public Inperience(@NotNull NAR n, int capacity, float rate) {
-        super(n, capacity, rate);
+        super(capacity, rate, n);
 //        super(
 //            new CurveBag(PriMerge.max, new ConcurrentHashMap<>(capacity), n.random(), capacity), rate, n
 //        );
         this.nar = n;
 
-        in = nar.newCauseChannel(this);
+        out = nar.newCauseChannel(this);
 
 //        n.eventConceptProcess.on(p -> {
 //            Task belief = p.belief();
@@ -158,22 +157,22 @@ public class Inperience extends LeakOut {
     }
 
     @Override
-    public boolean preFilter(Task task) {
+    public boolean preFilter(Task next) {
 
 
-        if (task.isCommand() || task.isInput()
+        if (next.isCommand() || next.isInput()
             /*|| task instanceof InperienceTask*/) //for disabling recursive inperience
             return false;
 
-        boolean full = leak.bag.isFull();
+        boolean full = in.bag.isFull();
 
 
-        if (task.isBeliefOrGoal()) {
+        if (next.isBeliefOrGoal()) {
             //check for sufficient truth polarization
-            if (full && task.conf() <= confMin.floatValue())
+            if (full && next.conf() <= confMin.floatValue())
                 return false; //too low confidence
 
-            float f = task.freq();
+            float f = next.freq();
             float fm = freqMax.floatValue();
             if (!(f <= fm) && !(f >= (1f - fm)))
                 return false;
@@ -215,7 +214,7 @@ public class Inperience extends LeakOut {
     }
 
     @Override
-    protected float leak(Task task) {
+    protected float leak(Task next) {
 
         //try {
         //        if (r == null)
@@ -255,26 +254,26 @@ public class Inperience extends LeakOut {
 //        }
 //        //its a normal negated compound, which will be unnegated in task constructor
 //        return (Compound) s;
-        Term r = normalizedOrNull(compoundOrNull(reify(task, nar.self())));
+        Term r = normalizedOrNull(compoundOrNull(reify(next, nar.self())));
         if (r != null) {
 
             long now = nar.time();
 
-            long start = task.start();
+            long start = next.start();
             long end;
             if (start == ETERNAL)
                 end = start = now;
             else {
-                end = task.end();
+                end = next.end();
             }
 
-            in.input( (Task)
+            out.input( (Task)
                 new NALTask(r, BELIEF,
                     new DiscreteTruth(1, nar.confDefault(Op.BELIEF)),
-                    now, start, end, task.stamp()
+                    now, start, end, next.stamp()
                 )
                     .log("Inperience")
-                    .pri(task.priElseZero() * priFactor)
+                    .pri(next.priElseZero() * priFactor)
             );
 
             return 1;

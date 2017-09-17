@@ -69,7 +69,7 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
 
                     final float[] spent = {0};
                     bag.sample((v) -> {
-                        float cost = onOut(v);
+                        float cost = receive(v);
                         assert(cost <= minBudget);
                         float spe = spent[0] + cost;
                         if (spe < budget) {
@@ -97,7 +97,7 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
      * from the rate each iteration. this can allow proportional consumption of
      * a finitely allocated resource.
      */
-    abstract protected float onOut(@NotNull Y b);
+    abstract protected float receive(@NotNull Y b);
 
     public void put(Y x) {
         bag.put(x);

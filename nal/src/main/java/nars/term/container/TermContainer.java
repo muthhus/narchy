@@ -309,19 +309,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return !impossibleSubTerm(t) && OR(t::equals);
     }
 
-    @Override
-    default boolean containsRecursively(@NotNull Term y) {
-        int s = size();
-        if (s > 0 && !impossibleSubTerm(y)) {
-            for (int i = 0; i < s; i++) {
-                Term x = sub(i);
-                if (x.equals(y) || (x.containsRecursively(y))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+
 
     @Override
     default boolean containsRecursively(@NotNull Term y, Predicate<Term> subTermOf) {
@@ -329,40 +317,12 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (s > 0 && !impossibleSubTerm(y)) {
             for (int i = 0; i < s; i++) {
                 Term x = sub(i);
-                if (x.equals(y) || (x.containsRecursively(y, subTermOf)))
+                if (x.equals(y) || x.containsRecursively(y, subTermOf))
                     return true;
             }
         }
         return false;
     }
-
-
-//    default boolean containsTermAtemporally(@NotNull Term b) {
-//        b = b.unneg();
-//        if (!impossibleSubTerm(b)) {
-//            int s = size();
-//            for (int i = 0; i < s; i++) {
-//                if (Terms.equalAtemporally(term(i),b)) {
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
-//    }
-
-//    default boolean containsTermRecursivelyAtemporally(@NotNull Term b) {
-//        b = b.unneg();
-//        if (!impossibleSubTerm(b)) {
-//            int s = size();
-//            for (int i = 0; i < s; i++) {
-//                Term x = term(i);
-//                if (Terms.equalAtemporally(x,b) || ((x instanceof Compound) && (((Compound) x).containsTermRecursivelyAtemporally(b)))) {
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
-//    }
 
     @NotNull
     static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {

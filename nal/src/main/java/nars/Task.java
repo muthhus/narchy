@@ -232,9 +232,12 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
     }
 
-    @Deprecated
+
     @Nullable
     static NALTask clone(@NotNull Task x, @NotNull Term newContent) {
+
+        //TODO:
+        //Task.tryTask()
 
 
         boolean negated = (newContent.op() == NEG);
@@ -340,16 +343,21 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
             negated = !negated;
         }
 
-        if (!o.conceptualizable)
+        if (!o.conceptualizable) {
+            if (!safe) Task.fail(t, "not conceptualizable", false);
             return null;
+        }
 
-        if ((t = normalizedOrNull(t)) == null)
+        if ((t = normalizedOrNull(t)) == null) {
+            if (!safe) Task.fail(t, "not normalizable", false);
             return null;
+        }
 
-        if (Task.taskContentValid(t, punc, null, safe))
+        if (Task.taskContentValid(t, punc, null, safe)) {
             return PrimitiveTuples.pair(t, negated);
-        else
+        } else {
             return null;
+        }
 
     }
 

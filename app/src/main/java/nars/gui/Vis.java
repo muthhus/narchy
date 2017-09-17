@@ -10,7 +10,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.Task;
-import nars.bag.leak.LeakOut;
+import nars.bag.leak.TaskLeak;
 import nars.concept.Concept;
 import nars.exe.FocusExec;
 import nars.gui.graph.EdgeDirected;
@@ -19,7 +19,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import spacegraph.AbstractSpace;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
@@ -339,21 +338,21 @@ public class Vis {
 
     public static ConsoleSurface logConsole(NAR nar, int cols, int rows, FloatParam priMin) {
         ConsoleSurface term = new ConsoleTerminal(cols, rows);
-        new LeakOut(nar, 4, 0.25f) {
+        new TaskLeak(4, 0.25f, nar) {
 
             @Override
-            public boolean preFilter(@NotNull Task t) {
-                if (t.pri() >= priMin.floatValue()) {
-                    return super.preFilter(t);
+            public boolean preFilter(@NotNull Task next) {
+                if (next.pri() >= priMin.floatValue()) {
+                    return super.preFilter(next);
                 }
                 return false;
             }
 
             @Override
-            protected float leak(Task t) {
-                if (t.pri() >= priMin.floatValue()) {
+            protected float leak(Task next) {
+                if (next.pri() >= priMin.floatValue()) {
                     try {
-                        t.appendTo(term);
+                        next.appendTo(term);
                         term.append('\n');
                     } catch (IOException e) {
                         e.printStackTrace();

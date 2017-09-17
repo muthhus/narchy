@@ -3,7 +3,7 @@ package nars;
 import jcog.TriConsumer;
 import jcog.Util;
 import jcog.net.UDPeer;
-import nars.bag.leak.LeakOut;
+import nars.bag.leak.TaskLeak;
 import nars.control.CauseChannel;
 import nars.control.TaskService;
 import nars.task.ActiveQuestionTask;
@@ -24,7 +24,7 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
 
     //public static final Logger logger = LoggerFactory.getLogger(InterNAR.class);
 
-    public final LeakOut buffer;
+    public final TaskLeak buffer;
     final CauseChannel<Task> recv;
     public MyUDPeer peer;
 
@@ -83,17 +83,17 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
 
         recv = nar.newCauseChannel(this);
 
-        buffer = new LeakOut(nar, 256, outRate) {
+        buffer = new TaskLeak(256, outRate, nar) {
             @Override
-            protected float leak(Task x) {
+            protected float leak(Task next) {
 
                 if (peer.connected()) {
                     try {
-                        x = nar.post(x);
+                        next = nar.post(next);
                         //if (x!=null) {
-                        @Nullable byte[] msg = IO.taskToBytes(x);
+                        @Nullable byte[] msg = IO.taskToBytes(next);
                         if (msg != null) {
-                            if (peer.tellSome(msg, ttl(x), true) > 0) {
+                            if (peer.tellSome(msg, ttl(next), true) > 0) {
                                 return 1;
                             }
                         }
@@ -107,11 +107,11 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
             }
 
             @Override
-            public boolean preFilter(@NotNull Task t) {
-                if (t.isCommand() || !peer.connected())
+            public boolean preFilter(@NotNull Task next) {
+                if (next.isCommand() || !peer.connected())
                     return false;
 
-                return super.preFilter(t);
+                return super.preFilter(next);
             }
         };
     }

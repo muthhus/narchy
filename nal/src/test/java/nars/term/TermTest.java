@@ -653,7 +653,7 @@ public class TermTest {
 
             NARS.shell().believe(o);
 
-            assertTrue(o + " should not have been allowed as a task content", false);
+            fail(o + " should not have been allowed as a task content");
 
 
         } catch (Exception e) {

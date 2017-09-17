@@ -24,7 +24,7 @@ import java.util.function.LongSupplier;
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAgent>, Iterable<CameraSensor<P>.PixelConcept> {
 
 
-    public static final int RADIX = 3;
+    public static final int RADIX = 8;
 
     public final List<PixelConcept> pixels;
     public final CauseChannel<Task> in;
@@ -50,9 +50,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
 
         pixels = encode(
-                //RadixProduct(root, w, h, RADIX)
+                RadixProduct(root, w, h, RADIX)
                 //RadixRecurse(root, w, h, RADIX)
-                InhRecurse(root, w, h, RADIX)
+                //InhRecurse(root, w, h, RADIX)
             , a.nar);
 
         a.onFrame(this);

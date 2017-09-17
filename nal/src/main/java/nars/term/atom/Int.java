@@ -12,6 +12,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
@@ -434,12 +435,17 @@ public class Int implements Intlike {
 
 
         Map<ByteList, IntRange> intervals = new HashMap();
+
         cc.pathsTo(x -> x instanceof IntRange ? ((IntRange) x) : null, (ByteList p, IntRange x) -> {
             intervals.put(p.toImmutable(), x);
             return true;
         });
 
-        switch (intervals.size()) {
+        int dim = intervals.size();
+        switch (dim) {
+
+            case 0:
+                throw new RuntimeException();
 
             case 1: //1D
             {
@@ -479,7 +485,7 @@ public class Int implements Intlike {
 
             default:
                 //either there is none, or too many -- just use the term directly
-                return null;
+                throw new UnsupportedOperationException("too many embedded dimensions: " + dim);
 
         }
 

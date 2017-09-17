@@ -1,6 +1,6 @@
 package nars.op.stm;
 
-import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.Prioritized;
@@ -9,6 +9,8 @@ import nars.Task;
 import nars.concept.Concept;
 import nars.control.TaskService;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.BlockingQueue;
 
 
 /**
@@ -19,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 public final class STMLinkage extends TaskService {
 
     @NotNull
-    public final DisruptorBlockingQueue<Task> stm;
+    public final BlockingQueue<Task> stm;
 
     final FloatParam strength = new FloatParam(1f, 0f, 1f);
     private final boolean allowNonInput;
@@ -34,9 +36,9 @@ public final class STMLinkage extends TaskService {
         this.allowNonInput = allowNonInput;
         strength.setValue(1f / capacity);
 
-        stm = new DisruptorBlockingQueue<>(capacity+1 /* extra slot for good measure */);
-        for (int i = 0; i < capacity+1; i++)
-            stm.add(null); //fill with nulls initially
+        stm = Util.blockingQueue(capacity+1 /* extra slot for good measure */);
+//        for (int i = 0; i < capacity+1; i++)
+//            stm.add(null); //fill with nulls initially
 
 
     }

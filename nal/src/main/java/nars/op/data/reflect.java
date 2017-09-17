@@ -1,23 +1,37 @@
 /*
  * Here comes the text of your license
- * Each line should be prefixed with  * 
+ * Each line should be prefixed with  *
  */
 package nars.op.data;
 
+import jcog.bloom.StableBloomFilter;
+import jcog.bloom.hash.BytesHashProvider;
 import nars.$;
-import nars.Op;
+import nars.IO;
+import nars.NAR;
+import nars.Task;
+import nars.bag.leak.LeakBack;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static nars.Op.BELIEF;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Produces canonical "Reflective-Narsese" representation of a parameter term
+ *
  * @author me
  */
-public class reflect  {
+public class reflect {
 
+    final static Atomic REFLECT_OP = Atomic.the("reflect");
 
     /**
      * <(*,subject,object) --> predicate>
@@ -55,6 +69,7 @@ public class reflect  {
     public static Term sop(@NotNull TermContainer s, Term predicate) {
         return $.inh($.p(reflect(s.sub(0)), reflect(s.sub(1))), predicate);
     }
+
     @Nullable
     public static Term sop(String operatorName, @NotNull TermContainer c) {
         Term[] m = new Term[c.size()];
@@ -84,7 +99,7 @@ public class reflect  {
         //  }
         return $.inh($.p(m), $.quote(operatorName));
     }
-    
+
     @Nullable
     public static Term reflect(Term t) {
         if (t.size() == 0) {
@@ -92,12 +107,107 @@ public class reflect  {
         }
         switch (t.op()) {
             //case NEG: return t; //wont work
-            case PROD: return t;
+            case PROD:
+                return t;
             //case INH: return sop(t, "inheritance");
             //case SIM:  return sop(t, "similarity");
-            default: return sop(t.op().toString(), t.subterms());
+            default:
+                return sop(t.op().toString(), t.subterms());
         }
     }
 
+    public static class ReflectTaskClone extends LeakBack {
+        final static Logger logger = LoggerFactory.getLogger(ReflectTaskClone.class);
 
+        private final NAR n;
+        final static float VOL_RATIO_MAX = 2f;
+        private final StableBloomFilter<Task> filter;
+
+        public ReflectTaskClone(int cap, NAR n) {
+            super(cap, n);
+            this.n = n;
+            this.filter = new StableBloomFilter<>(
+                    1024, 1,
+                    new BytesHashProvider<>(IO::taskToBytes));
+        }
+
+        @Override
+        public boolean preFilter(Task next) {
+            if (super.preFilter(next)) {
+                Term tt = next.term();
+                if (tt.size() > 1) {
+                    if (tt.volume() <= n.termVolumeMax.intValue() * 0.75f)
+                        if (filter.addIfMissing(next))
+                            return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        protected float leak(Task next) {
+            Term x = next.term().conceptual();
+            Term r = $.func(REFLECT_OP, x).eval(n);
+            if (r.size() > 0 && r.volume() <= n.termVolumeMax.intValue()) {
+                Task y = Task.clone(next, r);
+                if (y != null) {
+                    logger.info("+ {}", y);
+                    feedback(y);
+                    return 1;
+                }
+            }
+            return 0;
+        }
+    }
+
+    public static class ReflectSimilarToTaskTerm extends LeakBack {
+
+        final static Logger logger = LoggerFactory.getLogger(ReflectSimilarToTaskTerm.class);
+
+        final static float VOL_RATIO_MAX = 0.5f; //estimate
+        private final NAR n;
+        private final StableBloomFilter<Term> filter;
+
+
+        public ReflectSimilarToTaskTerm(int cap, NAR n) {
+            super(cap, n);
+            this.filter = new StableBloomFilter<>(
+                    1024, 1,
+                    new BytesHashProvider<>(IO::termToBytes));
+            this.n = n;
+        }
+
+
+        @Override
+        public boolean preFilter(Task next) {
+            if (super.preFilter(next)) {
+                Term tt = next.term();
+                if (tt.size() > 1)
+                    if (tt.volume() <= n.termVolumeMax.intValue() * VOL_RATIO_MAX)
+                        if (filter.addIfMissing(tt.term().conceptual()))
+                            return true;
+
+            }
+
+            return false;
+        }
+
+
+        @Override
+        protected float leak(Task next) {
+
+            filter.unlearn(0.01f);
+
+            Term x = next.term().conceptual();
+            Term reflectionSim = $.sim($.func(REFLECT_OP, x), x).eval(n);
+            if (reflectionSim.size() > 0 && reflectionSim.volume() <= n.termVolumeMax.intValue()) {
+                NALTask t = new NALTask(reflectionSim, BELIEF, $.t(1f, n.confDefault(BELIEF)), n.time(), ETERNAL, ETERNAL, n.time.nextInputStamp());
+                feedback(t);
+                logger.info("+ {}", reflectionSim);
+                return 1;
+            }
+            return 0;
+        }
+    }
 }
+

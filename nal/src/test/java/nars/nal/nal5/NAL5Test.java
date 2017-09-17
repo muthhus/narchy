@@ -640,21 +640,7 @@ public class NAL5Test extends AbstractNALTest {
         ;
     }
 
-    @Test public void testAnswerSubstUnifyDed() throws Narsese.NarseseException {
-        test
-                .log()
-                .ask("animal:bird")
-                .believe("(animal:$x ==> alive($x))")
-                .mustBelieve(cycles, "alive(bird)", 1.0f, 0.81f)
-        ;
-    }
-    @Test public void testAnswerSubstUnifyInd() throws Narsese.NarseseException {
-        test
-                .ask("animal:bird")
-                .believe("(alive($x) ==> animal:$x)")
-                .mustBelieve(cycles, "alive(bird)", 1.0f, 0.45f)
-        ;
-    }
+
 
 }
 

@@ -1,6 +1,5 @@
 package nars.exe;
 
-import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.Loop;
 import jcog.Util;
 import jcog.event.On;
@@ -10,10 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
 
@@ -39,8 +35,8 @@ public class MultiExec extends Exec {
         private final BlockingQueue<Runnable> q;
         private final ExecutorService calcThreads;
 
-        public Passive(int nThreads, int queueSize) {
-            q = new DisruptorBlockingQueue<>(queueSize);
+        public Passive(int nThreads, int queueSize) {BlockingQueue<Runnable> q1;
+            q = Util.blockingQueue(queueSize);
 
             calcThreads = Executors.newFixedThreadPool(nThreads);
             for (int i = 0; i < nThreads; i++) {

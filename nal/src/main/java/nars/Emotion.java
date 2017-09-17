@@ -77,7 +77,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
      * happiness rate
      */
     @NotNull
-    public final AtomicSummaryStatistics happy = new AtomicSummaryStatistics();
+    public final BufferedFloatGuage happy;
     private final NAR nar;
 
     float _happy;
@@ -110,7 +110,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
 
         this.nar = n;
 
-        //logger = LoggerFactory.getLogger(class);
+        this.happy = new BufferedFloatGuage("happy");
 
         this.busyVol = new BufferedFloatGuage("busyV");
 

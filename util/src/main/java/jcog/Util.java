@@ -14,6 +14,7 @@
  */
 package jcog;
 
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -55,6 +56,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -1778,6 +1781,15 @@ public enum Util {
 
     public static Object toString(Object x) {
         return x.getClass() + "@" + System.identityHashCode(x);
+    }
+
+    public static BlockingQueue blockingQueue(int capacity) {
+        try {
+            return new DisruptorBlockingQueue<>(capacity);
+        } catch (Throwable e) {
+            //for JDK which doesnt support what Disruptor requires
+            return new ArrayBlockingQueue<>(capacity);
+        }
     }
 
 

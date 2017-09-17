@@ -56,6 +56,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -138,10 +139,6 @@ public interface Term extends Termlike, Comparable<Term> {
         return recurseTerms(parentsMust, whileTrue, this);
     }
 
-    @Override
-    default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
-        return inSubtermsOf.test(this) && contains(t);
-    }
 
     /**
      * whether any subterms (recursively) have
@@ -163,7 +160,9 @@ public interface Term extends Termlike, Comparable<Term> {
     default byte[] pathTo(@NotNull Term subterm) {
         if (subterm.equals(this)) return ArrayUtils.EMPTY_BYTE_ARRAY;
         //if (!containsRecursively(subterm)) return null;
-        return pathTo(new ByteArrayList(0), this, subterm);
+        return
+            this instanceof Compound && !impossibleSubTerm(subterm) ?
+                    pathTo(new ByteArrayList(0), ((Compound)this).subterms(), subterm) : null;
     }
 
 
@@ -198,16 +197,18 @@ public interface Term extends Termlike, Comparable<Term> {
         if (ps < depth)
             throw new RuntimeException("path overflow");
 
-        int n = src.size();
-        if (n == 0)
+        if (!(src instanceof Compound))
             return src; //path wont continue inside an atom
 
         Compound csrc = (Compound) src;
+        TermContainer css = csrc.subterms();
+
+        int n = css.size(); if (n == 0) return src;
 
         Term[] target = new Term[n];
 
         for (int i = 0; i < n; i++) {
-            Term x = csrc.sub(i);
+            Term x = css.sub(i);
             if (path.get(depth) != i)
                 //unchanged subtree
                 target[i] = x;
@@ -226,16 +227,18 @@ public interface Term extends Termlike, Comparable<Term> {
     default <X> boolean pathsTo(@NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
         X ss = subterm.apply(this);
         if (ss != null) {
-            if (!receiver.test(ByteLists.immutable.empty(), ss))
+            if (!receiver.test(EmptyByteList, ss))
                 return false;
         }
-        return pathsTo(new ByteArrayList(0), this, subterm, receiver);
+        if (this instanceof Compound) {
+            return pathsTo(new ByteArrayList(0), ((Compound)this).subterms(), subterm, receiver);
+        } else {
+            return true;
+        }
     }
 
     @Nullable
-    static byte[] pathTo(@NotNull ByteArrayList p, Term superTerm, @NotNull Term target) {
-        if (superTerm.impossibleSubTerm(target))
-            return null;
+    static byte[] pathTo(@NotNull ByteArrayList p, TermContainer superTerm, @NotNull Term target) {
 
         int n = superTerm.size();
         for (int i = 0; i < n; i++) {
@@ -244,8 +247,8 @@ public interface Term extends Termlike, Comparable<Term> {
                 p.add((byte) i);
                 return p.toArray();
             }
-            if (s.size() > 0) {
-                byte[] pt = pathTo(p, s, target);
+            if (s instanceof Compound && !s.impossibleSubTerm(target)) {
+                byte[] pt = pathTo(p, ((Compound)s).subterms(), target);
                 if (pt != null) {
                     p.add((byte) i);
                     return pt;
@@ -258,7 +261,7 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     @Nullable
-    static <X> boolean pathsTo(@NotNull ByteArrayList p, Term superTerm, @NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
+    static <X> boolean pathsTo(@NotNull ByteArrayList p, TermContainer superTerm, @NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
 
 
         int ppp = p.size();
@@ -274,8 +277,8 @@ public interface Term extends Termlike, Comparable<Term> {
                 if (!receiver.test(p, ss))
                     return false;
             }
-            if (s.size() > 0) {
-                if (!pathsTo(p, s, subterm, receiver))
+            if (s instanceof Compound) {
+                if (!pathsTo(p, ((Compound)s).subterms(), subterm, receiver))
                     return false;
             }
             p.removeAtIndex(ppp);
@@ -310,11 +313,7 @@ public interface Term extends Termlike, Comparable<Term> {
             }
             //all matched, proceed downward to the next layer
         }
-        if (i == 0)
-            return this;
-        else {
-            return sub(i, subpaths.get(0));
-        }
+        return i == 0 ? this : sub(i, subpaths.get(0));
 
     }
 
@@ -598,7 +597,9 @@ public interface Term extends Termlike, Comparable<Term> {
         return pathsTo(subterm, 0);
     }
 
-    @NotNull
+    final static List<byte[]> ListOfEmptyByteArray = List.of(ArrayUtils.EMPTY_BYTE_ARRAY);
+
+  @NotNull
     default List<byte[]> pathsTo(Term subterm, int minLengthOfPathToReturn) {
         List<byte[]> list = $.newArrayList(0);
         pathsTo(

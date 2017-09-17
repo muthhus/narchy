@@ -1,7 +1,10 @@
 package nars.nlp;
 
-import nars.*;
-import nars.bag.leak.LeakOut;
+import nars.NAR;
+import nars.NARS;
+import nars.Param;
+import nars.Task;
+import nars.bag.leak.TaskLeak;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -326,26 +329,26 @@ public class IRCAgent extends IRC {
         return url.startsWith("https://gist.githubusercontent");
     }
 
-    private class MyLeakOut extends LeakOut {
+    private class MyLeakOut extends TaskLeak {
         private final NAR nar;
         private final String[] channels;
 
         public MyLeakOut(NAR nar, String... channels) {
-            super(nar, 8, 0.03f);
+            super(8, 0.03f, nar);
             this.nar = nar;
             this.channels = channels;
         }
 
         @Override
-        protected float leak(Task task) {
-            boolean cmd = task.isCommand();
-            if (cmd || (trace && !task.isDeleted())) {
-                String s = (!cmd) ? task.toString() : task.term().toString();
+        protected float leak(Task next) {
+            boolean cmd = next.isCommand();
+            if (cmd || (trace && !next.isDeleted())) {
+                String s = (!cmd) ? next.toString() : next.term().toString();
                 Runnable r = IRCAgent.this.send(channels, s);
                 if (r!=null) {
                     nar.runLater(r);
-                    if (Param.DEBUG && !task.isCommand())
-                        logger.info("{}\n{}", task, task.proof());
+                    if (Param.DEBUG && !next.isCommand())
+                        logger.info("{}\n{}", next, next.proof());
                 } else {
                     //..?
                 }
@@ -355,9 +358,9 @@ public class IRCAgent extends IRC {
         }
 
         @Override
-        public boolean preFilter(@NotNull Task t) {
-            if (trace || t.isCommand())
-                return super.preFilter(t);
+        public boolean preFilter(@NotNull Task next) {
+            if (trace || next.isCommand())
+                return super.preFilter(next);
             return false;
         }
     }

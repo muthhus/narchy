@@ -11,9 +11,9 @@ import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
+import nars.op.data.reflect;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
-import nars.op.mental.Reflector;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
 import nars.term.Term;
@@ -179,8 +179,10 @@ abstract public class NAgentX extends NAgent {
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
         Inperience inp = new Inperience(n, 8, 0.05f);
-        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.005f, 8);
-        Reflector ref = new Reflector(n, 4, 0.005f);
+        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 8);
+
+        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(n, 4, 0.1f);
+        reflect.ReflectTaskClone refTask = new reflect.ReflectTaskClone(n, 8, 0.2f);
 
         NAgent a = init.apply(n);
         //a.trace = true;

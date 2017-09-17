@@ -43,11 +43,11 @@ public interface Termlike extends Termed {
     boolean contains(Termlike t);
 
     default boolean containsRecursively(Term t) {
-        return contains(t);
+        return containsRecursively(t, (x) -> true);
     }
 
     default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
-        return contains(t);
+        return false;
     }
 
 

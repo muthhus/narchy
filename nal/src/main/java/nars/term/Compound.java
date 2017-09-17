@@ -30,14 +30,13 @@ import nars.derive.AbstractPred;
 import nars.derive.match.EllipsisMatch;
 import nars.index.term.NewCompound;
 import nars.index.term.TermContext;
-import nars.op.mental.AliasConcept;
-import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.Retemporalize;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.Variable;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
@@ -50,11 +49,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.Collections.emptySet;
@@ -101,7 +99,8 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
-        return !inSubtermsOf.test(this) && subterms().containsRecursively(t, inSubtermsOf);
+        assert(this!=t);
+        return inSubtermsOf.test(this) && subterms().containsRecursively(t, inSubtermsOf);
     }
 
     @Override

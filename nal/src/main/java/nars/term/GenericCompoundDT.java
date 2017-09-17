@@ -10,13 +10,18 @@ import nars.index.term.TermContext;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
+import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
@@ -240,6 +245,11 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     @Override
     public final Term term() {
         return this;
+    }
+
+    @Override
+    public boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
+        return Compound.super.containsRecursively(t, inSubtermsOf);
     }
 
 

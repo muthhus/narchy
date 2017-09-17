@@ -46,8 +46,8 @@ public class FocusExec extends Exec implements Runnable {
     final Random random = new XorShift128PlusRandom(1);
 
     final CurveBag<Premise> premises =
-            new ConcurrentCurveBag
-            //new CurveBag
+            //new ConcurrentCurveBag
+            new CurveBag
                     <>(Param.premiseMerge /* TODO make separate premise merge param */,
                 new ConcurrentHashMap<>(), null, MAX_PREMISES) {
 
@@ -74,8 +74,8 @@ public class FocusExec extends Exec implements Runnable {
 
 
     public final Bag concepts =
-            new ConcurrentCurveBag
-            //new CurveBag
+            //new ConcurrentCurveBag
+            new CurveBag
                 <>(Param.activateMerge,
                     new ConcurrentHashMap<>(),
                     //new ConcurrentHashMapUnsafe<>(),

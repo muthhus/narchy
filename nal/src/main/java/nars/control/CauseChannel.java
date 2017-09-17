@@ -15,8 +15,8 @@ public class CauseChannel<X extends Priority> extends Cause<X> implements Consum
     /** linear gain control */
     public float bias, amplitude = 1;
 
-    /** in-bound traffic statistics */
-    public final AtomicSummaryStatistics traffic = new AtomicSummaryStatistics();
+//    /** in-bound traffic statistics */
+//    public final AtomicSummaryStatistics traffic = new AtomicSummaryStatistics();
 
     final Consumer<X> target;
 
@@ -56,7 +56,7 @@ public class CauseChannel<X extends Priority> extends Cause<X> implements Consum
         float p = x.pri();
         if (p!=p) return; //deleted
 
-        traffic.accept(p);
+        //traffic.accept(p);
 
         if (bias!=0 || amplitude!=1) {
             x.setPri(bias + p * amplitude);

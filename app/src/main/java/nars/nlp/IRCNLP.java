@@ -2,7 +2,7 @@
 package nars.nlp;
 
 import nars.*;
-import nars.bag.leak.LeakOut;
+import nars.bag.leak.TaskLeak;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -123,26 +123,26 @@ public class IRCNLP extends IRC {
     /**
      * identical with IRCAgent, TODO share them
      */
-    private class MyLeakOut extends LeakOut {
+    private class MyLeakOut extends TaskLeak {
         private final NAR nar;
         public final String[] channels;
 
         public MyLeakOut(NAR nar, String... channels) {
-            super(nar, 8, 0.05f);
+            super(8, 0.05f, nar);
             this.nar = nar;
             this.channels = channels;
         }
 
         @Override
-        protected float leak(Task task) {
-            boolean cmd = task.isCommand();
-            if (cmd || (trace && !task.isDeleted())) {
-                String s = (!cmd) ? task.toString() : task.term().toString();
+        protected float leak(Task next) {
+            boolean cmd = next.isCommand();
+            if (cmd || (trace && !next.isDeleted())) {
+                String s = (!cmd) ? next.toString() : next.term().toString();
                 Runnable r = IRCNLP.this.send(channels, s);
                 if (r != null) {
                     nar.runLater(r);
-                    if (Param.DEBUG && !task.isCommand())
-                        logger.info("{}\n{}", task, task.proof());
+                    if (Param.DEBUG && !next.isCommand())
+                        logger.info("{}\n{}", next, next.proof());
                 } else {
                     //..?
                 }
@@ -152,9 +152,9 @@ public class IRCNLP extends IRC {
         }
 
         @Override
-        public boolean preFilter(@NotNull Task t) {
-            if (trace || t.isCommand())
-                return super.preFilter(t);
+        public boolean preFilter(@NotNull Task next) {
+            if (trace || next.isCommand())
+                return super.preFilter(next);
             return false;
         }
     }

@@ -73,7 +73,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
         }, new FloatParam(selectionRate)) {
 
             @Override
-            protected float onOut(@NotNull PLink<Compound> b) {
+            protected float receive(@NotNull PLink<Compound> b) {
                 return abbreviate(b.get(), b, nar) ? 1f : 0f;
             }
         };

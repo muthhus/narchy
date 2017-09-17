@@ -1,28 +1,28 @@
 package jcog.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 /**
  * ex:
- *      toAdd = new QueueLock<T>(writeLock, 4, this::add);
+ * toAdd = new QueueLock<T>(writeLock, 4, this::add);
  */
 public class QueueLock<X> implements Consumer<X> {
 
     //public final Lock lock;
-    public final AtomicBoolean busy;
-    public final Queue<X> queue;
+    public final AtomicInteger busy;
+    public final BlockingQueue<X> queue;
     private final Consumer<X> proc;
+    private IntConsumer afterBatch;
 
-    //final static int concurrency = Runtime.getRuntime().availableProcessors();
-
-    public QueueLock(Consumer<X> procedure) {
-        this(new LinkedBlockingQueue(), procedure);
-    }
+    final static Logger logger = LoggerFactory.getLogger(QueueLock.class);
 
     /*
     //new EvictingQueue<>(capacity);
@@ -30,39 +30,53 @@ public class QueueLock<X> implements Consumer<X> {
     //new ArrayBlockingQueue<X>(capacity);
     //new LinkedBlockingQueue
      */
-    public QueueLock(Queue<X> queue, Consumer<X> procedure) {
+
+    /**
+     * @param queue      holds the queue of items to be processed
+     * @param each       procedure to process each queued item
+     * @param afterBatch if non-null, called after the batch is finished
+     */
+    public QueueLock(BlockingQueue<X> queue, Consumer<X> each, @Nullable IntConsumer afterBatch) {
         this.queue = queue;
 
         //this.lock = lock;
-        this.busy = new AtomicBoolean(false);
-        this.proc = procedure;
+        this.busy = new AtomicInteger(0);
+        this.proc = each;
+        this.afterBatch = afterBatch;
     }
 
-    @Override public void accept(@NotNull X x) {
-//        try {
-            if (!queue.offer(x))
-                return;
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
+    @Override
+    public void accept(@NotNull X x) {
+        try {
+            queue.put(x);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
-        boolean responsible = busy.compareAndSet(false, true);
+        boolean responsible = busy.compareAndSet(0, 1);
         if (responsible) {
             int count = 0;
-            try {
-                X next;
-                while ((next = queue.poll()) != null) {
-                    proc.accept(next);
-                    count++;
+            final X[] next = (X[]) new Object[1];
+            while (busy.updateAndGet((y) -> (next[0] = queue.poll()) != null ? 1 : 0) == 1) {
+                try {
+                    proc.accept(next[0]);
+                } catch (Throwable t) {
+                    onException(next[0], t);
                 }
-            } finally {
-                busy.set(false);
-                batchFinished(count);
+                count++;
+            }
+            if (afterBatch != null) {
+                try {
+                    afterBatch.accept(count);
+                } catch (Throwable t) {
+                    onException(null, t);
+                }
             }
         }
     }
 
-    protected void batchFinished(int batchSize) {
-
+    protected void onException(X x, Throwable t) {
+        logger.error("{} {}", x, t);
     }
+
 }

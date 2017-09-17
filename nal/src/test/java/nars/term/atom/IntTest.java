@@ -5,15 +5,18 @@ import nars.*;
 import nars.term.Term;
 import nars.test.TestNAR;
 import nars.time.Tense;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 import static nars.$.$;
 import static nars.term.atom.Int.range;
 import static nars.term.atom.Int.the;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class IntTest {
 
@@ -86,7 +89,23 @@ public class IntTest {
     public void testMultidimUnroll() throws Narsese.NarseseException {
         Term a = $.secti($("(1,1)"), $("(1,2)"));
         assertEquals("(1,1..2)", a.toString());
-        assertEquals("[(1,1), (1,2)]", Arrays.toString(Iterators.toArray(Int.unroll(a), Term.class)));
+        assertEquals("[(1,1), (1,2)]", unroll(a));
+    }
+
+    static String unroll(Term a) {
+        Iterator<Term> unroll = Int.unroll(a);
+        assertNotNull(unroll);
+        return Arrays.toString(Iterators.toArray(unroll, Term.class));
+    }
+
+    @Test public void testRecursiveUnroll() throws Narsese.NarseseException {
+        assertEquals("",
+                unroll(
+                    //$("(0..1,c,0,(2,b,1..2,(0..1,a,0)))")
+                    $.p(Int.range(0,1), $.the("c"), Int.the(0),
+                            $.p(Int.the(2), $.the("b"), Int.range(1,2),
+                                    $.p(Int.range(0,1), $.the("a"), Int.the(0))))
+        ));
     }
     @Test
     public void testRangeUnification() {

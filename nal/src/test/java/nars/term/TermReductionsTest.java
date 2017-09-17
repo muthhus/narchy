@@ -662,6 +662,10 @@ public class TermReductionsTest extends NarseseTest {
         assertInvalidTerms("((&&, a, b, c) ==> (&&, a, b))");
         assertEquals("c", $("((&&, a, b) ==> (&&, a, b, c))").toString());
         assertInvalidTerms("((&&, a, b, c) ==> a)");
+    }
+
+    @Test
+    public void testImplicationConjCommonSubterms2() throws Narsese.NarseseException {
         assertInvalidTerms("(a ==> (&&, a, b, c))");
     }
 
@@ -979,9 +983,12 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testReducibleImpl() {
-        assertInvalidTerms("((--,(x)) ==>+0 ((--,(y)) &&+0 (--,(x))))");
-        assertInvalidTerms("((--,(x)) ==> ((--,(y)) && (--,(x))))");
+    public void testReducibleImpl() throws Narsese.NarseseException {
+
+        assertEquals("(--x ==>+0 --y)",
+                $("(--x ==>+0 (--y &| --x))"));
+
+        assertInvalidTerms("(--x ==> (--y && --x))");
     }
 
     @Test
@@ -1076,8 +1083,11 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testCoNegatedImplication() throws Narsese.NarseseException {
         assertEquals(Null,
-                $("((--,$1)=|>(((--,$1)&|(--,#2)) &&+16 #2))")
+                $("((--,$1)=|>((--,$1)&|(--,#2)))")
         );
+//        assertEquals(Null,
+//                $("((--,$1)=|>(((--,$1)&|(--,#2)) &&+16 #2))")
+//        );
     }
 
     /**

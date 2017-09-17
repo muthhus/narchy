@@ -554,8 +554,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
         ObjectBooleanPair<Term> b = Task.tryContent(term, punc, false);
-        if (b == null)
-            return null;
 
         term = b.getOne();
         if (b.getTwo())
@@ -1772,6 +1770,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return newChannel(x, this::input);
     }
 
+
     /**
      * automatically adds the cause id to each input
      */
@@ -1780,12 +1779,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         synchronized (causes) {
 
             final short ci = (short) (causes.size());
+            final short[] sharedOneElement = new short[]{ci};
             CauseChannel c = new CauseChannel<ITask>(ci, id, (x) -> {
                 if (x instanceof NALTask) {
                     NALTask t = (NALTask) x;
                     int tcl = t.cause.length;
-                    if (t.cause == null || tcl == 0) {
-                        t.cause = new short[]{ci};
+                    if (tcl == 0) {
+                        assert(sharedOneElement[0] == ci);
+                        t.cause = sharedOneElement;
                     } else {
                         //concat
                         t.cause = Arrays.copyOf(t.cause, tcl + 1);
