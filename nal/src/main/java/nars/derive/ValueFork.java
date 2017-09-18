@@ -14,7 +14,7 @@ import static nars.time.Tense.ETERNAL;
 public class ValueFork extends Fork {
 
     //private final int id;
-    final Conclusion[] conc;
+    final MakeTask[] conc;
 
     /** cache of value vaulues */
     final float[] value;
@@ -25,13 +25,13 @@ public class ValueFork extends Fork {
 
     public ValueFork(PrediTerm[] branches) {
         super(branches);
-        conc = new Conclusion[branches.length];
+        conc = new MakeTask[branches.length];
         value = new float[branches.length];
         int n = 0;
         for (PrediTerm b : branches) {
-            PrediTerm fin = b instanceof AndCondition ? ((AndCondition)b).last() : b;
+            PrediTerm fin = AndCondition.last(b);
             UnifySubtermThenConclude u = (UnifySubtermThenConclude)fin;
-            conc[n++] = ((Conclusion)u.eachMatch);
+            conc[n++] = ((MakeTask)(AndCondition.last(u.eachMatch)));
         }
     }
 
@@ -43,7 +43,7 @@ public class ValueFork extends Fork {
     private void update() {
         int i = 0;
         float total = 0;
-        for (Conclusion c : conc) {
+        for (MakeTask c : conc) {
             float v = value[i++] = Math.max(c.channel.gain(), epsilon);
             total += v;
         }
@@ -72,12 +72,12 @@ public class ValueFork extends Fork {
 
             for (int i = 0; i < branches; i++) {
 
-                int subTTL = Math.round(ttl * (value[i] / valueTotal));
-                int reserve = d.getAndSetTTL(subTTL) - subTTL;
+//                int subTTL = Math.round(ttl * (value[i] / valueTotal));
+//                int reserve = d.getAndSetTTL(subTTL) - subTTL;
 
                 cache[order[i]].test(d);
 
-                d.addTTL(reserve);
+//                d.addTTL(reserve);
 
                 if (!d.revertAndContinue(before))
                     return false;

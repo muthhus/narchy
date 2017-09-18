@@ -38,7 +38,7 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
         List<PrediTerm> post = $.newArrayList();
 
 
-        Conclusion conc = new Conclude(rule, rule.conclusion().sub(0), rule.goalUrgent, nar).conc;
+        PrediTerm<Derivation> conc = Conclude.the(rule, rule.conclusion().sub(0), rule.goalUrgent, nar);
 
         boolean taskIsPatVar = taskPattern.op() == Op.VAR_PATTERN;
         boolean belIsPatVar = beliefPattern.op() == Op.VAR_PATTERN;

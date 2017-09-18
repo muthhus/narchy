@@ -102,10 +102,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.2f;
 
     /** cost of attempting a unification */
-    public static final int TTL_UNIFY = 5;
-
-    /** base cost spent per each AND predicate condition */
-    public static final int TTL_PREDICATE = 1;
+    public static final int TTL_UNIFY = 1;
 
     /** cost of a termutate permutation */
     public static final int TTL_MUTATE = 2;
@@ -129,7 +126,7 @@ public abstract class Param extends Services<Term,NAR> {
      * forward (compound to subterms) vs. reverse (subterms to parent compound).
      * when calculated, the total activation will sum to 1.0.
      * so 0.5 is equal amounts for both. */
-    public static final float TERMLINK_BALANCE = 0.75f;
+    public static final float TERMLINK_BALANCE = 0.5f;
 
 //
 //    /** belief projection lookahead time in premise formation, in multiples of duration */
@@ -142,8 +139,8 @@ public abstract class Param extends Services<Term,NAR> {
     public final float[] value = new float[Cause.Purpose.values().length];
 
     protected void valueDefaults() {
-        value[Cause.Purpose.Input.ordinal()] = -0.25f;
-        value[Cause.Purpose.Process.ordinal()] = +0.1f; //information implicitly is negative value.  knowledge for its own sake has some value but it should satisfy other values to compensate for the input cost.
+        value[Cause.Purpose.Input.ordinal()] = -0.05f;
+        value[Cause.Purpose.Process.ordinal()] = +0.025f; //information implicitly is negative value.  knowledge for its own sake has some value but it should satisfy other values to compensate for the input cost.
 
         value[Cause.Purpose.Accurate.ordinal()] = +1f;
         value[Cause.Purpose.Inaccurate.ordinal()] = -1f;

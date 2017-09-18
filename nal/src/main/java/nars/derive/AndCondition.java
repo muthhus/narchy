@@ -62,6 +62,10 @@ public final class AndCondition<D> extends AbstractPred<D> {
     }
 
 
+    public static @Nullable <D> PrediTerm<D> the(@NotNull PrediTerm<D>... cond) {
+        return the(List.of(cond));
+    }
+
     public static @Nullable <D> PrediTerm<D> the(@NotNull List<PrediTerm<D>> cond) {
 
         int s = cond.size();
@@ -151,27 +155,34 @@ public final class AndCondition<D> extends AbstractPred<D> {
         return AndCondition.the(Lists.newArrayList(x));
     }
 
-    @Override
-    public PrediTerm exec(D d, CPU c) {
-
-        int i;
-        final int cacheLength = cache.length;
-        for (i = 0; i < cacheLength; i++) {
-            PrediTerm p = cache[i];
-
-            //if p.exec returns the same value (stored in 'q') and not a different or null, this is the signal that p.test FAILED
-            PrediTerm q = p.exec(d, c);
-            if (q == p)
-                break;
-        }
-
-        ((Derivation)d).use((1+i) * Param.TTL_PREDICATE);
-
-        return null;
-    }
+//    @Override
+//    public PrediTerm exec(D d, CPU c) {
+//
+//        int i;
+//        final int cacheLength = cache.length;
+//        for (i = 0; i < cacheLength; i++) {
+//            PrediTerm p = cache[i];
+//
+//            //if p.exec returns the same value (stored in 'q') and not a different or null, this is the signal that p.test FAILED
+//            PrediTerm q = p.exec(d, c);
+//            if (q == p)
+//                break;
+//        }
+//
+//        ((Derivation)d).use((1+i) * Param.TTL_PREDICATE);
+//
+//        return null;
+//    }
 
     public PrediTerm<D> last() {
         return cache[cache.length-1];
     }
 
+    /** chase the last of the last of the last(...etc.) condition in any number of recursive AND's */
+    public static PrediTerm last(PrediTerm b) {
+        while (b instanceof AndCondition) {
+            b = ((AndCondition)b).last();
+        }
+        return b;
+    }
 }

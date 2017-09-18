@@ -1,6 +1,7 @@
 package nars.control;
 
 import jcog.math.ByteShuffler;
+import jcog.version.Versioned;
 import nars.*;
 import nars.derive.DerivationTemporalize;
 import nars.derive.PrediTerm;
@@ -120,6 +121,9 @@ public class Derivation extends Unify implements TermContext {
     public float premisePri;
     public short[] parentCause;
 
+    public final Versioned<Term> derivedTerm;
+    public long[] derivedOcc;
+
     public PrediTerm<Derivation> deriver;
     public final ByteShuffler shuffler = new ByteShuffler(64);
     public boolean single;
@@ -189,6 +193,8 @@ public class Derivation extends Unify implements TermContext {
                 nar.get($.the("conjEvent")),
                 nar.get($.the("without"))
         );
+
+        derivedTerm = new Versioned(this, 3);
     }
 
     static ImmutableMap<Term, Termed> functors(Termed... t) {
@@ -286,6 +292,7 @@ public class Derivation extends Unify implements TermContext {
 
         this.belief = belief;
 
+        this.derivedOcc = null;
 
 //        int ttv = taskTerm.vars();
 //        if (ttv > 0 && bt.vars() > 0) {
@@ -358,13 +365,10 @@ public class Derivation extends Unify implements TermContext {
         this.concTruth = truth;
         this.concPunc = punc;
         this.single = single;
-        //this.concEvidence = evidence;
     }
 
     @Override
     public final void onMatch(Term[][] match) {
-
-        //this.currentMatch = match;
 
         int now = now();
         try {

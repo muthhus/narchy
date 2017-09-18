@@ -22,12 +22,12 @@ public interface PrediTerm<X> extends Term, Predicate<X> {
         return f!=null ? f.apply(this) : this;
     }
 
-    /** returns null on success; returns this instance on the test failure. go figure */
-    default PrediTerm<X> exec(X context, CPU cpu) {
-        if (!test(context))
-            return this;
-        else
-            return null;
-    }
+//    /** returns null on success; returns this instance on the test failure. go figure */
+//    default PrediTerm<X> exec(X context, CPU cpu) {
+//        if (!test(context))
+//            return this;
+//        else
+//            return null;
+//    }
 
 }

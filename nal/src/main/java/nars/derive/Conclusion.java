@@ -8,6 +8,7 @@ import nars.Task;
 import nars.control.Cause;
 import nars.control.CauseChannel;
 import nars.control.Derivation;
+import nars.derive.rule.PremiseRule;
 import nars.op.DepIndepVarIntroduction;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
@@ -42,27 +43,15 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Conclusion extends AbstractPred<Derivation> {
 
-    /**
-     * destination of any derived tasks; also may be used to communicate backpressure
-     * from the recipient.
-     */
-    public final CauseChannel<Task> channel;
 
     private final static Logger logger = LoggerFactory.getLogger(Conclusion.class);
     private final Term pattern;
-    private final String rule;
-    private final boolean varIntro, goalUrgent;
-    private final int minNAL;
+    private final boolean goalUrgent;
 
-    public Conclusion(@NotNull Conclude id, CauseChannel<Task> input) {
-        super($.func("derive", /*$.the(cid), */id.sub(0) /* prod args */));
-        this.channel = input;
-        this.pattern = id.pattern;
-        this.varIntro = id.varIntro;
-        this.goalUrgent = id.goalUrgent;
-        this.rule = id.rule.toString(); //only store toString of the rule to avoid remaining attached to the RuleSet
-        this.minNAL = id.rule.minNAL;
-        //assert(this.minNAL!=0): "unknown min NAL level for rule: " + rule;
+    public Conclusion(Term id, Term pattern, boolean goalUrgent) {
+        super(id);
+        this.pattern = pattern;
+        this.goalUrgent = goalUrgent;
     }
 
     /**
@@ -83,7 +72,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         int volMax = nar.termVolumeMax.intValue();
         if (c1 == null || c1 == pattern || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
-            return true;
+            return false;
 
         @NotNull final long[] occ;
         final float[] confGain = {1f}; //flat by default
@@ -106,7 +95,7 @@ public class Conclusion extends AbstractPred<Derivation> {
                 if (Param.DEBUG) {
                     logger.error("temporalize error: {} {} {}", p, c1, t.getMessage());
                 }
-                return true;
+                return false;
             }
 
             //invalid or impossible temporalization; could not determine temporal attributes. seems this can happen normally
@@ -119,7 +108,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 //                if (t1==null)
 //                    new Temporalize(d.random).solve(d, c1, new long[]{ETERNAL, ETERNAL});
 
-                return true;
+                return false;
             }
 
             if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
@@ -149,85 +138,12 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         c2 = c2.normalize();
         if (c2 == null)
-            return true;
-
-        // 3. VAR INTRO
-        if (varIntro) {
-            //var intro before temporalizing.  otherwise any calculated temporal data may not applied to the changed term (ex: occ shift)
-            @Nullable Pair<Term, Map<Term, Term>> vc = DepIndepVarIntroduction.varIntroX(c2, p.random);
-            if (vc == null) return true;
-
-            Term v = vc.getOne();
-            if (!(v.op().conceptualizable) || (v.equals(c2) /* keep only if it differs */))
-                return true;
-
-//            if (d.temporal) {
-//                Map<Term, Term> m = vc.getTwo();
-//                m.forEach(d.xy::tryPut); //store the mapping so that temporalization can resolve with it
-//            }
+            return false;
 
 
-            c2 = v;
-
-        }
-
-        //5. VALIDATE FOR TASK TERM
-
-        byte punc = p.concPunc; assert (punc != 0) : "no punctuation assigned";
-
-        Task t = Task.tryTask(c2, punc, p.concTruth, (C, tr) -> {
-
-            long start = occ[0];
-            long end = occ[1];
-            assert (end >= start);
-
-            short[] cause = ArrayUtils.addAll(p.parentCause, channel.id);
-
-            long[] evi = p.single ? p.evidenceSingle() : p.evidenceDouble();
-
-            long now = p.time;
-
-            DerivedTask derived =
-                    Param.DEBUG ?
-                            new DebugDerivedTask(C, punc, tr, now, start, end, evi, cause, p.task, !p.single ? p.belief : null) :
-                            new DerivedTask(C, punc, tr, now, start, end, evi, cause);
-
-
-            return derived;
-        });
-
-        if (t == null) {
-            return spam(p, Param.TTL_DERIVE_TASK_FAIL, c2, nar, 0);
-        }
-
-        if (same(t, p.task, p.truthResolution) || (p.belief != null && same(t, p.belief, p.truthResolution))) {
-            //created a duplicate of the task
-            return spam(p, Param.TTL_DERIVE_TASK_SAME, t, nar,0);
-        }
-
-
-        float priority = nar.derivePriority(t, p);
-        assert (priority == priority);
-
-        float tp = t.setPri(priority);
-
-        if (Param.DEBUG)
-            t.log(rule);
-
-        if (p.derivations.merge(t, t, DUPLICATE_DERIVATION_MERGE) != t) {
-            spam(p, Param.TTL_DERIVE_TASK_REPEAT, t, nar, 0);
-        } else {
-            p.use(Param.TTL_DERIVE_TASK_SUCCESS);
-        }
-
-        return true;
-    }
-
-    private boolean spam(@NotNull Derivation p, int cost, Termed t, NAR nar, float factor) {
-        p.use(cost);
-        if (factor > 0)
-            channel.purpose[Cause.Purpose.Input.ordinal()].addAndGet(Param.inputCost(t, nar)*factor);
-        return true; //just does
+        p.derivedTerm.set(c2);
+        p.derivedOcc = occ;
+        return p.live();
     }
 
     final static BiFunction<Task, Task, Task> DUPLICATE_DERIVATION_MERGE = (pp, tt) -> {
@@ -244,34 +160,6 @@ public class Conclusion extends AbstractPred<Derivation> {
         }
 //        dt = new DerivationTemporalize(d);
         return dt.solve(d, c1, occ, confGain);
-    }
-
-    boolean same(Task derived, Task parent, float truthResolution) {
-        if (parent.isDeleted())
-            return false;
-
-        if (derived.equals(parent)) return true;
-
-        if (FILTER_SIMILAR_DERIVATIONS) {
-            //test for same punc, term, start/end, freq, but different conf
-            if (parent.term().equals(derived.term()) && parent.punc() == derived.punc() && parent.start() == derived.start() && parent.end() == derived.end()) {
-                if (Arrays.equals(derived.stamp(), parent.stamp())) {
-                    if (parent.isQuestOrQuestion() ||
-                            (Util.equals(parent.freq(), derived.freq(), truthResolution) &&
-                                    parent.evi() >= derived.evi())
-                            ) {
-                        if (Param.DEBUG_SIMILAR_DERIVATIONS)
-                            logger.warn("similar derivation to parent:\n\t{} {}\n\t{}", derived, parent, rule);
-
-                        //((NALTask)parent).merge(derived);
-                        parent.priMax(derived.priElseZero());
-                        ((NALTask) parent).causeMerge(derived); //merge cause
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
 

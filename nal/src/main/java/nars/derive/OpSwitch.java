@@ -60,9 +60,9 @@ public final class OpSwitch extends AbstractPred<Derivation> {
         return swtch[((subterm == 0) ? m.termSub0op : m.termSub1op)];
     }
 
-    @Override
-    public PrediTerm<Derivation> exec(Derivation d, CPU cpu) {
-        return branch(d);
-    }
+//    @Override
+//    public PrediTerm<Derivation> exec(Derivation d, CPU cpu) {
+//        return branch(d);
+//    }
 
 }

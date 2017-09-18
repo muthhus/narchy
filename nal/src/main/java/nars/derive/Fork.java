@@ -59,7 +59,7 @@ public class Fork extends AbstractPred<Derivation> {
     }
 
     @Nullable
-    public static PrediTerm<Derivation> fork(@NotNull PrediTerm<Derivation>[] n) {
+    public static PrediTerm<Derivation> fork(@NotNull PrediTerm<Derivation>... n) {
         switch (n.length) {
             case 0:
                 return null;
@@ -70,11 +70,11 @@ public class Fork extends AbstractPred<Derivation> {
         }
     }
 
-    @Override
-    public PrediTerm<Derivation> exec(Derivation d, CPU c) {
-        c.fork(d, cache);
-        return null;
-    }
+//    @Override
+//    public PrediTerm<Derivation> exec(Derivation d, CPU c) {
+//        c.fork(d, cache);
+//        return null;
+//    }
 
 
     //    @Override

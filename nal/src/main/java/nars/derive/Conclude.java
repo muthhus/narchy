@@ -3,8 +3,7 @@ package nars.derive;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.Task;
-import nars.control.CauseChannel;
+import nars.control.Derivation;
 import nars.derive.rule.PremiseRule;
 import nars.term.ProxyTerm;
 import nars.term.Term;
@@ -16,47 +15,45 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Conclusion builder
  */
-public final class Conclude extends ProxyTerm {
+public final class Conclude {
 
-    @NotNull
-    public final PremiseRule rule;
+    private static final Term VAR_INTRO = $.the("varIntro");
+    private static final Term GOAL_URGENT = $.the("urgent");
 
-    public final boolean varIntro;
-    public final boolean goalUrgent;
+    static public PrediTerm<Derivation> the(@NotNull PremiseRule rule, @NotNull Term pattern, boolean goalUrgent, NAR nar) {
 
-    @NotNull
-    public final Term pattern;
-
-    public final Conclusion conc;
-
-
-    public Conclude(@NotNull PremiseRule rule, @NotNull Term pattern, boolean goalUrgent, NAR nar) {
-
-        super(!goalUrgent ? $.func("derive", pattern) : $.func("derive", pattern, $.the("urgent")));
-
-        this.rule = rule;
-
-//        this.belief = belief;
-//        this.goal = goal;
-
-        Term pp = pattern;
 
         //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
-        Pair<Atom, TermContainer> outerFunctor = Op.functor(pp, $.terms, false);
-        if (outerFunctor != null && outerFunctor.getOne().toString().equals("varIntro")) {
-            varIntro = true;
-            pp = outerFunctor.getTwo().sub(0);
+        boolean introVars;
+        Pair<Atom, TermContainer> outerFunctor = Op.functor(pattern, $.terms, false);
+
+        if (outerFunctor != null && outerFunctor.getOne().equals(VAR_INTRO)) {
+            introVars = true;
+            pattern = outerFunctor.getTwo().sub(0);
         } else {
-            varIntro = false;
+            introVars = false;
         }
 
-        this.goalUrgent = goalUrgent;
-        this.pattern = pp;
+        Term id = !goalUrgent ? $.func("derive", pattern) : $.func("derive", pattern, $.the("urgent"));
 
-        //input.privaluate = false; //disable priority affect, since feedback is applied in other more direct ways (ex: deriver backpressure)
+             //input.privaluate = false; //disable priority affect, since feedback is applied in other more direct ways (ex: deriver backpressure)
         //input.valueBias = 0;//-0.1f;
-        conc = new Conclusion(this, nar.newChannel(rule));
+        PrediTerm<Derivation> makeTask = new MakeTask(rule, nar.newChannel(rule));
+
+        Term concID =
+                !goalUrgent ?
+                    $.func("derive", /*$.the(cid), */pattern/* prod args */) :
+                    $.func("derive", /*$.the(cid), */pattern/* prod args */, GOAL_URGENT);
+        return AndCondition.the(
+                new Conclusion(concID,pattern, goalUrgent),
+                introVars ? //Fork.fork(
+                        AndCondition.the(new IntroVars(), makeTask)
+                        //makeTask)
+                        : makeTask
+        );
+
     }
+
 
 
     //    public static class RuleFeedbackDerivedTask extends DerivedTask.DefaultDerivedTask {
