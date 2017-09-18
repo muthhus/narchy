@@ -786,7 +786,6 @@ public interface Compound extends Term, IPair, TermContainer {
             return Null;
 
 
-
         Term u;
         Op o = op();
 
@@ -892,8 +891,20 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     @Nullable
     default Term transform(@NotNull CompoundTransform t) {
-        return transform(t.dt(this), t);
+        Op o = op();
+        int dt = o.temporal ? t.dt(this) : DTERNAL;
+        return transform(o, dt, t);
     }
+
+
+    @Override
+    @Nullable
+    default Term transform(@NotNull CompoundTransform t, Compound parent) {
+        Op o = op();
+        int dt = o.temporal ? t.dt(this) : DTERNAL;
+        return transform(o, dt, t);
+    }
+
 
     @Override
     @Nullable
@@ -901,18 +912,8 @@ public interface Compound extends Term, IPair, TermContainer {
         return transform(op(), newDT, t);
     }
 
-    @Override
     @Nullable
-    default Term transform(@NotNull CompoundTransform t, Compound parent) {
-        int dt = t.dt(this);
-        Term x = transform(dt, t);
-        if (x == null)
-            return null;
-        return x.dt(dt); //ignore parent
-    }
-
-    @Nullable
-    private Term transform(Op op, int dt, @NotNull CompoundTransform t) {
+    public default Term transform(Op op, int dt, @NotNull CompoundTransform t) {
 
         if (!t.applyInside(this))
             return this;
@@ -981,10 +982,8 @@ public interface Compound extends Term, IPair, TermContainer {
             y = this.dt(dt);
         }
 
-        if (t instanceof Derivation && y.op()==INH && y.sub(1).op()==ATOM) {
-            //if (!this.equals(y)) {
-                return y.eval(((TermContext)t));
-            //}
+        if (y instanceof Compound && t instanceof Derivation && y.op() == INH && y.subIs(1, ATOM) && y.subIs(0, PROD)) {
+            return y.eval(((TermContext) t));
         }
 
         return y;
@@ -1009,8 +1008,15 @@ public interface Compound extends Term, IPair, TermContainer {
         if (!hasAny(Op.TemporalBits))
             return this;
         else {
-            int dt = r.dt(this);
-            return transform(dt, r).dt(dt); //.dt twice, trust me
+            Op o = op();
+            boolean ot = o.temporal;
+            int dt = ot ? r.dt(this) : DTERNAL;
+            Term t = transform(o, dt, r);
+            if (t == null) {
+                return null;
+            } else {
+                return t;
+            }
         }
     }
 

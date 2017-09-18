@@ -31,11 +31,13 @@ abstract public class Retemporalize implements CompoundTransform {
             return x;
 
         Compound cx = (Compound) x;
-        int tdt = dt(cx);
+        Op o = cx.op();
+        boolean temporal = o.temporal;
+        int tdt = temporal ? dt(cx) : DTERNAL;
         if (parent != null) {
-            return cx.transform(tdt, this);
+            return cx.transform(o, tdt, this);
         } else {
-            return cx.dt(tdt);
+            return temporal ? cx.dt(tdt) : cx;
         }
     }
 

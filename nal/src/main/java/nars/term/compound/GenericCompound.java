@@ -29,7 +29,7 @@ public class GenericCompound implements Compound {
     @NotNull
     public final Op op;
 
-    final short structureCached;
+    final int structureCached;
 
     public transient boolean normalized;
 
@@ -43,7 +43,7 @@ public class GenericCompound implements Compound {
         this.normalized = !(subterms.vars() > 0 || subterms.varPattern() > 0);
 
         this.subterms = subterms;
-        this.structureCached = (short) Compound.super.structure();
+        this.structureCached = Compound.super.structure();
 
 //        //HACK
 //        this.dynamic =

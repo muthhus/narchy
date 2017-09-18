@@ -581,7 +581,7 @@ public class TemporalizeTest {
         assertEquals("(a &&+5 b)@[1..6]", t.solve($("(a &&+- b)")).toString());
         assertEquals("((a &&+5 b) &&+5 c)@[1..11]", t.solve($("((a &&+- b) &&+- c)")).toString());
         assertEquals("((a &&+5 b) ==>+5 c)@1", t.solve($("((a &&+5 b) ==>+- (b &&+5 c))")).toString());
-        assertEquals("((b &&+5 c) ==>-10 a)@6", t.solve($("((b &&+5 c) ==>+- (a &&+5 b))")).toString());
+        assertEquals("((b &&+5 c) ==>-10 (a &&+5 b))@6", t.solve($("((b &&+5 c) ==>+- (a &&+5 b))")).toString());
 
     }
 

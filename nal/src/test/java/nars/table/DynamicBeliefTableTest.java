@@ -114,7 +114,7 @@ public class DynamicBeliefTableTest {
         BaseConcept cc = ((BaseConcept) n.conceptualize($("(&&, a:x, a:y, a:z)")));
         Truth now = n.beliefTruth(cc, n.time());
         assertNotNull(now);
-        assertTrue($.t(1f, 0.73f).equals(now, 0.01f));
+        assertTrue(now + " truth at " + n.time(), $.t(1f, 0.73f).equals(now, 0.1f));
         //the truth values were provided despite the belief tables being empty:
         assertTrue(cc.beliefs().isEmpty());
 
@@ -128,7 +128,7 @@ public class DynamicBeliefTableTest {
         //test negation:
         Concept ccn = n.conceptualize($("(&&, a:x, (--, a:y), a:z)"));
         Truth nown = n.beliefTruth(ccn, n.time());
-        assertTrue($.t(0f, 0.73f).equals(nown, 0.01f));
+        assertTrue($.t(0f, 0.73f).equals(nown, 0.1f));
 
         n.clear();
 

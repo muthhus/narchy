@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 /**
  * Compound inheriting directly from TermVector1
@@ -76,8 +77,12 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
     @Override
     public Term dt(int nextDT) {
-        if (nextDT == DTERNAL)
-            return this;
+        switch (nextDT) {
+            case DTERNAL:
+            case XTERNAL:
+            case 0:
+                return this;
+        }
         throw new UnsupportedOperationException();
     }
 

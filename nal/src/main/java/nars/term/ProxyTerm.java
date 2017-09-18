@@ -156,10 +156,7 @@ public class ProxyTerm<T extends Term> implements Term {
         ref.append(w);
     }
 
-    @Override
-    public boolean levelValid(int nal) {
-        return ref.levelValid(nal);
-    }
+
 
     @Override
     @NotNull
