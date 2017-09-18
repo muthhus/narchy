@@ -2,8 +2,8 @@ package nars.derive;
 
 import com.google.common.collect.Lists;
 import jcog.Util;
+import jcog.list.FasterList;
 import nars.$;
-import nars.Param;
 import nars.control.Derivation;
 import nars.derive.constraint.MatchConstraint;
 import nars.term.Term;
@@ -63,7 +63,7 @@ public final class AndCondition<D> extends AbstractPred<D> {
 
 
     public static @Nullable <D> PrediTerm<D> the(@NotNull PrediTerm<D>... cond) {
-        return the(List.of(cond));
+        return the(new FasterList<>(cond)); //HACK
     }
 
     public static @Nullable <D> PrediTerm<D> the(@NotNull List<PrediTerm<D>> cond) {

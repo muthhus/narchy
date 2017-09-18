@@ -83,6 +83,15 @@ public class NARS {
         return this;
     }
 
+    public NARS deriver(Function<NAR, PrediTerm<Derivation>> dBuilder) {
+        this.deriver = dBuilder;
+        return this;
+    }
+
+    public NARS deriver(PrediTerm<Derivation> d) {
+        return deriver((nar)->d);
+    }
+
     /**
      * defaults
      */

@@ -62,7 +62,7 @@ public class FunctorTest {
         t.believe("((complexity($1)<->3)==>c3($1))");
         t.ask("c3(x:y)");
         t.mustBelieve(512, "c3(x:y)", 1f, 0.81f);
-        t.run(true);
+        t.test(true);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class FunctorTest {
         t.ask("c({x, (x)})");
         t.mustBelieve(TIME, "c({x,y})", 1f, 0.81f);
         t.mustBelieve(TIME, "c({x,(x)})", 0f, 0.81f);
-        t.run(true);
+        t.test(true);
     }
 
     @Test

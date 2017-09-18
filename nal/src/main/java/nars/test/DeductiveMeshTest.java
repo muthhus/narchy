@@ -138,7 +138,7 @@ public class DeductiveMeshTest {
 //        };
 
 
-        testnar.run(false);
+        testnar.test(false);
 
 
         //n.stdout();

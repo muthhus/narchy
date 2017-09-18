@@ -6,15 +6,20 @@ import nars.Narsese;
 import nars.Task;
 import nars.control.Derivation;
 import nars.control.Premise;
+import nars.derive.AndCondition;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.derive.TrieDeriver;
+import nars.derive.op.UnifySubtermThenConclude;
+import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
 import nars.task.ITask;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.test.TestNAR;
 import net.byteseek.utils.collections.IdentityHashSet;
+import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -25,6 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static nars.Op.QUEST;
 import static org.junit.Assert.*;
 
 /**
@@ -88,12 +94,16 @@ public class TrieDeriverTest {
         return testCompile(n, false, rules);
     }
 
-    public static PrediTerm<Derivation> testCompile(NAR n, boolean debug, String... rules) {
+    public static PrediTerm<Derivation> testCompile(@NotNull NAR n, boolean debug, String... rules) {
 
-        @NotNull PatternTermIndex pi = new PatternTermIndex();
-        pi.nar = n;
+        assertNotEquals(0, rules.length);
 
-        PremiseRuleSet src = new PremiseRuleSet(PremiseRuleSet.parse(Stream.of(rules), pi), pi, false);
+        @NotNull PatternTermIndex pi = new PatternTermIndex(n);
+
+        Stream<Pair<PremiseRule, String>> parsed = PremiseRuleSet.parse(Stream.of(rules), pi);
+
+        PremiseRuleSet src = new PremiseRuleSet(parsed, pi, false);
+        assertNotEquals(0, src.size());
         PrediTerm d = Deriver.the(src);
 
         if (debug) d.printRecursive();
@@ -157,19 +167,40 @@ public class TrieDeriverTest {
         assertEquals(0, t2.size());
 
     }
-   @Test
-    public void testConversionWierdness() throws Narsese.NarseseException {
 
-        String[] rules = {
-                "(P --> S), (S --> P), task(\"?\") |- (P --> S),   (Punctuation:Quest)"
-        };
+    @Test
+    public void testDeriveQuest() throws Narsese.NarseseException {
 
-        Set<Task> t1 = testDerivation(rules, "(a-->b)?", "(b-->a)", 64, true);
-        assertEquals(1, t1.size());
-
+        test(64, "(P --> S), (S --> P), task(\"?\") |- (P --> S),   (Punctuation:Quest)")
+                .log()
+                .ask("b:a")
+                .believe("a:b")
+                .mustOutput(16, "b:a", QUEST)
+                .test();
     }
+    @Test
+    public void testDeriveReuseTaskContent() throws Narsese.NarseseException {
+
+        test(64, "(P --> S), (S --> P), task(\"?\") |- _taskTerm,   (Punctuation:Quest)")
+                .log()
+                .ask("b:a")
+                .believe("a:b")
+                .mustOutput(16, "b:a", QUEST)
+                .test();
+    }
+
     public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax) throws Narsese.NarseseException {
         return testDerivation(rules, task, belief, ttlMax, false);
+    }
+
+    public static TestNAR test(int tlMax, String... rules) throws Narsese.NarseseException {
+        NAR n = new NARS().deriver((NAR nar)->{
+            PrediTerm<Derivation> d = testCompile(nar, false, rules);
+            TrieDeriver.print(d);
+            return d;
+        }).get();
+        TestNAR t = new TestNAR(n);
+        return t;
     }
 
     public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax, boolean debug) throws Narsese.NarseseException {
@@ -202,7 +233,7 @@ public class TrieDeriverTest {
     }
 
     @Test
-    public void testDeductionRecrusveWeirdness() {
+    public void testConstraints() {
 
         String s = "B, (A ==> C), neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionRecursive)";
 
@@ -210,8 +241,21 @@ public class TrieDeriverTest {
         PrediTerm<Derivation> d = testCompile(n, false, s);
         TrieDeriver.print(d, System.out);
 
+        assertTrue("last element should be unify, not constraints or anything else: " + AndCondition.last(d),
+                AndCondition.last(d) instanceof UnifySubtermThenConclude);
     }
 
+    @Test public void testSubstIfUnifies1() throws Narsese.NarseseException {
+
+
+        TestNAR tester = test(64,
+                "(B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)");
+
+        tester.believe("(&&,<#x --> lock>,(<$y --> key> ==> open($y,#x)))"); //en("There is a lock that can be opened by every key.");
+        tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
+        tester.mustBelieve(100, "<<$1 --> key> ==> open($1,{lock1})>", 1.00f,
+                0.81f);
+    }
     @Test
     public void testContrapositionWierdness() {
 

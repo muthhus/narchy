@@ -156,18 +156,21 @@ public class PremiseRule extends GenericCompound {
 
         s.addAll(match.pre);
 
-        s.addAll(match.constraints);
+
 
 
         //SUFFIX (order already determined for matching)
-        int n =  match.post.size();
+        int n =  match.constraints.size() + match.post.size();
         PrediTerm[] suff = new PrediTerm[n];
         int k = 0;
+        for (PrediTerm p : match.constraints) {
+            suff[k++] = p;
+        }
         for (PrediTerm p : match.post) {
             suff[k++] = p;
         }
 
-        return pair(s, (PrediTerm<Derivation>)AndCondition.the(new FasterList(suff)));
+        return pair(s, (PrediTerm<Derivation>)AndCondition.the(suff));
     }
 
     /**

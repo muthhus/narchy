@@ -174,7 +174,7 @@ public class BeliefTableTest {
         t.inputAt(2, "y. :|:");
         t.mustBelieve(5, "(x&|y)", 1f, 0.81f, 1, 2);
         t.mustBelieve(5, "(x=|>y)", 1f, 0.45f, 1);
-        t.run(true);
+        t.test(true);
 
 
 //        assertEquals( $.$("((x) &| (y))"), n.term("((x) &&+1 (y))"));

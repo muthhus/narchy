@@ -21,14 +21,14 @@ import java.util.function.Function;
  * information - the particular labels the input has attached.
  *
  */
-public class VariableNormalization extends VariableTransform implements Function<Variable,Variable> {
+public class VariableNormalization extends VariableTransform  {
 
     /** indexing offset of assigned variable id's */
     private final int offset;
 
     protected int count;
 
-    @NotNull
+    /*@NotNull*/
     public final Map<Variable /* Input Variable */, Variable /*Variable*/> map;
 
     //private boolean renamed;
@@ -41,7 +41,7 @@ public class VariableNormalization extends VariableTransform implements Function
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
         @Override
-        public Term apply(@Nullable Compound containing, @NotNull Term t) {
+        public Term apply(@Nullable Compound containing, /*@NotNull*/ Term t) {
 
             //if (current instanceof Ellipsis)
             //throw new RuntimeException("not allowed");
@@ -54,28 +54,27 @@ public class VariableNormalization extends VariableTransform implements Function
         }
     };
 
-
-    @NotNull
     @Override
-    public Variable apply(@NotNull Variable x) {
-        ++count;
-        return newVariable(x);
-    }
-
-    @Override
-    public final Term apply(@Nullable Compound ct, @NotNull Term v) {
+    public final Term apply(@Nullable Compound ct, /*@NotNull*/ Term v) {
         if (v instanceof Variable) {
             if (v.equals(Op.Imdex)) {
-                return apply((Variable)v); //anonymized to a unique variable each occurrence
+                //anonymized to a unique variable each occurrence
+                return newVariableIncreasingCount((Variable)v);
             } else {
-                return map.computeIfAbsent((Variable) v, this);
+                return map.computeIfAbsent((Variable) v, this::newVariableIncreasingCount);
             }
         } else
             return v;
     }
 
-    @NotNull
-    protected Variable newVariable(@NotNull Variable x) {
+    /*@NotNull*/
+    protected Variable newVariableIncreasingCount(/*@NotNull*/ Variable x) {
+        ++count;    
+        return newVariable(x);
+    }
+    
+    /*@NotNull*/
+    protected Variable newVariable(/*@NotNull*/ Variable x) {
         //Variable y;
 
         int vid = this.count + offset;
@@ -98,11 +97,11 @@ public class VariableNormalization extends VariableTransform implements Function
         this(new HashMap<>(size), offset);
     }
 
-    public VariableNormalization(@NotNull Map<Variable, Variable> r) {
+    public VariableNormalization(/*@NotNull*/ Map<Variable, Variable> r) {
         this(r, 0);
     }
 
-    public VariableNormalization(@NotNull Map<Variable, Variable> r, int offset) {
+    public VariableNormalization(/*@NotNull*/ Map<Variable, Variable> r, int offset) {
         this.offset = offset;
         map = r;
 

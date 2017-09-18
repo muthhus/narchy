@@ -30,9 +30,13 @@ public abstract class TermIndex implements TermContext {
     /**
      * internal get procedure
      */
-    @Override
     @Nullable
     public abstract Termed get(@NotNull Term key, boolean createIfMissing);
+
+    @Override
+    public final Termed apply(Term term) {
+        return get(term, false);
+    }
 
     /**
      * sets or replaces the existing value, unless the existing value is a PermanentConcept it must not
@@ -45,6 +49,7 @@ public abstract class TermIndex implements TermContext {
     }
 
     abstract public void clear();
+
 
 //    /**
 //     * called when a concept has been modified, ie. to trigger persistence
@@ -80,7 +85,9 @@ public abstract class TermIndex implements TermContext {
 
     abstract public Stream<Termed> stream();
 
-    /** default impl */
+    /**
+     * default impl
+     */
     public void forEach(@NotNull Consumer<? super Termed> c) {
         stream().forEach(c);
     }
@@ -92,7 +99,7 @@ public abstract class TermIndex implements TermContext {
     @Nullable
     public final Concept concept(@NotNull Term term, boolean createIfMissing) {
 
-        assert(term.op().conceptualizable); //term = term.unneg();
+        assert (term.op().conceptualizable); //term = term.unneg();
 
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {

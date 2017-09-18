@@ -1552,7 +1552,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return self.get();
     }
 
-    @Override
+    public final Termed get(Term x) {
+        return get(x, false);
+    }
+
     public final Termed get(Term x, boolean createIfAbsent) {
         return terms.get(x, createIfAbsent);
     }
@@ -1637,6 +1640,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     public void retract(long stampComponent) {
         tasks().filter(x -> Longs.contains(x.stamp(), stampComponent)).forEach(Task::delete);
+    }
+
+    @Override
+    public final Termed apply(Term term) {
+        return terms.apply(term);
     }
 
     /**

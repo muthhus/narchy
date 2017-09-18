@@ -123,7 +123,7 @@ public class IntTest {
                 Tense.Present
         );
         n.mustBelieve(128,"(x-->z)", 1f, 0.81f, 0);
-        n.run();
+        n.test();
     }
 
 }

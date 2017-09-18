@@ -1186,7 +1186,7 @@ public enum Op implements $ {
                 if (s0.op() == PROD) {
                     Term s1 = c.sub(1);
                     if (s1 instanceof Atom /*&& s1.op() == ATOM*/) {
-                        Termed ff = index.getIfPresentElse(s1);
+                        Termed ff = index.applyOrElse(s1);
                         if (!mustFunctor || ff instanceof Functor) {
                             return Tuples.pair(
                                     ((Atom) ff),

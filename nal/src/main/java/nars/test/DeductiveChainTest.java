@@ -107,7 +107,7 @@ public class DeductiveChainTest  {
 //        };
 
 
-        testnar.run(false);
+        testnar.test(false);
 
 
         //n.stdout();

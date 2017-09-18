@@ -27,7 +27,6 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.Param;
-import nars.index.term.StaticTermIndex;
 import nars.index.term.TermContext;
 import nars.op.mental.AliasConcept;
 import nars.term.atom.Atomic;
@@ -127,7 +126,9 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
 
-    /** BiPredicate param: child,parent */
+    /**
+     * BiPredicate param: child,parent
+     */
     boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent);
 
     default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, Term parent) {
@@ -146,8 +147,8 @@ public interface Term extends Termlike, Comparable<Term> {
     default boolean isTemporal() {
         return hasAny(Op.TemporalBits) &&
                 ((op().temporal && (dt() != DTERNAL))
-                ||
-                (subterms().isTemporal()));
+                        ||
+                        (subterms().isTemporal()));
     }
 
     /**
@@ -160,8 +161,8 @@ public interface Term extends Termlike, Comparable<Term> {
         if (subterm.equals(this)) return ArrayUtils.EMPTY_BYTE_ARRAY;
         //if (!containsRecursively(subterm)) return null;
         return
-            this instanceof Compound && !impossibleSubTerm(subterm) ?
-                    pathTo(new ByteArrayList(0), ((Compound)this).subterms(), subterm) : null;
+                this instanceof Compound && !impossibleSubTerm(subterm) ?
+                        pathTo(new ByteArrayList(0), ((Compound) this).subterms(), subterm) : null;
     }
 
 
@@ -174,6 +175,7 @@ public interface Term extends Termlike, Comparable<Term> {
     default Term transform(@NotNull CompoundTransform t) {
         return t.apply(null, this);
     }
+
     @Nullable
     default Term transform(@NotNull CompoundTransform t, Compound parent) {
         return t.apply(parent, this);
@@ -182,7 +184,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
     @Nullable
     default Term transform(int newDT, @NotNull CompoundTransform t) {
-        assert(newDT == DTERNAL);
+        assert (newDT == DTERNAL);
         return t.apply(null, this);
     }
 
@@ -202,7 +204,8 @@ public interface Term extends Termlike, Comparable<Term> {
         Compound csrc = (Compound) src;
         TermContainer css = csrc.subterms();
 
-        int n = css.size(); if (n == 0) return src;
+        int n = css.size();
+        if (n == 0) return src;
 
         Term[] target = new Term[n];
 
@@ -230,7 +233,7 @@ public interface Term extends Termlike, Comparable<Term> {
                 return false;
         }
         if (this instanceof Compound) {
-            return pathsTo(new ByteArrayList(0), ((Compound)this).subterms(), subterm, receiver);
+            return pathsTo(new ByteArrayList(0), ((Compound) this).subterms(), subterm, receiver);
         } else {
             return true;
         }
@@ -247,7 +250,7 @@ public interface Term extends Termlike, Comparable<Term> {
                 return p.toArray();
             }
             if (s instanceof Compound && !s.impossibleSubTerm(target)) {
-                byte[] pt = pathTo(p, ((Compound)s).subterms(), target);
+                byte[] pt = pathTo(p, ((Compound) s).subterms(), target);
                 if (pt != null) {
                     p.add((byte) i);
                     return pt;
@@ -277,7 +280,7 @@ public interface Term extends Termlike, Comparable<Term> {
                     return false;
             }
             if (s instanceof Compound) {
-                if (!pathsTo(p, ((Compound)s).subterms(), subterm, receiver))
+                if (!pathsTo(p, ((Compound) s).subterms(), subterm, receiver))
                     return false;
             }
             p.removeAtIndex(ppp);
@@ -598,7 +601,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
     final static List<byte[]> ListOfEmptyByteArray = List.of(ArrayUtils.EMPTY_BYTE_ARRAY);
 
-  @NotNull
+    @NotNull
     default List<byte[]> pathsTo(Term subterm, int minLengthOfPathToReturn) {
         List<byte[]> list = $.newArrayList(0);
         pathsTo(
@@ -705,19 +708,20 @@ public interface Term extends Termlike, Comparable<Term> {
         return this;
     }
 
-    /** for safety, dont override this method. override evalSafe */
+    /**
+     * for safety, dont override this method. override evalSafe
+     */
     default Term eval(TermContext index) {
         return evalSafe(index, Param.MAX_EVAL_RECURSION);
     }
 
     @NotNull
     default Term evalSafe(TermContext index, int remain) {
-        if (!(index instanceof StaticTermIndex)) {
-            Termed t = index.get(this, false); //resolve
-            if (t != null)
-                return t.term();
-        }
-        return this;
+        Termed t = index.apply(this);
+        if (t != null)
+            return t.term();
+        else
+            return this;
     }
 
     /* collects any contained events */
@@ -870,7 +874,8 @@ public interface Term extends Termlike, Comparable<Term> {
         return negate ? NEG.the(this) : this;
     }
 
-    @Nullable default Term temporalize(Retemporalize r) {
+    @Nullable
+    default Term temporalize(Retemporalize r) {
         return transform(r.dt(this), r);
     }
 

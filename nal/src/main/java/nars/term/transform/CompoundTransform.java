@@ -1,8 +1,10 @@
 package nars.term.transform;
 
 import nars.$;
+import nars.index.term.TermContext;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,8 +12,13 @@ import org.jetbrains.annotations.Nullable;
 import static nars.Op.VAR_QUERY;
 
 /** I = input term type, T = transformable subterm type */
-@FunctionalInterface public interface CompoundTransform  {
+@FunctionalInterface public interface CompoundTransform extends TermContext {
 
+
+    @Override
+    default @Nullable Termed apply(@NotNull Term t) {
+        return null;
+    }
 
     /**
      * change all query variables to dep vars

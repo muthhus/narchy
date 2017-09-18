@@ -171,12 +171,12 @@ public class QuestionTest {
             int seed = i + 1;
 
             TestNAR withQuestion = testProvider.apply(seed, 0);
-            withQuestion.run(true);
+            withQuestion.test(true);
             withTime.accept(withQuestion.time());
             withTasks.add(withQuestion.nar);
 
             TestNAR withoutQuestion = testProvider.apply(seed, 1);
-            withoutQuestion.run(true);
+            withoutQuestion.test(true);
             withOutTime.accept(withoutQuestion.time());
             withoutTasks.add(withoutQuestion.nar);
         }
@@ -232,7 +232,7 @@ public class QuestionTest {
         new TestNAR(new NARS().get()) //requires NAL3 single premise
                 .ask("((S | P) --> M)")
                 .believe("(S --> M)")
-                .mustQuestion(512, "(P --> M)").run();
+                .mustQuestion(512, "(P --> M)").test();
     }
     @Ignore @Test
     public void testDeriveQuestOrdinary() throws Narsese.NarseseException {
@@ -240,7 +240,7 @@ public class QuestionTest {
         new TestNAR(new NARS().get()) //requires NAL3 single premise
                 .quest("((S | P) --> M)")
                 .believe("(S --> M)")
-                .mustQuest(256, "(P --> M)").run();
+                .mustQuest(256, "(P --> M)").test();
     }
 
 

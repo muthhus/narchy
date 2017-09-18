@@ -66,12 +66,12 @@ public class Conclusion extends AbstractPred<Derivation> {
         nar.emotion.derivationTry.increment();
         p.use(Param.TTL_DERIVE_TRY);
 
-        Term c1 = pattern.transform(p); //SUBSTITUTE and EVAL
+        Term c1 = pattern.eval(p); //transform(p); //SUBSTITUTE and EVAL
 
         nar.emotion.derivationEval.increment();
 
         int volMax = nar.termVolumeMax.intValue();
-        if (c1 == null || c1 == pattern || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
+        if (c1 == null || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
             return false;
 
         @NotNull final long[] occ;

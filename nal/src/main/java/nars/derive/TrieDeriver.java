@@ -320,49 +320,6 @@ public enum TrieDeriver {
 //        return true;
 //    }
 
-    @NotNull
-    private static List<PrediTerm<Derivation>> factorSubOpToSwitch(@NotNull List<PrediTerm<Derivation>> bb, int subterm, int minToCreateSwitch) {
-        if (!bb.isEmpty()) {
-            Map<PatternOp, PrediTerm<Derivation>> cases = $.newHashMap(8);
-            List<PrediTerm<Derivation>> removed = $.newArrayList(); //in order to undo
-            bb.removeIf(p -> {
-                if (p instanceof AndCondition) {
-                    AndCondition ac = (AndCondition) p;
-                    if (ac.OR(x -> {
-                        if (x instanceof PatternOp) {
-                            PatternOp so = (PatternOp) x;
-                            if (so.taskOrBelief == subterm) {
-                                if (null == cases.putIfAbsent(so, ac.without(so))) {
-                                    removed.add(p);
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
-                    }))
-                        return true;
-
-                }
-                return false;
-            });
-
-
-            int numCases = cases.size();
-            if (numCases >= minToCreateSwitch) {
-                if (numCases != removed.size()) {
-                    throw new RuntimeException("switch fault");
-                }
-
-                EnumMap<Op, PrediTerm<Derivation>> caseMap = new EnumMap(Op.class);
-                cases.forEach((c, p) -> caseMap.put(Op.values()[c.opOrdinal], p));
-                bb.add(new OpSwitch(subterm, caseMap));
-            } else {
-                bb.addAll(removed); //undo
-            }
-        }
-
-        return bb;
-    }
 
     @Nullable
     public static PrediTerm<Derivation> ifThen(@NotNull Stream<PrediTerm<Derivation>> cond, @Nullable PrediTerm<Derivation> conseq) {
@@ -371,6 +328,9 @@ public enum TrieDeriver {
         ));
     }
 
+    public static void print(PrediTerm<Derivation> d) {
+        print(d, System.out);
+    }
 
     public static void print(PrediTerm<Derivation> d, @NotNull PrintStream out) {
         print(d, out, 0);
@@ -479,140 +439,6 @@ public enum TrieDeriver {
     //        }
     //
     //    }
-
-    /**
-     * derivation term graph, gathered for analysis
-     */
-    //public final HashMultimap<MatchTerm,Derive> derivationLinks = HashMultimap.create();
-
-    static final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
-
-
-        public PrediTrie(PremiseRuleSet r) {
-            super();
-
-            NAR nar = r.patterns.nar;
-
-            Map<Set<Term>, RoaringBitmap> pre = new HashMap<>();
-            List<PrediTerm<Derivation>> conclusions = $.newArrayList(r.size() * 4);
-
-
-            ObjectIntHashMap<Term> preconditionCount = new ObjectIntHashMap(256);
-
-            r.forEach(rule -> {
-
-                assert (rule.POST != null) : "null POSTconditions:" + rule;
-
-                for (PostCondition p : rule.POST) {
-
-                    Pair<Set<Term>, PrediTerm<Derivation>> c = rule.build(p);
-
-                    c.getOne().forEach((k) -> preconditionCount.addToValue(k, 1));
-
-
-                    int id = conclusions.size();
-                    conclusions.add(c.getTwo());
-
-                    pre.computeIfAbsent(c.getOne(), (x) -> new RoaringBitmap()).add(id);
-
-
-                }
-            });
-
-//            System.out.println("PRECOND");
-//            preconditionCount.keyValuesView().toSortedListBy((x)->x.getTwo()).forEach((x)->System.out.println(Texts.iPad(x.getTwo(),3) + "\t" + x.getOne() ));
-
-            Comparator<Term> sort = (a, b) -> {
-
-                if (a.equals(b)) return 0;
-
-                int ac = preconditionCount.get(a);
-                int bc = preconditionCount.get(b);
-                if (ac > bc) return -1;
-                else if (ac < bc) return +1;
-                else return a.compareTo(b);
-            };
-
-            List<List<Term>> paths = $.newArrayList();
-            pre.forEach((k, v) -> {
-
-                FasterList<Term> path = new FasterList(k);
-                path.sort(sort);
-
-                PrediTerm<Derivation>[] ll = StreamSupport.stream(v.spliterator(), false).map((i) -> conclusions.get(i).transform((Function) null)).toArray(PrediTerm[]::new);
-                assert (ll.length != 0);
-
-                PrediTerm<Derivation> cx;
-                if (ll.length == 1) {
-                    cx = ll[0];
-                } else {
-                    cx = new ValueFork(ll);
-                }
-                path.add(cx);
-                put(path, cx);
-            });
-
-
-        }
-
-//        @Override
-//        protected void onMatch(Term existing, Term incoming) {
-//            if (existing instanceof UnificationPrototype) {
-//                //merge the set of conclusions where overlapping
-//
-//
-//                ((UnificationPrototype) existing).conclude.addAll(((UnificationPrototype) incoming).conclude);
-//                //((UnificationPrototype) incoming).conclude.addAll(((UnificationPrototype) existing).conclude);
-//                //incomingConcs.clear();
-//            }
-//        }
-
-
-        public PrediTerm<Derivation> compile(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
-            List<PrediTerm<Derivation>> bb = compile(root);
-            PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
-
-            PrediTerm<Derivation> tf = Fork.fork(roots);
-            if (each != null)
-                tf = tf.transform(each);
-
-            return tf;
-        }
-
-        @NotNull
-        static List<PrediTerm<Derivation>> compile(@NotNull TrieNode<List<Term>, PrediTerm<Derivation>> node) {
-
-
-            List<PrediTerm<Derivation>> bb = $.newArrayList(node.childCount());
-
-            node.forEach(n -> {
-
-                List<PrediTerm<Derivation>> conseq = compile(n);
-
-                int nStart = n.start();
-                int nEnd = n.end();
-                PrediTerm<Derivation> branch = ifThen(
-                        conditions(n.seq().stream().skip(nStart).limit(nEnd - nStart)),
-                        !conseq.isEmpty() ? (PrediTerm<Derivation>) Fork.fork(conseq.toArray(new PrediTerm[conseq.size()])) : null
-                );
-
-                if (branch != null)
-                    bb.add(branch);
-            });
-
-            return compileSwitch(bb);
-        }
-
-        protected static List<PrediTerm<Derivation>> compileSwitch(List<PrediTerm<Derivation>> bb) {
-
-            bb = factorSubOpToSwitch(bb, 0, 2);
-            bb = factorSubOpToSwitch(bb, 1, 2);
-
-            return bb;
-        }
-
-
-    }
 
     //    //TODO not complete
     //    protected void compile(@NotNull ProcTerm p) throws IOException, CannotCompileException, NotFoundException {

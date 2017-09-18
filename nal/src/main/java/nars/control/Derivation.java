@@ -2,7 +2,10 @@ package nars.control;
 
 import jcog.math.ByteShuffler;
 import jcog.version.Versioned;
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
+import nars.Task;
 import nars.derive.DerivationTemporalize;
 import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
@@ -12,6 +15,7 @@ import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.subst.Unify;
 import nars.truth.Stamp;
@@ -131,6 +135,9 @@ public class Derivation extends Unify implements TermContext {
     public DerivationTemporalize temporalize;
     public int parentComplexity;
 
+    public static final Atomic _taskTerm = Atomic.the("_taskTerm");
+    public static final Atomic _beliefTerm = Atomic.the("_beliefTerm");
+
 //    private transient Term[][] currentMatch;
 
 //    public /*static*/ final Cache<Transformation, Term> transformsCache; //works in static mode too
@@ -160,7 +167,9 @@ public class Derivation extends Unify implements TermContext {
 //        transformsCache = cb.builder();
 
         final Functor substituteIfUnifiesAny = new substituteIfUnifiesAny(this);
+
         //final Functor substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
+
         final Functor polarize = Functor.f2("polarize", (subterm, whichTask) -> {
             Truth compared;
             if (whichTask.equals(PremiseRule.Task)) {
@@ -185,23 +194,26 @@ public class Derivation extends Unify implements TermContext {
                 substituteIfUnifiesAny,
                 polarize,
                 substitute,
-                nar.get($.the("dropAnyEvent")),
-                nar.get($.the("dropAnySet")),
-                nar.get($.the("union")),
-                nar.get($.the("differ")),
-                nar.get($.the("intersect")),
-                nar.get($.the("conjEvent")),
-                nar.get($.the("without"))
+                nar.get(Atomic.the("dropAnyEvent")),
+                nar.get(Atomic.the("dropAnySet")),
+                nar.get(Atomic.the("union")),
+                nar.get(Atomic.the("differ")),
+                nar.get(Atomic.the("intersect")),
+                nar.get(Atomic.the("conjEvent")),
+                nar.get(Atomic.the("without"))
         );
+
 
         derivedTerm = new Versioned(this, 3);
     }
 
-    static ImmutableMap<Term, Termed> functors(Termed... t) {
-        java.util.Map m = new HashMap();
+    ImmutableMap<Term, Termed> functors(Termed... t) {
+        java.util.Map<Term,Termed> m = new HashMap();
         for (Termed x : t) {
             m.put(x.term(), x);
         }
+        m.put(_taskTerm, ()->taskTerm);
+        m.put(_beliefTerm, ()->beliefTerm);
         return Maps.immutable.ofMap(m);
     }
 
@@ -210,14 +222,14 @@ public class Derivation extends Unify implements TermContext {
      * only returns derivation-specific functors.  other functors must be evaluated at task execution time
      */
     @Override
-    public Termed get(Term x, boolean createIfAbsent) {
+    public Termed apply(Term x) {
         if (x instanceof Atom) {
             Termed f = derivationFunctors.get(x);
             if (f != null)
                 return f;
         }
 
-        return x;
+        return x.transform(this);
     }
 
     /**
@@ -271,10 +283,12 @@ public class Derivation extends Unify implements TermContext {
         this.taskTruth = task.truth();
         this.taskPunct = task.punc();
 
-        Term tt = task.term();
-        this.taskTerm = tt;
-        this.termSub0Struct = tt.structure();
-        Op tOp = tt.op();
+        Term taskTerm = task.term();
+        this.taskTerm = taskTerm;
+
+
+        this.termSub0Struct = taskTerm.structure();
+        Op tOp = taskTerm.op();
         this.termSub0op = tOp.id;
         this.termSub0opBit = tOp.bit;
 
@@ -299,7 +313,7 @@ public class Derivation extends Unify implements TermContext {
 //            bt = bt.normalize(ttv); //shift variables up to be unique compared to taskTerm's
 //        }
         this.beliefTerm = bt;
-        this.parentComplexity = Math.max(tt.complexity(), bt.complexity());
+        this.parentComplexity = Math.max(taskTerm.complexity(), bt.complexity());
 
         this.cyclic = task.cyclic(); //belief cyclic should not be considered because in single derivation its evidence will not be used any way
 
@@ -349,7 +363,6 @@ public class Derivation extends Unify implements TermContext {
         this.parentCause = belief != null ?
                 Cause.zip(task, belief) :
                 task.cause();
-
 
         deriver.test(this);
 

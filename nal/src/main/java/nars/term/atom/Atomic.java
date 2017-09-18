@@ -62,8 +62,8 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default Term evalSafe(TermContext index, int remain) {
-        return this;
+    default Term evalSafe(TermContext context, int remain) {
+        return remain <= 0 ? null : context.applyOrElseTerm(this);
     }
 
     @NotNull

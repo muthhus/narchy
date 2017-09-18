@@ -539,7 +539,7 @@ public class TestNAR {
         return mustOutput(withinCycles, qt, QUEST);
     }
 
-    private TestNAR mustOutput(long withinCycles, @NotNull String qt, byte question) {
+    public TestNAR mustOutput(long withinCycles, @NotNull String qt, byte question) {
         return mustOutput(withinCycles, qt, question, NaN, NaN);
     }
 
@@ -609,8 +609,8 @@ public class TestNAR {
 
 
     @NotNull
-    public TestNAR run() {
-        return run(trace);
+    public TestNAR test() {
+        return test(trace);
     }
 
 
@@ -652,7 +652,7 @@ public class TestNAR {
 
 
     @NotNull
-    public TestNAR run(boolean testAndPrintReport /* for use with JUnit */) {
+    public TestNAR test(boolean testAndPrintReport /* for use with JUnit */) {
         return run(0, testAndPrintReport);
     }
 

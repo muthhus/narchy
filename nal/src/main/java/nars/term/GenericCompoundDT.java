@@ -116,8 +116,8 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     }
 
     @Override
-    public Term evalSafe(TermContext index, int remain) {
-        return Compound.super.evalSafe(index, remain);
+    public Term evalSafe(TermContext context, int remain) {
+        return Compound.super.evalSafe(context, remain);
     }
 
     @Nullable

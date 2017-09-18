@@ -40,8 +40,8 @@ public final class AliasConcept extends BaseConcept {
         }
 
         @Override
-        public Term evalSafe(TermContext index, int remain) {
-            Term e = target.evalSafe(index, remain);
+        public Term evalSafe(TermContext context, int remain) {
+            Term e = target.evalSafe(context, remain);
             if (e != target)
                 return e; //if a dynamic result, return that
             else

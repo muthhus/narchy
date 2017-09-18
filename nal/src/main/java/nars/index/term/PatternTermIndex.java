@@ -17,7 +17,7 @@ import nars.term.var.Variable;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 
 import static nars.$.v;
 import static nars.Op.VAR_PATTERN;
@@ -29,7 +29,7 @@ import static nars.Op.concurrent;
 public class PatternTermIndex extends MapTermIndex {
 
     public PatternTermIndex() {
-        super(new ConcurrentHashMap<>(512));
+        super(new HashMap<>(512));
     }
     public PatternTermIndex(NAR n) {
         this();

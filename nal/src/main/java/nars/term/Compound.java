@@ -768,7 +768,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    default Term evalSafe(TermContext index, int remain) {
+    default Term evalSafe(TermContext context, int remain) {
 
         if (!isDynamic())
             return this;
@@ -786,7 +786,7 @@ public interface Compound extends Term, IPair, TermContainer {
             int s = xy.length;
             for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
                 Term x = xy[i];
-                Term y = x.evalSafe(index, remain);
+                Term y = x.evalSafe(context, remain);
                 if (y == null) {
                     //if a functor returns null, it means unmodified
                 } else if (x != y) {
@@ -813,7 +813,7 @@ public interface Compound extends Term, IPair, TermContainer {
             if (possibleArgs.op() == PROD) {
                 Term possibleFunc = u.sub(1);
                 if (possibleFunc.op() == ATOM) {
-                    Termed ff = index.getIfPresentElse(possibleFunc);
+                    Termed ff = context.applyOrElse(possibleFunc);
                     if (ff instanceof Functor) {
                         u = ((Functor) ff).apply(possibleArgs.subterms());
                         if (u instanceof AbstractPred) {
@@ -834,7 +834,7 @@ public interface Compound extends Term, IPair, TermContainer {
             //it has been changed, so eval recursively until stable
             try {
                 assert (u != this) : "equality tested previously should have included identity check";
-                return u.evalSafe(index, remain);
+                return u.evalSafe(context, remain);
             } catch (StackOverflowError e) {
                 logger.error("eval stack overflow: {} -> {}", this, u);
                 return Null;

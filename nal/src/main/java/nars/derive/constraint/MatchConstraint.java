@@ -15,7 +15,7 @@ public abstract class MatchConstraint extends AbstractPred<Derivation> {
     public final Term target;
 
     protected MatchConstraint(String func, Term target, Term... args) {
-        super($.impl(target, $.func(func, args)));
+        super($.p(target, $.func(func, args)));
         this.target = target;
     }
 

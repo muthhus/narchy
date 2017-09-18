@@ -84,7 +84,7 @@ public interface Deriver {
 
     static PrediTerm<Derivation> the(PremiseRuleSet r, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
 
-        PrediTerm<Derivation> tf = new TrieDeriver.PrediTrie(r).compile(each);
+        PrediTerm<Derivation> tf = new PrediTrie(r).compile(each);
 
         //TrieDeriver.print(tf, System.out);
 

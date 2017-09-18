@@ -28,7 +28,7 @@ public abstract class AbstractNALTest  {
     @After
     public void end() {
 
-        test.run();
+        test.test();
 
         nar.stop();
         nar.clear();

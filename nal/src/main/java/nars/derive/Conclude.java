@@ -22,6 +22,8 @@ public final class Conclude {
 
     static public PrediTerm<Derivation> the(@NotNull PremiseRule rule, @NotNull Term pattern, boolean goalUrgent, NAR nar) {
 
+        //substitute occurrences of the exact task and belief terms with the short-cut
+        pattern = pattern.replace(rule.getTask(), Derivation._taskTerm).replace(rule.getBelief(), Derivation._beliefTerm);
 
         //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
         boolean introVars;

@@ -55,18 +55,18 @@ abstract public class PatternCompound extends GenericCompoundDT {
     }
 
 
-    /** invoked by derivation Conclusion; combines substitution and evaluation in one step */
-    @Override public @Nullable Term transform(@NotNull CompoundTransform t) {
-        Term y = super.transform(t);
-        if (t instanceof Derivation) {
-            return (y != null && y!=this) ? y.eval((Derivation) t) : null;
-        } else {
-            return y;
-        }
-    }
+//    /** invoked by derivation Conclusion; combines substitution and evaluation in one step */
+//    @Override public @Nullable Term transform(@NotNull CompoundTransform t) {
+//        Term y = super.transform(t);
+//        if (t instanceof Derivation) {
+//            return (y != null && y!=this) ? y.eval((Derivation) t) : null;
+//        } else {
+//            return y;
+//        }
+//    }
 
     @Override
-    public Term evalSafe(TermContext index, int remain) {
+    public Term evalSafe(TermContext context, int remain) {
         return this; //no evaluations should be applied to patterns
     }
 

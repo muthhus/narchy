@@ -5,29 +5,40 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Function;
+
 /**
  * interface necessary for evaluating terms
  */
-public interface TermContext {
+public interface TermContext extends Function<Term,Termed> {
 
-
-    /** TODO rename: eval( */
-    @Nullable Termed get(Term x, boolean createIfAbsent);
-
-    /**
-     * internal get procedure: get if not absent
-     */
-    @Nullable
-    default Termed get(@NotNull Term t) {
-        return get(t, false);
-    }
-
-    default Termed getIfPresentElse(@NotNull Term _else) {
-        Termed y = get(_else);
+    /** if the result is null, return the input */
+    default public Termed applyOrElse(/*@NotNull*/ Term x) {
+        Termed y = apply(x);
         if (y != null)
             return y;
         else
-            return _else;
+            return x;
     }
+
+    /** elides superfluous .term() call */
+    default public Term applyOrElseTerm(/*@NotNull*/ Term x) {
+        Termed y = apply(x);
+        if (y != null)
+            return y.term();
+        else
+            return x;
+    }
+
+
+//    /**
+//     * internal get procedure: get if not absent
+//     */
+//    @Nullable
+//    default Termed apply(@NotNull Term t) {
+//        return apply(t, false);
+//    }
+
+
 
 }
