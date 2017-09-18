@@ -4,6 +4,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Streams;
 import jcog.Util;
 import nars.$;
+import nars.NAR;
 import nars.Narsese;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
@@ -37,9 +38,11 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     private final boolean permuteBackwards, permuteForwards;
 
     @NotNull
-    public static PremiseRuleSet rules(boolean permute, String... filename) {
+    public static PremiseRuleSet rules(NAR nar, boolean permute, String... filename) {
 
         final PatternTermIndex p = new PatternTermIndex();
+        p.nar = nar;
+
         PremiseRuleSet rs = new PremiseRuleSet(parsedRules(p, filename), p, permute);
 
         //logger.info("{} totalRules={}, uniqueComponents={}", name, rs.rules.size(), rs.patterns.size());

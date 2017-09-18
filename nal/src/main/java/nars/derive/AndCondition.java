@@ -6,7 +6,6 @@ import nars.$;
 import nars.Param;
 import nars.control.Derivation;
 import nars.derive.constraint.MatchConstraint;
-import nars.derive.op.UnifyOneSubterm;
 import nars.term.Term;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
@@ -117,7 +116,7 @@ public final class AndCondition<D> extends AbstractPred<D> {
             int iMatchTerm = -1; //first index of a MatchTerm op, if any
             for (int j = 0, cccSize = p.size(); j < cccSize; j++) {
                 PrediTerm c = p.get(j);
-                if ((c instanceof UnifyOneSubterm || c instanceof Fork) && iMatchTerm == -1) {
+                if ((c instanceof Fork) && iMatchTerm == -1) {
                     iMatchTerm = j;
                 }
             }

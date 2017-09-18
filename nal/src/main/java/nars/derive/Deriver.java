@@ -23,7 +23,7 @@ import java.util.function.Function;
 public interface Deriver {
 
 
-    static PremiseRuleSet DEFAULT(int level, String... otherFiles) {
+    static Set<String> DEFAULT(int level, String... otherFiles) {
         Set<String> files = new TreeSet();
         switch (level) {
             case 8:
@@ -51,8 +51,7 @@ public interface Deriver {
 
         Collections.addAll(files, otherFiles);
 
-        @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(true, files.toArray(new String[files.size()]));
-        return RULES;
+        return files;
     }
 
     static Function<NAR, PrediTerm<Derivation>> newDeriver(int nal, String... additional) {
@@ -67,12 +66,31 @@ public interface Deriver {
             else
                 xf = null;
 
-            PrediTerm<Derivation> x = TrieDeriver.the(DEFAULT(nal, additional), nar, xf);
+            Set<String> files = DEFAULT(nal, additional);
+            @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(nar,true, files.toArray(new String[files.size()]) );
+            RULES.patterns.nar = nar;
+
+            PrediTerm<Derivation> x = the(RULES, xf);
             if (Param.TRACE) {
                 TrieDeriver.print(x, System.out);
             }
             return x;
         };
+    }
+
+    static PrediTerm<Derivation> the(PremiseRuleSet r) {
+        return the(r, (x) -> x);
+    }
+
+    static PrediTerm<Derivation> the(PremiseRuleSet r, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
+
+        PrediTerm<Derivation> tf = new TrieDeriver.PrediTrie(r).compile(each);
+
+        //TrieDeriver.print(tf, System.out);
+
+        return tf;
+
+        //return new TrieExecutor(tf);
     }
 
 //    /**

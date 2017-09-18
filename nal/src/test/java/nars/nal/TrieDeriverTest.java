@@ -37,17 +37,11 @@ public class TrieDeriverTest {
 //            //(TrieDeriver) DefaultDeriver.the;
 //            new TrieDeriver(DefaultDeriver.rules);
 
-    @Test
-    public void printCompiledRuleTree() {
-
-        TrieDeriver.print(TrieDeriver.the(Deriver.DEFAULT(8), NARS.tmp()), System.out);
-
-    }
 
 
     @Test
     public void testConclusionWithXTERNAL() {
-        PatternTermIndex idx = new PatternTermIndex() {
+        PatternTermIndex idx = new PatternTermIndex(NARS.tmp()) {
             @Override
             public @Nullable Termed get(@NotNull Term x, boolean create) {
                 Termed u = super.get(x, create);
@@ -64,10 +58,10 @@ public class TrieDeriverTest {
 
         System.out.println();
 
-        PrediTerm d = TrieDeriver.the(new PremiseRuleSet(idx,
+        PrediTerm d = Deriver.the(new PremiseRuleSet(idx,
                 "Y, Y |- (?1 &&+0 Y), ()",
                 "X, X |- (?1 &&+- X), ()"
-        ), NARS.tmp());
+        ));
 
         System.out.println();
 
@@ -97,8 +91,10 @@ public class TrieDeriverTest {
     public static PrediTerm<Derivation> testCompile(NAR n, boolean debug, String... rules) {
 
         @NotNull PatternTermIndex pi = new PatternTermIndex();
+        pi.nar = n;
+
         PremiseRuleSet src = new PremiseRuleSet(PremiseRuleSet.parse(Stream.of(rules), pi), pi, false);
-        PrediTerm d = TrieDeriver.the(src, n);
+        PrediTerm d = Deriver.the(src);
 
         if (debug) d.printRecursive();
 

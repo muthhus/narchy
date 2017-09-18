@@ -4,7 +4,6 @@ import jcog.data.graph.AdjGraph;
 import jcog.list.FasterIntArrayList;
 import jcog.list.FasterList;
 import nars.control.Derivation;
-import nars.derive.op.UnifyOneSubterm;
 
 /**
  * stackless recursive virtual machine which

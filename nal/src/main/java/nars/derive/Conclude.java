@@ -13,22 +13,24 @@ import nars.term.container.TermContainer;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Function;
-
 /**
  * Conclusion builder
  */
-public final class Conclude extends ProxyTerm implements Function<NAR,Conclusion> {
+public final class Conclude extends ProxyTerm {
 
-    @NotNull public final PremiseRule rule;
+    @NotNull
+    public final PremiseRule rule;
 
     public final boolean varIntro;
     public final boolean goalUrgent;
 
-    @NotNull public final Term pattern;
+    @NotNull
+    public final Term pattern;
+
+    public final Conclusion conc;
 
 
-    public Conclude(@NotNull PremiseRule rule, @NotNull Term pattern, boolean goalUrgent) {
+    public Conclude(@NotNull PremiseRule rule, @NotNull Term pattern, boolean goalUrgent, NAR nar) {
 
         super(!goalUrgent ? $.func("derive", pattern) : $.func("derive", pattern, $.the("urgent")));
 
@@ -50,15 +52,10 @@ public final class Conclude extends ProxyTerm implements Function<NAR,Conclusion
 
         this.goalUrgent = goalUrgent;
         this.pattern = pp;
-    }
 
-
-    @Override
-    public Conclusion apply(@NotNull NAR nar) {
-        CauseChannel<Task> input = nar.newChannel(rule);
         //input.privaluate = false; //disable priority affect, since feedback is applied in other more direct ways (ex: deriver backpressure)
-        input.valueBias = 0;//-0.1f;
-        return new Conclusion(this, input);
+        //input.valueBias = 0;//-0.1f;
+        conc = new Conclusion(this, nar.newChannel(rule));
     }
 
 

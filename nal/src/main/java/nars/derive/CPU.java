@@ -6,7 +6,7 @@ import jcog.list.FasterList;
 import jcog.map.CustomConcurrentHashMap;
 import jcog.pri.Pri;
 import nars.control.Derivation;
-import nars.derive.op.UnifyOneSubterm;
+import nars.derive.op.UnifySubtermThenConclude;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -166,8 +166,8 @@ final class CPU<D> {
         if (x instanceof AndCondition) {
             PrediTerm[] p = ((AndCondition) x).cache;
             return _value(p[p.length - 1], d);
-        } else if (x instanceof UnifyOneSubterm.UnifySubtermThenConclude) {
-            return _value(((UnifyOneSubterm.UnifySubtermThenConclude) x).eachMatch, d);
+        } else if (x instanceof UnifySubtermThenConclude) {
+            return _value(((UnifySubtermThenConclude) x).eachMatch, d);
         } else if (x instanceof Conclusion) {
             return ((Conclusion) x).channel.value();
         } else if (x instanceof Fork) {

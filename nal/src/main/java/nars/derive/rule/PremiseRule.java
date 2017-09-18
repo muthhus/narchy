@@ -1,6 +1,5 @@
 package nars.derive.rule;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import jcog.list.FasterList;
 import nars.$;
@@ -25,7 +24,6 @@ import nars.truth.func.BeliefFunction;
 import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
 import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -97,12 +95,12 @@ public class PremiseRule extends GenericCompound {
     }
 
     @NotNull
-    private Compound getPremise() {
+    private Compound match() {
         return (Compound) sub(0);
     }
 
     @NotNull
-    private Compound getConclusion() {
+    public Compound conclusion() {
         return (Compound) sub(1);
     }
 
@@ -114,7 +112,7 @@ public class PremiseRule extends GenericCompound {
     /**
      * compiles the conditions which are necessary to activate this rule
      */
-    public Pair<Set<Term>, PrediTerm<Derivation>> build(@NotNull PostCondition post, NAR nar) {
+    public Pair<Set<Term>, PrediTerm<Derivation>> build(@NotNull PostCondition post) {
 
 
         byte puncOverride = post.puncOverride;
@@ -128,7 +126,6 @@ public class PremiseRule extends GenericCompound {
             throw new RuntimeException("unknown GoalFunction: " + post.goalTruth);
         }
 
-        Conclude conc = new Conclude(this, post.pattern, goalUrgent);
 
         String beliefLabel = belief != null ? belief.toString() : "_";
         String goalLabel = goal != null ? goal.toString() : "_";
@@ -161,18 +158,14 @@ public class PremiseRule extends GenericCompound {
 
         s.addAll(match.constraints);
 
-        int n =  match.post.size();
-            //match.constraints.size() +
 
         //SUFFIX (order already determined for matching)
+        int n =  match.post.size();
         PrediTerm[] suff = new PrediTerm[n];
         int k = 0;
-//        for (PrediTerm p : match.constraints)
-//            suff[k++] = p;
         for (PrediTerm p : match.post) {
             suff[k++] = p;
         }
-        ((UnificationPrototype)suff[k-1]).conclude.add(conc.apply(nar));
 
         return pair(s, (PrediTerm<Derivation>)AndCondition.the(new FasterList(suff)));
     }
@@ -278,7 +271,7 @@ public class PremiseRule extends GenericCompound {
      */
     @NotNull
     public final Term getTask() {
-        return (getPremise().sub(0));
+        return (match().sub(0));
     }
 
     /**
@@ -286,12 +279,12 @@ public class PremiseRule extends GenericCompound {
      */
     @NotNull
     public final Term getBelief() {
-        return (getPremise().sub(1));
+        return (match().sub(1));
     }
 
     @NotNull
     private Term getConclusionTermPattern() {
-        return getConclusion().sub(0);
+        return conclusion().sub(0);
     }
 
 
@@ -622,8 +615,8 @@ public class PremiseRule extends GenericCompound {
         }
 
         this.match = new MatchTaskBelief(
-                getTask(), getBelief(), //HACK
-                constraints);
+                this,
+                constraints, index.nar);
 
         List<PostCondition> postConditions = newArrayList(postcons.length);
 

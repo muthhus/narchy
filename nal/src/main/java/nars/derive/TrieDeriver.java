@@ -8,8 +8,7 @@ import nars.NAR;
 import nars.Op;
 import nars.control.Derivation;
 import nars.derive.op.AbstractPatternOp.PatternOp;
-import nars.derive.op.UnificationPrototype;
-import nars.derive.op.UnifyOneSubterm;
+import nars.derive.op.UnifySubtermThenConclude;
 import nars.derive.rule.PremiseRuleSet;
 import nars.term.Term;
 import nars.util.TermTrie;
@@ -35,21 +34,6 @@ import static java.util.stream.Collectors.toList;
  */
 public enum TrieDeriver {
     ;
-
-    public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar) {
-        return the(r, nar, (x) -> x);
-    }
-
-    public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
-
-        PrediTerm<Derivation> tf = new PrediTrie(nar, r).compile(each);
-
-        TrieDeriver.print(tf, System.out);
-
-        return tf;
-
-        //return new TrieExecutor(tf);
-    }
 
 
 //    public static TrieDeriver get(String individualRule) throws Narsese.NarseseException {
@@ -123,8 +107,6 @@ public enum TrieDeriver {
             out.println("}");
         } else {
 
-            if (p instanceof UnificationPrototype)
-                p = ((UnificationPrototype) p).transform((x) -> x);
 
             TermTrie.indent(indent);
             out.print( /*Util.className(p) + ": " +*/ p);
@@ -197,18 +179,10 @@ public enum TrieDeriver {
                 //out.println("}");
 
             }
-//            TermTrie.indent(indent);
-//            out.println("}");
-        } else if (p instanceof UnifyOneSubterm.UnifySubtermThenConclude) {
-            forEach(((UnifyOneSubterm.UnifySubtermThenConclude) p).eachMatch, out);
+
+        } else if (p instanceof UnifySubtermThenConclude) {
+            forEach(((UnifySubtermThenConclude) p).eachMatch, out);
         } else {
-
-            if (p instanceof UnificationPrototype)
-                throw new UnsupportedOperationException();
-            //((MatchTermPrototype) p).builder();
-
-//            TermTrie.indent(indent);
-//            out.println( /*Util.className(p) + ": " +*/ p);
 
 
         }
@@ -278,8 +252,8 @@ public enum TrieDeriver {
             }
 //            TermTrie.indent(indent);
 //            out.println("}");
-        } else if (x instanceof UnifyOneSubterm.UnifySubtermThenConclude) {
-            forEach(x, ((UnifyOneSubterm.UnifySubtermThenConclude) x).eachMatch, out);
+        } else if (x instanceof UnifySubtermThenConclude) {
+            forEach(x, ((UnifySubtermThenConclude) x).eachMatch, out);
         }
     }
 
@@ -513,11 +487,11 @@ public enum TrieDeriver {
 
     static final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
 
-        private final NAR nar;
 
-        public PrediTrie(NAR nar, PremiseRuleSet r) {
+        public PrediTrie(PremiseRuleSet r) {
             super();
-            this.nar = nar;
+
+            NAR nar = r.patterns.nar;
 
             Map<Set<Term>, RoaringBitmap> pre = new HashMap<>();
             List<PrediTerm<Derivation>> conclusions = $.newArrayList(r.size() * 4);
@@ -531,7 +505,7 @@ public enum TrieDeriver {
 
                 for (PostCondition p : rule.POST) {
 
-                    Pair<Set<Term>, PrediTerm<Derivation>> c = rule.build(p, this.nar);
+                    Pair<Set<Term>, PrediTerm<Derivation>> c = rule.build(p);
 
                     c.getOne().forEach((k) -> preconditionCount.addToValue(k, 1));
 
@@ -581,17 +555,17 @@ public enum TrieDeriver {
 
         }
 
-        @Override
-        protected void onMatch(Term existing, Term incoming) {
-            if (existing instanceof UnificationPrototype) {
-                //merge the set of conclusions where overlapping
-
-
-                ((UnificationPrototype) existing).conclude.addAll(((UnificationPrototype) incoming).conclude);
-                //((UnificationPrototype) incoming).conclude.addAll(((UnificationPrototype) existing).conclude);
-                //incomingConcs.clear();
-            }
-        }
+//        @Override
+//        protected void onMatch(Term existing, Term incoming) {
+//            if (existing instanceof UnificationPrototype) {
+//                //merge the set of conclusions where overlapping
+//
+//
+//                ((UnificationPrototype) existing).conclude.addAll(((UnificationPrototype) incoming).conclude);
+//                //((UnificationPrototype) incoming).conclude.addAll(((UnificationPrototype) existing).conclude);
+//                //incomingConcs.clear();
+//            }
+//        }
 
 
         public PrediTerm<Derivation> compile(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {

@@ -2,7 +2,7 @@ package nars.derive;
 
 import jcog.math.ByteShuffler;
 import nars.control.Derivation;
-import nars.derive.op.UnifyOneSubterm;
+import nars.derive.op.UnifySubtermThenConclude;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,7 +30,7 @@ public class ValueFork extends Fork {
         int n = 0;
         for (PrediTerm b : branches) {
             PrediTerm fin = b instanceof AndCondition ? ((AndCondition)b).last() : b;
-            UnifyOneSubterm.UnifySubtermThenConclude u = (UnifyOneSubterm.UnifySubtermThenConclude)fin;
+            UnifySubtermThenConclude u = (UnifySubtermThenConclude)fin;
             conc[n++] = ((Conclusion)u.eachMatch);
         }
     }

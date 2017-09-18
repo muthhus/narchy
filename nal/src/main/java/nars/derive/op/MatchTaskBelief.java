@@ -1,15 +1,18 @@
 package nars.derive.op;
 
 import nars.$;
+import nars.NAR;
 import nars.Op;
 import nars.control.Derivation;
 import nars.derive.AbstractPred;
+import nars.derive.Conclude;
+import nars.derive.Conclusion;
 import nars.derive.PrediTerm;
 import nars.derive.constraint.MatchConstraint;
 import nars.derive.match.Ellipsis;
+import nars.derive.rule.PremiseRule;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -19,25 +22,72 @@ import java.util.SortedSet;
 public class MatchTaskBelief extends AbstractPred<Derivation> {
 
 
-
-
     public final List<PrediTerm> post;
     public final List<PrediTerm> pre;
     public final Set<MatchConstraint> constraints;
 
-//    @NotNull
-//    public final Term term;
+    public MatchTaskBelief(PremiseRule rule, SortedSet<MatchConstraint> constraints, NAR nar) {
+        this(rule, rule.getTask(), rule.getBelief(), constraints, nar);
+    }
 
-
-    public MatchTaskBelief(@NotNull Term taskPattern, Term beliefPattern, @NotNull SortedSet<MatchConstraint> constraints) {
-        super($.func(MatchTaskBelief.class.getSimpleName(), taskPattern ,beliefPattern ));
+    MatchTaskBelief(final PremiseRule rule, final @NotNull Term taskPattern, final Term beliefPattern, @NotNull SortedSet<MatchConstraint> constraints, NAR nar) {
+        super($.func(MatchTaskBelief.class.getSimpleName(), taskPattern, beliefPattern));
 
         List<PrediTerm> pre = $.newArrayList();
 
         List<PrediTerm> post = $.newArrayList();
 
 
-        compile(taskPattern, beliefPattern, pre, post);
+        Conclusion conc = new Conclude(rule, rule.conclusion().sub(0), rule.goalUrgent, nar).conc;
+
+        boolean taskIsPatVar = taskPattern.op() == Op.VAR_PATTERN;
+        boolean belIsPatVar = beliefPattern.op() == Op.VAR_PATTERN;
+
+        if (!taskIsPatVar)
+            pre.add(new AbstractPatternOp.PatternOp(0, taskPattern.op()));
+        if (!belIsPatVar)
+            pre.add(new AbstractPatternOp.PatternOp(1, beliefPattern.op()));
+
+        if (!taskIsPatVar)
+            pre.addAll(SubTermStructure.get(0, taskPattern.structure()));
+
+//        if (belief!=null && task instanceof Compound && !task.isCommutative()) {
+//            int beliefInTask = ((Compound)task).indexOf(belief);
+//            if (beliefInTask!=-1) {
+//                System.out.println(belief + " in " + task);
+//            }
+//        }
+
+        if (!belIsPatVar)
+            pre.addAll(SubTermStructure.get(1, beliefPattern.structure()));
+
+        //        } else {
+        //            if (x0.containsTermRecursively(x1)) {
+        //                //pre.add(new TermContainsRecursively(x0, x1));
+        //            }
+        //        }
+
+        //@Nullable ListMultimap<Term, MatchConstraint> c){
+
+
+        //ImmutableMap<Term, MatchConstraint> cc = compact(constraints);
+
+
+        //match both
+        //code.add(new MatchTerm.MatchTaskBeliefPair(pattern, initConstraints(constraints)));
+
+        if (taskPattern.equals(beliefPattern)) {
+            post.add(new UnifySubtermThenConclude(0, taskPattern, conc));
+        } else if (taskFirst(taskPattern, beliefPattern)) {
+            //task first
+            post.add(new UnifySubterm(0, taskPattern));
+            post.add(new UnifySubtermThenConclude(1, beliefPattern, conc));
+        } else {
+            //belief first
+            post.add(new UnifySubterm(1, beliefPattern));
+            post.add(new UnifySubtermThenConclude(0, taskPattern,  conc));
+        }
+
 
         this.pre = pre;
         this.constraints = constraints; //sorted, at the end of the preMatch
@@ -65,135 +115,62 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
     }
 
 
-
-
     @Override
     public boolean test(Derivation m) {
         throw new RuntimeException("this should not be called");
     }
 
 
-    private static void compile(@NotNull Term task, @NotNull Term belief,
-                                @NotNull List<PrediTerm> pre, @NotNull List<PrediTerm> code) {
-
-        //BoolPredicate preGuard = null;
-
-        //check for any self similarity
-//        if (task.equals(belief)) {
-//            //add precondition constraint that task and belief must be equal.
-//            // assuming this succeeds, only need to test the task half
-//            preGuard = new TaskBeliefEqualCondition();
-//            belief = null;
-//        }
+//    private static void compile(@NotNull Term task, @NotNull Term belief,
+//                                @NotNull List<PrediTerm> pre, @NotNull List<PrediTerm> code) {
 //
-//        else if (task instanceof Compound && belief instanceof Compound && !task.isCommutative()
-//                && null==Ellipsis.firstEllipsis((Compound)task)
-//                && null==Ellipsis.firstEllipsis((Compound)belief)
-//                ) {
-//            byte[] beliefInTask = ((Compound)task).isSubterm(belief);
-//            if (beliefInTask != null) {
-//                //add precondition for this constraint that is checked between the premise's terms
-//                //assuming this succeeds, only need to test the task half
-//                preGuard = new ComponentCondition(0, beliefInTask, 1);
-//                belief = null;
-//            }
-//        }
+//        //BoolPredicate preGuard = null;
 //
-//        else if (belief instanceof Compound && task instanceof Compound && !belief.isCommutative()
-//                && null==Ellipsis.firstEllipsis((Compound)belief)
-//                && null==Ellipsis.firstEllipsis((Compound)task)
-//         ) {
-//            byte[] taskInBelief = ((Compound)belief).isSubterm(task);
-//            if (taskInBelief != null) {
-//                //add precondition for this constraint that is checked between the premise's terms
-//                //assuming this succeeds, only need to test the belief half
-//                preGuard = new ComponentCondition(1, taskInBelief, 0);
-//                task = null;
-//            }
-//        }
+//        //check for any self similarity
+////        if (task.equals(belief)) {
+////            //add precondition constraint that task and belief must be equal.
+////            // assuming this succeeds, only need to test the task half
+////            preGuard = new TaskBeliefEqualCondition();
+////            belief = null;
+////        }
+////
+////        else if (task instanceof Compound && belief instanceof Compound && !task.isCommutative()
+////                && null==Ellipsis.firstEllipsis((Compound)task)
+////                && null==Ellipsis.firstEllipsis((Compound)belief)
+////                ) {
+////            byte[] beliefInTask = ((Compound)task).isSubterm(belief);
+////            if (beliefInTask != null) {
+////                //add precondition for this constraint that is checked between the premise's terms
+////                //assuming this succeeds, only need to test the task half
+////                preGuard = new ComponentCondition(0, beliefInTask, 1);
+////                belief = null;
+////            }
+////        }
+////
+////        else if (belief instanceof Compound && task instanceof Compound && !belief.isCommutative()
+////                && null==Ellipsis.firstEllipsis((Compound)belief)
+////                && null==Ellipsis.firstEllipsis((Compound)task)
+////         ) {
+////            byte[] taskInBelief = ((Compound)belief).isSubterm(task);
+////            if (taskInBelief != null) {
+////                //add precondition for this constraint that is checked between the premise's terms
+////                //assuming this succeeds, only need to test the belief half
+////                preGuard = new ComponentCondition(1, taskInBelief, 0);
+////                task = null;
+////            }
+////        }
+////
+////        //put this one after the guards added in the compileTaskBelief like checking for op, subterm vector etc which will be less expensive
+////        if (preGuard!=null)
+////            pre.add(preGuard);
 //
-//        //put this one after the guards added in the compileTaskBelief like checking for op, subterm vector etc which will be less expensive
-//        if (preGuard!=null)
-//            pre.add(preGuard);
+//        //default case: exhaustively match both, with appropriate pruning guard preconditions
+//
+//
+//    }
 
-        //default case: exhaustively match both, with appropriate pruning guard preconditions
-        compileTaskBelief(pre, code, task, belief);
-
-
-    }
-
-    private static void compileTaskBelief(@NotNull List<PrediTerm> pre,
-                                          @NotNull List<PrediTerm> code,
-                                          @Nullable Term task, @Nullable Term belief) {
-
-        boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
-
-        boolean belIsPatVar = belief!=null && belief.op() == Op.VAR_PATTERN;
-
-        if (task!=null && !taskIsPatVar)
-            pre.add(new AbstractPatternOp.PatternOp(0, task.op()));
-        if (belief!=null && !belIsPatVar)
-            pre.add(new AbstractPatternOp.PatternOp(1, belief.op()));
-
-        if (task!=null && !taskIsPatVar)
-            pre.addAll(SubTermStructure.get(0, task.structure()));
-
-//        if (belief!=null && task instanceof Compound && !task.isCommutative()) {
-//            int beliefInTask = ((Compound)task).indexOf(belief);
-//            if (beliefInTask!=-1) {
-//                System.out.println(belief + " in " + task);
-//            }
-//        }
-
-        if (belief!=null && !belIsPatVar)
-            pre.addAll(SubTermStructure.get(1, belief.structure()));
-
-        //        } else {
-        //            if (x0.containsTermRecursively(x1)) {
-        //                //pre.add(new TermContainsRecursively(x0, x1));
-        //            }
-        //        }
-
-        //@Nullable ListMultimap<Term, MatchConstraint> c){
-
-
-        //ImmutableMap<Term, MatchConstraint> cc = compact(constraints);
-
-
-        if (task!=null && belief!=null) {
-
-            //match both
-            //code.add(new MatchTerm.MatchTaskBeliefPair(pattern, initConstraints(constraints)));
-
-            if (task.equals(belief)) {
-                code.add(new UnifyOneSubterm(task, 0, true));
-            } else if (taskFirst(task, belief)) {
-                //task first
-                code.add(new UnifyOneSubterm(task, 0, false));
-                code.add(new UnifyOneSubterm(belief, 1, true));
-            } else {
-                //belief first
-                code.add(new UnifyOneSubterm(belief, 1, false));
-                code.add(new UnifyOneSubterm(task, 0, true));
-            }
-
-        } else if (belief!=null) {
-            //match belief only
-            code.add(new UnifyOneSubterm(belief, 1, true));
-        } else if (task!=null) {
-            //match task only
-            code.add(new UnifyOneSubterm(task, 0, true));
-        } else {
-            throw new RuntimeException("invalid");
-        }
-
-
-
-
-    }
 
     private static boolean taskFirst(@NotNull Term task, @NotNull Term belief) {
-
 
 
         Ellipsis taskEllipsis = Ellipsis.firstEllipsisRecursive(task);
@@ -211,15 +188,12 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
 
         //prefer non-ellipsis matches first
         Ellipsis beliefEllipsis = Ellipsis.firstEllipsisRecursive(belief);
-        if (beliefEllipsis!=null) {
+        if (beliefEllipsis != null) {
             return true;
         }
-        if (taskEllipsis!=null) {
+        if (taskEllipsis != null) {
             return false;
         }
-
-
-
 
 
         //return task.volume() >= belief.volume();
@@ -361,7 +335,6 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
 //            return (cN != null) && cN.invalid(assignee, value, f);
 //        }
 //    }
-
 
 
 //    private void compile(Term x, List<BooleanCondition<PremiseMatch>> code) {

@@ -1,5 +1,6 @@
 package nars.index.term;
 
+import nars.NAR;
 import nars.Narsese;
 import nars.Op;
 import nars.derive.PatternCompound;
@@ -29,6 +30,10 @@ public class PatternTermIndex extends MapTermIndex {
 
     public PatternTermIndex() {
         super(new ConcurrentHashMap<>(512));
+    }
+    public PatternTermIndex(NAR n) {
+        this();
+        this.nar = n;
     }
 
     @SuppressWarnings("Java8MapApi")
