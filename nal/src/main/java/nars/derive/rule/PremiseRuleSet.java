@@ -118,7 +118,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
                 PremiseRule preNorm = new PremiseRule(rawAndSrc.getOne());
                 permute(preNorm, src, patterns, ur);
             } catch (RuntimeException ex) {
-                throw new RuntimeException("Invalid TaskRule: " + src, ex);
+                throw new RuntimeException("Invalid TaskRule:\n\t" + src, ex);
             }
 
             return ur;

@@ -42,13 +42,12 @@ public interface Termlike extends Termed {
      */
     boolean contains(Termlike t);
 
+    /** shouldnt need overrridden */
     default boolean containsRecursively(Term t) {
         return containsRecursively(t, (x) -> true);
     }
 
-    default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
-        return false;
-    }
+    boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf);
 
 
 
@@ -213,16 +212,8 @@ public interface Termlike extends Termed {
      * whether it can safely be cached/memoized -- or if it must be evaluated.
      * if unsure, err on the side of caution and return true.
      */
-    default boolean isDynamic() {
-        int c = complexity();
-        if (c >= 2 && hasAll(EvalBits)) {
-            return
-                ((op() == INH && subIs(0, PROD) && subIs(1, ATOM)) /* potential function */
-                    ||
-                (c >= 3 && OR(Termlike::isDynamic))); /* possible function in subterms */
-        }
-        return false;
-    }
+    boolean isDynamic();
+
 
     /**
      * return whether a subterm op at an index is an operator.

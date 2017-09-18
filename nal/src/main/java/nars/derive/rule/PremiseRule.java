@@ -45,7 +45,7 @@ import static org.eclipse.collections.impl.tuple.Tuples.pair;
  */
 public class PremiseRule extends GenericCompound {
 
-    static final Term UNPROJ = $.the("unproj");
+    static final Atomic UNPROJ = Atomic.the("unproj");
     public static final Atomic Task = Atomic.the("task");
     static final Atomic Belief = Atomic.the("belief");
     private static final Term TaskAny = $.func("task", Atomic.the("any"));

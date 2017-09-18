@@ -97,15 +97,16 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
 
     @Override
     public final Term term() {
-        //return this;
         return term;
     }
 
     @Override
+    public final boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
+        return term.containsRecursively(t, inSubtermsOf);
+    }
+
+    @Override
     public final @NotNull Op op() {
-//        Op t = term.op();
-//        assert(t!=NEG); //HACK
-//        return t;
         return term.op();
     }
 
@@ -121,7 +122,6 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
         return termLinks;
     }
 
-    final static Term TEMPLATE_KEY = $.the("templates");
 
     @Override
     public Collection<Termed> templates() {

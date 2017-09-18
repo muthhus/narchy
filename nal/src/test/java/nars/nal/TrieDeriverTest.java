@@ -1,9 +1,6 @@
 package nars.nal;
 
-import nars.NAR;
-import nars.NARS;
-import nars.Narsese;
-import nars.Task;
+import nars.*;
 import nars.control.Derivation;
 import nars.control.Premise;
 import nars.derive.AndCondition;
@@ -22,12 +19,10 @@ import net.byteseek.utils.collections.IdentityHashSet;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.After;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static nars.Op.QUEST;
@@ -42,7 +37,6 @@ public class TrieDeriverTest {
 //            //(TrieDeriver) Deriver.get("nal1.nal");
 //            //(TrieDeriver) DefaultDeriver.the;
 //            new TrieDeriver(DefaultDeriver.rules);
-
 
 
     @Test
@@ -75,8 +69,9 @@ public class TrieDeriverTest {
 
         System.out.println(d);
 
-        assertTrue(d.toString().contains("(?2&|%1)"));
-        assertTrue(d.toString().contains("(?2 &&+- %1)"));
+        String ds = d.toString();
+        assertTrue(ds.contains("&|?2"));
+        assertTrue(ds.contains("&&+- ?2"));
 
 
         //assertTrue("something at least got stored in the index", idx.size() > 16);
@@ -156,50 +151,53 @@ public class TrieDeriverTest {
     @Test
     public void testConclusionFold() throws Narsese.NarseseException {
 
-        String[] rules = {
-                "(A --> B), C, task(\"?\") |- (A --> C), (Punctuation:Question)",
+        TestNAR t = test(64,
+        "(A --> B), C, task(\"?\") |- (A --> C), (Punctuation:Question)",
                 "(A --> B), C, task(\"?\") |- (A ==> C), (Punctuation:Question)"
-        };
+        );
+        PrediTerm<Derivation> d = t.nar.derivation().deriver;
+        TrieDeriver.print(d);
 
-        Set<Task> t1 = testDerivation(rules, "(a-->b)?", "b", 64, false);
-        assertEquals(2, t1.size());
-        Set<Task> t2 = testDerivation(rules, "(a<->b)?", "b", 64);
-        assertEquals(0, t2.size());
+        t.log().ask("(a-->b)").mustQuestion(16, "b");
 
     }
 
     @Test
     public void testDeriveQuest() throws Narsese.NarseseException {
 
-        test(64, "(P --> S), (S --> P), task(\"?\") |- (P --> S),   (Punctuation:Quest)")
+        @NotNull TestNAR t = test(64, "(P --> S), (S --> P), task(\"?\") |- (P --> S),   (Punctuation:Quest)")
                 .log()
                 .ask("b:a")
                 .believe("a:b")
-                .mustOutput(16, "b:a", QUEST)
-                .test();
-    }
-    @Test
-    public void testDeriveReuseTaskContent() throws Narsese.NarseseException {
+                .mustOutput(16, "b:a", QUEST);
 
-        test(64, "(P --> S), (S --> P), task(\"?\") |- _taskTerm,   (Punctuation:Quest)")
-                .log()
-                .ask("b:a")
-                .believe("a:b")
-                .mustOutput(16, "b:a", QUEST)
-                .test();
+        //ensure the fast conclusion substitute term was applied since the conclusion pattern is the task term
+        PrediTerm<Derivation> d = t.nar.derivation().deriver;
+        System.out.println(d);
+        TrieDeriver.print(d);
+        assertTrue(d.containsRecursively(Derivation._taskTerm));
     }
 
     public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax) throws Narsese.NarseseException {
         return testDerivation(rules, task, belief, ttlMax, false);
     }
 
-    public static TestNAR test(int tlMax, String... rules) throws Narsese.NarseseException {
-        NAR n = new NARS().deriver((NAR nar)->{
+
+    private final List<TestNAR> tests = $.newArrayList();
+
+    @After
+    public void runTests() {
+        tests.forEach(TestNAR::test);
+    }
+
+    public TestNAR test(int tlMax, String... rules) throws Narsese.NarseseException {
+        NAR n = new NARS().deriver((NAR nar) -> {
             PrediTerm<Derivation> d = testCompile(nar, false, rules);
             TrieDeriver.print(d);
             return d;
         }).get();
         TestNAR t = new TestNAR(n);
+        tests.add(t);
         return t;
     }
 
@@ -207,7 +205,7 @@ public class TrieDeriverTest {
         NAR n = NARS.tmp();
 
         PrediTerm<Derivation> d = testCompile(n, debug, rules);
-                //.transform(DebugDerivationPredicate::new);
+        //.transform(DebugDerivationPredicate::new);
 
         Set<Task> tasks = new LinkedHashSet();
         n.onTask(tasks::add);
@@ -219,11 +217,12 @@ public class TrieDeriverTest {
         assertNotNull(b);
 
         Iterable<? extends ITask> derived = new Premise(t, b, 0.5f, Collections.emptySet()) {
-            @Override protected Derivation derivation(@NotNull NAR n) {
+            @Override
+            protected Derivation derivation(@NotNull NAR n) {
                 return n.derivation(d);
             }
         }.run(n);
-        if (derived!=null) {
+        if (derived != null) {
             derived.forEach(x ->
                     tasks.add((Task) x)
             );
@@ -245,17 +244,19 @@ public class TrieDeriverTest {
                 AndCondition.last(d) instanceof UnifySubtermThenConclude);
     }
 
-    @Test public void testSubstIfUnifies1() throws Narsese.NarseseException {
+    @Test
+    public void testSubstIfUnifies1() throws Narsese.NarseseException {
 
 
         TestNAR tester = test(64,
-                "(B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)");
+                "(B --> K), (($X --> L) ==> (&&,(#Y --> K),%A..+)) |- substitute((($X --> L) ==>+- (&&,%A..+)),#Y,B), (Belief:AnonymousAnalogy)");
 
         tester.believe("(&&,<#x --> lock>,(<$y --> key> ==> open($y,#x)))"); //en("There is a lock that can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
         tester.mustBelieve(100, "<<$1 --> key> ==> open($1,{lock1})>", 1.00f,
                 0.81f);
     }
+
     @Test
     public void testContrapositionWierdness() {
 

@@ -19,7 +19,7 @@ abstract public class Retemporalize implements CompoundTransform {
 
     @Override
     public final boolean testSuperTerm(@NotNull Compound c) {
-        return (c.hasAny(Op.TemporalBits));
+        return c.isTemporal();
     }
 
     @Nullable

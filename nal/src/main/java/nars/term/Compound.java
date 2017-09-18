@@ -67,12 +67,7 @@ import static nars.time.Tense.XTERNAL;
 public interface Compound extends Term, IPair, TermContainer {
 
     static boolean equals(@NotNull Term a, @Nullable Object b) {
-
-        if (a == b)
-            return true;
-
-        if (!(b instanceof Term) || a.hashCode() != b.hashCode())
-            return false;
+        assert(a!=b): "instance check should have already been performed before calling this";
 
         Term bb = (Term) b;
 
@@ -97,6 +92,17 @@ public interface Compound extends Term, IPair, TermContainer {
 //        }
     }
 
+    /**
+     * whether any subterms (recursively) have
+     * non-DTernal temporal relation
+     */
+    default boolean isTemporal() {
+        return hasAny(Op.TemporalBits) &&
+                ((op().temporal && (dt() != DTERNAL))
+                        ||
+                        (subterms().isTemporal()));
+    }
+
     @Override
     default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
         assert(this!=t);
@@ -108,14 +114,7 @@ public interface Compound extends Term, IPair, TermContainer {
     TermContainer subterms();
 
     @Override
-    default int hashCodeSubTerms() {
-        return subterms().hashCode();
-    }
-
-    @Override
-    default boolean isTemporal() {
-        return Term.super.isTemporal();
-    }
+    int hashCodeSubTerms();
 
     @Override
     default int opX() {
@@ -768,10 +767,23 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
+    default boolean isDynamic() {
+        int c = complexity();
+        if (c >= 2 && hasAll(EvalBits)) {
+            return
+                ((op() == INH && subIs(0, PROD) && subIs(1, ATOM)) /* potential function */
+                    ||
+                (c >= 3 && OR(Termlike::isDynamic))); /* possible function in subterms */
+        }
+        return false;
+    }
+
+    @Override
     default Term evalSafe(TermContext context, int remain) {
 
-        if (!isDynamic())
-            return this;
+        if (!isDynamic()) {
+            return context.applyOrElseTerm(this);
+        }
 
         if (remain-- <= 0)
             return null;
@@ -961,10 +973,8 @@ public interface Compound extends Term, IPair, TermContainer {
             //else
             //return Op.compound(op, target.theArray(), false).dt(dt); //HACK
 
-        } else if (dt != this.dt()) {
-            y = this.dt(dt);
         } else {
-            y = this;
+            y = this.dt(dt);
         }
         return y!=null ? t.apply(null, y) : null;
     }
@@ -978,9 +988,12 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     @Nullable
     default Term eternal() {
-        return temporalize(Retemporalize.retemporalizeAllToXTERNAL);
 //        if (!this.hasAny(Op.TemporalBits))
 //            return this;
+        if (!isTemporal())
+            return this;
+        return temporalize(Retemporalize.retemporalizeAllToXTERNAL);
+
 //
 //        TermContainer subs = this.subterms();
 //        Term[] s = subs.toArray();

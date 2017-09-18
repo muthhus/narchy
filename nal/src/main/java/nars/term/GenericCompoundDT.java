@@ -6,42 +6,32 @@ import nars.IO;
 import nars.Op;
 import nars.Param;
 import nars.derive.PatternCompound;
-import nars.index.term.TermContext;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.subst.Unify;
-import nars.term.transform.CompoundTransform;
-import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
-public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
+public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compound {
 
     /**
      * numeric (term or "dt" temporal relation)
      */
     public final int dt;
     private final int hashDT;
+    Compound ref;
 
     public GenericCompoundDT(Compound base, int dt) {
-        super(base);
+        this.ref = base;
 
-
-
-        if (!(dt==XTERNAL || Math.abs(dt) <  Param.DT_ABS_LIMIT))
+        if (!(dt == XTERNAL || Math.abs(dt) < Param.DT_ABS_LIMIT))
             throw new InvalidTermException(base.op(), dt, base.subterms(), "exceeded DT limit");
 
         if (Param.DEBUG_EXTRA) {
 
-            assert(getClass()!=GenericCompoundDT.class /* a subclass */ || dt!=DTERNAL);
+            assert (getClass() != GenericCompoundDT.class /* a subclass */ || dt != DTERNAL);
 
             Op op = base.op();
 
@@ -70,60 +60,19 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     }
 
     @Override
+    public @NotNull Op op() {
+        return ref.op();
+    }
+
+
+    @Override
     public Term dt(int dt) {
         return dt == this.dt ? this : Compound.super.dt(dt);
     }
 
     @Override
     public void append(ByteArrayDataOutput out) {
-        Term.append( this, out);
-    }
-
-    @Override
-    public Term eternal() {
-        return Compound.super.eternal();
-    }
-
-    @Override
-    public Term conceptual() {
-        return Compound.super.conceptual();
-    }
-
-    @Override
-    public boolean eternalEquals(Term x) {
-        return Compound.super.eternalEquals(x);
-    }
-
-    @Override
-    public @Nullable Term normalize(int offset) {
-        return Compound.super.normalize(offset);
-    }
-
-
-    @Override
-    public void events(Consumer<ObjectLongPair<Term>> events, long dt, int level) {
-        Compound.super.events(events, dt, level);
-    }
-
-    @Override
-    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-        return Compound.super.unify(y, subst);
-    }
-
-    @Override
-    public void append(@NotNull Appendable p) throws IOException {
-        Compound.super.append(p);
-    }
-
-    @Override
-    public Term evalSafe(TermContext context, int remain) {
-        return Compound.super.evalSafe(context, remain);
-    }
-
-    @Nullable
-    @Override
-    public Set<Term> varsUnique(@Nullable Op type, Set<Term> exceptIfHere) {
-        return Compound.super.varsUnique(type, exceptIfHere);
+        Term.append(this, out);
     }
 
     @NotNull
@@ -132,10 +81,34 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         return IO.Printer.stringify(this).toString();
     }
 
-
     @Override
     public Term sub(int i, Term ifOutOfBounds) {
         return ref.sub(i, ifOutOfBounds);
+    }
+
+    @Override
+    public final int hashCodeSubTerms() {
+        return ref.hashCodeSubTerms();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        if (this == that) return true;
+
+        if (!(that instanceof Compound) || hashDT != that.hashCode())
+            return false;
+
+//        if (that instanceof GenericCompoundDT) {
+//            GenericCompoundDT cthat = (GenericCompoundDT) that;
+//            if (dt != cthat.dt) return false;
+//            if (ref == cthat.ref) return true;
+//            else if (ref.equals(cthat.ref)) {
+//                ref = cthat.ref; //share
+//                return true;
+//            }
+//        }
+
+        return Compound.equals(this, that);
     }
 
     //    @Override
@@ -195,16 +168,12 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         ref.setNormalized();
     }
 
-    @Override
-    public boolean isCommutative() {
-        return Compound.super.isCommutative();
-    }
-
 
     @Override
-    public int subtermTimeSafe(@NotNull Term x) {
-        return Compound.super.subtermTimeSafe(x);
+    public boolean isNormalized() {
+        return ref.isNormalized();
     }
+
 
     @Override
     public final int hashCode() {
@@ -216,36 +185,10 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         return dt;
     }
 
-//    @Override
-//    public @Nullable Term transform(Op op, int dt, @NotNull CompoundTransform t) {
-//        return Compound.super.transform(op, dt, t);
-//    }
-
-    @Override
-    @Nullable
-    public final Term transform(int newDT, @NotNull CompoundTransform t) {
-        return Compound.super.transform(newDT, t);
-    }
-
-    @Nullable
-    @Override
-    public Term transform(@NotNull CompoundTransform t, Compound parent) {
-        return Compound.super.transform(t, parent);
-    }
-
-    @Override
-    public @Nullable Term transform(@NotNull CompoundTransform t) {
-        return Compound.super.transform(t);
-    }
 
     @Override
     public final Term term() {
         return this;
-    }
-
-    @Override
-    public boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
-        return Compound.super.containsRecursively(t, inSubtermsOf);
     }
 
 

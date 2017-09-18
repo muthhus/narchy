@@ -29,7 +29,7 @@ public class SerialCompound extends DynBytes implements Compound {
     boolean normalized;
 
     public SerialCompound(Compound c) {
-        this(c.op(), c.dt(), c.toArray());
+        this(c.op(), c.dt(), c.theArray());
     }
 
     public SerialCompound(Op op, int dt, Term[] subterms) {
@@ -84,6 +84,11 @@ public class SerialCompound extends DynBytes implements Compound {
     @Override
     public int hashCode() {
         throw new UnsupportedOperationException(); //TODO impl in a subclass
+    }
+
+    @Override
+    public int hashCodeSubTerms() {
+        throw new UnsupportedOperationException(); //TODO
     }
 
     @Override

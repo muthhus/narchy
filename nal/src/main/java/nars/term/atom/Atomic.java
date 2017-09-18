@@ -24,16 +24,33 @@ public interface Atomic extends Term {
     default boolean OR(Predicate<Term> v) {
         return v.test(this);
     }
+
     @Override
     default boolean AND(Predicate<Term> v) {
         return v.test(this);
     }
 
+    /** for speed, elides virtual call to the complete containsRecursively procedure with additional predicate arg */
+    @Override default boolean containsRecursively(Term t) {
+        return false;
+    }
+
+    @Override
+    default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
+        return false;
+    }
+
+    @Override
+    default boolean isDynamic() {
+        return false;
+    }
+
+    @Override
+    default boolean isTemporal() { return false; }
+
     @NotNull
     static Atomic the(@NotNull String id) {
         int l = id.length();
-        if (l == 0)
-            System.out.println("wtf");
         assert(l>0): "attempted zero-length Atomic id";
 
         //special cases
@@ -43,11 +60,21 @@ public interface Atomic extends Term {
                 case Op.NullSym:  return Op.Null;
                 case Op.TrueSym:  return Op.True;
                 case Op.FalseSym:  return Op.False;
+                case '0': return Int.digits[0];
+                case '1': return Int.digits[1];
+                case '2': return Int.digits[2];
+                case '3': return Int.digits[3];
+                case '4': return Int.digits[4];
+                case '5': return Int.digits[5];
+                case '6': return Int.digits[6];
+                case '7': return Int.digits[7];
+                case '8': return Int.digits[8];
+                case '9': return Int.digits[9];
             }
         }
 
-        //TODO handle negative ints prefixd with '-'
-        if (Character.isDigit(id.charAt(0))) {
+        //TODO handle negative ints prefixed with '-'
+        if (l > 1 /* already handled single digit cases in the above switch */ && Character.isDigit(id.charAt(0))) {
             //try to parse int
             int i = Texts.i(id, MIN_VALUE);
             if (i != MIN_VALUE)

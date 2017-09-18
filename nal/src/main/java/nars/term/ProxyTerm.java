@@ -35,10 +35,15 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public TermContainer subterms() {
+    public final TermContainer subterms() {
         return ref.subterms();
     }
 
+
+    @Override
+    public boolean isTemporal() {
+        return ref.isTemporal();
+    }
 
     @NotNull
     @Override
@@ -62,6 +67,11 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
+    public boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
+        return ref.containsRecursively(t, inSubtermsOf);
+    }
+
+    @Override
     public @Nullable Term transform(@NotNull CompoundTransform t, Compound parent) {
         return ref.transform(t, parent);
     }
@@ -72,7 +82,7 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override public boolean equals(Object o) {
-        return Compound.equals(this, o);
+        return ref.equals(o);
     }
 
     @Override
@@ -313,11 +323,10 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.varPattern();
     }
 
-//    @Override
-//    public boolean unifyPossible(@Nullable Op t) {
-//        return ref.unifyPossible(t);
-//    }
-
+    @Override
+    public boolean isDynamic() {
+        return ref.isDynamic();
+    }
 
 
     @Override

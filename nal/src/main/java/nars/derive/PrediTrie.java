@@ -121,6 +121,8 @@ public final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
 
 
         List<PrediTerm<Derivation>> bb = $.newArrayList(node.childCount());
+        assert(node.getKey()!=null);
+        assert(node.getValue()!=null);
 
         node.forEach(n -> {
 
@@ -159,7 +161,8 @@ public final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
                         if (x instanceof AbstractPatternOp.PatternOp) {
                             AbstractPatternOp.PatternOp so = (AbstractPatternOp.PatternOp) x;
                             if (so.taskOrBelief == subterm) {
-                                if (null == cases.putIfAbsent(so, ac.without(so))) {
+                                PrediTerm acw = ac.without(so);
+                                if (null == cases.putIfAbsent(so, acw)) {
                                     removed.add(p);
                                     return true;
                                 }

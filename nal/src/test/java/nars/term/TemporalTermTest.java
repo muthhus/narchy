@@ -712,6 +712,10 @@ public class TemporalTermTest {
 
         Term c = $.$("(x &&+1 x)");
         assertEquals("(x &&+- x)", c.eternal().toString());
+    }
+
+    @Test
+    public void testEqualsAnonymous2() throws Narsese.NarseseException {
 
         //assertTrue(Terms.equalAtemporally(a, b));
         //        if (as == bs) {

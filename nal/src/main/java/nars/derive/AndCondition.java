@@ -147,8 +147,11 @@ public final class AndCondition<D> extends AbstractPred<D> {
 
 
     public @Nullable PrediTerm<D> without(PrediTerm<D> condition) {
+        int subterm = ref.subterms().indexOf(condition);
+        assert(subterm!=-1);
+
         //TODO returns a new AndCondition with condition removed, or null if it was the only item
-        PrediTerm[] x = ArrayUtils.removeElement(cache, condition);
+        PrediTerm[] x = ArrayUtils.removeElement(cache, subterm);
         if (x.length == cache.length)
             throw new RuntimeException("element missing for removal");
 

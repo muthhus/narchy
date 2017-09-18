@@ -60,6 +60,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return true;
     }
 
+    @Override default boolean isDynamic() { return OR(Term::isDynamic); }
 
     /**
      * a termcontainer is not necessarily a term of its own
@@ -676,7 +677,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
 
     default boolean isTemporal() {
-        return OR(Term::isTemporal);
+        return hasAny(Op.TemporalBits) && OR(Term::isTemporal);
     }
 
     default boolean isSorted() {

@@ -212,6 +212,11 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
+    public boolean isDynamic() {
+        return sub.isDynamic();
+    }
+
+    @Override
     public int vars() {
         return sub.vars();
     }

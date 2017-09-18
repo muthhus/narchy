@@ -75,9 +75,12 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
 
     @Override
-    public boolean equals(@Nullable Object that) {
+    public final boolean equals(@Nullable Object that) {
+        if (this == that) return true;
+        if (!(that instanceof Compound) || hash!=that.hashCode())
+            return false;
+
         return Compound.equals(this, that);
-//        if (this == that) return true;
 //
 //        if (hash == that.hashCode()) {
 //            Term t = (Term)that;

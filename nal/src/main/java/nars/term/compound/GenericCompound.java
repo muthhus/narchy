@@ -4,6 +4,7 @@ import jcog.Util;
 import nars.IO;
 import nars.Op;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,6 +98,11 @@ public class GenericCompound implements Compound {
         return op;
     }
 
+    @Override
+    public final int hashCodeSubTerms() {
+        return subterms.hashCode();
+    }
+
     @NotNull
     @Override
     public String toString() {
@@ -106,6 +112,9 @@ public class GenericCompound implements Compound {
     @Override
     public final boolean equals(@Nullable Object that) {
         if (this==that) return true;
+
+        if (!(that instanceof Compound) || hash != that.hashCode())
+            return false;
 
         if (Compound.equals(this, that)) {
             if (that instanceof GenericCompound) {

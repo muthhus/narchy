@@ -190,14 +190,14 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
 
 
 
-    public boolean add(@NotNull Termed x) {
+    public boolean add(@NotNull Term x) {
         int c = subs.length;
         int len = this.size;
         if (c == len) {
             ensureCapacity(len, len + Math.max(1, (len / 2)));
         }
 
-        _add(x.term());
+        _add(x);
 
         return true;
     }

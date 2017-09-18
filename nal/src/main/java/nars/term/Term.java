@@ -73,7 +73,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
 
     //@NotNull public static final int[] ZeroIntArray = new int[0];
-    @NotNull Term[] EmptyArray = new Term[0];
+    Term[] EmptyArray = new Term[0];
     ImmutableByteList EmptyByteList = ByteLists.immutable.empty();
 
     @Override
@@ -82,7 +82,7 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
 
-    @NotNull
+    /*@NotNull*/
     @Override
     Op op();
 
@@ -139,17 +139,8 @@ public interface Term extends Termlike, Comparable<Term> {
         return recurseTerms(parentsMust, whileTrue, this);
     }
 
-
-    /**
-     * whether any subterms (recursively) have
-     * non-DTernal temporal relation
-     */
-    default boolean isTemporal() {
-        return hasAny(Op.TemporalBits) &&
-                ((op().temporal && (dt() != DTERNAL))
-                        ||
-                        (subterms().isTemporal()));
-    }
+    /** whether this term is or contains, as subterms, any temporal terms */
+    boolean isTemporal();
 
     /**
      * returns an int[] path to the first occurrence of the specified subterm
@@ -157,7 +148,7 @@ public interface Term extends Termlike, Comparable<Term> {
      * @return null if not a subterm, an empty int[] array if equal to this term, or a non-empty int[] array specifying subterm paths to reach it
      */
     @Nullable
-    default byte[] pathTo(@NotNull Term subterm) {
+    default byte[] pathTo(/*@NotNull*/ Term subterm) {
         if (subterm.equals(this)) return ArrayUtils.EMPTY_BYTE_ARRAY;
         //if (!containsRecursively(subterm)) return null;
         return
@@ -167,30 +158,30 @@ public interface Term extends Termlike, Comparable<Term> {
 
 
     @Nullable
-    default Term transform(@NotNull ByteList path, Term replacement) {
+    default Term transform(/*@NotNull*/ ByteList path, Term replacement) {
         return transform(path, 0, replacement);
     }
 
     @Nullable
-    default Term transform(@NotNull CompoundTransform t) {
+    default Term transform(CompoundTransform t) {
         return t.apply(null, this);
     }
 
     @Nullable
-    default Term transform(@NotNull CompoundTransform t, Compound parent) {
+    default Term transform(CompoundTransform t, Compound parent) {
         return t.apply(parent, this);
     }
 
 
     @Nullable
-    default Term transform(int newDT, @NotNull CompoundTransform t) {
+    default Term transform(int newDT, CompoundTransform t) {
         assert (newDT == DTERNAL);
         return t.apply(null, this);
     }
 
 
     @Nullable
-    default Term transform(@NotNull ByteList path, int depth, Term replacement) {
+    default Term transform(/*@NotNull*/ ByteList path, int depth, Term replacement) {
         final Term src = this;
         int ps = path.size();
         if (ps == depth)
@@ -226,7 +217,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
 
     @Nullable
-    default <X> boolean pathsTo(@NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
+    default <X> boolean pathsTo(/*@NotNull*/ Function<Term, X> subterm, /*@NotNull*/ BiPredicate<ByteList, X> receiver) {
         X ss = subterm.apply(this);
         if (ss != null) {
             if (!receiver.test(EmptyByteList, ss))
@@ -240,7 +231,7 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     @Nullable
-    static byte[] pathTo(@NotNull ByteArrayList p, TermContainer superTerm, @NotNull Term target) {
+    static byte[] pathTo(/*@NotNull*/ ByteArrayList p, TermContainer superTerm, /*@NotNull*/ Term target) {
 
         int n = superTerm.size();
         for (int i = 0; i < n; i++) {
@@ -263,7 +254,7 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     @Nullable
-    static <X> boolean pathsTo(@NotNull ByteArrayList p, TermContainer superTerm, @NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
+    static <X> boolean pathsTo(/*@NotNull*/ ByteArrayList p, TermContainer superTerm, /*@NotNull*/ Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
 
 
         int ppp = p.size();
@@ -320,7 +311,7 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     @Nullable
-    default Term sub(@NotNull ByteList path) {
+    default Term sub(/*@NotNull*/ ByteList path) {
         Term ptr = this;
         int s = path.size();
         for (int i = 0; i < s; i++)
@@ -334,12 +325,12 @@ public interface Term extends Termlike, Comparable<Term> {
      * returns null if specified subterm does not exist
      */
     @Nullable
-    default Term sub(@NotNull byte... path) {
+    default Term sub(/*@NotNull*/ byte... path) {
         return sub(path.length, path);
     }
 
     @Nullable
-    default Term sub(int n, @NotNull byte... path) {
+    default Term sub(int n, /*@NotNull*/ byte... path) {
         Term ptr = this;
         for (int i = 0; i < n; i++) {
             if ((ptr = ptr.sub(path[i])) == Null)
@@ -452,7 +443,7 @@ public interface Term extends Termlike, Comparable<Term> {
         return (structure() | mask) == mask;
     }
 
-    @NotNull
+
     default String structureString() {
         return String.format("%16s",
                 Integer.toBinaryString(structure()))
@@ -472,7 +463,7 @@ public interface Term extends Termlike, Comparable<Term> {
      *
      * @param x subterm which must be present
      */
-    default int subtermTime(@NotNull Term x) {
+    default int subtermTime(/*@NotNull*/ Term x) {
         int d = subtermTimeSafe(x);
         if (d != DTERNAL)
             return d;
@@ -489,7 +480,7 @@ public interface Term extends Termlike, Comparable<Term> {
      * @param dt the current offset in the search
      * @return DTERNAL if the subterm was not found
      */
-    default int subtermTimeSafe(@NotNull Term x) {
+    default int subtermTimeSafe(/*@NotNull*/ Term x) {
         return equals(x) ? 0 : DTERNAL;
     }
 
@@ -529,7 +520,7 @@ public interface Term extends Termlike, Comparable<Term> {
                     TermContainer tt = subterms();
                     int l = tt.size();
                     for (int i = 0; i < l; i++) {
-                        @NotNull Term x = tt.sub(i);
+                        Term x = tt.sub(i);
                         s = Math.max(s, x.dtRange());
                     }
 
@@ -557,7 +548,7 @@ public interface Term extends Termlike, Comparable<Term> {
      * subclasses can override this for more efficient aggregation if certain features are sure to be absent
      */
     @Override
-    default void init(@NotNull int[] meta) {
+    default void init(/*@NotNull*/ int[] meta) {
 
         if (vars() > 0) {
             meta[0] += varDep();
@@ -583,25 +574,25 @@ public interface Term extends Termlike, Comparable<Term> {
 //        //TODO
 //    }
 
-    @NotNull
+
     default ByteList structureKey() {
         return structureKey(new ByteArrayList(volume() * 2 /* estimate */));
     }
 
-    @NotNull
-    default ByteList structureKey(@NotNull ByteArrayList appendTo) {
+
+    default ByteList structureKey(/*@NotNull*/ ByteArrayList appendTo) {
         appendTo.add(op().id);
         return appendTo;
     }
 
-    @NotNull
+    /*@NotNull*/
     default List<byte[]> pathsTo(Term subterm) {
         return pathsTo(subterm, 0);
     }
 
     final static List<byte[]> ListOfEmptyByteArray = List.of(ArrayUtils.EMPTY_BYTE_ARRAY);
 
-    @NotNull
+    /*@NotNull*/
     default List<byte[]> pathsTo(Term subterm, int minLengthOfPathToReturn) {
         List<byte[]> list = $.newArrayList(0);
         pathsTo(
@@ -614,7 +605,7 @@ public interface Term extends Termlike, Comparable<Term> {
         return list;
     }
 
-    default boolean pathsTo(@NotNull Term subterm, @NotNull BiPredicate<ByteList, Term> receiver) {
+    default boolean pathsTo(/*@NotNull*/ Term subterm, /*@NotNull*/ BiPredicate<ByteList, Term> receiver) {
         return pathsTo((x) -> subterm.equals(x) ? x : null, receiver);
     }
 
@@ -629,7 +620,7 @@ public interface Term extends Termlike, Comparable<Term> {
      * GLOBAL TERM COMPARATOR FUNCTION
      */
     @Override
-    default int compareTo(@NotNull Term y) {
+    default int compareTo(/*@NotNull*/ Term y) {
         if (this.equals(y)) return 0;
 
         //order first by volume. this is important for conjunctions which rely on volume-dependent ordering for balancing
@@ -695,7 +686,7 @@ public interface Term extends Termlike, Comparable<Term> {
     /**
      * unwraps any negation superterm
      */
-    @NotNull
+    /*@NotNull*/
     @Override
     default Term unneg() {
         if (op() == NEG) {
@@ -715,7 +706,7 @@ public interface Term extends Termlike, Comparable<Term> {
         return evalSafe(index, Param.MAX_EVAL_RECURSION);
     }
 
-    @NotNull
+    /*@NotNull*/
     default Term evalSafe(TermContext index, int remain) {
         Termed t = index.apply(this);
         if (t != null)
@@ -778,7 +769,7 @@ public interface Term extends Termlike, Comparable<Term> {
     /**
      * for convenience, delegates to the byte function
      */
-    static int opX(@NotNull Op o, int subOp) {
+    static int opX(/*@NotNull*/ Op o, int subOp) {
         return opX(o, (byte) subOp);
     }
 
@@ -814,14 +805,14 @@ public interface Term extends Termlike, Comparable<Term> {
     /**
      * returns this term in a form which can identify a concept, or Null if it can't
      */
-    default @NotNull Term conceptual() {
+    default Term conceptual() {
         return this;
     }
 
     /**
      * erases temporal information, for use in computing root()
      */
-    default @NotNull Term eternal() {
+    default Term eternal() {
         return this;
     }
 
@@ -840,7 +831,7 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
 
-    default Term replace(@NotNull Map<Term, Term> m) {
+    default Term replace(/*@NotNull*/ Map<Term, Term> m) {
         if (size() == 0) {
             Term y = m.get(this); //atom substitutions
             return y != null ? y : this;

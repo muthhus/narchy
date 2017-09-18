@@ -48,7 +48,7 @@ public class Int implements Intlike {
 
     public final int id;
 
-    private static final Int[] digits = new Int[Param.MAX_CACHED_INTS];
+    protected static final Int[] digits = new Int[Param.MAX_CACHED_INTS];
 
     static {
         for (int i = 0; i < Param.MAX_CACHED_INTS; i++) {

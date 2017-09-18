@@ -2,6 +2,7 @@ package nars.term.container;
 
 import jcog.list.ArrayIterator;
 import nars.Op;
+import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
@@ -92,6 +93,11 @@ public final class TermVector2 extends TermVector {
     @Override public void recurseTerms(@NotNull Consumer<Term> v) {
         x.recurseTerms(v);
         y.recurseTerms(v);
+    }
+
+    @Override
+    public boolean isDynamic() {
+        return x.isDynamic() || y.isDynamic();
     }
 
 }

@@ -42,10 +42,10 @@ public class Emotion extends ConcurrentMonitorRegistry {
     public final Counter taskIgnored = new BasicCounter(id("task ignored"));
 
 
-    /**
-     * setup stage, where substitution is applied to generate a conclusion term from the pattern
-     */
-    public final Counter derivationTry = new BasicCounter(id("derivation try"));
+//    /**
+//     * setup stage, where substitution is applied to generate a conclusion term from the pattern
+//     */
+//    public final Counter derivationTry = new BasicCounter(id("derivation try"));
 
     /**
      * a successful conclusion term gets evaluated and temporalized and formed into a Task
