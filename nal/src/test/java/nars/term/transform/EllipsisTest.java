@@ -1,10 +1,7 @@
 package nars.term.transform;
 
 import jcog.random.XorShift128PlusRandom;
-import nars.$;
-import nars.Narsese;
-import nars.Op;
-import nars.Param;
+import nars.*;
 import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
 import nars.derive.match.EllipsisOneOrMore;
@@ -172,7 +169,7 @@ public class EllipsisTest {
             this.prefix = prefix;
             this.suffix = suffix;
             this.ellipsisTerm = ellipsisTerm;
-            p = new PatternTermIndex().pattern(
+            p = patterns().pattern(
                     getPattern(prefix, suffix)
             );
         }
@@ -203,6 +200,11 @@ public class EllipsisTest {
         public Compound getMatchable(int arity) throws Narsese.NarseseException {
             return $(prefix + termSequence(arity) + suffix);
         }
+    }
+
+    @NotNull
+    public static PatternTermIndex patterns() {
+        return new PatternTermIndex(NARS.shell());
     }
 
     public static class CommutiveEllipsisTest1 extends CommutiveEllipsisTest {
@@ -240,7 +242,7 @@ public class EllipsisTest {
         @NotNull
         @Override
         public Compound getPattern(String prefix, String suffix) throws Narsese.NarseseException {
-            PatternTermIndex pi = new PatternTermIndex();
+            PatternTermIndex pi = patterns();
             Compound pattern = (Compound) Narsese.term(prefix + "%1, " + ellipsisTerm + suffix, true).term();
             return pattern;
         }
@@ -249,7 +251,7 @@ public class EllipsisTest {
 
         @Override
         public @NotNull Term getResult() throws Narsese.NarseseException {
-            final PatternTermIndex pi = new PatternTermIndex();
+            final PatternTermIndex pi = patterns();
             return Narsese.term("<%1 --> (" + ellipsisTerm + ")>", true).normalize().term();
         }
 
@@ -343,7 +345,7 @@ public class EllipsisTest {
         assertTrue(_x.toString(), _x instanceof PremiseRule);
         PremiseRule x = (PremiseRule)_x;
         //System.out.println(x);
-        x = x.normalizeRule(new PatternTermIndex());
+        x = x.normalizeRule(patterns());
         //System.out.println(x);
 
         assertEquals(
@@ -389,7 +391,7 @@ public class EllipsisTest {
     }
 
     static void testCombinations(Compound X, @NotNull Compound Y, int expect) {
-        X = new PatternTermIndex().pattern(X);
+        X = patterns().pattern(X);
 
         for (int seed = 0; seed < 3 /*expect*5*/; seed++) {
 

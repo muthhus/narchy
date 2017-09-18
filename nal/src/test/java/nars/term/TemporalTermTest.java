@@ -82,6 +82,24 @@ public class TemporalTermTest {
                 Op.True,
                 $("((a && b)<->(a &&+1 b))")
         );
+    }
+
+    @Test
+    public void testInvalidInheritanceOfEternalAndItsTemporalDeeper() throws Narsese.NarseseException {
+
+        Term b = $("(x,((--,R) &&+6 (--,happy)))");
+        assertTrue(b.isTemporal());
+        Term bx = b.xternal();
+        assertEquals(XTERNAL, bx.sub(1).dt());
+        assertFalse(bx.equals(b));
+
+        Term a = $("(x,((--,R)&&(--,happy)))");
+        Term ax = a.xternal();
+        assertEquals(XTERNAL, ax.sub(1).dt());
+        assertFalse(ax.equals(a));
+
+        assertTrue(b.xternalEquals(a));
+        assertTrue(a.xternalEquals(b));
         assertEquals(
                 Op.True,
                 $("((x,((--,R) &&+6 (--,happy)))-->(x,((--,R)&&(--,happy))))")

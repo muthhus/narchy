@@ -702,13 +702,13 @@ public interface Term extends Termlike, Comparable<Term> {
     /**
      * for safety, dont override this method. override evalSafe
      */
-    default Term eval(TermContext index) {
-        return evalSafe(index, Param.MAX_EVAL_RECURSION);
+    default Term eval(TermContext context) {
+        return evalSafe(context, Param.MAX_EVAL_RECURSION);
     }
 
     /*@NotNull*/
-    default Term evalSafe(TermContext index, int remain) {
-        Termed t = index.apply(this);
+    default Term evalSafe(TermContext context, int remain) {
+        Termed t = context.apply(this);
         if (t != null)
             return t.term();
         else
@@ -798,7 +798,7 @@ public interface Term extends Termlike, Comparable<Term> {
     /**
      * TODO override in Compound implementations for accelerated root comparison without root() instantiation
      */
-    default boolean eternalEquals(Term x) {
+    default boolean xternalEquals(Term x) {
         return equals(x);
     }
 

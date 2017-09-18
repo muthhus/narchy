@@ -68,7 +68,6 @@ public interface Deriver {
 
             Set<String> files = DEFAULT(nal, additional);
             @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(nar,true, files.toArray(new String[files.size()]) );
-            RULES.patterns.nar = nar;
 
             PrediTerm<Derivation> x = the(RULES, xf);
             if (Param.TRACE) {

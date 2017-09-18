@@ -6,6 +6,7 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.TemporalBits;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -18,15 +19,15 @@ abstract public class Retemporalize implements CompoundTransform {
     public static final Retemporalize retemporalizeXTERNALToZero = new RetemporalizeNonXternal(0);
 
     @Override
-    public final boolean testSuperTerm(@NotNull Compound c) {
-        return c.isTemporal();
+    public final boolean applyInside(@NotNull Compound c) {
+        return c.hasAny(TemporalBits);
     }
 
     @Nullable
     @Override
     public final Term apply(@Nullable Compound parent, @NotNull Term x) {
 
-        if (!(x instanceof Compound) || !x.hasAny(Op.TemporalBits))
+        if (!(x instanceof Compound) || !x.hasAny(TemporalBits))
             return x;
 
         Compound cx = (Compound) x;

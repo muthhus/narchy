@@ -60,7 +60,7 @@ public class UnifyTest {
 
             Compound t1;
             if (type == Op.VAR_PATTERN) {
-                t1 = new PatternTermIndex().pattern( s1 ); //special handling for ellipsis
+                t1 = new PatternTermIndex(NARS.shell()).pattern( s1 ); //special handling for ellipsis
                 assertNotNull(t1);
             } else {
                 t1 = (Compound)Narsese.parse().term(s1, true);

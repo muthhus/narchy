@@ -151,7 +151,7 @@ public final class AndCondition<D> extends AbstractPred<D> {
         assert(subterm!=-1);
 
         //TODO returns a new AndCondition with condition removed, or null if it was the only item
-        PrediTerm[] x = ArrayUtils.removeElement(cache, subterm);
+        PrediTerm[] x = ArrayUtils.remove(cache, subterm);
         if (x.length == cache.length)
             throw new RuntimeException("element missing for removal");
 

@@ -119,7 +119,7 @@ public class GenericCompound implements Compound {
     public final boolean equals(@Nullable Object that) {
         if (this==that) return true;
 
-        if (!(that instanceof Compound) || hash != that.hashCode())
+        if (!(that instanceof Term) || hash != that.hashCode())
             return false;
 
         if (Compound.equals(this, that)) {

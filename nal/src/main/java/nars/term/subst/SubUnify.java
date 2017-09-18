@@ -19,22 +19,14 @@ public class SubUnify extends Unify {
     private Term result;
 
 
-    public SubUnify(@NotNull Unify parent, @Nullable Op type) {
-        super(type, parent.random, Param.UnificationStackMax, 0);
+    public SubUnify(@NotNull Unify parent, @Nullable Op type, int ttl) {
+        super(type, parent.random, Param.UnificationStackMax, ttl);
         this.parent = parent;
     }
 
-//    @Override
-//    public void onDeath() {
-//        parent.onDeath();
-//    }
-
     @Override
     public boolean unify(@NotNull Term x, @NotNull Term y, boolean finish) {
-        this.ttl = parent.ttl; //load
-        boolean result = super.unify(x, y, finish);
-        parent.ttl = ttl; //restore
-        return result;
+        return super.unify(x, y, finish);
     }
 
     //    @Override
@@ -74,6 +66,7 @@ public class SubUnify extends Unify {
             Term result = transformed.transform(this);//transform(transformed);
             if (result!=null && !(result instanceof Bool)) {
                 if (!result.equals(transformed)) {
+                    int before = parent.now();
                     if (
                         //xy.forEachVersioned(parent.xy::tryPut)
                     xy.forEachVersioned((x,y)->{
@@ -83,18 +76,11 @@ public class SubUnify extends Unify {
                     })
                     ) {
                         this.result = result;
+                        parent.addTTL(stop()); //stop and refund parent
                     } else {
-                        return; //maybe try again
+                        parent.revert(before); //continue trying
                     }
-
-                    //copy mappings to parent if succeeded
-                    //this is needed to resolve task/belief to any transformations appearing in the conclusion
-
-                } else {
-                    this.result = transformed; //no change
                 }
-
-                stop(); //done
             }
         }
     }

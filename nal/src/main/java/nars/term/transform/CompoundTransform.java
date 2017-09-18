@@ -33,7 +33,7 @@ import static nars.Op.VAR_QUERY;
     @Nullable Term apply(@Nullable Compound parent, Term subterm);
 
     /** enable predicate determined by the superterm, tested before processing any subterms */
-    default boolean testSuperTerm(@NotNull Compound c) {
+    default boolean applyInside(@NotNull Compound c) {
         return true;
     }
 

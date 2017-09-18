@@ -40,8 +40,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     @NotNull
     public static PremiseRuleSet rules(NAR nar, boolean permute, String... filename) {
 
-        final PatternTermIndex p = new PatternTermIndex();
-        p.nar = nar;
+        final PatternTermIndex p = new PatternTermIndex(nar);
 
         PremiseRuleSet rs = new PremiseRuleSet(parsedRules(p, filename), p, permute);
 
@@ -86,22 +85,10 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     private static final Logger logger = LoggerFactory.getLogger(PremiseRuleSet.class);
 
 
-    @Deprecated public PremiseRuleSet(PatternTermIndex index, @NotNull String... rules) {
-        this(false, index, (PremiseRule[]) parse($.terms, rules));
+    public PremiseRuleSet(PatternTermIndex index, boolean permute, @NotNull String... rules) {
+        this(parse(Stream.of(rules), index), index, permute);//$.terms, rules));
     }
 
-    @Deprecated public PremiseRuleSet(boolean permute, @NotNull PatternTermIndex index, @NotNull PremiseRule... rules) {
-        super();
-        this.patterns = index;
-        for (PremiseRule p : rules) {
-            try {
-                this.add(normalize(p, this.patterns));
-            } catch (RuntimeException e) {
-                logger.error(" {}", e);
-            }
-        }
-        this.permuteBackwards = this.permuteForwards = permute;
-    }
 
     final int[] errors = {0};
 
@@ -239,11 +226,6 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
     }
 
-    @NotNull
-    public static PremiseRule parse(@NotNull String src) throws Narsese.NarseseException {
-        return parse(src, $.terms);
-    }
-
 
     public static PremiseRule[] parse(@NotNull TermIndex index, @NotNull String... src) {
         return Util.map((s -> {
@@ -288,7 +270,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     @NotNull
     public Set<PremiseRule> permute(@NotNull PremiseRule preNorm) {
         Set<PremiseRule> ur;
-        permute(preNorm, "", new PatternTermIndex(), ur = $.newHashSet(1));
+        permute(preNorm, "", new PatternTermIndex(this.patterns.nar), ur = $.newHashSet(1));
         return ur;
     }
 

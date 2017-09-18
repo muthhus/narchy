@@ -11,12 +11,14 @@ import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
 import nars.op.substitute;
+import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
+import nars.term.atom.Intlike;
 import nars.term.subst.Unify;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -218,18 +220,26 @@ public class Derivation extends Unify implements TermContext {
     }
 
 
+    @Override
+    public @Nullable Term apply(@Nullable Compound parent, Term x) {
+        return super.apply(parent, applyOrElseTerm(x));
+    }
+
     /**
      * only returns derivation-specific functors.  other functors must be evaluated at task execution time
      */
     @Override
     public Termed apply(Term x) {
+        if (x instanceof Bool || x instanceof Intlike)//assert (!(x instanceof Bool));
+            return x;
+
         if (x instanceof Atom) {
             Termed f = derivationFunctors.get(x);
             if (f != null)
                 return f;
         }
 
-        return x.transform(this);
+        return x;
     }
 
     /**

@@ -328,6 +328,8 @@ public class PremiseRule extends GenericCompound {
     @NotNull
     public final PremiseRule setup(@NotNull PatternTermIndex index) /* throws PremiseRuleException */ {
 
+        assert(index.nar!=null);
+
         compile(index);
 
         //1. construct precondition term array

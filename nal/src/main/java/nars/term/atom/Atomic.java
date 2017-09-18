@@ -118,7 +118,7 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default boolean eternalEquals(Term x) {
+    default boolean xternalEquals(Term x) {
         return equals(x);
     }
 

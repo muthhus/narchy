@@ -86,7 +86,7 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override public boolean equals(Object o) {
-        return ref.equals(o);
+        return this == o || ref.equals(o);
     }
 
     @Override
@@ -106,8 +106,8 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public boolean eternalEquals(Term x) {
-        return ref.eternalEquals(x);
+    public boolean xternalEquals(Term x) {
+        return ref.xternalEquals(x);
     }
 
     @Override
@@ -222,8 +222,8 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public Term evalSafe(TermContext index, int remain) {
-        return ref.evalSafe(index, remain);
+    public Term evalSafe(TermContext context, int remain) {
+        return ref.evalSafe(context, remain);
     }
 
     @Override

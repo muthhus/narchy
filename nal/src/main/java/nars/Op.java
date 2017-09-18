@@ -1266,7 +1266,7 @@ public enum Op implements $ {
             case SIM:
                 if (subject instanceof Bool || predicate instanceof Bool)
                     return $.the(subject==predicate );
-                if (subject.eternalEquals(predicate))
+                if (subject.xternalEquals(predicate))
                     return True;
                 break;
 
@@ -1291,7 +1291,7 @@ public enum Op implements $ {
                     polarity = !polarity;
                 }
 
-                if (subject.eternalEquals(predicate))
+                if (subject.xternalEquals(predicate))
                     return $.the(polarity);
 
 
@@ -1787,7 +1787,7 @@ public enum Op implements $ {
         }
 
         @Override
-        public boolean eternalEquals(Term x) {
+        public boolean xternalEquals(Term x) {
             return false;
         }
 
@@ -1810,7 +1810,7 @@ public enum Op implements $ {
         }
 
         @Override
-        public boolean eternalEquals(Term x) {
+        public boolean xternalEquals(Term x) {
             return x == this;
         }
 
@@ -1834,7 +1834,7 @@ public enum Op implements $ {
         }
 
         @Override
-        public boolean eternalEquals(Term x) {
+        public boolean xternalEquals(Term x) {
             return x == this;
         }
 

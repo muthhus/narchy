@@ -83,7 +83,8 @@ public final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
             if (ll.length == 1) {
                 cx = ll[0];
             } else {
-                cx = Fork.fork(ll); //new ValueFork(ll);
+                cx = //Fork.fork(ll);
+                    new ValueFork(ll);
             }
             path.add(cx);
             put(path, cx);
@@ -121,8 +122,8 @@ public final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
 
 
         List<PrediTerm<Derivation>> bb = $.newArrayList(node.childCount());
-        assert(node.getKey()!=null);
-        assert(node.getValue()!=null);
+//        assert(node.getKey()!=null);
+//        assert(node.getValue()!=null);
 
         node.forEach(n -> {
 

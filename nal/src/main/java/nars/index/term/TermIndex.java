@@ -31,7 +31,7 @@ public abstract class TermIndex implements TermContext {
      * internal get procedure
      */
     @Nullable
-    public abstract Termed get(@NotNull Term key, boolean createIfMissing);
+    public abstract Termed get(/*@NotNull*/ Term key, boolean createIfMissing);
 
     @Override
     public final Termed apply(Term term) {

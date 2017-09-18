@@ -6,9 +6,11 @@ import nars.IO;
 import nars.Op;
 import nars.Param;
 import nars.derive.PatternCompound;
-import nars.term.compound.GenericCompound;
+import nars.index.term.TermContext;
 import nars.term.container.TermContainer;
+import nars.term.transform.CompoundTransform;
 import nars.term.transform.Retemporalize;
+import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -104,21 +106,63 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
     @Override
+    public boolean xternalEquals(Term x) {
+        return Compound.super.xternalEquals(x);
+    }
+
+    @Override
+    public Term evalSafe(TermContext context, int remain) {
+        return Compound.super.evalSafe(context, remain);
+    }
+
+    @Override
+    @Nullable
+    public final Term xternal() {
+        return Compound.super.xternal();
+    }
+
+    @Override
+    public @Nullable Term transform(@NotNull CompoundTransform t, Compound parent) {
+        return Compound.super.transform(t, parent);
+    }
+
+    @Override
+    public @Nullable Term transform(int newDT, @NotNull CompoundTransform t) {
+        return Compound.super.transform(newDT, t);
+    }
+
+    @Override
+    public @Nullable Term transform(@NotNull CompoundTransform t) {
+        return Compound.super.transform(t);
+    }
+
+    @Override
+    public @Nullable Term transform(ByteList path, Term replacement) {
+        return Compound.super.transform(path, replacement);
+    }
+
+    @Override
+    public @Nullable Term transform(ByteList path, int depth, Term replacement) {
+        return Compound.super.transform(path, depth, replacement);
+    }
+
+    @Override
     public boolean equals(Object that) {
         if (this == that) return true;
 
-        if (!(that instanceof Compound) || hashDT != that.hashCode())
+        if (!(that instanceof Term) || hashDT != that.hashCode())
             return false;
 
-//        if (that instanceof GenericCompoundDT) {
-//            GenericCompoundDT cthat = (GenericCompoundDT) that;
-//            if (dt != cthat.dt) return false;
-//            if (ref == cthat.ref) return true;
-//            else if (ref.equals(cthat.ref)) {
-//                ref = cthat.ref; //share
-//                return true;
-//            }
-//        }
+        if (that instanceof GenericCompoundDT) {
+            GenericCompoundDT cthat = (GenericCompoundDT) that;
+            if (dt != cthat.dt) return false;
+            if (ref == cthat.ref) return true;
+            else if (ref.equals(cthat.ref)) {
+                ref = cthat.ref; //share
+                return true;
+            }
+            return false;
+        }
 
         return Compound.equals(this, that);
     }

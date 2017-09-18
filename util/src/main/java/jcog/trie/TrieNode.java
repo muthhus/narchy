@@ -16,6 +16,8 @@
 
 package jcog.trie;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;

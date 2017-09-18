@@ -98,8 +98,11 @@ public class Versioning<X> extends
         throw new UnsupportedOperationException();
     }
 
-    public final void stop() {
+    /** returns remaining TTL */
+    public final int stop() {
+        int t = ttl;
         setTTL(0);
+        return t;
     }
 
     public final boolean tick() {

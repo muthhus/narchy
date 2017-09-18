@@ -28,11 +28,9 @@ import static nars.Op.concurrent;
  */
 public class PatternTermIndex extends MapTermIndex {
 
-    public PatternTermIndex() {
-        super(new HashMap<>(512));
-    }
-    public PatternTermIndex(NAR n) {
-        this();
+
+    public PatternTermIndex(@NotNull NAR n) {
+        super(new HashMap<>());
         this.nar = n;
     }
 

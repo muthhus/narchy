@@ -15,7 +15,7 @@ public class FunctorTest {
 
     @Test
     public void testImmediateTransformOfInput() throws Narsese.NarseseException { //as opposed to deriver's use of it
-        NAR d = new NARS().get();
+        NAR d = NARS.tmp();
 
 
         d.log();
@@ -35,7 +35,7 @@ public class FunctorTest {
 
     @Test
     public void testAdd1() throws Narsese.NarseseException {
-        NAR d = new NARS().get();
+        NAR d = NARS.tmp();
 
         d.input("add(1,2,#x)!");
         d.run(16);
@@ -45,7 +45,7 @@ public class FunctorTest {
 
     @Test
     public void testAdd1Temporal() throws Narsese.NarseseException {
-        NAR d = new NARS().get();
+        NAR d = NARS.tmp();
 
         d.input("add(1,2,#x)! :|:");
         d.run(16);
@@ -57,8 +57,8 @@ public class FunctorTest {
     @Test public void testFunctor1() throws Narsese.NarseseException {
         Param.DEBUG = true;
 
-        TestNAR t = new TestNAR(new NARS().get());
-        //t.log();
+        TestNAR t = new TestNAR(NARS.tmp());
+        t.log();
         t.believe("((complexity($1)<->3)==>c3($1))");
         t.ask("c3(x:y)");
         t.mustBelieve(512, "c3(x:y)", 1f, 0.81f);
@@ -70,7 +70,7 @@ public class FunctorTest {
         //Param.DEBUG = true;
 
         int TIME = 2048;
-        TestNAR t = new TestNAR(new NARS().get());
+        TestNAR t = new TestNAR(NARS.tmp());
 
         Param.DEBUG = true; t.log();
         t.believe("(equal(complexity($1),complexity($2)) ==> c({$1,$2}))");

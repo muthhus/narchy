@@ -56,9 +56,8 @@ public class TrieDeriverTest {
             }
         };
 
-        System.out.println();
 
-        PrediTerm d = Deriver.the(new PremiseRuleSet(idx,
+        PrediTerm d = Deriver.the(new PremiseRuleSet(idx, false,
                 "Y, Y |- (?1 &&+0 Y), ()",
                 "X, X |- (?1 &&+- X), ()"
         ));

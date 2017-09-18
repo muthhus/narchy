@@ -26,6 +26,7 @@ import jcog.data.sexpression.Pair;
 import nars.$;
 import nars.IO;
 import nars.Op;
+import nars.control.Derivation;
 import nars.derive.AbstractPred;
 import nars.derive.match.EllipsisMatch;
 import nars.index.term.NewCompound;
@@ -781,13 +782,12 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default Term evalSafe(TermContext context, int remain) {
 
-        if (!isDynamic()) {
-            return context.applyOrElseTerm(this);
-        }
-
         if (remain-- <= 0)
-            return null;
+            return Null;
 
+
+
+        Term u;
         Op o = op();
 
         @NotNull final Term[] xy = toArray();
@@ -809,8 +809,6 @@ public interface Compound extends Term, IPair, TermContainer {
             }
         }
 
-
-        Term u;
         if (subsModified) {
             u = o.the(dt(), xy);
             if (u.size() == 0)
@@ -838,8 +836,8 @@ public interface Compound extends Term, IPair, TermContainer {
             }
         }
 
-        //atomic, including Bool short-circuits on invalid term
-        if (!(u.op().conceptualizable) || u.equals(this)) {
+
+        if (u == this || (!(u.op().conceptualizable) || u.equals(this))) {
             return u; //return u and not this
         } else {
 
@@ -907,13 +905,16 @@ public interface Compound extends Term, IPair, TermContainer {
     @Nullable
     default Term transform(@NotNull CompoundTransform t, Compound parent) {
         int dt = t.dt(this);
-        return transform(dt, t).dt(dt); //ignore parent
+        Term x = transform(dt, t);
+        if (x == null)
+            return null;
+        return x.dt(dt); //ignore parent
     }
 
     @Nullable
     private Term transform(Op op, int dt, @NotNull CompoundTransform t) {
 
-        if (!t.testSuperTerm(this))
+        if (!t.applyInside(this))
             return this;
 
         boolean boolFilter = !op.allowsBool;
@@ -979,13 +980,21 @@ public interface Compound extends Term, IPair, TermContainer {
         } else {
             y = this.dt(dt);
         }
+
+        if (t instanceof Derivation && y.op()==INH && y.sub(1).op()==ATOM) {
+            //if (!this.equals(y)) {
+                return y.eval(((TermContext)t));
+            //}
+        }
+
         return y;
     }
 
 
     @Override
-    default boolean eternalEquals(Term x) {
-        return structure() == x.structure() && volume() == x.volume() && op() == x.op() && xternal().equals(x.xternal());
+    default boolean xternalEquals(Term x) {
+        return structure() == x.structure() && volume() == x.volume() && size() == x.size() && op() == x.op() &&
+                xternal().equals(x.xternal());
     }
 
     @Override

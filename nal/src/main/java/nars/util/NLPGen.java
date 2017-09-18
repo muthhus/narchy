@@ -19,7 +19,7 @@ import static nars.Op.VAR_PATTERN;
 public class NLPGen {
 
     final NAR terminal = NARS.shell();
-    final PatternTermIndex index = new PatternTermIndex();
+    final PatternTermIndex index = new PatternTermIndex(terminal);
 
     public interface Rule {
         @NotNull String get(Term t, float freq, float conf, Tense tense);
