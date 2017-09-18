@@ -3,41 +3,42 @@ package nars.term.atom;
 import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
 import nars.Op;
-import nars.term.Term;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+
+import static java.lang.System.arraycopy;
 
 /**
  * an Atomic impl which relies on the value provided by toString()
  */
-public abstract class AtomicToString implements Atomic {
+public abstract class AtomicConst implements Atomic {
 
 
     private final transient byte[] bytesCached;
     protected final transient int hashCached;
 
-    protected AtomicToString(Op op, @Nullable String s) {
+    protected AtomicConst(Op op, @Nullable String s) {
         if (s == null) s = toString(); //must be a constant method
         int slen = s.length();
 
-        this.bytesCached = ArrayUtils.addAll(
-            new byte[] { (op!=null ? op : op()) .id, (byte)(slen>>8 & 0xff), (byte)(slen&0xff) },
-            s.getBytes()
-        );
+        byte[] stringbytes = s.getBytes();
+        byte[] sbytes = new byte[ stringbytes.length + 3 ];
+        sbytes[0] = (op!=null ? op : op()).id;
+        sbytes[1] = (byte)(slen>>8 & 0xff);
+        sbytes[2] = (byte)(slen&0xff);
+        arraycopy(stringbytes, 0, sbytes, 3, stringbytes.length);
+        this.bytesCached = sbytes;
+
         this.hashCached = Util.hashWangJenkins( s.hashCode() );
     }
 
     @Override public boolean equals(Object u) {
-
-        return  (this == u)
-                ||
-                (
-                        u instanceof Term &&
-                        hashCached == u.hashCode() &&
-                        opX() == ((Term) u).opX()) &&
-                        toString().equals(u.toString()
-                );
-
+        if (this == u) return true;
+        if (!(u instanceof AtomicConst))
+            return false;
+        AtomicConst c = (AtomicConst)u;
+        return hashCached==c.hashCached && Arrays.equals(bytesCached, c.bytesCached);
     }
 
     @Override
@@ -48,8 +49,6 @@ public abstract class AtomicToString implements Atomic {
 //        out.write(b);
         out.write(bytesCached);
     }
-
-
 
     @Override abstract public String toString();
 

@@ -202,12 +202,12 @@ public class IO {
 
 
     @NotNull
-    public static Atomic readVariable(@NotNull DataInput in, @NotNull Op o) throws IOException {
+    public static Atomic readVariable(@NotNull DataInput in, /*@NotNull*/ Op o) throws IOException {
         return $.v(o, in.readInt());
     }
 
     @NotNull
-    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o) throws IOException {
+    public static Atomic readAtomic(@NotNull DataInput in, /*@NotNull*/ Op o) throws IOException {
 
         switch (o) {
 
@@ -320,7 +320,7 @@ public class IO {
      * TODO make a version which reads directlyinto TermIndex
      */
     @NotNull
-    static Term readCompound(@NotNull DataInput in, @NotNull Op o) throws IOException {
+    static Term readCompound(@NotNull DataInput in, /*@NotNull*/ Op o) throws IOException {
 
         Term[] v = readTermContainer(in);
 
@@ -589,7 +589,7 @@ public class IO {
 //            p.append(Symbols.COMPOUND_TERM_CLOSER);
 //        }
 
-        static void statementAppend(@NotNull Compound c, @NotNull Appendable p, @NotNull Op op) throws IOException {
+        static void statementAppend(@NotNull Compound c, @NotNull Appendable p, /*@NotNull*/ Op op) throws IOException {
 
             @NotNull TermContainer cs = c.subterms();
             Term a = cs.sub(0);

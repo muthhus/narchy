@@ -91,7 +91,7 @@
 ////    }
 ////
 ////
-////    public void testOscillate(@NotNull NAR n, @NotNull FloatConcept x, @NotNull OperationConcept y, @NotNull Term impl, float positiveThreshold, float negationThreshold, @NotNull Tense tense) {
+////    public void testOscillate(@NotNull NAR n, @NotNull FloatConcept x, /*@NotNull*/ OperationConcept y, @NotNull Term impl, float positiveThreshold, float negationThreshold, @NotNull Tense tense) {
 ////        n.step().step();
 ////
 ////        assertEquals(0.5f, y.motivation(n), 0.01f);

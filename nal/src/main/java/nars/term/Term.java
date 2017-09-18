@@ -30,7 +30,7 @@ import nars.Param;
 import nars.index.term.TermContext;
 import nars.op.mental.AliasConcept;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicToString;
+import nars.term.atom.AtomicConst;
 import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
@@ -382,7 +382,7 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
 //    /** for multiple Op comparsions, use Op.or to produce an int and call isAny(int vector) */
-//    default boolean isA(@NotNull Op otherOp) {
+//    default boolean isA(/*@NotNull*/ Op otherOp) {
 //        return op() == otherOp;
 //    }
 
@@ -646,7 +646,7 @@ public interface Term extends Termlike, Comparable<Term> {
                 return Integer.compare(((Int) this).id, ((Int) y).id);
             } else if (this instanceof Int.IntRange) {
                 return Long.compareUnsigned(((Int.IntRange) this).hash64(), ((Int.IntRange) y).hash64());
-            } else if (this instanceof AtomicToString) {
+            } else if (this instanceof AtomicConst) {
 //                boolean gx = this instanceof UnnormalizedVariable;
 //                boolean gy = y instanceof UnnormalizedVariable;
 //                if (gx && !gy)
@@ -810,9 +810,9 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     /**
-     * erases temporal information, for use in computing root()
+     * erases any temporal information
      */
-    default Term eternal() {
+    default Term xternal() {
         return this;
     }
 
@@ -866,9 +866,7 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     @Nullable
-    default Term temporalize(Retemporalize r) {
-        return transform(r.dt(this), r);
-    }
+    Term temporalize(Retemporalize r);
 
 }
 

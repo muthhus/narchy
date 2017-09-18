@@ -37,6 +37,10 @@ import static nars.Op.VAR_QUERY;
         return true;
     }
 
+    default int dt(Compound c) {
+        return c.dt();
+    }
+
 //    CompoundTransform Identity = (parent, subterm) -> subterm;
 
 //    CompoundTransform<Compound,Term> None = new CompoundTransform<Compound,Term>() {

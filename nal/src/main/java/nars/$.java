@@ -225,7 +225,7 @@ public interface $ {
     /**
      * warning: generic variable
      */
-    static @NotNull Variable v(@NotNull Op type, @NotNull String name) {
+    static @NotNull Variable v(/*@NotNull*/ Op type, @NotNull String name) {
 
 //        if (name.length()==1) {
 //            char c = name.charAt(0);
@@ -422,7 +422,7 @@ public interface $ {
     /**
      * normalized variable
      */
-    static @NotNull AbstractVariable v(@NotNull Op type, int id) {
+    static @NotNull AbstractVariable v(/*@NotNull*/ Op type, int id) {
         return AbstractVariable.the(type, id);
     }
 

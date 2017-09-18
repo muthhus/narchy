@@ -67,7 +67,7 @@ public class SerialCompound extends DynBytes implements Compound {
     }
 
     @Override
-    public final @NotNull Op op() {
+    public final /*@NotNull*/ Op op() {
         return Op.values()[bytes[0]];
     }
 
@@ -136,7 +136,7 @@ public class SerialCompound extends DynBytes implements Compound {
 
 }
 
-//    public SerialCompound(@NotNull Op op, int dt, @NotNull TermContainer subs) {
+//    public SerialCompound(/*@NotNull*/ Op op, int dt, @NotNull TermContainer subs) {
 //        super(op, dt, subs);
 //
 //        uniqueSubs = new ObjectByteHashMap<>(volume());

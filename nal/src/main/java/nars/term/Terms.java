@@ -40,7 +40,7 @@ public enum Terms {
      * TODO decide on some reasonable coding scheme for bundling these numeric values
      * into 32-bit or 64-bit fields/arrays
      */
-    public static int hashVar(@NotNull Op type, int id) {
+    public static int hashVar(/*@NotNull*/ Op type, int id) {
         return (type.id << 16) | id;
     }
 
@@ -614,7 +614,7 @@ public enum Terms {
      *
      * @param dt will be either 0 or DTERNAL (commutive relation)
      */
-    public static boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, ObjectByteHashMap<Term> s) {
+    public static boolean flatten(/*@NotNull*/ Op op, @NotNull Term[] u, int dt, ObjectByteHashMap<Term> s) {
 
         //sort by volume, decreasing first. necessary for proper subsumption of events into sibling sequence compounds that may contain them
         //may also provide some performance benefit for accelerated early termination in case of invalid construction attempts (ex: co-negation)
@@ -630,7 +630,7 @@ public enum Terms {
         return true;
     }
 
-    public static boolean flatten(@NotNull Op op, @NotNull TermContainer u, int dt, ObjectByteHashMap<Term> s) {
+    public static boolean flatten(/*@NotNull*/ Op op, @NotNull TermContainer u, int dt, ObjectByteHashMap<Term> s) {
         int l = u.size();
         for (int i = 0; i < l; i++) {
             if (!flatten(op, dt, u.sub(i), s))
@@ -644,7 +644,7 @@ public enum Terms {
         return target == 0 && candidate == DTERNAL;
     }
 
-    public static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
+    public static boolean flatten(/*@NotNull*/ Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
         if (x instanceof Bool) {
 
             if (x == True)
@@ -709,7 +709,7 @@ public enum Terms {
     }
 
     @NotNull
-    public static Term intersect(@NotNull Op o, @NotNull TermContainer a, @NotNull TermContainer b) {
+    public static Term intersect(/*@NotNull*/ Op o, @NotNull TermContainer a, @NotNull TermContainer b) {
         if (a.equals(b) && a instanceof Term)
             return (Term) a;
 
@@ -718,7 +718,7 @@ public enum Terms {
     }
 
     @NotNull
-    public static Term union(@NotNull Op o, @NotNull TermContainer a, @NotNull TermContainer b) {
+    public static Term union(/*@NotNull*/ Op o, @NotNull TermContainer a, @NotNull TermContainer b) {
         boolean bothTerms = a instanceof Term && b instanceof Term;
         if (bothTerms && a.equals(b))
             return (Term) a;

@@ -7,7 +7,9 @@ import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.Term;
 import nars.term.Termlike;
+import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.function.BiPredicate;
@@ -47,6 +49,9 @@ public interface Atomic extends Term {
 
     @Override
     default boolean isTemporal() { return false; }
+
+    @Override
+    default @Nullable Term temporalize(Retemporalize r) { return this; }
 
     @NotNull
     static Atomic the(@NotNull String id) {

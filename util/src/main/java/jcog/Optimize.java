@@ -44,19 +44,19 @@ public class Optimize<X> {
     }
 
 
-    public @NotNull Optimize<X> tweak(int min, int max, FloatObjectProcedure<X> apply) {
+    public /*@NotNull*/ Optimize<X> tweak(int min, int max, FloatObjectProcedure<X> apply) {
         return tweak(min, max, 1, apply);
     }
 
-    public @NotNull Optimize<X> tweak(int min, int max, int inc, FloatObjectProcedure<X> apply) {
+    public /*@NotNull*/ Optimize<X> tweak(int min, int max, int inc, FloatObjectProcedure<X> apply) {
         return tweak(apply.toString(), min, max, inc, apply);
     }
 
-    public @NotNull Optimize<X> tweak(String parameter, int min, int max, FloatObjectProcedure<X> apply) {
+    public /*@NotNull*/ Optimize<X> tweak(String parameter, int min, int max, FloatObjectProcedure<X> apply) {
         return tweak(parameter, min, max, 1f, apply);
     }
 
-    public @NotNull Optimize<X> tweak(float min, float max, float inc, FloatObjectProcedure<X> apply) {
+    public /*@NotNull*/ Optimize<X> tweak(float min, float max, float inc, FloatObjectProcedure<X> apply) {
         return tweak(apply.toString(), min, max, inc, apply);
     }
 
@@ -65,7 +65,7 @@ public class Optimize<X> {
         return this;
     }
 
-//    public @NotNull Optimize<X> tweak(String parameter, float min, float max, float inc, @NotNull String invoker) {
+//    public /*@NotNull*/ Optimize<X> tweak(String parameter, float min, float max, float inc, @NotNull String invoker) {
 //        Map m = new HashMap(4);
 //
 //        tweaks.add(new FloatRange<>(parameter, min, max, inc, (v,x) -> {

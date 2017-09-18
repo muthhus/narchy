@@ -32,7 +32,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
     private final int minVolumeNecessary;
     private final int size;
 
-    PatternCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
+    PatternCompound(/*@NotNull*/ Op op, int dt, @NotNull TermContainer subterms) {
         super(new GenericCompound(op, subterms), dt);
 
         this.op = op;
@@ -114,7 +114,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
         @NotNull
         final Ellipsis ellipsis;
 
-        PatternCompoundWithEllipsis(@NotNull Op seed, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        PatternCompoundWithEllipsis(/*@NotNull*/ Op seed, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, dt, subterms);
 
             this.ellipsis = ellipsis;
@@ -134,7 +134,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
     public static class PatternCompoundWithEllipsisLinear extends PatternCompoundWithEllipsis {
 
-        public PatternCompoundWithEllipsisLinear(@NotNull Op op, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        public PatternCompoundWithEllipsisLinear(/*@NotNull*/ Op op, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(op, dt, ellipsis, subterms);
         }
 

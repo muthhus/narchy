@@ -10,7 +10,7 @@ public final class OpExclusionConstraint extends MatchConstraint {
 
     private final int op;
 
-//    public OpNotConstraint(@NotNull Op o) {
+//    public OpNotConstraint(/*@NotNull*/ Op o) {
 //        this(o.bit);
 //    }
 

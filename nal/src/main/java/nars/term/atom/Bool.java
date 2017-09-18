@@ -17,7 +17,7 @@ import static nars.Op.Null;
  *  these represent an intrinsic level of truth that exist within the context of
  *  an individual term.  not to be confused with Task-level Truth
  */
-abstract public class Bool extends AtomicToString {
+abstract public class Bool extends AtomicConst {
 
     private final String id;
 
@@ -27,7 +27,7 @@ abstract public class Bool extends AtomicToString {
     }
 
     @Override
-    public @NotNull Op op() {
+    public /*@NotNull*/ Op op() {
         return BOOL;
     }
 

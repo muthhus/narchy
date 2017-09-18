@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 public final class CommonVariable extends GenericNormalizedVariable {
 
 
-    CommonVariable(@NotNull Op type, int hash) {
+    CommonVariable(/*@NotNull*/ Op type, int hash) {
         super(type, hash);
     }
 

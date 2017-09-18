@@ -6,6 +6,7 @@ import nars.index.term.TermContext;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
+import nars.term.transform.Retemporalize;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
@@ -39,13 +40,16 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.subterms();
     }
 
+    @Override
+    public @Nullable Term temporalize(Retemporalize r) {
+        return ref.temporalize(r);
+    }
 
     @Override
     public boolean isTemporal() {
         return ref.isTemporal();
     }
 
-    @NotNull
     @Override
     public Op op() {
         return ref.op();
@@ -92,8 +96,8 @@ public class ProxyTerm<T extends Term> implements Term {
 
 
     @Override
-    public @NotNull Term eternal() {
-        return ref.eternal();
+    public @NotNull Term xternal() {
+        return ref.xternal();
     }
 
     @Override

@@ -28,7 +28,7 @@
 //            setNormalized();
 //    }
 //
-//    public FastCompound(@NotNull Op op, int dt, @NotNull TermContainer subs) {
+//    public FastCompound(/*@NotNull*/ Op op, int dt, @NotNull TermContainer subs) {
 //        super(op, dt, subs);
 //
 //        uniqueSubs = new ObjectByteHashMap<>(volume());

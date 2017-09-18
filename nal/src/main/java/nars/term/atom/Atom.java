@@ -10,7 +10,7 @@ import static nars.Op.ATOM;
  * default Atom implementation: wraps a String instance as closely as possible.
  * ideally this string is stored encoded in UTF8 byte[]'s
  */
-public class Atom extends AtomicToString {
+public class Atom extends AtomicConst {
 
     @NotNull public final String id;
 
@@ -59,13 +59,11 @@ public class Atom extends AtomicToString {
         return AtomString;
     }
 
-    @NotNull
     @Override
     public final Op op() {
         return Op.ATOM;
     }
 
-    @NotNull
     @Override public final String toString() {
         return id;
     }
@@ -95,17 +93,16 @@ public class Atom extends AtomicToString {
         return 0;
     }
 
-
     @Override
-    public final int hashCode() {
-        return hashCached;
+    public final int structure() {
+        return ATOM.bit;
     }
 
     @Override
     public final void init(@NotNull int[] meta) {
 
         meta[4] ++; //volume
-        meta[5] |= op().bit; //structure();
+        meta[5] |= ATOM.bit; //structure();
 
     }
 

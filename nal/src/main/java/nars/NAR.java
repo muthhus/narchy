@@ -824,12 +824,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @Deprecated
-    public final void on(@NotNull String atom, @NotNull Operator o) {
+    public final void on(@NotNull String atom, /*@NotNull*/ Operator o) {
         on((Atom) Atomic.the(atom), o);
     }
 
     @Deprecated
-    public final void on(@NotNull Atom a, @NotNull Operator o) {
+    public final void on(@NotNull Atom a, /*@NotNull*/ Operator o) {
 
         on(new Operation(a, this) {
 
@@ -847,7 +847,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         });
     }
 
-    public final void on(@NotNull Operation c) {
+    public final void on(/*@NotNull*/ Operation c) {
         terms.set(c);
     }
 

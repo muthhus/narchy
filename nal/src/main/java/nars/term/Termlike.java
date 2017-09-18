@@ -64,7 +64,7 @@ public interface Termlike extends Termed {
      * tests if contains a term in the structural hash
      * WARNING currently this does not detect presence of pattern variables
      */
-    default boolean hasAny(@NotNull Op op) {
+    default boolean hasAny(/*@NotNull*/ Op op) {
         return (op == Op.VAR_PATTERN) ? (varPattern() > 0) : hasAny(op.bit);
     }
 

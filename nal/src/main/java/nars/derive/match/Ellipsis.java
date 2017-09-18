@@ -45,7 +45,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 
         public final int minArity;
 
-        public EllipsisPrototype(@NotNull Op type, @NotNull UnnormalizedVariable target, int minArity) {
+        public EllipsisPrototype(/*@NotNull*/ Op type, @NotNull UnnormalizedVariable target, int minArity) {
             super(type, target
                     + ".." + (minArity == 0 ? '*' : '+'));
             this.minArity = minArity;

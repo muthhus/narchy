@@ -4,7 +4,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import nars.$;
 import nars.Op;
 import nars.term.Term;
-import nars.term.atom.AtomicToString;
+import nars.term.atom.AtomicConst;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +13,7 @@ import static nars.IO.SPECIAL_OP;
 /**
  * Unnormalized, labeled variable
  */
-public class UnnormalizedVariable extends AtomicToString implements Variable {
+public class UnnormalizedVariable extends AtomicConst implements Variable {
 
     @NotNull
     public final Op type;
@@ -21,7 +21,7 @@ public class UnnormalizedVariable extends AtomicToString implements Variable {
 
     @Override public int opX() { return Term.opX(op(), 10);    }
 
-    public UnnormalizedVariable(@NotNull Op type, @NotNull String label) {
+    public UnnormalizedVariable(/*@NotNull*/ Op type, @NotNull String label) {
         super(type, label);
         this.str = label;
         this.type = type;

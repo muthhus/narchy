@@ -10,7 +10,7 @@
 //public final class TermStructure extends MatchOp {
 //    public final int bits;
 //
-//    public TermStructure(@NotNull Op matchingType, int bits) {
+//    public TermStructure(/*@NotNull*/ Op matchingType, int bits) {
 //        this.bits = bits & (~matchingType.bit());
 //    }
 //

@@ -134,14 +134,14 @@ public class TemporalTermTest {
     @Test
     public void testAtemporalization2() throws Narsese.NarseseException {
 
-        assertEquals("((--,y) &&+- y)", $.<Compound>$("(y &&+3 (--,y))").eternal().toString());
+        assertEquals("((--,y) &&+- y)", $.<Compound>$("(y &&+3 (--,y))").xternal().toString());
     }
 
     @Test
     public void testAtemporalization3() throws Narsese.NarseseException {
 
         assertEquals("(--,((x &&+- $1) ==>+- ((--,y) &&+- $1)))",
-                $.<Compound>$("(--,(($1&&x) ==>+1 ((--,y) &&+2 $1)))").eternal().toString());
+                $.<Compound>$("(--,(($1&&x) ==>+1 ((--,y) &&+2 $1)))").xternal().toString());
     }
 
     @Test
@@ -149,7 +149,7 @@ public class TemporalTermTest {
         //maintain temporal information that would otherwise be factored out if non-temporal
 
         assertEquals("((x &&+- $1) ==>+- (y &&+- $1))",
-                $.<Compound>$("(($1 && x) ==>+1 ($1 &&+1 y))").eternal().toString());
+                $.$("(($1 && x) ==>+1 ($1 &&+1 y))").xternal().toString());
     }
 
 
@@ -160,7 +160,7 @@ public class TemporalTermTest {
             assertTrue(c instanceof Compound);
 
             assertEquals("((x ==>+- y) &&+- y)",
-                    c.eternal().toString());
+                    c.xternal().toString());
         }
     }
 
@@ -168,7 +168,7 @@ public class TemporalTermTest {
     public void testAtemporalization6() throws Narsese.NarseseException {
         Compound x = $("((--,(($1&&x) ==>+1 ((--,y) &&+2 $1))) &&+3 (--,y))");
 
-        Term y = x.eternal();
+        Term y = x.xternal();
         assertEquals("((--,((x &&+- $1) ==>+- ((--,y) &&+- $1))) &&+- (--,y))", y.toString());
     }
 
@@ -414,7 +414,7 @@ public class TemporalTermTest {
 
             Term f0 = $("(y " + op + "+- x)");
             assertEquals("(x " + op + "+- y)", f0.toString());
-            assertEquals("(x " + op + "+- y)", f0.eternal().toString());
+            assertEquals("(x " + op + "+- y)", f0.xternal().toString());
 
             Concept f = n.conceptualize(f0);
             assertTrue(e + "==" + f, e == f);
@@ -502,18 +502,19 @@ public class TemporalTermTest {
 
     @Test
     public void testConceptualization() throws Narsese.NarseseException {
-        //NAR n = new NARBuilder().get();
 
-        n.input("(x ==>+0 y)."); //eternal
-        n.input("(x ==>+1 y)."); //eternal
+        Term t = $("(x==>y)");
+        Term x = t.xternal();
+        assertEquals(XTERNAL, x.dt());
+        assertEquals("(x ==>+- y)", x.toString());
 
-        //d.index().print(System.out);
-        //d.concept("(x==>y)").print();
+        n.input("(x ==>+0 y).", "(x ==>+1 y).").run(2);
 
-        n.run(2);
+        BaseConcept xImplY = (BaseConcept) n.conceptualize(t);
+        assertNotNull(xImplY);
 
+        assertEquals("(x ==>+- y)", xImplY.toString());
 
-        BaseConcept xImplY = (BaseConcept) n.conceptualize($("(x==>y)"));
         assertEquals(3, xImplY.beliefs().size());
 
         int indexSize = n.terms.size();
@@ -708,10 +709,10 @@ public class TemporalTermTest {
         @NotNull Term a = $("(x && y)");
 
         Term b = $.$("(x &&+1 y)");
-        assertEquals("(x &&+- y)", b.eternal().toString());
+        assertEquals("(x &&+- y)", b.xternal().toString());
 
         Term c = $.$("(x &&+1 x)");
-        assertEquals("(x &&+- x)", c.eternal().toString());
+        assertEquals("(x &&+- x)", c.xternal().toString());
     }
 
     @Test
@@ -752,8 +753,8 @@ public class TemporalTermTest {
 //        }
         Term f = $("(x ==> y)");
         Term g = $("(y ==>+1 x)");
-        assertEquals("(x ==>+- y)", f.eternal().toString());
-        assertEquals("(y ==>+- x)", g.eternal().toString());
+        assertEquals("(x ==>+- y)", f.xternal().toString());
+        assertEquals("(y ==>+- x)", g.xternal().toString());
     }
 
     @Ignore
@@ -775,8 +776,8 @@ public class TemporalTermTest {
 //            return as.equals(bs);
 //        }
 
-        assertEquals($.<Compound>$("(x && (y ==> z))").eternal(),
-                $.<Compound>$("(x &&+1 (y ==>+1 z))").eternal());
+        assertEquals($.<Compound>$("(x && (y ==> z))").xternal(),
+                $.<Compound>$("(x &&+1 (y ==>+1 z))").xternal());
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -787,8 +788,8 @@ public class TemporalTermTest {
         assertEquals("((x &&+1 z) ==>+1 w)",
                 $("(x &&+1 (z ==>+1 w))").toString());
 
-        assertEquals($.<Compound>$("((x &&+- z) ==>+- w)").eternal(),
-                $.<Compound>$("(x &&+1 (z ==>+1 w))").eternal());
+        assertEquals($.<Compound>$("((x &&+- z) ==>+- w)").xternal(),
+                $.<Compound>$("(x &&+1 (z ==>+1 w))").xternal());
     }
 
 //    @Test

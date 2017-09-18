@@ -186,7 +186,7 @@
 //
 //    //TODO run in separate execution context to avoid synchronized
 //    @Nullable
-//    public void invoked(@Nullable Object result, @NotNull OperationConcept invokingGoal) {
+//    public void invoked(@Nullable Object result, /*@NotNull*/ OperationConcept invokingGoal) {
 //
 //        Task volitionTask = volition.get();
 //

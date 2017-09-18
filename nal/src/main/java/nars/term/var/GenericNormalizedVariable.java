@@ -9,7 +9,7 @@ public abstract class GenericNormalizedVariable extends AbstractVariable {
     @NotNull
     public final Op type;
 
-    protected GenericNormalizedVariable(@NotNull Op type, int id) {
+    protected GenericNormalizedVariable(/*@NotNull*/ Op type, int id) {
         super(type, id);
         this.type = type;
     }

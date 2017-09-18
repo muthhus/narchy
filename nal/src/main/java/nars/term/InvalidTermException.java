@@ -20,19 +20,19 @@ public final class InvalidTermException extends SoftException {
     @NotNull private final String reason;
 
 
-    public InvalidTermException(@NotNull Op op, @NotNull Term[] args, @NotNull String reason) {
+    public InvalidTermException(/*@NotNull*/ Op op, @NotNull Term[] args, @NotNull String reason) {
         this(op, DTERNAL, reason, args);
     }
 
-    public InvalidTermException(@NotNull Op op, int dt, @NotNull Term[] args, @NotNull String reason) {
+    public InvalidTermException(/*@NotNull*/ Op op, int dt, @NotNull Term[] args, @NotNull String reason) {
         this(op, dt, reason, args);
     }
 
-    public InvalidTermException(@NotNull Op op, int dt, @NotNull TermContainer args, @NotNull String reason) {
+    public InvalidTermException(/*@NotNull*/ Op op, int dt, @NotNull TermContainer args, @NotNull String reason) {
         this(op, dt, reason, args.toArray());
     }
 
-    public InvalidTermException(@NotNull Op op, int dt, @NotNull String reason, @NotNull Term... args) {
+    public InvalidTermException(/*@NotNull*/ Op op, int dt, @NotNull String reason, @NotNull Term... args) {
         this.op = op;
         this.dt = dt;
         this.args = args;

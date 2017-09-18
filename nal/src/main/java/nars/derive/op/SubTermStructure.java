@@ -42,7 +42,7 @@ public final class SubTermStructure extends AbstractPred<Derivation> {
         this(Op.VAR_PATTERN, subterm, bits);
     }
 
-    private SubTermStructure(@NotNull Op matchingType, int subterm, int bits) {
+    private SubTermStructure(/*@NotNull*/ Op matchingType, int subterm, int bits) {
         super($.func("subTermStruct", $.the(subterm), $.the(bits)));
 //                ((Integer.bitCount(bits) == 1) ?
 //                        ("onBit_" + Integer.numberOfTrailingZeros(bits)) //shorthand for n'th bit
@@ -69,7 +69,7 @@ public final class SubTermStructure extends AbstractPred<Derivation> {
         return Op.hasAll((subterm == 0 ? ff.termSub0Struct : ff.termSub1Struct), bits);
     }
 
-    static int filter(@NotNull Op matchingType, int bits) {
+    static int filter(/*@NotNull*/ Op matchingType, int bits) {
         if (matchingType != Op.VAR_PATTERN)
             bits &= (~matchingType.bit);
 

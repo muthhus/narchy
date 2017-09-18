@@ -49,7 +49,7 @@ public interface ProtoCompound extends TermContainer {
     }
 
     @Override
-    default boolean hasAny(@NotNull Op op) {
+    default boolean hasAny(/*@NotNull*/ Op op) {
         return true;
     }
 

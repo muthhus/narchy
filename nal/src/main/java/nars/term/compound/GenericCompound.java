@@ -29,11 +29,12 @@ public class GenericCompound implements Compound {
     @NotNull
     public final Op op;
 
+    final short structureCached;
 
     public transient boolean normalized;
 
 
-    public GenericCompound(@NotNull Op op, @NotNull TermContainer subterms) {
+    public GenericCompound(/*@NotNull*/ Op op, @NotNull TermContainer subterms) {
 
         this.op = op;
 
@@ -42,6 +43,7 @@ public class GenericCompound implements Compound {
         this.normalized = !(subterms.vars() > 0 || subterms.varPattern() > 0);
 
         this.subterms = subterms;
+        this.structureCached = (short) Compound.super.structure();
 
 //        //HACK
 //        this.dynamic =
@@ -50,8 +52,12 @@ public class GenericCompound implements Compound {
 //                (hasAll(EvalBits) && OR(Termlike::isDynamic)); /* possible function in subterms */
     }
 
+    @Override
+    public final int structure() {
+        return structureCached;
+    }
 
-//    @Override
+    //    @Override
 //    public boolean isDynamic() {
 //        return dynamic;
 //    }

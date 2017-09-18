@@ -25,7 +25,7 @@ public enum AbstractPatternOp  {
         public final int opOrdinal;
 
 
-        public PatternOp(int taskOrBelief, @NotNull Op op) {
+        public PatternOp(int taskOrBelief, /*@NotNull*/ Op op) {
             super(name(PatternOp.class, taskOrBelief, op.str));
             this.taskOrBelief = taskOrBelief;
             this.opOrdinal = op.id;

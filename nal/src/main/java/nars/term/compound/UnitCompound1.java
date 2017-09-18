@@ -25,7 +25,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     /** cached */
     transient private final int structure;
 
-    public UnitCompound1(@NotNull Op op, @NotNull Term arg) {
+    public UnitCompound1(/*@NotNull*/ Op op, @NotNull Term arg) {
         super(arg);
 
         this.op = op;
@@ -75,6 +75,14 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
 
     @Override
+    public Term dt(int nextDT) {
+        if (nextDT == DTERNAL)
+            return this;
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
     public final boolean equals(@Nullable Object that) {
         if (this == that) return true;
         if (!(that instanceof Compound) || hash!=that.hashCode())
@@ -98,7 +106,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     }
 
     @Override
-    public final @NotNull Op op() {
+    public final /*@NotNull*/ Op op() {
         return op;
     }
 

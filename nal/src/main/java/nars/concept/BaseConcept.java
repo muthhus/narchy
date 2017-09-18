@@ -106,7 +106,7 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
     }
 
     @Override
-    public final @NotNull Op op() {
+    public final /*@NotNull*/ Op op() {
         return term.op();
     }
 

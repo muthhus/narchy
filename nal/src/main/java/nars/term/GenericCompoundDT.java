@@ -8,7 +8,9 @@ import nars.Param;
 import nars.derive.PatternCompound;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
@@ -60,14 +62,24 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
     @Override
-    public @NotNull Op op() {
+    public @Nullable Term temporalize(Retemporalize r) {
+        return Compound.super.temporalize(r);
+    }
+
+    @Override
+    public /*@NotNull*/ Op op() {
         return ref.op();
     }
 
 
     @Override
-    public Term dt(int dt) {
+    public final Term dt(int dt) {
         return dt == this.dt ? this : Compound.super.dt(dt);
+    }
+
+    @Override
+    public int structure() {
+        return ref.structure();
     }
 
     @Override

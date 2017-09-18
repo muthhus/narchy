@@ -264,7 +264,7 @@ public abstract class Unify extends Versioning implements Subst {
     /**
      * whether the op is assignable
      */
-    public final boolean matchType(@NotNull Op oy) {
+    public final boolean matchType(/*@NotNull*/ Op oy) {
         Op t = this.type;
         return t == null ?
                 oy.var : //any variable

@@ -103,7 +103,7 @@ public class Int implements Intlike {
     }
 
     @Override
-    public @NotNull Op op() {
+    public /*@NotNull*/ Op op() {
         return INT;
     }
 
@@ -182,7 +182,7 @@ public class Int implements Intlike {
         }
 
         @Override
-        public @NotNull Op op() {
+        public /*@NotNull*/ Op op() {
             return INT;
         }
 

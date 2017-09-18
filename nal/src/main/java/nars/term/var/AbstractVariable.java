@@ -40,7 +40,7 @@ public abstract class AbstractVariable implements Variable {
     public final int id;
     protected transient final int hash;
 
-    protected AbstractVariable(@NotNull Op type, int id) {
+    protected AbstractVariable(/*@NotNull*/ Op type, int id) {
 
         this.id = id;
         this.hash = Terms.hashVar(type, id); //lower 16 bits reserved for the type, which includes all permutations of 2x 8-bit id'd common variables
@@ -184,7 +184,7 @@ public abstract class AbstractVariable implements Variable {
 //        }
 //        throw new RuntimeException(c + " not a variable");
 //    }
-    public static int opToVarIndex(@NotNull Op o) {
+    public static int opToVarIndex(/*@NotNull*/ Op o) {
         switch (o) {
             case VAR_PATTERN:
                 return 0;
@@ -217,7 +217,7 @@ public abstract class AbstractVariable implements Variable {
      * TODO move this to TermBuilder
      */
     @NotNull
-    static AbstractVariable vNew(@NotNull Op type, int id) {
+    static AbstractVariable vNew(/*@NotNull*/ Op type, int id) {
         switch (type) {
             case VAR_PATTERN:
                 return new VarPattern(id);
@@ -232,7 +232,7 @@ public abstract class AbstractVariable implements Variable {
         }
     }
 
-    public static AbstractVariable the(@NotNull Op type, int id) {
+    public static AbstractVariable the(/*@NotNull*/ Op type, int id) {
         if (id >= Param.MAX_VARIABLE_CACHED_PER_TYPE) {
             return AbstractVariable.vNew(type, id); //for special variables like ellipsis
         } else {

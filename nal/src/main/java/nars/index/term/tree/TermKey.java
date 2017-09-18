@@ -139,7 +139,7 @@ public class TermKey extends HashCachedBytes {
         writeTermContainerSeq(out, c.subterms(), includeTemporal);
         out.writeByte(')');
 
-        @NotNull Op o = c.op();
+        /*@NotNull*/ Op o = c.op();
         out.writeByte(o.id); //put operator last
         if (includeTemporal && o.temporal) {
             out.writeInt(c.dt());

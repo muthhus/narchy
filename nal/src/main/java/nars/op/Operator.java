@@ -66,7 +66,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 //    @Override
-//    public void accept(@NotNull OperationConcept exec) {
+//    public void accept(/*@NotNull*/ OperationConcept exec) {
 //
 //        //only proceed with execution if positively motivated
 //        if ((exec.goals().motivation(nar.time()) > 0))
@@ -231,7 +231,7 @@ import org.jetbrains.annotations.NotNull;
 //
 ////    }
 //
-//    static MutableTask resultTerm(@NotNull NAR nar, @NotNull OperationConcept operation, Term y/*, Term[] x0, Term lastTerm*/, @NotNull Tense tense) {
+//    static MutableTask resultTerm(@NotNull NAR nar, /*@NotNull*/ OperationConcept operation, Term y/*, Term[] x0, Term lastTerm*/, @NotNull Tense tense) {
 //
 //
 //        //Variable var=new Variable("$1");
@@ -348,7 +348,7 @@ import org.jetbrains.annotations.NotNull;
 //    //feedback(Task[] t)
 //    //feedback(Object o)
 //
-//    static void feedback(@NotNull OperationConcept cause, Task feedback, @NotNull NAR n) {
+//    static void feedback(/*@NotNull*/ OperationConcept cause, Task feedback, @NotNull NAR n) {
 //        n.inputLater(
 //            noticeExecuted(n, cause),
 //            feedback
@@ -360,7 +360,7 @@ import org.jetbrains.annotations.NotNull;
 //     *
 //     * @param operation
 //     */
-//    static Task noticeExecuted(@NotNull NAR nar, @NotNull OperationConcept operation) {
+//    static Task noticeExecuted(@NotNull NAR nar, /*@NotNull*/ OperationConcept operation) {
 //
 //        //Budgeted b = !operation.isDeleted() ? operation : UnitBudget.Zero;
 //

@@ -67,7 +67,7 @@ import static nars.time.Tense.XTERNAL;
 public interface Compound extends Term, IPair, TermContainer {
 
     static boolean equals(@NotNull Term a, @Nullable Object b) {
-        assert(a!=b): "instance check should have already been performed before calling this";
+        assert (a != b) : "instance check should have already been performed before calling this";
 
         Term bb = (Term) b;
 
@@ -105,7 +105,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
-        assert(this!=t);
+        assert (this != t);
         return inSubtermsOf.test(this) && subterms().containsRecursively(t, inSubtermsOf);
     }
 
@@ -160,7 +160,8 @@ public interface Compound extends Term, IPair, TermContainer {
         return false;
     }
 
-    @Override default int subtermTimeSafe(@NotNull Term x) {
+    @Override
+    default int subtermTimeSafe(@NotNull Term x) {
         if (equals(x))
             return 0;
 
@@ -234,7 +235,6 @@ public interface Compound extends Term, IPair, TermContainer {
 
         return DTERNAL;
     }
-
 
 
     @Override
@@ -771,9 +771,9 @@ public interface Compound extends Term, IPair, TermContainer {
         int c = complexity();
         if (c >= 2 && hasAll(EvalBits)) {
             return
-                ((op() == INH && subIs(0, PROD) && subIs(1, ATOM)) /* potential function */
-                    ||
-                (c >= 3 && OR(Termlike::isDynamic))); /* possible function in subterms */
+                    ((op() == INH && subIs(0, PROD) && subIs(1, ATOM)) /* potential function */
+                            ||
+                            (c >= 3 && OR(Termlike::isDynamic))); /* possible function in subterms */
         }
         return false;
     }
@@ -890,10 +890,11 @@ public interface Compound extends Term, IPair, TermContainer {
         return y;
     }
 
+
     @Override
     @Nullable
     default Term transform(@NotNull CompoundTransform t) {
-        return transform(dt(), t);
+        return transform(t.dt(this), t);
     }
 
     @Override
@@ -905,7 +906,8 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     @Nullable
     default Term transform(@NotNull CompoundTransform t, Compound parent) {
-        return transform(t); //ignore parent
+        int dt = t.dt(this);
+        return transform(dt, t).dt(dt); //ignore parent
     }
 
     @Nullable
@@ -959,6 +961,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         }
 
+
         //TODO does it need to recreate the container if the dt has changed because it may need to be commuted ... && (superterm.dt()==dt) but more specific for the case: (XTERNAL -> 0 or DTERNAL)
 
         //        if (subtermMods == 0 && !opMod && dtMod && (op.image || (op.temporal && concurrent(dt)==concurrent(src.dt()))) ) {
@@ -976,97 +979,36 @@ public interface Compound extends Term, IPair, TermContainer {
         } else {
             y = this.dt(dt);
         }
-        return y!=null ? t.apply(null, y) : null;
+        return y;
     }
 
 
     @Override
     default boolean eternalEquals(Term x) {
-        return structure()==x.structure() && volume()==x.volume() && op()==x.op() && eternal().equals(x.eternal());
+        return structure() == x.structure() && volume() == x.volume() && op() == x.op() && xternal().equals(x.xternal());
     }
 
     @Override
     @Nullable
-    default Term eternal() {
-//        if (!this.hasAny(Op.TemporalBits))
-//            return this;
-        if (!isTemporal())
-            return this;
+    default Term xternal() {
         return temporalize(Retemporalize.retemporalizeAllToXTERNAL);
+    }
 
-//
-//        TermContainer subs = this.subterms();
-//        Term[] s = subs.toArray();
-//
-//        //1. determine if any subterms (excluding the term itself) get rewritten
-//        boolean subsChanged = false;
-//        if (subs.hasAny(Op.TemporalBits)) {
-//
-//            //atemporalize subterms first
-//
-//            int cs = s.length;
-//            for (int i = 0; i < cs; i++) {
-//
-//                Term xi = s[i];
-//
-//                Term yi = xi.eternal();
-//                if (yi instanceof Bool)
-//                    return Null;
-//                if (!xi.equals(yi)) {
-//                    s[i] = yi;
-//                    subsChanged = true;
-//                }
-//
-//            }
-//        }
-//
-//
-//        //2. anonymize the term itself if anything has changed.
-//        Op o = this.op();
-//        int dt = this.dt();
-//        int nextDT = !o.temporal ? dt : DTERNAL;
-//
-//        if (o.temporal)
-//            nextDT = XTERNAL;
-//
-//        if (o.temporal && s.length == 2) {
-//
-//
-////            if (s.length s[0].equals(s[1])) {
-////                s = new Term[]{s[0], s[0] /* repeated */};
-////                subsChanged = true;
-////            } else
-//            if (o.commutative) {
-//                if (s[0].compareTo(s[1]) > 0) { //lexical sort
-//                    Term x = s[0];
-//                    s[0] = s[1];
-//                    s[1] = x;
-//                    subsChanged = true;
-//                }
-//            }
-//        }
-//
-//        boolean dtChanging = (nextDT != dt);
-//
-//        if (!subsChanged && !dtChanging) {
-//            return this; //no change is necessary
-//        }
-//        if (!subsChanged) {
-//            s = subs.theArray(); //re-use the instance from the input
-//        }
-//
-//        Term y =
-//                subsChanged ? o.the(nextDT, s) : this.dt(nextDT);
-//        if (y == null)
-//            return Null;
-//
-//        return y;
+    @Override
+    @Nullable
+    default Term temporalize(Retemporalize r) {
+        if (!hasAny(Op.TemporalBits))
+            return this;
+        else {
+            int dt = r.dt(this);
+            return transform(dt, r).dt(dt); //.dt twice, trust me
+        }
     }
 
     @Override
     @NotNull
     default Term conceptual() {
-        Term term = unneg().eternal();
+        Term term = unneg().xternal();
         if (term == null)
             return Null;
 
