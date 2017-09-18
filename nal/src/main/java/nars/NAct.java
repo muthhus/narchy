@@ -3,7 +3,6 @@ package nars;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatNormalized;
-import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;
@@ -21,6 +20,7 @@ import java.util.function.BiConsumer;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 
+import static jcog.Util.unitize;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static nars.truth.TruthFunctions.c2w;
@@ -340,23 +340,23 @@ public interface NAct {
     }
 
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        actionBipolarExpectation(s, update);
-        //actionBipolarExpectationNormalized(s, update);
+        //actionBipolarExpectation(s, update);
+        actionBipolarExpectationNormalized(s, update);
         //actionBipolarGreedy(s, update);
         //actionBipolarMutex3(s, update);
     }
 
     default void actionBipolarExpectationNormalized(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         float v[] = new float[1];
-        FloatNormalized f = new FloatNormalized(()->v[0]);
+        FloatNormalized f = new FloatNormalized(() -> v[0]);
         actionBipolarExpectation(s, (x) -> {
             v[0] = Math.abs(x);
             float y = f.asFloat() * Math.signum(x);
             update.valueOf(y);
             f.relax(0.99f);
             return
-                y;
-                //u;
+                    y;
+            //u;
         });
     }
 
@@ -368,7 +368,7 @@ public interface NAct {
                 //$.inh($.the("\"-\""), s);
                 $.p(s.neg(), s);
         final float exp[] = new float[2];
-        final float cc[] = new float[2];
+
         final float EXE_THRESHOLD = 0.5f;
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
 
@@ -383,40 +383,51 @@ public interface NAct {
 
             float restConf =
                     //n.confMin.floatValue();
-                    n.confDefault(GOAL);
-                    //0;
-            //n.confDefault(BELIEF);
-
+                    n.confDefault(BELIEF);
+            //0;
 
             int ip = p ? 0 : 1;
-            exp[ip] = g!=null ? g.expectation() : 0f;
-            cc[ip] = g != null ? g.conf() :
-                    restConf;
-                    //0; //n.confMin.floatValue();;
-
+            exp[ip] = g != null ? (g.expectation() - 0.5f) : -0.5f;
 
             if (!p) {
 
-                int winner =
-                        //Util.decideRoulette(2, (i) -> cc[i], n.random());
-                        Util.decideSoftmax(2, (i) -> c2w(cc[i]), 0.6f, n.random());
-                        //cc[0] > cc[1] ? 0 : 1; //GREEDY
 
-                int loser = 1 - winner;
+                float ew;
+
+                int winner;
 
                 //curiosity applied to winner, how ironic
                 if (cur > 0 && rng.nextFloat() <= cur) {
-                    float f  = //rng.nextFloat(); //bipolar
-                            0.5f + 0.5f * rng.nextFloat(); //unipolar, [0.5,1.0]
+                    float f = //rng.nextFloat(); //bipolar
+                            rng.nextFloat(); //unipolar, [0.5,1.0]
 
-                    cc[winner] = nar().confDefault(GOAL);
-                    exp[winner] = $.t(f, cc[winner]).expectation();
+
+                    ew = 2f * (rng.nextFloat() - 0.5f);
+                    winner = ew > 0f ? 0 : 1;
+                } else {
+
+                    winner =
+                            //Util.decideRoulette(2, (i) -> cc[i], n.random());
+                            Util.decideSoftmax(2,
+
+                                    (i) -> Math.abs(exp[i]), //even though an exp value < 0.5 has no effect, it acts as a veto override of a weaker positive motivation it competes with
+                                    //(i) -> (cc[i]),
+                                    //(i) -> c2w(cc[i]),
+                                    0.4f, n.random());
+                    //cc[0] > cc[1] ? 0 : 1; //GREEDY
+
+                    ew = (winner == 1 ? +1 : -1f) * (Math.max(0.5f, exp[winner]) - 0.5f) * 2f;
+                    //ew = Math.max(EXE_THRESHOLD, exp[0]) - Math.max(EXE_THRESHOLD, exp[1]);
+
                 }
 
+                //int winner = ew >= 0f ? 0 : 1;
+                int loser = 1 - winner;
+
                 Truth l, w;
-                if (exp[winner] > EXE_THRESHOLD) {
-                    float x = (Math.max(0.5f, exp[winner]) - 0.5f) * 2f;
-                    float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
+                {
+                    //float x = (Math.max(0.5f, ew) - 0.5f) * 2f;
+                    float y = update.valueOf(ew); //winner == 0 ? x : -x); //invert depending on which polarity won
 
 //                float conf =
 //                        //cc[winner];
@@ -425,14 +436,20 @@ public interface NAct {
 
                     //inverse expectation
                     float conf =
-                            restConf;
-                            //Math.max(cc[winner], nar().confMin.floatValue());
-                    //0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
+                            Math.max(
+                                    4 * nar().confMin.floatValue(),
+                                    //restConf/2f,
+                                    Math.abs(y) * restConf);
+                    //w2c(Math.abs(y) * c2w(restConf));
+                    if (conf > nar().confMin.floatValue()) {
+                        //Math.max(cc[winner], nar().confMin.floatValue());
+                        //0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
 
-                    l = $.t(0f, conf);
-                    w = y == y ? $.t(1, conf) : l;
-                } else {
-                    w = l = $.t(0f, restConf);
+                        l = $.t(0f, conf);
+                        w = y == y ? $.t(1, conf) : l;
+                    } else {
+                        l = w = null;
+                    }
                 }
 
                 ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, null);
@@ -936,7 +953,7 @@ public interface NAct {
             } else {
                 ff = 0f;
             }
-            return $.t(Util.unitize(ff), nar().confDefault(BELIEF));
+            return $.t(unitize(ff), nar().confDefault(BELIEF));
         });
     }
 

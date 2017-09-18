@@ -12,7 +12,7 @@ abstract public class LeakBack extends TaskLeak {
     final static float INITIAL_RATE = 1f;
 
     //HACK
-    public final FloatParam amp = new FloatParam(0.001f, 0, 1f);
+    public final FloatParam amp = new FloatParam(0.0001f, 0, 1f);
 
     private final CauseChannel<Task> out;
 

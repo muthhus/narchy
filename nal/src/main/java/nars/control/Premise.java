@@ -234,7 +234,7 @@ public class Premise extends UnaryTask {
                     }
                 }
             } else {
-                long focus = matchFocus(task, now, dur);
+                long focus = matchFocus(task, now, dur, nar);
                 long focusStart, focusEnd;
                 if (focus == ETERNAL) {
                     focusStart = focusEnd = ETERNAL;
@@ -302,13 +302,19 @@ public class Premise extends UnaryTask {
     /**
      * temporal focus control: determines when a matching belief or answer should be projected to
      */
-    static long matchFocus(Task task, long now, int dur) {
+    static long matchFocus(Task task, long now, int dur, NAR nar) {
         if (now == ETERNAL)
             return ETERNAL;
 
+        if (task.isEternal())
+            return now;
+
+        //return task.nearestTimeTo(now);
+        return nar.random().nextBoolean() ?
+                task.nearestTimeTo(now) :
+                now + Math.round((-0.5f + nar.random().nextFloat()) * 2f * (Math.abs(now - task.mid())));
         //return now;
         //return now + dur;
-        return task.nearestTimeTo(now);
 
 //        if (task.isEternal()) {
 //            return ETERNAL;

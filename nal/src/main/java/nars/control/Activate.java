@@ -3,6 +3,7 @@ package nars.control;
 import jcog.bag.Bag;
 import jcog.pri.PLink;
 import jcog.pri.PLinkUntilDeleted;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
@@ -194,11 +195,12 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             Bag<Term, PriReference<Term>> termlinks = id.termlinks();
             for (Termed localSub : localTemplates) {
 
-                Term localSubTerm = localSub.term();
 
-                localSub = mutateTermlink(localSubTerm, rng); //for special Termed instances, ex: RotatedInt etc
+                localSub = mutateTermlink(localSub.term(), rng); //for special Termed instances, ex: RotatedInt etc
                 if (localSub instanceof Bool)
                     continue; //unlucky mutation
+
+                Term localSubTerm = localSub.term(); //if mutated then localSubTerm would change so do it here
 
                 float d;
                 if (localSubTerm.op().conceptualizable && !localSubTerm.equals(thisTerm)) {
@@ -207,17 +209,21 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                     if (localSubConcept != null) {
                         localSubConcept.activate(subDecay, nar);
 
-                        localSubConcept.termlinks().putAsync(
-                                new PLink(thisTerm, subDecayReverse)
-                        );
+                        if (subDecayReverse > Pri.EPSILON) {
+                            localSubConcept.termlinks().putAsync(
+                                    new PLink(thisTerm, subDecayReverse)
+                            );
+                        }
                         localSubConcepts.add(localSubConcept);
                     }
 
                 }
 
-                termlinks.putAsync(
-                        new PLink(localSubTerm, subDecayForward)
-                );
+                if (subDecayForward > Pri.EPSILON) {
+                    termlinks.putAsync(
+                            new PLink(localSubTerm, subDecayForward)
+                    );
+                }
 
             }
 

@@ -75,6 +75,7 @@ public interface TaskRegion extends HyperRegion, Tasked {
 
     @Override
     default boolean intersects(HyperRegion x) {
+        if (x == this) return true;
         //        for (int i = 0; i < d; i++)
         //            if (coord(false, i) > x.coord(true, i) ||
         //                    coord(true, i) < x.coord(false, i))
@@ -95,6 +96,8 @@ public interface TaskRegion extends HyperRegion, Tasked {
 
     @Override
     default boolean contains(HyperRegion x) {
+        if (this == x) return false;
+
         //    default boolean contains(HyperRegion<X> x) {
         //        int d = dim();
         //        for (int i = 0; i < d; i++)

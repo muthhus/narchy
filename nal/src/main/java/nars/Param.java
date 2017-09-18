@@ -38,9 +38,9 @@ public abstract class Param extends Services<Term,NAR> {
     public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.5f;
 
     /** freq coherence below which a contradictory sensor belief is dis-valued, and above which it is valued */
-    public static final float SENSOR_FEEDBACK_FREQ_THRESHOLD = 0.75f;
+    public static final float SENSOR_FEEDBACK_FREQ_THRESHOLD = 0.9f;
 
-    public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
+    public static final boolean DELETE_INACCURATE_PREDICTIONS = false;
 
 
 
@@ -96,7 +96,7 @@ public abstract class Param extends Services<Term,NAR> {
                     32;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(384);
+    public final MutableInteger matchTTL = new MutableInteger(512);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.2f;
@@ -129,7 +129,7 @@ public abstract class Param extends Services<Term,NAR> {
      * forward (compound to subterms) vs. reverse (subterms to parent compound).
      * when calculated, the total activation will sum to 1.0.
      * so 0.5 is equal amounts for both. */
-    public static final float TERMLINK_BALANCE = 0.5f;
+    public static final float TERMLINK_BALANCE = 0.75f;
 
 //
 //    /** belief projection lookahead time in premise formation, in multiples of duration */
@@ -142,14 +142,14 @@ public abstract class Param extends Services<Term,NAR> {
     public final float[] value = new float[Cause.Purpose.values().length];
 
     protected void valueDefaults() {
-        value[Cause.Purpose.Input.ordinal()] = -1f;
+        value[Cause.Purpose.Input.ordinal()] = -0.25f;
         value[Cause.Purpose.Process.ordinal()] = +0.1f; //information implicitly is negative value.  knowledge for its own sake has some value but it should satisfy other values to compensate for the input cost.
 
         value[Cause.Purpose.Accurate.ordinal()] = +1f;
         value[Cause.Purpose.Inaccurate.ordinal()] = -1f;
 
         value[Cause.Purpose.Answer.ordinal()] = +1f;
-        value[Cause.Purpose.Action.ordinal()] = +1f;
+        value[Cause.Purpose.Action.ordinal()] = +2f;
     }
 
     /** how many durations above which to dither dt relations to dt=0 (parallel)

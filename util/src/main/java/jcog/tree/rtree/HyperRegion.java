@@ -143,6 +143,7 @@ public interface HyperRegion<X> {
      * @return true if intersects, false otherwise
      */
     default boolean intersects(HyperRegion<X> x) {
+        if (this == x) return true;
         int d = dim();
 //            if (min.coord[i] > x.max.coord[i] || x.min.coord[i] > max.coord[i])
         for (int i = 0; i < d; i++)

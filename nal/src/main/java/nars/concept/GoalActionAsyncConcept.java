@@ -196,8 +196,8 @@ public class GoalActionAsyncConcept extends ActionConcept {
         Task fg;
         Task fb;
         nar.input(
-            fg = feedGoal.set(term, g, stamper, now, dur, nar),
-            fb = feedBelief.set(term, f, stamper, now, dur, nar)
+            fg = feedGoal.set(term, g, stamper, now-dur/2, dur, nar),
+            fb = feedBelief.set(term, f, stamper, now+dur/2, dur, nar)
         );
 
         if (fb != null) {
