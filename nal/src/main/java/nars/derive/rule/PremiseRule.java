@@ -114,9 +114,8 @@ public class PremiseRule extends GenericCompound {
     /**
      * compiles the conditions which are necessary to activate this rule
      */
-    public Pair<Set<Term>, PrediTerm<Derivation>> conditions(@NotNull PostCondition post, NAR nar) {
+    public Pair<Set<Term>, PrediTerm<Derivation>> build(@NotNull PostCondition post, NAR nar) {
 
-        Set<Term> s = newHashSet(16); //for ensuring uniqueness / no duplicates
 
         byte puncOverride = post.puncOverride;
 
@@ -152,22 +151,24 @@ public class PremiseRule extends GenericCompound {
                 new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
 
         //PREFIX
+        Set<Term> s = newHashSet(16); //for ensuring uniqueness / no duplicates
+
         addAll(s, PRE);
 
         s.add(truth);
 
         s.addAll(match.pre);
 
+        s.addAll(match.constraints);
 
-
-        int n = match.constraints.size() + match.post.size();
-
+        int n =  match.post.size();
+            //match.constraints.size() +
 
         //SUFFIX (order already determined for matching)
         PrediTerm[] suff = new PrediTerm[n];
         int k = 0;
-        for (PrediTerm p : match.constraints)
-            suff[k++] = p;
+//        for (PrediTerm p : match.constraints)
+//            suff[k++] = p;
         for (PrediTerm p : match.post) {
             suff[k++] = p;
         }

@@ -10,7 +10,6 @@ import nars.control.Derivation;
 import nars.derive.op.AbstractPatternOp.PatternOp;
 import nars.derive.op.UnificationPrototype;
 import nars.derive.op.UnifyOneSubterm;
-import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.term.Term;
 import nars.util.TermTrie;
@@ -29,7 +28,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 
 /**
@@ -44,16 +42,12 @@ public enum TrieDeriver {
 
     public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
 
-        final TermTrie<Term, ValueFork> trie = new RuleTrie(nar, r);
+        PrediTerm<Derivation> tf = new PrediTrie(nar, r).compile(each);
 
-        List<PrediTerm<Derivation>> bb = subtree(trie.root);
-        PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
-
-        PrediTerm<Derivation> tf = Fork.fork(roots);
-        if (each!=null)
-            tf = tf.transform(each);
+        TrieDeriver.print(tf, System.out);
 
         return tf;
+
         //return new TrieExecutor(tf);
     }
 
@@ -112,7 +106,7 @@ public enum TrieDeriver {
         } else if (p instanceof OpSwitch) {
             OpSwitch sw = (OpSwitch) p;
             TermTrie.indent(indent);
-            out.println("switch(op(" + (sw.subterm==0 ? "task" : "belief") + ")) {");
+            out.println("switch(op(" + (sw.subterm == 0 ? "task" : "belief") + ")) {");
             int i = -1;
             for (PrediTerm b : sw.swtch) {
                 i++;
@@ -290,15 +284,6 @@ public enum TrieDeriver {
     }
 
 
-    protected static List<PrediTerm<Derivation>> compileSwitch(List<PrediTerm<Derivation>> bb) {
-
-        bb = factorSubOpToSwitch(bb, 0, 2);
-        bb = factorSubOpToSwitch(bb, 1, 2);
-
-        return bb;
-    }
-
-
 //    static class StackFrame {
 //        private final int i;
 //        int version;
@@ -425,30 +410,6 @@ public enum TrieDeriver {
     }
 
 
-    @NotNull
-    static List<PrediTerm<Derivation>> subtree(@NotNull TrieNode<List<Term>, ValueFork> node) {
-
-
-        List<PrediTerm<Derivation>> bb = $.newArrayList(node.childCount());
-
-        node.forEach(n -> {
-
-            List<PrediTerm<Derivation>> conseq = subtree(n);
-
-            int nStart = n.start();
-            int nEnd = n.end();
-            PrediTerm<Derivation> branch = ifThen(
-                    conditions(n.seq().stream().skip(nStart).limit(nEnd - nStart)),
-                    !conseq.isEmpty() ? (PrediTerm<Derivation>) Fork.fork(conseq.toArray(new PrediTerm[conseq.size()])) : null
-            );
-
-            if (branch != null)
-                bb.add(branch);
-        });
-
-        return compileSwitch(bb);
-    }
-
 //    public void recurse(@NotNull CauseEffect each) {
 //        for (BoolCondition p : roots) {
 //            recurse(null, p, each);
@@ -550,16 +511,16 @@ public enum TrieDeriver {
      */
     //public final HashMultimap<MatchTerm,Derive> derivationLinks = HashMultimap.create();
 
-    static final class RuleTrie extends TermTrie<Term, ValueFork> {
+    static final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
 
         private final NAR nar;
 
-        public RuleTrie(NAR nar, PremiseRuleSet r) {
+        public PrediTrie(NAR nar, PremiseRuleSet r) {
             super();
             this.nar = nar;
 
             Map<Set<Term>, RoaringBitmap> pre = new HashMap<>();
-            List<Pair<PrediTerm<Derivation>, PremiseRule>> conclusions = $.newArrayList(r.size()*4);
+            List<PrediTerm<Derivation>> conclusions = $.newArrayList(r.size() * 4);
 
 
             ObjectIntHashMap<Term> preconditionCount = new ObjectIntHashMap(256);
@@ -570,14 +531,16 @@ public enum TrieDeriver {
 
                 for (PostCondition p : rule.POST) {
 
-                    Pair<Set<Term>,PrediTerm<Derivation>> c = rule.conditions(p, this.nar);
+                    Pair<Set<Term>, PrediTerm<Derivation>> c = rule.build(p, this.nar);
 
                     c.getOne().forEach((k) -> preconditionCount.addToValue(k, 1));
 
-                    int n = conclusions.size();
-                    conclusions.add(pair(c.getTwo(), rule));
 
-                    pre.computeIfAbsent(c.getOne(), (x)->new RoaringBitmap()).add(n);
+                    int id = conclusions.size();
+                    conclusions.add(c.getTwo());
+
+                    pre.computeIfAbsent(c.getOne(), (x) -> new RoaringBitmap()).add(id);
+
 
                 }
             });
@@ -585,25 +548,36 @@ public enum TrieDeriver {
 //            System.out.println("PRECOND");
 //            preconditionCount.keyValuesView().toSortedListBy((x)->x.getTwo()).forEach((x)->System.out.println(Texts.iPad(x.getTwo(),3) + "\t" + x.getOne() ));
 
+            Comparator<Term> sort = (a, b) -> {
+
+                if (a.equals(b)) return 0;
+
+                int ac = preconditionCount.get(a);
+                int bc = preconditionCount.get(b);
+                if (ac > bc) return -1;
+                else if (ac < bc) return +1;
+                else return a.compareTo(b);
+            };
+
             List<List<Term>> paths = $.newArrayList();
-            pre.forEach((k,v) -> {
+            pre.forEach((k, v) -> {
+
                 FasterList<Term> path = new FasterList(k);
-                path.sort((a, b) -> {
+                path.sort(sort);
 
-                    if (a.equals(b)) return 0;
+                PrediTerm<Derivation>[] ll = StreamSupport.stream(v.spliterator(), false).map((i) -> conclusions.get(i).transform((Function) null)).toArray(PrediTerm[]::new);
+                assert (ll.length != 0);
 
-                    int ac = preconditionCount.get(a);
-                    int bc = preconditionCount.get(b);
-                    if (ac > bc) return -1;
-                    else if (ac < bc) return +1;
-                    else return a.compareTo(b);
-                });
-
-                PrediTerm<Derivation>[] ll = StreamSupport.stream(v.spliterator(), false).map((i) -> conclusions.get(i).getOne().transform((Function)null)).toArray(PrediTerm[]::new);
-                ValueFork cx = new ValueFork(ll);
+                PrediTerm<Derivation> cx;
+                if (ll.length == 1) {
+                    cx = ll[0];
+                } else {
+                    cx = new ValueFork(ll);
+                }
                 path.add(cx);
                 put(path, cx);
             });
+
 
         }
 
@@ -617,6 +591,50 @@ public enum TrieDeriver {
                 //((UnificationPrototype) incoming).conclude.addAll(((UnificationPrototype) existing).conclude);
                 //incomingConcs.clear();
             }
+        }
+
+
+        public PrediTerm<Derivation> compile(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
+            List<PrediTerm<Derivation>> bb = compile(root);
+            PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
+
+            PrediTerm<Derivation> tf = Fork.fork(roots);
+            if (each != null)
+                tf = tf.transform(each);
+
+            return tf;
+        }
+
+        @NotNull
+        static List<PrediTerm<Derivation>> compile(@NotNull TrieNode<List<Term>, PrediTerm<Derivation>> node) {
+
+
+            List<PrediTerm<Derivation>> bb = $.newArrayList(node.childCount());
+
+            node.forEach(n -> {
+
+                List<PrediTerm<Derivation>> conseq = compile(n);
+
+                int nStart = n.start();
+                int nEnd = n.end();
+                PrediTerm<Derivation> branch = ifThen(
+                        conditions(n.seq().stream().skip(nStart).limit(nEnd - nStart)),
+                        !conseq.isEmpty() ? (PrediTerm<Derivation>) Fork.fork(conseq.toArray(new PrediTerm[conseq.size()])) : null
+                );
+
+                if (branch != null)
+                    bb.add(branch);
+            });
+
+            return compileSwitch(bb);
+        }
+
+        protected static List<PrediTerm<Derivation>> compileSwitch(List<PrediTerm<Derivation>> bb) {
+
+            bb = factorSubOpToSwitch(bb, 0, 2);
+            bb = factorSubOpToSwitch(bb, 1, 2);
+
+            return bb;
         }
 
 
