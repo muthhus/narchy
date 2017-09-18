@@ -3,6 +3,7 @@ package nars.control;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
+import jcog.pri.Pri;
 import jcog.util.AtomicFloat;
 import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
@@ -33,6 +34,7 @@ public class Cause<X> {
     public boolean privaluate = true;
 
     public float valueBias = 0;
+    private float valuePreNorm;
 
     /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
     public float value() {
@@ -55,31 +57,56 @@ public class Cause<X> {
             //r.setMax(m * 0.9f);
         }
 
-        for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {
+        int cc = causes.size();
+        for (int i = 0, causesSize = cc; i < causesSize; i++) {
             causes.get(i).commit(summary);
         }
 
-        final float LIMIT = +1f;
-        final float momentum = 0.9f;
-        final float speed = 1f;
+        //final float LIMIT = +1f;
+        final float momentum = 0.95f;
+
 
         int p = value.length;
-        for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {
+        RecycledSummaryStatistics prenorms = new RecycledSummaryStatistics();
+        for (int i = 0, causesSize = cc; i < causesSize; i++) {
             Cause c = causes.get(i);
             float v = 0;
             for (int j = 0; j < p; j++) {
                 float y = c.purpose[j].current;
                 v += value[j] * RecycledSummaryStatistics.norm( y, 0, summary[j].getMax() );
             }
+            prenorms.accept( c.valuePreNorm = v );
+        }
 
+        float max = (float) prenorms.getMax();
+        float min = (float) prenorms.getMin();
 
-            float nextValue =
-                    Util.clamp( (c.value * momentum) + (speed * v), -LIMIT, +LIMIT);
-                    //smooth(c.value, v, 0.5f);
+        if (Util.equals(max, min, Pri.EPSILON)) {
+            causes.forEach(c -> c.setValue(0)); //flat
+        } else {
 
-            c.setValue(
-                    nextValue
-            );
+            boolean bipolar = !(min <= 0 ^ max < 0);
+            float mid = bipolar ? 0 : (max+min)/2f;
+            float rangePos = max - mid;
+            float rangeNeg = mid - min;
+
+            for (int i = 0, causesSize = cc; i < causesSize; i++) {
+                Cause c = causes.get(i);
+
+                float n = c.valuePreNorm;
+                float v = n >= 0 ?
+                        (n - mid) / rangePos :
+                        (mid - n) / rangeNeg
+                        ;
+//
+                float nextValue =
+                        Util.lerp(momentum, v, c.value);
+
+                c.setValue(
+                        nextValue
+                );
+
+            }
         }
 
 
@@ -93,6 +120,8 @@ public class Cause<X> {
 //        System.out.println();
 
     }
+
+
 
 //    public static DurService updates(NAR nar) {
 //        return new DurService(nar) {

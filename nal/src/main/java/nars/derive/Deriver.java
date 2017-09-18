@@ -51,7 +51,7 @@ public interface Deriver {
 
         Collections.addAll(files, otherFiles);
 
-        @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(true, files.toArray(new String[files.size()])       );
+        @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(true, files.toArray(new String[files.size()]));
         return RULES;
     }
 
@@ -61,12 +61,13 @@ public interface Deriver {
         }
 
         return (nar) -> {
-            PrediTerm<Derivation> x = TrieDeriver.the(DEFAULT(nal, additional), nar, (PrediTerm<Derivation> d) -> {
-                if (Param.TRACE)
-                    return new DebugDerivationPredicate(d);
-                else
-                    return d;
-            });
+            Function<PrediTerm<Derivation>, PrediTerm<Derivation>> xf;
+            if (Param.TRACE)
+                xf = (PrediTerm<Derivation> d) -> new DebugDerivationPredicate(d);
+            else
+                xf = null;
+
+            PrediTerm<Derivation> x = TrieDeriver.the(DEFAULT(nal, additional), nar, xf);
             if (Param.TRACE) {
                 TrieDeriver.print(x, System.out);
             }
@@ -99,8 +100,6 @@ public interface Deriver {
 //                    return Stream.empty();
 //                }), new PatternTermIndex(), true);
 //    }
-
-
 
 
 //    PremiseRuleSet DEFAULT_RULES = PremiseRuleSet.rules(true,

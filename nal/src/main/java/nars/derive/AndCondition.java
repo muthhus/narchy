@@ -170,4 +170,9 @@ public final class AndCondition<D> extends AbstractPred<D> {
 
         return null;
     }
+
+    public PrediTerm<D> last() {
+        return cache[cache.length-1];
+    }
+
 }

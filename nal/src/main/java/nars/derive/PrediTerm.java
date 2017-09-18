@@ -19,7 +19,7 @@ public interface PrediTerm<X> extends Term, Predicate<X> {
     };
 
     default PrediTerm<X> transform(Function<PrediTerm<X>, PrediTerm<X>> f) {
-        return f.apply(this);
+        return f!=null ? f.apply(this) : this;
     }
 
     /** returns null on success; returns this instance on the test failure. go figure */

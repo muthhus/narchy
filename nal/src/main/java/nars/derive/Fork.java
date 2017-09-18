@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 /**
  * parallel branching
- *
+ * <p>
  * TODO generify beyond only Derivation
  */
 public class Fork extends AbstractPred<Derivation> {
@@ -37,19 +37,25 @@ public class Fork extends AbstractPred<Derivation> {
     }
 
     @Override
-    public final boolean test(@NotNull Derivation m) {
-
-        int branches = cache.length;
-        ByteShuffler b = m.shuffler;
-        byte[] order = b.shuffle(m.random, branches, true); //must get a copy because recursion will re-use the shuffler's internal array
+    public boolean test(@NotNull Derivation m) {
 
         int before = m.now();
-        for (int i = 0; i < branches; i++) {
-            cache[order[i]].test(m);
-            if (!m.revertAndContinue(before))
-                return false;
+
+        int branches = cache.length;
+        if (branches == 1) {
+            cache[0].test(m);
+            return m.revertAndContinue(before);
+        } else {
+            ByteShuffler b = m.shuffler;
+            byte[] order = b.shuffle(m.random, branches, true); //must get a copy because recursion will re-use the shuffler's internal array
+
+            for (int i = 0; i < branches; i++) {
+                cache[order[i]].test(m);
+                if (!m.revertAndContinue(before))
+                    return false;
+            }
         }
-        return m.live();
+        return true;
     }
 
     @Nullable
@@ -69,7 +75,6 @@ public class Fork extends AbstractPred<Derivation> {
         c.fork(d, cache);
         return null;
     }
-
 
 
     //    @Override

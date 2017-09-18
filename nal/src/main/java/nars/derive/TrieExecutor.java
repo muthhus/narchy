@@ -4,6 +4,7 @@ import jcog.data.graph.AdjGraph;
 import jcog.list.FasterIntArrayList;
 import jcog.list.FasterList;
 import nars.control.Derivation;
+import nars.derive.op.UnifyOneSubterm;
 
 /**
  * stackless recursive virtual machine which
@@ -26,21 +27,6 @@ public class TrieExecutor extends AbstractPred<Derivation> {
 
     }
 
-
-    static class Choice extends Fork {
-
-        //private final int id;
-
-        public Choice(PrediTerm[] branches) {
-            super(branches);
-            //id = value.addNode(this);
-        }
-
-//        @Override
-//        public String toString() {
-//            return id + "(to=" + cache.length + ")";
-//        }
-    }
 
     class Path {
 

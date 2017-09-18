@@ -44,12 +44,14 @@ public enum TrieDeriver {
 
     public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
 
-        final TermTrie<Term, TrieExecutor.Choice> trie = new RuleTrie(nar, r);
+        final TermTrie<Term, ValueFork> trie = new RuleTrie(nar, r);
 
         List<PrediTerm<Derivation>> bb = subtree(trie.root);
         PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
 
-        PrediTerm<Derivation> tf = Fork.fork(roots).transform(each);
+        PrediTerm<Derivation> tf = Fork.fork(roots);
+        if (each!=null)
+            tf = tf.transform(each);
 
         return tf;
         //return new TrieExecutor(tf);
@@ -424,7 +426,7 @@ public enum TrieDeriver {
 
 
     @NotNull
-    static List<PrediTerm<Derivation>> subtree(@NotNull TrieNode<List<Term>, TrieExecutor.Choice> node) {
+    static List<PrediTerm<Derivation>> subtree(@NotNull TrieNode<List<Term>, ValueFork> node) {
 
 
         List<PrediTerm<Derivation>> bb = $.newArrayList(node.childCount());
@@ -548,7 +550,7 @@ public enum TrieDeriver {
      */
     //public final HashMultimap<MatchTerm,Derive> derivationLinks = HashMultimap.create();
 
-    static final class RuleTrie extends TermTrie<Term, TrieExecutor.Choice> {
+    static final class RuleTrie extends TermTrie<Term, ValueFork> {
 
         private final NAR nar;
 
@@ -597,8 +599,8 @@ public enum TrieDeriver {
                     else return a.compareTo(b);
                 });
 
-                PrediTerm<Derivation>[] ll = StreamSupport.stream(v.spliterator(), false).map((i) -> conclusions.get(i).getOne()).toArray(PrediTerm[]::new);
-                TrieExecutor.Choice cx = new TrieExecutor.Choice(ll);
+                PrediTerm<Derivation>[] ll = StreamSupport.stream(v.spliterator(), false).map((i) -> conclusions.get(i).getOne().transform((Function)null)).toArray(PrediTerm[]::new);
+                ValueFork cx = new ValueFork(ll);
                 path.add(cx);
                 put(path, cx);
             });
