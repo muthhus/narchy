@@ -2,6 +2,8 @@ package nars;
 
 import jcog.Util;
 import jcog.data.FloatParam;
+import jcog.math.FloatNormalized;
+import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;
@@ -339,8 +341,23 @@ public interface NAct {
 
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         actionBipolarExpectation(s, update);
+        //actionBipolarExpectationNormalized(s, update);
         //actionBipolarGreedy(s, update);
         //actionBipolarMutex3(s, update);
+    }
+
+    default void actionBipolarExpectationNormalized(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+        float v[] = new float[1];
+        FloatNormalized f = new FloatNormalized(()->v[0]);
+        actionBipolarExpectation(s, (x) -> {
+            v[0] = Math.abs(x);
+            float y = f.asFloat() * Math.signum(x);
+            update.valueOf(y);
+            f.relax(0.99f);
+            return
+                y;
+                //u;
+        });
     }
 
     default void actionBipolarExpectation(@NotNull Term s, @NotNull FloatToFloatFunction update) {
@@ -352,6 +369,7 @@ public interface NAct {
                 $.p(s.neg(), s);
         final float exp[] = new float[2];
         final float cc[] = new float[2];
+        final float EXE_THRESHOLD = 0.5f;
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
 
             boolean p = c.term().equals(pt);
@@ -365,13 +383,16 @@ public interface NAct {
 
             float restConf =
                     //n.confMin.floatValue();
-                    n.confDefault(GOAL) * 0.9f;
+                    n.confDefault(GOAL);
+                    //0;
             //n.confDefault(BELIEF);
 
 
             int ip = p ? 0 : 1;
             exp[ip] = g!=null ? g.expectation() : 0f;
-            cc[ip] = g != null ? g.conf() : 0; //n.confMin.floatValue();;
+            cc[ip] = g != null ? g.conf() :
+                    restConf;
+                    //0; //n.confMin.floatValue();;
 
 
             if (!p) {
@@ -379,30 +400,40 @@ public interface NAct {
                 int winner =
                         //Util.decideRoulette(2, (i) -> cc[i], n.random());
                         Util.decideSoftmax(2, (i) -> c2w(cc[i]), 0.6f, n.random());
-                //cc[0] > cc[1] ? 0 : 1; //GREEDY
+                        //cc[0] > cc[1] ? 0 : 1; //GREEDY
 
                 int loser = 1 - winner;
 
                 //curiosity applied to winner, how ironic
                 if (cur > 0 && rng.nextFloat() <= cur) {
-                    exp[winner] = //rng.nextFloat(); //bipolar
+                    float f  = //rng.nextFloat(); //bipolar
                             0.5f + 0.5f * rng.nextFloat(); //unipolar, [0.5,1.0]
+
                     cc[winner] = nar().confDefault(GOAL);
+                    exp[winner] = $.t(f, cc[winner]).expectation();
                 }
 
-                float x = (Math.max(0.5f, exp[winner]) - 0.5f) * 2f;
-                float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
+                Truth l, w;
+                if (exp[winner] > EXE_THRESHOLD) {
+                    float x = (Math.max(0.5f, exp[winner]) - 0.5f) * 2f;
+                    float y = update.valueOf(winner == 0 ? x : -x); //invert depending on which polarity won
 
 //                float conf =
 //                        //cc[winner];
 //                        //Util.max(cc[0], cc[1]);
 //                        nar().confDefault(BELIEF);
 
-                //inverse expectation
-                float conf = 0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
+                    //inverse expectation
+                    float conf =
+                            restConf;
+                            //Math.max(cc[winner], nar().confMin.floatValue());
+                    //0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
 
-                Truth l = $.t(0f, conf);
-                Truth w = y == y ? $.t(1, conf) : l;
+                    l = $.t(0f, conf);
+                    w = y == y ? $.t(1, conf) : l;
+                } else {
+                    w = l = $.t(0f, restConf);
+                }
 
                 ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, null);
                 ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, null);

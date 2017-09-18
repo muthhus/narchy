@@ -142,8 +142,8 @@ public abstract class Param extends Services<Term,NAR> {
     public final float[] value = new float[Cause.Purpose.values().length];
 
     protected void valueDefaults() {
-        value[Cause.Purpose.Input.ordinal()] = -0.1f;
-        value[Cause.Purpose.Process.ordinal()] = +0.05f; //knowledge for its own sake has some value but it should satisfy other values to compensate for the input cost
+        value[Cause.Purpose.Input.ordinal()] = -0.5f;
+        value[Cause.Purpose.Process.ordinal()] = +0.25f; //knowledge for its own sake has some value but it should satisfy other values to compensate for the input cost
 
         value[Cause.Purpose.Accurate.ordinal()] = +1f;
         value[Cause.Purpose.Inaccurate.ordinal()] = -1f;

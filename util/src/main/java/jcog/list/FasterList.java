@@ -52,6 +52,12 @@ public class FasterList<X> extends FastList<X> {
     public FasterList(Collection<X> copy) {
         super(copy);
     }
+    public FasterList(Collection<X> copy, X... extra) {
+        this.items = (X[])new Object[copy.size() + extra.length];
+        addAll(copy);
+        for (X x : extra)
+            add(x);
+    }
 
     /**
      * uses array directly

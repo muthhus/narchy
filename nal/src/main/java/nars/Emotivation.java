@@ -100,21 +100,21 @@ public class Emotivation extends Emotion {
     @Override
     public @Nullable ITask onInput(@NotNull ITask x) {
 
-
-        if (x instanceof Task && !((Task) x).isCommand()) {
-            Task t = (Task) x;
-
-            //float p0 = t.priSafe(0);
-            float cost = Param.inputCost(t, nar);
-
-            //((NALTask)t).causeAppend(nar.taskCauses.get(t));
-
-            if (cost != 0) {
-                value(Cause.Purpose.Input, t.cause(), cost);
-            }
-
-            evaluate(t);
-        }
+//
+//        if (x instanceof Task && !((Task) x).isCommand()) {
+//            Task t = (Task) x;
+//
+//            //float p0 = t.priSafe(0);
+//            float cost = Param.inputCost(t, nar);
+//
+//            //((NALTask)t).causeAppend(nar.taskCauses.get(t));
+//
+//            if (cost != 0) {
+//                value(Cause.Purpose.Input, t.cause(), cost);
+//            }
+//
+//            evaluate(t);
+//        }
 
         return x;
     }

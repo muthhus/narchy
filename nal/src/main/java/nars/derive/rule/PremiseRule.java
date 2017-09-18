@@ -1,10 +1,12 @@
 package nars.derive.rule;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
 import nars.Op;
+import nars.control.Derivation;
 import nars.derive.*;
 import nars.derive.constraint.*;
 import nars.derive.op.*;
@@ -22,6 +24,8 @@ import nars.term.transform.CompoundTransform;
 import nars.truth.func.BeliefFunction;
 import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +39,7 @@ import static nars.Op.CONJ;
 import static nars.Op.PROD;
 import static nars.term.Terms.concat;
 import static nars.term.Terms.maxLevel;
+import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 /**
  * A rule which matches a Premise and produces a Task
@@ -109,7 +114,7 @@ public class PremiseRule extends GenericCompound {
     /**
      * compiles the conditions which are necessary to activate this rule
      */
-    public List<Term> conditions(@NotNull PostCondition post, NAR nar) {
+    public Pair<Set<Term>, PrediTerm<Derivation>> conditions(@NotNull PostCondition post, NAR nar) {
 
         Set<Term> s = newHashSet(16); //for ensuring uniqueness / no duplicates
 
@@ -153,17 +158,22 @@ public class PremiseRule extends GenericCompound {
 
         s.addAll(match.pre);
 
-        List<Term> l = sort(new FasterList(s));
 
-        l.addAll(match.constraints);
+
+        int n = match.constraints.size() + match.post.size();
+
 
         //SUFFIX (order already determined for matching)
+        PrediTerm[] suff = new PrediTerm[n];
+        int k = 0;
+        for (PrediTerm p : match.constraints)
+            suff[k++] = p;
+        for (PrediTerm p : match.post) {
+            suff[k++] = p;
+        }
+        ((UnificationPrototype)suff[k-1]).conclude.add(conc.apply(nar));
 
-        l.addAll(match.post);
-
-        ((UnificationPrototype) match.post.get(match.post.size() - 1)).conclude.add(conc.apply(nar));
-
-        return l;
+        return pair(s, (PrediTerm<Derivation>)AndCondition.the(new FasterList(suff)));
     }
 
     /**

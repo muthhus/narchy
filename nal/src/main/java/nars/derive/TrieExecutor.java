@@ -27,19 +27,19 @@ public class TrieExecutor extends AbstractPred<Derivation> {
     }
 
 
-    class Choice extends Fork {
+    static class Choice extends Fork {
 
-        private final int id;
+        //private final int id;
 
-        protected Choice(PrediTerm[] branches) {
+        public Choice(PrediTerm[] branches) {
             super(branches);
-            id = value.addNode(this);
+            //id = value.addNode(this);
         }
 
-        @Override
-        public String toString() {
-            return id + "(to=" + cache.length + ")";
-        }
+//        @Override
+//        public String toString() {
+//            return id + "(to=" + cache.length + ")";
+//        }
     }
 
     class Path {

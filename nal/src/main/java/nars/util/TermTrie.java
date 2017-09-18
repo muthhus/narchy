@@ -37,10 +37,7 @@ abstract public class TermTrie<K extends Term, V> extends Trie<List<K>, V> imple
         super(null);
     }
 
-    /**
-     * called for each item on insert
-     */
-    abstract public void put(V v);
+
 
     public static <A, B> void printSummary(@NotNull TrieNode<List<A>, B> node, @NotNull PrintStream out) {
 

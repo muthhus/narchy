@@ -1,6 +1,7 @@
 package nars.derive;
 
 import jcog.Util;
+import jcog.list.FasterList;
 import jcog.trie.TrieNode;
 import nars.$;
 import nars.NAR;
@@ -13,19 +14,22 @@ import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.term.Term;
 import nars.util.TermTrie;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.roaringbitmap.RoaringBitmap;
 
 import java.io.PrintStream;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 
 /**
@@ -40,7 +44,7 @@ public enum TrieDeriver {
 
     public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
 
-        final TermTrie<Term, PremiseRule> trie = new RuleTrie(nar, r);
+        final TermTrie<Term, TrieExecutor.Choice> trie = new RuleTrie(nar, r);
 
         List<PrediTerm<Derivation>> bb = subtree(trie.root);
         PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
@@ -420,7 +424,7 @@ public enum TrieDeriver {
 
 
     @NotNull
-    static List<PrediTerm<Derivation>> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
+    static List<PrediTerm<Derivation>> subtree(@NotNull TrieNode<List<Term>, TrieExecutor.Choice> node) {
 
 
         List<PrediTerm<Derivation>> bb = $.newArrayList(node.childCount());
@@ -544,14 +548,61 @@ public enum TrieDeriver {
      */
     //public final HashMultimap<MatchTerm,Derive> derivationLinks = HashMultimap.create();
 
-    static final class RuleTrie extends TermTrie<Term, PremiseRule> {
+    static final class RuleTrie extends TermTrie<Term, TrieExecutor.Choice> {
 
         private final NAR nar;
 
         public RuleTrie(NAR nar, PremiseRuleSet r) {
             super();
             this.nar = nar;
-            r.forEach(this::put);
+
+            Map<Set<Term>, RoaringBitmap> pre = new HashMap<>();
+            List<Pair<PrediTerm<Derivation>, PremiseRule>> conclusions = $.newArrayList(r.size()*4);
+
+
+            ObjectIntHashMap<Term> preconditionCount = new ObjectIntHashMap(256);
+
+            r.forEach(rule -> {
+
+                assert (rule.POST != null) : "null POSTconditions:" + rule;
+
+                for (PostCondition p : rule.POST) {
+
+                    Pair<Set<Term>,PrediTerm<Derivation>> c = rule.conditions(p, this.nar);
+
+                    c.getOne().forEach((k) -> preconditionCount.addToValue(k, 1));
+
+                    int n = conclusions.size();
+                    conclusions.add(pair(c.getTwo(), rule));
+
+                    pre.computeIfAbsent(c.getOne(), (x)->new RoaringBitmap()).add(n);
+
+                }
+            });
+
+//            System.out.println("PRECOND");
+//            preconditionCount.keyValuesView().toSortedListBy((x)->x.getTwo()).forEach((x)->System.out.println(Texts.iPad(x.getTwo(),3) + "\t" + x.getOne() ));
+
+            List<List<Term>> paths = $.newArrayList();
+            pre.forEach((k,v) -> {
+                FasterList<Term> path = new FasterList(k);
+                path.sort((a, b) -> {
+
+                    if (a.equals(b)) return 0;
+
+                    int ac = preconditionCount.get(a);
+                    int bc = preconditionCount.get(b);
+                    if (ac > bc) return -1;
+                    else if (ac < bc) return +1;
+                    else return a.compareTo(b);
+                });
+
+                PrediTerm<Derivation>[] ll = StreamSupport.stream(v.spliterator(), false).map((i) -> conclusions.get(i).getOne()).toArray(PrediTerm[]::new);
+                TrieExecutor.Choice cx = new TrieExecutor.Choice(ll);
+                path.add(cx);
+                put(path, cx);
+            });
+
         }
 
         @Override
@@ -566,29 +617,7 @@ public enum TrieDeriver {
             }
         }
 
-        @Override
-        public void put(@NotNull PremiseRule rule) {
 
-            assert (rule.POST != null) : "null POSTconditions:" + rule;
-
-            for (PostCondition p : rule.POST) {
-
-                List<Term> c = rule.conditions(p, nar);
-
-                PremiseRule existing = put(c, rule);
-
-//                if (existing != null) {
-//                    throw new RuntimeException("Duplicate condition sequence:\n\t" + c + "\n\t" + existing);
-//                }
-//                    if (existing != null && s != existing && existing.equals(s)) {
-//                        System.err.println("DUPL: " + existing);
-//                        System.err.println("      " + existing.getSource());
-//                        System.err.println("EXST: " + s.getSource());
-//                        System.err.println();
-//                    }
-//                }
-            }
-        }
     }
 
     //    //TODO not complete

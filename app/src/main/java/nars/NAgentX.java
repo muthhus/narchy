@@ -436,7 +436,9 @@ abstract public class NAgentX extends NAgent {
 
                         i.updateMomentum(
                                 //0.01f + Util.sqr(Util.tanhFast(v)+1),
-                                Math.signum(v) *(1+Math.abs(v))*(t), 0.05f,
+                                //Math.signum(v) *(1+Math.abs(v))*(t),
+                                Math.signum(v) * t,
+                                0.05f,
                                 r, g, b);
 
                     }, builder);
