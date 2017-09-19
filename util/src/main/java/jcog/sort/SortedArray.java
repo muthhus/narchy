@@ -269,7 +269,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
                 System.arraycopy(list, index, newItems, index + 1, oldSize - index);
                 this.list = list = newItems;
             } else {
-                displace(list[index]);
+                reject(list[index]);
             }
 
         } else {
@@ -280,7 +280,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
     }
 
     /** called when the lowest value has been kicked out of the list by a higher ranking insertion */
-    protected void displace(E e) {
+    protected void reject(E e) {
 
     }
 

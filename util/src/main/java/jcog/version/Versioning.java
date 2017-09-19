@@ -28,7 +28,7 @@ public class Versioning<X> extends
     }
 
 
-    public final boolean revertAndContinue(int to) {
+    public final boolean revertLive(int to) {
         revert(to);
         return live();
     }
@@ -71,7 +71,7 @@ public class Versioning<X> extends
     @Override
     public final boolean add(@NotNull Versioned<X> newItem) {
         Versioned<X>[] ii = this.items;
-        if (tick() && ii.length > this.size) {
+        if (ii.length > this.size) {
             ii[this.size++] = newItem; //cap
             return true;
         }
@@ -105,14 +105,7 @@ public class Versioning<X> extends
         return t;
     }
 
-    public final boolean tick() {
-//        if (ttl-- == 0) {
-//            onDeath(); //transition from live to death occurred
-//        }
 
-        return ttl-- > 0;
-
-    }
 
 //    /**
 //     * empty for subclass impl

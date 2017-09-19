@@ -10,7 +10,8 @@ import spacegraph.render.Draw;
  */
 public class Label extends Surface {
 
-    private String value = "";
+    private String value = "(null)";
+
     public float fontScale = 1f;
     public final Color4f color = new Color4f(1f,1f,1f,1f);
     public float lineWidth = 3f;
@@ -37,11 +38,12 @@ public class Label extends Surface {
 
     public void set(String newValue) {
 
-        if (newValue == null)
-            newValue = "(null)";
-        this.value = newValue;
-        int len = newValue.length();
+       if (this.value==newValue)
+            return;
 
+        this.value = newValue;
+
+        int len = newValue.length();
         this.aspect = 1f / (len);
         this.fontScale = 1f / len;
 

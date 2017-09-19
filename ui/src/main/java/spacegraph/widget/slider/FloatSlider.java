@@ -6,6 +6,7 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
 import spacegraph.widget.Label;
+import spacegraph.widget.XorLabel;
 
 /**
  * Created by me on 11/18/16.
@@ -14,19 +15,19 @@ public class FloatSlider extends BaseSlider {
 
     private final float max;
     private final float min;
-    final Label label;
+    final Label label = new Label();
     public FloatSupplier input;
-
+    private String labelText = "";
 
     public FloatSlider(float v, float min, float max) {
         super((v - min) / (max - min));
 
-
-        label = new Label();
         set(label);
+        updateLabel();
 
         this.min = min;
         this.max = max;
+
     }
 
     public FloatSlider(String label, float v, float min, float max) {
@@ -37,33 +38,35 @@ public class FloatSlider extends BaseSlider {
     public FloatSlider(FloatParam f) {
         this(f.floatValue(), f.min, f.max);
         input = f;
-        on((s,v)-> f.setValue(v));
+        on((s, v) -> f.setValue(v));
     }
 
     public FloatSlider label(String label) {
-        this.label.set(label);
+        this.labelText = label;
+        updateLabel();
         return this;
     }
 
     @Override
-    protected void paint(GL2 gl) {
+    protected void changed(float p) {
+        super.changed(p);
+        updateLabel();
+    }
 
+    private void updateLabel() {
+        this.label.set(labelText());
+    }
 
-        if (input!=null)
+    @Override
+    protected void paintComponent(GL2 gl) {
+        if (input != null)
             value(input.asFloat());
 
-//        gl.glLineWidth(1f);
-//        gl.glColor3f(1, 1, 1);
-        this.label.set(labelText());
-//        Draw.text(gl, label, 0.5f / label.length(), 0.5f, 0.5f, 0);
-
-
-        super.paint(gl);
-
+        super.paintComponent(gl);
     }
 
     public String labelText() {
-        return Texts.n2(value());
+        return this.labelText + Texts.n2(value());
     }
 
     @Override
@@ -75,4 +78,5 @@ public class FloatSlider extends BaseSlider {
     protected float v(float p) {
         return Util.clamp(p, 0, 1f) * (max - min) + min;
     }
+
 }

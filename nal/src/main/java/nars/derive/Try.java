@@ -4,6 +4,7 @@ import jcog.Util;
 import nars.$;
 import nars.control.CauseChannel;
 import nars.control.Derivation;
+import org.roaringbitmap.IntIterator;
 import org.roaringbitmap.RoaringBitmap;
 
 import java.util.Random;
@@ -35,7 +36,10 @@ public class Try extends AbstractPred<Derivation> {
 
         short[] routing = new short[numChoices * 2]; //sequence of (choice, score) pairs
         final int[] p = {0};
-        values.getNormalized(choices, 10000, (c, v) -> {
+
+        Random rng = d.random;
+        IntIterator ii = numChoices==1 || rng.nextBoolean() ? choices.getIntIterator() : choices.getReverseIntIterator();
+        values.getNormalized(ii, 10, (c, v) -> {
             int pp = p[0]++ * 2;
             routing[pp] = (short) c;
             routing[pp + 1] = (short) v;
@@ -44,9 +48,7 @@ public class Try extends AbstractPred<Derivation> {
         if (p[0] > 1)
             bingoSortPairwise(routing);
 
-        Random rng = d.random;
-        int minPerBranch = 64;
-        int maxPerBranch = 128;
+
         int loopCost = 5;
         //TODO int maxRepeats and associate this with expected # of termutes or something to avoid useless repeats
         int before = d.now();
@@ -57,25 +59,26 @@ public class Try extends AbstractPred<Derivation> {
             if (numChoices > 1) {
                 //curvebag sampling of the above array
                 float x = rng.nextFloat();
-                float curve = x * x * x;
+                float curve = x * x;
                 sample = (int) ((1f - curve) * (numChoices - 0.5f));
             } else {
                 sample = 0;
             }
 
             int n = g2(routing, sample, KEY);
-            int loopBudget = Util.lerp(g2(routing, sample, VAL), minPerBranch, maxPerBranch);
-            int ttlSaved = d.getAndSetTTL(loopBudget) - loopBudget - loopCost;
-            if (ttlSaved < 0) {
-                d.setTTL(0);
-                break;
-            }
+            //int loopBudget = Util.lerp(g2(routing, sample, VAL), minPerBranch, maxPerBranch);
+            //int ttlSaved = d.getAndSetTTL(loopBudget) - loopBudget - loopCost;
+            d.use(loopCost);
+//            if (ttlSaved < 0) {
+//                d.setTTL(0);
+//                break;
+//            }
 
             branches[n].test(d);
 
             if (before > 0) d.revert(before);
 
-            d.addTTL(ttlSaved );
+            //d.addTTL(ttlSaved );
         }
 
         return false;

@@ -2,18 +2,22 @@ package nars.exe;
 
 import jcog.Loop;
 import jcog.Util;
+import jcog.event.ListTopic;
 import jcog.event.On;
+import jcog.event.Topic;
+import jcog.sort.TopN;
 import nars.NAR;
+import nars.control.Activate;
+import nars.control.DurService;
 import nars.task.ITask;
+import nars.task.RunTask;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.IntFunction;
+import java.util.concurrent.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -21,188 +25,162 @@ import java.util.stream.Stream;
  */
 public class MultiExec extends Exec {
 
-    private static final long LAG_REPORT_THRESH_ms = 0;
-
-    private final Passive passive;
-    private final Worker[] active;
-
-    //private final ForkJoinPool passive;
 
     /**
      * https://github.com/conversant/disruptor/wiki
      */
-    static class Passive implements Executor {
 
-        public static final Logger logger = LoggerFactory.getLogger(Passive.class);
+    public static final Logger logger = LoggerFactory.getLogger(MultiExec.class);
 
-        private final BlockingQueue<Runnable> q;
-        private final ExecutorService calcThreads;
+    private final BlockingQueue<ITask> q;
+    private ExecutorService exe;
 
-        public Passive(int nThreads, int queueSize) {BlockingQueue<Runnable> q1;
-            q = Util.blockingQueue(queueSize);
+    final Topic<Activate> onActivate = new ListTopic();
 
-            calcThreads = Executors.newFixedThreadPool(nThreads);
-            for (int i = 0; i < nThreads; i++) {
-                calcThreads.execute(() -> {
-                    int idle = 0;
-                    while (true) {
-                        //try {
-                            Runnable r = q.poll(); //100L, TimeUnit.MILLISECONDS);
-                            if (r != null) {
-                                idle = 0;
-                                work(r);
-                            } else {
-                                Util.pauseNext(idle++);
-                            }
-//                        } catch (InterruptedException e) {
-//                            Thread.yield();
-//                        }
-                    }
-                });
-            }
-        }
-
-        @Override
-        public void execute(@NotNull Runnable command) {
-            try {
-                q.put(command);
-            } catch (InterruptedException e) {
-                logger.error("{} {}", command, e);
-            }
-        }
-
-        static void work(Runnable r) {
-            try {
-                r.run();
-            } catch (Throwable t) {
-                logger.error("{} {}", r, t);
-            }
-        }
+    @Override
+    public void execute(@NotNull Runnable runnable) {
+        add(new RunTask(runnable));
     }
+
+
+    public Stream<ITask> stream() {
+        return q.stream();
+    }
+
 
     //private final Worker[] workers;
     private final int num;
     private On onCycle;
 
-
-    public MultiExec(IntFunction<Worker> active, int numWorkers, int passive) {
-        this(
-                Util.map(0, numWorkers, active, Worker[]::new),
-                passive
-                //new ForkJoinPool(passive, defaultForkJoinWorkerThreadFactory,
-                       // null, true /* async */)
-        );
-    }
-
-    public MultiExec(Worker[] active, int passiveThreads) {
-        this.num = active.length;
-        assert (num > 0);
-        this.active = active;
-        this.passive = new Passive(passiveThreads, 512);
-        //this.working = Executors.newFixedThreadPool(num);
-
-        for (Worker s : active) {
-            s.passive = passive;
-        }
+    public MultiExec(int threads, int qSize) {
+        num = threads;
+        q = Util.blockingQueue(qSize);
     }
 
     @Override
     public synchronized void start(NAR nar) {
         super.start(nar);
+        exe = Executors.newFixedThreadPool(num);
+        for (int i = 0; i < num; i++) {
+            exe.execute(() -> {
+                int idle = 0;
+                while (true) {
+                    ITask r = q.poll(); //100L, TimeUnit.MILLISECONDS);
+                    if (r != null) {
+                        idle = 0;
+                        execute(r);
+                    } else {
+                        Util.pauseNext(idle++);
+                    }
 
-        for (Worker w : active) {
-            w.start(nar, 0);
+                }
+            });
         }
-
-        onCycle = nar.onCycle(this::cycle);
     }
 
-    @Override
-    public void execute(Runnable r) {
-        passive.execute(r);
+    public void execute(ITask r) {
+        try {
+
+            r.run(nar);
+
+            if (r instanceof Activate)
+                onActivate.emit((Activate)r);
+
+        } catch (Throwable t) {
+            logger.error("{} {}", r, t);
+        }
     }
-
-
-    @Override
-    public void add(@NotNull ITask x) {
-        int sub = worker(x);
-        active[sub].add(x);
-    }
-
-    public int worker(@NotNull ITask x) {
-        return Math.abs(Util.hashWangJenkins(x.hashCode())) % num;
-    }
-
-
-//        public void apply(CLink<? extends ITask> x) {
-//            if (x!=null && !x.isDeleted()) {
-//                x.priMult(((MixContRL) (((NARS) nar).in)).gain(x));
-//            }
-//        }
 
     @Override
     public synchronized void stop() {
-
-        for (Worker w : active)
-            w.stop();
-
-        super.stop();
-
-//        onCycle.off();
-//        onCycle = null;
-//        lastCycle = null;
-    }
-
-
-    public void cycle() {
-        Runnable r;
-        while ((r = passive.q.poll()) != null) {
-            Passive.work(r);
+        exe.shutdownNow();
+        if (!exe.isShutdown()) {
+            logger.info("awaiting termination..");
+            try {
+                exe.awaitTermination(60, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                logger.error("awaiting termination: {}", e);
+            }
         }
-//        while (!passive.awaitQuiescence(10, TimeUnit.MILLISECONDS)) {
-//            Thread.yield();
-//        }
+        super.stop();
     }
 
-//            int waitCycles = 0;
-//            while (!passive.isQuiescent()) {
-//                Util.pauseNext(waitCycles++);
-//            }
-//
-//        if (!busy.compareAndSet(false, true))
-//            return; //already in the cycle
-//
-//
-//        try {
-//
-//            if (!passive.isQuiescent()) {
-//                long start = System.currentTimeMillis();
-//                int pauseCount = 0;
-//
-//                do {
-//                    Util.pauseNext(pauseCount++);
-//                } while (!passive.isQuiescent());
-//
-//                long lagMS = System.currentTimeMillis() - start;
-//                if (lagMS > LAG_REPORT_THRESH_ms)
-//                    NAR.logger.info("cycle lag {} ms", lagMS);
-//            }
-//
-//        } finally {
-//            busy.set(false);
-//        }
-//    }
+    @Override
+    public void add(/*@NotNull*/ ITask t) {
+        if (!q.offer(t)) {
 
-//    /**
-//     * dont call directly
-//     */
-//    void run() {
-//        nar.eventCycle.emitAsync(nar, passive); //TODO make a variation of this for ForkJoin specifically
-//    }
+            //1. reduce system power parameter
+            //TODO
+
+            Util.pauseNext(0);
+
+            //2. attempt to evict any weaker tasks consuming space
+            int sample = Math.max(4, q.size() / (num+1) / 4);
+
+            int survive = Math.round(sample * 0.5f);
+
+            TopN<ITask> tmpEvict = new TopN<>(new ITask[survive], (x) -> x.priElseNeg1() ) {
+                @Override
+                protected void reject(ITask iTask) {
+                    logger.info("ignored: {}", iTask);
+                }
+            };
+            tmpEvict.add(t);
+
+            q.drainTo(tmpEvict, sample);
+//            if (tmpEvict.isEmpty()) {
+//                logger.warn("ignored {}", t);
+//                return;
+//            }
+
+            //reinsert the temporarily evicted
+            tmpEvict.forEach(q::offer);
+        }
+    }
+
+    public void add(Exec reasoner, Predicate<Activate> filter) {
+        execute((Runnable)()->new Reasoner(reasoner, filter));
+    }
+
+    class Reasoner extends DurService /* TODO use Throttled */ implements Consumer<Activate> {
+        private final Exec sub;
+
+        /** customizable filter, or striping so that every reasoner doesnt get the same inputs */
+        private final Predicate<Activate> filter;
+
+        public Reasoner(Exec focusExec, Predicate<Activate> filter) {
+            super(nar);
+            this.sub = focusExec;
+            this.filter = filter;
+            sub.start(nar);
+        }
+
+        @Override
+        protected void start(NAR nar) {
+            super.start(nar);
+            ons.add(onActivate.on(this));
+        }
+
+        @Override
+        protected void run(NAR n, long dt) {
+            ((FocusExec) sub).run();
+        }
+
+        public void stop() {
+            sub.stop();
+        }
+
+        @Override
+        public void accept(Activate activate) {
+            if (filter.test(activate))
+                sub.add(activate);
+        }
+    }
+
 
     @Override
     public int concurrency() {
-        return 1 + num; //TODO calculate based on # of sub-NAR's but definitely is concurrent so we add 1 here in case passive=1
+        return num; //TODO calculate based on # of sub-NAR's but definitely is concurrent so we add 1 here in case passive=1
     }
 
     @Override
@@ -210,18 +188,14 @@ public class MultiExec extends Exec {
         return true;
     }
 
-    @Override
-    public Stream<ITask> stream() {
-        return Stream.of(active).flatMap(Worker::stream);
-    }
 
-    public static class Worker extends Exec {
+    static class Sub extends Exec {
 
         private final Exec model;
         private Executor passive;
         private Loop loop;
 
-        public Worker(Exec delegate) {
+        public Sub(Exec delegate) {
             super();
             this.model = delegate;
         }

@@ -6,6 +6,7 @@ import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
 import nars.time.Tense;
 import org.eclipse.collections.api.block.predicate.primitive.IntFloatPredicate;
+import org.roaringbitmap.IntIterator;
 import org.roaringbitmap.PeekableIntIterator;
 import org.roaringbitmap.RoaringBitmap;
 
@@ -46,8 +47,7 @@ public class ValueCache extends RecycledSummaryStatistics {
         }
     }
 
-    public void get(RoaringBitmap b, IntFloatPredicate each) {
-        PeekableIntIterator ii = b.getIntIterator();
+    public void get(IntIterator ii, IntFloatPredicate each) {
         int k = 0;
         while (ii.hasNext()) {
             int n = ii.next();
@@ -55,7 +55,7 @@ public class ValueCache extends RecycledSummaryStatistics {
                 break;
         }
     }
-    public void getNormalized(RoaringBitmap b, int levels, IntFloatPredicate each) {
+    public void getNormalized(IntIterator b, int levels, IntFloatPredicate each) {
         float min = (float)getMin();
         float max = (float)getMax();
         float range = max - min;

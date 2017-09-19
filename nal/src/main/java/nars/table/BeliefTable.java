@@ -293,6 +293,12 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return t == null ? Float.NaN : t.freq();
     }
 
+    /** truth expectation: returns 0.5f (neutral) if no truth can be determined */
+    default double exp(long now, NAR n) {
+        Truth t = truth(now, n);
+        return t == null ? 0.5f : t.expectation();
+    }
+
 
 //    /** 2-element array containing running min/max range accumulator */
 //    void range(long[] t);

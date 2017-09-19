@@ -2,12 +2,16 @@ package spacegraph.widget.slider;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
+import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
+import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
+import static com.jogamp.opengl.GL.GL_COLOR_LOGIC_OP;
+import static com.jogamp.opengl.GL.GL_XOR;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.grid;
 
@@ -22,49 +26,34 @@ public class BaseSlider extends Widget {
 
     private static final float EPSILON = 0.001f;
 
-    @Nullable SliderChange change;
+    @Nullable ObjectFloatProcedure<BaseSlider> change;
     private float p;
 
 
-    public interface SliderChange {
-        void onChange(BaseSlider s, float value);
-    }
+
 
     public BaseSlider(float p) {
         this.p = p;
     }
 
 
-    public BaseSlider on(SliderChange c) {
+    public BaseSlider on(ObjectFloatProcedure<BaseSlider> c) {
         this.change = c;
         return this;
     }
 
     @Override
     protected void paintComponent(GL2 gl) {
-
-
-
-        //float margin = 0.1f;
-        //float mh = margin / 2.0f;
-
-        //gl.glLineWidth(mh * 2);
-        //gl.glColor3f(0.5f, 0.5f, 0.5f);
-        //ShapeDrawer.strokeRect(gl, 0, 0, W, H);
-
-        //double hp = 0.5 + 0.5 * p;
-
-        float p = this.p;
-        gl.glColor4f(1f - p, p, 0f, 0.8f);
-        //g1.setFill(Color.ORANGE.deriveColor(70 * (p - 0.5), hp, 0.65f, 1.0f));
-
-        float W = 1;
-        float barSize = W * p;
-        //ShapeDrawer.rect(gl, mh/2, mh/2f, barSize - mh, H - mh);
-        float H = 1;
-        Draw.rect(gl, 0, 0, barSize, H);
+        draw.value(this.p, gl);
     }
 
+
+    FloatObjectProcedure<GL2> draw = SolidLeft;
+
+    public BaseSlider draw(FloatObjectProcedure<GL2> draw) {
+        this.draw = draw;
+        return this;
+    }
 
     @Override
     protected boolean onTouching(v2 hitPoint, short[] buttons) {
@@ -82,10 +71,14 @@ public class BaseSlider extends Widget {
     public void _set(float p) {
         float current = Util.unitize(this.p);
         if (!Util.equals(current, p, EPSILON)) {
-            this.p = p;
-            if (change!=null)
-                change.onChange(this, value());
+            changed(p);
         }
+    }
+
+    protected void changed(float p) {
+        this.p = p;
+        if (change!=null)
+            change.value(this, value());
     }
 
     public float value() {
@@ -144,6 +137,28 @@ public class BaseSlider extends Widget {
         else
             return hitPoint.x;
     }
+
+    public static final FloatObjectProcedure<GL2> SolidLeft = (p, gl) -> {
+        gl.glColor4f(1f - p, p, 0f, 0.8f);
+
+        float W = 1;
+        float H = 1;
+        float barSize = W * p;
+        Draw.rect(gl, 0, 0, barSize, H);
+    };
+
+    public static final FloatObjectProcedure<GL2> Knob = (p, gl) -> {
+
+        float knobWidth = 0.05f;
+        float W = 1;
+        float H = 1;
+        float x = W * p;
+        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.2f);
+        Draw.rect(gl, 0, 0, W, H);
+        gl.glColor4f(1f - p, p, 0f, 0.75f);
+        Draw.rect(gl, x-knobWidth/2f, 0, knobWidth, H);
+
+    };
 
 
 //    public void denormalized(double... n) {

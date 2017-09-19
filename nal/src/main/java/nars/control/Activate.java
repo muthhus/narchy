@@ -17,8 +17,12 @@ import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 
 import static nars.Op.INT;
@@ -138,7 +142,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
 
-        Set<Concept> localSubConcepts = linkTemplates(nar, decayed);
+        Collection<Concept> localSubConcepts = linkTemplates(nar, decayed);
 
 
         List<PriReference<Term>> terml;
@@ -177,16 +181,18 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         return premises;
     }
 
-    @NotNull
-    public Set<Concept> linkTemplates(NAR nar, float decayed) {
+    @Nullable
+    public Collection<Concept> linkTemplates(NAR nar, float decayed) {
         Collection<Termed> localTemplates = id.templates();
-
-
-        if (!localTemplates.isEmpty()) {
-            float subDecay = decayed / localTemplates.size();
+        int n = localTemplates.size();
+        if (n > 0) {
+            float subDecay = decayed / n;
             Term thisTerm = id.term();
 
-            Set<Concept> localSubConcepts = new HashSet<>(); //temporary for this function call only, so as not to retain refs to Concepts
+            Collection<Concept> localSubConcepts =
+                    //new HashSet<>(); //temporary for this function call only, so as not to retain refs to Concepts
+                    //new UnifiedSet(); //allows concurrent read
+                    $.newArrayList(n); //maybe contain duplicates but its ok, this is fast to construct
 
             Random rng = nar.random();
             float balance = Param.TERMLINK_BALANCE;
@@ -207,13 +213,15 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
                     Concept localSubConcept = nar.conceptualize(localSub);
                     if (localSubConcept != null) {
-                        localSubConcept.activate(subDecay, nar);
 
                         if (subDecayReverse > Pri.EPSILON) {
                             localSubConcept.termlinks().putAsync(
                                     new PLink(thisTerm, subDecayReverse)
                             );
                         }
+
+                        localSubConcept.activate(subDecay, nar);
+
                         localSubConcepts.add(localSubConcept);
                     }
 
@@ -224,14 +232,13 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                             new PLink(localSubTerm, subDecayForward)
                     );
                 }
-
             }
 
-            return localSubConcepts;
+            if (!localSubConcepts.isEmpty())
+                return localSubConcepts;
         }
 
-        return Collections.emptySet();
-
+        return null;
     }
 
     /**

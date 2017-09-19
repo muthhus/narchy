@@ -44,14 +44,14 @@ public class Fork extends AbstractPred<Derivation> {
         int branches = cache.length;
         if (branches == 1) {
             cache[0].test(m);
-            return m.revertAndContinue(before);
+            return m.revertLive(before);
         } else {
             ByteShuffler b = m.shuffler;
             byte[] order = b.shuffle(m.random, branches, true); //must get a copy because recursion will re-use the shuffler's internal array
 
             for (int i = 0; i < branches; i++) {
                 cache[order[i]].test(m);
-                if (!m.revertAndContinue(before))
+                if (!m.revertLive(before))
                     return false;
             }
         }

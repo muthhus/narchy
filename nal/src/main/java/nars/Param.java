@@ -97,7 +97,7 @@ public abstract class Param extends Services<Term,NAR> {
                     32;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(192);
+    public final MutableInteger matchTTL = new MutableInteger(128);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.1f;
@@ -105,23 +105,20 @@ public abstract class Param extends Services<Term,NAR> {
     /** cost of attempting a unification */
     public static final int TTL_UNIFY = 1;
 
-    /** cost of a termutate permutation */
-    public static final int TTL_MUTATE = 2;
-
     /** cost of substitution/evaluating a derived term */
-    public static final int TTL_DERIVE_TRY = 3;
+    public static final int TTL_DERIVE_TRY = 1;
 
     /** cost of a successful task derivation */
-    public static final int TTL_DERIVE_TASK_SUCCESS = 20;
+    public static final int TTL_DERIVE_TASK_SUCCESS = 4;
 
     /** cost of a repeat (of another within the premise's batch) task derivation */
-    public static final int TTL_DERIVE_TASK_REPEAT = 15;
+    public static final int TTL_DERIVE_TASK_REPEAT = 2;
 
     /** cost of a task derived, but too similar to one of its parents */
-    public static final int TTL_DERIVE_TASK_SAME = 15;
+    public static final int TTL_DERIVE_TASK_SAME = 2;
 
     /** cost of a failed/aborted task derivation */
-    public static final int TTL_DERIVE_TASK_FAIL = 10;
+    public static final int TTL_DERIVE_TASK_FAIL = 2;
 
     /** number between 0 and 1 controlling the proportion of activation going
      * forward (compound to subterms) vs. reverse (subterms to parent compound).
@@ -143,7 +140,7 @@ public abstract class Param extends Services<Term,NAR> {
         float[] w = this.want;
 
         //follows the pos/neg guidelines described in the comment of each MetaGoal
-        Perceive.want(w, -1f);
+        Perceive.want(w, -0.05f);
         Accept.want(w, 0.5f);
         Accurate.want(w, 0.5f);
         Inaccurate.want(w, -1f);

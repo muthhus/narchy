@@ -26,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import static nars.Op.BELIEF;
@@ -46,9 +48,9 @@ public class Premise extends UnaryTask {
     public final Task taskLink;
     public final Term termLink;
 
-    public final Set<Concept> links;
+    @Nullable public Collection<Concept> links;
 
-    public Premise(@Nullable Task tasklink, @Nullable Term termlink, float pri, Set<Concept> links) {
+    public Premise(@Nullable Task tasklink, @Nullable Term termlink, float pri, Collection<Concept> links) {
         super(Tuples.pair(tasklink, termlink), pri);
         this.taskLink = tasklink;
         this.termLink = termlink;
@@ -103,10 +105,15 @@ public class Premise extends UnaryTask {
         }
 
 
-        activateSubterms(this.taskLink, links,
-                1f
-                /*decayed*/);
-        links.clear();
+        //WARNING: this exchange is not thread safe
+        Collection<Concept> l = links;
+        if (l!=null) {
+            links = null;
+
+            activateSubterms(this.taskLink, l,
+                    1f
+                    /*decayed*/);
+        }
 
         //float taskPri = task.priElseZero();
 
@@ -386,6 +393,27 @@ public class Premise extends UnaryTask {
     }
 
     public void merge(@NotNull Premise incoming) {
-        links.addAll(incoming.links);
+        //WARNING this isnt thread safe but collisions should be rare
+
+        Collection<Concept> target = this.links;
+        Collection<Concept> add = incoming.links;
+
+        if (target == add || add == null)
+            return; //same or no change
+
+        if (target == null || target.isEmpty()) {
+            this.links = add;
+            return; //just replace it
+        }
+
+        if (!(target instanceof Set)) {
+            Set<Concept> merge = new HashSet(target.size() + add.size());
+            this.links = merge;
+            merge.addAll(target);
+            merge.addAll(add);
+        } else {
+            target.addAll(add);
+        }
     }
+
 }

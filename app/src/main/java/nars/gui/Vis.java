@@ -208,11 +208,6 @@ public class Vis {
 //                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), history);
 //    }
 
-    public static Grid emotionPlots(NAgent a, int plotHistory) {
-
-        return new EmotionPlot(plotHistory, a);
-    }
-
     public static Label label(Object x) {
         return label(x.toString());
     }
@@ -380,7 +375,7 @@ public class Vis {
         }
 
         public EmotionPlot(int plotHistory, NAgent a, NAR x) {
-            super(Grid.VERTICAL);
+            super();
 
             NAR nar = x;
 
@@ -401,13 +396,13 @@ public class Vis {
                 return a.happy.beliefs().freq(a.now, a.nar);
             }, 0, 1f);
             plot4.add("WantHpy", () -> {
-                return a.happy.goals().freq(a.now, a.nar);
+                return a.happy.goals().exp(a.now, a.nar);
             }, 0, 1f);
             plot4.add("Sad", () -> {
                 return a.sad.beliefs().freq(a.now, a.nar);
             }, 0, 1f);
             plot4.add("WantSad", () -> {
-                return a.sad.goals().freq(a.now, a.nar);
+                return a.sad.goals().exp(a.now, a.nar);
             }, 0, 1f);
 
 //            plot4.add("Hapy", nar.emotion.happy::getSum);

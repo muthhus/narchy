@@ -20,10 +20,10 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E> {
 //     * resets the best values, effectively setting a the minimum entry requirement
 //     * untested
 //     */
-//    public TopN min(float min) {
-//        this.minSeen = min;
-//        return this;
-//    }
+    public TopN min(float min) {
+        this.minSeen = min;
+        return this;
+    }
 
     @Override
     public int add(E element, float elementRank, FloatFunction<E> cmp) {
@@ -32,6 +32,7 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E> {
 //                    last() + "=last but min=" + min;
 
             if (elementRank >= minSeen) {
+                reject(element);
                 return -1; //insufficient
             }
         }

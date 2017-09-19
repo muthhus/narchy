@@ -65,7 +65,7 @@ public class Choose1 extends Termutator.AbstractTermutator {
 
             }
 
-            if (!u.revertAndContinue(start))
+            if (!u.revertLive(start))
                 break;
         }
 

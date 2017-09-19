@@ -81,19 +81,22 @@ public enum MetaGoal {
             causes.forEach(Cause::setValueZero); //flat
         } else {
 
-            boolean bipolar = !(min <= 0 ^ max < 0);
-            float mid = bipolar ? 0 : (max+min)/2f;
-            float rangePos = max - mid;
-            float rangeNeg = mid - min;
+//            boolean bipolar = !(min <= 0 ^ max < 0);
+//            float mid = bipolar ? 0 : (max+min)/2f;
+//            float rangePos = max - mid;
+//            float rangeNeg = mid - min;
+
+            float valueMag = Math.max(Math.abs(max),Math.abs(min));
 
             for (int i = 0, causesSize = cc; i < causesSize; i++) {
                 Cause c = causes.get(i);
 
                 float n = c.valuePreNorm;
-                float v = n >= 0 ?
-                        (n - mid) / rangePos :
-                        (mid - n) / rangeNeg
-                        ;
+//                float v = n >= 0 ?
+//                        (n - mid) / rangePos :
+//                        (mid - n) / rangeNeg
+//                        ;
+                float v = n / valueMag; //normalize to -1..+1
 //
                 float nextValue =
                         Util.lerp(momentum, v, c.value);

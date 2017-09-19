@@ -533,6 +533,7 @@ public enum Draw {
         tt.enable(gl);
         tt.bind(gl);
 
+
         //sharp pixels on magnification
         gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -549,6 +550,8 @@ public enum Draw {
         gl.glTexCoord2f(0.0f, 0.0f);
         gl.glVertex3f(x1, y1 + h, z);
         gl.glEnd();
+
+        tt.disable(gl);
 
 
     }

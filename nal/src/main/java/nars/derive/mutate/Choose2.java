@@ -90,7 +90,7 @@ public class Choose2 extends Termutator.AbstractTermutator {
 
             }
 
-            if (!f.revertAndContinue(start))
+            if (!f.revertLive(start))
                 break;
         }
 

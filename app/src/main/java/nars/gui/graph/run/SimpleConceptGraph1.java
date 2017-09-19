@@ -1,6 +1,5 @@
 package nars.gui.graph.run;
 
-import jcog.bag.util.Bagregate;
 import jcog.math.MultiStatistics;
 import jcog.meter.event.CSVOutput;
 import nars.NAR;
@@ -8,7 +7,7 @@ import nars.NARS;
 import nars.Narsese;
 import nars.Param;
 import nars.control.Activate;
-
+import nars.gui.Vis;
 import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;
 import nars.task.ITask;
@@ -153,7 +152,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                 col(
                         reflect(cs),
                         reflect(cs.vis),
-                        reflect(fd),
+                        Vis.reflect(fd),
                         reflect(n.exe)
                         //new CheckBox("Atoms", atomsEnabled),
                         //reflect( new CycleView(n) ),

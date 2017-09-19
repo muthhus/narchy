@@ -116,14 +116,14 @@ public class reflect {
         }
     }
 
-    public static class ReflectTaskClone extends LeakBack {
-        final static Logger logger = LoggerFactory.getLogger(ReflectTaskClone.class);
+    public static class ReflectClonedTask extends LeakBack {
+        final static Logger logger = LoggerFactory.getLogger(ReflectClonedTask.class);
 
         private final NAR n;
         final static float VOL_RATIO_MAX = 2f;
         private final StableBloomFilter<Task> filter;
 
-        public ReflectTaskClone(int cap, NAR n) {
+        public ReflectClonedTask(int cap, NAR n) {
             super(cap, n);
             this.n = n;
             this.filter = new StableBloomFilter<>(

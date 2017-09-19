@@ -2,6 +2,7 @@ package nars.task;
 
 import jcog.pri.Priority;
 import nars.NAR;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * @param X identifier key
  */
 public interface ITask extends Priority {
+
 
     /**
      * note: the first null in the returned array will break the iteration because it means its the end of the list (all following it should also be null)

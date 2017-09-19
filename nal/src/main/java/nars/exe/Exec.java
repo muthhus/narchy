@@ -32,7 +32,7 @@ abstract public class Exec implements Executor, PriMerge {
 
 
     /** schedules the task for execution but makes no guarantee it will ever actually execute */
-    abstract public void add(@NotNull ITask input);
+    abstract public void add(/*@NotNull*/ ITask input);
 
     /** an estimate or exact number of parallel processes this runs */
     abstract public int concurrency();

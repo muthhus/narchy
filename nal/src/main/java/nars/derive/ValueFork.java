@@ -15,9 +15,8 @@ import java.util.function.Function;
 /** AIKR value-determined fork (aka choice-point) */
 public class ValueFork extends Fork {
 
-    //private final int id;
     final Taskify[] conc;
-    final ValueCache values;
+//    final ValueCache values;
 
     /** the term which a derivation will encounter signaling
      * that it may continue here after evaluating it among other choices */
@@ -51,7 +50,7 @@ public class ValueFork extends Fork {
         }
 
         causes = Util.map(c->c.channel, new CauseChannel[n], conc);
-        values = new ValueCache(c -> c::value, causes);
+//        values = new ValueCache(c -> c::value, causes);
     }
 
     @Override
@@ -59,22 +58,18 @@ public class ValueFork extends Fork {
         return new ValueFork(transformedBranches(f), can, downstream);
     }
 
-    private void update() {
-        values.update();
-    }
-
     @Override
     public boolean test(@NotNull Derivation d) {
 
         long now = d.time;
-        values.update(now);
+//        values.update(now);
 
         int before = d.now();
 
         int branches = cache.length;
         if (branches == 1) {
             cache[0].test(d);
-            return d.revertAndContinue(before);
+            return d.revertLive(before);
         } else {
             ByteShuffler b = d.shuffler;
             byte[] order = b.shuffle(d.random, branches, true); //must get a copy because recursion will re-use the shuffler's internal array
@@ -90,11 +85,11 @@ public class ValueFork extends Fork {
 
 //                d.addTTL(reserve);
 
-                if (!d.revertAndContinue(before))
+                if (!d.revertLive(before))
                     return false;
             }
         }
-        return true;
+        return d.live();
     }
 
 

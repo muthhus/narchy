@@ -44,7 +44,7 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
                 f.tryMutate(chain, current);
             }
 
-            if (!f.revertAndContinue(start))
+            if (!f.revertLive(start))
                 break;
         }
 

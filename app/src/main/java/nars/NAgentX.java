@@ -7,7 +7,7 @@ import jcog.list.FasterList;
 import jcog.pri.mix.control.MixContRL;
 import nars.control.Cause;
 import nars.control.Derivation;
-import nars.control.NARService;
+import nars.control.MetaGoal;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
@@ -38,6 +38,8 @@ import spacegraph.widget.meta.WindowButton;
 import spacegraph.widget.meter.BitmapMatrixView;
 import spacegraph.widget.meter.Plot2D;
 import spacegraph.widget.meter.TreeChart;
+import spacegraph.widget.slider.BaseSlider;
+import spacegraph.widget.slider.FloatSlider;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -46,6 +48,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 import static nars.$.$;
 import static nars.Op.BELIEF;
@@ -136,22 +139,13 @@ abstract public class NAgentX extends NAgent {
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8
                 , "motivation.nal");
 
-        int THREADS = 2;
+        int THREADS = 4;
+
+        MultiExec exe = new MultiExec(THREADS, 8192);
+        exe.add(new FocusExec(), (a) -> true);
+
         NAR n = new NARS()
-                .exe(
-                        new MultiExec((i) ->
-                                new MultiExec.Worker(
-                                        new FocusExec() {
-                                            @Override
-                                            protected @Nullable
-                                            NARService newTrigger() {
-                                                return null;
-                                            }
-                                        }
-
-//                                        new UniExec()
-
-                                ), THREADS, 3))
+                .exe(exe)
                 .time(clock)
                 .index(
                         new CaffeineIndex(64 * 1024)
@@ -161,6 +155,7 @@ abstract public class NAgentX extends NAgent {
                         //new MapTermIndex(new CustomConcurrentHashMap<>(STRONG, EQUALS, SOFT, EQUALS, 128*1024))
                 )
                 .get();
+
 
         n.setEmotion(new Emotivation(n));
 
@@ -190,7 +185,7 @@ abstract public class NAgentX extends NAgent {
         Inperience inp = new Inperience(n, 4);
 
         reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
-        reflect.ReflectTaskClone refTask = new reflect.ReflectTaskClone(4, n);
+        reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);
 
         NAgent a = init.apply(n);
         //a.trace = true;
@@ -263,68 +258,42 @@ abstract public class NAgentX extends NAgent {
 //        }), 100, 100);
 
 
-        //launch in separate thread cuz JOGL startup is slow
-        new Thread(() -> {
+        //get ready
+        System.gc();
+
+        NARLoop loop = a.nar.startFPS(fps);
+
+        a.nar.runLater(() -> {
+
             chart(a);
-            chart(n, a);
-            window(valueChart(a), 800, 600);
-            window(/*row*/(
 
-                    valuePlot(a)
+            window(new Vis.EmotionPlot(64, a), 500, 500);
 
-                    //mixPlot(a, m, HISTORY),
+            window(grid(Vis.reflect(n), Vis.reflect(n.services)), 700, 600);
 
+            window(grid(
+                    metaGoalChart(a),
+                    grid(
+                            metaGoalPlot(a),
+                            metaGoalSliders(n)
+                    )
+            ), 800, 500);
 
-                    //                        row(
-                    ////                                new Plot2D(HISTORY, Plot2D.Line)
-                    ////                                        .on(a::onFrame),
-                    //                                new Plot2D(HISTORY, Plot2D.Line)
-                    //                                        .add("happy", () -> m.lastScore)
-                    //                                        .on(a::onFrame)
-                    //                        )
-
-                    ////                        new MatrixView(m.traffic, 4, (x, gl) -> {
-                    ////                            Draw.colorGrays(gl, x);
-                    ////                            return 0;
-                    ////                        }),
-                    //                        MatrixView.get((ArrayTensor) m.agentIn, 4, (x, gl) -> {
-                    //                            Draw.colorGrays(gl, x);
-                    //                            return 0;
-                    //                        }),
-
-
-                    ////                        new MatrixView(new RingBufferTensor(m.agentIn, 2), 2, (x, gl) -> {
-                    ////                                    Draw.colorGrays(gl, x);
-                    ////                                    return 0;
-                    ////                                })
-
-
-                    ////                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.W),
-                    ////                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.y, false),
-                    ////
-                    ////                        row(
-                    ////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[0].q),
-                    ////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[1].q),
-                    ////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[2].q),
-                    ////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[3].q)
-                    ////                        ),
-
-                    // //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
-
-                    //                        MatrixView.get(m.mixControl, 4, (x, gl) -> {
-                    //                            Draw.colorBipolar(gl, (x - 0.5f) * 2f);
-                    //                            return 0;
-                    //                        })
-            ), 600, 600);
-
-            //get ready
-            System.gc();
-
-            NARLoop loop = a.nar.startFPS(fps);
-
-        }).start();
+        });
 
         return n;
+    }
+
+    private static Surface metaGoalSliders(NAR n) {
+        return grid(IntStream.range(0, n.want.length).mapToObj(
+            w -> new FloatSlider(n.want[w], -2f, +2f)
+                    .label(MetaGoal.values()[w].name())
+                    .draw(BaseSlider.Knob)
+                    .on((s, v) -> {
+                        n.want[w] = v;
+                    })
+        ).toArray(Surface[]::new));
+
     }
 
     /**
@@ -403,7 +372,7 @@ abstract public class NAgentX extends NAgent {
     }
 
 
-    private static Surface valueChart(NAgent a) {
+    private static Surface metaGoalChart(NAgent a) {
 
         return new TreeChart<Cause>() {
             final Ons on;
@@ -413,11 +382,11 @@ abstract public class NAgentX extends NAgent {
             final Function<Cause, TreeChart.ItemVis<Cause>> builder = ((i) -> {
                 short id = i.id;
                 ItemVis<Cause> item;
-                if (cache.capacity()-1 < id)
-                    cache.ensureCapacity(id +16);
+                if (cache.capacity() - 1 < id)
+                    cache.ensureCapacity(id + 16);
                 else {
                     item = cache.get(id);
-                    if (item!=null)
+                    if (item != null)
                         return item;
                 }
 
@@ -446,16 +415,16 @@ abstract public class NAgentX extends NAgent {
                         float v = c.value();
                         float r, g, b;
                         if (v < 0) {
-                            r = 0.75f * Math.min(1f, -v);
+                            r = 0.75f * Math.max(0.1f, Math.min(1f, -v));
                             g = 0;
                         } else {
-                            g = 0.75f * Math.min(1f, +v);
+                            g = 0.75f * Math.max(0.1f, Math.min(1f, +v));
                             r = 0;
                         }
 
-                        float t = Util.sum(p -> Math.abs(p.current), c.goalValue);
+                        float t = Util.sum(p -> Math.abs(p.current + p.prev), c.goalValue) / 10f;
 
-                        b = Math.max(r, g)/3f * t;
+                        b = Math.max(r, g) / 2f * Util.unitize(t);
 
                         i.updateMomentum(
                                 //0.01f + Util.sqr(Util.tanhFast(v)+1),
@@ -477,7 +446,7 @@ abstract public class NAgentX extends NAgent {
         };
     }
 
-    private static Surface valuePlot(NAgent a) {
+    private static Surface metaGoalPlot(NAgent a) {
         NAR nar = a.nar;
 
         int s = nar.causes.size();
@@ -505,60 +474,59 @@ abstract public class NAgentX extends NAgent {
         return bmp;
     }
 
-    private static void chart(NAR n, NAgent a) {
-        window(new NARSView(n, a), 600, 600);
-    }
-
-    public static class NARSView extends Grid {
-
-
-        public NARSView(NAR n, NAgent a) {
-            super(
-                    //new MixBoard(n, n.in),
-                    //new MixBoard(n, n.nalMix), //<- currently dont use this it will itnerfere with the stat collection
-                    Vis.reflect(n),
-                    new Vis.EmotionPlot(64, a)
-                    //row(n.sub.stream().map(c -> Vis.reflect(n)).collect(toList()))
-            );
-//                (n.sub.stream().map(c -> {
-//                int capacity = 128;
-//                return new BagChart<ITask>(
-//                        //new Bagregate<>(
-//                                ((BufferedSynchronousExecutorHijack) c.exe).active
-//                          //      ,capacity*2,
-//                            //    0.9f
-//                        //)
-//                        ,capacity) {
+//    public static class NARSView extends Grid {
 //
-//                    @Override
-//                    public void accept(ITask x, ItemVis<ITask> y) {
-//                        float p = Math.max(x.priElseZero(), Pri.EPSILON);
-//                        float r = 0, g = 0, b = 0;
-//                        int hash = x.hashCode();
-//                        switch (Math.abs(hash) % 3) {
-//                            case 0: r = p/2f; break;
-//                            case 1: g = p/2f; break;
-//                            case 2: b = p/2f; break;
-//                        }
-//                        switch (Math.abs(2837493 ^ hash) % 3) {
-//                            case 0: r += p/2f; break;
-//                            case 1: g += p/2f; break;
-//                            case 2: b += p/2f; break;
-//                        }
 //
-//                        y.update(p, r, g, b);
-//                    }
-//                };
-//            }).collect(toList()))); //, 0.5f);
-            a.onFrame(x -> update());
-        }
-
-        protected void update() {
-//            /*bottom().*/forEach(x -> {
-//                x.update();
-//            });
-        }
-    }
+//        public NARSView(NAR n, NAgent a) {
+//            super(
+//                    //new MixBoard(n, n.in),
+//                    //new MixBoard(n, n.nalMix), //<- currently dont use this it will itnerfere with the stat collection
+//
+//
+//
+//
+//
+//                    //row(n.sub.stream().map(c -> Vis.reflect(n)).collect(toList()))
+//            );
+////                (n.sub.stream().map(c -> {
+////                int capacity = 128;
+////                return new BagChart<ITask>(
+////                        //new Bagregate<>(
+////                                ((BufferedSynchronousExecutorHijack) c.exe).active
+////                          //      ,capacity*2,
+////                            //    0.9f
+////                        //)
+////                        ,capacity) {
+////
+////                    @Override
+////                    public void accept(ITask x, ItemVis<ITask> y) {
+////                        float p = Math.max(x.priElseZero(), Pri.EPSILON);
+////                        float r = 0, g = 0, b = 0;
+////                        int hash = x.hashCode();
+////                        switch (Math.abs(hash) % 3) {
+////                            case 0: r = p/2f; break;
+////                            case 1: g = p/2f; break;
+////                            case 2: b = p/2f; break;
+////                        }
+////                        switch (Math.abs(2837493 ^ hash) % 3) {
+////                            case 0: r += p/2f; break;
+////                            case 1: g += p/2f; break;
+////                            case 2: b += p/2f; break;
+////                        }
+////
+////                        y.update(p, r, g, b);
+////                    }
+////                };
+////            }).collect(toList()))); //, 0.5f);
+//            a.onFrame(x -> update());
+//        }
+//
+//        protected void update() {
+////            /*bottom().*/forEach(x -> {
+////                x.update();
+////            });
+//        }
+//    }
 
     //    public static NAR newAlann(int dur) {
 //
@@ -587,78 +555,68 @@ abstract public class NAgentX extends NAgent {
         a.nar.runLater(() -> {
             window(grid(
 
-                    grid(
-                            new WindowButton("nar", () -> nar),
-                            new WindowButton("emotion", () -> Vis.emotionPlots(a, 256))
-                            //new WindowButton( "focus", nar::focus),
+                    new WindowButton("log", () -> Vis.logConsole(nar, 80, 25, new FloatParam(0f))),
+                    new WindowButton("top", () -> (new ConsoleTerminal(new nars.TextUI(nar).session(20f)))),
+                    //new WindowButton("prompt", () -> Vis.newInputEditor(), 300, 60)
 
-                            //new WindowButton("mix", () -> new MixBoard(nar, nar.in))
-                    ),
-
-                    grid(
-                            new WindowButton("log", () -> Vis.logConsole(nar, 80, 25, new FloatParam(0f))),
-                            new WindowButton("top", () -> (new ConsoleTerminal(new nars.TextUI(nar).session(20f)))),
-                            new WindowButton("prompt", () -> Vis.newInputEditor(), 300, 60)
-                    ),
-
-                    grid(
-                            Vis.beliefCharts(16, nar, a.reward),
-                            new WindowButton("agent", () -> (a)),
+                    Vis.beliefCharts(16, nar, a.reward),
+                    new WindowButton("agent", () -> (a)),
+                    col(
                             new WindowButton("actionShort", () -> Vis.beliefCharts(a.nar.dur() * 4, a.actions.keySet(), a.nar)),
                             new WindowButton("actionMed", () -> Vis.beliefCharts(a.nar.dur() * 32, a.actions.keySet(), a.nar)),
-                            new WindowButton("actionLong", () -> Vis.beliefCharts(a.nar.dur() * 64, a.actions.keySet(), a.nar)),
-                            new WindowButton("predict", () -> Vis.beliefCharts(200, a.predictors, a.nar)),
-                            //"agentActions",
-                            //"agentPredict",
-
-                            a instanceof NAgentX ?
-                                    new WindowButton("vision", () -> grid(((NAgentX) a).cam.stream().map(cs ->
-                                            new CameraSensorView(cs, a).align(Surface.Align.Center, cs.width, cs.height))
-                                            .toArray(Surface[]::new))
-                                    ) : grid()
+                            new WindowButton("actionLong", () -> Vis.beliefCharts(a.nar.dur() * 64, a.actions.keySet(), a.nar))
                     ),
+                    //new WindowButton("predict", () -> Vis.beliefCharts(200, a.predictors, a.nar)),
+                    //"agentActions",
+                    //"agentPredict",
 
-                    grid(
-//                    new WindowButton( "conceptBudget",
-//                            ()->{
-//
-//                                double[] d = new double[32];
-//                                return new HistogramChart(
-//                                        ()->d,
-//                                        //()->h.uniformProb(32, 0, 1.0)
-//                                        new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.25f)) {
-//
-//                                    On on = a.onFrame((r) -> {
-//                                        Bag.priHistogram(r.nar.focus().concepts(), d);
-//                                    });
-//
-//                                    @Override
-//                                    public Surface hide() {
-//                                        on.off();
-//                                        return this;
-//                                    }
-//                                };
-//                            }
-//                        //Vis.budgetHistogram(nar, 64)
-//                    ),
+                    a instanceof NAgentX ?
+                            new WindowButton("vision", () -> grid(((NAgentX) a).cam.stream().map(cs ->
+                                    new CameraSensorView(cs, a).align(Surface.Align.Center, cs.width, cs.height))
+                                    .toArray(Surface[]::new))
+                            ) : grid()
 
-//                    new WindowButton( "conceptTreeMap", () -> {
+//                    grid(
+////                    new WindowButton( "conceptBudget",
+////                            ()->{
+////
+////                                double[] d = new double[32];
+////                                return new HistogramChart(
+////                                        ()->d,
+////                                        //()->h.uniformProb(32, 0, 1.0)
+////                                        new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.25f)) {
+////
+////                                    On on = a.onFrame((r) -> {
+////                                        Bag.priHistogram(r.nar.focus().concepts(), d);
+////                                    });
+////
+////                                    @Override
+////                                    public Surface hide() {
+////                                        on.off();
+////                                        return this;
+////                                    }
+////                                };
+////                            }
+////                        //Vis.budgetHistogram(nar, 64)
+////                    ),
 //
-//                        BagChart tc = new Vis.ConceptBagChart(new Bagregate(
-//                                ((NARS)a.nar).sub.stream().flatMap(x ->
-//                                        (((BufferedSynchronousExecutorHijack)(x.exe)).active.stream().map(
-//                                    y -> (y instanceof ConceptFire) ? ((ConceptFire)y) : null
-//                                ).filter(Objects::nonNull)), 128, 0.5f), 128, nar);
+////                    new WindowButton( "conceptTreeMap", () -> {
+////
+////                        BagChart tc = new Vis.ConceptBagChart(new Bagregate(
+////                                ((NARS)a.nar).sub.stream().flatMap(x ->
+////                                        (((BufferedSynchronousExecutorHijack)(x.exe)).active.stream().map(
+////                                    y -> (y instanceof ConceptFire) ? ((ConceptFire)y) : null
+////                                ).filter(Objects::nonNull)), 128, 0.5f), 128, nar);
+////
+////                        return tc;
+////                    })
 //
-//                        return tc;
-//                    })
-
-                            //"tasks", ()-> taskChart,
-
-                            new WindowButton("conceptGraph", () ->
-                                    Vis.conceptsWindow3D(nar, 128, 4))
-
-                    )
+//                            //"tasks", ()-> taskChart,
+//
+//                            new WindowButton("conceptGraph", () ->
+//                                    Vis.conceptsWindow3D(nar, 128, 4))
+//
+//                    )
             ), 900, 600);
         });
     }
@@ -775,6 +733,7 @@ abstract public class NAgentX extends NAgent {
             a.onFrame(this::update);
         }
     }
+
 
     //    private static class CorePanel extends Surface{
 //
