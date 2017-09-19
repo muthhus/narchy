@@ -32,6 +32,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.CharToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.roaringbitmap.PeekableIntIterator;
+import org.roaringbitmap.RoaringBitmap;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptEngineManager;
@@ -395,7 +397,24 @@ public interface $ {
     @NotNull
     static Term sete(Term... t) {
         return SETe.the(DTERNAL, t);
+    }
 
+    @NotNull static Term sete(RoaringBitmap b) {
+        return $.sete(the(b));
+    }
+    @NotNull static Term p(RoaringBitmap b) {
+        return $.p(the(b));
+    }
+
+    @NotNull static Term[] the(RoaringBitmap b) {
+        int size = b.getCardinality();
+        PeekableIntIterator ii = b.getIntIterator();
+        Term[] t = new Term[size];
+        int k = 0;
+        while (ii.hasNext()) {
+            t[k++] = Int.the(ii.next());
+        }
+        return t;
     }
 
     /**

@@ -1,79 +1,74 @@
 package nars.derive;
 
+import jcog.Util;
 import jcog.math.ByteShuffler;
+import jcog.math.FloatSupplier;
 import nars.$;
+import nars.control.CauseChannel;
 import nars.control.Derivation;
 import nars.derive.op.UnifyTerm;
 import org.jetbrains.annotations.NotNull;
+import org.roaringbitmap.RoaringBitmap;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
-
-import static nars.time.Tense.ETERNAL;
 
 /** AIKR value-determined fork (aka choice-point) */
 public class ValueFork extends Fork {
 
     //private final int id;
     final Taskify[] conc;
-
-    /** cache of value vaulues */
-    final float[] value;
-
-    final AtomicLong now = new AtomicLong(ETERNAL);
+    final ValueCache values;
 
     /** the term which a derivation will encounter signaling
      * that it may continue here after evaluating it among other choices */
     public final Choice choice;
+    private final RoaringBitmap downstream;
 
-    private float valueTotal = 0;
-    final static float epsilon = 0.01f;
+    /** the causes that this is responsible for, ie. those that may be caused by this */
+    public final CauseChannel[] causes;
 
-    public static ValueFork the(PrediTerm[] branches, List<ValueFork> choices) {
-        int choiceID = choices.size();
-        Choice choice = new Choice(choiceID);
-        ValueFork v = new ValueFork(branches, choice);
+
+    public static ValueFork the(PrediTerm[] branches, List<ValueFork> choices, RoaringBitmap downstream) {
+        int branchID = choices.size();
+        Choice choice = new Choice(branchID, downstream);
+        ValueFork v = new ValueFork(branches, choice, downstream);
         choices.add(v);
         return v;
     }
 
-    protected ValueFork(PrediTerm[] branches, Choice choice) {
+    protected ValueFork(PrediTerm[] branches, Choice choice, RoaringBitmap downstream) {
         super(branches);
+
         this.choice = choice;
+        this.downstream = downstream;
 
         conc = new Taskify[branches.length];
-        value = new float[branches.length];
         int n = 0;
         for (PrediTerm b : branches) {
             PrediTerm fin = AndCondition.last(b);
             UnifyTerm.UnifySubtermThenConclude u = (UnifyTerm.UnifySubtermThenConclude)fin;
             conc[n++] = ((Taskify)(AndCondition.last(u.eachMatch)));
         }
+
+        causes = Util.map(c->c.channel, new CauseChannel[n], conc);
+        values = new ValueCache(c -> c::value, causes);
     }
 
     @Override
     public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
-        return new ValueFork(transformedBranches(f), choice);
+        return new ValueFork(transformedBranches(f), choice, downstream);
     }
 
     private void update() {
-        int i = 0;
-        float total = 0;
-        for (Taskify c : conc) {
-            float v = value[i++] = Math.max(c.channel.gain(), epsilon);
-            total += v;
-        }
-        this.valueTotal = total;
+        values.update();
     }
 
     @Override
     public boolean test(@NotNull Derivation d) {
 
         long now = d.time;
-        if (this.now.getAndSet(now) != now) {
-            update();
-        }
+        values.update(now);
 
         int before = d.now();
 
@@ -106,13 +101,18 @@ public class ValueFork extends Fork {
 
     /** remembers the possiblity of a choice which can be pursued
      * (ie. according to value rank) */
-    public static class Choice extends AbstractPred<Derivation> {
+    static class Choice extends AbstractPred<Derivation> {
 
         public final int id;
 
-        protected Choice(int id) {
-            super($.func("choice", $.the(id)));
+        /** global cause channel ID's that this leads to */
+        private final RoaringBitmap downstream;
+
+        protected Choice(int id, RoaringBitmap downstream) {
+            super($.func("try", /*$.the(id),*/ $.sete(downstream)));
+
             this.id = id;
+            this.downstream = downstream;
         }
 
         @Override

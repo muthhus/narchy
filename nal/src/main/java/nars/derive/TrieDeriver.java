@@ -1,6 +1,5 @@
 package nars.derive;
 
-import jcog.Texts;
 import jcog.Util;
 import nars.Op;
 import nars.control.Derivation;
@@ -46,7 +45,7 @@ public enum TrieDeriver {
             out.println("eval {");
             EvaluateChoices ac = (EvaluateChoices) p;
             int i = 0;
-            for (ValueFork b : ac.targets) {
+            for (ValueFork b : ac.branches) {
                 TermTrie.indent(indent + 2); out.println(i + ":");
                 print(b, out, indent + 4);
                 i++;

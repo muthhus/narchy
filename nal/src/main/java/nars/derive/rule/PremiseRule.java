@@ -151,17 +151,19 @@ public class PremiseRule extends GenericCompound {
 
         addAll(s, PRE);
 
-        s.add(truth);
-
         s.addAll(match.pre);
 
+        ////-------------------
+        //below here are predicates which affect the derivation
 
 
 
         //SUFFIX (order already determined for matching)
-        int n =  match.constraints.size() + match.post.size();
+        int n = 1 + match.constraints.size() + match.post.size();
+
         PrediTerm[] suff = new PrediTerm[n];
         int k = 0;
+        suff[k++] = truth;
         for (PrediTerm p : match.constraints) {
             suff[k++] = p;
         }
@@ -170,89 +172,6 @@ public class PremiseRule extends GenericCompound {
         }
 
         return pair(s, (PrediTerm<Derivation>)AndCondition.the(suff));
-    }
-
-    /**
-     * higher is earlier
-     */
-    private static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
-
-        int rank = 50;
-
-        put("PatternOp1", rank--);
-        put("PatternOp0", rank--);
-
-        put(TaskPunctuation.class, rank--);
-
-        put(TaskBeliefOp.class, rank--);
-        put(TaskBeliefHas.class, rank--);
-
-        put(SubTermStructure.class, rank--);
-
-        put(TaskBeliefOccurrence.class, rank--);
-        put(TaskPolarity.class, rank--); //includes both positive or negative
-        put(BeliefPolarity.class, rank--);
-
-        put(Solve.class, rank--);
-
-
-    }};
-
-    private static Object classify(Term b) {
-        if (b instanceof AbstractPatternOp.PatternOp)
-            return "PatternOp" + (((AbstractPatternOp.PatternOp) b).taskOrBelief == 0 ? "0" : "1"); //split
-
-        if ((b == TaskPolarity.taskPos) || (b == TaskPolarity.taskNeg)) return TaskPolarity.class;
-        if ((b == TaskPolarity.beliefPos) || (b == TaskPolarity.beliefNeg)) return BeliefPolarity.class;
-        //if (b == BeliefPolarity.beliefExist) return "BeliefExist";
-
-        if (b.getClass() == TaskBeliefHas.class) return TaskBeliefHas.class;
-
-        if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
-        if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
-        if (b == TaskPunctuation.Question) return TaskPunctuation.class;
-        if (b == TaskPunctuation.Quest) return TaskPunctuation.class;
-        if (b == TaskPunctuation.BeliefOrGoal) return TaskPunctuation.class;
-        if (b == TaskPunctuation.QuestionOrQuest) return TaskPunctuation.class;
-        if (b.getClass() == TaskBeliefOp.class) return TaskBeliefOp.class;
-        if (b.getClass() == TaskBeliefOp.TaskBeliefConjSeq.class) return TaskBeliefOp.class;
-        if (b.getClass() == TaskBeliefOp.TaskBeliefConjComm.class) return TaskBeliefOp.class;
-
-//        if (b instanceof TermNotEquals) return TermNotEquals.class;
-
-        if (b == TaskBeliefOccurrence.bothEvents) return TaskBeliefOccurrence.class;
-
-        if (b == TaskBeliefOccurrence.after) return TaskBeliefOccurrence.class;
-        if (b == TaskBeliefOccurrence.afterOrEternals) return TaskBeliefOccurrence.class;
-        if (b == TaskBeliefOccurrence.eventsOrEternals) return TaskBeliefOccurrence.class;
-
-        if (b instanceof SubTermStructure) return SubTermStructure.class;
-
-        if (b instanceof Solve) return Solve.class;
-
-        throw new UnsupportedOperationException("unranked precondition: " + b);
-        //return b.getClass();
-    }
-
-    /**
-     * apply deterministic and uniform sort to the current preconditions.
-     * the goal of this is to maximally fold subexpressions while also
-     * pulling the cheapest and most discriminating tests to the beginning.
-     */
-    @NotNull
-    private static List<Term> sort(@NotNull List<Term> l) {
-
-        l.sort((a, b) -> {
-
-            Object ac = classify(a);
-            Object bc = classify(b);
-
-            HashMap<Object, Integer> ps = PremiseRule.preconditionScore;
-            int c = Integer.compare(ps.get(bc) /*getOrDefault(bc, -1)*/, ps.get(ac) /*ps.getOrDefault(ac, -1)*/);
-            return (c != 0) ? c : b.toString().compareTo(a.toString());
-        });
-
-        return l;
     }
 
 
@@ -357,7 +276,7 @@ public class PremiseRule extends GenericCompound {
         //pattern = PatternCompound.make(p(taskTermPattern, beliefTermPattern));
 
 
-        SortedSet<MatchConstraint> constraints = new TreeSet();
+        SortedSet<MatchConstraint> constraints = new TreeSet(PrediTerm.sortByCost);
 
         char taskPunc = 0;
 

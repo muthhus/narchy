@@ -76,34 +76,18 @@ public final class PrediTrie {
             PrediTerm<Derivation>[] ll = StreamSupport.stream(v.spliterator(), false).map((i) -> conclusions.get(i).transform((Function) null)).toArray(PrediTerm[]::new);
             assert (ll.length != 0);
 
-            ValueFork cx = ValueFork.the(ll, postChoices);
+            ValueFork cx = ValueFork.the(ll, postChoices, v);
             path.add(cx.choice);
             this.pre.put(path, cx);
         });
 
-
     }
-
 
 
     public static PrediTerm<Derivation> the(PremiseRuleSet r, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
-
         PrediTrie t = new PrediTrie(r);
         return AndCondition.the(t.compile(t.pre, each), new EvaluateChoices(t.postChoices.toArray(ValueFork[]::new)));
     }
-
-
-//        @Override
-//        protected void onMatch(Term existing, Term incoming) {
-//            if (existing instanceof UnificationPrototype) {
-//                //merge the set of conclusions where overlapping
-//
-//
-//                ((UnificationPrototype) existing).conclude.addAll(((UnificationPrototype) incoming).conclude);
-//                //((UnificationPrototype) incoming).conclude.addAll(((UnificationPrototype) existing).conclude);
-//                //incomingConcs.clear();
-//            }
-//        }
 
 
     public PrediTerm<Derivation> compile(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
