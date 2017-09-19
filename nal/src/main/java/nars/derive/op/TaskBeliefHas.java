@@ -26,5 +26,10 @@ public final class TaskBeliefHas extends AbstractPred<Derivation> {
                 &&
                (!belief || derivation.beliefTerm.hasAny(structure));
     }
+
+    @Override
+    public float cost() {
+        return 0.15f;
+    }
 }
 

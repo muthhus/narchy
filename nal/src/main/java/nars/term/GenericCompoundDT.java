@@ -132,6 +132,11 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
     @Override
+    public @NotNull Term conceptual() {
+        return Compound.super.conceptual();
+    }
+
+    @Override
     public @Nullable Term transform(@NotNull CompoundTransform t) {
         return Compound.super.transform(t);
     }

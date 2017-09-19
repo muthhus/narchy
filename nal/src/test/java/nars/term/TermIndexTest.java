@@ -120,8 +120,8 @@ public class TermIndexTest {
 //    }
 
     private void testNotShared(@NotNull NAR n, @NotNull String s) throws Narsese.NarseseException {
-        Termed t1 = n.term(s); //create by parsing
-        Termed t2 = n.term(s); //create by parsing again
+        Termed t1 = $.$(s); //create by parsing
+        Termed t2 = $.$(s); //create by parsing again
         assertEquals(t1, t2);
         assertTrue(t1 != t2);
     }

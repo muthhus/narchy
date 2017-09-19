@@ -3,7 +3,6 @@ package nars.derive.rule;
 import com.google.common.collect.Sets;
 import jcog.list.FasterList;
 import nars.$;
-import nars.NAR;
 import nars.Op;
 import nars.control.Derivation;
 import nars.derive.*;
@@ -47,7 +46,7 @@ public class PremiseRule extends GenericCompound {
 
     static final Atomic UNPROJ = Atomic.the("unproj");
     public static final Atomic Task = Atomic.the("task");
-    static final Atomic Belief = Atomic.the("belief");
+    public static final Atomic Belief = Atomic.the("belief");
     private static final Term TaskAny = $.func("task", Atomic.the("any"));
     private static final Term QUESTION_PUNCTUATION = $.inh(Atomic.the("Question"), Atomic.the("Punctuation"));
 
@@ -204,7 +203,7 @@ public class PremiseRule extends GenericCompound {
             return "PatternOp" + (((AbstractPatternOp.PatternOp) b).taskOrBelief == 0 ? "0" : "1"); //split
 
         if ((b == TaskPolarity.taskPos) || (b == TaskPolarity.taskNeg)) return TaskPolarity.class;
-        if ((b == BeliefPolarity.beliefPos) || (b == BeliefPolarity.beliefNeg)) return BeliefPolarity.class;
+        if ((b == TaskPolarity.beliefPos) || (b == TaskPolarity.beliefNeg)) return BeliefPolarity.class;
         //if (b == BeliefPolarity.beliefExist) return "BeliefExist";
 
         if (b.getClass() == TaskBeliefHas.class) return TaskBeliefHas.class;
@@ -543,10 +542,10 @@ public class PremiseRule extends GenericCompound {
                 case "belief":
                     switch (XString) {
                         case "negative":
-                            pres.add(BeliefPolarity.beliefNeg);
+                            pres.add(TaskPolarity.beliefNeg);
                             break;
                         case "positive":
-                            pres.add(BeliefPolarity.beliefPos);
+                            pres.add(TaskPolarity.beliefPos);
                             break;
 
                         //HACK do somethign other than duplciate this with the "task" select below, and also generalize to all ops

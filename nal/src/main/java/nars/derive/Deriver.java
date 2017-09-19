@@ -69,7 +69,7 @@ public interface Deriver {
             Set<String> files = DEFAULT(nal, additional);
             @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(nar,true, files.toArray(new String[files.size()]) );
 
-            PrediTerm<Derivation> x = the(RULES, xf);
+            PrediTerm<Derivation> x = PrediTrie.the(RULES, xf);
             if (Param.TRACE) {
                 TrieDeriver.print(x, System.out);
             }
@@ -77,22 +77,7 @@ public interface Deriver {
         };
     }
 
-    static PrediTerm<Derivation> the(PremiseRuleSet r) {
-        return the(r, (x) -> x);
-    }
-
-    static PrediTerm<Derivation> the(PremiseRuleSet r, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
-
-        PrediTerm<Derivation> tf = new PrediTrie(r).compile(each);
-
-        //TrieDeriver.print(tf, System.out);
-
-        return tf;
-
-        //return new TrieExecutor(tf);
-    }
-
-//    /**
+    //    /**
 //     * for now it seems there is a leak so its better if each NAR gets its own copy. adds some overhead but we'll fix this later
 //     * not working yet probably due to unsupported ellipsis IO codec. will fix soon
 //     */

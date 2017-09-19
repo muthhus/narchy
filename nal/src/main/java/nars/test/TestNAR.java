@@ -293,7 +293,7 @@ public class TestNAR {
     public TestNAR goal(@NotNull String t, @NotNull Tense tense, float f, float c) {
         finished = false;
         try {
-            nar.goal(nar.term(t), tense, f, c);
+            nar.goal($.$(t), tense, f, c);
         } catch (Narsese.NarseseException e) {
             throw new RuntimeException(e);
         }

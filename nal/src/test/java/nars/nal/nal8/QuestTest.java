@@ -1,5 +1,6 @@
 package nars.nal.nal8;
 
+import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
@@ -72,7 +73,7 @@ public class QuestTest {
     }
 
     public void goal(NAR nar) throws Narsese.NarseseException {
-        nar.goal(nar.term("a:b"), Tense.Eternal, 1.0f, 0.9f);
+        nar.goal($.$("a:b"), Tense.Eternal, 1.0f, 0.9f);
     }
 
 

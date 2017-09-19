@@ -2,6 +2,7 @@ package nars.test.analyze;
 
 import jcog.bag.Bag;
 import jcog.pri.PriReference;
+import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
@@ -27,7 +28,7 @@ public class BeliefAnalysis implements Termed {
 	}
 
 	public BeliefAnalysis(@NotNull NAR n, @NotNull String term) throws Narsese.NarseseException {
-		this( n, n.term(term));
+        this( n, $.$(term));
 	}
 
 	@Override

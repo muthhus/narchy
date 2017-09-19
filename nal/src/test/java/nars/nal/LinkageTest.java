@@ -94,15 +94,15 @@ public class LinkageTest extends AbstractNALTest {
 
         //nar.log();
 
-        Termed premise1 = nar.term(spremise1);
+        Termed premise1 = $.$(spremise1);
         assertEquals("reparsed", $.$(spremise1), premise1);
         assertNotNull(premise1);
-        assertEquals(nar.term(spremise1), premise1);
+        assertEquals($.$(spremise1), premise1);
 
-        Termed premise2 = nar.term(spremise2);
+        Termed premise2 = $.$(spremise2);
         assertEquals("reparsed", $.$(spremise2), premise2);
         assertNotNull(premise2);
-        assertEquals(nar.term(spremise2), premise2);
+        assertEquals($.$(spremise2), premise2);
 
         String t1 = getTask(punc, premise1);
         String t2 = getTask(punc, premise2);

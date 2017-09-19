@@ -22,9 +22,7 @@ public abstract class MatchConstraint extends AbstractPred<Derivation> {
     /**
      * cost of testing this, for sorting. higher value will be tested later than lower
      */
-    public int cost() {
-        return 0;
-    }
+    abstract public float cost();
 
     @Override
     public boolean test(Derivation p) {
@@ -35,7 +33,7 @@ public abstract class MatchConstraint extends AbstractPred<Derivation> {
 
     public static final Comparator<MatchConstraint> costComparator = (a, b) -> {
         if (a.equals(b)) return 0;
-        int i = Integer.compare(a.cost(), b.cost());
+        int i = Float.compare(a.cost(), b.cost());
         return i == 0 ? a.compareTo(b) : i;
     };
 

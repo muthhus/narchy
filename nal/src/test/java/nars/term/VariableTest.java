@@ -176,7 +176,7 @@ public class VariableTest {
         String t = "<$x --> y>";
         String n = "($1-->y)";
         NAR nar = NARS.shell();
-        Termed x = nar.term(t);
+        Termed x = $.$(t);
         assertEquals(n, x.toString());
         //assertTrue("immediate construction of a term from a string should automatically be normalized", x.isNormalized());
 
@@ -205,7 +205,7 @@ public class VariableTest {
 
         String t = "<<($1, $2) --> bigger> ==> <($2, $1) --> smaller>>";
 
-        Termed term = n.term(t);
+        Termed term = $.$(t);
         Task task = Narsese.parse().task(t + '.', n);
 
         System.out.println(t);

@@ -33,6 +33,6 @@ public class TermNormalizationTest {
         assertEquals($.$(a), $.$(b));
 
         NAR t = NARS.shell();
-        assertEquals(t.term(a), t.term(b));
+        assertEquals($.$(a), $.$(b));
     }
 }

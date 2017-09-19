@@ -24,6 +24,10 @@ abstract public class Solve extends AbstractPred<Derivation> {
         this.beliefProjected = beliefProjected;
     }
 
+    @Override
+    public float cost() {
+        return 2f;
+    }
 
     final boolean test(@NotNull Derivation p, byte punc) {
 

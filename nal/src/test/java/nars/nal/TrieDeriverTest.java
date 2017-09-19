@@ -4,10 +4,10 @@ import nars.*;
 import nars.control.Derivation;
 import nars.control.Premise;
 import nars.derive.AndCondition;
-import nars.derive.Deriver;
 import nars.derive.PrediTerm;
+import nars.derive.PrediTrie;
 import nars.derive.TrieDeriver;
-import nars.derive.op.UnifySubtermThenConclude;
+import nars.derive.op.UnifyTerm;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
@@ -33,11 +33,25 @@ import static org.junit.Assert.*;
  */
 public class TrieDeriverTest {
 
-//    final static TrieDeriver d =
-//            //(TrieDeriver) Deriver.get("nal1.nal");
-//            //(TrieDeriver) DefaultDeriver.the;
-//            new TrieDeriver(DefaultDeriver.rules);
 
+
+    @Test public void printTrie() {
+
+        TrieDeriver.print(NARS.tmp().derivation().deriver);
+    }
+
+    @Test public void testRuleSerialization() {
+        byte[] x = IO.termToBytes( NARS.tmp(1).derivation().deriver );
+        assertTrue(x.length > 128 );
+        System.out.println(x.length + " bytes");
+
+        Term y = IO.termFromBytes(x);
+        assertTrue(y.volume() > 64 );
+        //System.out.println(y);
+
+//        z = new PremiseRuleSet.rules()
+        //TrieDeriver.print(y);
+    }
 
     @Test
     public void testConclusionWithXTERNAL() {
@@ -57,7 +71,7 @@ public class TrieDeriverTest {
         };
 
 
-        PrediTerm d = Deriver.the(new PremiseRuleSet(idx, false,
+        PrediTerm d = the(new PremiseRuleSet(idx, false,
                 "Y, Y |- (?1 &&+0 Y), ()",
                 "X, X |- (?1 &&+- X), ()"
         ));
@@ -79,6 +93,9 @@ public class TrieDeriverTest {
         //assertTrue(d.trie.getSummary().contains("..+"));
     }
 
+static PrediTerm<Derivation> the(PremiseRuleSet r) {
+        return PrediTrie.the(r, (x) -> x);
+    }
 
     public static PrediTerm<Derivation> testCompile(String... rules) {
         return testCompile(NARS.tmp(0), false, rules);
@@ -98,7 +115,7 @@ public class TrieDeriverTest {
 
         PremiseRuleSet src = new PremiseRuleSet(parsed, pi, false);
         assertNotEquals(0, src.size());
-        PrediTerm d = Deriver.the(src);
+        PrediTerm d = the(src);
 
         if (debug) d.printRecursive();
 
@@ -212,7 +229,7 @@ public class TrieDeriverTest {
 
         Task t = Narsese.parse().task(task, n);
         assertNotNull(t);
-        Term b = n.term(belief);
+        Term b = $.$(belief);
         assertNotNull(b);
 
         Iterable<? extends ITask> derived = new Premise(t, b, 0.5f, Collections.emptySet()) {
@@ -240,7 +257,7 @@ public class TrieDeriverTest {
         TrieDeriver.print(d, System.out);
 
         assertTrue("last element should be unify, not constraints or anything else: " + AndCondition.last(d),
-                AndCondition.last(d) instanceof UnifySubtermThenConclude);
+                AndCondition.last(d) instanceof UnifyTerm.UnifySubtermThenConclude);
     }
 
     @Test

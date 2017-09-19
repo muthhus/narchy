@@ -17,8 +17,8 @@ public final class CommonSubtermConstraint extends CommonalityConstraint {
     }
 
     @Override
-    public int cost() {
-        return 10;
+    public float cost() {
+        return 2;
     }
 
     @Override

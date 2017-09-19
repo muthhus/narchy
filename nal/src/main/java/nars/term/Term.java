@@ -804,6 +804,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
     /**
      * returns this term in a form which can identify a concept, or Null if it can't
+     *
      */
     default Term conceptual() {
         return this;

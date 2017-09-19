@@ -34,18 +34,18 @@ public class TemporalTermTest {
 
     @Test
     public void testCoNegatedSubtermConcept() throws Narsese.NarseseException {
-        assertEquals("((x) &&+- (x))", n.conceptualize(n.term("((x) &&+10 (x))")).toString());
+        assertEquals("((x) &&+- (x))", n.conceptualize($.$("((x) &&+10 (x))")).toString());
 
-        assertEquals("((--,(x)) &&+- (x))", n.conceptualize(n.term("((x) &&+10 (--,(x)))")).toString());
-        assertEquals("((--,(x)) &&+- (x))", n.conceptualize(n.term("((x) &&-10 (--,(x)))")).toString());
+        assertEquals("((--,(x)) &&+- (x))", n.conceptualize($.$("((x) &&+10 (--,(x)))")).toString());
+        assertEquals("((--,(x)) &&+- (x))", n.conceptualize($.$("((x) &&-10 (--,(x)))")).toString());
 
 //        assertEquals("((x) <=>+- (x))", n.conceptualize(n.term("((x) <=>+10 (--,(x)))")).toString());
 //        assertEquals("((x) <=>+- (x))", n.conceptualize(n.term("((x) <=>-10 (--,(x)))")).toString());
 
-        assertEquals("((x) ==>+- (x))", n.conceptualize(n.term("((x) ==>+10 (x))")).toString());
-        assertEquals("((--,(x)) ==>+- (x))", n.conceptualize(n.term("((--,(x)) ==>+10 (x))")).toString());
-        assertEquals("((x) ==>+- (x))", n.conceptualize(n.term("((x) ==>+10 (--,(x)))")).toString());
-        assertEquals("((x) ==>+- (x))", n.conceptualize(n.term("((x) ==>-10 (--,(x)))")).toString());
+        assertEquals("((x) ==>+- (x))", n.conceptualize($.$("((x) ==>+10 (x))")).toString());
+        assertEquals("((--,(x)) ==>+- (x))", n.conceptualize($.$("((--,(x)) ==>+10 (x))")).toString());
+        assertEquals("((x) ==>+- (x))", n.conceptualize($.$("((x) ==>+10 (--,(x)))")).toString());
+        assertEquals("((x) ==>+- (x))", n.conceptualize($.$("((x) ==>-10 (--,(x)))")).toString());
 
     }
 
@@ -144,7 +144,7 @@ public class TemporalTermTest {
 
     @Test
     public void testAtemporalization() throws Narsese.NarseseException {
-        Term t = n.term("((x) ==>+10 (y))");
+        Term t = $.$("((x) ==>+10 (y))");
         Concept c = n.conceptualize(t);
         assertEquals("((x) ==>+- (y))", c.toString());
     }
@@ -228,9 +228,9 @@ public class TemporalTermTest {
         assertEquals(
                 //"(do(that) &&+0 ((a)&&(b)))",
                 "(&|,do(that),(a),(b))",
-                n.term("(do(that) &&+0 ((a)&&(b)))").toString());
+                $.$("(do(that) &&+0 ((a)&&(b)))").toString());
 
-        Termed nt = n.term("(((that)-->do) &&+0 ((a)&&(b)))");
+        Termed nt = $.$("(((that)-->do) &&+0 ((a)&&(b)))");
         assertEquals(
                 //"(do(that) &&+0 ((a)&&(b)))",
                 "(&|,do(that),(a),(b))",
@@ -245,7 +245,7 @@ public class TemporalTermTest {
 
     @Test
     public void testAnonymization2() throws Narsese.NarseseException {
-        Termed nn = n.term("((do(that) &&+1 (a)) ==>+2 (b))");
+        Termed nn = $.$("((do(that) &&+1 (a)) ==>+2 (b))");
         assertEquals("((do(that) &&+1 (a)) ==>+2 (b))", nn.toString());
 
 
@@ -322,8 +322,8 @@ public class TemporalTermTest {
 
     @Test
     public void testCommutiveTemporalityDepVar0() throws Narsese.NarseseException {
-        Term t0 = n.term("((SELF,#1)-->at)").term();
-        Term t1 = n.term("goto(#1)").term();
+        Term t0 = $.$("((SELF,#1)-->at)").term();
+        Term t1 = $.$("goto(#1)").term();
         assertEquals(
                 Op.subterms(Terms.sorted(t0, t1)),
                 Op.subterms(Terms.sorted(t1, t0))
@@ -363,7 +363,7 @@ public class TemporalTermTest {
     void testParse(String input, String expected) {
         Termed t = null;
         try {
-            t = n.term(input);
+            t = $.$(input);
         } catch (Narsese.NarseseException e) {
             assertTrue(false);
         }

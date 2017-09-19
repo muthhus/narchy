@@ -1,35 +1,21 @@
 package nars.derive;
 
-import jcog.Util;
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.control.Cause;
-import nars.control.CauseChannel;
 import nars.control.Derivation;
-import nars.derive.rule.PremiseRule;
-import nars.op.DepIndepVarIntroduction;
-import nars.task.DebugDerivedTask;
-import nars.task.DerivedTask;
 import nars.task.NALTask;
 import nars.term.InvalidTermException;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.time.Tense;
-import org.apache.commons.lang3.ArrayUtils;
-import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.Map;
 import java.util.function.BiFunction;
 
 import static nars.Op.GOAL;
-import static nars.Param.FILTER_SIMILAR_DERIVATIONS;
 import static nars.time.Tense.ETERNAL;
 
 /**

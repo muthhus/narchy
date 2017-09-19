@@ -11,7 +11,7 @@ import java.util.Map;
 public class IntroVars extends AbstractPred<Derivation> {
 
     protected IntroVars() {
-        super("IntroVars");
+        super("varIntro");
     }
 
     @Override

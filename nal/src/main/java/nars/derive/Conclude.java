@@ -5,10 +5,8 @@ import nars.NAR;
 import nars.Op;
 import nars.control.Derivation;
 import nars.derive.rule.PremiseRule;
-import nars.term.ProxyTerm;
 import nars.term.Term;
-import nars.term.atom.Atom;
-import nars.term.container.TermContainer;
+import nars.term.Termed;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,9 +25,8 @@ public final class Conclude {
 
         //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
         boolean introVars;
-        Pair<Atom, TermContainer> outerFunctor = Op.functor(pattern, $.terms, false);
-
-        if (outerFunctor != null && outerFunctor.getOne().equals(VAR_INTRO)) {
+        Pair<Termed, Term> outerFunctor = Op.functor(pattern, (i)->i.equals(VAR_INTRO) ? VAR_INTRO : null);
+        if (outerFunctor != null) {
             introVars = true;
             pattern = outerFunctor.getTwo().sub(0);
         } else {
@@ -40,7 +37,7 @@ public final class Conclude {
 
              //input.privaluate = false; //disable priority affect, since feedback is applied in other more direct ways (ex: deriver backpressure)
         //input.valueBias = 0;//-0.1f;
-        PrediTerm<Derivation> makeTask = new MakeTask(rule, nar.newChannel(rule));
+        Taskify taskify = new Taskify(rule, nar.newChannel(rule));
 
         Term concID =
                 !goalUrgent ?
@@ -49,9 +46,9 @@ public final class Conclude {
         return AndCondition.the(
                 new Conclusion(concID,pattern, goalUrgent),
                 introVars ? //Fork.fork(
-                        AndCondition.the(new IntroVars(), makeTask)
+                        AndCondition.the(new IntroVars(), taskify)
                         //makeTask)
-                        : makeTask
+                        : taskify
         );
 
     }

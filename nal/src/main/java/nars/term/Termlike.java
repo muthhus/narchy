@@ -7,8 +7,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static nars.Op.*;
-
 /**
  * Features exhibited by, and which can classify terms
  * and termlike productions

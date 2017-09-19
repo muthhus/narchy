@@ -23,5 +23,9 @@ public final class OpConstraint extends MatchConstraint {
         return y.op()!=op;
     }
 
+    @Override
+    public float cost() {
+        return 0.1f;
+    }
 }
 

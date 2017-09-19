@@ -24,6 +24,9 @@ public final class OpExclusionConstraint extends MatchConstraint {
         return y.op().in(op);
     }
 
-
+    @Override
+    public float cost() {
+        return 0.1f;
+    }
 }
 

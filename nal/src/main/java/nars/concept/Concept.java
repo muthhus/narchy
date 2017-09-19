@@ -32,7 +32,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.util.SoftException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -43,18 +42,18 @@ import java.util.stream.Stream;
 public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
 
 
-    @NotNull Bag<Task,PriReference<Task>> tasklinks();
+    /*@NotNull*/ Bag<Task,PriReference<Task>> tasklinks();
 
-    @NotNull Bag<Term,PriReference<Term>> termlinks();
+    /*@NotNull*/ Bag<Term,PriReference<Term>> termlinks();
 
 
-    @NotNull BeliefTable beliefs();
+    /*@NotNull*/ BeliefTable beliefs();
 
-    @NotNull BeliefTable goals();
+    /*@NotNull*/ BeliefTable goals();
 
-    @NotNull QuestionTable questions();
+    /*@NotNull*/ QuestionTable questions();
 
-    @Nullable QuestionTable quests();
+    /*@NotNull*/ QuestionTable quests();
 
     Activate activate(float pri, NAR n);
 
@@ -81,7 +80,7 @@ public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
     /**
      * prints a summary of all termlink, tasklink, etc..
      */
-    default void print(@NotNull Appendable out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
+    default void print(Appendable out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
 
         try {
             out.append("concept: ").append(toString()).append('\n');
@@ -168,12 +167,12 @@ public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
     }
 
     @Override
-    default int compareTo(@NotNull Concept o) {
+    default int compareTo(/*@NotNull*/ Concept o) {
         return term().compareTo(o.term());
     }
 
 
-    @NotNull ConceptState state();
+    /*@NotNull*/ ConceptState state();
 
     /**
      * returns the previous state
@@ -184,7 +183,7 @@ public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
     Collection<Termed> templates();
 
 
-    void process(Task task, @NotNull NAR n);
+    void process(Task task, /*@NotNull*/ NAR n);
 
     float value(Task t, float activation, long when, NAR n);
 
@@ -200,12 +199,10 @@ public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
      */
     final class InvalidConceptException extends SoftException {
 
-        @NotNull
         public final Termed term;
-        @NotNull
         public final String reason;
 
-        public InvalidConceptException(@NotNull Termed term, @NotNull String reason) {
+        public InvalidConceptException(Termed term, String reason) {
             this.term = term;
             this.reason = reason;
         }

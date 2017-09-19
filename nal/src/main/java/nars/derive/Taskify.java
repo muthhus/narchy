@@ -1,6 +1,7 @@
 package nars.derive;
 
 import jcog.Util;
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -22,9 +23,9 @@ import java.util.Arrays;
 
 import static nars.Param.FILTER_SIMILAR_DERIVATIONS;
 
-public class MakeTask extends AbstractPred<Derivation> {
+public class Taskify extends AbstractPred<Derivation> {
 
-    private final static Logger logger = LoggerFactory.getLogger(MakeTask.class);
+    private final static Logger logger = LoggerFactory.getLogger(Taskify.class);
 
     /**
      * destination of any derived tasks; also may be used to communicate backpressure
@@ -33,8 +34,8 @@ public class MakeTask extends AbstractPred<Derivation> {
     public final CauseChannel<Task> channel;
     private final String rule;
 
-    protected MakeTask(@NotNull PremiseRule rule, CauseChannel<Task> channel) {
-        super("TASK");
+    protected Taskify(@NotNull PremiseRule rule, CauseChannel<Task> channel) {
+        super($.func("taskify", $.the(channel.id)));
         this.channel = channel;
         this.rule = rule.toString(); //only store toString of the rule to avoid remaining attached to the RuleSet
     }

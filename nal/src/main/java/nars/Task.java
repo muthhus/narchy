@@ -13,6 +13,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Tense;
 import nars.truth.*;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
@@ -160,7 +161,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         }
 
 
-
         if ((punc == Op.GOAL || punc == Op.QUEST) && !goalable(t))
             return fail(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
 
@@ -264,56 +264,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 //        return taskStatementValid(t, (byte) 0, safe); //ignore the punctuation-specific conditions
 //    }
 
-    static @Nullable Task execute(Task cmd, NAR nar) {
-
-
-        Term inputTerm = cmd.term();
-        if (inputTerm.hasAll(Op.EvalBits) && inputTerm.op() == INH) {
-            Term func = inputTerm.sub(1);
-            if (func != Null && func.op() == ATOM) {
-                Term args = inputTerm.sub(0);
-                if (args != Null && args.op() == PROD) {
-                    Concept funcConcept = nar.concept(func);
-                    if (funcConcept instanceof Operation) {
-                        Operation o = (Operation) funcConcept;
-
-                        Task result = o.run(cmd, nar);
-                        if (result != null && result != cmd) {
-                            //return input(result); //recurse
-                            return execute(result, nar);
-                        }
-
-                        //                            } else {
-//
-//                                if (!cmd.isEternal() && cmd.start() > time() + time.dur()) {
-//                                    inputAt(cmd.start(), cmd); //schedule for execution later
-//                                    return null;
-//                                } else {
-//                                    if (executable(cmd)) {
-//                                        Task result = o.run(cmd, this);
-//                                        if (result != cmd) { //instance equality, not actual equality in case it wants to change this
-//                                            if (result == null) {
-//                                                return null; //finished
-//                                            } else {
-//                                                //input(result); //recurse until its stable
-//                                                return result;
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-
-
-                    }
-                }
-            }
-        }
-
-//        if (isCommand())
-//        nar.eventTask.emit(cmd);
-        return cmd;
-
-    }
 
     @Nullable
     static Task tryTask(@NotNull Term t, byte punc, Truth tr, BiFunction<Term, Truth, ? extends Task> res) {
@@ -411,7 +361,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
                 long touched =
                         //nearestTimeTo(when);
-                        (a + z)/2; //midpoint: to be fair to other more precisely endured tasks
+                        (a + z) / 2; //midpoint: to be fair to other more precisely endured tasks
 
                 long dist = Math.abs(when - touched);
                 assert (dist > 0) : "what time is " + a + ".." + z + " supposed to mean relative to " + when;
@@ -421,7 +371,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                 float durAdjusted = dur *
                         1
                         //volume()
-                ;
+                        ;
 
 //                long r = z - a;
 //                cw = r != 0 ?
@@ -642,7 +592,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
     default long nearestTimeBetween(final long x, final long y) {
         long a = this.start();
         if (a == ETERNAL)
-            return (x+y)/2; //use midpoint of the two if this task is eternal
+            return (x + y) / 2; //use midpoint of the two if this task is eternal
 
         long b = this.end();
         if (x == y) {
@@ -900,7 +850,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
      * of the Task and the reason for it.
      */
     @NotNull
-    default Task log( Object entry) {
+    default Task log(Object entry) {
         if (Param.DEBUG_TASK_LOG)
             getOrCreateLog().add(entry);
         return this;
@@ -1002,48 +952,44 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
     }
 
     @Override
-    default @Nullable Iterable<? extends ITask> run(@NotNull NAR n) {
+    default @Nullable Iterable<? extends ITask> run(NAR n) {
 
         n.emotion.busy(priElseZero(), this.volume());
 
-        boolean evaluate = true; //!isCommand();
-
-        if (evaluate) {
-
+        //invoke possible functor
+        {
             Term x = term();
-
-            Term y = x.eval(n.terms);
-
+            Term y = x.eval(n);
             if (!x.equals(y)) {
+
                 @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), true);
-                if (yy != null) {
+                /* the evaluated result here acts as a memoization of possibly many results
+                   depending on whether the functor is purely static in which case
+                   it would be the only one.
+                 */
+                Task result = yy != null ? clone(this, yy.getOne().negIf(yy.getTwo())) : null;
+                if (result == null)
+                    result = Operation.logTask(n.time(), $.p(x, y));
 
-                    /* the evaluated result here acts as a memoization of possibly many results
-                       depending on whether the functor is purely static in which case
-                       it would be the only one.
-                     */
-                    NALTask evaluated = clone(this, yy.getOne().negIf(yy.getTwo()));
-                    if (evaluated != null) {
-                        return evaluated.run(n);
-                    }
-                }
-
-
-                return Collections.singleton(Operation.logTask(n.time(), $.p(x, y)));
+                return Collections.singleton(result);
             }
         }
 
+        //invoke possible Operation
         boolean cmd = isCommand();
         if (cmd || (isGoal() && !isEternal())) {
-            Task exe = execute(this, n);
-            if (exe!=this)
-                return null; //done
+            Pair<Operation, Term> o = Op.functor(term(), (i) -> {
+                Concept operation = n.concept(i);
+                return operation instanceof Operation ? (Operation) operation : null;
+            });
+            if (o != null) {
+                Task y = o.getOne().run(this, n);
+                if (y != null && !this.equals(y)) {
+                    return Collections.singleton(y);
+                }
+                return null;
+            }
         }
-
-//        if (n.time instanceof FrameTime) {
-//            //HACK for unique serial number w/ frameclock
-//            ((FrameTime) n.time).validate(this.stamp());
-//        }
 
         if (!cmd) {
             Concept c = concept(n, true);

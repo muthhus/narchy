@@ -154,8 +154,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         GLCapabilities config = new GLCapabilities(
 
                 //GLProfile.getMinimum(true)
-                //GLProfile.getDefault()
-                GLProfile.getMaximum(true)
+                GLProfile.getDefault()
+                //GLProfile.getMaximum(true)
 
 
         );
@@ -242,11 +242,11 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     @Override
     public final void display(GLAutoDrawable drawable) {
 
-        long start = System.currentTimeMillis();
+        //long start = System.currentTimeMillis();
         update();
         render();
-        long now = System.currentTimeMillis();
-
+        window.swapBuffers();
+        //long now = System.currentTimeMillis();
         //frameTimeMS.hit(now - start);
 
     }
@@ -266,7 +266,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         g.setDefaultCloseOperation(WindowClosingProtocol.WindowClosingMode.DISPOSE_ON_CLOSE);
         g.preserveGLStateAtDestroy(false);
         g.setSize(w, h);
-        g.setAutoSwapBufferMode(true);
+        g.setAutoSwapBufferMode(false);
         if (x != Integer.MIN_VALUE) {
             g.setPosition(x, y);
         }

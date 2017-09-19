@@ -21,9 +21,10 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
         this.recurse = recurse;
     }
 
+
     @Override
-    public int cost() {
-        return recurse ? 10 : 5;
+    public float cost() {
+        return recurse ? 1.5f : 1f;
     }
 
     @NotNull

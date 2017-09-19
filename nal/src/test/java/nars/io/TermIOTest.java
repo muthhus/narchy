@@ -29,7 +29,7 @@ public class TermIOTest {
     final NAR nar = NARS.shell();
 
     void assertEqualSerialize(@NotNull String orig) throws Narsese.NarseseException {
-        assertEqualSerialize(nar.term(orig).term());
+        assertEqualSerialize($.$(orig).term());
     }
 
     void assertEqualSerialize(@NotNull Object orig) {
@@ -134,7 +134,7 @@ public class TermIOTest {
     }
 
     void assertTermEqualSerialize(@NotNull String s) throws Narsese.NarseseException {
-        Termed t = nar.term(s);
+        Termed t = $.$(s);
         assertTrue(t.isNormalized());
         assertTrue(t.term().isNormalized());
         assertEqualSerialize(t.term() /* term, not the concept */);

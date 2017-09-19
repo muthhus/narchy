@@ -21,6 +21,10 @@ public final class OpInConstraint extends MatchConstraint {
         return !y.op().in(ops);
     }
 
+    @Override
+    public float cost() {
+        return 0.1f;
+    }
 }
 
 

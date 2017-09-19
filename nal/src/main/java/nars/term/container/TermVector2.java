@@ -2,7 +2,6 @@ package nars.term.container;
 
 import jcog.list.ArrayIterator;
 import nars.Op;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 

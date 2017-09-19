@@ -1,11 +1,8 @@
 package nars.experiment.fzero;
 
 import jcog.Util;
-import jcog.learn.ql.HaiQAgent;
-import jcog.math.FloatNormalized;
 import nars.*;
 import nars.concept.ScalarConcepts;
-import nars.control.AgentService;
 import nars.gui.Vis;
 import nars.video.CameraSensor;
 import nars.video.Scale;

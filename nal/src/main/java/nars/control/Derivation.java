@@ -26,6 +26,7 @@ import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.roaringbitmap.RoaringBitmap;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -139,6 +140,7 @@ public class Derivation extends Unify implements TermContext {
 
     public static final Atomic _taskTerm = Atomic.the("_taskTerm");
     public static final Atomic _beliefTerm = Atomic.the("_beliefTerm");
+    public RoaringBitmap choices = new RoaringBitmap();
 
 //    private transient Term[][] currentMatch;
 
@@ -283,6 +285,8 @@ public class Derivation extends Unify implements TermContext {
         termutes.clear();
 
         derivations.clear();
+
+        choices.clear();
 
         forEachMatch = null;
 
@@ -465,6 +469,10 @@ public class Derivation extends Unify implements TermContext {
         int before = this.ttl;
         this.ttl = next;
         return before;
+    }
+
+    public void canChoose(int id) {
+        choices.add(id);
     }
 
     //    /**

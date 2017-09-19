@@ -2,7 +2,10 @@ package nars.concept;
 
 import jcog.bag.Bag;
 import jcog.pri.PriReference;
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
+import nars.Task;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
 import nars.control.Activate;

@@ -29,7 +29,10 @@ abstract public class TaskBeliefOccurrence extends AbstractPred<Derivation> {
 //
 //    };
 
-
+@Override
+        public float cost() {
+            return 0.1f;
+        }
     @Nullable
     public static final PrediTerm bothEvents = new TaskBeliefOccurrence("(bothEvents)") {
 

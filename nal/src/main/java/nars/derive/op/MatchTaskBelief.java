@@ -6,7 +6,6 @@ import nars.Op;
 import nars.control.Derivation;
 import nars.derive.AbstractPred;
 import nars.derive.Conclude;
-import nars.derive.Conclusion;
 import nars.derive.PrediTerm;
 import nars.derive.constraint.MatchConstraint;
 import nars.derive.match.Ellipsis;
@@ -77,15 +76,15 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
         //code.add(new MatchTerm.MatchTaskBeliefPair(pattern, initConstraints(constraints)));
 
         if (taskPattern.equals(beliefPattern)) {
-            post.add(new UnifySubtermThenConclude(0, taskPattern, conc));
+            post.add(new UnifyTerm.UnifySubtermThenConclude(0, taskPattern, conc));
         } else if (taskFirst(taskPattern, beliefPattern)) {
             //task first
-            post.add(new UnifySubterm(0, taskPattern));
-            post.add(new UnifySubtermThenConclude(1, beliefPattern, conc));
+            post.add(new UnifyTerm.UnifySubterm(0, taskPattern));
+            post.add(new UnifyTerm.UnifySubtermThenConclude(1, beliefPattern, conc));
         } else {
             //belief first
-            post.add(new UnifySubterm(1, beliefPattern));
-            post.add(new UnifySubtermThenConclude(0, taskPattern,  conc));
+            post.add(new UnifyTerm.UnifySubterm(1, beliefPattern));
+            post.add(new UnifyTerm.UnifySubtermThenConclude(0, taskPattern,  conc));
         }
 
 

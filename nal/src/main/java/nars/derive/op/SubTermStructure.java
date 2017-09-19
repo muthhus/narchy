@@ -77,4 +77,9 @@ public final class SubTermStructure extends AbstractPred<Derivation> {
 
         return bits;
     }
+
+    @Override
+    public float cost() {
+        return 0.2f;
+    }
 }

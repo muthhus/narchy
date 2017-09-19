@@ -19,6 +19,20 @@ public final class OpSwitch extends AbstractPred<Derivation> {
     public final PrediTerm[] swtch;
     public final int subterm;
 
+        @Override
+    public boolean test(Derivation m) {
+
+        PrediTerm p = branch(m);
+        if (p != null)
+            return p.test(m);
+
+        return true;
+    }
+
+    @Override public float cost() {
+        return 0.25f;
+    }
+
     OpSwitch(int subterm, @NotNull EnumMap<Op, PrediTerm<Derivation>> cases) {
         super(/*$.impl*/ $.p($.the("op" + subterm), $.p(cases.entrySet().stream().map(e -> $.p($.quote(e.getKey().toString()), e.getValue())).toArray(Term[]::new))));
 
@@ -45,18 +59,10 @@ public final class OpSwitch extends AbstractPred<Derivation> {
     }
 
 
-    @Override
-    public boolean test(@NotNull Derivation m) {
 
-        PrediTerm p = branch(m);
-        if (p != null)
-            p.test(m);
-
-        return true;
-    }
 
     @Nullable
-    public PrediTerm<Derivation> branch(@NotNull Derivation m) {
+    public PrediTerm<Derivation> branch(Derivation m) {
         return swtch[((subterm == 0) ? m.termSub0op : m.termSub1op)];
     }
 

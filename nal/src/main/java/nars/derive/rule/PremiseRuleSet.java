@@ -35,6 +35,7 @@ import java.util.stream.Stream;
 public class PremiseRuleSet extends HashSet<PremiseRule> {
 
     private static final Pattern ruleImpl = Pattern.compile("\\|\\-");
+
     private final boolean permuteBackwards, permuteForwards;
 
     @NotNull
@@ -102,8 +103,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
             Collection<PremiseRule> ur = $.newArrayList(4);
             try {
-                PremiseRule preNorm = new PremiseRule(rawAndSrc.getOne());
-                permute(preNorm, src, patterns, ur);
+                permute(new PremiseRule(rawAndSrc.getOne()), src, patterns, ur);
             } catch (RuntimeException ex) {
                 throw new RuntimeException("Invalid TaskRule:\n\t" + src, ex);
             }

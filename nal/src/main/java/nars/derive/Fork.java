@@ -37,7 +37,7 @@ public class Fork extends AbstractPred<Derivation> {
     }
 
     @Override
-    public boolean test(@NotNull Derivation m) {
+    public boolean test(Derivation m) {
 
         int before = m.now();
 

@@ -1,5 +1,6 @@
 package nars.nal.nal6;
 
+import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
@@ -71,7 +72,7 @@ public class QueryVariableTest {
 
         NAR nar = NARS.tmp();
 
-        Term beliefTerm = nar.term(beliefString);
+        Term beliefTerm = $.$(beliefString);
         assertNotNull(beliefTerm);
 
 //        nar.believe(beliefTerm, 1f, 0.9f);

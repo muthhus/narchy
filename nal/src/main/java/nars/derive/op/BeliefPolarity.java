@@ -11,19 +11,7 @@ import nars.truth.Truth;
 public enum BeliefPolarity {
     ;
 
-    public static final PrediTerm<Derivation> beliefPos = new AbstractPred<Derivation>("(BeliefPos)") {
-        @Override public boolean test(Derivation d) {
-            Truth B = d.beliefTruth;
-            return B != null && B.freq() >= 0.5f;
-        }
-    };
-    public static final PrediTerm<Derivation> beliefNeg = new AbstractPred<Derivation>("(BeliefNeg)") {
-        @Override public boolean test(Derivation d) {
-            Truth B = d.beliefTruth;
-            return B != null && B.freq() < 0.5f;
-        }
-    };
-//    public static final PrediTerm<Derivation> beliefExist = new AbstractPred<Derivation>("(BeliefExist)") {
+    //    public static final PrediTerm<Derivation> beliefExist = new AbstractPred<Derivation>("(BeliefExist)") {
 //        @Override public boolean test(Derivation d) {
 //            return d.belief!=null;
 //        }

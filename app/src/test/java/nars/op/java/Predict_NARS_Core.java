@@ -179,7 +179,7 @@ public class Predict_NARS_Core {
             }*/
 
             //n.ask(n.term("(?X)"), '?', n.time() + thinkInterval);
-            n.que(n.term("(?X)"), QUESTION, n.time() + thinkInterval / 2);
+            n.que($.$("(?X)"), QUESTION, n.time() + thinkInterval / 2);
             //n.ask(n.term("(?X)"), '?', n.time() + thinkInterval / 4);
 
         }

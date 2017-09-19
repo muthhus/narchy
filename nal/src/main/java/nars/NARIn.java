@@ -16,13 +16,9 @@ public interface NARIn {
 
     void input(ITask... t);
 
-    default <T extends Term> T term(@NotNull String t) throws Narsese.NarseseException {
-        return (T) Narsese.term(t, true);
-    }
-
     @Nullable
     default Task question(@NotNull String questionTerm, long occ, @NotNull BiConsumer<ActiveQuestionTask,Task> eachAnswer) throws Narsese.NarseseException {
-        return question(term(questionTerm), occ, eachAnswer);
+        return question($.$(questionTerm), occ, eachAnswer);
     }
 
     @Nullable

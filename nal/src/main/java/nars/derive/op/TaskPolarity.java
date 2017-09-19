@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * task truth is postiive
  */
-public class TaskPolarity {
+abstract public class TaskPolarity extends AbstractPred<Derivation>{
 
-    public static final PrediTerm<Derivation> taskPos = new AbstractPred<Derivation>("(TaskPos)") {
+    public static final PrediTerm<Derivation> taskPos = new TaskPolarity("TaskPos") {
         @Override
         public boolean test(@NotNull Derivation m) {
             Truth t = m.taskTruth;
@@ -19,13 +19,32 @@ public class TaskPolarity {
         }
 
     };
-    public static final PrediTerm<Derivation> taskNeg = new AbstractPred<Derivation>("(TaskNeg)") {
+    public static final PrediTerm<Derivation> taskNeg = new TaskPolarity("TaskNeg") {
         @Override
         public boolean test(@NotNull Derivation m) {
             Truth t = m.taskTruth;
             return (t != null && t.freq() < 0.5f);
         }
     };
+    public static final PrediTerm<Derivation> beliefPos = new TaskPolarity("BeliefPos") {
+        @Override public boolean test(Derivation d) {
+            Truth B = d.beliefTruth;
+            return B != null && B.freq() >= 0.5f;
+        }
+    };
+    public static final PrediTerm<Derivation> beliefNeg = new TaskPolarity("BeliefNeg") {
+        @Override public boolean test(Derivation d) {
+            Truth B = d.beliefTruth;
+            return B != null && B.freq() < 0.5f;
+        }
+    };
 
+    @Override
+    public float cost() {
+        return 0.1f;
+    }
 
+    protected TaskPolarity(String x) {
+        super(x);
+    }
 }

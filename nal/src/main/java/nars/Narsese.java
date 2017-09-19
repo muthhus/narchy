@@ -15,6 +15,7 @@ import com.github.fge.grappa.support.Var;
 import com.github.fge.grappa.transform.ParserTransformer;
 import jcog.Texts;
 import jcog.list.FasterList;
+import jcog.map.FileHashMap;
 import nars.derive.match.Ellipsis;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
@@ -24,11 +25,13 @@ import nars.term.var.UnnormalizedVariable;
 import nars.time.Tense;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
@@ -582,7 +585,9 @@ public class Narsese extends BaseParser<Object> {
     }
 
     @Nullable
-    Term TemporalRelationBuilder(Term pred, int cycles, Op o, Term subj) {
+    static Term TemporalRelationBuilder(Term pred, int cycles, Op o, Term subj) {
+        if (subj == null || subj == Null || pred == null || pred == Null)
+            return null;
         return o.the(cycles, subj, pred);
     }
 
@@ -1124,7 +1129,7 @@ public class Narsese extends BaseParser<Object> {
      * which can be re-used because a Memory can generate them
      * ondemand
      */
-    public static void tasks(String input, Consumer<Task> c, NAR m) throws NarseseException {
+    static void tasks(String input, Consumer<Task> c, NAR m) throws NarseseException {
         @NotNull Narsese p = parse();
 
         int parsedTasks = 0;
@@ -1146,10 +1151,10 @@ public class Narsese extends BaseParser<Object> {
             }
 
             Task t = decodeTask(m, y);
-            if (t != null) {
-                c.accept(t);
-                parsedTasks++;
-            }
+
+            c.accept(t);
+            parsedTasks++;
+
         }
 
         if (parsedTasks == 0)
@@ -1159,22 +1164,11 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    //r.getValueStack().clear();
-
-//        r.getValueStack().iterator().forEachRemaining(x -> {
-//            if (x instanceof Task)
-//                c.accept((Task) x);
-//            else {
-//                throw new RuntimeException("Unknown parse result: " + x + " (" + x.getClass() + ')');
-//            }
-//        });
-
-
     /**
      * parse one task
      */
     @NotNull
-    public Task task(String input, NAR n) throws NarseseException {
+    static public Task task(String input, NAR n) throws NarseseException {
         List<Task> tt = tasks(input, n);
         if (tt.size() != 1)
             throw new NarseseException(tt.size() + " tasks parsed in single-task parse: " + input);
@@ -1248,11 +1242,41 @@ public class Narsese extends BaseParser<Object> {
         return ttt.log(NARSESE_TASK_TAG).apply(m);
     }
 
+//    final static Map<String,byte[]> termCache =
+//            //new FileHashMap();
+//            new ConcurrentHashMap<>();
+//
+//
+//    @NotNull
+//    public static Term term(@NotNull String ss) throws NarseseException {
+//        if (ss.length() < 16) {
+//            return _term(ss);
+//        }
+//
+//        Term[] t = new Term[1];
+//        final NarseseException[] e = new NarseseException[1];
+//        byte[] b = termCache.computeIfAbsent(ss, (s) -> {
+//            try {
+//                t[0] = _term(s);
+//            } catch (NarseseException e1) {
+//                e[0] = e1;
+//                t[0] = Null;
+//            }
+//            return IO.termToBytes(Null);
+//        });
+//        if (e[0]!=null)
+//            throw e[0];
+//        if (t[0]!=null)
+//            return t[0];
+//        return IO.termFromBytes(b);
+//    }
+
     /**
      * parse one term NOT NORMALIZED
      */
     @NotNull
-    public static Term term(String s) throws NarseseException {
+    public static Term term(@NotNull String s) throws NarseseException {
+
         Exception ee = null;
         try {
             //Term x = singleTerms.get(s);

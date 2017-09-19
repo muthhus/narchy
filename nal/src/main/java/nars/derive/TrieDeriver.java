@@ -1,32 +1,18 @@
 package nars.derive;
 
+import jcog.Texts;
 import jcog.Util;
-import jcog.list.FasterList;
-import jcog.trie.TrieNode;
-import nars.$;
-import nars.NAR;
 import nars.Op;
 import nars.control.Derivation;
-import nars.derive.op.AbstractPatternOp.PatternOp;
-import nars.derive.op.UnifySubtermThenConclude;
-import nars.derive.rule.PremiseRuleSet;
-import nars.term.Term;
+import nars.derive.op.UnifyTerm;
 import nars.util.TermTrie;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.roaringbitmap.RoaringBitmap;
 
 import java.io.PrintStream;
-import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -42,54 +28,40 @@ public enum TrieDeriver {
 
     public static void print(Object p, @NotNull PrintStream out, int indent) {
 
-        /*if (p instanceof IfThen) {
+        TermTrie.indent(indent);
 
-            IfThen it = (IfThen) p;
-
-            TermTrie.indent(indent);
-            out.println(Util.className(p) + " (");
-            print(it.cond, out, indent + 2);
-
-            TermTrie.indent(indent);
-            out.println(") ==> {");
-
-            print(it.conseq, out, indent + 2);
-            TermTrie.indent(indent);
-            out.println("}");
-
-        } *//*else if (p instanceof If) {
-
-            indent(indent); out.println(Util.className(p) + " {");
-            {
-                If it = (If) p;
-                print(it.cond, out, indent + 2);
-            }
-            indent(indent); out.println("}");
-
-        }  else */
-
-        if (p instanceof AndCondition) {
-            TermTrie.indent(indent);
+        if (p instanceof UnifyTerm.UnifySubtermThenConclude) {
+            UnifyTerm.UnifySubtermThenConclude u = (UnifyTerm.UnifySubtermThenConclude)p;
+            out.println("unify(" + UnifyTerm.label(u.subterm) + "," + u.pattern + ") {");
+            print(u.eachMatch, out, indent+2);
+            TermTrie.indent(indent); out.println("}");
+        } else if (p instanceof AndCondition) {
             out.println("and {");
             AndCondition ac = (AndCondition) p;
             for (PrediTerm b : ac.cache) {
                 print(b, out, indent + 2);
             }
-            TermTrie.indent(indent);
-            out.println("}");
+            TermTrie.indent(indent); out.println("}");
+        } else if (p instanceof EvaluateChoices) {
+            out.println("eval {");
+            EvaluateChoices ac = (EvaluateChoices) p;
+            int i = 0;
+            for (ValueFork b : ac.targets) {
+                TermTrie.indent(indent + 2); out.println(i + ":");
+                print(b, out, indent + 4);
+                i++;
+            }
+            TermTrie.indent(indent); out.println("}");
         } else if (p instanceof Fork) {
-            TermTrie.indent(indent);
             out.println(Util.className(p) + " {");
             Fork ac = (Fork) p;
             for (PrediTerm b : ac.cache) {
                 print(b, out, indent + 2);
             }
-            TermTrie.indent(indent);
-            out.println("}");
+            TermTrie.indent(indent); out.println("}");
 
         } else if (p instanceof OpSwitch) {
             OpSwitch sw = (OpSwitch) p;
-            TermTrie.indent(indent);
             out.println("switch(op(" + (sw.subterm == 0 ? "task" : "belief") + ")) {");
             int i = -1;
             for (PrediTerm b : sw.swtch) {
@@ -99,21 +71,13 @@ public enum TrieDeriver {
                 TermTrie.indent(indent + 2);
                 out.println('"' + Op.values()[i].toString() + "\": {");
                 print(b, out, indent + 4);
-                TermTrie.indent(indent + 2);
-                out.println("}");
+                TermTrie.indent(indent + 2); out.println("}");
 
             }
-            TermTrie.indent(indent);
-            out.println("}");
+            TermTrie.indent(indent); out.println("}");
         } else {
-
-
-            TermTrie.indent(indent);
             out.print( /*Util.className(p) + ": " +*/ p);
-
-
             out.println();
-
         }
 
 
@@ -180,11 +144,8 @@ public enum TrieDeriver {
 
             }
 
-        } else if (p instanceof UnifySubtermThenConclude) {
-            forEach(((UnifySubtermThenConclude) p).eachMatch, out);
-        } else {
-
-
+        } else if (p instanceof UnifyTerm.UnifySubtermThenConclude) {
+            forEach(((UnifyTerm.UnifySubtermThenConclude) p).eachMatch, out);
         }
 
 
@@ -252,8 +213,8 @@ public enum TrieDeriver {
             }
 //            TermTrie.indent(indent);
 //            out.println("}");
-        } else if (x instanceof UnifySubtermThenConclude) {
-            forEach(x, ((UnifySubtermThenConclude) x).eachMatch, out);
+        } else if (x instanceof UnifyTerm.UnifySubtermThenConclude) {
+            forEach(x, ((UnifyTerm.UnifySubtermThenConclude) x).eachMatch, out);
         }
     }
 
@@ -324,8 +285,8 @@ public enum TrieDeriver {
     @Nullable
     public static PrediTerm<Derivation> ifThen(@NotNull Stream<PrediTerm<Derivation>> cond, @Nullable PrediTerm<Derivation> conseq) {
         return AndCondition.the(AndCondition.compile(
-                (conseq != null ? Stream.concat(cond, Stream.of(conseq)) : cond).collect(toList())
-        ));
+                (conseq != null ? Stream.concat(cond, Stream.of(conseq)) : cond)
+        ).toArray(PrediTerm[]::new));
     }
 
     public static void print(PrediTerm<Derivation> d) {
@@ -398,7 +359,7 @@ public enum TrieDeriver {
 //    }
 
     @NotNull
-    static Stream<PrediTerm<Derivation>> conditions(@NotNull Stream<Term> t) {
+    static Stream<PrediTerm<Derivation>> conditions(@NotNull Stream<PrediTerm<Derivation>> t) {
 
 //
 //            final AtomicReference<UnificationPrototype> unificationParent = new AtomicReference<>(null);

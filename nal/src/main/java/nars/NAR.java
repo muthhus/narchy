@@ -35,9 +35,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.time.Time;
 import nars.truth.DiscreteTruth;
@@ -357,24 +355,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return l;
     }
 
-    @Override
-    @NotNull
-    public <T extends Term> T term(@NotNull String t) throws NarseseException {
-        return $.$(t);
-    }
-
-    @NotNull
-    public <T extends Term> T term(@NotNull byte[] code) {
-        return (T) IO.termFromBytes(code);
-    }
-
 
     /**
      * gets a concept if it exists, or returns null if it does not
      */
     @Nullable
     public final Concept conceptualize(@NotNull String conceptTerm) throws NarseseException {
-        return conceptualize(term(conceptTerm));
+        return conceptualize($.$(conceptTerm));
     }
 
 //    /** parses a term, returning it, or throws an exception (but will not return null) */
@@ -391,7 +378,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     @NotNull
     public void question(@NotNull String termString) throws NarseseException {
         //TODO remove '?' if it is attached at end
-        question(term(termString));
+        question($.$(termString));
     }
 
     /**
@@ -454,7 +441,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     @NotNull
     public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf) {
         try {
-            believe(priDefault(BELIEF), term(term), time(tense), freq, conf);
+            believe(priDefault(BELIEF), $.$(term), time(tense), freq, conf);
         } catch (NarseseException e) {
             throw new RuntimeException(e);
         }
@@ -467,13 +454,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public NAR believe(@NotNull String termString, float freq, float conf) throws NarseseException {
-        return believe(term(termString), freq, conf);
+        return believe($.$(termString), freq, conf);
     }
 
     @NotNull
     public Task goal(@NotNull String termString) {
         try {
-            return goal(term(termString), true);
+            return goal($.$(termString), true);
         } catch (NarseseException e) {
             throw new RuntimeException(e);
         }
@@ -490,12 +477,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public NAR believe(@NotNull String termString, boolean isTrue) throws NarseseException {
-        return believe(term(termString), isTrue);
+        return believe($.$(termString), isTrue);
     }
 
     @NotNull
     public Task goal(@NotNull String termString, boolean isTrue) throws NarseseException {
-        return goal(term(termString), isTrue);
+        return goal($.$(termString), isTrue);
     }
 
     @NotNull
@@ -1239,27 +1226,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @Nullable
     public Concept concept(/*@NotNull */Termed x, boolean createIfMissing) {
-
-        Term xt;
-        if (x instanceof Concept) {
-            Concept ct = (Concept) x;
-            if (!ct.isDeleted())
-                return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
-            //otherwise if it is deleted, continue
-            xt = ct.term();
-        } else {
-
-            if (x instanceof Variable /* fast test */ || !(xt = x.unneg()).op().conceptualizable)
-                return null;
-        }
-
-        Term y = xt.conceptual();
-
-        if (y instanceof Bool)
-            return null; //throw new RuntimeException("failed to find conceptual root of " + x);
-
-
-        return terms.concept(y, createIfMissing);
+        return terms.concept(x, createIfMissing);
     }
 
 

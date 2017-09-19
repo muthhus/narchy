@@ -19,4 +19,8 @@ public final class StructureInclusionConstraint extends MatchConstraint {
         return !y.hasAny(structure);
     }
 
+    @Override
+    public float cost() {
+        return 0.1f;
+    }
 }

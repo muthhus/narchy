@@ -1,5 +1,6 @@
 package nars.term;
 
+import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
@@ -108,7 +109,7 @@ public class TermIDTest {
     @NotNull
     public Term testBytesRepresentation(@Nullable String expectedCompactOutput, @NotNull String expectedPrettyOutput, int expectedLength) throws Narsese.NarseseException {
         //UTF8Identifier b = new UTF8Identifier(expectedPrettyOutput);
-        Termed i = nar.term(expectedPrettyOutput);
+        Termed i = $.$(expectedPrettyOutput);
         //byte[] b = i.bytes();
         //byte[] b = i.bytes();
 

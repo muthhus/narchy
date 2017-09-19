@@ -37,6 +37,10 @@ public enum AbstractPatternOp  {
             return (taskOrBelief == 0 ? ff.termSub0op : ff.termSub1op) == opOrdinal;
         }
 
+        @Override
+        public float cost() {
+            return 0.1f;
+        }
     }
 
 //    /** tests op membership in a given vector

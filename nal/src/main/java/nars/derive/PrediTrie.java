@@ -16,17 +16,23 @@ import org.jetbrains.annotations.NotNull;
 import org.roaringbitmap.RoaringBitmap;
 
 import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
 /**
  * predicate trie, for maximum folding
+ * TODO generify this beyond Derivation state
  */
-public final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
+public final class PrediTrie {
 
+    final TermTrie<PrediTerm<Derivation>, PrediTerm<Derivation>> pre;
+    final FasterList<ValueFork> postChoices = new FasterList();
 
     public PrediTrie(PremiseRuleSet r) {
         super();
+
+        pre = new TermTrie<>();
 
         NAR nar = r.patterns.nar;
 
@@ -46,7 +52,6 @@ public final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
 
                 c.getOne().forEach((k) -> preconditionCount.addToValue(k, 1));
 
-
                 int id = conclusions.size();
                 conclusions.add(c.getTwo());
 
@@ -59,39 +64,34 @@ public final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
 //            System.out.println("PRECOND");
 //            preconditionCount.keyValuesView().toSortedListBy((x)->x.getTwo()).forEach((x)->System.out.println(Texts.iPad(x.getTwo(),3) + "\t" + x.getOne() ));
 
-        Comparator<Term> sort = (a, b) -> {
 
-            if (a.equals(b)) return 0;
-
-            int ac = preconditionCount.get(a);
-            int bc = preconditionCount.get(b);
-            if (ac > bc) return -1;
-            else if (ac < bc) return +1;
-            else return a.compareTo(b);
-        };
+        Comparator<PrediTerm<?>> sort = PrediTerm.sort(preconditionCount::get);
 
         List<List<Term>> paths = $.newArrayList();
         pre.forEach((k, v) -> {
 
-            FasterList<Term> path = new FasterList(k);
+            FasterList<PrediTerm<Derivation>> path = new FasterList(k);
             path.sort(sort);
 
             PrediTerm<Derivation>[] ll = StreamSupport.stream(v.spliterator(), false).map((i) -> conclusions.get(i).transform((Function) null)).toArray(PrediTerm[]::new);
             assert (ll.length != 0);
 
-            PrediTerm<Derivation> cx;
-            if (ll.length == 1) {
-                cx = ll[0];
-            } else {
-                cx = //Fork.fork(ll);
-                    new ValueFork(ll);
-            }
-            path.add(cx);
-            put(path, cx);
+            ValueFork cx = ValueFork.the(ll, postChoices);
+            path.add(cx.choice);
+            this.pre.put(path, cx);
         });
 
 
     }
+
+
+
+    public static PrediTerm<Derivation> the(PremiseRuleSet r, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
+
+        PrediTrie t = new PrediTrie(r);
+        return AndCondition.the(t.compile(t.pre, each), new EvaluateChoices(t.postChoices.toArray(ValueFork[]::new)));
+    }
+
 
 //        @Override
 //        protected void onMatch(Term existing, Term incoming) {
@@ -107,7 +107,11 @@ public final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
 
 
     public PrediTerm<Derivation> compile(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
-        List<PrediTerm<Derivation>> bb = compile(root);
+        return compile(pre, each);
+    }
+
+    public PrediTerm<Derivation> compile(TermTrie<PrediTerm<Derivation>, PrediTerm<Derivation>> trie, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
+        List<PrediTerm<Derivation>> bb = compile(trie.root);
         PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
 
         PrediTerm<Derivation> tf = Fork.fork(roots);
@@ -117,8 +121,9 @@ public final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
         return tf;
     }
 
+
     @NotNull
-    static List<PrediTerm<Derivation>> compile(@NotNull TrieNode<List<Term>, PrediTerm<Derivation>> node) {
+    static List<PrediTerm<Derivation>> compile(@NotNull TrieNode<List<PrediTerm<Derivation>>, PrediTerm<Derivation>> node) {
 
 
         List<PrediTerm<Derivation>> bb = $.newArrayList(node.childCount());
@@ -150,6 +155,7 @@ public final class PrediTrie extends TermTrie<Term, PrediTerm<Derivation>> {
 
         return bb;
     }
+
     @NotNull
     private static List<PrediTerm<Derivation>> factorSubOpToSwitch(@NotNull List<PrediTerm<Derivation>> bb, int subterm, int minToCreateSwitch) {
         if (!bb.isEmpty()) {

@@ -1,6 +1,7 @@
 package nars.nar;
 
 import com.google.common.primitives.Longs;
+import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
@@ -136,9 +137,9 @@ public class NARTest {
 
         String statement1 = "<a --> b>.";
 
-        Termed a = n.term("a");
+        Termed a = $.$("a");
         assertTrue(a != null);
-        Termed a1 = n.term("a");
+        Termed a1 = $.$("a");
         assertTrue(a.equals(a1));
 
         n.input(statement1);
@@ -153,7 +154,7 @@ public class NARTest {
         n.input(statement2);
         n.run(4);
 
-        Termed a2 = n.term("a");
+        Termed a2 = $.$("a");
         assertNotNull(a2);
 
         Concept ca = n.concept(a2, true);

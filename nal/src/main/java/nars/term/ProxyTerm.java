@@ -26,7 +26,7 @@ public class ProxyTerm<T extends Term> implements Term {
 
     public final /*HACK make unpublic */ T ref;
 
-    public ProxyTerm(T t) {
+    public ProxyTerm(@NotNull T t) {
         this.ref = t;
     }
 

@@ -3,7 +3,6 @@ package nars;
 
 import jcog.list.FasterList;
 import nars.derive.match.Ellipsislike;
-import nars.index.term.TermContext;
 import nars.op.mental.AliasConcept;
 import nars.term.*;
 import nars.term.atom.Atom;
@@ -30,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.Arrays.copyOfRange;
@@ -1177,8 +1177,7 @@ public enum Op implements $ {
     /**
      * decode a term which may be a functor, return null if it isnt
      */
-    @Nullable
-    public static Pair<Atom, TermContainer> functor(@NotNull Term maybeOperation, TermContext index, boolean mustFunctor) {
+    @Nullable public static <X> Pair<X, Term> functor(@NotNull Term maybeOperation, Function<Term, X> invokes) {
         if (maybeOperation.hasAll(Op.opBits)) {
             Term c = maybeOperation;
             if (c.op() == INH) {
@@ -1186,14 +1185,9 @@ public enum Op implements $ {
                 if (s0.op() == PROD) {
                     Term s1 = c.sub(1);
                     if (s1 instanceof Atom /*&& s1.op() == ATOM*/) {
-                        Termed ff = index.applyOrElse(s1);
-                        if (!mustFunctor || ff instanceof Functor) {
-                            return Tuples.pair(
-                                    ((Atom) ff),
-                                    s0.subterms()
-                            );
-                        }
-
+                        X i = invokes.apply(s1);
+                        if (i!=null)
+                            return Tuples.pair(i, s0);
                     }
                 }
             }

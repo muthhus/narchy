@@ -10,11 +10,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AbstractPred<X> extends ProxyTerm<Term> implements PrediTerm<X> {
 
-    protected AbstractPred(@NotNull String x) {
+    protected AbstractPred(String x) {
         this($.$safe(x));
     }
 
-    protected AbstractPred(@NotNull Term term) {
+    protected AbstractPred(Term term) {
         super(term);
     }
 

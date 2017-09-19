@@ -26,6 +26,11 @@ public final class TaskBeliefOp extends AbstractPred<Derivation> {
     }
 
     @Override
+    public float cost() {
+        return 0.1f;
+    }
+
+    @Override
     public boolean test(Derivation derivation) {
         return (!task || derivation.termSub0op == op)
                 &&

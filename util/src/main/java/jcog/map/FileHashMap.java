@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 /**
  * from: https://github.com/bmc/javautil
@@ -296,6 +299,11 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             | FORCE_OVERWRITE
             | RECLAIM_FILE_GAPS;
 
+    /**
+     * initial size of an output write buffer
+     */
+    private static final int WRITE_BUFFER_SIZE = 1024;
+
     /*----------------------------------------------------------------------*\
                            Private Inner Classes
     \*----------------------------------------------------------------------*/
@@ -394,8 +402,8 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
         @Override
         public int compareTo(FileHashMapEntry o) {
             FileHashMapEntry other = o;
-            Long thisPos = new Long(this.filePosition);
-            Long otherPos = new Long(other.filePosition);
+            Long thisPos = this.filePosition;
+            Long otherPos = other.filePosition;
 
             return thisPos.compareTo(otherPos);
         }
@@ -494,8 +502,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
     private static class ValuesFile {
         private final RandomAccessFile file;
 
-        ValuesFile(File f)
-                throws IOException {
+        ValuesFile(File f) throws FileNotFoundException {
             this.file = new RandomAccessFile(f, "rw");
         }
 
@@ -536,10 +543,6 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             return (this.getClass().isInstance(o));
         }
 
-        public int hashCode()                                       // NOPMD
-        {
-            return super.hashCode();
-        }
     }
 
     /**
@@ -572,10 +575,6 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             return (this.getClass().isInstance(o));
         }
 
-        public int hashCode()                                   // NOPMD
-        {
-            return super.hashCode();
-        }
     }
 
     /**
@@ -583,8 +582,8 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * sorted order, by file position. Used to implement other iterators.
      */
     private class EntryIterator implements Iterator<FileHashMapEntry<K>> {
-        List<FileHashMapEntry<K>> entries;
-        Iterator<FileHashMapEntry<K>> iterator;
+        final List<FileHashMapEntry<K>> entries;
+        final Iterator<FileHashMapEntry<K>> iterator;
         FileHashMapEntry<K> currentEntry;
 
         /**
@@ -645,7 +644,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * loaded into memory at the same time.
      */
     private class ValueIterator implements Iterator<V> {
-        EntryIterator it;
+        final EntryIterator it;
 
         private ValueIterator() {
             it = new EntryIterator();
@@ -672,11 +671,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * are loaded only when referenced.
      */
     private class ValueSet extends AbstractSet<V> {
-        ValuesFile valuesDB = FileHashMap.this.valuesDB;
-
-        private ValueSet() {
-            // Nothing to do
-        }
+        final ValuesFile valuesDB = FileHashMap.this.valuesDB;
 
         @Override
         public void clear() {
@@ -849,8 +844,8 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
 
         @Override
         public Iterator<Map.Entry<K, V>> iterator() {
-            return new Iterator<Map.Entry<K, V>>() {
-                EntryIterator it = new EntryIterator();
+            return new Iterator<>() {
+                final EntryIterator it = new EntryIterator();
 
                 @Override
                 public Map.Entry<K, V> next() {
@@ -876,11 +871,6 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
                 eq = super.equals(obj);
 
             return eq;
-        }
-
-        public int hashCode()                                // NOPMD
-        {
-            return super.hashCode();
         }
 
         public boolean remove(FileHashMapEntry<K> o) {
@@ -1032,10 +1022,8 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
 
         private synchronized void loadKeyArray() {
             if (keys == null) {
-                List<FileHashMapEntry<K>> entries;
-
-                entries = FileHashMap.this.getSortedEntries();
-                keys = new ArrayList<K>();
+                List<FileHashMapEntry<K>> entries = FileHashMap.this.getSortedEntries();
+                keys = new ArrayList<>(entries.size());
                 for (FileHashMapEntry<K> entry : entries)
                     keys.add(entry.getKey());
             }
@@ -1051,7 +1039,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * FileHashMapEntry object. This index is stored on disk, in the index
      * file.
      */
-    private HashMap<K, FileHashMapEntry<K>> indexMap;
+    private final Map<K, FileHashMapEntry<K>> indexMap;
 
     /**
      * The file prefix with which this object was created.
@@ -1087,7 +1075,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
     /**
      * Whether or not the object is still valid. See close().
      */
-    private boolean valid = true;
+    private final AtomicBoolean valid = new AtomicBoolean(true);
 
     /**
      * The value returned by the entrySet() method. It's created the first
@@ -1132,7 +1120,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @see #FileHashMap(String, int)
      * @see #FileHashMap(String)
      */
-    public FileHashMap() throws IOException {
+    public FileHashMap() {
         this(null);
     }
 
@@ -1154,18 +1142,22 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @see #FileHashMap(String, int)
      * @see #FileHashMap()
      */
-    public FileHashMap(String tempFilePrefix)
-            throws IOException {
+    public FileHashMap(String tempFilePrefix) {
         this.flags = TRANSIENT;
         this.filePrefix = tempFilePrefix;
 
         if (filePrefix == null)
-            filePrefix = "fmh";
+            filePrefix = UUID.randomUUID().toString();
 
-        this.valuesDBPath = File.createTempFile(filePrefix, DATA_FILE_SUFFIX);
-        this.valuesDBPath.deleteOnExit();
+        try {
+            this.valuesDBPath = File.createTempFile(filePrefix, DATA_FILE_SUFFIX);
+            this.valuesDBPath.deleteOnExit();
 
-        createNewMap(this.valuesDBPath);
+            this.valuesDB = new ValuesFile(this.valuesDBPath);
+            this.indexMap = new ConcurrentHashMap();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -1233,7 +1225,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
     public FileHashMap(String pathPrefix, int flags)
             throws
             ClassNotFoundException,
-            IOException {
+            IOException, FileNotFoundException {
         assert (((~ALL_FLAGS_MASK) & flags) == 0);
 
         int filesFound = 0;
@@ -1287,7 +1279,8 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
                                     "FileHashMap.NO_CREATE flag was set.");
                 }
 
-                createNewMap(this.valuesDBPath);
+                this.valuesDB = new ValuesFile(this.valuesDBPath);
+                this.indexMap = new ConcurrentHashMap();
                 break;
 
             case 1:
@@ -1305,11 +1298,39 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
 
             case 2:
                 valuesDB = new ValuesFile(valuesDBPath);
-                loadIndex();
+                ObjectInputStream objStream;
+                String version;
+
+                objStream = new ObjectInputStream
+                        (new FileInputStream(this.indexFilePath));
+                version = (String) objStream.readObject();
+
+                if (!version.equals(VERSION_STAMP)) {
+                    throw new RuntimeException(//Package.BUNDLE_NAME,
+                            "FileHashMap.versionMismatch" +
+                                    "FileHashMap version mismatch in index file " +
+                                    "\"{0}\". Expected version \"{1}\", found " +
+                                    "version \"{2}\"" +
+                                    Arrays.toString(new Object[]
+                                            {
+                                                    indexFilePath.getName(),
+                                                    VERSION_STAMP,
+                                                    version
+                                            }) +
+                                    VERSION_STAMP +
+                                    version);
+                }
+
+                // This typecast will generate an "unchecked cast" exception.
+                // Unfortunately, there's no way around it (other than to avoid
+                // making calls like this). See
+                // http://www.langer.camelot.de/GenericsFAQ/JavaGenericsFAQ.html#Technicalities
+
+                indexMap = (HashMap<K, FileHashMapEntry<K>>) objStream.readObject();
                 break;
 
             default:
-                assert (false);
+                throw new RuntimeException();
         }
 
         if ((flags & RECLAIM_FILE_GAPS) != 0)
@@ -1353,14 +1374,11 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
 
         try {
             // Implement the clear operation by truncating the data file.
-
             valuesDB.getFile().getChannel().truncate(0);
             modified = true;
         } catch (IOException ex) {
-            log.error("Failed to truncate FileHashMap file \"" +
-                            valuesDBPath.getPath() + "\"",
-                    ex);
-            valid = false;
+            valid.set(false);
+            log.error("Failed to truncate FileHashMap file \"{}\"", valuesDBPath.getPath(), ex);
         }
     }
 
@@ -1373,10 +1391,8 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @throws IOException              Error writing index
      * @see #save
      */
-    public synchronized void close()
-            throws
-            IOException {
-        if (valid) {
+    public synchronized void close() throws IOException {
+        if (valid.get()) {
             if ((flags & TRANSIENT) != 0) {
                 // Be sure to remove the data files.
 
@@ -1390,7 +1406,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
                 save();
             }
 
-            valid = false;
+            valid.set(false);
         }
     }
 
@@ -1406,7 +1422,6 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      */
     @Override
     public boolean containsKey(Object key) {
-        checkValidity();
         return indexMap.containsKey(key);
     }
 
@@ -1432,7 +1447,6 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
     public void delete() {
         try {
             close();
-        } catch (NotSerializableException ex) {
         } catch (IOException ex) {
         }
 
@@ -1509,14 +1523,9 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
     @Override
     public V get(Object key) {
         checkValidity();
-
-        V result = null;
         FileHashMapEntry<K> entry = indexMap.get(key);
+        return entry != null ? readValueNoError(entry) : null;
 
-        if (entry != null)
-            result = readValueNoError(entry);
-
-        return result;
     }
 
     /**
@@ -1553,7 +1562,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @return <tt>true</tt> if this object is valid, <tt>false</tt> if not
      */
     public boolean isValid() {
-        return valid;
+        return valid.get();
     }
 
     /**
@@ -1598,13 +1607,15 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      *                                  <tt>null</tt>.
      */
     @Override
-    public V put(K key, V value)
-            throws ClassCastException,
-            IllegalArgumentException,
-            NullPointerException {
-        checkValidity();
+    public V put(K key, V value) throws ClassCastException, IllegalArgumentException, NullPointerException {
+        return put(key, value, true);
+    }
 
-        V result = null;
+    public void putAsync(K key, V value) throws ClassCastException, IllegalArgumentException, NullPointerException {
+        put(key, value, false);
+    }
+
+    V put(K key, V value, boolean read) throws ClassCastException, IllegalArgumentException, NullPointerException {
 
         if (key == null)
             throw new NullPointerException("null key parameter");     // NOPMD
@@ -1619,25 +1630,15 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
         // reasonable to use unserializable keys if the hash map is transient.
         // Unserializable keys will be caught on save, for persistent maps.
 
+        V result;
         try {
-            FileHashMapEntry<K> old = indexMap.get(key);
+            checkValidity();
 
-            // Read the old value first. Then, modify the index and write
-            // the new value. That way, we can reclaim the old value's space
-            // if RECLAIM_FILE_GAPS is enabled.
+            result = remove(key, read);
 
-            if (old != null) {
-                result = readValueNoError(old);
-
-                // Removing the key forces the space to be listed in the gaps
-                // list.
-
-                remove(key);
-            }
-
-            FileHashMapEntry<K> entry = writeValue(key, value);
-            indexMap.put(key, entry);
+            indexMap.put(key, writeValue(key, value));
             modified = true;
+
         } catch (IOException ex) {
             throw new IllegalArgumentException("Error saving value: " +
                     ex.getMessage());
@@ -1657,6 +1658,10 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      */
     @Override
     public V remove(Object key) {
+        return remove(key, true);
+    }
+
+    public V remove(Object key, boolean readOld) {
         checkValidity();
 
         V result = null;
@@ -1664,23 +1669,16 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
         // We do nothing with the space in the data file for any existing
         // item. It remains in the data file, but is unreferenced.
 
-        if (indexMap.containsKey(key)) {
-            FileHashMapEntry<K> entry = indexMap.get(key);
-            result = readValueNoError(entry);
-            indexMap.remove(key);
+        FileHashMapEntry<K> entry;
+        if ((entry = indexMap.remove(key))!=null) {
+            result = readOld ? readValueNoError(entry) : null;
             modified = true;
 
             if ((flags & RECLAIM_FILE_GAPS) != 0) {
                 // Have to recalculate gaps, since we may be able to coalesce
                 // this returned space with ones to either side of it.
 
-                log.debug("Removed value for key \"" +
-                        key +
-                        "\" at pos=" +
-                        entry.getFilePosition() +
-                        ", size=" +
-                        entry.getObjectSize() +
-                        ". Re-figuring gaps.");
+                //log.debug("Removed value for key \"{}\" at pos={}, size={}. Re-figuring gaps.", key, entry.getFilePosition(), entry.getObjectSize());
                 findFileGaps();
             }
         }
@@ -1758,21 +1756,8 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * Throw an exception if the object isn't valid.
      */
     private void checkValidity() {
-        if (!valid)
+        if (!valid.get())
             throw new IllegalStateException("Invalid FileHashMap object");
-    }
-
-    /**
-     * Initialize a new index and data file for a hash map being created.
-     * Used only by the constructors.
-     *
-     * @param valuesDBPath path to the data file
-     * @throws IOException I/O error
-     */
-    private void createNewMap(File valuesDBPath)
-            throws IOException {
-        this.valuesDB = new ValuesFile(valuesDBPath);
-        this.indexMap = new HashMap<K, FileHashMapEntry<K>>();
     }
 
     /**
@@ -1793,7 +1778,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
         log.debug("Looking for file gaps.");
 
         if (fileGaps == null)
-            fileGaps = new TreeSet<FileHashMapEntry<K>>(new FileHashMapEntryGapComparator());
+            fileGaps = new TreeSet<>(new FileHashMapEntryGapComparator());
         else
             fileGaps.clear();
 
@@ -1811,10 +1796,10 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             if (pos > 0) {
                 // There's a gap at the beginning.
 
-                log.debug("First entry is at pos " + pos + ", size=" + size);
+                log.debug("First entry is at pos {}, size={}", pos, size);
                 size = (int) pos;
-                log.debug("Gap at position 0 of size " + size);
-                fileGaps.add(new FileHashMapEntry<K>((long) 0, size));
+                log.debug("Gap at position 0 of size {}", size);
+                fileGaps.add(new FileHashMapEntry<>(0L, size));
             }
 
             previous = entry;
@@ -1830,9 +1815,8 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
                 if (possibleGapPos != pos) {
                     int gapSize = (int) (pos - possibleGapPos);
 
-                    log.debug("Gap at position " + possibleGapPos +
-                            " of size " + gapSize);
-                    fileGaps.add(new FileHashMapEntry<K>(possibleGapPos,
+                    log.debug("Gap at position {} of size {}", possibleGapPos, gapSize);
+                    fileGaps.add(new FileHashMapEntry<>(possibleGapPos,
                             gapSize));
                 }
 
@@ -1845,62 +1829,40 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * Get the list of FileHashMapEntry pointers for the values, sorted
      * in ascending file position order.
      *
+     * TODO use Stream<>
+     *
      * @return A sorted list of FileHashMapEntry objects.
      */
     private List<FileHashMapEntry<K>> getSortedEntries() {
         // Get the set of values in the hash index. Each value is a
         // FileHashMapEntry object.
 
-        List<FileHashMapEntry<K>> vals = new ArrayList<FileHashMapEntry<K>>();
-        vals.addAll(indexMap.values());
+        List<FileHashMapEntry<K>> vals = new ArrayList<>(indexMap.values());
 
         // Sort the list.
 
-        Collections.sort(vals, new FileHashMapEntryComparator());
+        vals.sort(new FileHashMapEntryComparator());
 
         return vals;
     }
 
-    /**
-     * Load the index from its disk file.
-     *
-     * @throws IOException              on error
-     * @throws ClassNotFoundException   error deserializing one of the objects
-     * @throws VersionMismatchException bad version in index file
-     */
-    private void loadIndex()
-            throws IOException,
-            ClassNotFoundException {
-        ObjectInputStream objStream;
-        String version;
+    @Override public V computeIfAbsent(K key,
+            Function<? super K, ? extends V> mappingFunction) {
 
-        objStream = new ObjectInputStream
-                (new FileInputStream(this.indexFilePath));
-        version = (String) objStream.readObject();
-
-        if (!version.equals(VERSION_STAMP)) {
-            throw new RuntimeException(//Package.BUNDLE_NAME,
-                    "FileHashMap.versionMismatch" +
-                            "FileHashMap version mismatch in index file " +
-                            "\"{0}\". Expected version \"{1}\", found " +
-                            "version \"{2}\"" +
-                            Arrays.toString(new Object[]
-                                    {
-                                            indexFilePath.getName(),
-                                            VERSION_STAMP,
-                                            version
-                                    }) +
-                            VERSION_STAMP +
-                            version);
+        V v;
+        synchronized (indexMap) {
+            if ((v = get(key)) == null) {
+                V newValue;
+                if ((newValue = mappingFunction.apply(key)) != null) {
+                    put(key, newValue);
+                    return newValue;
+                }
+            }
         }
 
-        // This typecast will generate an "unchecked cast" exception.
-        // Unfortunately, there's no way around it (other than to avoid
-        // making calls like this). See
-        // http://www.langer.camelot.de/GenericsFAQ/JavaGenericsFAQ.html#Technicalities
-
-        indexMap = (HashMap<K, FileHashMapEntry<K>>) objStream.readObject();
+        return v;
     }
+
 
     /**
      * Read an object from a specific location in the random access file
@@ -1927,19 +1889,18 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
 
         // Load the serialized object into memory.
 
+        RandomAccessFile valuesFile;
         synchronized (this) {
-            RandomAccessFile valuesFile = valuesDB.getFile();
+            valuesFile = valuesDB.getFile();
             valuesFile.seek(entry.getFilePosition());
-            if ((sizeRead = valuesFile.read(byteBuf)) != size) {
-                throw new IOException("Expected to read " +
-                        size +
-                        "-byte serialized object from " +
-                        " on-disk data file. Got only " +
-                        sizeRead +
-                        " bytes.");
-            }
-        }
 
+        }
+        if ((sizeRead = valuesFile.read(byteBuf)) != size) {
+            throw new IOException("Expected to read " +
+                    size + "-byte serialized object from " +
+                    " on-disk data file. Got only " +
+                    sizeRead + " bytes.");
+        }
         // Use a ByteArrayInputStream and an ObjectInputStream to read
         // the actual object itself.
 
@@ -1964,8 +1925,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
 
         try {
             obj = readValue(entry);
-        } catch (IOException ex) {
-        } catch (ClassNotFoundException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
         }
 
         return obj;
@@ -1977,7 +1937,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @throws IOException on error
      */
     private synchronized void saveIndex()
-            throws IOException {
+            throws IOException, FileNotFoundException {
         ObjectOutputStream objStream;
 
         objStream = new ObjectOutputStream
@@ -1988,13 +1948,13 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
         if (log.isDebugEnabled()) {
             List<FileHashMapEntry<K>> entries = getSortedEntries();
 
-            log.debug("Just saved index. Total entries=" + currentSize());
-            log.debug("Index values follow.");
+            //log.debug("Just saved index. Total entries={}", currentSize());
+            //log.debug("Index values follow.");
             for (FileHashMapEntry<K> entry : entries) {
                 long pos = entry.getFilePosition();
                 int size = entry.getObjectSize();
 
-                log.debug("    pos=" + pos + ", size=" + size);
+                //log.debug("    pos={}, size={}", pos, size);
             }
         }
     }
@@ -2014,7 +1974,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @see #getFilePosition
      * @see #readValue
      */
-    private synchronized FileHashMapEntry<K> writeValue(K key, V obj)
+    private FileHashMapEntry<K> writeValue(K key, V obj)
             throws IOException {
         ObjectOutputStream objStream;
         ByteArrayOutputStream byteStream;
@@ -2023,29 +1983,33 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
 
         // Serialize the object to a byte buffer.
 
-        byteStream = new ByteArrayOutputStream();
+        byteStream = new ByteArrayOutputStream(WRITE_BUFFER_SIZE);
         objStream = new ObjectOutputStream(byteStream);
         objStream.writeObject(obj);
         size = byteStream.size();
 
-        // Find a location for the object.
+        byte[] ba = byteStream.toByteArray();
 
-        if ((flags & RECLAIM_FILE_GAPS) != 0)
-            filePos = findBestFitGap(size);
+        synchronized (indexMap) {
+            // Find a location for the object.
 
-        RandomAccessFile valuesFile = this.valuesDB.getFile();
-        if (filePos == -1)
-            filePos = valuesFile.length();
+            if ((flags & RECLAIM_FILE_GAPS) != 0)
+                filePos = findBestFitGap(size);
 
-        valuesFile.seek(filePos);
+            RandomAccessFile valuesFile = this.valuesDB.getFile();
+            if (filePos == -1)
+                filePos = valuesFile.length();
 
-        // Write the bytes of the serialized object.
+            valuesFile.seek(filePos);
 
-        valuesFile.write(byteStream.toByteArray());
+            // Write the bytes of the serialized object.
 
-        // Return the entry.
+            valuesFile.write(ba);
 
-        return new FileHashMapEntry<K>(filePos, size, key);
+            // Return the entry.
+        }
+
+        return new FileHashMapEntry<>(filePos, size, key);
     }
 
     /**
@@ -2057,7 +2021,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
     private long findBestFitGap(int objectSize) {
         long result = -1;
 
-        log.debug("Finding smallest gap for " + objectSize + "-byte object");
+        //log.debug("Finding smallest gap for {}-byte object", objectSize);
 
         assert (fileGaps != null);
         for (Iterator<FileHashMapEntry<K>> it = fileGaps.iterator();
@@ -2067,14 +2031,14 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             long pos = gap.getFilePosition();
             int size = gap.getObjectSize();
 
-            log.debug("Gap: pos=" + pos + ", size=" + size);
+            //log.debug("Gap: pos={}, size={}", pos, size);
             if (size >= objectSize) {
-                log.debug("Found it.");
+                //log.debug("Found it.");
                 result = pos;
 
                 if (size > objectSize) {
-                    log.debug("Gap size is larger than required. Making " +
-                            "smaller gap.");
+//                    log.debug("Gap size is larger than required. Making " +
+//                            "smaller gap.");
 
                     // Remove it and re-insert it, since the gap list is
                     // sorted by size.
@@ -2086,8 +2050,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
                     gap.setFilePosition(pos);
                     gap.setObjectSize(size);
 
-                    log.debug("Saving new, smaller gap: pos=" + pos +
-                            ", size=" + size);
+                    log.debug("Saving new, smaller gap: pos={}, size={}", pos, size);
 
                     fileGaps.add(gap);
                 }
@@ -2096,7 +2059,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             }
         }
 
-        log.debug("findBestFitGap: returning " + result);
+        log.debug("findBestFitGap: returning {}", result);
         return result;
     }
 

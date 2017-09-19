@@ -17,6 +17,8 @@ import java.io.PrintStream;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static nars.Op.Null;
+
 /**
  *
  */
@@ -97,11 +99,24 @@ public abstract class TermIndex implements TermContext {
      * term should be conceptualizable prior to calling this
      */
     @Nullable
-    public final Concept concept(@NotNull Term term, boolean createIfMissing) {
+    public final Concept concept(@NotNull Termed x, boolean createIfMissing) {
 
-        assert (term.op().conceptualizable); //term = term.unneg();
+        Term xt;
+        if (x instanceof Concept) {
+            Concept ct = (Concept) x;
+            if (!ct.isDeleted())
+                return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
+            //otherwise if it is deleted, continue
+            xt = ct.term();
+        } else {
+            xt = x.term();
+        }
 
-        @Nullable Termed c = get(term, createIfMissing);
+        Term y = xt.conceptual();
+        if (y == Null)
+            return null;
+
+        @Nullable Termed c = get(y, createIfMissing);
         if (!(c instanceof Concept)) {
 //            if (createIfMissing) {
 //                throw new Concept.InvalidConceptException(term, "Failed to builder concept");
@@ -110,13 +125,15 @@ public abstract class TermIndex implements TermContext {
         }
 
         Concept cc = (Concept) c;
-
-        @NotNull ConceptState s = cc.state();
+        ConceptState s = cc.state();
 
         if (s == ConceptState.Deleted) {
-            if (createIfMissing)
-                throw new RuntimeException("TermIndex impl should not return a deleted concept without trying to create a new one");
-            else
+            //probably just a race condition fluke when this occurrs
+            //and without looping again (and again) this should just give up
+
+//            if (createIfMissing)
+//                throw new RuntimeException("TermIndex impl should not return a deleted concept without trying to create a new one");
+//            else
                 return null;
         }
 
