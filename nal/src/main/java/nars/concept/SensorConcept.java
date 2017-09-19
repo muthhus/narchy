@@ -4,7 +4,7 @@ import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.control.Cause;
+import nars.control.MetaGoal;
 import nars.table.BeliefTable;
 import nars.task.SignalTask;
 import nars.term.Term;
@@ -118,11 +118,11 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
             if (coherence > fThresh) {
                 //reward
                 v = factor * confidence;
-                nar.emotion.value(Cause.Purpose.Accurate, cc, v);
+                nar.emotion.value(MetaGoal.Accurate, cc, v);
             } else {
                 //punish
                 v = factor * confidence * (1f - coherence);
-                nar.emotion.value(Cause.Purpose.Inaccurate, cc, v);
+                nar.emotion.value(MetaGoal.Inaccurate, cc, v);
                 if (deleteIfIncorrect)
                     y.delete();
             }

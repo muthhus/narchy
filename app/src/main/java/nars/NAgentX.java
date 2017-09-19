@@ -2,7 +2,8 @@ package nars;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.event.On;
+import jcog.event.Ons;
+import jcog.list.FasterList;
 import jcog.pri.mix.control.MixContRL;
 import nars.control.Cause;
 import nars.control.Derivation;
@@ -135,7 +136,7 @@ abstract public class NAgentX extends NAgent {
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8
                 , "motivation.nal");
 
-        int THREADS = 3;
+        int THREADS = 2;
         NAR n = new NARS()
                 .exe(
                         new MultiExec((i) ->
@@ -150,20 +151,22 @@ abstract public class NAgentX extends NAgent {
 
 //                                        new UniExec()
 
-                                ), THREADS, 2))
+                                ), THREADS, 3))
                 .time(clock)
                 .index(
                         new CaffeineIndex(64 * 1024)
                         //new CaffeineIndex2(64 * 1024)
+                        //new CaffeineIndex2(-1)
                         //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
+                        //new MapTermIndex(new CustomConcurrentHashMap<>(STRONG, EQUALS, SOFT, EQUALS, 128*1024))
                 )
                 .get();
 
         n.setEmotion(new Emotivation(n));
 
         n.confMin.setValue(0.01f);
-        n.truthResolution.setValue(0.01f);
-        n.termVolumeMax.setValue(30);
+        n.truthResolution.setValue(0.02f);
+        n.termVolumeMax.setValue(26);
 
         n.beliefConfidence(0.9f);
         n.goalConfidence(0.9f);
@@ -179,15 +182,15 @@ abstract public class NAgentX extends NAgent {
         //n.dtMergeOrChoose.setValue(true);
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
-        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 3, true, 32f);
+        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, true, 32f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.005f, 8);
+        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
 
-        Inperience inp = new Inperience(n, 8);
+        Inperience inp = new Inperience(n, 4);
 
         reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
-        reflect.ReflectTaskClone refTask = new reflect.ReflectTaskClone(8, n);
+        reflect.ReflectTaskClone refTask = new reflect.ReflectTaskClone(4, n);
 
         NAgent a = init.apply(n);
         //a.trace = true;
@@ -264,7 +267,7 @@ abstract public class NAgentX extends NAgent {
         new Thread(() -> {
             chart(a);
             chart(n, a);
-            window( valueChart(a), 800, 600);
+            window(valueChart(a), 800, 600);
             window(/*row*/(
 
                     valuePlot(a)
@@ -401,23 +404,41 @@ abstract public class NAgentX extends NAgent {
 
 
     private static Surface valueChart(NAgent a) {
-        final Function<Cause,TreeChart.ItemVis<Cause>> builder = (i) -> {
-            String str = i.toString();
-            if (str.startsWith("class nars."))
-                str = str.substring("class nars.".length()); //skip default toString
 
-            if (str.startsWith("class "))
-                str = str.substring(5); //skip default toString
-
-            return new TreeChart.ItemVis<Cause>(i, StringUtils.abbreviate(str, 26)) {
-                @Override
-                public float requestedArea() {
-                    return 0.1f + super.requestedArea();
-                }
-            };
-        };
         return new TreeChart<Cause>() {
-            final On<NAgent> on;
+            final Ons on;
+
+            final FasterList<ItemVis<Cause>> cache = new FasterList();
+
+            final Function<Cause, TreeChart.ItemVis<Cause>> builder = ((i) -> {
+                short id = i.id;
+                ItemVis<Cause> item;
+                if (cache.capacity()-1 < id)
+                    cache.ensureCapacity(id +16);
+                else {
+                    item = cache.get(id);
+                    if (item!=null)
+                        return item;
+                }
+
+
+                String str = i.toString();
+                if (str.startsWith("class nars."))
+                    str = str.substring("class nars.".length()); //skip default toString
+
+                if (str.startsWith("class "))
+                    str = str.substring(5); //skip default toString
+
+                item = new TreeChart.ItemVis<Cause>(i, StringUtils.abbreviate(str, 26)) {
+                    @Override
+                    public float requestedArea() {
+                        return 0.1f + super.requestedArea();
+                    }
+                };
+                cache.set(id, item);
+                return item;
+            });
+
             {
 
                 on = a.onFrame(() -> {
@@ -425,20 +446,23 @@ abstract public class NAgentX extends NAgent {
                         float v = c.value();
                         float r, g, b;
                         if (v < 0) {
-                            r = 0.75f * Math.min(1f, -v); g = 0;
+                            r = 0.75f * Math.min(1f, -v);
+                            g = 0;
                         } else {
-                            g = 0.75f * Math.min(1f, +v); r = 0;
+                            g = 0.75f * Math.min(1f, +v);
+                            r = 0;
                         }
 
-                        float t = Util.sum(p->Math.abs(p.last), c.purpose);
+                        float t = Util.sum(p -> Math.abs(p.current), c.goalValue);
 
-                        b = Math.max(r, g) * t;
+                        b = Math.max(r, g)/3f * t;
 
                         i.updateMomentum(
                                 //0.01f + Util.sqr(Util.tanhFast(v)+1),
                                 //Math.signum(v) *(1+Math.abs(v))*(t),
-                                Math.signum(v) * t,
-                                0.05f,
+                                //Math.signum(v) * t,
+                                v,
+                                0.25f,
                                 r, g, b);
 
                     }, builder);
@@ -452,6 +476,7 @@ abstract public class NAgentX extends NAgent {
             }
         };
     }
+
     private static Surface valuePlot(NAgent a) {
         NAR nar = a.nar;
 
@@ -464,12 +489,10 @@ abstract public class NAgentX extends NAgent {
                 s, Math.max(1, (int) Math.sqrt(s)),
                 Draw::colorBipolar) {
 
-            final On<NAgent> on;
+            final Ons on;
 
             {
-                on = a.onFrame(() -> {
-                    update();
-                });
+                on = a.onFrame((Runnable) this::update);
             }
 
             @Override

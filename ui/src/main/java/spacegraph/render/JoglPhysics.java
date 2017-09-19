@@ -330,11 +330,9 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
 
 
     @Override protected void render() {
-        //window.swapBuffers();
         clear();
         updateCamera();
         forEachSpatial(this::render);
-        //gl.glFlush();
     }
 
 

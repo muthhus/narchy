@@ -2,9 +2,8 @@ package nars;
 
 import com.netflix.servo.monitor.BasicGauge;
 import com.netflix.servo.monitor.LongGauge;
-import jcog.Util;
 import nars.concept.Concept;
-import nars.control.Cause;
+import nars.control.MetaGoal;
 import nars.task.ITask;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -70,32 +69,10 @@ public class Emotivation extends Emotion {
         //reward answer for answering the question
         float str = answer.conf() * question.priSafe(0);
         //value(Cause.Purpose.Answer, question.cause(), -str);
-        value(Cause.Purpose.Answer, answer.cause(), str);
+        value(MetaGoal.Answer, answer.cause(), str);
     }
 
-    /**
-     * adjusts the task priority
-     */
-    public void evaluate(Task x) {
 
-        float gain = nar.privaluate(x, x.cause());
-        assert (gain == gain);
-        if (gain != 0) {
-
-            float amp =
-                    //Util.tanhFast(gain) + 1f; //[0..+2]
-                    //0.5f + (Util.tanhFast(gain)/2f);
-                    1f + Util.tanhFast(gain)*0.75f;
-
-            //amp = Math.max(amp, 0.1f);
-
-            x.priMult(
-                //amp
-                //amp*amp
-                amp
-            );
-        }
-    }
 
     @Override
     public @Nullable ITask onInput(@NotNull ITask x) {
@@ -105,12 +82,12 @@ public class Emotivation extends Emotion {
             Task t = (Task) x;
 
             //float p0 = t.priSafe(0);
-            float cost = Param.inputCost(t, nar);
+            float cost = t.voluplexity();
 
             //((NALTask)t).causeAppend(nar.taskCauses.get(t));
 
             if (cost != 0) {
-                value(Cause.Purpose.Input, t.cause(), cost);
+                value(MetaGoal.Perceive, t.cause(), cost);
             }
 
             //evaluate(t);
@@ -128,7 +105,7 @@ public class Emotivation extends Emotion {
         if (xl > 0) {
             float conceptValue = origin.value(t, activation, n.time(), n);
             if (conceptValue!=0)
-                value(Cause.Purpose.Process, x, conceptValue);
+                value(MetaGoal.Accept, x, conceptValue);
         }
 
     }
@@ -138,3 +115,51 @@ public class Emotivation extends Emotion {
 //    }
 
 }
+
+//    /**
+//     * adjusts the task priority
+//     */
+//    public void evaluate(Task x) {
+//
+//        float gain = nar.privaluate(x, x.cause());
+//        assert (gain == gain);
+//        if (gain != 0) {
+//
+//            float amp =
+//                    //Util.tanhFast(gain) + 1f; //[0..+2]
+//                    //0.5f + (Util.tanhFast(gain)/2f);
+//                    Util.sqr(1f + Util.tanhFast(gain));
+//
+//            //amp = Math.max(amp, 0.1f);
+//
+//            x.priMult(
+//                //amp
+//                //amp*amp
+//                amp
+//            );
+//        }
+//    }
+//   /**
+//     * estimate the priority factor determined by the current value of priority-affecting causes
+//     */
+//    protected float privaluate(Task x, short[] causes) {
+//
+//        int totalCauses = causes.length;
+//        if (totalCauses == 0) return 0;
+//
+//        float boost = 0;
+//        for (short c : causes) {
+//            Cause cause = this.causes.getSafe(c);
+//            if (cause == null) {
+//                logger.error("cause id={} missing", c);
+//                continue;
+//            }
+//
+//            if (cause.valuePrioritizes)
+//                boost += cause.value();
+//        }
+//
+//
+//        return boost / totalCauses;
+//    }
+//

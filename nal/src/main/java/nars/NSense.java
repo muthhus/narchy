@@ -1,7 +1,7 @@
 package nars;
 
 import jcog.Util;
-import jcog.event.On;
+import jcog.event.Ons;
 import jcog.math.FirstOrderDifferenceFloat;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.FloatSupplier;
@@ -200,7 +200,7 @@ public interface NSense {
         return fs;
     }
 
-    On onFrame(Consumer r);
+    Ons onFrame(Consumer r);
 
     @NotNull
     default ScalarConcepts senseNumber(Term id, FloatSupplier v, int precision, ScalarConcepts.ScalarEncoder model)  {

@@ -7,8 +7,8 @@ import java.util.function.Consumer;
 /* High-performance Circular (Ring) Buffer. Not thread safe, and sacrifices safety for speed in other ways. */
 public class CircularArrayList<E> extends AbstractList<E> implements RandomAccess, Deque<E>, Serializable {
 
-    private final int n; // buffer length
-    public final E[] array;
+    private int n = -1; // buffer length
+    public E[] array;
     private int head;
     private int tail;
     private int size;
@@ -18,10 +18,20 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
         addAll(c);
     }
 
+    public CircularArrayList() {
+        this(0);
+    }
+
     public CircularArrayList(int capacity) {
-        n = capacity;
-        //buf = (E[])Array.newInstance(clazz, capacity);
-        array = (E[]) new Object[capacity];
+        clear(capacity);
+    }
+
+    public void clear(int resize) {
+        if (n!=resize) {
+            n = resize+1;
+            array = (E[]) new Object[resize];
+        }
+        clear();
     }
 
     @Override

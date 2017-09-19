@@ -550,8 +550,6 @@ public enum Draw {
         gl.glVertex3f(x1, y1 + h, z);
         gl.glEnd();
 
-        //gl.glFlush();
-        //gl.glPopMatrix();
 
     }
 

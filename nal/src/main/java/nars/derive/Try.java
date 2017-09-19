@@ -9,14 +9,15 @@ import org.roaringbitmap.RoaringBitmap;
 import java.util.Random;
 import java.util.stream.Stream;
 
-public class EvaluateChoices extends AbstractPred<Derivation> {
+/** set of branches, subsets of which a premise "can" "try" */
+public class Try extends AbstractPred<Derivation> {
 
     public final ValueCache values;
     public final ValueFork[] branches;
     private final CauseChannel[] causes;
 
-    public EvaluateChoices(ValueFork[] branches) {
-        super($.func("Evaluate", branches));
+    public Try(ValueFork[] branches) {
+        super($.func("try", branches));
         this.branches = branches;
         causes = Stream.of(branches).flatMap(b -> Stream.of(b.causes)).toArray(CauseChannel[]::new);
         values = new ValueCache(c -> c::value, causes);
@@ -35,10 +36,9 @@ public class EvaluateChoices extends AbstractPred<Derivation> {
         short[] routing = new short[numChoices * 2]; //sequence of (choice, score) pairs
         final int[] p = {0};
         values.getNormalized(choices, 10000, (c, v) -> {
-            int pp = p[0] * 2;
+            int pp = p[0]++ * 2;
             routing[pp] = (short) c;
             routing[pp + 1] = (short) v;
-            p[0]++;
             return true;
         });
         if (p[0] > 1)
@@ -53,7 +53,7 @@ public class EvaluateChoices extends AbstractPred<Derivation> {
 
         while (d.live()) {
 
-            int sample = 0;
+            int sample;
             if (numChoices > 1) {
                 //curvebag sampling of the above array
                 float x = rng.nextFloat();
@@ -63,15 +63,17 @@ public class EvaluateChoices extends AbstractPred<Derivation> {
                 sample = 0;
             }
 
-            int n = routing[sample * 2];
-            int loopBudget = Util.lerp(routing[sample * 2 + 1], minPerBranch, maxPerBranch);
+            int n = g2(routing, sample, KEY);
+            int loopBudget = Util.lerp(g2(routing, sample, VAL), minPerBranch, maxPerBranch);
             int ttlSaved = d.getAndSetTTL(loopBudget) - loopBudget - loopCost;
             if (ttlSaved < 0) {
                 d.setTTL(0);
                 break;
             }
 
-            branches[n].test(d); if (before > 0) d.revert(before);
+            branches[n].test(d);
+
+            if (before > 0) d.revert(before);
 
             d.addTTL(ttlSaved );
         }
@@ -109,6 +111,7 @@ public class EvaluateChoices extends AbstractPred<Derivation> {
 
     private static void bingoSortPairwise(short[] A) {
         /*
+        https://en.wikipedia.org/wiki/Selection_sort
         In the bingo sort variant, items are ordered by repeatedly
         looking through the remaining items to find the greatest
         value and moving all items with that value to their final location.

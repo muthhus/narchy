@@ -217,26 +217,34 @@ public class RecycledSummaryStatistics implements FloatProcedure, StatisticalSum
         return norm(x, min, max);
     }
 
+    public float normPolar(float x) {
+        return Util.unitize( x / magnitude() );
+    }
+
+    public float magnitude() {
+        return (float)Math.max(Math.abs(max), Math.abs(min));
+    }
+
     public static float norm(float x, double min, double max) {
         double r = max - min;
         if (r < Double.MIN_NORMAL) return 0;
         return Util.unitize( (float)((x - min) / r) );
     }
 
-    public float normPolar(float x) {
-        if (Util.equals(min, max, 2 * Pri.EPSILON)) {
-            return 0.5f;
-        } else if (min < -Pri.EPSILON) {
-            if (x < 0) {
-                return 0.5f - norm(x, min, 0)/2f;
-            } else {
-                return 0.5f + norm(x, 0, max)/2f;
-            }
-        } else {
-            //return norm(x, min, max); //unipolar
-            return norm(x, 0, max);
-        }
-    }
+//    public float normPolar(float x) {
+//        if (Util.equals(min, max, 2 * Pri.EPSILON)) {
+//            return 0.5f;
+//        } else if (min < -Pri.EPSILON) {
+//            if (x < 0) {
+//                return 0.5f - norm(x, min, 0)/2f;
+//            } else {
+//                return 0.5f + norm(x, 0, max)/2f;
+//            }
+//        } else {
+//            //return norm(x, min, max); //unipolar
+//            return norm(x, 0, max);
+//        }
+//    }
 
     public void setMin(double min) {
         this.min = min;

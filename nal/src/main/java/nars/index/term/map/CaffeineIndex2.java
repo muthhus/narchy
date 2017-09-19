@@ -99,6 +99,7 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
         super.start(nar);
     }
 
+
     @Override
     public Stream<Termed> stream() {
         return vectors.asMap().values().stream().flatMap(x -> IntStream.range(0, x.length()).mapToObj(x::get).filter(Objects::nonNull));
@@ -263,6 +264,7 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
 
     @Override
     public void onRemoval(TermContainer key, TermContainerToOpMap<Termed> value, RemovalCause cause) {
-        value.forEach(this::onRemove);
+        if (value!=null)
+            value.forEach(this::onRemove);
     }
 }

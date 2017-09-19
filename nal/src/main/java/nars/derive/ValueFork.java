@@ -2,7 +2,6 @@ package nars.derive;
 
 import jcog.Util;
 import jcog.math.ByteShuffler;
-import jcog.math.FloatSupplier;
 import nars.$;
 import nars.control.CauseChannel;
 import nars.control.Derivation;
@@ -22,7 +21,7 @@ public class ValueFork extends Fork {
 
     /** the term which a derivation will encounter signaling
      * that it may continue here after evaluating it among other choices */
-    public final Choice choice;
+    public final Can can;
     private final RoaringBitmap downstream;
 
     /** the causes that this is responsible for, ie. those that may be caused by this */
@@ -31,16 +30,16 @@ public class ValueFork extends Fork {
 
     public static ValueFork the(PrediTerm[] branches, List<ValueFork> choices, RoaringBitmap downstream) {
         int branchID = choices.size();
-        Choice choice = new Choice(branchID, downstream);
-        ValueFork v = new ValueFork(branches, choice, downstream);
+        Can can = new Can(branchID, downstream);
+        ValueFork v = new ValueFork(branches, can, downstream);
         choices.add(v);
         return v;
     }
 
-    protected ValueFork(PrediTerm[] branches, Choice choice, RoaringBitmap downstream) {
+    protected ValueFork(PrediTerm[] branches, Can can, RoaringBitmap downstream) {
         super(branches);
 
-        this.choice = choice;
+        this.can = can;
         this.downstream = downstream;
 
         conc = new Taskify[branches.length];
@@ -57,7 +56,7 @@ public class ValueFork extends Fork {
 
     @Override
     public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
-        return new ValueFork(transformedBranches(f), choice, downstream);
+        return new ValueFork(transformedBranches(f), can, downstream);
     }
 
     private void update() {
@@ -99,17 +98,17 @@ public class ValueFork extends Fork {
     }
 
 
-    /** remembers the possiblity of a choice which can be pursued
+    /** remembers the possiblity of a choice which "can" be pursued
      * (ie. according to value rank) */
-    static class Choice extends AbstractPred<Derivation> {
+    static class Can extends AbstractPred<Derivation> {
 
         public final int id;
 
         /** global cause channel ID's that this leads to */
         private final RoaringBitmap downstream;
 
-        protected Choice(int id, RoaringBitmap downstream) {
-            super($.func("try", /*$.the(id),*/ $.sete(downstream)));
+        protected Can(int id, RoaringBitmap downstream) {
+            super($.func("can", /*$.the(id),*/ $.sete(downstream)));
 
             this.id = id;
             this.downstream = downstream;

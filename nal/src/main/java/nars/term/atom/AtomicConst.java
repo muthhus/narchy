@@ -58,6 +58,9 @@ public abstract class AtomicConst implements Atomic {
     }
 
     @Override
+    public float voluplexity() { return 1;     }
+
+    @Override
     public int hashCode() {
         return hashCached;
     }

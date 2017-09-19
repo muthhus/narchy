@@ -8,7 +8,7 @@ import nars.NARS;
 import nars.Narsese;
 import nars.Param;
 import nars.control.Activate;
-import nars.gui.NARChart;
+
 import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;
 import nars.task.ITask;
@@ -39,18 +39,18 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //                        term.complexity()==3 && term.toString().endsWith("-->x)");
     }
 
-    public static class TaskTreeChart extends NARChart<ITask> {
-
-        public TaskTreeChart(@NotNull Iterable<ITask> b, int limit, NAR nar) {
-            super(new Bagregate(b, limit, 1f), nar);
-        }
-
-        @Override
-        public void accept(ITask x, ItemVis<ITask> y) {
-            float p = x.priElseZero();
-            y.update(p, 0.25f + 0.5f * p, 0.25f, 0.25f);
-        }
-    }
+//    public static class TaskTreeChart extends NARChart<ITask> {
+//
+//        public TaskTreeChart(@NotNull Iterable<ITask> b, int limit, NAR nar) {
+//            super(new Bagregate(b, limit, 1f), nar);
+//        }
+//
+//        @Override
+//        public void accept(ITask x, ItemVis<ITask> y) {
+//            float p = x.priElseZero();
+//            y.update(p, 0.25f + 0.5f * p, 0.25f, 0.25f);
+//        }
+//    }
 
     public static void main(String[] args) throws Narsese.NarseseException {
 

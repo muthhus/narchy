@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 /** metered and mixable extension of Cause base class */
-public class CauseChannel<X extends Priority> extends Cause<X> implements Consumer<X> {
+public class CauseChannel<X extends Priority> extends Cause implements Consumer<X> {
 
     /** linear gain control */
     public float preBias, preAmp = 1;

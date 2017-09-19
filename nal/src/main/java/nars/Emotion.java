@@ -7,6 +7,7 @@ import jcog.meter.event.BufferedFloatGuage;
 import jcog.pri.Prioritized;
 import nars.concept.Concept;
 import nars.control.Cause;
+import nars.control.MetaGoal;
 import nars.task.ITask;
 import nars.term.Compound;
 import nars.util.BudgetFunctions;
@@ -319,7 +320,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
         n.emotion.taskActivations.increment();
     }
 
-    public void value(Cause.Purpose p, short[] causes, float strength) {
+    public void value(MetaGoal p, short[] causes, float strength) {
 
         //assert(strength >= 0);
         if (Math.abs(strength) < Prioritized.EPSILON) return; //no change
@@ -339,7 +340,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
 
             //float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
             if (vPer != 0) {
-                cc.apply(p, vPer);
+                cc.learn(p, vPer);
             }
         }
     }

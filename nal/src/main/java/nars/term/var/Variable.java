@@ -32,11 +32,7 @@ public interface Variable extends Atomic {
     @Override
     boolean equals(Object o);
 
-    //    @Override
-//    default int volume() {
-//        //TODO decide if this is the case for zero-or-more ellipsis
-//        return 1;
-//    }
+
 
 
     @Override
@@ -58,6 +54,12 @@ public interface Variable extends Atomic {
     default int complexity() {
         return 0;
     }
+
+    @Override
+    default float voluplexity() {
+        return 0.5f;
+    }
+
 
     @Override
     @NotNull

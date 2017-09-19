@@ -41,9 +41,9 @@ public enum TrieDeriver {
                 print(b, out, indent + 2);
             }
             TermTrie.indent(indent); out.println("}");
-        } else if (p instanceof EvaluateChoices) {
+        } else if (p instanceof Try) {
             out.println("eval {");
-            EvaluateChoices ac = (EvaluateChoices) p;
+            Try ac = (Try) p;
             int i = 0;
             for (ValueFork b : ac.branches) {
                 TermTrie.indent(indent + 2); out.println(i + ":");

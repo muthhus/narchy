@@ -1,10 +1,7 @@
 package nars.control;
 
 import jcog.Util;
-import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
-import jcog.pri.Pri;
-import jcog.util.AtomicFloat;
 import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
@@ -26,19 +23,28 @@ import static nars.Param.CAUSE_CAPACITY;
  * positive and negative decay rates.  the value is clamped to a range
  * (ex: 0..+1) so it doesn't explode.
  */
-public class Cause<X> {
+public class Cause {
 
-    private float value;
+    /** current scalar utility estimate for this cause's support of the current MetaGoal's.
+     *  may be positive or negative, and is in relation to other cause's values
+     */
+    protected float value;
+
+    /** the value measured contributed by its effect on each MetaGoal.
+     *  the index corresponds to the ordinal of MetaGoal enum entries.
+     *  these values are used in determining the scalar 'value' field on each update. */
+    public final Traffic[] goalValue;
+
+
+    protected float valuePreNorm;
 
     /** flag indicating whether the value should be included in aggregations that adjust priority of items */
-    public boolean privaluate = true;
+    public boolean valuePrioritizes = true;
 
-    public float valueBias = 0;
-    private float valuePreNorm;
 
     /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
     public float value() {
-        return value + valueBias;
+        return value;
     }
 
     public float factor() {
@@ -48,141 +54,23 @@ public class Cause<X> {
          return factor()+1;
     }
 
-    /** value and momentum indices correspond to the possible values in Purpose enum */
-    public static void update(FasterList<Cause> causes, float[] value, RecycledSummaryStatistics[] summary) {
-
-        for (RecycledSummaryStatistics r : summary) {
-            //double m = r.getMax();
-            r.clear();
-            //r.setMax(m * 0.9f);
-        }
-
-        int cc = causes.size();
-        for (int i = 0, causesSize = cc; i < causesSize; i++) {
-            causes.get(i).commit(summary);
-        }
-
-        //final float LIMIT = +1f;
-        final float momentum = 0.95f;
-
-
-        int p = value.length;
-        RecycledSummaryStatistics prenorms = new RecycledSummaryStatistics();
-        for (int i = 0, causesSize = cc; i < causesSize; i++) {
-            Cause c = causes.get(i);
-            float v = 0;
-            for (int j = 0; j < p; j++) {
-                float y = c.purpose[j].current;
-                v += value[j] * RecycledSummaryStatistics.norm( y, 0, summary[j].getMax() );
-            }
-            prenorms.accept( c.valuePreNorm = v );
-        }
-
-        float max = (float) prenorms.getMax();
-        float min = (float) prenorms.getMin();
-
-        if (Util.equals(max, min, Pri.EPSILON)) {
-            causes.forEach(c -> c.setValue(0)); //flat
-        } else {
-
-            boolean bipolar = !(min <= 0 ^ max < 0);
-            float mid = bipolar ? 0 : (max+min)/2f;
-            float rangePos = max - mid;
-            float rangeNeg = mid - min;
-
-            for (int i = 0, causesSize = cc; i < causesSize; i++) {
-                Cause c = causes.get(i);
-
-                float n = c.valuePreNorm;
-                float v = n >= 0 ?
-                        (n - mid) / rangePos :
-                        (mid - n) / rangeNeg
-                        ;
-//
-                float nextValue =
-                        Util.lerp(momentum, v, c.value);
-
-                c.setValue(
-                        nextValue
-                );
-
-            }
-        }
-
-
-
-//        System.out.println("WORST");
-//        causes.stream().map(x -> PrimitiveTuples.pair(x, x.value())).sorted(
-//                (x,y) -> Doubles.compare(x.getTwo(), y.getTwo())
-//        ).limit(20).forEach(x -> {
-//            System.out.println("\t" + x);
-//        });
-//        System.out.println();
-
+    /** convenience procedure to set value to zero */
+    public void setValueZero() {
+        value = 0;
     }
 
 
-
-//    public static DurService updates(NAR nar) {
-//        return new DurService(nar) {
-//            @Override protected void run(NAR nar) {
-//                update(nar.causes, nar.value, nar.valueSummary, nar.valueMomentum);
-//            }
-//        };
-//    }
-
-
-    public enum Purpose {
-        /** neg: accepted for input, or pre-input spam */
-        Input,
-
-        /** pos: activated in concept to some degree */
-        Process,
-
-        /** pos: anwers a question */
-        Answer,
-
-        /** pos: actuated a goal concept */
-        Action,
-
-        /** pos: confirmed a sensor input */
-        Accurate,
-
-        /** neg: contradicted a sensor input */
-        Inaccurate
-    }
-
-    /** the AtomicDouble this inherits holds the accumulated value which is periodically (every cycle) committed  */
-    public static class Traffic extends AtomicFloat {
-        /** current, ie. the last commited value */
-
-        public float last;
-
-        public float current;
-
-        public double total;
-
-        public void commit() {
-            this.last = this.current;
-            double next = getAndSet(0f);
-            this.total += next;
-            this.current = (float) next; //smooth(current, (float)next, momentum);
-        }
-    }
-
-
+    /** internally assigned id */
     public final short id;
+
     public final Object name;
-
-
-    public final Traffic[] purpose;
 
     public Cause(short id, Object name) {
         this.id = id;
         this.name = name;
-        purpose = new Traffic[Purpose.values().length];
-        for (int i = 0; i < purpose.length; i++) {
-            purpose[i] = new Traffic();
+        goalValue = new Traffic[MetaGoal.values().length];
+        for (int i = 0; i < goalValue.length; i++) {
+            goalValue[i] = new Traffic();
         }
     }
 
@@ -257,28 +145,18 @@ public class Cause<X> {
         return ll;
     }
 
-    public void apply(Purpose p, float v) {
-        purpose[p.ordinal()].addAndGet(v);
+    /** learn the utility of this cause with regard to a goal. */
+    public void learn(MetaGoal p, float v) {
+        p.learn(goalValue, v);
     }
-
-    public void setValue(float nextValue) {
-        this.value = nextValue;
-    }
-
 
 
     void commit(RecycledSummaryStatistics[] valueSummary) {
-        for (int i = 0, purposeLength = purpose.length; i < purposeLength; i++) {
-            Traffic p = purpose[i];
+        for (int i = 0, purposeLength = goalValue.length; i < purposeLength; i++) {
+            Traffic p = goalValue[i];
             p.commit();
             valueSummary[i].accept(p.current);
         }
-    }
-
-
-
-    static float smooth(float cur, float next, float momentum) {
-        return (momentum * cur) + ((1f - momentum) * next);
     }
 
 }

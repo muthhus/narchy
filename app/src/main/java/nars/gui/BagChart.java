@@ -5,6 +5,7 @@ import jcog.pri.Prioritized;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.widget.meter.TreeChart;
 
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
@@ -14,7 +15,7 @@ import java.util.function.BiConsumer;
 abstract public class BagChart<X extends Prioritized> extends TreeChart<X> implements BiConsumer<X, TreeChart.ItemVis<X>> {
 
     final AtomicBoolean busy = new AtomicBoolean(false);
-    public final @NotNull Iterable<? extends X> input;
+    public final @NotNull Collection<? extends X> input;
 
     public void update() {
         if (busy.compareAndSet(false, true)) {
@@ -38,7 +39,7 @@ abstract public class BagChart<X extends Prioritized> extends TreeChart<X> imple
 //        this(b, -1);
 //    }
 
-    public BagChart(@NotNull Iterable<X> b) {
+    public BagChart(@NotNull Collection<X> b) {
         super();
         this.input = b;
         update();

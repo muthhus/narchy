@@ -2,9 +2,8 @@ package nars;
 
 import jcog.Loop;
 import jcog.data.FloatParam;
-import jcog.event.ListTopic;
 import jcog.event.On;
-import jcog.event.Topic;
+import jcog.event.Ons;
 import jcog.list.FasterList;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.RecycledSummaryStatistics;
@@ -93,7 +92,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
     public float rewardSum;
 
-    private final Topic<NAgent> eventFrame = new ListTopic();
 
     /**
      * range: -1..+1
@@ -434,7 +432,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 //        if (nar.exe.concurrent())
 //            eventFrame.emitAsync(this, nar.exe); //not safe for use with some features, ex: bipolar currently demands a specific ordering sequence for processing its two concpets
 //        else
-        eventFrame.emit(this);
 
         if (trace)
             logger.info(summary());
@@ -589,12 +586,12 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     }
 
     @Override
-    public On onFrame(Consumer each) {
-        return eventFrame.on(each);
+    public Ons onFrame(Consumer each) {
+        return DurService.build(nar, ()->each.accept(this)).ons;
     }
 
-    public On<NAgent> onFrame(Runnable each) {
-        return eventFrame.on((n) -> each.run());
+    public Ons onFrame(Runnable each) {
+        return DurService.build(nar, each).ons;
     }
 
 }

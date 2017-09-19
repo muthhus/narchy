@@ -1,20 +1,23 @@
 package spacegraph.widget.meter;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.list.CircularArrayList;
 import jcog.list.FasterList;
+import jcog.map.CustomConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
+import static jcog.map.CustomConcurrentHashMap.*;
 
 /**
  * @author Tadas Subonis <tadas.subonis@gmail.com>
@@ -36,12 +39,13 @@ public class TreeChart<X> extends Surface {
     private double left;
     private double top;
     private LayoutOrient layoutOrient = LayoutOrient.HORIZONTAL;
-    private Collection<ItemVis<X>> children;
 
-    final Cache<X, ItemVis<X>> cache;
+    final AtomicBoolean phase = new AtomicBoolean();
+    final CircularArrayList<ItemVis<X>> prev = new CircularArrayList(), next = new CircularArrayList<>();
+
 
     public TreeChart() {
-        cache = Caffeine.newBuilder().maximumSize(1024).build(); //TODO just use LRUHashMap or something
+
     }
 
 
@@ -50,37 +54,57 @@ public class TreeChart<X> extends Surface {
         super.paint(gl);
 
         double totalArea = width * height;
-        for (ItemVis v : children) {
+        for (ItemVis v : draw()) {
             v.paint(gl, v.area * totalArea);
         }
     }
 
-    public void update(Iterable<? extends X> children, BiConsumer<X, ItemVis<X>> update) {
-        update(1, 1, children, update, i -> new ItemVis<>(i, i.toString()));
+    public void update(Collection<? extends X> children, BiConsumer<X, ItemVis<X>> update) {
+        update(1, 1, children, update, cached(i -> new ItemVis<>(i, i.toString())));
     }
 
-    public void update(double width, double height, Iterable<? extends X> children, BiConsumer<X, ItemVis<X>> update) {
-        update(width, height, children, update, i -> new ItemVis<>(i, i.toString()));
+    public void update(double width, double height, Collection<? extends X> children, BiConsumer<X, ItemVis<X>> update) {
+        update(width, height, children, update, cached(i -> new ItemVis<>(i, i.toString())));
     }
 
 
-    public void update(double width, double height, Iterable<? extends X> next, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> itemBuilder) {
+    public static <X> Function<X, ItemVis<X>> cached(Function<X, ItemVis<X>> vis) {
+        return new Function<X, ItemVis<X>>() {
+            final Map<X, ItemVis<X>> cache
+                    = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, EQUALS, 256);
+//            final Cache<X, ItemVis<X>> cache
+//                    Caffeine.newBuilder().maximumSize(1024).build(); //TODO just use LRUHashMap or something
+
+            @Override
+            public ItemVis<X> apply(X x) {
+                return cache.computeIfAbsent(x, vis);
+            }
+        };
+    }
+
+    public void update(double width, double height, Collection<? extends X> next, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> vis) {
         this.width = width;
         this.height = height;
         left = 0.0;
         top = 0.0;
 
-
-        CircularArrayList<ItemVis<X>> display = //sort ? new TreeSet<>() : new FasterList();
-                new CircularArrayList<>(((Collection) next).size());
-
+        CircularArrayList<ItemVis<X>> display = edit();
+        int ns = next.size();
+        int cs = display.capacity();
+        if (cs < ns) {
+            display.clear(ns);
+        } else if (cs > ns*2) {
+            display.clear(ns); //shrink if more than 2x as large
+        } else {
+            display.clear(); //just fine
+        }
 
         final float[] weight = {0};
         next.forEach(item -> {
             if (item == null)
                 return; //TODO return false to stop the iteration
 
-            ItemVis<X> e = cache.get(item, itemBuilder);
+            ItemVis<X> e = vis.apply(item);
             if (e != null) {
                 update.accept(item, e);
                 float a = e.requestedArea();
@@ -107,11 +131,18 @@ public class TreeChart<X> extends Surface {
             });
 
             squarify(display, new CircularArrayList(size), minimumSide());
-            this.children = display;
+
         } else {
-            this.children = Collections.emptyList();
+
         }
 
+    }
+
+    @NotNull public CircularArrayList<ItemVis<X>> edit() {
+        return phase.getAndSet(!phase.get()) ? this.prev : this.next;
+    }
+    @NotNull public CircularArrayList<ItemVis<X>> draw() {
+        return phase.get() ? this.prev : this.next;
     }
 
 
@@ -403,7 +434,7 @@ public class TreeChart<X> extends Surface {
         }
 
         public void updateMomentum(float w, float speed, float r, float g, float b) {
-            update( Util.lerp(speed, this.weight, w), r, g, b);
+            update(Util.lerp(speed, this.weight, w), r, g, b);
         }
     }
 

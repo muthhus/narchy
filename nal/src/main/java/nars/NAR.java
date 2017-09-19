@@ -272,7 +272,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         for (int i = 0; i < valueSummary.length; i++)
             valueSummary[i] = new RecycledSummaryStatistics();
 
-        valueDefaults();
+        defaultWants();
 
 
         this.emotion = new Emotion(this);
@@ -951,7 +951,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         eventCycle.emit(this); //synchronous only
 
-        Cause.update(causes, value, valueSummary);
+        MetaGoal.update(causes, want, valueSummary);
 
         emotion.cycle();
     }
@@ -1585,7 +1585,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * table of values influencing reasoner heuristics
      */
     public final FasterList<Cause> causes = new FasterList(256);
-    public final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[value.length];
+    public final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[want.length + 1 /* for global norm */];
 
     /**
      * default deriver
@@ -1708,29 +1708,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 //    }
 
 
-    /**
-     * estimate the priority factor determined by the current value of priority-affecting causes
-     */
-    protected float privaluate(Task x, short[] causes) {
-
-        int totalCauses = causes.length;
-        if (totalCauses == 0) return 0;
-
-        float boost = 0;
-        for (short c : causes) {
-            Cause cause = this.causes.getSafe(c);
-            if (cause == null) {
-                logger.error("cause id={} missing", c);
-                continue;
-            }
-
-            if (cause.privaluate)
-                boost += cause.value();
-        }
-
-
-        return boost / totalCauses;
-    }
 
 
 

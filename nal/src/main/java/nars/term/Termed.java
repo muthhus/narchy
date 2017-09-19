@@ -60,4 +60,10 @@ public interface Termed /* TODO finish implementing: extends Termlike */ {
     }
 
     Termed[] EmptyArray = new Termed[0];
+
+    /** average of complexity and volume */
+    default float voluplexity() {
+        return (complexity()+volume())/2f;
+    }
+
 }

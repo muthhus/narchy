@@ -2,6 +2,7 @@ package nars.video;
 
 import jcog.Util;
 import jcog.event.On;
+import jcog.event.Ons;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.BaseConcept;
@@ -19,7 +20,7 @@ public class CameraSensorView extends BitmapMatrixView implements BitmapMatrixVi
 
     private final Sensor2D cam;
     private final NAR nar;
-    private final On<NAgent> on;
+    private final Ons on;
     private float maxConceptPriority;
     private long now;
     int dur;

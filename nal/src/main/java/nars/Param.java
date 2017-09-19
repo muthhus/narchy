@@ -6,8 +6,8 @@ import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.pri.op.PriMerge;
 import jcog.util.FloatFloatToFloatFunction;
-import nars.control.Cause;
 import nars.control.Derivation;
+import nars.control.MetaGoal;
 import nars.task.Tasked;
 import nars.task.TruthPolation;
 import nars.term.Term;
@@ -24,6 +24,7 @@ import java.util.concurrent.Executor;
 
 import static jcog.Util.unitize;
 import static nars.Op.*;
+import static nars.control.MetaGoal.*;
 
 /**
  * NAR Parameters
@@ -99,7 +100,7 @@ public abstract class Param extends Services<Term,NAR> {
     public final MutableInteger matchTTL = new MutableInteger(192);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
-    public static final float BELIEF_MATCH_TTL_FRACTION = 0.2f;
+    public static final float BELIEF_MATCH_TTL_FRACTION = 0.1f;
 
     /** cost of attempting a unification */
     public static final int TTL_UNIFY = 1;
@@ -108,16 +109,16 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int TTL_MUTATE = 2;
 
     /** cost of substitution/evaluating a derived term */
-    public static final int TTL_DERIVE_TRY = 5;
+    public static final int TTL_DERIVE_TRY = 3;
 
     /** cost of a successful task derivation */
-    public static final int TTL_DERIVE_TASK_SUCCESS = 10;
+    public static final int TTL_DERIVE_TASK_SUCCESS = 20;
 
     /** cost of a repeat (of another within the premise's batch) task derivation */
-    public static final int TTL_DERIVE_TASK_REPEAT = 10;
+    public static final int TTL_DERIVE_TASK_REPEAT = 15;
 
     /** cost of a task derived, but too similar to one of its parents */
-    public static final int TTL_DERIVE_TASK_SAME = 10;
+    public static final int TTL_DERIVE_TASK_SAME = 15;
 
     /** cost of a failed/aborted task derivation */
     public static final int TTL_DERIVE_TASK_FAIL = 10;
@@ -136,17 +137,18 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS = 2;
 
 
-    public final float[] value = new float[Cause.Purpose.values().length];
+    public final float[] want = newWants();
 
-    protected void valueDefaults() {
-        value[Cause.Purpose.Input.ordinal()] = -0.05f;
-        value[Cause.Purpose.Process.ordinal()] = +0.025f; //information implicitly is negative value.  knowledge for its own sake has some value but it should satisfy other values to compensate for the input cost.
+    protected void defaultWants() {
+        float[] w = this.want;
 
-        value[Cause.Purpose.Accurate.ordinal()] = +1f;
-        value[Cause.Purpose.Inaccurate.ordinal()] = -1f;
-
-        value[Cause.Purpose.Answer.ordinal()] = +1f;
-        value[Cause.Purpose.Action.ordinal()] = +2f;
+        //follows the pos/neg guidelines described in the comment of each MetaGoal
+        Perceive.want(w, -1f);
+        Accept.want(w, 0.5f);
+        Accurate.want(w, 0.5f);
+        Inaccurate.want(w, -1f);
+        Answer.want(w, 0.5f);
+        Action.want(w, 1f);
     }
 
     /** how many durations above which to dither dt relations to dt=0 (parallel)
@@ -158,38 +160,6 @@ public abstract class Param extends Services<Term,NAR> {
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
     public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;
 
-
-    /** pessimistic positive value measuring the computational cost of
-     * inputting a task
-     * (from now until the time of concept processing)
-     * this may be balanced by a future positive value (ie. on concept processing) */
-    public static float inputCost(Termed t, NAR nar) {
-
-//        //prefer simple
-        float c = ((t.complexity()+t.volume())/2f);//
-                // /nar.termVolumeMax.floatValue();
-
-        //c *= t.priSafe(0);
-
-        return c;
-//
-//        if (t.isBeliefOrGoal()) {
-//
-//            //prefer confidence
-//            c *= (1f + (1f - Math.min(1f, t.conf()/nar.confDefault(t.punc()))));
-//
-//            //prefer polarized
-//            //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));
-//        } else {
-//            c *= 2;
-//        }
-//
-//        return c;
-
-
-
-        //return 0;
-    }
 
     public float derivePriority(Task t, @NotNull Derivation d) {
         //float p = 1f / (1f + ((float)t.complexity())/termVolumeMax.floatValue());

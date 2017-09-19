@@ -77,7 +77,7 @@ public final class PrediTrie {
             assert (ll.length != 0);
 
             ValueFork cx = ValueFork.the(ll, postChoices, v);
-            path.add(cx.choice);
+            path.add(cx.can);
             this.pre.put(path, cx);
         });
 
@@ -86,7 +86,10 @@ public final class PrediTrie {
 
     public static PrediTerm<Derivation> the(PremiseRuleSet r, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
         PrediTrie t = new PrediTrie(r);
-        return AndCondition.the(t.compile(t.pre, each), new EvaluateChoices(t.postChoices.toArray(ValueFork[]::new)));
+        return AndCondition.the(
+                t.compile(t.pre, each),
+                new Try(t.postChoices.toArray(ValueFork[]::new)));
+
     }
 
 
