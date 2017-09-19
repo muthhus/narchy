@@ -91,25 +91,25 @@ public class Cause {
 
     }
 
-    public static short[] append(int maxLen, short[] src, short[] add) {
-        int addLen = add.length;
-        if (addLen == 0) return src;
-
-        int srcLen = src.length;
-        if (srcLen + addLen < maxLen) {
-            return ArrayUtils.addAll(src, add);
-        } else {
-            if (addLen >= srcLen) {
-                return zip(maxLen, ()->src, ()->add);
-            } else {
-                short[] dst = new short[maxLen];
-                int mid = maxLen - addLen;
-                System.arraycopy(src, srcLen - mid, dst, 0, mid);
-                System.arraycopy(add, 0, dst, mid, addLen);
-                return dst;
-            }
-        }
-    }
+//    public static short[] append(int maxLen, short[] src, short[] add) {
+//        int addLen = add.length;
+//        if (addLen == 0) return src;
+//
+//        int srcLen = src.length;
+//        if (srcLen + addLen < maxLen) {
+//            return ArrayUtils.addAll(src, add);
+//        } else {
+//            if (addLen >= srcLen) {
+//                return zip(maxLen, ()->src, ()->add);
+//            } else {
+//                short[] dst = new short[maxLen];
+//                int mid = maxLen - addLen;
+//                System.arraycopy(src, srcLen - mid, dst, 0, mid);
+//                System.arraycopy(add, 0, dst, mid, addLen);
+//                return dst;
+//            }
+//        }
+//    }
 
     public static short[] zip(int maxLen, Supplier<short[]>... s) {
 
@@ -118,7 +118,8 @@ public class Cause {
             return s[0].get();
         }
 
-        ShortArrayList l = new ShortArrayList(maxLen);
+        AwesomeShortArrayList l = new AwesomeShortArrayList(maxLen);
+
         int ls = 0;
         int n = 1;
         boolean remain;
@@ -159,6 +160,20 @@ public class Cause {
         }
     }
 
+    static class AwesomeShortArrayList extends ShortArrayList {
+
+        public AwesomeShortArrayList(int cap) {
+            super(cap);
+        }
+
+        @Override public short[] toArray() {
+            if (this.size() == items.length)
+                return items;
+            else
+                return super.toArray();
+        }
+
+    }
 }
 //    /** calculate the value scalar  from the distinctly tracked positive and negative values;
 //     * any function could be used here. for example:

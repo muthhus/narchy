@@ -126,9 +126,7 @@ public class reflect {
         public ReflectClonedTask(int cap, NAR n) {
             super(cap, n);
             this.n = n;
-            this.filter = new StableBloomFilter<>(
-                    1024, 1,
-                    new BytesHashProvider<>(IO::taskToBytes));
+            this.filter = Task.newBloomFilter(1024);
         }
 
         @Override
@@ -137,7 +135,7 @@ public class reflect {
                 Term tt = next.term();
                 if (tt.size() > 1) {
                     if (tt.volume() <= n.termVolumeMax.intValue() * 0.75f)
-                        if (filter.addIfMissing(next))
+                        if (filter.addIfMissing(next, 0.01f))
                             return true;
                 }
             }
@@ -146,8 +144,6 @@ public class reflect {
 
         @Override
         protected float leak(Task next) {
-            filter.unlearn(0.01f);
-
             Term x = next.term().conceptual();
             Term r = $.func(REFLECT_OP, x).eval(n).normalize();
             if (x.equals(r)) //can happen

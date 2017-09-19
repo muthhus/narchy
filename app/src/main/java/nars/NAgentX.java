@@ -5,6 +5,7 @@ import jcog.data.FloatParam;
 import jcog.event.Ons;
 import jcog.list.FasterList;
 import jcog.pri.mix.control.MixContRL;
+import nars.control.Activate;
 import nars.control.Cause;
 import nars.control.Derivation;
 import nars.control.MetaGoal;
@@ -25,6 +26,7 @@ import nars.truth.Truth;
 import nars.video.*;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
@@ -33,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
 import spacegraph.render.Draw;
+import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.meta.WindowButton;
 import spacegraph.widget.meter.BitmapMatrixView;
@@ -45,16 +48,18 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static nars.$.$;
 import static nars.Op.BELIEF;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.layout.Grid.col;
-import static spacegraph.layout.Grid.grid;
+import static spacegraph.layout.Grid.*;
 
 /**
  * Extensions to NAgent interface:
@@ -142,7 +147,19 @@ abstract public class NAgentX extends NAgent {
         int THREADS = 4;
 
         MultiExec exe = new MultiExec(THREADS, 8192);
-        exe.add(new FocusExec(), (a) -> true);
+        Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
+        exe.add(new FocusExec() {
+                    {
+                        subCycles = 16;
+                    }
+                },
+                randomBool);
+        exe.add(new FocusExec() {
+                    {
+                        subCycles = 16;
+                    }
+                },
+                (a) -> a.id.voluplexity() <= 10);
 
         NAR n = new NARS()
                 .exe(exe)
@@ -271,11 +288,11 @@ abstract public class NAgentX extends NAgent {
 
             window(grid(Vis.reflect(n), Vis.reflect(n.services)), 700, 600);
 
-            window(grid(
+            window(col(
                     metaGoalChart(a),
-                    grid(
+                    row(
                             metaGoalPlot(a),
-                            metaGoalSliders(n)
+                            metaGoalControls(n)
                     )
             ), 800, 500);
 
@@ -284,15 +301,20 @@ abstract public class NAgentX extends NAgent {
         return n;
     }
 
-    private static Surface metaGoalSliders(NAR n) {
-        return grid(IntStream.range(0, n.want.length).mapToObj(
-            w -> new FloatSlider(n.want[w], -2f, +2f)
-                    .label(MetaGoal.values()[w].name())
-                    .draw(BaseSlider.Knob)
-                    .on((s, v) -> {
-                        n.want[w] = v;
-                    })
-        ).toArray(Surface[]::new));
+    private static Surface metaGoalControls(NAR n) {
+        return grid(
+                Stream.concat(
+                        Stream.of(new CheckBox("Auto", (BooleanProcedure) (enable) -> {
+                            System.out.println("x");
+                        })),
+                        IntStream.range(0, n.want.length).mapToObj(
+                                w -> new FloatSlider(n.want[w], -2f, +2f)
+                                        .label(MetaGoal.values()[w].name())
+                                        .draw(BaseSlider.Knob)
+                                        .on((s, v) -> {
+                                            n.want[w] = v;
+                                        })
+                        )).toArray(Surface[]::new));
 
     }
 

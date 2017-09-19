@@ -4,7 +4,9 @@ import nars.NAR;
 import nars.NAct;
 import nars.Param;
 import nars.Task;
+import nars.control.CauseChannel;
 import nars.task.SignalTask;
+import nars.task.util.PredictionAccuracyFeedback;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
@@ -30,7 +32,8 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
     @NotNull
     private final BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor;
-    private NAR nar;
+    private final PredictionAccuracyFeedback beliefFeedback;
+    final CauseChannel in;
 
     public GoalActionAsyncConcept(@NotNull Term c, @NotNull NAct act, @NotNull BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor) {
         super(c,
@@ -44,6 +47,8 @@ public class GoalActionAsyncConcept extends ActionConcept {
 //        this.action = new Signal(GOAL, n.truthResolution).pri(() -> n.priDefault(GOAL));
         //((SensorBeliefTable) goals).sensor = action;
 
+        this.in = n.newCauseChannel(term());
+
         this.feedBelief = new Signal(BELIEF, resolution).pri(() -> n.priDefault(BELIEF));
         //((SensorBeliefTable) beliefs).sensor = feedback;
 
@@ -51,6 +56,8 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create
+
+        beliefFeedback = new PredictionAccuracyFeedback(beliefs);
 
     }
 
@@ -85,9 +92,6 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
     @Override
     public Stream<Task> update(long now, int dur, NAR nar) {
-
-
-        this.nar = nar;
 
         long pStart = now;// - dur/2;
         long pEnd = now + dur;
@@ -187,7 +191,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
     }
 
 
-    public void feedback(@Nullable Truth f, @Nullable Truth g) {
+    public void feedback(@Nullable Truth f, @Nullable Truth g, NAR nar) {
 
         long now = nar.time();
         int dur = nar.dur();
@@ -195,14 +199,12 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
         Task fg;
         Task fb;
-        nar.input(
+        in.input(
             fg = feedGoal.set(term, g, stamper, now-dur/2, dur, nar),
             fb = feedBelief.set(term, f, stamper, now+dur/2, dur, nar)
         );
 
-        if (fb != null) {
-            SensorConcept.feedback(fb, false, beliefs(), now, nar);
-        }
+        beliefFeedback.accept(feedBelief.get() /* in case stretched */, nar);
     }
 
 

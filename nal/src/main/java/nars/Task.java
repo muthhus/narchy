@@ -1,6 +1,9 @@
 package nars;
 
+import com.google.common.hash.BloomFilter;
 import jcog.Texts;
+import jcog.bloom.StableBloomFilter;
+import jcog.bloom.hash.BytesHashProvider;
 import jcog.math.Interval;
 import nars.concept.Concept;
 import nars.op.Operation;
@@ -81,6 +84,12 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                 proof(pb, indent + 1, sb);
             }
         }
+    }
+
+    public static StableBloomFilter<Task> newBloomFilter(int cap) {
+        return new StableBloomFilter<>(
+                cap, 1,
+                new BytesHashProvider<>(IO::taskToBytes));
     }
 
     @Nullable

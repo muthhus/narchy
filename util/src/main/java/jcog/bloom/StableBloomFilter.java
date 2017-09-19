@@ -26,9 +26,15 @@ public class StableBloomFilter<E> implements CountingLeakySet<E> {
 
     /** if the element isnt contained, add it. return true if added, false if already present.*/
     public boolean addIfMissing(E element) {
+       return addIfMissing(element, 0);
+    }
+
+    public boolean addIfMissing(E element, float unlearnIfNew) {
         int[] hash = hash(element);
         boolean c = contains(hash);
         if (!c) {
+            if (unlearnIfNew>0)
+                unlearn(unlearnIfNew);
             add(hash);
             return true;
         }

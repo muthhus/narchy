@@ -452,8 +452,8 @@ public interface NAct {
                     }
                 }
 
-                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, null);
-                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, null);
+                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, null, n);
+                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, null, n);
             }
         };
 
@@ -546,8 +546,8 @@ public interface NAct {
                     w = l = //null;
                             $.t(restFreq, conf);
                 }
-                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, null);
-                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, null);
+                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, null, n);
+                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, null, n);
             }
         };
 

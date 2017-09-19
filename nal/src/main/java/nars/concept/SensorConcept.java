@@ -1,12 +1,14 @@
 package nars.concept;
 
 import jcog.math.FloatSupplier;
+import jcog.pri.Pri;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.control.MetaGoal;
 import nars.table.BeliefTable;
 import nars.task.SignalTask;
+import nars.task.util.PredictionAccuracyFeedback;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.ScalarSignal;
@@ -31,6 +33,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
+    final PredictionAccuracyFeedback beliefFeedback;
 
     public SensorConcept(@NotNull Term c, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
         super(c,
@@ -45,6 +48,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
             }
         };
         //((SensorBeliefTable)beliefs).sensor = sensor;
+
+        beliefFeedback = new PredictionAccuracyFeedback(beliefs);
 
         this.signal = signal;
 
@@ -75,60 +80,16 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
 
-    /**
-     * should only be called if autoupdate() is false
-     */
+
     @Nullable
     public Task update(long time, int dur, NAR nar) {
-
         Task x = sensor.update(nar, time, dur);
 
-        if (x != null) {
-            feedback(x, Param.DELETE_INACCURATE_PREDICTIONS, beliefs(), time, nar);
-        }
+        beliefFeedback.accept(sensor.get() /* get() again in case x is stretched it will be null */, nar);
 
         return x;
     }
 
-    public static void feedback(Task x, boolean deleteIfIncorrect, @NotNull BeliefTable beliefs, long time, NAR nar) {
-        float xFreq = x.freq();
-        float xConf = x.conf();
-
-        float factor = 1;
-
-        float fThresh = Param.SENSOR_FEEDBACK_FREQ_THRESHOLD;
-
-
-        int dur = nar.dur();
-
-        //sensor feedback
-        //punish any non-signal beliefs at the current time which contradict this sensor reading, and reward those which it supports
-        beliefs.forEachTask(false, time - dur / 2, time + dur / 2, (y) -> {
-            if (y instanceof SignalTask)
-                return; //ignore previous signaltask
-
-            float coherence = 1f -
-                    Math.abs(xFreq - y.freq());
-                    //TruthFunctions.freqSimilarity(xFreq, y.freq());
-
-            float confidence = y.conf() / xConf; //allow > 1
-
-            short[] cc = y.cause();
-            float v;
-            if (coherence > fThresh) {
-                //reward
-                v = factor * confidence;
-                nar.emotion.value(MetaGoal.Accurate, cc, v);
-            } else {
-                //punish
-                v = factor * confidence * (1f - coherence);
-                nar.emotion.value(MetaGoal.Inaccurate, cc, v);
-                if (deleteIfIncorrect)
-                    y.delete();
-            }
-
-        });
-    }
 
     public SensorConcept resolution(float r) {
         resolution = ()->r;

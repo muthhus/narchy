@@ -38,9 +38,6 @@ public abstract class Param extends Services<Term,NAR> {
     /** rate that integers in integer-containing termlink compounds will be dynamically mutated on activation */
     public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.5f;
 
-    /** freq coherence below which a contradictory sensor belief is dis-valued, and above which it is valued */
-    public static final float SENSOR_FEEDBACK_FREQ_THRESHOLD = 0.9f;
-
     public static final boolean DELETE_INACCURATE_PREDICTIONS = false;
 
 
@@ -140,10 +137,10 @@ public abstract class Param extends Services<Term,NAR> {
         float[] w = this.want;
 
         //follows the pos/neg guidelines described in the comment of each MetaGoal
-        Perceive.want(w, -0.05f);
-        Accept.want(w, 0.5f);
-        Accurate.want(w, 0.5f);
-        Inaccurate.want(w, -1f);
+        Perceive.want(w, -0.01f);
+        Accept.want(w, 0.1f);
+        Accurate.want(w, 0.25f);
+        Inaccurate.want(w, -0.5f);
         Answer.want(w, 0.5f);
         Action.want(w, 1f);
     }

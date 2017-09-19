@@ -164,14 +164,6 @@ public class NALTask extends Pri implements Task {
         this.cause = Cause.zip(this, incoming);
     }
 
-    public void causeMerge(short[] x) {
-        this.cause = Cause.zip(CAUSE_CAPACITY, this::cause, () -> x);
-    }
-
-    public void causeAppend(short[] x) {
-        this.cause = Cause.append(CAUSE_CAPACITY, cause, x);
-    }
-
     @Nullable
     @Override
     public final Truth truth() {

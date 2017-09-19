@@ -28,7 +28,7 @@ public enum MetaGoal {
     /** pos: actuated a goal concept */
     Action,
 
-    /** pos: confirmed a sensor input */
+    /** pos: prediction confirmed a sensor input */
     Accurate,
 
     /** neg: contradicted a sensor input */

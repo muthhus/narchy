@@ -429,7 +429,9 @@ public class Revision {
         t.setPri(Util.lerp(aProp, b.priElseZero(), a.priElseZero()));
 
         //t.setPri(a.priElseZero() + b.priElseZero());
+
         t.cause = Cause.zip(a, b);
+
         if (Param.DEBUG)
             t.log("Revection Merge");
         return t;
