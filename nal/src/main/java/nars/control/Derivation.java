@@ -232,9 +232,7 @@ public class Derivation extends Unify implements TermContext {
      * only returns derivation-specific functors.  other functors must be evaluated at task execution time
      */
     @Override
-    public Termed apply(Term x) {
-        if (x instanceof Bool || x instanceof Intlike)//assert (!(x instanceof Bool));
-            return x;
+    public final Termed apply(Term x) {
 
         if (x instanceof Atom) {
             Termed f = derivationFunctors.get(x);
@@ -242,7 +240,7 @@ public class Derivation extends Unify implements TermContext {
                 return f;
         }
 
-        return x;
+        return super.apply(x);
     }
 
     /**
