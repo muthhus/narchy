@@ -39,9 +39,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     private final boolean permuteBackwards, permuteForwards;
 
     @NotNull
-    public static PremiseRuleSet rules(NAR nar, boolean permute, String... filename) {
-
-        final PatternTermIndex p = new PatternTermIndex(nar);
+    public static PremiseRuleSet rules(NAR nar, PatternTermIndex p, boolean permute, String... filename) {
 
         PremiseRuleSet rs = new PremiseRuleSet(parsedRules(p, filename), p, permute);
 
@@ -346,7 +344,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
     @NotNull
     static PremiseRule normalize(@NotNull PremiseRule q, @NotNull PatternTermIndex index) {
-        return q.normalizeRule(index).setup(index);
+        return q.normalize(index).setup(index);
     }
 
 }

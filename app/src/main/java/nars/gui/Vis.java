@@ -336,6 +336,11 @@ public class Vis {
         new TaskLeak(4, 0.25f, nar) {
 
             @Override
+            public float value() {
+                return 1;
+            }
+
+            @Override
             public boolean preFilter(@NotNull Task next) {
                 if (next.pri() >= priMin.floatValue()) {
                     return super.preFilter(next);

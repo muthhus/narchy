@@ -99,9 +99,10 @@ public enum MetaGoal {
                 float v = n / valueMag; //normalize to -1..+1
 //
                 float nextValue =
-                        Util.lerp(momentum, v, c.value);
+                        Util.lerp(momentum, v, c.value());
 
-                c.value = nextValue;
+
+                c.setValue(nextValue);
             }
         }
 

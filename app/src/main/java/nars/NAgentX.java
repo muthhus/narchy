@@ -14,6 +14,8 @@ import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
+import nars.gui.graph.EdgeDirected;
+import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.data.reflect;
 import nars.op.mental.Abbreviation;
@@ -32,6 +34,7 @@ import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
 import spacegraph.render.Draw;
@@ -141,7 +144,7 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8
+        Function<NAR, PrediTerm<Derivation>> deriver = Deriver.getDefault(8
                 , "motivation.nal");
 
         int THREADS = 4;
@@ -150,16 +153,12 @@ abstract public class NAgentX extends NAgent {
         Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
         exe.add(new FocusExec() {
                     {
-                        subCycles = 16;
+                        subCycles = 64;
+                        concepts.setCapacity(64);
                     }
                 },
-                randomBool);
-        exe.add(new FocusExec() {
-                    {
-                        subCycles = 16;
-                    }
-                },
-                (a) -> a.id.voluplexity() <= 10);
+                (x)->true);
+        exe.add(new FocusExec() { { subCycles = 128; concepts.setCapacity(128); } },(a) -> a.id.voluplexity() <= 10);
 
         NAR n = new NARS()
                 .exe(exe)
@@ -286,7 +285,7 @@ abstract public class NAgentX extends NAgent {
 
             window(new Vis.EmotionPlot(64, a), 500, 500);
 
-            window(grid(Vis.reflect(n), Vis.reflect(n.services)), 700, 600);
+            window(grid(Vis.reflect(n)), 700, 600);
 
             window(col(
                     metaGoalChart(a),
@@ -420,12 +419,7 @@ abstract public class NAgentX extends NAgent {
                 if (str.startsWith("class "))
                     str = str.substring(5); //skip default toString
 
-                item = new TreeChart.ItemVis<Cause>(i, StringUtils.abbreviate(str, 26)) {
-                    @Override
-                    public float requestedArea() {
-                        return 0.1f + super.requestedArea();
-                    }
-                };
+                item = new CauseVis(i, str);
                 cache.set(id, item);
                 return item;
             });
@@ -579,6 +573,18 @@ abstract public class NAgentX extends NAgent {
 
                     new WindowButton("log", () -> Vis.logConsole(nar, 80, 25, new FloatParam(0f))),
                     new WindowButton("top", () -> (new ConsoleTerminal(new nars.TextUI(nar).session(20f)))),
+                    new WindowButton("concept graph", () -> {
+                        SpaceGraph s = new SpaceGraph<>(
+                            new SimpleConceptGraph1(nar,
+                        128, 256, 2, 8)
+                        );
+                        EdgeDirected fd = new EdgeDirected();
+                        s.dyn.addBroadConstraint(fd);
+                        s.camPos(0, 0, 90);
+                        return s;
+                    }),
+
+
                     //new WindowButton("prompt", () -> Vis.newInputEditor(), 300, 60)
 
                     Vis.beliefCharts(16, nar, a.reward),
@@ -753,6 +759,17 @@ abstract public class NAgentX extends NAgent {
             add(m.id(i) + "_in", () -> m.trafficInput(i), 0f, 1f);
             add(m.id(i), () -> m.trafficActive(i), 0f, 1f);
             a.onFrame(this::update);
+        }
+    }
+
+    private static class CauseVis extends TreeChart.ItemVis<Cause> {
+        public CauseVis(Cause i, String str) {
+            super(i, StringUtils.abbreviate(str, 26));
+        }
+
+        @Override
+        public float requestedArea() {
+            return 0.01f + super.requestedArea();
         }
     }
 

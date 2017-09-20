@@ -63,7 +63,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
                 Caffeine.newBuilder()
                         //.softValues().builder();
                         .removalListener((X k, Spatial<X> v, RemovalCause c) -> {
-                            v.delete(dyn);
+                            if (v!=null)
+                                v.delete(dyn);
                         })
                         //.maximumSize(cacheCapacity)
                         .weakValues()

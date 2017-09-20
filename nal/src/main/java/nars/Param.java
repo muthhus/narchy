@@ -38,7 +38,7 @@ public abstract class Param extends Services<Term,NAR> {
     /** rate that integers in integer-containing termlink compounds will be dynamically mutated on activation */
     public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.5f;
 
-    public static final boolean DELETE_INACCURATE_PREDICTIONS = false;
+    public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
 
 
 

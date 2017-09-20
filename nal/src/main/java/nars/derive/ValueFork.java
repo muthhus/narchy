@@ -3,6 +3,7 @@ package nars.derive;
 import jcog.Util;
 import jcog.math.ByteShuffler;
 import nars.$;
+import nars.control.Cause;
 import nars.control.CauseChannel;
 import nars.control.Derivation;
 import nars.derive.op.UnifyTerm;
@@ -24,7 +25,7 @@ public class ValueFork extends Fork {
     private final RoaringBitmap downstream;
 
     /** the causes that this is responsible for, ie. those that may be caused by this */
-    public final CauseChannel[] causes;
+    public final Cause[] causes;
 
 
     public static ValueFork the(PrediTerm[] branches, List<ValueFork> choices, RoaringBitmap downstream) {
@@ -49,7 +50,7 @@ public class ValueFork extends Fork {
             conc[n++] = ((Taskify)(AndCondition.last(u.eachMatch)));
         }
 
-        causes = Util.map(c->c.channel, new CauseChannel[n], conc);
+        causes = Util.map(c->c.channel, new Cause[n], conc);
 //        values = new ValueCache(c -> c::value, causes);
     }
 

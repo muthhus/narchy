@@ -19,7 +19,7 @@ import java.util.function.Consumer;
  * manages reading a camera to a pixel grid of SensorConcepts
  * monochrome
  */
-public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAgent>, Iterable<CameraSensor<P>.PixelConcept> {
+public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Iterable<CameraSensor<P>.PixelConcept> {
 
 
     public static final int RADIX = 1;
@@ -52,12 +52,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                 RadixProduct(root, w, h, RADIX)
                 //RadixRecurse(root, w, h, RADIX)
                 //InhRecurse(root, w, h, RADIX)
-            , a.nar);
-
-        a.onFrame(this);
+                , a.nar);
 
     }
-
 
     @NotNull
     @Override
@@ -193,41 +190,30 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         return (PixelConcept) matrix[x][y]; //pixels.get(x * width + y);
     }
 
+
+    @Override public float value() {
+        return in.amp();
+    }
+
     @Override
-    public void accept(NAgent a) {
-
-
-
+    protected float run(NAR nar, long dt, float work) {
 
         src.update(1);
 
-        NAR nar = a.nar;
+
         //stamp = nar.time.nextStamp();
 
-        long now = a.now;
+        long now = nar.time();
         int dur = nar.dur();
 
-        float value = in.value();
-        resolution( Util.round((0.5f * (Util.tanhFast(-value)+1)), 0.01f) );
+        resolution(Util.round(Math.min(0.01f, 0.5f * (1f - this.in.amp())), 0.01f));
 
+        //frame-rate timeslicing
         int actualPixels = pixels.size();
-        int pixelsSize = actualPixels;
-        int start = 0, end = pixelsSize;
-        int lp = this.lastPixel;
-        this.lastPixel = 0;
-        if (value < 0) {
-            //frame-rate timeslicing
-            float fraction = 1f-Util.tanhFast(-value);
-            if (fraction < 0.99f) {
-                pixelsSize = Math.round( Util.sqr(fraction) * pixelsSize);
-                assert(pixelsSize < actualPixels);
-
-                start = lp;
-                this.lastPixel = end = (start + pixelsSize) % actualPixels; //for progressive fractional wrap-around
-                //System.out.println(value + " " + fraction + " "+ start + " " + end);
-            }
-
-        }
+        int pixelsSize = Math.min(actualPixels, Math.round(work));
+        int start = this.lastPixel;
+        int end = this.lastPixel = (start + pixelsSize) % actualPixels; //for progressive fractional wrap-around
+        //System.out.println(value + " " + fraction + " "+ start + " " + end);
 
         this.conf = nar.confDefault(Op.BELIEF);
         for (int i = start; i < end; i++) {
@@ -237,6 +223,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                 in.input(t);
             }
         }
+
+        return pixelsSize;
     }
 
 

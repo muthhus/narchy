@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 
 /**
  * a bag which wraps another bag, accepts its value as input but at a throttled rate
@@ -22,8 +23,12 @@ public class Bagregate<X extends Prioritized> extends PLinkArrayBag<X> {
     private final MutableFloat scale;
     final AtomicBoolean busy = new AtomicBoolean();
 
+    public Bagregate(@NotNull Stream<X> src, int capacity, float scale) {
+        this(src::iterator, capacity, scale);
+    }
+
     public Bagregate(@NotNull Iterable<X> src, int capacity, float scale) {
-        super(capacity, PriMerge.avg, new ConcurrentHashMap<>(capacity));
+        super(capacity, PriMerge.max, new ConcurrentHashMap<>(capacity));
 
         this.src = src;
         this.scale = new FloatParam(scale);

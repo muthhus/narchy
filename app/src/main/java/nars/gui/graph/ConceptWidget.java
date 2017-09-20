@@ -5,6 +5,7 @@ import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.FloatParam;
+import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Deleteable;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
@@ -14,7 +15,7 @@ import nars.concept.Concept;
 import nars.gui.ConceptIcon;
 import nars.term.Term;
 import nars.term.Termed;
-import org.eclipse.collections.impl.tuple.Tuples;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -27,9 +28,9 @@ import spacegraph.render.JoglPhysics;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
 
-import java.util.HashMap;
 import java.util.function.Consumer;
 
+import static jcog.Util.unitize;
 import static spacegraph.math.v3.v;
 
 
@@ -43,7 +44,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
     private transient ConceptSpace space;
     public float pri;
 
-    private final float edgeDecayRate = 0.5f;
+    private final float edgeDecayRate = 0.75f;
 
 
     public ConceptWidget(Termed x) {
@@ -68,7 +69,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
                 //new PLinkHijackBag(0, 2);
-                new PLinkArrayBag<>(0, PriMerge.avg, new HashMap());
+                new PLinkArrayBag<>(0, PriMerge.max, new UnifiedMap());
 
 
 //        for (int i = 0; i < edges; i++)
@@ -86,12 +87,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
         final float initImpulseEpsilon = 0.25f;
 
         //place in a random direction
-        x.transform().set(SpaceGraph.r(initDistanceEpsilon),
+        x.transform().set(
+                SpaceGraph.r(initDistanceEpsilon),
                 SpaceGraph.r(initDistanceEpsilon),
                 SpaceGraph.r(initDistanceEpsilon));
 
         //impulse in a random direction
-        x.impulse(v(SpaceGraph.r(initImpulseEpsilon),
+        x.impulse(v(
+                SpaceGraph.r(initImpulseEpsilon),
                 SpaceGraph.r(initImpulseEpsilon),
                 SpaceGraph.r(initImpulseEpsilon)));
 
@@ -122,6 +125,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
 
 
+    final RecycledSummaryStatistics edgeStats = new RecycledSummaryStatistics();
+
     public void commit(ConceptVis conceptVis, ConceptSpace space) {
 
         this.space = space;
@@ -139,22 +144,30 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
                 //edges.commit(); //forget
 
                 //phase 1: collect
+                edgeStats.clear();
                 c.tasklinks().forEach(this);
+                float tasklinkVar = (float) edgeStats.getVariance();
+                if (tasklinkVar != tasklinkVar) tasklinkVar = 0; //none anyway
+
+                edgeStats.clear();
                 c.termlinks().forEach(this);
+                float termlinkVar = (float) edgeStats.getVariance();
+                if (termlinkVar != termlinkVar) termlinkVar = 0; //none anyway
 
                 float priSum = edges.priSum();
 
-                conceptVis.apply(this, key);
+                float termlinkBoost = conceptVis.termlinkOpacity.floatValue()
+                        * unitize( termlinkVar );
+                float tasklinkBoost = conceptVis.tasklinkOpacity.floatValue()
+                        * unitize( tasklinkVar );
 
-
-                float termlinkOpacity = conceptVis.termlinkOpacity.floatValue();
-                float tasklinkOpacity = conceptVis.tasklinkOpacity.floatValue();
                 edges.commit(x -> {
                     TermEdge e = x.get();
-                    e.update(ConceptWidget.this, priSum, edgeDecayRate, termlinkOpacity, tasklinkOpacity);
-
+                    e.update(ConceptWidget.this, priSum, termlinkBoost, tasklinkBoost);
                     x.priMult(edgeDecayRate);
                 });
+
+                conceptVis.apply(this, key);
 
             }
 
@@ -243,6 +256,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
         if (pri < 0)
             return;
 
+
         Termed ttt = tgt.get();
         Term tt = ttt.term();
         if (!tt.equals(key)) {
@@ -250,12 +264,15 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
             if (to != null && to.active()) {
 //                Concept c = space.nar.concept(tt);
 //                if (c != null) {
-                    TermEdge ate = space.edges.apply(Tuples.pair(to.concept, to));
+                    TermEdge ate =
+                            //space.edges.apply(Tuples.pair(to.concept, to));
+                            space.edgeBuilder.apply(to);
                     ate.add(tgt, !(ttt instanceof Task));
                     edges.put(
                             //new PLinkUntilDeleted(ate, pri)
                             new PLink(ate, pri)
                     );
+                    edgeStats.accept(pri);
 //                }
             }
         }
@@ -312,7 +329,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
             return hash;
         }
 
-        public void update(ConceptWidget src, float conceptEdgePriSum, float edgeDecayRate, float termlinkOpacity, float tasklinkOpacity) {
+        public void update(ConceptWidget src, float conceptEdgePriSum, float termlinkBoost, float tasklinkBoost) {
 
             float edgeSum = (termlinkPri + tasklinkPri);
 
@@ -332,9 +349,9 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
 
                 if (edgeSum > 0) {
-                    this.b = 0.1f;
-                    this.r = 0.1f + 0.8f * (tasklinkPri / edgeSum)* tasklinkOpacity;
-                    this.g = 0.1f + 0.8f * (termlinkPri / edgeSum)* termlinkOpacity;
+                    this.b = 0.1f + Util.or(tasklinkBoost, termlinkBoost) * 0.4f;
+                    this.r = 0.1f + 0.8f * (tasklinkPri / edgeSum) * (0.75f + 0.25f * tasklinkBoost);
+                    this.g = 0.1f + 0.8f * (termlinkPri / edgeSum) * (0.75f + 0.25f * termlinkBoost);
                 } else {
                     this.r = this.g = this.b = 0.1f;
                 }
@@ -347,14 +364,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
                         // 0.5f * edgeProp
                         0.1f + 0.75f * Util.or(termlinkPri , tasklinkPri );
 
-                this.attraction = 0f + 0.1f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attraction = 0f + 0.2f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
                 this.attractionDist = 0.1f + src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = -1;
                 this.attraction = 0;
             }
 
-            decay(edgeDecayRate);
+            //decay(edgeDecayRate);
 
         }
 

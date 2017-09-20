@@ -27,6 +27,12 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
     final AtomicBoolean atomsEnabled = new AtomicBoolean(true);
 
+    public SimpleConceptGraph1(NAR nar, int visibleNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+        this(nar, ()->nar.exe.stream().
+                        map(x -> x instanceof Activate ? (Activate)x : null).filter(Objects::nonNull).iterator(),
+                visibleNodes, bufferedNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
+    }
+
     public SimpleConceptGraph1(NAR nar, @NotNull Iterable<Activate> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         super(nar, concepts, maxNodes, bufferedNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
     }
@@ -101,10 +107,8 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        );
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                () -> n.exe.stream().map(x -> x instanceof Activate ? (Activate)x : null)
-                        .filter(Objects::nonNull)
-                        .iterator()
-                /* TODO */, 64, 64, 7, 15);
+
+                /* TODO */ 64, 64, 7, 15);
 
 
         SpaceGraph<Term> s = new SpaceGraph<>(
@@ -136,6 +140,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         EdgeDirected fd = new EdgeDirected();
         s.dyn.addBroadConstraint(fd);
+        s.camPos(0, 0, 90);
 
         //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
 

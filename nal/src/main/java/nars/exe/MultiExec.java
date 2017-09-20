@@ -37,6 +37,10 @@ public class MultiExec extends Exec {
 
     final Topic<Activate> onActivate = new ListTopic();
 
+    //private final Worker[] workers;
+    private final int num;
+    private On onCycle;
+
     @Override
     public void execute(@NotNull Runnable runnable) {
         add(new RunTask(runnable));
@@ -47,10 +51,6 @@ public class MultiExec extends Exec {
         return q.stream();
     }
 
-
-    //private final Worker[] workers;
-    private final int num;
-    private On onCycle;
 
     public MultiExec(int threads, int qSize) {
         num = threads;
@@ -65,14 +65,13 @@ public class MultiExec extends Exec {
             exe.execute(() -> {
                 int idle = 0;
                 while (true) {
-                    ITask r = q.poll(); //100L, TimeUnit.MILLISECONDS);
+                    ITask r = q.poll();
                     if (r != null) {
-                        idle = 0;
                         execute(r);
+                        idle = 0;
                     } else {
-                        Util.pauseNext(idle++);
+                        Util.pauseNext(++idle);
                     }
-
                 }
             });
         }

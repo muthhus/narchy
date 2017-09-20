@@ -162,7 +162,7 @@ public class PremiseRuleTest {
         assertNotNull(y);
 
         PatternTermIndex i = new PatternTermIndex(n);
-        y = ((PremiseRule) y).normalizeRule(i);
+        y = ((PremiseRule) y).normalize(i);
         assertNotNull(y);
         PremiseRule.printRecursive(y);
 

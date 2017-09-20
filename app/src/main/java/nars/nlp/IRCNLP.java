@@ -20,9 +20,8 @@ import static nars.Op.PROD;
 import static nars.time.Tense.ETERNAL;
 
 /**
- *
  * http://englishlearning.webgarden.es/menu/1st-and-2nd-eso-year/easy-reading-texts
- *
+ * <p>
  * $0.9;0.9;0.99$
  * <p>
  * $0.9;0.9;0.99$ (hear(?someone, $something) ==>+1 hear(I,$something)).
@@ -131,6 +130,11 @@ public class IRCNLP extends IRC {
             super(8, 0.05f, nar);
             this.nar = nar;
             this.channels = channels;
+        }
+
+        @Override
+        public float value() {
+            return 1;
         }
 
         @Override
@@ -323,7 +327,6 @@ public class IRCNLP extends IRC {
                 }
             }
         });
-
 
 
         //n.log();

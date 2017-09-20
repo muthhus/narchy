@@ -28,11 +28,14 @@ import static nars.Op.concurrent;
  */
 public class PatternTermIndex extends MapTermIndex {
 
-
     public PatternTermIndex(@NotNull NAR n) {
         super(new HashMap<>());
         this.nar = n;
     }
+
+
+    /** HACK holds a deriverID allowing the cause channel to include it, for multiple derivers. this is messy */
+    public short deriverID = -1;
 
     @SuppressWarnings("Java8MapApi")
     @Override

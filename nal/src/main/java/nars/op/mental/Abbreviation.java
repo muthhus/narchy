@@ -90,7 +90,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     @Override
     protected void start(NAR nar) {
         super.start(nar);
-        ons.add(nar.onCycle(nn -> bag.commit(nn.time(), nn.dur())));
+        ons.add(nar.onCycle(nn -> bag.commit(nn.time(), nn.dur(), 1f)));
     }
 
     @Override

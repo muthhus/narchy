@@ -2,9 +2,13 @@ package nars.derive;
 
 import nars.NAR;
 import nars.Param;
+import nars.Task;
+import nars.control.Cause;
+import nars.control.CauseChannel;
 import nars.control.Derivation;
 import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRuleSet;
+import nars.index.term.PatternTermIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -23,7 +27,7 @@ import java.util.function.Function;
 public interface Deriver {
 
 
-    static Set<String> DEFAULT(int level, String... otherFiles) {
+    static Set<String> defaultRules(int level, String... otherFiles) {
         Set<String> files = new TreeSet();
         switch (level) {
             case 8:
@@ -54,7 +58,7 @@ public interface Deriver {
         return files;
     }
 
-    static Function<NAR, PrediTerm<Derivation>> newDeriver(int nal, String... additional) {
+    static Function<NAR, PrediTerm<Derivation>> getDefault(int nal, String... additional) {
         if (nal == 0) {
             return (n) -> PrediTerm.NullDeriver;
         }
@@ -62,20 +66,26 @@ public interface Deriver {
         return (nar) -> {
             Function<PrediTerm<Derivation>, PrediTerm<Derivation>> xf;
             if (Param.TRACE)
-                xf = (PrediTerm<Derivation> d) -> new DebugDerivationPredicate(d);
+                xf = DebugDerivationPredicate::new;
             else
                 xf = null;
 
-            Set<String> files = DEFAULT(nal, additional);
-            @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(nar,true, files.toArray(new String[files.size()]) );
+            Set<String> files = defaultRules(nal, additional);
 
-            PrediTerm<Derivation> x = PrediTrie.the(RULES, xf);
-            if (Param.TRACE) {
-                TrieDeriver.print(x, System.out);
-            }
+            Cause in = nar.newCause((cid)->new Cause(cid, "Derive(" + files + ")"));
+
+            final PatternTermIndex p = new PatternTermIndex(nar);
+            p.deriverID = in.id; //HACK
+
+            @NotNull PremiseRuleSet r = PremiseRuleSet.rules(nar, p,true, files.toArray(new String[files.size()]) );
+
+            PrediTerm<Derivation> x = PrediTrie.the(r, xf);
+
             return x;
         };
     }
+
+
 
     //    /**
 //     * for now it seems there is a leak so its better if each NAR gets its own copy. adds some overhead but we'll fix this later

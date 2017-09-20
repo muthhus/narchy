@@ -110,7 +110,7 @@ public class NARS {
 
         concepts = DefaultConceptBuilder::new;
 
-        deriver = Deriver.newDeriver(8);
+        deriver = Deriver.getDefault(8);
     }
 
     /**
@@ -202,7 +202,7 @@ public class NARS {
         public Default(int nal, boolean threadSafe) {
 
             this.nal = nal;
-            this.deriver = Deriver.newDeriver(nal);
+            this.deriver = Deriver.getDefault(nal);
 
 
             if (threadSafe)

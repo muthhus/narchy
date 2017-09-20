@@ -55,12 +55,13 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 
 
 
-    public final HijackMemoize<Pair<Concept, ConceptWidget /* target */>, ConceptWidget.TermEdge> edges = new HijackMemoize<>((to) -> {
-        return edgeBuilder.apply(to.getTwo());
-    }, 4096, 2);
+//    public final HijackMemoize<Pair<Concept, ConceptWidget /* target */>, ConceptWidget.TermEdge> edges = new HijackMemoize<>((to) -> {
+//        return edgeBuilder.apply(to.getTwo());
+//    }, 4096, 2);
 
     void removeNode(Activate concept) {
-        space.remove(concept.term());
+        if (space!=null)
+            space.remove(concept.id.term());
 
 //        @Nullable ConceptWidget cw = widgets.getIfPresent(concept.get());
 //        if (cw != null) {
@@ -78,14 +79,23 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 
 
     protected ConceptWidget nodeGetOrCreate(PriReference<Activate> clink) {
-        ConceptWidget cw = nodeGetOrCreate(clink.get());
-        cw.pri = clink.priElseZero();
-        return cw;
+        Activate c = clink.get();
+        if (c != null) {
+            ConceptWidget cw = nodeGetOrCreate(c);
+            if (cw != null) {
+                cw.pri = clink.priElseZero();
+                return cw;
+            }
+        }
+        return null;
     }
 
     protected ConceptWidget nodeGetOrCreate(Activate concept) {
-        ConceptWidget cw = space.getOrAdd(concept.term(), nodeBuilder);
-        cw.concept = concept.get();
+        if (space==null)
+            return null;
+
+        ConceptWidget cw = space.getOrAdd(concept.id.term(), nodeBuilder);
+        cw.concept = concept.id;
         cw.activate();
         return cw;
     }

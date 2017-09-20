@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.function.BiFunction;
 
 import static nars.Op.GOAL;
@@ -133,7 +134,8 @@ public class Conclusion extends AbstractPred<Derivation> {
 
     final static BiFunction<Task, Task, Task> DUPLICATE_DERIVATION_MERGE = (pp, tt) -> {
         pp.priMax(tt.pri());
-        ((NALTask) pp).causeMerge(tt);
+        if (!Arrays.equals(pp.cause(), tt.cause())) //dont merge if they are duplicates, it's pointless here
+            ((NALTask) pp).causeMerge(tt);
         return pp;
     };
 

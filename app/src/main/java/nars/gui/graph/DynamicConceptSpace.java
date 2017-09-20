@@ -5,6 +5,7 @@ import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
 import nars.control.Activate;
+import nars.control.DurService;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -16,12 +17,13 @@ public class DynamicConceptSpace extends ConceptSpace {
 
     private final List next;
     final float bagUpdateRate = 0.1f;
+    private final DurService on;
 
-    public DynamicConceptSpace(NAR nar, @NotNull Iterable<Activate> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+    public DynamicConceptSpace(NAR nar, Iterable<Activate> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         super(nar, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
 
 
-        bag = new Bagregate<>(concepts, maxNodes + bufferedNodes, bagUpdateRate) {
+        bag = new Bagregate<Activate>(concepts, maxNodes + bufferedNodes, bagUpdateRate) {
             @Override
             protected boolean include(Activate x) {
                 return DynamicConceptSpace.this.include(x.term());
@@ -39,11 +41,14 @@ public class DynamicConceptSpace extends ConceptSpace {
         };
 
         next = $.newArrayList();
-        nar.onCycle(nn -> {
+        on = DurService.build(nar, ()->{
             bag.update();
             next.clear();
-            bag.forEach(maxNodes, (PriReference<Activate> concept) ->
-                            next.add(nodeGetOrCreate(concept))
+            bag.forEach(maxNodes, (PriReference<Activate> concept) -> {
+                        ConceptWidget e = nodeGetOrCreate(concept);
+                        if (e!=null)
+                            next.add(e);
+                    }
                     //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
             );
             update();

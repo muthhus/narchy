@@ -29,11 +29,11 @@ public class PredictionAccuracyFeedback {
     }
 
     /** TODO handle stretched tasks */
-    void feedback(Task x, boolean deleteIfIncorrect, long now, NAR nar) {
+    void feedback(Task x, boolean deleteIfIncoherent, long now, NAR nar) {
         float xFreq = x.freq();
 
         int dur = nar.dur();
-        float xEvi = x.evi(now, dur);
+        float xConf = x.conf(now, dur);
 
         float strength = 1;
         long last = this.last;
@@ -54,29 +54,31 @@ public class PredictionAccuracyFeedback {
             if (leadTime < 0)
                 return;
 
-            float headstart = 1f + leadTime/(1f+y.range()) / ((float)dur); //divide by range because it must be specific
+            float yConf = y.conf(now, dur);
+            if (yConf!=yConf)
+                return;
 
-            float coherence = 1f -
-                    Math.abs(xFreq - y.freq());
+            float headstart = 1f + (1f+leadTime)/(1f+y.range()) / dur; //divide by range because it must be specific
+
+            float coherence = 1f - Math.abs(xFreq - y.freq());
                     //TruthFunctions.freqSimilarity(xFreq, y.freq());
 
-            float yEvi = y.evi(now, dur);
-            float confFraction = 2f * yEvi / (yEvi + xEvi); //allow > 1
+            float confFraction = yConf / xConf; //allow > 1
 
             /** durations ago since the prediction was created */
 
             float v;
             if (coherence > 0.5f) {
                 //reward
-                v = (coherence - 0.5f) * 2f * confFraction * headstart * strength;
+                v = coherence * 2f * confFraction * headstart * strength;
                 if (v > Pri.EPSILON)
                     nar.emotion.value(MetaGoal.Accurate, cause, v);
             } else {
                 //punish
-                v = (0.5f - coherence) * 2f * confFraction * (1f - coherence) / headstart * strength;
+                v = (1f - coherence) * 2f * confFraction / headstart * strength;
                 if (v > Pri.EPSILON) {
                     nar.emotion.value(MetaGoal.Inaccurate, cause, v);
-                    if (deleteIfIncorrect)
+                    if (deleteIfIncoherent)
                         y.delete();
                 }
             }

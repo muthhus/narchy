@@ -23,7 +23,7 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
     float RATE_THRESH = 0.5f;
 
     @NotNull
-    public final FloatParam rate /* items per dt */;
+    public final FloatParam rate /* base rate items per dt */;
 
 
     protected long lastLeak = ETERNAL;
@@ -37,10 +37,10 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
 
     private final AtomicBoolean busy = new AtomicBoolean(false);
 
-    public void commit(long now, int dur) {
+    public float commit(long now, int dur, float work) {
 
         if (!busy.compareAndSet(false, true))
-            return;
+            return 0;
 
         try {
             bag.commit();
@@ -52,24 +52,26 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
                     this.lastLeak = last = now;
                 }
 
-                commit(now, now - last, dur);
+                return commit(now, now - last, dur, work);
 
             }
         } finally {
             busy.set(false);
         }
+
+        return 0;
     }
 
-    public void commit(long now, long last, int dur) {
+    public float commit(long now, long last, int dur, float work) {
 
         //durations delta
         float durDT = Math.max(0, (now - last) / ((float) dur));
 
-        float nextBudget = rate.floatValue() * durDT + lastBudget;
+        float nextBudget = work * rate.floatValue() * durDT + lastBudget;
         //System.out.println(this + " " + rate + " " + durDT + " " + nextBudget + " { " + lastBudget );
 
         if (nextBudget < RATE_THRESH) {
-            return; //wait longer
+            return 0; //wait longer
         }
 
         this.lastLeak = now;
@@ -92,6 +94,9 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
         });
 
         this.lastBudget = Math.min(0, budget[0]); //only store deficit, which will be added to the next. otherwise if positive is also stored, it can explode
+
+        return nextBudget - budget[0];
+
     }
 
     /**

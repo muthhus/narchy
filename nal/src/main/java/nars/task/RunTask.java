@@ -22,6 +22,11 @@ public class RunTask implements ITask {
     }
 
     @Override
+    public String toString() {
+        return run.toString();
+    }
+
+    @Override
     public boolean delete() {
         return false;
     }

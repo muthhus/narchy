@@ -12,7 +12,7 @@ abstract public class LeakBack extends TaskLeak {
     final static float INITIAL_RATE = 1f;
 
     //HACK
-    public final FloatParam amp = new FloatParam(0.001f, 0, 1f);
+    public final FloatParam boost = new FloatParam(0.001f, 0, 1f);
 
     private final CauseChannel<Task> out;
 
@@ -24,14 +24,9 @@ abstract public class LeakBack extends TaskLeak {
     public void feedback(Task x) {
         out.input(x);
     }
+    
 
-    @Override
-    protected void run(NAR nar, long dt) {
-
-        float g = out.gain();
-        inputRate( g * amp.floatValue() );
-        //System.out.println(this + " " + g);
-
-        super.run(nar, dt);
+    @Override public float value() {
+        return out.amp();
     }
 }

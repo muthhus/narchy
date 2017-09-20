@@ -84,6 +84,12 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
         recv = nar.newCauseChannel(this);
 
         buffer = new TaskLeak(256, outRate, nar) {
+
+            @Override
+            public float value() {
+                return 1;
+            }
+
             @Override
             protected float leak(Task next) {
 

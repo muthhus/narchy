@@ -28,7 +28,7 @@ public class Cause {
     /** current scalar utility estimate for this cause's support of the current MetaGoal's.
      *  may be positive or negative, and is in relation to other cause's values
      */
-    protected float value;
+    private float value;
 
     /** the value measured contributed by its effect on each MetaGoal.
      *  the index corresponds to the ordinal of MetaGoal enum entries.
@@ -44,19 +44,28 @@ public class Cause {
 
     /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
     public float value() {
+        //assert(v==v && v >= -1f && v <= +1f);
         return value;
     }
 
-    public float factor() {
-        return Util.tanhFast(value());
+    /** 0..+1 */
+    public float amp() {
+        return (value+1)/2;
     }
+
+    /** 0..+2 */
     public float gain() {
-         return factor()+1;
+         return value+1;
     }
 
     /** convenience procedure to set value to zero */
     public void setValueZero() {
         value = 0;
+    }
+
+    public void setValue(float nextValue) {
+        assert(nextValue==nextValue && nextValue >= -1f && nextValue <= +1f);
+        value = nextValue;
     }
 
 
@@ -65,9 +74,13 @@ public class Cause {
 
     public final Object name;
 
-    public Cause(short id, Object name) {
+    public Cause(short id) {
+        this(id, null);
+    }
+
+    public Cause(short id, @Nullable Object name) {
         this.id = id;
-        this.name = name;
+        this.name = name!=null ? name : id;
         goalValue = new Traffic[MetaGoal.values().length];
         for (int i = 0; i < goalValue.length; i++) {
             goalValue[i] = new Traffic();

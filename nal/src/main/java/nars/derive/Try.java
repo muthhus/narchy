@@ -1,7 +1,7 @@
 package nars.derive;
 
-import jcog.Util;
 import nars.$;
+import nars.control.Cause;
 import nars.control.CauseChannel;
 import nars.control.Derivation;
 import org.roaringbitmap.IntIterator;
@@ -15,12 +15,12 @@ public class Try extends AbstractPred<Derivation> {
 
     public final ValueCache values;
     public final ValueFork[] branches;
-    private final CauseChannel[] causes;
+    private final Cause[] causes;
 
     public Try(ValueFork[] branches) {
         super($.func("try", branches));
         this.branches = branches;
-        causes = Stream.of(branches).flatMap(b -> Stream.of(b.causes)).toArray(CauseChannel[]::new);
+        causes = Stream.of(branches).flatMap(b -> Stream.of(b.causes)).toArray(Cause[]::new);
         values = new ValueCache(c -> c::value, causes);
     }
 

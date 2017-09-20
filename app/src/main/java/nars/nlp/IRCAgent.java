@@ -363,6 +363,11 @@ public class IRCAgent extends IRC {
                 return super.preFilter(next);
             return false;
         }
+
+        @Override
+        public float value() {
+            return 1;
+        }
     }
 
 //    final StringBuilder b = new StringBuilder();

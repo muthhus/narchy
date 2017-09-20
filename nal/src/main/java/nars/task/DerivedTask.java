@@ -15,11 +15,10 @@ public class DerivedTask extends NALTask {
 
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Term tc, byte punct, @Nullable Truth truth, long now, long start, long end, long[] evi, short[] cause) {
+    public DerivedTask(@NotNull Term tc, byte punct, @Nullable Truth truth, long now, long start, long end, long[] evi) {
         super(tc, punct, truth, now, start, end,
                 evi);
 
-        this.cause = cause;
 
 
 //        if (!isBeliefOrGoal() || tc.term().dt()!=DTERNAL) {

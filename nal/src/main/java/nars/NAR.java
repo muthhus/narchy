@@ -44,6 +44,7 @@ import nars.util.Cycles;
 import org.HdrHistogram.Histogram;
 import org.HdrHistogram.ShortCountsHistogram;
 import org.apache.commons.math3.stat.Frequency;
+import org.eclipse.collections.api.block.function.primitive.ShortToObjectFunction;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.fusesource.jansi.Ansi;
@@ -933,7 +934,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         //clear();
         super.stop();
 
-        derivation.forEach(Derivation::reset);
+        derivation.forEach(Derivation::clear);
         //derivation.forEach(c -> c.transformsCache.invalidateAll());
 
         exe.stop();
@@ -1711,10 +1712,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
 
-    public CauseChannel<Task> newChannel(Object x) {
-        return newChannel(x, this::input);
-    }
-
 
     /**
      * automatically adds the cause id to each input
@@ -1745,10 +1742,16 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
-    public CauseChannel<Task> newChannel(Object x, Consumer<ITask> target) {
+//    public CauseChannel<Task> newChannel(Object x, Consumer<ITask> target) {
+//        return newCause((next)-> {
+//            return new CauseChannel(next, x, target);
+//        });
+//    }
+
+    public <C extends Cause> C newCause(ShortToObjectFunction<C> idToChannel) {
         synchronized (causes) {
             short next = (short) (causes.size());
-            CauseChannel c = new CauseChannel(next, x, target);
+            C c = idToChannel.valueOf(next);
             causes.add(c);
             return c;
         }

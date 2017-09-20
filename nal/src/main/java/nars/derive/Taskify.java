@@ -5,7 +5,6 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.control.CauseChannel;
 import nars.control.Derivation;
 import nars.derive.rule.PremiseRule;
 import nars.task.DebugDerivedTask;
@@ -31,10 +30,10 @@ public class Taskify extends AbstractPred<Derivation> {
      * destination of any derived tasks; also may be used to communicate backpressure
      * from the recipient.
      */
-    public final CauseChannel<Task> channel;
+    public final Conclude.RuleCause channel;
     private final String rule;
 
-    protected Taskify(@NotNull PremiseRule rule, CauseChannel<Task> channel) {
+    protected Taskify(/*@NotNull*/ PremiseRule rule, Conclude.RuleCause channel) {
         super($.func("taskify", $.the(channel.id)));
         this.channel = channel;
         this.rule = rule.toString(); //only store toString of the rule to avoid remaining attached to the RuleSet
@@ -57,7 +56,6 @@ public class Taskify extends AbstractPred<Derivation> {
             long end = occ[1];
             assert (end >= start);
 
-            short[] cause = ArrayUtils.addAll(p.parentCause, channel.id);
 
             long[] evi = p.single ? p.evidenceSingle() : p.evidenceDouble();
 
@@ -65,20 +63,20 @@ public class Taskify extends AbstractPred<Derivation> {
 
             DerivedTask derived =
                     Param.DEBUG ?
-                            new DebugDerivedTask(C, punc, tr, now, start, end, evi, cause, p.task, !p.single ? p.belief : null) :
-                            new DerivedTask(C, punc, tr, now, start, end, evi, cause);
+                            new DebugDerivedTask(C, punc, tr, now, start, end, evi, p.task, !p.single ? p.belief : null) :
+                            new DerivedTask(C, punc, tr, now, start, end, evi);
 
 
             return derived;
         });
 
         if (t == null) {
-            return spam(p, Param.TTL_DERIVE_TASK_FAIL, x, nar, 0.5f);
+            return spam(p, Param.TTL_DERIVE_TASK_FAIL, x, nar, 0.01f);
         }
 
         if (same(t, p.task, p.truthResolution) || (p.belief != null && same(t, p.belief, p.truthResolution))) {
             //created a duplicate of the task
-            return spam(p, Param.TTL_DERIVE_TASK_SAME, t, nar, 0.5f);
+            return spam(p, Param.TTL_DERIVE_TASK_SAME, t, nar, 0.01f);
         }
 
 
@@ -90,8 +88,11 @@ public class Taskify extends AbstractPred<Derivation> {
         if (Param.DEBUG)
             t.log(rule);
 
+        short[] cause = ArrayUtils.addAll(p.parentCause, channel.deriver, channel.id);
+        ((DerivedTask)t).cause = cause;
+
         if (p.derivations.merge(t, t, Conclusion.DUPLICATE_DERIVATION_MERGE) != t) {
-            spam(p, Param.TTL_DERIVE_TASK_REPEAT, t, nar, 0.25f);
+            spam(p, Param.TTL_DERIVE_TASK_REPEAT, t, nar, 0.01f);
         } else {
             p.use(Param.TTL_DERIVE_TASK_SUCCESS);
         }

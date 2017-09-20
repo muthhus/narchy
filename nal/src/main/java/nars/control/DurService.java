@@ -2,6 +2,7 @@ package nars.control;
 
 import nars.NAR;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -72,4 +73,6 @@ abstract public class DurService extends NARService implements Runnable {
 
     /** time (raw cycles, not durations) which elapsed since run was scheduled last */
     abstract protected void run(NAR n, long dt);
+
+
 }

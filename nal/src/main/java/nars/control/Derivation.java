@@ -134,7 +134,10 @@ public class Derivation extends Unify implements TermContext {
     public PrediTerm<Derivation> deriver;
     public final ByteShuffler shuffler = new ByteShuffler(64);
     public boolean single;
+
+    /** temporary buffer for derivations before input so they can be merged in case of duplicates */
     public final Map<Task, Task> derivations = new LinkedHashMap();
+
     public DerivationTemporalize temporalize;
     public int parentComplexity;
 
@@ -454,15 +457,12 @@ public class Derivation extends Unify implements TermContext {
     }
 
 
-    public void reset() {
-        clear();
-        time = ETERNAL;
-    }
 
     @Override
     public void clear() {
         derivations.clear();
         super.clear();
+        time = ETERNAL;
     }
 
     public int getAndSetTTL(int next) {

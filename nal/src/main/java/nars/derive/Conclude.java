@@ -3,12 +3,22 @@ package nars.derive;
 import nars.$;
 import nars.NAR;
 import nars.Op;
+import nars.control.Cause;
 import nars.control.Derivation;
+import nars.derive.constraint.MatchConstraint;
+import nars.derive.match.Ellipsis;
+import nars.derive.op.AbstractPatternOp;
+import nars.derive.op.SubTermStructure;
+import nars.derive.op.UnifyTerm;
 import nars.derive.rule.PremiseRule;
+import nars.index.term.PatternTermIndex;
 import nars.term.Term;
 import nars.term.Termed;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.SortedSet;
 
 /**
  * Conclusion builder
@@ -18,7 +28,8 @@ public final class Conclude {
     private static final Term VAR_INTRO = $.the("varIntro");
     private static final Term GOAL_URGENT = $.the("urgent");
 
-    static public PrediTerm<Derivation> the(@NotNull PremiseRule rule, @NotNull Term pattern, boolean goalUrgent, NAR nar) {
+    static public PrediTerm<Derivation> the(@NotNull PremiseRule rule, NAR nar, short deriverID) {
+        Term pattern = rule.conclusion().sub(0);
 
         //substitute occurrences of the exact task and belief terms with the short-cut
         pattern = pattern.replace(rule.getTask(), Derivation._taskTerm).replace(rule.getBelief(), Derivation._beliefTerm);
@@ -33,18 +44,17 @@ public final class Conclude {
             introVars = false;
         }
 
-        Term id = !goalUrgent ? $.func("derive", pattern) : $.func("derive", pattern, $.the("urgent"));
+        Term id = !rule.goalUrgent ? $.func("derive", pattern) : $.func("derive", pattern, $.the("urgent"));
 
-             //input.privaluate = false; //disable priority affect, since feedback is applied in other more direct ways (ex: deriver backpressure)
-        //input.valueBias = 0;//-0.1f;
-        Taskify taskify = new Taskify(rule, nar.newChannel(rule));
+        Taskify taskify = new Taskify(rule, nar.newCause((channelID) ->
+                new RuleCause(channelID, deriverID)));
 
         Term concID =
-                !goalUrgent ?
+                !rule.goalUrgent ?
                     $.func("derive", /*$.the(cid), */pattern/* prod args */) :
                     $.func("derive", /*$.the(cid), */pattern/* prod args */, GOAL_URGENT);
         return AndCondition.the(
-                new Conclusion(concID,pattern, goalUrgent),
+                new Conclusion(concID,pattern, rule.goalUrgent),
                 introVars ? //Fork.fork(
                         AndCondition.the(new IntroVars(), taskify)
                         //makeTask)
@@ -53,6 +63,131 @@ public final class Conclude {
 
     }
 
+    public static void match(final PremiseRule rule, List<PrediTerm> pre, List<PrediTerm> post, @NotNull SortedSet<MatchConstraint> constraints, PatternTermIndex index) {
+
+        final Term taskPattern = rule.getTask();
+        final Term beliefPattern = rule.getBelief();
+
+        NAR nar = index.nar;
+        short deriverID = index.deriverID; assert(deriverID!=-1);
+
+        PrediTerm<Derivation> conc = the(rule, nar, deriverID);
+
+        boolean taskIsPatVar = taskPattern.op() == Op.VAR_PATTERN;
+        boolean belIsPatVar = beliefPattern.op() == Op.VAR_PATTERN;
+
+        if (!taskIsPatVar)
+            pre.add(new AbstractPatternOp.PatternOp(0, taskPattern.op()));
+        if (!belIsPatVar)
+            pre.add(new AbstractPatternOp.PatternOp(1, beliefPattern.op()));
+
+        if (!taskIsPatVar)
+            pre.addAll(SubTermStructure.get(0, taskPattern.structure()));
+
+//        if (belief!=null && task instanceof Compound && !task.isCommutative()) {
+//            int beliefInTask = ((Compound)task).indexOf(belief);
+//            if (beliefInTask!=-1) {
+//                System.out.println(belief + " in " + task);
+//            }
+//        }
+
+        if (!belIsPatVar)
+            pre.addAll(SubTermStructure.get(1, beliefPattern.structure()));
+
+        //        } else {
+        //            if (x0.containsTermRecursively(x1)) {
+        //                //pre.add(new TermContainsRecursively(x0, x1));
+        //            }
+        //        }
+
+        //@Nullable ListMultimap<Term, MatchConstraint> c){
+
+
+        //ImmutableMap<Term, MatchConstraint> cc = compact(constraints);
+
+
+        //match both
+        //code.add(new MatchTerm.MatchTaskBeliefPair(pattern, initConstraints(constraints)));
+
+        if (taskPattern.equals(beliefPattern)) {
+            post.add(new UnifyTerm.UnifySubtermThenConclude(0, taskPattern, conc));
+        } else if (taskFirst(taskPattern, beliefPattern)) {
+            //task first
+            post.add(new UnifyTerm.UnifySubterm(0, taskPattern));
+            post.add(new UnifyTerm.UnifySubtermThenConclude(1, beliefPattern, conc));
+        } else {
+            //belief first
+            post.add(new UnifyTerm.UnifySubterm(1, beliefPattern));
+            post.add(new UnifyTerm.UnifySubtermThenConclude(0, taskPattern, conc));
+        }
+
+        //Term beliefPattern = pattern.term(1);
+
+        //if (Global.DEBUG) {
+//            if (beliefPattern.structure() == 0) {
+
+        // if nothing else in the rule involves this term
+        // which will be a singular VAR_PATTERN variable
+        // then allow null
+//                if (beliefPattern.op() != Op.VAR_PATTERN)
+//                    throw new RuntimeException("not what was expected");
+
+//            }
+        //}
+
+        /*System.out.println( Long.toBinaryString(
+                        pStructure) + " " + pattern
+        );*/
+
+
+    }
+
+    private static boolean taskFirst(@NotNull Term task, @NotNull Term belief) {
+
+
+        Ellipsis taskEllipsis = Ellipsis.firstEllipsisRecursive(task);
+//        if (taskEllipsis instanceof EllipsisTransform) {
+//            //belief must be matched first especially for EllipsisTransform
+//            return false;
+//        }
+
+        if (belief.size() == 0) {
+            return false;
+        }
+        if (task.size() == 0) {
+            return true;
+        }
+
+        //prefer non-ellipsis matches first
+        Ellipsis beliefEllipsis = Ellipsis.firstEllipsisRecursive(belief);
+        if (beliefEllipsis != null) {
+            return true;
+        }
+        if (taskEllipsis != null) {
+            return false;
+        }
+
+
+        //return task.volume() >= belief.volume();
+
+        return task.volume() <= belief.volume(); //might fold better
+
+        //return task.varPattern() <= belief.varPattern();
+    }
+
+    /** just a cause, not an input channel.
+     * derivation inputs are batched for input by another method
+     * holds the deriver id also that it can be applied at the end of a derivation.
+     */
+    static class RuleCause extends Cause {
+
+        public final short deriver;
+
+        public RuleCause(short id, short deriverID) {
+            super(id);
+            this.deriver = deriverID;
+        }
+    }
 
 
     //    public static class RuleFeedbackDerivedTask extends DerivedTask.DefaultDerivedTask {

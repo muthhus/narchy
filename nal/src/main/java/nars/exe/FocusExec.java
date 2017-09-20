@@ -12,7 +12,6 @@ import nars.control.CycleService;
 import nars.control.NARService;
 import nars.control.Premise;
 import nars.task.ITask;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,7 @@ public class FocusExec extends Exec implements Runnable {
 
 
     public int subCycles = 1;
-    final int subCycleConcepts = 1;
+    final int subCycleConcepts = 2;
     final int subCyclePremises = subCycleConcepts * 3;
 
     final int MAX_PREMISES = subCyclePremises * 2;
@@ -123,7 +122,7 @@ public class FocusExec extends Exec implements Runnable {
 
     @Nullable
     protected NARService newTrigger() {
-        return new MyTrigger();
+        return !(nar.exe instanceof MultiExec) ? new MyTrigger() : null; //HACK
     }
 
     /**

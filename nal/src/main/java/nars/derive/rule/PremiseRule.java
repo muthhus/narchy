@@ -73,8 +73,6 @@ public class PremiseRule extends GenericCompound {
 
     public String source;
 
-    @Nullable
-    private MatchTaskBelief match;
 
     /**
      * unless time(raw), projected belief truth will be used by default
@@ -85,6 +83,10 @@ public class PremiseRule extends GenericCompound {
      * when a rule with time(urgent) derives a goal, the occurrence time is set to the task time
      */
     public boolean goalUrgent;
+
+    final SortedSet<MatchConstraint> constraints = new TreeSet(PrediTerm.sortByCost);
+    final List<PrediTerm> pre = $.newArrayList();
+    final List<PrediTerm> post = $.newArrayList();
 
     /**
      * for printing complex terms as a recursive tree
@@ -112,7 +114,6 @@ public class PremiseRule extends GenericCompound {
      * compiles the conditions which are necessary to activate this rule
      */
     public Pair<Set<Term>, PrediTerm<Derivation>> build(@NotNull PostCondition post) {
-
 
         byte puncOverride = post.puncOverride;
 
@@ -151,27 +152,26 @@ public class PremiseRule extends GenericCompound {
 
         addAll(s, PRE);
 
-        s.addAll(match.pre);
+        s.addAll(this.pre);
 
         ////-------------------
         //below here are predicates which affect the derivation
 
 
-
         //SUFFIX (order already determined for matching)
-        int n = 1 + match.constraints.size() + match.post.size();
+        int n = 1 + this.constraints.size() + this.post.size();
 
         PrediTerm[] suff = new PrediTerm[n];
         int k = 0;
         suff[k++] = truth;
-        for (PrediTerm p : match.constraints) {
+        for (PrediTerm p : this.constraints) {
             suff[k++] = p;
         }
-        for (PrediTerm p : match.post) {
+        for (PrediTerm p : this.post) {
             suff[k++] = p;
         }
 
-        return pair(s, (PrediTerm<Derivation>)AndCondition.the(suff));
+        return pair(s, (PrediTerm<Derivation>) AndCondition.the(suff));
     }
 
 
@@ -235,18 +235,19 @@ public class PremiseRule extends GenericCompound {
     };
 
 
-    @NotNull
-    public final PremiseRule normalizeRule(@NotNull PatternTermIndex index) {
-        return new PremiseRule(index.pattern(
-                (Compound) transform(UppercaseAtomsToPatternVariables)
-        ));
+    public final PremiseRule normalize(PatternTermIndex index) {
+        Compound t = index.pattern( (Compound) transform(UppercaseAtomsToPatternVariables) );
+        if (t != this)
+            return new PremiseRule(t);
+        else
+            return this;
     }
 
 
     @NotNull
     public final PremiseRule setup(@NotNull PatternTermIndex index) /* throws PremiseRuleException */ {
 
-        assert(index.nar!=null);
+        assert (index.nar != null);
 
         compile(index);
 
@@ -274,9 +275,6 @@ public class PremiseRule extends GenericCompound {
         //(which will not reference any particular atoms)
 
         //pattern = PatternCompound.make(p(taskTermPattern, beliefTermPattern));
-
-
-        SortedSet<MatchConstraint> constraints = new TreeSet(PrediTerm.sortByCost);
 
         char taskPunc = 0;
 
@@ -537,9 +535,10 @@ public class PremiseRule extends GenericCompound {
             }
         }
 
-        this.match = new MatchTaskBelief(
+        Conclude.match(
                 this,
-                constraints, index.nar);
+                pre, post,
+                constraints, index);
 
         List<PostCondition> postConditions = newArrayList(postcons.length);
 
@@ -552,16 +551,12 @@ public class PremiseRule extends GenericCompound {
         }
 
 
+        int pcs = postConditions.size();
+        assert (pcs > 0) : "no postconditions";
+        assert (Sets.newHashSet(postConditions).size() == pcs) :
+                "postcondition duplicates:\n\t" + postConditions;
 
-
-        if (Sets.newHashSet(postConditions).size() != postConditions.size())
-            throw new RuntimeException("postcondition duplicates:\n\t" + postConditions);
-
-        POST = postConditions.toArray(new PostCondition[postConditions.size()]);
-        if (POST.length == 0) {
-            //System.out.println(Arrays.toString(postcons));
-            throw new RuntimeException("no postconditions");
-        }
+        POST = postConditions.toArray(new PostCondition[pcs]);
 
         if (taskPunc == 0) {
             //default: add explicit no-questions rule
@@ -570,11 +565,11 @@ public class PremiseRule extends GenericCompound {
 
             boolean b = false, g = true;
             for (PostCondition x : POST) {
-                if (x.puncOverride!=0) {
+                if (x.puncOverride != 0) {
                     throw new RuntimeException("puncOverride with no input punc specifier");
                 } else {
-                    b |= (x.beliefTruth!=null);
-                    g |= (x.goalTruth!=null);
+                    b |= (x.beliefTruth != null);
+                    g |= (x.goalTruth != null);
                 }
             }
 
@@ -770,7 +765,8 @@ public class PremiseRule extends GenericCompound {
             newPremise = pc; //same
         }
 
-        return PremiseRuleSet.normalize(new PremiseRule(TermVector.the(newPremise, newConclusion)), index);
+        return PremiseRuleSet.normalize(
+                new PremiseRule(TermVector.the(newPremise, newConclusion)), index);
 
     }
 

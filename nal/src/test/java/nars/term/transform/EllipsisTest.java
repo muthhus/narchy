@@ -345,7 +345,7 @@ public class EllipsisTest {
         assertTrue(_x.toString(), _x instanceof PremiseRule);
         PremiseRule x = (PremiseRule)_x;
         //System.out.println(x);
-        x = x.normalizeRule(patterns());
+        x = x.normalize(patterns());
         //System.out.println(x);
 
         assertEquals(
