@@ -71,7 +71,7 @@ public class UnitCompound1Test {
         assertEquals(g, u);
         assertEquals(u, u);
         assertEquals(g, g);
-        assertEquals(u.size(), g.size());
+        assertEquals(u.subs(), g.subs());
         assertEquals(u.dt(), g.dt());
         assertEquals(u.subterms(), g.subterms());
         assertEquals(g.subterms(), u.subterms()); //reverse

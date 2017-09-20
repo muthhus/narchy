@@ -4,6 +4,7 @@
  */
 package nars.control;
 
+import jcog.Util;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -11,6 +12,7 @@ import nars.concept.Concept;
 import nars.derive.time.Event;
 import nars.derive.time.Temporalize;
 import nars.table.BeliefTable;
+import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.UnaryTask;
 import nars.term.InvalidTermException;
@@ -26,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,7 +49,8 @@ public class Premise extends UnaryTask {
     public final Task taskLink;
     public final Term termLink;
 
-    @Nullable public Collection<Concept> links;
+    @Nullable
+    public Collection<Concept> links;
 
     public Premise(@Nullable Task tasklink, @Nullable Term termlink, float pri, Collection<Concept> links) {
         super(Tuples.pair(tasklink, termlink), pri);
@@ -76,7 +78,7 @@ public class Premise extends UnaryTask {
     @Override
     public @Nullable Iterable<? extends ITask> run(@NotNull NAR n) {
 
-        int ttlMax = n.matchTTL.intValue(); //TODO adjust this, maybe by priority and other factors
+        int ttlMax = Util.lerp(priElseZero(), Param.TTL_PREMISE_MIN,n.matchTTL.intValue());
 
         Derivation d = derivation(n);
         d.nar.emotion.conceptFirePremises.increment();
@@ -107,7 +109,7 @@ public class Premise extends UnaryTask {
 
         //WARNING: this exchange is not thread safe
         Collection<Concept> l = links;
-        if (l!=null) {
+        if (l != null) {
             links = null;
 
             activateSubterms(this.taskLink, l,
@@ -286,14 +288,21 @@ public class Premise extends UnaryTask {
         if (beliefTerm instanceof Bool)
             return null;
 
-        Collection<Task> dd = d.run(this, task, belief, beliefTerm, ttlMax);
-        int dds = dd.size();
-        if (dds > 0) {
-            nar.emotion.taskDerived.increment(dds);
-            return dd;
-        } else {
-            return null;
+        try {
+            DerivedTask[] dd = d.run(this, task, belief, beliefTerm, ttlMax);
+            if (dd != null) {
+                int dds = dd.length;
+                if (dds > 0) {
+                    nar.emotion.taskDerived.increment(dds);
+                }
+                nar.input(dd); //input to NAR directly
+            }
+        } finally {
+            d.clear(); //emergency clear
         }
+
+        return null;
+
 
 //        long ds = d.transformsCache.estimatedSize();
 //        if (ds >0)

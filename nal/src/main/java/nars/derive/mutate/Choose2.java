@@ -60,7 +60,7 @@ public class Choose2 extends Termutator.AbstractTermutator {
         int start = f.now();
         @NotNull ShuffledSubterms yy = this.yy;
 
-        Term[] m = new Term[this.yy.size()-2];
+        Term[] m = new Term[this.yy.subs()-2];
 
         Ellipsis xEllipsis = this.xEllipsis;
         Unify f = this.f;

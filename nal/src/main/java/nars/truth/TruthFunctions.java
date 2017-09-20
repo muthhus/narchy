@@ -556,7 +556,7 @@ public final class TruthFunctions {
      */
     public static float w2c(float w) {
         assert (w == w && w > 0): "w2c(" + w + ") is invalid";
-        return clamp(w / (w + Param.HORIZON), 0, MAX_CONF);
+        return w / (w + Param.HORIZON);
     }
 
     public static float confAnd(Truthed... tt) {

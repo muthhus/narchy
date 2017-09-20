@@ -2,13 +2,11 @@ package nars.derive;
 
 import nars.NAR;
 import nars.Param;
-import nars.Task;
 import nars.control.Cause;
-import nars.control.CauseChannel;
 import nars.control.Derivation;
 import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRuleSet;
-import nars.index.term.PatternTermIndex;
+import nars.index.term.PatternIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -74,7 +72,7 @@ public interface Deriver {
 
             Cause in = nar.newCause((cid)->new Cause(cid, "Derive(" + files + ")"));
 
-            final PatternTermIndex p = new PatternTermIndex(nar);
+            final PatternIndex p = new PatternIndex(nar);
             p.deriverID = in.id; //HACK
 
             @NotNull PremiseRuleSet r = PremiseRuleSet.rules(nar, p,true, files.toArray(new String[files.size()]) );

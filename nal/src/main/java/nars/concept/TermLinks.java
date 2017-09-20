@@ -18,7 +18,7 @@ public enum TermLinks {
 
     public static Collection<Termed> templates(Term term) {
 
-        if (term.size() > 0) {
+        if (term.subs() > 0) {
 
             Collection<Termed> templates;
 
@@ -59,7 +59,7 @@ public enum TermLinks {
         if (!tc.add(b))
             return; //already added
 
-        if (b.size() == 0)
+        if (b.subs() == 0)
             return;
 
         if (--layersRemain <= 0) // || !b.op().conceptualizable || b.isAny(VAR_QUERY.bit | VAR_PATTERN.bit))

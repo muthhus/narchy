@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.math.ByteShuffler;
 import nars.$;
 import nars.control.Cause;
-import nars.control.CauseChannel;
 import nars.control.Derivation;
 import nars.derive.op.UnifyTerm;
 import org.jetbrains.annotations.NotNull;
@@ -56,20 +55,17 @@ public class ValueFork extends Fork {
 
     @Override
     public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
-        return new ValueFork(transformedBranches(f), can, downstream);
+        return new ValueFork(PrediTerm.transform(f, branches), can, downstream);
     }
 
     @Override
     public boolean test(@NotNull Derivation d) {
 
-        long now = d.time;
-//        values.update(now);
-
         int before = d.now();
 
-        int branches = cache.length;
+        int branches = this.branches.length;
         if (branches == 1) {
-            cache[0].test(d);
+            this.branches[0].test(d);
             return d.revertLive(before);
         } else {
             ByteShuffler b = d.shuffler;
@@ -82,7 +78,7 @@ public class ValueFork extends Fork {
 //                int subTTL = Math.round(ttl * (value[i] / valueTotal));
 //                int reserve = d.getAndSetTTL(subTTL) - subTTL;
 
-                cache[order[i]].test(d);
+                this.branches[order[i]].test(d);
 
 //                d.addTTL(reserve);
 
@@ -112,7 +108,7 @@ public class ValueFork extends Fork {
 
         @Override
         public boolean test(Derivation derivation) {
-            derivation.canChoose(id);
+            derivation.preToPost.add(id);
             return true;
         }
     }

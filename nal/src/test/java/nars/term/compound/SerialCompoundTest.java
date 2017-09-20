@@ -40,7 +40,7 @@ public class SerialCompoundTest {
 
         //assertNotSame(x, z); //<- when cached on construction, they may be the same
         assertEquals(x, z);
-        assertEquals(x.size(), z.size());
+        assertEquals(x.subs(), z.subs());
         assertEquals(x.volume(), z.volume());
 
         assertEquals(x.toString(), z.toString());

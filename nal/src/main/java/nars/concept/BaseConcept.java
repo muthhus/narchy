@@ -4,7 +4,6 @@ import jcog.bag.Bag;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
-import nars.Param;
 import nars.Task;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
@@ -14,7 +13,6 @@ import nars.table.QuestionTable;
 import nars.table.TaskTable;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Termlike;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.Op.*;
@@ -33,7 +30,7 @@ import static nars.concept.state.ConceptState.New;
 /**
  * concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks
  */
-public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike {
+public class BaseConcept extends ConcurrentHashMap implements Concept, Termed {
 
     @NotNull
     public final Term term;
@@ -103,10 +100,6 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
         return term;
     }
 
-    @Override
-    public final boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
-        return term.containsRecursively(t, inSubtermsOf);
-    }
 
     @Override
     public final /*@NotNull*/ Op op() {
@@ -205,71 +198,29 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
     }
 
     @Override
-    public int size() {
-        return term.size();
+    public int subs() {
+        return term.subs();
     }
 
-    /**
-     * first-level only
-     */
-    @Deprecated
-    @Override
-    public boolean contains(@NotNull Termlike t) {
-        return term.contains(t);
-    }
 
-    @Override
-    public Term sub(int i, Term ifOutOfBounds) {
-        return term.sub(i, ifOutOfBounds);
-    }
-
-    @Override
-    public boolean AND(Predicate<Term> v) {
-        return term.AND(v);
-    }
-
-    @Override
-    public boolean ANDrecurse(@NotNull Predicate<Term> v) {
-        return term.ANDrecurse(v);
-    }
-
-    @Override
-    public void recurseTerms(@NotNull Consumer<Term> v) {
-        term.recurseTerms(v);
-    }
-
-    @Override
-    public boolean OR(Predicate<Term> v) {
-        return term.OR(v);
-    }
-
-    @Override
-    public boolean ORrecurse(@NotNull Predicate<Term> v) {
-        return term.ORrecurse(v);
-    }
-
-    @Deprecated
-    @Override
-    public int vars() {
-        return term.vars();
-    }
-
-    @Deprecated
     @Override
     public int varIndep() {
         return term.varIndep();
     }
 
-    @Deprecated
     @Override
     public int varDep() {
         return term.varDep();
     }
 
-    @Deprecated
     @Override
     public int varQuery() {
         return term.varQuery();
+    }
+
+    @Override
+    public boolean isDynamic() {
+        return false;
     }
 
     @Deprecated
@@ -295,14 +246,10 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
         return term.volume();
     }
 
+
     @Override
     public boolean isNormalized() {
         return term.isNormalized(); //compound concepts may be un-normalized
-    }
-
-    @Override
-    public boolean isDynamic() {
-        throw new UnsupportedOperationException("concepts should not be tested for evaluability");
     }
 
 

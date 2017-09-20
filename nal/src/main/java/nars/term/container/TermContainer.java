@@ -15,7 +15,6 @@ import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -36,13 +35,13 @@ import static nars.time.Tense.XTERNAL;
  */
 public interface TermContainer extends Termlike, Iterable<Term> {
 
-    @NotNull TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[0]);
+    /*@NotNull*/ TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[0]);
 
 
     //TODO optionally allow atomic structure positions to differ
     default boolean equivalentStructures() {
         int t0Struct = sub(0).structure();
-        int s = size();
+        int s = subs();
         for (int i = 1; i < s; i++) {
             if (sub(i).structure() != t0Struct)
                 return false;
@@ -60,29 +59,19 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return true;
     }
 
-    @Override default boolean isDynamic() { return OR(Term::isDynamic); }
-
-    /**
-     * a termcontainer is not necessarily a term of its own
-     */
-    @Override
-    default Term term() {
-        throw new UnsupportedOperationException();
-    }
 
     /**
      * gets subterm at index i
      */
-    @Override
-    @NotNull Term sub(int i);
+    /*@NotNull*/ Term sub(int i);
 
 
-    @NotNull
+    /*@NotNull*/
     default Compound compound(int i) {
         return ((Compound) sub(i));
     }
 
-    @NotNull
+    /*@NotNull*/
     @Override
     default Iterator<Term> iterator() {
         throw new UnsupportedOperationException();
@@ -93,12 +82,12 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @Override
     default Term sub(int i, Term ifOutOfBounds) {
-        return size() <= i ? ifOutOfBounds : sub(i);
+        return subs() <= i ? ifOutOfBounds : sub(i);
     }
 
     @Nullable
-    default boolean subEquals(int i, @NotNull Term x) {
-        return size() > i && sub(i).equals(x);
+    default boolean subEquals(int i, /*@NotNull*/ Term x) {
+        return subs() > i && sub(i).equals(x);
     }
 
 
@@ -126,14 +115,14 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * int reduction operation
      */
     default int intValue(int x, IntObjectToIntFunction<Term> reduce) {
-        int l = size();
+        int l = subs();
         for (int t = 0; t < l; t++)
             x = reduce.intValueOf(x, sub(t));
         return x;
     }
 
-    default @NotNull TreeSet<Term> toSortedSet() {
-        int s = size();
+    default /*@NotNull*/ TreeSet<Term> toSortedSet() {
+        int s = subs();
         TreeSet u = new TreeSet();
         forEach(u::add);
         return u;
@@ -142,8 +131,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * @return a Mutable Set, unless empty
      */
-    default @NotNull Set<Term> toSet() {
-        int s = size();
+    default /*@NotNull*/ Set<Term> toSet() {
+        int s = subs();
         if (s > 0) {
             UnifiedSet u = new UnifiedSet(s);
             forEach(u::add);
@@ -160,12 +149,12 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        };
     }
 
-    default @NotNull Set<Term> toSet(Predicate<Term> ifTrue) {
-        int s = size();
+    default /*@NotNull*/ Set<Term> toSet(Predicate<Term> ifTrue) {
+        int s = subs();
         if (s > 0) {
             UnifiedSet u = new UnifiedSet(s);
             for (int i = 0; i < s; i++) {
-                @NotNull Term x = sub(i);
+                /*@NotNull*/ Term x = sub(i);
                 if (ifTrue.test(x))
                     u.add(x);
             }
@@ -185,7 +174,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * returns sorted ready for commutive
      */
-    static @Nullable Term[] intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
+    static @Nullable Term[] intersect(/*@NotNull*/ TermContainer a, /*@NotNull*/ TermContainer b) {
         if ((a.structure() & b.structure()) == 0)
             return null; //nothing in common
         else {
@@ -214,8 +203,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * recursively
      */
-    @NotNull
-    static boolean hasCommonSubtermsRecursive(@NotNull Term a, @NotNull Term b, boolean excludeVariables) {
+    /*@NotNull*/
+    static boolean hasCommonSubtermsRecursive(/*@NotNull*/ Term a, /*@NotNull*/ Term b, boolean excludeVariables) {
 
         int commonStructure = a.structure() & b.structure();
         if (excludeVariables)
@@ -229,7 +218,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return b.subterms().recurseTermsToSet(commonStructure, scratch, false);
     }
 
-    @NotNull default Set<Term> recurseTermsToSet() {
+    /*@NotNull*/ default Set<Term> recurseTermsToSet() {
         return recurseTermsToSet(null);
     }
 
@@ -237,7 +226,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * gets the set of unique recursively contained terms of a specific type
      * TODO generalize to a provided lambda predicate selector
      */
-    @NotNull
+    /*@NotNull*/
     default Set<Term> recurseTermsToSet(@Nullable Op onlyType) {
         if (onlyType!=null && !hasAny(onlyType))
             return Sets.mutable.empty();
@@ -256,14 +245,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * returns whether the set operation caused a change or not
      */
-    @NotNull
-    default boolean termsToSet(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
+    /*@NotNull*/
+    default boolean termsToSet(int inStructure, /*@NotNull*/ Collection<Term> t, boolean addOrRemoved) {
         boolean r = false;
 
-        TermContainer tt = subterms();
-        int l = tt.size();
+        int l = subs();
         for (int i = 0; i < l; i++) {
-            @NotNull Term s = tt.sub(i);
+            /*@NotNull*/ Term s = sub(i);
             if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
                 r |= (addOrRemoved) ? t.add(s) : t.remove(s);
                 if (!addOrRemoved && r) //on removal we can exit early
@@ -273,8 +261,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return r;
     }
 
-    @NotNull
-    default boolean recurseTermsToSet(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
+    /*@NotNull*/
+    default boolean recurseTermsToSet(int inStructure, /*@NotNull*/ Collection<Term> t, boolean addOrRemoved) {
         final boolean[] r = {false};
         Predicate<Term> selector = (s) -> {
 
@@ -297,22 +285,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return r[0];
     }
 
-    /**
-     * Check the subterms (first level only) for a target term
-     *
-     * @param t The term to be searched
-     * @return Whether the target is in the current term
-     */
-    @Override
-    default boolean contains(@NotNull Termlike t) {
-        return !impossibleSubTerm(t) && OR(t::equals);
-    }
-
 
 
     @Override
-    default boolean containsRecursively(@NotNull Term y, Predicate<Term> subTermOf) {
-        int s = size();
+    default boolean containsRecursively(/*@NotNull*/ Term y, Predicate<Term> subTermOf) {
+        int s = subs();
         if (s > 0 && !impossibleSubTerm(y)) {
             for (int i = 0; i < s; i++) {
                 Term x = sub(i);
@@ -323,8 +300,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return false;
     }
 
-    @NotNull
-    static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {
+    /*@NotNull*/
+    static boolean commonSubterms(/*@NotNull*/ Compound a, /*@NotNull*/ Compound b, boolean excludeVariables) {
 
         int commonStructure = a.structure() & b.structure();
         if (excludeVariables)
@@ -333,7 +310,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (commonStructure == 0)
             return false;
 
-        Set<Term> scratch = new HashSet(a.size());
+        Set<Term> scratch = new HashSet(a.subs());
         a.termsToSet(commonStructure, scratch, true);
         return b.termsToSet(commonStructure, scratch, false);
 
@@ -348,13 +325,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //    }
 
 
-//    static boolean equals(@NotNull TermContainer a, Object b) {
+//    static boolean equals(/*@NotNull*/ TermContainer a, Object b) {
 //        return b instanceof TermContainer && TermContainer.equals(a, (TermContainer)b);
 //    }
 
 
-//    boolean equalTerms(@NotNull TermContainer c);
-//    default boolean equalTerms(@NotNull TermContainer c) {
+//    boolean equalTerms(/*@NotNull*/ TermContainer c);
+//    default boolean equalTerms(/*@NotNull*/ TermContainer c) {
 //        int s = size();
 //        if (s !=c.size())
 //            return false;
@@ -367,8 +344,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        return true;
 //    }
 
-    default boolean equalTerms(@NotNull List<Term> c) {
-        int s = size();
+    default boolean equalTerms(/*@NotNull*/ List<Term> c) {
+        int s = subs();
         if (s != c.size())
             return false;
         for (int i = 0; i < s; i++) {
@@ -378,8 +355,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return true;
     }
 
-    default boolean equalTerms(@NotNull Term[] c) {
-        int s = size();
+    default boolean equalTerms(/*@NotNull*/ Term[] c) {
+        int s = subs();
         if (s != c.length)
             return false;
         for (int i = 0; i < s; i++) {
@@ -409,7 +386,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * this is meant to be a clone always
      */
     default Term[] toArray() {
-        int s = size();
+        int s = subs();
         switch (s) {
             case 0:
                 return Term.EmptyArray;
@@ -436,10 +413,10 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return x;
     }
 
-    @NotNull
-    default Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
-        List<Term> l = $.newArrayList(size());
-        int s = size();
+    /*@NotNull*/
+    default Term[] terms(/*@NotNull*/ IntObjectPredicate<Term> filter) {
+        List<Term> l = $.newArrayList(subs());
+        int s = subs();
         int added = 0;
         for (int i = 0; i < s; i++) {
             Term t = sub(i);
@@ -459,7 +436,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @Override
     default void forEach(Consumer<? super Term> action) {
-        forEach(action, 0, size());
+        forEach(action, 0, subs());
     }
 
 
@@ -473,9 +450,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //    }
 
 
-    static String toString(@NotNull TermContainer t) {
+    static String toString(/*@NotNull*/ TermContainer t) {
         StringBuilder sb = new StringBuilder("{[(");
-        int s = t.size();
+        int s = t.subs();
         for (int i = 0; i < s; i++) {
             sb.append(t.sub(i));
             if (i < s - 1)
@@ -489,7 +466,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * extract a sublist of terms as an array
      */
-    @NotNull
+    /*@NotNull*/
     default Term[] terms(int start, int end) {
         //TODO for TermVector, create an Array copy directly
         //TODO for TermVector, if (start == 0) && end == just return its array
@@ -504,9 +481,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * follows normal indexOf() semantics; -1 if not found
      */
-    default int indexOf(@NotNull Term t) {
+    default int indexOf(/*@NotNull*/ Term t) {
         if (!impossibleSubTerm(t)) {
-            int s = size();
+            int s = subs();
             for (int i = 0; i < s; i++) {
                 if (t.equals(sub(i)))
                     return i;
@@ -570,7 +547,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //
 //    }
 
-//    default boolean equivalent(@NotNull List<Term> sub) {
+//    default boolean equivalent(/*@NotNull*/ List<Term> sub) {
 //        int s = size();
 //        if (s == sub.size()) {
 //            for (int i = 0; i < s; i++) {
@@ -582,7 +559,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        return false;
 //    }
 //
-//    default boolean equivalent(@NotNull Term[] sub) {
+//    default boolean equivalent(/*@NotNull*/ Term[] sub) {
 //        int s = size();
 //        if (s == sub.length) {
 //            for (int i = 0; i < s; i++) {
@@ -602,101 +579,33 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return hashCode();
     }
 
-    /**
-     * returns true if evaluates true for any terms
-     *
-     * @param p
-     */
-    @Override
-    default boolean OR(@NotNull Predicate<Term> p) {
-        int s = size();
-        for (int i = 0; i < s; i++) {
-            if (p.test(sub(i)))
-                return true;
-        }
-        return false;
-    }
 
-    /**
-     * returns true if evaluates true for all terms
-     *
-     * @param p
-     */
-    @Override
-    default boolean AND(@NotNull Predicate<Term> p) {
-        int s = size();
-        for (int i = 0; i < s; i++)
-            if (!p.test(sub(i)))
-                return false;
-        return true;
-    }
+//    default int count(/*@NotNull*/ Predicate<Term> match) {
+//        int s = subs();
+//        int count = 0;
+//        for (int i = 0; i < s; i++) {
+//            if (match.test(sub(i))) {
+//                count++;
+//            }
+//        }
+//        return count;
+//    }
 
-    @Override
-    default boolean ANDrecurse(@NotNull Predicate<Term> p) {
-        int s = size();
-        for (int i = 0; i < s; i++)
-            if (!sub(i).ANDrecurse(p))
-                return false;
-        return true;
-    }
 
-    @Override
-    default boolean ORrecurse(@NotNull Predicate<Term> p) {
-        int s = size();
-        for (int i = 0; i < s; i++)
-            if (sub(i).ORrecurse(p))
-                return true;
-        return false;
-    }
-
-    default int count(@NotNull Predicate<Term> match) {
-        int s = size();
-        int count = 0;
-        for (int i = 0; i < s; i++) {
-            if (match.test(sub(i))) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    /**
-     * note: if the function returns null, null will not be added to the result set
-     */
-    @NotNull
-    default Set<Term> unique(@NotNull Function<Term, Term> each) {
-        Set<Term> r = new HashSet(size());
-        int s = size();
-        for (int i = 0; i < s; i++) {
-            Term e = each.apply(sub(i));
-            if (e != null)
-                r.add(e);
-        }
-        return r;
-    }
 
 
     default boolean isTemporal() {
         return hasAny(Op.TemporalBits) && OR(Term::isTemporal);
     }
 
-    default boolean isSorted() {
-        int s = size();
-        if (s < 2) return true;
-
-        for (int i = 1; i < s; i++) {
-            if (sub(i - 1).compareTo(sub(i)) != -1)
-                return false;
-        }
-        return true;
-    }
 
 
-//    default int compareTo(@NotNull Termlike o) {
+
+//    default int compareTo(/*@NotNull*/ Termlike o) {
 //        return compareTo(this, o);
 //    }
 
-    static int compare(@NotNull TermContainer a, @NotNull TermContainer b) {
+    static int compare(/*@NotNull*/ TermContainer a, /*@NotNull*/ TermContainer b) {
 
         if (a.equals(b)) return 0;
         int diff;
@@ -704,7 +613,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //            return diff;
 
         int s;
-        if ((diff = Integer.compare((s = a.size()), b.size())) != 0)
+        if ((diff = Integer.compare((s = a.subs()), b.subs())) != 0)
             return diff;
 
 //        if ((diff = (a.hashCode() - b.hashCode())) != 0)
@@ -744,14 +653,14 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * a and b must be instances of input, and output must be of size input.length-2
      */
-    @NotNull
-    static Term[] except(@NotNull TermContainer input, Term a, Term b, @NotNull Term[] output) {
+    /*@NotNull*/
+    static Term[] except(/*@NotNull*/ TermContainer input, Term a, Term b, /*@NotNull*/ Term[] output) {
 //        int targetLen = input.size() - 2;
 //        if (output.length!= targetLen) {
 //            throw new RuntimeException("wrong size");
 //        }
         int j = 0;
-        int l = input.size();
+        int l = input.subs();
         for (int i = 0; i < l; i++) {
             Term x = input.sub(i);
             if ((x != a) && (x != b))
@@ -768,8 +677,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * a must be in input, and output must be of size input.length-1
      * equality is compared by instance for speed
      */
-    @NotNull
-    static Term[] exceptThe(@NotNull Term[] input, Term a, @NotNull Term[] output) {
+    /*@NotNull*/
+    static Term[] exceptThe(/*@NotNull*/ Term[] input, Term a, /*@NotNull*/ Term[] output) {
 //        int targetLen = input.size() - 1;
 //        if (output.length!= targetLen) {
 //            throw new RuntimeException("wrong size");
@@ -787,14 +696,14 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    @NotNull
-    static Set<Term> toSetExcept(@NotNull TermContainer c, @NotNull MutableSet<Term> except) {
+    /*@NotNull*/
+    static Set<Term> toSetExcept(/*@NotNull*/ TermContainer c, /*@NotNull*/ MutableSet<Term> except) {
 
 //        return c.value(null, (x, s) -> {
 //
 //        });
 
-        int cs = c.size();
+        int cs = c.subs();
         Set<Term> s = null;
         for (int i = 0; i < cs; i++) {
             Term x = c.sub(i);
@@ -810,7 +719,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //     * constructs a new container with the matching elements missing
 //     * TODO elide creating a new vector if nothing would change
 //     */
-//    @NotNull
+//    /*@NotNull*/
 //    default TermContainer asFiltered(Predicate<Term> p) {
 //        if (!(this instanceof TermContainer))
 //            throw new UnsupportedOperationException("only implemented for TermVector instance currently");
@@ -822,12 +731,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //            return ZeroProduct;
 //    }
 
-    /**
-     * stream of each subterm
-     */
-    default Stream<Term> subStream() {
-        return IntStream.range(0, size()).mapToObj(this::sub);
-    }
+
 
     //TODO
 //    default Stream<? extends Term> streamRecursive() {
@@ -842,7 +746,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //    }
 
     /** matches in the correct ordering conditions for CONJ */
-    static boolean unifyConj(TermContainer X, int Xdt, TermContainer Y, int Ydt, @NotNull Unify u) {
+    static boolean unifyConj(TermContainer X, int Xdt, TermContainer Y, int Ydt, /*@NotNull*/ Unify u) {
         boolean xCommutes = communify(Xdt);
         boolean yCommutes = communify(Ydt);
 
@@ -864,12 +768,12 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return Xdt == XTERNAL || Xdt == DTERNAL || Xdt == 0;
     }
 
-    default boolean unifyLinear(TermContainer Y, @NotNull Unify u) {
+    default boolean unifyLinear(TermContainer Y, /*@NotNull*/ Unify u) {
 
         /**
          * a branch for comparing a particular permutation, called from the main next()
          */
-        int s = size();
+        int s = subs();
         switch (s) {
             case 0:
                 return true; //shouldnt ever happen
@@ -910,7 +814,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     }
 
-    default boolean unifyCommute(TermContainer y, @NotNull Unify u) {
+    default boolean unifyCommute(TermContainer y, /*@NotNull*/ Unify u) {
 
         if (y.equals(this))
             return true;
@@ -966,9 +870,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * match a range of subterms of Y.
      */
-    @NotNull
+    /*@NotNull*/
     default Term[] toArraySubRange(int from, int to) {
-        if (from == 0 && to == size()) {
+        if (from == 0 && to == subs()) {
             return toArray();
         } else {
 
@@ -986,7 +890,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     default boolean recurseSubTerms(BiPredicate<Term, Term> whileTrue, Compound parent) {
-        int s = size();
+        int s = subs();
         for (int i = 0; i < s; i++) {
             if (!sub(i).recurseTerms(whileTrue, parent))
                 return false;
@@ -995,7 +899,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     @Override
-    default void recurseTerms(@NotNull Consumer<Term> v) {
+    default void recurseTerms(/*@NotNull*/ Consumer<Term> v) {
         forEach(s -> s.recurseTerms(v));
     }
 
@@ -1004,7 +908,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     default TermContainer reverse() {
-        return size() > 1 ? new ReverseTermContainer(this) : this;
+        return subs() > 1 ? new ReverseTermContainer(this) : this;
     }
 
     //    /**

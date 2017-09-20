@@ -2,7 +2,7 @@ package nars.derive;
 
 import nars.NARS;
 import nars.Narsese;
-import nars.index.term.PatternTermIndex;
+import nars.index.term.PatternIndex;
 import nars.term.Compound;
 import org.junit.Test;
 
@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 
 public class PatternCompoundTest {
 
-    final PatternTermIndex i = new PatternTermIndex(NARS.shell());
+    final PatternIndex i = new PatternIndex(NARS.shell());
 
     @Test
     public void testPatternCompoundWithXTERNAL() throws Narsese.NarseseException {

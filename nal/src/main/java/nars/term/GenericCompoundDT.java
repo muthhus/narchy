@@ -14,11 +14,13 @@ import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Predicate;
+
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
-public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compound {
+public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compound, CompoundDT {
 
     /**
      * numeric (term or "dt" temporal relation)
@@ -40,7 +42,7 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
             Op op = base.op();
 
             @NotNull TermContainer subterms = base.subterms();
-            int size = subterms.size();
+            int size = subterms.subs();
 
             if (op.temporal && (op != CONJ && size != 2))
                 throw new InvalidTermException(op, dt, "Invalid dt value for operator", subterms.toArray());
@@ -61,6 +63,11 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
 
         int baseHash = base.hashCode();
         this.hashDT = dt != DTERNAL ? Util.hashCombine(baseHash, dt) : baseHash;
+    }
+
+    @Override
+    public boolean contains(Term t) {
+        return ref.subterms().contains(t);
     }
 
     @Override
@@ -137,9 +144,7 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
 
     @Override
     public @Nullable Term transform(@NotNull CompoundTransform t) {
-        Op o = op();
-        int dt = o.temporal ? t.dt(this) : DTERNAL;
-        return t.transform(this, o, dt);
+        return t.transform(this, op(), dt);
     }
 
     @Override

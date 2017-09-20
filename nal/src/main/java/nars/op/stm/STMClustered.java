@@ -445,14 +445,14 @@ public abstract class STMClustered extends TaskService {
     }
 
 
-    public int size() {
+    public int subs() {
         int sum[] = new int[1];
         net.forEachNode(x -> sum[0] += x.tasks.size());
         return sum[0];
     }
 
     public void print(@NotNull PrintStream out) {
-        out.println(this + " @" + now + ", x " + size() + " tasks");
+        out.println(this + " @" + now + ", x " + subs() + " tasks");
 //        out.println("\tNode Sizes: " + nodeStatistics() + "\t+" + removed.size() + " nodes pending migration ("
 //                + removed.stream().mapToInt(TasksNode::size).sum() + " tasks)");
         net.forEachNode(v -> {

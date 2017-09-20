@@ -49,7 +49,7 @@ public class NarseseTest {
 
 
     protected void testProductABC(@NotNull Compound p) {
-        assertEquals(p + " should have 3 sub-terms", 3, p.size());
+        assertEquals(p + " should have 3 sub-terms", 3, p.subs());
         assertEquals("a", p.sub(0).toString());
         assertEquals("b", p.sub(1).toString());
         assertEquals("c", p.sub(2).toString());
@@ -250,7 +250,7 @@ public class NarseseTest {
     public void testEmptyProduct() throws Narsese.NarseseException {
         Compound e = term("()");
         assertNotNull(e);
-        assertEquals(0, e.size());
+        assertEquals(0, e.subs());
         assertEquals(term("()"), term("( )"));
         assertEquals(term("()"), term(" (   )"));
 

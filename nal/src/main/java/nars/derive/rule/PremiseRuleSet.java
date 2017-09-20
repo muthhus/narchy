@@ -5,7 +5,7 @@ import com.google.common.collect.Streams;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.index.term.PatternTermIndex;
+import nars.index.term.PatternIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
@@ -37,7 +37,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     private final boolean permuteBackwards, permuteForwards;
 
     @NotNull
-    public static PremiseRuleSet rules(NAR nar, PatternTermIndex p, boolean permute, String... filename) {
+    public static PremiseRuleSet rules(NAR nar, PatternIndex p, boolean permute, String... filename) {
 
         PremiseRuleSet rs = new PremiseRuleSet(parsedRules(filename), p, permute);
 
@@ -77,12 +77,12 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
 
     @NotNull
-    public final PatternTermIndex patterns;
+    public final PatternIndex patterns;
 
     private static final Logger logger = LoggerFactory.getLogger(PremiseRuleSet.class);
 
 
-    public PremiseRuleSet(PatternTermIndex index, boolean permute, @NotNull String... rules) {
+    public PremiseRuleSet(PatternIndex index, boolean permute, @NotNull String... rules) {
         this(parse(Stream.of(rules)), index, permute);//$.terms, rules));
     }
 
@@ -90,7 +90,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     final int[] errors = {0};
 
 
-    public PremiseRuleSet(@NotNull Stream<Pair<PremiseRule, String>> parsed, @NotNull PatternTermIndex patterns, boolean permute) {
+    public PremiseRuleSet(@NotNull Stream<Pair<PremiseRule, String>> parsed, @NotNull PatternIndex patterns, boolean permute) {
         this.patterns = patterns;
         this.permuteBackwards = this.permuteForwards = permute;
         parsed.map(rawAndSrc -> {
@@ -266,17 +266,17 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     @NotNull
     public Set<PremiseRule> permute(@NotNull PremiseRule preNorm) {
         Set<PremiseRule> ur;
-        permute(preNorm, "", new PatternTermIndex(this.patterns.nar), ur = $.newHashSet(1));
+        permute(preNorm, "", new PatternIndex(this.patterns.nar), ur = $.newHashSet(1));
         return ur;
     }
 
-    public void permute(@NotNull PremiseRule preNormRule, String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur) {
+    public void permute(@NotNull PremiseRule preNormRule, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur) {
         add(preNormRule, src, ur, index,
                 (PremiseRule r) -> permuteSwap(r, src, index, ur,
                         (PremiseRule s) -> permuteBackward(src, index, ur, r)));
     }
 
-    void permuteBackward(String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur, @NotNull PremiseRule r) {
+    void permuteBackward(String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, @NotNull PremiseRule r) {
         if (permuteBackwards && r.permuteBackward) {
 
             r.backwardPermutation(index, (q, reason) -> {
@@ -291,7 +291,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
         }
     }
 
-    protected static void add(@NotNull PremiseRule preNorm, String src, @NotNull Collection<PremiseRule> ur, @NotNull PatternTermIndex index, @NotNull Consumer<PremiseRule> each) {
+    protected static void add(@NotNull PremiseRule preNorm, String src, @NotNull Collection<PremiseRule> ur, @NotNull PatternIndex index, @NotNull Consumer<PremiseRule> each) {
 
 //        Term[] pp = getPremise().terms().clone();
 //        pp = ArrayUtils.add(pp, TaskPositive.proto);
@@ -314,7 +314,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     }
 
 
-    public void permuteSwap(@NotNull PremiseRule r, String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur, @NotNull Consumer<PremiseRule> then) {
+    public void permuteSwap(@NotNull PremiseRule r, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur, @NotNull Consumer<PremiseRule> then) {
 
         then.accept(r);
 
@@ -329,7 +329,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
 
     @Nullable
-    static PremiseRule add(@Nullable PremiseRule q, String src, @NotNull Collection<PremiseRule> target, @NotNull PatternTermIndex index) {
+    static PremiseRule add(@Nullable PremiseRule q, String src, @NotNull Collection<PremiseRule> target, @NotNull PatternIndex index) {
         if (q == null)
             return null;
 //            throw new RuntimeException("null: " + q + ' ' + src);
@@ -341,7 +341,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     }
 
     @NotNull
-    static PremiseRule normalize(@NotNull PremiseRule q, @NotNull PatternTermIndex index) {
+    static PremiseRule normalize(@NotNull PremiseRule q, @NotNull PatternIndex index) {
         return q.normalize(index).setup(index);
     }
 

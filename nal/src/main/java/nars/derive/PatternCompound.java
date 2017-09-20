@@ -12,9 +12,11 @@ import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -29,11 +31,13 @@ abstract public class PatternCompound extends GenericCompoundDT {
     private final int minVolumeNecessary;
     private final int size;
 
+    @Nullable public final Set<Variable> uniqueVars;
+
     PatternCompound(/*@NotNull*/ Op op, int dt, @NotNull TermContainer subterms) {
         super(new GenericCompound(op, subterms), dt);
 
         this.op = op;
-        sizeCached = subterms.size();
+        sizeCached = subterms.subs();
         structureNecessary =
                 structure() &
                           ~(VAR_PATTERN.bit
@@ -42,7 +46,9 @@ abstract public class PatternCompound extends GenericCompoundDT {
                         );
         commutative = super.isCommutative();
         minVolumeNecessary = volume();
-        size = size();
+        size = subs();
+
+        this.uniqueVars = varsUnique(VAR_PATTERN);
     }
 
 
@@ -76,7 +82,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
         if (
                 y.hasAll(structureNecessary) &&
                 op == y.op() &&
-                size == y.size()
+                size == y.subs()
             //ty.volume() >= minVolumeNecessary
                 ) {
 
@@ -153,7 +159,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
             int i = 0, j = 0;
             int xsize = sizeCached;
-            int ysize = Y.size();
+            int ysize = Y.subs();
 
             //TODO check for shim and subtract xsize?
 
@@ -186,7 +192,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
                             EllipsisMatch ex = (EllipsisMatch) eMatched;
                             if (!ex.linearMatch(Y, j, u))
                                 return false;
-                            j += ex.size();
+                            j += ex.subs();
                         } else {
                             //it is a single ellipsis term to unify against
                             if (!sub(j).unify(eMatched, u))
@@ -387,7 +393,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
             SortedSet<Term> yFree = y.toSortedSet();
 
-            int s = size();
+            int s = subs();
 
             for (int k = 0; k < s; k++) {
 

@@ -46,7 +46,7 @@ public class TermVector1 implements TermContainer {
         if (this == obj) return true;
         if (obj instanceof TermContainer && hash1== obj.hashCode()) {
             TermContainer t = (TermContainer) obj;
-            if (t.size() == 1 && sub.equals(t.sub(0)))
+            if (t.subs() == 1 && sub.equals(t.sub(0)))
                 return true;
         }
         return false;
@@ -102,7 +102,7 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public int size() {
+    public int subs() {
         return 1;
     }
 
@@ -177,7 +177,7 @@ public class TermVector1 implements TermContainer {
 
 
     @Override
-    public boolean contains(@NotNull Termlike t) {
+    public final boolean contains(@NotNull Term t) {
         return sub.equals(t);
     }
 

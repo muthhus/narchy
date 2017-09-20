@@ -43,7 +43,7 @@ public class TaskRule extends TaskMatch {
         this.input = $.$(input);
         this.outputRaw = (Compound) Narsese.term(output, false);
 
-        VariableNormalization varNorm = new VariableNormalization(outputRaw.size() /* est */, 0);
+        VariableNormalization varNorm = new VariableNormalization(outputRaw.subs() /* est */, 0);
 
         this.output = compoundOrNull(outputRaw.transform(varNorm));
         if (this.output == null)
@@ -73,7 +73,7 @@ public class TaskRule extends TaskMatch {
         }
 
         @Override
-        public void onMatch(Term[][] match) {
+        public void tryMatch() {
             accept(x, xy);
             setTTL(0);
         }

@@ -123,7 +123,7 @@ public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Ta
             if (dist >= ifLessThan) return dist;
         }
 
-        if (a.size() != b.size()) {
+        if (a.subs() != b.subs()) {
             dist += 0.2f;
             if (dist >= ifLessThan) return dist;
         }

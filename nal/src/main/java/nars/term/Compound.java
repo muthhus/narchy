@@ -33,12 +33,9 @@ import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.Retemporalize;
 import nars.term.transform.VariableNormalization;
-import nars.term.var.Variable;
 import org.eclipse.collections.api.list.primitive.ByteList;
-import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,12 +45,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static java.util.Collections.emptySet;
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -63,6 +58,7 @@ import static nars.time.Tense.XTERNAL;
  * TODO make this an interface extending Subterms
  */
 public interface Compound extends Term, IPair, TermContainer {
+
 
     static boolean equals(@NotNull Term a, @Nullable Object b) {
         assert (a != b) : "instance check should have already been performed before calling this";
@@ -116,7 +112,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default int opX() {
-        return Term.opX(op(), size());
+        return Term.opX(op(), subs());
     }
 
     /**
@@ -218,7 +214,7 @@ public interface Compound extends Term, IPair, TermContainer {
                     }
                 }
 
-                int ys = yy.size();
+                int ys = yy.subs();
                 int offset = 0;
                 for (int yi = 0; yi < ys; yi++) {
                     Term yyy = yy.sub(reverse ? ((ys - 1) - yi) : yi);
@@ -280,7 +276,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @NotNull
     default ByteList structureKey(@NotNull ByteArrayList appendTo) {
         appendTo.add(op().id);
-        appendTo.add((byte) size());
+        appendTo.add((byte) subs());
         forEach(x -> {
             x.structureKey(appendTo);
         });
@@ -294,50 +290,6 @@ public interface Compound extends Term, IPair, TermContainer {
 //                    :
 //                (hasAny(type));
 //    }
-    default Set<Term> varsUnique(@Nullable Op type) {
-        int num = vars(type);
-        if (num == 0)
-            return emptySet();
-        else {
-            //must check all in case of repeats
-            Set<Term> u = new UnifiedSet(num);
-            final int[] remain = {num};
-
-            recurseTerms(parent -> vars(type) > 0,
-                    (sub) -> {
-                        if (sub.op() == type) {
-                            u.add(sub);
-                            remain[0]--;
-                        }
-                        return (remain[0] > 0);
-                    });
-            return u;
-        }
-    }
-
-    @Override
-    @Nullable
-    default Set<Term> varsUnique(@Nullable Op type, @NotNull Set<Term> unlessHere) {
-        int num = vars(type);
-        if (num == 0)
-            return null;
-        else {
-            //must check all in case of repeats
-            MutableSet<Term> u = new UnifiedSet(num);
-            final int[] remain = {num};
-
-            recurseTerms(parent -> vars(type) > 0,
-                    (sub) -> {
-                        if (sub instanceof Variable && (type == null || sub.op() == type)) {
-                            if (!unlessHere.contains(sub))
-                                u.add(sub);
-                            remain[0]--;
-                        }
-                        return (remain[0] > 0);
-                    });
-            return u.isEmpty() ? null : u;
-        }
-    }
 
     /**
      * unification matching entry point (default implementation)
@@ -359,7 +311,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         //int xs;
         TermContainer xsubs = subterms();
-        if ((/*xs = */xsubs.size()) != ty.size())
+        if ((/*xs = */xsubs.subs()) != ty.subs())
             return false;
 
 //            if (vars(subst.type) == 0)
@@ -441,7 +393,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Nullable
     @Override
     default Object _cdr() {
-        int len = size();
+        int len = subs();
         switch (len) {
             case 1:
                 throw new RuntimeException("Pair fault");
@@ -508,6 +460,9 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
+    default boolean contains(Term t) { return subterms().contains(t); }
+
+    @Override
     default boolean OR(@NotNull Predicate<Term> p) {
         return subterms().OR(p);
     }
@@ -537,8 +492,8 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    default int size() {
-        return subterms().size();
+    default int subs() {
+        return subterms().subs();
     }
 
     @Override
@@ -565,13 +520,13 @@ public interface Compound extends Term, IPair, TermContainer {
             switch (dt) {
                 case 0:
                 case DTERNAL:
-                    return (size() > 1);
+                    return (subs() > 1);
                 case XTERNAL:
                 default:
                     return false;
             }
         } else
-            return op.commutative && size() > 1;
+            return op.commutative && subs() > 1;
     }
 
 
@@ -635,7 +590,7 @@ public interface Compound extends Term, IPair, TermContainer {
                     ((GenericCompoundDT) this).ref : this;
 
             @NotNull TermContainer subs = subterms();
-            if ((nextDT != XTERNAL && !concurrent(nextDT)) && subs.size() > 2)
+            if ((nextDT != XTERNAL && !concurrent(nextDT)) && subs.subs() > 2)
                 return Null; //tried to temporalize what can only be commutive
 
             if (nextDT == XTERNAL) {
@@ -681,7 +636,7 @@ public interface Compound extends Term, IPair, TermContainer {
      */
 
     static boolean pathFirst(@NotNull Compound container, @NotNull Term t, @NotNull ByteArrayList l) {
-        int s = container.size();
+        int s = container.subs();
         for (int i = 0; i < s; i++) {
             Term xx = container.sub(i);
             if (xx.equals(t) || ((xx.contains(t)) && pathFirst((Compound) xx, t, l))) {
@@ -746,7 +701,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 } else reverse = false;
 
                 TermContainer tt = subterms();
-                int s = tt.size();
+                int s = tt.subs();
                 long t = offset;
                 for (int i = 0; i < s; i++) {
                     Term st = tt.sub(reverse ? (s - 1 - i) : i);
@@ -807,7 +762,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         if (subsModified) {
             u = o.the(dt(), xy);
-            if (u.size() == 0)
+            if (u.subs() == 0)
                 return u; //atomic, including Bool short-circuits on invalid term
         } else {
             u = this;
@@ -901,7 +856,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default boolean xternalEquals(Term x) {
-        return structure() == x.structure() && volume() == x.volume() && size() == x.size() && op() == x.op() &&
+        return structure() == x.structure() && volume() == x.volume() && subs() == x.subs() && op() == x.op() &&
                 xternal().equals(x.xternal());
     }
 
@@ -914,20 +869,21 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     @Nullable
     default Term temporalize(Retemporalize r) {
-        if (!hasAny(Op.TemporalBits))
-            return this;
-        else {
-            Op o = op();
-            boolean ot = o.temporal;
-            int dt = ot ? r.dt(this) : DTERNAL;
-
-            Term t = r.transform(this, o, dt);
-            if (t == null) {
-                return null;
-            } else {
-                return t;
-            }
-        }
+        return r.transform(this, op(), DTERNAL /*will be replaced with r's decision*/);
+//        if (!hasAny(Op.TemporalBits))
+//            return this;
+//        else {
+//            Op o = op();
+//            boolean ot = o.temporal;
+//            int dt = ot ? r.dt(this) : DTERNAL;
+//
+//            Term t = r.transform(this, o, dt);
+//            if (t == null) {
+//                return null;
+//            } else {
+//                return t;
+//            }
+//        }
     }
 
     @Override

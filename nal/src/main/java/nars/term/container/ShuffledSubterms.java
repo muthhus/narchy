@@ -46,8 +46,8 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
     @Override
-    public int size() {
-        return srcsubs.size();
+    public int subs() {
+        return srcsubs.subs();
     }
 
     @NotNull
@@ -112,8 +112,8 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
         TermContainer c = (TermContainer) obj;
 
-        int s = size();
-        if (s != c.size())
+        int s = subs();
+        if (s != c.subs())
             return false;
         for (int i = 0; i < s; i++) {
             if (!sub(i).equals(c.sub(i))) {
@@ -142,7 +142,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
 
     protected void reset(Random rng) {
-        restart(srcsubs.size(), rng);
+        restart(srcsubs.subs(), rng);
     }
 
 

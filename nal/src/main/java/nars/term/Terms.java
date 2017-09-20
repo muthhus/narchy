@@ -70,7 +70,7 @@ public enum Terms {
      */
     public static int hashSubterms(@NotNull TermContainer container) {
         int h = 1;
-        int s = container.size();
+        int s = container.subs();
         for (int i = 0; i < s; i++) {
             h = container.sub(i).hashCode() + h * 31 /*Util.PRIME1 */;
         }
@@ -631,7 +631,7 @@ public enum Terms {
     }
 
     public static boolean flatten(/*@NotNull*/ Op op, @NotNull TermContainer u, int dt, ObjectByteHashMap<Term> s) {
-        int l = u.size();
+        int l = u.subs();
         for (int i = 0; i < l; i++) {
             if (!flatten(op, dt, u.sub(i), s))
                 return false;
@@ -727,8 +727,8 @@ public enum Terms {
         a.copyInto(t);
         b.copyInto(t);
         if (bothTerms) {
-            int as = a.size();
-            int bs = b.size();
+            int as = a.subs();
+            int bs = b.subs();
             int maxSize = Math.max(as, bs);
             if (t.size() == maxSize) {
                 //the smaller is contained by the larger other

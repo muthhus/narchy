@@ -19,15 +19,14 @@ import org.jetbrains.annotations.Nullable;
 public interface ProtoCompound extends TermContainer {
 
     @Nullable
-    @Override
     Op op();
 
     /** subterms as an array for construction */
-    @NotNull Term[] subs();
+    @Override /*@NotNull*/ Term[] theArray();
 
     /** number subterms */
     @Override
-    int size();
+    int subs();
 
     @Override
     boolean equals(Object obj);
@@ -54,12 +53,12 @@ public interface ProtoCompound extends TermContainer {
     }
 
     @Override
-    default boolean impossibleSubTerm( @NotNull Termlike target) {
+    default boolean impossibleSubTerm( /*@NotNull*/ Termlike target) {
         return false;
     }
 
     @Override
-    default boolean impossibleSubTermOrEquality(@NotNull Term target) {
+    default boolean impossibleSubTermOrEquality(/*@NotNull*/ Term target) {
         return false;
     }
 

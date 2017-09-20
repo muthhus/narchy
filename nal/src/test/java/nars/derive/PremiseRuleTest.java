@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import nars.*;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
-import nars.index.term.PatternTermIndex;
+import nars.index.term.PatternIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -161,7 +161,7 @@ public class PremiseRuleTest {
 
         assertNotNull(y);
 
-        PatternTermIndex i = new PatternTermIndex(n); i.deriverID = 0;
+        PatternIndex i = new PatternIndex(n); i.deriverID = 0;
         y = ((PremiseRule) y).normalize(i);
         assertNotNull(y);
         PremiseRule.printRecursive(y);
@@ -203,7 +203,7 @@ public class PremiseRuleTest {
 //    }
 
     final NAR n = NARS.tmp();
-    final PremiseRuleSet permuter = new PremiseRuleSet(new PatternTermIndex(n) { { deriverID = 0; }}, true);
+    final PremiseRuleSet permuter = new PremiseRuleSet(new PatternIndex(n) { { deriverID = 0; }}, true);
 
     @Test
     public void testBackwardPermutations() throws Narsese.NarseseException {

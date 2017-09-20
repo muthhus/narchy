@@ -8,7 +8,7 @@ import nars.derive.match.EllipsisOneOrMore;
 import nars.derive.match.EllipsisZeroOrMore;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.BasicTermIndex;
-import nars.index.term.PatternTermIndex;
+import nars.index.term.PatternIndex;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
@@ -78,7 +78,7 @@ public class EllipsisTest {
                 Unify f = new Unify(VAR_PATTERN, new XorShift128PlusRandom(1+seed), Param.UnificationStackMax, 128) {
 
                     @Override
-                    public void onMatch(Term[][] match) {
+                    public void tryMatch() {
                         //System.out.println(x + "\t" + y + "\t" + this);
 
 
@@ -88,7 +88,7 @@ public class EllipsisTest {
 
                             //matched.set(true);
 
-                            assertEquals(getExpectedUniqueTerms(arity), varArgs.size());
+                            assertEquals(getExpectedUniqueTerms(arity), varArgs.subs());
 
                             Term u = xy(varArgs);
                             if (u == null) {
@@ -203,8 +203,8 @@ public class EllipsisTest {
     }
 
     @NotNull
-    public static PatternTermIndex patterns() {
-        return new PatternTermIndex(NARS.shell());
+    public static PatternIndex patterns() {
+        return new PatternIndex(NARS.shell());
     }
 
     public static class CommutiveEllipsisTest1 extends CommutiveEllipsisTest {
@@ -242,7 +242,7 @@ public class EllipsisTest {
         @NotNull
         @Override
         public Compound getPattern(String prefix, String suffix) throws Narsese.NarseseException {
-            PatternTermIndex pi = patterns();
+            PatternIndex pi = patterns();
             Compound pattern = (Compound) Narsese.term(prefix + "%1, " + ellipsisTerm + suffix, true).term();
             return pattern;
         }
@@ -251,7 +251,7 @@ public class EllipsisTest {
 
         @Override
         public @NotNull Term getResult() throws Narsese.NarseseException {
-            final PatternTermIndex pi = patterns();
+            final PatternIndex pi = patterns();
             return Narsese.term("<%1 --> (" + ellipsisTerm + ")>", true).normalize().term();
         }
 
@@ -400,7 +400,7 @@ public class EllipsisTest {
             Random rng = new XorShift128PlusRandom(seed);
             Unify f = new Unify(VAR_PATTERN, rng, Param.UnificationStackMax, 128) {
                 @Override
-                public void onMatch(Term[][] match) {
+                public void tryMatch() {
                     results.add(xy.toString());
                 }
             };

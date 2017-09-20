@@ -130,9 +130,9 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
         } else {
             //recursiely try subterms of a temporal or exceedingly large concept
             //budget with a proportion of this compound relative to their volume contribution
-            float subScale = 1f / (1 + t.size());
+            float subScale = 1f / (1 + t.subs());
             t.forEach(x -> {
-                if (x.size() > 0)
+                if (x.subs() > 0)
                     input(b, each, ((Compound) x), subScale, nar);
             });
         }

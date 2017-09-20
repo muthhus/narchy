@@ -68,6 +68,10 @@ public class GenericCompound implements Compound {
         return subterms;
     }
 
+    @Override
+    public boolean contains(Term t) {
+        return subterms.contains(t);
+    }
 
     @Override
     public int hashCode() {
@@ -95,7 +99,7 @@ public class GenericCompound implements Compound {
 
     @Override
     public boolean isCommutative() {
-        return op().commutative && size() > 1;
+        return op().commutative && subs() > 1;
     }
 
     @NotNull

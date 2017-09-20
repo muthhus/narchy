@@ -45,7 +45,7 @@ public enum TrieDeriver {
             out.println("eval {");
             Try ac = (Try) p;
             int i = 0;
-            for (ValueFork b : ac.branches) {
+            for (PrediTerm b : ac.branches) {
                 TermTrie.indent(indent + 2); out.println(i + ":");
                 print(b, out, indent + 4);
                 i++;
@@ -54,7 +54,7 @@ public enum TrieDeriver {
         } else if (p instanceof Fork) {
             out.println(Util.className(p) + " {");
             Fork ac = (Fork) p;
-            for (PrediTerm b : ac.cache) {
+            for (PrediTerm b : ac.branches) {
                 print(b, out, indent + 2);
             }
             TermTrie.indent(indent); out.println("}");
@@ -121,7 +121,7 @@ public enum TrieDeriver {
             //TermTrie.indent(indent);
             //out.println(Util.className(p) + " {");
             Fork ac = (Fork) p;
-            for (PrediTerm b : ac.cache) {
+            for (PrediTerm b : ac.branches) {
                 forEach(b, out);
             }
 //            TermTrie.indent(indent);
@@ -189,7 +189,7 @@ public enum TrieDeriver {
             //TermTrie.indent(indent);
             //out.println(Util.className(p) + " {");
             Fork ac = (Fork) x;
-            for (PrediTerm y : ac.cache) {
+            for (PrediTerm y : ac.branches) {
                 forEach(x, y, out);
             }
 //            TermTrie.indent(indent);

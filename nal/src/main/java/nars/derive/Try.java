@@ -1,33 +1,46 @@
 package nars.derive;
 
+import jcog.Util;
 import nars.$;
+import nars.Param;
 import nars.control.Cause;
-import nars.control.CauseChannel;
 import nars.control.Derivation;
 import org.roaringbitmap.IntIterator;
 import org.roaringbitmap.RoaringBitmap;
 
 import java.util.Random;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /** set of branches, subsets of which a premise "can" "try" */
 public class Try extends AbstractPred<Derivation> {
 
     public final ValueCache values;
-    public final ValueFork[] branches;
+    public final PrediTerm<Derivation>[] branches;
     private final Cause[] causes;
 
-    public Try(ValueFork[] branches) {
+    Try(PrediTerm<Derivation>[] branches, Cause[] causes) {
         super($.func("try", branches));
         this.branches = branches;
-        causes = Stream.of(branches).flatMap(b -> Stream.of(b.causes)).toArray(Cause[]::new);
+        this.causes = causes;
         values = new ValueCache(c -> c::value, causes);
+    }
+
+    public Try(ValueFork[] branches) {
+        this(branches, Stream.of(branches).flatMap(b -> Stream.of(b.causes)).toArray(Cause[]::new));
+    }
+
+    @Override
+    public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
+        return new Try(
+            PrediTerm.transform(f, branches), causes
+        );
     }
 
     @Override
     public boolean test(Derivation d) {
 
-        RoaringBitmap choices = d.choices;
+        RoaringBitmap choices = d.preToPost;
         int numChoices = choices.getCardinality();
         if (numChoices == 0)
             return false;
@@ -45,41 +58,70 @@ public class Try extends AbstractPred<Derivation> {
             routing[pp + 1] = (short) v;
             return true;
         });
-        if (p[0] > 1)
-            bingoSortPairwise(routing);
 
+        d.preToPost.clear();
 
-        int loopCost = 5;
-        //TODO int maxRepeats and associate this with expected # of termutes or something to avoid useless repeats
+        int minVal, maxVal;
+        float valRatio;
+        if (p[0] > 1) {
+            int[] minMax = new int[2];
+            bingoSortPairwise(routing, minMax);
+            minVal = minMax[0]; maxVal = minMax[1];
+            valRatio = minVal/((float)(maxVal));
+        } else {
+            minVal = maxVal = routing[1];
+            valRatio = 1f;
+        }
+
+        //TODO fork budgeting
+        @Deprecated int loopCost = 1;
+
+        int startTTL = d.ttl;
+        int minPerBranch =
+                Math.min(startTTL,
+                    Param.TTL_MUTATE * 2 +
+                    Param.TTL_UNIFY * 2 +
+                    Param.TTL_DERIVE_TRY +
+                    Param.TTL_DERIVE_TASK_SUCCESS * 2 +
+                    Param.TTL_DERIVE_TASK_FAIL * 2
+                );
+
+        int maxPerBranch = Math.max(minPerBranch, startTTL / numChoices);
         int before = d.now();
-
-        while (d.live()) {
+        int ttlSaved;
+        do {
 
             int sample;
             if (numChoices > 1) {
-                //curvebag sampling of the above array
-                float x = rng.nextFloat();
-                float curve = x * x;
-                sample = (int) ((1f - curve) * (numChoices - 0.5f));
+                if (minVal == maxVal) {
+                    //flat
+                    sample = rng.nextInt(numChoices);
+                } else {
+                    //curvebag sampling of the above array
+                    float x = rng.nextFloat();
+                    float curve = Util.lerp(x * x, x, valRatio);
+                    sample = (int) ((1f - curve) * (numChoices - 0.5f));
+                }
             } else {
                 sample = 0;
             }
 
-            int n = g2(routing, sample, KEY);
-            //int loopBudget = Util.lerp(g2(routing, sample, VAL), minPerBranch, maxPerBranch);
-            //int ttlSaved = d.getAndSetTTL(loopBudget) - loopBudget - loopCost;
-            d.use(loopCost);
-//            if (ttlSaved < 0) {
+//            if (d.ttl <= loopCost) {
 //                d.setTTL(0);
 //                break;
 //            }
+            int n = g2(routing, sample, KEY);
+            float branchScore =
+                    minVal!=maxVal ? ((float) (g2(routing, sample, VAL)) - minVal) / (maxVal - minVal) : 0.5f;
+            int loopBudget = Util.lerp(branchScore, minPerBranch, maxPerBranch);
+
+            ttlSaved = d.getAndSetTTL(loopBudget) - loopBudget - loopCost;
 
             branches[n].test(d);
 
             if (before > 0) d.revert(before);
 
-            //d.addTTL(ttlSaved );
-        }
+        } while (d.addTTL(ttlSaved) >= 0);
 
         return false;
     }
@@ -112,7 +154,7 @@ public class Try extends AbstractPred<Derivation> {
         s[i * 2 + (firstOrSecond ? 0 : 1)] = newValue;
     }
 
-    private static void bingoSortPairwise(short[] A) {
+    private static void bingoSortPairwise(short[] A, int[] range) {
         /*
         https://en.wikipedia.org/wiki/Selection_sort
         In the bingo sort variant, items are ordered by repeatedly
@@ -138,6 +180,7 @@ public class Try extends AbstractPred<Derivation> {
             if ((vi = g2(A, i, VAL)) > vm) //        if A[i] > nextValue then
                 vm = vi;
         }
+        range[1] = vm;
         while (max >= 0 && g2(A, max, VAL) == vm) max--;
         while (max >= 0) { //    while max > 0 do begin
             float value = vm;
@@ -159,6 +202,7 @@ public class Try extends AbstractPred<Derivation> {
             while (max >= 0 && g2(A, max, VAL) == vm)
                 max--;
         }
+        range[0] = g2(A, 0, VAL);
 
     }
 }

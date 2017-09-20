@@ -11,7 +11,7 @@ import nars.derive.op.AbstractPatternOp;
 import nars.derive.op.SubTermStructure;
 import nars.derive.op.UnifyTerm;
 import nars.derive.rule.PremiseRule;
-import nars.index.term.PatternTermIndex;
+import nars.index.term.PatternIndex;
 import nars.term.Term;
 import nars.term.Termed;
 import org.eclipse.collections.api.tuple.Pair;
@@ -28,11 +28,16 @@ public final class Conclude {
     private static final Term VAR_INTRO = $.the("varIntro");
     private static final Term GOAL_URGENT = $.the("urgent");
 
-    static public PrediTerm<Derivation> the(@NotNull PremiseRule rule, NAR nar, short deriverID) {
+    static public PrediTerm<Derivation> the(@NotNull PremiseRule rule, PatternIndex index) {
+
+        NAR nar = index.nar;
+        short deriverID = index.deriverID; assert(deriverID!=-1);
+
         Term pattern = rule.conclusion().sub(0);
 
         //substitute occurrences of the exact task and belief terms with the short-cut
-        pattern = pattern.replace(rule.getTask(), Derivation._taskTerm).replace(rule.getBelief(), Derivation._beliefTerm);
+        pattern = index.get(
+                pattern.replace(rule.getTask(), Derivation._taskTerm).replace(rule.getBelief(), Derivation._beliefTerm), true).term();
 
         //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
         boolean introVars;
@@ -63,15 +68,13 @@ public final class Conclude {
 
     }
 
-    public static void match(final PremiseRule rule, List<PrediTerm<Derivation>> pre, List<PrediTerm<Derivation>> post, @NotNull SortedSet<MatchConstraint> constraints, PatternTermIndex index) {
+    public static void match(final PremiseRule rule, List<PrediTerm<Derivation>> pre, List<PrediTerm<Derivation>> post, @NotNull SortedSet<MatchConstraint> constraints, PatternIndex index) {
 
         final Term taskPattern = rule.getTask();
         final Term beliefPattern = rule.getBelief();
 
-        NAR nar = index.nar;
-        short deriverID = index.deriverID; assert(deriverID!=-1);
 
-        PrediTerm<Derivation> conc = the(rule, nar, deriverID);
+        PrediTerm<Derivation> conc = the(rule, index);
 
         boolean taskIsPatVar = taskPattern.op() == Op.VAR_PATTERN;
         boolean belIsPatVar = beliefPattern.op() == Op.VAR_PATTERN;
@@ -151,10 +154,10 @@ public final class Conclude {
 //            return false;
 //        }
 
-        if (belief.size() == 0) {
+        if (belief.subs() == 0) {
             return false;
         }
-        if (task.size() == 0) {
+        if (task.subs() == 0) {
             return true;
         }
 

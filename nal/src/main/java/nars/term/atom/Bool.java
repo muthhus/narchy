@@ -41,7 +41,6 @@ abstract public class Bool extends AtomicConst {
     @Override
     abstract public int opX();
 
-
     @NotNull
     @Override
     abstract public Term unneg();

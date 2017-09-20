@@ -57,7 +57,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
 
     public static LambdaFunctor f(@NotNull Atom termAtom, int arityRequired, @NotNull Function<TermContainer, Term> ff) {
         return f(termAtom, (tt)->{
-            if (tt.size()!=arityRequired)
+            if (tt.subs()!=arityRequired)
                 return null;
                 //throw new RuntimeException(termAtom + " requires " + arityRequired + " arguments: " + Arrays.toString(tt));
 
@@ -180,7 +180,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
 
         @Nullable
         @Override public final Term apply(@NotNull TermContainer x) {
-            if (x.size()!=1)
+            if (x.subs()!=1)
                 return null;
                 //throw new UnsupportedOperationException("# args must equal 1");
 
@@ -206,7 +206,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
 
         @Nullable
         @Override public final Term apply(@NotNull TermContainer x) {
-            if (x.size()!=2)
+            if (x.subs()!=2)
                 throw new UnsupportedOperationException("# args must equal 2");
 
 

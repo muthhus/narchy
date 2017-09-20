@@ -202,7 +202,7 @@ public class QuestionTest {
         Param.DEBUG = true;
 
         n.on("odd", a->{
-            if (a.size() == 1 && a.sub(0).op()== Op.ATOM) {
+            if (a.subs() == 1 && a.sub(0).op()== Op.ATOM) {
                 try {
                     return $.intValue(a.sub(0)) % 2 == 0 ? Op.False : Op.True;
                 } catch (NumberFormatException ignored) {

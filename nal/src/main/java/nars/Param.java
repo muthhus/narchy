@@ -92,13 +92,17 @@ public abstract class Param extends Services<Term,NAR> {
                     32;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(192);
+    public final MutableInteger matchTTL = new MutableInteger(128);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.1f;
+    public static final int TTL_PREMISE_MIN = Param.TTL_UNIFY * 2 + Param.TTL_DERIVE_TRY + Param.TTL_DERIVE_TASK_SUCCESS;
 
     /** cost of attempting a unification */
     public static final int TTL_UNIFY = 1;
+
+    /** cost of executing a termute permutation */
+    public static final int TTL_MUTATE = 1;
 
     /** cost of substitution/evaluating a derived term */
     public static final int TTL_DERIVE_TRY = 1;

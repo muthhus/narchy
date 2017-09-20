@@ -110,7 +110,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
 
                         if (validUnwrappableSubterms(subj.subterms())) {
-                            int s = subj.size();
+                            int s = subj.subs();
                             FasterList<Term> lx = new FasterList(s);
                             if (subj instanceof Int.IntRange || so == PROD && subj.hasAny(INT)) {
                                 Int.unroll(subj).forEachRemaining(dsi -> lx.add(INH.the(dsi, pred)));
@@ -183,7 +183,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference)
                         Compound cpred = (Compound) pred;
                         if (validUnwrappableSubterms(cpred.subterms())) {
-                            int s = cpred.size();
+                            int s = cpred.subs();
                             Term[] x = new Term[s];
                             boolean valid = true;
                             for (int i = 0; i < s; i++) {

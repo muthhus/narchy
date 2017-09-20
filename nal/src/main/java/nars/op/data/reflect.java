@@ -72,8 +72,8 @@ public class reflect {
 
     @Nullable
     public static Term sop(String operatorName, @NotNull TermContainer c) {
-        Term[] m = new Term[c.size()];
-        for (int i = 0; i < c.size(); i++) {
+        Term[] m = new Term[c.subs()];
+        for (int i = 0; i < c.subs(); i++) {
             if ((m[i] = reflect(c.sub(i))) == null)
                 return null;
         }
@@ -102,7 +102,7 @@ public class reflect {
 
     @Nullable
     public static Term reflect(Term t) {
-        if (t.size() == 0) {
+        if (t.subs() == 0) {
             return t;
         }
         switch (t.op()) {
@@ -133,7 +133,7 @@ public class reflect {
         public boolean preFilter(Task next) {
             if (super.preFilter(next)) {
                 Term tt = next.term();
-                if (tt.size() > 1) {
+                if (tt.subs() > 1) {
                     if (tt.volume() <= n.termVolumeMax.intValue() * 0.75f)
                         if (filter.addIfMissing(next, 0.01f))
                             return true;
@@ -148,7 +148,7 @@ public class reflect {
             Term r = $.func(REFLECT_OP, x).eval(n).normalize();
             if (x.equals(r)) //can happen
                 return 0f;
-            if (r != null && r.size() > 0 && r.volume() <= n.termVolumeMax.intValue()) {
+            if (r != null && r.subs() > 0 && r.volume() <= n.termVolumeMax.intValue()) {
                 Task y = Task.clone(next, r);
                 if (y != null) {
                     logger.info("+ {}", y);
@@ -182,7 +182,7 @@ public class reflect {
         public boolean preFilter(Task next) {
             if (super.preFilter(next)) {
                 Term tt = next.term();
-                if (tt.size() > 1)
+                if (tt.subs() > 1)
                     if (tt.volume() <= n.termVolumeMax.intValue() * VOL_RATIO_MAX)
                         if (filter.addIfMissing(tt.term().conceptual()))
                             return true;
@@ -200,7 +200,7 @@ public class reflect {
 
             Term x = next.term().conceptual();
             Term reflectionSim = $.sim($.func(REFLECT_OP, x), x).eval(n).normalize();
-            if (reflectionSim != null && reflectionSim.size() > 0 && reflectionSim.volume() <= n.termVolumeMax.intValue()) {
+            if (reflectionSim != null && reflectionSim.subs() > 0 && reflectionSim.volume() <= n.termVolumeMax.intValue()) {
                 NALTask t = new NALTask(reflectionSim, BELIEF, $.t(1f, n.confDefault(BELIEF)), n.time(), ETERNAL, ETERNAL, n.time.nextInputStamp());
                 t.pri(n.priDefault(BELIEF));
                 feedback(t);

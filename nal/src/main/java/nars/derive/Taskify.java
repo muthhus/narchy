@@ -18,12 +18,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
 
 import static nars.Param.FILTER_SIMILAR_DERIVATIONS;
 import static nars.control.MetaGoal.Perceive;
 
 public class Taskify extends AbstractPred<Derivation> {
 
+    final static BiFunction<DerivedTask, DerivedTask, DerivedTask> DUPLICATE_DERIVATION_MERGE = (pp, tt) -> {
+        pp.priMax(tt.pri());
+        if (!Arrays.equals(pp.cause(), tt.cause())) //dont merge if they are duplicates, it's pointless here
+            pp.causeMerge(tt);
+        return pp;
+    };
     private final static Logger logger = LoggerFactory.getLogger(Taskify.class);
 
     /**
@@ -50,7 +57,7 @@ public class Taskify extends AbstractPred<Derivation> {
         assert (punc != 0) : "no punctuation assigned";
 
         final NAR nar = p.nar;
-        Task t = Task.tryTask(x, punc, p.concTruth, (C, tr) -> {
+        DerivedTask t = (DerivedTask) Task.tryTask(x, punc, p.concTruth, (C, tr) -> {
 
             long start = occ[0];
             long end = occ[1];
@@ -91,7 +98,7 @@ public class Taskify extends AbstractPred<Derivation> {
         short[] cause = ArrayUtils.addAll(p.parentCause, channel.deriver, channel.id);
         ((DerivedTask)t).cause = cause;
 
-        if (p.derivations.merge(t, t, Conclusion.DUPLICATE_DERIVATION_MERGE) != t) {
+        if (p.derivations.merge(t, t, DUPLICATE_DERIVATION_MERGE) != t) {
             spam(p, Param.TTL_DERIVE_TASK_REPEAT, t, nar, 0.01f);
         } else {
             p.use(Param.TTL_DERIVE_TASK_SUCCESS);

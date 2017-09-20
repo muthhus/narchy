@@ -175,7 +175,7 @@ public class TermIndexTest {
 
         if (t1 instanceof Compound) {
             //test all subterms are shared
-            for (int i = 0; i < t1.term().size(); i++)
+            for (int i = 0; i < t1.term().subs(); i++)
                 testShared(((Compound) t1).sub(i), ((Compound) t2).sub(i));
         }
     }

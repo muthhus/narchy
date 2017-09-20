@@ -3,14 +3,15 @@ package nars.nal;
 import nars.*;
 import nars.control.Derivation;
 import nars.control.Premise;
-import nars.derive.AndCondition;
 import nars.derive.PrediTerm;
 import nars.derive.PrediTrie;
+import nars.derive.Taskify;
 import nars.derive.TrieDeriver;
-import nars.derive.op.UnifyTerm;
+import nars.derive.constraint.MatchConstraint;
+import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
-import nars.index.term.PatternTermIndex;
+import nars.index.term.PatternIndex;
 import nars.task.ITask;
 import nars.term.Term;
 import nars.term.Termed;
@@ -55,7 +56,7 @@ public class TrieDeriverTest {
 
     @Test
     public void testConclusionWithXTERNAL() {
-        PatternTermIndex idx = new PatternTermIndex(NARS.tmp()) {
+        PatternIndex idx = new PatternIndex(NARS.tmp()) {
             {
                 deriverID = 0;
             }
@@ -112,16 +113,19 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
 
         assertNotEquals(0, rules.length);
 
-        @NotNull PatternTermIndex pi = new PatternTermIndex(n);
+        @NotNull PatternIndex pi = new PatternIndex(n);
         pi.deriverID = 0;
 
         Stream<Pair<PremiseRule, String>> parsed = PremiseRuleSet.parse(Stream.of(rules));
 
         PremiseRuleSet src = new PremiseRuleSet(parsed, pi, false);
         assertNotEquals(0, src.size());
-        PrediTerm d = the(src);
+        PrediTerm<Derivation> d = the(src);
 
-        if (debug) d.printRecursive();
+        if (debug) {
+            //d.printRecursive();
+            d = d.transform(DebugDerivationPredicate::new);
+        }
 
         Set<Term> byEquality = new HashSet();
         Set<Term> byIdentity = new IdentityHashSet();
@@ -211,8 +215,12 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
     }
 
     public TestNAR test(int tlMax, String... rules) throws Narsese.NarseseException {
+        return test(tlMax, false, rules);
+    }
+
+    public TestNAR test(int tlMax, boolean debug, String... rules) throws Narsese.NarseseException {
         NAR n = new NARS().deriver((NAR nar) -> {
-            PrediTerm<Derivation> d = testCompile(nar, false, rules);
+            PrediTerm<Derivation> d = testCompile(nar, debug, rules);
             TrieDeriver.print(d);
             return d;
         }).get();
@@ -225,7 +233,8 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
         NAR n = NARS.tmp();
 
         PrediTerm<Derivation> d = testCompile(n, debug, rules);
-        //.transform(DebugDerivationPredicate::new);
+        if (debug)
+            d = d.transform(DebugDerivationPredicate::new);
 
         Set<Task> tasks = new LinkedHashSet();
         n.onTask(tasks::add);
@@ -236,10 +245,11 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
         Term b = $.$(belief);
         assertNotNull(b);
 
+        PrediTerm<Derivation> dd = d;
         Iterable<? extends ITask> derived = new Premise(t, b, 0.5f, Collections.emptySet()) {
             @Override
             protected Derivation derivation(@NotNull NAR n) {
-                return n.derivation(d);
+                return n.derivation(dd);
             }
         }.run(n);
         if (derived != null) {
@@ -260,20 +270,23 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
         PrediTerm<Derivation> d = testCompile(n, false, s);
         TrieDeriver.print(d, System.out);
 
-        assertTrue("last element should be unify, not constraints or anything else: " + AndCondition.last(d),
-                AndCondition.last(d) instanceof UnifyTerm.UnifySubtermThenConclude);
+        assertTrue(d.subs(x -> x instanceof MatchConstraint) > 0);
+        assertTrue(d.subs(x -> x instanceof Taskify) > 0);
+//        assertTrue("last element should be unify, not constraints or anything else: " + AndCondition.last(d),
+//                AndCondition.last(d) instanceof UnifyTerm.UnifySubtermThenConclude);
     }
 
     @Test
     public void testSubstIfUnifies1() throws Narsese.NarseseException {
 
 
-        TestNAR tester = test(64,
+        TestNAR tester = test(64, false,
                 "(B --> K), (($X --> L) ==> (&&,(#Y --> K),%A..+)) |- substitute((($X --> L) ==>+- (&&,%A..+)),#Y,B), (Belief:AnonymousAnalogy)");
 
-        tester.believe("(&&,<#x --> lock>,(<$y --> key> ==> open($y,#x)))"); //en("There is a lock that can be opened by every key.");
-        tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
-        tester.mustBelieve(100, "<<$1 --> key> ==> open($1,{lock1})>", 1.00f,
+        tester.believe("(&&,<#x --> lock>,(key:$y ==> open($y,#x)))"); //en("There is a lock that can be opened by every key.");
+        tester.believe("lock:{lock1}"); //en("Lock-1 is a lock.");
+        tester.log();
+        tester.mustBelieve(500, "<<$1 --> key> ==> open($1,{lock1})>", 1.00f,
                 0.81f);
     }
 

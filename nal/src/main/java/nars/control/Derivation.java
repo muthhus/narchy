@@ -1,25 +1,29 @@
 package nars.control;
 
 import jcog.math.ByteShuffler;
+import jcog.pri.Pri;
 import jcog.version.Versioned;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
+import nars.derive.Conclusion;
 import nars.derive.DerivationTemporalize;
 import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
 import nars.op.substitute;
-import nars.term.Compound;
+import nars.task.DerivedTask;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
-import nars.term.atom.Intlike;
 import nars.term.subst.Unify;
+import nars.term.var.AbstractVariable;
+import nars.term.var.CommonVariable;
+import nars.term.var.VarPattern;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.eclipse.collections.api.map.ImmutableMap;
@@ -28,12 +32,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.roaringbitmap.RoaringBitmap;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static nars.Op.Null;
+import static nars.Op.*;
 import static nars.op.substituteIfUnifies.substituteIfUnifiesAny;
 import static nars.time.Tense.ETERNAL;
 
@@ -43,48 +46,44 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Derivation extends Unify implements TermContext {
 
-    @NotNull
+    public static final Atomic _taskTerm = Atomic.the("_taskTerm");
+    public static final Atomic _beliefTerm = Atomic.the("_beliefTerm");
+
     public final NAR nar;
+
+    public final Versioned<Term> derivedTerm;
+
+    public final ByteShuffler shuffler = new ByteShuffler(64);
+
+    /** temporary buffer for derivations before input so they can be merged in case of duplicates */
+    public final Map<DerivedTask, DerivedTask> derivations = new LinkedHashMap<>();
 
     private final ImmutableMap<Term, Termed> derivationFunctors;
 
     public float truthResolution;
-    public float confMin;
-
-    @Nullable
-    public Truth concTruth;
-    public byte concPunc;
-
-
-    /**
-     * the current premise being evaluated in this context TODO make private again
-     */
-    @NotNull
-    public Premise premise;
-
-
-
-    /**
-     * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
-     */
-    @Nullable
-    public PrediTerm forEachMatch;
 
     /**
      * cached values ==========================================
      */
+    public float confMin;
+    public Truth concTruth;
+    public byte concPunc;
 
+//    /**
+//     * the current premise being evaluated in this context TODO make private again
+//     */
+//    public Premise premise;
+
+    /**
+     * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
+     */
+    public PrediTerm<Derivation> forEachMatch;
     /**
      * op ordinals: 0=task, 1=belief
      */
     public byte termSub0op;
     public byte termSub1op;
 
-    /**
-     * op bits: 0=task, 1=belief
-     */
-    public int termSub0opBit;
-    public int termSub1opBit;
 
     /**
      * structs, 0=task, 1=belief
@@ -92,59 +91,36 @@ public class Derivation extends Unify implements TermContext {
     public int termSub0Struct;
     public int termSub1Struct;
 
-    /**
-     * current NAR time, set at beginning of derivation
-     */
+    /** current NAR time, set at beginning of derivation */
     public long time = ETERNAL;
 
-    @Nullable
-    public Truth taskTruth;
-    @Nullable
-    public Truth beliefTruth, beliefTruthRaw;
-
-    @NotNull
+    public Truth taskTruth, beliefTruth, beliefTruthRaw;
     public Term taskTerm;
-    @NotNull
     public Term beliefTerm;
-
-    @NotNull
     public Task task;
-    @Nullable
     public Task belief;
     public byte taskPunct;
 
     /**
-     * whether the premise involves temporality that must be calculated upon derivation
+     * whether either the task or belief are events and thus need to be considered with respect to time
      */
-    public boolean temporal;
-
-    @Nullable
-    private long[] evidenceDouble, evidenceSingle;
+    public boolean taskOrBeliefIsEvent;
 
     public boolean cyclic, overlap;
-
     public float premisePri;
     public short[] parentCause;
-
-    public final Versioned<Term> derivedTerm;
-    public long[] derivedOcc;
-
+    public final long[] derivedOcc = new long[2];
     public PrediTerm<Derivation> deriver;
-    public final ByteShuffler shuffler = new ByteShuffler(64);
     public boolean single;
-
-    /** temporary buffer for derivations before input so they can be merged in case of duplicates */
-    public final Map<Task, Task> derivations = new LinkedHashMap();
-
     public DerivationTemporalize temporalize;
     public int parentComplexity;
 
-    public static final Atomic _taskTerm = Atomic.the("_taskTerm");
-    public static final Atomic _beliefTerm = Atomic.the("_beliefTerm");
-    public RoaringBitmap choices = new RoaringBitmap();
+    /** choices mapping the available post targets */
+    public final RoaringBitmap preToPost = new RoaringBitmap();
+
     public float premiseConfSingle;
     public float premiseConfDouble;
-;
+    private long[] evidenceDouble, evidenceSingle;
 
 //    private transient Term[][] currentMatch;
 
@@ -193,7 +169,7 @@ public class Derivation extends Unify implements TermContext {
         final Functor substitute = new substitute() {
             @Override
             protected boolean onChange(Term from, Term x, Term y, Term to) {
-                assert (Derivation.this.xy.tryPut(x, y));
+                //assert (Derivation.this.xy.tryPut(x, y));
                 return true;
             }
         };
@@ -216,7 +192,7 @@ public class Derivation extends Unify implements TermContext {
     }
 
     ImmutableMap<Term, Termed> functors(Termed... t) {
-        java.util.Map<Term,Termed> m = new HashMap();
+        java.util.Map<Term,Termed> m = new HashMap(t.length + 2);
         for (Termed x : t) {
             m.put(x.term(), x);
         }
@@ -224,9 +200,6 @@ public class Derivation extends Unify implements TermContext {
         m.put(_beliefTerm, ()->beliefTerm);
         return Maps.immutable.ofMap(m);
     }
-
-
-
 
     /**
      * only returns derivation-specific functors.  other functors must be evaluated at task execution time
@@ -243,11 +216,7 @@ public class Derivation extends Unify implements TermContext {
         return super.apply(x);
     }
 
-    /**
-     * concept-scope
-     *
-     * @param deriver
-     */
+
     public Derivation cycle(PrediTerm<Derivation> deriver) {
         long now = this.nar.time();
         if (now != this.time) {
@@ -261,65 +230,45 @@ public class Derivation extends Unify implements TermContext {
         return this;
     }
 
-
-//    @Override
-//    public void onDeath() {
-//        nar.emotion.derivationDeath.increment();
-//    }
-
     /**
      * tasklink/termlink scope
      */
-    public Collection<Task> run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, int ttl) {
+    public DerivedTask[] run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, final int ttl) {
 
-        Term bt = beliefTerm.unneg();
-        assert (!(bt instanceof Bool));
-
-        revert(0); //revert directly
-
-        //remove common variable entries because they will just consume memory if retained as empty
-        //xy.map.entrySet().removeIf(e -> e.getKey() instanceof CommonVariable);
+        if (revert(0)) {
+            //remove common variable entries because they will just consume memory if retained as empty
+//            xy.map.keySet().removeIf(k -> {
+//                return !(k instanceof AbstractVariable) || k instanceof CommonVariable;
+//            });
+//            xy.map.clear();
+        }
         xy.map.clear();
 
-        termutes.clear();
+        assert(termutes.isEmpty() && derivations.isEmpty() && preToPost.isEmpty());
 
-        derivations.clear();
-
-        choices.clear();
-
-        forEachMatch = null;
-
-        temporalize = null;
+        this.forEachMatch = null;
+        this.temporalize = null;
+        this.concTruth = null;
+        this.concPunc = 0;
+        this.single = false;
+        this.evidenceDouble = evidenceSingle = null;
 
         this.task = task;
 
-        this.taskTruth = task.truth();
-        this.taskPunct = task.punc();
 
         Term taskTerm = task.term();
         this.taskTerm = taskTerm;
 
 
         this.termSub0Struct = taskTerm.structure();
-        Op tOp = taskTerm.op();
-        this.termSub0op = tOp.id;
-        this.termSub0opBit = tOp.bit;
+        this.termSub0op = taskTerm.op().id;
 
-        this.concTruth = null;
-        this.concPunc = 0;
-
-        this.single = false;
-        evidenceDouble = evidenceSingle = null;
-        temporal = cyclic = overlap = false;
-
-        assert (ttl > 0);
-        this.setTTL(ttl);
-
-        this.premise = p;
 
         this.belief = belief;
 
-        this.derivedOcc = null;
+        Term bt = beliefTerm.unneg(); assert (!(bt instanceof Bool));
+
+        this.derivedOcc[0] = this.derivedOcc[1] = ETERNAL;
 
 //        int ttv = taskTerm.vars();
 //        if (ttv > 0 && bt.vars() > 0) {
@@ -330,25 +279,32 @@ public class Derivation extends Unify implements TermContext {
 
         this.cyclic = task.cyclic(); //belief cyclic should not be considered because in single derivation its evidence will not be used any way
 
+        switch (this.taskPunct = task.punc()) {
+            case QUESTION:
+            case QUEST:
+                this.taskTruth = null;
+                break;
+            default:
+                this.taskTruth = task.truth();
+        }
+
         if (belief != null) {
-            Truth beliefTruth = this.beliefTruthRaw = belief.truth();
+            this.beliefTruthRaw = belief.truth();
 
             /** to compute the time-discounted truth, find the minimum distance
              *  of the tasks considering their dtRange
              */
             if (!belief.isEternal()) {
 
-                long beliefTruthTime;
-                if (task.isEternal()) {
-                    beliefTruthTime = ETERNAL;
-                } else {
-                    beliefTruthTime = belief.nearestTimeBetween(task.start(), task.end());
-                }
+                long beliefTruthTime = task.isEternal() ?
+                        ETERNAL :
+                        belief.nearestTimeBetween(task.start(), task.end());
 
-                beliefTruth = belief.truth(beliefTruthTime, dur, 0); //project belief truth to task's time
+                this.beliefTruth = belief.truth(beliefTruthTime, dur, 0); //project belief truth to task's time
+            } else {
+                this.beliefTruth = beliefTruthRaw;
             }
 
-            this.beliefTruth = beliefTruth;
 
             overlap = (cyclic |= belief.cyclic()) || Stamp.overlapping(task, belief);
 
@@ -362,12 +318,8 @@ public class Derivation extends Unify implements TermContext {
 
         Op bOp = beliefTerm.op();
         this.termSub1op = bOp.id;
-        this.termSub1opBit = bOp.bit;
 
-        this.temporal = temporal(task) || temporal(belief);
-
-        this.premiseConfSingle = task.isBeliefOrGoal() ? taskTruth.conf() : 0;
-        this.premiseConfDouble = beliefTruth != null ? Math.max(premiseConfSingle, beliefTruth.conf()) : premiseConfSingle;
+        this.taskOrBeliefIsEvent = !task.isEternal() || (belief!=null && !belief.isEternal());
 
         this.premisePri = p.priElseZero();
 
@@ -375,24 +327,30 @@ public class Derivation extends Unify implements TermContext {
                 Cause.zip(task, belief) :
                 task.cause();
 
+        this.premiseConfSingle = this.taskTruth != null ? taskTruth.conf() : 0;
+        this.premiseConfDouble = beliefTruth != null ? Math.max(premiseConfSingle, beliefTruth.conf()) : premiseConfSingle;
+
+        setTTL(ttl); assert (ttl > 0);
+
         deriver.test(this);
 
-        return derivations.values();
+        int ds = derivations.size();
+        if (ds > 0) {
+            DerivedTask[] dd = derivations.values().toArray(new DerivedTask[ds]);
+            derivations.clear();
+            return dd;
+        } else {
+            return null;
+        }
 
     }
 
 
-    /**
-     * set in Solve once these (3) conclusion parameters have been determined
-     */
-    public void truth(Truth truth, byte punc, boolean single) {
-        this.concTruth = truth;
-        this.concPunc = punc;
-        this.single = single;
-    }
 
     @Override
-    public final void onMatch(Term[][] match) {
+    public final void tryMatch() {
+
+
 
         int now = now();
         try {
@@ -402,13 +360,6 @@ public class Derivation extends Unify implements TermContext {
         }
 
     }
-
-
-    private static boolean temporal(@Nullable Task task) {
-        return task != null &&
-                (!task.isEternal() || task.term().isTemporal());
-    }
-
 
     @Nullable
     public long[] evidenceSingle() {
@@ -421,23 +372,22 @@ public class Derivation extends Unify implements TermContext {
     @Nullable
     public long[] evidenceDouble() {
         if (evidenceDouble == null) {
-            float te, be;
+            float te, be, tb;
             if (task.isBeliefOrGoal()) {
                 //for belief/goal use the relative conf
                 te = taskTruth.conf();
                 be = beliefTruth != null ? beliefTruth.conf() : 0; //beliefTruth can be zero in temporal cases
+                tb = te / (te + be);
             } else {
                 //for question/quest, use the relative priority
                 te = task.priElseZero();
                 be = belief.priElseZero();
+                tb = te + be; tb = tb < Pri.EPSILON ? 0.5f : te / tb;
             }
-            evidenceDouble = Stamp.zip(task.stamp(), belief.stamp(), te / (te + be));
-//            if ((task.cyclic() || belief.cyclic()) && Stamp.isCyclic(evidenceDouble))
-//                throw new RuntimeException("cyclic should not be propagated");
-            //System.out.println(Arrays.toString(task.evidence()) + " " + Arrays.toString(belief.evidence()) + " -> " + Arrays.toString(evidenceDouble));
+            return evidenceDouble = Stamp.zip(task.stamp(), belief.stamp(), tb);
+        } else {
+            return evidenceDouble;
         }
-
-        return evidenceDouble;
     }
 
     @Override
@@ -446,27 +396,19 @@ public class Derivation extends Unify implements TermContext {
                 + ' ' + super.toString();
     }
 
-    public int ttl() {
-        return ttl;
-    }
-
-
-
-    @Override
-    public void clear() {
+    /** include any .clear() for data structures in case of emergency we can continue to assume they will be clear on next run() */
+    @Override public void clear() {
         derivations.clear();
-        super.clear();
+        termutes.clear();
+        preToPost.clear();
         time = ETERNAL;
+        super.clear();
     }
 
     public int getAndSetTTL(int next) {
         int before = this.ttl;
         this.ttl = next;
         return before;
-    }
-
-    public void canChoose(int id) {
-        choices.add(id);
     }
 
     //    /**

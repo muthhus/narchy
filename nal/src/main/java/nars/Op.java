@@ -272,7 +272,7 @@ public enum Op implements $ {
             final int[] subevents = {0};
             a.recurseTerms(sub -> {
                 if (sub.op() == CONJ)
-                    subevents[0] += sub.size();
+                    subevents[0] += sub.subs();
             });
             return subevents[0];
         }
@@ -1033,7 +1033,7 @@ public enum Op implements $ {
 
         //if there is only one implication subterm (first layer only), then fold into that.
         int whichImpl = -1;
-        int conjSize = conj.size();
+        int conjSize = conj.subs();
         Term implication = null;
         int implDT = XTERNAL;
         for (int i = 0; i < conjSize; i++) {
@@ -1153,7 +1153,7 @@ public enum Op implements $ {
 //            return a;
 //        }
 
-        int size = a.size();
+        int size = a.subs();
         List<Term> terms = $.newArrayList(size);
 
         for (int i = 0; i < size; i++) {

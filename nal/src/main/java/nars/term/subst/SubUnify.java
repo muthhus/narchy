@@ -57,10 +57,9 @@ public class SubUnify extends Unify {
     /**
      * terminate after the first match
      *
-     * @param match
      */
     @Override
-    public void onMatch(Term[][] match) {
+    public void tryMatch() {
 
         if (transformed != null) {
             Term result = transformed.transform(this);//transform(transformed);

@@ -68,7 +68,7 @@ public class EllipsisMatch extends GenericCompound {
     }
 
     public final boolean forEachWhile(@NotNull Predicate<? super Term> c) {
-        int s = size();
+        int s = subs();
         for (int i = 0; i < s; i++) {
             if (!c.test(sub(i)))
                 return false;
@@ -77,9 +77,9 @@ public class EllipsisMatch extends GenericCompound {
     }
 
     public boolean linearMatch(TermContainer y, int from, @NotNull Unify subst) {
-        int s = size();
+        int s = subs();
 
-        if (s + from > y.size())
+        if (s + from > y.subs())
             return false; //size mismatch: would extend beyond y's size
 
         for (int i = 0; i < s; i++) {
@@ -118,7 +118,7 @@ public class EllipsisMatch extends GenericCompound {
 
     public boolean rematch(@NotNull TermContainer y, @NotNull Collection<Term> yFree) {
         @NotNull TermContainer x = subterms();
-        int xs = x.size();
+        int xs = x.subs();
         for (int i = 0; i < xs; i++) {
             Term e = x.sub(i);
             //if something in this ellipsis was not present in the matchable subterms

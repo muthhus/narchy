@@ -15,14 +15,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 
-public class ProxyTerm<T extends Term> implements Term {
+public class ProxyTerm<T extends Term> implements Term, CompoundDT {
 
     public final /*HACK make unpublic */ T ref;
 
@@ -48,6 +47,16 @@ public class ProxyTerm<T extends Term> implements Term {
     @Override
     public boolean isTemporal() {
         return ref.isTemporal();
+    }
+
+    @Override
+    public final int dt() {
+        return ref.dt();
+    }
+
+    @Override
+    public final Term term() {
+        return this;
     }
 
     @Override
@@ -229,18 +238,14 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.dt(dt);
     }
 
+
     @Override
-    public @Nullable Set<Term> varsUnique(@Nullable Op type, Set<Term> exceptIfHere) {
-        return ref.varsUnique(type, exceptIfHere);
+    public int subs() {
+        return ref.subs();
     }
 
     @Override
-    public int size() {
-        return ref.size();
-    }
-
-    @Override
-    public boolean contains(Termlike t) {
+    public boolean contains(Term t) {
         return ref.contains(t);
     }
 
@@ -324,11 +329,6 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.isDynamic();
     }
 
-
-    @Override
-    public boolean isAndSubEquals(Op thisOp, int i, Term sub) {
-        return ref.isAndSubEquals(thisOp, i, sub);
-    }
 
     @Override
     public int vars(@Nullable Op type) {

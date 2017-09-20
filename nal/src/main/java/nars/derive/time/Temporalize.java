@@ -479,7 +479,7 @@ public class Temporalize implements ITemporalize {
 
         }
 
-        if (x.size() > 0) {
+        if (x.subs() > 0) {
             Event e = solveComponents(x, trail);
 
             if (e != null) {
@@ -516,7 +516,7 @@ public class Temporalize implements ITemporalize {
             else
                 return null;
         } else if (o.temporal) {
-            int xSize = x.size();
+            int xSize = x.subs();
             if (x.dt() != XTERNAL) {
                 //TODO verify that the provided subterm timing is correct.
                 // if so, return the input as-is
@@ -542,7 +542,7 @@ public class Temporalize implements ITemporalize {
             } else {
                 TermContainer tt = x.subterms();
 
-                int tts = tt.size();
+                int tts = tt.subs();
                 assert (tts > 1);
 
 

@@ -8,7 +8,7 @@ import nars.control.Derivation;
 import nars.derive.*;
 import nars.derive.constraint.*;
 import nars.derive.op.*;
-import nars.index.term.PatternTermIndex;
+import nars.index.term.PatternIndex;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
@@ -238,7 +238,7 @@ public class PremiseRule extends GenericCompound {
     };
 
 
-    public final PremiseRule normalize(PatternTermIndex index) {
+    public final PremiseRule normalize(PatternIndex index) {
         Compound t = index.pattern((Compound) transform(UppercaseAtomsToPatternVariables));
         if (t != this)
             return new PremiseRule(t);
@@ -248,7 +248,7 @@ public class PremiseRule extends GenericCompound {
 
 
     @NotNull
-    public final PremiseRule setup(@NotNull PatternTermIndex index) /* throws PremiseRuleException */ {
+    public final PremiseRule setup(@NotNull PatternIndex index) /* throws PremiseRuleException */ {
 
         assert (index.nar != null);
 
@@ -666,7 +666,7 @@ public class PremiseRule extends GenericCompound {
      * so each premise gets exchanged with the conclusion in order to form a own rule,
      * additionally task("?") is added to ensure that the derived rule is only used in backward inference.
      */
-    public final void backwardPermutation(@NotNull PatternTermIndex index, @NotNull BiConsumer<PremiseRule, String> w) {
+    public final void backwardPermutation(@NotNull PatternIndex index, @NotNull BiConsumer<PremiseRule, String> w) {
 
         Term T = getTask(); //Task
         Term B = getBelief(); //Belief
@@ -702,7 +702,7 @@ public class PremiseRule extends GenericCompound {
      * after generating, these are then backward permuted
      */
     @Nullable
-    public final PremiseRule swapPermutation(@NotNull PatternTermIndex index) {
+    public final PremiseRule swapPermutation(@NotNull PatternIndex index) {
 
         // T, B, [pre] |- C, [post] ||--
         Term T = getTask();
@@ -719,7 +719,7 @@ public class PremiseRule extends GenericCompound {
 
 
     @NotNull
-    private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question, @NotNull PatternTermIndex index) {
+    private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question, @NotNull PatternIndex index) {
 
 
         Map<Term, Term> m = new HashMap(3);

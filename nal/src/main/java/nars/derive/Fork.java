@@ -1,6 +1,5 @@
 package nars.derive;
 
-import jcog.Util;
 import jcog.math.ByteShuffler;
 import nars.$;
 import nars.control.Derivation;
@@ -19,21 +18,16 @@ import java.util.function.Function;
 public class Fork extends AbstractPred<Derivation> {
 
     @NotNull
-    public final PrediTerm[] cache;
+    public final PrediTerm<Derivation>[] branches;
 
     protected Fork(@NotNull PrediTerm[] actions) {
         super($.s((Term[]) actions) /* maybe should be a set but prod is faster */);
-        this.cache = actions;
+        this.branches = actions;
     }
 
     @Override
     public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
-        return fork(transformedBranches(f));
-        //return f.apply(this);
-    }
-
-    public PrediTerm[] transformedBranches(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
-        return Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache);
+        return fork(PrediTerm.transform(f, branches));
     }
 
     /**
@@ -44,7 +38,7 @@ public class Fork extends AbstractPred<Derivation> {
 
         int before = m.now();
 
-        for (PrediTerm c : cache) {
+        for (PrediTerm c : branches) {
 
             c.test(m);
 
@@ -67,16 +61,16 @@ public class Fork extends AbstractPred<Derivation> {
 
             int before = m.now();
 
-            int branches = cache.length;
+            int branches = this.branches.length;
             if (branches == 1) {
-                cache[0].test(m);
+                this.branches[0].test(m);
                 return m.revertLive(before);
             } else {
                 ByteShuffler b = m.shuffler;
                 byte[] order = b.shuffle(m.random, branches, true); //must get a copy because recursion will re-use the shuffler's internal array
 
                 for (int i = 0; i < branches; i++) {
-                    cache[order[i]].test(m);
+                    this.branches[order[i]].test(m);
                     if (!m.revertLive(before))
                         return false;
                 }

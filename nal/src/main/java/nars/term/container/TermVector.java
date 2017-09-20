@@ -81,7 +81,7 @@ public abstract class TermVector implements TermContainer {
 
     @Override
     public void forEach(@NotNull Consumer<? super Term> action) {
-        forEach(action, 0, size());
+        forEach(action, 0, subs());
     }
 
 //    @NotNull
@@ -113,7 +113,7 @@ public abstract class TermVector implements TermContainer {
     }
 
     @Override
-    public abstract int size();
+    public abstract int subs();
 
     @NotNull
     @Override

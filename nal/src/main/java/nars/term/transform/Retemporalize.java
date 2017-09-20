@@ -15,15 +15,16 @@ abstract public class Retemporalize implements CompoundTransform {
 
     public static final Retemporalize retemporalizeAllToDTERNAL = new RetemporalizeAll(DTERNAL);
     public static final Retemporalize retemporalizeAllToXTERNAL = new RetemporalizeAll(XTERNAL);
-    public static final Retemporalize retemporalizeXTERNALToDTERNAL = new RetemporalizeNonXternal(DTERNAL);
-    public static final Retemporalize retemporalizeXTERNALToZero = new RetemporalizeNonXternal(0);
+    public static final Retemporalize retemporalizeXTERNALToDTERNAL = new RetemporalizeFromTo(XTERNAL, DTERNAL);
+    public static final Retemporalize retemporalizeXTERNALToZero = new RetemporalizeFromTo(XTERNAL, 0);
 
     @Override
     public Term transform(Compound x, Op op, int dt) {
-        if (!x.hasAny(TemporalBits))
+        if (!x.hasAny(TemporalBits)) {
             return x;
-        else
-            return CompoundTransform.super.transform(x, op, dt);
+        } else {
+            return CompoundTransform.super.transform(x, op, dt(x));
+        }
     }
 
 
@@ -50,7 +51,7 @@ abstract public class Retemporalize implements CompoundTransform {
     @Override abstract public int dt(Compound x);
 
     @Deprecated
-    public static class RetemporalizeAll extends Retemporalize {
+    public static final class RetemporalizeAll extends Retemporalize {
 
         final int targetDT;
 
@@ -59,26 +60,24 @@ abstract public class Retemporalize implements CompoundTransform {
         }
 
         @Override
-        public int dt(Compound x) {
-            return x.op().temporal ? targetDT : DTERNAL;
+        public final int dt(Compound x) {
+            return targetDT;
         }
     }
 
-    @Deprecated
-    public static class RetemporalizeNonXternal extends Retemporalize {
+    public static final class RetemporalizeFromTo extends Retemporalize {
 
-        final int dtIfXternal;
+        final int from, to;
 
-        public RetemporalizeNonXternal(int dtIfXternal) {
-            this.dtIfXternal = dtIfXternal;
+        public RetemporalizeFromTo(int from, int to) {
+            this.from = from;
+            this.to = to;
         }
 
         @Override
         public int dt(Compound x) {
-            if (!x.op().temporal) return DTERNAL;
-
             int dt = x.dt();
-            return (dt == XTERNAL) ? dtIfXternal : dt;
+            return dt == from ? to : dt;
         }
     }
 

@@ -1,5 +1,6 @@
 package nars.derive;
 
+import jcog.Util;
 import nars.Op;
 import nars.control.Derivation;
 import nars.term.Term;
@@ -43,6 +44,10 @@ public interface PrediTerm<X> extends Term, Predicate<X> {
             else if (ac < bc) return +1;
             else return a.compareTo(b);
         };
+    }
+
+    static <X> PrediTerm<X>[] transform(Function<PrediTerm<X>, PrediTerm<X>> f, PrediTerm[] cache) {
+        return Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache);
     }
 
     default PrediTerm<X> transform(Function<PrediTerm<X>, PrediTerm<X>> f) {

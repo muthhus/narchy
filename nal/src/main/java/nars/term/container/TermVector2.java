@@ -57,14 +57,14 @@ public final class TermVector2 extends TermVector {
         if (obj instanceof TermContainer) {
             if (hash == obj.hashCode()) {
                 TermContainer t = (TermContainer) obj;
-                return (t.size() == 2 && t.sub(0).equals(x) && t.sub(1).equals(y));
+                return (t.subs() == 2 && t.sub(0).equals(x) && t.sub(1).equals(y));
             }
         }
         return false;
     }
 
     @Override
-    public int size() {
+    public int subs() {
         return 2;
     }
 

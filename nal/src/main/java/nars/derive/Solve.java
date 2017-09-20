@@ -118,11 +118,9 @@ abstract public class Solve extends AbstractPred<Derivation> {
 //            ev = Stamp.uncyclic(ev);
 //        }
 
-        d.truth(
-                t,
-                punc,
-                single
-        );
+        d.concTruth = t;
+        d.concPunc = punc;
+        d.single = single;
         return true;
     }
 

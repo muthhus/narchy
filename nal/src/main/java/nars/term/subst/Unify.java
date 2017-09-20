@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -50,9 +50,7 @@ public abstract class Unify extends Versioning implements Subst {
     public final Op type;
 
     @NotNull
-    public final Set<Termutator> termutes =
-            new HashSet();
-    //new LinkedHashSet();
+    public final Set<Termutator> termutes = new LinkedHashSet();
 
 //    @NotNull
 //    public final TermIndex terms;
@@ -101,12 +99,14 @@ public abstract class Unify extends Versioning implements Subst {
     /**
      * called each time all variables are satisfied in a unique way
      *
-     * @param match [variables][2] where index 0 = key, index 1 = value
      * @return whether to continue on any subsequent matches
      */
-    public abstract void onMatch(Term[][] match);
+    public abstract void tryMatch();
 
     public final void tryMutate(Termutator[] chain, int next) {
+        if (!use(Param.TTL_MUTATE))
+            return;
+
         if (++next < chain.length) {
             chain[next].mutate(this, chain, next);
         } else {
@@ -213,43 +213,43 @@ public abstract class Unify extends Versioning implements Subst {
 
     }
 
-    private void tryMatch() {
-
-
-//        if (freeCount.get() > 0) {
-//            //quick test for no assignments
-//            return;
-//        }
-
-        //filter incomplete matches by detecting them here
-        //TODO use a counter to measure this instead of checking all the time
-//        Iterator<Map.Entry<Term, Versioned<Term>>> ee = xy.map.entrySet().iterator();
-//        while (ee.hasNext()) {
-//            Map.Entry<Term, Versioned<Term>> e = ee.next();
-//            Versioned<Term> v = e.getValue();
-//            if ((v == null || v.get() == null) && matchType(e.getKey()))
-//                return;
-//        }
-
-
-//        Set<Term> free = this.free.get();
-//        Term[][] match = new Term[free.size()][];
-//        int m = 0;
-//        for (Term x : free) {
-//            Term y = xy(x);
-//            if (y == null)
-//                return;
-//            match[m++] = new Term[]{x, y};
-//        }
-//        Arrays.sort(match, matchElementComparator); //sort by key
-
-//        if (!matched.add(((ConstrainedVersionMap)xy).snapshot()))
-//            return; //already seen
-
-        onMatch(null /*match*/);
-
-
-    }
+//    private void tryMatch() {
+//
+//
+////        if (freeCount.get() > 0) {
+////            //quick test for no assignments
+////            return;
+////        }
+//
+//        //filter incomplete matches by detecting them here
+//        //TODO use a counter to measure this instead of checking all the time
+////        Iterator<Map.Entry<Term, Versioned<Term>>> ee = xy.map.entrySet().iterator();
+////        while (ee.hasNext()) {
+////            Map.Entry<Term, Versioned<Term>> e = ee.next();
+////            Versioned<Term> v = e.getValue();
+////            if ((v == null || v.get() == null) && matchType(e.getKey()))
+////                return;
+////        }
+//
+//
+////        Set<Term> free = this.free.get();
+////        Term[][] match = new Term[free.size()][];
+////        int m = 0;
+////        for (Term x : free) {
+////            Term y = xy(x);
+////            if (y == null)
+////                return;
+////            match[m++] = new Term[]{x, y};
+////        }
+////        Arrays.sort(match, matchElementComparator); //sort by key
+//
+////        if (!matched.add(((ConstrainedVersionMap)xy).snapshot()))
+////            return; //already seen
+//
+//        onMatch( /*match*/);
+//
+//
+//    }
 
     //final static Comparator<Term[]> matchElementComparator = Comparator.comparing(v -> v[0]);
 
@@ -309,17 +309,13 @@ public abstract class Unify extends Versioning implements Subst {
 
     /** stack counter, not time */
     public final int now() {
-        return this.size();
+        return this.size;
     }
 
-    public void addTTL(int x) {
-        this.ttl += x;
+    /** returns the updated value */
+    public int addTTL(int x) {
+        return this.ttl += x;
     }
-
-//    public final boolean revert(int then) {
-//        versioning.revert(then);
-//        return live();
-//    }
 
     private class ConstrainedVersionMap extends VersionMap<Term, Term> {
         public ConstrainedVersionMap(@NotNull Versioning versioning, int mapCap) {

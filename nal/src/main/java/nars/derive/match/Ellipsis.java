@@ -135,7 +135,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
         if (x.varPattern()==0)
             return null;
 
-        int xsize = x.size();
+        int xsize = x.subs();
         for (int i = 0; i < xsize; i++) {
             Term xi = x.sub(i);
             if (xi instanceof Ellipsis) {
@@ -154,7 +154,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 
     /** this needs to use .term(x) instead of Term[] because of shuffle terms */
     @Nullable public static Ellipsis firstEllipsisRecursive(@NotNull TermContainer x) {
-        int xsize = x.size();
+        int xsize = x.subs();
         for (int i = 0; i < xsize; i++) {
             Term xi = x.sub(i);
             Ellipsis ex = firstEllipsisRecursive(xi);

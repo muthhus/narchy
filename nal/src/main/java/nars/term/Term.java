@@ -46,9 +46,11 @@ import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.list.primitive.ImmutableByteList;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,7 +71,7 @@ import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
 
-public interface Term extends Termlike, Comparable<Term> {
+public interface Term extends Termed, Comparable<Term> {
 
 
     //@NotNull public static final int[] ZeroIntArray = new int[0];
@@ -80,6 +82,7 @@ public interface Term extends Termlike, Comparable<Term> {
     default Term term() {
         return this;
     }
+
 
 
     /*@NotNull*/
@@ -93,7 +96,21 @@ public interface Term extends Termlike, Comparable<Term> {
     int complexity();
 
     @Override
+    int varPattern();
+
+    @Override
+    int varQuery();
+
+    @Override
+    int varIndep();
+
+    @Override
+    int varDep();
+
+    @Override
     int structure();
+
+    @Override boolean contains(Term t);
 
     default void append(ByteArrayDataOutput out) {
         Term.append(this, out);
@@ -110,8 +127,8 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     @Override
-    default int size() {
-        return subterms().size();
+    default int subs() {
+        return subterms().subs();
     }
 
     @Override
@@ -139,7 +156,9 @@ public interface Term extends Termlike, Comparable<Term> {
         return recurseTerms(parentsMust, whileTrue, this);
     }
 
-    /** whether this term is or contains, as subterms, any temporal terms */
+    /**
+     * whether this term is or contains, as subterms, any temporal terms
+     */
     boolean isTemporal();
 
     /**
@@ -188,7 +207,7 @@ public interface Term extends Termlike, Comparable<Term> {
         Compound csrc = (Compound) src;
         TermContainer css = csrc.subterms();
 
-        int n = css.size();
+        int n = css.subs();
         if (n == 0) return src;
 
         Term[] target = new Term[n];
@@ -200,7 +219,7 @@ public interface Term extends Termlike, Comparable<Term> {
                 target[i] = x;
             else {
                 //replacement is in this subtree
-                target[i] = x.size() == 0 ? replacement : x.transform(path, depth + 1, replacement);
+                target[i] = x.subs() == 0 ? replacement : x.transform(path, depth + 1, replacement);
             }
 
         }
@@ -226,7 +245,7 @@ public interface Term extends Termlike, Comparable<Term> {
     @Nullable
     static byte[] pathTo(/*@NotNull*/ ByteArrayList p, TermContainer superTerm, /*@NotNull*/ Term target) {
 
-        int n = superTerm.size();
+        int n = superTerm.subs();
         for (int i = 0; i < n; i++) {
             Term s = superTerm.sub(i);
             if (s.equals(target)) {
@@ -252,7 +271,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
         int ppp = p.size();
 
-        int n = superTerm.size();
+        int n = superTerm.subs();
         for (int i = 0; i < n; i++) {
             Term s = superTerm.sub(i);
             X ss = subterm.apply(s);
@@ -427,14 +446,6 @@ public interface Term extends Termlike, Comparable<Term> {
 //    }
 
 
-    @Override
-    default boolean levelValid(int nal) {
-
-        if (nal >= 8) return true;
-
-        int mask = Op.NALLevelEqualAndAbove[nal];
-        return (structure() | mask) == mask;
-    }
 
 
     default String structureString() {
@@ -491,7 +502,7 @@ public interface Term extends Termlike, Comparable<Term> {
 //
             case CONJ:
 
-                if (size() == 2) {
+                if (subs() == 2) {
                     int dt = dt();
 
                     switch (dt) {
@@ -511,7 +522,7 @@ public interface Term extends Termlike, Comparable<Term> {
                     int s = 0;
 
                     TermContainer tt = subterms();
-                    int l = tt.size();
+                    int l = tt.subs();
                     for (int i = 0; i < l; i++) {
                         Term x = tt.sub(i);
                         s = Math.max(s, x.dtRange());
@@ -680,7 +691,6 @@ public interface Term extends Termlike, Comparable<Term> {
      * unwraps any negation superterm
      */
     /*@NotNull*/
-    @Override
     default Term unneg() {
         if (op() == NEG) {
             Term x = sub(0);
@@ -783,10 +793,26 @@ public interface Term extends Termlike, Comparable<Term> {
      * return null if none, cheaper than using an empty iterator
      */
     @Nullable
-    default Set<Term> varsUnique(@Nullable Op type, @Nullable Set<Term> exceptIfHere) {
-        return null;
-    }
+    default Set<Variable> varsUnique(@Nullable Op type/*, Set<Term> exceptIfHere*/) {
+        int num = vars(type);
+        if (num == 0)
+            return null;
 
+        //must check all in case of repeats
+        MutableSet<Variable> u = new UnifiedSet(num);
+        final int[] remain = {num};
+
+        recurseTerms(parent -> vars(type) > 0,
+                (sub) -> {
+                    if (sub instanceof Variable && (type == null || sub.op() == type)) {
+                        //if (!unlessHere.contains(sub))
+                        u.add((Variable) sub);
+                        remain[0]--;
+                    }
+                    return (remain[0] > 0);
+                });
+        return u.isEmpty() ? null : u;
+    }
 
     /**
      * TODO override in Compound implementations for accelerated root comparison without root() instantiation
@@ -797,7 +823,6 @@ public interface Term extends Termlike, Comparable<Term> {
 
     /**
      * returns this term in a form which can identify a concept, or Null if it can't
-     *
      */
     default Term conceptual() {
         return this;
@@ -810,7 +835,6 @@ public interface Term extends Termlike, Comparable<Term> {
         return this;
     }
 
-    @Override
     default int dt() {
         return DTERNAL;
     }
@@ -827,16 +851,16 @@ public interface Term extends Termlike, Comparable<Term> {
 
     default Term replace(/*@NotNull*/ Map<Term, Term> m) {
 
-            Subst s;
+        Subst s;
 
-            if (m.size() == 1) {
-                Map.Entry<Term, Term> e = m.entrySet().iterator().next();
-                s = new MapSubst1(e.getKey(), e.getValue());
-            } else
-                s = new MapSubst(m);
+        if (m.size() == 1) {
+            Map.Entry<Term, Term> e = m.entrySet().iterator().next();
+            s = new MapSubst1(e.getKey(), e.getValue());
+        } else
+            s = new MapSubst(m);
 
-            //return s.transform(this);
-            return transform(s);
+        //return s.transform(this);
+        return transform(s);
 
     }
 

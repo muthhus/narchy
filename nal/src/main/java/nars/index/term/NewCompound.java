@@ -47,7 +47,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
      * hash will be modified for each added subterm
      *
      * @param initial_capacity estimated size, but will grow if exceeded
-     * @param op if null, indicates construction of a subterms vector
+     * @param op               if null, indicates construction of a subterms vector
      */
     public NewCompound(@Nullable Op op, int initial_capacity) {
         super();
@@ -69,7 +69,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
 //    }
 
     @Override
-    public int size() {
+    public int subs() {
         return size;
     }
 
@@ -82,18 +82,9 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
      * use only during actual builder step; should not be called while being compared
      */
     @Override
-    public Term[] subs() {
+    public Term[] theArray() {
         compact(); //compact the key
 
-        Term[] tt = this.theArray();
-
-        this.subs = null; //clear refernce to the array from this point
-
-        return tt;
-    }
-
-    @Override
-    public Term[] theArray() {
         Term[] tt;
         int s = this.size;
         @NotNull Term[] ss = this.subs;
@@ -103,12 +94,15 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
         } else {
             tt = Arrays.copyOfRange(ss, 0, s); //trim
         }
+        this.subs = null; //clear refernce to the array from this point
+
         return tt;
     }
 
+
     @Override
     public Term[] toArray() {
-       return theArray().clone();
+        return theArray().clone();
     }
 
 //    @Override
@@ -188,7 +182,6 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
     }
 
 
-
     public boolean add(@NotNull Term x) {
         int c = subs.length;
         int len = this.size;
@@ -249,7 +242,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
     @Override
     public String toString() {
         return getClass().getSimpleName() + '<' +
-                (op!=null ? (op + "|") : "") +
+                (op != null ? (op + "|") : "") +
                 Arrays.toString(Arrays.copyOfRange(subs, 0, size)) + //HACK use more efficient string method
                 '>';
     }

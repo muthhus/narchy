@@ -107,7 +107,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void subbelief_2() throws Narsese.NarseseException {
         Term t = $.$("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001})))");
-        assertEquals(2, t.size());
+        assertEquals(2, t.subs());
         assertEquals(10, t.dtRange());
 
         test

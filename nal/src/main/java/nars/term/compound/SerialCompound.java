@@ -72,7 +72,7 @@ public class SerialCompound extends DynBytes implements Compound {
     }
 
     @Override
-    public int size() {
+    public int subs() {
         return bytes[1];
     }
 

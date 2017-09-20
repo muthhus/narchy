@@ -150,7 +150,7 @@ public class TermKey extends HashCachedBytes {
 
     static void writeTermContainerSeq(@NotNull DataOutput out, @NotNull TermContainer c, boolean includeTemporal) throws IOException {
 
-        int siz = c.size();
+        int siz = c.subs();
         for (int i = 0; i < siz; i++) {
             writeTermSeq(out, c.sub(i), includeTemporal);
             if (i < siz - 1)

@@ -20,6 +20,15 @@ import java.util.stream.Stream;
  */
 public final class AndCondition<D> extends AbstractPred<D> {
 
+    @Override
+    public final boolean test(Object m) {
+        for (PrediTerm x : cache) {
+            boolean b = x.test(m);
+            if (!b)
+                return false;
+        }
+        return true;
+    }
     AndCondition(@NotNull PrediTerm<D>[] p) {
         super($.p((Term[]) p));
         assert (p.length >= 2) : "unnecessary use of AndCondition";
@@ -73,21 +82,18 @@ public final class AndCondition<D> extends AbstractPred<D> {
 
     /** chase the last of the last of the last(...etc.) condition in any number of recursive AND's */
     public static PrediTerm last(PrediTerm b) {
-        while (b instanceof AndCondition) {
+        while (b instanceof AndCondition)
             b = ((AndCondition)b).last();
-        }
         return b;
     }
 
-    @Override
-    public final boolean test(Object m) {
-        for (PrediTerm x : cache) {
-            boolean b = x.test(m);
-            if (!b)
-                return false;
-        }
-        return true;
+     /** chase the last of the first of the first (...etc.) condition in any number of recursive AND's */
+    public static PrediTerm first(PrediTerm b) {
+        while (b instanceof AndCondition)
+            b = ((AndCondition)b).first();
+        return b;
     }
+
 
     @Override
     public PrediTerm<D> transform(Function<PrediTerm<D>, PrediTerm<D>> f) {

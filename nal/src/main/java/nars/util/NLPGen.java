@@ -1,7 +1,7 @@
 package nars.util;
 
 import nars.*;
-import nars.index.term.PatternTermIndex;
+import nars.index.term.PatternIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Unify;
@@ -19,7 +19,7 @@ import static nars.Op.VAR_PATTERN;
 public class NLPGen {
 
     final NAR terminal = NARS.shell();
-    final PatternTermIndex index = new PatternTermIndex(terminal);
+    final PatternIndex index = new PatternIndex(terminal);
 
     public interface Rule {
         @NotNull String get(Term t, float freq, float conf, Tense tense);
@@ -78,7 +78,7 @@ public class NLPGen {
                         Unify u = new Unify(VAR_PATTERN, terminal.random(), Param.UnificationStackMax, terminal.matchTTL.intValue()) {
 
                             @Override
-                            public void onMatch(Term[][] match) {
+                            public void tryMatch() {
 
 
                                 final String[] r = {natural};

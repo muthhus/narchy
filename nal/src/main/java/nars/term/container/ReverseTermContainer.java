@@ -11,11 +11,11 @@ public class ReverseTermContainer implements TermContainer {
 
     public ReverseTermContainer(TermContainer ref) {
         this.ref = ref;
-        this.size = ref.size();
+        this.size = ref.subs();
     }
 
     @Override
-    public int size() {
+    public int subs() {
         return size;
     }
 

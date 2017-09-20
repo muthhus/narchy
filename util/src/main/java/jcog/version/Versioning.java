@@ -35,12 +35,13 @@ public class Versioning<X> extends
 
     /**
      * reverts/undo to previous state
+     * returns whether any revert was actually applied
      */
-    public final void revert(int when) {
+    public final boolean revert(int when) {
 
         int s = size;
-        if (s == 0)
-            return;
+        if (s == 0 || s==when)
+            return false;
 
         int c = s - when;
         final Versioned<X>[] i = this.items;
@@ -51,6 +52,7 @@ public class Versioning<X> extends
         }
 
         this.size = s;
+        return true;
     }
 
 

@@ -2,19 +2,16 @@ package nars.derive;
 
 import nars.NAR;
 import nars.Param;
-import nars.Task;
 import nars.control.Derivation;
-import nars.task.NALTask;
+import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
-import nars.time.Tense;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.function.BiFunction;
+import java.util.Set;
 
 import static nars.Op.GOAL;
 import static nars.time.Tense.ETERNAL;
@@ -28,28 +25,31 @@ import static nars.time.Tense.ETERNAL;
  * a unique instance, assigned the appropriate cause id by the NAR
  * at initialization.
  */
-public class Conclusion extends AbstractPred<Derivation> {
+public final class Conclusion extends AbstractPred<Derivation> {
 
 
     private final static Logger logger = LoggerFactory.getLogger(Conclusion.class);
-    private final Term pattern;
+    public final Term pattern;
     private final boolean goalUrgent;
+
+
+    public final Set<Variable> uniqueVars;
 
     public Conclusion(Term id, Term pattern, boolean goalUrgent) {
         super(id);
         this.pattern = pattern;
+        this.uniqueVars = pattern instanceof Compound ? ((PatternCompound)pattern).uniqueVars : Set.of();
         this.goalUrgent = goalUrgent;
     }
 
-    /**
-     * @return true to allow the matcher to continue matching,
-     * false to stop it
-     */
+
+
+
+
     @Override
     public final boolean test(@NotNull Derivation p) {
 
         NAR nar = p.nar;
-
 
         p.use(Param.TTL_DERIVE_TRY);
         nar.emotion.derivationEval.increment();
@@ -60,23 +60,23 @@ public class Conclusion extends AbstractPred<Derivation> {
         if (c1 == null || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
             return false;
 
-        @NotNull final long[] occ;
+        final long[] occ = p.derivedOcc;
+        occ[0] = occ[1] = ETERNAL;
+
         final float[] confGain = {1f}; //flat by default
 
         Term c2;
-        if (p.temporal) {
+        if (p.taskOrBeliefIsEvent || c1.isTemporal()) {
 
-            Term t1;
             try {
-                occ = new long[]{ETERNAL, ETERNAL};
-                t1 = solveTime(p, c1, occ, confGain);
 
+                DerivationTemporalize dt = p.temporalize;
+                if (dt == null) {
+                    p.temporalize = dt = new DerivationTemporalize(p); //cache in derivation
+                }
 
-//                if (t1!=null && occ[0] == 7) {
-//                    //FOR A SPECIFIC TEST TEMPORAR
-//                    System.err.println("wtf");
-//                    solveTime(d, c1, occ, eviGain);
-//                }
+                c2 = dt.solve(p, c1, occ, confGain);
+
             } catch (InvalidTermException t) {
                 if (Param.DEBUG) {
                     logger.error("temporalize error: {} {} {}", p, c1, t.getMessage());
@@ -85,7 +85,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             }
 
             //invalid or impossible temporalization; could not determine temporal attributes. seems this can happen normally
-            if (t1 == null || t1.volume() > volMax || !t1.op().conceptualizable/*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
+            if (c2 == null || c2.volume() > volMax || !c2.op().conceptualizable/*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
 //                            throw new InvalidTermException(c1.op(), c1.dt(), "temporalization failure"
 //                                    //+ (Param.DEBUG ? rule : ""), c1.toArray()
 //                            );
@@ -102,7 +102,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             if (goalUrgent && p.concPunc == GOAL) {
                 long taskStart = p.task.start();
 
-                if (p.temporal && taskStart == ETERNAL)
+                if (taskStart == ETERNAL)
                     taskStart = p.time;
 
                 //if (taskStart != ETERNAL) {
@@ -115,10 +115,7 @@ public class Conclusion extends AbstractPred<Derivation> {
                 }
             }
 
-            c2 = t1;
-
         } else {
-            occ = Tense.ETERNAL_RANGE;
             c2 = c1;
         }
 
@@ -126,27 +123,12 @@ public class Conclusion extends AbstractPred<Derivation> {
         if (c2 == null)
             return false;
 
-
-        p.derivedTerm.set(c2);
-        p.derivedOcc = occ;
-        return p.live();
-    }
-
-    final static BiFunction<Task, Task, Task> DUPLICATE_DERIVATION_MERGE = (pp, tt) -> {
-        pp.priMax(tt.pri());
-        if (!Arrays.equals(pp.cause(), tt.cause())) //dont merge if they are duplicates, it's pointless here
-            ((NALTask) pp).causeMerge(tt);
-        return pp;
-    };
-
-    @Nullable
-    private static Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] confGain) {
-        DerivationTemporalize dt = d.temporalize;
-        if (dt == null) {
-            d.temporalize = dt = new DerivationTemporalize(d); //cache in derivation
+        if (p.live()) {
+            p.derivedTerm.set(c2);
+            return true;
+        } else {
+            return false;
         }
-//        dt = new DerivationTemporalize(d);
-        return dt.solve(d, c1, occ, confGain);
     }
 
 

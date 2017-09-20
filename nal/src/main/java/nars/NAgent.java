@@ -494,7 +494,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
             }
             m[0] += c;
         });
-        return w2c(m[0] / n /* avg */);
+        return m[0] > 0 ? w2c(m[0] /* / n*/ /* avg */) : 0;
     }
 
 

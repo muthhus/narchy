@@ -71,7 +71,7 @@ public class ArrayTermVector extends TermVector {
                 return false;
 
             int s = x.length;
-            if (s != c.size())
+            if (s != c.subs())
                 return false;
             for (int i = 0; i < s; i++)
                 if (!x[i].equals(c.sub(i)))
@@ -92,7 +92,7 @@ public class ArrayTermVector extends TermVector {
     }
 
     @Override
-    public final int size() {
+    public final int subs() {
         return terms.length;
     }
 

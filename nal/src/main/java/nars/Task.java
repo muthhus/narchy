@@ -1,6 +1,5 @@
 package nars;
 
-import com.google.common.hash.BloomFilter;
 import jcog.Texts;
 import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
@@ -32,7 +31,6 @@ import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
@@ -132,7 +130,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                 return fail(t, "term not conceptualizable", safe);
             }
 
-            return (t.size() == 0) || validTaskCompound(t, punc, safe);
+            return (t.subs() == 0) || validTaskCompound(t, punc, safe);
         }
 
         return true;
@@ -771,7 +769,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         return Stamp.isCyclic(stamp());
     }
 
-    @Override
     default int dt() {
         return term().dt();
     }

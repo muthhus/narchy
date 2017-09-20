@@ -33,8 +33,8 @@ public class StructuralSimilarity implements Consumer<Task> {
             if (a.op() == Op.SETe && b.op() == Op.SETe) {
                 Compound A = (Compound) a;
                 Compound B = (Compound) b;
-                int bs = B.size();
-                int as = A.size();
+                int bs = B.subs();
+                int as = A.subs();
                 int max = Math.max(as, bs);
                 int plus = as + bs;
                 Set<Term> e = new HashSet(plus);

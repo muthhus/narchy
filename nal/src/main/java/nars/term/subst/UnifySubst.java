@@ -38,7 +38,7 @@ public class UnifySubst extends Unify {
 
 
 
-    @Override public void onMatch(Term[][] match) {
+    @Override public void tryMatch() {
 
         //TODO combine these two blocks to use the same sub-method
 

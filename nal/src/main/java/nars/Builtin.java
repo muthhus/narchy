@@ -140,7 +140,7 @@ public class Builtin {
                 }
             } else {
                 //random
-                which = nar.random().nextInt(x.size());
+                which = nar.random().nextInt(x.subs());
             }
 
             return x.sub(which);
@@ -151,7 +151,7 @@ public class Builtin {
         nar.on(Functor.f2((Atom) $.the("without"), (Term container, Term content) -> {
             if (container.op().commutative) {
                 TermContainer cs = container.subterms();
-                int z = cs.size();
+                int z = cs.subs();
                 if (z > 1 && cs.contains(content)) {
                     @NotNull SortedSet<Term> s = cs.toSortedSet();
                     if (s.remove(content)) {
@@ -178,7 +178,7 @@ public class Builtin {
             if (!oo.in(SETi.bit | SETe.bit))
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
-            int size = t.size();
+            int size = t.subs();
             switch (size) {
                 case 0:
                     assert (false) : "empty set impossible here";
@@ -203,7 +203,7 @@ public class Builtin {
             int tdt = t.dt();
             Term r;
             if (tdt == DTERNAL || tdt == 0 || tdt == XTERNAL) {
-                switch (t.size()) {
+                switch (t.subs()) {
                     case 0:
                     case 1:
                         throw new RuntimeException("degenerate conjunction cases");
@@ -238,9 +238,9 @@ public class Builtin {
             if (c.op() != CONJ || !(when instanceof Atom))
                 return null;
             if (c.dt() == DTERNAL || c.dt() == 0) {
-                return c.sub(nar.random().nextInt(c.size())); //choose a subterm at random
+                return c.sub(nar.random().nextInt(c.subs())); //choose a subterm at random
             }
-            assert (c.size() == 2);
+            assert (c.subs() == 2);
             int target;
             switch (when.toString()) {
                 case "early":
@@ -305,7 +305,7 @@ public class Builtin {
         nar.on(Functor.f("top", (args) -> {
 
             String query;
-            if (args.size() > 0 && args.sub(0) instanceof Atom) {
+            if (args.subs() > 0 && args.sub(0) instanceof Atom) {
                 query = $.unquote(args.sub(0)).toLowerCase();
             } else {
                 query = null;
@@ -344,10 +344,10 @@ public class Builtin {
 //            a specific integer value index, from 0 to compound size
 //            (a,b) pair of integers, a range of indices */
             nar.on(Functor.f("slice", (args) -> {
-                if (args.size() == 2) {
+                if (args.subs() == 2) {
                     Term x = args.sub(0);
-                    if (x.size() > 0) {
-                        int len = x.size();
+                    if (x.subs() > 0) {
+                        int len = x.subs();
 
                         Term index = args.sub(1);
                         Op o = index.op();
@@ -359,7 +359,7 @@ public class Builtin {
                             else
                                 return False;
 
-                        } else if (o == PROD && index.size() == 2) {
+                        } else if (o == PROD && index.subs() == 2) {
                             Term start = (index).sub(0);
                             if (start.op() == INT) {
                                 Term end = (index).sub(1);
@@ -456,7 +456,7 @@ public class Builtin {
     }
 
     static Term[] dropRandom(Random random, TermContainer t) {
-        int size = t.size();
+        int size = t.subs();
         assert (size > 1);
         Term[] y = new Term[size - 1];
         int except = random.nextInt(size);

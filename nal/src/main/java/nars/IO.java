@@ -273,7 +273,7 @@ public class IO {
 //    }
 
     public static void writeTermContainer(@NotNull ByteArrayDataOutput out, @NotNull TermContainer c) {
-        int siz = c.size();
+        int siz = c.subs();
 
         out.writeByte(siz);
 
@@ -469,7 +469,7 @@ public class IO {
             c.op().append(c, p);
 
             TermContainer cs = c.subterms();
-            if (cs.size() == 1)
+            if (cs.subs() == 1)
                 p.append(Op.ARGUMENT_SEPARATOR);
 
             appendArgs(cs, p);
@@ -484,7 +484,7 @@ public class IO {
 
             p.append(o);
 
-            if (c.size() == 1)
+            if (c.subs() == 1)
                 p.append(Op.ARGUMENT_SEPARATOR);
 
             appendArgs(c, filter, p);
@@ -495,7 +495,7 @@ public class IO {
 
 
         static void appendArgs(@NotNull TermContainer c, @NotNull Appendable p) throws IOException {
-            int nterms = c.size();
+            int nterms = c.subs();
 
             boolean bb = nterms > 1;
             for (int i = 0; i < nterms; i++) {
@@ -507,7 +507,7 @@ public class IO {
         }
 
         static void appendArgs(@NotNull TermContainer c, @NotNull Function<Term, Term> filter, @NotNull Appendable p) throws IOException {
-            int nterms = c.size();
+            int nterms = c.subs();
 
             boolean bb = nterms > 1;
             for (int i = 0; i < nterms; i++) {
@@ -546,7 +546,7 @@ public class IO {
                     }
             }
 
-            if (op.statement || c.size() == 2) {
+            if (op.statement || c.subs() == 2) {
 
                 //special case: functional form
                 if (c.hasAll(Op.opBits)) {
@@ -621,7 +621,7 @@ public class IO {
 
         static void productAppend(@NotNull TermContainer product, @NotNull Appendable p) throws IOException {
 
-            int s = product.size();
+            int s = product.subs();
             p.append(Op.COMPOUND_TERM_OPENER);
             for (int i = 0; i < s; i++) {
                 product.sub(i).append(p);
@@ -635,7 +635,7 @@ public class IO {
 
         static void setAppend(@NotNull Compound set, @NotNull Appendable p) throws IOException {
 
-            int len = set.size();
+            int len = set.subs();
 
             //duplicated from above, dont want to store this as a field in the class
             char opener, closer;

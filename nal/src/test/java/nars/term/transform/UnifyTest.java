@@ -2,7 +2,7 @@ package nars.term.transform;
 
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
-import nars.index.term.PatternTermIndex;
+import nars.index.term.PatternIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Subst;
@@ -60,7 +60,7 @@ public class UnifyTest {
 
             Compound t1;
             if (type == Op.VAR_PATTERN) {
-                t1 = new PatternTermIndex(NARS.shell()).pattern( s1 ); //special handling for ellipsis
+                t1 = new PatternIndex(NARS.shell()).pattern( s1 ); //special handling for ellipsis
                 assertNotNull(t1);
             } else {
                 t1 = (Compound)Narsese.parse().term(s1, true);
@@ -93,7 +93,7 @@ public class UnifyTest {
 
 
                 @Override
-                public void onMatch(Term[][] match) {
+                public void tryMatch() {
 
                     if (shouldSub) {
 
@@ -960,7 +960,7 @@ public class UnifyTest {
         Unify f = new Unify(Op.VAR_QUERY, new XorShift128PlusRandom(1), Param.UnificationStackMax, 128) {
 
             @Override
-            public void onMatch(Term[][] match) {
+            public void tryMatch() {
 
                 assertTrue(matches);
 

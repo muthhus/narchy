@@ -109,7 +109,7 @@ public class Revision {
             return a;
         }
 
-        int len = a.size();
+        int len = a.subs();
         if (len > 0) {
 
             Op ao = a.op();
@@ -480,9 +480,9 @@ public class Revision {
         float d = dLocal;
 
         TermContainer aa = a.subterms();
-        int len = aa.size();
+        int len = aa.subs();
         TermContainer bb = b.subterms();
-        if (bb.size()!=len)
+        if (bb.subs()!=len)
             return Float.POSITIVE_INFINITY; //? why
 
         for (int i = 0; i < len; i++) {

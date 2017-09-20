@@ -101,7 +101,6 @@ public class Cause {
             default:
                 return zip(CAUSE_CAPACITY, Util.map((x) -> x::cause, new Supplier[e.length], e)); //HACK
         }
-
     }
 
 //    public static short[] append(int maxLen, short[] src, short[] add) {

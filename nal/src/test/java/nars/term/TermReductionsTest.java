@@ -138,7 +138,7 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testFunctionRecursion() throws Narsese.NarseseException {
         //that this is valid, though self referential
-        assertTrue($("task((polarize(%1,task) ==>+- polarize(%2,belief)))").size() > 0);
+        assertTrue($("task((polarize(%1,task) ==>+- polarize(%2,belief)))").subs() > 0);
     }
 
 //    @Test
@@ -374,8 +374,8 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals(d, cc.toString());
 
         //correct subterm ordering by volume
-        assertTrue(aa.sub(0).size() > aa.sub(1).size());
-        assertTrue(cc.sub(0).size() > cc.sub(1).size());
+        assertTrue(aa.sub(0).subs() > aa.sub(1).subs());
+        assertTrue(cc.sub(0).subs() > cc.sub(1).subs());
 
     }
 
@@ -409,7 +409,7 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testConjunctionNormal() throws Narsese.NarseseException {
         Term x = $("(&&, <#1 --> lock>, <#1 --> (/, open, #2, _)>, <#2 --> key>)");
-        assertEquals(3, x.size());
+        assertEquals(3, x.subs());
         assertEquals(CONJ, x.op());
     }
 
@@ -505,7 +505,7 @@ public class TermReductionsTest extends NarseseTest {
                 seti($("a"), $("b"), $("c")),
                 seti($("d"), $("b")));
         assertEquals(Op.SETi, d.op());
-        assertEquals(d.toString(), 2, d.size());
+        assertEquals(d.toString(), 2, d.subs());
         assertEquals("[a,c]", d.toString());
     }
 
@@ -517,7 +517,7 @@ public class TermReductionsTest extends NarseseTest {
         Term b = sete($("d"), $("b"));
         Term d = diffe(a, b);
         assertEquals(Op.SETe, d.op());
-        assertEquals(d.toString(), 2, d.size());
+        assertEquals(d.toString(), 2, d.subs());
         assertEquals("{a,c}", d.toString());
 
     }

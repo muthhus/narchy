@@ -91,7 +91,7 @@ public class ActiveQuestionTask extends NALTask implements Consumer<Task> {
         }
 
         @Override
-        public void onMatch(Term[][] match) {
+        public void tryMatch() {
             //accept(x, xy);
             this.match = true;
             setTTL(0); //accept only one

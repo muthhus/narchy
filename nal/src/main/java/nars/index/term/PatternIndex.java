@@ -26,12 +26,12 @@ import static nars.Op.concurrent;
 /**
  * Index which specifically holds the term components of a deriver ruleset.
  */
-public class PatternTermIndex extends MapTermIndex {
+public class PatternIndex extends MapTermIndex {
 
     /** HACK holds a deriverID allowing the cause channel to include it, for multiple derivers. this is messy */
     public short deriverID = -1;
 
-    public PatternTermIndex(@NotNull NAR n) {
+    public PatternIndex(@NotNull NAR n) {
         super(new HashMap<>());
         this.nar = n;
     }
@@ -55,7 +55,7 @@ public class PatternTermIndex extends MapTermIndex {
 
 
         TermContainer s = x.subterms();
-        int ss = s.size();
+        int ss = s.subs();
         Term[] bb = new Term[ss];
         boolean changed = false;//, temporal = false;
         for (int i = 0; i < ss; i++) {
@@ -140,10 +140,14 @@ public class PatternTermIndex extends MapTermIndex {
 
     }
 
+    public Term pattern(Term x) {
+        return x instanceof Compound ? pattern((Compound) x) : get(x, true).term();
+    }
+
     /**
      * returns an normalized, optimized pattern term for the given compound
      */
-    public @NotNull Compound pattern(@NotNull Compound x) {
+    public @NotNull Compound pattern(Compound x) {
 
         Term y = x.transform(new PremiseRuleVariableNormalization());
 

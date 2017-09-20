@@ -148,21 +148,21 @@ public class NarseseBaseTest extends NarseseTest {
     public void testInfix2() throws Narsese.NarseseException {
         Compound t = term("(x & y)");
         assertEquals(Op.SECTe, t.op());
-        assertEquals(2, t.size());
+        assertEquals(2, t.subs());
         assertEquals("x", t.sub(0).toString());
         assertEquals("y", t.sub(1).toString());
 
         Compound a = term("(x | y)");
         assertEquals(Op.SECTi, a.op());
-        assertEquals(2, a.size());
+        assertEquals(2, a.subs());
 
         Compound b = term("(x * y)");
         assertEquals(Op.PROD, b.op());
-        assertEquals(2, b.size());
+        assertEquals(2, b.subs());
 
         Compound c = term("(<a -->b> && y)");
         assertEquals(Op.CONJ, c.op());
-        assertEquals(2, c.size());
+        assertEquals(2, c.subs());
         assertEquals(5, c.complexity());
         assertEquals(Op.INH, c.sub(0).op()); //heavier term on the left
     }
@@ -314,16 +314,16 @@ public class NarseseBaseTest extends NarseseTest {
     public void testSet() throws Narsese.NarseseException {
         Compound xInt = term("[x]");
         assertEquals(Op.SETi, xInt.op());
-        assertEquals(1, xInt.size());
+        assertEquals(1, xInt.subs());
         assertEquals("x", xInt.sub(0).toString());
 
         Compound xExt = term("{x}");
         assertEquals(Op.SETe, xExt.op());
-        assertEquals(1, xExt.size());
+        assertEquals(1, xExt.subs());
         assertEquals("x", xExt.sub(0).toString());
 
         Compound abInt = term("[a,b]");
-        assertEquals(2, abInt.size());
+        assertEquals(2, abInt.subs());
         assertEquals("a", abInt.sub(0).toString());
         assertEquals("b", abInt.sub(1).toString());
 

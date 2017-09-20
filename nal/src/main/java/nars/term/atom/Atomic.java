@@ -55,6 +55,25 @@ public interface Atomic extends Term {
     default @Nullable Term temporalize(Retemporalize r) { return this; }
 
     @Override
+    default int varDep() {
+        return 0;
+    }
+
+    @Override
+    default int varIndep() {
+        return 0;
+    }
+
+    @Override
+    default int varQuery() {
+        return 0;
+    }
+
+    @Override
+    default int varPattern() {
+        return 0;
+    }
+    @Override
     default Term replace(Map<Term, Term> m) {
         Term y = m.get(this); //atom substitutions
         return y != null ? y : this;
@@ -155,7 +174,7 @@ public interface Atomic extends Term {
 
     /** number of subterms; for atoms this must be zero */
     @Override
-    default int size() {
+    default int subs() {
         return 0;
     }
 
@@ -166,7 +185,7 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default boolean contains(Termlike t) {
+    default boolean contains(Term t) {
         return false;
     }
 

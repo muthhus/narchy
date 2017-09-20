@@ -48,7 +48,7 @@ public interface CompoundTransform extends TermContext {
 
         @NotNull TermContainer srcSubs = x.subterms(); //for faster access, generally
 
-        int s = srcSubs.size(), subtermMods = 0;
+        int s = srcSubs.subs(), subtermMods = 0;
 
         NewCompound target = new NewCompound(op, s);
 
@@ -64,7 +64,7 @@ public interface CompoundTransform extends TermContext {
 
             if (y instanceof EllipsisMatch) {
                 EllipsisMatch xx = (EllipsisMatch) y;
-                int xxs = xx.size();
+                int xxs = xx.subs();
                 for (int j = 0; j < xxs; j++) {
                     @Nullable Term k = xx.sub(j).transform(this);
                     if (Term.invalidBoolSubterm(k, boolFilter)) {
