@@ -3,6 +3,7 @@ package nars.concept;
 import nars.$;
 import nars.NAR;
 import nars.Task;
+import nars.task.ITask;
 import nars.term.Term;
 import nars.time.Tense;
 import nars.truth.Truth;
@@ -41,7 +42,7 @@ public class BeliefActionConcept extends ActionConcept {
 //    }
 
     @Override
-    public Stream<Task> update(long now, int dur, NAR nar) {
+    public Stream<ITask> update(long now, int dur, NAR nar) {
 
         long nowStart = now;
         long nowEnd = now + dur;

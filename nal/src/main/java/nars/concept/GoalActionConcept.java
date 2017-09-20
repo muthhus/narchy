@@ -3,6 +3,7 @@ package nars.concept;
 import jcog.Util;
 import jcog.data.FloatParam;
 import nars.*;
+import nars.task.ITask;
 import nars.task.SignalTask;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -89,7 +90,7 @@ public class GoalActionConcept extends ActionConcept {
         return v;
     }
 
-    @Override public Stream<Task> update(long now, int dur, NAR nar) {
+    @Override public Stream<ITask> update(long now, int dur, NAR nar) {
 
 
         long pStart = now;
@@ -102,7 +103,7 @@ public class GoalActionConcept extends ActionConcept {
         float cur = curiosity.floatValue();
 
         Truth belief;
-        Task fg;
+        ITask fg;
         if (nar.random().nextFloat() < cur) {
 //            // curiosity override
 //

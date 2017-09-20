@@ -8,6 +8,7 @@ import jcog.math.FloatSupplier;
 import nars.concept.ScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
+import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -33,7 +34,7 @@ public interface NSense {
     @NotNull Atomic MID = Atomic.the("mid");
     @NotNull Atomic HIH = Atomic.the("hih");
 
-    @NotNull Map<SensorConcept,CauseChannel<Task>> sensors();
+    @NotNull Map<SensorConcept,CauseChannel<ITask>> sensors();
 
     NAR nar();
 
@@ -57,7 +58,7 @@ public interface NSense {
     }
 
     default void addSensor(SensorConcept c) {
-        CauseChannel existing = sensors().put(c, nar().newCauseChannel(c));
+        CauseChannel<ITask> existing = sensors().put(c, nar().newCauseChannel(c));
         assert(existing == null);
         nar().on(c);
     }

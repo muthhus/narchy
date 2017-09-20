@@ -22,7 +22,9 @@
  */
 
 package spacegraph.phys;
+
 import jcog.list.FasterList;
+import jcog.util.DoubleBuffer;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;
@@ -76,6 +78,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     @Nullable protected v3 gravity;
 
 
+    DoubleBuffer<List<Collidable>> coll = new DoubleBuffer(FasterList::new);
     private List<Collidable> collidable = new FasterList();
 
     final FasterList<BroadConstraint> broadConstraints = new FasterList<>(0);
@@ -234,7 +237,8 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
     protected final void updateObjects() {
 
-        List<Collidable> nextCollidables = new FasterList( collidable.size() );
+        List<Collidable> nextCollidables = coll.preWrite();
+        nextCollidables.clear();
 
         forEachIntSpatial((i, s) -> {
 
@@ -285,7 +289,8 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
 
         //List<Collidable> prevCollidables = collidable;
-        this.collidable = nextCollidables;
+        this.collidable = coll.write();
+
     }
 
 //    @Override
@@ -1026,6 +1031,10 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
     public void removeAnimation(Animated a) {
         animations.remove(a);
+    }
+
+    protected List<Collidable> getCollidable() {
+        return collidable;
     }
 
     private static class InplaceSolverIslandCallback extends Islands.IslandCallback {

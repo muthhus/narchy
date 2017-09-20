@@ -364,8 +364,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
                         // 0.5f * edgeProp
                         0.1f + 0.75f * Util.or(termlinkPri , tasklinkPri );
 
-                this.attraction = 0f + 0.2f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
-                this.attractionDist = 0.1f + src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+                this.attraction = 0f + 0.1f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attractionDist = 0.05f + src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = -1;
                 this.attraction = 0;

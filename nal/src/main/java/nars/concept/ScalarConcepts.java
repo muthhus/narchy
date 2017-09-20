@@ -6,9 +6,9 @@ import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.Task;
 import nars.control.CauseChannel;
 import nars.control.NARService;
+import nars.task.ITask;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +35,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
     private final Term id;
 
     final AtomicDouble value = new AtomicDouble();
-    public final CauseChannel<Task> in;
+    public final CauseChannel<ITask> in;
 
     @Override
     public float asFloat() {

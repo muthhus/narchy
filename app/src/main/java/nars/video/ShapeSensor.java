@@ -20,6 +20,7 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Task;
 import nars.control.CauseChannel;
+import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -33,7 +34,7 @@ import static nars.Op.BELIEF;
 public class ShapeSensor implements Runnable {
 
     private final Bitmap2D input;
-    private final CauseChannel<Task> in;
+    private final CauseChannel<ITask> in;
     private final Term id;
     private final NAR nar;
     //GrayF32 img = null;

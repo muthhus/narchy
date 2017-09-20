@@ -313,11 +313,30 @@ public class Emotion extends ConcurrentMonitorRegistry {
      */
     @Nullable
     public ITask onInput(@NotNull ITask x) {
-        return x; //no change by default
+        if (x instanceof Task) {
+            Task t = (Task) x;
+            if (t.isCommand())
+                return x; //ignore
+
+            float cost =
+                t.voluplexity();
+
+            value(MetaGoal.Perceive, t.cause(), cost);
+        }
+
+        return x;
     }
 
     public void onActivate(@NotNull Task t, float activation, Concept origin, NAR n) {
         n.emotion.taskActivations.increment();
+
+        short[] x = t.cause();
+        int xl = x.length;
+        if (xl > 0) {
+            float conceptValue = origin.value(t, activation, n.time(), n);
+            if (conceptValue!=0)
+                value(MetaGoal.Accept, x, conceptValue);
+        }
     }
 
     public void value(MetaGoal p, short[] causes, float strength) {
@@ -347,29 +366,14 @@ public class Emotion extends ConcurrentMonitorRegistry {
 
     public void onAnswer(Task question, @Nullable Task answer) {
         //transfer budget from question to answer
-        //float qBefore = taskBudget.priElseZero();
-        //float aBefore = answered.priElseZero();
-        BudgetFunctions.fund(question, answer,
-                                /*Util.sqr*/answer.conf() * answer.originality(), false);
+        //transfer more of the budget from an unoriginal question to an answer than an original question
+        answer.take(question,
+            answer.conf() * (1 - question.originality()), false);
 
+        //reward answer for answering the question
+        float str = answer.conf() * question.priSafe(0);
+        value(MetaGoal.Answer, answer.cause(), str);
     }
-
-
-    //    public void count(String id) {
-//        AtomicInteger c = counts.get(id);
-//        if (c == null) {
-//            c = new AtomicInteger(1);
-//            counts.put(id, c);
-//        } else {
-//            c.incrementAndGet();
-//        }
-//    }
-
-
-
-/*    public void busy(@NotNull Task cause, float activation) {
-        busy += cause.pri() * activation;
-    }*/
 
 
 //    /** float to long at the default conversion precision */

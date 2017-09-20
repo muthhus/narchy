@@ -43,21 +43,24 @@ public class TransformUtil {
 	}
 
 	public static void planeSpace1(v3 n, v3 p, v3 q) {
-		if (Math.abs(n.z) > SIMDSQRT12) {
+		float ny = n.y;
+		float nz = n.z;
+		float nx = n.x;
+		if (Math.abs(nz) > SIMDSQRT12) {
 			// choose p in y-z plane
-			float a = n.y * n.y + n.z * n.z;
+			float a = ny * ny + nz * nz;
 			float k = recipSqrt(a);
-			p.set(0, -n.z * k, n.y * k);
+			p.set(0, -nz * k, ny * k);
 			// set q = n x p
-			q.set(a * k, -n.x * p.z, n.x * p.y);
+			q.set(a * k, -nx * p.z, nx * p.y);
 		}
 		else {
 			// choose p in x-y plane
-			float a = n.x * n.x + n.y * n.y;
+			float a = nx * nx + ny * ny;
 			float k = recipSqrt(a);
-			p.set(-n.y * k, n.x * k, 0);
+			p.set(-ny * k, nx * k, 0);
 			// set q = n x p
-			q.set(-n.z * p.y, n.z * p.x, a * k);
+			q.set(-nz * p.y, nz * p.x, a * k);
 		}
 	}
 	
@@ -141,8 +144,7 @@ public class TransformUtil {
 		float lenSq = axis.lengthSquared();
 		if (lenSq < BulletGlobals.FLT_EPSILON * BulletGlobals.FLT_EPSILON) {
 			axis.set(1f, 0f, 0f);
-		}
-		else {
+		} else {
 			axis.scale(1f / (float) Math.sqrt(lenSq));
 		}
 	}

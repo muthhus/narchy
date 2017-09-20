@@ -5,6 +5,7 @@ import jcog.Util;
 import jcog.list.CircularArrayList;
 import jcog.list.FasterList;
 import jcog.map.CustomConcurrentHashMap;
+import jcog.util.DoubleBuffer;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
@@ -12,7 +13,6 @@ import spacegraph.render.Draw;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -40,8 +40,7 @@ public class TreeChart<X> extends Surface {
     private double top;
     private LayoutOrient layoutOrient = LayoutOrient.HORIZONTAL;
 
-    final AtomicBoolean phase = new AtomicBoolean();
-    final CircularArrayList<ItemVis<X>> prev = new CircularArrayList(), next = new CircularArrayList<>();
+    final DoubleBuffer<CircularArrayList<ItemVis<X>>> phase = new DoubleBuffer(CircularArrayList::new);
 
 
     public TreeChart() {
@@ -54,7 +53,7 @@ public class TreeChart<X> extends Surface {
         super.paint(gl);
 
         double totalArea = width * height;
-        for (ItemVis v : draw()) {
+        for (ItemVis v : phase.read()) {
             v.paint(gl, v.area * totalArea);
         }
     }
@@ -69,7 +68,7 @@ public class TreeChart<X> extends Surface {
 
 
     public static <X> Function<X, ItemVis<X>> cached(Function<X, ItemVis<X>> vis) {
-        return new Function<X, ItemVis<X>>() {
+        return new Function<>() {
             final Map<X, ItemVis<X>> cache
                     = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, EQUALS, 256);
 //            final Cache<X, ItemVis<X>> cache
@@ -88,7 +87,7 @@ public class TreeChart<X> extends Surface {
         left = 0.0;
         top = 0.0;
 
-        CircularArrayList<ItemVis<X>> display = edit();
+        CircularArrayList<ItemVis<X>> display = phase.write();
         int ns = next.size();
         int cs = display.capacity();
         if (cs < ns) {
@@ -138,12 +137,6 @@ public class TreeChart<X> extends Surface {
 
     }
 
-    @NotNull public CircularArrayList<ItemVis<X>> edit() {
-        return phase.getAndSet(!phase.get()) ? this.prev : this.next;
-    }
-    @NotNull public CircularArrayList<ItemVis<X>> draw() {
-        return phase.get() ? this.prev : this.next;
-    }
 
 
     private void squarify(Collection<ItemVis<X>> display, Collection<ItemVis> row, double w) {

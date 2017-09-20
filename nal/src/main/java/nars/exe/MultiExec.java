@@ -8,7 +8,8 @@ import jcog.event.Topic;
 import jcog.sort.TopN;
 import nars.NAR;
 import nars.control.Activate;
-import nars.control.DurService;
+import nars.control.Cause;
+import nars.control.ThrottledService;
 import nars.task.ITask;
 import nars.task.RunTask;
 import org.jetbrains.annotations.NotNull;
@@ -137,20 +138,23 @@ public class MultiExec extends Exec {
         }
     }
 
-    public void add(Exec reasoner, Predicate<Activate> filter) {
+    public void add(FocusExec reasoner, Predicate<Activate> filter) {
         execute((Runnable)()->new Reasoner(reasoner, filter));
     }
 
-    class Reasoner extends DurService /* TODO use Throttled */ implements Consumer<Activate> {
-        private final Exec sub;
+    class Reasoner extends ThrottledService /* TODO use Throttled */ implements Consumer<Activate> {
+        private final FocusExec sub;
 
         /** customizable filter, or striping so that every reasoner doesnt get the same inputs */
         private final Predicate<Activate> filter;
+        private final Cause out;
 
-        public Reasoner(Exec focusExec, Predicate<Activate> filter) {
+        public Reasoner(FocusExec focusExec, Predicate<Activate> filter) {
             super(nar);
             this.sub = focusExec;
             this.filter = filter;
+            this.out = nar.newCauseChannel(this);
+            sub.cause = this.out.id;
             sub.start(nar);
         }
 
@@ -161,8 +165,16 @@ public class MultiExec extends Exec {
         }
 
         @Override
-        protected void run(NAR n, long dt) {
-            ((FocusExec) sub).run();
+        public float value() {
+            return out.amp();
+        }
+
+        @Override
+        protected float run(NAR n, long dt, float work) {
+            FocusExec f = (FocusExec) this.sub;
+            f.subCycles = (int) Math.ceil(work);
+            f.run();
+            return work; //TODO better estimate than this, even to the precision of the TTL spent
         }
 
         public void stop() {
@@ -170,9 +182,9 @@ public class MultiExec extends Exec {
         }
 
         @Override
-        public void accept(Activate activate) {
-            if (filter.test(activate))
-                sub.add(activate);
+        public void accept(Activate a) {
+            if (filter.test(a))
+                sub.add(a);
         }
     }
 

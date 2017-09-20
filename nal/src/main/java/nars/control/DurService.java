@@ -12,6 +12,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 abstract public class DurService extends NARService implements Runnable {
 
+    /** minimum durations to delay a repeat in the case of an already delayed predecessor task */
+    private static final float COALESCE_THRESHOLD_DUR = 0.1f;
+
     /** ideal duration multiple to be called, since time after implementation's procedure finished last*/
     public final MutableFloat durations;
 
@@ -64,9 +67,15 @@ abstract public class DurService extends NARService implements Runnable {
                 run(nar, delta);
                 //----
             } finally {
-                long next = nar.time() + Math.round(nar.dur() * durations.floatValue());
-                nar.at(next, this);
                 busy.set(false);
+
+                long after = nar.time();
+                int dur = nar.dur();
+                long next = Math.max(
+                        last + Math.round(dur * durations.floatValue()),
+                        after + (int)Math.ceil(dur * COALESCE_THRESHOLD_DUR)
+                );
+                nar.at(next, this);
             }
         }
     }

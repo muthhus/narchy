@@ -945,7 +945,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * steps 1 frame forward. cyclesPerFrame determines how many cycles this frame consists of
      */
-    @NotNull
     public final void cycle() {
 
         time.cycle(this);
@@ -1716,7 +1715,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * automatically adds the cause id to each input
      */
-    public CauseChannel<Task> newCauseChannel(Object id) {
+    public CauseChannel<ITask> newCauseChannel(Object id) {
 
         synchronized (causes) {
 

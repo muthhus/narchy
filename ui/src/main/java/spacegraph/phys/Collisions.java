@@ -517,14 +517,15 @@ public abstract class Collisions<X> {
 		//Transform tmpTrans = new Transform();
 
 		List<Collidable> objs = collidables();
-		for (Collidable collidable : objs) {
+		for (int i = 0, objsSize = objs.size(); i < objsSize; i++) {
+			Collidable collidable = objs.get(i);
 			// terminate further ray tests, once the closestHitFraction reached zero
 			if (resultCallback.closestHitFraction == 0f) {
 				break;
 			}
 
 			//return array[index];
-			if (collidable !=null) {
+			if (collidable != null) {
 
 				Broadphasing broadphaseHandle = collidable.broadphase();
 
@@ -537,7 +538,7 @@ public abstract class Collisions<X> {
 
 					shape.getAabb(worldTransform, collisionObjectAabbMin, collisionObjectAabbMax);
 
-					if (!collisionObjectAabbMin.isFinite() && collisionObjectAabbMax.isFinite())
+					if (!collisionObjectAabbMin.isFinite() || !collisionObjectAabbMax.isFinite())
 						continue;
 
 					hitLambda[0] = resultCallback.closestHitFraction;

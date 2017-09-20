@@ -611,7 +611,8 @@ public enum Util {
     }
 
     public static float notNaN(float x) throws NumberException {
-        if (x != x) throw new NumberException("NaN");
+        if (x != x)
+            throw new NumberException("NaN");
         return x;
     }
 

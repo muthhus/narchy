@@ -164,6 +164,11 @@ public class NALTask extends Pri implements Task {
         this.cause = Cause.zip(this, incoming);
     }
 
+    /** overkill for one or two id but this will get optimized later */
+    public void causeMerge(short... id) {
+        this.cause = Cause.zip(CAUSE_CAPACITY,  ()->cause, ()->id );
+    }
+
     @Nullable
     @Override
     public final Truth truth() {

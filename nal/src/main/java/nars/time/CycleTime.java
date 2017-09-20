@@ -1,5 +1,6 @@
 package nars.time;
 
+import nars.NAR;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -48,8 +49,9 @@ public class CycleTime extends Time {
 
 
     @Override
-    public final void update() {
-        t+=dt;
+    public final void cycle(NAR n) {
+        t += dt;
+        super.cycle(n);
     }
 
     @NotNull

@@ -61,55 +61,6 @@ public class Emotivation extends Emotion {
     }
 
 
-
-    @Override
-    public void onAnswer(Task question, @Nullable Task answer) {
-        super.onAnswer(question, answer);
-
-        //reward answer for answering the question
-        float str = answer.conf() * question.priSafe(0);
-        //value(Cause.Purpose.Answer, question.cause(), -str);
-        value(MetaGoal.Answer, answer.cause(), str);
-    }
-
-
-
-    @Override
-    public @Nullable ITask onInput(@NotNull ITask x) {
-
-
-        if (x instanceof Task && !((Task) x).isCommand()) {
-            Task t = (Task) x;
-
-            //float p0 = t.priSafe(0);
-            float cost = t.voluplexity();
-
-            //((NALTask)t).causeAppend(nar.taskCauses.get(t));
-
-            if (cost != 0) {
-                value(MetaGoal.Perceive, t.cause(), cost);
-            }
-
-            //evaluate(t);
-        }
-
-        return x;
-    }
-
-    @Override
-    public void onActivate(@NotNull Task t, float activation, Concept origin, NAR n) {
-        super.onActivate(t, activation, origin, n);
-
-        short[] x = t.cause();
-        int xl = x.length;
-        if (xl > 0) {
-            float conceptValue = origin.value(t, activation, n.time(), n);
-            if (conceptValue!=0)
-                value(MetaGoal.Accept, x, conceptValue);
-        }
-
-    }
-
 //    public static float preferConfidentAndRelevant(@NotNull Task t, float activation, long when, NAR n) {
 //        return 0.001f * activation * (t.isBeliefOrGoal() ? t.conf(when, n.dur()) : 0.5f);
 //    }

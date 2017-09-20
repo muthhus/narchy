@@ -5,6 +5,7 @@ import nars.NAct;
 import nars.Param;
 import nars.Task;
 import nars.control.CauseChannel;
+import nars.task.ITask;
 import nars.task.SignalTask;
 import nars.task.util.PredictionAccuracyFeedback;
 import nars.term.Term;
@@ -33,7 +34,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
     @NotNull
     private final BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor;
     private final PredictionAccuracyFeedback beliefFeedback;
-    final CauseChannel in;
+    final CauseChannel<ITask> in;
 
     public GoalActionAsyncConcept(@NotNull Term c, @NotNull NAct act, @NotNull BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor) {
         super(c,
@@ -91,7 +92,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
     }
 
     @Override
-    public Stream<Task> update(long now, int dur, NAR nar) {
+    public Stream<ITask> update(long now, int dur, NAR nar) {
 
         long pStart = now;// - dur/2;
         long pEnd = now + dur;
@@ -184,7 +185,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
 //            fg.log("Curiosity");
 //        }
 
-        return Stream.empty();
+        return null; //Stream.empty();
         //return Stream.of(fb, fg).filter(Objects::nonNull);
         //return Stream.of(fb).filter(Objects::nonNull);
 

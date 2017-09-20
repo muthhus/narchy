@@ -95,7 +95,8 @@ public interface CompoundTransform extends TermContext {
 //            return src.dt(dt);
 //        }
         Term y;
-        if (subtermMods > 0 || op != x.op()/* || dt != src.dt()*/) {
+        Op xo = x.op();
+        if (subtermMods > 0 || op != xo/* || dt != src.dt()*/) {
 
             //if (target.internable())
             y = op.the(dt, target.theArray());
@@ -103,7 +104,7 @@ public interface CompoundTransform extends TermContext {
             //return Op.compound(op, target.theArray(), false).dt(dt); //HACK
 
         } else {
-            y = x.dt(dt);
+            y = xo.temporal ? x.dt(dt) : x;
         }
 
         if (y instanceof Compound && this instanceof Derivation && y.op() == INH && y.subIs(1, ATOM) && y.subIs(0, PROD)) {

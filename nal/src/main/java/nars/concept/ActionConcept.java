@@ -1,8 +1,8 @@
 package nars.concept;
 
 import nars.NAR;
-import nars.Task;
 import nars.table.BeliefTable;
+import nars.task.ITask;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ public abstract class ActionConcept extends WiredConcept {
         super(term, null, null, n);
     }
 
-    abstract public Stream<Task> update(long now, int dur, NAR nar);
+    @Nullable abstract public Stream<ITask> update(long now, int dur, NAR nar);
     
 //    @Deprecated public static class CuriosityTask extends GeneratedTask {
 //

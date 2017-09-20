@@ -7,6 +7,7 @@ import nars.concept.ActionConcept;
 import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
+import nars.task.ITask;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
@@ -30,7 +31,7 @@ import static nars.truth.TruthFunctions.c2w;
  */
 public interface NAct {
 
-    @NotNull Map<ActionConcept, CauseChannel<Task>> actions();
+    @NotNull Map<ActionConcept, CauseChannel<ITask>> actions();
 
     NAR nar();
 
@@ -340,8 +341,8 @@ public interface NAct {
     }
 
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        //actionBipolarExpectation(s, update);
-        actionBipolarExpectationNormalized(s, update);
+        actionBipolarExpectation(s, update);
+        //actionBipolarExpectationNormalized(s, update);
         //actionBipolarGreedy(s, update);
         //actionBipolarMutex3(s, update);
     }
@@ -452,8 +453,8 @@ public interface NAct {
                     }
                 }
 
-                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, null, n);
-                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, null, n);
+                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, w, n);
+                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, l, n);
             }
         };
 

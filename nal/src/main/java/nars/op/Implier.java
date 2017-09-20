@@ -8,6 +8,7 @@ import nars.NAR;
 import nars.Task;
 import nars.control.CauseChannel;
 import nars.control.DurService;
+import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.var.Variable;
@@ -36,7 +37,7 @@ public class Implier extends DurService {
     private final TermGraph.ImplGraph tg;
     private final Iterable<Term> seeds;
     private final NAR nar;
-    private final CauseChannel<Task> in;
+    private final CauseChannel<ITask> in;
 
     float min = Prioritized.EPSILON; //even though it's for truth
     Map<Term, TruthAccumulator> goalTruth = new HashMap();

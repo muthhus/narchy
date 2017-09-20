@@ -123,6 +123,10 @@ public class Cause {
 //        }
 //    }
 
+    public static short[] zip(int maxLen, short... s) {
+        return zip(maxLen, ()->s);
+    }
+
     public static short[] zip(int maxLen, Supplier<short[]>... s) {
 
         int ss = s.length;

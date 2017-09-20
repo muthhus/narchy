@@ -149,16 +149,15 @@ abstract public class NAgentX extends NAgent {
 
         int THREADS = 4;
 
-        MultiExec exe = new MultiExec(THREADS, 8192);
+        MultiExec exe = new MultiExec(THREADS, 16384);
         Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
         exe.add(new FocusExec() {
                     {
-                        subCycles = 64;
                         concepts.setCapacity(64);
                     }
                 },
-                (x)->true);
-        exe.add(new FocusExec() { { subCycles = 128; concepts.setCapacity(128); } },(a) -> a.id.voluplexity() <= 10);
+                randomBool);
+        //exe.add(new FocusExec() { { subCycles = 64; concepts.setCapacity(64); } },(a) -> a.id.voluplexity() <= 16);
 
         NAR n = new NARS()
                 .exe(exe)
@@ -176,14 +175,14 @@ abstract public class NAgentX extends NAgent {
         n.setEmotion(new Emotivation(n));
 
         n.confMin.setValue(0.01f);
-        n.truthResolution.setValue(0.02f);
-        n.termVolumeMax.setValue(26);
+        n.truthResolution.setValue(0.01f);
+        n.termVolumeMax.setValue(30);
 
         n.beliefConfidence(0.9f);
         n.goalConfidence(0.9f);
 
 
-        float priFactor = 0.1f;
+        float priFactor = 0.75f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
@@ -196,9 +195,9 @@ abstract public class NAgentX extends NAgent {
         MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, true, 32f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
+//        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
 
-        Inperience inp = new Inperience(n, 4);
+//        Inperience inp = new Inperience(n, 4);
 
         reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
         reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);

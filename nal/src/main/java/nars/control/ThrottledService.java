@@ -1,10 +1,10 @@
 package nars.control;
 
+import jcog.Texts;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.math.RecyclingPolynomialFitter;
 import jcog.pri.Pri;
 import nars.NAR;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 
 /**
  * instruments the runtime resource consumption of its iterated procedure.
@@ -17,8 +17,29 @@ import org.eclipse.collections.api.block.function.primitive.FloatFunction;
  */
 abstract public class ThrottledService extends DurService {
 
+    /** upper limit for each individual work unit */
+    private static final double OVERLOAD_NS = 500000; /* 0.5ms */
+
+    /** lower limit for each individual work unit */
+    private static final double UNDERLOAD_NS = 500; /* 0.5us */
+
+    /** how much swing (difference) should be sought between the mean and the max value */
+    private static final double COMPRESSION_RATIO = 3;
+
+    /** absolute upper limit for any assigned workload. this determines the maximum granularity
+     * of the scheduler, and should be quite finite. */
+    private static final int UNIT_MAX = 16 * 1024;
+
+
     /** value specific to this instance indicating the relative workload response */
     float workGranularity = 1;
+
+    /**
+     * basic estimator of: workUnits / realtime (ns)
+     */
+    final RecyclingPolynomialFitter workEstimator =
+            new RecyclingPolynomialFitter(3, 16, Integer.MAX_VALUE)
+                .tolerate(1 /* work unit */, 1 /* ns */);
 
     public ThrottledService(NAR nar) {
         super(nar);
@@ -30,16 +51,19 @@ abstract public class ThrottledService extends DurService {
 
     @Override
     protected final void run(NAR n, long dt) {
-//        if (workAllowed < Pri.EPSILON)
+        float v = value();
+
+        //        if (workAllowed < Pri.EPSILON)
 //            return;
-        System.out.print("\t" + this + " x " + workGranularity + "\t");
+        StringBuilder summary = new StringBuilder(256);
+        summary.append("\t" + this + " x " + Texts.n1(v * workGranularity) + "/" + workGranularity + "\t");
         RecycledSummaryStatistics s = new RecycledSummaryStatistics();
         for (float i = 0.1f; i <= 1; i+=0.1f) {
-            double t = workEstimator.guess(i);
+            double t = workEstimator.guess(i * workGranularity);
             s.accept(t);
-            System.out.print(" " + i + "=" + Math.round(t)+"ms");
+            summary.append(" " + Texts.n1(i) + "=" + Texts.n1((float) t) + "ns");
         }
-        System.out.println();
+        System.out.println(summary);
 
 
         //principles:
@@ -47,16 +71,20 @@ abstract public class ThrottledService extends DurService {
         //  2. if a value exceeds the allowable limit point for a task, that indicates the work amount needs scaled down.
         {
             //example naive policy
-            //TODO use function solver to find estimates for target values
-
-            if (s.getMin() <= 1f) {
-                workGranularity = Math.min(1024, workGranularity * 1.5f);
+            double max = s.getMax();
+            if (s.getMin() > OVERLOAD_NS) {
+                workGranularity = Math.max(1, workGranularity * 0.9f); //backoff
+            } else if (s.getMax() < UNDERLOAD_NS) {
+                workGranularity = Math.min(UNIT_MAX, workGranularity * 1.25f); //surge hard
+            } else if (max / s.getMean() < COMPRESSION_RATIO) {
+                //assert(mean!=0);
+                workGranularity = Math.min(UNIT_MAX, workGranularity * 1.05f); //surge soft
             } else {
-                workGranularity = Math.max(1, workGranularity * 0.99f);
+                workGranularity = Math.max(1, workGranularity * 0.99f); //constant gentle backoff
             }
         }
 
-        float workAllowed = value() * workGranularity;
+        float workAllowed = v * workGranularity;
 
         Throwable error = null;
         long start = System.nanoTime();
@@ -74,18 +102,13 @@ abstract public class ThrottledService extends DurService {
             float ratio = workDone / workAllowed;
             workGranularity = workGranularity * ratio;
         }
-        learn(dt/1000000.0, workAllowed, workDone, (end - start)/1000000.0);
-
+        learn(dt, workAllowed, workDone, (end - start));
         if (error != null)
             throw new RuntimeException(error);
     }
 
-    /**
-     * basic estimator:  dims: work done, compute time (ms)
-     */
-    final RecyclingPolynomialFitter workEstimator = new RecyclingPolynomialFitter(3, 16, Integer.MAX_VALUE);
 
-    protected void learn(double waitNS, float workAllowed, float workDone, double runtimeNS) {
+    protected void learn(long waitNS, float workAllowed, float workDone, long runtimeNS) {
         //double cycleTime = runtimeNS + waitNS;
         //double dutyCycle = runtimeNS / cycleTime; //estimate
         workEstimator.learn(workDone, runtimeNS);

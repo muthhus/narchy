@@ -4,6 +4,7 @@ import jcog.Util;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
+import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -13,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * manages reading a camera to a pixel grid of SensorConcepts
@@ -25,7 +25,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
     public static final int RADIX = 1;
 
     public final List<PixelConcept> pixels;
-    public final CauseChannel<Task> in;
+    public final CauseChannel<ITask> in;
 
     float resolution = 0.01f;//Param.TRUTH_EPSILON;
 

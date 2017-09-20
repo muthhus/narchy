@@ -132,6 +132,27 @@ public interface Priority extends Prioritized {
         return this;
     }
 
+    default void take(Priority source, float part, boolean copyOrMove) {
+        if (part < Pri.EPSILON) return;
+        float amount = source.priElseZero() * part;
+        if (amount < Pri.EPSILON) return;
+
+        if (copyOrMove) {
+            priAdd(amount); //COPY
+        } else {
+            //TRANSFER
+            float afterReceived = priElseZero() + amount;
+            float overflow = afterReceived - 1f;
+
+            //cap at 1, and only transfer what is necessary to reach it
+            amount -= overflow;
+
+            //subtract first to ensure the funds are available
+            source.priSub(amount);
+            priAdd(amount);
+        }
+    }
+
 //    /** returns the delta */
 //    default float priLerpMult(float factor, float speed) {
 //

@@ -9,6 +9,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.control.CauseChannel;
+import nars.task.ITask;
 import nars.task.NALTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Term;
@@ -42,7 +43,7 @@ public class MySTMClustered extends STMClustered {
     private final int maxGroupSize;
     private final int minGroupSize;
     private final int inputsPerDur;
-    private final CauseChannel<Task> in;
+    private final CauseChannel<ITask> in;
     private final boolean allowNonInput;
 
     float freqCoherenceThresh = 0.9f;

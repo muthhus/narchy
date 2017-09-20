@@ -584,7 +584,10 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
             Op o = op();
-            assert (o.temporal);
+            if (!o.temporal) {
+                return this;
+                //assert (o.temporal);
+            }
 
             Compound b = this instanceof GenericCompoundDT ?
                     ((GenericCompoundDT) this).ref : this;

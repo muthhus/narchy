@@ -2,7 +2,6 @@ package nars;
 
 import jcog.Loop;
 import jcog.data.FloatParam;
-import jcog.event.On;
 import jcog.event.Ons;
 import jcog.list.FasterList;
 import jcog.math.FloatPolarNormalized;
@@ -13,6 +12,7 @@ import nars.concept.ScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
 import nars.control.DurService;
+import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -49,9 +49,9 @@ abstract public class NAgent extends DurService implements NSense, NAct {
      **/
     public final Term id;
 
-    public final Map<SensorConcept, CauseChannel<Task>> sensors = new LinkedHashMap();
+    public final Map<SensorConcept, CauseChannel<ITask>> sensors = new LinkedHashMap();
 
-    public final Map<ActionConcept, CauseChannel<Task>> actions = new LinkedHashMap();
+    public final Map<ActionConcept, CauseChannel<ITask>> actions = new LinkedHashMap();
 
     /**
      * the general reward signal for this agent
@@ -67,7 +67,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
 
     public final FloatParam predictorProbability = new FloatParam(0.5f);
-    private final CauseChannel<Task> predict;
+    private final CauseChannel<ITask> predict;
 
 
     /**
@@ -147,13 +147,13 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
     @NotNull
     @Override
-    public final Map<SensorConcept, CauseChannel<Task>> sensors() {
+    public final Map<SensorConcept, CauseChannel<ITask>> sensors() {
         return sensors;
     }
 
     @NotNull
     @Override
-    public final Map<ActionConcept, CauseChannel<Task>> actions() {
+    public final Map<ActionConcept, CauseChannel<ITask>> actions() {
         return actions;
     }
 
@@ -421,7 +421,9 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         actions.forEach((a, c) -> {
             //nar.exe.execute(() -> {
-            c.input(a.update(now, dur, nar));
+            Stream<ITask> s = a.update(now, dur, nar);
+            if (s!=null)
+                c.input(s);
             //});
         });
 
@@ -466,10 +468,8 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         return loop;
     }
 
-    protected Stream<Task> predictions(long now) {
-        return predictors.stream().map(x -> {
-            return x.get().budget(nar);
-        });
+    protected Stream<ITask> predictions(long now) {
+        return predictors.stream().map(x -> x.get().budget(nar));
     }
 
     /**

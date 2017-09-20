@@ -4,6 +4,7 @@ import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Task;
 import nars.control.CauseChannel;
+import nars.task.ITask;
 
 /** LeakOut subclass which has support for a return input channel
  * whose value adjusts the throttle rate of the Leak. */
@@ -12,9 +13,9 @@ abstract public class LeakBack extends TaskLeak {
     final static float INITIAL_RATE = 1f;
 
     //HACK
-    public final FloatParam boost = new FloatParam(0.001f, 0, 1f);
+    public final FloatParam boost = new FloatParam(1f, 0, 2f);
 
-    private final CauseChannel<Task> out;
+    private final CauseChannel<ITask> out;
 
     public LeakBack(int capacity, NAR nar) {
         super(capacity, INITIAL_RATE, nar);

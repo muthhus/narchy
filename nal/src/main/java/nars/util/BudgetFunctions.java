@@ -197,21 +197,6 @@ public final class BudgetFunctions  {
 //    }
 
 
-    /** from a to b, LERP of priority according to strength 's' [0 <= s <= 1] */
-    public static void transferPri(@NotNull Priority to, @NotNull Priority from, float priToSend) {
-        if (priToSend > 0) {
-            float afterReceived = to.priElseZero() + priToSend;
-            float overflow = afterReceived - 1f;
-
-            //cap at 1, and only transfer what is necessary to reach it
-            if (overflow > 0)
-                priToSend -= overflow;
-
-            //subtract first to ensure the funds are available
-            from.priSub(priToSend);
-            to.priAdd(priToSend);
-        }
-    }
 
 
     @NotNull
@@ -221,20 +206,11 @@ public final class BudgetFunctions  {
 
         Pri u = new Pri(0f);
         for (Priority t : src) {
-            fund(u, t, perSrc, copyOrTransfer);
+            u.take(t, perSrc, copyOrTransfer);
         }
         return u;
     }
 
-    public static void fund(Priority target, Priority source, float amount, boolean copyOrTransfer) {
-        if (copyOrTransfer) {
-            //COPY
-            target.priAdd(amount);
-        } else {
-            //TRANSFER
-            transferPri(target, source, amount);
-        }
-    }
 
     /**
      * balance the priorities of 2 existing budgets ('a' and 'b')

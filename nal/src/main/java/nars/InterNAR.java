@@ -7,6 +7,7 @@ import nars.bag.leak.TaskLeak;
 import nars.control.CauseChannel;
 import nars.control.TaskService;
 import nars.task.ActiveQuestionTask;
+import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +26,7 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
     //public static final Logger logger = LoggerFactory.getLogger(InterNAR.class);
 
     public final TaskLeak buffer;
-    final CauseChannel<Task> recv;
+    final CauseChannel<ITask> recv;
     public MyUDPeer peer;
 
 

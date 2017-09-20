@@ -42,12 +42,18 @@ public class AabbUtil2 {
 	}
 
 	public static int outcode(v3 p, v3 halfExtent) {
-		return (p.x < -halfExtent.x ? 0x01 : 0x0) |
-				(p.x > halfExtent.x ? 0x08 : 0x0) |
-				(p.y < -halfExtent.y ? 0x02 : 0x0) |
-				(p.y > halfExtent.y ? 0x10 : 0x0) |
-				(p.z < -halfExtent.z ? 0x4 : 0x0) |
-				(p.z > halfExtent.z ? 0x20 : 0x0);
+		float hx = halfExtent.x;
+		float px = p.x;
+		float py = p.y;
+		float pz = p.z;
+		float hy = halfExtent.y;
+		float hz = halfExtent.z;
+		return  (px < -hx ? 0x01 : 0x0) |
+				(px > hx ? 0x08 : 0x0) |
+				(py < -hy ? 0x02 : 0x0) |
+				(py > hy ? 0x10 : 0x0) |
+				(pz < -hz ? 0x4 : 0x0) |
+				(pz > hz ? 0x20 : 0x0);
 	}
 
 	public static boolean rayAabb(v3 rayFrom, v3 rayTo, v3 aabbMin, v3 aabbMax, float[] param) {
@@ -74,14 +80,14 @@ public class AabbUtil2 {
 		int sourceOutcode = outcode(source, aabbHalfExtent);
 		int targetOutcode = outcode(target, aabbHalfExtent);
 		if ((sourceOutcode & targetOutcode) == 0x0) {
-			float lambda_enter = 0f;
 			float lambda_exit = param[0];
 			r.sub(target, source);
 
-			float normSign = 1f;
 			hitNormal.set(0f, 0f, 0f);
 			int bit = 1;
 
+			float normSign = 1f;
+			float lambda_enter = 0f;
 			for (int j = 0; j < 2; j++) {
 				for (int i = 0; i != 3; ++i) {
 					if ((sourceOutcode & bit) != 0) {
@@ -114,11 +120,9 @@ public class AabbUtil2 {
 	 * Conservative test for overlap between two AABBs.
 	 */
 	public static boolean testAabbAgainstAabb2(v3 aabbMin1, v3 aabbMax1, v3 aabbMin2, v3 aabbMax2) {
-		boolean overlap = true;
-		overlap = !(aabbMin1.x > aabbMax2.x || aabbMax1.x < aabbMin2.x) && overlap;
-		overlap = !(aabbMin1.z > aabbMax2.z || aabbMax1.z < aabbMin2.z) && overlap;
-		overlap = !(aabbMin1.y > aabbMax2.y || aabbMax1.y < aabbMin2.y) && overlap;
-		return overlap;
+		return !(aabbMin1.x > aabbMax2.x || aabbMax1.x < aabbMin2.x) &&
+			   !(aabbMin1.z > aabbMax2.z || aabbMax1.z < aabbMin2.z) &&
+			   !(aabbMin1.y > aabbMax2.y || aabbMax1.y < aabbMin2.y);
 	}
 
 	/**

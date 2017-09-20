@@ -79,11 +79,7 @@ public class Try extends AbstractPred<Derivation> {
         int startTTL = d.ttl;
         int minPerBranch =
                 Math.min(startTTL,
-                    Param.TTL_MUTATE * 2 +
-                    Param.TTL_UNIFY * 2 +
-                    Param.TTL_DERIVE_TRY +
-                    Param.TTL_DERIVE_TASK_SUCCESS * 2 +
-                    Param.TTL_DERIVE_TASK_FAIL * 2
+                    Param.TTL_PREMISE_MIN
                 );
 
         int maxPerBranch = Math.max(minPerBranch, startTTL / numChoices);
@@ -99,8 +95,9 @@ public class Try extends AbstractPred<Derivation> {
                 } else {
                     //curvebag sampling of the above array
                     float x = rng.nextFloat();
-                    float curve = Util.lerp(x * x, x, valRatio);
+                    float curve = Util.lerp(x, x*x, valRatio);
                     sample = (int) ((1f - curve) * (numChoices - 0.5f));
+                    if (sample >= numChoices) sample = numChoices-1; //HACK happens rarely, rounding error?
                 }
             } else {
                 sample = 0;

@@ -7,11 +7,9 @@ import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.control.Activate;
-import nars.control.CycleService;
-import nars.control.NARService;
-import nars.control.Premise;
+import nars.control.*;
 import nars.task.ITask;
+import nars.task.NALTask;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +44,7 @@ public class FocusExec extends Exec implements Runnable {
             //new ConcurrentCurveBag
             new CurveBag
                     <>(Param.premiseMerge /* TODO make separate premise merge param */,
-                new ConcurrentHashMap<>(), null, MAX_PREMISES) {
+                    new ConcurrentHashMap<>(), null, MAX_PREMISES) {
 
                 @Override
                 protected float merge(Premise existing, Premise incoming) {
@@ -73,7 +71,7 @@ public class FocusExec extends Exec implements Runnable {
     public final Bag concepts =
             //new ConcurrentCurveBag
             new CurveBag
-                <>(Param.activateMerge,
+                    <>(Param.activateMerge,
                     new ConcurrentHashMap<>(),
                     //new ConcurrentHashMapUnsafe<>(),
                     random, MAX_CONCEPTS);
@@ -90,8 +88,10 @@ public class FocusExec extends Exec implements Runnable {
     @Nullable
     private NARService trigger;
 
-    public FocusExec() {
+    /** if >= 0, adds this cause before executing any Tasks */
+    public short cause = -1;
 
+    public FocusExec() {
 
     }
 
@@ -227,7 +227,11 @@ public class FocusExec extends Exec implements Runnable {
     public void add(/*@NotNull*/ ITask x) {
         if (x instanceof Task) {
             //if (x.isInput()) {
-                execute(x); //execute immediately
+
+            if (cause!=-1)
+                ((NALTask)x).causeMerge(cause);
+
+            execute(x); //execute immediately
 //            } else {
 //                tasks.putAsync((Task) x); //buffer
 //            }

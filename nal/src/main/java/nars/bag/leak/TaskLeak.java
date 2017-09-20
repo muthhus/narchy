@@ -1,7 +1,7 @@
 package nars.bag.leak;
 
 import jcog.bag.Bag;
-import jcog.bag.impl.ConcurrentCurveBag;
+import jcog.bag.impl.CurveBag;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.op.PriMerge;
@@ -26,7 +26,7 @@ public abstract class TaskLeak extends ThrottledService {
     }
 
     protected TaskLeak(int capacity, float ratePerDuration, @NotNull NAR n) {
-        this(new ConcurrentCurveBag<>(PriMerge.max, new ConcurrentHashMap(capacity), n.random(), capacity), ratePerDuration, n);
+        this(new CurveBag<>(PriMerge.max, new ConcurrentHashMap(capacity), n.random(), capacity), ratePerDuration, n);
     }
 
     TaskLeak(@NotNull Bag<Task, PLink<Task>> bag, @NotNull FloatParam rate, @NotNull NAR n) {

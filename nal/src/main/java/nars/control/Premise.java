@@ -289,13 +289,11 @@ public class Premise extends UnaryTask {
             return null;
 
         try {
-            DerivedTask[] dd = d.run(this, task, belief, beliefTerm, ttlMax);
+            Collection<DerivedTask> dd = d.run(this, task, belief, beliefTerm, ttlMax);
             if (dd != null) {
-                int dds = dd.length;
-                if (dds > 0) {
-                    nar.emotion.taskDerived.increment(dds);
-                }
-                nar.input(dd); //input to NAR directly
+                int dds = dd.size();
+                nar.emotion.taskDerived.increment(dds);
+                return dd;
             }
         } finally {
             d.clear(); //emergency clear

@@ -20,6 +20,7 @@ public class QueueLock<X> implements Consumer<X> {
     public final AtomicInteger busy;
     public final BlockingQueue<X> queue;
     private final Consumer<X> proc;
+
     private IntConsumer afterBatch;
 
     final static Logger logger = LoggerFactory.getLogger(QueueLock.class);
@@ -54,23 +55,25 @@ public class QueueLock<X> implements Consumer<X> {
         }
 
         boolean responsible = busy.compareAndSet(0, 1);
-        if (responsible) {
-            int count = 0;
-            final X[] next = (X[]) new Object[1];
-            while (busy.updateAndGet((y) -> (next[0] = queue.poll()) != null ? 1 : 0) == 1) {
-                try {
-                    proc.accept(next[0]);
-                } catch (Throwable t) {
-                    onException(next[0], t);
-                }
-                count++;
+        if (!responsible)
+            return; //to be processed by another thread
+
+        int count = 0;
+        final X[] next = (X[]) new Object[1];
+        while (busy.updateAndGet((y) -> (next[0] = queue.poll()) != null ? 1 : 0) == 1) {
+            X n = next[0];
+            try {
+                proc.accept(n);
+            } catch (Throwable t) {
+                onException(n, t);
             }
-            if (afterBatch != null) {
-                try {
-                    afterBatch.accept(count);
-                } catch (Throwable t) {
-                    onException(null, t);
-                }
+            count++;
+        }
+        if (afterBatch != null) {
+            try {
+                afterBatch.accept(count);
+            } catch (Throwable t) {
+                onException(null, t);
             }
         }
     }

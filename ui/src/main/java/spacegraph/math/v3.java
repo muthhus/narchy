@@ -219,10 +219,6 @@ public class v3 extends Tuple3f {
         return norm;
     }
 
-    public final v3 normalized() {
-        normalize();
-        return this;
-    }
 
 //    public final v3 normalized(float scale)     {
 //        return normalized().scale(scale);

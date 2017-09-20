@@ -15,6 +15,7 @@ package jcog;
 
 import com.google.common.annotations.GwtIncompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import jcog.event.On;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +106,14 @@ public class Services<X, C>  {
 //    }
 
     enum ServiceState {
-        Off, OffToOn, On, OnToOff, Deleted
+        Off {
+            @Override public String toString() { return "-"; }
+        },
+        OffToOn,
+        On {
+            @Override public String toString() { return "+"; }
+        },
+        OnToOff, Deleted
     }
 
     public interface Service<C> {
@@ -129,7 +137,15 @@ public class Services<X, C>  {
 
         @Override
         public String toString() {
-            return getClass() + "[" + super.toString() +"]";
+            String nameString = getClass().getName();
+
+            //quick common package name filters
+            if (nameString.startsWith("jcog."))
+                nameString = getClass().getSimpleName();
+            else if (nameString.startsWith("nars."))
+                nameString = getClass().getSimpleName();
+
+            return nameString + ':' + super.toString();
         }
 
         @Override

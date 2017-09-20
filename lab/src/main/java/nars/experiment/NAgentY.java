@@ -6,11 +6,11 @@ import jcog.util.IntIntToObjectFunc;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
-import nars.Task;
 import nars.concept.ActionConcept;
 import nars.concept.ScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.control.AgentService;
+import nars.task.ITask;
 import nars.term.Term;
 import nars.util.signal.Signal;
 import nars.video.Bitmap2D;
@@ -101,7 +101,7 @@ abstract public class NAgentY extends NAgentX {
         }
 
         @Override
-        public Stream<Task> update(long now, int dur, NAR nar) {
+        public Stream<ITask> update(long now, int dur, NAR nar) {
             return Stream.of(belief.get());
         }
     }

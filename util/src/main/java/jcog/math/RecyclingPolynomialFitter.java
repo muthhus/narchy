@@ -1,17 +1,15 @@
 package jcog.math;
 
+import jcog.pri.Pri;
 import org.apache.commons.math3.analysis.MultivariateMatrixFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math3.fitting.AbstractCurveFitter;
 import org.apache.commons.math3.fitting.WeightedObservedPoint;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresBuilder;
-import org.apache.commons.math3.fitting.leastsquares.LeastSquaresOptimizer;
 import org.apache.commons.math3.fitting.leastsquares.LeastSquaresProblem;
-import org.apache.commons.math3.fitting.leastsquares.LevenbergMarquardtOptimizer;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.DiagonalMatrix;
-import org.apache.commons.math3.util.Precision;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,10 +22,26 @@ public class RecyclingPolynomialFitter extends AbstractCurveFitter {
     private final double[] x;
     private final double[] y;
     private final double[] weights;
-    int nextObs = 0;
 //    private LeastSquaresOptimizer optimizer;
     private boolean changed = true;
     private double[] solution;
+
+    /**
+     * Parametric function to be fitted.
+     */
+    private static final PolynomialFunction.Parametric FUNCTION = new PolynomialFunction.Parametric();
+
+    /**
+     * Initial guess.
+     */
+    private final double[] param;
+    /**
+     * Maximum number of iterations of the optimization algorithm.
+     */
+    private final int iter;
+
+    /** tolerance in X and Y for replacement policy */
+    double tolX = Pri.EPSILON, tolY = Pri.EPSILON;
 
     public RecyclingPolynomialFitter(int degree, int window, int iter) {
         this.param = new double[degree + 1];
@@ -41,7 +55,7 @@ public class RecyclingPolynomialFitter extends AbstractCurveFitter {
         x = new double[window];
         y = new double[window];
         weights = new double[window];
-        Arrays.fill(weights, 1f);
+        clear();
 
         final int len = x.length;
         final double[] values = new double[len];
@@ -72,12 +86,61 @@ public class RecyclingPolynomialFitter extends AbstractCurveFitter {
                 build();
     }
 
+    public void clear() {
+        Arrays.fill(param, 0);
+        Arrays.fill(x, Float.NaN);
+        Arrays.fill(y, Float.NaN);
+        Arrays.fill(weights, 1f);
+    }
+
+    public RecyclingPolynomialFitter tolerate(double tolX, double tolY) {
+        this.tolX = tolX;
+        this.tolY = tolY;
+        return this;
+    }
+
     public void learn(double xi, double yi) {
-        int nextObs = this.nextObs;
-        x[nextObs] = xi;
-        y[nextObs] = yi;
-        this.nextObs = (nextObs +1)%x.length;
+        double[] xx = this.x;
+        double[] yy = this.y;
+
+        if (xx[0]!=xx[0] /* NaN */) {
+            //special case: empty; fill entirely with the first value
+            Arrays.fill(xx, xi);
+            Arrays.fill(yy, yi);
+            return;
+        }
+
+        int farX = -1;
+        double farDX = Float.NEGATIVE_INFINITY;
+        for (int i = 0, x1Length = xx.length; i < x1Length; i++) {
+            double x = xx[i];
+            double dx = Math.abs(x - xi);
+            if (dx <= tolX) {
+                double y = yy[i];
+                if (Math.abs(y - yi) <= tolY) {
+                    //nothing new to be learned, but merge anyway
+                    merge(i, xi, yi);
+                    return;
+                }
+            }
+            if (dx >= farDX) {
+                farX = i;
+                farDX = dx;
+            }
+        }
+
+        replace(farX, xi, yi);
+
         //solution = null; //trigger re-solve
+    }
+
+    public void merge(int i, double xi, double yi) {
+        this.x[i] = (this.x[i] + xi)/2;
+        this.y[i] = (this.y[i] + yi)/2;
+    }
+    public void replace(int i, double xi, double yi) {
+        this.x[i] = xi;
+        this.y[i] = yi;
     }
 
     public double guess(double  xi) {
@@ -100,18 +163,6 @@ public class RecyclingPolynomialFitter extends AbstractCurveFitter {
 //        return optimizer;
 //    }
 
-    /**
-     * Parametric function to be fitted.
-     */
-    private static final PolynomialFunction.Parametric FUNCTION = new PolynomialFunction.Parametric();
-    /**
-     * Initial guess.
-     */
-    private final double[] param;
-    /**
-     * Maximum number of iterations of the optimization algorithm.
-     */
-    private final int iter;
 
 
     /**

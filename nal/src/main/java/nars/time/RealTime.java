@@ -1,5 +1,6 @@
 package nars.time;
 
+import nars.NAR;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -24,7 +25,7 @@ public abstract class RealTime extends Time {
     protected RealTime(int unitsPerSecond, boolean relativeToStart) {
         super();
         this.unitsPerSecod = unitsPerSecond;
-        this.start = relativeToStart ? getRealTime() : 0L;
+        this.start = relativeToStart ? realtime() : 0L;
     }
 
 
@@ -39,9 +40,7 @@ public abstract class RealTime extends Time {
 
     @Override
     public void clear() {
-        update();
-
-        long rt = getRealTime();
+        long rt = realtime();
 
         if (start!=0)
             start = rt;
@@ -49,14 +48,11 @@ public abstract class RealTime extends Time {
         t = (rt - start);
     }
 
-
     @Override
-    public final void update() {
-        long now = (getRealTime()-start);
-
-        t = now;
+    public final void cycle(NAR n) {
+        t = (realtime()-start);
+        super.cycle(n);
     }
-
 
     @Override
     public final long now() {
@@ -64,7 +60,7 @@ public abstract class RealTime extends Time {
     }
 
 
-    protected abstract long getRealTime();
+    protected abstract long realtime();
 
     float secondsSinceStart() {
         return unitsToSeconds(t - start);
@@ -117,7 +113,7 @@ public abstract class RealTime extends Time {
         }
 
         @Override
-        protected long getRealTime() {
+        protected long realtime() {
             return System.currentTimeMillis() / 100;
         }
 
@@ -136,7 +132,7 @@ public abstract class RealTime extends Time {
         }
 
         @Override
-        protected long getRealTime() {
+        protected long realtime() {
             return System.currentTimeMillis() / 20;
         }
 
@@ -155,7 +151,7 @@ public abstract class RealTime extends Time {
         }
 
         @Override
-        protected long getRealTime() {
+        protected long realtime() {
             return System.currentTimeMillis() / 10;
         }
 
@@ -175,7 +171,7 @@ public abstract class RealTime extends Time {
         }
 
         @Override
-        protected long getRealTime() {
+        protected long realtime() {
             return System.currentTimeMillis();
         }
 
@@ -190,7 +186,7 @@ public abstract class RealTime extends Time {
         }
 
         @Override
-        protected long getRealTime() {
+        protected long realtime() {
             return System.nanoTime();
         }
 

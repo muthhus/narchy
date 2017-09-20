@@ -55,7 +55,7 @@ public class RecyclingPolynomialFitterTest {
             float yActual = f.valueOf(x);
             double yEstim = w.guess(x);
             System.out.println(x + " " + " " + yActual + " " + yEstim);
-            assertEquals(yActual, yEstim, 1f);
+            assertEquals(yActual, yEstim, 2f);
         }
     }
 

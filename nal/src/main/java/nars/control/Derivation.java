@@ -7,13 +7,13 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.derive.Conclusion;
 import nars.derive.DerivationTemporalize;
 import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
 import nars.op.substitute;
 import nars.task.DerivedTask;
+import nars.task.ITask;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
@@ -21,9 +21,6 @@ import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.subst.Unify;
-import nars.term.var.AbstractVariable;
-import nars.term.var.CommonVariable;
-import nars.term.var.VarPattern;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.eclipse.collections.api.map.ImmutableMap;
@@ -32,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.roaringbitmap.RoaringBitmap;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -233,7 +231,7 @@ public class Derivation extends Unify implements TermContext {
     /**
      * tasklink/termlink scope
      */
-    public DerivedTask[] run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, final int ttl) {
+    public Collection<DerivedTask> run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, final int ttl) {
 
         if (revert(0)) {
             //remove common variable entries because they will just consume memory if retained as empty
@@ -241,11 +239,12 @@ public class Derivation extends Unify implements TermContext {
 //                return !(k instanceof AbstractVariable) || k instanceof CommonVariable;
 //            });
 //            xy.map.clear();
+            xy.map.clear();
         }
-        xy.map.clear();
 
-        assert(termutes.isEmpty() && derivations.isEmpty() && preToPost.isEmpty());
+        assert(termutes.isEmpty() && preToPost.isEmpty());
 
+        this.derivations.clear();
         this.forEachMatch = null;
         this.temporalize = null;
         this.concTruth = null;
@@ -336,9 +335,7 @@ public class Derivation extends Unify implements TermContext {
 
         int ds = derivations.size();
         if (ds > 0) {
-            DerivedTask[] dd = derivations.values().toArray(new DerivedTask[ds]);
-            derivations.clear();
-            return dd;
+            return derivations.values();
         } else {
             return null;
         }
