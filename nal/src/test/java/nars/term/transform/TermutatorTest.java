@@ -162,10 +162,6 @@ public class TermutatorTest {
 
             }
 
-            @Override public int getEstimatedPermutations() {
-                return 0;
-            }
-
          }}, 0);
 
 

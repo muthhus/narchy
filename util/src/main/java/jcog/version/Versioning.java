@@ -29,8 +29,7 @@ public class Versioning<X> extends
 
 
     public final boolean revertLive(int to) {
-        if (to > 0)
-            revert(to);
+        revert(to);
         return live();
     }
 
@@ -38,30 +37,20 @@ public class Versioning<X> extends
      * reverts/undo to previous state
      */
     public final void revert(int when) {
-        //assert (size >= when);
-
-        //pop(size - when );
 
         int s = size;
+        if (s == 0)
+            return;
+
         int c = s - when;
         final Versioned<X>[] i = this.items;
 
         while (c-- > 0) {
-
-            //Versioned versioned =
-            //removeLast();
-
-            Versioned versioned = i[s = (--size)]; //pop()
+            i[--s].pop();
             i[s] = null;
-
-
-            versioned.pop();
-
-            //}
-            //assert(removed!=null);
-            //TODO removeLastFast where we dont need the returned value
         }
 
+        this.size = s;
     }
 
 
