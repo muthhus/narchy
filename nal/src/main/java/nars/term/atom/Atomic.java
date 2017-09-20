@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -52,6 +53,17 @@ public interface Atomic extends Term {
 
     @Override
     default @Nullable Term temporalize(Retemporalize r) { return this; }
+
+    @Override
+    default Term replace(Map<Term, Term> m) {
+        Term y = m.get(this); //atom substitutions
+        return y != null ? y : this;
+    }
+
+    @Override
+    default Term replace(Term from, Term to) {
+        return equals(from) ? to : this; //atom substitution
+    }
 
     @NotNull
     static Atomic the(@NotNull String id) {
@@ -95,7 +107,7 @@ public interface Atomic extends Term {
 
     @Override
     default Term evalSafe(TermContext context, int remain) {
-        return remain <= 0 ? null : context.applyOrElseTerm(this);
+        return remain <= 0 ? null : context.applyTermIfPossible(this);
     }
 
     @NotNull

@@ -1,7 +1,7 @@
 package nars.term.subst;
 
-import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Bool;
 import nars.term.atom.Intlike;
 import nars.term.transform.CompoundTransform;
@@ -35,7 +35,7 @@ public interface Subst extends CompoundTransform {
     void clear();
 
     @Override
-    default @Nullable Term apply(@Nullable Compound parent, Term x) {
+    default @Nullable Termed apply(Term x) {
         if (x instanceof Bool || x instanceof Intlike)//assert (!(x instanceof Bool));
             return x;
 

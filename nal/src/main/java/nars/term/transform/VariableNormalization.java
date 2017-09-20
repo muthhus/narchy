@@ -1,27 +1,27 @@
 package nars.term.transform;
 
 import nars.Op;
-import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.var.Variable;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Variable normalization
- *
+ * <p>
  * Destructive mode modifies the input Compound instance, which is
  * fine if the concept has been created and unreferenced.
- *
+ * <p>
  * The term 'destructive' is used because it effectively destroys some
  * information - the particular labels the input has attached.
- *
  */
-public class VariableNormalization extends VariableTransform  {
+public class VariableNormalization extends VariableTransform {
 
-    /** indexing offset of assigned variable id's */
+    /**
+     * indexing offset of assigned variable id's
+     */
     private final int offset;
 
     protected int count;
@@ -35,42 +35,38 @@ public class VariableNormalization extends VariableTransform  {
         this(0);
     }*/
 
-    /** for use with compounds that have exactly one variable (when offset=0, default) */
+    /**
+     * for use with compounds that have exactly one variable (when offset=0, default)
+     */
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
-        @Override
-        public Term apply(@Nullable Compound containing, /*@NotNull*/ Term t) {
-
-            //if (current instanceof Ellipsis)
-            //throw new RuntimeException("not allowed");
-            //return null;
-
-            if (t instanceof Variable)
-                return t.normalize(1);
-            else
-                return t;
+        @Override public Term apply(Term t) {
+            return t instanceof Variable ? t.normalize(1) : t;
         }
     };
 
+
     @Override
-    public final Term apply(@Nullable Compound ct, /*@NotNull*/ Term v) {
+    public final Termed apply(Term v) {
         if (v instanceof Variable) {
             if (v.equals(Op.Imdex)) {
                 //anonymized to a unique variable each occurrence
-                return newVariableIncreasingCount((Variable)v);
+                return newVariableIncreasingCount((Variable) v);
             } else {
                 return map.computeIfAbsent((Variable) v, this::newVariableIncreasingCount);
             }
-        } else
+        } else {
             return v;
+        }
     }
+
 
     /*@NotNull*/
     protected Variable newVariableIncreasingCount(/*@NotNull*/ Variable x) {
-        ++count;    
+        ++count;
         return newVariable(x);
     }
-    
+
     /*@NotNull*/
     protected Variable newVariable(/*@NotNull*/ Variable x) {
         //Variable y;

@@ -286,7 +286,7 @@ public class Revision {
 
         //relate high frequency difference with low confidence
         float freqDiscount =
-               0.5f + 0.5f * TruthFunctions.freqSimilarity(a.freq(), b.freq());
+               0.5f + 0.5f * (1f - Math.abs(a.freq() - b.freq()));
         factor *= freqDiscount; if (factor < Prioritized.EPSILON) return null;
 
         //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount

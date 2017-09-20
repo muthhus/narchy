@@ -26,10 +26,7 @@ import jcog.data.sexpression.Pair;
 import nars.$;
 import nars.IO;
 import nars.Op;
-import nars.control.Derivation;
 import nars.derive.AbstractPred;
-import nars.derive.match.EllipsisMatch;
-import nars.index.term.NewCompound;
 import nars.index.term.TermContext;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
@@ -822,7 +819,7 @@ public interface Compound extends Term, IPair, TermContainer {
             if (possibleArgs.op() == PROD) {
                 Term possibleFunc = u.sub(1);
                 if (possibleFunc.op() == ATOM) {
-                    Termed ff = context.applyOrElse(possibleFunc);
+                    Termed ff = context.applyIfPossible(possibleFunc);
                     if (ff instanceof Functor) {
                         u = ((Functor) ff).apply(possibleArgs.subterms());
                         if (u instanceof AbstractPred) {
@@ -891,102 +888,14 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     @Nullable
     default Term transform(@NotNull CompoundTransform t) {
-        Op o = op();
-        int dt = o.temporal ? t.dt(this) : DTERNAL;
-        return transform(o, dt, t);
+        return t.transform(this, op(), DTERNAL);
     }
 
 
     @Override
     @Nullable
-    default Term transform(@NotNull CompoundTransform t, Compound parent) {
-        Op o = op();
-        int dt = o.temporal ? t.dt(this) : DTERNAL;
-        return transform(o, dt, t);
-    }
-
-
-    @Override
-    @Nullable
-    default Term transform(int newDT, @NotNull CompoundTransform t) {
-        return transform(op(), newDT, t);
-    }
-
-    @Nullable
-    public default Term transform(Op op, int dt, @NotNull CompoundTransform t) {
-
-        if (!t.applyInside(this))
-            return this;
-
-        boolean boolFilter = !op.allowsBool;
-
-        @NotNull TermContainer srcSubs = this.subterms(); //for faster access, generally
-
-        int s = srcSubs.size(), subtermMods = 0;
-
-        NewCompound target = new NewCompound(op, s);
-
-        for (int i = 0; i < s; i++) {
-
-            Term x = srcSubs.sub(i);
-
-            Term y = x.transform(t, this); //x instanceof Compound ? x.transform(t) : t.apply(this, x);
-//            if (y==x)
-//                y = t.apply(null, y);
-
-            if (Term.invalidBoolSubterm(y, boolFilter)) {
-                return null;
-            }
-
-            if (y instanceof EllipsisMatch) {
-                EllipsisMatch xx = (EllipsisMatch) y;
-                int xxs = xx.size();
-                for (int j = 0; j < xxs; j++) {
-                    @Nullable Term k = xx.sub(j).transform(t, this);
-                    if (Term.invalidBoolSubterm(k, boolFilter)) {
-                        return null;
-                    } else {
-                        target.add(k);
-                    }
-                }
-                subtermMods += xxs;
-            } else {
-                if (y != x /*&& !y.equals(x)*/) {
-                    subtermMods++;
-                } /*else {
-                    y = x;
-                }*/
-
-                target.add(y);
-            }
-
-
-        }
-
-
-        //TODO does it need to recreate the container if the dt has changed because it may need to be commuted ... && (superterm.dt()==dt) but more specific for the case: (XTERNAL -> 0 or DTERNAL)
-
-        //        if (subtermMods == 0 && !opMod && dtMod && (op.image || (op.temporal && concurrent(dt)==concurrent(src.dt()))) ) {
-//            //same concurrency, just change dt, keep subterms
-//            return src.dt(dt);
-//        }
-        Term y;
-        if (subtermMods > 0 || op != this.op()/* || dt != src.dt()*/) {
-
-            //if (target.internable())
-            y = op.the(dt, target.theArray());
-            //else
-            //return Op.compound(op, target.theArray(), false).dt(dt); //HACK
-
-        } else {
-            y = this.dt(dt);
-        }
-
-        if (y instanceof Compound && t instanceof Derivation && y.op() == INH && y.subIs(1, ATOM) && y.subIs(0, PROD)) {
-            return y.eval(((TermContext) t));
-        }
-
-        return y;
+    default Term transform(int newDT, CompoundTransform t) {
+        return t.transform(this, op(), newDT);
     }
 
 
@@ -1011,7 +920,8 @@ public interface Compound extends Term, IPair, TermContainer {
             Op o = op();
             boolean ot = o.temporal;
             int dt = ot ? r.dt(this) : DTERNAL;
-            Term t = transform(o, dt, r);
+
+            Term t = r.transform(this, o, dt);
             if (t == null) {
                 return null;
             } else {

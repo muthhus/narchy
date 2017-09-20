@@ -21,6 +21,7 @@
 package nars.truth;
 
 import jcog.Util;
+import jcog.pri.Pri;
 import nars.$;
 import nars.Param;
 import org.jetbrains.annotations.Nullable;
@@ -48,9 +49,13 @@ public final class TruthFunctions {
      * @return Truth value of the conclusion
      */
     public static Truth conversion(/*@NotNull*/ Truth t, float minConf) {
-        float w = and(t.freq(), t.conf());
-        float c = w2c(w);
-        return c >= minConf ? t(1, c) : null;
+        float cc = t.freqTimesConf();
+        if (cc > 0) {
+            float c = w2c(cc);
+            if (c >= minConf)
+                return t(1, c);
+        }
+        return null;
     }
 
     /* ----- Single argument functions, called in StructuralRules ----- */
@@ -85,8 +90,13 @@ public final class TruthFunctions {
      * @return Truth value of the conclusion
      */
     public static Truth contraposition(/*@NotNull*/ Truth t, float minConf) {
-        float c = w2c(and(1 - t.freq(), t.conf()));
-        return (c < minConf) ? null : t(0, c);
+        float cc = t.freqNegTimesConf();
+        if (cc > 0) {
+            float c = w2c(cc);
+            if (c >= minConf)
+                return t(0, c);
+        }
+        return null;
     }
 
     //    public static float temporalIntersection(long now, long at, long bt) {
@@ -108,7 +118,7 @@ public final class TruthFunctions {
         float c = and(f, a.conf(), reliance);
         return (c >= minConf) ? t(f, c) : null;
     }
-        /* ----- double argument functions, called in SyllogisticRules ----- */
+    /* ----- double argument functions, called in SyllogisticRules ----- */
 
     /**
      * assumes belief freq=1f
@@ -131,7 +141,6 @@ public final class TruthFunctions {
 
         return c >= minConf ? t(f, c) : null;
     }
-
 
 
     /**
@@ -175,14 +184,13 @@ public final class TruthFunctions {
      * @return Truth value of the conclusion, or null if either truth is analytic already
      */
     public static Truth induction(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
-        float c = w2c(and(b.freq(), a.conf(), b.conf()));
-
-//        float aF = a.freq();
-//        float bF = b.freq();
-//        float c = w2c(and(
-//                freqSimilarity(aF, bF),
-//                a.conf(), b.conf()));
-        return (c < minConf) ? null : t(a.freq(), c);
+        float cc = a.conf() * b.freqTimesConf();
+        if (cc > 0) {
+            float c = w2c(cc); //and(a.conf(),b.freq(),b.conf())
+            if (c >= minConf)
+                return $.t(a.freq(), c);
+        }
+        return null;
     }
 
 
@@ -205,8 +213,13 @@ public final class TruthFunctions {
      * @return Truth value of the conclusion
      */
     public static Truth exemplification(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
-        float c = w2c(and(a.freq(), b.freq(), a.conf(), b.conf()));
-        return c < minConf ? null : t(1, c);
+        float cc = a.freqTimesConf() * b.freqTimesConf();
+        if (cc > 0) {
+            float c = w2c(cc);
+            if (c >= minConf)
+                return t(1, c);
+        }
+        return null;
     }
 
 
@@ -231,26 +244,29 @@ public final class TruthFunctions {
 
 
         float f0 = or(f1, f2);
-        float c = w2c(and(f0, a.conf(), b.conf()));
-        if (c < minConf)
-            return null;
-
-        float f = (Util.equals(f0, 0, Param.TRUTH_EPSILON)) ? 0 : (and(f1, f2) / f0);
-        return t(f, c);
+        float cc = and(f0, a.conf(), b.conf());
+        if (cc > 0) {
+            float c = w2c(cc);
+            if (c >= minConf) {
+                float f = (Util.equals(f0, 0, Param.TRUTH_EPSILON)) ? 0 : (and(f1, f2) / f0);
+                return t(f, c);
+            }
+        }
+        return null;
     }
 
-    /**
-     * measures the similarity or coherence of two freqency values
-     */
-    public static float freqSimilarity(float aFreq, float bFreq) {
-        if (aFreq == bFreq) return 1f;
-
-        //linear
-        return 1f - Math.abs(aFreq - bFreq);
-
-        //TODO check this:
-        //return Math.max((aFreq * bFreq), (1f - aFreq) * (1f - bFreq));
-    }
+//    /**
+//     * measures the similarity or coherence of two freqency values
+//     */
+//    public static float freqSimilarity(float aFreq, float bFreq) {
+//        if (aFreq == bFreq) return 1f;
+//
+//        //linear
+//        return 1f - Math.abs(aFreq - bFreq);
+//
+//        //TODO check this:
+//        //return Math.max((aFreq * bFreq), (1f - aFreq) * (1f - bFreq));
+//    }
 
     /**
      * if unipolar (ex: NAL 1), the condition frequency acts as a gate
@@ -311,6 +327,7 @@ public final class TruthFunctions {
 
     /**
      * A function specially designed for desire value [To be refined]
+     *
      * @param v1 Truth value of the first premise
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
@@ -330,6 +347,7 @@ public final class TruthFunctions {
 
     /**
      * A function specially designed for desire value [To be refined]
+     *
      * @param v1 Truth value of the first premise
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
@@ -522,8 +540,7 @@ public final class TruthFunctions {
      * @return The corresponding weight of evidence, a non-negative real number
      */
     private static float c2w(float c, float horizon) {
-        if (c != c || (c > MAX_CONF) || (c < 0))
-            throw new InvalidParameterException();
+        assert(c == c && (c < MAX_CONF) && c > Pri.EPSILON);
         return c2wSafe(c, horizon);
     }
 
@@ -538,13 +555,8 @@ public final class TruthFunctions {
      * @return The corresponding confidence, in [0, 1)
      */
     public static float w2c(float w) {
-        return w2c(w, Param.HORIZON);
-    }
-
-    private static float w2c(float w, float horizon) {
-        if ((w != w) || (w < 0))
-            throw new IllegalArgumentException();
-        return clamp(w / (w + horizon), 0, MAX_CONF);
+        assert (w == w && w > 0): "w2c(" + w + ") is invalid";
+        return clamp(w / (w + Param.HORIZON), 0, MAX_CONF);
     }
 
     public static float confAnd(Truthed... tt) {

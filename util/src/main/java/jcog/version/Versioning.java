@@ -29,7 +29,8 @@ public class Versioning<X> extends
 
 
     public final boolean revertLive(int to) {
-        revert(to);
+        if (to > 0)
+            revert(to);
         return live();
     }
 
@@ -43,14 +44,15 @@ public class Versioning<X> extends
 
         int s = size;
         int c = s - when;
+        final Versioned<X>[] i = this.items;
 
         while (c-- > 0) {
 
             //Versioned versioned =
             //removeLast();
 
-            Versioned versioned = items[--size]; //pop()
-            items[size] = null;
+            Versioned versioned = i[s = (--size)]; //pop()
+            i[s] = null;
 
 
             versioned.pop();

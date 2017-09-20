@@ -121,9 +121,8 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
         return Compound.super.xternal();
     }
 
-    @Override
     public @Nullable Term transform(@NotNull CompoundTransform t, Compound parent) {
-        return Compound.super.transform(t, parent);
+        return transform(t);
     }
 
     @Override
@@ -138,7 +137,9 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
 
     @Override
     public @Nullable Term transform(@NotNull CompoundTransform t) {
-        return Compound.super.transform(t);
+        Op o = op();
+        int dt = o.temporal ? t.dt(this) : DTERNAL;
+        return t.transform(this, o, dt);
     }
 
     @Override
@@ -161,9 +162,10 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
         if (that instanceof GenericCompoundDT) {
             GenericCompoundDT cthat = (GenericCompoundDT) that;
             if (dt != cthat.dt) return false;
-            if (ref == cthat.ref) return true;
-            else if (ref.equals(cthat.ref)) {
-                ref = cthat.ref; //share
+            Compound cThatRef = cthat.ref;
+            if (this.ref == cThatRef) return true;
+            else if (this.ref.equals(cThatRef)) {
+                this.ref = cThatRef; //share
                 return true;
             }
             return false;

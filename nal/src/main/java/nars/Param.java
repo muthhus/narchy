@@ -7,11 +7,9 @@ import jcog.data.MutableInteger;
 import jcog.pri.op.PriMerge;
 import jcog.util.FloatFloatToFloatFunction;
 import nars.control.Derivation;
-import nars.control.MetaGoal;
 import nars.task.Tasked;
 import nars.task.TruthPolation;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
@@ -94,7 +92,7 @@ public abstract class Param extends Services<Term,NAR> {
                     32;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(128);
+    public final MutableInteger matchTTL = new MutableInteger(192);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.1f;
@@ -158,29 +156,32 @@ public abstract class Param extends Services<Term,NAR> {
     public float derivePriority(Task t, @NotNull Derivation d) {
         //float p = 1f / (1f + ((float)t.complexity())/termVolumeMax.floatValue());
 
-        float decayRate = 1f;
+        float discount = 1f;
 
         int dCompl = t.complexity();
         int pCompl = d.parentComplexity;
         float relGrowth =
                 unitize(((float)dCompl) / (dCompl + pCompl)); //1 - (proportion of its complexity / (its complexity + parent complexity) )
 
-        decayRate *= 1f - 0.5f * Util.sqr(relGrowth);
+        discount *= 1f - 0.5f * /*Util.sqr*/(relGrowth);
 
         Truth tr = t.truth();
         if (/* belief or goal */ tr!=null) {
 
             //prefer confidence, relative to the premise which formed it
-            float relConf = unitize(tr.conf() / d.premiseConf);
-            decayRate *= relConf;
+            float parentConf = d.single ? d.premiseConfSingle : d.premiseConfDouble;
+            assert(parentConf > 0);
+            float relConf = unitize(tr.conf() / parentConf);
+
+            discount *= relConf;
 
             //prefer polarized
             //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));
         } else {
-            decayRate *= 0.5f;
+            discount *= 0.5f;
         }
 
-        return decayRate * d.premisePri;
+        return discount * d.premisePri;
         //return Util.lerp(1f, decayRate, t.originality()) * d.premisePri; //more lenient derivation budgeting priority reduction in proportion to lack of originality
     }
 

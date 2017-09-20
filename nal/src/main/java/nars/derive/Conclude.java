@@ -63,7 +63,7 @@ public final class Conclude {
 
     }
 
-    public static void match(final PremiseRule rule, List<PrediTerm> pre, List<PrediTerm> post, @NotNull SortedSet<MatchConstraint> constraints, PatternTermIndex index) {
+    public static void match(final PremiseRule rule, List<PrediTerm<Derivation>> pre, List<PrediTerm<Derivation>> post, @NotNull SortedSet<MatchConstraint> constraints, PatternTermIndex index) {
 
         final Term taskPattern = rule.getTask();
         final Term beliefPattern = rule.getBelief();

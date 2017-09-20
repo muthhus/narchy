@@ -61,14 +61,12 @@ public class PreciseTruth implements Truth {
     }
 
     @Override
-    public float freq() {
+    public final float freq() {
         return f;
     }
 
     @Override
-    public float evi() {
-        return e;
-    }
+    public final float evi() { return e;    }
 
     @Override
     public float conf() {

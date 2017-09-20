@@ -2,12 +2,10 @@ package nars.derive.rule;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Streams;
-import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.index.term.PatternTermIndex;
-import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
@@ -41,7 +39,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     @NotNull
     public static PremiseRuleSet rules(NAR nar, PatternTermIndex p, boolean permute, String... filename) {
 
-        PremiseRuleSet rs = new PremiseRuleSet(parsedRules(p, filename), p, permute);
+        PremiseRuleSet rs = new PremiseRuleSet(parsedRules(filename), p, permute);
 
         //logger.info("{} totalRules={}, uniqueComponents={}", name, rs.rules.size(), rs.patterns.size());
         if (rs.errors[0] > 0) {
@@ -51,7 +49,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
         return rs;
     }
 
-    public static Stream<Pair<PremiseRule, String>> parsedRules(PatternTermIndex p, String... name) {
+    public static Stream<Pair<PremiseRule, String>> parsedRules(String... name) {
         return Stream.of(name)./*parallel().*/flatMap(n -> {
 
                     InputStream nn = null;
@@ -71,7 +69,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
                         e.printStackTrace();
                         bb = ArrayUtils.EMPTY_BYTE_ARRAY;
                     }
-                    return parse(load(bb), p);
+                    return parse(load(bb));
 
                 }
         );
@@ -85,7 +83,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
 
     public PremiseRuleSet(PatternTermIndex index, boolean permute, @NotNull String... rules) {
-        this(parse(Stream.of(rules), index), index, permute);//$.terms, rules));
+        this(parse(Stream.of(rules)), index, permute);//$.terms, rules));
     }
 
 
@@ -211,11 +209,11 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 //            .builder();
 
     @NotNull
-    public static Stream<Pair<PremiseRule, String>> parse(@NotNull Stream<String> rawRules, @NotNull PatternTermIndex index) {
+    public static Stream<Pair<PremiseRule, String>> parse(@NotNull Stream<String> rawRules) {
 
         return rawRules.map(src -> Tuples.pair(lines.computeIfAbsent(src, s -> {
             try {
-                return PremiseRuleSet.parse( s, index);
+                return PremiseRuleSet.parse( s);
             } catch (Narsese.NarseseException e) {
                 logger.error("rule parse: {}:\t{}", e, src);
                 return null;
@@ -225,24 +223,24 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     }
 
 
-    public static PremiseRule[] parse(@NotNull TermIndex index, @NotNull String... src) {
-        return Util.map((s -> {
-            try {
-                return parse(s, index);
-            } catch (Narsese.NarseseException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }), new PremiseRule[src.length], src);
+//    public static PremiseRule[] parse(@NotNull TermIndex index, @NotNull String... src) {
+//        return Util.map((s -> {
+//            try {
+//                return parse(s, index);
+//            } catch (Narsese.NarseseException e) {
+//                e.printStackTrace();
+//                return null;
+//            }
+//        }), new PremiseRule[src.length], src);
+//    }
+
+    @NotNull
+    public static PremiseRule parse(@NotNull String src) throws Narsese.NarseseException {
+        return new PremiseRule(parseRuleComponents(src));
     }
 
     @NotNull
-    public static PremiseRule parse(@NotNull String src, @NotNull TermIndex index) throws Narsese.NarseseException {
-        return new PremiseRule(parseRuleComponents(src, index));
-    }
-
-    @NotNull
-    public static TermContainer parseRuleComponents(@NotNull String src, @NotNull TermIndex index) throws Narsese.NarseseException {
+    public static TermContainer parseRuleComponents(@NotNull String src) throws Narsese.NarseseException {
 
         //(Compound) index.parseRaw(src)
         String[] ab = ruleImpl.split(src);

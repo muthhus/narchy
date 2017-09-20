@@ -1242,7 +1242,8 @@ public enum Op implements $ {
     public static final Predicate<Term> recursiveCommonalityDelimeter =
             c -> !c.op().in(EVENT_DELIMETER_OP);
     public static final Predicate<Term> nonEventDelimeter =
-            c -> c.op()!=CONJ || concurrent(c.dt()); //!c.op().temporal || concurrent(c.dt());
+            c -> true;
+                    //c.op()!=CONJ || concurrent(c.dt()); //!c.op().temporal || concurrent(c.dt());
 
     private static final int InvalidImplicationSubj = or(IMPL);
 

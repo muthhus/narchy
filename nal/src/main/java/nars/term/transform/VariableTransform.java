@@ -1,7 +1,14 @@
 package nars.term.transform;
 
+import nars.Op;
 import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Function;
 
 /**
  * Created by me on 6/1/15.
@@ -9,8 +16,15 @@ import org.jetbrains.annotations.NotNull;
 public abstract class VariableTransform implements CompoundTransform {
 
     @Override
-    public boolean applyInside(@NotNull Compound t) {
-        //prevent executing on any superterms that contain no variables, because this would have no effect
-        return t.vars() > 0 || t.varPattern() > 0;
+    public @Nullable Termed apply(Term t) {
+        if (t instanceof Variable) {
+            return apply((Variable)t);
+        }
+        return t;
     }
+
+    @Override public final Term transform(Compound t, Op op, int dt) {
+        return t.vars() > 0 || t.varPattern() > 0 ? CompoundTransform.super.transform(t, op, dt) : t;
+    }
+
 }

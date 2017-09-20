@@ -19,27 +19,33 @@ abstract public class Retemporalize implements CompoundTransform {
     public static final Retemporalize retemporalizeXTERNALToZero = new RetemporalizeNonXternal(0);
 
     @Override
-    public final boolean applyInside(@NotNull Compound c) {
-        return c.hasAny(TemporalBits);
-    }
-
-    @Nullable
-    @Override
-    public final Term apply(@Nullable Compound parent, @NotNull Term x) {
-
-        if (!(x instanceof Compound) || !x.hasAny(TemporalBits))
+    public Term transform(Compound x, Op op, int dt) {
+        if (!x.hasAny(TemporalBits))
             return x;
-
-        Compound cx = (Compound) x;
-        Op o = cx.op();
-        boolean temporal = o.temporal;
-        int tdt = temporal ? dt(cx) : DTERNAL;
-        if (parent != null) {
-            return cx.transform(o, tdt, this);
-        } else {
-            return temporal ? cx.dt(tdt) : cx;
-        }
+        else
+            return CompoundTransform.super.transform(x, op, dt);
     }
+
+
+//    @Nullable
+//    @Override
+//    public final Term apply(@NotNull Term x) {
+//
+//        if (!(x instanceof Compound) || !x.hasAny(TemporalBits))
+//            return x;
+//
+//        Compound cx = (Compound) x;
+//        Op o = cx.op();
+//        boolean temporal = o.temporal;
+//        int tdt = temporal ? dt(cx) : DTERNAL;
+//        if (parent != null) {
+//
+//            return transform(cx, o, tdt);
+//
+//        } else {
+//            return temporal ? cx.dt(tdt) : cx;
+//        }
+//    }
 
     @Override abstract public int dt(Compound x);
 

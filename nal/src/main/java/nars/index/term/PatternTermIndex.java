@@ -28,14 +28,13 @@ import static nars.Op.concurrent;
  */
 public class PatternTermIndex extends MapTermIndex {
 
+    /** HACK holds a deriverID allowing the cause channel to include it, for multiple derivers. this is messy */
+    public short deriverID = -1;
+
     public PatternTermIndex(@NotNull NAR n) {
         super(new HashMap<>());
         this.nar = n;
     }
-
-
-    /** HACK holds a deriverID allowing the cause channel to include it, for multiple derivers. this is messy */
-    public short deriverID = -1;
 
     @SuppressWarnings("Java8MapApi")
     @Override
@@ -231,12 +230,12 @@ public class PatternTermIndex extends MapTermIndex {
 //            return true;
 //        }
 
-        @NotNull
-        public Term applyAfter(@NotNull Variable secondary) {
-            if (secondary.equals(Op.Imdex))
-                return secondary; //dont try to normalize any imdex
-            else
-                return apply(null, secondary);
-        }
+//        @NotNull
+//        public Term applyAfter(@NotNull Variable secondary) {
+//            if (secondary.equals(Op.Imdex))
+//                return secondary; //dont try to normalize any imdex
+//            else
+//                return apply(secondary);
+//        }
     }
 }

@@ -36,7 +36,6 @@ import java.util.Map;
 import static nars.Op.Null;
 import static nars.op.substituteIfUnifies.substituteIfUnifiesAny;
 import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.w2c;
 
 
 /**
@@ -64,7 +63,6 @@ public class Derivation extends Unify implements TermContext {
     public Premise premise;
 
 
-    public float premiseConf;
 
     /**
      * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
@@ -144,6 +142,9 @@ public class Derivation extends Unify implements TermContext {
     public static final Atomic _taskTerm = Atomic.the("_taskTerm");
     public static final Atomic _beliefTerm = Atomic.the("_beliefTerm");
     public RoaringBitmap choices = new RoaringBitmap();
+    public float premiseConfSingle;
+    public float premiseConfDouble;
+;
 
 //    private transient Term[][] currentMatch;
 
@@ -225,10 +226,7 @@ public class Derivation extends Unify implements TermContext {
     }
 
 
-    @Override
-    public @Nullable Term apply(@Nullable Compound parent, Term x) {
-        return super.apply(parent, applyOrElseTerm(x));
-    }
+
 
     /**
      * only returns derivation-specific functors.  other functors must be evaluated at task execution time
@@ -370,10 +368,8 @@ public class Derivation extends Unify implements TermContext {
 
         this.temporal = temporal(task) || temporal(belief);
 
-        float premiseEvidence = task.isBeliefOrGoal() ? taskTruth.evi() : 0;
-        if (beliefTruth != null)
-            premiseEvidence = Math.max(premiseEvidence, beliefTruth.evi());
-        this.premiseConf = w2c(premiseEvidence);
+        this.premiseConfSingle = task.isBeliefOrGoal() ? taskTruth.conf() : 0;
+        this.premiseConfDouble = beliefTruth != null ? Math.max(premiseConfSingle, beliefTruth.conf()) : premiseConfSingle;
 
         this.premisePri = p.priElseZero();
 

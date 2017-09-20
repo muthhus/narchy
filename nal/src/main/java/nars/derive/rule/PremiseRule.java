@@ -12,6 +12,7 @@ import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
@@ -85,8 +86,8 @@ public class PremiseRule extends GenericCompound {
     public boolean goalUrgent;
 
     final SortedSet<MatchConstraint> constraints = new TreeSet(PrediTerm.sortByCost);
-    final List<PrediTerm> pre = $.newArrayList();
-    final List<PrediTerm> post = $.newArrayList();
+    final List<PrediTerm<Derivation>> pre = $.newArrayList();
+    final List<PrediTerm<Derivation>> post = $.newArrayList();
 
     /**
      * for printing complex terms as a recursive tree
@@ -144,15 +145,17 @@ public class PremiseRule extends GenericCompound {
 
 
         Solve truth = (puncOverride == 0) ?
-                new SolvePuncFromTask(ii, belief, goal, beliefProjected) :
-                new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
+                new Solve.SolvePuncFromTask(ii, belief, goal, beliefProjected) :
+                new Solve.SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
 
         //PREFIX
-        Set<Term> s = newHashSet(16); //for ensuring uniqueness / no duplicates
+        Set<Term> precon = newHashSet(16); //for ensuring uniqueness / no duplicates
 
-        addAll(s, PRE);
+        addAll(precon, PRE);
 
-        s.addAll(this.pre);
+        precon.addAll(this.pre);
+
+        truth.preSolve().forEach(precon::add);
 
         ////-------------------
         //below here are predicates which affect the derivation
@@ -171,7 +174,7 @@ public class PremiseRule extends GenericCompound {
             suff[k++] = p;
         }
 
-        return pair(s, (PrediTerm<Derivation>) AndCondition.the(suff));
+        return pair(precon, (PrediTerm<Derivation>) AndCondition.the(suff));
     }
 
 
@@ -218,25 +221,25 @@ public class PremiseRule extends GenericCompound {
         premisePattern[1] = index.get(premisePattern[1], true).term(); //belief pattern
     }
 
-    private static final CompoundTransform UppercaseAtomsToPatternVariables = (containingCompound, v) -> {
-
-        if (v instanceof Atom) {
-            String name = v.toString();
-            if (Character.isUpperCase(name.charAt(0)) && name.length() == 1) {
-                //do not alter postconditions
-                return (containingCompound.op() == Op.INH) && PostCondition.reservedMetaInfoCategories.contains(containingCompound.sub(1)) ?
-                        v : v(Op.VAR_PATTERN, v.toString());
-
+    private static final CompoundTransform UppercaseAtomsToPatternVariables = new CompoundTransform() {
+        @Override @NotNull public Termed apply(Term v) {
+            if (v instanceof Atom) {
+                if (!PostCondition.reservedMetaInfoCategories.contains(v)) { //do not alter keywords
+                    String name = v.toString();
+                    if (name.length() == 1 && Character.isUpperCase(name.charAt(0))) {
+                        return v(Op.VAR_PATTERN, v.toString());
+                    }
+                }
             }
-        }/* else if (v.op().temporal && v.dt()!=XTERNAL) {
-            return v.dt(XTERNAL); //convert to XTERNAL to allow free retemporalization
-        }*/
-        return v;
+            return v;
+        }
+
+
     };
 
 
     public final PremiseRule normalize(PatternTermIndex index) {
-        Compound t = index.pattern( (Compound) transform(UppercaseAtomsToPatternVariables) );
+        Compound t = index.pattern((Compound) transform(UppercaseAtomsToPatternVariables));
         if (t != this)
             return new PremiseRule(t);
         else
@@ -772,6 +775,7 @@ public class PremiseRule extends GenericCompound {
 
 
 }
+
 
 
 

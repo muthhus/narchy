@@ -548,7 +548,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
         test
                 .input("(R)! :|:")
                 .input("((--,a:b) ==>+0 (R)).")
-                .mustGoal(cycles, "a:b", 0.0f, 0.81f, 0);
+                .mustGoal(cycles, "a:b", 0.0f, 0.45f, 0);
 
     }
 
@@ -578,7 +578,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
         test
                 .input("(happy)! :|:")
                 .input("((--,(in)) ==>+1 ((happy) &&-1 (--,(out)))).")
-                .mustGoal(cycles, "(in)", 0f, 0.73f, 0);
+                .mustGoal(cycles, "(in)", 0f, 0.42f, 0);
     }
 
     @Test

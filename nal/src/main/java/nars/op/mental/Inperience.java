@@ -326,8 +326,6 @@ public class Inperience extends LeakBack {
                 x instanceof Compound && x.hasAny(VAR_QUERY) ? x
                     .transform(CompoundTransform.queryToDepVar) : x; //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
-
-
         try {
             Term ff = $.func(reify(s.punc()), arg);
             return ff.negIf(false);

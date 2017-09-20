@@ -164,21 +164,14 @@ public interface Term extends Termlike, Comparable<Term> {
 
     @Nullable
     default Term transform(CompoundTransform t) {
-        return t.apply(null, this);
+        return t.applyTermOrNull(this);
     }
-
-    @Nullable
-    default Term transform(CompoundTransform t, Compound parent) {
-        return t.apply(parent, this);
-    }
-
 
     @Nullable
     default Term transform(int newDT, CompoundTransform t) {
         assert (newDT == DTERNAL);
-        return t.apply(null, this);
+        return t.applyTermOrNull(this);
     }
-
 
     @Nullable
     default Term transform(/*@NotNull*/ ByteList path, int depth, Term replacement) {
@@ -833,10 +826,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
 
     default Term replace(/*@NotNull*/ Map<Term, Term> m) {
-        if (size() == 0) {
-            Term y = m.get(this); //atom substitutions
-            return y != null ? y : this;
-        } else {
+
             Subst s;
 
             if (m.size() == 1) {
@@ -847,15 +837,11 @@ public interface Term extends Termlike, Comparable<Term> {
 
             //return s.transform(this);
             return transform(s);
-        }
+
     }
 
     default Term replace(Term from, Term to) {
-        if (size() == 0) {
-            return equals(from) ? to : this; //atom substitution
-        } else {
-            return transform(new MapSubst1(from, to));
-        }
+        return equals(from) ? to : transform(new MapSubst1(from, to));
     }
 
     default Term neg() {

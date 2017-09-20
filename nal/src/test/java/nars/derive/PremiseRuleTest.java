@@ -22,7 +22,7 @@ public class PremiseRuleTest {
 
     @NotNull
     public static PremiseRule parse(@NotNull String src) throws Narsese.NarseseException {
-        return PremiseRuleSet.parse(src, $.terms);
+        return PremiseRuleSet.parse(src);
     }
 
     @Test
@@ -161,7 +161,7 @@ public class PremiseRuleTest {
 
         assertNotNull(y);
 
-        PatternTermIndex i = new PatternTermIndex(n);
+        PatternTermIndex i = new PatternTermIndex(n); i.deriverID = 0;
         y = ((PremiseRule) y).normalize(i);
         assertNotNull(y);
         PremiseRule.printRecursive(y);
@@ -203,7 +203,7 @@ public class PremiseRuleTest {
 //    }
 
     final NAR n = NARS.tmp();
-    final PremiseRuleSet permuter = new PremiseRuleSet(new PatternTermIndex(n), true);
+    final PremiseRuleSet permuter = new PremiseRuleSet(new PatternTermIndex(n) { { deriverID = 0; }}, true);
 
     @Test
     public void testBackwardPermutations() throws Narsese.NarseseException {

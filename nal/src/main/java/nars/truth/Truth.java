@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.*;
 import static nars.truth.TruthFunctions.w2c;
+import static nars.util.UtilityFunctions.and;
 
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
@@ -244,6 +245,15 @@ public interface Truth extends Truthed {
 //        return c2w(c);
         return conf(); //c2w(w2c(conf)) = conf
     }
+
+    default float freqTimesConf() {
+        return freq() * conf();
+    }
+
+    default float freqNegTimesConf() {
+        return (1 - freq()) * conf();
+    }
+
 
 //    default Truth eternalized() {
 //        return $.t(freq(), eternalizedConf());

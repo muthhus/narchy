@@ -1,5 +1,8 @@
 package nars.term.subst;
 
+import nars.Op;
+import nars.index.term.TermContext;
+import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +28,14 @@ public class MapSubst1 implements Subst {
     @Override
     public boolean isEmpty() {
         return false;
+    }
+
+    @Override
+    public final Term transform(Compound x, Op op, int dt) {
+        if (x.equals(from))
+            return to;
+        else
+            return !x.impossibleSubTerm(from) ? Subst.super.transform(x, op, dt) : x;
     }
 
     @Override

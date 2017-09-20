@@ -56,6 +56,9 @@ public class TrieDeriverTest {
     @Test
     public void testConclusionWithXTERNAL() {
         PatternTermIndex idx = new PatternTermIndex(NARS.tmp()) {
+            {
+                deriverID = 0;
+            }
             @Override
             public @Nullable Termed get(@NotNull Term x, boolean create) {
                 Termed u = super.get(x, create);
@@ -110,8 +113,9 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
         assertNotEquals(0, rules.length);
 
         @NotNull PatternTermIndex pi = new PatternTermIndex(n);
+        pi.deriverID = 0;
 
-        Stream<Pair<PremiseRule, String>> parsed = PremiseRuleSet.parse(Stream.of(rules), pi);
+        Stream<Pair<PremiseRule, String>> parsed = PremiseRuleSet.parse(Stream.of(rules));
 
         PremiseRuleSet src = new PremiseRuleSet(parsed, pi, false);
         assertNotEquals(0, src.size());

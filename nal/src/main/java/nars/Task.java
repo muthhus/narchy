@@ -808,8 +808,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
     @Nullable
     default Truth truth(long when, int dur, float minConf) {
         float eve = evi(when, dur);
-        if (eve == eve && eve >= c2w(minConf)) {
-
+        if (eve == eve && w2c(eve) >= minConf) {
 
             return new PreciseTruth(freq(), eve, false);
 

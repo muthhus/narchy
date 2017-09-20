@@ -76,11 +76,6 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public @Nullable Term transform(@NotNull CompoundTransform t, Compound parent) {
-        return ref.transform(t, parent);
-    }
-
-    @Override
     public @Nullable Term transform(int newDT, @NotNull CompoundTransform t) {
         return ref.transform(newDT, t);
     }
