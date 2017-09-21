@@ -1,7 +1,7 @@
 package spacegraph.audio;
 
 import spacegraph.audio.sample.SamplePlayer;
-import spacegraph.audio.sample.SonarSample;
+import spacegraph.audio.sample.SoundSample;
 
 import javax.sound.sampled.*;
 import java.io.File;
@@ -15,7 +15,7 @@ public class Audio implements Runnable {
     private final Line.Info info;
     private final int bufferBytes;
     public final int maxChannels;
-    private final SonarSample silentSample;
+    private final SoundSample silentSample;
     private final SourceDataLine sdl;
 
     private final int rate = 44100;
@@ -39,7 +39,7 @@ public class Audio implements Runnable {
     public Audio(int maxChannels) throws LineUnavailableException {
 
         this.maxChannels = maxChannels;
-        silentSample = new SonarSample(new float[]{0}, 44100);
+        silentSample = new SoundSample(new float[]{0}, 44100);
         Mixer mixer = AudioSystem.getMixer(null);
 
         bufferBytes = bufferSize * 2 * 2;
@@ -58,7 +58,7 @@ public class Audio implements Runnable {
         }
 
         listenerMixer = new ListenerMixer(maxChannels);
-        setListener(SoundListener.zero);
+        setListener(SoundSource.center);
 
         leftBuf = new float[bufferSize];
         rightBuf = new float[bufferSize];
@@ -90,18 +90,14 @@ public class Audio implements Runnable {
 
     }
 
-    public void setListener(SoundListener soundListener) {
-        listenerMixer.setSoundListener(soundListener);
+    public void setListener(SoundSource soundSource) {
+        listenerMixer.setSoundListener(soundSource);
     }
 
     public void shutDown() {
         alive = false;
     }
 
-
-    public void play(SonarSample sample, SoundSource soundSource, float volume, float priority) {
-        play(new SamplePlayer(sample, rate), soundSource, volume, priority);
-    }
 
     static class DefaultSource implements SoundSource {
 
@@ -125,6 +121,10 @@ public class Audio implements Runnable {
         }
     }
 
+
+    public void play(SoundSample sample, SoundSource soundSource, float volume, float priority) {
+        play(new SamplePlayer(sample, rate), soundSource, volume, priority);
+    }
 
     public <S extends SoundProducer> Sound<S> play(S p, float volume, float priority, float balance) {
         return play(p, new DefaultSource(p, balance), volume, priority);

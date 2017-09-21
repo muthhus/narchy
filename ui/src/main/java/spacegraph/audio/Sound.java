@@ -26,7 +26,7 @@ public class Sound<S extends SoundProducer> implements SoundSource, Comparable
 
     }
     
-    public void update(SoundListener listener, float alpha)
+    public void update(SoundSource listener, float alpha)
     {
         x = source.getX(alpha)-listener.getX(alpha);
         y = source.getY(alpha)-listener.getY(alpha);

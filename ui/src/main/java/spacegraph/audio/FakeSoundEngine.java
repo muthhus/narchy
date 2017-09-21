@@ -1,6 +1,6 @@
 package spacegraph.audio;
 
-import spacegraph.audio.sample.SonarSample;
+import spacegraph.audio.sample.SoundSample;
 
 import javax.sound.sampled.LineUnavailableException;
 
@@ -12,7 +12,7 @@ public class FakeSoundEngine extends Audio
     }
 
     @Override
-    public void setListener(SoundListener soundListener)
+    public void setListener(SoundSource soundSource)
     {
     }
 
@@ -21,12 +21,12 @@ public class FakeSoundEngine extends Audio
     {
     }
 
-    public SonarSample loadSample(String resourceName)
+    public SoundSample loadSample(String resourceName)
     {
         return null;
     }
 
-    public void play(SonarSample sample, SoundSource soundSource, float volume, float priority, float rate)
+    public void play(SoundSample sample, SoundSource soundSource, float volume, float priority, float rate)
     {
     }
 

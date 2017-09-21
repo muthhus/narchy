@@ -13,7 +13,7 @@ import spacegraph.audio.Sound;
 import spacegraph.audio.SoundProducer;
 import spacegraph.audio.granular.Granulize;
 import spacegraph.audio.sample.SampleLoader;
-import spacegraph.audio.sample.SonarSample;
+import spacegraph.audio.sample.SoundSample;
 import spacegraph.audio.synth.SineWave;
 
 import javax.sound.sampled.LineUnavailableException;
@@ -40,11 +40,11 @@ public class SoNAR extends TimerTask {
     private long now;
 
     public static class SampleDirectory {
-        final Map<String, SonarSample> samples = new ConcurrentHashMap<>();
+        final Map<String, SoundSample> samples = new ConcurrentHashMap<>();
 
         final Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        public SonarSample sample(String file) {
+        public SoundSample sample(String file) {
             return samples.computeIfAbsent(file, SampleLoader::load);
         }
 
@@ -58,10 +58,10 @@ public class SoNAR extends TimerTask {
         /**
          * gets a random sample from what is loaded
          */
-        public SonarSample sample(int hash) {
-            List<SonarSample> l = samples.values().stream().collect(Collectors.toList());         //HACK
+        public SoundSample sample(int hash) {
+            List<SoundSample> l = samples.values().stream().collect(Collectors.toList());         //HACK
             if (l != null && !l.isEmpty()) {
-                SonarSample s;
+                SoundSample s;
                 do {
                     s = l.get(Math.abs(hash) % l.size());
                 } while (s == null);

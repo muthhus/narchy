@@ -25,7 +25,7 @@ public enum SampleLoader
     /**
      * Loads a sample from an url
      */
-    public static SonarSample load(InputStream isis) throws UnsupportedAudioFileException, IOException
+    public static SoundSample load(InputStream isis) throws UnsupportedAudioFileException, IOException
     {
         // Hack to prevent "mark/reset not supported" on some systems 
         byte[] d = rip(isis);
@@ -34,7 +34,7 @@ public enum SampleLoader
         return buildSample(rip(ais), ais.getFormat());
     }
 
-    public static SonarSample load(String path)  {
+    public static SoundSample load(String path)  {
         try {
             return load(new FileInputStream(path));
         } catch (UnsupportedAudioFileException | IOException e) {
@@ -65,7 +65,7 @@ public enum SampleLoader
     /**
      * Reorganizes audio sample data into the intenal sonar format
      */
-    private static SonarSample buildSample(byte[] b, AudioFormat af) throws UnsupportedAudioFileException
+    private static SoundSample buildSample(byte[] b, AudioFormat af) throws UnsupportedAudioFileException
     {
         // Rip audioformat data
         int channels = af.getChannels();
@@ -127,14 +127,14 @@ public enum SampleLoader
         }
         
         // Return the completed sample
-        return new SonarSample(buf, rate);
+        return new SoundSample(buf, rate);
     }
 
     /** digitize provided function at sample rate (ex: 44.1kh) */
-    public static SonarSample digitize(FloatToFloatFunction f, int sampleRate, int duration) {
+    public static SoundSample digitize(FloatToFloatFunction f, int sampleRate, int duration) {
 
         int samples = duration * sampleRate;
-        SonarSample ss = new SonarSample(new float[samples], sampleRate);
+        SoundSample ss = new SoundSample(new float[samples], sampleRate);
         float[] b = ss.buf;
         float t = 0, dt = 1.0f / sampleRate;
         for (int i = 0; i < samples; i++) {

@@ -1,15 +1,13 @@
 package nars.experiment.mario;
 
 
-
 import spacegraph.audio.Audio;
-import spacegraph.audio.SoundListener;
+import spacegraph.audio.SoundSource;
 
 import java.awt.*;
 
 
-public abstract class Scene implements SoundListener
-{
+public abstract class Scene implements SoundSource {
     public Audio sound;
     public static boolean[] keys = new boolean[16];
 

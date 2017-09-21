@@ -21,6 +21,10 @@ exclude(module: 'objenesis')
     compile group: 'org.boofcv', name: 'io', version:'0.26'
     compile group: 'org.boofcv', name: 'ip', version:'0.26'
     compile group: 'org.boofcv', name: 'WebcamCapture', version:'0.26'
+
+
+  compile group: 'de.dfki.mary', name: 'voice-cmu-slt-hsmm', version: '5.2'
+
     compile(group: 'org.pircbotx', name: 'pircbotx', version:'2.1') {
 exclude(module: 'commons-lang3')
 exclude(module: 'guava')

@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -196,5 +197,6 @@ public class CountMinSketchTest {
                 c.add(i); //i x j
         }
         System.out.println(c.toString() + " " + c.summary());
+        assertTrue(c.toString().startsWith("1x1,2x2,3x3,4x4,5x5,6x6,7x7,8x8,9x9"));
     }
 }

@@ -1,7 +1,7 @@
 package nars.experiment.mario;
 
 
-import spacegraph.audio.sample.SonarSample;
+import spacegraph.audio.sample.SoundSample;
 
 import javax.imageio.ImageIO;
 import javax.sound.midi.Sequence;
@@ -43,7 +43,7 @@ public class Art
     public static Image logo;
     public static Image titleScreen;
 
-    public static SonarSample[] samples = new SonarSample[100];
+    public static SoundSample[] samples = new SoundSample[100];
 
     private static final Sequence[] songs = new Sequence[10];
     private static Sequencer sequencer;

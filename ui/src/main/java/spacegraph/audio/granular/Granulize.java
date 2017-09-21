@@ -2,7 +2,7 @@ package spacegraph.audio.granular;
 
 import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.audio.SoundProducer;
-import spacegraph.audio.sample.SonarSample;
+import spacegraph.audio.sample.SoundSample;
 
 import java.util.Random;
 
@@ -28,7 +28,7 @@ public class Granulize extends Granulator implements SoundProducer, SoundProduce
 	private boolean isPlaying;
 	private int playOffset = -1;
 
-    public Granulize(SonarSample s, float grainSizeSecs, float windowSizeFactor, Random rng) {
+    public Granulize(SoundSample s, float grainSizeSecs, float windowSizeFactor, Random rng) {
         this(s.buf, s.rate, grainSizeSecs, windowSizeFactor, rng);
     }
 

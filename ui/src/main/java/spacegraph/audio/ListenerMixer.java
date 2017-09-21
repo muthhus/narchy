@@ -12,14 +12,14 @@ public class ListenerMixer extends CopyOnWriteArrayList<Sound> implements Stereo
 
     private final int maxChannels;
 
-    private SoundListener soundListener;
+    private SoundSource soundSource;
 
     public ListenerMixer(int maxChannels) {
         this.maxChannels = maxChannels;
     }
 
-    public void setSoundListener(SoundListener soundListener) {
-        this.soundListener = soundListener;
+    public void setSoundListener(SoundSource soundSource) {
+        this.soundSource = soundSource;
     }
 
     public <S extends SoundProducer> Sound<S> addSoundProducer(S producer, SoundSource soundSource, float volume, float priority) {
@@ -29,11 +29,11 @@ public class ListenerMixer extends CopyOnWriteArrayList<Sound> implements Stereo
     }
 
     public void update(float alpha) {
-        boolean updating = (soundListener != null);
+        boolean updating = (soundSource != null);
 
         this.removeIf(sound -> {
             if (updating)
-                sound.update(soundListener, alpha);
+                sound.update(soundSource, alpha);
 
             return !sound.isLive();
         });
