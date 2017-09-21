@@ -5,9 +5,11 @@ import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.FloatParam;
+import jcog.map.MRUCache;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Deleteable;
 import jcog.pri.PLink;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.Task;
@@ -15,7 +17,7 @@ import nars.concept.Concept;
 import nars.gui.ConceptIcon;
 import nars.term.Term;
 import nars.term.Termed;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -28,6 +30,8 @@ import spacegraph.render.JoglPhysics;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import static jcog.Util.unitize;
@@ -43,12 +47,12 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
     public Concept concept;
     private transient ConceptSpace space;
     public float pri;
+    final Map edgeBagSharedMap = new MRUCache(1024);
 
-    private final float edgeDecayRate = 0.75f;
 
 
-    public ConceptWidget(Termed x) {
-        super(x.term(), 1, 1);
+    public ConceptWidget(Term x) {
+        super(x, 1, 1);
 
         setFront(
 //            /*col(
@@ -69,7 +73,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
                 //new PLinkHijackBag(0, 2);
-                new PLinkArrayBag<>(0, PriMerge.max, new UnifiedMap());
+                new PLinkArrayBag<>(0,
+                        //PriMerge.max,
+                        //PriMerge.replace,
+                        PriMerge.avg,
+                        //new UnifiedMap()
+                        //new LinkedHashMap()
+                        edgeBagSharedMap
+                );
 
 
 //        for (int i = 0; i < edges; i++)
@@ -141,17 +152,15 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
             edges.setCapacity(newCap);
             if (newCap > 0) {
 
-                //edges.commit(); //forget
-
                 //phase 1: collect
                 edgeStats.clear();
                 c.tasklinks().forEach(this);
-                float tasklinkVar = (float) edgeStats.getVariance();
+                float tasklinkVar = (float) edgeStats.getStandardDeviation()/2f;
                 if (tasklinkVar != tasklinkVar) tasklinkVar = 0; //none anyway
 
                 edgeStats.clear();
                 c.termlinks().forEach(this);
-                float termlinkVar = (float) edgeStats.getVariance();
+                float termlinkVar = (float) edgeStats.getStandardDeviation()/2f;
                 if (termlinkVar != termlinkVar) termlinkVar = 0; //none anyway
 
                 float priSum = edges.priSum();
@@ -161,10 +170,12 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
                 float tasklinkBoost = conceptVis.tasklinkOpacity.floatValue()
                         * unitize( tasklinkVar );
 
+//                float p = edges.depressurize();
+//                float decayRate =
                 edges.commit(x -> {
                     TermEdge e = x.get();
                     e.update(ConceptWidget.this, priSum, termlinkBoost, tasklinkBoost);
-                    x.priMult(edgeDecayRate);
+                    e.decay(0.9f);
                 });
 
                 conceptVis.apply(this, key);
@@ -240,12 +251,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
     public void render(@NotNull GL2 gl, @NotNull EDraw e) {
 
-        gl.glColor4f(e.r, e.g, e.b, e.a);
 
-        float width = e.width;// * radius();
-        if (width <= 0.1f) {
+        float width = e.width;
+        float thresh = 0.1f;
+        if (width <= thresh) {
+            gl.glColor4f(e.r, e.g, e.b, e.a * (width / thresh) /* fade opacity */);
             Draw.renderLineEdge(gl, this, e, width);
         } else {
+            gl.glColor4f(e.r, e.g, e.b, e.a);
             Draw.renderHalfTriEdge(gl, this, e, width / 9f, e.r * 2f /* hack */);
         }
     }
@@ -265,8 +278,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 //                Concept c = space.nar.concept(tt);
 //                if (c != null) {
                     TermEdge ate =
-                            //space.edges.apply(Tuples.pair(to.concept, to));
-                            space.edgeBuilder.apply(to);
+                            space.edges.apply(Tuples.pair(to.concept, to));
+                            //space.edgeBuilder.apply(to);
                     ate.add(tgt, !(ttt instanceof Task));
                     edges.put(
                             //new PLinkUntilDeleted(ate, pri)
@@ -325,7 +338,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
         }
 
         @Override
-        public int hashCode() {
+        public final int hashCode() {
             return hash;
         }
 
@@ -337,10 +350,11 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
                 //float priAvg = priSum/2f;
 
-                float minLineWidth = 5f;
-                float priToWidth = 5f;
+                float minLineWidth = 0.05f;
+                float priToWidth = 1.5f;
 
-                this.width = minLineWidth + priToWidth * Math.min(edgeSum, 5);
+                float widthSqrt = minLineWidth + priToWidth * edgeSum;
+                this.width = Util.sqr(widthSqrt);
 
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
 //                float qEst = ff.qua();
@@ -348,30 +362,28 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 //                    qEst = 0f;
 
 
+                float edgeProp;
                 if (edgeSum > 0) {
                     this.b = 0.1f + Util.or(tasklinkBoost, termlinkBoost) * 0.4f;
                     this.r = 0.1f + 0.8f * (tasklinkPri / edgeSum) * (0.75f + 0.25f * tasklinkBoost);
                     this.g = 0.1f + 0.8f * (termlinkPri / edgeSum) * (0.75f + 0.25f * termlinkBoost);
+                    edgeProp = conceptEdgePriSum > Pri.EPSILON ? unitize(edgeSum / conceptEdgePriSum) : 0;
                 } else {
                     this.r = this.g = this.b = 0.1f;
+                    edgeProp = 0.5f;
                 }
-
-                //this.a = 0.1f + 0.5f * pri;
-                float edgeProp = conceptEdgePriSum > 0 ? edgeSum / conceptEdgePriSum : 0;
 
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                         //0.1f + 0.9f * ff.pri(); //0.9f;
                         // 0.5f * edgeProp
-                        0.1f + 0.75f * Util.or(termlinkPri , tasklinkPri );
+                        0.5f;
 
-                this.attraction = 0f + 0.1f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
-                this.attractionDist = 0.05f + src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+                this.attraction = -0.01f + 0.05f * widthSqrt;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attractionDist = 0.05f + 2f * src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = -1;
                 this.attraction = 0;
             }
-
-            //decay(edgeDecayRate);
 
         }
 

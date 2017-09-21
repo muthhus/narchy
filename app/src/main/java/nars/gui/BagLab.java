@@ -1,12 +1,12 @@
 package nars.gui;
 
-import com.google.common.primitives.Shorts;
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.HijackBag;
-import jcog.bag.impl.bloom.BloomBag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
+import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -16,9 +16,11 @@ import spacegraph.widget.meter.MatrixView;
 import spacegraph.widget.slider.FloatSlider;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
+import static jcog.pri.op.PriMerge.plus;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.row;
 
@@ -97,10 +99,11 @@ public class BagLab  {
     public static void main(String[] arg) {
 
         BagLab bagLab = new BagLab(
-                //new CurveBag(256, plusBlend, new XorShift128PlusRandom(1), new HashMap())
+                new CurveBag(plus,  new HashMap(), new XorShift128PlusRandom(1), 256)
                 //new DefaultHijackBag<>(PriMerge.plus, 1024, 8)
-                new BloomBag<>(32, (i) -> Shorts.toByteArray(i.shortValue()))
+                //new BloomBag<>(32, (i) -> Shorts.toByteArray(i.shortValue()))
         );
+
 
         SpaceGraph.window(
             bagLab.surface(), 1200, 800);

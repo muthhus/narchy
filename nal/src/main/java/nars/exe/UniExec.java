@@ -132,7 +132,7 @@ public class UniExec extends Exec implements Runnable {
                     }
 
                     @Override
-                    protected Consumer<ITask> forget(float rate) {
+                    public Consumer<ITask> forget(float rate) {
                         return null;
 //                        return new PriForget(rate) {
 //                            @Override

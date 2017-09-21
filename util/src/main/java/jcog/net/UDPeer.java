@@ -149,7 +149,7 @@ public class UDPeer extends UDP {
             }
 
             @Override
-            protected Consumer<UDProfile> forget(float rate) {
+            public Consumer<UDProfile> forget(float rate) {
                 return null;
             }
 
@@ -184,7 +184,7 @@ public class UDPeer extends UDP {
             }
 
             @Override
-            protected Consumer<Msg> forget(float rate) {
+            public Consumer<Msg> forget(float rate) {
                 return null;
             }
         };

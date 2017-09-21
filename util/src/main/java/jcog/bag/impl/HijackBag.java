@@ -1,5 +1,6 @@
 package jcog.bag.impl;
 
+import com.sun.javafx.tools.packager.Param;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.util.SpinMutex;
@@ -582,19 +583,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         return Math.max(0,pressure.getAndSet(0f));  //max() in case it becomes negative
     }
 
+
     @Override
-    @Deprecated
-    public Bag<K, V> commit() {
-
-        float p = depressurize();
-        int s = size;
-
-        return commit(
-                ((s > 0) && (p > 0)) ?
-                        PriForget.forget(s, capacity, p, mass, PriForget.DEFAULT_TEMP, Prioritized.EPSILON, this::forget) :
-                        null
-        );
-
+    public float mass() {
+        return mass;
     }
 
     @Override
@@ -606,8 +598,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     public float priMax() {
         return max;
     }
-
-    abstract protected Consumer<V> forget(float rate);
 
 
     //final AtomicBoolean busy = new AtomicBoolean(false);

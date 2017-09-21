@@ -33,13 +33,6 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PriReference<K>> {
 
 
 
-
-    @Override
-    protected Consumer<PriReference<K>> forget(float avgToBeRemoved) {
-        return new PriForget(avgToBeRemoved);
-    }
-
-
     @Override
     public K key(PriReference<K> value) {
         return value.get();

@@ -13,7 +13,6 @@ import java.util.function.Consumer;
  */
 public class PriForget<P extends Priority> implements Consumer<P> {
 
-    public static final float DEFAULT_TEMP = 0.9f;
     public final float avgToBeRemoved;
 
     public PriForget(float avgToBeRemoved) {
@@ -44,7 +43,7 @@ public class PriForget<P extends Priority> implements Consumer<P> {
             //* 2f; /* x 2 to apply to both the existing pressure and estimated future pressure */
             float perMember = temperature * (p) / c;
             if (perMember >= priEpsilon)
-                return f.valueOf(perMember);
+                 return f.valueOf(perMember);
 //        }
         }
         return null;

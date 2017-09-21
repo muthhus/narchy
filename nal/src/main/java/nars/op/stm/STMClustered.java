@@ -63,13 +63,10 @@ public abstract class STMClustered extends TaskService {
         /**
          * current members
          */
-
-
         public TasksNode(int id, int cap) {
 
             super(id, dims);
             tasks = new PriorityHijackBag<>(cap, 3) {
-
 
                 @Override
                 protected TLink merge(@NotNull STMClustered.TLink existing, @NotNull STMClustered.TLink incoming, @Nullable MutableFloat overflowing) {
@@ -83,10 +80,8 @@ public abstract class STMClustered extends TaskService {
 //                    return existing; //default to the original instance
                 }
 
-
-
                 @Override
-                protected Consumer<TLink> forget(float rate) {
+                public Consumer<TLink> forget(float rate) {
                     return null;
                 }
 

@@ -78,7 +78,7 @@ public class Premise extends UnaryTask {
     @Override
     public @Nullable Iterable<? extends ITask> run(@NotNull NAR n) {
 
-        int ttlMax = Util.lerp(priElseZero(), Param.TTL_PREMISE_MIN,n.matchTTL.intValue());
+        int ttlMax = Util.lerp(priElseZero(), Param.TTL_PREMISE_MIN, n.matchTTL.intValue());
 
         Derivation d = derivation(n);
         d.nar.emotion.conceptFirePremises.increment();
@@ -288,18 +288,14 @@ public class Premise extends UnaryTask {
         if (beliefTerm instanceof Bool)
             return null;
 
-        try {
-            Collection<DerivedTask> dd = d.run(this, task, belief, beliefTerm, ttlMax);
-            if (dd != null) {
-                int dds = dd.size();
-                nar.emotion.taskDerived.increment(dds);
-                return dd;
-            }
-        } finally {
-            d.clear(); //emergency clear
+        Collection<DerivedTask> dd = d.run(this, task, belief, beliefTerm, ttlMax);
+        if (dd != null) {
+            int dds = dd.size();
+            nar.emotion.taskDerived.increment(dds);
+            return dd;
+        } else {
+            return null;
         }
-
-        return null;
 
 
 //        long ds = d.transformsCache.estimatedSize();

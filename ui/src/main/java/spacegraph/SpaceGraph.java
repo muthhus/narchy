@@ -6,6 +6,8 @@ import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.opengl.GL2;
 import jcog.list.FasterList;
+import jcog.map.MRUCache;
+import jcog.memoize.Memoize;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +23,7 @@ import spacegraph.space.ListSpace;
 import spacegraph.widget.meta.ReflectionSurface;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -34,14 +37,15 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     final List<AbstractSpace<X, Spatial<X>>> inputs = new FasterList<>(1);
 
-    final Cache<X, Spatial<X>> atoms;
+    final MRUCache<X, Spatial<X>> atoms;
+
     final List<Ortho> preAdd = new FasterList();
     final List<Consumer<SpaceGraph>> frameListeners = new FasterList();
 
     @Override
     public void windowDestroyed(WindowEvent windowEvent) {
         super.windowDestroyed(windowEvent);
-        atoms.invalidateAll();
+        atoms.clear();//invalidateAll();
         orthos.clear();
         inputs.clear();
         frameListeners.clear();
@@ -57,20 +61,26 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     public SpaceGraph() {
         super();
 
-        Cache<X, Spatial<X>> atoms =
-                //new NonBlockingHashMap(cacheCapacity);
-                //new ConcurrentHashMap<>(cacheCapacity);
-                Caffeine.newBuilder()
-                        //.softValues().builder();
-                        .removalListener((X k, Spatial<X> v, RemovalCause c) -> {
-                            if (v!=null)
-                                v.delete(dyn);
-                        })
-                        //.maximumSize(cacheCapacity)
-                        .weakValues()
-                        .build();
-
-        this.atoms = atoms;
+        final int MAX_ATOMS = 4096; //TODO make parameter
+        atoms = new MRUCache<>(MAX_ATOMS) {
+            @Override
+            protected void onEvict(Map.Entry<X, Spatial<X>> entry) {
+                entry.getValue().delete(dyn);
+            }
+        };
+//        Cache<X, Spatial<X>> atoms =
+//                //new NonBlockingHashMap(cacheCapacity);
+//                //new ConcurrentHashMap<>(cacheCapacity);
+//                Caffeine.newBuilder()
+//                        //.softValues().builder();
+//                        .removalListener((X k, Spatial<X> v, RemovalCause c) -> {
+//                            if (v!=null)
+//                                v.delete(dyn);
+//                        })
+//                        //.maximumSize(cacheCapacity)
+//                        .weakValues()
+//                        .build();
+//        this.atoms = atoms;
 
     }
 
@@ -131,12 +141,14 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
     public @NotNull <Y extends Spatial<X>> Y getOrAdd(X x, Function<X, Y> materializer) {
-        Spatial y = atoms.get(x, materializer);
+        //Spatial y = atoms.get(x, materializer);
+        Spatial y = atoms.computeIfAbsent(x, materializer);
         y.activate();
         return (Y) y;
     }
     public @Nullable <Y extends Spatial<X>> Y get(X x) {
-        Spatial y = atoms.getIfPresent(x);
+        //Spatial y = atoms.getIfPresent(x);
+        Spatial y = atoms.get(x);
         if (y!=null)
             y.activate();
         return (Y) y;
@@ -145,7 +157,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         @NotNull Spatial<X> y = get(x);
         if (y!=null) {
             y.hide();
-            atoms.invalidate(x);
+            //atoms.invalidate(x);
+            atoms.remove(x);
         }
     }
 
@@ -245,7 +258,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     }
     public String summary() {
-        return this.atoms.estimatedSize() + " cached; " + "\t" + dyn.summary();
+        return this.atoms.size() + " cached; " + "\t" + dyn.summary();
     }
 
 //    void print(AbstractSpace s) {

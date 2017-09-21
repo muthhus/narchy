@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Created by me on 6/28/16.
+ * most recently used cache based on (non-thread_safe) LinkedHashMap
  */
 public class MRUCache<K, V> extends LinkedHashMap<K, V> {
 
@@ -23,13 +23,13 @@ public class MRUCache<K, V> extends LinkedHashMap<K, V> {
     @Override
     protected boolean removeEldestEntry(Map.Entry<K, V> entry) {
         if (this.size() > capacity) {
-            overflow(entry);
+            onEvict(entry);
             return true;
         }
         return false;
     }
 
-    protected void overflow(Map.Entry<K, V> entry) {
+    protected void onEvict(Map.Entry<K, V> entry) {
 
     }
 }

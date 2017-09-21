@@ -1,5 +1,6 @@
 package jcog.bag.impl;
 
+import com.sun.javafx.tools.packager.Param;
 import jcog.bag.Bag;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
@@ -40,6 +41,11 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
     protected ArrayBag(PriMerge mergeFunction, @NotNull Map<X, Y> map) {
         this(0, mergeFunction, map);
+    }
+
+    @Override
+    public float mass() {
+        return mass;
     }
 
     static final class SortedPLinks extends SortedArray {
@@ -621,16 +627,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 //    }
 
 
-    @Override
-    @Deprecated
-    public Bag<X, Y> commit() {
-        float p = this.pressure.getAndSet(0f);
-        if (p >= Prioritized.EPSILON) {
-            return commit(PriForget.forget(size(), capacity(),
-                    p, mass, PriForget.DEFAULT_TEMP, Prioritized.EPSILON, PriForget::new));
-        }
-        return this;
-    }
+
 
     @Override
     @NotNull

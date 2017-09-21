@@ -239,10 +239,11 @@ public class Derivation extends Unify implements TermContext {
 //                return !(k instanceof AbstractVariable) || k instanceof CommonVariable;
 //            });
 //            xy.map.clear();
-            xy.map.clear();
         }
-
-        assert(termutes.isEmpty() && preToPost.isEmpty());
+        xy.map.clear();
+        termutes.clear();
+        preToPost.clear();
+        //assert(termutes.isEmpty() && preToPost.isEmpty());
 
         this.derivations.clear();
         this.forEachMatch = null;

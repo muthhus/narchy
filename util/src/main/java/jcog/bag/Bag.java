@@ -5,6 +5,7 @@ import jcog.list.FasterList;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
+import jcog.pri.op.PriForget;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -30,14 +31,15 @@ import static jcog.bag.Bag.BagSample.*;
 public interface Bag<K, V> extends Table<K, V> {
 
 
-    /** action returned from bag sampling visitor indicating what to do with the current
-     * item  */
+    /**
+     * action returned from bag sampling visitor indicating what to do with the current
+     * item
+     */
     enum BagSample {
         Next(false, false),
         Remove(true, false),
         Stop(false, true),
-        RemoveAndStop(true, true)
-        ;
+        RemoveAndStop(true, true);
 
         public final boolean remove;
         public final boolean stop;
@@ -135,7 +137,9 @@ public interface Bag<K, V> extends Table<K, V> {
     }
 
 
-    /** normalizes a priorty to within the present min/max range of this bag, and unitized to within 0..1.0 clipping if exceeded */
+    /**
+     * normalizes a priorty to within the present min/max range of this bag, and unitized to within 0..1.0 clipping if exceeded
+     */
     default float normalizeMinMax(float pri) {
         return Util.unitize(Util.lerp(pri, priMin(), priMax()));
     }
@@ -172,7 +176,7 @@ public interface Bag<K, V> extends Table<K, V> {
     }
 
     default Stream<V> stream() {
-        return StreamSupport.stream(()->this.spliterator(), 0, false);
+        return StreamSupport.stream(() -> this.spliterator(), 0, false);
     }
 
     default Bag<K, V> sample(int max, Consumer<? super V> each) {
@@ -301,7 +305,9 @@ public interface Bag<K, V> extends Table<K, V> {
 
     }
 
-    /** called if an item which was attempted to be inserted was not */
+    /**
+     * called if an item which was attempted to be inserted was not
+     */
     default void onReject(@NotNull V value) {
 
     }
@@ -315,7 +321,7 @@ public interface Bag<K, V> extends Table<K, V> {
      */
     float pri(V key);
 
-    default float pri( Object key, float ifMissing) {
+    default float pri(Object key, float ifMissing) {
         V x = get(key);
         if (x == null)
             return ifMissing;
@@ -325,10 +331,9 @@ public interface Bag<K, V> extends Table<K, V> {
 
     default boolean active(@NotNull V key) {
         float x = pri(key);
-        return (x==x);
+        return (x == x);
         //return priSafe(key, -1) >= 0;
     }
-
 
 
     default float priElse(V key, float valueIfMissing) {
@@ -577,9 +582,27 @@ public interface Bag<K, V> extends Table<K, V> {
         return d;
     }
 
-    @Deprecated
-    Bag<K, V> commit();
 
+    default Bag<K, V> commit() {
+        return commit(forget(0.5f));
+    }
+
+    /** creates a forget procedure for the current bag's
+     *  state, which can be applied as a parameter to the commit(Consumer<V>) method
+     *  temperature is a value between 0..1.0 controlling
+     *  how fast the bag should allow new items. 0.5 is a default value
+     */
+    default @Nullable Consumer<V> forget(float temperature) {
+        int s = size();
+        if (s > 0) {
+            float p = depressurize();
+            if (p > 0)
+                return PriForget.forget(s, capacity(), p, mass(), temperature, Prioritized.EPSILON, PriForget::new);
+        }
+        return null;
+    }
+
+    float mass();
 
     /**
      * commits the next set of changes and updates budgeting
@@ -591,9 +614,20 @@ public interface Bag<K, V> extends Table<K, V> {
 
     @Nullable Bag EMPTY = new Bag() {
 
-        
+
         @Override
-        public Bag sample( Bag.BagCursor each) {
+        public float mass() {
+            return 0;
+        }
+
+        @Nullable
+        @Override
+        public Consumer forget(float temperature) {
+            return null;
+        }
+
+        @Override
+        public Bag sample(Bag.BagCursor each) {
             return this;
         }
 
@@ -607,19 +641,19 @@ public interface Bag<K, V> extends Table<K, V> {
         }
 
         @Override
-        public float pri( Object key) {
+        public float pri(Object key) {
             return 0;
         }
 
 
         @Nullable
         @Override
-        public Object remove( Object x) {
+        public Object remove(Object x) {
             return null;
         }
 
         @Override
-        public Object put( Object b, @Nullable MutableFloat overflowing) {
+        public Object put(Object b, @Nullable MutableFloat overflowing) {
             return null;
         }
 
@@ -628,14 +662,14 @@ public interface Bag<K, V> extends Table<K, V> {
             return 0;
         }
 
-        
+
         @Override
         public Iterator iterator() {
             return Collections.emptyIterator();
         }
 
         @Override
-        public boolean contains( Object it) {
+        public boolean contains(Object it) {
             return false;
         }
 
@@ -655,7 +689,7 @@ public interface Bag<K, V> extends Table<K, V> {
             return this;
         }
 
-        
+
         @Override
         public Bag commit(Consumer update) {
             return this;
@@ -664,12 +698,12 @@ public interface Bag<K, V> extends Table<K, V> {
 
         @Nullable
         @Override
-        public Object get( Object key) {
+        public Object get(Object key) {
             return null;
         }
 
         @Override
-        public void forEachKey( Consumer each) {
+        public void forEachKey(Consumer each) {
 
         }
 

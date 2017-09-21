@@ -38,6 +38,7 @@ public abstract class Param extends Services<Term,NAR> {
 
     public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
 
+    public static final float DEFAULT_FORGET_TEMPERATURE = 0.5f;
 
 
     /**
@@ -263,7 +264,7 @@ public abstract class Param extends Services<Term,NAR> {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 24;
+    public static final int CAUSE_CAPACITY = 64;
 
     public final static int UnificationStackMax = 32; //how many assignments can be stored in the 'versioning' maps
 

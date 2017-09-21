@@ -61,7 +61,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         Param.DEBUG = true;
         //Param.TRACE = true;
-        NAR n = NARS.tmp();
+        NAR n = NARS.threadSafe();
         //n.DEFAULT_BELIEF_PRIORITY = 0.1f;
         //n.DEFAULT_QUESTION_PRIORITY = 0.1f;
         float fps = 50f;

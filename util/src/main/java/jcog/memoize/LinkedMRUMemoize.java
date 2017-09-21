@@ -1,16 +1,19 @@
 package jcog.memoize;
 
 import jcog.map.CustomConcurrentHashMap;
+import jcog.map.MRUCache;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
-public class SoftMemoize<X, Y> extends CustomConcurrentHashMap<X, Y> implements Memoize<X, Y> {
+
+
+public class LinkedMRUMemoize<X, Y> extends MRUCache<X, Y> implements Memoize<X, Y> {
 
     private final Function<X, Y> f;
 
-    public SoftMemoize(@NotNull Function<X, Y> f, int expSize, boolean softOrWeak) {
-        super(STRONG, EQUALS, softOrWeak ? SOFT : WEAK, EQUALS, expSize);
+    public LinkedMRUMemoize(@NotNull Function<X, Y> f, int capacity) {
+        super(capacity);
         this.f = f;
     }
 

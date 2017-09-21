@@ -1,6 +1,7 @@
 package nars.gui.graph;
 
-import jcog.memoize.HijackMemoize;
+import jcog.memoize.LinkedMRUMemoize;
+import jcog.memoize.Memoize;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.concept.Concept;
@@ -23,10 +24,8 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 
     public ConceptWidget.ConceptVis vis =
         new ConceptWidget.ConceptVis2();
-    public Function<Term, ConceptWidget> nodeBuilder = (c) ->
-        new ConceptWidget(c);
-    public Function<ConceptWidget, ConceptWidget.TermEdge> edgeBuilder = (to) ->
-        new ConceptWidget.TermEdge(to);
+
+    public Function<ConceptWidget, ConceptWidget.TermEdge> edgeBuilder = ConceptWidget.TermEdge::new;
 
 
 //    public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
@@ -40,24 +39,25 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
         this.maxEdgesPerNodeMax = maxEdgesPerNodeMax;
     }
 
-//    public final HijackMemoize<Concept,ConceptWidget> widgets = new HijackMemoize<>(2048, 4, (c) -> {
+
+//    public final Memoize<Term,ConceptWidget> conceptWidgets = new LinkedMRUMemoize<Term,ConceptWidget>((c) -> {
 //        ConceptWidget y = new ConceptWidget(c);
-//        y.concept = c;
 //        return y;
-//    }) {
+//    }, 2048) {
 //        @Override
-//        public void onRemoved(@NotNull PLink<Pair<Concept, ConceptWidget>> value) {
-//            value.get().getTwo()
-//                    //.hide();
+//        protected void onEvict(Map.Entry<Term, ConceptWidget> entry) {
+//            entry.getValue()
 //                    .delete(space.dyn);
 //        }
 //    };
+    public Function<Term, ConceptWidget> nodeBuilder = (c) ->
+            new ConceptWidget(c);
+            //conceptWidgets.apply(c);
 
 
+    public final Memoize<Pair<Concept, ConceptWidget /* target */>, ConceptWidget.TermEdge> edges =
+        new LinkedMRUMemoize<>((to) -> edgeBuilder.apply(to.getTwo()), 4096);
 
-//    public final HijackMemoize<Pair<Concept, ConceptWidget /* target */>, ConceptWidget.TermEdge> edges = new HijackMemoize<>((to) -> {
-//        return edgeBuilder.apply(to.getTwo());
-//    }, 4096, 2);
 
     void removeNode(Activate concept) {
         if (space!=null)

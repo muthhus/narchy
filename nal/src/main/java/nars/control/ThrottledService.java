@@ -38,7 +38,7 @@ abstract public class ThrottledService extends DurService {
      * basic estimator of: workUnits / realtime (ns)
      */
     final RecyclingPolynomialFitter workEstimator =
-            new RecyclingPolynomialFitter(3, 16, Integer.MAX_VALUE)
+            new RecyclingPolynomialFitter(2, 16, Integer.MAX_VALUE)
                 .tolerate(1 /* work unit */, 1 /* ns */);
 
     public ThrottledService(NAR nar) {

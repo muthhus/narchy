@@ -1,11 +1,13 @@
 package nars.control;
 
 import jcog.Util;
+import jcog.bloom.CountMinSketch;
 import jcog.math.RecycledSummaryStatistics;
 import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.jetbrains.annotations.Nullable;
+import org.roaringbitmap.RoaringBitmap;
 
 import java.util.function.Supplier;
 
@@ -134,6 +136,7 @@ public class Cause {
             return s[0].get();
         }
 
+
         AwesomeShortArrayList l = new AwesomeShortArrayList(maxLen);
 
         int ls = 0;
@@ -190,6 +193,7 @@ public class Cause {
         }
 
     }
+
 }
 //    /** calculate the value scalar  from the distinctly tracked positive and negative values;
 //     * any function could be used here. for example:

@@ -305,7 +305,7 @@ public class HijackMemoize<X, Y> extends PriorityHijackBag<X, HijackMemoize.Comp
 
 
     @Override
-    protected Consumer<Computation<X, Y>> forget(float rate) {
+    public Consumer<Computation<X, Y>> forget(float rate) {
         return null;
     }
 

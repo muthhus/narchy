@@ -25,7 +25,7 @@ public class RUCache<K, V> {
 
         mru = new MRUCache<K,V>(capacity) {
             @Override
-            protected void overflow(Map.Entry<K, V> entry) {
+            protected void onEvict(Map.Entry<K, V> entry) {
                 lru.put(entry.getKey(), entry.getValue());
             }
         };

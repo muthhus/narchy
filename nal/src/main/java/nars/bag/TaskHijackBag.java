@@ -44,8 +44,9 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
     }
 
     @Override
-    protected Consumer<Task> forget(float avgToBeRemoved) {
-        return new PriForget<>(avgToBeRemoved);
+    public Consumer<Task> forget(float temp) {
+        //return new PriForget<>(avgToBeRemoved);
+        return null;
     }
 
 

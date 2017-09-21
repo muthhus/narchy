@@ -182,7 +182,7 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.9f);
 
 
-        float priFactor = 0.75f;
+        float priFactor = 0.1f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
@@ -199,8 +199,8 @@ abstract public class NAgentX extends NAgent {
 
 //        Inperience inp = new Inperience(n, 4);
 
-        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
-        reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);
+        //reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
+        //reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);
 
         NAgent a = init.apply(n);
         //a.trace = true;
