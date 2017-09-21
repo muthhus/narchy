@@ -1,5 +1,7 @@
 package jcog.math;
 
+import jcog.pri.Pri;
+
 /** balances at zero, balanced normalization of positive and negative ranges (radius)
  *  output is normalized to range 0..1.0
  * */
@@ -10,7 +12,7 @@ public class FloatPolarNormalized extends FloatNormalized {
     }
 
     public FloatPolarNormalized(FloatSupplier in) {
-        this(in, 1);
+        this(in, Pri.EPSILON*2);
     }
 
     public FloatPolarNormalized(FloatSupplier in, float radius) {
@@ -22,9 +24,9 @@ public class FloatPolarNormalized extends FloatNormalized {
     public float normalize(float raw) {
         if (raw==raw) {
             float araw = Math.abs(raw);
-            float n = super.normalize(araw);
-            if (raw < 0) n = -n;
-            return n / 2f + 0.5f;
+            updateRange(araw);
+            assert(min==0);
+            return (raw / (max))/2f+0.5f;
         } else {
             return Float.NaN;
         }

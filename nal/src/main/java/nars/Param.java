@@ -37,7 +37,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.5f;
 
     /** TODO if a task is deleted by this, the system should replace it with a question about the state sometime in the future */
-    public static final boolean DELETE_INACCURATE_PREDICTIONS = false;
+    public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
 
     public static final float LINK_FORGET_TEMPERATURE = 0.5f;
 
@@ -146,10 +146,11 @@ public abstract class Param extends Services<Term,NAR> {
 
         //follows the pos/neg guidelines described in the comment of each MetaGoal
         Perceive.want(w, -0.01f);
-        Accept.want(w, 0.1f);
-        Accurate.want(w, 0.25f);
-        Inaccurate.want(w, -0.5f);
-        Answer.want(w, 0.5f);
+        Believe.want(w, 0.1f);
+        Desire.want(w, 0.1f);
+        Accurate.want(w, 0.1f);
+        Inaccurate.want(w, -0.1f);
+        Answer.want(w, 0.1f);
         Action.want(w, 1f);
     }
 

@@ -2,11 +2,10 @@ package nars.concept;
 
 import nars.NAR;
 import nars.NAct;
-import nars.Param;
 import nars.Task;
 import nars.control.CauseChannel;
+import nars.control.MetaGoal;
 import nars.task.ITask;
-import nars.task.SignalTask;
 import nars.task.util.PredictionAccuracyFeedback;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -62,34 +61,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
     }
 
-    @Override
-    public float value(@NotNull Task t, float activation, long when, NAR n) {
 
-        float factor = 1f;
-
-        float v = super.value(t, activation, when, n);
-
-        if (t.isBeliefOrGoal() /*t.isGoal()*/ && !t.isInput() && !(t instanceof SignalTask)) {
-
-            long now = n.time();
-            if (!t.isBefore(now)) {
-                int dur = n.dur();
-
-                float boost = factor * Param.evidenceDecay(t.conf() * activation, dur, t.distanceTo(now));
-                v += boost;
-            }
-            //allow the boost to apply to D durations ahead, to promote goal prediction
-//            for (int d = 1; d < 3; d++) {
-//                b = Math.max(v,
-//                        super.value(t, activation, now + d * dur, n));
-//            }
-
-//            assert(v >= 0);
-//            v *= 2; //boost goal derivations in general
-        }
-
-        return v;
-    }
 
     @Override
     public Stream<ITask> update(long now, int dur, NAR nar) {
@@ -201,8 +173,8 @@ public class GoalActionAsyncConcept extends ActionConcept {
         Task fg;
         Task fb;
         in.input(
-            fg = feedGoal.set(term, g, stamper, now-dur/2, dur, nar),
-            fb = feedBelief.set(term, f, stamper, now+dur/2, dur, nar)
+            fg = feedGoal.set(term, g, stamper, now/*-dur/2*/, dur, nar),
+            fb = feedBelief.set(term, f, stamper, now/*+dur/2*/, dur, nar)
         );
 
         beliefFeedback.accept(feedBelief.get() /* in case stretched */, nar);

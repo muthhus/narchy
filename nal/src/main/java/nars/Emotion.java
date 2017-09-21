@@ -4,13 +4,10 @@ import com.netflix.servo.monitor.BasicCounter;
 import com.netflix.servo.monitor.Counter;
 import com.netflix.servo.monitor.StepCounter;
 import jcog.meter.event.BufferedFloatGuage;
-import jcog.pri.Prioritized;
 import nars.concept.Concept;
-import nars.control.Cause;
 import nars.control.MetaGoal;
 import nars.task.ITask;
 import nars.term.Compound;
-import nars.util.BudgetFunctions;
 import nars.util.ConcurrentMonitorRegistry;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -318,10 +315,9 @@ public class Emotion extends ConcurrentMonitorRegistry {
             if (t.isCommand())
                 return x; //ignore
 
-            float cost =
-                t.voluplexity();
+            float cost = t.voluplexity();
 
-            value(MetaGoal.Perceive, t.cause(), cost);
+            MetaGoal.value(MetaGoal.Perceive, t.cause(), cost, nar.causes);
         }
 
         return x;
@@ -330,37 +326,10 @@ public class Emotion extends ConcurrentMonitorRegistry {
     public void onActivate(@NotNull Task t, float activation, Concept origin, NAR n) {
         n.emotion.taskActivations.increment();
 
-        short[] x = t.cause();
-        int xl = x.length;
+        short[] effect = t.cause();
+        int xl = effect.length;
         if (xl > 0) {
-            float conceptValue = origin.value(t, activation, n.time(), n);
-            if (conceptValue!=0)
-                value(MetaGoal.Accept, x, conceptValue);
-        }
-    }
-
-    public void value(MetaGoal p, short[] causes, float strength) {
-
-        //assert(strength >= 0);
-        if (Math.abs(strength) < Prioritized.EPSILON) return; //no change
-
-        int numCauses = causes.length;
-
-        float vPer =
-                strength / numCauses; //flat
-                //strength;
-
-        for (int i = 0; i < numCauses; i++) {
-            short c = causes[i];
-            Cause cc = nar.causes.get(c);
-            if (cc == null)
-                continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
-                /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
-
-            //float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
-            if (vPer != 0) {
-                cc.learn(p, vPer);
-            }
+            origin.value(t, activation, n);
         }
     }
 
@@ -372,7 +341,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
 
         //reward answer for answering the question
         float str = answer.conf() * question.priSafe(0);
-        value(MetaGoal.Answer, answer.cause(), str);
+        MetaGoal.value(MetaGoal.Answer, answer.cause(), str, nar);
     }
 
 

@@ -24,10 +24,10 @@ public class SignalTask extends NALTask {
         slidingEnd = end;
     }
 
-    @Override
-    public float eternalizable() {
-        return 0;
-    }
+//    @Override
+//    public float eternalizable() {
+//        return 0;
+//    }
 
 
     @Override public long end() {

@@ -1,6 +1,8 @@
 package nars.concept;
 
 import nars.NAR;
+import nars.Task;
+import nars.control.MetaGoal;
 import nars.table.BeliefTable;
 import nars.task.ITask;
 import nars.term.Term;
@@ -23,7 +25,19 @@ public abstract class ActionConcept extends WiredConcept {
     }
 
     @Nullable abstract public Stream<ITask> update(long now, int dur, NAR nar);
-    
+
+   @Override
+    public void value(@NotNull Task t, float activation, NAR n) {
+
+        super.value(t, activation, n);
+
+        if (t.isGoal() && t.isAfter(n.time()-n.dur())) {
+            MetaGoal.value(MetaGoal.Action, t.cause(),
+                    activation * Math.abs(t.expectation() - 0.5f) * 2f,
+                    n);
+        }
+    }
+
 //    @Deprecated public static class CuriosityTask extends GeneratedTask {
 //
 //        public CuriosityTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] stamp) {

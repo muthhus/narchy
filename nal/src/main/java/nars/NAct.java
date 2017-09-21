@@ -341,22 +341,19 @@ public interface NAct {
     }
 
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        //actionBipolarExpectation(s, update);
-        actionBipolarExpectationNormalized(s, update);
+        actionBipolarExpectation(s, update);
+        //actionBipolarExpectationNormalized(s, update);
         //actionBipolarGreedy(s, update);
         //actionBipolarMutex3(s, update);
     }
 
     default void actionBipolarExpectationNormalized(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         float v[] = new float[1];
-        FloatNormalized f = new FloatNormalized(() -> v[0]);
+        FloatNormalized f = new FloatNormalized(() -> v[0]).relax(0.99f);
         actionBipolarExpectation(s, (x) -> {
-            v[0] = Math.abs(x);
+            v[0] = Math.abs(x); //HACK
             float y = f.asFloat() * Math.signum(x);
-            update.valueOf(y);
-            f.relax(0.99f);
-            return
-                    y;
+            return update.valueOf(y) * 0.5f; //to prevent saturation
             //u;
         });
     }
@@ -383,12 +380,12 @@ public interface NAct {
             Random rng = n.random();
 
             float restConf =
-                    //n.confMin.floatValue();
-                    n.confDefault(BELIEF);
+                    n.confMin.floatValue() * 2;
+                    //n.confDefault(BELIEF);
             //0;
 
             int ip = p ? 0 : 1;
-            exp[ip] = g != null ? (g.expectation() - 0.5f) : -0.5f;
+            exp[ip] = g != null ? g.expectation() : 0f;
 
             if (!p) {
 
@@ -397,29 +394,25 @@ public interface NAct {
 
                 int winner;
 
+                float x; //0..+1
                 //curiosity applied to winner, how ironic
                 if (cur > 0 && rng.nextFloat() <= cur) {
-                    float f = //rng.nextFloat(); //bipolar
-                            rng.nextFloat(); //unipolar, [0.5,1.0]
-
-
-                    ew = 2f * (rng.nextFloat() - 0.5f);
-                    winner = ew > 0f ? 0 : 1;
+                    x = rng.nextFloat() * nar().confDefault(GOAL); //[0..1)
+                    winner = rng.nextBoolean() ? 0 : 1;
                 } else {
 
                     winner =
                             //Util.decideRoulette(2, (i) -> cc[i], n.random());
-                            Util.decideSoftmax(2,
 
-                                    (i) -> Math.abs(exp[i]), //even though an exp value < 0.5 has no effect, it acts as a veto override of a weaker positive motivation it competes with
-                                    //(i) -> (cc[i]),
-                                    //(i) -> c2w(cc[i]),
-                                    0.7f, n.random());
-                    //cc[0] > cc[1] ? 0 : 1; //GREEDY
+                        //SOFTMAX
+                        Util.decideSoftmax(2,
+                                (i) -> Math.abs(exp[i]),
+                                0.7f, n.random());
 
-                    ew = (winner == 1 ? +1 : -1f) * (Math.max(0.5f, exp[winner]) - 0.5f) * 2f;
-                    //ew = Math.max(EXE_THRESHOLD, exp[0]) - Math.max(EXE_THRESHOLD, exp[1]);
+                        //GREEDY
+                        //      exp[0] > exp[1] ? 0 : 1;
 
+                    x = (Math.max(0.5f, exp[winner] - 0.5f) - 0.5f) * 2f; //0..+1
                 }
 
                 //int winner = ew >= 0f ? 0 : 1;
@@ -427,22 +420,16 @@ public interface NAct {
 
                 Truth l, w;
                 {
-                    //float x = (Math.max(0.5f, ew) - 0.5f) * 2f;
-                    float y = update.valueOf(ew); //winner == 0 ? x : -x); //invert depending on which polarity won
-
-//                float conf =
-//                        //cc[winner];
-//                        //Util.max(cc[0], cc[1]);
-//                        nar().confDefault(BELIEF);
+                    float y = update.valueOf(winner == 0 ? x : -x); //-1..+1
 
                     //inverse expectation
                     float conf =
                             Math.max(
-                                    4 * nar().confMin.floatValue(),
+                                    restConf,
                                     //restConf/2f,
-                                    Math.abs(y) * restConf);
+                                    Math.abs(y) * Math.abs(x));
                     //w2c(Math.abs(y) * c2w(restConf));
-                    if (conf > nar().confMin.floatValue()) {
+                    if (conf >= nar().confMin.floatValue()) {
                         //Math.max(cc[winner], nar().confMin.floatValue());
                         //0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
 
@@ -453,8 +440,8 @@ public interface NAct {
                     }
                 }
 
-                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, null, n);
-                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, null, n);
+                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, w, n);
+                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, l, n);
             }
         };
 

@@ -71,16 +71,14 @@ public class PredictionAccuracyFeedback {
             if (coherence >= 0.5f) {
                 //reward
                 v = coherence * 2f * confFraction * headstart * strength;
-                if (v > Pri.EPSILON)
-                    nar.emotion.value(MetaGoal.Accurate, cause, v);
+                MetaGoal.value(MetaGoal.Accurate, cause, v, nar);
             } else {
                 //punish
                 v = (1f - coherence) * 2f * confFraction / headstart * strength;
-                if (v > Pri.EPSILON) {
-                    nar.emotion.value(MetaGoal.Inaccurate, cause, v);
-                    if (deleteIfIncoherent)
-                        y.delete();
-                }
+
+                MetaGoal.value(MetaGoal.Inaccurate, cause, v, nar);
+                if (deleteIfIncoherent)
+                    y.delete();
             }
 
         });

@@ -62,16 +62,13 @@ public class FloatNormalized implements FloatSupplier {
     }
 
     public float normalize(float raw) {
-//        if (!Float.isFinite(raw))
-//            //throw new ArithmeticException();
-//            return 0.5f;
 
         updateRange(raw);
 
         float r = max - min;
         assert(r >= 0);
         if (r <= epsilon)
-            return 0.5f;
+            return raw;
         else
             return (raw - min) / r;
     }
@@ -104,9 +101,9 @@ public class FloatNormalized implements FloatSupplier {
         }
 
         if (relax > 0) {
-            if (incMax)
+            if (!incMax)
                 max = Util.clamp(max - (max - min * relax), min, max);
-            if (incMin)
+            if (!incMin)
                 min = Util.clamp(min + (max - min * relax), min, max);
         }
 

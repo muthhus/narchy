@@ -2,9 +2,12 @@ package nars.concept;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.NAct;
+import nars.Task;
+import nars.control.MetaGoal;
 import nars.task.ITask;
-import nars.task.SignalTask;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
@@ -30,7 +33,6 @@ public class GoalActionConcept extends ActionConcept {
     public final Signal action;
 
     private final FloatParam curiosity;
-
 
 
     @NotNull
@@ -61,36 +63,10 @@ public class GoalActionConcept extends ActionConcept {
 
     }
 
+
+
     @Override
-    public float value(@NotNull Task t, float activation, long when, NAR n) {
-
-        float factor = 1f;
-
-        float v = super.value(t, activation, when, n);
-
-        if (t.isBeliefOrGoal() /*t.isGoal()*/ && !t.isInput() && !(t instanceof SignalTask)) {
-
-            long now = n.time();
-            if (!t.isBefore(now)) {
-                int dur = n.dur();
-
-                float boost = factor * Param.evidenceDecay(t.conf() * activation, dur, t.distanceTo(now));
-                v += boost;
-            }
-            //allow the boost to apply to D durations ahead, to promote goal prediction
-//            for (int d = 1; d < 3; d++) {
-//                b = Math.max(v,
-//                        super.value(t, activation, now + d * dur, n));
-//            }
-
-//            assert(v >= 0);
-//            v *= 2; //boost goal derivations in general
-        }
-
-        return v;
-    }
-
-    @Override public Stream<ITask> update(long now, int dur, NAR nar) {
+    public Stream<ITask> update(long now, int dur, NAR nar) {
 
 
         long pStart = now;
@@ -110,9 +86,9 @@ public class GoalActionConcept extends ActionConcept {
             float curiConf =
 //                    //nar.confDefault(GOAL);
                     //nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR;
-                    Math.max(goal!=null ? goal.conf() : 0,
+                    Math.max(goal != null ? goal.conf() : 0,
                             nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR);
-                            //nar.confMin.floatValue()*2);
+            //nar.confMin.floatValue()*2);
 //
 ////            float cc =
 ////                    //curiConf;
@@ -195,7 +171,6 @@ public class GoalActionConcept extends ActionConcept {
         //return Stream.of(fb).filter(Objects::nonNull);
 
     }
-
 
 
     //    Truth[] linkTruth(long when, long now, float minConf) {
@@ -412,7 +387,6 @@ public class GoalActionConcept extends ActionConcept {
 //    public @NotNull Task filterGoals(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
 //        return t;
 //    }
-
 
 
 //    @NotNull

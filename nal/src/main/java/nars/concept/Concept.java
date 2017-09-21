@@ -185,7 +185,7 @@ public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
 
     void process(Task task, /*@NotNull*/ NAR n);
 
-    float value(Task t, float activation, long when, NAR n);
+    void value(Task t, float activation, NAR n);
 
     Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests);
 

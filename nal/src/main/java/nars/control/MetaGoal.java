@@ -3,6 +3,8 @@ package nars.control;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
+import jcog.pri.Prioritized;
+import nars.NAR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +26,14 @@ public enum MetaGoal {
     Perceive,
 
     /**
-     * pos: accepted into the memory
+     * pos: accepted as belief
      */
-    Accept,
+    Believe,
+
+    /**
+     * pos: accepted as goal
+     */
+    Desire,
 
     /**
      * pos: anwers a question
@@ -101,7 +108,9 @@ public enum MetaGoal {
 //            float rangePos = max - mid;
 //            float rangeNeg = mid - min;
 
-            float valueMag = Math.max(Math.abs(max), Math.abs(min));
+            float valueMag =
+                    //Math.max(Math.abs(max), Math.abs(min)); //normalized to absolute range
+                    1; //no normalization
 
             for (int i = 0, causesSize = cc; i < causesSize; i++) {
                 Cause c = causes.get(i);
@@ -116,7 +125,6 @@ public enum MetaGoal {
                 float nextValue =
                         Util.lerp(momentum, v, c.value());
 
-
                 c.setValue(nextValue);
             }
         }
@@ -130,6 +138,36 @@ public enum MetaGoal {
 //        });
 //        System.out.println();
 
+    }
+
+    public static void value(MetaGoal p, short[] effects, float strength, NAR nar) {
+        value(p, effects, strength, nar.causes);
+    }
+
+    /** learn that the given effects have a given value */
+    public static void value(MetaGoal p, short[] effects, float strength, FasterList<Cause> causes) {
+
+        //assert(strength >= 0);
+        if (Math.abs(strength) < Prioritized.EPSILON) return; //no change
+
+        int numCauses = effects.length;
+
+        float vPer =
+                strength / numCauses; //flat
+                //strength;
+
+        for (int i = 0; i < numCauses; i++) {
+            short c = effects[i];
+            Cause cc = causes.get(c);
+            if (cc == null)
+                continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
+                /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
+
+            //float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
+            if (vPer != 0) {
+                cc.learn(p, vPer);
+            }
+        }
     }
 
     /**

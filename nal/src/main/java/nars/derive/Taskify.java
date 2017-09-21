@@ -11,7 +11,6 @@ import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
 import nars.task.NALTask;
 import nars.term.Term;
-import nars.term.Termed;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -21,7 +20,6 @@ import java.util.Arrays;
 import java.util.function.BiFunction;
 
 import static nars.Param.FILTER_SIMILAR_DERIVATIONS;
-import static nars.control.MetaGoal.Perceive;
 
 public class Taskify extends AbstractPred<Derivation> {
 
@@ -78,12 +76,12 @@ public class Taskify extends AbstractPred<Derivation> {
         });
 
         if (t == null) {
-            return spam(p, Param.TTL_DERIVE_TASK_FAIL, x, nar, 0.01f);
+            return spam(p, Param.TTL_DERIVE_TASK_FAIL);
         }
 
         if (same(t, p.task, p.truthResolution) || (p.belief != null && same(t, p.belief, p.truthResolution))) {
             //created a duplicate of the task
-            return spam(p, Param.TTL_DERIVE_TASK_SAME, t, nar, 0.01f);
+            return spam(p, Param.TTL_DERIVE_TASK_SAME);
         }
 
 
@@ -99,7 +97,7 @@ public class Taskify extends AbstractPred<Derivation> {
         ((DerivedTask)t).cause = cause;
 
         if (p.derivations.merge(t, t, DUPLICATE_DERIVATION_MERGE) != t) {
-            spam(p, Param.TTL_DERIVE_TASK_REPEAT, t, nar, 0.01f);
+            spam(p, Param.TTL_DERIVE_TASK_REPEAT);
         } else {
             p.use(Param.TTL_DERIVE_TASK_SUCCESS);
         }
@@ -108,11 +106,8 @@ public class Taskify extends AbstractPred<Derivation> {
     }
 
 
-    private boolean spam(@NotNull Derivation p, int cost, Termed t, NAR nar, float factor) {
+    private boolean spam(@NotNull Derivation p, int cost) {
         p.use(cost);
-        if (factor > 0) {
-            channel.learn(Perceive,  t.voluplexity() * factor);
-        }
         return true; //just does
     }
 

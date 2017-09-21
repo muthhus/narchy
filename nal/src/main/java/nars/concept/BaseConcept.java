@@ -8,6 +8,7 @@ import nars.Task;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
 import nars.control.Activate;
+import nars.control.MetaGoal;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.table.TaskTable;
@@ -285,9 +286,15 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termed {
     }
 
     @Override
-    public float value(@NotNull Task t, float activation, long when, NAR n) {
+    public void value(@NotNull Task t, float activation, NAR n) {
 
-        return t.voluplexity() * activation; //undo the input load in proportion to the activation factor
+        byte punc = t.punc();
+        if (punc == BELIEF || punc == GOAL) {
+            MetaGoal.value(
+                punc == BELIEF ? MetaGoal.Believe : MetaGoal.Desire,
+                t.cause(), t.conf() * activation, n);
+        }
+
 
         //return Emotivation.preferConfidentAndRelevant(t, activation, when, n);
         //positive value based on the conf but also multiplied by the activation in case it already was known

@@ -68,7 +68,7 @@ public class Cause {
     }
 
     public void setValue(float nextValue) {
-        assert(nextValue==nextValue && nextValue >= -1f && nextValue <= +1f);
+        assert(nextValue==nextValue);
         value = nextValue;
     }
 
@@ -159,15 +159,15 @@ public class Cause {
         boolean enough = (totalItems < maxLen);
         ShortIterable l;
         ShortPredicate adder;
-        if (enough) {
+        //if (enough) {
             AwesomeShortArrayList ll = new AwesomeShortArrayList(totalItems);
-            l = ll;
-            adder = ll::add;
-        } else {
+            //l = ll;
+            //adder = ll::add;
+        /*} else {
             ShortHashSet ll = new ShortHashSet(maxLen);
             l = ll;
             adder = ll::add;
-        }
+        }*/
 
 
 
@@ -178,8 +178,9 @@ public class Cause {
             done = 0;
             for (int i = 0; i < ss; i++) {
                 short[] c = s[i];
-                if (n < c.length) {
-                    if (adder.accept(c[n])) {
+                int cl = c.length;
+                if (n < cl) {
+                    if (ll.add/*adder.accept*/(c[cl-1-n])) {
                         if (++ls >= maxLen)
                             break main;
                     }
@@ -191,9 +192,9 @@ public class Cause {
         } while (done < ss);
 
         assert(ls > 0);
-        short[] ll = l.toArray();
-        assert(ll.length == ls);
-        return ll;
+        short[] lll = ll.toArray();
+        assert(lll.length == ls);
+        return lll;
     }
 
     /** learn the utility of this cause with regard to a goal. */
