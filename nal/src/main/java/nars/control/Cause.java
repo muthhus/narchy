@@ -1,13 +1,15 @@
 package nars.control;
 
 import jcog.Util;
-import jcog.bloom.CountMinSketch;
 import jcog.math.RecycledSummaryStatistics;
 import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.ShortIterable;
+import org.eclipse.collections.api.block.predicate.primitive.ShortPredicate;
+import org.eclipse.collections.api.set.primitive.ShortSet;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
+import org.eclipse.collections.impl.set.mutable.primitive.ShortHashSet;
 import org.jetbrains.annotations.Nullable;
-import org.roaringbitmap.RoaringBitmap;
 
 import java.util.function.Supplier;
 
@@ -99,9 +101,9 @@ public class Cause {
         switch (e.length) {
             case 0: throw new NullPointerException();
             case 1: return e[0].cause();
-            case 2: return zip(CAUSE_CAPACITY, e[0]::cause, e[1]::cause);
+            case 2: return zip(CAUSE_CAPACITY, e[0].cause(), e[1].cause());
             default:
-                return zip(CAUSE_CAPACITY, Util.map((x) -> x::cause, new Supplier[e.length], e)); //HACK
+                return zip(CAUSE_CAPACITY, Util.map(Task::cause, short[][]::new, e)); //HACK
         }
     }
 
@@ -125,43 +127,72 @@ public class Cause {
 //        }
 //    }
 
-    public static short[] zip(int maxLen, short... s) {
-        return zip(maxLen, ()->s);
+
+
+    public static short[] zip(int maxLen, Supplier<short[]>[] s) {
+        if (s.length == 1) {
+            return s[0].get();
+        }
+        return zip(maxLen, Util.map(Supplier::get, short[][]::new, s));
     }
 
-    public static short[] zip(int maxLen, Supplier<short[]>... s) {
+    public static short[] zip(int maxLen, short[]... s) {
 
         int ss = s.length;
-        if (ss == 1) {
-            return s[0].get();
+
+        int totalItems = 0;
+        short[] lastNonEmpty = null;
+        int nonEmpties = 0;
+        for (short[] t : s) {
+            int tl = t.length;
+            totalItems += tl;
+            if (tl > 0) {
+                lastNonEmpty = t;
+                nonEmpties++;
+            }
+        }
+        if (nonEmpties==1)
+            return lastNonEmpty;
+        if (totalItems == 0)
+            return ArrayUtils.EMPTY_SHORT_ARRAY;
+
+        boolean enough = (totalItems < maxLen);
+        ShortIterable l;
+        ShortPredicate adder;
+        if (enough) {
+            AwesomeShortArrayList ll = new AwesomeShortArrayList(totalItems);
+            l = ll;
+            adder = ll::add;
+        } else {
+            ShortHashSet ll = new ShortHashSet(maxLen);
+            l = ll;
+            adder = ll::add;
         }
 
 
-        AwesomeShortArrayList l = new AwesomeShortArrayList(maxLen);
 
         int ls = 0;
-        int n = 1;
-        boolean remain;
+        int n = 0;
+        int done;
         main: do {
-            remain = false;
+            done = 0;
             for (int i = 0; i < ss; i++) {
-                short[] c = s[i].get();
-                int cl = c.length;
-                if (cl >= n) {
-                    l.add(c[cl - n]);
-                    if (++ls >= maxLen)
-                        break main;
-                    remain |= (cl >= (n + 1));
+                short[] c = s[i];
+                if (n < c.length) {
+                    if (adder.accept(c[n])) {
+                        if (++ls >= maxLen)
+                            break main;
+                    }
+                } else {
+                    done++;
                 }
             }
             n++;
-        } while (remain);
-        if (ls == 0)
-            return ArrayUtils.EMPTY_SHORT_ARRAY;
+        } while (done < ss);
 
+        assert(ls > 0);
         short[] ll = l.toArray();
-        ArrayUtils.reverse(ll);
-        assert(ll.length <= maxLen);
+        assert(ll.length == ls);
         return ll;
     }
 

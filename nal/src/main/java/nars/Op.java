@@ -1240,8 +1240,10 @@ public enum Op implements $ {
 
     final static int EVENT_DELIMETER_OP = Op.or(Op.PROD, Op.CONJ);
     public static final Predicate<Term> recursiveCommonalityDelimeter =
-            c -> !c.op().in(EVENT_DELIMETER_OP);
-    public static final Predicate<Term> nonEventDelimeter =
+            //c -> !c.op().in(EVENT_DELIMETER_OP);
+            c -> c.op()!=(Op.PROD);
+
+    public static final Predicate<Term> noLimit =
             c -> true;
                     //c.op()!=CONJ || concurrent(c.dt()); //!c.op().temporal || concurrent(c.dt());
 
@@ -1354,7 +1356,7 @@ public enum Op implements $ {
         if (concurrent(dt)) {
 
 
-            Predicate<Term> delim = op == IMPL ? Op.nonEventDelimeter : Op.recursiveCommonalityDelimeter;
+            Predicate<Term> delim = op == IMPL ? Op.noLimit : Op.recursiveCommonalityDelimeter;
 
             if ((subject.varPattern() == 0 && predicate.varPattern() == 0)) {
                 if ((containEachOther(subject, predicate, delim))) {

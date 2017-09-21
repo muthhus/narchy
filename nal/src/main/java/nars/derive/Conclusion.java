@@ -6,6 +6,7 @@ import nars.control.Derivation;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
+import nars.term.transform.Retemporalize;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -66,7 +67,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
         final float[] confGain = {1f}; //flat by default
 
         Term c2;
-        if (p.taskOrBeliefIsEvent || c1.isTemporal()) {
+        if (p.temporal) {
 
             try {
 
@@ -116,7 +117,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
             }
 
         } else {
-            c2 = c1;
+            c2 = c1.temporalize(Retemporalize.retemporalizeAllToDTERNAL);
         }
 
         c2 = c2.normalize();

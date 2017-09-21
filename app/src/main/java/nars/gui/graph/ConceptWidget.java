@@ -351,10 +351,10 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
                 //float priAvg = priSum/2f;
 
                 float minLineWidth = 0.05f;
-                float priToWidth = 1.5f;
+                float priToWidth = 0.5f;
 
-                float widthSqrt = minLineWidth + priToWidth * edgeSum;
-                this.width = Util.sqr(widthSqrt);
+                float widthSqrt = priToWidth * edgeSum;
+                this.width = minLineWidth + /*Util.sqr*/(widthSqrt);
 
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
 //                float qEst = ff.qua();

@@ -1614,102 +1614,111 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return terms.apply(term);
     }
 
+
     /**
-     * bins a range of values into N equal levels
+     * computes an evaluation amplifier factor, in range 0..2.0.
+     *          VALUE -> AMP
+     *      -Infinity -> amp=0
+     *          0     -> amp=1
+     *      +Infinity -> amp=2
      */
-    public static class ChannelRange<X extends Priority> {
-        public final float min, max;
-        public final Cause[] levels;
-        transient private final float range; //cache
-
-        public ChannelRange(String id, int levels, Function<Object, CauseChannel<X>> src, float min, float max) {
-            this.min = min;
-            this.max = max;
-            assert (max > min);
-            this.range = max - min;
-            assert (range > Prioritized.EPSILON);
-            this.levels = Util.map(0, levels, (l) -> src.apply(id + l), Cause[]::new);
-        }
-
-        public Cause get(float value) {
-            return levels[Util.bin(Util.unitize((value - min) / range), levels.length)];
-        }
+    public float evaluate(short[] effect) {
+        float value = MetaGoal.privaluate(causes, effect);
+        return 1f + Util.tanhFast(value);
     }
 
-//    public final ImplicitTaskCauses taskCauses = new ImplicitTaskCauses(this);
+//    /**
+//     * bins a range of values into N equal levels
+//     */
+//    public static class ChannelRange<X extends Priority> {
+//        public final float min, max;
+//        public final Cause[] levels;
+//        transient private final float range; //cache
 //
-//    static class ImplicitTaskCauses {
-//
-//        public final Cause causeBelief, causeGoal, causeQuestion, causeQuest;
-//        public final Cause causePast, causePresent, causeFuture, causeEternal;
-//        //public final ChannelRange causeConf, causeFreq;
-//        public final NAR nar;
-//
-//        ImplicitTaskCauses(NAR nar) {
-//            this.nar = nar;
-//            causeBelief = nar.newChannel(String.valueOf((char) BELIEF));
-//            causeGoal = nar.newChannel(String.valueOf((char) GOAL));
-//            causeQuestion = nar.newChannel(String.valueOf((char) QUESTION));
-//            causeQuest = nar.newChannel(String.valueOf((char) QUEST));
-//            causeEternal = nar.newChannel("Eternal");
-//            causePast = nar.newChannel("Past");
-//            causePresent = nar.newChannel("Present");
-//            causeFuture = nar.newChannel("Future");
-////            causeConf = new ChannelRange("Conf", 7 /* odd */, nar::newChannel, 0f, 1f);
-////            causeFreq = new ChannelRange("Freq", 7 /* odd */, nar::newChannel, 0f, 1f);
+//        public ChannelRange(String id, int levels, Function<Object, CauseChannel<X>> src, float min, float max) {
+//            this.min = min;
+//            this.max = max;
+//            assert (max > min);
+//            this.range = max - min;
+//            assert (range > Prioritized.EPSILON);
+//            this.levels = Util.map(0, levels, (l) -> src.apply(id + l), Cause[]::new);
 //        }
 //
-//        /**
-//         * classifies the implicit / self-evident causes a task
-//         */
-//        public short[] get(Task x) {
-//            //short[] ii = ArrayPool.shorts().getExact(8);
-//
-//            short time;
-//            if (x.isEternal())
-//                time = causeEternal.id;
-//            else {
-//                long now = nar.time();
-//                long then = x.nearestTimeTo(now);
-//                if (Math.abs(now - then) <= nar.dur())
-//                    time = causePresent.id;
-//                else if (then > now)
-//                    time = causeFuture.id;
-//                else
-//                    time = causePast.id;
-//            }
-//
-//            short punc;
-//            switch (x.punc()) {
-//                case BELIEF:
-//                    punc = causeBelief.id;
-//                    break;
-//                case GOAL:
-//                    punc = causeGoal.id;
-//                    break;
-//                case QUESTION:
-//                    punc = causeQuestion.id;
-//                    break;
-//                case QUEST:
-//                    punc = causeQuest.id;
-//                    break;
-//                default:
-//                    throw new UnsupportedOperationException();
-//            }
-////            if (x.isBeliefOrGoal()) {
-////                short freq = causeFreq.get(x.freq()).id;
-////                short conf = causeConf.get(x.conf()).id;
-////                return new short[]{time, punc, freq, conf};
-////            } else {
-//            return new short[]{time, punc};
-////            }
+//        public Cause get(float value) {
+//            return levels[Util.bin(Util.unitize((value - min) / range), levels.length)];
 //        }
-//
 //    }
-
-
-
-
+//
+////    public final ImplicitTaskCauses taskCauses = new ImplicitTaskCauses(this);
+////
+////    static class ImplicitTaskCauses {
+////
+////        public final Cause causeBelief, causeGoal, causeQuestion, causeQuest;
+////        public final Cause causePast, causePresent, causeFuture, causeEternal;
+////        //public final ChannelRange causeConf, causeFreq;
+////        public final NAR nar;
+////
+////        ImplicitTaskCauses(NAR nar) {
+////            this.nar = nar;
+////            causeBelief = nar.newChannel(String.valueOf((char) BELIEF));
+////            causeGoal = nar.newChannel(String.valueOf((char) GOAL));
+////            causeQuestion = nar.newChannel(String.valueOf((char) QUESTION));
+////            causeQuest = nar.newChannel(String.valueOf((char) QUEST));
+////            causeEternal = nar.newChannel("Eternal");
+////            causePast = nar.newChannel("Past");
+////            causePresent = nar.newChannel("Present");
+////            causeFuture = nar.newChannel("Future");
+//////            causeConf = new ChannelRange("Conf", 7 /* odd */, nar::newChannel, 0f, 1f);
+//////            causeFreq = new ChannelRange("Freq", 7 /* odd */, nar::newChannel, 0f, 1f);
+////        }
+////
+////        /**
+////         * classifies the implicit / self-evident causes a task
+////         */
+////        public short[] get(Task x) {
+////            //short[] ii = ArrayPool.shorts().getExact(8);
+////
+////            short time;
+////            if (x.isEternal())
+////                time = causeEternal.id;
+////            else {
+////                long now = nar.time();
+////                long then = x.nearestTimeTo(now);
+////                if (Math.abs(now - then) <= nar.dur())
+////                    time = causePresent.id;
+////                else if (then > now)
+////                    time = causeFuture.id;
+////                else
+////                    time = causePast.id;
+////            }
+////
+////            short punc;
+////            switch (x.punc()) {
+////                case BELIEF:
+////                    punc = causeBelief.id;
+////                    break;
+////                case GOAL:
+////                    punc = causeGoal.id;
+////                    break;
+////                case QUESTION:
+////                    punc = causeQuestion.id;
+////                    break;
+////                case QUEST:
+////                    punc = causeQuest.id;
+////                    break;
+////                default:
+////                    throw new UnsupportedOperationException();
+////            }
+//////            if (x.isBeliefOrGoal()) {
+//////                short freq = causeFreq.get(x.freq()).id;
+//////                short conf = causeConf.get(x.conf()).id;
+//////                return new short[]{time, punc, freq, conf};
+//////            } else {
+////            return new short[]{time, punc};
+//////            }
+////        }
+////
+////    }
 
 
     /**

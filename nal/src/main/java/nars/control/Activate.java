@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -48,11 +47,16 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //        if (n.exe.concurrent()) {
 //            n.exe.execute(() -> activate(t, activationApplied, n, true));
 //        } else {
-        activate(t, activationApplied, n, true);
+
+
+        float evalAmp = n.evaluate(t.cause());
+        activate(t,
+                activationApplied * evalAmp,
+                n, true);
 //        }
     }
 
-    static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n, boolean process) {
+    private static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n, boolean process) {
         // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
         //if (activation >= EPSILON) {
         Concept cc = t.concept(n, true);
@@ -79,7 +83,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         //}
     }
 
-    public static Activate activate(@NotNull Task t, float activation, Concept origin, NAR n) {
+    private static Activate activate(@NotNull Task t, float activation, Concept origin, NAR n) {
 
 
 //        if (activation < EPSILON) {
@@ -87,7 +91,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //        }
 
         n.emotion.onActivate(t, activation, origin, n);
-
 
         origin.tasklinks().putAsync(
                 new PLinkUntilDeleted<>(t, activation)
@@ -115,9 +118,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         //nar.terms.commit(id); //index cache update
 
         final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
-
-
-        tasklinks.commit();
+        tasklinks.commit(tasklinks.forget(Param.LINK_FORGET_TEMPERATURE));
 
         int talSampled = Math.min(tasklinks.size(), TASKLINKS_SAMPLED);
         if (talSampled == 0)
@@ -135,14 +136,11 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         //      its termlinks to subterms
         //      and their reverse links back to this
 
-        float cPri = priElseZero();
-        float decayRate = 1f - nar.momentum.floatValue();
-        float decayed = cPri * decayRate;
-        priSub(decayed); //for balanced budgeting: important
+        final Bag<Term, PriReference<Term>> termlinks = id.termlinks();
+        termlinks.commit(termlinks.forget(Param.LINK_FORGET_TEMPERATURE));
 
-        final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
 
-        Collection<Concept> localSubConcepts = linkTemplates(nar, decayed);
+        Collection<Concept> localSubConcepts = linkTemplates(nar);
 
 
         List<PriReference<Term>> terml;
@@ -181,12 +179,19 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         return premises;
     }
 
+
     @Nullable
-    public Collection<Concept> linkTemplates(NAR nar, float decayed) {
+    public Collection<Concept> linkTemplates(NAR nar) {
+        float budgeted = priElseZero();
+        float decayRate = 1f - nar.momentum.floatValue();
+        float decayed = budgeted * decayRate;
+
+        priSub(decayed); //for balanced budgeting: important
+
         Collection<Termed> localTemplates = id.templates();
         int n = localTemplates.size();
         if (n > 0) {
-            float subDecay = decayed / n;
+            float subDecay = budgeted / n;
             Term thisTerm = id.term();
 
             Collection<Concept> localSubConcepts =
@@ -195,12 +200,13 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                     $.newArrayList(n); //maybe contain duplicates but its ok, this is fast to construct
 
             Random rng = nar.random();
-            float balance = Param.TERMLINK_BALANCE;
-            float subDecayReverse = subDecay * (1f - balance);
-            float subDecayForward = subDecay * balance;
+            //float balance = Param.TERMLINK_BALANCE;
+            float subDecayReverse = subDecay;// * (1f - balance);
+            float subDecayForward = subDecay;// * balance;
             Bag<Term, PriReference<Term>> termlinks = id.termlinks();
-            for (Termed localSub : localTemplates) {
 
+            float spent = 0;
+            for (Termed localSub : localTemplates) {
 
                 localSub = mutateTermlink(localSub.term(), rng); //for special Termed instances, ex: RotatedInt etc
                 if (localSub instanceof Bool)
@@ -209,29 +215,37 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 Term localSubTerm = localSub.term(); //if mutated then localSubTerm would change so do it here
 
                 float d;
+                boolean reverseLinked = false;
                 if (localSubTerm.op().conceptualizable && !localSubTerm.equals(thisTerm)) {
 
                     Concept localSubConcept = nar.conceptualize(localSub);
                     if (localSubConcept != null) {
 
-                        if (subDecayReverse > Pri.EPSILON) {
-                            localSubConcept.termlinks().putAsync(
-                                    new PLink(thisTerm, subDecayReverse)
-                            );
-                        }
+                        localSubConcept.termlinks().putAsync(
+                                new PLink(thisTerm, subDecayReverse)
+                        );
+                        reverseLinked = true;
+
 
                         localSubConcept.activate(subDecay, nar);
 
                         localSubConcepts.add(localSubConcept);
+
+                        spent += subDecay;
                     }
 
                 }
 
-                if (subDecayForward > Pri.EPSILON) {
-                    termlinks.putAsync(
-                            new PLink(localSubTerm, subDecayForward)
-                    );
-                }
+                termlinks.putAsync(
+                        new PLink(localSubTerm,
+                                subDecayForward)
+                                //reverseLinked ? subDecayForward : subDecay /* full */)
+                );
+
+            }
+            float refund = budgeted - spent;
+            if (refund > Pri.EPSILON) {
+                priAdd(refund);
             }
 
             if (!localSubConcepts.isEmpty())

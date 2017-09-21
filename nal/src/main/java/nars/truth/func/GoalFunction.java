@@ -50,7 +50,7 @@ public enum GoalFunction implements TruthOperator {
 
     },
 
-    @AllowOverlap DeciInduction() {
+    DeciInduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             if (B.isNegative()) {

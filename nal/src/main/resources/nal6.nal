@@ -43,15 +43,15 @@
 //Same as for inheritance
 
 
-    (P ==> M), (S ==> M), neq(P,S) |- ((P &&+- S) ==>+- M), (Belief:Intersection)
-    (P ==> M), (S ==> M), neq(P,S) |- (--(--P &&+- --S) ==>+- M), (Belief:Union)
+    (P ==> M), (S ==> M), neqRCom(P,S) |- ((P &&+- S) ==>+- M), (Belief:Intersection)
+    (P ==> M), (S ==> M), neqRCom(P,S) |- (--(--P &&+- --S) ==>+- M), (Belief:Union)
     //(P ==> M), (S ==> M) |- ((P &&+- --S) ==>+- M), (Belief:IntersectionPN)
         //(P ==> M), (S ==> M), neqCom(P,S) |- (--((--,%P) &&+- (--,%S)) ==>+- M), (Belief:Union)
                 //(P || S) ==>+-M
 
 
-    (M ==> P), (M ==> S), neq(P,S) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
-    (P ==> M), (S ==> M), neq(P,S) |- (M ==>+- --(--P &&+- --S)), (Belief:Union)
+    (M ==> P), (M ==> S), neqRCom(P,S) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
+    (P ==> M), (S ==> M), neqRCom(P,S) |- (M ==>+- --(--P &&+- --S)), (Belief:Union)
     //(M ==> P), (M ==> S) |- (M ==>+- (P &&+- --S)), (Belief:IntersectionPN)
         //(M ==> P), (M ==> S), neqCom(P,S) |- (M ==>+- --((--,%P) &&+- (--,%S))), (Belief:Union)
                 //M ==>+- (P || S)
@@ -90,7 +90,7 @@
     B, (--A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
         //B, (--A ==> C), time(urgent),  notImpl(B) |- varIntro(subIfUnifiesAny(C,A,B)), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
 
-    B, (C ==> A), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionRecursivePB, Goal:DeciInduction)
+    B, (C ==> A), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionPB, Goal:DeciInduction)
 
         //has(A,"$"),
     //B, ((--,%A) ==> C), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursiveN, Goal:InductionRecursiveN)
@@ -149,7 +149,7 @@
 
     //((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
     //((&&,M,A..+) ==> C), ((&&,A..+) ==> C), task(".") |- M, (Belief:Abduction)
-    (M ==> C), C, task(".") |- M, (Belief:Abduction)
+    //(M ==> C), C, task(".") |- M, (Belief:Abduction)
 
         //TODO modify ellipsis to allow these two rules to be expressed as one:
         // ((&&,M,A..+) ==> C), (A..+ ==> C) |- M, (Belief:Abduction)
@@ -165,8 +165,11 @@
     ((&&,B,A..+) ==> C), (B ==> M), neqRCom(C,M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Induction)
     ((&&,A..+) ==> C), M, neqRCom(C,M), notImpl(M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Induction)
 
-    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C) |- (B ==>+- M), (Belief:Induction)
-    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C) |- (M ==>+- B), (Belief:Induction)
+    ((&&,X,A..+) ==> C), ((&&,Y,A..+) ==> C), neqRCom(X,Y) |- (X ==>+- Y), (Belief:Induction)
+    ((&&,X,A..+) ==> C), ((&&,Y,A..+) ==> C), neqRCom(X,Y) |- (Y ==>+- X), (Belief:Abduction)
+    (C ==> (&&,X,A..+)), (C ==> (&&,Y,A..+)), neqRCom(X,Y) |- (X ==>+- Y), (Belief:Induction)
+    (C ==> (&&,X,A..+)), (C ==> (&&,Y,A..+)), neqRCom(X,Y) |- (Y ==>+- X), (Belief:Abduction)
+        //((&&,B,A..+) ==> C), ((&&,A..+) ==> C) |- (B ==>+- C), (Belief:Induction)
 
 
 

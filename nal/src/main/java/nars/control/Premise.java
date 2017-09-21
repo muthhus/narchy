@@ -276,11 +276,10 @@ public class Premise extends UnaryTask {
 
 
         if (belief != null) {
+            beliefTerm = belief.term(); //use the belief's actual possibly-temporalized term
+
             if (belief.equals(task)) { //do not repeat the same task for belief
                 belief = null; //force structural transform; also prevents potential inductive feedback loop
-                beliefTerm = taskTerm; //use the task's term, which may have temporal information
-            } else {
-                beliefTerm = belief.term(); //use the belief's actual possibly-temporalized term
             }
         }
 

@@ -13,10 +13,10 @@ import java.util.function.Consumer;
  */
 public class PriForget<P extends Priority> implements Consumer<P> {
 
-    public final float avgToBeRemoved;
+    public final float priFactor;
 
-    public PriForget(float avgToBeRemoved) {
-        this.avgToBeRemoved = avgToBeRemoved;
+    public PriForget(float priFactor) {
+        this.priFactor = priFactor;
     }
 
 
@@ -33,25 +33,22 @@ public class PriForget<P extends Priority> implements Consumer<P> {
      * @return the update function to apply to a bag
      */
     @Nullable
-    public static Consumer forget(int s, int c, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer> f) {
+    public static Consumer forget(int s, int c, float pressure, float mass, float temperature, float priEpsilon, FloatToObjectFunction<Consumer> f) {
 
-        if ((s > 0) && (p > 0)) {
+        if ((s > 0) && (pressure > 0) && (c > 0) && temperature > 0) {
 
-//        float estimatedExcess = p/(m+p); //(m + p) - (c * (1f - temperature));
-//        if (estimatedExcess > 0) {
-//            float presentAndFutureExcess = estimatedExcess;
-            //* 2f; /* x 2 to apply to both the existing pressure and estimated future pressure */
-            float perMember = temperature * (p) / c;
-            if (perMember >= priEpsilon)
-                 return f.valueOf(perMember);
-//        }
+            float priFactor =
+                    Math.max(0, 1f - Math.min(1f, temperature * (pressure)/(c+(c-s /* free space */))));
+            if (priFactor < 1 - 2 * priEpsilon)
+                 return f.valueOf(priFactor);
         }
         return null;
     }
 
     @Override
     public void accept(@NotNull Priority b) {
-        b.priSub(avgToBeRemoved);
+        b.priMult(priFactor);
+        //b.priSub(avgToBeRemoved);
 
 //        b.priSub(avgToBeRemoved
 //            ,0.5f //50% retained

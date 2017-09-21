@@ -414,7 +414,7 @@ public interface NAct {
                                     (i) -> Math.abs(exp[i]), //even though an exp value < 0.5 has no effect, it acts as a veto override of a weaker positive motivation it competes with
                                     //(i) -> (cc[i]),
                                     //(i) -> c2w(cc[i]),
-                                    0.4f, n.random());
+                                    0.7f, n.random());
                     //cc[0] > cc[1] ? 0 : 1; //GREEDY
 
                     ew = (winner == 1 ? +1 : -1f) * (Math.max(0.5f, exp[winner]) - 0.5f) * 2f;
@@ -453,8 +453,8 @@ public interface NAct {
                     }
                 }
 
-                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, w, n);
-                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, l, n);
+                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, null, n);
+                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, null, n);
             }
         };
 

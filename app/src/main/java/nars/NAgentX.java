@@ -182,7 +182,7 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.9f);
 
 
-        float priFactor = 0.1f;
+        float priFactor = 0.5f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;

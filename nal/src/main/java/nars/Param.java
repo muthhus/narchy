@@ -36,9 +36,10 @@ public abstract class Param extends Services<Term,NAR> {
     /** rate that integers in integer-containing termlink compounds will be dynamically mutated on activation */
     public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.5f;
 
-    public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
+    /** TODO if a task is deleted by this, the system should replace it with a question about the state sometime in the future */
+    public static final boolean DELETE_INACCURATE_PREDICTIONS = false;
 
-    public static final float DEFAULT_FORGET_TEMPERATURE = 0.5f;
+    public static final float LINK_FORGET_TEMPERATURE = 0.5f;
 
 
     /**
@@ -93,17 +94,15 @@ public abstract class Param extends Services<Term,NAR> {
                     32;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(512);
+    public final MutableInteger matchTTL = new MutableInteger(128);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.1f;
 
     public static final int TTL_PREMISE_MIN =
-            Param.TTL_MUTATE * 2 +
             Param.TTL_UNIFY * 2 +
             Param.TTL_DERIVE_TRY +
-            Param.TTL_DERIVE_TASK_SUCCESS * 2 +
-            Param.TTL_DERIVE_TASK_FAIL * 2;
+            Param.TTL_DERIVE_TASK_SUCCESS;
 
     /** cost of attempting a unification */
     public static final int TTL_UNIFY = 1;
@@ -171,10 +170,11 @@ public abstract class Param extends Services<Term,NAR> {
 
         int dCompl = t.complexity();
         int pCompl = d.parentComplexity;
+        int penalty = 1;
         float relGrowth =
-                unitize(((float)dCompl) / (dCompl + pCompl)); //1 - (proportion of its complexity / (its complexity + parent complexity) )
+                unitize(((float)dCompl) / (penalty + dCompl + pCompl)); //1 - (proportion of its complexity / (its complexity + parent complexity) )
 
-        discount *= 1f - 0.5f * /*Util.sqr*/(relGrowth);
+        discount *= 1f - (relGrowth);
 
         Truth tr = t.truth();
         if (/* belief or goal */ tr!=null) {
@@ -264,7 +264,7 @@ public abstract class Param extends Services<Term,NAR> {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 64;
+    public static final int CAUSE_CAPACITY = 32;
 
     public final static int UnificationStackMax = 32; //how many assignments can be stored in the 'versioning' maps
 

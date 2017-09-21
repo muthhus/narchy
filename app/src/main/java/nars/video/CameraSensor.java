@@ -211,8 +211,19 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         //frame-rate timeslicing
         int actualPixels = pixels.size();
         int pixelsSize = Math.min(actualPixels, Math.round(work));
-        int start = this.lastPixel;
-        int end = this.lastPixel = (start + pixelsSize) % actualPixels; //for progressive fractional wrap-around
+        int start, end;
+        if (pixelsSize == actualPixels) {
+            start = 0; end = actualPixels;
+        } else {
+            start = this.lastPixel;
+            end = (start + pixelsSize) % actualPixels; //for progressive fractional wrap-around
+            if (end >= actualPixels) { //wrap around
+                start = end - actualPixels;
+                end = start;
+            }
+
+            this.lastPixel = end;
+        }
         //System.out.println(value + " " + fraction + " "+ start + " " + end);
 
         this.conf = nar.confDefault(Op.BELIEF);

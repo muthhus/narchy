@@ -13,7 +13,6 @@ import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
 import nars.op.substitute;
 import nars.task.DerivedTask;
-import nars.task.ITask;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
@@ -102,7 +101,7 @@ public class Derivation extends Unify implements TermContext {
     /**
      * whether either the task or belief are events and thus need to be considered with respect to time
      */
-    public boolean taskOrBeliefIsEvent;
+    public boolean temporal;
 
     public boolean cyclic, overlap;
     public float premisePri;
@@ -319,7 +318,8 @@ public class Derivation extends Unify implements TermContext {
         Op bOp = beliefTerm.op();
         this.termSub1op = bOp.id;
 
-        this.taskOrBeliefIsEvent = !task.isEternal() || (belief!=null && !belief.isEternal());
+        this.temporal = (!task.isEternal() || task.term().isTemporal()) ||
+                (belief!=null && (!belief.isEternal() || belief.term().isTemporal()));
 
         this.premisePri = p.priElseZero();
 

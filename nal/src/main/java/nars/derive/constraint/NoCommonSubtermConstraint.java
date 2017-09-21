@@ -5,6 +5,8 @@ import nars.term.Term;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Predicate;
+
 /** containment test of x to y's subterms and y to x's subterms */
 public final class NoCommonSubtermConstraint extends CommonalityConstraint {
 
@@ -32,6 +34,11 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
         return isSubtermOfTheOther(x, y, recurse, true);
     }
 
+
+        final static Predicate<Term> limit =
+                Op.recursiveCommonalityDelimeter;
+
+
     static boolean isSubtermOfTheOther(@NotNull Term a, @NotNull Term b, boolean recurse, boolean excludeVariables) {
 
         if ((excludeVariables) && (a instanceof Variable || b instanceof Variable))
@@ -40,7 +47,8 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
         return recurse ?
 
                 //a.containsRecursively(b) || b.containsRecursively(a) :
-                a.containsRecursively(b, Op.recursiveCommonalityDelimeter) || b.containsRecursively(a, Op.recursiveCommonalityDelimeter) :
+                a.containsRecursively(b, limit) ||
+                        b.containsRecursively(a, limit) :
 
                 a.contains(b) || b.contains(a);
     }

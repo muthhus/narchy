@@ -151,8 +151,8 @@ public class NALTask extends Pri implements Task {
     public final boolean equals(Object that) {
         return this == that ||
                 (hash == that.hashCode() &&
-                    that instanceof Tasked &&
-                    Task.equal(this, ((Tasked) that).task())
+                        that instanceof Tasked &&
+                        Task.equal(this, ((Tasked) that).task())
                 );
     }
 
@@ -164,9 +164,11 @@ public class NALTask extends Pri implements Task {
         this.cause = Cause.zip(this, incoming);
     }
 
-    /** overkill for one or two id but this will get optimized later */
+    /**
+     * overkill for one or two id but this will get optimized later
+     */
     public void causeMerge(short... id) {
-        this.cause = Cause.zip(CAUSE_CAPACITY,  ()->cause, ()->id );
+        this.cause = Cause.zip(CAUSE_CAPACITY, cause, id);
     }
 
     @Nullable
@@ -326,21 +328,30 @@ public class NALTask extends Pri implements Task {
     @Override
     public double range(int dim) {
         switch (dim) {
-            case 0: return end-start;
-            case 1: return 0;
-            case 2: return 0;
+            case 0:
+                return end - start;
+            case 1:
+                return 0;
+            case 2:
+                return 0;
             default:
                 throw new UnsupportedOperationException();
         }
     }
 
-    /** rtree cost heuristic; constant result */
-    @Override public float freqCost() {
+    /**
+     * rtree cost heuristic; constant result
+     */
+    @Override
+    public float freqCost() {
         return 1;
     }
 
-    /** rtree cost heuristic; constant result */
-    @Override public float confCost() {
+    /**
+     * rtree cost heuristic; constant result
+     */
+    @Override
+    public float confCost() {
         return 1;
     }
 }

@@ -3,38 +3,53 @@ package nars.control;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** high-level reasoner control parameters */
+/**
+ * high-level reasoner control parameters
+ */
 public enum MetaGoal {
 
     /**
      * neg: perceived as input, can be measured for partial and complete tasks
      * in their various stages of construction.
-     *
+     * <p>
      * information is considered negative value by default (spam).
      * see: http://mattmahoney.net/costofai.pdf
-     *
+     * <p>
      * satisfying other goals is necessary to compensate for the
      * perceptual cost.
-     * */
+     */
     Perceive,
 
-    /** pos: accepted into the memory */
+    /**
+     * pos: accepted into the memory
+     */
     Accept,
 
-    /** pos: anwers a question */
+    /**
+     * pos: anwers a question
+     */
     Answer,
 
-    /** pos: actuated a goal concept */
+    /**
+     * pos: actuated a goal concept
+     */
     Action,
 
-    /** pos: prediction confirmed a sensor input */
+    /**
+     * pos: prediction confirmed a sensor input
+     */
     Accurate,
 
-    /** neg: contradicted a sensor input */
+    /**
+     * neg: contradicted a sensor input
+     */
     Inaccurate;
 
-    /** goal and goalSummary instances correspond to the possible MetaGoal's enum
+    /**
+     * goal and goalSummary instances correspond to the possible MetaGoal's enum
      * however summary has an additional instance for the global normalization step
      */
     public static void update(FasterList<Cause> causes, float[] goal, RecycledSummaryStatistics[] goalSummary) {
@@ -69,9 +84,9 @@ public enum MetaGoal {
             float v = 0;
             //mix the weighted current values of each purpose, each independently normalized against the values (the reason for calculating summary statistics in previous step)
             for (int j = 0; j < goals; j++) {
-                v += goal[j] * c.goalValue[j].current /goalMagnitude[j];
+                v += goal[j] * c.goalValue[j].current / goalMagnitude[j];
             }
-            goalPreNorms.accept( c.valuePreNorm = v );
+            goalPreNorms.accept(c.valuePreNorm = v);
         }
 
         float max = (float) goalPreNorms.getMax();
@@ -86,7 +101,7 @@ public enum MetaGoal {
 //            float rangePos = max - mid;
 //            float rangeNeg = mid - min;
 
-            float valueMag = Math.max(Math.abs(max),Math.abs(min));
+            float valueMag = Math.max(Math.abs(max), Math.abs(min));
 
             for (int i = 0, causesSize = cc; i < causesSize; i++) {
                 Cause c = causes.get(i);
@@ -107,7 +122,6 @@ public enum MetaGoal {
         }
 
 
-
 //        System.out.println("WORST");
 //        causes.stream().map(x -> PrimitiveTuples.pair(x, x.value())).sorted(
 //                (x,y) -> Doubles.compare(x.getTwo(), y.getTwo())
@@ -118,12 +132,15 @@ public enum MetaGoal {
 
     }
 
-    /** contributes the value to a particular goal in a cause's goal vector */
+    /**
+     * contributes the value to a particular goal in a cause's goal vector
+     */
     public void learn(Traffic[] goalValue, float v) {
         goalValue[ordinal()].addAndGet(v);
     }
 
-    /** sets the desired level for a particular MetaGoal.
+    /**
+     * sets the desired level for a particular MetaGoal.
      * the value may be positive or negative indicating
      * its desirability or undesirability.
      * the absolute value is considered relative to the the absolute values
@@ -133,9 +150,38 @@ public enum MetaGoal {
         wants[ordinal()] = v;
     }
 
-    /** creates a new goal vector  */
+    /**
+     * creates a new goal vector
+     */
     public static float[] newWants() {
         return new float[MetaGoal.values().length];
+    }
+
+
+    public static final Logger logger = LoggerFactory.getLogger(MetaGoal.class);
+
+    /**
+     * estimate the priority factor determined by the current value of priority-affecting causes
+     */
+    public static float privaluate(FasterList<Cause> values, short[] effect) {
+
+        int effects = effect.length;
+        if (effects == 0) return 0;
+
+        float value = 0;
+        for (short c : effect) {
+            Cause cause = values.getSafe(c);
+            if (cause == null) {
+                logger.error("cause id={} missing", c);
+                continue;
+            }
+
+            if (cause.valuePrioritizes)
+                value += cause.value();
+        }
+
+
+        return value / effects;
     }
 
 }

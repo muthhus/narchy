@@ -68,7 +68,7 @@ public class PredictionAccuracyFeedback {
             /** durations ago since the prediction was created */
 
             float v;
-            if (coherence > 0.5f) {
+            if (coherence >= 0.5f) {
                 //reward
                 v = coherence * 2f * confFraction * headstart * strength;
                 if (v > Pri.EPSILON)

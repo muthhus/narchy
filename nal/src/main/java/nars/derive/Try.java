@@ -74,13 +74,13 @@ public class Try extends AbstractPred<Derivation> {
         }
 
         //TODO fork budgeting
-        @Deprecated int loopCost = 1;
 
         int startTTL = d.ttl;
         int minPerBranch =
                 Math.min(startTTL,
                     Param.TTL_PREMISE_MIN
                 );
+        int loopCost = Math.max(1, minPerBranch/4);
 
         int maxPerBranch = Math.max(minPerBranch, startTTL / numChoices);
         int before = d.now();
