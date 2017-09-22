@@ -75,7 +75,7 @@ public enum MetaGoal {
         final float epsilon = 0.01f;
 
         //final float LIMIT = +1f;
-        final float momentum = 0.9f;
+        final float momentum = 0.99f;
 
         int goals = goal.length;
         float[] goalMagnitude = new float[goals];

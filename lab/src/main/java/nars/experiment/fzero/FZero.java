@@ -20,8 +20,8 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
-    float fwdSpeed = 5f;
-    float rotSpeed = 0.2f;
+    float fwdSpeed = 8f;
+    float rotSpeed = 0.5f;
 
     public static void main(String[] args) {
 
@@ -75,7 +75,7 @@ public class FZero extends NAgentX {
         });//.resolution.setValue(0.02f);
 
         actionBipolar($.the("x"), (x) -> {
-            fz.playerAngle += (x) * Math.pow(rotSpeed, 1);
+            fz.playerAngle += (x) * rotSpeed;
             return x;
         });
 //        actionUnipolar(p("left"), (r) -> {

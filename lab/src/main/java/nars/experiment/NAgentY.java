@@ -107,9 +107,9 @@ abstract public class NAgentY extends NAgentX {
     }
 
     @Override
-    public @Nullable ActionConcept actionToggle(@NotNull Term s, @NotNull Runnable on, @NotNull Runnable off) {
+    public @Nullable void actionToggle(@NotNull Term t, @NotNull Runnable on, @NotNull Runnable off) {
 
-        RLActionConcept m = new RLActionConcept(s, nar);
+        RLActionConcept m = new RLActionConcept(t, nar);
 
         spec.out(2, (i) -> {
             switch (i) {
@@ -124,6 +124,6 @@ abstract public class NAgentY extends NAgentX {
             }
         });
 
-        return addAction(m);
+        addAction(m);
     }
 }

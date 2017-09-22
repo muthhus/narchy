@@ -192,7 +192,7 @@ abstract public class NAgentX extends NAgent {
         //n.dtMergeOrChoose.setValue(true);
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
-        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, true, 32f);
+        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, false, 32f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
 //        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);

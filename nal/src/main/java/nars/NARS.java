@@ -207,6 +207,7 @@ public class NARS {
 
             if (threadSafe)
                 index = ()->new CaffeineIndex(128 * 1024 /*HACK */);
+
         }
 
         @Override
@@ -224,6 +225,8 @@ public class NARS {
 
             if (nal >= 7)
                 new STMLinkage(nar, 1, false);
+
+            nar.defaultWants();
 
         }
     }

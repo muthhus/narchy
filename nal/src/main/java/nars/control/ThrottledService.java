@@ -73,15 +73,16 @@ abstract public class ThrottledService extends DurService {
             //example naive policy
             double max = s.getMax();
             if (s.getMin() > OVERLOAD_NS) {
-                workGranularity = Math.max(1, workGranularity * 0.9f); //backoff
+                workGranularity = workGranularity; //backoff
             } else if (s.getMax() < UNDERLOAD_NS) {
                 workGranularity = Math.min(UNIT_MAX, workGranularity * 1.25f); //surge hard
             } else if (max / s.getMean() < COMPRESSION_RATIO) {
                 //assert(mean!=0);
                 workGranularity = Math.min(UNIT_MAX, workGranularity * 1.05f); //surge soft
             } else {
-                workGranularity = Math.max(1, workGranularity * 0.99f); //constant gentle backoff
+                workGranularity = workGranularity * 0.99f; //constant gentle backoff
             }
+            if (workGranularity < 1) workGranularity = 1;
         }
 
         float workAllowed = v * workGranularity;

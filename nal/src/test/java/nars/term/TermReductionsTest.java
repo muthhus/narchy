@@ -991,11 +991,20 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testReducibleImplParallel() throws Narsese.NarseseException {
-        assertEquals("(x ==>+0 y)",
-                $("(x ==>+0 (y &| x))"));
+        assertEquals("(x=|>y)",
+                $("(x ==>+0 (y &| x))").toString());
+        assertEquals("(y=|>x)",
+                $("((y &| x) =|> x)").toString());
+     assertEquals("(--,((--,$1)=|>#2))",
+                $("((--,$1)=|>((--,$1)&|(--,#2)))").toString()
+        );
+    }
 
-        assertEquals("(--x ==>+0 --y)",
-                $("(--x ==>+0 (--y &| --x))"));
+    @Test public void testReducibleImplParallelNeg() throws Narsese.NarseseException {
+        assertEquals("((--,x)=|>(--,y))",
+                $("(--x ==>+0 (--y &| --x))").toString());
+        assertEquals("((--,y)=|>(--,x))",
+                $("((--y &| --x) =|> --x)").toString());
 
     }
 
@@ -1088,15 +1097,7 @@ public class TermReductionsTest extends NarseseTest {
         );
     }
 
-    @Test
-    public void testCoNegatedImplication() throws Narsese.NarseseException {
-        assertEquals(Null,
-                $("((--,$1)=|>((--,$1)&|(--,#2)))")
-        );
-//        assertEquals(Null,
-//                $("((--,$1)=|>(((--,$1)&|(--,#2)) &&+16 #2))")
-//        );
-    }
+
 
     /**
      * TODO decide if it should not apply this reduction to eternal

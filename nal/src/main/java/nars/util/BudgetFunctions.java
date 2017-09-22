@@ -206,7 +206,7 @@ public final class BudgetFunctions  {
 
         Pri u = new Pri(0f);
         for (Priority t : src) {
-            u.take(t, perSrc, copyOrTransfer);
+            u.take(t, perSrc, true, copyOrTransfer);
         }
         return u;
     }

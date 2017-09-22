@@ -39,7 +39,7 @@ public abstract class Param extends Services<Term,NAR> {
     /** TODO if a task is deleted by this, the system should replace it with a question about the state sometime in the future */
     public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
 
-    public static final float LINK_FORGET_TEMPERATURE = 0.5f;
+    public static final float LINK_FORGET_TEMPERATURE = 0.9f;
 
 
     /**
@@ -131,10 +131,6 @@ public abstract class Param extends Services<Term,NAR> {
      * so 0.5 is equal amounts for both. */
     public static final float TERMLINK_BALANCE = 0.5f;
 
-//
-//    /** belief projection lookahead time in premise formation, in multiples of duration */
-//    public static final int PREDICTION_HORIZON = 4;
-
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
     public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS = 2;
 
@@ -149,9 +145,9 @@ public abstract class Param extends Services<Term,NAR> {
         Believe.want(w, 0.1f);
         Desire.want(w, 0.1f);
         Accurate.want(w, 0.1f);
-        Inaccurate.want(w, -0.1f);
-        Answer.want(w, 0.1f);
-        Action.want(w, 1f);
+        Inaccurate.want(w, -0.05f);
+        Answer.want(w, 0.05f);
+        Action.want(w, 0.1f);
     }
 
     /** how many durations above which to dither dt relations to dt=0 (parallel)

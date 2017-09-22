@@ -19,22 +19,24 @@ public class SanityTest {
         NAR n = NARS.tmp();
         final int[] togglesPos = {0};
         final int[] togglesNeg = {0};
+        boolean[] target = new boolean[1];
+
         NAgent a = new NAgent(n) {
 
-            public final GoalActionConcept must;
-            public boolean on;
+
+            float score = 0;
 
             {
-                must = (GoalActionConcept) actionToggle($.the("mustBeOn"), (b) -> {
-                    (b ? togglesPos : togglesNeg)[0]++;
-                    on = b;
+                actionToggle($.the("mustBeOn"), (b) -> {
+                    score += (b == target[0]) ? +1 : -1;
                 });
 
             }
 
             @Override
             protected float act() {
-                float r = on ? 1f : -1f;
+                float r = score;
+                score = 0;
 
                 return r;
             }
@@ -42,7 +44,7 @@ public class SanityTest {
 
         n.termVolumeMax.setValue(7);
         a.durations.setValue(1);
-        a.curiosity.setValue(0.1f);
+
 
 
         SortedSet<DerivedTask> derived = new TreeSet<>((y,x) -> {
@@ -63,25 +65,48 @@ public class SanityTest {
         });
 
         //n.log();
-        int timeBatch = 200;
+        int timeBatch = 150;
 
-        for (int i = 0; i < 15; i++) {
-            n.run(timeBatch);
-
-
-            float averageReward = a.rewardSum / timeBatch;
-            System.out.println("time=" + n.time() + "\tavg reward=" + n4(averageReward) +
-                    "\ttoggles +" + togglesPos[0] + "/-" + togglesNeg[0]);
-            a.rewardSum = 0;
-
-
-//            if (averageReward < 0) {
-//                derived.forEach(t -> {
-//                    if (t.isGoal())
-//                        System.out.println(t.proof());
-//                });
-//            }
-            derived.clear();
+        for (int i = 0; i < 32; i++) {
+            a.curiosity.setValue(1+(1f/i));
+            batchCycle(n, togglesPos, togglesNeg, target, a, derived, timeBatch);
         }
+    }
+
+    public void batchCycle(NAR n, int[] togglesPos, int[] togglesNeg, boolean[] target, NAgent a, SortedSet<DerivedTask> derived, int timeBatch) {
+        //System.out.println("ON");
+        target[0] = true;
+        togglesPos[0] = togglesNeg[0] = 0;
+        for (int i = 0; i < 1; i++) {
+            batch(n, togglesPos[0], togglesNeg[0], a, derived, timeBatch);
+        }
+
+        //System.out.println("OFF");
+        target[0] = false;
+        togglesPos[0] = togglesNeg[0] = 0;
+
+        for (int i = 0; i < 1; i++) {
+            batch(n, togglesPos[0], togglesNeg[0], a, derived, timeBatch);
+        }
+    }
+
+    public void batch(NAR n, int togglesPo, int i, NAgent a, SortedSet<DerivedTask> derived, int timeBatch) {
+        n.run(timeBatch);
+
+
+        float averageReward = a.rewardSum / timeBatch;
+        //System.out.println("time=" + n.time() + "\tavg reward=" + n4(averageReward) );
+        System.out.println(n.time() + ", "  + n4(averageReward) );
+//                "\ttoggles +" + togglesPo + "/-" + i);
+        a.rewardSum = 0;
+
+
+            if (averageReward < 0) {
+                derived.forEach(t -> {
+                    if (t.isGoal())
+                        System.out.println(t.proof());
+                });
+            }
+        derived.clear();
     }
 }

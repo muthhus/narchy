@@ -273,9 +273,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         for (int i = 0; i < valueSummary.length; i++)
             valueSummary[i] = new RecycledSummaryStatistics();
 
-        //defaultWants();
-
-
         this.emotion = new Emotion(this);
 
         if (terms.nar == null) { //dont reinitialize if already initialized, for sharing

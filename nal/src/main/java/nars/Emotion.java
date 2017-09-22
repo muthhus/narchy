@@ -337,7 +337,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
         //transfer budget from question to answer
         //transfer more of the budget from an unoriginal question to an answer than an original question
         answer.take(question,
-            answer.conf() * (1 - question.originality()), false);
+            answer.conf() * (1 - question.originality()), false,false);
 
         //reward answer for answering the question
         float str = answer.conf() * question.priSafe(0);

@@ -95,7 +95,7 @@ public class Gradius extends NAgentX {
         /*nar.believe($.inh(*///$.sete(
 
         actionToggle($.p("fire"),
-                (b) -> g.keys[VK_SHOOT] = b).term();
+                (b) -> g.keys[VK_SHOOT] = b);
 
         actionBipolar($.the("y"), (dy) -> {
             float thresh = 0.33f;

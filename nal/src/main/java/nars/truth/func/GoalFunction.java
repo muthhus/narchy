@@ -36,14 +36,14 @@ public enum GoalFunction implements TruthOperator {
     @AllowOverlap DeciDeduction() {
         @Override
         public Truth apply(Truth T, Truth B, NAR m, float minConf) {
-            if (B.isNegative()) {
-                Truth x = deduction(T, B.neg(), minConf);
-                //Truth x = desireDed(T, B.neg(), minConf);
-                return x != null ? x.neg() : null;
-            } else {
+//            if (B.isNegative()) {
+//                Truth x = deduction(T, B.neg(), minConf);
+//                //Truth x = desireDed(T, B.neg(), minConf);
+//                return x != null ? x.neg() : null;
+//            } else {
                 return deduction(T, B, minConf);
                 //return desireDed(T, B, minConf);
-            }
+//            }
 
             //return desireStrongNew(T, B, minConf, true);
         }

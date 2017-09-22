@@ -252,7 +252,7 @@ public class MySTMClustered extends STMClustered {
                                     m.causeMerge(u); //cause merge
 
                                 float maxPri = new FasterList<>(uuLen, uu)
-                                        .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List
+                                        .maxValue(Task::priElseZero)/uuLen; //HACK todo dont use List
 
                                 m.setPri(BudgetFunctions.fund(maxPri, false, uu));
                                 return m;

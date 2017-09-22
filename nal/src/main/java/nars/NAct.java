@@ -47,14 +47,35 @@ public interface NAct {
      * its initial state will remain indetermined until the first feedback is generated.
      */
     @Nullable
-    default ActionConcept actionToggle(@NotNull Term s, @NotNull Runnable on, @NotNull Runnable off) {
-        float THRESH = 0.5f;
-        GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
-            boolean next = d != null && d.freq() > THRESH;
-            return toggle(d, on, off, next);
-        });
+    default void actionToggle(@NotNull Term t, @NotNull Runnable on, @NotNull Runnable off) {
+        //float THRESH = 0.5f;
+//        GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
+//            boolean next = d != null && d.freq() > THRESH;
+//            return toggle(d, on, off, next);
+//        });
+
         //m.resolution(0.5f);
-        return addAction(m);
+        float deadZoneFreqRadius = 1f / 6;
+
+        final boolean[] last = {false};
+        actionBipolar(t, (float f) -> {
+
+            //radius of center dead zone; diameter = 2x this
+
+            if (f > deadZoneFreqRadius) {
+                on.run();
+                last[0] = true;
+                return 1f;
+            } else if (f < -deadZoneFreqRadius) {
+                off.run();
+                last[0] = false;
+                return -1f;
+            } else {
+                return last[0] ? 1f : -1f;
+            }
+        });
+        //m.resolution(1f);
+        //return addAction(m);
     }
 
 //    /** softmax-like signal corruption that emulates PWM (pulse-width modulation) modulated by desire frequency */
@@ -256,8 +277,8 @@ public interface NAct {
     }
 
     @Nullable
-    default ActionConcept actionToggle(@NotNull Term s, @NotNull BooleanProcedure onChange) {
-        return actionToggle(s, () -> onChange.value(true), () -> onChange.value(false));
+    default void actionToggle(@NotNull Term s, @NotNull BooleanProcedure onChange) {
+        actionToggle(s, () -> onChange.value(true), () -> onChange.value(false));
     }
 //
 //    @Nullable
@@ -341,8 +362,8 @@ public interface NAct {
     }
 
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        actionBipolarExpectation(s, update);
-        //actionBipolarExpectationNormalized(s, update);
+        //actionBipolarExpectation(s, update);
+        actionBipolarExpectationNormalized(s, update);
         //actionBipolarGreedy(s, update);
         //actionBipolarMutex3(s, update);
     }
@@ -353,7 +374,12 @@ public interface NAct {
         actionBipolarExpectation(s, (x) -> {
             v[0] = Math.abs(x); //HACK
             float y = f.asFloat() * Math.signum(x);
-            return update.valueOf(y) * 0.5f; //to prevent saturation
+            float z = update.valueOf(y);
+            if (z == z) {
+                return x * (z/y);
+            } else {
+                return Float.NaN;
+            }
             //u;
         });
     }
@@ -405,14 +431,20 @@ public interface NAct {
                             //Util.decideRoulette(2, (i) -> cc[i], n.random());
 
                         //SOFTMAX
-                        Util.decideSoftmax(2,
-                                (i) -> Math.abs(exp[i]),
-                                0.7f, n.random());
+//                        Util.decideSoftmax(2,
+//                                (i) -> Math.abs(exp[i]),
+//                                0.7f, n.random());
 
                         //GREEDY
-                        //      exp[0] > exp[1] ? 0 : 1;
+                              exp[0] > exp[1] ? 0 : 1;
 
-                    x = (Math.max(0.5f, exp[winner] - 0.5f) - 0.5f) * 2f; //0..+1
+                    //absolute
+//                    x = (Math.max(0.5f,
+//                             exp[winner] - 0.5f
+//                    ) - 0.5f) * 2f; //0..+1
+
+                    //compare
+                    x = (exp[winner] - 0.5f) - (exp[1-winner]-0.5f);  //0..+1
                 }
 
                 //int winner = ew >= 0f ? 0 : 1;
