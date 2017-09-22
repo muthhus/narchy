@@ -1,6 +1,6 @@
 package nars.task.util;
 
-import jcog.pri.Pri;
+import jcog.Util;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -63,15 +63,18 @@ public class PredictionAccuracyFeedback {
             float coherence = 1f - Math.abs(xFreq - y.freq());
                     //TruthFunctions.freqSimilarity(xFreq, y.freq());
 
-            float confFraction = yConf / xConf; //allow > 1
+            float confFraction = Util.clamp(yConf / xConf, 0.5f, 2f);
 
             /** durations ago since the prediction was created */
 
             float v;
             if (coherence >= 0.5f) {
+
                 //reward
                 v = coherence * 2f * confFraction * headstart * strength;
+
                 MetaGoal.value(MetaGoal.Accurate, cause, v, nar);
+
             } else {
                 //punish
                 v = (1f - coherence) * 2f * confFraction / headstart * strength;
@@ -79,6 +82,8 @@ public class PredictionAccuracyFeedback {
                 MetaGoal.value(MetaGoal.Inaccurate, cause, v, nar);
                 if (deleteIfIncoherent)
                     y.delete();
+                else
+                    y.setPri(0); //drain priority  TODO maybe transfer it to nearby tasks?
             }
 
         });

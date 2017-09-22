@@ -305,7 +305,7 @@ abstract public class NAgentX extends NAgent {
                             System.out.println("x");
                         })),
                         IntStream.range(0, n.want.length).mapToObj(
-                                w -> new FloatSlider(n.want[w], -2f, +2f)
+                                w -> new FloatSlider(n.want[w], -1f, +1f)
                                         .label(MetaGoal.values()[w].name())
                                         .draw(BaseSlider.Knob)
                                         .on((s, v) -> {

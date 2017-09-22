@@ -25,7 +25,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
 
-        float fps = 20f;
+        float fps = 10f;
 
         NAgentX.runRT((n) -> {
 

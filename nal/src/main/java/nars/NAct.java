@@ -10,6 +10,7 @@ import nars.control.CauseChannel;
 import nars.task.ITask;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import org.jetbrains.annotations.NotNull;
@@ -362,8 +363,8 @@ public interface NAct {
     }
 
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        actionBipolarExpectation(s, update);
-        //actionBipolarExpectationNormalized(s, update);
+        //actionBipolarExpectation(s, update);
+        actionBipolarExpectationNormalized(s, update);
         //actionBipolarGreedy(s, update);
         //actionBipolarMutex3(s, update);
     }
@@ -375,11 +376,7 @@ public interface NAct {
             v[0] = Math.abs(x); //HACK
             float y = f.asFloat() * Math.signum(x);
             float z = update.valueOf(y);
-            if (z == z) {
-                return x * (z/y);
-            } else {
-                return Float.NaN;
-            }
+            return z; //limit to below input
             //u;
         });
     }
@@ -391,9 +388,13 @@ public interface NAct {
         Term nt =
                 //$.inh($.the("\"-\""), s);
                 $.p(s.neg(), s);
+
+
+        //boolean highpass = true;
+
+        //final float evi[] = new float[2];
         final float exp[] = new float[2];
 
-        final float EXE_THRESHOLD = 0.5f;
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
 
             boolean p = c.term().equals(pt);
@@ -406,74 +407,81 @@ public interface NAct {
             Random rng = n.random();
 
             float restConf =
-                    n.confMin.floatValue() * 2;
-                    //n.confDefault(BELIEF);
+                    //n.confMin.floatValue() * 2;
+                    nar().confDefault(GOAL);
+
+            //n.confDefault(BELIEF);
             //0;
 
             int ip = p ? 0 : 1;
-            exp[ip] = g != null ? g.expectation() : 0f;
+            exp[ip] = g != null ? g.expectation() : 0.5f;
+            //evi[ip] = g != null ? g.evi(): 0f;
 
             if (!p) {
 
 
                 float ew;
 
-                int winner;
 
                 float x; //0..+1
-                //curiosity applied to winner, how ironic
                 if (cur > 0 && rng.nextFloat() <= cur) {
-                    x = rng.nextFloat() * nar().confDefault(GOAL); //[0..1)
-                    winner = rng.nextBoolean() ? 0 : 1;
+                    x = (TruthFunctions.expectation(
+                        rng.nextFloat(),
+                        restConf
+                    ) - 0.5f)*2f;
                 } else {
 
-                    winner =
-                            //Util.decideRoulette(2, (i) -> cc[i], n.random());
+//                    int winner =
+////                            //Util.decideRoulette(2, (i) -> cc[i], n.random());
+////
+//                        //SOFTMAX
+//                        Util.decideSoftmax(2,
+//                                //(i) -> Math.abs(exp[i]),
+//                                (i) -> Math.abs(evi[i]),
+//                                0.4f, n.random());
 
-                        //SOFTMAX
-                        Util.decideSoftmax(2,
-                                (i) -> Math.abs(exp[i]),
-                                0.6f, n.random());
-
-                        //GREEDY
-                              //exp[0] > exp[1] ? 0 : 1;
+                    //GREEDY
+                    //exp[0] > exp[1] ? 0 : 1;
 
                     //absolute
 //                    x = (Math.max(0.5f,
 //                             exp[winner] - 0.5f
 //                    ) - 0.5f) * 2f; //0..+1
 
-                    //compare
-                    x = (exp[0] - 0.5f) - (exp[1]-0.5f);  //-1..+1
+                    //compare positive vs negative
+                    x =
+                            ((exp[0]-0.5f) - (exp[1]-0.5f));  //-1..+1
                 }
 
                 //int winner = ew >= 0f ? 0 : 1;
-                int loser = 1 - winner;
+//                int loser = 1 - winner;
 
-                Truth l, w;
-                {
-                    float y = update.valueOf(x); //-1..+1
+                Truth N, P;
 
-                    //inverse expectation
-                    float conf =
-                            Math.max(
-                                    restConf,
-                                    //restConf/2f,
-                                    Math.abs(y) * Math.abs(x));
-                    //w2c(Math.abs(y) * c2w(restConf));
-                    if (conf >= nar().confMin.floatValue()) {
-                        //Math.max(cc[winner], nar().confMin.floatValue());
-                        //0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
+                float y = update.valueOf(x); //-1..+1
 
-                        l = $.t(0f, conf);
-                        w = y == y ? $.t(1, conf) : l;
-                    } else {
-                        l = w = null;
-                    }
+                //inverse expectation
+                float conf = y == y ?
+                            //restConf/2f,
+                            Math.abs(y) * Math.abs(x)
+                            //Math.abs(y)
+                        : 0;
+                //w2c(Math.abs(y) * c2w(restConf));
+                if (conf >= nar().confMin.floatValue()) {
+                    //Math.max(cc[winner], nar().confMin.floatValue());
+                    //0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
+
+                    P = $.t(1, conf);
+                    N = $.t(0f, conf);
+                } else {
+                    N = P = null;
                 }
 
-                ((GoalActionAsyncConcept) n.concept(winner == 0 ? pt : nt)).feedback(w, w, n);
-                ((GoalActionAsyncConcept) n.concept(winner == 1 ? pt : nt)).feedback(l, l, n);
+
+                Truth pp = y >= 0 ? P : N;
+                ((GoalActionAsyncConcept) n.concept(pt)).feedback(pp, pp, n);
+                Truth nn = y >= 0 ? N : P;
+                ((GoalActionAsyncConcept) n.concept(nt)).feedback(nn, nn, n);
             }
         };
 

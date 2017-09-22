@@ -31,9 +31,9 @@ public abstract class ActionConcept extends WiredConcept {
 
         super.value(t, activation, n);
 
-        if (t.isGoal() && t.isAfter(n.time()-n.dur())) {
+        if (t.isGoal() && !t.isBefore(n.time())) {
             MetaGoal.value(MetaGoal.Action, t.cause(),
-                    activation * Math.abs(t.expectation() - 0.5f) * 2f,
+                    activation * t.conf(),
                     n);
         }
     }
