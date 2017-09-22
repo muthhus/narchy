@@ -1,46 +1,44 @@
 package nars.time;
 
-import com.google.common.collect.MinMaxPriorityQueue;
-import com.google.common.primitives.Longs;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.netflix.servo.util.Clock;
-import nars.$;
 import nars.NAR;
-import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
+import nars.task.ITask;
+import nars.task.NativeTask.SchedTask;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.PriorityQueue;
 
 /**
  * Time state
  */
 public abstract class Time implements Clock, Serializable {
 
-    //TODO write this to replace LongObjectPair and cache the object's hash
-    /*public static class Scheduled {
+//    //TODO write this to replace LongObjectPair and cache the object's hash
+//    public static class Scheduled extends LinkedList<Runnable> implements Comparable<Scheduled> {
+//        long when;
+//        public Scheduled(Runnable r) {
+//            super();
+//            super.add(r);
+//        }
+//
+//        @Override
+//        public boolean add(Runnable runnable) {
+//            synchronized (getFirst()) {
+//                return super.add(runnable);
+//            }
+//        }
+//
+//    }
 
-    }*/
 
-    final MinMaxPriorityQueue<LongObjectPair<Runnable>> scheduled =
-            MinMaxPriorityQueue.orderedBy((LongObjectPair<Runnable> a, LongObjectPair<Runnable> b) -> {
-                if (a == b)
-                    return 0;
-
-                int t = Longs.compare(a.getOne(), b.getOne());
-                if (t == 0) {
-                    int h1 = Integer.compare(a.getTwo().hashCode(), b.getTwo().hashCode());
-                    if (h1 == 0) {
-                        //as a last resort, compare their system ID
-                        return Integer.compare(System.identityHashCode(a.getTwo()), System.identityHashCode(b.getTwo())); //maintains uniqueness in case they occupy the same time
-                    }
-                    return h1;
-                } else {
-                    return t;
-                }
-            }).create();
+    final PriorityQueue<SchedTask> scheduled =
+    //final MinMaxPriorityQueue<SchedTask> scheduled =
+            //MinMaxPriorityQueue.orderedBy((SchedTask a, SchedTask b) -> {
+            new PriorityQueue<>();
 
     /**
      * called when memory reset
@@ -78,47 +76,53 @@ public abstract class Time implements Clock, Serializable {
 
 
     public void at(long whenOrAfter, Runnable then) {
-        LongObjectPair<Runnable> event = PrimitiveTuples.pair(whenOrAfter, then);
+        at(new SchedTask(whenOrAfter, then));
+    }
+
+    public void at(SchedTask event) {
         synchronized (scheduled) {
             scheduled.offer(event);
         }
     }
 
 
-    public void exeScheduled(Executor exe) {
+    @Nullable
+    public List<SchedTask> exeScheduled() {
 
-        List<Runnable> pending = new LinkedList();
+        long now = now();
+
+        SchedTask firstQuick = scheduled.peek(); //it's safe to call this outside synchronized block for speed
+        if (firstQuick == null || firstQuick.when > now)
+            return null; //too soon for the next one
+
+        List<SchedTask> pending = new LinkedList();
 
         synchronized (scheduled) {
-            int ns = scheduled.size();
-            if (ns == 0)
-                return;
 
-            LongObjectPair<Runnable> next;
-            long now = now();
-            while ((next = scheduled.peek()) != null) {
-                if (next.getOne() <= now) {
-                    scheduled.poll();
-                    pending.add(next.getTwo());
+            SchedTask next;
+            while ((next = scheduled.poll()) != null) {
+                if (next.when <= now) {
+                    pending.add(next);
                 } else {
+                    //oops we need to reinsert this for some reason? can this even happen?
+                    at(next);
                     break; //wait till another time
                 }
             }
         }
 
 
-        //incase execution is synchronous, do it outside the synchronized block here to prevent deadlock.
-        pending.forEach(exe::execute);
+        return pending;
     }
 
     public void cycle(NAR n) {
-        exeScheduled(n.exe);
+        n.input(exeScheduled());
     }
 
 
     /** flushes the pending work queued for the current time */
-    public synchronized void synch() {
-        exeScheduled(MoreExecutors.directExecutor());
+    public synchronized void synch(NAR n) {
+        n.input(exeScheduled());
     }
 
     public long[] nextInputStamp() {

@@ -431,12 +431,12 @@ public interface NAct {
                             //Util.decideRoulette(2, (i) -> cc[i], n.random());
 
                         //SOFTMAX
-//                        Util.decideSoftmax(2,
-//                                (i) -> Math.abs(exp[i]),
-//                                0.7f, n.random());
+                        Util.decideSoftmax(2,
+                                (i) -> Math.abs(exp[i]),
+                                0.6f, n.random());
 
                         //GREEDY
-                              exp[0] > exp[1] ? 0 : 1;
+                              //exp[0] > exp[1] ? 0 : 1;
 
                     //absolute
 //                    x = (Math.max(0.5f,
@@ -444,7 +444,7 @@ public interface NAct {
 //                    ) - 0.5f) * 2f; //0..+1
 
                     //compare
-                    x = (exp[winner] - 0.5f) - (exp[1-winner]-0.5f);  //0..+1
+                    x = (exp[0] - 0.5f) - (exp[1]-0.5f);  //-1..+1
                 }
 
                 //int winner = ew >= 0f ? 0 : 1;
@@ -452,7 +452,7 @@ public interface NAct {
 
                 Truth l, w;
                 {
-                    float y = update.valueOf(winner == 0 ? x : -x); //-1..+1
+                    float y = update.valueOf(x); //-1..+1
 
                     //inverse expectation
                     float conf =

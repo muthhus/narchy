@@ -1195,21 +1195,28 @@ public enum Draw {
     static {
 
         List<HGlyph> glyphs = new FasterList();
-        String[] lines;
-        try {
-            String font =
-                    //"meteorology";
-                    "rowmans";
-//                lines = Files.readAllLines(
-//                    Paths.get(
-//                        Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf").toURI()
-//                        //Draw.class.getClassLoader().getResource("spacegraph/font/hershey/" + font + ".jhf").toURI()
-//                    )
-//                );
+        String[] lines = null ;
 
-            lines = new String(Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf").readAllBytes()).split("\n");
-        } catch (IOException e) {
-            e.printStackTrace();
+        //this started happening after switching back to gradle which at the present seems to cause malfunctioned class loading on jdk9
+        for (int tries = 0; tries < 2 && lines == null; tries++) {
+            try {
+                String font =
+                        //"meteorology";
+                        "rowmans";
+                //                lines = Files.readAllLines(
+                //                    Paths.get(
+                //                        Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf").toURI()
+                //                        //Draw.class.getClassLoader().getResource("spacegraph/font/hershey/" + font + ".jhf").toURI()
+                //                    )
+                //                );
+
+                lines = new String(Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf").readAllBytes()).split("\n");
+            } catch (IOException e) {
+
+            }
+            Util.pause(50);
+        }
+        if (lines == null) {
             lines = ArrayUtils.EMPTY_STRING_ARRAY;
         }
 

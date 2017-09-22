@@ -1,6 +1,5 @@
 package jcog.bag.impl;
 
-import com.sun.javafx.tools.packager.Param;
 import jcog.bag.Bag;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;

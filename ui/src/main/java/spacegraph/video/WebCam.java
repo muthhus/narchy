@@ -4,7 +4,6 @@ import boofcv.struct.image.InterleavedU8;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
-import javafx.scene.image.WritableImage;
 import jcog.data.Range;
 import jcog.event.ListTopic;
 import jcog.event.Topic;
@@ -269,12 +268,12 @@ public class WebCam {
         return img;
     }
 
-    /**
-     * before display output
-     */
-    protected WritableImage process(WritableImage finalImage) {
-        return finalImage;
-    }
+//    /**
+//     * before display output
+//     */
+//    protected WritableImage process(WritableImage finalImage) {
+//        return finalImage;
+//    }
 
 
 //    /**

@@ -5,13 +5,14 @@ import jcog.Util;
 import jcog.event.ListTopic;
 import jcog.event.On;
 import jcog.event.Topic;
+import jcog.pri.Prioritized;
 import jcog.sort.TopN;
 import nars.NAR;
 import nars.control.Activate;
 import nars.control.Cause;
 import nars.control.Causable;
+import nars.task.NativeTask;
 import nars.task.ITask;
-import nars.task.RunTask;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +45,8 @@ public class MultiExec extends Exec {
 
     @Override
     public void execute(@NotNull Runnable runnable) {
-        add(new RunTask(runnable));
+        add(new NativeTask.RunTask(runnable));
     }
-
 
     public Stream<ITask> stream() {
         return q.stream();
@@ -115,11 +115,11 @@ public class MultiExec extends Exec {
             Util.pauseNext(0);
 
             //2. attempt to evict any weaker tasks consuming space
-            int sample = Math.max(4, q.size() / (num+1) / 4);
+            int sample = Math.max(4, q.size() / (num+1) / 8);
 
             int survive = Math.round(sample * 0.5f);
 
-            TopN<ITask> tmpEvict = new TopN<>(new ITask[survive], (x) -> x.priElseNeg1() ) {
+            TopN<ITask> tmpEvict = new TopN<>(new ITask[survive], Prioritized::priElseNeg1) {
                 @Override
                 protected void reject(ITask iTask) {
                     logger.info("ignored: {}", iTask);

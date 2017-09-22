@@ -226,12 +226,15 @@ public class TestNAR {
 
 
         //preinit
-        nar.time.synch();
+        nar.time.synch(nar);
 
         //try {
         int frames = Math.max(0,(int) (finalCycle - time()));
         while (frames-- > 0 && !finished)
             nar.cycle();
+
+        //finish anything pending
+        nar.time.synch(nar);
 
         /*}
         catch (Exception e) {

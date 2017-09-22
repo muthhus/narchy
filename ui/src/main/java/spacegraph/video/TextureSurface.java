@@ -39,7 +39,7 @@ public class TextureSurface extends Surface {
 
 
     @Override
-    protected void paint(GL2 gl) {
+    public void paint(GL2 gl) {
 
         if (profile == null)
             profile = gl.getGLProfile();

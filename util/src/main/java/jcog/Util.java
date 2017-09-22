@@ -30,6 +30,7 @@ import com.google.common.primitives.Longs;
 import jcog.io.BinTxt;
 import jcog.math.NumberException;
 import jcog.math.OneDHaar;
+import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import org.HdrHistogram.AbstractHistogram;
 import org.HdrHistogram.DoubleHistogram;
@@ -58,12 +59,10 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.IntFunction;
+import java.util.function.*;
 import java.util.stream.DoubleStream;
 
+import static java.lang.Float.NaN;
 import static java.util.Arrays.stream;
 import static jcog.Texts.iPad;
 import static jcog.Texts.n4;
@@ -1247,21 +1246,45 @@ public enum Util {
         return x;
     }
 
-    public static int selectRoulette(float[] x, Random rng) {
+    public static int decideRoulette(float[] x, Random rng) {
         return decideRoulette(x.length, (n) -> x[n], rng);
+    }
+
+    private static float weightSum(int weightCount, IntToFloatFunction weight) {
+        float weightSum = 0;
+        for (int i = 0; i < weightCount; i++) {
+            float w = weight.valueOf(i);
+            assert(w==w && w >= 0);
+            weightSum += Math.max(0, w);
+        }
+        return weightSum;
     }
 
     /**
      * https://en.wikipedia.org/wiki/Fitness_proportionate_selection
      * Returns the selected index based on the weights(probabilities)
      */
-    public static int decideRoulette(int count, IntToFloatFunction weight, Random rng) {
+    public static int decideRoulette(int weightCount, IntToFloatFunction weight, Random rng) {
         // calculate the total weight
-        float weight_sum = 0;
-        for (int i = 0; i < count; i++) {
-            weight_sum += weight.valueOf(i);
+        assert(weightCount > 0);
+        return decideRoulette(weightCount, weight, weightSum(weightCount, weight), rng);
+    }
+
+    public static enum RouletteControl {
+        STOP, CONTINUE, WEIGHTS_CHANGED
+    }
+    public static void decideRoulette(int weightCount, IntToFloatFunction weight, Random rng, IntFunction<RouletteControl> each) {
+        float weightSum = NaN;
+        while (true) {
+            if (weightSum != weightSum) {
+                weightSum = weightSum(weightCount, weight);
+            }
+            switch (each.apply(decideRoulette(weightCount, weight, weightSum, rng))) {
+                case STOP: return;
+                case CONTINUE: break;
+                case WEIGHTS_CHANGED: weightSum = Float.NaN; break;
+            }
         }
-        return decideRoulette(count, weight, weight_sum, rng);
     }
 
     public static int decideSoftmax(int count, IntToFloatFunction weight, float temperature, Random random) {
@@ -1273,15 +1296,21 @@ public enum Util {
      * faster if the sum is already known
      */
     public static int decideRoulette(int count, IntToFloatFunction weight, float weight_sum, Random rng) {
-        // get a random value
-        float value = rng.nextFloat() * weight_sum;
-        // locate the random value based on the weights
-        for (int i = 0; i < count; i++) {
-            value -= weight.valueOf(i);
-            if (value <= 0) return i;
+
+        int i = rng.nextInt(count); //random start location
+        if (weight_sum < Pri.EPSILON) {
+            return i; //flat, choose one at random
         }
-        // only when rounding errors occur
-        return count - 1;
+
+        float distance = rng.nextFloat() * weight_sum;
+        boolean dir = rng.nextBoolean(); //randomize the direction
+
+        while ((distance = distance - weight.valueOf(i)) > 0) {
+            if (dir) { if (++i == count) i = 0;}
+            else { if (--i == -1) i = count-1; }
+        }
+
+        return i;
     }
 
 

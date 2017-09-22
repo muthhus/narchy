@@ -1,20 +1,19 @@
 package spacegraph.audio;
 
-import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.event.ListTopic;
 import jcog.event.Topic;
+import jcog.exe.Loop;
 import jcog.math.OneDHaar;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
-import spacegraph.widget.meter.MatrixView;
+import spacegraph.render.Draw;
+import spacegraph.widget.meter.BitmapMatrixView;
 import spacegraph.widget.meter.Plot2D;
 import spacegraph.widget.slider.FloatSlider;
 
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static spacegraph.layout.Grid.VERTICAL;
@@ -23,49 +22,41 @@ import static spacegraph.layout.Grid.row;
 /**
  * Created by me on 10/28/15.
  */
-public class WaveCapture implements Runnable {
+public class WaveCapture extends Loop {
 
 
     private final Plot2D.Series rawWave, wavelet1d;
 
     private int bufferSamples;
 
-    ScheduledThreadPoolExecutor exec;
+
     private float[] samples;
 
 
-    public final int freqSamplesPerFrame = 16;
+    public final int freqSamplesPerFrame = 32;
 
-    private final int historyFrames = 16;
-    public float[] data;
+    private final int historyFrames = 32;
+    public float[] data = new float[historyFrames * freqSamplesPerFrame];
+
 
     private WaveSource source;
 
     /**
      * called when next sample buffer is ready
      */
-    final Topic<WaveCapture> nextReady = new ListTopic();
+    final Topic<WaveCapture> eachBuffer = new ListTopic();
 
-    /** holds the normalized value of the latest data */
+    /**
+     * holds the normalized value of the latest data
+     */
     public float[] dataNorm = new float[freqSamplesPerFrame];
 
     //private final boolean normalizeDisplayedWave = false;
 
     synchronized void start(float FRAME_RATE) {
 
-        if (exec != null) {
-            exec.shutdownNow();
-            exec = null;
-        }
 
-        data = new float[historyFrames * freqSamplesPerFrame];
-
-        if (FRAME_RATE > 0) {
-            exec = new ScheduledThreadPoolExecutor(1);
-            exec.scheduleAtFixedRate(this, 0, (long) (1000.0f / FRAME_RATE),
-                    TimeUnit.MILLISECONDS);
-
-        }
+        runFPS(FRAME_RATE);
     }
 
     public void stop() {
@@ -77,30 +68,30 @@ public class WaveCapture implements Runnable {
 
         Plot2D audioPlot = new Plot2D(bufferSamples, Plot2D.Line);//, bufferSamples, 450, 60);
         audioPlot.add(rawWave);
+
+        //Plot2D.BitmapWave wav2 = new Plot2D.BitmapWave();
         Plot2D audioPlot2 = new Plot2D(bufferSamples, Plot2D.Line);
         audioPlot2.add(wavelet1d);
 
 
-        MatrixView freqHistory = new MatrixView(freqSamplesPerFrame, historyFrames, (x, y, g) -> {
+        BitmapMatrixView freqHistory = new BitmapMatrixView(freqSamplesPerFrame, historyFrames, (x, y) -> {
             if (data == null)
                 return 0; //HACK
             float kw = (data[y * freqSamplesPerFrame + x]);
             //int kw = (int)(v*255);
-            g.glColor3f(kw >= 0 ? kw : 0, kw < 0 ? -kw : 0, 0);
-            return 0;
+            return Draw.rgbInt(kw >= 0 ? kw : 0, kw < 0 ? -kw : 0, 0);
         });
 
 
         Grid v = new Grid(VERTICAL,
                 audioPlot,
-                audioPlot2, freqHistory) {
-            @Override
-            protected void paint(GL2 gl) {
-                audioPlot.update();
-                audioPlot2.update();
-                super.paint(gl);
-            }
-        };
+                audioPlot2, freqHistory);
+        eachBuffer.on(() -> {
+            freqHistory.update();
+            audioPlot.update();
+            audioPlot2.update();
+            //wav2.update();
+        });
 
 //
 //        //noinspection OverlyComplexAnonymousInnerClass
@@ -156,9 +147,21 @@ public class WaveCapture implements Runnable {
                 //samples[0] = null;
 
 
-                int bufferSamples = Math.min(WaveCapture.this.bufferSamples, samples.length);
-                for (int i = 0; i < bufferSamples; i++)
-                    add(samples[i]);
+                int chans = WaveCapture.this.source.channelsPerSample();
+                int bufferSamples = Math.min(WaveCapture.this.bufferSamples, samples.length / chans);
+                switch (chans) {
+                    case 1:
+                        for (int i = 0; i < bufferSamples; i++)
+                            add(samples[i]);
+                        break;
+                    case 2:
+                        for (int i = 0; i < bufferSamples; )
+                            add((samples[i++] + samples[i++]) / 2f); //to mono
+                        break;
+                    default:
+                        throw new UnsupportedOperationException();
+                }
+
 
                 //minValue = -0.5f;
                 //maxValue = 0.5f;
@@ -192,42 +195,41 @@ public class WaveCapture implements Runnable {
             }
 
         };
+
         wavelet1d = new Plot2D.Series("Wavelet", 1) {
 
             final float[] transformedSamples = new float[Util.largestPowerOf2NoGreaterThan(bufferSamples)];
             final AtomicBoolean busy = new AtomicBoolean();
 
-            @Override
-            public void update() {
-
-                if (!busy.compareAndSet(false, true))
-                    return;
-
+            {
+                eachBuffer.on((w) -> {
+                    if (!busy.compareAndSet(false, true))
+                        return;
 
 
-                FloatArrayList history = this;
+                    FloatArrayList history = this;
 
-                //                        for (short s : ss) {
-                //                            history.add((float)s);
-                //                        }
-                //
-                //
-                //                        while (history.size() > maxHistory)
-                //                            history.removeAtIndex(0);
-                //
-                //                        while (history.size() < maxHistory)
-                //                            history.add(0);
+                    //                        for (short s : ss) {
+                    //                            history.add((float)s);
+                    //                        }
+                    //
+                    //
+                    //                        while (history.size() > maxHistory)
+                    //                            history.removeAtIndex(0);
+                    //
+                    //                        while (history.size() < maxHistory)
+                    //                            history.add(0);
 
 
-                final int bufferSamples = Math.min(samples.length, WaveCapture.this.bufferSamples);
+                    final int bufferSamples = Math.min(samples.length, WaveCapture.this.bufferSamples);
 
-                float[] ss = transformedSamples;
-                //1d haar wavelet transform
-                //OneDHaar.displayOrderedFreqsFromInPlaceHaar(x);
-                System.arraycopy(samples, 0, ss, 0, bufferSamples); //the remainder will be zero
-                OneDHaar.inPlaceFastHaarWaveletTransform(ss);
-                sampleFrequency(ss);
-                //OneDHaar.displayOrderedFreqsFromInPlaceHaar(samples, System.out);
+                    float[] ss = transformedSamples;
+                    //1d haar wavelet transform
+                    //OneDHaar.displayOrderedFreqsFromInPlaceHaar(x);
+                    System.arraycopy(samples, 0, ss, 0, bufferSamples); //the remainder will be zero
+                    OneDHaar.inPlaceFastHaarWaveletTransform(ss);
+                    sampleFrequency(ss);
+                    //OneDHaar.displayOrderedFreqsFromInPlaceHaar(samples, System.out);
 
 //                //apache commons math - discrete cosine transform
 //                {
@@ -239,9 +241,9 @@ public class WaveCapture implements Runnable {
 //                        samples[i] = (float) dsamples[i];
 //                }
 
-                history.clear();
-                for (int i = 0; i < bufferSamples; i++)
-                    history.addAll(ss[i]);
+                    history.clear();
+                    for (int i = 0; i < bufferSamples; i++)
+                        history.addAll(ss[i]);
 
 //                minValue = Short.MIN_VALUE;
 //                maxValue = Short.MAX_VALUE;
@@ -262,22 +264,25 @@ public class WaveCapture implements Runnable {
 //                    maxValue = 1f;
 //                }
 
-                //System.out.println(maxHistory + " " + start + " " + end + ": " + minValue + " " + maxValue);
+                    //System.out.println(maxHistory + " " + start + " " + end + ": " + minValue + " " + maxValue);
 
-                busy.set(false);
+                    busy.set(false);
+
+                });
             }
+
 
             private void sampleFrequency(float[] freqSamples) {
                 int lastFrameIdx = data.length - freqSamplesPerFrame;
 
                 int samples = freqSamples.length;
 
-                float bandWidth = ((float)samples) / freqSamplesPerFrame;
+                float bandWidth = ((float) samples) / freqSamplesPerFrame;
                 float sensitivity = 1f;
 
-                final Envelope uniform = (i,k)->{
+                final Envelope uniform = (i, k) -> {
                     float centerFreq = (0.5f + i) * bandWidth;
-                    return 1f/(1f + Math.abs(k - centerFreq)/(bandWidth/sensitivity));
+                    return 1f / (1f + Math.abs(k - centerFreq) / (bandWidth / sensitivity));
                 };
 
                 System.arraycopy(data, 0, data, freqSamplesPerFrame, lastFrameIdx);
@@ -296,7 +301,7 @@ public class WaveCapture implements Runnable {
                     float s = 0;
                     for (int k = 0; k < samples; k++) {
                         float fk = freqSamples[k];
-                        s += uniform.apply(i,k) * fk;
+                        s += uniform.apply(i, k) * fk;
                     }
                     if (s > max)
                         max = s;
@@ -306,10 +311,10 @@ public class WaveCapture implements Runnable {
                     h[i] = s;
                 }
 
-                if (max!=min) { //TODO epsilon check
-                    float range = max-min;
+                if (max != min) { //TODO epsilon check
+                    float range = max - min;
                     for (int i = 0; i < freqSamplesPerFrame; i++)
-                        dataNorm[i] = (data[i]-min) / range;
+                        dataNorm[i] = (data[i] - min) / range;
                 }
 
                 //System.arraycopy(freqSamples, 0, history, 0, freqSamplesPerFrame);
@@ -317,8 +322,8 @@ public class WaveCapture implements Runnable {
 
         };
 
-        rawWave.range(-1,+1);
-        wavelet1d.range(-1,+1);
+        rawWave.range(-1, +1);
+        wavelet1d.range(-1, +1);
 
         start(updateFrameRate);
 
@@ -339,35 +344,32 @@ public class WaveCapture implements Runnable {
 
             //System.out.println("bufferSamples=" + bufferSamples + ", sampleRate=" + sampleRate + ", numChannels=" + numChannels);
 
-            if (samples == null || samples.length!=audioBufferSize)
+            if (samples == null || samples.length != audioBufferSize)
                 samples = new float[Util.largestPowerOf2NoGreaterThan(audioBufferSize)];
         }
     }
 
+
     @Override
-    public void run() {
-        try {
+    public boolean next() {
 
-            source.next(samples);
+        source.next(samples);
 
-            nextReady.emit(this);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        eachBuffer.emit(this);
+        return true;
     }
 
     public static void main(String[] args) {
-        AudioSource audio = new AudioSource( 7, 20);
+        AudioSource audio = new AudioSource(7, 20);
         WaveCapture au = new WaveCapture(
                 audio,
                 //new SineSource(128),
                 20);
 
         SpaceGraph.window(row(
-            au.newMonitorPane(),
-            new FloatSlider(audio.gain)
-        ),1200,1200);
+                au.newMonitorPane(),
+                new FloatSlider(audio.gain)
+        ), 1200, 1200);
 
 //            b.setScene(new Scene(au.newMonitorPane(), 500, 400));
 //            b.show();

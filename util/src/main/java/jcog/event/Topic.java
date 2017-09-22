@@ -105,6 +105,11 @@ public interface Topic<V> {
     default On on(Consumer<V> o) {
         return new On.Strong<>(this, o);
     }
+
+    default On on(Runnable o) {
+        return new On.Strong<>(this, (ignored)->o.run());
+    }
+
     default On onWeak(Consumer<V> o) {
         return new On.Weak<>(this, o);
     }

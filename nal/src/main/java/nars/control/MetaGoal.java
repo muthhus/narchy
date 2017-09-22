@@ -3,11 +3,17 @@ package nars.control;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
-import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import nars.NAR;
+import nars.task.ITask;
+import nars.task.NativeTask;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+
+import static jcog.Util.RouletteControl.*;
 
 /**
  * high-level reasoner control parameters
@@ -76,7 +82,7 @@ public enum MetaGoal {
         final float epsilon = 0.01f;
 
         //final float LIMIT = +1f;
-        final float momentum = 0.99f;
+        final float momentum = 0.9f;
 
         int goals = goal.length;
         float[] goalMagnitude = new float[goals];
@@ -226,38 +232,103 @@ public enum MetaGoal {
     }
 
     public static void cause(FasterList<Causable> causables, NAR nar) {
+        int cc = causables.size();
+        if (cc == 0)
+            return;
+
         long dt = nar.time.sinceLast();
 
-        double totalInvestment = 0;
-        int cc = causables.size();
+
+        /** factor to multiply the mean iteration to determine demand for the next cycle.
+         *  this allows the # of iterations to continually increase.
+         either:
+         1) a cause will not be able to meet this demand and this value
+         will remain relatively constant
+         2) a cause will hit a point of diminishing returns where increasing
+         the demand does not yield any more value, and the system should
+         continue to tolerate this dynamic balance
+         3) a limit to the # of iterations that a cause is able to supply in a cycle
+         has not been determined (but is limited by the hard limit factor for safety).
+         */
+        float ITERATION_DEMAND_GROWTH = 1.75f;
+
+        final int ITERATION_DEMAND_MAX = 64 * 1024;
+
+
+        final long targetCycleTimeNS = 25 * 1000000; //x ms
+        final float targetCycleTimeNSperEach = targetCycleTimeNS / cc;
+
+        //Benefit to cost ratio (estimate)
+        //https://en.wikipedia.org/wiki/Benefit%E2%80%93cost_ratio
+        //BCR = Discounted value of incremental benefits ÷ Discounted value of incremental costs
+        float[] bcr = new float[cc];
+        float[] granular = new float[cc];
+        int[] iterLimit = new int[cc];
         for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
             Causable c = causables.get(i);
-            double nanoPerIteration = c.estimatedIterationTimeNS();
-            double ii = c.iterationsMean();
-            float v = c.value();
-            double investment = (v) / (1 + ii * nanoPerIteration); //benefit:cost ratio
-            if (investment != investment)
-                investment = 0;
-            c.cycleInvest = investment;
-            totalInvestment += (investment);
+            float time = (float) Math.max(1, c.exeTimeNS());
+            float iters = (float) Math.max(1, c.iterationsMean());
+            iterLimit[i] = Math.min(ITERATION_DEMAND_MAX, Math.round(iters * ITERATION_DEMAND_GROWTH));
+
+            bcr[i] = (float) (c.value() / time);
+            granular[i] = iters / (time / (targetCycleTimeNSperEach));
         }
 
-        if (Util.equals(totalInvestment, 0, Pri.EPSILON)) {
-            //FLAT
-            totalInvestment = cc;
-            for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
-                Causable c = causables.get(i);
-                c.cycleInvest = 1;
+
+        int[] iter = new int[cc];
+        Arrays.fill(iter, 1);
+
+        int SAMPLING_FACTOR = 8;
+        final int[] throttle = {
+            cc * SAMPLING_FACTOR
+        };
+
+        Util.decideRoulette(cc, (c) -> bcr[c], nar.random(), (j) -> {
+
+            float a = Math.max(1, granular[j] * bcr[j]);
+            iter[j] += a;
+            boolean changedWeights = false;
+            int li = iterLimit[j];
+            if (iter[j] > li) {
+                iter[j] = li;
+                bcr[j] = 0;
+                changedWeights = true;
             }
-        }
 
+            if (throttle[0]-- <= 0) return STOP;
+            else {
+                return changedWeights ? WEIGHTS_CHANGED : CONTINUE;
+            }
+        });
 
-        for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
-            Causable c = causables.get(i);
-            int work = 100 * (int) Math.max(1, Math.round((c.cycleInvest / totalInvestment) / (1 + c.estimatedIterationTimeNS())));
-            c.next(nar, work);
-        }
-
-
+        for (int i = 0, causablesSize = cc; i < causablesSize; i++)
+            if (iter[i] > 0)
+                nar.input(new InvokeCause(causables.get(i), iter[i]));
     }
+
+    final private static class InvokeCause extends NativeTask {
+
+        public final Causable cause;
+        public final int iterations;
+
+        private InvokeCause(Causable cause, int iterations) {
+            assert (iterations > 0);
+            this.cause = cause;
+            this.iterations = iterations;
+        }
+        //TODO deadline? etc
+
+        @Override
+        public String toString() {
+            return cause + ":" + iterations + "x";
+        }
+
+        @Override
+        public @Nullable Iterable<? extends ITask> run(NAR n) {
+            cause.run(n, iterations);
+            return null;
+        }
+    }
+
+
 }

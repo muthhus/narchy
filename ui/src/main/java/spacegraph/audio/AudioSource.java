@@ -51,6 +51,9 @@ public class AudioSource implements WaveSource {
 
     }
 
+    @Override public int channelsPerSample() {
+        return audioFormat.getChannels();
+    }
 
     @Override
     public int start() {

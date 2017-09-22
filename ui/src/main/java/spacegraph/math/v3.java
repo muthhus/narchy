@@ -45,6 +45,7 @@ public class v3 extends Tuple3f {
 
     // Combatible with 1.1
     static final long serialVersionUID = -7031930069184524614L;
+    public static v2 one = new v2(1,1);
 
 
     /**

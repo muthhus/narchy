@@ -1,7 +1,7 @@
 package nars.control;
 
+import jcog.math.AtomicSummaryStatistics;
 import nars.NAR;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,9 +43,9 @@ abstract public class Causable extends NARService {
 //                .tolerate(1 /* work unit */, 1 /* ns */);
 
     final int WINDOW = 16;
-    final DescriptiveStatistics iterationTimeNS = new DescriptiveStatistics(WINDOW);
-    final DescriptiveStatistics iterationCount = new DescriptiveStatistics(WINDOW);
-    public double cycleInvest; //temporary
+    final AtomicSummaryStatistics exeTimeNS = new AtomicSummaryStatistics();
+    final AtomicSummaryStatistics iterationCount = new AtomicSummaryStatistics();
+
 
     public Causable(NAR nar) {
         super(nar);
@@ -88,8 +88,8 @@ abstract public class Causable extends NARService {
         }
         long end = System.nanoTime();
 
-        iterationTimeNS.addValue(  (double)(end-start) / completed );
-        iterationCount.addValue(completed);
+        exeTimeNS.accept(  (double)(end-start) );
+        iterationCount.accept(completed);
 
         if (error != null) {
             logger.error("{} {}", this, error);
@@ -112,11 +112,13 @@ abstract public class Causable extends NARService {
     /** returns the system estimated value of running this */
     public abstract float value();
 
-    public double estimatedIterationTimeNS() {
-        return (iterationTimeNS.getMean());
+    public double exeTimeNS() {
+        double m = (exeTimeNS.getMean());
+        return m!= m ? 0 : m;
     }
     public double iterationsMean() {
-        return (iterationCount.getMean());
+        double m = iterationCount.getMean();
+        return m != m ? 0 : m;
     }
 
 }

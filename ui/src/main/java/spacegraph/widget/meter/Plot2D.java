@@ -6,9 +6,11 @@ import jcog.event.On;
 import jcog.list.FasterList;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.Surface;
+import spacegraph.math.v3;
 import spacegraph.render.Draw;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
@@ -220,6 +222,14 @@ public class Plot2D extends Surface {
 
     @FunctionalInterface
     public interface PlotVis {
+
+        /**
+         * externally triggered update function
+         */
+        default void update() {
+
+        }
+
         void draw(List<Series> series, GL2 g, float minValue, float maxValue);
     }
 
@@ -262,6 +272,8 @@ public class Plot2D extends Surface {
             }
         }
     };
+
+
 
     public float[] backgroundColor = {0, 0, 0, 0.75f};
 
@@ -319,7 +331,7 @@ public class Plot2D extends Surface {
 //                else
 //                    repeats = 0;
 //                if (repeats < 3 || (i == ss - 1) || (i == 0)) {
-                    gl.glVertex2f(x, yy = ny);
+                gl.glVertex2f(x, yy = ny);
                 //}
 
                 x += dx;
@@ -332,12 +344,6 @@ public class Plot2D extends Surface {
         }
     };
 
-    //    private static float ypos(float minValue, float maxValue, float v) {
-//        float ny = (v - minValue) / (maxValue - minValue);
-//        //if (ny < 0) ny = 0;
-//        //else if (ny > 1.0) ny = 1.0f;
-//        return ny;
-//    }
     private static float ypos(float minValue, float range, float v) {
         float ny = (v - minValue) / range;
         //if (ny < 0) ny = 0;
@@ -362,5 +368,58 @@ public class Plot2D extends Surface {
         }
     }
 
+    public static class BitmapWave implements PlotVis {
+
+        public GL2 gl;
+        BitmapMatrixView view;
+        Series series;
+        int width;
+        int yRes = 32;
+        float[] yHeights;
+        AtomicBoolean ready = new AtomicBoolean(false);
+
+        @Override
+        public void update() {
+
+            if (series == null)
+                return;
+
+            if (view == null) {
+
+                width = series.size();
+                yHeights = new float[width];
+                view = new BitmapMatrixView(width, yRes, (int x, int y)->{
+                    if ((y * yRes) < yHeights[x]) {
+                        return Draw.rgbInt(255,255,255);
+                    } else {
+                        return 0;
+                    }
+                });
+            }
+
+            float[] array = series.array();
+            float min = series.minValue;
+            float max = series.maxValue;
+            float range = max-min;
+            final int width = this.width;
+            final float[] yHeights = this.yHeights;
+            for (int i = 0; i < width; i++) {
+                yHeights[i] = (array[i] - min)/range * yRes;
+            }
+            view.update();
+
+            ready.set(true);
+        }
+
+        @Override
+        public void draw(List<Series> series, GL2 g, float minValue, float maxValue) {
+            if (ready.get()) {
+                view.render(g, v3.one);
+            } else {
+                BitmapWave.this.series = series.get(0);
+                this.gl = g;
+            }
+        }
+    }
 }
 

@@ -5,12 +5,17 @@ package spacegraph.audio;
  */
 public interface WaveSource {
 
-	/**
-	 * returns the buffer size, in samples
-	 */
-	int start();
+    /**
+     * returns the buffer size, in samples
+     */
+    int start();
 
-	void stop();
+    void stop();
 
-	int next(float[] buffer);
+    int next(float[] buffer);
+
+    default int channelsPerSample() {
+        return 1;
+    }
+
 }
