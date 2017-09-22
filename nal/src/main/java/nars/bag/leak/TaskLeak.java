@@ -7,7 +7,7 @@ import jcog.pri.PLink;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Task;
-import nars.control.ThrottledService;
+import nars.control.Causable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * interface for controlled draining of a bag
  * "leaky bucket" model
  */
-public abstract class TaskLeak extends ThrottledService {
+public abstract class TaskLeak extends Causable {
 
     protected final DtLeak<Task, PLink<Task>> in;
 
@@ -58,9 +58,10 @@ public abstract class TaskLeak extends ThrottledService {
     }
 
     @Override
-    protected float run(NAR nar, long dt, float work) {
-        return in.commit(nar.time(), dt, nar.dur(),
-                work/((float)in.bag.capacity()));
+    protected int next(NAR nar, int work) {
+//        return in.commit(nar.time(), dt, nar.dur(),
+//                work/((float)in.bag.capacity()));
+        return 0;
     }
 
     public final void accept(NAR nar, Task t) {

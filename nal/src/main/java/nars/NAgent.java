@@ -1,6 +1,6 @@
 package nars;
 
-import jcog.Loop;
+import jcog.exe.Loop;
 import jcog.data.FloatParam;
 import jcog.event.Ons;
 import jcog.list.FasterList;

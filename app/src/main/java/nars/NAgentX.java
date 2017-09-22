@@ -157,7 +157,6 @@ abstract public class NAgentX extends NAgent {
                     }
                 },
                 randomBool);
-        //exe.add(new FocusExec() { { subCycles = 64; concepts.setCapacity(64); } },(a) -> a.id.voluplexity() <= 16);
 
         NAR n = new NARS()
                 .exe(exe)

@@ -3,6 +3,7 @@ package nars.control;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
+import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import org.slf4j.Logger;
@@ -144,7 +145,9 @@ public enum MetaGoal {
         value(p, effects, strength, nar.causes);
     }
 
-    /** learn that the given effects have a given value */
+    /**
+     * learn that the given effects have a given value
+     */
     public static void value(MetaGoal p, short[] effects, float strength, FasterList<Cause> causes) {
 
         //assert(strength >= 0);
@@ -154,14 +157,14 @@ public enum MetaGoal {
 
         float vPer =
                 strength / numCauses; //flat
-                //strength;
+        //strength;
 
         for (int i = 0; i < numCauses; i++) {
             short c = effects[i];
             Cause cc = causes.get(c);
             if (cc == null)
                 continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
-                /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
+            /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
 
             //float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
             if (vPer != 0) {
@@ -222,4 +225,39 @@ public enum MetaGoal {
         return value / effects;
     }
 
+    public static void cause(FasterList<Causable> causables, NAR nar) {
+        long dt = nar.time.sinceLast();
+
+        double totalInvestment = 0;
+        int cc = causables.size();
+        for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
+            Causable c = causables.get(i);
+            double nanoPerIteration = c.estimatedIterationTimeNS();
+            double ii = c.iterationsMean();
+            float v = c.value();
+            double investment = (v) / (1 + ii * nanoPerIteration); //benefit:cost ratio
+            if (investment != investment)
+                investment = 0;
+            c.cycleInvest = investment;
+            totalInvestment += (investment);
+        }
+
+        if (Util.equals(totalInvestment, 0, Pri.EPSILON)) {
+            //FLAT
+            totalInvestment = cc;
+            for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
+                Causable c = causables.get(i);
+                c.cycleInvest = 1;
+            }
+        }
+
+
+        for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
+            Causable c = causables.get(i);
+            int work = 100 * (int) Math.max(1, Math.round((c.cycleInvest / totalInvestment) / (1 + c.estimatedIterationTimeNS())));
+            c.next(nar, work);
+        }
+
+
+    }
 }

@@ -1,6 +1,6 @@
 package nars.exe;
 
-import jcog.Loop;
+import jcog.exe.Loop;
 import jcog.Util;
 import jcog.event.ListTopic;
 import jcog.event.On;
@@ -9,7 +9,7 @@ import jcog.sort.TopN;
 import nars.NAR;
 import nars.control.Activate;
 import nars.control.Cause;
-import nars.control.ThrottledService;
+import nars.control.Causable;
 import nars.task.ITask;
 import nars.task.RunTask;
 import org.jetbrains.annotations.NotNull;
@@ -142,7 +142,7 @@ public class MultiExec extends Exec {
         execute((Runnable)()->new Reasoner(reasoner, filter));
     }
 
-    class Reasoner extends ThrottledService /* TODO use Throttled */ implements Consumer<Activate> {
+    class Reasoner extends Causable /* TODO use Throttled */ implements Consumer<Activate> {
         private final FocusExec sub;
 
         /** customizable filter, or striping so that every reasoner doesnt get the same inputs */
@@ -170,9 +170,9 @@ public class MultiExec extends Exec {
         }
 
         @Override
-        protected float run(NAR n, long dt, float work) {
+        protected int next(NAR n, int work) {
             FocusExec f = (FocusExec) this.sub;
-            f.subCycles = (int) Math.ceil(work);
+            f.subCycles = work;
             f.run();
             return work; //TODO better estimate than this, even to the precision of the TTL spent
         }

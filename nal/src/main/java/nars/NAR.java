@@ -11,7 +11,6 @@ import jcog.event.Topic;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Prioritized;
-import jcog.pri.Priority;
 import jcog.util.IterableThreadLocal;
 import nars.Narsese.NarseseException;
 import nars.concept.BaseConcept;
@@ -56,6 +55,8 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -946,6 +947,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         time.cycle(this);
 
+        MetaGoal.cause(causables, this);
+
         eventCycle.emit(this); //synchronous only
 
         MetaGoal.update(causes, want, valueSummary);
@@ -1582,7 +1585,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * table of values influencing reasoner heuristics
      */
     public final FasterList<Cause> causes = new FasterList(256);
-    public final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[want.length + 1 /* for global norm */];
+    public final FasterList<Causable> causables = new FasterList(16);
+
+    private final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[want.length + 1 /* for global norm */];
 
     /**
      * default deriver
@@ -1716,6 +1721,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 ////        }
 ////
 ////    }
+
 
 
     /**

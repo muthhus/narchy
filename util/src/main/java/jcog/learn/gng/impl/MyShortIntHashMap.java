@@ -15,6 +15,7 @@ import org.eclipse.collections.api.collection.primitive.MutableIntCollection;
 import org.eclipse.collections.api.iterator.MutableIntIterator;
 import org.eclipse.collections.api.iterator.MutableShortIterator;
 import org.eclipse.collections.api.map.primitive.ImmutableShortIntMap;
+import org.eclipse.collections.api.map.primitive.MutableIntShortMap;
 import org.eclipse.collections.api.map.primitive.MutableShortIntMap;
 import org.eclipse.collections.api.map.primitive.ShortIntMap;
 import org.eclipse.collections.api.set.primitive.MutableShortSet;
@@ -733,6 +734,11 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
                 return value;
             }
         }
+    }
+
+    @Override
+    public MutableIntShortMap flipUniqueValues() {
+        throw new UnsupportedOperationException("TODO");
     }
 
     @Override

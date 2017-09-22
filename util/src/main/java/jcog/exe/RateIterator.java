@@ -1,4 +1,4 @@
-package jcog;
+package jcog.exe;
 
 import com.google.common.util.concurrent.RateLimiter;
 

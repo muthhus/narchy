@@ -2,12 +2,12 @@ package nars.video;
 
 import nars.NAR;
 import nars.concept.SensorConcept;
-import nars.control.ThrottledService;
+import nars.control.Causable;
 
 /**
  * Created by me on 9/21/16.
  */
-abstract public class Sensor2D<S> extends ThrottledService {
+abstract public class Sensor2D<S> extends Causable {
 
     public final SensorConcept[][] matrix;
     public final int width, height;

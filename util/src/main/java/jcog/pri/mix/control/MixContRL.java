@@ -1,6 +1,6 @@
 package jcog.pri.mix.control;
 
-import jcog.Loop;
+import jcog.exe.Loop;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;

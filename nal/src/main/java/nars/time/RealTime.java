@@ -21,11 +21,12 @@ public abstract class RealTime extends Time {
     final AtomicLong nextStamp = new AtomicLong(seed);
 
     private int dur = 1;
+    private long t0;
 
     protected RealTime(int unitsPerSecond, boolean relativeToStart) {
         super();
         this.unitsPerSecod = unitsPerSecond;
-        this.start = relativeToStart ? realtime() : 0L;
+        this.t = this.t0 = this.start = relativeToStart ? realtime() : 0L;
     }
 
 
@@ -50,6 +51,7 @@ public abstract class RealTime extends Time {
 
     @Override
     public final void cycle(NAR n) {
+        t0 = t;
         t = (realtime()-start);
         super.cycle(n);
     }
@@ -70,7 +72,10 @@ public abstract class RealTime extends Time {
         return l / ((float)unitsPerSecod);
     }
 
-
+    @Override
+    public long sinceLast() {
+        return t - t0;
+    }
 
     @NotNull
     @Override

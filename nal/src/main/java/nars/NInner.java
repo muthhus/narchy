@@ -11,7 +11,7 @@ import com.netflix.servo.tag.Tag;
 import com.netflix.servo.util.Clock;
 import com.netflix.servo.util.Reflection;
 import com.netflix.servo.util.Throwables;
-import jcog.Loop;
+import jcog.exe.Loop;
 import jcog.event.On;
 import jcog.list.FasterList;
 import jcog.meter.event.BufferedFloatGuage;

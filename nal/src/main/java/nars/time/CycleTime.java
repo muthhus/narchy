@@ -47,6 +47,10 @@ public class CycleTime extends Time {
         return t;
     }
 
+    @Override
+    public long sinceLast() {
+        return dt;
+    }
 
     @Override
     public final void cycle(NAR n) {

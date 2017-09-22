@@ -196,7 +196,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
     }
 
     @Override
-    protected float run(NAR nar, long dt, float work) {
+    protected int next(NAR nar, int work) {
 
         src.update(1);
 
@@ -210,7 +210,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
 
         //frame-rate timeslicing
         int actualPixels = pixels.size();
-        int pixelsSize = Math.min(actualPixels, Math.round(work));
+        int pixelsSize = Math.min(actualPixels, work);
         int start, end;
         if (pixelsSize == actualPixels) {
             start = 0; end = actualPixels;

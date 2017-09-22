@@ -53,6 +53,10 @@ public abstract class Time implements Clock, Serializable {
     @Override
     public abstract long now();
 
+
+    /** time elapsed since last cycle */
+    public abstract long sinceLast();
+
     /**
      * returns a new stamp evidence id
      */

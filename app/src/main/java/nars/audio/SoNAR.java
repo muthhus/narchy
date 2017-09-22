@@ -1,6 +1,6 @@
 package nars.audio;
 
-import jcog.Loop;
+import jcog.exe.Loop;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.NARS;

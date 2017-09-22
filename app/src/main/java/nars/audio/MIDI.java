@@ -1,6 +1,6 @@
 package nars.audio;
 
-import jcog.Loop;
+import jcog.exe.Loop;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;

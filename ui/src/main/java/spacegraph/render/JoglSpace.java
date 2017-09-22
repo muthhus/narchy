@@ -10,7 +10,7 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
-import jcog.Loop;
+import jcog.exe.Loop;
 import jcog.Util;
 import jogamp.opengl.FPSCounterImpl;
 import org.slf4j.Logger;

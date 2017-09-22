@@ -12,7 +12,7 @@ public class ListTopic<V> extends FasterList<Consumer<V>> implements Topic<V> {
     private Consumer[] copy = EMPTY;
 
     public ListTopic() {
-        super(4);
+        super(8);
     }
 
     @Override

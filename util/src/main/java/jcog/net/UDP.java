@@ -2,7 +2,7 @@ package jcog.net;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jcog.Loop;
+import jcog.exe.Loop;
 import jcog.Util;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

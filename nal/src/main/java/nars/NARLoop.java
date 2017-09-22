@@ -1,6 +1,6 @@
 package nars;
 
-import jcog.Loop;
+import jcog.exe.Loop;
 import org.jetbrains.annotations.NotNull;
 
 /**

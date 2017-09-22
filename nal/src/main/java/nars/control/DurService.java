@@ -34,7 +34,7 @@ abstract public class DurService extends NARService implements Runnable {
         this.nar = n;
     }
 
-    /** simple convenient constructor */
+    /** simple convenient adapter for Runnable's */
     public static DurService build(NAR nar, Runnable r) {
         return new DurService(nar) {
             @Override protected void run(NAR n, long dt) {

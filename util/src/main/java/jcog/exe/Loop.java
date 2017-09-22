@@ -1,5 +1,7 @@
-package jcog;
+package jcog.exe;
 
+import jcog.Texts;
+import jcog.Util;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 
