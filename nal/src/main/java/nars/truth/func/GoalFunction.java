@@ -33,19 +33,21 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
+
     @AllowOverlap DeciDeduction() {
         @Override
         public Truth apply(Truth T, Truth B, NAR m, float minConf) {
-            if (B.isNegative()) {
-                Truth x = deduction(T, B.neg(), minConf);
-                //Truth x = desireDed(T, B.neg(), minConf);
-                return x != null ? x.neg() : null;
-            } else {
-                return deduction(T, B, minConf);
-                //return desireDed(T, B, minConf);
-            }
-
-            //return desireStrongNew(T, B, minConf, true);
+            return BeliefFunction.DeductionPB.apply(T, B, m, minConf);
+//            if (B.isNegative()) {
+//                Truth x = deduction(T, B.neg(), minConf);
+//                //Truth x = desireDed(T, B.neg(), minConf);
+//                return x != null ? x.neg() : null;
+//            } else {
+//                return deduction(T, B, minConf);
+//                //return desireDed(T, B, minConf);
+//            }
+//
+//            //return desireStrongNew(T, B, minConf, true);
         }
 
     },
@@ -53,14 +55,16 @@ public enum GoalFunction implements TruthOperator {
     @AllowOverlap DeciInduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            if (B.isNegative()) {
-                Truth x = induction(T, B.neg(), minConf);
-                //Truth x = desireInd(T, B.neg(), minConf);
-                return x != null ? x.neg() : null;
-            } else  {
-                return induction(T, B, minConf);
-                //return desireInd(T, B, minConf);
-            }
+            return BeliefFunction.AbductionPB.apply(B, T, m, minConf); //swap B and T to compute Induction from the Abduction formula
+
+//            if (B.isNegative()) {
+//                Truth x = induction(T, B.neg(), minConf);
+//                //Truth x = desireInd(T, B.neg(), minConf);
+//                return x != null ? x.neg() : null;
+//            } else  {
+//                return induction(T, B, minConf);
+//                //return desireInd(T, B, minConf);
+//            }
         }
     },
 

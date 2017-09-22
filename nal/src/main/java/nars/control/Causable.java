@@ -2,8 +2,11 @@ package nars.control;
 
 import jcog.math.AtomicSummaryStatistics;
 import nars.NAR;
+import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * instruments the runtime resource consumption of its iteratable procedure.
@@ -43,12 +46,15 @@ abstract public class Causable extends NARService {
 //                .tolerate(1 /* work unit */, 1 /* ns */);
 
     final int WINDOW = 16;
-    final AtomicSummaryStatistics exeTimeNS = new AtomicSummaryStatistics();
-    final AtomicSummaryStatistics iterationCount = new AtomicSummaryStatistics();
+    final SynchronizedDescriptiveStatistics exeTimeNS = new SynchronizedDescriptiveStatistics(WINDOW);
+    final SynchronizedDescriptiveStatistics iterationCount = new SynchronizedDescriptiveStatistics(WINDOW);
 
+    private final AtomicBoolean busy;
 
     public Causable(NAR nar) {
         super(nar);
+        busy = singleton() ? new AtomicBoolean(false) : null;
+
         //initial values
 //        workEstimator.learn(0,0);
 //        workEstimator.learn(1,1);
@@ -75,7 +81,16 @@ abstract public class Causable extends NARService {
         super.stop(nar);
     }
 
+    /** if true, allows multiple threads to execute on this instance */
+    public boolean singleton() {
+        return false;
+    }
+
     protected final int run(NAR n, int iterations) {
+
+        if (singleton() && !busy.compareAndSet(false, true)) {
+            return 0; //another thread running in here
+        }
 
         Throwable error = null;
         long start = System.nanoTime();
@@ -88,8 +103,11 @@ abstract public class Causable extends NARService {
         }
         long end = System.nanoTime();
 
-        exeTimeNS.accept(  (double)(end-start) );
-        iterationCount.accept(completed);
+        exeTimeNS.addValue(  (double)(end-start) );
+        iterationCount.addValue(completed);
+
+        if (busy!=null)
+            busy.set(false);
 
         if (error != null) {
             logger.error("{} {}", this, error);

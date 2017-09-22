@@ -18,10 +18,9 @@ public class Traffic extends AtomicFloat {
 
     public double total;
 
-    public void commit() {
+    public final void commit() {
         this.prev = this.current;
         double next = getAndSet(0f);
-        this.total += next;
-        this.current = (float) next; //smooth(current, (float)next, momentum);
+        this.total += (this.current = (float) next);
     }
 }

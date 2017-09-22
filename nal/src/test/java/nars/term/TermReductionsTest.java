@@ -984,27 +984,52 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testReducibleImpl() throws Narsese.NarseseException {
+    public void testReducibleImplFactored() throws Narsese.NarseseException {
+        assertEquals("(x=|>z)",
+                $("((y &| x) =|> (y &| z))").toString()
+        );
+        assertEquals("(x==>z)",
+                $("((y &| x) ==> (y &| z))").toString()
+        );
+        assertEquals("(x==>z)",
+                $("((y && x) ==> (y && z))").toString()
+        );
+        assertEquals("((a&&x)==>z)",
+                $("((&&, x, y, a) ==> (y && z))").toString()
+        );
+        assertEquals("((y &&+1 x)=|>(z &&+1 y))", //not reducible
+                $("((y &&+1 x)=|>(z &&+1 y))").toString()
+        );
+        assertEquals("((x&&y) ==>+1 (y&&z))",//not reducible
+                $("((y&&x) ==>+1 (y&&z))").toString()
+        );
 
-        assertInvalidTerms("(--x ==> (--y && --x))");
     }
 
     @Test
-    public void testReducibleImplParallel() throws Narsese.NarseseException {
-        assertEquals("(x=|>y)",
-                $("(x ==>+0 (y &| x))").toString());
-        assertEquals("(y=|>x)",
-                $("((y &| x) =|> x)").toString());
-     assertEquals("(--,((--,$1)=|>#2))",
-                $("((--,$1)=|>((--,$1)&|(--,#2)))").toString()
+    public void testReducibleImpl() throws Narsese.NarseseException {
+
+        assertInvalidTerms("(--x ==> (--y && --x))");
+
+        assertEquals(Null,//"(x=|>y)",
+                $("(x ==>+0 (y &| x))")//.toString()
+        );
+        assertEquals(Null,//"(y=|>x)",
+                $("((y &| x) =|> x)")//.toString()
+        );
+        assertEquals(Null,//"(--,((--,$1)=|>#2))",
+                $("((--,$1)=|>((--,$1)&|(--,#2)))")//.toString()
         );
     }
 
-    @Test public void testReducibleImplParallelNeg() throws Narsese.NarseseException {
-        assertEquals("((--,x)=|>(--,y))",
-                $("(--x ==>+0 (--y &| --x))").toString());
-        assertEquals("((--,y)=|>(--,x))",
-                $("((--y &| --x) =|> --x)").toString());
+    @Test
+    public void testReducibleImplParallelNeg() throws Narsese.NarseseException {
+        assertEquals(Null,//"((--,x)=|>(--,y))",
+                $("(--x ==>+0 (--y &| --x))")//.toString()
+        );
+        assertEquals(Null,//"((--,y)=|>(--,x))",
+                $("((--y &| --x) =|> --x)")//.toString()
+        );
 
     }
 
@@ -1096,7 +1121,6 @@ public class TermReductionsTest extends NarseseTest {
                 $("((--,(happy-->noid))&|((--,((x-->ball)&&(x-->paddle)))&&(happy-->noid)))")
         );
     }
-
 
 
     /**

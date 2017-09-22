@@ -7,6 +7,7 @@ import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.task.ITask;
 import nars.task.NativeTask;
+import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,75 +67,76 @@ public enum MetaGoal {
      * goal and goalSummary instances correspond to the possible MetaGoal's enum
      * however summary has an additional instance for the global normalization step
      */
-    public static void update(FasterList<Cause> causes, float[] goal, RecycledSummaryStatistics[] goalSummary) {
+    public static void update(FasterList<Cause> causes, float[] goal, RecycledSummaryStatistics[] causeSummary) {
 
-        for (RecycledSummaryStatistics r : goalSummary) {
-            //double m = r.getMax();
+        for (RecycledSummaryStatistics r : causeSummary) {
             r.clear();
-            //r.setMax(m * 0.9f);
         }
 
         int cc = causes.size();
         for (int i = 0, causesSize = cc; i < causesSize; i++) {
-            causes.get(i).commit(goalSummary);
+            causes.get(i).commit(causeSummary);
         }
 
-        final float epsilon = 0.01f;
+//        final float epsilon = 0.01f;
 
         //final float LIMIT = +1f;
         final float momentum = 0.9f;
 
         int goals = goal.length;
-        float[] goalMagnitude = new float[goals];
-        for (int i = 0; i < goals; i++) {
-            float m = goalSummary[i].magnitude();
-            goalMagnitude[i] = Util.equals(m, 0, epsilon) ? 1 : m;
-        }
+//        float[] goalMagnitude = new float[goals];
+//        for (int i = 0; i < goals; i++) {
+//            float m = causeSummary[i].magnitude();
+//            goalMagnitude[i] = Util.equals(m, 0, epsilon) ? 1 : m;
+//        }
 
-        RecycledSummaryStatistics goalPreNorms = goalSummary[goals /* the extra one */];
+        //RecycledSummaryStatistics goalCausePreNorm = causeSummary[goals /* the extra one */];
 
         for (int i = 0, causesSize = cc; i < causesSize; i++) {
             Cause c = causes.get(i);
             float v = 0;
             //mix the weighted current values of each purpose, each independently normalized against the values (the reason for calculating summary statistics in previous step)
             for (int j = 0; j < goals; j++) {
-                v += goal[j] * c.goalValue[j].current / goalMagnitude[j];
+                v += goal[j] * c.goalValue[j].current; // / goalMagnitude[j];
             }
-            goalPreNorms.accept(c.valuePreNorm = v);
+
+            float nextValue = Util.lerp(momentum, v, c.value());
+            c.setValue(nextValue);
+
         }
 
-        float max = (float) goalPreNorms.getMax();
-        float min = (float) goalPreNorms.getMin();
-
-        if (Util.equals(max, min, epsilon)) {
-            causes.forEach(Cause::setValueZero); //flat
-        } else {
-
-//            boolean bipolar = !(min <= 0 ^ max < 0);
-//            float mid = bipolar ? 0 : (max+min)/2f;
-//            float rangePos = max - mid;
-//            float rangeNeg = mid - min;
-
-            float valueMag =
-                    //Math.max(Math.abs(max), Math.abs(min)); //normalized to absolute range
-                    1; //no normalization
-
-            for (int i = 0, causesSize = cc; i < causesSize; i++) {
-                Cause c = causes.get(i);
-
-                float n = c.valuePreNorm;
-//                float v = n >= 0 ?
-//                        (n - mid) / rangePos :
-//                        (mid - n) / rangeNeg
-//                        ;
-                float v = n / valueMag; //normalize to -1..+1
+//        float max = (float) goalCausePreNorm.getMax();
+//        float min = (float) goalCausePreNorm.getMin();
 //
-                float nextValue =
-                        Util.lerp(momentum, v, c.value());
-
-                c.setValue(nextValue);
-            }
-        }
+//        if (Util.equals(max, min, epsilon)) {
+//            causes.forEach(Cause::setValueZero); //flat
+//        } else {
+//
+////            boolean bipolar = !(min <= 0 ^ max < 0);
+////            float mid = bipolar ? 0 : (max+min)/2f;
+////            float rangePos = max - mid;
+////            float rangeNeg = mid - min;
+//
+//            float valueMag =
+//                    //Math.max(Math.abs(max), Math.abs(min)); //normalized to absolute range
+//                    1; //no normalization
+//
+////            for (int i = 0, causesSize = cc; i < causesSize; i++) {
+////                Cause c = causes.get(i);
+////
+////                float n = c.valuePreNorm;
+//////                float v = n >= 0 ?
+//////                        (n - mid) / rangePos :
+//////                        (mid - n) / rangeNeg
+//////                        ;
+////                float v = n / valueMag; //normalize to -1..+1
+//////
+////                float nextValue =
+////                        Util.lerp(momentum, v, c.value());
+////
+////                c.setValue(nextValue);
+////            }
+//        }
 
 
 //        System.out.println("WORST");
@@ -250,12 +252,15 @@ public enum MetaGoal {
          3) a limit to the # of iterations that a cause is able to supply in a cycle
          has not been determined (but is limited by the hard limit factor for safety).
          */
-        float ITERATION_DEMAND_GROWTH = 1.75f;
+        float ITERATION_DEMAND_GROWTH = 2f;
 
         final int ITERATION_DEMAND_MAX = 64 * 1024;
 
 
+        /** set this to some cpu duty cycle fraction of the target fps */
         final long targetCycleTimeNS = 25 * 1000000; //x ms
+
+        /** if each recieved exactly the same amount of time, this would be how much is allocated to each */
         final float targetCycleTimeNSperEach = targetCycleTimeNS / cc;
 
         //Benefit to cost ratio (estimate)
@@ -268,12 +273,12 @@ public enum MetaGoal {
             Causable c = causables.get(i);
             float time = (float) Math.max(1, c.exeTimeNS());
             float iters = (float) Math.max(1, c.iterationsMean());
-            iterLimit[i] = Math.min(ITERATION_DEMAND_MAX, Math.round(iters * ITERATION_DEMAND_GROWTH));
+            iterLimit[i] = Math.min(ITERATION_DEMAND_MAX, Math.round((iters+1) * ITERATION_DEMAND_GROWTH));
 
-            bcr[i] = (float) (c.value() / time);
-            granular[i] = iters / (time / (targetCycleTimeNSperEach));
+            float idealCycleTime = time / (targetCycleTimeNSperEach);
+            bcr[i] = (float) c.value() / time;
+            granular[i] = iters / idealCycleTime;
         }
-
 
         int[] iter = new int[cc];
         Arrays.fill(iter, 1);
@@ -285,11 +290,11 @@ public enum MetaGoal {
 
         Util.decideRoulette(cc, (c) -> bcr[c], nar.random(), (j) -> {
 
-            float a = Math.max(1, granular[j] * bcr[j]);
+            int a = Math.max(1, Math.round(granular[j] / SAMPLING_FACTOR));
             iter[j] += a;
             boolean changedWeights = false;
             int li = iterLimit[j];
-            if (iter[j] > li) {
+            if (iter[j] >= li) {
                 iter[j] = li;
                 bcr[j] = 0;
                 changedWeights = true;

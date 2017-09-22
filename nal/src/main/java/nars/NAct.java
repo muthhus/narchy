@@ -362,8 +362,8 @@ public interface NAct {
     }
 
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        //actionBipolarExpectation(s, update);
-        actionBipolarExpectationNormalized(s, update);
+        actionBipolarExpectation(s, update);
+        //actionBipolarExpectationNormalized(s, update);
         //actionBipolarGreedy(s, update);
         //actionBipolarMutex3(s, update);
     }

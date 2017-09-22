@@ -172,7 +172,7 @@ public class reflect {
         public ReflectSimilarToTaskTerm(int cap, NAR n) {
             super(cap, n);
             this.filter = new StableBloomFilter<>(
-                    16 * 1024, 1,
+                    1024, 1,
                     new BytesHashProvider<>(IO::termToBytes));
             this.n = n;
         }
@@ -184,7 +184,7 @@ public class reflect {
                 Term tt = next.term();
                 if (tt.subs() > 1)
                     if (tt.volume() <= n.termVolumeMax.intValue() * VOL_RATIO_MAX)
-                        if (filter.addIfMissing(tt.term().conceptual()))
+                        if (filter.addIfMissing(tt.term().conceptual(), 0.01f))
                             return true;
 
             }
@@ -196,7 +196,7 @@ public class reflect {
         @Override
         protected float leak(Task next) {
 
-            filter.unlearn(0.001f);
+
 
             Term x = next.term().conceptual();
             Term reflectionSim = $.sim($.func(REFLECT_OP, x), x).eval(n).normalize();

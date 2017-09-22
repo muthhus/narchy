@@ -59,7 +59,7 @@ public enum BeliefFunction implements TruthOperator {
     },
 
     /**
-     * polarizes according to belief
+     * polarizes according to an implication belief and its effective negation reduction
      */
     DeductionPB() {
         @Override
@@ -119,12 +119,20 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
+    /** polarizes according to an implication belief.
+     *  this is slightly different than DeductionPB.
+     *
+     *  here if the belief is negated, then both task and belief truths are
+     *  applied to the truth function negated.  but the resulting truth
+     *  is unaffected as it derives the subject of the implication.
+     * */
     AbductionPB() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+
             if (B.isNegative()) {
-                Truth x = abduction(T, B.neg(), minConf);
-                return x != null ? x.neg() : null;
+                Truth x = abduction(T.neg(), B.neg(), minConf);
+                return x != null ? x : null;
             } else {
                 return abduction(T, B, minConf);
             }

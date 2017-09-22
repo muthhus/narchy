@@ -194,12 +194,12 @@ abstract public class NAgentX extends NAgent {
         MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, false, 32f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-//        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
+        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
 
-//        Inperience inp = new Inperience(n, 4);
+        Inperience inp = new Inperience(n, 4);
 
-        //reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
-        //reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);
+        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
+        reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);
 
         NAgent a = init.apply(n);
         //a.trace = true;

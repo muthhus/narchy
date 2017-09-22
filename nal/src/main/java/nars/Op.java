@@ -1346,14 +1346,19 @@ public enum Op implements $ {
                     if (subjConj && !predConj && subjComm) {
                         TermContainer subjs = subject.subterms();
                         int i = subjs.indexOf(predicate);
-                        if (i!=-1)
-                            subject = conjDrop(subject, i);
-
+                        if (i!=-1) {
+                            //probably need to drop from both but for now the safest thing is just to return Null
+                            //subject = conjDrop(subject, i);
+                            return Null;
+                        }
                     } else if (!subjConj && predConj && predComm) {
                         TermContainer preds = predicate.subterms();
                         int i = preds.indexOf(subject);
-                        if (i!=-1)
-                            predicate = conjDrop(predicate, i);
+                        if (i!=-1) {
+                            //probably need to drop from both but for now the safest thing is just to return Null
+                            //predicate = conjDrop(predicate, i);
+                            return Null;
+                        }
 
                     } if ((subjConj && predConj) && subjComm && predComm) {
                         final Term csub = subject;

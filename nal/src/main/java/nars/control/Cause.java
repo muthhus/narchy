@@ -54,12 +54,12 @@ public class Cause {
 
     /** 0..+1 */
     public float amp() {
-        return (value+1)/2;
+        return (value+1)/2f;
     }
 
     /** 0..+2 */
     public float gain() {
-         return value+1;
+         return value+1f;
     }
 
     /** convenience procedure to set value to zero */

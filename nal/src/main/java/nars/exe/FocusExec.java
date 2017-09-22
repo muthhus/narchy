@@ -241,8 +241,10 @@ public class FocusExec extends Exec implements Runnable {
 
         } else if (x instanceof Activate) {
             concepts.putAsync(x);
-        } else
-            throw new UnsupportedOperationException("what is " + x);
+        } else {
+            execute(x);
+            //throw new UnsupportedOperationException("what is " + x);
+        }
     }
 
     private class MyTrigger extends CycleService {

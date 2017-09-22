@@ -190,6 +190,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         return (PixelConcept) matrix[x][y]; //pixels.get(x * width + y);
     }
 
+    @Override
+    public boolean singleton() {
+        return true;
+    }
 
     @Override public float value() {
         return in.amp();
@@ -203,8 +207,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
 
         //stamp = nar.time.nextStamp();
 
-        long now = nar.time();
-        int dur = nar.dur();
+
+        this.conf = nar.confDefault(Op.BELIEF);
 
         resolution(Util.round(Math.min(0.01f, 0.5f * (1f - this.in.amp())), 0.01f));
 
@@ -213,20 +217,30 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         int pixelsSize = Math.min(actualPixels, work);
         int start, end;
         if (pixelsSize == actualPixels) {
-            start = 0; end = actualPixels;
+            update(0, actualPixels, nar);
         } else {
             start = this.lastPixel;
-            end = (start + pixelsSize) % actualPixels; //for progressive fractional wrap-around
-            if (end >= actualPixels) { //wrap around
-                start = end - actualPixels;
-                end = start;
+            end = (start + pixelsSize);
+            if (end > actualPixels) {
+                //wrap around
+                int extra = end - actualPixels;
+                update(start, actualPixels, nar); //last 'half'
+                update(0, extra, nar); //first half after wrap around
+            } else {
+                update(start, end, nar);
             }
 
-            this.lastPixel = end;
         }
+
         //System.out.println(value + " " + fraction + " "+ start + " " + end);
 
-        this.conf = nar.confDefault(Op.BELIEF);
+
+        return pixelsSize;
+    }
+
+    private void update(int start, int end, NAR nar) {
+        long now = nar.time();
+        int dur = nar.dur();
         for (int i = start; i < end; i++) {
             PixelConcept p = pixels.get(i);
             @Nullable Task t = p.update(now, dur, nar);
@@ -234,8 +248,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
                 in.input(t);
             }
         }
-
-        return pixelsSize;
+        this.lastPixel = end;
     }
 
 

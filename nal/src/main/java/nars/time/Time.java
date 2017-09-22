@@ -89,25 +89,22 @@ public abstract class Time implements Clock, Serializable {
     @Nullable
     public List<SchedTask> exeScheduled() {
 
-        long now = now();
-
-        SchedTask firstQuick = scheduled.peek(); //it's safe to call this outside synchronized block for speed
-        if (firstQuick == null || firstQuick.when > now)
-            return null; //too soon for the next one
+        long now;
+//        now = now();
+//        SchedTask firstQuick = scheduled.peek(); //it's safe to call this outside synchronized block for speed
+//        if (firstQuick == null || firstQuick.when > now)
+//            return null; //too soon for the next one
 
         List<SchedTask> pending = new LinkedList();
 
         synchronized (scheduled) {
 
+            now = now(); //get time now inside the synch in case it had to wait to enter
+
             SchedTask next;
-            while ((next = scheduled.poll()) != null) {
-                if (next.when <= now) {
-                    pending.add(next);
-                } else {
-                    //oops we need to reinsert this for some reason? can this even happen?
-                    at(next);
-                    break; //wait till another time
-                }
+            while (((next = scheduled.peek()) != null) && (next.when <= now)) {
+                SchedTask next2 = scheduled.poll(); assert(next==next2);
+                pending.add(next);
             }
         }
 
