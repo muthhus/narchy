@@ -171,14 +171,15 @@ public class RecycledSummaryStatistics implements FloatProcedure, StatisticalSum
                 getMax());
     }
 
-    public final double normalize(float n) {
+    /** to 0..1.0 range */
+    public final float normalize(float n) {
         double min = getMin();
         double max = getMax();
         double range = max - min;
         if (range < Float.MIN_VALUE*64f /* estimate of an FP epsilon */)
             return 0.5f;
         else
-            return (n - min) / (range);
+            return (float) ((n - min) / (range));
     }
 
     /**

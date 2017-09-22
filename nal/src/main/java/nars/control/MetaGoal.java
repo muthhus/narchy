@@ -78,17 +78,16 @@ public enum MetaGoal {
             causes.get(i).commit(causeSummary);
         }
 
-//        final float epsilon = 0.01f;
+        final float epsilon = 0.01f;
 
-        //final float LIMIT = +1f;
         final float momentum = 0.9f;
 
         int goals = goal.length;
-//        float[] goalMagnitude = new float[goals];
-//        for (int i = 0; i < goals; i++) {
-//            float m = causeSummary[i].magnitude();
-//            goalMagnitude[i] = Util.equals(m, 0, epsilon) ? 1 : m;
-//        }
+        float[] goalMagnitude = new float[goals];
+        for (int i = 0; i < goals; i++) {
+            float m = causeSummary[i].magnitude();
+            goalMagnitude[i] = Util.equals(m, 0, epsilon) ? 1 : m;
+        }
 
         //RecycledSummaryStatistics goalCausePreNorm = causeSummary[goals /* the extra one */];
 
@@ -97,7 +96,7 @@ public enum MetaGoal {
             float v = 0;
             //mix the weighted current values of each purpose, each independently normalized against the values (the reason for calculating summary statistics in previous step)
             for (int j = 0; j < goals; j++) {
-                v += goal[j] * c.goalValue[j].current; // / goalMagnitude[j];
+                v += goal[j] * c.goalValue[j].current / goalMagnitude[j];
             }
 
             float nextValue = Util.lerp(momentum, v, c.value());
@@ -269,6 +268,8 @@ public enum MetaGoal {
         float[] bcr = new float[cc];
         float[] granular = new float[cc];
         int[] iterLimit = new int[cc];
+        float bcrTotal = 0;
+        RecycledSummaryStatistics bcrStat = new RecycledSummaryStatistics();
         for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
             Causable c = causables.get(i);
             float time = (float) Math.max(1, c.exeTimeNS());
@@ -276,9 +277,17 @@ public enum MetaGoal {
             iterLimit[i] = Math.min(ITERATION_DEMAND_MAX, Math.round((iters+1) * ITERATION_DEMAND_GROWTH));
 
             float idealCycleTime = time / (targetCycleTimeNSperEach);
-            bcr[i] = (float) c.value() / time;
+
+            float vv = Util.unitize(c.value());
+
+            bcrStat.accept(
+                bcr[i] = vv / time
+            );
             granular[i] = iters / idealCycleTime;
         }
+//        for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
+//            bcr[i] = bcrStat.normalize(bcr[i]);
+//        }
 
         int[] iter = new int[cc];
         Arrays.fill(iter, 1);

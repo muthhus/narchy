@@ -77,7 +77,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static final PriMerge premiseMerge = PriMerge.plus;
 
 
-    /** used on premise formation  */
+    /** budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links) */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
             //UtilityFunctions::aveGeo;
             //UtilityFunctions::aveAri;
@@ -85,6 +85,10 @@ public abstract class Param extends Services<Term,NAR> {
             //Util::and;
             //Math::min;
             //Math::max;
+
+    /** budgets derivations from the task and optional belief budget */
+    public static final FloatFloatToFloatFunction TaskBeliefCombine =
+            Util::or;
 
     /** maximum time (in durations) that a signal task can latch its last value before it becomes unknown */
     public final static int SIGNAL_LATCH_TIME_MAX =

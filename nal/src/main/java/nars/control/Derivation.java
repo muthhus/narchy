@@ -321,7 +321,9 @@ public class Derivation extends Unify implements TermContext {
         this.temporal = (!task.isEternal() || task.term().isTemporal()) ||
                 (belief!=null && (!belief.isEternal() || belief.term().isTemporal()));
 
-        this.premisePri = p.priElseZero();
+        this.premisePri =
+                //p.priElseZero();
+                belief == null ? task.priElseZero() : Param.TaskBeliefCombine.apply(task.priElseZero(), belief.priElseZero());
 
         this.parentCause = belief != null ?
                 Cause.zip(task, belief) :

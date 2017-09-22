@@ -127,7 +127,7 @@ abstract public class Causable extends NARService {
     /** returns iterations actually completed */
     protected abstract int next(NAR n, int iterations);
 
-    /** returns the system estimated value of running this */
+    /** returns a system estimated value of invoking this. between 0..1.0 */
     public abstract float value();
 
     public double exeTimeNS() {

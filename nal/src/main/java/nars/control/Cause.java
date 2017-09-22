@@ -32,7 +32,7 @@ public class Cause {
     /** current scalar utility estimate for this cause's support of the current MetaGoal's.
      *  may be positive or negative, and is in relation to other cause's values
      */
-    private float value;
+    private float value = 0;
 
     /** the value measured contributed by its effect on each MetaGoal.
      *  the index corresponds to the ordinal of MetaGoal enum entries.
@@ -40,7 +40,7 @@ public class Cause {
     public final Traffic[] goalValue;
 
 
-    protected float valuePreNorm;
+//    protected float valuePreNorm;
 
     /** flag indicating whether the value should be included in aggregations that adjust priority of items */
     public boolean valuePrioritizes = true;

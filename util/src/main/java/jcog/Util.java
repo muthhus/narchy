@@ -1254,6 +1254,8 @@ public enum Util {
         float weightSum = 0;
         for (int i = 0; i < weightCount; i++) {
             float w = weight.valueOf(i);
+            if (w!=w || w < 0)
+                System.err.println("x");
             assert(w==w && w >= 0);
             weightSum += Math.max(0, w);
         }

@@ -20,7 +20,7 @@ public class CameraSensorView extends BitmapMatrixView implements BitmapMatrixVi
 
     private final Sensor2D cam;
     private final NAR nar;
-    private final Ons on;
+    private Ons on;
     private float maxConceptPriority;
     private long now;
     int dur;
@@ -33,9 +33,10 @@ public class CameraSensorView extends BitmapMatrixView implements BitmapMatrixVi
         on = a.onFrame(this);
     }
 
+
     @Override
-    public void stop() {
-        on.off();
+    public synchronized void stop() {
+        if (on!=null) { on.off(); this.on = null; }
         super.stop();
     }
 
