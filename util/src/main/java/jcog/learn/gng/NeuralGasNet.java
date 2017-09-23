@@ -51,6 +51,8 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
      */
     private double winnerNeighborUpdateRate;
 
+    private float shrinkRate;
+
     public int getLambda() {
         return lambda;
     }
@@ -109,6 +111,8 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
         this.dimension = dimension;
         this.maxNodes = centroids;
 
+        this.shrinkRate = 1f - (1f/centroids);
+
         //default values
         setLambda(centroids * 2);
         setMaxEdgeAge(centroids * 2);
@@ -122,7 +126,7 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
         /** nodes should begin with randomized coordinates */
         double[] r = rangeMinMax.write();
         for (int i = 0; i < centroids; i++) {
-            range(r, i, (this.centroids[i] = newCentroid(i, dimension)).getDataRef());
+            this.centroids[i] = newCentroid(i, dimension);
         }
         System.arraycopy(rangeMinMax.read(), 0, r, 0, r.length); //copy to both buffers
 
@@ -213,10 +217,13 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
 
         double[] r = rangeMinMax.preWrite();
 
+
+        range(r, x, shrinkRate);
+
         for (short j = 0; j < nodes; j++) {
             Centroid nj = this.centroids[j];
 
-            range(r, j, nj.getDataRef());
+
 
             double dd = nj.learn(x, distanceSq);
 
@@ -378,14 +385,14 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
             newNode.randomizeUniform(i, r[i*2], r[i*2+1]);
     }
 
-    public static void range(double[] minMaxPairs, int i, double[] coord) {
+    public static void range(double[] minMaxPairs, double[] coord, float shrink) {
         int dim = coord.length;
         int k = 0;
         for (int d = 0; d < dim; d++) {
             double c = coord[d];
-            minMaxPairs[k] = i == 0 ? c : Math.min(minMaxPairs[k], c);
+            minMaxPairs[k] = Math.min(minMaxPairs[k] * shrink, c);
             k++;
-            minMaxPairs[k] = i == 0 ? c : Math.max(minMaxPairs[k], c);
+            minMaxPairs[k] = Math.max(minMaxPairs[k] * shrink, c);
             k++;
         }
     }

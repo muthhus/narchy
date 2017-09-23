@@ -4,6 +4,7 @@ import jcog.Services;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
+import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
 import jcog.util.FloatFloatToFloatFunction;
 import nars.control.Derivation;
@@ -40,7 +41,7 @@ public abstract class Param extends Services<Term,NAR> {
     /** TODO if a task is deleted by this, the system should replace it with a question about the state sometime in the future */
     public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
 
-    public static final float LINK_FORGET_TEMPERATURE = 0.9f;
+    public static final float LINK_FORGET_TEMPERATURE = PriForget.FORGET_TEMPERATURE_DEFAULT;
 
 
     /**

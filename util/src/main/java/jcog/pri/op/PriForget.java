@@ -13,6 +13,8 @@ import java.util.function.Consumer;
  */
 public class PriForget<P extends Priority> implements Consumer<P> {
 
+    public static final float FORGET_TEMPERATURE_DEFAULT = 0.1f;
+
     public final float priFactor;
 
     public PriForget(float priFactor) {
@@ -38,7 +40,9 @@ public class PriForget<P extends Priority> implements Consumer<P> {
         if ((s > 0) && (pressure > 0) && (c > 0) && temperature > 0) {
 
             float priFactor =
-                    Math.max(0, 1f - Math.min(1f, temperature * (pressure)/(c+(c-s /* free space */))));
+                    Math.max(0, 1f - Math.min(1f,
+                            temperature * (pressure)/(c+(c-s /* free space */)))
+                    );
             if (priFactor < 1 - 2 * priEpsilon)
                  return f.valueOf(priFactor);
         }

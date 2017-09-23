@@ -196,7 +196,7 @@ public class STMView {
          */
         protected double[] range;
 
-        protected float sx = 0.2f, sy = 2;
+        protected float sx = 0.5f, sy = 5;
         float tx = 0, ty = -sy;
 
         public GNGVis(NeuralGasNet net) {
@@ -219,7 +219,7 @@ public class STMView {
                 Centroid ii = net.centroids[i];
 
                 float e = (float) ii.localError();
-                draw(gl, centroidHue(ii.id), 0.1f, ii.getDataRef(), i, -(0.5f + 0.5f / (1f + e)));
+                draw(gl, centroidHue(ii.id),  ii.getDataRef(), i, -(0.5f + 0.5f / (1f + e)));
             }
         }
 
@@ -234,26 +234,31 @@ public class STMView {
             range[5] = range[7] = 1;
         }
 
-        protected void draw(GL2 gl, float hue, float w, double[] c, int centroid, float v) {
+        protected void draw(GL2 gl, float hue,  double[] c, int centroid, float v) {
             //float p = n.priSum()/size;
             float xs = sx * r(0, c[0]);
             float xe = sx * r(1, c[1]);
             float y = sy * r(2, c[2]);
             float z = r(3, c[3]);
 
-            w *= sx;
 
             //TODO HACK dimension c > 1 ignored
 
 
+            float H = 0.1f;
 
             if (v < 0) {
                 v = -v;
-                Draw.hsb(gl, hue, 0.5f, z, z * 1f / (1f + w));
-                Draw.rectStroke(gl, tx + xs - w / 2, ty + y - w / 2, w + (xe - xs), w * (sy / sx));
+                Draw.hsb(gl, hue, 0.5f, z, v);
+                Draw.rectStroke(gl,  tx + xs, ty + y - H / 2, tx + xe, H);
             } else {
-                Draw.hsb(gl, hue, 0.5f, z, z * 1f / (1f + w));
-                Draw.rect(gl, tx + xs - w / 2, ty + y - w / 2, w + (xe - xs), w * (sy / sx));
+
+                if (centroid >= 0)
+                    Draw.hsb(gl, hue, 0.5f, z, v);
+                else
+                    gl.glColor4f(0.5f, 0.5f, 0.5f, v); //gray: unassigned
+
+                Draw.rect(gl, tx + xs, ty + y - H / 2, tx + xe, H);
             }
         }
 
@@ -296,10 +301,17 @@ public class STMView {
 
         @Override
         protected void paint(GL2 gl) {
+
+            //temporary
+            //bag.commit(1);
+
             super.paint(gl);
+
             bag.bag.forEach(x -> {
-                draw(gl, centroidHue(x.centroid), 0.05f * x.priElseZero(), x.coord, x.centroid,
-                        0.5f + 0.5f * x.priElseZero());
+
+                int ci = x.centroid;
+                draw(gl, centroidHue(ci), x.coord, ci,
+                        0.1f + 0.2f * x.priElseZero());
             });
         }
     }

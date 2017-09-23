@@ -9,7 +9,6 @@ import jcog.pri.op.PriForget;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -585,7 +584,7 @@ public interface Bag<K, V> extends Table<K, V> {
 
 
     default Bag<K, V> commit() {
-        return commit(forget(0.5f));
+        return commit(forget(PriForget.FORGET_TEMPERATURE_DEFAULT));
     }
 
     /** creates a forget procedure for the current bag's

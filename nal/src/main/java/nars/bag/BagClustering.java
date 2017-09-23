@@ -5,6 +5,7 @@ import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Centroid;
 import jcog.pri.VLink;
 import jcog.pri.op.PriMerge;
+import jcog.util.DoubleBuffer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +45,7 @@ public class BagClustering<X> {
 
 
 
-        PriMerge merge = PriMerge.avg;
+        PriMerge merge = PriMerge.plus;
         this.bag = new ArrayBag<>(merge, new ConcurrentHashMap<>(initialCap)) {
 
 
@@ -54,12 +55,12 @@ public class BagClustering<X> {
                 return x.id;
             }
 
-//            @Override
-//            public void onAdd(@NotNull VLink<X> x) {
-////                synchronized (bag) {
-////                    learn(x);
-////                }
-//            }
+            @Override
+            public void onAdd(@NotNull VLink<X> x) {
+                synchronized (bag) {
+                    learn(x);
+                }
+            }
 //
 //            @Override
 //            public void onRemove(@NotNull VLink<X> value) {
@@ -169,16 +170,15 @@ public class BagClustering<X> {
                     if (s == 0)
                         return false;
 
-                    //                net.compact();
-                    int cc = bag.capacity();
-                    net.setLambda(1 + cc/2);
-                    net.setWinnerUpdateRate(10f / cc, 5f / cc);
-
                     bag.commit(); //first, apply bag forgetting
 
-                    for (int i = 0; i < iterations; i++) {
-                        bag.forEach(this::learn);
-                    }
+                    //                net.compact();
+                    int cc = bag.capacity();
+
+
+//                    for (int i = 0; i < iterations * precision; i++) {
+//                        bag.forEach(this::learn);
+//                    }
                 }
             } catch (Throwable t) {
                 throw new RuntimeException(t);

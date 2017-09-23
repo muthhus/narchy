@@ -96,7 +96,8 @@ public class ClusterJunction extends Causable {
     public void accept(NAR nar, @NotNull Task t) {
         if (STMLinkage.stmLinkable(t, allowNonInput) && (t.punc() == punc && !t.isEternal())) {
             bag.put(t,
-                t.priElseZero()
+                t.priElseZero() + t.conf()
+                //t.priElseZero()
                 //t.conf()
                 //t.conf() * t.priElseZero()
             );
@@ -123,7 +124,7 @@ public class ClusterJunction extends Causable {
 
         //int maxVol = nar.termVolumeMax.intValue() - 2;
 
-        bag.commit(2);
+        bag.commit(1);
 
         return work;
 
