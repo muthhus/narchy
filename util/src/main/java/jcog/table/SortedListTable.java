@@ -21,7 +21,7 @@ abstract public class SortedListTable<X, Y> extends ArrayListTable<X, Y> impleme
      * array of lists of items, for items on different level
      */
     //protected final SortedList_1x4<L> items;
-    protected final @NotNull SortedArray<Y> items;
+    public final @NotNull SortedArray<Y> items;
 
 
     public SortedListTable(SortedArray<Y> items, @NotNull Map<X, Y> map) {

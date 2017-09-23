@@ -46,7 +46,7 @@ public class PriForget<P extends Priority> implements Consumer<P> {
     }
 
     @Override
-    public void accept(@NotNull Priority b) {
+    public void accept(P b) {
         b.priMult(priFactor);
         //b.priSub(avgToBeRemoved);
 

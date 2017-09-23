@@ -1,6 +1,8 @@
 package jcog.math;
 
 
+import jcog.Util;
+import jcog.pri.Pri;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
 /**
@@ -41,7 +43,7 @@ public class StreamingNormalizer {
             if (v < min)
                 n[i * 2 + 1] = v;
 
-            y[i] = (!Float.isFinite(max) || max == min) ? 0 : (v - min) / (max - min);
+            y[i] = (!Float.isFinite(max) || !Float.isFinite(min) || !Util.equals(Math.abs(max - min),0, Pri.EPSILON)) ? v : (v - min) / (max - min);
         }
         return y;
     }

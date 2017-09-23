@@ -2,6 +2,7 @@ package jcog.learn;
 
 import jcog.Util;
 import jcog.decide.Deciding;
+import jcog.pri.Pri;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 
 import java.util.Random;
@@ -15,7 +16,7 @@ import static java.util.Arrays.fill;
  */
 public class Autoencoder {
 
-	final static float NORMALIZATION_EPSILON = Float.MIN_VALUE*2f;
+	final static float NORMALIZATION_EPSILON = Pri.EPSILON*2;
 
 
 	/** input vector after preprocessing (noise, corruption, etc..) */
@@ -159,8 +160,9 @@ public class Autoencoder {
 			for (int i = 0; i < outs; i++) {
 				lengthSq += Util.sqr(y[i]);
 			}
-			float length = (float) Math.sqrt(lengthSq);
-			if (length > NORMALIZATION_EPSILON) {
+			if (lengthSq > NORMALIZATION_EPSILON*NORMALIZATION_EPSILON) {
+				float length = (float) Math.sqrt(lengthSq);
+				assert(length > Pri.EPSILON);
 				for (int i = 0; i < outs; i++) {
 					y[i] /= length;
 				}
@@ -233,7 +235,14 @@ public class Autoencoder {
 				zi += w[j][i] * y[j++];
 			}
 
-			z[i++] = sigmoid ? Util.sigmoid(zi) : zi;
+			zi = sigmoid ?
+					//Util.sigmoid(zi)
+					(Util.tanhFast(zi) + 1) / 2f
+					:
+					zi;
+
+
+			z[i++] = zi;
 		}
 
 		return z;
@@ -284,9 +293,7 @@ public class Autoencoder {
 			float delta = x[i] - z[i];
 
 			error += Math.abs(delta);
-
-			L_vbias[i] = delta;
-			vbias[i] += learningRate * delta;
+			vbias[i] += learningRate * (L_vbias[i] = delta);
 		}
 
 		float[] hbias = this.hbias;

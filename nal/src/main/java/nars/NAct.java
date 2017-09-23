@@ -371,7 +371,7 @@ public interface NAct {
 
     default void actionBipolarExpectationNormalized(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         float v[] = new float[1];
-        FloatNormalized f = new FloatNormalized(() -> v[0]).relax(0.99f);
+        FloatNormalized f = new FloatNormalized(() -> v[0]).relax(0.9f);
         actionBipolarExpectation(s, (x) -> {
             v[0] = Math.abs(x); //HACK
             float y = f.asFloat() * Math.signum(x);
@@ -414,7 +414,7 @@ public interface NAct {
             //0;
 
             int ip = p ? 0 : 1;
-            exp[ip] = g != null ? g.expectation() : 0.5f;
+            exp[ip] = g != null ? g.expectation() : 0f;
             //evi[ip] = g != null ? g.evi(): 0f;
 
             if (!p) {

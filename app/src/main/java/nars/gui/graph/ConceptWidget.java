@@ -1,64 +1,29 @@
 package nars.gui.graph;
 
-import com.jogamp.opengl.GL2;
 import jcog.Util;
-import jcog.bag.Bag;
-import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.FloatParam;
-import jcog.map.MRUCache;
-import jcog.pri.Deleteable;
-import jcog.pri.PLink;
-import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.PriReference;
-import jcog.pri.op.PriMerge;
 import nars.Task;
 import nars.concept.Concept;
-import nars.gui.ConceptIcon;
 import nars.term.Term;
 import nars.term.Termed;
 import org.eclipse.collections.impl.tuple.Tuples;
-import org.jetbrains.annotations.NotNull;
-import spacegraph.SpaceGraph;
-import spacegraph.Surface;
-import spacegraph.phys.Collidable;
-import spacegraph.phys.Dynamic;
-import spacegraph.phys.Dynamics;
-import spacegraph.phys.collision.ClosestRay;
 import spacegraph.render.Draw;
-import spacegraph.render.JoglPhysics;
-import spacegraph.space.Cuboid;
-import spacegraph.space.EDraw;
 
-import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static spacegraph.math.v3.v;
 
 
-public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference<? extends Termed>> {
+public class ConceptWidget extends TermWidget implements Consumer<PriReference<? extends Termed>> {
 
-    public final Bag<TermEdge, TermEdge> edges;
-
-
-    //caches a reference to the current concept
-    public Concept concept;
-    private transient ConceptSpace space;
-    public float pri;
-    final Map edgeBagSharedMap = new MRUCache(1024);
-
-
+    public final static TermVis visDefault = new ConceptWidget.ConceptVis2();
 
     public ConceptWidget(Term x) {
         super(x, 1, 1);
 
-        setFront(
-//            /*col(
-                //new Label(x.toString())
-//                row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(nar, x))
-//                    //new CheckBox("?")
-//            )*/
-                new ConceptIcon(x)
-        );
+
 
 //        final PushButton icon = new PushButton(x.toString(), (z) -> {
 //            setFront(new BeliefTableChart(nar, x).scale(4,4));
@@ -68,16 +33,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
         //float edgeActivationRate = 1f;
 
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
-        this.edges =
-                //new PLinkHijackBag(0, 2);
-                new PLinkArrayBag<>(0,
-                        //PriMerge.max,
-                        //PriMerge.replace,
-                        PriMerge.avg,
-                        //new UnifiedMap()
-                        //new LinkedHashMap()
-                        edgeBagSharedMap
-                );
+
 
 
 //        for (int i = 0; i < edges; i++)
@@ -85,60 +41,15 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
     }
 
-
-    @Override
-    public Dynamic newBody(boolean collidesWithOthersLikeThis) {
-        Dynamic x = super.newBody(collidesWithOthersLikeThis);
-
-
-        final float initDistanceEpsilon = 50f;
-        final float initImpulseEpsilon = 0.25f;
-
-        //place in a random direction
-        x.transform().set(
-                SpaceGraph.r(initDistanceEpsilon),
-                SpaceGraph.r(initDistanceEpsilon),
-                SpaceGraph.r(initDistanceEpsilon));
-
-        //impulse in a random direction
-        x.impulse(v(
-                SpaceGraph.r(initImpulseEpsilon),
-                SpaceGraph.r(initImpulseEpsilon),
-                SpaceGraph.r(initImpulseEpsilon)));
-
-        return x;
-    }
-
-    @Override
-    public void delete(Dynamics dyn) {
-        concept = null;
-        super.delete(dyn);
-        //edges.setCapacity(0);
-    }
-
-
-    @Override
-    public Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons, JoglPhysics space) {
-        Surface s = super.onTouch(body, hitPoint, buttons, space);
-        if (s != null) {
-        }
-
-        if (buttons.length > 0 && buttons[0] == 1) {
-            if (concept!=null)
-                concept.print();
-        }
-
-        return s;
-    }
-
+    public static final Function<Term, ConceptWidget> nodeBuilder = (c) ->
+            new ConceptWidget(c);
 
 
     //final RecycledSummaryStatistics edgeStats = new RecycledSummaryStatistics();
 
-    public void commit(ConceptVis conceptVis, ConceptSpace space) {
+    public void commit(TermVis termVis, TermSpace space) {
 
         this.space = space;
-
 
         Concept c = concept;
 
@@ -162,8 +73,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
                 float priSum = edges.priSum();
 
-                float termlinkOpac = conceptVis.termlinkOpacity.floatValue();
-                float tasklinkOpac = conceptVis.tasklinkOpacity.floatValue();
+                float termlinkOpac = termVis.termlinkOpacity.floatValue();
+                float tasklinkOpac = termVis.tasklinkOpacity.floatValue();
 
 //                float p = edges.depressurize();
 //                float decayRate =
@@ -172,7 +83,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
                     e.decay(0.95f);
                 });
 
-                conceptVis.apply(this, key);
+                termVis.apply(this, key);
 
             }
 
@@ -230,32 +141,6 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 //        return z;
 //    }
 
-    @Override
-    public void renderAbsolute(GL2 gl) {
-        renderEdges(gl);
-    }
-
-
-    void renderEdges(GL2 gl) {
-        edges.forEachKey(f -> {
-            if (f.a > 0)
-                render(gl, f);
-        });
-    }
-
-    public void render(@NotNull GL2 gl, @NotNull EDraw e) {
-
-
-        float width = e.width;
-        float thresh = 0.1f;
-        if (width <= thresh) {
-            gl.glColor4f(e.r, e.g, e.b, e.a * (width / thresh) /* fade opacity */);
-            Draw.renderLineEdge(gl, this, e, width);
-        } else {
-            gl.glColor4f(e.r, e.g, e.b, e.a);
-            Draw.renderHalfTriEdge(gl, this, e, width / 9f, e.r * 2f /* hack */);
-        }
-    }
 
     @Override
     public void accept(PriReference<? extends Termed> tgt) {
@@ -291,105 +176,15 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 //        return this;
 //    }
 
-    public static class TermEdge extends EDraw<Term, ConceptWidget> implements Termed, Deleteable {
-
-        float termlinkPri, tasklinkPri;
-
-        private final int hash;
-
-        public TermEdge(@NotNull ConceptWidget target) {
-            super(target);
-            this.hash = target.key.hashCode();
-        }
-
-        protected void decay(float rate) {
-            //termlinkPri = tasklinkPri = 0;
-
-            //decay
-            termlinkPri *= rate;
-            tasklinkPri *= rate;
-        }
-
-
-        public void add(PriReference b, boolean termOrTask) {
-            float p = b.priElseZero();
-            if (termOrTask) {
-                termlinkPri += p;
-            } else {
-                tasklinkPri += p;
-            }
-        }
-
-        @Override
-        public Term term() {
-            return target.key;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return this == o || target.key.equals(o);
-        }
-
-        @Override
-        public final int hashCode() {
-            return hash;
-        }
-
-        public void update(ConceptWidget src, float conceptEdgePriSum, float termlinkBoost, float tasklinkBoost) {
-
-            float edgeSum = (termlinkPri + tasklinkPri);
-
-
-            if (edgeSum >= 0) {
-
-                //float priAvg = priSum/2f;
-
-                float minLineWidth = 1f;
-                float priToWidth = 1f;
-
-                float widthSqrt = priToWidth * edgeSum;
-                this.width = Util.sqr(minLineWidth + widthSqrt);
-
-                //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
-//                float qEst = ff.qua();
-//                if (qEst!=qEst)
-//                    qEst = 0f;
-
-
-                if (edgeSum > 0) {
-                    this.b = 0.1f;
-                    this.r = 0.1f + 0.8f * (tasklinkPri / edgeSum);
-                    this.g = 0.1f + 0.8f * (termlinkPri / edgeSum);
-                } else {
-                    this.r = this.g = this.b = 0.1f;
-                }
-
-                this.a = Util.or(this.r * tasklinkBoost, this.g * termlinkBoost);
-
-                this.attraction = 0.1f * widthSqrt;// + priSum * 0.75f;// * 0.5f + 0.5f;
-                this.attractionDist = 1f + 2 * src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
-            } else {
-                this.a = -1;
-                this.attraction = 0;
-            }
-
-        }
-
-        @Override
-        public boolean isDeleted() {
-            return !target.active();
-        }
-    }
-
-    public static abstract class ConceptVis {
+    public static abstract class TermVis<X extends TermWidget> {
 
         public final FloatParam termlinkOpacity = new FloatParam(1f, 0f, 1f);
         public final FloatParam tasklinkOpacity = new FloatParam(1f, 0f, 1f);
 
-        public abstract void apply(ConceptWidget w, Term tt);
+        public abstract void apply(X w, Term tt);
     }
 
-    public static class ConceptVis1 extends ConceptVis {
+    public static class ConceptVis1 extends TermVis<ConceptWidget> {
 
         final float minSize = 0.1f;
         final float maxSize = 6f;
@@ -409,7 +204,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
         }
     }
 
-    public static class ConceptVis2 extends ConceptVis {
+    public static class ConceptVis2 extends TermVis<ConceptWidget> {
 
         public FloatParam minSize = new FloatParam(2f, 0.1f, 5f);
         public FloatParam maxSizeMult = new FloatParam(4f, 1f, 5f);

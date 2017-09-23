@@ -13,6 +13,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
+import nars.util.UtilityFunctions;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -89,13 +90,15 @@ public abstract class Param extends Services<Term,NAR> {
     /** budgets derivations from the task and optional belief budget */
     public static final FloatFloatToFloatFunction TaskBeliefCombine =
             Util::or;
+            //UtilityFunctions::aveAri;
+            //Util::and;
 
     /** maximum time (in durations) that a signal task can latch its last value before it becomes unknown */
     public final static int SIGNAL_LATCH_TIME_MAX =
                     //0;
                     //Integer.MAX_VALUE;
                     //4;
-                    32;
+                    8;
 
     /** 'time to live', unification steps until unification is stopped */
     public final MutableInteger matchTTL = new MutableInteger(128);

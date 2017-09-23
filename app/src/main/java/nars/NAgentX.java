@@ -13,6 +13,7 @@ import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
+import nars.gui.STMView;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
@@ -20,7 +21,7 @@ import nars.index.term.map.CaffeineIndex;
 import nars.op.data.reflect;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
-import nars.op.stm.MySTMClustered;
+import nars.op.stm.ClusterJunction;
 import nars.op.stm.STMLinkage;
 import nars.term.Term;
 import nars.time.RealTime;
@@ -149,7 +150,7 @@ abstract public class NAgentX extends NAgent {
 
         int THREADS = 4;
 
-        MultiExec exe = new MultiExec(THREADS, 16384);
+        MultiExec exe = new MultiExec(THREADS, 8192);
         Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
         exe.add(new FocusExec() {
                     {
@@ -191,15 +192,20 @@ abstract public class NAgentX extends NAgent {
         //n.dtMergeOrChoose.setValue(true);
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
-        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, false, 32f);
+
+        ClusterJunction stmBelief = new ClusterJunction(n, true, BELIEF,
+                2, 4, 4, 128);
+
+        STMView.show(n, stmBelief.bag, 800, 600);
+
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
-
-        Inperience inp = new Inperience(n, 4);
-
-        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
-        reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);
+//        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
+//
+//        Inperience inp = new Inperience(n, 4);
+//
+//        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
+//        reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);
 
         NAgent a = init.apply(n);
         //a.trace = true;

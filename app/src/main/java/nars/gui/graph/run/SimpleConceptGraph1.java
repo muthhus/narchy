@@ -114,53 +114,13 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                 /* TODO */ 64, 64, 7, 15);
 
 
-        SpaceGraph<Term> s = new SpaceGraph<>(
-
-                cs.with(
-//                        new SpaceTransform<Term>() {
-//                            @Override
-//                            public void update(SpaceGraph<Term> g, AbstractSpace<Term, ?> src, float dt) {
-//                                float cDepth = -9f;
-//                                src.forEach(s -> {
-//                                    ((SimpleSpatial)s).moveZ(
-//                                            s.key.volume() * cDepth, 0.05f );
-//                                });
-//                            }
-//                        }
-
-                        //new Flatten()
-//                        new Flatten() {
-//                            protected void locate(SimpleSpatial s, v3 f) {
-//                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
-//                            }
-//                        }
-
-
-                        //new Spiral()
-//                        //new FastOrganicLayout()
-                )
-        );
-
-        EdgeDirected fd = new EdgeDirected();
-        s.dyn.addBroadConstraint(fd);
-        s.camPos(0, 0, 90);
-
-        //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
-
-
-        //Vis.conceptsWindow2D
-        s
-
-                //.add(new ZoomOrtho(logConsole(n, 120, 40, new FloatParam(0.25f)).opacity(0.5f)))
-                //.ortho(logConsole( n, 90, 40, new FloatParam(0f)).opacity(0.25f))
-                .camPos(0, 0, 90)
-                .show(1300, 900);
+        cs.show(800, 800, false);
 
         SpaceGraph.window(
                 col(
                         reflect(cs),
-                        reflect(cs.vis),
-                        Vis.reflect(fd),
+//                        reflect(cs.vis),
+                        //Vis.reflect(fd),
                         reflect(n.exe)
                         //new CheckBox("Atoms", atomsEnabled),
                         //reflect( new CycleView(n) ),
@@ -229,6 +189,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
 
     }
+
 
     public static void csvPriority(NAR n, String path) {
 

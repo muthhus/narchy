@@ -64,7 +64,7 @@ public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DCentroid> {
     }
 
     protected void sort() {
-        Centroid[] l = node.clone();
+        Centroid[] l = centroids.clone();
         java.util.Arrays.sort(l, (a,b)-> Doubles.compare(a.getEntry(0), b.getEntry(0)));
         int i = 0;
         for (Centroid m : l) {
@@ -72,7 +72,7 @@ public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DCentroid> {
         }
     }
 
-    @NotNull @Override public Gasolinear.Sorted1DCentroid newNode(int i, int dims) {
+    @NotNull @Override public Gasolinear.Sorted1DCentroid newCentroid(int i, int dims) {
         return (Sorted1DCentroid) new Sorted1DCentroid(i).randomizeUniform(min, max);
     }
 

@@ -6,6 +6,7 @@ import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
+import nars.time.RealTime;
 import spacegraph.SpaceGraph;
 
 import javax.swing.*;
@@ -31,7 +32,7 @@ public class PoleCart extends NAgentX {
 
             try {
                 NAgent a = new PoleCart(n);
-                //((RealTime)n.time).durFPS(80f);
+                //a.durations.setValue(1f);
                 //n.goalConfidence(0.75f);
                 return a;
             } catch (Exception e) {

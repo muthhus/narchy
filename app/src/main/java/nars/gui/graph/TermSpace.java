@@ -1,5 +1,6 @@
 package nars.gui.graph;
 
+import jcog.map.MRUCache;
 import jcog.memoize.LinkedMRUMemoize;
 import jcog.memoize.Memoize;
 import jcog.pri.PriReference;
@@ -8,13 +9,13 @@ import nars.concept.Concept;
 import nars.control.Activate;
 import nars.gui.NARSpace;
 import nars.term.Term;
-import nars.term.Termed;
 import org.eclipse.collections.api.tuple.Pair;
 
+import java.util.Map;
 import java.util.function.Function;
 
 
-abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
+abstract public class TermSpace extends NARSpace<Term, TermWidget> {
 
     public final NAR nar;
 
@@ -23,17 +24,18 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
     public long now;
     public int dur;
 
-    public ConceptWidget.ConceptVis vis =
-        new ConceptWidget.ConceptVis2();
+    final Map edgeBagSharedMap = new MRUCache(1024);
 
-    public Function<ConceptWidget, ConceptWidget.TermEdge> edgeBuilder = ConceptWidget.TermEdge::new;
+
+
+    public Function<TermWidget, TermWidget.TermEdge> edgeBuilder = TermWidget.TermEdge::new;
 
 
 //    public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
 //        this(nar, maxNodes, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
 //    }
 
-    public ConceptSpace(NAR nar, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+    public TermSpace(NAR nar, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         super();
         this.nar = nar;
         this.maxEdgesPerNodeMin = maxEdgesPerNodeMin;
@@ -41,7 +43,7 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
     }
 
 
-//    public final Memoize<Term,ConceptWidget> conceptWidgets = new LinkedMRUMemoize<Term,ConceptWidget>((c) -> {
+    //    public final Memoize<Term,ConceptWidget> conceptWidgets = new LinkedMRUMemoize<Term,ConceptWidget>((c) -> {
 //        ConceptWidget y = new ConceptWidget(c);
 //        return y;
 //    }, 2048) {
@@ -51,17 +53,16 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 //                    .delete(space.dyn);
 //        }
 //    };
-    public Function<Term, ConceptWidget> nodeBuilder = (c) ->
-            new ConceptWidget(c);
-            //conceptWidgets.apply(c);
+
+    //conceptWidgets.apply(c);
 
 
     public final Memoize<Pair<Concept, ConceptWidget /* target */>, ConceptWidget.TermEdge> edges =
-        new LinkedMRUMemoize<>((to) -> edgeBuilder.apply(to.getTwo()), 4096);
+            new LinkedMRUMemoize<>((to) -> edgeBuilder.apply(to.getTwo()), 4096);
 
 
     void removeNode(Activate concept) {
-        if (space!=null)
+        if (space != null)
             space.remove(concept.id.term());
 
 //        @Nullable ConceptWidget cw = widgets.getIfPresent(concept.get());
@@ -79,44 +80,23 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 //    }
 
 
-    protected ConceptWidget conceptWidgetActivation(PriReference<Activate> clink) {
-        Activate c = clink.get();
-        if (c != null) {
 
-            ConceptWidget cw = space.getOrAdd(c.id.term(), nodeBuilder);
-            cw.concept = c.id;
-
-            if (cw != null) {
-                cw.activate();
-                //cw.pri = clink.priElseZero();
-                return cw;
-            }
-        }
-        return null;
-    }
-
-   protected ConceptWidget conceptWidget(PriReference<Concept> clink) {
+    protected ConceptWidget conceptWidget(PriReference<Concept> clink) {
         Concept c = clink.get();
         if (c != null) {
 
-            ConceptWidget cw = space.getOrAdd(c.term(), nodeBuilder);
+            ConceptWidget cw = space.getOrAdd(c.term(), ConceptWidget.nodeBuilder);
             cw.concept = c;
 
-            if (cw != null) {
-                cw.activate();
-                cw.pri = clink.priElseZero();
-                return cw;
-            }
+
+            cw.activate();
+            cw.pri = clink.priElseZero();
+            return cw;
+
         }
         return null;
     }
 
-    protected void update() {
-        for (int i = 0, activeSize = active.size(); i < activeSize; i++) {
-            ConceptWidget a = active.get(i);
-            if (a!=null) a.commit(vis, this);
-        }
-    }
 
 
 }

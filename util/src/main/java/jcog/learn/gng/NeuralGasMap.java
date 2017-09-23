@@ -19,7 +19,8 @@ public class NeuralGasMap extends NeuralGasNet<NeuralGasMap.AECentroid> {
     /** call this before retrieving values */
     public void update() {
 
-        enc.forget(0.01f);
+        enc.forget(0.001f);
+
         forEachNode(n -> {
 
             if (n.center==null)
@@ -27,7 +28,7 @@ public class NeuralGasMap extends NeuralGasNet<NeuralGasMap.AECentroid> {
 
             float[] x1 = Util.doubleToFloatArray(n.getDataRef());
             if (x1[0] == x1[0]) { //avoid NaN contaminating the matrices
-                enc.put(x1, 0.01f, 0.001f, 0.0f, false, false, false);
+                enc.put(x1, 0.02f, 0.001f, 0.0f, false, true, false);
                 arraycopy(enc.output(), 0, n.center, 0, outs);
 //                if (n.isInfinite()) {
 //                    clear();
@@ -54,12 +55,6 @@ public class NeuralGasMap extends NeuralGasNet<NeuralGasMap.AECentroid> {
             randomizeUniform(-1, 1);
         }
 
-        @Override
-        public double learn(double[] x) {
-            double e = super.learn(x);
-            return e;
-        }
-
         public float[] center() {
             return center;
         }
@@ -69,7 +64,7 @@ public class NeuralGasMap extends NeuralGasNet<NeuralGasMap.AECentroid> {
     //final StreamingNormalizer s;
 
     public NeuralGasMap(int in, int maxNodes, int out) {
-        super(in, maxNodes);
+        super(in, maxNodes, null);
         this.outs = out;
         this.enc = new Autoencoder(in, out, new XorShift128PlusRandom(1));
         //this.s = new StreamingNormalizer(in);
@@ -84,7 +79,7 @@ public class NeuralGasMap extends NeuralGasNet<NeuralGasMap.AECentroid> {
 
     @NotNull
     @Override
-    public NeuralGasMap.AECentroid newNode(int i, int dims) {
+    public NeuralGasMap.AECentroid newCentroid(int i, int dims) {
         return new AECentroid(i, dims);
     }
 }

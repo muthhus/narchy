@@ -39,7 +39,7 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
 
         this.net = new NeuralGasNet(3, (short)blobs) {
 
-            @NotNull @Override public Centroid newNode(int i, int dims) {
+            @NotNull @Override public Centroid newCentroid(int i, int dims) {
                 return new Centroid(i, dims);
             }
 

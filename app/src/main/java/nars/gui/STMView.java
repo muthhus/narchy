@@ -1,103 +1,245 @@
-//package nars.gui;
-//
-//import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
-//import com.jogamp.opengl.GL2;
-//import nars.Task;
-//import nars.learn.gng.NeuralGasNet;
-//import nars.link.BLink;
-//import nars.op.time.MySTMClustered;
-//import nars.op.time.STMClustered;
-//import org.jetbrains.annotations.NotNull;
-//import org.jetbrains.annotations.Nullable;
-//import spacegraph.Ortho;
-//import spacegraph.SpaceGraph;
-//import spacegraph.Surface;
-//import spacegraph.obj.layout.Grid;
-//import spacegraph.obj.layout.Stacking;
-//import spacegraph.render.Draw;
-//
-//
-///**
-// * Created by me on 7/20/16.
-// */
-//public class STMView  {
-//
-//
+package nars.gui;
+
+import com.jogamp.opengl.GL2;
+import jcog.Util;
+import jcog.learn.gng.NeuralGasNet;
+import jcog.learn.gng.impl.Centroid;
+import jcog.pri.Pri;
+import nars.$;
+import nars.NAR;
+import nars.Task;
+import nars.bag.BagClustering;
+import nars.control.DurService;
+import nars.gui.graph.ConceptWidget;
+import spacegraph.SpaceGraph;
+import spacegraph.Surface;
+import spacegraph.render.Draw;
+import spacegraph.space.ListSpace;
+
+import java.util.function.Function;
+
+
+/**
+ * Created by me on 7/20/16.
+ */
+public class STMView {
+
+
 //    private final BagChart inputBagChart;
-//    private final MySTMClustered stm;
-//    protected int limit = -1;
-//    public final NeuralGasNet.NeuralGasNetState state = new NeuralGasNet.NeuralGasNetState();
-//
-//    class BubbleChart extends Surface {
-//
-//        @Override
-//        protected void paint(GL2 gl) {
-//            super.paint(gl);
-//
-//            if (state.range.length == 0)
-//                return;
-//
-//            //if (state.range.length!=2)
-//                //throw new UnsupportedOperationException("only dim=2 supported currently");
-//
-//            float s = 1f;
-//            float w = 0.02f;
-//
-//            double[][] coord = state.coord;
-//
-//            @NotNull NeuralGasNet<STMClustered.TasksNode> net = stm.net;
-//
-//            for (int i = 0, coordLength = coord.length; i < coordLength; i++) {
-//
-//                STMClustered.TasksNode n = net.node(i);
-//
-//                float size = n.size();
-//                if (size == 0)
-//                    continue;
-//
-//                double[] c = coord[i];
-//
-//                float p = n.priSum()/size;
-//
-//                float x = (float) c[0];
-//                float y = (float) c[1];
-//                //TODO HACK dimension c > 1 ignored
-//
-//                gl.glColor4f(p, 0.5f, 0, 0.75f);
-//
-//                float r = w * (float)Math.sqrt(size);
-//
-//                Draw.rect(gl, x * s, y * s, r, r);
-//            }
-//
-//        }
-//
-//    }
-//    public STMView(MySTMClustered stm, SpaceGraph s) {
+
+
+    public static class GNGVis3D extends ListSpace<Task,ConceptWidget> {
+
+        private final ConceptWidget[] centroids;
+        protected int limit = -1;
+        final NeuralGasNet net;
+
+        /** local copy of the range data, buffering it because it changes rapidly */
+        protected double[] range;
+
+        protected float sx = 1, sy = 1;
+
+        Function<Centroid, ConceptWidget> centroidVis = c -> {
+            return new ConceptWidget($.the(c.id));
+        };
+
+        public GNGVis3D(NAR nar, BagClustering b) {
+            super();//nar, null, b.bag.capacity(), b.bag.capacity(), 8, 16);
+
+            this.net = b.net;
+
+
+            this.centroids = Util.map(centroidVis, ConceptWidget[]::new, b.net.centroids);
+
+            range = new double[net.dimension*2];
+
+            DurService.build(nar, this::commit);
+        }
+
+        private void commit() {
+
+            updateRange();
+
+            float maxDimNorm = (float) (range[1]-range[0]); //start time span
+
+            int C = net.centroids.length;
+            for (int i = 0, coordLength = C; i < coordLength; i++) {
+                Centroid ii = net.centroids[i];
+
+                float e = (float) ii.localError();
+                //draw(gl, centroidHue(ii.id), 0.1f, ii.getDataRef(), i, 0.5f + 0.5f/(1f+ e));
+            }
+        }
+
+        static float centroidHue(int id) {
+            return (id % 8) / 8f;
+        }
+
+        protected void updateRange() {
+            System.arraycopy(net.rangeMinMax.read(), 0, range, 0, range.length);
+            //override freq and conf dimensions
+            range[4] = range[6] = 0;
+            range[5] = range[7] = 1;
+        }
+
+        protected void draw(GL2 gl, float hue, float w, double[] c, int centroid, float v) {
+            //float p = n.priSum()/size;
+            float xs = sx * r(0, c[0]);
+            float xe = sx * r(1, c[1]);
+            float y = sy * r(2, c[2]);
+            float z = r(3, c[3]);
+
+            //TODO HACK dimension c > 1 ignored
+
+
+            Draw.hsb( gl, hue, 0.5f, z, z *1f/(1f+w));
+            Draw.rect(gl, xs - w / 2, y - w / 2, w+(xe-xs), w);
+        }
+
+        private float r(int d, double v) {
+            double min = range[d * 2];
+            double max = range[d * 2 + 1];
+            float u = Util.equals(Math.abs(max-min), 0, Pri.EPSILON) ?
+                    ((float) v) //as-is
+                    :
+                    (float) ((v - min) / (max - min));
+            float scale = 4f;
+            return u;
+        }
+
+    }
+    public static class GNGVis extends Surface {
+
+        protected int limit = -1;
+        final NeuralGasNet net;
+
+        /** local copy of the range data, buffering it because it changes rapidly */
+        protected double[] range;
+
+        protected float sx = 1, sy = 1;
+
+        public GNGVis(NeuralGasNet net) {
+            this.net = net;
+            range = new double[net.dimension*2];
+        }
+
+        @Override
+        protected void paint(GL2 gl) {
+            super.paint(gl);
+
+            updateRange();
+
+            float maxDimNorm = (float) (range[1]-range[0]); //start time span
+
+            int C = net.centroids.length;
+            for (int i = 0, coordLength = C; i < coordLength; i++) {
+                Centroid ii = net.centroids[i];
+
+                float e = (float) ii.localError();
+                draw(gl, centroidHue(ii.id), 0.1f, ii.getDataRef(), i, 0.5f + 0.5f/(1f+ e));
+            }
+        }
+
+        static float centroidHue(int id) {
+            return (id % 8) / 8f;
+        }
+
+        protected void updateRange() {
+            System.arraycopy(net.rangeMinMax.read(), 0, range, 0, range.length);
+            //override freq and conf dimensions
+            range[4] = range[6] = 0;
+            range[5] = range[7] = 1;
+        }
+
+        protected void draw(GL2 gl, float hue, float w, double[] c, int centroid, float v) {
+            //float p = n.priSum()/size;
+            float xs = sx * r(0, c[0]);
+            float xe = sx * r(1, c[1]);
+            float y = sy * r(2, c[2]);
+            float z = r(3, c[3]);
+
+            //TODO HACK dimension c > 1 ignored
+
+
+            Draw.hsb( gl, hue, 0.5f, z, z *1f/(1f+w));
+            Draw.rect(gl, xs - w / 2, y - w / 2, w+(xe-xs), w);
+        }
+
+        private float r(int d, double v) {
+            double min = range[d * 2];
+            double max = range[d * 2 + 1];
+            float u = Util.equals(Math.abs(max-min), 0, Pri.EPSILON) ?
+                    ((float) v) //as-is
+                    :
+                    (float) ((v - min) / (max - min));
+            float scale = 4f;
+            return u;
+        }
+
+    }
+
+    public static class BagClusterVis extends GNGVis {
+
+        private final BagClustering<?> bag;
+        private final NAR nar;
+
+        public BagClusterVis(NAR nar, BagClustering b) {
+            super(b.net);
+            this.bag = b;
+            this.nar = nar;
+        }
+
+        @Override
+        protected void updateRange() {
+            super.updateRange();
+            final int DURS = 8;
+            long now = nar.time();
+            int dur = nar.dur();
+            range[0] = range[2] = now - dur * DURS;
+            range[1] = range[3] = now + dur * DURS;
+
+//            sy = 4;
+//            sx = 0.5f;
+        }
+
+        @Override
+        protected void paint(GL2 gl) {
+            super.paint(gl);
+            bag.bag.forEach(x -> {
+                draw(gl, centroidHue(x.centroid), 0.05f * x.priElseZero(), x.coord, x.centroid, x.priElseZero());
+            });
+        }
+    }
+//    public STMView(BagClustering c) {
 //        super();
-//        this.stm = stm;
+//        this.c = c;
 //
 //        final float maxVolume = 64;
 //
-//        s.add(new Ortho(
-//                    new Grid(
-//                        inputBagChart = new BagChart<Task>(stm.input, -1) {
-//                            @NotNull
-//                            @Override
-//                            protected ItemVis<BLink<Task>> newItem(@NotNull BLink<Task> i) {
-//                                @Nullable Task ii = i.get();
-//                                String label;
-//                                if (ii != null)
-//                                    label =  ii.toStringWithoutBudget();
-//                                else
-//                                    label = "?";
+////        s.add(new Ortho(
+////                    grid(
+////                        inputBagChart = new BagChart<Task>(c.bag, -1) {
+////                            @Override
+////                            public void accept(Task task, ItemVis<Task> taskItemVis) {
+////
+////                            }
+////
+////                            @NotNull
+////                            @Override
+////                            protected ItemVis<Task> newItem(@NotNull BLink<Task> i) {
+////                                @Nullable Task ii = i.get();
+////                                String label;
+////                                if (ii != null)
+////                                    label =  ii.toStringWithoutBudget();
+////                                else
+////                                    label = "?";
+////
+////                                return new ItemVis<>(i, label(label, 16));
+////                            }
+////                        },
 //
-//                                return new ItemVis<>(i, label(label, 16));
-//                            }
-//                        },
 //
-//
-//                        new Stacking(
+////                        new Stacking(
 ////                            new ConsoleSurface(new TopicTerminal<Task>(
 ////                                stm.generate,
 ////                                    (Task t) -> t.toStringWithoutBudget(),
@@ -110,19 +252,19 @@
 ////                                    null,  //(Task t) -> TextColor.hsb(t.term().volume()/maxVolume, 0.8f, 0.25f),
 ////                                    50, 24
 ////                            )),
-//                            new BubbleChart()
-//                        )
-//                )).maximize());
-//
-//        stm.nar.onFrame(xx -> {
-//            update();
-//        });
+////                            new BubbleChart()
+////                        )
+////                )).maximize());
+////
+////        c.nar.onFrame(xx -> {
+////            update();
+////        });
 //
 //
 //    }
-//
-//    public static void show(MySTMClustered stm, int w, int h) {
-//        SpaceGraph<VirtualTerminal> s = new SpaceGraph<VirtualTerminal>() {
+
+    public static void show(NAR n, BagClustering c, int w, int h) {
+//        SpaceGraph<VirtualTerminal> s = new SpaceGraph<>() {
 //            @Override
 //            public void init(GL2 gl) {
 //                super.init(gl);
@@ -130,20 +272,22 @@
 //            }
 //        };
 //        s.show(w, h);
-//
-//        STMView sv = new STMView(stm, s);
-//
-//
-//    }
-//
+
+        //STMView sv = new STMView(stm);
+
+        GNGVis view = new BagClusterVis(n, c);
+        SpaceGraph.window(view, w, h);
+        //DurService.build(n, view::update);
+    }
+
 //    public void update() {
 //        inputBagChart.update();
 //
 //        synchronized(state) {
-//            state.update(stm.net).normalize();
+//            state.update(c.net).normalize();
 //        }
 //
 //    }
-//
-//
-//}
+
+
+}

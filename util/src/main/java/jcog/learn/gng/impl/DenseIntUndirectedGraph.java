@@ -11,12 +11,20 @@ import java.util.Arrays;
  */
 public class DenseIntUndirectedGraph implements ShortUndirectedGraph {
 
-    public static final int CLEAR_VALUE = Integer.MIN_VALUE;
+    public static final int CLEAR_VALUE =
+            //Integer.MIN_VALUE;
+            0;
+
     public final int[][] data;
 
     public DenseIntUndirectedGraph(short dim) {
         this.data = new int[dim][dim]; //HACK techncially only a triangular matrix should be necessary
         clear();
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.deepToString(data);
     }
 
     @Override
@@ -32,8 +40,11 @@ public class DenseIntUndirectedGraph implements ShortUndirectedGraph {
     }
 
     private void addToEdge(short x, short y, int d) {
-        data[x][y] += d;
-        data[y][x] += d;
+        int e = data[x][y];
+        if (e!=this.CLEAR_VALUE) {
+            data[x][y] += d;
+            data[y][x] += d;
+        }
     }
 
     @Override
@@ -61,9 +72,10 @@ public class DenseIntUndirectedGraph implements ShortUndirectedGraph {
 
     @Override
     public void removeEdgeIf(IntPredicate filter) {
-        for (short i = 0; i < data.length; i++) {
+        int l = data.length;
+        for (short i = 0; i < l; i++) {
             if (filter.accept(i)) {
-                for (short j = 0; j < data.length; j++) {
+                for (short j = 0; j < l; j++) {
                     setEdge(i, j, CLEAR_VALUE);
                 }
             }

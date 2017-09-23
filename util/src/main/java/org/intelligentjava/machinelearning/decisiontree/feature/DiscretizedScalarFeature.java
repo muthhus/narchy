@@ -35,11 +35,11 @@ public class DiscretizedScalarFeature {
     }
 
     public float value() {
-        return (float) discretizer.node[num].getEntry(0);
+        return (float) discretizer.centroids[num].getEntry(0);
     }
 
     protected int levels() {
-        return discretizer.node.length;
+        return discretizer.centroids.length;
     }
 
     class CentroidMatch implements Predicate<Function<Integer, Float>> {
@@ -59,7 +59,7 @@ public class DiscretizedScalarFeature {
         }
 
         public double value() {
-            return discretizer.node[v].getEntry(0);
+            return discretizer.centroids[v].getEntry(0);
         }
 
         @Override

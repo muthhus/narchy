@@ -226,6 +226,9 @@ public abstract class Dynamics<X> extends Collisions<X> {
             CProfileManager.incrementFrameCounter();
 
             return numSimulationSubSteps;
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return 1;
         } finally {
             //BulletStats.popProfile();
 

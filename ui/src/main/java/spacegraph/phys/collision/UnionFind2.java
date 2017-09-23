@@ -108,6 +108,9 @@ public class UnionFind2 {
     }
 
     public void unite(int p, int q) {
+
+        if (p == -1 || q == -1) return; //ignore
+
         int i = find(p), j = find(q);
         if (i == j) {
             return;

@@ -9,6 +9,7 @@ import jcog.pri.op.PriForget;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -601,6 +602,7 @@ public interface Bag<K, V> extends Table<K, V> {
         }
         return null;
     }
+
 
     float mass();
 

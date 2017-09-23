@@ -4,17 +4,17 @@ import com.google.common.primitives.Doubles;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.data.FloatParam;
+import jcog.exe.Loop;
 import jcog.learn.gng.NeuralGasMap;
 import jcog.math.StreamingNormalizer;
 import jcog.net.attn.MeshMap;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.phys.Collidable;
-import spacegraph.phys.Dynamics;
 import spacegraph.render.Draw;
 
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.Queue;
 
 import static spacegraph.SpaceGraph.window;
 
@@ -33,42 +33,49 @@ public class Dimensionaleyez extends SimpleSpatial {
 
     private final MeshMap<Integer, List<Float>> m;
 
-    int outs = 3;
-    final NeuralGasMap n = new NeuralGasMap(5, 64, outs);
+    final static int THREE_D = 3;
+    final static int IN = 5;
+    final NeuralGasMap n = new NeuralGasMap(IN, 64, THREE_D);
+    final FloatParam scale = new FloatParam(10, 0.5f, 300f);
+
+    final Queue<double[]> queue =
+            Util.blockingQueue(1024);
 
     private final StreamingNormalizer s;
 
     public Dimensionaleyez(String id) {
         super(id);
 
-        s = new StreamingNormalizer(5);
+        s = new StreamingNormalizer(IN);
         m = MeshMap.get(id, (k, v) -> {
             //System.out.println(k + " " + v);
             accept(k, v);
         });
+
+        new Loop() {
+
+            @Override
+            public boolean next() {
+                double[] x;
+                while ((x = queue.poll()) != null) {
+                    float[] df = Util.doubleToFloatArray(x); //HACK
+                    x = Util.floatToDoubleArray(s.normalize(df, df)); //HACK
+
+                    //history.addLast(da);
+
+
+                    n.put(x);
+                }
+
+
+                n.update();
+                return true;
+
+            }
+        }.runFPS(20f);
     }
 
-    @Override
-    public void update(Dynamics world) {
-        super.update(world);
 
-        double[] x;
-        while ((x = queue.poll()) != null) {
-            float[] df = Util.doubleToFloatArray(x); //HACK
-            x = Util.floatToDoubleArray(s.normalize(df, df)); //HACK
-
-            //history.addLast(da);
-
-
-            n.put(x);
-        }
-
-
-        n.update();
-
-    }
-
-    final ArrayBlockingQueue<double[]> queue = new ArrayBlockingQueue<double[]>(1024);
 
     private void accept(Integer k, List v) {
         double[] da = Doubles.toArray(v);
@@ -79,7 +86,6 @@ public class Dimensionaleyez extends SimpleSpatial {
 //    /** NOTE: history could also be a bag, prioritized by error in order to collect the most anomalous samples */
 //    final CircularArrayList<double[]> history = new CircularArrayList<>(512);
 
-    final FloatParam scale = new FloatParam(10, 0.5f, 200f);
 
     @Override
     public void renderRelative(GL2 gl, Collidable body) {
@@ -111,7 +117,7 @@ public class Dimensionaleyez extends SimpleSpatial {
             float p = 0.3f + (float) (0.7f / (1f + n.localDistance()));
 
             float sat = 0.5f;
-            float hue = 0.1f + 0.3f * (last);
+            float hue = (n.id%10)/10f;
             float bri = 0.5f;
             float size = last;
 

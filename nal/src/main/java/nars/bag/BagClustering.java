@@ -1,15 +1,14 @@
 package nars.bag;
 
 import jcog.bag.impl.ArrayBag;
-import jcog.bag.impl.PLinkArrayBag;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Centroid;
 import jcog.pri.PLink;
-import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,47 +19,129 @@ import java.util.stream.Stream;
  * clusterjunctioning
  * TODO abstract into general purpose "Cluster of Bags" class
  */
-public abstract class BagClustering<K,X>  {
+public class BagClustering<X> {
 
+    public final ArrayBag<X, VLink<X>> bag;
 
+    final Dimensionalize<X> model;
 
-    /** how to interpret the bag items as vector space data */
-    abstract public static class Dimensionalize<X> {
+    public final Clusters net;
 
-        /** TODO allow dynamic change */
-        public final short clusters;
-
-        public final int dims;
-
-        protected Dimensionalize(short clusters, int dims) {
-            this.clusters = clusters;
-            this.dims = dims;
-        }
-
-        abstract public double[] coord(/*@NotNull*/ X t);
-
-        abstract public double distanceSq(double[] x, double[] y);
-
-    }
-
-    public static class BagCentroid extends Centroid {
-
-        BagCentroid(int id, int dimensions) {
-            super(id, dimensions);
-        }
-    }
-
-
-
-
+    final AtomicBoolean busy = new AtomicBoolean(false);
 
 
     /**
-     * priotized vector link
-     *      a) reference to an item
-     *      b) priority
-     *      c) vector coordinates
-     *      d) current centroid id(s)
+     * TODO allow dynamic change
+     */
+    private final short clusters;
+
+    public BagClustering(Dimensionalize<X> model, int centroids, int initialCap) {
+
+        this.clusters = (short) centroids;
+
+        this.model = model;
+
+        this.net = new Clusters(model.dims, centroids);
+
+
+
+        PriMerge merge = PriMerge.avg;
+        this.bag = new ArrayBag<>(merge, new ConcurrentHashMap<>(initialCap)) {
+
+
+            @Nullable
+            @Override
+            public X key(@NotNull VLink<X> x) {
+                return x.id;
+            }
+
+//            @Override
+//            public void onAdd(@NotNull VLink<X> x) {
+////                synchronized (bag) {
+////                    learn(x);
+////                }
+//            }
+//
+//            @Override
+//            public void onRemove(@NotNull VLink<X> value) {
+//                //value.delete();
+//            }
+
+
+        };
+        bag.setCapacity(initialCap);
+
+
+    }
+
+
+    public Centroid newCentroid(int i, int dims) {
+        return new BagCentroid(i, dims);
+    }
+
+    public void print() {
+        print(System.out);
+    }
+
+    public void print(PrintStream out) {
+        forEachCluster(c -> {
+            out.println(c.toString());
+            stream(c.id).forEach(i -> {
+                out.print("\t");
+                out.println(i);
+            });
+            out.println();
+        });
+        out.println(net.edges);
+    }
+
+    public void forEachCluster(Consumer<Centroid> c) {
+        for (Centroid b : net.centroids) {
+            c.accept(b);
+        }
+    }
+
+
+//    protected class MyForget extends PriForget<VLink<X>> {
+//
+//        public MyForget(float priFactor) {
+//            super(priFactor);
+//        }
+//
+//        @Override
+//        public void accept(VLink<X> b) {
+//            super.accept(b);
+//            learn(b);
+//        }
+//    }
+
+    public int size() {
+        return bag.size();
+    }
+
+
+    /**
+     * how to interpret the bag items as vector space data
+     */
+    abstract public static class Dimensionalize<X> {
+
+        public final int dims;
+
+        protected Dimensionalize(int dims) {
+            this.dims = dims;
+        }
+
+        abstract public void coord(X t, double[] d);
+
+    }
+
+
+    /**
+     * prioritized vector link
+     * a) reference to an item
+     * b) priority
+     * c) vector coordinates
+     * d) current centroid id(s)
      */
     public final class VLink<X> extends PLink<X> {
 
@@ -72,19 +153,27 @@ public abstract class BagClustering<K,X>  {
 
         /**
          * current centroid
+         * TODO if allowing multiple memberships this will be a RoaringBitmap or something
          */
-        int centroid;
+        public int centroid = -1;
 
-        public VLink(@NotNull X t, float pri, Dimensionalize d) {
+        public VLink(X t, float pri, Dimensionalize<X> d) {
             super(t, pri);
-            this.coord = d.coord(t);
+            this.coord = new double[d.dims];
+            update(d);
         }
 
+        /**
+         * call this to revectorize, ie. if a dimension has changed
+         */
+        public void update(Dimensionalize<X> d) {
+            d.coord(id, coord);
+        }
 
         @NotNull
         @Override
         public String toString() {
-            return get() + "<<" + Arrays.toString(coord) + '|' + id + ">>";
+            return id + "<" + Arrays.toString(coord) + '@' + centroid+ ">";
         }
 
         @Override
@@ -96,88 +185,58 @@ public abstract class BagClustering<K,X>  {
     }
 
 
-    /** TODO make this an abstract class or interface for pluggable Clustering implementations. gasnet is just the first for now */
-    public class Clusters extends NeuralGasNet {
+    /**
+     * TODO make this an abstract class or interface for pluggable Clustering implementations. gasnet is just the first for now
+     */
+    public class Clusters extends NeuralGasNet<Centroid> {
 
         public Clusters(int dimension, int maxNodes) {
-            super(dimension, maxNodes);
+            this(dimension, maxNodes, null);
+        }
+
+        public Clusters(int dimension, int maxNodes, Centroid.DistanceFunction distanceSq) {
+            super(dimension, maxNodes, distanceSq);
         }
 
         @NotNull
         @Override
-        public Centroid newNode(int i, int dims) {
-            return new Centroid(i, dims);
+        public Centroid newCentroid(int i, int dims) {
+            return new BagCentroid(i, dims);
         }
 
-    }
-    
-    public final ArrayBag<X, VLink<X>> bag;
 
-    private final Dimensionalize model;
-
-    private final Clusters net;
-
-
-    protected BagClustering(Dimensionalize<X> model, int initialCap) {
-
-        this.model = model;
-
-        PriMerge merge = PriMerge.max;
-        this.bag = new ArrayBag<>(merge, new ConcurrentHashMap<>(initialCap)) {
-
-            @Nullable
-            @Override
-            public X key(@NotNull VLink<X> x) {
-                return x.id;
-            }
-
-            @Override
-            public void onAdd(@NotNull VLink<X> x) {
-                synchronized (net) {
-                    learn(x);
-                }
-            }
-
-            @Override
-            public void onRemove(@NotNull VLink<X> value) {
-                value.delete();
-            }
-
-            @Nullable
-            @Override
-            public Consumer<VLink<X>> forget(float temperature) {
-                return new PriForget<>(temperature) {
-                    @Override
-                    public void accept(@NotNull VLink<X> b) {
-                        super.accept(b);
-                        learn(b);
-                    }
-                };
-            }
-        };
-        bag.setCapacity(initialCap);
-
-        this.net = new Clusters(model.dims, model.clusters) {
-            @Override
-            public @NotNull Centroid newNode(int i, int dims) {
-                return new BagNode(i, dims);
-            }
-        };
     }
 
 
-    final AtomicBoolean busy = new AtomicBoolean(false);
-
-    protected boolean update() {
+    public boolean commit(int iterations) {
 
         if (busy.compareAndSet(false, true)) {
 
-            synchronized (net) {
-                bag.commit();
-                net.compact();
+            try {
+                synchronized (bag.items) {
+
+                    int s = bag.size();
+                    if (s == 0)
+                        return false;
+
+                    //                net.compact();
+                    int cc = bag.capacity();
+                    net.setLambda(1 + cc/2);
+                    net.setWinnerUpdateRate(10f / cc, 5f / cc);
+
+                    bag.commit(); //first, apply bag forgetting
+
+                    for (int i = 0; i < iterations; i++) {
+                        bag.forEach(this::learn);
+                    }
+                }
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            } finally {
+                 busy.set(false);
+
             }
 
-            busy.set(false);
             return true;
         } else {
             return false;
@@ -190,56 +249,60 @@ public abstract class BagClustering<K,X>  {
     }
 
     public void clear() {
-        synchronized (bag) {
+        synchronized (bag.items) {
             bag.clear();
-            synchronized (net) {
-                net.clear();
-            }
+            net.clear();
         }
     }
 
     public void put(X x, float pri) {
-        bag.putAsync(new VLink<X>(x, pri, model)); //TODO defer vectorization until after accepted
+        bag.putAsync(new VLink<>(x, pri, model)); //TODO defer vectorization until after accepted
     }
 
     public void remove(X x) {
         bag.remove(x);
     }
 
-    /** returns NaN if either or both of the items are not present */
+    /**
+     * returns NaN if either or both of the items are not present
+     */
     public double distance(X x, X y) {
-        assert(!x.equals(y));
+        assert (!x.equals(y));
         @Nullable VLink<X> xx = bag.get(x);
-        if (xx!=null && xx.centroid>=0) {
+        if (xx != null && xx.centroid >= 0) {
             @Nullable VLink<X> yy = bag.get(y);
-            if (yy!=null && yy.centroid>=0) {
-                return model.distanceSq(xx.coord, yy.coord);
+            if (yy != null && yy.centroid >= 0) {
+                return Math.sqrt( net.distanceSq.distance(xx.coord, yy.coord) );
             }
         }
-        return Double.NaN;
+        return Double.POSITIVE_INFINITY;
+    }
+
+    /**
+     * TODO this is O(N) not great
+     */
+    public Stream<VLink<X>> stream(int centroid) {
+        return bag.stream().filter(y -> y.centroid == centroid);
     }
 
     public Stream<VLink<X>> neighbors(X x) {
         @Nullable VLink<X> link = bag.get(x);
-        if (link!=null) {
+        if (link != null) {
             int centroid = link.centroid;
-            if (centroid>=0) {
-                Centroid[] nodes = net.node;
+            if (centroid >= 0) {
+                Centroid[] nodes = net.centroids;
                 if (centroid < nodes.length) //in case of resize
-                    return bag.stream().filter(y -> y.centroid == centroid);
+                    return stream(centroid)
+                            .filter(y -> !y.equals(x))
+                            ;
             }
         }
         return Stream.empty();
     }
 
-    private class BagNode extends Centroid {
-        public BagNode(int i, int dims) {
+    public class BagCentroid extends Centroid {
+        public BagCentroid(int i, int dims) {
             super(i, dims);
-        }
-
-        @Override
-        public double distanceSq(double[] x) {
-            return model.distanceSq(getDataRef(), x);
         }
     }
 
