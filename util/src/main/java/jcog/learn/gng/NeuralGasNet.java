@@ -2,7 +2,7 @@ package jcog.learn.gng;
 
 import com.google.common.base.Joiner;
 import jcog.learn.gng.impl.DenseIntUndirectedGraph;
-import jcog.learn.gng.impl.Node;
+import jcog.learn.gng.impl.Centroid;
 import jcog.learn.gng.impl.ShortUndirectedGraph;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,14 +13,14 @@ import java.util.stream.Stream;
  * from: https://github.com/scadgek/NeuralGas
  * TODO use a graph for incidence structures to avoid some loops
  */
-abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Connection<N>>*/ {
+abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N, Connection<N>>*/ {
 
 
     private final int dimension;
 
 
     private final ShortUndirectedGraph e;
-    public final Node[] node;
+    public final Centroid[] node;
 
     private int iteration;
 
@@ -76,7 +76,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         this.e =
                 //new SemiDenseShortUndirectedGraph((short) maxNodes);
                 new DenseIntUndirectedGraph((short)maxNodes);
-        this.node = new Node[maxNodes];
+        this.node = new Centroid[maxNodes];
         clear();
      /** nodes should begin with randomized coordinates */
         for (int i = 0; i < maxNodes; i++) {
@@ -110,7 +110,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
     }
 
     public void forEachNode(Consumer<N> each) {
-        for (Node n : node)
+        for (Centroid n : node)
             each.accept((N)n);
     }
 
@@ -125,8 +125,8 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
     public N closest(double... x) {
         //find closest nodes
         double minDist = Double.POSITIVE_INFINITY;
-        Node closest = null;
-        for (Node n : node) {
+        Centroid closest = null;
+        for (Centroid n : node) {
             if (n.distanceSq(x) < minDist)
                 closest = n;
         }
@@ -138,7 +138,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
      * translates all nodes uniformly
      */
     public void translate(double[] x) {
-        for (Node n : node) {
+        for (Centroid n : node) {
             n.add(x);
         }
     }
@@ -154,7 +154,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
         final int nodes = maxNodes;
         for (short j = 0; j < nodes; j++) {
-            Node nj = this.node[j];
+            Centroid nj = this.node[j];
             if (nj == null)
                 continue;
             double dd = nj.learn(x);
@@ -171,7 +171,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
         double minDist2 = Double.POSITIVE_INFINITY;
         for (short j = 0; j < nodes; j++) {
-            Node n = node[j];
+            Centroid n = node[j];
             if (n == null)
                 continue;
             if (j == closest) continue;
@@ -219,7 +219,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
             {
                 double maxError = Double.NEGATIVE_INFINITY;
                 for (int i = 0, nodeLength = node.length; i < nodeLength; i++) {
-                    Node n = node[i];
+                    Centroid n = node[i];
                     if (i == furthest) continue; //skip furthest which was supposed to be removed, and will be replaced below
                     if (n.localError() > maxError) {
                         maxErrorID = (short) i;
@@ -239,7 +239,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
             short _maxErrorNeighbour[] = {-1};
             e.edgesOf(maxErrorID, (otherNodeID) -> {
 
-                Node otherNode = node[otherNodeID];
+                Centroid otherNode = node[otherNodeID];
 
                 if (otherNode.localError() > maxError[0]) {
                     _maxErrorNeighbour[0] = otherNodeID;
@@ -270,8 +270,8 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
             //create node between errorest nodes
             N newNode = newNode(furthest, dimension);
-            Node maxErrorNeighbor = node[maxErrorNeighborID];
-            Node maxErrorNode = node[maxErrorID];
+            Centroid maxErrorNeighbor = node[maxErrorNeighborID];
+            Centroid maxErrorNode = node[maxErrorID];
             newNode.set(maxErrorNode, maxErrorNeighbor);
             node[furthest] = newNode;
 
@@ -292,7 +292,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         //System.out.println(node.size() + " nodes, " + edgeSet().size() + " edges in neuralgasnet");
 
         //update errors of the nodes
-        for (Node n : node) {
+        for (Centroid n : node) {
             n.mulLocalError(beta);
         }
 
@@ -392,9 +392,9 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
                 range[d][0] = Float.POSITIVE_INFINITY;
                 range[d][1] = Float.NEGATIVE_INFINITY;
             }
-            Node[] node1 = n.node;
+            Centroid[] node1 = n.node;
             for (int i = 0, node1Length = node1.length; i < node1Length; i++) {
-                Node x = node1[i];
+                Centroid x = node1[i];
 
                 double[] cc = coord[i];
                 double[] dd = x.getDataRef();

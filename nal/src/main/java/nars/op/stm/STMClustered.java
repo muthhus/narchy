@@ -5,7 +5,7 @@ import jcog.bag.Bag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.MutableInteger;
 import jcog.learn.gng.NeuralGasNet;
-import jcog.learn.gng.impl.Node;
+import jcog.learn.gng.impl.Centroid;
 import jcog.pri.PLink;
 import nars.NAR;
 import nars.Task;
@@ -43,7 +43,7 @@ public abstract class STMClustered extends TaskService {
 
 
     @NotNull
-    public final NeuralGasNet<TasksNode> net;
+    public final NeuralGasNet<TasksCentroid> net;
 
     //final Map<TLink,TasksNode> transfer = new ConcurrentHashMap();
 
@@ -56,14 +56,14 @@ public abstract class STMClustered extends TaskService {
 
     final static double[] noCoherence = {0, 0};
 
-    public final class TasksNode extends Node {
+    public final class TasksCentroid extends Centroid {
 
         private final Bag<TLink, TLink> tasks;
 
         /**
          * current members
          */
-        public TasksNode(int id, int cap) {
+        public TasksCentroid(int id, int cap) {
 
             super(id, dims);
             tasks = new PriorityHijackBag<>(cap, 3) {
@@ -87,7 +87,7 @@ public abstract class STMClustered extends TaskService {
 
                 @Override
                 public void onAdd(@NotNull TLink x) {
-                    x.node = TasksNode.this;
+                    x.node = TasksCentroid.this;
                 }
 
                 @Override
@@ -124,7 +124,7 @@ public abstract class STMClustered extends TaskService {
         }
 
         public void transfer(@NotNull TLink x) {
-            TasksNode previous = x.node;
+            TasksCentroid previous = x.node;
             if (previous == this)
                 return; //nothing to do
 
@@ -243,7 +243,7 @@ public abstract class STMClustered extends TaskService {
         /**
          * current centroid
          */
-        @Nullable TasksNode node;
+        @Nullable STMClustered.TasksCentroid node;
 
         public TLink(@NotNull Task t) {
             super(t, t.priElseZero());
@@ -265,7 +265,7 @@ public abstract class STMClustered extends TaskService {
         }
 
 
-        private TasksNode nearest() {
+        private TasksCentroid nearest() {
             return net.put(filter(coord));
         }
 
@@ -356,8 +356,8 @@ public abstract class STMClustered extends TaskService {
         this.net = new NeuralGasNet<>(dims, clusters) {
             @NotNull
             @Override
-            public STMClustered.TasksNode newNode(int i, int _dims) {
-                TasksNode c = newCentroid(i);
+            public STMClustered.TasksCentroid newNode(int i, int _dims) {
+                TasksCentroid c = newCentroid(i);
                 c.filter();
                 return c;
             }
@@ -370,7 +370,7 @@ public abstract class STMClustered extends TaskService {
 //                    }
 
             @Override
-            protected void removed(TasksNode furthest) {
+            protected void removed(TasksCentroid furthest) {
                 //System.err.println("node removed: " + furthest);
                 //removed.add(furthest);
 
@@ -389,7 +389,7 @@ public abstract class STMClustered extends TaskService {
         nar.onCycle(this::iterate);
     }
 
-    abstract protected TasksNode newCentroid(int id);
+    abstract protected TasksCentroid newCentroid(int id);
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
@@ -430,7 +430,7 @@ public abstract class STMClustered extends TaskService {
 
         TLink tt = new TLink(t);
 
-        TasksNode nearest;
+        TasksCentroid nearest;
         synchronized (net) {
             nearest = tt.nearest();
             nearest.transfer(tt);
@@ -465,7 +465,7 @@ public abstract class STMClustered extends TaskService {
 
 
     public IntSummaryStatistics nodeStatistics() {
-        return net.nodeStream().mapToInt(TasksNode::size).summaryStatistics();
+        return net.nodeStream().mapToInt(TasksCentroid::size).summaryStatistics();
     }
 
 

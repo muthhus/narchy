@@ -4,7 +4,7 @@ package jcog.learn.gng.impl;
 import java.util.Objects;
 
 
-public class Connection<N extends Node>  {
+public class Connection<N extends Centroid>  {
     public final N from;
     public final N to;
     private final int hash;

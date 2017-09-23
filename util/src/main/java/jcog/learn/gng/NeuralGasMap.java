@@ -2,7 +2,7 @@ package jcog.learn.gng;
 
 import jcog.Util;
 import jcog.learn.Autoencoder;
-import jcog.learn.gng.impl.Node;
+import jcog.learn.gng.impl.Centroid;
 import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +11,7 @@ import static java.lang.System.arraycopy;
 /**
  * dimension reduction applied to a neural gasnet
  */
-public class NeuralGasMap extends NeuralGasNet<NeuralGasMap.AENode> {
+public class NeuralGasMap extends NeuralGasNet<NeuralGasMap.AECentroid> {
 
     private final Autoencoder enc;
     private final int outs;
@@ -45,11 +45,11 @@ public class NeuralGasMap extends NeuralGasNet<NeuralGasMap.AENode> {
             enc.randomize();
     }
 
-    public static class AENode extends Node {
+    public static class AECentroid extends Centroid {
 
         public float[] center;
 
-        public AENode(int id, int dimensions) {
+        public AECentroid(int id, int dimensions) {
             super(id, dimensions);
             randomizeUniform(-1, 1);
         }
@@ -78,13 +78,13 @@ public class NeuralGasMap extends NeuralGasNet<NeuralGasMap.AENode> {
 
 
     @Override
-    public AENode put(double[] x) {
+    public AECentroid put(double[] x) {
         return super.put(x);
     }
 
     @NotNull
     @Override
-    public AENode newNode(int i, int dims) {
-        return new AENode(i, dims);
+    public NeuralGasMap.AECentroid newNode(int i, int dims) {
+        return new AECentroid(i, dims);
     }
 }

@@ -2,19 +2,21 @@ package jcog.learn.gng.impl;
 
 
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.ml.distance.DistanceMeasure;
+import org.apache.commons.math3.util.MathArrays;
 
 import static jcog.Texts.n4;
 
 /**
  * Created by Scadgek on 11/3/2014.
  */
-public class Node extends ArrayRealVector  {
+public class Centroid extends ArrayRealVector  {
 
     public final int id;
     private double localError;
     private double localDistanceSq; //caches square of last tested distance
 
-    public Node(int id, int dimensions) {
+    public Centroid(int id, int dimensions) {
         super(dimensions);
         this.id = id;
         this.localError = 0;
@@ -22,7 +24,7 @@ public class Node extends ArrayRealVector  {
 
     @Override
     public boolean equals(Object other) {
-        return (this == other) || ((Node)other).id == id;
+        return (this == other) || ((Centroid)other).id == id;
     }
 
     @Override
@@ -31,7 +33,7 @@ public class Node extends ArrayRealVector  {
     }
 
     /** create a node from two existing nodes */
-    public void set(Node maxErrorNode, Node maxErrorNeighbour) {
+    public void set(Centroid maxErrorNode, Centroid maxErrorNeighbour) {
         double[] a = maxErrorNode.getDataRef();
         setLocalError(maxErrorNode.localError());
         double[] b = maxErrorNeighbour.getDataRef();
@@ -41,12 +43,12 @@ public class Node extends ArrayRealVector  {
         }
     }
 
-    public Node randomizeUniform(int dim, double min, double max) {
+    public Centroid randomizeUniform(int dim, double min, double max) {
         setEntry(dim, Math.random() * (max-min) + min);
         return this;
     }
 
-    public Node randomizeUniform(double min, double max) {
+    public Centroid randomizeUniform(double min, double max) {
         int dim = getDimension();
         for (int i = 0; i < dim; i++) {
             setEntry(i, Math.random() * (max-min) + min);
@@ -66,7 +68,7 @@ public class Node extends ArrayRealVector  {
         return localError;
     }
 
-    public Node setLocalError(double localError) {
+    public Centroid setLocalError(double localError) {
         this.localError = localError;
         return this;
     }
@@ -76,8 +78,15 @@ public class Node extends ArrayRealVector  {
     }
 
     public double distanceSq(final double[] x) {
+        return distanceCartesian(getDataRef(), x);
+    }
+
+    public static double distanceManhattan(double[] x, double[] y) {
+        return MathArrays.distance1(x, y);
+    }
+
+    public static double distanceCartesian(double[] x, double[] y) {
         double s = 0;
-        final double[] y = getDataRef();
         int l = y.length;
         for (int i = 0; i < l; i++) {
             final double d = y[i] - x[i];
@@ -85,7 +94,6 @@ public class Node extends ArrayRealVector  {
         }
         return s;
     }
-
 
 
     public double distance(final double[] x) {
@@ -124,7 +132,7 @@ public class Node extends ArrayRealVector  {
 
 
 
-    public double getDistanceSq(Node b) {
+    public double getDistanceSq(Centroid b) {
         return distanceSq(b.getDataRef());
     }
 

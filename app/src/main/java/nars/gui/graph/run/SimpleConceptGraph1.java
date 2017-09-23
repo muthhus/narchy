@@ -1,5 +1,6 @@
 package nars.gui.graph.run;
 
+import jcog.data.FloatParam;
 import jcog.math.MultiStatistics;
 import jcog.meter.event.CSVOutput;
 import nars.NAR;
@@ -15,11 +16,13 @@ import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static nars.gui.Vis.logConsole;
 import static nars.gui.Vis.reflect;
 import static spacegraph.layout.Grid.col;
 
@@ -149,8 +152,8 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         s
 
                 //.add(new ZoomOrtho(logConsole(n, 120, 40, new FloatParam(0.25f)).opacity(0.5f)))
+                //.ortho(logConsole( n, 90, 40, new FloatParam(0f)).opacity(0.25f))
                 .camPos(0, 0, 90)
-                //.ortho( logConsole(n, 40, 10, 0.0f) )
                 .show(1300, 900);
 
         SpaceGraph.window(

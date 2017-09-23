@@ -90,11 +90,11 @@ public interface Bag<K, V> extends Table<K, V> {
     V remove(@NotNull K x);
 
 
-    default V put(@NotNull V x) {
+    default V put(/*@NotNull */V x) {
         return put(x, null);
     }
 
-    default void putAsync(@NotNull V b) {
+    default void putAsync(/*@NotNull */V b) {
         put(b);
     }
 

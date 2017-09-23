@@ -2,7 +2,7 @@ package nars.video;
 
 import com.jogamp.opengl.GL2;
 import jcog.learn.gng.NeuralGasNet;
-import jcog.learn.gng.impl.Node;
+import jcog.learn.gng.impl.Centroid;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatSupplier;
 import nars.$;
@@ -39,8 +39,8 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
 
         this.net = new NeuralGasNet(3, (short)blobs) {
 
-            @NotNull @Override public Node newNode(int i, int dims) {
-                return new Node(i, dims);
+            @NotNull @Override public Centroid newNode(int i, int dims) {
+                return new Centroid(i, dims);
             }
 
         };
@@ -52,7 +52,7 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
             Term base = $.func("blob" , $.the(i), root);
 
             FloatSupplier v2 = () -> {
-                Node node = net.node(i);
+                Centroid node = net.node(i);
                 if (node!=null)
                     return (float) node.getEntry(0);
                 else
@@ -60,7 +60,7 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
             };
             agent.senseNumber($.inh(base, Atomic.the("x")), new FloatNormalized(v2, 0f, 1f));
             FloatSupplier v1 = () -> {
-                Node node = net.node(i);
+                Centroid node = net.node(i);
                 if (node!=null)
                     return (float) node.getEntry(1);
                 else
@@ -68,7 +68,7 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
             };
             agent.senseNumber($.inh(base, Atomic.the("y")), new FloatNormalized(v1, 0f, 1f));
             FloatSupplier v = () -> {
-                Node node = net.node(i);
+                Centroid node = net.node(i);
                 if (node!=null)
                     return (float) node.getEntry(2);
                 else
@@ -89,7 +89,7 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
             protected void paint(GL2 gl) {
                 int nodes = net.size();
                 for (int i = 0; i < nodes; i++) {
-                    Node n = net.node(i);
+                    Centroid n = net.node(i);
                     float e = (float) ((1f + n.localDistance()) * (1f + n.localError()));
                     float x = (float) n.getEntry(0);
                     float y = (float) n.getEntry(1);

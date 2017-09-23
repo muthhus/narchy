@@ -111,8 +111,8 @@ public class MySTMClustered extends STMClustered {
     }
 
     @Override
-    protected TasksNode newCentroid(int id) {
-        TasksNode t = new TasksNode(id, capacity.intValue() / clusters);
+    protected TasksCentroid newCentroid(int id) {
+        TasksCentroid t = new TasksCentroid(id, capacity.intValue() / clusters);
         t.randomizeUniform(0, dur * -2, dur * +2);
         t.randomizeUniform(1, dur * -2, dur * +2);
         t.randomizeUniform(2, 0f, 1f);

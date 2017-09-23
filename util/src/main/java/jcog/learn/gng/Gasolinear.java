@@ -1,22 +1,22 @@
 package jcog.learn.gng;
 
 import com.google.common.primitives.Doubles;
-import jcog.learn.gng.impl.Node;
+import jcog.learn.gng.impl.Centroid;
 import org.jetbrains.annotations.NotNull;
 
 /** convenience class for discretizing points in a 1D (linear) space
  *  with growing neural gasnet
  *
  * */
-public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DNode> {
+public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DCentroid> {
 
 
     boolean needsSort = true;
     private double min, max;
 
-    public static class Sorted1DNode extends Node {
+    public static class Sorted1DCentroid extends Centroid {
         public int order = -1;
-        public Sorted1DNode(int id) {
+        public Sorted1DCentroid(int id) {
             super(id, 1);
         }
     }
@@ -57,23 +57,23 @@ public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DNode> {
     }
 
     @Override
-    public Sorted1DNode put(double... x) {
-        Sorted1DNode y = super.put(x);
+    public Sorted1DCentroid put(double... x) {
+        Sorted1DCentroid y = super.put(x);
         needsSort = true;
         return y;
     }
 
     protected void sort() {
-        Node[] l = node.clone();
+        Centroid[] l = node.clone();
         java.util.Arrays.sort(l, (a,b)-> Doubles.compare(a.getEntry(0), b.getEntry(0)));
         int i = 0;
-        for (Node m : l) {
-            ((Sorted1DNode)m).order = i++;
+        for (Centroid m : l) {
+            ((Sorted1DCentroid)m).order = i++;
         }
     }
 
-    @NotNull @Override public Sorted1DNode newNode(int i, int dims) {
-        return (Sorted1DNode) new Sorted1DNode(i).randomizeUniform(min, max);
+    @NotNull @Override public Gasolinear.Sorted1DCentroid newNode(int i, int dims) {
+        return (Sorted1DCentroid) new Sorted1DCentroid(i).randomizeUniform(min, max);
     }
 
 }
