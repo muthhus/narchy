@@ -130,12 +130,6 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testInheritNegative() throws Narsese.NarseseException {
-        assertEquals("(--,(x-->y))", inh($("x").neg(), $("y")).toString());
-        assertEquals("(x-->y)", inh($("x").neg(), $("y").neg()).toString());
-    }
-
-    @Test
     public void testFunctionRecursion() throws Narsese.NarseseException {
         //that this is valid, though self referential
         assertTrue($("task((polarize(%1,task) ==>+- polarize(%2,belief)))").subs() > 0);
@@ -795,16 +789,34 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals($("((a1) &&-1 (a1))"), $("((a1) &&+1 (a1))"));
         assertEquals($("((a1) <=>-1 (a1))"), $("((a1) <=>+1 (a1))"));
     }
-
     @Test
-    public void testFilterCoNegatedStatements() throws Narsese.NarseseException {
-        assertEquals("((--,(a1))<->(a1))", $("((--,(a1)) <-> (a1))").toString()); //valid
+    public void testAllowInhNegationStatements() throws Narsese.NarseseException {
+        assertEquals(True, $("(a-->a)"));
+
+        assertEquals("((--,a)-->b)", $("((--,a) --> b)").toString());
+            assertNotEquals("(a-->b)", $("((--,a) --> b)").toString());
+        assertEquals("(b-->(--,a))", $("(b --> (--,a))").toString());
+            assertNotEquals("(a-->b)", $("(b --> (--,a))").toString());
+        assertEquals("((--,a)-->(--,b))", $("(--a --> --b)").toString());
+
+        assertEquals("((--,a)-->a)", $("((--,a)-->a)").toString());
+        assertEquals("(a-->(--,a))", $("(a-->(--,a))").toString());
 
     }
-
     @Test
-    public void testInheritFromItsNegative() throws Narsese.NarseseException {
-        assertEquals(False, $("((--,(a1)) --> (a1))"));
+    public void testAllowSimNegationStatements() throws Narsese.NarseseException {
+        assertEquals(True, $("(a<->a)"));
+
+        assertNotEquals($("(--a <-> b)"), $("(a <-> --b)"));
+
+        assertEquals("((--,a)<->b)", $("((--,a) <-> b)").toString());
+            assertNotEquals("(a<->b)", $("((--,a) <-> b)").toString());
+        assertEquals("((--,a)<->b)", $("(b <-> (--,a))").toString());
+            assertNotEquals("(a<->b)", $("(b <-> (--,a))").toString());
+        assertEquals("((--,a)<->(--,b))", $("(--a <-> --b)").toString());
+
+        assertEquals("((--,a)<->a)", $("((--,a)<->a)").toString());
+
     }
 
 

@@ -27,9 +27,8 @@ import java.util.LinkedHashMap;
 
 import static spacegraph.math.v3.v;
 
-public abstract class TermWidget extends Cuboid<Term> {
+public class TermWidget extends Cuboid<Termed> {
 
-    public final Bag<TermEdge, TermEdge> edges;
 
 
     //caches a reference to the current concept
@@ -37,7 +36,7 @@ public abstract class TermWidget extends Cuboid<Term> {
     public float pri;
     protected transient TermSpace space;
 
-    public TermWidget(Term x, float w, float h) {
+    public TermWidget(Termed x, float w, float h) {
         super(x, w, h);
 
        setFront(
@@ -49,44 +48,12 @@ public abstract class TermWidget extends Cuboid<Term> {
                 new TermIcon(x)
         );
 
-        this.edges =
-                //new PLinkHijackBag(0, 2);
-                new PLinkArrayBag<>(0,
-                        //PriMerge.max,
-                        //PriMerge.replace,
-                        PriMerge.max,
-                        //new UnifiedMap()
-                        //new LinkedHashMap()
-                        new LinkedHashMap() //maybe: edgeBagSharedMap
-                );
-
     }
     public void commit(ConceptWidget.TermVis vis, TermSpace space) {
 
         this.space = space;
     }
 
-    @Override
-    public Dynamic newBody(boolean collidesWithOthersLikeThis) {
-        Dynamic x = super.newBody(collidesWithOthersLikeThis);
-
-        final float initDistanceEpsilon = 50f;
-        final float initImpulseEpsilon = 0.25f;
-
-        //place in a random direction
-        x.transform().set(
-                SpaceGraph.r(initDistanceEpsilon),
-                SpaceGraph.r(initDistanceEpsilon),
-                SpaceGraph.r(initDistanceEpsilon));
-
-        //impulse in a random direction
-        x.impulse(v(
-                SpaceGraph.r(initImpulseEpsilon),
-                SpaceGraph.r(initImpulseEpsilon),
-                SpaceGraph.r(initImpulseEpsilon)));
-
-        return x;
-    }
 
     @Override
     public void delete(Dynamics dyn) {
@@ -109,17 +76,6 @@ public abstract class TermWidget extends Cuboid<Term> {
         return s;
     }
 
-    @Override
-    public void renderAbsolute(GL2 gl) {
-        renderEdges(gl);
-    }
-
-    void renderEdges(GL2 gl) {
-        edges.forEachKey(f -> {
-            if (f.a > 0)
-                render(gl, f);
-        });
-    }
 
     public void render(@NotNull GL2 gl, @NotNull EDraw e) {
 
@@ -135,7 +91,7 @@ public abstract class TermWidget extends Cuboid<Term> {
         }
     }
 
-    public static class TermEdge extends EDraw<Term, TermWidget> implements Termed, Deleteable {
+    public static class TermEdge extends EDraw<Termed, TermWidget> implements Termed, Deleteable {
 
         float termlinkPri, tasklinkPri;
 
@@ -166,7 +122,7 @@ public abstract class TermWidget extends Cuboid<Term> {
 
         @Override
         public Term term() {
-            return target.key;
+            return target.key.term();
         }
 
         @Override

@@ -1,15 +1,22 @@
 package nars.gui.graph;
 
+import com.jogamp.opengl.GL2;
 import jcog.Util;
+import jcog.bag.Bag;
+import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.FloatParam;
 import jcog.pri.PriReference;
+import jcog.pri.op.PriMerge;
 import nars.Task;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
 import org.eclipse.collections.impl.tuple.Tuples;
+import spacegraph.SpaceGraph;
+import spacegraph.phys.Dynamic;
 import spacegraph.render.Draw;
 
+import java.util.LinkedHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -20,10 +27,21 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
 
     public final static TermVis visDefault = new ConceptWidget.ConceptVis2();
 
+    public Bag<TermEdge, TermEdge> edges;
+
     public ConceptWidget(Term x) {
         super(x, 1, 1);
 
-
+        this.edges =
+                //new PLinkHijackBag(0, 2);
+                new PLinkArrayBag<>(0,
+                        //PriMerge.max,
+                        //PriMerge.replace,
+                        PriMerge.max,
+                        //new UnifiedMap()
+                        //new LinkedHashMap()
+                        new LinkedHashMap() //maybe: edgeBagSharedMap
+                );
 
 //        final PushButton icon = new PushButton(x.toString(), (z) -> {
 //            setFront(new BeliefTableChart(nar, x).scale(4,4));
@@ -35,15 +53,35 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
 
 
-
 //        for (int i = 0; i < edges; i++)
 //            this.edges.add(new EDraw());
 
     }
 
-    public static final Function<Term, ConceptWidget> nodeBuilder = (c) ->
-            new ConceptWidget(c);
+    public static final Function<Termed, ConceptWidget> nodeBuilder = (c) ->
+            new ConceptWidget(c.term());
 
+    @Override
+    public Dynamic newBody(boolean collidesWithOthersLikeThis) {
+        Dynamic x = super.newBody(collidesWithOthersLikeThis);
+
+        final float initDistanceEpsilon = 50f;
+        final float initImpulseEpsilon = 0.25f;
+
+        //place in a random direction
+        x.transform().set(
+                SpaceGraph.r(initDistanceEpsilon),
+                SpaceGraph.r(initDistanceEpsilon),
+                SpaceGraph.r(initDistanceEpsilon));
+
+        //impulse in a random direction
+        x.impulse(v(
+                SpaceGraph.r(initImpulseEpsilon),
+                SpaceGraph.r(initImpulseEpsilon),
+                SpaceGraph.r(initImpulseEpsilon)));
+
+        return x;
+    }
 
     //final RecycledSummaryStatistics edgeStats = new RecycledSummaryStatistics();
 
@@ -83,7 +121,7 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
                     e.decay(0.95f);
                 });
 
-                termVis.apply(this, key);
+                termVis.apply(this, key.term());
 
             }
 
@@ -127,6 +165,18 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
     }
 
 
+    @Override
+    public void renderAbsolute(GL2 gl) {
+        renderEdges(gl);
+    }
+
+    void renderEdges(GL2 gl) {
+        edges.forEachKey(f -> {
+            if (f.a > 0)
+                render(gl, f);
+        });
+    }
+
 //    @Override
 //    protected void renderRelativeAspect(GL2 gl) {
 //        renderLabel(gl, 0.05f);
@@ -156,13 +206,13 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
             if (to != null && to.active()) {
 //                Concept c = space.nar.concept(tt);
 //                if (c != null) {
-                    TermEdge ate =
-                            space.edges.apply(Tuples.pair(to.concept, to));
-                    ate.priAdd(pri);
-                    ate.add(tgt, !(ttt instanceof Task));
-                    edges.put(ate);
-                            //new PLinkUntilDeleted(ate, pri)
-                            //new PLink(ate, pri)
+                TermEdge ate =
+                        space.edges.apply(Tuples.pair(to.concept, to));
+                ate.priAdd(pri);
+                ate.add(tgt, !(ttt instanceof Task));
+                edges.put(ate);
+                //new PLinkUntilDeleted(ate, pri)
+                //new PLink(ate, pri)
 
 //                }
             }
@@ -232,7 +282,7 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
 
             float density = 10.5f;
             if (cw.body != null) {
-                cw.body.setMass( l * w * h * density);
+                cw.body.setMass(l * w * h * density);
                 cw.body.setDamping(0.9f, 0.9f);
             }
 

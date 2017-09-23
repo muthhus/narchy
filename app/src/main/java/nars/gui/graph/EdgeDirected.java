@@ -18,8 +18,10 @@ public class EdgeDirected extends ForceDirected {
             Collidable c = objects.get(i);
 
             Spatial A = ((Spatial) c.data());
-            if (A instanceof TermWidget) {
-                ((TermWidget) A).edges.forEachKey(e -> {
+
+            //TODO abstract the Edges as a feature to optionally add to a TermWidget, not just for ConceptWidgets
+            if (A instanceof ConceptWidget) {
+                ((ConceptWidget) A).edges.forEachKey(e -> {
 
                     float attraction = e.attraction;
                     if (attraction > 0) {

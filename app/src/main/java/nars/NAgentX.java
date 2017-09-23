@@ -18,9 +18,6 @@ import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.data.reflect;
-import nars.op.mental.Abbreviation;
-import nars.op.mental.Inperience;
 import nars.op.stm.ClusterJunction;
 import nars.op.stm.STMLinkage;
 import nars.term.Term;
@@ -194,10 +191,9 @@ abstract public class NAgentX extends NAgent {
         STMLinkage stmLink = new STMLinkage(n, 1, false);
 
         ClusterJunction stmBelief = new ClusterJunction(n, true, BELIEF,
-                2, 4, 4, 128);
+                2, 4, 8, 32);
 
-        STMView.show(n, stmBelief.bag, 800, 600);
-
+        STMView.show2D(n, stmBelief.bag, 800, 600);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
 //        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);

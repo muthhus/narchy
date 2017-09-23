@@ -35,6 +35,8 @@ abstract public class AbstractSpace<X, Y>  {
 
     }
 
+
+
     abstract public void forEach(Consumer<? super Y> var1);
 
 

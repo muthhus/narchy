@@ -8,14 +8,14 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.control.Activate;
 import nars.gui.NARSpace;
-import nars.term.Term;
+import nars.term.Termed;
 import org.eclipse.collections.api.tuple.Pair;
 
 import java.util.Map;
 import java.util.function.Function;
 
 
-abstract public class TermSpace extends NARSpace<Term, TermWidget> {
+abstract public class TermSpace extends NARSpace<Termed, TermWidget> {
 
     public final NAR nar;
 

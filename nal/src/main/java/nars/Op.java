@@ -1242,10 +1242,9 @@ public enum Op implements $ {
         return bits;
     }
 
-    final static int EVENT_DELIMETER_OP = Op.or(Op.PROD, Op.CONJ);
+    final static int EVENT_DELIMETER_OP = Op.or(Op.PROD, Op.CONJ, Op.NEG);
     public static final Predicate<Term> recursiveCommonalityDelimeter =
-            //c -> !c.op().in(EVENT_DELIMETER_OP);
-            c -> c.op() != (Op.PROD);
+            c -> !c.isAny(EVENT_DELIMETER_OP);
 
     public static final Predicate<Term> noLimit =
             c -> true;
@@ -1266,36 +1265,13 @@ public enum Op implements $ {
         switch (op) {
 
             case SIM:
-                if (subject instanceof Bool || predicate instanceof Bool)
-                    return $.the(subject == predicate);
-                if (subject.xternalEquals(predicate))
-                    return True;
-                break;
-
             case INH:
 
-                if (subject.equals(predicate))
-                    return True;
                 if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
-                    return False;
-
-
-                boolean sNeg = subject.op() == NEG;
-                boolean pNeg = predicate.op() == NEG;
-                if (sNeg && pNeg) {
-                    subject = subject.unneg();
-                    predicate = predicate.unneg();
-                } else if (sNeg/* && !pNeg*/) {
-                    subject = subject.unneg();
-                    polarity = !polarity;
-                } else if (pNeg/* && !sNeg*/) {
-                    predicate = predicate.unneg();
-                    polarity = !polarity;
-                }
+                    return $.the(subject.equals(predicate));
 
                 if (subject.xternalEquals(predicate))
-                    return $.the(polarity);
-
+                    return True;
 
                 break;
 

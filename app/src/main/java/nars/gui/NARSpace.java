@@ -4,6 +4,7 @@ import jcog.event.On;
 import jcog.list.FasterList;
 import nars.gui.graph.EdgeDirected;
 import nars.term.Term;
+import nars.term.Termed;
 import spacegraph.AbstractSpace;
 import spacegraph.Active;
 import spacegraph.SpaceGraph;
@@ -20,7 +21,7 @@ import java.util.List;
  * thread-safe visualization of capacity-bound NAR data buffers
  * TODO extract to superclass: BufferedListSpace
  */
-public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends ListSpace<X, Y> implements Animated {
+public abstract class NARSpace<X extends Termed, Y extends Spatial<X>> extends ListSpace<X, Y> implements Animated {
 
 
     //private final TriConsumer<NAR, SpaceGraph<Term>, List<Spatial<X>>> collect;

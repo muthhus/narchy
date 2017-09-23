@@ -92,6 +92,7 @@ public class DynamicConceptSpace extends TermSpace {
     }
 
 
+    /** HACK */
     protected void update() {
         for (int i = 0, activeSize = active.size(); i < activeSize; i++) {
             TermWidget a = active.get(i);

@@ -526,7 +526,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
     protected synchronized void internalSingleStepSimulation(float timeStep) {
         BulletStats.pushProfile("internalSingleStepSimulation");
-        try {
             if (preTickCallback != null) {
                 preTickCallback.internalTick(this, timeStep);
             }
@@ -555,9 +554,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
             if (internalTickCallback != null) {
                 internalTickCallback.internalTick(this, timeStep);
             }
-        } finally {
-            BulletStats.popProfile();
-        }
+
     }
 
 

@@ -3,13 +3,12 @@ package nars.bag;
 import jcog.bag.impl.ArrayBag;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Centroid;
-import jcog.pri.PLink;
+import jcog.pri.VLink;
 import jcog.pri.op.PriMerge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -137,55 +136,6 @@ public class BagClustering<X> {
 
 
     /**
-     * prioritized vector link
-     * a) reference to an item
-     * b) priority
-     * c) vector coordinates
-     * d) current centroid id(s)
-     */
-    public final class VLink<X> extends PLink<X> {
-
-        /**
-         * feature vector representing the item as learned by clusterer
-         */
-        @NotNull
-        public final double[] coord;
-
-        /**
-         * current centroid
-         * TODO if allowing multiple memberships this will be a RoaringBitmap or something
-         */
-        public int centroid = -1;
-
-        public VLink(X t, float pri, Dimensionalize<X> d) {
-            super(t, pri);
-            this.coord = new double[d.dims];
-            update(d);
-        }
-
-        /**
-         * call this to revectorize, ie. if a dimension has changed
-         */
-        public void update(Dimensionalize<X> d) {
-            d.coord(id, coord);
-        }
-
-        @NotNull
-        @Override
-        public String toString() {
-            return id + "<" + Arrays.toString(coord) + '@' + centroid+ ">";
-        }
-
-        @Override
-        public boolean delete() {
-            centroid = -1;
-            return super.delete();
-        }
-
-    }
-
-
-    /**
      * TODO make this an abstract class or interface for pluggable Clustering implementations. gasnet is just the first for now
      */
     public class Clusters extends NeuralGasNet<Centroid> {
@@ -256,7 +206,7 @@ public class BagClustering<X> {
     }
 
     public void put(X x, float pri) {
-        bag.putAsync(new VLink<>(x, pri, model)); //TODO defer vectorization until after accepted
+        bag.putAsync(new VLink<>(x, pri, new double[model.dims], model::coord)); //TODO defer vectorization until after accepted
     }
 
     public void remove(X x) {

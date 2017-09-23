@@ -1,6 +1,5 @@
 package nars.gui.graph.run;
 
-import jcog.data.FloatParam;
 import jcog.math.MultiStatistics;
 import jcog.meter.event.CSVOutput;
 import nars.NAR;
@@ -8,21 +7,17 @@ import nars.NARS;
 import nars.Narsese;
 import nars.Param;
 import nars.control.Activate;
-import nars.gui.Vis;
 import nars.gui.graph.DynamicConceptSpace;
-import nars.gui.graph.EdgeDirected;
 import nars.task.ITask;
 import nars.task.NALTask;
-import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static nars.gui.Vis.logConsole;
 import static nars.gui.Vis.reflect;
 import static spacegraph.layout.Grid.col;
 
@@ -41,8 +36,9 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
     }
 
     @Override
-    protected boolean include(Term x) {
-        return atomsEnabled.get() || !(x instanceof Atomic);
+    protected boolean include(Termed x) {
+        return true;
+        //return atomsEnabled.get() || !(x.term() instanceof Atomic);
 //                return term instanceof Compound &&
 //                        term.complexity()==3 && term.toString().endsWith("-->x)");
     }
