@@ -47,8 +47,8 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     @Override
     public boolean animate(float dt) {
 
-            updateIfNotBusy(this::render);
-
+        //updateIfNotBusy(this::render);
+        render();
 
         return true;
     }

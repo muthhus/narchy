@@ -34,7 +34,7 @@ public abstract class SpaceKeys extends KeyAdapter implements Consumer<SpaceGrap
         float dt = j.getLastFrameTime();
         synchronized (keyState) {
             keyState.forEachKeyValue((k, s) -> {
-                FloatProcedure f = (s) ? keyPressed.get(k) : keyReleased.get(k);
+                FloatProcedure f = ((s) ? keyPressed : keyReleased).get(k);
                 if (f != null) {
                     f.value(dt);
                 }
@@ -45,10 +45,15 @@ public abstract class SpaceKeys extends KeyAdapter implements Consumer<SpaceGrap
     protected void watch(int keyCode, @Nullable FloatProcedure ifPressed, @Nullable FloatProcedure ifReleased) {
         synchronized (keyState) {
             keyState.put(keyCode, false); //initialized
-            if (ifPressed != null)
+            keyState.compact();
+            if (ifPressed != null) {
                 keyPressed.put(keyCode, ifPressed);
-            if (ifReleased != null)
+                keyPressed.compact();
+            }
+            if (ifReleased != null) {
                 keyReleased.put(keyCode, ifReleased);
+                keyReleased.compact();
+            }
         }
     }
 
@@ -69,6 +74,7 @@ public abstract class SpaceKeys extends KeyAdapter implements Consumer<SpaceGrap
         synchronized (keyState) {
             if (keyState.containsKey(c)) {
                 keyState.put(c, state);
+                keyState.compact();
             }
         }
     }

@@ -44,8 +44,8 @@ public class DynamicConceptSpace extends ConceptSpace {
         on = DurService.build(nar, ()->{
             bag.update();
             next.clear();
-            bag.forEach(maxNodes, (PriReference<Activate> concept) -> {
-                        ConceptWidget e = nodeGetOrCreate(concept);
+            bag.forEach(maxNodes, (concept) -> {
+                        ConceptWidget e = conceptWidgetActivation(concept);
                         if (e!=null)
                             next.add(e);
                     }

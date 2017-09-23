@@ -207,14 +207,14 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
 
 
         gl.glHint(GL_POLYGON_SMOOTH_HINT,
-                //GL_NICEST);
-                GL_FASTEST);
+                GL_NICEST);
+                //GL_FASTEST);
         gl.glHint(GL_LINE_SMOOTH_HINT,
-                //GL_NICEST);
-                GL_FASTEST);
+                GL_NICEST);
+                //GL_FASTEST);
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT,
-                //GL_NICEST);
-                GL_FASTEST);
+                GL_NICEST);
+                //GL_FASTEST);
 
         //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
         gl.glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);

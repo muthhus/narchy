@@ -58,8 +58,6 @@ abstract public class AbstractSpace<X, Y>  {
         }
     }
 
-    abstract public long now();
-
 
     /** needs to call update(space) for each active item */
     public void update(SpaceGraph<X> s) {

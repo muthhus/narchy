@@ -6,10 +6,9 @@ import jcog.bag.Bag;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.FloatParam;
 import jcog.map.MRUCache;
-import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Deleteable;
 import jcog.pri.PLink;
-import jcog.pri.Pri;
+import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.Task;
@@ -30,17 +29,15 @@ import spacegraph.render.JoglPhysics;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static jcog.Util.unitize;
 import static spacegraph.math.v3.v;
 
 
 public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference<? extends Termed>> {
 
-    public final Bag<TermEdge, PriReference<TermEdge>> edges;
+    public final Bag<TermEdge, TermEdge> edges;
 
 
     //caches a reference to the current concept
@@ -136,7 +133,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
 
 
-    final RecycledSummaryStatistics edgeStats = new RecycledSummaryStatistics();
+    //final RecycledSummaryStatistics edgeStats = new RecycledSummaryStatistics();
 
     public void commit(ConceptVis conceptVis, ConceptSpace space) {
 
@@ -153,29 +150,26 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
             if (newCap > 0) {
 
                 //phase 1: collect
-                edgeStats.clear();
+                //edgeStats.clear();
                 c.tasklinks().forEach(this);
-                float tasklinkVar = (float) edgeStats.getStandardDeviation()/2f;
-                if (tasklinkVar != tasklinkVar) tasklinkVar = 0; //none anyway
+                //float tasklinkVar = (float) edgeStats.getStandardDeviation()/2f;
+                //if (tasklinkVar != tasklinkVar) tasklinkVar = 0; //none anyway
 
-                edgeStats.clear();
+                //edgeStats.clear();
                 c.termlinks().forEach(this);
-                float termlinkVar = (float) edgeStats.getStandardDeviation()/2f;
-                if (termlinkVar != termlinkVar) termlinkVar = 0; //none anyway
+                //float termlinkVar = (float) edgeStats.getStandardDeviation()/2f;
+                //if (termlinkVar != termlinkVar) termlinkVar = 0; //none anyway
 
                 float priSum = edges.priSum();
 
-                float termlinkBoost = conceptVis.termlinkOpacity.floatValue()
-                        * unitize( termlinkVar );
-                float tasklinkBoost = conceptVis.tasklinkOpacity.floatValue()
-                        * unitize( tasklinkVar );
+                float termlinkOpac = conceptVis.termlinkOpacity.floatValue();
+                float tasklinkOpac = conceptVis.tasklinkOpacity.floatValue();
 
 //                float p = edges.depressurize();
 //                float decayRate =
-                edges.commit(x -> {
-                    TermEdge e = x.get();
-                    e.update(ConceptWidget.this, priSum, termlinkBoost, tasklinkBoost);
-                    e.decay(0.9f);
+                edges.commit(e -> {
+                    e.update(ConceptWidget.this, priSum, termlinkOpac, tasklinkOpac);
+                    e.decay(0.95f);
                 });
 
                 conceptVis.apply(this, key);
@@ -279,13 +273,12 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 //                if (c != null) {
                     TermEdge ate =
                             space.edges.apply(Tuples.pair(to.concept, to));
-                            //space.edgeBuilder.apply(to);
+                    ate.priAdd(pri);
                     ate.add(tgt, !(ttt instanceof Task));
-                    edges.put(
+                    edges.put(ate);
                             //new PLinkUntilDeleted(ate, pri)
-                            new PLink(ate, pri)
-                    );
-                    edgeStats.accept(pri);
+                            //new PLink(ate, pri)
+
 //                }
             }
         }
@@ -346,15 +339,16 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
             float edgeSum = (termlinkPri + tasklinkPri);
 
+
             if (edgeSum >= 0) {
 
                 //float priAvg = priSum/2f;
 
-                float minLineWidth = 0.05f;
-                float priToWidth = 0.5f;
+                float minLineWidth = 1f;
+                float priToWidth = 1f;
 
                 float widthSqrt = priToWidth * edgeSum;
-                this.width = minLineWidth + /*Util.sqr*/(widthSqrt);
+                this.width = Util.sqr(minLineWidth + widthSqrt);
 
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
 //                float qEst = ff.qua();
@@ -362,24 +356,18 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 //                    qEst = 0f;
 
 
-                float edgeProp;
                 if (edgeSum > 0) {
-                    this.b = 0.1f + Util.or(tasklinkBoost, termlinkBoost) * 0.4f;
-                    this.r = 0.1f + 0.8f * (tasklinkPri / edgeSum) * (0.75f + 0.25f * tasklinkBoost);
-                    this.g = 0.1f + 0.8f * (termlinkPri / edgeSum) * (0.75f + 0.25f * termlinkBoost);
-                    edgeProp = conceptEdgePriSum > Pri.EPSILON ? unitize(edgeSum / conceptEdgePriSum) : 0;
+                    this.b = 0.1f;
+                    this.r = 0.1f + 0.8f * (tasklinkPri / edgeSum);
+                    this.g = 0.1f + 0.8f * (termlinkPri / edgeSum);
                 } else {
                     this.r = this.g = this.b = 0.1f;
-                    edgeProp = 0.5f;
                 }
 
-                this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
-                        //0.1f + 0.9f * ff.pri(); //0.9f;
-                        // 0.5f * edgeProp
-                        0.5f;
+                this.a = Util.or(this.r * tasklinkBoost, this.g * termlinkBoost);
 
-                this.attraction = -0.01f + 0.05f * widthSqrt;// + priSum * 0.75f;// * 0.5f + 0.5f;
-                this.attractionDist = 0.05f + 2f * src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+                this.attraction = 0.1f * widthSqrt;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attractionDist = 1f + 2 * src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = -1;
                 this.attraction = 0;

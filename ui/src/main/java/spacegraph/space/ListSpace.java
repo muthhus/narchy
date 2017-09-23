@@ -37,10 +37,4 @@ public class ListSpace<X,Y> extends AbstractSpace<X,Y> {
         return o[0];
     }
 
-    @Override
-    public long now() {
-        return 0;
-    }
-
-
 }

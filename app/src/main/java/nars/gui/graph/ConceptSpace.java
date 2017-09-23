@@ -8,6 +8,7 @@ import nars.concept.Concept;
 import nars.control.Activate;
 import nars.gui.NARSpace;
 import nars.term.Term;
+import nars.term.Termed;
 import org.eclipse.collections.api.tuple.Pair;
 
 import java.util.function.Function;
@@ -78,28 +79,37 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 //    }
 
 
-    protected ConceptWidget nodeGetOrCreate(PriReference<Activate> clink) {
+    protected ConceptWidget conceptWidgetActivation(PriReference<Activate> clink) {
         Activate c = clink.get();
         if (c != null) {
-            ConceptWidget cw = nodeGetOrCreate(c);
+
+            ConceptWidget cw = space.getOrAdd(c.id.term(), nodeBuilder);
+            cw.concept = c.id;
+
             if (cw != null) {
-                cw.pri = clink.priElseZero();
+                cw.activate();
+                //cw.pri = clink.priElseZero();
                 return cw;
             }
         }
         return null;
     }
 
-    protected ConceptWidget nodeGetOrCreate(Activate concept) {
-        if (space==null)
-            return null;
+   protected ConceptWidget conceptWidget(PriReference<Concept> clink) {
+        Concept c = clink.get();
+        if (c != null) {
 
-        ConceptWidget cw = space.getOrAdd(concept.id.term(), nodeBuilder);
-        cw.concept = concept.id;
-        cw.activate();
-        return cw;
+            ConceptWidget cw = space.getOrAdd(c.term(), nodeBuilder);
+            cw.concept = c;
+
+            if (cw != null) {
+                cw.activate();
+                cw.pri = clink.priElseZero();
+                return cw;
+            }
+        }
+        return null;
     }
-
 
     protected void update() {
         for (int i = 0, activeSize = active.size(); i < activeSize; i++) {

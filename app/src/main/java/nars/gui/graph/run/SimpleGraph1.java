@@ -3,11 +3,13 @@ package nars.gui.graph.run;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
+import jcog.data.FloatParam;
+import jcog.exe.Loop;
 import jcog.pri.PLink;
 import nars.$;
 import nars.NARS;
 import nars.concept.Concept;
-import nars.control.Activate;
+import nars.gui.Vis;
 import nars.gui.graph.ConceptSpace;
 import nars.gui.graph.ConceptWidget;
 import nars.gui.graph.EdgeDirected;
@@ -59,7 +61,7 @@ public class SimpleGraph1 extends ConceptSpace {
 
         vis = new ConceptWidget.ConceptVis() {
             final float minSize = 3f;
-            final float maxSize = 8;
+            final float maxSize = 24;
 
             @Override
             public void apply(ConceptWidget cw, Term tt) {
@@ -84,33 +86,39 @@ public class SimpleGraph1 extends ConceptSpace {
             }
         };
 
+
+        //nar.startFPS(1f);
     }
 
     @Override
     public void start(SpaceGraph space) {
         super.start(space);
-        space.add( new Ortho( status ).maximize() );
-                //Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f))
+//        space.add( new Ortho( status ).maximize() );
+//                Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f);
 
     }
 
     //TODO use AtomicReference
-    List<Activate> nodes = $.newArrayList(), next;
+//    List<ConceptWidget> next = $.newArrayList();
 
     protected SimpleGraph1 commit(Graph g) {
-        List<Activate> n2 = $.newArrayList(g.nodes().size());
+        List<ConceptWidget> n2 = $.newArrayList(g.nodes().size());
 
         g.nodes().forEach(x -> {
             //HACK todo use proxyterms in a cache
             Concept c = nar.conceptualize(nodeTerm(x));
             //c.termlinks().clear();
             g.successors(x).forEach( y -> c.termlinks().put(new PLink(nodeTerm(y),  1f) ));
-            n2.add(new Activate(c, 1f));
+            n2.add(conceptWidget(new PLink(c, 1f)));
         });
 
-        this.next = n2;
+        this.active = n2;
+
+        update();
+
         return this;
     }
+
 
 //   protected <N,E> SimpleGraph1 commit(ValueGraph<N,E> g, FloatFunction<E> pri) {
 //        List<Activate> n2 = $.newArrayList(g.nodes().size());
@@ -140,12 +148,20 @@ public class SimpleGraph1 extends ConceptSpace {
     }
 
     @Override
+    protected void render() {
+        //super.render();
+//        active = next;
+    }
+
+    @Override
     protected void get(Collection<ConceptWidget> displayNext) {
-        if (next!=null) {
-            nodes = next;
-            next = null;
-        }
-        nodes.forEach(c -> displayNext.add(nodeGetOrCreate(c)));
+//        if (next!=null) {
+//            nodes = next;
+//            next = null;
+//        }
+//        nodes.forEach(c -> displayNext.add(nodeGetOrCreate(c)));
+        //displayNext.addAll(next);
+        throw new UnsupportedOperationException("shouldnt get called because render is overridden");
     }
 
     public synchronized SpaceGraph show(int w, int h) {
@@ -173,9 +189,15 @@ public class SimpleGraph1 extends ConceptSpace {
         g.putEdge("y", "z");
         g.putEdge("y", "w");
 
-        SimpleGraph1 cs = new SimpleGraph1(10).commit(g);
-        cs.show(800, 600);
+        SimpleGraph1 cs = new SimpleGraph1(10) {
+            @Override
+            public void start(SpaceGraph space) {
+                super.start(space);
+                commit(g);
+            }
+        };
 
+        cs.show(800, 600);
 
     }
 
