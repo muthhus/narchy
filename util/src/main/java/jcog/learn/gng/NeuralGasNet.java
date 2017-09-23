@@ -6,7 +6,6 @@ import jcog.learn.gng.impl.Centroid;
 import jcog.learn.gng.impl.DenseIntUndirectedGraph;
 import jcog.learn.gng.impl.ShortUndirectedGraph;
 import jcog.pri.Pri;
-import jcog.util.DoubleBuffer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -25,7 +24,7 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
      * stored as a 1D double[] with every pair of numbers corresponding
      * to min/max bounds of each dimension, so it will have dimension*2 elements
      */
-    public final DoubleBuffer<double[]> rangeMinMax;
+    public final double[] rangeMinMax;
 
     public final ShortUndirectedGraph edges;
     public final Centroid[] centroids;
@@ -51,7 +50,7 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
      */
     private double winnerNeighborUpdateRate;
 
-    private float shrinkRate;
+    private float rangeAdaptRate;
 
     public int getLambda() {
         return lambda;
@@ -103,7 +102,7 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
                 new DenseIntUndirectedGraph((short) centroids);
 
         this.centroids = new Centroid[centroids];
-        this.rangeMinMax = new DoubleBuffer(() -> new double[dimension * 2]);
+        this.rangeMinMax = new double[dimension * 2];
         this.distanceSq = distanceSq != null ? distanceSq : this::distanceCartesianSq;
 
 
@@ -111,7 +110,7 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
         this.dimension = dimension;
         this.maxNodes = centroids;
 
-        this.shrinkRate = 1f - (1f/centroids);
+        this.rangeAdaptRate = 1f /(1f + centroids);
 
         //default values
         setLambda(centroids * 2);
@@ -124,11 +123,11 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
 
 
         /** nodes should begin with randomized coordinates */
-        double[] r = rangeMinMax.write();
+        double[] r = rangeMinMax;
         for (int i = 0; i < centroids; i++) {
-            this.centroids[i] = newCentroid(i, dimension);
+            range(rangeMinMax, (this.centroids[i] = newCentroid(i, dimension)).getDataRef(), 0f);
         }
-        System.arraycopy(rangeMinMax.read(), 0, r, 0, r.length); //copy to both buffers
+        System.arraycopy(rangeMinMax, 0, r, 0, r.length); //copy to both buffers
 
 //        pw = new PrintWriter("resources/output.txt");
 //
@@ -177,7 +176,7 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
     public double distanceCartesianSq(double[] x, double[] y) {
         double s = 0;
         int l = y.length;
-        double[] ranges = rangeMinMax.read();
+        double[] ranges = rangeMinMax;
         for (int i = 0; i < l; i++) {
 
             double ri = (ranges[i * 2 + 1] - ranges[i * 2]);
@@ -213,17 +212,14 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
         short nextClosestNode = -1;
         short furthest = -1;
 
+
         final int nodes = maxNodes;
 
-        double[] r = rangeMinMax.preWrite();
-
-
-        range(r, x, shrinkRate);
+        double[] r = rangeMinMax;
+        range(r, x, rangeAdaptRate);
 
         for (short j = 0; j < nodes; j++) {
             Centroid nj = this.centroids[j];
-
-
 
             double dd = nj.learn(x, distanceSq);
 
@@ -255,7 +251,7 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
             }
         }
 
-        rangeMinMax.write();
+
 
         if (closest == -1) {
             //throw new RuntimeException("closest=" + closest + ", nextClosest=" + nextClosestNode);
@@ -385,14 +381,18 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
             newNode.randomizeUniform(i, r[i*2], r[i*2+1]);
     }
 
-    public static void range(double[] minMaxPairs, double[] coord, float shrink) {
+    public static void range(double[] minMaxPairs, double[] coord, float adapt) {
         int dim = coord.length;
         int k = 0;
         for (int d = 0; d < dim; d++) {
             double c = coord[d];
-            minMaxPairs[k] = Math.min(minMaxPairs[k] * shrink, c);
+
+            double curMin = minMaxPairs[k];
+            minMaxPairs[k] = curMin > c ? c : Util.lerp(adapt, curMin, c);
             k++;
-            minMaxPairs[k] = Math.max(minMaxPairs[k] * shrink, c);
+
+            double curMax = minMaxPairs[k];
+            minMaxPairs[k] = curMax < c ? c : Util.lerp(adapt, curMax, c);
             k++;
         }
     }

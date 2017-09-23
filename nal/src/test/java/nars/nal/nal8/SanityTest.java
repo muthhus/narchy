@@ -65,9 +65,9 @@ public class SanityTest {
         });
 
         //n.log();
-        int timeBatch = 150;
+        int timeBatch = 25;
 
-        for (int i = 0; i < 32; i++) {
+        for (int i = 0; i < 8; i++) {
             a.curiosity.setValue(1+(1f/i));
             batchCycle(n, togglesPos, togglesNeg, target, a, derived, timeBatch);
         }

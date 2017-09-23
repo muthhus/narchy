@@ -176,9 +176,9 @@ public class BagClustering<X> {
                     int cc = bag.capacity();
 
 
-//                    for (int i = 0; i < iterations * precision; i++) {
-//                        bag.forEach(this::learn);
-//                    }
+                    for (int i = 0; i < iterations; i++) {
+                        bag.forEach(this::learn);
+                    }
                 }
             } catch (Throwable t) {
                 throw new RuntimeException(t);

@@ -56,7 +56,7 @@ public class STMView {
             this.bag = b.bag;
 
             range = new double[net.dimension * 2];
-            range = b.net.rangeMinMax.read();
+            range = b.net.rangeMinMax;
 
             this.centroids = new ConceptWidget[net.centroids.length];
 
@@ -75,7 +75,7 @@ public class STMView {
         }
 
         protected void updateRange() {
-            System.arraycopy(net.rangeMinMax.read(), 0, range, 0, range.length);
+            System.arraycopy(net.rangeMinMax, 0, range, 0, range.length);
             //override freq and conf dimensions
             range[4] = range[6] = 0;
             range[5] = range[7] = 1;
@@ -228,7 +228,7 @@ public class STMView {
         }
 
         protected void updateRange() {
-            System.arraycopy(net.rangeMinMax.read(), 0, range, 0, range.length);
+            System.arraycopy(net.rangeMinMax, 0, range, 0, range.length);
             //override freq and conf dimensions
             range[4] = range[6] = 0;
             range[5] = range[7] = 1;

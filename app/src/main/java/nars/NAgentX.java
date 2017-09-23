@@ -191,7 +191,7 @@ abstract public class NAgentX extends NAgent {
         STMLinkage stmLink = new STMLinkage(n, 1, false);
 
         ClusterJunction stmBelief = new ClusterJunction(n, false, BELIEF,
-                2, 4, 8, 128);
+                2, 4, 32, 128);
 
         STMView.show2D(n, stmBelief.bag, 800, 600);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
