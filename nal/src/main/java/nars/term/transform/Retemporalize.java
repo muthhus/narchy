@@ -3,8 +3,6 @@ package nars.term.transform;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.TemporalBits;
 import static nars.time.Tense.DTERNAL;

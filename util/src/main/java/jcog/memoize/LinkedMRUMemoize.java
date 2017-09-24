@@ -1,6 +1,5 @@
 package jcog.memoize;
 
-import jcog.map.CustomConcurrentHashMap;
 import jcog.map.MRUCache;
 import org.jetbrains.annotations.NotNull;
 

@@ -2,7 +2,6 @@ package nars.bag;
 
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.pri.Prioritized;
-import jcog.pri.op.PriForget;
 import nars.NAR;
 import nars.Task;
 import nars.concept.BaseConcept;

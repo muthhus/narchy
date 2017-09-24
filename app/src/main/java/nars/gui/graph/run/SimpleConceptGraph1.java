@@ -11,7 +11,6 @@ import nars.gui.graph.DynamicConceptSpace;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Termed;
-import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 

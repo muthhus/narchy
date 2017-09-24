@@ -1,7 +1,6 @@
 package nars;
 
 
-import com.google.common.collect.ObjectArrays;
 import jcog.list.FasterList;
 import nars.derive.match.Ellipsislike;
 import nars.op.mental.AliasConcept;
@@ -1131,7 +1130,10 @@ public enum Op implements $ {
                         Null;
             case 2:
                 Term et0 = t[0], et1 = t[1];
-                if (et0.equals(et1) || et0.containsRecursively(et1, recursiveCommonalityDelimeter) || et1.containsRecursively(et0, recursiveCommonalityDelimeter))
+                if (et0.equals(et1)
+                        || et0.containsRecursively(et1, recursiveCommonalityDelimeter)
+                        || et1.containsRecursively(et0, recursiveCommonalityDelimeter))
+
                     return Null;
                 else if ((et0.op() == set && et1.op() == set))
                     return difference(set, et0, et1);
@@ -1242,12 +1244,13 @@ public enum Op implements $ {
         return bits;
     }
 
-    final static int EVENT_DELIMETER_OP = Op.or(Op.PROD, Op.CONJ, Op.NEG);
+    /** ops across which reflexivity of terms is allowed */
+    final static int relationDelimeter = Op.or(Op.PROD, Op.CONJ, Op.NEG);
     public static final Predicate<Term> recursiveCommonalityDelimeter =
-            c -> !c.isAny(EVENT_DELIMETER_OP);
+            c -> !c.isAny(relationDelimeter);
 
-    public static final Predicate<Term> noLimit =
-            c -> true;
+    public static final Predicate<Term> onlyTemporal =
+            c -> c.op().temporal && !concurrent(c.dt());
     //c.op()!=CONJ || concurrent(c.dt()); //!c.op().temporal || concurrent(c.dt());
 
     private static final int InvalidImplicationSubj = or(IMPL);
@@ -1444,7 +1447,7 @@ public enum Op implements $ {
         }
 
 
-        Predicate<Term> delim = op == IMPL ? Op.noLimit : Op.recursiveCommonalityDelimeter;
+        Predicate<Term> delim = op == IMPL ? Op.onlyTemporal : Op.recursiveCommonalityDelimeter;
 
         if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
                 (op != IMPL || dtConcurrent)) { //apply to: inh, sim, and current impl
@@ -1495,10 +1498,11 @@ public enum Op implements $ {
     }
 
     private static Term conjDrop(@NotNull Term conj, int i) {
-        if (conj.subs() == 2) {
+        TermContainer cs = conj.subterms();
+        if (cs.subs() == 2) {
             return conj.sub(1-i);
         } else {
-            Term[] s = conj.subterms().theArray();
+            Term[] s = cs.theArray();
             int sl = s.length;
             Term[] t = new Term[sl - 1];
             if (i > 0)

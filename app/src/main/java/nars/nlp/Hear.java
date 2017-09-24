@@ -1,8 +1,8 @@
 package nars.nlp;
 
 import com.google.common.collect.Lists;
-import jcog.exe.Loop;
 import jcog.event.On;
+import jcog.exe.Loop;
 import jcog.io.Twokenize;
 import nars.*;
 import nars.concept.Concept;

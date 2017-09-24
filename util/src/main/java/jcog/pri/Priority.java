@@ -37,7 +37,7 @@ public interface Priority extends Prioritized {
     }
 
     default float priAdd(float toAdd) {
-        notNaN(toAdd);
+        //notNaN(toAdd);
         float e = pri();
         if (e != e) {
             if (toAdd <= 0) {
@@ -119,7 +119,7 @@ public interface Priority extends Prioritized {
     default float priMult(float factor) {
         float p = pri();
         if (p == p)
-            return setPri(p * notNaNOrNeg(factor));
+            return setPri(p * /*notNaNOrNeg*/(factor));
         return Float.NaN;
     }
 

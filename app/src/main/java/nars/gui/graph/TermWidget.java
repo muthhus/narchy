@@ -2,30 +2,21 @@ package nars.gui.graph;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
-import jcog.bag.Bag;
-import jcog.bag.impl.PLinkArrayBag;
 import jcog.pri.Deleteable;
 import jcog.pri.PriReference;
-import jcog.pri.op.PriMerge;
 import nars.concept.Concept;
 import nars.gui.TermIcon;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.phys.Collidable;
-import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.render.Draw;
 import spacegraph.render.JoglPhysics;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
-
-import java.util.LinkedHashMap;
-
-import static spacegraph.math.v3.v;
 
 public class TermWidget extends Cuboid<Termed> {
 

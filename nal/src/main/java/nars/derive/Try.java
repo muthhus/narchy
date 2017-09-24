@@ -48,30 +48,36 @@ public class Try extends AbstractPred<Derivation> {
         values.update(d.time);
 
         short[] routing = new short[numChoices * 2]; //sequence of (choice, score) pairs
-        final int[] p = {0};
+        final int[] p = {0, Integer.MAX_VALUE, Integer.MIN_VALUE};
 
         Random rng = d.random;
         IntIterator ii = numChoices==1 || rng.nextBoolean() ? choices.getIntIterator() : choices.getReverseIntIterator();
+        final float[] wweightSum = {0};
         values.getNormalized(ii, 10, (c, v) -> {
             int pp = p[0]++ * 2;
             routing[pp] = (short) c;
-            routing[pp + 1] = (short) v;
+            wweightSum[0] += routing[pp + 1] = (short) v;
+            if (v < p[1]) p[1] = (int) v;
+            if (v > p[2]) p[2] = (int) v;
             return true;
         });
+        int minVal = p[1];
+        int maxVal = p[2];
+        float weightSum = wweightSum[0];
 
         d.preToPost.clear();
 
-        int minVal, maxVal;
-        float valRatio;
-        if (p[0] > 1) {
-            int[] minMax = new int[2];
-            bingoSortPairwise(routing, minMax);
-            minVal = minMax[0]; maxVal = minMax[1];
-            valRatio = minVal/((float)(maxVal));
-        } else {
-            minVal = maxVal = routing[1];
-            valRatio = 1f;
-        }
+//        int minVal, maxVal;
+//        float valRatio;
+//        if (p[0] > 1) {
+//            int[] minMax = new int[2];
+//            bingoSortPairwise(routing, minMax);
+//            minVal = minMax[0]; maxVal = minMax[1];
+//            valRatio = minVal/((float)(maxVal));
+//        } else {
+//            minVal = maxVal = routing[1];
+//            valRatio = 1f;
+//        }
 
         //TODO fork budgeting
 
@@ -87,40 +93,47 @@ public class Try extends AbstractPred<Derivation> {
         int ttlSaved;
         do {
 
-            int sample;
-            if (numChoices > 1) {
-                if (minVal == maxVal) {
-                    //flat
-                    sample = rng.nextInt(numChoices);
-                } else {
-                    //curvebag sampling of the above array
-                    float x = rng.nextFloat();
-                    float curve = Util.lerp(x, x*x, valRatio);
-                    sample = (int) ((1f - curve) * (numChoices - 0.5f));
-                    if (sample >= numChoices) sample = numChoices-1; //HACK happens rarely, rounding error?
-                }
-            } else {
-                sample = 0;
-            }
+            int sample = Util.decideRoulette(numChoices, (choice) -> g2(routing, choice, VAL), weightSum, rng);
+//            int sample;
+//            if (numChoices > 1) {
+//                if (minVal == maxVal) {
+//                    //flat
+//                    sample = rng.nextInt(numChoices);
+//                } else {
+//                    //curvebag sampling of the above array
+//                    float x = rng.nextFloat();
+//                    float curve = Util.lerp(x, x*x, valRatio);
+//                    sample = (int) ((1f - curve) * (numChoices - 0.5f));
+//                    if (sample >= numChoices) sample = numChoices-1; //HACK happens rarely, rounding error?
+//                }
+//            } else {
+//                sample = 0;
+//            }
 
 //            if (d.ttl <= loopCost) {
 //                d.setTTL(0);
 //                break;
 //            }
-            int n = g2(routing, sample, KEY);
-            float branchScore =
-                    minVal!=maxVal ? ((float) (g2(routing, sample, VAL)) - minVal) / (maxVal - minVal) : 0.5f;
-            int loopBudget = Util.lerp(branchScore, minPerBranch, maxPerBranch);
-
-            ttlSaved = d.getAndSetTTL(loopBudget) - loopBudget - loopCost;
-
-            branches[n].test(d);
-
-            if (before > 0) d.revert(before);
+            ttlSaved = tryBranch(d, routing, minVal, maxVal, minPerBranch, loopCost, maxPerBranch, before, sample);
 
         } while (d.addTTL(ttlSaved) >= 0);
 
         return false;
+    }
+
+    public int tryBranch(Derivation d, short[] routing, int minVal, int maxVal, int minPerBranch, int loopCost, int maxPerBranch, int before, int sample) {
+        int ttlSaved;
+        int n = g2(routing, sample, KEY);
+        float branchScore =
+                minVal!=maxVal ? ((float) (g2(routing, sample, VAL)) - minVal) / (maxVal - minVal) : 0.5f;
+        int loopBudget = Util.lerp(branchScore, minPerBranch, maxPerBranch);
+
+        ttlSaved = d.getAndSetTTL(loopBudget) - loopBudget - loopCost;
+
+        branches[n].test(d);
+
+        if (before > 0) d.revert(before);
+        return ttlSaved;
     }
 
 

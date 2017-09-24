@@ -1,9 +1,7 @@
 package nars.time;
 
-import com.google.common.util.concurrent.MoreExecutors;
 import com.netflix.servo.util.Clock;
 import nars.NAR;
-import nars.task.ITask;
 import nars.task.NativeTask.SchedTask;
 import org.jetbrains.annotations.Nullable;
 

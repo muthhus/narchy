@@ -6,7 +6,6 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
 import spacegraph.widget.Label;
-import spacegraph.widget.XorLabel;
 
 /**
  * Created by me on 11/18/16.

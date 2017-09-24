@@ -4,7 +4,6 @@ import jcog.bag.Bag;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
-import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
 import jcog.sort.SortedArray;
 import jcog.table.SortedListTable;

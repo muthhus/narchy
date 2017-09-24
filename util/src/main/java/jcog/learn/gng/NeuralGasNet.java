@@ -8,6 +8,7 @@ import jcog.learn.gng.impl.ShortUndirectedGraph;
 import jcog.pri.Pri;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -15,7 +16,7 @@ import java.util.stream.Stream;
  * from: https://github.com/scadgek/NeuralGas
  * TODO use a graph for incidence structures to avoid some loops
  */
-abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N, Connection<N>>*/ {
+public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N, Connection<N>>*/ {
 
 
     public final int dimension;
@@ -102,7 +103,10 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
                 new DenseIntUndirectedGraph((short) centroids);
 
         this.centroids = new Centroid[centroids];
+
         this.rangeMinMax = new double[dimension * 2];
+        Arrays.fill(rangeMinMax, Float.NaN);
+
         this.distanceSq = distanceSq != null ? distanceSq : this::distanceCartesianSq;
 
 
@@ -123,11 +127,10 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
 
 
         /** nodes should begin with randomized coordinates */
-        double[] r = rangeMinMax;
         for (int i = 0; i < centroids; i++) {
-            range(rangeMinMax, (this.centroids[i] = newCentroid(i, dimension)).getDataRef(), 0f);
+            this.centroids[i] = newCentroid(i, dimension);
         }
-        System.arraycopy(rangeMinMax, 0, r, 0, r.length); //copy to both buffers
+
 
 //        pw = new PrintWriter("resources/output.txt");
 //
@@ -149,7 +152,9 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
     }
 
     @NotNull
-    abstract public N newCentroid(int i, int dims);
+    public N newCentroid(int i, int dims) {
+        return (N) new Centroid(i, dims);
+    }
 
     public N closest(double[] x) {
         //find closest nodes
@@ -176,15 +181,8 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
     public double distanceCartesianSq(double[] x, double[] y) {
         double s = 0;
         int l = y.length;
-        double[] ranges = rangeMinMax;
         for (int i = 0; i < l; i++) {
-
-            double ri = (ranges[i * 2 + 1] - ranges[i * 2]);
-
-            if (Util.equals(ri, 0, Pri.EPSILON))
-                ri = 1; //no normalization
-
-            final double d = (y[i] - x[i]) / ri;
+            final double d = (y[i] - x[i]);
             s += d * d;
         }
         return s;
@@ -215,8 +213,8 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
 
         final int nodes = maxNodes;
 
-        double[] r = rangeMinMax;
-        range(r, x, rangeAdaptRate);
+
+        range(x, rangeAdaptRate);
 
         for (short j = 0; j < nodes; j++) {
             Centroid nj = this.centroids[j];
@@ -331,7 +329,7 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
 
                 //create node between errorest nodes
                 N newNode = newCentroid(furthest, dimension);
-                randomizeCentroid(r, newNode);
+                randomizeCentroid(rangeMinMax, newNode);
 
 
                 Centroid maxErrorNeighbor = this.centroids[maxErrorNeighborID];
@@ -381,20 +379,27 @@ abstract public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N,
             newNode.randomizeUniform(i, r[i*2], r[i*2+1]);
     }
 
-    public static void range(double[] minMaxPairs, double[] coord, float adapt) {
+    public void range(double[] coord, float adapt) {
         int dim = coord.length;
         int k = 0;
+
+
+
         for (int d = 0; d < dim; d++) {
             double c = coord[d];
 
-            double curMin = minMaxPairs[k];
-            minMaxPairs[k] = curMin > c ? c : Util.lerp(adapt, curMin, c);
+            double curMin = rangeMinMax[k];
+
+                rangeMinMax[k] = ((curMin != curMin) || (curMin > c)) ? c : Util.lerp(adapt, curMin, c);
+
             k++;
 
-            double curMax = minMaxPairs[k];
-            minMaxPairs[k] = curMax < c ? c : Util.lerp(adapt, curMax, c);
+            double curMax = rangeMinMax[k];
+
+                rangeMinMax[k] = ((curMax != curMax) || (curMax < c)) ? c : Util.lerp(adapt, curMax, c);
             k++;
         }
+
     }
 
 

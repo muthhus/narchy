@@ -3,7 +3,6 @@ package nars.derive;
 import jcog.list.FasterList;
 import jcog.trie.TrieNode;
 import nars.$;
-import nars.NAR;
 import nars.Op;
 import nars.control.Derivation;
 import nars.derive.op.AbstractPatternOp;
@@ -16,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import org.roaringbitmap.RoaringBitmap;
 
 import java.util.*;
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
 

@@ -1,13 +1,8 @@
 package nars.concept;
 
 import jcog.math.FloatSupplier;
-import jcog.pri.Pri;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
-import nars.control.MetaGoal;
-import nars.table.BeliefTable;
-import nars.task.SignalTask;
 import nars.task.util.PredictionAccuracyFeedback;
 import nars.term.Term;
 import nars.truth.Truth;

@@ -2,7 +2,6 @@ package jcog.pri.op;
 
 import jcog.pri.Priority;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -13,7 +12,7 @@ import java.util.function.Consumer;
  */
 public class PriForget<P extends Priority> implements Consumer<P> {
 
-    public static final float FORGET_TEMPERATURE_DEFAULT = 0.5f;
+    public static final float FORGET_TEMPERATURE_DEFAULT = 0.9f;
 
     public final float priFactor;
 

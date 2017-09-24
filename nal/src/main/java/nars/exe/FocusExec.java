@@ -7,7 +7,10 @@ import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.control.*;
+import nars.control.Activate;
+import nars.control.CycleService;
+import nars.control.NARService;
+import nars.control.Premise;
 import nars.task.ITask;
 import nars.task.NALTask;
 import org.jetbrains.annotations.Nullable;
@@ -80,10 +83,7 @@ public class FocusExec extends Exec implements Runnable {
 
     final static Logger logger = LoggerFactory.getLogger(FocusExec.class);
 
-    /**
-     * temporary buffer for tasks about to be executed
-     */
-    private final FasterList<ITask> next = new FasterList(1024);
+
 
     @Nullable
     private NARService trigger;
@@ -97,7 +97,7 @@ public class FocusExec extends Exec implements Runnable {
 
     @Override
     protected synchronized void clear() {
-        next.clear();
+
         premises.clear();
 //        tasks.clear();
         concepts.clear();
@@ -125,11 +125,15 @@ public class FocusExec extends Exec implements Runnable {
         return !(nar.exe instanceof MultiExec) ? new MyTrigger() : null; //HACK
     }
 
+    @Override
+    public void run() {
+        run(this.subCycles);
+    }
+
     /**
      * run an iteration
      */
-    @Override
-    public void run() {
+    public void run(int subCycles) {
 
         if (Param.TRACE) {
             System.out.println(
@@ -166,6 +170,10 @@ public class FocusExec extends Exec implements Runnable {
 //            });
 //            execute(next);
 
+
+
+            //temporary buffer for tasks about to be executed. alloc on stack in case of multithread access of this instance
+            final FasterList<ITask> next = new FasterList();
             concepts.commit().sample(subCycleConcepts, (Predicate<ITask>) (next::add));
 
             execute(next);

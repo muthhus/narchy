@@ -509,21 +509,21 @@ public class Tetris extends NAgentX implements Bitmap2D {
                 e.printStackTrace();
             }
 
-            try {
-                InterNAR i = new InterNAR(n, 8, 0);
-                i.runFPS(5);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+//            try {
+//                InterNAR i = new InterNAR(n, 8, 0);
+//                i.runFPS(5);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
 
             Tetris aa = a;
-            n.onTask((t) -> {
-                if (t.isEternal() && !t.isInput()) {
-                    System.err.println(t.proof());
-                }
-
-            });
+//            n.onTask((t) -> {
+//                if (t.isEternal() && !t.isInput()) {
+//                    System.err.println(t.proof());
+//                }
+//
+//            });
 
             return a;
         }, 20f);

@@ -6,7 +6,6 @@ import jcog.bag.util.SpinMutex;
 import jcog.bag.util.Treadmill2;
 import jcog.list.FasterList;
 import jcog.pri.Prioritized;
-import jcog.pri.op.PriForget;
 import jcog.util.AtomicFloat;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;

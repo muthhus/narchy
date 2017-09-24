@@ -15,7 +15,6 @@ import com.github.fge.grappa.support.Var;
 import com.github.fge.grappa.transform.ParserTransformer;
 import jcog.Texts;
 import jcog.list.FasterList;
-import jcog.map.FileHashMap;
 import nars.derive.match.Ellipsis;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
@@ -25,13 +24,11 @@ import nars.term.var.UnnormalizedVariable;
 import nars.time.Tense;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import static nars.Op.*;

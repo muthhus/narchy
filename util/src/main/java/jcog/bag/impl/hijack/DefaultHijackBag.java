@@ -1,11 +1,8 @@
 package jcog.bag.impl.hijack;
 
 import jcog.pri.PriReference;
-import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
 import org.apache.commons.lang3.mutable.MutableFloat;
-
-import java.util.function.Consumer;
 
 /**
  * unsorted priority queue with stochastic replacement policy

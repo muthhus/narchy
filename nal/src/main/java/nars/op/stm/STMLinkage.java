@@ -3,6 +3,7 @@ package nars.op.stm;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
+import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
@@ -36,7 +37,7 @@ public final class STMLinkage extends TaskService {
         this.allowNonInput = allowNonInput;
         strength.setValue(1f / capacity);
 
-        stm = Util.blockingQueue(capacity+1 /* extra slot for good measure */);
+        stm = Util.blockingQueue(capacity + 1 /* extra slot for good measure */);
 //        for (int i = 0; i < capacity+1; i++)
 //            stm.add(null); //fill with nulls initially
 
@@ -44,7 +45,7 @@ public final class STMLinkage extends TaskService {
     }
 
     static boolean stmLinkable(@NotNull Task newEvent, boolean allowNonInput) {
-        return ( !newEvent.isEternal() && (allowNonInput || newEvent.isInput()));
+        return (!newEvent.isEternal() && (allowNonInput || newEvent.isInput()));
     }
 
     @Override
@@ -65,9 +66,10 @@ public final class STMLinkage extends TaskService {
         if (tPri == 0)
             return;
 
+        float p = strength * tPri;
         for (Task u : stm) {
             if (u == null) continue; //skip null's and dummy's
-            link(t, strength, tPri, u, nar);
+            link(t, p * u.priElseZero(), u, nar);
         }
 
         stm.poll();
@@ -75,11 +77,11 @@ public final class STMLinkage extends TaskService {
     }
 
 
-    protected static void link(@NotNull Task ta, float strength, float tPri, Task tb, NAR nar) {
+    protected static void link(@NotNull Task ta, float pri, Task tb, NAR nar) {
 
 
         /** current task's... */
-        float interStrength = tPri * tb.priElseZero() * strength;
+        float interStrength = pri;
         if (interStrength >= Prioritized.EPSILON) {
             Concept ca = ta.concept(nar, true);
             if (ca != null) {
@@ -91,8 +93,8 @@ public final class STMLinkage extends TaskService {
                     ca.termlinks().putAsync(new PLink(cb.term(), interStrength));
 
                     //tasklinks, not sure:
-                    cb.tasklinks().putAsync( new PLink<>(ta, interStrength));
-                    ca.tasklinks().putAsync( new PLink<>(tb, interStrength));
+                    cb.tasklinks().putAsync(new PLinkUntilDeleted<>(ta, interStrength));
+                    ca.tasklinks().putAsync(new PLinkUntilDeleted<>(tb, interStrength));
 
                 }
             }

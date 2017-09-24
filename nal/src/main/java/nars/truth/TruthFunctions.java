@@ -26,10 +26,8 @@ import nars.$;
 import nars.Param;
 import org.jetbrains.annotations.Nullable;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 
-import static jcog.Util.clamp;
 import static jcog.Util.or;
 import static nars.$.t;
 import static nars.util.UtilityFunctions.and;

@@ -59,7 +59,10 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.stream.DoubleStream;
 
 import static java.lang.Float.NaN;
@@ -1275,13 +1278,13 @@ public enum Util {
     public static enum RouletteControl {
         STOP, CONTINUE, WEIGHTS_CHANGED
     }
-    public static void decideRoulette(int weightCount, IntToFloatFunction weight, Random rng, IntFunction<RouletteControl> each) {
+    public static void decideRoulette(int choices, IntToFloatFunction choiceWeight, Random rng, IntFunction<RouletteControl> each) {
         float weightSum = NaN;
         while (true) {
             if (weightSum != weightSum) {
-                weightSum = weightSum(weightCount, weight);
+                weightSum = weightSum(choices, choiceWeight);
             }
-            switch (each.apply(decideRoulette(weightCount, weight, weightSum, rng))) {
+            switch (each.apply(decideRoulette(choices, choiceWeight, weightSum, rng))) {
                 case STOP: return;
                 case CONTINUE: break;
                 case WEIGHTS_CHANGED: weightSum = Float.NaN; break;
@@ -1351,6 +1354,9 @@ public enum Util {
     }
 
     public static float sqr(float f) {
+        return f * f;
+    }
+    public static double sqr(double f) {
         return f * f;
     }
 

@@ -3,13 +3,17 @@ package nars.bag;
 import jcog.bag.impl.ArrayBag;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Centroid;
+import jcog.list.FasterList;
 import jcog.pri.VLink;
 import jcog.pri.op.PriMerge;
 import jcog.util.DoubleBuffer;
+import nars.$;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -25,7 +29,7 @@ public class BagClustering<X> {
 
     final Dimensionalize<X> model;
 
-    public final Clusters net;
+    public final NeuralGasNet net;
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
@@ -34,6 +38,7 @@ public class BagClustering<X> {
      * TODO allow dynamic change
      */
     private final short clusters;
+    public DoubleBuffer<List<VLink<X>>> sorted = new DoubleBuffer(FasterList::new);
 
     public BagClustering(Dimensionalize<X> model, int centroids, int initialCap) {
 
@@ -41,7 +46,7 @@ public class BagClustering<X> {
 
         this.model = model;
 
-        this.net = new Clusters(model.dims, centroids);
+        this.net = new NeuralGasNet(model.dims, centroids, model::distanceSq);
 
 
 
@@ -55,13 +60,6 @@ public class BagClustering<X> {
                 return x.id;
             }
 
-            @Override
-            public void onAdd(@NotNull VLink<X> x) {
-                synchronized (bag) {
-                    learn(x);
-                }
-            }
-//
 //            @Override
 //            public void onRemove(@NotNull VLink<X> value) {
 //                //value.delete();
@@ -75,9 +73,6 @@ public class BagClustering<X> {
     }
 
 
-    public Centroid newCentroid(int i, int dims) {
-        return new BagCentroid(i, dims);
-    }
 
     public void print() {
         print(System.out);
@@ -133,33 +128,18 @@ public class BagClustering<X> {
 
         abstract public void coord(X t, double[] d);
 
-    }
-
-
-    /**
-     * TODO make this an abstract class or interface for pluggable Clustering implementations. gasnet is just the first for now
-     */
-    public class Clusters extends NeuralGasNet<Centroid> {
-
-        public Clusters(int dimension, int maxNodes) {
-            this(dimension, maxNodes, null);
+        /** default impl, feel free to override */
+        public double distanceSq(double[] a, double[] b) {
+            return Centroid.distanceCartesianSq(a, b);
         }
-
-        public Clusters(int dimension, int maxNodes, Centroid.DistanceFunction distanceSq) {
-            super(dimension, maxNodes, distanceSq);
-        }
-
-        @NotNull
-        @Override
-        public Centroid newCentroid(int i, int dims) {
-            return new BagCentroid(i, dims);
-        }
-
 
     }
 
 
-    public boolean commit(int iterations) {
+
+
+
+    public boolean commit(int iterations, Consumer<List<VLink<X>>> takeSortedClusters) {
 
         if (busy.compareAndSet(false, true)) {
 
@@ -175,10 +155,16 @@ public class BagClustering<X> {
                     //                net.compact();
                     int cc = bag.capacity();
 
-
                     for (int i = 0; i < iterations; i++) {
                         bag.forEach(this::learn);
                     }
+
+                    List<VLink<X>> x = sorted.preWrite();
+                    x.clear();
+                    bag.forEach((Consumer<VLink<X>>) x::add);
+                    x.sort(Comparator.comparingInt(a -> a.centroid));
+                    takeSortedClusters.accept(x);
+                    sorted.write();
                 }
             } catch (Throwable t) {
                 throw new RuntimeException(t);
@@ -194,7 +180,11 @@ public class BagClustering<X> {
 
     }
 
+
     private void learn(VLink<X> x) {
+        if (x.coord[0]!=x.coord[0])
+            model.coord(x.id, x.coord);
+
         x.centroid = net.put(x.coord).id;
     }
 
@@ -206,7 +196,7 @@ public class BagClustering<X> {
     }
 
     public void put(X x, float pri) {
-        bag.putAsync(new VLink<>(x, pri, new double[model.dims], model::coord)); //TODO defer vectorization until after accepted
+        bag.putAsync(new VLink<>(x, pri, model.dims)); //TODO defer vectorization until after accepted
     }
 
     public void remove(X x) {
@@ -249,12 +239,5 @@ public class BagClustering<X> {
         }
         return Stream.empty();
     }
-
-    public class BagCentroid extends Centroid {
-        public BagCentroid(int i, int dims) {
-            super(i, dims);
-        }
-    }
-
 
 }

@@ -7,7 +7,6 @@ import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.task.ITask;
 import nars.task.NativeTask;
-import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

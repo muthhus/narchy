@@ -10,8 +10,6 @@ import spacegraph.math.v2;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
-import static com.jogamp.opengl.GL.GL_COLOR_LOGIC_OP;
-import static com.jogamp.opengl.GL.GL_XOR;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.grid;
 

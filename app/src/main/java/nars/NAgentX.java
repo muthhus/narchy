@@ -13,12 +13,12 @@ import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
-import nars.gui.STMView;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.stm.ClusterJunction;
+import nars.op.stm.ConjClustering;
+import nars.op.stm.LinkClustering;
 import nars.op.stm.STMLinkage;
 import nars.term.Term;
 import nars.time.RealTime;
@@ -127,12 +127,16 @@ abstract public class NAgentX extends NAgent {
 
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
+        return runRT(init, fps*2, fps, endTime );
+    }
+
+    public static NAR runRT(Function<NAR, NAgent> init, float narFPS, float agentFPS, long endTime) {
 
         //Builder.Subterms.the = Builder.Subterms.WeakSubtermBuilder.get();
         //Builder.Compound.the = Builder.Compound.CaffeineCompoundBuilder.get();
 
         float durFPS =
-                fps;
+                agentFPS;
         //fps * 2f; //nyquist
 
         RealTime clock =
@@ -140,21 +144,21 @@ abstract public class NAgentX extends NAgent {
                         new RealTime.CS(true) :
                         new RealTime.DSHalf(true);
 
-        clock.durFPS(durFPS);
-
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.getDefault(8
-                , "motivation.nal");
+                , "motivation.nal", "relation_introduction.nal");
 
         int THREADS = 4;
 
-        MultiExec exe = new MultiExec(THREADS, 8192);
+        MultiExec exe = new MultiExec(THREADS, 64*1024);
         Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
+
+        exe.add(new FocusExec(), (x)->true);
         exe.add(new FocusExec() {
                     {
-                        concepts.setCapacity(64);
+                        concepts.setCapacity(32);
                     }
                 },
-                randomBool);
+                (x)->true);
 
         NAR n = new NARS()
                 .exe(exe)
@@ -190,10 +194,11 @@ abstract public class NAgentX extends NAgent {
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
 
-        ClusterJunction stmBelief = new ClusterJunction(n, false, BELIEF,
-                2, 4, 32, 128);
+        LinkClustering stmBelief = new LinkClustering(n, (t) -> t.priElseZero() /* anything temporal */, 16, 256);
+        //STMView.show2D(n, stmBelief.bag, 800, 600);
 
-        STMView.show2D(n, stmBelief.bag, 800, 600);
+        ConjClustering conjCluster = new ConjClustering(n, 3, BELIEF, 8, 32);
+
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
 //        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
@@ -204,6 +209,8 @@ abstract public class NAgentX extends NAgent {
 //        reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);
 
         NAgent a = init.apply(n);
+        a.durations.setValue(1);
+
         //a.trace = true;
 
 
@@ -277,7 +284,7 @@ abstract public class NAgentX extends NAgent {
         //get ready
         System.gc();
 
-        NARLoop loop = a.nar.startFPS(fps);
+        NARLoop loop = a.nar.startFPS(narFPS);
 
         a.nar.runLater(() -> {
 

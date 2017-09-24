@@ -1,6 +1,5 @@
 package nars.bag;
 
-import jcog.learn.gng.impl.Centroid;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -1,6 +1,5 @@
 package nars.control;
 
-import jcog.math.AtomicSummaryStatistics;
 import nars.NAR;
 import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.slf4j.Logger;

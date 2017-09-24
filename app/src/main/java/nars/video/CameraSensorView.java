@@ -1,7 +1,6 @@
 package nars.video;
 
 import jcog.Util;
-import jcog.event.On;
 import jcog.event.Ons;
 import nars.NAR;
 import nars.NAgent;

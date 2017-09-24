@@ -25,7 +25,6 @@ import spacegraph.net.vnc.rfb.codec.handshaker.event.ServerInitEvent;
 import spacegraph.net.vnc.rfb.codec.security.SecurityType;
 import spacegraph.net.vnc.rfb.codec.security.vncauth.VncAuthSecurityMessage;
 import spacegraph.net.vnc.rfb.exception.ProtocolException;
-import spacegraph.net.vnc.rfb.exception.SecurityException;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

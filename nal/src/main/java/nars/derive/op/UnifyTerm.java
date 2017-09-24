@@ -10,7 +10,6 @@ import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.term.var.VarPattern;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.NAct;
 import nars.Task;
 import nars.control.CauseChannel;
-import nars.control.MetaGoal;
 import nars.task.ITask;
 import nars.task.util.PredictionAccuracyFeedback;
 import nars.term.Term;

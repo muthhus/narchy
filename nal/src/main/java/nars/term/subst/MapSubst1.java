@@ -1,7 +1,6 @@
 package nars.term.subst;
 
 import nars.Op;
-import nars.index.term.TermContext;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

@@ -1,7 +1,6 @@
 package nars.nal.nal8;
 
 import nars.*;
-import nars.concept.GoalActionConcept;
 import nars.task.DerivedTask;
 import org.junit.Test;
 

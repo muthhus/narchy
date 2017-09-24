@@ -6,9 +6,7 @@ import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.ShortIterable;
 import org.eclipse.collections.api.block.predicate.primitive.ShortPredicate;
-import org.eclipse.collections.api.set.primitive.ShortSet;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
-import org.eclipse.collections.impl.set.mutable.primitive.ShortHashSet;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;

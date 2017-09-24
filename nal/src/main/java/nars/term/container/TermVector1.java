@@ -4,7 +4,6 @@ import com.google.common.collect.Iterators;
 import jcog.Util;
 import nars.Op;
 import nars.term.Term;
-import nars.term.Termlike;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

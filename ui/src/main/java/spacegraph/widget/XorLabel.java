@@ -2,7 +2,8 @@ package spacegraph.widget;
 
 import com.jogamp.opengl.GL2;
 
-import static com.jogamp.opengl.GL.*;
+import static com.jogamp.opengl.GL.GL_COLOR_LOGIC_OP;
+import static com.jogamp.opengl.GL.GL_INVERT;
 
 /** label which paints in XOR so it contrasts with what is underneath */
 public class XorLabel extends Label {

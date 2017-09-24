@@ -1,7 +1,5 @@
 package jcog.util;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 

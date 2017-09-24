@@ -1,7 +1,6 @@
 package jcog.math;
 
 import jcog.Util;
-import jcog.pri.Pri;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 

@@ -3,7 +3,6 @@ package nars.derive;
 import nars.$;
 import nars.term.ProxyTerm;
 import nars.term.Term;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 4/21/17.

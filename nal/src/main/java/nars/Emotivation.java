@@ -2,12 +2,7 @@ package nars;
 
 import com.netflix.servo.monitor.BasicGauge;
 import com.netflix.servo.monitor.LongGauge;
-import nars.concept.Concept;
-import nars.control.MetaGoal;
-import nars.task.ITask;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static nars.NInner.id;
 

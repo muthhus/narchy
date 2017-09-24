@@ -31,6 +31,11 @@ public final class VLink<X> extends PLink<X> {
         this.coord = coord;
     }
 
+    public VLink(X t, float pri, int dims) {
+        super(t, pri);
+        Arrays.fill(this.coord = new double[dims], Double.NaN);
+    }
+
     public VLink(X t, float pri, double[] coord, BiConsumer<X,double[]> initializer) {
         this(t, pri, coord);
         update(initializer);

@@ -2,10 +2,11 @@ package nars.control;
 
 import nars.NAR;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static nars.time.Tense.ETERNAL;
 
 /**
  * executes approximately once every N durations
@@ -60,22 +61,23 @@ abstract public class DurService extends NARService implements Runnable {
         //if (now - lastNow >= durations.floatValue() * nar.dur()) {
         if (busy.compareAndSet(false, true)) {
             long last = this.now;
-            this.now = nar.time();
-            long delta = now - last;
+            long now = nar.time();
+            int dur = nar.dur();
+            long durCycles = Math.round(durations.floatValue() * nar.dur());
             try {
                 //TODO instrument here
-                run(nar, delta);
-                //----
+                long delta = (now - last);
+                if (delta >= durCycles) {
+                    run(nar, delta);
+                    this.now = nar.time();
+                } else {
+                    //too soon, reschedule
+                    System.out.println("too early");
+                }
+
+                nar.at(this.now + durCycles, this);
             } finally {
                 busy.set(false);
-
-                long after = nar.time();
-                int dur = nar.dur();
-                long next = Math.max(
-                        last + Math.round(dur * durations.floatValue()),
-                        after + (int)Math.ceil(dur * COALESCE_THRESHOLD_DUR)
-                );
-                nar.at(next, this);
             }
         }
     }

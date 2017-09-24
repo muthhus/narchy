@@ -15,7 +15,6 @@ package jcog;
 
 import com.google.common.annotations.GwtIncompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import jcog.event.On;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 

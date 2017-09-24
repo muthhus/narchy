@@ -9,6 +9,7 @@ import jcog.pri.Pri;
 import jcog.pri.VLink;
 import nars.$;
 import nars.NAR;
+import nars.Task;
 import nars.bag.BagClustering;
 import nars.gui.graph.ConceptWidget;
 import nars.term.Termed;
@@ -56,7 +57,6 @@ public class STMView {
             this.bag = b.bag;
 
             range = new double[net.dimension * 2];
-            range = b.net.rangeMinMax;
 
             this.centroids = new ConceptWidget[net.centroids.length];
 
@@ -75,10 +75,6 @@ public class STMView {
         }
 
         protected void updateRange() {
-            System.arraycopy(net.rangeMinMax, 0, range, 0, range.length);
-            //override freq and conf dimensions
-            range[4] = range[6] = 0;
-            range[5] = range[7] = 1;
         }
 
         protected SimpleSpatial<X> task(SimpleSpatial<X> w, double[] c) {
@@ -90,12 +86,12 @@ public class STMView {
         protected SimpleSpatial position(SimpleSpatial w, double[] c) {
             //float p = n.priSum()/size;
 
-            float xs = sx * r(0, c[0]);
-            float xe = sx * r(1, c[1]);
-            float y = sy * r(2, c[2]);
-            float z = r(3, c[3]);
+            float x = sx * r(0, c[0]);
+            //float xe = sx * r(1, c[1]);
+            float f = sy * r(1, c[1]);
+            //float c = r(3, c[3]);
 
-            w.move((xs + xe) / 2f, y, z);
+            w.move(x, f, 0);
 
             return w;
 
@@ -188,6 +184,7 @@ public class STMView {
 
     public static class GNGVis extends Surface {
 
+        protected long now;
         protected int limit = -1;
         final NeuralGasNet net;
 
@@ -196,19 +193,23 @@ public class STMView {
          */
         protected double[] range;
 
-        protected float sx = 0.5f, sy = 5;
-        float tx = 0, ty = -sy;
+        protected float sy = 5;
+        float tx = 0, ty = 0;
+        protected double dur;
 
         public GNGVis(NeuralGasNet net) {
             this.net = net;
-            range = new double[net.dimension * 2];
+            this.range = net.rangeMinMax;
+            this.now = 0;
+            this.dur = 1;
         }
 
         @Override
         protected void paint(GL2 gl) {
             super.paint(gl);
 
-            updateRange();
+            if (range[0] != range[0])
+                return; //nothing to show
 
             float maxDimNorm = (float) (range[1] - range[0]); //start time span
 
@@ -219,7 +220,7 @@ public class STMView {
                 Centroid ii = net.centroids[i];
 
                 float e = (float) ii.localError();
-                draw(gl, centroidHue(ii.id),  ii.getDataRef(), i, -(0.5f + 0.5f / (1f + e)));
+                draw(ii, gl, centroidHue(ii.id), ii.getDataRef(), i, (0.5f + 0.5f / (1f + e)));
             }
         }
 
@@ -227,50 +228,44 @@ public class STMView {
             return (id % 8) / 8f;
         }
 
-        protected void updateRange() {
-            System.arraycopy(net.rangeMinMax, 0, range, 0, range.length);
-            //override freq and conf dimensions
-            range[4] = range[6] = 0;
-            range[5] = range[7] = 1;
-        }
 
-        protected void draw(GL2 gl, float hue,  double[] c, int centroid, float v) {
-            //float p = n.priSum()/size;
-            float xs = sx * r(0, c[0]);
-            float xe = sx * r(1, c[1]);
-            float y = sy * r(2, c[2]);
-            float z = r(3, c[3]);
+        protected void draw(Object o, GL2 gl, float hue, double[] c, int centroid, float v) {
+            //float xe = sx * r(1, c[1]);
+            float f = c.length > 1 ? (float) (sy * c[1]) : 0.5f;
+            //float c = r(3, c[3]);
 
 
             //TODO HACK dimension c > 1 ignored
 
 
-            float H = 0.1f;
+            if (o instanceof Centroid) {
+                float H = 0.15f;
+                float x = x((float) c[0]);
+                Draw.hsb(gl, hue, 0.5f, 0.5f, v);
+                Draw.rectStroke(gl, x-H/2f, ty + f - H / 2, H, H);
+            } else if (o instanceof Task) {
+                float H = 0.1f;
 
-            if (v < 0) {
-                v = -v;
-                Draw.hsb(gl, hue, 0.5f, z, v);
-                Draw.rectStroke(gl,  tx + xs, ty + y - H / 2, tx + xe, H);
-            } else {
-
+                Task t = (Task) o;
+                float xl = x( t.start() - 0.5f);
+                float xr = x( t.end() + 0.5f);
+                if (xr < xl) {
+                    float xx = xr;
+                    xr = xl;
+                    xl = xx;
+                }
+                float xw = (xr-xl);
                 if (centroid >= 0)
-                    Draw.hsb(gl, hue, 0.5f, z, v);
+                    Draw.hsb(gl, hue, 0.5f, 0.5f, v);
                 else
                     gl.glColor4f(0.5f, 0.5f, 0.5f, v); //gray: unassigned
 
-                Draw.rect(gl, tx + xs, ty + y - H / 2, tx + xe, H);
+                Draw.rect(gl, xl - (xw/2f), ty + f - H / 2, xw, H);
             }
         }
 
-        private float r(int d, double v) {
-            double min = range[d * 2];
-            double max = range[d * 2 + 1];
-            float u = Util.equals(Math.abs(max - min), 0, Pri.EPSILON) ?
-                    ((float) v) //as-is
-                    :
-                    (float) ((v - min) / (max - min));
-            float scale = 4f;
-            return u;
+        private float x( double v) {
+            return (float) ((v - now)/dur);
         }
 
     }
@@ -286,18 +281,6 @@ public class STMView {
             this.nar = nar;
         }
 
-        @Override
-        protected void updateRange() {
-            super.updateRange();
-            final int DURS = 8;
-            long now = nar.time();
-            int dur = nar.dur();
-            range[0] = range[2] = now - dur * DURS;
-            range[1] = range[3] = now + dur * DURS;
-
-//            sy = 4;
-//            sx = 0.5f;
-        }
 
         @Override
         protected void paint(GL2 gl) {
@@ -305,13 +288,16 @@ public class STMView {
             //temporary
             //bag.commit(1);
 
+            this.now = nar.time();
+            this.dur = nar.dur()*5f;
+
             super.paint(gl);
 
-            bag.bag.forEach(x -> {
+            bag.sorted.read().forEach(x -> {
 
                 int ci = x.centroid;
-                draw(gl, centroidHue(ci), x.coord, ci,
-                        0.1f + 0.2f * x.priElseZero());
+                draw(x.get(), gl, centroidHue(ci), x.coord, ci,
+                        0.1f + 0.5f * x.priElseZero());
             });
         }
     }
@@ -373,6 +359,7 @@ public class STMView {
                 .camPos(0, 0, 90)
                 .show(w, h);
     }
+
     public static void show2D(NAR n, BagClustering c, int w, int h) {
         SpaceGraph.window(new BagClusterVis(n, c), w, h);
     }

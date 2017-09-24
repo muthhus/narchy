@@ -1,13 +1,9 @@
 package spacegraph;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.opengl.GL2;
 import jcog.list.FasterList;
 import jcog.map.MRUCache;
-import jcog.memoize.Memoize;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

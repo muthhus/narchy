@@ -1,11 +1,7 @@
 package jcog.learn.gng.impl;
 
 
-import jcog.Util;
-import jcog.pri.Pri;
 import org.apache.commons.math3.linear.ArrayRealVector;
-
-import java.util.function.BiFunction;
 
 import static jcog.Texts.n4;
 
@@ -113,7 +109,6 @@ public class Centroid extends ArrayRealVector {
         final double ir = (1.0 - rate);
         int k = 0;
         for (int i = 0; i < d.length; i++) {
-            //assert(Double.isFinite(x[i]));
             d[i] = (ir * d[i]) + (rate * x[i]);
         }
     }

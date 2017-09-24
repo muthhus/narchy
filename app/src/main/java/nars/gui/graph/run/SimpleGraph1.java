@@ -10,15 +10,10 @@ import nars.concept.Concept;
 import nars.gui.graph.ConceptWidget;
 import nars.gui.graph.TermSpace;
 import nars.gui.graph.TermWidget;
-import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.phys.Collidable;
-import spacegraph.phys.collision.ClosestRay;
-import spacegraph.render.Draw;
-import spacegraph.render.JoglPhysics;
 import spacegraph.widget.Label;
 
 import java.util.Collection;

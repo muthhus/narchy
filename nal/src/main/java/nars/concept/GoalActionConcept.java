@@ -6,7 +6,6 @@ import nars.$;
 import nars.NAR;
 import nars.NAct;
 import nars.Task;
-import nars.control.MetaGoal;
 import nars.task.ITask;
 import nars.term.Term;
 import nars.truth.Truth;

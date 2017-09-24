@@ -7,8 +7,6 @@ import jcog.pri.Pri;
 import nars.time.Tense;
 import org.eclipse.collections.api.block.predicate.primitive.IntFloatPredicate;
 import org.roaringbitmap.IntIterator;
-import org.roaringbitmap.PeekableIntIterator;
-import org.roaringbitmap.RoaringBitmap;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;

@@ -38,15 +38,16 @@ public class BooleanTest {
 
     void testSAT2Individual(int i, int j) throws Narsese.NarseseException {
 
-        final float confThresh = 0.7f;
+        final float confThresh = 0.5f;
         Param.DEBUG = true;
 
 //        for (int i = 0; i < 2; i++) {
 //            for (int j = 0; j < 2; j++) {
         NAR d = new NARS().get();
         //d.log();
+        d.truthResolution.setValue(0.05f);
         d.nal(6);
-        d.termVolumeMax.setValue(24);
+        d.termVolumeMax.setValue(18);
 
         String[] outcomes = {
                 "(x-->(0,0))",

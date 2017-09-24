@@ -10,13 +10,14 @@ import nars.video.PixelBag;
 
 import javax.swing.*;
 
+import static jcog.Util.unitize;
 import static nars.$.$;
 
 public class NARio extends NAgentX {
 
     private final MarioComponent mario;
 
-    private final SensorConcept vx;
+//    private final SensorConcept vx;
 
     public NARio(NAR nar) throws Narsese.NarseseException {
         super( nar);
@@ -97,8 +98,10 @@ public class NARio extends NAgentX {
 //        nar.believe("nario:{narioLocal, narioGlobal}");
 
 
-        vx = senseNumberDifference($("vx"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0).resolution(0.25f);
-        senseNumberDifference($("vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0).resolution(0.25f);
+        senseNumberDifference($("vx"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).
+                mario.x : 0).resolution(0.04f);
+        senseNumberDifference($("vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).
+                mario.y : 0).resolution(0.04f);
 
         actionBipolar($.the("x"), (x) -> {
             float thresh = 0.33f;
@@ -217,16 +220,21 @@ public class NARio extends NAgentX {
     public final FloatParam MoveRight = new FloatParam(0.25f, 0f, 1f);
     public final FloatParam EarnCoin = new FloatParam(0.95f, 0f, 1f);
 
+    float lastX;
+
     @Override
     protected float act() {
         int coins = Mario.coins;
         float reward = (coins - lastCoins) * EarnCoin.floatValue();
         lastCoins = coins;
 
-        float vx = this.vx.asFloat();
+//        float vx = this.vx.asFloat();
 
-        if (vx > 0.6f /* in range 0..1.0 */)
-            reward += MoveRight.floatValue();
+        float curX = mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : Float.NaN;
+        if (lastX == lastX && lastX < curX) {
+            reward +=  unitize(curX - lastX)/4f;
+        }
+        lastX = curX;
 
         reward -= Depress.floatValue();
 

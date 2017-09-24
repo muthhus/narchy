@@ -1,8 +1,8 @@
 package nars.index.term;
 
-import jcog.exe.Loop;
 import jcog.Util;
 import jcog.bag.impl.hijack.PLinkHijackBag;
+import jcog.exe.Loop;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import nars.NAR;

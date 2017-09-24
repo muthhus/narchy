@@ -6,7 +6,6 @@ import nars.Narsese;
 import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.Term;
-import nars.term.Termlike;
 import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +52,9 @@ public interface Atomic extends Term {
 
     @Override
     default @Nullable Term temporalize(Retemporalize r) { return this; }
+
+    @Override
+    default int vars() { return 0;     }
 
     @Override
     default int varDep() {

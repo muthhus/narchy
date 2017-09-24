@@ -1,18 +1,18 @@
 package nars.exe;
 
-import jcog.exe.Loop;
 import jcog.Util;
 import jcog.event.ListTopic;
 import jcog.event.On;
 import jcog.event.Topic;
+import jcog.exe.Loop;
 import jcog.pri.Prioritized;
 import jcog.sort.TopN;
 import nars.NAR;
 import nars.control.Activate;
-import nars.control.Cause;
 import nars.control.Causable;
-import nars.task.NativeTask;
+import nars.control.Cause;
 import nars.task.ITask;
+import nars.task.NativeTask;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,8 +172,7 @@ public class MultiExec extends Exec {
         @Override
         protected int next(NAR n, int work) {
             FocusExec f = (FocusExec) this.sub;
-            f.subCycles = work;
-            f.run();
+            f.run(work);
             return work; //TODO better estimate than this, even to the precision of the TTL spent
         }
 

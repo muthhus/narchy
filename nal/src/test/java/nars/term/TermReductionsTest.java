@@ -14,7 +14,6 @@ import static nars.$.conj;
 import static nars.$.diffe;
 import static nars.$.diffi;
 import static nars.$.disj;
-import static nars.$.inh;
 import static nars.$.p;
 import static nars.$.parallel;
 import static nars.$.secte;
