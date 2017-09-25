@@ -3,22 +3,15 @@
 //substitutionViaSimilarity
 
     //TODO these need special predicates to safely decompose the conjunctions without losing temporal information
-     (&&,X,A..+), (X<->Y)  |- ((&&,A..+) &&+- Y), (Belief:Intersection, Goal:Strong)
-        (&&,(--,%X),A..+), (X<->Y)  |- ((&&,A..+) &&+- (--,%Y)), (Belief:Intersection, Goal:Strong)
+     (&&,X,A..+), (X<->Y)  |- ((&&,A..+) &&+- Y), (Belief:Analogy, Goal:Weak)
+     (X ==> Z), (X<->Y) |- (Y ==>+- Z), (Belief:Analogy)
+     (Z ==> X), (X<->Y) |- (Z ==>+- Y), (Belief:Analogy)
 
-     (X ==> Z), (X<->Y) |- (Y ==>+- Z), (Belief:Intersection)
-        ((--,%X) ==> Z), (X<->Y) |- ((--,%Y) ==>+- Z), (Belief:Intersection)
-     (Z ==> X), (X<->Y) |- (Z ==>+- Y), (Belief:Intersection)
-        (Z ==> (--,%X)), (X<->Y) |- (Z ==>+- (--,%Y)), (Belief:Intersection)
-
-
-
-
-//INVALID:
-//desire spreading by similarity (was: Goal:Intersection)
-//     S, (S<->P) |- P, (Goal:Strong)
-//        S, ((--,%S)<->P), task(negative)  |- P, (Goal:StrongN)
-//        S, ((--,%P)<->S), task(negative)  |- (--,%P), (Goal:StrongN)
+//desire spreading by similarity
+//     S, (S<->P)    |- P, (Goal:Weak)
+//     S, (--S<->P)  |- P, (Goal:WeakN)
+     R, (S<->P)    |- subIfUnifiesAny(P, S, R), (Goal:Weak)
+     R, (--S<->P)  |- subIfUnifiesAny(P, S, R), (Goal:WeakN)
 
 
 

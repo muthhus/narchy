@@ -1,34 +1,32 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
-    }
-}
 
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'com.github.johnrengelman.shadow'
 
-description = ''
 dependencies {
+  //compile project(':nal')
   compile project(':nal')
+
   compile project(':ui')
+
 //  testCompile project(':nal')
 }
+
+
 
 mainClassName = 'nars.TextUI'
 
 shadowJar {
-   baseName = 'nars_app'
-   classifier = null
-   version = null
+
+
+//   baseName = 'nars_app'
+//   classifier = null
+//   version = null
 
    //exclude 'a2.properties'
    /* dependencies {
       exclude(dependency('shadow:d:1.0'))
    }*/
+
 
 }

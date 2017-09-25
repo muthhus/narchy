@@ -1,39 +1,35 @@
 buildscript {
-  repositories {
-      mavenLocal()
-      mavenCentral()
-  }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+    }
 }
 
 plugins {
-  id 'com.github.ben-manes.versions' version '0.15.0' //dependencyUpdates
+    id 'com.github.ben-manes.versions' version '0.15.0' //dependencyUpdates
 }
-
-
-tasks.withType(JavaCompile) {
-   options.incremental = true // one flag, and things will get MUCH faster
-}
-
-
 
 allprojects {
     apply plugin: 'maven'
     apply plugin: 'idea'
     group = 'narchy'
     version = '1.0'
-
-//    apply plugin: 'nebula.lint'
-//    gradleLint.rules = ['all-dependency'] // add as many rules here as you'd like
 }
-
 
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'com.github.johnrengelman.shadow'
+
     sourceCompatibility = 1.9
     targetCompatibility = 1.9
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
+        //options.incremental = true // one flag, and things will get MUCH faster
     }
 
 

@@ -1,11 +1,13 @@
 package nars;
 
+import com.google.common.collect.Iterables;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.Ons;
 import jcog.list.FasterList;
 import jcog.pri.Prioritized;
 import jcog.pri.mix.control.MixContRL;
+import nars.concept.ActionConcept;
 import nars.control.Activate;
 import nars.control.Cause;
 import nars.control.Derivation;
@@ -18,9 +20,11 @@ import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
+import nars.op.Implier;
+import nars.op.mental.Abbreviation;
+import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
 import nars.op.stm.LinkClustering;
-import nars.op.stm.STMLinkage;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.truth.Truth;
@@ -48,6 +52,7 @@ import spacegraph.widget.slider.FloatSlider;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -202,11 +207,9 @@ abstract public class NAgentX extends NAgent {
         ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, 16, 64);
         ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, 16, 64);
 
-        //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
-        //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-//        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
+        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
 //
-//        Inperience inp = new Inperience(n, 4);
+        Inperience inp = new Inperience(n, 4);
 //
 //        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
 //        reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);

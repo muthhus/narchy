@@ -444,18 +444,16 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
-    //similarity should not spread desire
     @Test
     public void testGoalSimilaritySpreading() {
 
         test
                 .input("(R)!")
                 .input("((G) <-> (R)).")
-                //.mustDesire(cycles, "(G)", 1.0f, 0.81f);
-                .mustNotOutput(cycles, "(G)", GOAL, ETERNAL); // because <-> isnt symmetric
+                .mustGoal(cycles, "(G)", 1.0f, 0.81f);
+                //.mustNotOutput(cycles, "(G)", GOAL, ETERNAL); // because <-> isnt symmetric
     }
 
-    //similarity should not spread desire
     @Test
     public void testNegatedGoalSimilaritySpreading() {
 
@@ -464,7 +462,15 @@ public class NAL8Test extends AbstractNALTest {
                 .input("((G) <-> (R)).")
                 .mustNotOutput(cycles, "(G)", GOAL, ETERNAL); // because <-> isnt symmetric
     }
+    @Test
+    public void testGoalPosNegSimilaritySpreading() {
 
+        test
+                .log()
+                .input("--(R)!")
+                .input("((G) <-> --(R)).")
+                .mustGoal(cycles, "(G)", 1f, 0.81f, GOAL, ETERNAL);
+    }
 
 //    @Test public void testInheritanceCompositionTemporal() {
 //        /*

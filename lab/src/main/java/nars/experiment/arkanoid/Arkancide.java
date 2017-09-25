@@ -60,7 +60,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 50);
+        }, 10);
 
 
 //        nar.forEachActiveConcept(c -> {

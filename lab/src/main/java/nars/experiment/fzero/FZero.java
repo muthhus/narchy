@@ -20,8 +20,8 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
-    float fwdSpeed = 8f;
-    float rotSpeed = 0.25f;
+    float fwdSpeed = 12f;
+    float rotSpeed = 0.4f;
 
     public static void main(String[] args) {
 
@@ -51,7 +51,8 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        CameraSensor<Scale> c = senseCamera((String) null, new Scale(() -> fz.image, 32, 24)/*.blur()*/);//.resolution(0.01f)
+        CameraSensor<Scale> c = senseCamera(id, new Scale(() -> fz.image,
+                48, 32)/*.blur()*/);//.resolution(0.01f)
 
 //        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
 //        cc.addActions($.the("fz"), this, false, false, true);
@@ -59,7 +60,7 @@ public class FZero extends NAgentX {
 //                .resolution(0.05f);
 
 
-        actionBipolar(the("fwd"), (f) -> {
+        actionBipolar(p("fwd"), (f) -> {
             //if (f > 0) {
             //accelerator
             //if (f > 0.5f)
@@ -74,7 +75,7 @@ public class FZero extends NAgentX {
             return f;
         });//.resolution.setValue(0.02f);
 
-        actionBipolar($.the("x"), (x) -> {
+        actionBipolar($.p("x"), (x) -> {
             fz.playerAngle += (x) * rotSpeed;
             return x;
         });
@@ -91,8 +92,8 @@ public class FZero extends NAgentX {
 
 
         //yaw stabilizer (eternal goal)
-        nar.goal(p($.the("x"), $.the("\"+\"")), 0.5f, 0.1f);
-        nar.goal(p($.the("x"), $.the("\"-\"")), 0.5f, 0.1f);
+//        nar.goal(p($.the("x"), $.the("\"+\"")), 0.5f, 0.1f);
+//        nar.goal(p($.the("x"), $.the("\"-\"")), 0.5f, 0.1f);
 
         //keyboard-ish controls:
 //actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );
@@ -107,7 +108,7 @@ public class FZero extends NAgentX {
         //senseNumberDifference($.inh(the("joy"), id), happy).resolution.setValue(0.02f);
 //        senseNumberDifference($.prop(the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.02f);
 //        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
-        @NotNull ScalarConcepts ang = senseNumber(the("ang"), () ->
+        @NotNull ScalarConcepts ang = senseNumber(p("ang"), () ->
                         (float) (0.5f + 0.5f * MathUtils.normalizeAngle(fz.playerAngle, 0) / (Math.PI)),
                 5,
                 //ScalarConcepts.Needle

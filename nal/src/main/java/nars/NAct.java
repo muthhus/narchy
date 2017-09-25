@@ -363,8 +363,8 @@ public interface NAct {
     }
 
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        //actionBipolarExpectation(s, update);
-        actionBipolarExpectationNormalized(s, update);
+        actionBipolarExpectation(s, update);
+        //actionBipolarExpectationNormalized(s, update);
         //actionBipolarGreedy(s, update);
         //actionBipolarMutex3(s, update);
     }
@@ -408,7 +408,7 @@ public interface NAct {
 
             float restConf =
                     //n.confMin.floatValue() * 2;
-                    nar().confDefault(GOAL);
+                    nar().confDefault(GOAL)/2f;
 
             //n.confDefault(BELIEF);
             //0;
@@ -463,9 +463,11 @@ public interface NAct {
                 //inverse expectation
                 float conf = y == y ?
                             //restConf/2f,
-                            Math.abs(y) * Math.abs(x)
+                            //Math.abs(y) * Math.abs(x)
+                            Math.abs(y) * restConf
                             //Math.abs(y)
                         : 0;
+
                 //w2c(Math.abs(y) * c2w(restConf));
                 if (conf >= nar().confMin.floatValue()) {
                     //Math.max(cc[winner], nar().confMin.floatValue());

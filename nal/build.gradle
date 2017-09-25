@@ -9,6 +9,7 @@ buildscript {
 }
 
 apply plugin: "info.solidsoft.pitest"
+apply plugin: 'com.github.johnrengelman.shadow'
 
 
 pitest {
@@ -29,7 +30,7 @@ pitest {
         'nars.derive.time.*'
     ]
 
-    jvmArgs = ["-ea"]
+//    jvmArgs = ["-ea"]
 
     pitestVersion = "1.2.3" //not needed when a default PIT version should be used
 
@@ -43,10 +44,6 @@ pitest {
 
 description = ''
 
-compileJava {
-    includes = ['src/main/java/nars/nal/*.nal']
-    //files("src/main/java/nars/nal/*.nal")
-}
 
 dependencies {
     compile project(':util')
