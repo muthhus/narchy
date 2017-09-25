@@ -5,7 +5,7 @@ import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
 import jcog.math.Interval;
 import nars.concept.Concept;
-import nars.op.Operation;
+import nars.op.Operator;
 import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.BiFunction;
 
+import static java.util.Collections.singleton;
 import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.term.Terms.normalizedOrNull;
@@ -974,23 +975,28 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                  */
                 Task result = yy != null ? clone(this, yy.getOne().negIf(yy.getTwo())) : null;
                 if (result == null)
-                    result = Operation.logTask(n.time(), $.p(x, y));
+                    result = Operator.log(n.time(), $.p(x, y));
 
-                return Collections.singleton(result);
+                return singleton(result);
             }
         }
 
         //invoke possible Operation
         boolean cmd = isCommand();
         if (cmd || (isGoal() && !isEternal())) {
-            Pair<Operation, Term> o = Op.functor(term(), (i) -> {
+            Pair<Operator, Term> o = Op.functor(term(), (i) -> {
                 Concept operation = n.concept(i);
-                return operation instanceof Operation ? (Operation) operation : null;
+                return operation instanceof Operator ? (Operator) operation : null;
             });
             if (o != null) {
-                Task y = o.getOne().run(this, n);
-                if (y != null && !this.equals(y)) {
-                    return Collections.singleton(y);
+                try {
+                    Task y = o.getOne().execute.apply(this, n);
+                    if (y != null && !this.equals(y)) {
+                        return singleton(y);
+                    }
+                } catch (Throwable t) {
+                    //n.logger.error("{} {}", this, t);
+                    return singleton(Operator.error(this, t, n.time()));
                 }
                 return null;
             }

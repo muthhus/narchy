@@ -20,7 +20,10 @@ dependencies {
 //    compile group: 'com.airhacks', name: 'afterburner.fx', version:'1.7.0'
 
     compile group: 'org.jogamp.gluegen', name: 'gluegen-rt-main', version: '2.3.2'
-    compile group: 'org.jogamp.jogl', name: 'jogl-all-noawt-main', version: '2.3.2'
+    compile (group: 'org.jogamp.jogl',
+            name: 'jogl-all-noawt-main',
+            version: '2.3.2')
+
 
     compile group: 'org.boofcv', name: 'all', version: '0.26'
     compile group: 'org.boofcv', name: 'sfm', version: '0.26'
@@ -31,7 +34,11 @@ dependencies {
 
 
     compile(group: 'de.dfki.mary', name: 'voice-cmu-slt-hsmm', version: '5.2') {
-//      exclude(module: 'log4j')
+        //exclude(group: 'log4j')
+        exclude(group: 'org.codehaus.groovy')
+        exclude(group: 'org.swinglabs')
+        exclude(group: 'org.slf4j')
+        exclude(group: 'com.google.guava')
     }
 
     compile(group: 'org.pircbotx', name: 'pircbotx', version: '2.1') {

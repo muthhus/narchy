@@ -243,9 +243,9 @@ public class IRCAgent extends IRC {
                 "#nars"
         );
 
-        n.on("trace", (a, t, nn) -> {
-            if (t.length > 0) {
-                switch (t[0].toString()) {
+        n.onOpArgs("trace", (arg, nn) -> {
+            if (arg.subs() > 0) {
+                switch (arg.sub(0).toString()) {
                     case "on": bot.setTrace(true); break;
                     case "off": bot.setTrace(false);  bot.out.clear(); break;
                 }

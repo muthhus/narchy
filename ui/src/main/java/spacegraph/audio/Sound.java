@@ -26,7 +26,7 @@ public class Sound<S extends SoundProducer> implements SoundSource, Comparable
 
     }
     
-    public void update(SoundSource listener, float alpha)
+    public boolean update(SoundSource listener, float alpha)
     {
         x = source.getX(alpha)-listener.getX(alpha);
         y = source.getY(alpha)-listener.getY(alpha);
@@ -52,6 +52,8 @@ public class Sound<S extends SoundProducer> implements SoundSource, Comparable
 
         pan = p;
         amplitude = volume / (1.0f + dist); //TODO i added /dist divisor
+
+        return isLive();
     }
 
     public void read(float[] buf, int readRate)    {

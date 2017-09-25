@@ -3,7 +3,6 @@ package nars;
 import jcog.Texts;
 import nars.concept.Concept;
 import nars.op.DepIndepVarIntroduction;
-import nars.op.Operation;
 import nars.op.Operator;
 import nars.op.data.*;
 import nars.op.data.intersect;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.SortedSet;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.BiConsumer;
 
 import static nars.Op.*;
 import static nars.term.Functor.f0;
@@ -256,10 +256,10 @@ public class Builtin {
                 target = 1 - target;
             return c.sub(target);
         }));
-        nar.on("assertEquals", (op, args, nn) -> {
+        nar.onOp("assertEquals", (args, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';
-            assertEquals(/*msg,*/ 2, args.length);
-            assertEquals(/*msg,*/ args[0], args[1]);
+            assertEquals(/*msg,*/ 2, args.subs());
+            assertEquals(/*msg,*/ args.sub(0), args.sub(1));
         });
 
         nar.on(f0("self", nar::self));
@@ -276,31 +276,31 @@ public class Builtin {
 //            );
 //        });
 
-        Operator log = (a, t, n) -> NAR.logger.info(" {}", t);
-        nar.on("log", log);
-        nar.on(Operation.LOG_FUNCTOR, log);
+        BiConsumer<Task,NAR> log = (t, n) -> NAR.logger.info(" {}", t);
+        nar.onOp("log", log);
+        nar.onOp(Operator.LOG_FUNCTOR, log);
 
-        nar.on("error", (a, t, n) -> NAR.logger.error(" {}", t));
+        nar.onOpArgs("error", (t, n) -> NAR.logger.error(" {}", t));
 
-        nar.on("reset", (op, args1, nn) ->
-                nn.runLater(nn::reset)
-        );
+        nar.onOp("reset", (t, nn) -> {
+            nn.runLater(nn::reset);
+        });
 
-        nar.on("clear", (op, args, n) -> {
+        nar.onOp("clear", (t, n) -> {
             n.runLater(() -> {
                 n.clear();
-                Operation.log(n, "ready");
+                n.input(Operator.log(n.time(), "ready"));
             });
         });
 
-        nar.on("stat", (op, args, n) -> Operation.log(n,
+        nar.onOpLogged("stat", (t, n) ->
                 $.p(
                         $.quote(n.emotion.summary()),
                         $.quote(n.terms.summary()),
                         $.quote(n.emotion.summary()),
                         $.quote(n.exe.toString())
                 )
-        ));
+        );
 
         nar.on(Functor.f("top", (args) -> {
 

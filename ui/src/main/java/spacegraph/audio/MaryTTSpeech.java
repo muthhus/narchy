@@ -12,11 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sound.sampled.*;
-import java.io.IOException;
+import javax.sound.sampled.AudioInputStream;
 import java.util.Locale;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
 
 /**
  * https://github.com/marytts/marytts/wiki/MaryInterface
@@ -26,7 +23,8 @@ public class MaryTTSpeech {
     final static Logger logger = LoggerFactory.getLogger(MaryTTSpeech.class);
 
     final static MaryInterface marytts;
-    final static Executor speechQueue = ForkJoinPool.commonPool(); //Executors.newCachedThreadPool();
+
+
     static {
         System.setProperty("java.version", "1.9.0"); //HACK
         LocalMaryInterface m;
@@ -53,61 +51,74 @@ public class MaryTTSpeech {
 
         speak("hello 1234 abc this is a sentence!!! now what?");
 
-        Thread.sleep(16*1000);
+        Thread.sleep(16 * 1000);
     }
 
 
-    /** async */
+    /**
+     * async
+     */
     public static void speak(String text) {
         speak(text, null);
     }
 
-    /** async */
-    public static void speak(String text, @Nullable Runnable whenFinished) {
-        speechQueue.execute( ()->{
-            try {
-                speakNow(text, whenFinished!=null ? true : false);
+    /**
+     * async
+     */
+    public static void speak(String _text, @Nullable Runnable whenFinished) {
+        String text = _text.trim();
+        if (text.isEmpty())
+            return;
 
-            } catch (SynthesisException e) {
-                e.printStackTrace();
-            }
-            if (whenFinished!=null) {
-                whenFinished.run();
-            }
-        });
+
+        try {
+
+            DDSoundProducer sound = speech(text);
+            sound.onFinish = whenFinished;
+
+            Audio.the().play( sound, SoundSource.center,
+//                new SoundSource() {
+//
+//                    float now = 0;
+//                    @Override
+//                    public float getX(float alpha) {
+//                        now += alpha;
+//                        return (float) Math.sin(now);//(float) Math.random();
+//                    }
+//
+//                    @Override
+//                    public float getY(float alpha) {
+//                        return (float) Math.cos(now); //(float) Math.random();
+//                    }
+//                },
+                1f, 1f);
+
+
+        } catch (SynthesisException e) {
+            e.printStackTrace();
+        }
+        if (whenFinished != null) {
+            whenFinished.run();
+        }
+
     }
 
 
-    /** synchronous */
-    public static void speakNow(String text, boolean waitUntilCompleted) throws SynthesisException {
+    /**
+     * synchronous
+     */
+    public static DDSoundProducer speech(String text) throws SynthesisException {
 
 
         AudioInputStream audio = marytts.generateAudio(text);
         double[] x = MaryAudioUtils.getSamplesAsDoubleArray(audio);
-        DDSAudioInputStream audioInputStream = new DDSAudioInputStream(new BufferedDoubleDataSource(x), audio.getFormat());
+
+        DDSoundProducer sound = new DDSoundProducer(new DDSAudioInputStream(new BufferedDoubleDataSource(x), audio.getFormat()));
+        return sound;
 
 
-        if(audioInputStream != null) {
-            AudioFormat format = audioInputStream.getFormat();
-            DataLine.Info info = new DataLine.Info(Clip.class, format);
+//        DDSAudioInputStream audioInputStream = new DDSAudioInputStream(new BufferedDoubleDataSource(x), audio.getFormat());
 
-            Clip m_clip;
-            try {
-                m_clip = (Clip)AudioSystem.getLine(info);
-                m_clip.open(audioInputStream);
-                m_clip.loop(0); //plays once
-                if(waitUntilCompleted) {
-                    m_clip.drain();
-                }
-            } catch (LineUnavailableException var8) {
-                var8.printStackTrace();
-            } catch (IOException var9) {
-                var9.printStackTrace();
-            }
-
-        } else {
-            throw new NullPointerException();
-        }
 
     }
 

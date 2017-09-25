@@ -25,9 +25,7 @@ import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
 import nars.control.Activate;
 import nars.control.NARService;
-import nars.nlp.Hear;
-import nars.op.Operation;
-import nars.op.in.NoteFS;
+import nars.op.Operator;
 import nars.task.ITask;
 import org.slf4j.LoggerFactory;
 
@@ -80,14 +78,7 @@ public class TextUI {
 
     public static void main(String[] args) throws IOException {
 
-        NAR nar = NARS
-                .realtime()
-                //.memory("/tmp/nal")
-                .then(Hear::wiki)
-                .get();
-
-        nar.startFPS(10f);
-
+        NAR nar = NARchy.all();
 
         try {
             //new NoteFS("/tmp/nal", nar);
@@ -101,6 +92,7 @@ public class TextUI {
 
         new TextUI(nar, 1024);
 
+        nar.startFPS(10f);
 
     }
 
@@ -309,7 +301,7 @@ public class TextUI {
                         try {
                             nar.input(t);
                         } catch (Narsese.NarseseException e) {
-                            Operation.log(nar, e);
+                            nar.input(Operator.log(nar.time(), e));
                         }
                     }
                 }

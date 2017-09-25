@@ -1,6 +1,8 @@
 package spacegraph.audio;
 
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -8,7 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ListenerMixer extends CopyOnWriteArrayList<Sound> implements StereoSoundProducer {
 
-    private float[] buf = new float[0];
+    private float[] buf = ArrayUtils.EMPTY_FLOAT_ARRAY;
 
     private final int maxChannels;
 
@@ -31,12 +33,9 @@ public class ListenerMixer extends CopyOnWriteArrayList<Sound> implements Stereo
     public void update(float alpha) {
         boolean updating = (soundSource != null);
 
-        this.removeIf(sound -> {
-            if (updating)
-                sound.update(soundSource, alpha);
-
-            return !sound.isLive();
-        });
+        this.removeIf(sound ->
+                !updating || !sound.update(soundSource, alpha)
+        );
 
 //        for (Iterator it = sounds.iterator(); it.hasNext();)         {
 //

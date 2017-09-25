@@ -3,6 +3,7 @@ package nars.op;
 import com.google.common.base.Joiner;
 import jcog.list.CircularArrayList;
 import nars.*;
+import nars.nar.OperatorTest;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -64,11 +65,11 @@ public class SeqTest {
             return Joiner.on('\n').join(seqs.entrySet());
         }
 
-        private class seqAdd extends Operation {
+        private class seqAdd extends Operator {
 
 
             public seqAdd(NAR n) {
-                super((Atom) $.the("seqAdd"), n);
+                super((Atom) $.the("seqAdd"), execute, n);
             }
 
             @Override
@@ -76,7 +77,7 @@ public class SeqTest {
                 if (t.isBelief() && !t.isEternal() && t.term().vars() == 0) {
                     float e = t.expectation();
                     if (e > expThresh) {
-                        Term[] args = Operator.args(t);
+                        Term[] args = OperatorTest.args(t);
                         if (args.length == 2) {
                             Term key = args[0];
                             Term belief = args[1];

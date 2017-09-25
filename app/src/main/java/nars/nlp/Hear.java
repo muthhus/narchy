@@ -6,9 +6,8 @@ import jcog.exe.Loop;
 import jcog.io.Twokenize;
 import nars.*;
 import nars.concept.Concept;
-import nars.op.Operation;
+import nars.op.Operator;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
@@ -137,8 +136,9 @@ public class Hear extends Loop {
     }
 
     static public void wiki(NAR nar) {
-        nar.on( (Atom)Atomic.the("readWiki"),  (op, args, n) -> {
+        nar.onOp( "readWiki",  (t, n) -> {
 
+            Term[] args = Operator.args(t).toArray();
             try {
                 String base = "simple.wikipedia.org";
                 //"en.wikipedia.org";
@@ -157,12 +157,13 @@ public class Hear extends Loop {
 
                 //System.out.println(strippedText);
 
-                Hear.hear(nar, strippedText, page, 250, 0.1f);
+                Hear.hear(n, strippedText, page, 250, 0.1f);
 
-                Operation.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
+                return Operator.log(n.time(), "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
 
             } catch (Exception e) {
                 e.printStackTrace();
+                return null;
             }
         });
     }

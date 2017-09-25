@@ -120,7 +120,8 @@ public class Repl {
         //Default e = new Default();
         //new InterNAR2(e, 15000);
 
-        NAR d = new NARS().get();
+        NAR d = NARchy.all();
+
         //InterNAR2 ii = new InterNAR2(d, 15001);
         //ii.connect("tcp://localhost:15000");
 
@@ -130,84 +131,5 @@ public class Repl {
         new Repl(d);
     }
 
-    /**
-     * https://github.com/zeromq/jeromq/blob/master/src/test/java/guide/psenvpub.java
-     */
-    private static class InterNAR2 implements Runnable {
-
-        private final NAR nar;
-        private final ZMQ.Context context;
-        private final ZMQ.Socket publisher;
-        private final Thread thread;
-        private final ZMQ.Socket subscriber;
-
-        public InterNAR2(NAR n, int port) {
-            //super("tcp://0.0.0.0:" + port);
-
-            context = ZMQ.context(1);
-            publisher = context.socket(ZMQ.PUB);
-            subscriber = context.socket(ZMQ.SUB);
-
-            //publisher.bind("tcp://*:5563");
-            publisher.bind("tcp://*:" + port);
-
-            new Thread(() -> {
-                while (!Thread.currentThread().isInterrupted()) {
-                    // Write two messages, each with an envelope and content
-                    publisher.sendMore("A");
-                    publisher.send("We don't want to see this");
-                    Util.sleep(100);
-                    publisher.sendMore("B");
-                    publisher.send("We would like to see this");
-                    Util.sleep(100);
-                }
-            }).start();
-
-
-            this.nar = n;
-
-            thread = new Thread(this);
-            thread.start();
-
-        }
-
-        public void connect(String url) {
-            subscriber.connect(url);
-        }
-
-        @Override
-        public void run() {
-
-
-            // Prepare our context and subscriber
-
-
-
-            subscriber.subscribe("B".getBytes(ZMQ.CHARSET));
-            while (!Thread.currentThread().isInterrupted()) {
-
-                // Read envelope with address
-                String address = subscriber.recvStr();
-                // Read message contents
-                String contents = subscriber.recvStr();
-                System.out.println(this + " " + address + " : " + contents);
-            }
-        }
-
-        public void stop() {
-            publisher.close();
-            subscriber.close();
-            context.term();
-        }
-
-        public void send(String x) {
-            publisher.send(x);
-        }
-
-//        @Override
-//        protected String receive(ZMQ.Socket sub) {
-//            return sub.recvStr();
-//        }
-    }
 
 }

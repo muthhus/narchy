@@ -1,13 +1,12 @@
-
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 apply plugin: 'application'
 
 dependencies {
-  //compile project(':nal')
-  compile project(':nal')
+    //compile project(':nal')
+    compile project(':nal')
 
-  compile project(':ui')
+    compile project(':ui')
 
 //  testCompile project(':nal')
 }
@@ -18,15 +17,26 @@ mainClassName = 'nars.TextUI'
 
 shadowJar {
 
+    exclude 'org/bytedeco/javacpp/macosx-x86_64/*'
+    exclude 'org/bytedeco/javacpp/windows-x86_64/*'
+    exclude 'com/sun/jna/platform/win32/*'
+    exclude 'com/sun/jna/platform/wince/*'
+    exclude 'com/sun/jna/platform/mac/*'
+    exclude 'com/sun/jna/win32*'
+    exclude 'com/sun/jna/darwin/*'
+    exclude 'com/sun/jna/sunos*'
+    exclude 'com/sun/jna/aix*'
+    exclude 'Conversant*.png'
+
 
 //   baseName = 'nars_app'
 //   classifier = null
 //   version = null
 
-   //exclude 'a2.properties'
-   /* dependencies {
-      exclude(dependency('shadow:d:1.0'))
-   }*/
+    //exclude 'a2.properties'
+    /* dependencies {
+       exclude(dependency('shadow:d:1.0'))
+    }*/
 
 
 }

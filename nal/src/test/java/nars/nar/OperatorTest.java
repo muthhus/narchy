@@ -1,10 +1,9 @@
 package nars.nar;
 
 import nars.*;
-import nars.op.AtomicOperation;
 import nars.op.Operator;
+import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.time.Tense;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -16,7 +15,11 @@ import static org.junit.Assert.*;
 
 
 @Ignore
-public class OperationTest {
+public class OperatorTest {
+
+    public static Term[] args(Task t) {
+        return ((Compound)(t.sub(0)/*subject*/)).toArray();
+    }
 
     @Test
     public void testEcho() throws Narsese.NarseseException {
@@ -52,7 +55,7 @@ public class OperationTest {
 //            }
 //        });
         final int[] count = {0};
-        n.on(new AtomicOperation((Atom) $.the("x"), 2, 0.66f, n) {
+        n.on(new Operator.AtomicExec(exe, 0.66f, 2) {
             @Override
             public void accept(Task x, NAR nar) {
                 System.err.println("INVOKE " + x);
@@ -73,10 +76,10 @@ public class OperationTest {
     public void testChoose() throws Narsese.NarseseException {
         NAR n = NARS.tmp();
         n.time.dur(10);
-        n.on(new AtomicOperation((Atom) $.the("x"), 1, 0.51f, n) {
+        n.on(new Operator.AtomicExec(exe, 0.51f, 1) {
             @Override
             public void accept(Task x, NAR nar) {
-                Term[] args = Operator.args(x);
+                Term[] args = args(x);
                 if (args.length > 0) {
                     Term r;
                     if ($.the(1).equals(args[0])) {
@@ -105,11 +108,11 @@ public class OperationTest {
     @Test
     public void testGoal2() throws Narsese.NarseseException {
         NAR n = NARS.tmp();
-        n.on(new AtomicOperation((Atom) $.the("x"), 2, 0.66f, n) {
+        n.on(new Operator.AtomicExec(exe, 0.66f, 2) {
             @Override
             public void accept(Task t, NAR nar) {
                 Term x = t.term();
-                Term[] args = Operator.args(t);
+                Term[] args = args(t);
                 Term y = $.func("args", args);
                 Term xy = $.impl(x, y);
                 n.believe(xy, Tense.Present);

@@ -22,13 +22,11 @@ import nars.derive.PrediTerm;
 import nars.exe.Exec;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
-import nars.op.Operation;
 import nars.op.Operator;
 import nars.table.BeliefTable;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.task.util.InvalidTaskException;
-import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
@@ -56,10 +54,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 import static nars.$.$;
@@ -807,33 +802,48 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         runLater(() -> add(s.term(), s));
     }
 
-    @Deprecated
-    public final void on(@NotNull String atom, /*@NotNull*/ Operator o) {
-        on((Atom) Atomic.the(atom), o);
-    }
 
-    @Deprecated
-    public final void on(@NotNull Atom a, /*@NotNull*/ Operator o) {
-
-        on(new Operation(a, this) {
-
-            @Override
-            public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
-                Term c = t.term();
-                Atomic op = (Atomic) (c.sub(1));
-                @NotNull Term[] args = ((Compound) (t.term().sub(0))).toArray();
-                nar.runLater(() -> {
-                    o.run(op, args, nar);
-                });
-                return t;
-            }
-
+    /** simplified wrapper for use cases where only the arguments of an operation task, and not the task itself matter */
+    public final void onOpArgs(@NotNull String atom, @NotNull BiConsumer<TermContainer,NAR> exe) {
+        onOp(atom, (task, nar) -> {
+            exe.accept( task.term().sub(0).subterms(), nar );
+            return null;
         });
     }
 
-    public final void on(/*@NotNull*/ Operation c) {
-        terms.set(c);
+    /** simplified wrapper which converts the term result of the supplied lambda to a log event */
+    public final void onOpLogged(@NotNull String a, @NotNull BiFunction<Task,NAR,Term> exe) {
+        onOp(a, (BiFunction<Task,NAR,Task>)(t, n) -> Operator.log(exe.apply(t, n)));
     }
+
+    /** registers an operator */
+    public final void onOp(@NotNull String a, @NotNull BiConsumer<Task,NAR> exe) {
+        onOp(a, (BiFunction<Task,NAR,Task>)(task, nar) -> {
+            exe.accept( task, nar );
+            return null;
+        });
+    }
+
+    /** registers an operator */
+    public final void onOp(@NotNull String a, @NotNull BiFunction<Task,NAR,Task> exe) {
+
+        terms.set(new Operator( (Atom)Atomic.the(a), exe, this));
+//        {
+//
+//            @Override
+//            public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
+//                Term c = t.term();
+//                Atomic op = (Atomic) (c.sub(1));
+//                @NotNull Term[] args = ((Compound) (t.term().sub(0))).toArray();
+//                nar.runLater(() -> {
+//                    o.run(op, args, nar);
+//                });
+//                return t;
+//            }
+//
+//        });
+    }
+
 
     public void input(Function<NAR, Task>... tasks) {
         for (Function<NAR, Task> x : tasks) {
