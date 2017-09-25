@@ -30,29 +30,29 @@ public class MaryTTSpeech {
         LocalMaryInterface m;
         try {
             m = new LocalMaryInterface();
-            logger.info("Speech System READY");
+            //logger.info("Speech System READY");
         } catch (MaryConfigurationException e) {
             m = null;
         }
         marytts = m;
     }
 
-    public static void main(String[] args) throws Exception {
-
-        System.out.println("I currently have " + marytts.getAvailableVoices() + " voices in "
-                + marytts.getAvailableLocales() + " languages available.");
-        System.out.println("Out of these, " + marytts.getAvailableVoices(Locale.US) + " are for US English.");
-
-
-//        AudioInputStream audio = marytts.generateAudio("This is my text.");
-//        MaryAudioUtils.writeWavFile(MaryAudioUtils.getSamplesAsDoubleArray(audio), "/tmp/thisIsMyText.wav", audio.getFormat());
-//        MaryAudioUtils.playWavFile("/tmp/thisIsMyText.wav", 3);
-
-
-        speak("hello 1234 abc this is a sentence!!! now what?");
-
-        Thread.sleep(16 * 1000);
-    }
+//    public static void main(String[] args) throws Exception {
+//
+//        System.out.println("I currently have " + marytts.getAvailableVoices() + " voices in "
+//                + marytts.getAvailableLocales() + " languages available.");
+//        System.out.println("Out of these, " + marytts.getAvailableVoices(Locale.US) + " are for US English.");
+//
+//
+////        AudioInputStream audio = marytts.generateAudio("This is my text.");
+////        MaryAudioUtils.writeWavFile(MaryAudioUtils.getSamplesAsDoubleArray(audio), "/tmp/thisIsMyText.wav", audio.getFormat());
+////        MaryAudioUtils.playWavFile("/tmp/thisIsMyText.wav", 3);
+//
+//
+//        speak("hello 1234 abc this is a sentence!!! now what?");
+//
+//        Thread.sleep(16 * 1000);
+//    }
 
 
     /**
@@ -76,7 +76,7 @@ public class MaryTTSpeech {
             DDSoundProducer sound = speech(text);
             sound.onFinish = whenFinished;
 
-            Audio.the().play( sound, SoundSource.center,
+            Audio.the().play( sound, SoundSource.center, 1f, 1f);
 //                new SoundSource() {
 //
 //                    float now = 0;
@@ -91,7 +91,6 @@ public class MaryTTSpeech {
 //                        return (float) Math.cos(now); //(float) Math.random();
 //                    }
 //                },
-                1f, 1f);
 
 
         } catch (SynthesisException e) {

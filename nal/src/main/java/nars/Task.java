@@ -990,6 +990,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
             });
             if (o != null) {
                 try {
+                    //TODO add a pre-test guard here to avoid executing a task which will be inconsequential anyway
                     Task y = o.getOne().execute.apply(this, n);
                     if (y != null && !this.equals(y)) {
                         return singleton(y);

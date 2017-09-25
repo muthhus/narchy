@@ -1,6 +1,6 @@
 package nars;
 
-import jcog.Util;
+import nars.nlp.Hear;
 import org.fusesource.jansi.AnsiConsole;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -9,7 +9,6 @@ import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.history.history.MemoryHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
-import org.zeromq.ZMQ;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -23,6 +22,7 @@ public class Repl {
 
     public Repl(NAR nar) throws IOException {
 
+        AnsiConsole.systemInstall();
 
         TerminalBuilder tb = TerminalBuilder.builder();
 
@@ -38,7 +38,6 @@ public class Repl {
 //                        .toFormatter()))
 //                .toAnsi();
 
-        AnsiConsole.systemInstall();
 
         Terminal terminal = tb
                 //.system(true)
@@ -64,14 +63,12 @@ public class Repl {
                 .build();
 
         nar.logBudgetMin(new PrintStream(reader.getTerminal().output()), 0.1f);
-        nar.cycle();
-        NARLoop loop = nar.startFPS(20f);
-
 
         reader.setOpt(LineReader.Option.AUTO_FRESH_LINE);
         reader.setOpt(LineReader.Option.AUTO_LIST);
 
 
+        NARLoop loop = nar.startFPS(20f);
         while (true) {
 
             terminal.flush();
@@ -99,7 +96,11 @@ public class Repl {
                 try {
                     nar.input(line);
                 } catch (Exception e) {
-                    terminal.writer().println(e);
+                    try {
+                        Hear.hear(nar, line, "console", 100);
+                    } catch (Exception e1) {
+                        terminal.writer().println(e1);
+                    }
                 }
 
             }

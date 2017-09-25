@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class OperatorTest {
 
     public static Term[] args(Task t) {
-        return ((Compound)(t.sub(0)/*subject*/)).toArray();
+        return ((Compound) (t.sub(0)/*subject*/)).toArray();
     }
 
     @Test
@@ -55,13 +55,11 @@ public class OperatorTest {
 //            }
 //        });
         final int[] count = {0};
-        n.on(new Operator.AtomicExec(exe, 0.66f, 2) {
-            @Override
-            public void accept(Task x, NAR nar) {
-                System.err.println("INVOKE " + x);
-                count[0] ++;
-            }
-        });
+        n.onOp("x", new Operator.AtomicExec((x, nar) -> {
+            System.err.println("INVOKE " + x);
+            count[0]++;
+            return null;
+        }, 0.66f, 2));
         n.run(1);
         n.input("x(1)! :|:");
         n.input("x(\"too soon\")! :|:"); //<- not invoked because x(1) is
@@ -76,26 +74,23 @@ public class OperatorTest {
     public void testChoose() throws Narsese.NarseseException {
         NAR n = NARS.tmp();
         n.time.dur(10);
-        n.on(new Operator.AtomicExec(exe, 0.51f, 1) {
-            @Override
-            public void accept(Task x, NAR nar) {
-                Term[] args = args(x);
-                if (args.length > 0) {
-                    Term r;
-                    if ($.the(1).equals(args[0])) {
-                        System.err.println("YES");
-                        r = $.the("good");
-                    } else if ($.the(0).equals(args[0])) {
-                        r = $.the("good").neg();
-                    } else {
-                        return;
-                    }
-
-                    n.believe($.impl(x.term(), r), Tense.Present);
+        n.onOp("x", new Operator.AtomicExec((x, nar) -> {
+            Term[] args = args(x);
+            if (args.length > 0) {
+                Term r;
+                if ($.the(1).equals(args[0])) {
+                    System.err.println("YES");
+                    r = $.the("good");
+                } else if ($.the(0).equals(args[0])) {
+                    r = $.the("good").neg();
+                } else {
+                    return null;
                 }
 
+                n.believe($.impl(x.term(), r), Tense.Present);
             }
-        });
+            return null;
+        }, 0.51f, 1));
         n.log();
         n.input("x(1)! :|:");
         n.run(4);
@@ -108,16 +103,14 @@ public class OperatorTest {
     @Test
     public void testGoal2() throws Narsese.NarseseException {
         NAR n = NARS.tmp();
-        n.on(new Operator.AtomicExec(exe, 0.66f, 2) {
-            @Override
-            public void accept(Task t, NAR nar) {
-                Term x = t.term();
-                Term[] args = args(t);
-                Term y = $.func("args", args);
-                Term xy = $.impl(x, y);
-                n.believe(xy, Tense.Present);
-            }
-        });
+        n.onOp("x", new Operator.AtomicExec((t, nar) -> {
+            Term x = t.term();
+            Term[] args = args(t);
+            Term y = $.func("args", args);
+            Term xy = $.impl(x, y);
+            n.believe(xy, Tense.Present);
+            return null;
+        }, 1));
         n.log();
         n.run(1);
         n.input("x(1)! :|:");
@@ -126,6 +119,7 @@ public class OperatorTest {
         n.input("x(3)! :|:");
         n.run(10);
     }
+
     @Test
     public void testSliceAssertEtc() throws Narsese.NarseseException {
         //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice

@@ -202,10 +202,6 @@ public class Twenglish {
 //            t.removeLast(); //remove the punctuation, it will be redundant
 
 
-        if (t.isEmpty())
-            return null;
-
-
         List<TaskBuilder> tt = new ArrayList();
 
         //1. add the logical structure of the sequence of terms

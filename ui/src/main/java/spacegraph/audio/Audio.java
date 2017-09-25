@@ -98,6 +98,25 @@ public class Audio implements Runnable {
         thread.start();
     }
 
+
+	/**
+	 * Prints information about the current Mixer to System.out.
+	 */
+	public static void printMixerInfo() {
+		Mixer.Info[] mixerinfo = AudioSystem.getMixerInfo();
+		for (int i = 0; i < mixerinfo.length; i++) {
+			String name = mixerinfo[i].getName();
+			if (name.equals(""))
+				name = "No name";
+			System.out.println((i+1) + ") " + name + " --- " + mixerinfo[i].getDescription());
+			Mixer m = AudioSystem.getMixer(mixerinfo[i]);
+			Line.Info[] lineinfo = m.getSourceLineInfo();
+			for (int j = 0; j < lineinfo.length; j++) {
+				System.out.println("  - " + lineinfo[j].toString());
+			}
+		}
+	}
+
     public void record(String path) throws java.io.FileNotFoundException {
 
         //if (rec != null) //...
@@ -124,6 +143,10 @@ public class Audio implements Runnable {
 
     public void shutDown() {
         alive = false;
+    }
+
+    public int bufferSizeInFrames() {
+        return bufferSize;
     }
 
     static class DefaultSource implements SoundSource {
@@ -209,13 +232,21 @@ public class Audio implements Runnable {
     @Override
     public void run() {
         now = System.currentTimeMillis();
+        int idle = 0;
         while (alive) {
-            now = (float) (System.currentTimeMillis() - now);
-            synchronized (listenerMixer) {
-                clientTick(now);
-                tick();
+
+            if (listenerMixer.isEmpty()) {
+                Util.pauseNext(idle++);
+            } else {
+                idle = 0;
             }
-            //Thread.yield();
+
+            now = (float) (System.currentTimeMillis() - now);
+
+            clientTick(now);
+
+            tick();
+
         }
     }
 

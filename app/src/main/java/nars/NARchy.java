@@ -24,7 +24,6 @@ public class NARchy extends NARS {
                 if (text.charAt(0)!='"')
                     text = "\"" + text + '"';
 
-                System.out.println("speak: " + text);
                 MaryTTSpeech.speak(text);
             }
         });
