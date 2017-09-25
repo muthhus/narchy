@@ -1087,9 +1087,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public final NARLoop startFPS(float initialFPS) {
-        assert (initialFPS > 0);
+        assert (initialFPS >= 0);
 
-        float millisecPerFrame = 1000.0f / initialFPS;
+        float millisecPerFrame = initialFPS > 0 ? 1000.0f / initialFPS : 0 /* infinite speed */;
         return startPeriodMS((int) millisecPerFrame);
     }
 

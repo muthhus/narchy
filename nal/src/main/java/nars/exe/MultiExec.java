@@ -58,6 +58,12 @@ public class MultiExec extends Exec {
         q = Util.blockingQueue(qSize);
     }
 
+    @Override public float load() {
+        int siz = q.size();
+        int cap = q.remainingCapacity();
+        return ((float)siz)/(siz + cap);
+    }
+
     @Override
     public synchronized void start(NAR nar) {
         super.start(nar);
@@ -107,35 +113,46 @@ public class MultiExec extends Exec {
 
     @Override
     public void add(/*@NotNull*/ ITask t) {
-        if (!q.offer(t)) {
+//        if (!q.offer(t)) {
+//            drainEvict(t);
+//        }
+        int stall = 0;
+        while (!q.offer(t)) {
+            Util.pauseNext(stall++);
+            if (stall > 128) {
+                drainEvict(t);
+                break;
+            }
+        }
+    }
 
-            //1. reduce system power parameter
-            //TODO
+    private void drainEvict(ITask t) {
+        //1. reduce system power parameter
+        //TODO
 
-            Util.pauseNext(0);
+        Util.pauseNext(0);
 
-            //2. attempt to evict any weaker tasks consuming space
-            int sample = Math.max(4, q.size() / (num+1) / 8);
+        //2. attempt to evict any weaker tasks consuming space
+        int sample = Math.max(4, q.size() / (num+1) / 8);
 
-            int survive = Math.round(sample * 0.5f);
+        int survive = Math.round(sample * 0.5f);
 
-            TopN<ITask> tmpEvict = new TopN<>(new ITask[survive], Prioritized::priElseNeg1) {
-                @Override
-                protected void reject(ITask iTask) {
-                    logger.info("ignored: {}", iTask);
-                }
-            };
-            tmpEvict.add(t);
+        TopN<ITask> tmpEvict = new TopN<>(new ITask[survive], Prioritized::priElseNeg1) {
+            @Override
+            protected void reject(ITask iTask) {
+                logger.info("ignored: {}", iTask);
+            }
+        };
+        tmpEvict.add(t);
 
-            q.drainTo(tmpEvict, sample);
+        q.drainTo(tmpEvict, sample);
 //            if (tmpEvict.isEmpty()) {
 //                logger.warn("ignored {}", t);
 //                return;
 //            }
 
-            //reinsert the temporarily evicted
-            tmpEvict.forEach(q::offer);
-        }
+        //reinsert the temporarily evicted
+        tmpEvict.forEach(q::offer);
     }
 
     public void add(FocusExec reasoner, Predicate<Activate> filter) {

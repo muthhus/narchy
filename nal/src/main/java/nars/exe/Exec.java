@@ -107,6 +107,10 @@ abstract public class Exec implements Executor, PriMerge {
 
     }
 
+    public float load() {
+        return 0;
+    }
+
     //    public class Periodic extends Loop {
 //
 //        final AtomicBoolean busy = new AtomicBoolean(false);

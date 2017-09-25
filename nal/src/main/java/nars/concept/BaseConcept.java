@@ -92,7 +92,6 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termed {
         );
         //TODO forget based on dt
         a.priAdd(pri);
-        n.input(a);
         return a;
     }
 

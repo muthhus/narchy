@@ -66,7 +66,7 @@ public class TextUI {
     public TextUI(NAR n, int port) throws IOException {
         this(n);
         TelnetTerminalServer server = new TelnetTerminalServer(port, Charset.forName("utf-8"));
-        logger.info("listen port={}", port);
+        logger.info("telnet listen on port={}", port);
         while (true) {
             TelnetTerminal conn = server.acceptConnection();
             if (conn != null) {
@@ -82,14 +82,15 @@ public class TextUI {
 
         NAR nar = NARS
                 .realtime()
-                .memory("/tmp/nal")
+                //.memory("/tmp/nal")
                 .then(Hear::wiki)
                 .get();
 
-        nar.startFPS(2f);
+        nar.startFPS(10f);
+
 
         try {
-            new NoteFS("/tmp/nal", nar);
+            //new NoteFS("/tmp/nal", nar);
 
             InterNAR i = new InterNAR(nar, 8, 0);
             i.recv.preAmp(0.1f);

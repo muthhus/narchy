@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Util;
 import jcog.exe.Loop;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,14 +11,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class NARLoop extends Loop {
 
-
     @NotNull
     public final NAR nar;
-
-
-
-    private long cycles;
-
 
     /**
      * starts paused; thread is not automatically created
@@ -36,21 +31,30 @@ public class NARLoop extends Loop {
         setPeriodMS(initialPeriod);
     }
 
+    @Override
+    protected int nextPeriodMS() {
+        int delayMS = super.nextPeriodMS();
+
+//        float load = nar.exe.load();
+//
+//        float SAFETY_LOAD = 0.5f;
+//        if (load > SAFETY_LOAD) {
+//            float MAX_LOAD_BACKOFF_MS = 5f;
+//            int stallMS = 1+Math.round(1 + ((load - SAFETY_LOAD)) / (1 - SAFETY_LOAD) * MAX_LOAD_BACKOFF_MS);
+//            //delayMS += stallMS;
+//            Util.pause(stallMS);
+//        }
+
+        return delayMS;
+    }
 
     @Override
     public final boolean next() {
         nar.cycle();
-        cycles++;
         return true;
     }
 
 
-    public long cycleCount() {
-        return cycles;
-    }
 
 
-    public void prePeriodMS(int ms) {
-        periodMS.set(ms);
-    }
 }

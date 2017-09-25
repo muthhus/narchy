@@ -63,11 +63,11 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         if (cc != null) {
 
             Activate a = activate(t, activationApplied, cc, n);
-            if (t.isInput()) {
+//            if (t.isInput()) {
                 //sync run immediately
-                a.run(n);
-            }
-
+//                a.run(n);
+//            }
+//
             n.input(a);
 
 //                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
@@ -227,7 +227,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                         reverseLinked = true;
 
 
-                        localSubConcept.activate(subDecay, nar);
+                        Activate a = localSubConcept.activate(subDecay, nar);
+                        nar.input(a);
 
                         localSubConcepts.add(localSubConcept);
 

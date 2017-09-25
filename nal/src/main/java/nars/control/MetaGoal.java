@@ -5,6 +5,7 @@ import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Prioritized;
 import nars.NAR;
+import nars.op.data.flat;
 import nars.task.ITask;
 import nars.task.NativeTask;
 import org.jetbrains.annotations.Nullable;
@@ -232,6 +233,7 @@ public enum MetaGoal {
     }
 
     public static void cause(FasterList<Causable> causables, NAR nar) {
+
         int cc = causables.size();
         if (cc == 0)
             return;
@@ -255,10 +257,10 @@ public enum MetaGoal {
         final int ITERATION_DEMAND_MAX = 64 * 1024;
 
 
-        /** set this to some cpu duty cycle fraction of the target fps */
-        final long targetCycleTimeNS = 25 * 1000000; //x ms
-
-        /** if each recieved exactly the same amount of time, this would be how much is allocated to each */
+//        /** set this to some cpu duty cycle fraction of the target fps */
+        final long targetCycleTimeNS = 100 * 1000000; // ms * threads
+//
+//        /** if each recieved exactly the same amount of time, this would be how much is allocated to each */
         final float targetCycleTimeNSperEach = targetCycleTimeNS / cc;
 
         //Benefit to cost ratio (estimate)
@@ -273,14 +275,14 @@ public enum MetaGoal {
             Causable c = causables.get(i);
             float time = (float) Math.max(1, c.exeTimeNS());
             float iters = (float) Math.max(1, c.iterationsMean());
-            iterLimit[i] = Math.min(ITERATION_DEMAND_MAX, Math.round((iters+1) * ITERATION_DEMAND_GROWTH));
+            iterLimit[i] = Math.min(ITERATION_DEMAND_MAX, Math.round((iters + 1) * ITERATION_DEMAND_GROWTH));
 
             float idealCycleTime = time / (targetCycleTimeNSperEach);
 
             float vv = Util.unitize(c.value());
 
             bcrStat.accept(
-                bcr[i] = vv / time
+                    bcr[i] = vv / time
             );
             granular[i] = iters / idealCycleTime;
         }
@@ -288,18 +290,20 @@ public enum MetaGoal {
 //            bcr[i] = bcrStat.normalize(bcr[i]);
 //        }
 
-        int[] iter = new int[cc];
+        float[] iter = new float[cc];
         Arrays.fill(iter, 1);
 
-        int SAMPLING_FACTOR = 8;
-        final int[] throttle = {
-            cc * SAMPLING_FACTOR
+
+        final int maxSamplesEach = 8;
+        final int[] samplingFactor = {
+                cc * maxSamplesEach
         };
+
+        float throttle = /*nar.exe.load() */ 1f / (maxSamplesEach);
 
         Util.decideRoulette(cc, (c) -> bcr[c], nar.random(), (j) -> {
 
-            int a = Math.max(1, Math.round(granular[j] / SAMPLING_FACTOR));
-            iter[j] += a;
+            iter[j] += granular[j] * throttle;
             boolean changedWeights = false;
             int li = iterLimit[j];
             if (iter[j] >= li) {
@@ -308,15 +312,19 @@ public enum MetaGoal {
                 changedWeights = true;
             }
 
-            if (throttle[0]-- <= 0) return STOP;
+            if (samplingFactor[0]-- <= 0) return STOP;
             else {
                 return changedWeights ? WEIGHTS_CHANGED : CONTINUE;
             }
         });
 
-        for (int i = 0, causablesSize = cc; i < causablesSize; i++)
-            if (iter[i] > 0)
-                nar.input(new InvokeCause(causables.get(i), iter[i]));
+        //System.out.println(Arrays.toString(iter));
+
+        for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
+            int ii = ( Math.round(iter[i]));
+            if (ii > 0)
+                nar.input(new InvokeCause(causables.get(i), ii));
+        }
     }
 
     final private static class InvokeCause extends NativeTask {

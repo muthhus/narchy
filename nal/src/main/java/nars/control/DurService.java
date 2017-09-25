@@ -31,7 +31,7 @@ abstract public class DurService extends NARService implements Runnable {
     public DurService(NAR n, MutableFloat durations) {
         super(n);
         this.durations = durations;
-        this.now = n.time();
+        this.now = n.time()-1;
         this.nar = n;
     }
 

@@ -17,7 +17,7 @@ public class BagClusteringTest {
         b.put("x", 0.5f);
         b.put("y", 0.5f);
         b.put("z", 0.5f);
-        b.commit(2);
+        b.commit(1, (x) -> { });
 
         assertEquals(8, b.size());
 

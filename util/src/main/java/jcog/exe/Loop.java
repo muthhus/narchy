@@ -133,13 +133,13 @@ abstract public class Loop implements Runnable {
 
         onStart();
 
-        logger.info("start {} @ {}ms period", this, periodMS.get());
+        logger.info("start {} @ {}ms period", this, nextPeriodMS());
 
         prevTime = System.currentTimeMillis();
 
         int periodMS;
         long beforeTime = System.currentTimeMillis();
-        while ((periodMS = this.periodMS.get()) >= 0) {
+        while ((periodMS = nextPeriodMS()) >= 0) {
 
 
             try {
@@ -190,6 +190,9 @@ abstract public class Loop implements Runnable {
         lag = lagSum = 0;
     }
 
+    protected int nextPeriodMS() {
+        return this.periodMS.get();
+    }
 
     abstract public boolean next();
 

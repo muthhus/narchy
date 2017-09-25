@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.Ons;
 import jcog.list.FasterList;
+import jcog.pri.Prioritized;
 import jcog.pri.mix.control.MixContRL;
 import nars.control.Activate;
 import nars.control.Cause;
@@ -59,6 +60,7 @@ import java.util.stream.Stream;
 
 import static nars.$.$;
 import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
 
@@ -192,12 +194,13 @@ abstract public class NAgentX extends NAgent {
         //n.dtDither.setValue(0.25f);
         //n.dtMergeOrChoose.setValue(true);
 
-        STMLinkage stmLink = new STMLinkage(n, 1, false);
+        //STMLinkage stmLink = new STMLinkage(n, 1, false);
 
-        LinkClustering stmBelief = new LinkClustering(n, (t) -> t.priElseZero() /* anything temporal */, 16, 256);
+        LinkClustering stmBelief = new LinkClustering(n, Prioritized::priElseZero /* anything temporal */, 16, 256);
         //STMView.show2D(n, stmBelief.bag, 800, 600);
 
-        ConjClustering conjCluster = new ConjClustering(n, 3, BELIEF, 8, 32);
+        ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, 16, 64);
+        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, 16, 64);
 
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);

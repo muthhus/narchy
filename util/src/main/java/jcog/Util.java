@@ -1398,11 +1398,11 @@ public enum Util {
      * adaptive spinlock behavior
      */
     public static void pauseNext(int previousContiguousPauses) {
-        if (previousContiguousPauses < 16) {
+        if (previousContiguousPauses < 8) {
             Thread.onSpinWait();
-        } else if (previousContiguousPauses < 32) {
+        } else if (previousContiguousPauses < 16) {
             Thread.yield();
-        } else if (previousContiguousPauses < 64) {
+        } else if (previousContiguousPauses < 32) {
             Util.sleep(0);
         } else if (previousContiguousPauses < 128) {
             Util.sleep(1);
