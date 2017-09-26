@@ -399,6 +399,7 @@ public interface NAct {
         final float f[] = new float[2];
         final float c[] = new float[2];
         final float exp[] = new float[2];
+        final float[] px = {0};
 
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (action, g) -> {
 
@@ -457,18 +458,29 @@ public interface NAct {
 //                             exp[winner] - 0.5f
 //                    ) - 0.5f) * 2f; //0..+1
 
-                    //compare positive vs negative
-                    x =
-                            ((f[0]-0.5f) - (f[1]-0.5f));  //-1..+1
-                            //((exp[0]-0.5f) - (exp[1]-0.5f));  //-1..+1
-                            //(1 - Math.abs(exp[0] - exp[1])) * (f[0]-0.5f) - (f[1]-0.5f);  //-1..+1 discounted by difference in expectation
+//                    if (c[0] == 0 && c[1] == 0) {
+//                        x = Float.NaN;
+//                    } else {
+                        //compare positive vs negative
+                        x =
+                                //((f[0]-0.5f) - (f[1]-0.5f));  //-1..+1
+                                ((exp[0] - 0.5f) - (exp[1] - 0.5f));  //-1..+1
+                        //(1 - Math.abs(exp[0] - exp[1])) * (f[0]-0.5f) - (f[1]-0.5f);  //-1..+1 discounted by difference in expectation
+//                    }
                 }
 
 
 
                 PreciseTruth N, P;
 
-                float y = update.valueOf(x); //-1..+1
+                float y;
+//                if (x == x) {
+                    y = update.valueOf(x); //-1..+1
+                    px[0] = x;
+//                } else {
+//                    y = update.valueOf(px[0]); //latch previous value if undecided
+//                }
+
 
                 //inverse expectation
                 float conf = y == y ?
@@ -478,7 +490,7 @@ public interface NAct {
                             //Math.abs(y)
                             //w2c((c2wSafe(c[0]) + c2wSafe(c[1]))/2f)
                             //Math.max(c[0],c[1])
-                            Math.min(c[0],c[1])
+                            Math.max(c[0],c[1])
                         : 0;
 
                 //w2c(Math.abs(y) * c2w(restConf));
@@ -487,24 +499,26 @@ public interface NAct {
                     //0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
 
                     P = $.t(1, conf);
-                    N = $.t(0.5f, conf);
+                    N = $.t(0f, conf);
                 } else {
-                    //P = N = $.t(0.5f, conf);
-                    N = P = null;
+                    P = N = $.t(0.5f,
+                            n.confMin.floatValue() * 2);
+                            //restConf);
+                    //N = P = null;
                 }
 
 
                 PreciseTruth pb = y >= 0 ? P : N;
                 PreciseTruth pg =
                         //pb;
-                        //null;
                         pb!=null ? pb.eviMult(0.5f) : null;
+                        //null;
                 ((GoalActionAsyncConcept) n.concept(pt)).feedback(pb, pg, n);
                 PreciseTruth nb = y >= 0 ? N : P;
                 PreciseTruth ng =
                         //nb;
-                        //null;
                         nb!=null ? nb.eviMult(0.5f) : null;
+                        //null;
                 ((GoalActionAsyncConcept) n.concept(nt)).feedback(nb, ng, n);
             }
         };

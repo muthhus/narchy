@@ -26,6 +26,8 @@ public class ListenerMixer extends CopyOnWriteArrayList<Sound> implements Stereo
 
     public <S extends SoundProducer> Sound<S> addSoundProducer(S producer, SoundSource soundSource, float volume, float priority) {
         Sound s = new Sound(producer, soundSource, volume, priority);
+        if (!s.isLive())
+            throw new RuntimeException("dont add a dead sound");
         add(s);
         return s;
     }
@@ -33,9 +35,12 @@ public class ListenerMixer extends CopyOnWriteArrayList<Sound> implements Stereo
     public void update(float alpha) {
         boolean updating = (soundSource != null);
 
-        this.removeIf(sound ->
-                !updating || !sound.update(soundSource, alpha)
-        );
+        this.removeIf(sound -> {
+            if (!updating || !sound.update(soundSource, alpha)) {
+                return true;
+            }
+            return false;
+        });
 
 //        for (Iterator it = sounds.iterator(); it.hasNext();)         {
 //

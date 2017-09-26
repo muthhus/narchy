@@ -102,26 +102,26 @@ public class Reverb extends UGenChain implements DataBeadReceiver {
 				15000, 1);
 
 		drawFromChainInput(src);
-		earlyTapIn.addInput(src);
-		earlyTapIn.addInput(earlyGain);
-		eAPF1.addInput(earlyTapOut);
-		eAPF2.addInput(eAPF1);
-		eAPF3.addInput(eAPF2);
-		earlyGainEcho.addInput(eAPF3);
-		earlyGain.addInput(earlyGainEcho);
-		lAPF1.addInput(earlyGainEcho);
-		lAPF1.addInput(lateGainEcho);
-		lAPF1.addInput(src);
-		lAPF2.addInput(lAPF1);
-		lAPF3.addInput(lAPF2);
-		lAPF4.addInput(lAPF3);
-		lpf.addInput(lAPF4);
-		lateTapIn.addInput(lpf);
-		lateGainEcho.addInput(lateTapOut1);
-		lateGainEcho.addInput(lateTapOut2);
-		lateGain.addInput(lateGainEcho);
-		collectedGain.addInput(earlyGain);
-		collectedGain.addInput(lateGain);
+		earlyTapIn.in(src);
+		earlyTapIn.in(earlyGain);
+		eAPF1.in(earlyTapOut);
+		eAPF2.in(eAPF1);
+		eAPF3.in(eAPF2);
+		earlyGainEcho.in(eAPF3);
+		earlyGain.in(earlyGainEcho);
+		lAPF1.in(earlyGainEcho);
+		lAPF1.in(lateGainEcho);
+		lAPF1.in(src);
+		lAPF2.in(lAPF1);
+		lAPF3.in(lAPF2);
+		lAPF4.in(lAPF3);
+		lpf.in(lAPF4);
+		lateTapIn.in(lpf);
+		lateGainEcho.in(lateTapOut1);
+		lateGainEcho.in(lateTapOut2);
+		lateGain.in(lateGainEcho);
+		collectedGain.in(earlyGain);
+		collectedGain.in(lateGain);
 
 		apfOuts = new AllpassFilter[outChannels];
 		outDelayScale = new float[outChannels];
@@ -131,7 +131,7 @@ public class Reverb extends UGenChain implements DataBeadReceiver {
 			outDelayScale[i] = (3f * i + 5) / (5f * i + 5);
 			apfOuts[i] = new AllpassFilter(context, (int) (60f * sampsPerMS),
 					20, g);
-			apfOuts[i].addInput(collectedGain);
+			apfOuts[i].in(collectedGain);
 			addToChainOutput(i, apfOuts[i]);
 		}
 

@@ -42,11 +42,11 @@ public class PolyLimit extends UGen {
 	}
 	
 	/**
-	 * Overrides {@link UGen#addInput(UGen)} such that if a new UGen pushes the total number of 
+	 * Overrides {@link UGen#in(UGen)} such that if a new UGen pushes the total number of
 	 * connected UGens above the upper limit, the oldest UGen is removed.
 	 */
 	@Override
-    public void addInput(UGen sourceUGen) {
+    public UGen in(UGen sourceUGen) {
 		if(existingInputs.contains(sourceUGen)) {
 			existingInputs.remove(sourceUGen);
 			existingInputs.add(sourceUGen);
@@ -57,7 +57,7 @@ public class PolyLimit extends UGen {
 					removeAllConnections(deadUGen);			
 				}
 				existingInputs.add(sourceUGen);
-				super.addInput(sourceUGen);
+				super.in(sourceUGen);
 			} else {
 				//must check for deleted and remove
 				Queue<UGen> copy = new LinkedList<>();
@@ -67,10 +67,11 @@ public class PolyLimit extends UGen {
 				}
 				if(existingInputs.size() < maxInputs) {
 					existingInputs.add(sourceUGen);
-					super.addInput(sourceUGen);
+					super.in(sourceUGen);
 				}
 			}
 		}
+		return this;
 	}
 	
 	/* (non-Javadoc)

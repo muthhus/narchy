@@ -351,20 +351,21 @@ public class Spatial extends UGen {
 	}
 	
 	/** 
-	 * This overrides {@link #addInput(UGen)} by adding a new 'source' sound to the spatialisation.
+	 * This overrides {@link #in(UGen)} by adding a new 'source' sound to the spatialisation.
 	 */
 	@Override
-    public void addInput(UGen source) {
+    public UGen in(UGen source) {
 		Location location = new Location(source);
 		sources.put(source, location);
+		return this;
 	}
 	
 	/** 
-	 * This overrides {@link #addInput(UGen)} by adding a new 'source' sound to the spatialisation. 
+	 * This overrides {@link #in(UGen)} by adding a new 'source' sound to the spatialisation.
 	 */
 	@Override
     public void addInput(int inputIndex, UGen source, int outputIndex) {
-		addInput(source);
+		in(source);
 	}
 
 	/**
@@ -469,7 +470,7 @@ public class Spatial extends UGen {
 	}
 
 	@Override
-	public synchronized int getNumberOfConnectedUGens(int index) {
+	public synchronized int connectedCount(int index) {
 		return sources.size();
 	}
 

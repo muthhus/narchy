@@ -219,14 +219,13 @@ public class NARS {
             //nar.confMin.setValue(0.05f);
 
             nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
-            nar.DEFAULT_GOAL_PRIORITY = 0.7f;
-            nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
-            nar.DEFAULT_QUEST_PRIORITY = 0.35f;
+            nar.DEFAULT_GOAL_PRIORITY = 0.5f;
+            nar.DEFAULT_QUEST_PRIORITY = nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
 
             if (nal >= 7)
                 new STMLinkage(nar, 1, false);
 
-            nar.defaultWants();
+            //nar.defaultWants();
 
         }
     }

@@ -32,13 +32,13 @@ public class drum_machine_01
     kick = new WavePlayer(ac, 100.0f, Buffer.SINE);
     // set up the filters
     kickFilter = new BiquadFilter(ac, BiquadFilter.BESSEL_LP, 500.0f, 1.0f);
-    kickFilter.addInput(kick);
+    kickFilter.in(kick);
     // set up the Gain
     kickGain = new Gain(ac, 1, kickGainEnvelope);
-    kickGain.addInput(kickFilter);
+    kickGain.in(kickFilter);
 
     // connect the gain to the main out
-    ac.out.addInput(kickGain);
+    ac.out.in(kickGain);
 
     
     // set up the snare envelope
@@ -48,14 +48,14 @@ public class drum_machine_01
     snareTone = new WavePlayer(ac, 200.0f, Buffer.SINE);
     // set up the filters
     snareFilter = new BiquadFilter(ac, BiquadFilter.BP_SKIRT, 2500.0f, 1.0f);
-    snareFilter.addInput(snareNoise);
-    snareFilter.addInput(snareTone);
+    snareFilter.in(snareNoise);
+    snareFilter.in(snareTone);
     // set up the Gain
     snareGain = new Gain(ac, 1, snareGainEnvelope);
-    snareGain.addInput(snareFilter);
+    snareGain.in(snareFilter);
     
     // connect the gain to the main out
-    ac.out.addInput(snareGain);
+    ac.out.in(snareGain);
 
     // set up the keyboard input
 //    MidiKeyboard keys = new MidiKeyboard();
@@ -93,22 +93,22 @@ public class drum_machine_01
     if( midiPitch % 12 == 0 )
     {
       // attack segment
-      kickGainEnvelope.addSegment(0.5f, 2.0f);
+      kickGainEnvelope.add(0.5f, 2.0f);
       // decay segment
-      kickGainEnvelope.addSegment(0.2f, 5.0f);
+      kickGainEnvelope.add(0.2f, 5.0f);
       // release segment
-      kickGainEnvelope.addSegment(0.0f, 50.0f);
+      kickGainEnvelope.add(0.0f, 50.0f);
     }
     
     // snare should trigger on E
     if( midiPitch % 12 == 4 )
     {
       // attack segment
-      snareGainEnvelope.addSegment(0.5f, 2.00f);
+      snareGainEnvelope.add(0.5f, 2.00f);
       // decay segment
-      snareGainEnvelope.addSegment(0.2f, 8.0f);
+      snareGainEnvelope.add(0.2f, 8.0f);
       // release segment
-      snareGainEnvelope.addSegment(0.0f, 80.0f);
+      snareGainEnvelope.add(0.0f, 80.0f);
     }
   }
   

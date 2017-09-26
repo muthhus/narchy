@@ -14,19 +14,23 @@ import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
-import nars.gui.STMView;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
 import nars.op.stm.LinkClustering;
 import nars.term.Term;
 import nars.time.RealTime;
+import nars.time.Tense;
 import nars.truth.Truth;
 import nars.video.*;
+import net.beadsproject.beads.core.AudioContext;
+import net.beadsproject.beads.core.Bead;
+import net.beadsproject.beads.core.UGen;
+import net.beadsproject.beads.data.Buffer;
+import net.beadsproject.beads.ugens.*;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
@@ -131,7 +135,7 @@ abstract public class NAgentX extends NAgent {
 
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
-        return runRT(init, fps*2, fps, endTime );
+        return runRT(init, fps * 2, fps, endTime);
     }
 
     public static NAR runRT(Function<NAR, NAgent> init, float narFPS, float agentFPS, long endTime) {
@@ -153,16 +157,16 @@ abstract public class NAgentX extends NAgent {
 
         int THREADS = 4;
 
-        MultiExec exe = new MultiExec(THREADS, 64*1024);
+        MultiExec exe = new MultiExec(THREADS, 64 * 1024);
         Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
 
-        exe.add(new FocusExec(), (x)->true);
+        exe.add(new FocusExec(), (x) -> true);
         exe.add(new FocusExec() {
                     {
                         concepts.setCapacity(32);
                     }
                 },
-                (x)->true);
+                (x) -> true);
 
         NAR n = new NARS()
                 .exe(exe)
@@ -193,6 +197,9 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 1f * priFactor;
 
+        NAgent a = init.apply(n);
+        a.durations.setValue(1);
+
         //n.dtDither.setValue(0.25f);
         //n.dtMergeOrChoose.setValue(true);
 
@@ -204,6 +211,16 @@ abstract public class NAgentX extends NAgent {
         ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, 16, 64);
         ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, 16, 64);
 
+//        n.runLater(() -> {
+////            AudioContext ac = new AudioContext();
+////            ac.start();
+////            Clock aclock = new Clock(ac, 1000f / (agentFPS * 0.5f));
+////            new Metronome(aclock, n);
+//            new VocalCommentary(null, a);
+//            //ac.out.dependsOn(aclock);
+//        });
+
+
         //Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
 //
         Inperience inp = new Inperience(n, 4);
@@ -211,8 +228,6 @@ abstract public class NAgentX extends NAgent {
 //        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
 //        reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);
 
-        NAgent a = init.apply(n);
-        a.durations.setValue(1);
 
         //a.trace = true;
 
@@ -585,8 +600,8 @@ abstract public class NAgentX extends NAgent {
                     new WindowButton("top", () -> (new ConsoleTerminal(new nars.TextUI(nar).session(20f)))),
                     new WindowButton("concept graph", () -> {
                         SpaceGraph s = new SpaceGraph<>(
-                            new SimpleConceptGraph1(nar,
-                        64, 128, 1, 6)
+                                new SimpleConceptGraph1(nar,
+                                        64, 128, 1, 6)
                         );
                         EdgeDirected fd = new EdgeDirected();
                         s.dyn.addBroadConstraint(fd);
@@ -780,6 +795,89 @@ abstract public class NAgentX extends NAgent {
         @Override
         public float requestedArea() {
             return 0.01f + super.requestedArea();
+        }
+    }
+
+    private static class Metronome {
+        public Metronome(Clock cc, NAR n) {
+            cc.on(new Bead<Clock>() {
+
+                AudioContext ac = cc.getContext();
+                public final Envelope kickEnv, snareEnv;
+
+                {
+                    kickEnv = new Envelope(ac, 0.0f); //gain of kick drum
+
+                    UGen kickGain = new Gain(ac, 1, kickEnv).in(
+                            new BiquadFilter(ac, BiquadFilter.BESSEL_LP, 500.0f, 1.0f).in(
+                                    new WavePlayer(ac, 100.0f, Buffer.SINE)));
+
+                    ac.out.in(kickGain);
+
+                }
+
+                {
+                    snareEnv = new Envelope(ac, 0.0f);
+                    // set up the snare WavePlayers
+                    WavePlayer snareNoise = new WavePlayer(ac, 1.0f, Buffer.NOISE);
+                    WavePlayer snareTone = new WavePlayer(ac, 200.0f, Buffer.SINE);
+                    // set up the filters
+                    IIRFilter snareFilter = new BiquadFilter(ac, BiquadFilter.BP_SKIRT, 2500.0f, 1.0f);
+                    snareFilter.in(snareNoise);
+                    snareFilter.in(snareTone);
+                    // set up the Gain
+                    Gain snareGain = new Gain(ac, 1, snareEnv);
+                    snareGain.in(snareFilter);
+
+                    // connect the gain to the main out
+                    ac.out.in(snareGain);
+                }
+
+                @Override
+                protected void messageReceived(Clock c) {
+                    if (c.isBeat(16)) {
+                        snareEnv.add(0.5f, 2.00f);
+                        snareEnv.add(0.2f, 8.0f);
+                        snareEnv.add(0.0f, 80.0f);
+                        n.believe($.the("snare"), Tense.Present);
+                    }
+                    if (c.isBeat(4)) {
+
+                        kickEnv.add(0.5f, 2.0f); // attack segment
+                        kickEnv.add(0.2f, 5.0f); // decay segment
+                        kickEnv.add(0.0f, 50.0f);  // release segment
+                        n.believe($.the("kick"), Tense.Present);
+
+//                        //choose some nice frequencies
+//                        //if (random(1) < 0.5) return;
+//                        float pitch = Pitch.forceToScale((int) random(12), Pitch.dorian);
+//                        float freq = Pitch.mtof(pitch + (int) random(5) * 12 + 32);
+//                        WavePlayer wp = new WavePlayer(ac, freq, Buffer.SINE);
+//                        Gain g = new Gain(ac, 1, new Envelope(ac, 0));
+//                        g.addInput(wp);
+//                        ac.out.addInput(g);
+//                        ((Envelope) g.getGainUGen()).add(0.1f, random(200));
+//                        ((Envelope) g.getGainUGen()).add(0, random(200), g.die());
+                    }
+                }
+            });
+        }
+    }
+
+    private static class VocalCommentary {
+        public VocalCommentary(Clock ac, NAgent a) {
+
+            NARchy.installSpeech(a.nar);
+            try {
+                a.nar.goal($("speak(ready)"), Tense.Present, 1f, 0.9f);
+                a.nar.believe($("(" + a.sad + " =|> speak(sad))."));
+                a.nar.goal($("(" + a.sad + " &| speak(sad))"));
+                a.nar.believe($("(" + a.happy + " =|> speak(happy))."));
+                a.nar.goal($("(" + a.happy + " &| speak(happy))"));
+            } catch (Narsese.NarseseException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 

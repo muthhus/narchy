@@ -102,7 +102,7 @@ public class Clock extends UGen implements IntegerBead {
 	 * 
 	 * @param newListener the new message listener.
 	 */
-	public void addMessageListener(Bead newListener) {
+	public void on(Bead newListener) {
         listeners.add(newListener);
     }
     
@@ -205,7 +205,7 @@ public class Clock extends UGen implements IntegerBead {
      * Trigger a tick.
      */
     private void tick() {
-    	if(click && isBeat()) context.out.addInput(new Clicker(context, clickStrength));
+    	if(click && isBeat()) context.out.in(new Clicker(context, clickStrength));
     	listeners.message(this);
     }
 

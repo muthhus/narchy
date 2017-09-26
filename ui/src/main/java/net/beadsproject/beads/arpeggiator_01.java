@@ -51,7 +51,7 @@ public class arpeggiator_01
       }
     };
     // add arpeggiator as a dependent to the AudioContext
-    ac.out.addDependent(arpeggiator);
+    ac.out.dependsOn(arpeggiator);
     
     // the square generator
     square = new WavePlayer(ac, arpeggiator, Buffer.SQUARE);
@@ -59,15 +59,15 @@ public class arpeggiator_01
     // set up a clock to keep time
     beatClock = new Clock(ac, 500.0f);
     beatClock.setTicksPerBeat(4);
-    beatClock.addMessageListener(arpeggiator);
-    ac.out.addDependent(beatClock);
+    beatClock.on(arpeggiator);
+    ac.out.dependsOn(beatClock);
     
     // set up the Gain and connect it to the main output
     gain = new Gain(ac, 1, gainEnvelope);
-    gain.addInput(square);
+    gain.in(square);
 
 
-    ac.out.addInput(gain);
+    ac.out.in(gain);
 
     // set up the keyboard input
 //    MidiKeyboard keys = new MidiKeyboard();
@@ -125,7 +125,7 @@ public class arpeggiator_01
       // interrupt the envelope
       gainEnvelope.clear();
       // attack segment
-      gainEnvelope.addSegment(0.5f, 10.0f);
+      gainEnvelope.add(0.5f, 10.0f);
     }
   }
   
@@ -133,6 +133,6 @@ public class arpeggiator_01
   {
     // release segment
     if( midiPitch == lastKeyPressed && gainEnvelope != null )
-      gainEnvelope.addSegment(0.0f, 50.0f);
+      gainEnvelope.add(0.0f, 50.0f);
   }
 }

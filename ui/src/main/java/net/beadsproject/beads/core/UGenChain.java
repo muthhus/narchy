@@ -51,7 +51,7 @@ public class UGenChain extends UGen {
 	 *            The target UGen.
 	 */
 	public void drawFromChainInput(UGen targetUGen) {
-		targetUGen.addInput(chainIn);
+		targetUGen.in(chainIn);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class UGenChain extends UGen {
 	 *            The source UGen.
 	 */
 	public void addToChainOutput(UGen sourceUGen) {
-		chainOut.addInput(sourceUGen);
+		chainOut.in(sourceUGen);
 	}
 
 	/**

@@ -50,7 +50,7 @@ public class TapOut extends UGen {
 		super(ac, 0, 1);
 		sampsPerMS = (float) ac.msToSamples(1);
 		this.ti = ti;
-		this.addDependent(ti);
+		this.dependsOn(ti);
 		setMode(NO_INTERP);
 	}
 

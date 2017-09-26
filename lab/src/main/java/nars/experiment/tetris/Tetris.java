@@ -503,7 +503,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
             Tetris a = null;
             try {
                 //n.truthResolution.setValue(0.05f);
-                a = new Tetris(n, Tetris.tetris_width, Tetris.tetris_height, 2);
+                a = new Tetris(n, Tetris.tetris_width, Tetris.tetris_height, 1);
                 //a.durations.setValue(2f);
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
@@ -526,7 +526,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            });
 
             return a;
-        }, 10f);
+        }, 8f);
 
 
 //

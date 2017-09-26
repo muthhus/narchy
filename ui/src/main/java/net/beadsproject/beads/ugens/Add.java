@@ -46,7 +46,7 @@ public class Add extends UGen {
 	public Add(AudioContext context, UGen input, UGen adderUGen) {
 		super(context, input.getOuts(), input.getOuts());
 		setAdder(adderUGen);
-		addInput(input);
+		in(input);
 	}
 
 	/**

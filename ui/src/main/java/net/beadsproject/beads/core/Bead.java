@@ -3,7 +3,9 @@
  */
 package net.beadsproject.beads.core;
 
- 
+
+import net.beadsproject.beads.events.KillTrigger;
+
 /**
  * Bead is an abstract class which defines basic behaviour such as starting and stopping, pausing and handling messages. 
  * 
@@ -17,7 +19,7 @@ package net.beadsproject.beads.core;
  * 
  * @author ollie
  */
-public abstract class Bead {
+public abstract class Bead<M extends Bead> {
 
 	/** True if the Bead is paused. */
 	private boolean paused;
@@ -73,7 +75,7 @@ public abstract class Bead {
 	 * 
 	 * @param message the Bead is the message.
 	 */
-	public final void message(Bead message) {
+	public final void message(M message) {
 		if(!paused) messageReceived(message);
 	}
 	
@@ -82,7 +84,7 @@ public abstract class Bead {
 	 * 
 	 * @param message the message
 	 */
-	protected void messageReceived(Bead message) {
+	protected void messageReceived(M message) {
 		/*
 		 * To be subclassed, but not compulsory.
 		 */
@@ -153,5 +155,8 @@ public abstract class Bead {
 	public boolean isDeleted() {
 		return deleted;
 	}
-	
+
+	public KillTrigger die() {
+		return new KillTrigger(this);
+	}
 }

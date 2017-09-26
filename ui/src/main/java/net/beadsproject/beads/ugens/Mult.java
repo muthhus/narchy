@@ -61,7 +61,7 @@ public class Mult extends UGen {
 	public Mult(AudioContext context, UGen input, UGen multiplierUGen) {
 		super(context, input.getOuts(), input.getOuts());
 		setMultiplier(multiplierUGen);
-		addInput(input);
+		in(input);
 	}
 
 	/*

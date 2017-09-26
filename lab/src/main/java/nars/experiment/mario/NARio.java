@@ -105,7 +105,7 @@ public class NARio extends NAgentX {
 
         actionBipolar($.the("x"), (x) -> {
             float thresh = 0.33f;
-            float thresh2 = 0.75f;
+            float thresh2 = 0.9f;
             if (x <= -thresh) {
                mario.scene.key(Mario.KEY_LEFT, true);
                mario.scene.key(Mario.KEY_RIGHT, false);

@@ -39,7 +39,7 @@ public class Plug extends UGen {
 	 */
 	public Plug(AudioContext context, UGen sourceUGen) {
 		this(context, 1);
-		this.addInput(sourceUGen);
+		this.in(sourceUGen);
 	}
 
 	/**

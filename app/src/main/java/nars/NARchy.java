@@ -15,6 +15,12 @@ public class NARchy extends NARS {
                 .get();
 
 
+        installSpeech(nar);
+
+        return nar;
+    }
+
+    public static void installSpeech(NAR nar) {
         MaryTTSpeech.speak(""); //forces load of TTS so it will be ready ASAP and not load on the first use
         nar.onOpArgs("speak", (args, n) -> {
             if (args.AND(x -> !x.op().var)) {
@@ -27,7 +33,5 @@ public class NARchy extends NARS {
                 MaryTTSpeech.speak(text);
             }
         });
-
-        return nar;
     }
 }

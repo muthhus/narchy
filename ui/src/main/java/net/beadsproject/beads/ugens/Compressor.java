@@ -239,12 +239,12 @@ public class Compressor extends UGen implements DataBeadReceiver {
 				.setFrequency(31);
 		if (sideChain == null) {
 			powerUGen = new RMS(context, channels, rmsMemorySize);
-			powerUGen.addInput(myInputs);
-			pf.addInput(powerUGen);
+			powerUGen.in(myInputs);
+			pf.in(powerUGen);
 		} else {
 			powerUGen = new RMS(context, sideChain.getOuts(), rmsMemorySize);
-			powerUGen.addInput(sideChain);
-			pf.addInput(powerUGen);
+			powerUGen.in(sideChain);
+			pf.in(powerUGen);
 		}
 		return this;
 	}

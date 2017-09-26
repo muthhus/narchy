@@ -1310,9 +1310,10 @@ public enum Util {
     /**
      * faster if the sum is already known
      */
-    public static int decideRoulette(int count, IntToFloatFunction weight, float weight_sum, Random rng) {
+    public static int decideRoulette(final int count, IntToFloatFunction weight, float weight_sum, Random rng) {
 
         int i = rng.nextInt(count); //random start location
+        assert(i>=0);
         if (weight_sum < Pri.EPSILON) {
             return i; //flat, choose one at random
         }

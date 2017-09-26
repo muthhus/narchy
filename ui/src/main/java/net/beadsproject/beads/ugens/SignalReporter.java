@@ -37,7 +37,7 @@ public class SignalReporter extends UGen {
 		index = interval;
 		this.name = name;
 
-		context.out.addDependent(this);
+		context.out.dependsOn(this);
 	}
 
 	/**

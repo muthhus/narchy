@@ -13,12 +13,12 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * A UGen is the main base class for implementing signal generation and processing units (unit generators). UGens can have any number of audio input and output channels, which adopt the audio format of the {@link AudioContext} used to construct the UGen. Any UGen output can be connected to any other UGen input, using {@link #addInput(int, UGen, int)} (or use {@link #addInput(UGen)} to connect all outputs of one UGen to all inputs of another). UGens are constructed using an
+ * A UGen is the main base class for implementing signal generation and processing units (unit generators). UGens can have any number of audio input and output channels, which adopt the audio format of the {@link AudioContext} used to construct the UGen. Any UGen output can be connected to any other UGen input, using {@link #addInput(int, UGen, int)} (or use {@link #in(UGen)} to connect all outputs of one UGen to all inputs of another). UGens are constructed using an
  * AudioContext to determine the correct buffer size for audio processing. By connecting a UGen's output to another
  * UGen's input the source UGen is automatically added to a call chain that propagates
  * through subsequent UGens from the root UGen of the AudioContext. UGens that
  * do not have outputs (such as {@link Clock}) can be added
- * manually to the call chain using {@link #addDependent(UGen)} from any UGen
+ * manually to the call chain using {@link #dependsOn(UGen)} from any UGen
  * that is part of the call chain (such as the root UGen of the {@link AudioContext}).
  * 
  * </p>UGen inherits the
@@ -380,13 +380,14 @@ public abstract class UGen extends Bead {
 	 * 
 	 * @param sourceUGen the UGen to connect to this UGen.
 	 */
-	public synchronized void addInput(UGen sourceUGen) {
+	public synchronized <X extends UGen> X in(UGen sourceUGen) {
 		if(ins != 0 && sourceUGen.outs != 0) {
 			for (int i = 0; i < ins; i++) {
 				//System.out.println("adding " + i);
 				addInput(i, sourceUGen, i % sourceUGen.outs);
 			}
 		}
+		return (X) this;
 	}
 
 	/**
@@ -415,21 +416,21 @@ public abstract class UGen extends Bead {
 		//fade the old one out
 		Envelope fadeOut = new Envelope(context, 1f);
 		Gain gOut = new Gain(context, source.outs, fadeOut);
-		fadeOut.addSegment(0f, crossoverTime, new KillTrigger(gOut));
-		gOut.addInput(source);
-		addInput(gOut);
+		fadeOut.add(0f, crossoverTime, new KillTrigger(gOut));
+		gOut.in(source);
+		in(gOut);
 		//fade the new one in
 		Envelope fadeIn = new Envelope(context, 0f);
 		final Gain gIn = new Gain(context, destination.outs, fadeIn);
-		fadeIn.addSegment(1f, crossoverTime, new Bead() {
+		fadeIn.add(1f, crossoverTime, new Bead() {
 			@Override
 			public void messageReceived(Bead message) {
 				removeAllConnections(gIn);
-				addInput(destination);
+				in(destination);
 			}
 		});
-		gIn.addInput(source);
-		addInput(gIn);
+		gIn.in(source);
+		in(gIn);
 	}
 
 	/**
@@ -438,7 +439,7 @@ public abstract class UGen extends Bead {
 	 * 
 	 * @param dependent the dependent UGen.
 	 */
-	public synchronized void addDependent(UGen dependent) {
+	public synchronized void dependsOn(UGen dependent) {
 		dependents.add(dependent);
 	}
 
@@ -447,14 +448,14 @@ public abstract class UGen extends Bead {
 	 * 
 	 * @param dependent UGen to remove.
 	 */
-	public synchronized void removeDependent(UGen dependent) {
+	public synchronized void removeDepends(UGen dependent) {
 		dependents.remove(dependent);
 	}
 	
 	/**
 	 * Clears the list of dependent UGens.
 	 */
-	public synchronized void clearDependents() {
+	public synchronized void clearDepends() {
 		dependents.clear();
 	}
 
@@ -466,7 +467,7 @@ public abstract class UGen extends Bead {
 	 * 
 	 * @return number of UGen outputs connected to that input.
 	 */
-	public synchronized int getNumberOfConnectedUGens(int index) {
+	public synchronized int connectedCount(int index) {
 		return inputsAtChannel[index].size();
 	}
 	
@@ -474,7 +475,7 @@ public abstract class UGen extends Bead {
 	 * Gets the number of dependent UGens.
 	 * @return number of dependent UGens.
 	 */
-	public synchronized int getNumberOfDependents() {
+	public synchronized int dependentCount() {
 		return dependents.size();
 	}
 
@@ -487,27 +488,27 @@ public abstract class UGen extends Bead {
 		return (List<UGen>) dependents.clone();
 	}
 
-	/**
-	 * Checks if this UGen has the given UGen plugged into it.
-	 * @param ugen the UGen to test.
-	 * @return true if the given UGen is plugged into this UGen.
-	 */
-	@SuppressWarnings("unchecked")
-	public synchronized boolean containsInput(UGen ugen) {
-		if(noInputs) {
-			return false;
-		} else {
-			for (int i = 0; i < inputsAtChannel.length; i++) {
-				ArrayList<BufferPointer> bplist = (ArrayList<BufferPointer>) inputsAtChannel[i].clone();
-				for (BufferPointer bp : bplist) {
-					if (ugen.equals(bp.ugen)) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
-	}
+//	/**
+//	 * Checks if this UGen has the given UGen plugged into it.
+//	 * @param ugen the UGen to test.
+//	 * @return true if the given UGen is plugged into this UGen.
+//	 */
+//	@SuppressWarnings("unchecked")
+//	public synchronized boolean containsInput(UGen ugen) {
+//		if(noInputs) {
+//			return false;
+//		} else {
+//			for (int i = 0; i < inputsAtChannel.length; i++) {
+//				ArrayList<BufferPointer> bplist = (ArrayList<BufferPointer>) inputsAtChannel[i].clone();
+//				for (BufferPointer bp : bplist) {
+//					if (ugen.equals(bp.ugen)) {
+//						return true;
+//					}
+//				}
+//			}
+//			return false;
+//		}
+//	}
 	
 	/**
 	 * Returns a flat Set (i.e. no copies) of all the UGens connected to the inputs of this one.
@@ -536,12 +537,12 @@ public abstract class UGen extends Bead {
 		return (List<BufferPointer>) inputsAtChannel[index].clone();
 	}
 
-	private static final Hashtable<Class<?>, Hashtable<String, Method>> envelopeGetterMethods = new Hashtable<>();
+	private static final HashMap<Class<?>, HashMap<String, Method>> envelopeGetterMethods = new HashMap<>();
 	
 	private void findEnvelopeGetterMethods() {
-		Class<?> c = getClass();
-		if(!envelopeGetterMethods.containsKey(c)) {
-			Hashtable<String, Method> methodTable = new Hashtable<>();
+		Class<?> _c = getClass();
+		envelopeGetterMethods.computeIfAbsent(_c, (c)->{
+			HashMap<String, Method> methodTable = new HashMap<>();
 			Method[] methods = c.getMethods();
 			for(Method m : methods) {
 				String name = m.getName();
@@ -550,8 +551,8 @@ public abstract class UGen extends Bead {
 					methodTable.put(envelopeName, m);
 				}
 			}
-			envelopeGetterMethods.put(c, methodTable);
-		}
+			return methodTable;
+		});
 	}
 	
 	/**
@@ -560,9 +561,9 @@ public abstract class UGen extends Bead {
 	 * @return Map of envelope names to envelopes.
 	 */
 	public synchronized Map<String, UGen> getEnvelopes() {
-		Hashtable<String, UGen> envelopes = new Hashtable<>();
+		HashMap<String, UGen> envelopes = new HashMap<>();
 		findEnvelopeGetterMethods();
-		Hashtable<String, Method> methodTable = envelopeGetterMethods.get(getClass());
+		HashMap<String, Method> methodTable = envelopeGetterMethods.get(getClass());
 		for(Map.Entry<String, Method> stringMethodEntry : methodTable.entrySet()) {
 			Method m = stringMethodEntry.getValue();
 			try {

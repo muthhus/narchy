@@ -22,6 +22,12 @@ import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
+ *
+ * TODO this needs stereo support for the SoNAR sound system
+ * effectively it needs to provide 2 inputs to it because each of its channels
+ * is designed for mono, because it mixes its own 3d stereo
+ *
+ *
  * AudioContext provides the core audio set up for running audio in a Beads
  * project. An AudioContext determines the JavaSound {@link IOAudioFormat} used,
  * the IO device, the audio buffer size and the system IO buffer size. An
@@ -105,7 +111,6 @@ public class AudioContext {
 
 		UGenOutput ioSystem =  new UGenOutput();
 		Audio audio = Audio.the();
-		audio.play(ioSystem, SoundSource.center, 1f, 1f);
 
 		//attempt to find the default (JavaSound) AudioIO by reflection
 //		AudioIO ioSystem = null;
@@ -136,7 +141,10 @@ public class AudioContext {
 		// set up the default root UGen
 		out = new Gain(this, audioFormat.outputs);
 		AudioIO.prepare();
-		
+
+		start();
+
+		audio.play(ioSystem, SoundSource.center, 1f, 1f);
 
 	}
 
@@ -312,7 +320,7 @@ public class AudioContext {
 		// time the playback to n seconds
 		DelayTrigger dt = new DelayTrigger(this, n,
 				new AudioContextStopTrigger(this));
-		out.addDependent(dt);
+		out.dependsOn(dt);
 		runNonRealTime();
 	}
 
@@ -512,8 +520,8 @@ public class AudioContext {
 		RecordToSample r;
 		try {
 			r = new RecordToSample(this, s);
-			r.addInput(out);
-			out.addDependent(r);
+			r.in(out);
+			out.dependsOn(r);
 			r.start();
 			r.setKillListener(new AudioContextStopTrigger(this));
 		} catch (Exception e) { /* won't happen */

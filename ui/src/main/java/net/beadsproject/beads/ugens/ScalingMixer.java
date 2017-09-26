@@ -42,7 +42,7 @@ public class ScalingMixer extends UGen {
     @Override
     public void calculateBuffer() {
         for(int i = 0; i < ins; i++) {
-            int numInputs = getNumberOfConnectedUGens(i);
+            int numInputs = connectedCount(i);
             if (numInputs > 0) numInputs = 1;            
 	        for(int j = 0; j < bufferSize; j++) {
 	            bufOut[i][j] = bufIn[i][j] / (float)numInputs;

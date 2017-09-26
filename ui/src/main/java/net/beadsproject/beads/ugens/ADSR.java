@@ -23,7 +23,7 @@ public class ADSR extends UGen {
      */
     public ADSR(AudioContext context, UGen src, float... adsr) {
         this(context, src.getOuts(), adsr);
-        addInput(src);
+        in(src);
     }
 
     /**
@@ -37,9 +37,9 @@ public class ADSR extends UGen {
         env = new Envelope(context, 0);
         gain = new Gain(context, inouts, env);
         for(int i = 0; i < adsr.length - 1; i += 2) {
-            env.addSegment(adsr[i], adsr[i+1]);
+            env.add(adsr[i], adsr[i+1]);
         }
-        env.addSegment(0, adsr[adsr.length - 1], new KillTrigger(this));
+        env.add(0, adsr[adsr.length - 1], new KillTrigger(this));
     }
 
     @Override

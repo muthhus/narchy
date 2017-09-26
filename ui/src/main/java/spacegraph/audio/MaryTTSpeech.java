@@ -25,15 +25,22 @@ public class MaryTTSpeech {
 
 
     static {
+
+        String javaVersion = System.getProperty("java.version");
         System.setProperty("java.version", "1.9.0"); //HACK
+
         LocalMaryInterface m;
         try {
-            m = new LocalMaryInterface();
+            m = new LocalMaryInterface(); //this thing has a bad version check BAD BAD BAD
             //logger.info("Speech System READY");
         } catch (MaryConfigurationException e) {
+            e.printStackTrace();
             m = null;
         }
+
+        System.setProperty("java.version", javaVersion);
         marytts = m;
+
     }
 
 //    public static void main(String[] args) throws Exception {
@@ -75,7 +82,7 @@ public class MaryTTSpeech {
             DDSoundProducer sound = speech(text);
             sound.onFinish = whenFinished;
 
-            Audio.the().play( sound, SoundSource.center, 1f, 1f);
+            Audio.the().play(sound, SoundSource.center, 1f, 1f);
 //                new SoundSource() {
 //
 //                    float now = 0;

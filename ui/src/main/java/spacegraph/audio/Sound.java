@@ -39,6 +39,8 @@ public class Sound<S extends SoundProducer> implements SoundSource, Comparable
         
 //        float dB = (float)(volume + (20 * (Math.log(1.0 / distSqr) / l10)));
         float dB = (float)(volume - 20*Math.log(1 + ROLLOFF_FACTOR*(dist-REFERENCE_DISTANCE)/REFERENCE_DISTANCE )/ l10);
+        if (dB != dB) dB = 0;
+
         dB = Math.min(dB, +6);
 //      dB = Math.max(dB, MIN_GAIN);
         

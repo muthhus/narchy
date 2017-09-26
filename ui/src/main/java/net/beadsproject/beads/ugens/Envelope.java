@@ -15,7 +15,7 @@ import java.util.List;
  * An Envelope generates a sequence of timed transitions (segments) between 
  * values as an audio signal. New segments are added to a running Envelope 
  * using variations of the method <code>addSegment</code>. With the method 
- * {@link #addSegment(float, float, float, Bead)} a {@link Bead} 
+ * {@link #add(float, float, float, Bead)} a {@link Bead}
  * can be provided which gets triggered when the segment has reached its destination.
  *  
  * At any point in time, the Envelope maintains a current value. 
@@ -179,7 +179,7 @@ public class Envelope extends UGen {
 	 * @param trigger
 	 *            the trigger.
 	 */
-    public synchronized Envelope addSegment(float endValue, float duration, float curvature, Bead trigger) { //synchronized
+    public synchronized Envelope add(float endValue, float duration, float curvature, Bead trigger) { //synchronized
         if(!lock) {
         	if(!Float.isNaN(endValue) && !Float.isInfinite(endValue)) {
         		segments.add(new Segment(endValue, duration, curvature, trigger));
@@ -197,8 +197,8 @@ public class Envelope extends UGen {
 	 * @param duration
 	 *            the duration.
 	 */
-    public Envelope addSegment(float endValue, float duration) {
-    	return addSegment(endValue, duration, 1.0f, null);
+    public Envelope add(float endValue, float duration) {
+    	return add(endValue, duration, 1.0f, null);
     }
     
     /**
@@ -211,8 +211,8 @@ public class Envelope extends UGen {
 	 * @param trigger
 	 *            the trigger.
 	 */
-    public Envelope addSegment(float endValue, float duration, Bead trigger) {
-    	return addSegment(endValue, duration, 1.0f, trigger);
+    public Envelope add(float endValue, float duration, Bead trigger) {
+    	return add(endValue, duration, 1.0f, trigger);
     }
     
     /**
@@ -239,7 +239,7 @@ public class Envelope extends UGen {
     public void setValue(float value) {
     	if(!lock) {
     		clear();
-        	addSegment(value, 0.0f);
+        	add(value, 0.0f);
         	currentValue = value;
     	}
     }

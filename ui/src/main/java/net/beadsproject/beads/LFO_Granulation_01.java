@@ -72,10 +72,10 @@ public class LFO_Granulation_01
     
     // set up a gain
     Gain gain = new Gain(ac, 1, 0.5f);
-    gain.addInput(gsp);
+    gain.in(gsp);
     
     // connect the Gain to ac
-    ac.out.addInput(gain);
+    ac.out.in(gain);
     
     // begin audio processing
     ac.start();

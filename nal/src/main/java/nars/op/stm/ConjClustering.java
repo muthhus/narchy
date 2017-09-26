@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
+
 public class ConjClustering extends Causable {
     private final CauseChannel<ITask> in;
 
@@ -142,8 +144,8 @@ public class ConjClustering extends Causable {
 
     private void conjoin(NAR nar, List<VLink<Task>> sorted, int is, int ie) {
 
-        //get only the maximum confidence task for each term
-        Map<Term, Task> vv = new HashMap();
+        //get only the maximum confidence task for each term at its given starting time
+        Map<ObjectLongPair<Term>, Task> vv = new HashMap();
 
         final long[] end = {Long.MIN_VALUE};
         final long[] start = {Long.MAX_VALUE};
@@ -166,7 +168,7 @@ public class ConjClustering extends Causable {
                 if (end[0] < start[0])
                     throw new RuntimeException("wtf");
 
-                vv.merge(z.term(), z, (prevZ, newZ) -> {
+                vv.merge(pair(z.term(), zs), z, (prevZ, newZ) -> {
                     if (prevZ == null || newZ.conf() > prevZ.conf())
                         return newZ;
                     else
@@ -189,6 +191,9 @@ public class ConjClustering extends Causable {
 
 
                 float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
+                if (conf < confMin)
+                    return;
+
                 PreciseTruth t = $.t(1, conf).negIf(cp.getTwo()).ditherFreqConf(truthRes, confMin, 1f);
                 if (t != null) {
 
@@ -253,7 +258,7 @@ public class ConjClustering extends Causable {
         return
                 Op.conj(
                         new FasterList<ObjectLongPair<Term>>(
-                                Util.map(t -> PrimitiveTuples.pair(
+                                Util.map(t -> pair(
                                         t.term().negIf(t.truth().isNegative()),
                                         t.start()), ObjectLongPair[]::new,
                                         uu))

@@ -12,7 +12,7 @@ import net.beadsproject.beads.core.Bead;
 public class KillTrigger extends Bead {
 
 	/** The Bead that will be killed. */
-	Bead receiver;
+	final Bead receiver;
 	
 	/**
 	 * Instantiates a new KillTrigger which will stop the given {@link Bead} when triggered.
