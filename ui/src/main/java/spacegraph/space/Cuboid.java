@@ -25,7 +25,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
 
     @Nullable
     public Surface front;
-    final float zOffset = 0.1f; //relative to scale
+    static final float zOffset = 0.1f; //relative to scale
 
     @Nullable
     public Finger mouseFront;

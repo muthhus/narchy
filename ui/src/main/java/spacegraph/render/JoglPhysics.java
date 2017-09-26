@@ -150,7 +150,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
                 //new SimpleBroadphase();
                 new DbvtBroadphase();
 
-        dyn = new Dynamics<X>(dispatcher, broadphase) {
+        dyn = new Dynamics<>(dispatcher, broadphase) {
 
             @Override
             public void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each) {
@@ -777,7 +777,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
 
     }
 
-    public Dynamic newBody(float mass, Transform startTransform, CollisionShape shape) {
+    public static Dynamic newBody(float mass, Transform startTransform, CollisionShape shape) {
 
         boolean isDynamic = (mass != 0f);
         int collisionFilterGroup = isDynamic ? 1 : 2;

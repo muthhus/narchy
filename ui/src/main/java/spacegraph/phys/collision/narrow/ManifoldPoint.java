@@ -87,14 +87,6 @@ public class ManifoldPoint {
 		this.lifeTime = 0;
 	}
 
-	public float getDistance() {
-		return distance1;
-	}
-
-	public int getLifeTime() {
-		return lifeTime;
-	}
-	
 	public void set(ManifoldPoint p) {
 		localPointA.set(p.localPointA);
 		localPointB.set(p.localPointB);

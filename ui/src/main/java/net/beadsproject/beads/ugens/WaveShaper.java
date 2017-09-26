@@ -167,7 +167,7 @@ public class WaveShaper extends UGen implements DataBeadReceiver {
 
 		int l = length - 1;
 		for (int i = 1; i < length - 1; i++) {
-			float x = (i / l) * 2 - 1;
+			float x = (((float)i) / l) * 2f - 1;
 			if (x < 0) {
 				ret[i] = (float) -Math.pow(-x, exponent);
 			} else if (x == 0) {

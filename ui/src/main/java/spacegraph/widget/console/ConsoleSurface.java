@@ -164,7 +164,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
     abstract public TextCharacter charAt(int col, int row);
 
 
-    public char visible(char cc) {
+    public static char visible(char cc) {
         //HACK: un-ANSIfy
 
         //see: https://github.com/Hexworks/zircon/blob/master/src/main/kotlin/org/codetome/zircon/Symbols.kt

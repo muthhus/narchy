@@ -11,7 +11,7 @@ public enum GranulizerDemo {
     ;
 
     @SuppressWarnings("HardcodedFileSeparator")
-    public static void main(String[] args) throws LineUnavailableException, InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
 
         Audio audio = new Audio(4);
 

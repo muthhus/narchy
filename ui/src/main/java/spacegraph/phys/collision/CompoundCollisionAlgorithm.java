@@ -27,6 +27,7 @@ import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.broad.CollisionAlgorithm;
 import spacegraph.phys.collision.broad.CollisionAlgorithmConstructionInfo;
 import spacegraph.phys.collision.broad.DispatcherInfo;
+import spacegraph.phys.collision.broad.Intersecter;
 import spacegraph.phys.collision.narrow.PersistentManifold;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.CollisionShape;
@@ -74,7 +75,7 @@ public class CompoundCollisionAlgorithm extends CollisionAlgorithm {
 		for (int i=0; i<numChildren; i++) {
 			//childCollisionAlgorithms.get(i).destroy();
             //return array[index];
-            intersecter.freeCollisionAlgorithm(childCollisionAlgorithms.get(i));
+            Intersecter.freeCollisionAlgorithm(childCollisionAlgorithms.get(i));
 		}
 		childCollisionAlgorithms.clear();
 	}

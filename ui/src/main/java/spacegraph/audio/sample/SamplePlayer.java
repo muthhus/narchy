@@ -41,7 +41,7 @@ public class SamplePlayer implements SoundProducer {
 
     @Override
     public void skip(int samplesToSkip, int readRate) {
-        float step = ((float) rate) / readRate;
+        float step = rate / readRate;
         pos += step * samplesToSkip;
 
         if (alive && pos >= sample.buf.length) {

@@ -58,7 +58,7 @@ public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N, Connecti
     }
 
     /**
-     * lifespan of an edge
+     * lifespan of an node
      */
     public void setLambda(int lambda) {
         this.lambda = lambda;
@@ -106,6 +106,7 @@ public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N, Connecti
 
         this.rangeMinMax = new double[dimension * 2];
         Arrays.fill(rangeMinMax, Float.NaN);
+        this.rangeAdaptRate = 1f /(1f + centroids);
 
         this.distanceSq = distanceSq != null ? distanceSq : this::distanceCartesianSq;
 
@@ -114,16 +115,15 @@ public class NeuralGasNet<N extends Centroid>  /*extends SimpleGraph<N, Connecti
         this.dimension = dimension;
         this.maxNodes = centroids;
 
-        this.rangeAdaptRate = 1f /(1f + centroids);
 
         //default values
-        setLambda(centroids * 2);
-        setMaxEdgeAge(centroids * 2);
+        setLambda(centroids*2);
+        setMaxEdgeAge(centroids*2);
 
         setAlpha(0.8);
         setBeta(0.9);
 
-        setWinnerUpdateRate(1f / centroids, 0.5f / centroids);
+        setWinnerUpdateRate(0.5f / centroids, 0.25f / centroids);
 
 
         /** nodes should begin with randomized coordinates */

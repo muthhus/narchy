@@ -58,7 +58,7 @@ public class ValueCache extends RecycledSummaryStatistics {
         float max = (float)getMax();
         float range = max - min;
         if (Util.equals(Math.abs(max-min), 0, Pri.EPSILON)) {
-            get(b, (c, v) -> each.accept(c, 0)); //flat
+            get(b, (c, v) -> each.accept(c, levels/2)); //flat
         } else {
             get(b, (c, v) -> each.accept(c,
                 Util.bin((v - min) / range, levels)

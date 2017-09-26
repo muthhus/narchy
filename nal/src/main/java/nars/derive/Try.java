@@ -5,6 +5,7 @@ import nars.$;
 import nars.Param;
 import nars.control.Cause;
 import nars.control.Derivation;
+import nars.control.Premise;
 import org.roaringbitmap.IntIterator;
 import org.roaringbitmap.RoaringBitmap;
 
@@ -41,59 +42,45 @@ public class Try extends AbstractPred<Derivation> {
     public boolean test(Derivation d) {
 
         RoaringBitmap choices = d.preToPost;
-        int numChoices = choices.getCardinality();
-        if (numChoices == 0)
+        int N = choices.getCardinality();
+        if (N == 0)
             return false;
 
         values.update(d.time);
 
-        short[] routing = new short[numChoices * 2]; //sequence of (choice, score) pairs
+        short[] routing = new short[N * 2]; //sequence of (choice, score) pairs
         final int[] p = {0, Integer.MAX_VALUE, Integer.MIN_VALUE};
 
         Random rng = d.random;
-        IntIterator ii = numChoices==1 || rng.nextBoolean() ? choices.getIntIterator() : choices.getReverseIntIterator();
-        final float[] wweightSum = {0};
-        values.getNormalized(ii, 10, (c, v) -> {
+        IntIterator ii = N==1 || rng.nextBoolean() ? choices.getIntIterator() : choices.getReverseIntIterator();
+        int denom = 10000;
+        values.getNormalized(ii, denom, (c, v) -> {
             int pp = p[0]++ * 2;
-            routing[pp] = (short) c;
-            wweightSum[0] += routing[pp + 1] = (short) v;
+            routing[pp++] = (short) c;
+            routing[pp] = (short)v;
             if (v < p[1]) p[1] = (int) v;
             if (v > p[2]) p[2] = (int) v;
             return true;
         });
+        choices.clear();
+
         int minVal = p[1];
         int maxVal = p[2];
-        float weightSum = wweightSum[0];
-
-        d.preToPost.clear();
-
-//        int minVal, maxVal;
-//        float valRatio;
-//        if (p[0] > 1) {
-//            int[] minMax = new int[2];
-//            bingoSortPairwise(routing, minMax);
-//            minVal = minMax[0]; maxVal = minMax[1];
-//            valRatio = minVal/((float)(maxVal));
-//        } else {
-//            minVal = maxVal = routing[1];
-//            valRatio = 1f;
-//        }
-
-        //TODO fork budgeting
 
         int startTTL = d.ttl;
-        int minPerBranch =
-                Math.min(startTTL,
-                    Param.TTL_PREMISE_MIN
-                );
-        int loopCost = Math.max(1, minPerBranch/4);
+        int weightSum = 0;
+        for (int i = 0; i < N; i++) {
+            int t = i * 2 + 1;
+            short ti = (short) Math.max(Param.TTL_PREMISE_MIN*2, (routing[t] * startTTL / denom ));
+            weightSum += ti;
+            routing[t] = ti;
+        }
 
-        int maxPerBranch = Math.max(minPerBranch, startTTL / numChoices);
         int before = d.now();
         int ttlSaved;
         do {
 
-            int sample = Util.decideRoulette(numChoices, (choice) -> g2(routing, choice, VAL), weightSum, rng);
+            int sample = Util.decideRoulette(N, (choice) -> g2(routing, choice, VAL), weightSum, rng);
 //            int sample;
 //            if (numChoices > 1) {
 //                if (minVal == maxVal) {
@@ -114,25 +101,37 @@ public class Try extends AbstractPred<Derivation> {
 //                d.setTTL(0);
 //                break;
 //            }
-            ttlSaved = tryBranch(d, routing, minVal, maxVal, minPerBranch, loopCost, maxPerBranch, before, sample);
+            ttlSaved = tryBranch(d, routing, sample);
+            if (ttlSaved < 0)
+                break;
+
+            a2(routing, sample, false, (short)-ttlSaved);
+            weightSum -= ttlSaved;
 
         } while (d.addTTL(ttlSaved) >= 0);
 
         return false;
     }
 
-    public int tryBranch(Derivation d, short[] routing, int minVal, int maxVal, int minPerBranch, int loopCost, int maxPerBranch, int before, int sample) {
-        int ttlSaved;
-        int n = g2(routing, sample, KEY);
-        float branchScore =
-                minVal!=maxVal ? ((float) (g2(routing, sample, VAL)) - minVal) / (maxVal - minVal) : 0.5f;
-        int loopBudget = Util.lerp(branchScore, minPerBranch, maxPerBranch);
+    public int tryBranch(Derivation d, short[] routing, int sample) {
+//        float branchScore =
+//                minVal!=maxVal ? ((float) (g2(routing, sample, VAL)) - minVal) / (maxVal - minVal) : 0.5f;
+        int loopBudget = g2(routing, sample, VAL); //Util.lerp(branchScore, minPerBranch, maxPerBranch);
+        if (loopBudget < Param.TTL_PREMISE_MIN)
+            return -1;
 
-        ttlSaved = d.getAndSetTTL(loopBudget) - loopBudget - loopCost;
+
+        int ttlSaved = d.getAndSetTTL(loopBudget) - loopBudget - 1;
+
+        int n = g2(routing, sample, KEY);
+
+//        System.out.println(d.time + " " + d.ttl + " " + d.task + " " + d.belief + " "+ d.beliefTerm + " " + n);
+//        //TrieDeriver.print(branches[n]);
+//        System.out.println(branches[n]);
+//        System.out.println();
 
         branches[n].test(d);
 
-        if (before > 0) d.revert(before);
         return ttlSaved;
     }
 
@@ -142,6 +141,9 @@ public class Try extends AbstractPred<Derivation> {
      */
     private static short g2(short[] s, int i, boolean firstOrSecond) {
         return s[i * 2 + (firstOrSecond ? 0 : 1)];
+    }
+    private static void a2(short[] s, int i, boolean firstOrSecond, short amt) {
+        s[i * 2 + (firstOrSecond ? 0 : 1)] += amt;
     }
 
     /**

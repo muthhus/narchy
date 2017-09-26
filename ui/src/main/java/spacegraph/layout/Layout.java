@@ -72,7 +72,7 @@ import java.util.function.Consumer;
         x.start(this);
     }
 
-    private void remove(Surface x) {
+    private static void remove(Surface x) {
         x.stop();
     }
 

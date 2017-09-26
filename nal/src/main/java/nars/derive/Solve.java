@@ -70,10 +70,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
                 single = f.single();
 
 
-                if (single) {
-                    if (d.belief != null)
-                        return false;
-                } else {
+                if (!single) {
                     if ((beliefProjected ? d.beliefTruth : d.beliefTruthRaw) == null)
                         return false; //double premise requiring a belief, but belief is null
                 }

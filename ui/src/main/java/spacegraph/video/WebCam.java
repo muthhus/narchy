@@ -264,7 +264,7 @@ public class WebCam {
     /**
      * after webcam input
      */
-    protected BufferedImage process(BufferedImage img) {
+    protected static BufferedImage process(BufferedImage img) {
         return img;
     }
 

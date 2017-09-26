@@ -222,7 +222,7 @@ public class HashedOverlappingPairCache extends OverlappingPairCache {
 	public void cleanOverlappingPair(BroadphasePair pair, Intersecter intersecter) {
 		if (pair.algorithm != null) {
 			//pair.algorithm.destroy();
-			intersecter.freeCollisionAlgorithm(pair.algorithm);
+			Intersecter.freeCollisionAlgorithm(pair.algorithm);
 			pair.algorithm = null;
 		}
 	}

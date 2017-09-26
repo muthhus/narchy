@@ -154,7 +154,7 @@ public class GjkEpaSolver {
 		}
 		
 		// vdh: very dummy hash
-		public /*unsigned*/ int Hash(v3 v) {
+		public static /*unsigned*/ int Hash(v3 v) {
 			int h = (int)(v.x * 15461) ^ (int)(v.y * 83003) ^ (int)(v.z * 15473);
 			return (h * 169639) & GJK_hashmask;
 		}
@@ -493,7 +493,7 @@ public class GjkEpaSolver {
 			//sa = pgjk->sa;
 		}
 		
-		public v3 GetCoordinates(Face face) {
+		public static v3 GetCoordinates(Face face) {
 			v3 out = new v3();
 
 			v3 tmp = new v3();
@@ -542,7 +542,7 @@ public class GjkEpaSolver {
 			return bf;
 		}
 
-		public boolean Set(Face f, Mkv a, Mkv b, Mkv c) {
+		public static boolean Set(Face f, Mkv a, Mkv b, Mkv c) {
 			v3 tmp1 = new v3();
 			v3 tmp2 = new v3();
 			v3 tmp3 = new v3();
@@ -609,7 +609,7 @@ public class GjkEpaSolver {
 			}
 		}
 
-		public void Link(Face f0, int e0, Face f1, int e1) {
+		public static void Link(Face f0, int e0, Face f1, int e1) {
 			f0.f[e0] = f1; f1.e[e1] = e0;
 			f1.f[e1] = f0; f0.e[e0] = e1;
 		}

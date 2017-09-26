@@ -90,11 +90,6 @@ public class SSHConsole extends ConsoleTerminal {
                     }
 
                     @Override
-                    protected void processCursorDownLine(int count) throws IOException {
-                        super.processCursorDownLine(count);
-                    }
-
-                    @Override
                     protected void processCursorUpLine(int count) {
                         System.out.println("unhandled processCursorUpLine " + count);
                     }

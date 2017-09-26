@@ -19,6 +19,7 @@ import static org.junit.Assert.*;
  */
 public class PremiseRuleTest {
 
+    final NAR n = NARS.tmp();
 
     @NotNull
     public static PremiseRule parse(@NotNull String src) throws Narsese.NarseseException {
@@ -202,49 +203,60 @@ public class PremiseRuleTest {
 //
 //    }
 
-    final NAR n = NARS.tmp();
-    final PremiseRuleSet permuter = new PremiseRuleSet(new PatternIndex(n) { { deriverID = 0; }}, true);
-
-    @Test
-    public void testBackwardPermutations() throws Narsese.NarseseException {
-
-        //        PremiseRule r = (PremiseRule) p.term(onlyRule);
-//        return rule(
-//                r
-//        );
-        Set<PremiseRule> s = permuter.permute(
-                parse("(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward, Permute:Swap)")
-            );
-            assertNotNull(s);
-            System.out.println(Joiner.on('\n').join(s));
-
-            //total variations from the one input:
-            assertEquals(3, s.size());
-
-
-
-            //TODO
-            //String x = s.toString();
-//            assertTrue(x.contains("(((%1-->%2),(%3-->%1),neq(%3,%2)),((%3-->%2),((DeductionX-->Belief),(StrongX-->Desire),(AllowBackward-->Derive))))"));
-//            assertTrue(x.contains("(((%1-->%2),(%2-->%3),neq(%1,%3)),((%1-->%3),"));
-//            //assertTrue(x.contains("(((%1-->%2),(%1-->%3),neq(%1,%2),task(\"?\")),((%3-->%2),"));
-//            assertTrue(x.contains("(((%1-->%2),(%1-->%3),neq(%1,%3),task(\"?\")),((%2-->%3),"));
-//            //assertTrue(x.contains("(((%1-->%2),(%3-->%2),neq(%3,%2),task(\"?\")),((%3-->%1),"));
-//            assertTrue(x.contains("(((%1-->%2),(%3-->%2),neq(%1,%2),task(\"?\")),((%1-->%3),"));
-
-
-    }
-
-    @Test public void testSubstIfUnifies() throws Narsese.NarseseException {
-        //        PremiseRule r = (PremiseRule) p.term(onlyRule);
-//        return rule(
-//                r
-//        );
-        PremiseRule r = parse("(Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Goal:Induction)");
-        System.out.println(r);
-        System.out.println(r.source);
-        Set<PremiseRule> s = permuter.permute(r);
-        System.out.println(Joiner.on('\n').join(s));
-    }
+//    final PremiseRuleSet permuter = new PremiseRuleSet(new PatternIndex(n) { { deriverID = 0; }}, true);
+//
+//
+//    @NotNull
+//    public Set<PremiseRule> permute(PremiseRule preNorm, NAR nar) {
+//
+//        PatternIndex pi = new PatternIndex(nar);
+//        Set<PremiseRule> ur;
+//        permute(preNorm, "", pi, ur = $.newHashSet(1));
+//        return ur;
+//    }
+//
+//
+//
+//    @Test
+//    public void testBackwardPermutations() throws Narsese.NarseseException {
+//
+//        //        PremiseRule r = (PremiseRule) p.term(onlyRule);
+////        return rule(
+////                r
+////        );
+//        Set<PremiseRule> s = permuter.permute(
+//                parse("(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward, Permute:Swap)")
+//            );
+//            assertNotNull(s);
+//            System.out.println(Joiner.on('\n').join(s));
+//
+//            //total variations from the one input:
+//            assertEquals(3, s.size());
+//
+//
+//
+//            //TODO
+//            //String x = s.toString();
+////            assertTrue(x.contains("(((%1-->%2),(%3-->%1),neq(%3,%2)),((%3-->%2),((DeductionX-->Belief),(StrongX-->Desire),(AllowBackward-->Derive))))"));
+////            assertTrue(x.contains("(((%1-->%2),(%2-->%3),neq(%1,%3)),((%1-->%3),"));
+////            //assertTrue(x.contains("(((%1-->%2),(%1-->%3),neq(%1,%2),task(\"?\")),((%3-->%2),"));
+////            assertTrue(x.contains("(((%1-->%2),(%1-->%3),neq(%1,%3),task(\"?\")),((%2-->%3),"));
+////            //assertTrue(x.contains("(((%1-->%2),(%3-->%2),neq(%3,%2),task(\"?\")),((%3-->%1),"));
+////            assertTrue(x.contains("(((%1-->%2),(%3-->%2),neq(%1,%2),task(\"?\")),((%1-->%3),"));
+//
+//
+//    }
+//
+//    @Test public void testSubstIfUnifies() throws Narsese.NarseseException {
+//        //        PremiseRule r = (PremiseRule) p.term(onlyRule);
+////        return rule(
+////                r
+////        );
+//        PremiseRule r = parse("(Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Goal:Induction)");
+//        System.out.println(r);
+//        System.out.println(r.source);
+//        Set<PremiseRule> s = permuter.permute(r);
+//        System.out.println(Joiner.on('\n').join(s));
+//    }
 
 }

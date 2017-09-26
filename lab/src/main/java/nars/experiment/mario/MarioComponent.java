@@ -5,7 +5,6 @@ import nars.experiment.mario.sprites.Mario;
 import spacegraph.audio.Audio;
 import spacegraph.audio.FakeSoundEngine;
 
-import javax.sound.sampled.LineUnavailableException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
@@ -64,11 +63,9 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 //        catch (LineUnavailableException e)
 //        {
 //            e.printStackTrace();
-        try {
-            sound = new FakeSoundEngine(64);
-        } catch (LineUnavailableException e1) {
-            e1.printStackTrace();
-        }
+
+        sound = new FakeSoundEngine(64);
+
 //        }
 
         setFocusable(true);

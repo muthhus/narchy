@@ -38,11 +38,6 @@ public class WindowButton extends CheckBox implements ToggleButton.ToggleAction,
     }
 
     @Override
-    protected boolean onTouching(v2 hitPoint, short[] buttons) {
-        return super.onTouching(hitPoint, buttons);
-    }
-
-    @Override
     public void onChange(ToggleButton t, boolean enabled) {
         SpaceGraph space = this.space;
         synchronized (spacer) {

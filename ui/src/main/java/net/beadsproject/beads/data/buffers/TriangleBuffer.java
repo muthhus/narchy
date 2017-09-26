@@ -21,7 +21,7 @@ public class TriangleBuffer extends BufferFactory {
     public Buffer generateBuffer(int bufferSize) {
     	Buffer b = new Buffer(bufferSize);
         for(int i = 0; i < bufferSize; i++) {
-            b.buf[i] = i < bufferSize / 2 ? (float) i / ((float) bufferSize / 2f) * 2.0f - 1.0f : (1f - ((float) (i - (bufferSize / 2)) / ((float) bufferSize / 2f))) * 2.0f - 1.0f;
+            b.buf[i] = i < bufferSize / 2f ? (float) i / ((float) bufferSize / 2f) * 2.0f - 1.0f : (1f - ((float) (i - (bufferSize / 2)) / ((float) bufferSize / 2f))) * 2.0f - 1.0f;
         }
     	return b;
     }

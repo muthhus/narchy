@@ -1,12 +1,11 @@
 package nars.nlp;
 
+import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 /**
  * Created by me on 2/18/17.
@@ -29,8 +28,8 @@ public class NLPTest {
         //n.quaMin.setValue(0.1f);
         n.truthResolution.setValue(0.1f);
 
-        n.on("say", (x, args, nn) -> {
-            System.err.println(Arrays.toString(args));
+        n.onOpArgs("say", (args, nn) -> {
+            System.err.println(Joiner.on(" ").join(args));
         });
 
         //n.log();

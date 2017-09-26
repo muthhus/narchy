@@ -59,7 +59,7 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
     }
 
     //TODO abstract this
-    protected void locate(SimpleSpatial s, v3 f) {
+    protected static void locate(SimpleSpatial s, v3 f) {
         f.set(s.x(), s.y(), 0f);
     }
 

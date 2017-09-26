@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sound.sampled.AudioInputStream;
-import java.util.Locale;
 
 /**
  * https://github.com/marytts/marytts/wiki/MaryInterface

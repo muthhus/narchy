@@ -38,7 +38,7 @@ public class ReflectionSurface<X> extends Grid {
         set(l);
     }
 
-    private void collectServices(Services x, List<Surface> l) {
+    private static void collectServices(Services x, List<Surface> l) {
         x.stream().forEach((s) -> {
             l.add(new WindowButton(s.toString(), () -> {
                 return new ReflectionSurface(s);

@@ -84,25 +84,5 @@ public class BulletStats {
 		//return 1000000f;
 		return 1000f;
 	}
-	
-	/**
-	 * Pushes profile node. Use try/finally block to call {@link #popProfile} method.
-	 * 
-	 * @param name must be {@link String#intern interned} String (not needed for String literals)
-	 */
-	public static void pushProfile(String name) {
-//		if (enableProfile) {
-//			CProfileManager.startProfile(name);
-//		}
-	}
-	
-	/**
-	 * Pops profile node.
-	 */
-	public static void popProfile() {
-//		if (enableProfile) {
-//			CProfileManager.stopProfile();
-//		}
-	}
-	
+
 }

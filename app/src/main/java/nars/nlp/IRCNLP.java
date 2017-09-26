@@ -7,6 +7,7 @@ import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.types.GenericMessageEvent;
@@ -264,7 +265,7 @@ public class IRCNLP extends IRC {
     }
 
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException, IrcException {
 
         //Param.DEBUG = true;
 

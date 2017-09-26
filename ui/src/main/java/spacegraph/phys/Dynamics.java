@@ -320,7 +320,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
                 int numContacts = contactManifold.getNumContacts();
                 for (int j = 0; j < numContacts; j++) {
                     ManifoldPoint cp = contactManifold.getContactPoint(j);
-                    debugDrawer.drawContactPoint(cp.positionWorldOnB, cp.normalWorldOnB, cp.getDistance(), cp.getLifeTime(), color);
+                    debugDrawer.drawContactPoint(cp.positionWorldOnB, cp.normalWorldOnB, cp.distance1, cp.lifeTime, color);
                 }
             }
         }
@@ -426,14 +426,13 @@ public abstract class Dynamics<X> extends Collisions<X> {
      */
 
     public void updateActions(float timeStep) {
-        BulletStats.pushProfile("updateActions");
         try {
-            for (int i = 0; i < actions.size(); i++) {
+            int n = actions.size();
+            for (int i = 0; i < n; i++) {
                 //return array[index];
                 actions.get(i).updateAction(this, timeStep);
             }
         } finally {
-            BulletStats.popProfile();
         }
     }
 
@@ -451,7 +450,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
 //    }
 
     protected void updateActivationState(float timeStep) {
-        BulletStats.pushProfile("updateActivationState");
         try {
             v3 tmp = new v3();
 
@@ -486,7 +484,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
                 }
             });
         } finally {
-            BulletStats.popProfile();
         }
     }
 
@@ -525,7 +522,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
 
     protected synchronized void internalSingleStepSimulation(float timeStep) {
-        BulletStats.pushProfile("internalSingleStepSimulation");
+
             if (preTickCallback != null) {
                 preTickCallback.internalTick(this, timeStep);
             }
@@ -592,13 +589,12 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
         solverInfo.timeStep = timeStep;
 
-        BulletStats.pushProfile("solveConstraints");
         try {
             // sorted version of all btTypedConstraint, based on islandId
 
             if (!constraints.isEmpty()) {
                 sortedConstraints.clear();
-                constraints.forEach((TypedConstraint c) -> sortedConstraints.add(c));
+                constraints.forEach(sortedConstraints::add);
 
                 //Collections.sort(sortedConstraints, sortConstraintOnIslandPredicate);
                 MiscUtil.quickSort(sortedConstraints, sortConstraintOnIslandPredicate);
@@ -616,12 +612,11 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
             constrainer.allSolved(solverInfo /*, m_stackAlloc*/);
         } finally {
-            BulletStats.popProfile();
         }
     }
 
     protected void calculateSimulationIslands() {
-        BulletStats.pushProfile("calculateSimulationIslands");
+
         try {
 
             islands.updateActivationState(this);
@@ -642,7 +637,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
             // Store the island id in each body
             islands.storeIslandActivationState(this);
         } finally {
-            BulletStats.popProfile();
         }
     }
 
@@ -651,7 +645,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
     protected void integrateTransforms(float timeStep) {
-        BulletStats.pushProfile("integrateTransforms");
+
         try {
 
             v3 tmp = new v3();
@@ -674,7 +668,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
                         float motionThresh = body.getCcdSquareMotionThreshold();
 
                         if (motionThresh != 0f && motionThresh < squareMotion) {
-                            BulletStats.pushProfile("CCD motion clamping");
                             try {
                                 if (body.shape().isConvex()) {
                                     BulletStats.gNumClampedCcdMotions++;
@@ -699,7 +692,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
                                     }
                                 }
                             } finally {
-                                BulletStats.popProfile();
                             }
                         }
 
@@ -708,12 +700,11 @@ public abstract class Dynamics<X> extends Collisions<X> {
                 }
             }
         } finally {
-            BulletStats.popProfile();
         }
     }
 
     protected void predictUnconstraintMotion(float timeStep) {
-        BulletStats.pushProfile("predictUnconstraintMotion");
+
         try {
             collidables().forEach((colObj) -> {
                 Dynamic body = ifDynamic(colObj);
@@ -724,7 +715,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
                 }
             });
         } finally {
-            BulletStats.popProfile();
         }
     }
 
@@ -734,7 +724,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
         //#endif //BT_NO_PROFILE
     }
 
-    protected void debugDrawSphere(IDebugDraw debugDrawer, float radius, Transform transform, v3 color) {
+    protected static void debugDrawSphere(IDebugDraw debugDrawer, float radius, Transform transform, v3 color) {
         v3 start = new v3(transform);
 
         v3 xoffs = new v3();
@@ -793,7 +783,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
         debugDrawer.drawLine(tmp1, tmp2, color);
     }
 
-    public void debugDrawObject(IDebugDraw debugDrawer, Transform worldTransform, CollisionShape shape, v3 color) {
+    public static void debugDrawObject(IDebugDraw debugDrawer, Transform worldTransform, CollisionShape shape, v3 color) {
         v3 tmp = new v3();
         v3 tmp2 = new v3();
 
@@ -1144,7 +1134,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
             // call needsResponse, see http://code.google.com/p/bullet/issues/detail?id=179
             if (intersecter.needsResponse(me, otherObj)) {
                 // don't do CCD when there are already contact points (touching contact/penetration)
-                OArrayList<PersistentManifold> manifoldArray = new OArrayList<PersistentManifold>();
+                OArrayList<PersistentManifold> manifoldArray = new OArrayList<>();
                 BroadphasePair collisionPair = pairCache.findPair(me.broadphase(), proxy0);
                 if (collisionPair != null) {
                     if (collisionPair.algorithm != null) {

@@ -101,7 +101,7 @@ public class ControlSurface extends LabeledPane {
 
     }
 
-    private Surface build(Object k, MutableFloat f) {
+    private static Surface build(Object k, MutableFloat f) {
 //
 //        if (k instanceof Field) {
 //            System.out.println(k);

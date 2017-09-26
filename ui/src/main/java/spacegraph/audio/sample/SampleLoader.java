@@ -85,45 +85,35 @@ public enum SampleLoader
         int s = b.length / (sampleSize / 8);
         float[] buf = new float[s];
         // Six different cases for reordering the data. Can this be improved without slowing it down?
-        if (sampleSize == 8)
-        {
-            if (signed)
-            {
-                for (int i = 0; i < s; i++)
-                    buf[i] = bb.get() / (float)0x80;
-            }
-            else
-            {
-                for (int i = 0; i < s; i++)
-                    buf[i] = ((bb.get()&0xFF)-0x80) / (float)0x80;
-            }
-        }
-        else if (sampleSize == 16)
-        {
-            if (signed)
-            {
-                for (int i = 0; i < s; i++)
-                    buf[i] = bb.getShort() / (float)0x8000;
-            }
-            else
-            {
-                for (int i = 0; i < s; i++)
-                    buf[i] = ((bb.getShort()&0xFFFF)-0x8000) / (float)0x8000;
-            }
-        }
-        else if (sampleSize == 32)
-        {
-            if (signed)
-            {
-                for (int i = 0; i < s; i++)
-                    buf[i] = bb.getInt() / (float)0x80000000;
-            }
-            else
-            {
-                // Nasty.. check this.
-                for (int i = 0; i < s; i++)
-                    buf[i] = ((bb.getInt()& 0xFFFFFFFFL)- 0x80000000L) / (float)0x80000000;
-            }
+        switch (sampleSize) {
+            case 8:
+                if (signed) {
+                    for (int i = 0; i < s; i++)
+                        buf[i] = bb.get() / (float) 0x80;
+                } else {
+                    for (int i = 0; i < s; i++)
+                        buf[i] = ((bb.get() & 0xFF) - 0x80) / (float) 0x80;
+                }
+                break;
+            case 16:
+                if (signed) {
+                    for (int i = 0; i < s; i++)
+                        buf[i] = bb.getShort() / (float) 0x8000;
+                } else {
+                    for (int i = 0; i < s; i++)
+                        buf[i] = ((bb.getShort() & 0xFFFF) - 0x8000) / (float) 0x8000;
+                }
+                break;
+            case 32:
+                if (signed) {
+                    for (int i = 0; i < s; i++)
+                        buf[i] = bb.getInt() / (float) 0x80000000;
+                } else {
+                    // Nasty.. check this.
+                    for (int i = 0; i < s; i++)
+                        buf[i] = ((bb.getInt() & 0xFFFFFFFFL) - 0x80000000L) / (float) 0x80000000;
+                }
+                break;
         }
         
         // Return the completed sample

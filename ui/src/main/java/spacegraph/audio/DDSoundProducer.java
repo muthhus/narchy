@@ -106,7 +106,7 @@ public class DDSoundProducer implements SoundProducer {
     @Override
     public void skip(int samplesToSkip, int readRate) {
 
-        float step = ((float) format.getSampleRate()) / readRate;
+        float step = format.getSampleRate() / readRate;
         pos += step * samplesToSkip;
 
 //            if (alive && pos >= sample.buf.length) {

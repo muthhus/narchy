@@ -163,7 +163,7 @@ class ConvexTriangleCallback extends TriangleCallback {
 			//cvxcvxalgo.processCollision(m_convexBody,m_triBody,*m_dispatchInfoPtr,m_resultOut);
 			colAlgo.processCollision(convexBody, triBody, dispatchInfoPtr, resultOut);
 			//colAlgo.destroy();
-			ci.intersecter1.freeCollisionAlgorithm(colAlgo);
+			Intersecter.freeCollisionAlgorithm(colAlgo);
 			ob.internalSetTemporaryCollisionShape(tmpShape);
 		}
 	}

@@ -194,7 +194,7 @@ public class STMView {
         protected double[] range;
 
         protected float sy = 5;
-        float tx = 0, ty = 0;
+        float tx = -0.5f, ty = -0.5f;
         protected double dur;
 
         public GNGVis(NeuralGasNet net) {
@@ -211,9 +211,7 @@ public class STMView {
             if (range[0] != range[0])
                 return; //nothing to show
 
-            float maxDimNorm = (float) (range[1] - range[0]); //start time span
-
-            gl.glLineWidth(2f);
+            gl.glLineWidth(5f);
 
             int C = net.centroids.length;
             for (int i = 0, coordLength = C; i < coordLength; i++) {
@@ -231,7 +229,7 @@ public class STMView {
 
         protected void draw(Object o, GL2 gl, float hue, double[] c, int centroid, float v) {
             //float xe = sx * r(1, c[1]);
-            float f = c.length > 1 ? (float) (sy * c[1]) : 0.5f;
+            float f = 0f; //c.length > 1 ? (float) (sy * c[1]) : 0.5f;
             //float c = r(3, c[3]);
 
 
@@ -239,13 +237,17 @@ public class STMView {
 
 
             if (o instanceof Centroid) {
+                f = 0.1f;
                 float H = 0.15f;
-                float x = x((float) c[0]);
+                float cw = (float) (c[1]/2f+1f);
+                float xl = x((float) c[0] - cw);
+                float xr = x((float) c[0] + cw);
                 Draw.hsb(gl, hue, 0.5f, 0.5f, v);
-                Draw.rectStroke(gl, x-H/2f, ty + f - H / 2, H, H);
+                Draw.rectStroke(gl, xl, ty + f - H / 2, xr-xl, H);
             } else if (o instanceof Task) {
                 float H = 0.1f;
 
+                f = -0.1f;
                 Task t = (Task) o;
                 float xl = x( t.start() - 0.5f);
                 float xr = x( t.end() + 0.5f);
@@ -289,7 +291,7 @@ public class STMView {
             //bag.commit(1);
 
             this.now = nar.time();
-            this.dur = nar.dur()*5f;
+            this.dur = nar.dur()*100f;
 
             super.paint(gl);
 

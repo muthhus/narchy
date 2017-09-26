@@ -51,12 +51,7 @@ public class CylinderShapeZ extends CylinderShape {
 		}
 	}
 
-	@Override
-	public float getRadius() {
-		return getHalfExtentsWithMargin(new v3()).x;
-	}
-
-	@Override
+    @Override
 	public String getName() {
 		return "CylinderZ";
 	}

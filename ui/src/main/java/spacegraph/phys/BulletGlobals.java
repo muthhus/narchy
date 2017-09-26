@@ -50,12 +50,7 @@ public class BulletGlobals {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	private static final ThreadLocal<BulletGlobals> threadLocal = new ThreadLocal<BulletGlobals>() {
-        @Override
-        protected BulletGlobals initialValue() {
-            return new BulletGlobals();
-        }
-    };
+	private static final ThreadLocal<BulletGlobals> threadLocal = ThreadLocal.withInitial(() -> new BulletGlobals());
 
 	private ContactDestroyedCallback gContactDestroyedCallback;
 	private ContactAddedCallback gContactAddedCallback;

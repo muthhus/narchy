@@ -1,13 +1,11 @@
 package nars;
 
-import com.google.common.collect.Iterables;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.Ons;
 import jcog.list.FasterList;
 import jcog.pri.Prioritized;
 import jcog.pri.mix.control.MixContRL;
-import nars.concept.ActionConcept;
 import nars.control.Activate;
 import nars.control.Cause;
 import nars.control.Derivation;
@@ -16,11 +14,11 @@ import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
+import nars.gui.STMView;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.Implier;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
@@ -52,7 +50,6 @@ import spacegraph.widget.slider.FloatSlider;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -201,13 +198,13 @@ abstract public class NAgentX extends NAgent {
 
         //STMLinkage stmLink = new STMLinkage(n, 1, false);
 
-        LinkClustering stmBelief = new LinkClustering(n, Prioritized::priElseZero /* anything temporal */, 16, 256);
-        //STMView.show2D(n, stmBelief.bag, 800, 600);
+        LinkClustering linkCluster = new LinkClustering(n, Prioritized::priElseZero /* anything temporal */, 16, 256);
+        //STMView.show2D(n, linkCluster.bag, 800, 600);
 
         ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, 16, 64);
         ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, 16, 64);
 
-        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
+        //Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
 //
         Inperience inp = new Inperience(n, 4);
 //

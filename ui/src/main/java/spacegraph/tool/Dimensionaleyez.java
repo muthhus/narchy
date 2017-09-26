@@ -47,10 +47,8 @@ public class Dimensionaleyez extends SimpleSpatial {
         super(id);
 
         s = new StreamingNormalizer(IN);
-        m = MeshMap.get(id, (k, v) -> {
-            //System.out.println(k + " " + v);
-            accept(k, v);
-        });
+        //System.out.println(k + " " + v);
+        m = MeshMap.get(id, this::accept);
 
         new Loop() {
 

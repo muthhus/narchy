@@ -33,10 +33,7 @@ import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.CollisionAlgorithmCreateFunc;
 import spacegraph.phys.collision.DefaultIntersecter;
 import spacegraph.phys.collision.ManifoldResult;
-import spacegraph.phys.collision.broad.BroadphaseNativeType;
-import spacegraph.phys.collision.broad.CollisionAlgorithm;
-import spacegraph.phys.collision.broad.CollisionAlgorithmConstructionInfo;
-import spacegraph.phys.collision.broad.DispatcherInfo;
+import spacegraph.phys.collision.broad.*;
 import spacegraph.phys.collision.narrow.PersistentManifold;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
@@ -362,7 +359,7 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 	protected void destroyConvexAlgorithm() {
 		if (convex_algorithm != null) {
 			//convex_algorithm.destroy();
-			intersecter.freeCollisionAlgorithm(convex_algorithm);
+			Intersecter.freeCollisionAlgorithm(convex_algorithm);
 			convex_algorithm = null;
 		}
 	}
@@ -506,7 +503,7 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
         algor.processCollision(body0, body1, dispatchInfo, resultOut);
 
         //algor.destroy();
-        intersecter.freeCollisionAlgorithm(algor);
+        Intersecter.freeCollisionAlgorithm(algor);
 
         body0.internalSetTemporaryCollisionShape(tmpShape0);
 		body1.internalSetTemporaryCollisionShape(tmpShape1);

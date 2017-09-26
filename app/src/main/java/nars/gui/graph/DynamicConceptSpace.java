@@ -17,7 +17,7 @@ public class DynamicConceptSpace extends TermSpace {
     final Bagregate<Activate> bag;
 
     private final List next;
-    final float bagUpdateRate = 0.1f;
+    final float bagUpdateRate = 0.05f;
     private final DurService on;
 
 

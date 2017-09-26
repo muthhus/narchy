@@ -23,11 +23,15 @@ public class GasolinearTest {
         );
 
         //warmup
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 20; i++) {
+            out.println(g);
+            System.out.println();
+
             g.which(Math.random());
+        }
 
 
-        out.println(g);
+
 
         assertEquals(0, g.which(-0.1));
         assertEquals(0, g.which(0.1));

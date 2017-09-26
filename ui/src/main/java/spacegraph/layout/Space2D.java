@@ -58,7 +58,7 @@ public class Space2D<S extends Surface> extends Layout<S> {
             }
         }
     }
-    private void repel(Surface x, Surface y, float speed, float minDist, float maxDist, float sx, float sy) {
+    private static void repel(Surface x, Surface y, float speed, float minDist, float maxDist, float sx, float sy) {
 
         v3 delta = new v3();
         v3 xp = x.translateLocal;

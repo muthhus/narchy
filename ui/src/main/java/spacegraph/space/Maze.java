@@ -86,7 +86,7 @@ public class Maze extends CompoundSpatial {
     }
 
 
-    public ConvexHullShape hull() {
+    public static ConvexHullShape hull() {
         ConvexHullShape c = new ConvexHullShape().add(
             v(-3,0,0), v(-3, 0, 3), v(-3, -3, 3), v(-3, 3, 3),
             v(0, 3, 1.5f)
@@ -95,7 +95,7 @@ public class Maze extends CompoundSpatial {
         return c;
     }
 
-    protected CollisionShape terrain(int tesselation, float height, int seed, v3 scale) {
+    protected static CollisionShape terrain(int tesselation, float height, int seed, v3 scale) {
 
 
         int count = tesselation;
@@ -147,7 +147,7 @@ public class Maze extends CompoundSpatial {
         return cs;
     }
 
-    private float noise(float a, float b) {
+    private static float noise(float a, float b) {
         //TODO perlin noise
         return (float)Math.random();
     }

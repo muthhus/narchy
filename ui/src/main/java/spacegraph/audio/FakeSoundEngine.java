@@ -7,7 +7,7 @@ import javax.sound.sampled.LineUnavailableException;
 
 public class FakeSoundEngine extends Audio
 {
-    public FakeSoundEngine(int maxChannels) throws LineUnavailableException {
+    public FakeSoundEngine(int maxChannels) {
         super(maxChannels);
     }
 
@@ -21,7 +21,7 @@ public class FakeSoundEngine extends Audio
     {
     }
 
-    public SoundSample loadSample(String resourceName)
+    public static SoundSample loadSample(String resourceName)
     {
         return null;
     }

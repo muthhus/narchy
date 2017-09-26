@@ -88,10 +88,10 @@ public class PersistentManifold {
 		int maxPenetrationIndex = -1;
 //#define KEEP_DEEPEST_POINT 1
 //#ifdef KEEP_DEEPEST_POINT
-		float maxPenetration = pt.getDistance();
+        float maxPenetration = pt.distance1;
 		for (int i = 0; i < 4; i++) {
 			ManifoldPoint pii = pointCache[i];
-			float pid = pii.getDistance();
+            float pid = pii.distance1;
 			if (pid < maxPenetration) {
 				maxPenetrationIndex = i;
 				maxPenetration = pid;
@@ -276,7 +276,7 @@ public class PersistentManifold {
 
 //#define MAINTAIN_PERSISTENCY 1
 //#ifdef MAINTAIN_PERSISTENCY
-		int lifeTime = pointCache[insertIndex].getLifeTime();
+		int lifeTime = pointCache[insertIndex].lifeTime;
 		float appliedImpulse = pointCache[insertIndex].appliedImpulse;
 		float appliedLateralImpulse1 = pointCache[insertIndex].appliedImpulseLateral1;
 		float appliedLateralImpulse2 = pointCache[insertIndex].appliedImpulseLateral2;

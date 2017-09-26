@@ -93,7 +93,7 @@ public class KinematicCharacterController extends ActionInterface {
 	protected v3 targetPosition = new v3();
 
 	// keep track of the contact manifolds
-	OArrayList<PersistentManifold> manifoldArray = new OArrayList<PersistentManifold>();
+	OArrayList<PersistentManifold> manifoldArray = new OArrayList<>();
 
 	protected boolean touchingContact;
 	protected v3 touchingNormal = new v3();
@@ -340,7 +340,7 @@ public class KinematicCharacterController extends ActionInterface {
 	 *
 	 * From: http://www-cs-students.stanford.edu/~adityagp/final/node3.html
 	 */
-	protected v3 computeReflectionDirection(v3 direction, v3 normal, v3 out) {
+	protected static v3 computeReflectionDirection(v3 direction, v3 normal, v3 out) {
 		// return direction - (btScalar(2.0) * direction.dot(normal)) * normal;
 		out.set(normal);
 		out.scale(-2.0f * direction.dot(normal));
@@ -351,7 +351,7 @@ public class KinematicCharacterController extends ActionInterface {
 	/**
 	 * Returns the portion of 'direction' that is parallel to 'normal'
 	 */
-	protected v3 parallelComponent(v3 direction, v3 normal, v3 out) {
+	protected static v3 parallelComponent(v3 direction, v3 normal, v3 out) {
 		//btScalar magnitude = direction.dot(normal);
 		//return normal * magnitude;
 		out.set(normal);
@@ -362,7 +362,7 @@ public class KinematicCharacterController extends ActionInterface {
 	/**
 	 * Returns the portion of 'direction' that is perpindicular to 'normal'
 	 */
-	protected v3 perpindicularComponent(v3 direction, v3 normal, v3 out) {
+	protected static v3 perpindicularComponent(v3 direction, v3 normal, v3 out) {
 		//return direction - parallelComponent(direction, normal);
 		v3 perpendicular = parallelComponent(direction, normal, out);
 		perpendicular.scale(-1);
@@ -399,7 +399,7 @@ public class KinematicCharacterController extends ActionInterface {
 				for (int p=0; p<manifold.getNumContacts(); p++) {
 					ManifoldPoint pt = manifold.getContactPoint(p);
 
-					float dist = pt.getDistance();
+					float dist = pt.distance1;
 					if (dist < 0.0f) {
 						if (dist < maxPen) {
 							maxPen = dist;

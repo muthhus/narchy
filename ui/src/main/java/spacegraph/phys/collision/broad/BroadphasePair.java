@@ -56,8 +56,10 @@ public class BroadphasePair {
 		userInfo = p.userInfo;
 	}
 	
-	public boolean equals(BroadphasePair p) {
-		return this == p || (pProxy0 == p.pProxy0 && pProxy1 == p.pProxy1);
+	public boolean equals(Object pp) {
+		if (this == pp) return true;
+		BroadphasePair p = (BroadphasePair) pp;
+		return (pProxy0 == p.pProxy0 && pProxy1 == p.pProxy1);
 	}
 	
 	public static final Comparator<BroadphasePair> broadphasePairSortPredicate = (a, b) -> {

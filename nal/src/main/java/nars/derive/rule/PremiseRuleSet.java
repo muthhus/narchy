@@ -263,13 +263,6 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
         return TermVector.the(a, b);
     }
 
-    @NotNull
-    public Set<PremiseRule> permute(@NotNull PremiseRule preNorm) {
-        Set<PremiseRule> ur;
-        permute(preNorm, "", new PatternIndex(this.patterns.nar), ur = $.newHashSet(1));
-        return ur;
-    }
-
     public void permute(@NotNull PremiseRule preNormRule, String src, @NotNull PatternIndex index, @NotNull Collection<PremiseRule> ur) {
         add(preNormRule, src, ur, index,
                 (PremiseRule r) -> permuteSwap(r, src, index, ur,

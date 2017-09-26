@@ -524,17 +524,6 @@ public class AudioContext {
 	}
 
 	/**
-	 * Convenience method to quickly audition a {@link UGen}.
-	 * 
-	 * @param ugen
-	 *            the {@link UGen} to audition.
-	 */
-	public void quickie(UGen ugen) {
-		out.addInput(ugen);
-		start();
-	}
-
-	/**
 	 * Starts the AudioContext running in realtime. Only happens if not already
 	 * running. Resets time.
 	 */

@@ -38,7 +38,7 @@ public class ConjClustering extends Causable {
 
         @Override
         public void coord(Task t, double[] c) {
-            c[0] = t.mid();
+            c[0] = t.start();
             c[1] = t.truth().isNegative() ? (1f - t.freq()) : t.freq(); //0..+1 //if negative, will be negated in subterms
             c[2] = t.conf(); //0..+1
         }
@@ -203,7 +203,7 @@ public class ConjClustering extends Causable {
                             .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List
 
                     m.setPri(BudgetFunctions.fund(maxPri, false, uu));
-                    nar.input(m);
+                    in.input(m);
                 }
 
             }

@@ -703,7 +703,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
             Map<Term, Time> h = new HashMap();
             Event s = t.solve(the("a"), h);
 
-            assertEquals("a@-5->b", s.toString());
+            assertEquals("a@0->(a &&+5 b)" /*"a@-5->b"*/, s.toString());
 
         }
 

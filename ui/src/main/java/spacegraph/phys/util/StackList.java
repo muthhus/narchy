@@ -23,6 +23,8 @@
 
 package spacegraph.phys.util;
 
+import jcog.list.FasterList;
+
 import java.util.ArrayList;
 
 /**
@@ -48,9 +50,8 @@ import java.util.ArrayList;
  * 
  * @author jezek2
  */
-public abstract class StackList<T> {
+public abstract class StackList<T> extends FasterList<T>  {
 
-	private final ArrayList<T> list = new ArrayList<>();
 	private final T returnObj;
 	
 	private final int[] stack = new int[512];
@@ -91,11 +92,11 @@ public abstract class StackList<T> {
 	public T get() {
 		//if (true) return create();
 		
-		if (pos == list.size()) {
+		if (pos == size()) {
 			expand();
 		}
 		
-		return list.get(pos++);
+		return super.get(pos++);
 	}
 	
 	/**
@@ -129,7 +130,7 @@ public abstract class StackList<T> {
 	protected abstract void copy(T dest, T src);
 
 	private void expand() {
-		list.add(create());
+		super.add(create());
 	}
 	
 }

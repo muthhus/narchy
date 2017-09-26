@@ -107,14 +107,13 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-//    @SinglePremise
-//    @AllowOverlap
-//    BeliefStructuralDeduction() {
-//        @Override
-//        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-//            return deduction1(B, defaultConf(m), minConf);
-//        }
-//    },
+    @AllowOverlap
+    BeliefStructuralDeduction() {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return deduction1(B, defaultConf(m), minConf);
+        }
+    },
 
 
 //    @AllowOverlap @SinglePremise

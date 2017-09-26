@@ -384,20 +384,24 @@ public class Matrix3d implements java.io.Serializable, Cloneable {
      * @param v   the vector into which the matrix row values will be copied
      */
     public final void getRow(int row, Vector3d v) {
-        if (row == 0) {
-            v.x = m00;
-            v.y = m01;
-            v.z = m02;
-        } else if (row == 1) {
-            v.x = m10;
-            v.y = m11;
-            v.z = m12;
-        } else if (row == 2) {
-            v.x = m20;
-            v.y = m21;
-            v.z = m22;
-        } else {
-            throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix3d2"));
+        switch (row) {
+            case 0:
+                v.x = m00;
+                v.y = m01;
+                v.z = m02;
+                break;
+            case 1:
+                v.x = m10;
+                v.y = m11;
+                v.z = m12;
+                break;
+            case 2:
+                v.x = m20;
+                v.y = m21;
+                v.z = m22;
+                break;
+            default:
+                throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix3d2"));
         }
 
     }
@@ -409,20 +413,24 @@ public class Matrix3d implements java.io.Serializable, Cloneable {
      * @param v   the array into which the matrix row values will be copied
      */
     public final void getRow(int row, double v[]) {
-        if (row == 0) {
-            v[0] = m00;
-            v[1] = m01;
-            v[2] = m02;
-        } else if (row == 1) {
-            v[0] = m10;
-            v[1] = m11;
-            v[2] = m12;
-        } else if (row == 2) {
-            v[0] = m20;
-            v[1] = m21;
-            v[2] = m22;
-        } else {
-            throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix3d2"));
+        switch (row) {
+            case 0:
+                v[0] = m00;
+                v[1] = m01;
+                v[2] = m02;
+                break;
+            case 1:
+                v[0] = m10;
+                v[1] = m11;
+                v[2] = m12;
+                break;
+            case 2:
+                v[0] = m20;
+                v[1] = m21;
+                v[2] = m22;
+                break;
+            default:
+                throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix3d2"));
         }
 
     }
@@ -435,20 +443,24 @@ public class Matrix3d implements java.io.Serializable, Cloneable {
      * @param v      the vector into which the matrix row values will be copied
      */
     public final void getColumn(int column, Vector3d v) {
-        if (column == 0) {
-            v.x = m00;
-            v.y = m10;
-            v.z = m20;
-        } else if (column == 1) {
-            v.x = m01;
-            v.y = m11;
-            v.z = m21;
-        } else if (column == 2) {
-            v.x = m02;
-            v.y = m12;
-            v.z = m22;
-        } else {
-            throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix3d4"));
+        switch (column) {
+            case 0:
+                v.x = m00;
+                v.y = m10;
+                v.z = m20;
+                break;
+            case 1:
+                v.x = m01;
+                v.y = m11;
+                v.z = m21;
+                break;
+            case 2:
+                v.x = m02;
+                v.y = m12;
+                v.z = m22;
+                break;
+            default:
+                throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix3d4"));
         }
 
     }
@@ -461,20 +473,24 @@ public class Matrix3d implements java.io.Serializable, Cloneable {
      * @param v      the array into which the matrix row values will be copied
      */
     public final void getColumn(int column, double v[]) {
-        if (column == 0) {
-            v[0] = m00;
-            v[1] = m10;
-            v[2] = m20;
-        } else if (column == 1) {
-            v[0] = m01;
-            v[1] = m11;
-            v[2] = m21;
-        } else if (column == 2) {
-            v[0] = m02;
-            v[1] = m12;
-            v[2] = m22;
-        } else {
-            throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix3d4"));
+        switch (column) {
+            case 0:
+                v[0] = m00;
+                v[1] = m10;
+                v[2] = m20;
+                break;
+            case 1:
+                v[0] = m01;
+                v[1] = m11;
+                v[2] = m21;
+                break;
+            case 2:
+                v[0] = m02;
+                v[1] = m12;
+                v[2] = m22;
+                break;
+            default:
+                throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix3d4"));
         }
 
     }

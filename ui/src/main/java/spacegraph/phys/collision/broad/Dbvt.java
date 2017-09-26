@@ -70,7 +70,7 @@ public final class Dbvt {
 
 	public void optimizeBottomUp() {
 		if (root != null) {
-			FasterList<Node> leaves = new FasterList<Node>(this.leaves);
+			FasterList<Node> leaves = new FasterList<>(this.leaves);
 			fetchleaves(this, root, leaves);
 			bottomup(this, leaves);
             //return array[index];
@@ -84,7 +84,7 @@ public final class Dbvt {
 
 	public void optimizeTopDown(int bu_treshold) {
 		if (root != null) {
-			FasterList<Node> leaves = new FasterList<Node>(this.leaves);
+			FasterList<Node> leaves = new FasterList<>(this.leaves);
 			fetchleaves(this, root, leaves);
 			root = topdown(this, leaves, bu_treshold);
 		}
@@ -194,15 +194,15 @@ public final class Dbvt {
 		leaves--;
 	}
 
-	public void write(IWriter iwriter) {
+	public static void write(IWriter iwriter) {
 		throw new UnsupportedOperationException();
 	}
 
-	public void clone(Dbvt dest) {
+	public static void clone(Dbvt dest) {
 		clone(dest, null);
 	}
 
-	public void clone(Dbvt dest, IClone iclone) {
+	public static void clone(Dbvt dest, IClone iclone) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -289,7 +289,7 @@ public final class Dbvt {
 	public static void collideTT(Node root0, Node root1, Transform xform, ICollide policy) {
 		//DBVT_CHECKTYPE
 		if (root0 != null && root1 != null) {
-			OArrayList<sStkNN> stack = new OArrayList<sStkNN>(DOUBLE_STACKSIZE);
+			OArrayList<sStkNN> stack = new OArrayList<>(DOUBLE_STACKSIZE);
 			stack.add(new sStkNN(root0, root1));
 			do {
 				sStkNN p = stack.remove(stack.size() - 1);
@@ -338,7 +338,7 @@ public final class Dbvt {
 	public static void collideTV(Node root, DbvtAabbMm volume, ICollide policy) {
 		//DBVT_CHECKTYPE
 		if (root != null) {
-			OArrayList<Node> stack = new OArrayList<Node>(SIMPLE_STACKSIZE);
+			OArrayList<Node> stack = new OArrayList<>(SIMPLE_STACKSIZE);
 			stack.add(root);
 			do {
 				Node n = stack.remove(stack.size() - 1);
@@ -364,7 +364,7 @@ public final class Dbvt {
 			v3 invdir = new v3();
 			invdir.set(1f / normal.x, 1f / normal.y, 1f / normal.z);
 			int[] signs = { direction.x<0 ? 1:0, direction.y<0 ? 1:0, direction.z<0 ? 1:0 };
-			OArrayList<Node> stack = new OArrayList<Node>(SIMPLE_STACKSIZE);
+			OArrayList<Node> stack = new OArrayList<>(SIMPLE_STACKSIZE);
 			stack.add(root);
 			do {
 				Node node = stack.remove(stack.size() - 1);
@@ -386,7 +386,7 @@ public final class Dbvt {
 		//DBVT_CHECKTYPE
 		if (root != null) {
 			int inside = (1 << count) - 1;
-			OArrayList<sStkNP> stack = new OArrayList<sStkNP>(SIMPLE_STACKSIZE);
+			OArrayList<sStkNP> stack = new OArrayList<>(SIMPLE_STACKSIZE);
 			int[] signs = new int[4 * 8];
 			assert (count < (/*sizeof(signs)*/128 / /*sizeof(signs[0])*/ 4));
 			for (int i=0; i<count; ++i) {
@@ -417,7 +417,7 @@ public final class Dbvt {
 						stack.add(new sStkNP(se.node.childs[1], se.mask));
 					}
 					else {
-						if (policy.AllLeaves(se.node)) {
+						if (ICollide.AllLeaves(se.node)) {
 							enumLeaves(se.node, policy);
 						}
 					}
@@ -438,7 +438,7 @@ public final class Dbvt {
 					(sortaxis.y >= 0 ? 2 : 0) +
 					(sortaxis.z >= 0 ? 4 : 0);
 			int inside = (1 << count) - 1;
-			OArrayList<sStkNPS> stock = new OArrayList<sStkNPS>();
+			OArrayList<sStkNPS> stock = new OArrayList<>();
 			IntArrayList ifree = new IntArrayList();
 			IntArrayList stack = new IntArrayList();
 			int[] signs = new int[/*sizeof(unsigned)*8*/4 * 8];
@@ -477,7 +477,7 @@ public final class Dbvt {
 						continue;
 					}
 				}
-				if (policy.Descent(se.node)) {
+				if (ICollide.Descent(se.node)) {
 					if (se.node.isinternal()) {
 						Node[] pns = {se.node.childs[0], se.node.childs[1]};
 						sStkNPS[] nes = {new sStkNPS(pns[0], se.mask, pns[0].volume.ProjectMinimum(sortaxis, srtsgns)),
@@ -526,11 +526,11 @@ public final class Dbvt {
 	public static void collideTU(Node root, ICollide policy) {
 		//DBVT_CHECKTYPE
 		if (root != null) {
-			OArrayList<Node> stack = new OArrayList<Node>(SIMPLE_STACKSIZE);
+			OArrayList<Node> stack = new OArrayList<>(SIMPLE_STACKSIZE);
 			stack.add(root);
 			do {
 				Node n = stack.remove(stack.size() - 1);
-				if (policy.Descent(n)) {
+				if (ICollide.Descent(n)) {
 					if (n.isinternal()) {
 						stack.add(n.childs[0]);
 						stack.add(n.childs[1]);
@@ -975,11 +975,11 @@ public final class Dbvt {
 			process(n);
 		}
 
-		public boolean Descent(Node n) {
+		public static boolean Descent(Node n) {
 			return true;
 		}
 
-		public boolean AllLeaves(Node n) {
+		public static boolean AllLeaves(Node n) {
 			return true;
 		}
 	}

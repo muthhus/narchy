@@ -399,8 +399,6 @@ public class SequentialImpulseConstrainer extends Constrainer {
     }
 
     public float solveGroupCacheFriendlySetup(Collection<Collidable> bodies, int numBodies, FasterList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, FasterList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
-        BulletStats.pushProfile("solveGroupCacheFriendlySetup");
-        try {
 
             if ((numConstraints + numManifolds) == 0) {
                 // printf("empty\n");
@@ -545,7 +543,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
                         ManifoldPoint cp = manifold.getContactPoint(j);
 
-                        if (cp.getDistance() <= 0f) {
+                        if (cp.distance1 <= 0f) {
                             cp.getPositionWorldOnA(pos1);
                             cp.getPositionWorldOnB(pos2);
 
@@ -625,7 +623,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
                             rel_vel = cp.normalWorldOnB.dot(vel);
 
-                            solverConstraint.penetration = Math.min(cp.getDistance() + infoGlobal.linearSlop, 0f);
+                            solverConstraint.penetration = Math.min(cp.distance1 + infoGlobal.linearSlop, 0f);
                             //solverConstraint.m_penetration = cp.getDistance();
 
                             solverConstraint.friction = cp.combinedFriction;
@@ -755,14 +753,9 @@ public class SequentialImpulseConstrainer extends Constrainer {
             }
 
             return 0f;
-        } finally {
-            BulletStats.popProfile();
-        }
     }
 
     public float solveGroupCacheFriendlyIterations(Collection<Collidable> bodies, int numBodies, Collection<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, FasterList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal/*,btStackAlloc* stackAlloc*/) {
-        BulletStats.pushProfile("solveGroupCacheFriendlyIterations");
-        try {
             int numConstraintPool = tmpSolverConstraintPool.size();
             int numFrictionPool = tmpSolverFrictionConstraintPool.size();
 
@@ -857,9 +850,6 @@ public class SequentialImpulseConstrainer extends Constrainer {
             }
 
             return 0f;
-        } finally {
-            BulletStats.popProfile();
-        }
     }
 
     public void orderPool(int j, IntArrayList pool) {
@@ -928,8 +918,6 @@ public class SequentialImpulseConstrainer extends Constrainer {
      */
     @Override
     public float solveGroup(Collection<Collidable> bodies, int numBodies, FasterList<PersistentManifold> manifoldPtr, int manifold_offset, int numManifolds, FasterList<TypedConstraint> constraints, int constraints_offset, int numConstraints, ContactSolverInfo infoGlobal, Intersecter intersecter) {
-        BulletStats.pushProfile("solveGroup");
-        try {
             // TODO: solver cache friendly
             if ((infoGlobal.solverMode & SolverMode.SOLVER_CACHE_FRIENDLY) != 0) {
                 // you need to provide at least some bodies
@@ -1008,9 +996,6 @@ public class SequentialImpulseConstrainer extends Constrainer {
             }
 
             return 0f;
-        } finally {
-            BulletStats.popProfile();
-        }
     }
 
     protected void prepareConstraints(PersistentManifold manifoldPtr, ContactSolverInfo info) {
@@ -1046,7 +1031,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
         for (int i = 0; i < numpoints; i++) {
             ManifoldPoint cp = manifoldPtr.getContactPoint(i);
-            if (cp.getDistance() <= 0f) {
+            if (cp.distance1 <= 0f) {
                 cp.getPositionWorldOnA(pos1);
                 cp.getPositionWorldOnB(pos2);
 
@@ -1072,11 +1057,11 @@ public class SequentialImpulseConstrainer extends Constrainer {
                 if (cpd != null) {
                     // might be invalid
                     cpd.persistentLifeTime++;
-                    if (cpd.persistentLifeTime != cp.getLifeTime()) {
+                    if (cpd.persistentLifeTime != cp.lifeTime) {
                         //printf("Invalid: cpd->m_persistentLifeTime = %i cp.getLifeTime() = %i\n",cpd->m_persistentLifeTime,cp.getLifeTime());
                         //new (cpd) btConstraintPersistentData;
                         cpd.reset();
-                        cpd.persistentLifeTime = cp.getLifeTime();
+                        cpd.persistentLifeTime = cp.lifeTime;
 
                     } else {
                         //printf("Persistent: cpd->m_persistentLifeTime = %i cp.getLifeTime() = %i\n",cpd->m_persistentLifeTime,cp.getLifeTime());
@@ -1091,7 +1076,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
                     totalCpd++;
                     //printf("totalCpd = %i Created Ptr %x\n",totalCpd,cpd);
                     cp.userPersistentData = cpd;
-                    cpd.persistentLifeTime = cp.getLifeTime();
+                    cpd.persistentLifeTime = cp.lifeTime;
                     //printf("CREATED: %x . cpd->m_persistentLifeTime = %i cp.getLifeTime() = %i\n",cpd,cpd->m_persistentLifeTime,cp.getLifeTime());
                 }
                 assert (cpd != null);
@@ -1113,7 +1098,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
                 float combinedRestitution = cp.combinedRestitution;
 
-                cpd.penetration = cp.getDistance(); ///btScalar(info.m_numIterations);
+                cpd.penetration = cp.distance1; ///btScalar(info.m_numIterations);
                 cpd.friction = cp.combinedFriction;
                 cpd.restitution = restitutionCurve(rel_vel, combinedRestitution);
                 if (cpd.restitution <= 0f) {
@@ -1207,7 +1192,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
     public static float solveCombinedContactFriction(Dynamic body0, Dynamic body1, ManifoldPoint cp, ContactSolverInfo info, int iter) {
         float maxImpulse = 0f;
 
-        if (cp.getDistance() <= 0f) {
+        if (cp.distance1 <= 0f) {
 //btConstraintPersistentData* cpd = (btConstraintPersistentData*) cp.m_userPersistentData;
             float impulse = ContactConstraint.resolveSingleCollisionCombined(body0, body1, cp, info);
 
@@ -1221,7 +1206,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
     protected static float solve(Dynamic body0, Dynamic body1, ManifoldPoint cp, ContactSolverInfo info, int iter) {
         float maxImpulse = 0f;
 
-        if (cp.getDistance() <= 0f) {
+        if (cp.distance1 <= 0f) {
             ConstraintPersistentData cpd = (ConstraintPersistentData) cp.userPersistentData;
             float impulse = cpd.contactSolverFunc.resolveContact(body0, body1, cp, info);
 
@@ -1234,7 +1219,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
     }
 
     protected static float solveFriction(Dynamic body0, Dynamic body1, ManifoldPoint cp, ContactSolverInfo info, int iter) {
-        if (cp.getDistance() <= 0f) {
+        if (cp.distance1 <= 0f) {
             ConstraintPersistentData cpd = (ConstraintPersistentData) cp.userPersistentData;
             cpd.frictionSolverFunc.resolveContact(body0, body1, cp, info);
         }

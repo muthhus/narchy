@@ -174,7 +174,7 @@ public class ExampleMultiviewSceneReconstruction {
 		motionWorldToCamera = new Se3_F64[colorImages.size()];
 		for (int i = 0; i < colorImages.size(); i++) {
 			motionWorldToCamera[i] = new Se3_F64();
-			imageFeature3D.add(new ArrayList<Feature3D>());
+			imageFeature3D.add(new ArrayList<>());
 		}
 
 		// pick the image most similar to the original image to initialize pose estimation
@@ -528,7 +528,7 @@ public class ExampleMultiviewSceneReconstruction {
 	 * Given a list of 3D features, find the feature which was observed at the specified frame at the
 	 * specified location.  If no feature is found return null.
 	 */
-	private Feature3D lookupFeature(List<Feature3D> features, int frameIndex, Point2D_F64 pixel) {
+	private static Feature3D lookupFeature(List<Feature3D> features, int frameIndex, Point2D_F64 pixel) {
 		for (int i = 0; i < features.size(); i++) {
 			Feature3D t = features.get(i);
 			for (int j = 0; j < t.frame.size(); j++) {

@@ -46,23 +46,21 @@
 //// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
 
     (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong)
-        //(S <-> (--,%P)), (P --> S) |- (--,(S --> P)), (Belief:ReduceConjunction, Goal:Strong)
-
-//Conversion
-    (P --> S), (S --> P),             task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief)
-
-//Inheritance to Similarity
-    (S <-> P), (S --> P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief)
-        //TODO negated subterm variant
 
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
 //If S is a special case of P, and P is a special case of S, then S and P are similar
 
     (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Goal:Strong)
 
+//Conversion
+    (P --> S), (S --> P), task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief)
+
+//Inheritance to Similarity
+    (S <-> P), (S --> P), task("?") |- (S <-> P),   (Belief:BeliefStructuralAbduction, Punctuation:Belief)
+
 //Similarity to Inheritance
-    (S --> P), (S <-> P), task("?") |- (S --> P),   (Belief:StructuralDeduction, Punctuation:Belief)
-    (S --> P), (S <-> P), task("@") |- (S --> P),   (Goal:StructuralDeduction, Punctuation:Goal)
+    (S --> P), (S <-> P), task("?") |- (S --> P),   (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    (S --> P), (S <-> P), task("@") |- (S --> P),   (Goal:BeliefStructuralDeduction, Punctuation:Goal)
 
 
 

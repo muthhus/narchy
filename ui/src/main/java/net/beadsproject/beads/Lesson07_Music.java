@@ -57,7 +57,8 @@ public class Lesson07_Music {
 				          Panner p = new Panner(ac, random(1));
 				          p.addInput(g);
 				          ac.out.addInput(p);
-				          ((Envelope)g.getGainUGen()).addSegment(random(0.1), random(50));
+						   Envelope gain = (Envelope) g.getGainUGen();
+						   gain.addSegment(random(0.1), random(50));
 				          ((Envelope)g.getGainUGen()).addSegment(0, random(400), new KillTrigger(p));
 				       }
 				       if(c.getCount() % 4 == 0) {
@@ -73,8 +74,8 @@ public class Lesson07_Music {
 				   }
 				 );
 		ac.out.addDependent(clock);
-		ac.start();
 
+		ac.start();
 		Util.pause(1000000);
 	}
 	

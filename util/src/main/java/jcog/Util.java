@@ -322,7 +322,7 @@ public enum Util {
      * http://www.opensource.org/licenses/cpl1.0.php                          *
      *                                                                        *
      **************************************************************************
-    */
+     */
 
 
     public static long hashPJW(String str) {
@@ -343,7 +343,7 @@ public enum Util {
 
         return hash;
     }
-   /* End Of  P. J. Weinberger Hash Function */
+    /* End Of  P. J. Weinberger Hash Function */
 
 
     public static long hashELF(String str) {
@@ -1143,7 +1143,9 @@ public enum Util {
     }
 
 
-    /** TODO make a version of this which can return the input array if no modifications occurr either by .equals() or identity */
+    /**
+     * TODO make a version of this which can return the input array if no modifications occurr either by .equals() or identity
+     */
     public static <X, Y> Y[] map(Function<X, Y> f, Y[] target, X... src) {
         int i = 0;
         for (X x : src) {
@@ -1152,7 +1154,10 @@ public enum Util {
         }
         return target;
     }
-    /** TODO make a version of this which can return the input array if no modifications occurr either by .equals() or identity */
+
+    /**
+     * TODO make a version of this which can return the input array if no modifications occurr either by .equals() or identity
+     */
     public static <X, Y> Y[] map(Function<X, Y> f, IntFunction<Y[]> targetBuilder, X... src) {
         int i = 0;
         Y[] target = targetBuilder.apply(src.length);
@@ -1257,9 +1262,9 @@ public enum Util {
         float weightSum = 0;
         for (int i = 0; i < weightCount; i++) {
             float w = weight.valueOf(i);
-            if (w!=w || w < 0)
+            if (w != w || w < 0)
                 System.err.println("x");
-            assert(w==w && w >= 0);
+            assert (w == w && w >= 0);
             weightSum += Math.max(0, w);
         }
         return weightSum;
@@ -1271,13 +1276,14 @@ public enum Util {
      */
     public static int decideRoulette(int weightCount, IntToFloatFunction weight, Random rng) {
         // calculate the total weight
-        assert(weightCount > 0);
+        assert (weightCount > 0);
         return decideRoulette(weightCount, weight, weightSum(weightCount, weight), rng);
     }
 
     public static enum RouletteControl {
         STOP, CONTINUE, WEIGHTS_CHANGED
     }
+
     public static void decideRoulette(int choices, IntToFloatFunction choiceWeight, Random rng, IntFunction<RouletteControl> each) {
         float weightSum = NaN;
         while (true) {
@@ -1285,15 +1291,19 @@ public enum Util {
                 weightSum = weightSum(choices, choiceWeight);
             }
             switch (each.apply(decideRoulette(choices, choiceWeight, weightSum, rng))) {
-                case STOP: return;
-                case CONTINUE: break;
-                case WEIGHTS_CHANGED: weightSum = Float.NaN; break;
+                case STOP:
+                    return;
+                case CONTINUE:
+                    break;
+                case WEIGHTS_CHANGED:
+                    weightSum = Float.NaN;
+                    break;
             }
         }
     }
 
     public static int decideSoftmax(int count, IntToFloatFunction weight, float temperature, Random random) {
-        return decideRoulette(count, (i)->
+        return decideRoulette(count, (i) ->
                 (float) Math.exp(weight.valueOf(i) / temperature), random);
     }
 
@@ -1311,8 +1321,11 @@ public enum Util {
         boolean dir = rng.nextBoolean(); //randomize the direction
 
         while ((distance = distance - weight.valueOf(i)) > 0) {
-            if (dir) { if (++i == count) i = 0;}
-            else { if (--i == -1) i = count-1; }
+            if (dir) {
+                if (++i == count) i = 0;
+            } else {
+                if (--i == -1) i = count - 1;
+            }
         }
 
         return i;
@@ -1356,6 +1369,7 @@ public enum Util {
     public static float sqr(float f) {
         return f * f;
     }
+
     public static double sqr(double f) {
         return f * f;
     }
@@ -1423,22 +1437,23 @@ public enum Util {
     public static void pause(long milli) {
         if (milli <= 0) return;
 
-        Thread t = Thread.currentThread();
+        final Thread t = Thread.currentThread();
         long start = System.currentTimeMillis();
-        long now;
-        while ((now = System.currentTimeMillis()) - start < milli) {
-            synchronized (t) {
+        long now = start;
+        while (now - start < milli) {
+            long ignore = milli - (now - start);
+            if (ignore > 0L) {
                 try {
-                    long ignore = milli - (now - start);
-                    if (ignore > 0L) {
+                    synchronized (t) {
                         t.wait(ignore);
                     }
                 } catch (InterruptedException var9) {
                 }
             }
+            now = System.currentTimeMillis();
         }
-
     }
+
 
     public static boolean sleep(long periodMS) {
         if (periodMS < 0) {
@@ -1608,12 +1623,16 @@ public enum Util {
 //        return 1.0f - product;
 //    }
 
-    /** a and b should be in 0..1.0 unit domain; output will also */
+    /**
+     * a and b should be in 0..1.0 unit domain; output will also
+     */
     public static float or(float a, float b) {
         return 1.0f - ((1.0f - a) * (1.0f - b));
     }
 
-    /** a and b should be in 0..1.0 unit domain; output will also */
+    /**
+     * a and b should be in 0..1.0 unit domain; output will also
+     */
     public static float and(float a, float b) {
         return a * b;
     }
@@ -1776,45 +1795,47 @@ public enum Util {
 
     public static void toMap(Frequency f, String header, BiConsumer<String, Object> x) {
         f.entrySetIterator().forEachRemaining((e) -> {
-            x.accept(header + " " + e.getKey(), e.getValue() );
+            x.accept(header + " " + e.getKey(), e.getValue());
         });
     }
 
 
     public static void decode(AbstractHistogram h, String header, int linearStep, BiConsumer<String, Object> x) {
-        int digits = (int) (1+Math.log10(h.getMaxValue())); //pad leading number for lexicographic / ordinal coherence
-        h.linearBucketValues(linearStep).iterator().forEachRemaining((p)->{
+        int digits = (int) (1 + Math.log10(h.getMaxValue())); //pad leading number for lexicographic / ordinal coherence
+        h.linearBucketValues(linearStep).iterator().forEachRemaining((p) -> {
             x.accept(header + " [" +
-                    iPad(p.getValueIteratedFrom(), digits) + ".." + iPad(p.getValueIteratedTo(), digits) + ']',
-                   p.getCountAddedInThisIterationStep());
+                            iPad(p.getValueIteratedFrom(), digits) + ".." + iPad(p.getValueIteratedTo(), digits) + ']',
+                    p.getCountAddedInThisIterationStep());
         });
     }
+
     public static void decode(DoubleHistogram h, String header, double linearStep, BiConsumer<String, Object> x) {
         final char[] order = {'a'};
-        h.linearBucketValues(linearStep).iterator().forEachRemaining((p)->{
+        h.linearBucketValues(linearStep).iterator().forEachRemaining((p) -> {
             x.accept(header + " " + (order[0]++) +
-                   "[" + n4(p.getValueIteratedFrom()) + ".." + n4(p.getValueIteratedTo()) + ']',
-                   p.getCountAddedInThisIterationStep());
+                            "[" + n4(p.getValueIteratedFrom()) + ".." + n4(p.getValueIteratedTo()) + ']',
+                    p.getCountAddedInThisIterationStep());
         });
     }
 
     public static void decodePercentile(AbstractHistogram h, String header, BiConsumer<String, Object> x) {
         h.percentiles(1).iterator().forEachRemaining(p -> {
-           x.accept(header + " [" +
-                   p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + ']',
-                   p.getCountAddedInThisIterationStep());
+            x.accept(header + " [" +
+                            p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + ']',
+                    p.getCountAddedInThisIterationStep());
         });
     }
 
-    /** pretty close
+    /**
+     * pretty close
      * http://www.musicdsp.org/showone.php?id=238
      * https://en.wikipedia.org/wiki/Pad%C3%A9_approximant
      * http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJ4KigyNyt4KngpLygyNys5KngqeCkiLCJjb2xvciI6IiMxQjM3QTgifSx7InR5cGUiOjAsImVxIjoidGFuaCh4KSIsImNvbG9yIjoiIzVBQzIzQSJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0xLjczMzE5OTc5MDA3OTk5NjIiLCIwLjAxMTYzMDY3MzkyMDAwMDI3OCIsIi0xLjA2MTExNDM0NzUxOTk5OCIsIjAuMDEyNjI3NDc2NDgwMDAwNjc3Il19XQ--
-     * */
+     */
     public static float tanhFast(float x) {
         if (x <= -3) return -1f;
         if (x >= 3f) return +1f;
-        return x * ( 27 + x * x ) / ( 27 + 9 * x * x );
+        return x * (27 + x * x) / (27 + 9 * x * x);
     }
 
     public static Object toString(Object x) {

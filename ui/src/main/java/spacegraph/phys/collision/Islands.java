@@ -24,7 +24,6 @@
 package spacegraph.phys.collision;
 
 import jcog.list.FasterList;
-import spacegraph.phys.BulletStats;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Collisions;
 import spacegraph.phys.collision.broad.BroadphasePair;
@@ -121,8 +120,7 @@ public class Islands {
 
         //System.out.println("builder islands");
 
-        BulletStats.pushProfile("islandUnionFindAndQuickSort");
-        try {
+
             islandmanifold.clearFast();
 
             // we are going to sort the unionfind array, and store the element id in the size
@@ -251,12 +249,10 @@ public class Islands {
                     }
                 }
             }
-        } finally {
-            BulletStats.popProfile();
-        }
+
     }
 
-    public void islandError(Collidable colObj0) {
+    public static void islandError(Collidable colObj0) {
         System.err.println("error in island management: " + colObj0 + " " + colObj0.data());
     }
 
@@ -267,8 +263,7 @@ public class Islands {
         int startIslandIndex;
         int numElem = find.size();
 
-        BulletStats.pushProfile("processIslands");
-        try {
+
             //#ifndef SPLIT_ISLANDS
             //btPersistentManifold** manifold = dispatcher->getInternalManifoldPointer();
             //
@@ -350,9 +345,7 @@ public class Islands {
 
 
             //#endif //SPLIT_ISLANDS
-        } finally {
-            BulletStats.popProfile();
-        }
+
     }
 
     ////////////////////////////////////////////////////////////////////////////

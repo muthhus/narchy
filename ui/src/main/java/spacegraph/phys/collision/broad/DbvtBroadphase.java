@@ -165,7 +165,7 @@ public class DbvtBroadphase extends Broadphase {
 		forEach(root, maxClusterPopulation, population, 0, each);
 	}
 
-	public int forEach(Node node, int maxClusterPopulation, int unvisited, int level, Consumer<List<Collidable>> each) {
+	public static int forEach(Node node, int maxClusterPopulation, int unvisited, int level, Consumer<List<Collidable>> each) {
 
 
 		//HACK approximate cluster segmentation, a better one can be designed which will more evenly partition the set

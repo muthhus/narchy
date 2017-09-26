@@ -564,28 +564,33 @@ public class Matrix4f implements java.io.Serializable, Cloneable {
      * @param v   the vector into which the matrix row values will be copied
      */
     public final void getRow(int row, Vector4f v) {
-        if (row == 0) {
-            v.x = m00;
-            v.y = m01;
-            v.z = m02;
-            v.w = m03;
-        } else if (row == 1) {
-            v.x = m10;
-            v.y = m11;
-            v.z = m12;
-            v.w = m13;
-        } else if (row == 2) {
-            v.x = m20;
-            v.y = m21;
-            v.z = m22;
-            v.w = m23;
-        } else if (row == 3) {
-            v.x = m30;
-            v.y = m31;
-            v.z = m32;
-            v.w = m33;
-        } else {
-            throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix4f2"));
+        switch (row) {
+            case 0:
+                v.x = m00;
+                v.y = m01;
+                v.z = m02;
+                v.w = m03;
+                break;
+            case 1:
+                v.x = m10;
+                v.y = m11;
+                v.z = m12;
+                v.w = m13;
+                break;
+            case 2:
+                v.x = m20;
+                v.y = m21;
+                v.z = m22;
+                v.w = m23;
+                break;
+            case 3:
+                v.x = m30;
+                v.y = m31;
+                v.z = m32;
+                v.w = m33;
+                break;
+            default:
+                throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix4f2"));
         }
 
     }
@@ -597,28 +602,33 @@ public class Matrix4f implements java.io.Serializable, Cloneable {
      * @param v   the array into which the matrix row values will be copied
      */
     public final void getRow(int row, float v[]) {
-        if (row == 0) {
-            v[0] = m00;
-            v[1] = m01;
-            v[2] = m02;
-            v[3] = m03;
-        } else if (row == 1) {
-            v[0] = m10;
-            v[1] = m11;
-            v[2] = m12;
-            v[3] = m13;
-        } else if (row == 2) {
-            v[0] = m20;
-            v[1] = m21;
-            v[2] = m22;
-            v[3] = m23;
-        } else if (row == 3) {
-            v[0] = m30;
-            v[1] = m31;
-            v[2] = m32;
-            v[3] = m33;
-        } else {
-            throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix4f2"));
+        switch (row) {
+            case 0:
+                v[0] = m00;
+                v[1] = m01;
+                v[2] = m02;
+                v[3] = m03;
+                break;
+            case 1:
+                v[0] = m10;
+                v[1] = m11;
+                v[2] = m12;
+                v[3] = m13;
+                break;
+            case 2:
+                v[0] = m20;
+                v[1] = m21;
+                v[2] = m22;
+                v[3] = m23;
+                break;
+            case 3:
+                v[0] = m30;
+                v[1] = m31;
+                v[2] = m32;
+                v[3] = m33;
+                break;
+            default:
+                throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix4f2"));
         }
 
     }
@@ -631,28 +641,33 @@ public class Matrix4f implements java.io.Serializable, Cloneable {
      * @param v      the vector into which the matrix row values will be copied
      */
     public final void getColumn(int column, Vector4f v) {
-        if (column == 0) {
-            v.x = m00;
-            v.y = m10;
-            v.z = m20;
-            v.w = m30;
-        } else if (column == 1) {
-            v.x = m01;
-            v.y = m11;
-            v.z = m21;
-            v.w = m31;
-        } else if (column == 2) {
-            v.x = m02;
-            v.y = m12;
-            v.z = m22;
-            v.w = m32;
-        } else if (column == 3) {
-            v.x = m03;
-            v.y = m13;
-            v.z = m23;
-            v.w = m33;
-        } else {
-            throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix4f4"));
+        switch (column) {
+            case 0:
+                v.x = m00;
+                v.y = m10;
+                v.z = m20;
+                v.w = m30;
+                break;
+            case 1:
+                v.x = m01;
+                v.y = m11;
+                v.z = m21;
+                v.w = m31;
+                break;
+            case 2:
+                v.x = m02;
+                v.y = m12;
+                v.z = m22;
+                v.w = m32;
+                break;
+            case 3:
+                v.x = m03;
+                v.y = m13;
+                v.z = m23;
+                v.w = m33;
+                break;
+            default:
+                throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix4f4"));
         }
 
     }
@@ -665,28 +680,33 @@ public class Matrix4f implements java.io.Serializable, Cloneable {
      * @param v      the array into which the matrix row values will be copied
      */
     public final void getColumn(int column, float v[]) {
-        if (column == 0) {
-            v[0] = m00;
-            v[1] = m10;
-            v[2] = m20;
-            v[3] = m30;
-        } else if (column == 1) {
-            v[0] = m01;
-            v[1] = m11;
-            v[2] = m21;
-            v[3] = m31;
-        } else if (column == 2) {
-            v[0] = m02;
-            v[1] = m12;
-            v[2] = m22;
-            v[3] = m32;
-        } else if (column == 3) {
-            v[0] = m03;
-            v[1] = m13;
-            v[2] = m23;
-            v[3] = m33;
-        } else {
-            throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix4f4"));
+        switch (column) {
+            case 0:
+                v[0] = m00;
+                v[1] = m10;
+                v[2] = m20;
+                v[3] = m30;
+                break;
+            case 1:
+                v[0] = m01;
+                v[1] = m11;
+                v[2] = m21;
+                v[3] = m31;
+                break;
+            case 2:
+                v[0] = m02;
+                v[1] = m12;
+                v[2] = m22;
+                v[3] = m32;
+                break;
+            case 3:
+                v[0] = m03;
+                v[1] = m13;
+                v[2] = m23;
+                v[3] = m33;
+                break;
+            default:
+                throw new ArrayIndexOutOfBoundsException(VecMathI18N.getString("Matrix4f4"));
         }
 
     }

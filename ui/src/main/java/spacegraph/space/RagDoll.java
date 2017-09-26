@@ -77,7 +77,7 @@ public class RagDoll  {
         Transform groundTransform = new Transform();
         groundTransform.setIdentity();
         groundTransform.set(0f, -15f, 0f);
-        d.newBody(0f, groundTransform, groundShape);
+        JoglPhysics.newBody(0f, groundTransform, groundShape);
     }
 
 
@@ -475,7 +475,7 @@ public class RagDoll  {
 //        }
 //    }
 
-    private Dynamic localCreateRigidBody(float mass, Transform startTransform, CollisionShape shape) {
+    private static Dynamic localCreateRigidBody(float mass, Transform startTransform, CollisionShape shape) {
         //stack.vectors.push();
         //try {
 

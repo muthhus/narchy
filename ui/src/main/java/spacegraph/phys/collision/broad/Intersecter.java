@@ -60,7 +60,7 @@ public abstract class Intersecter {
 
 	//public abstract Object allocateCollisionAlgorithm(int size);
 
-	public final void freeCollisionAlgorithm(CollisionAlgorithm algo) {
+	public static void freeCollisionAlgorithm(CollisionAlgorithm algo) {
 		algo.destroy();
 	}
 	

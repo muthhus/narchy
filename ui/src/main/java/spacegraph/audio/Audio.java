@@ -21,9 +21,11 @@ public class Audio implements Runnable {
     /**
      * the default audio system
      */
-    public static synchronized Audio the() {
-        if (defaultAudio == null) {
-            defaultAudio = new Audio(4);
+    public static Audio the() {
+        synchronized (logger) {
+            if (defaultAudio == null) {
+                defaultAudio = new Audio(4);
+            }
         }
         return defaultAudio;
     }
@@ -106,7 +108,7 @@ public class Audio implements Runnable {
 		Mixer.Info[] mixerinfo = AudioSystem.getMixerInfo();
 		for (int i = 0; i < mixerinfo.length; i++) {
 			String name = mixerinfo[i].getName();
-			if (name.equals(""))
+			if (name.isEmpty())
 				name = "No name";
 			System.out.println((i+1) + ") " + name + " --- " + mixerinfo[i].getDescription());
 			Mixer m = AudioSystem.getMixer(mixerinfo[i]);
@@ -121,7 +123,7 @@ public class Audio implements Runnable {
 
         //if (rec != null) //...
 
-        logger.info("recording to: " + path);
+        logger.info("recording to: {}", path);
         rec = new FileOutputStream(new File(path), false);
 
 //        PipedInputStream pi = new PipedInputStream();
@@ -152,7 +154,7 @@ public class Audio implements Runnable {
     static class DefaultSource implements SoundSource {
 
         private final SoundProducer producer;
-        final float distanceFactor = 1.0f;
+        static final float distanceFactor = 1.0f;
         private final float balance;
 
         DefaultSource(SoundProducer p, float balance) {
@@ -241,7 +243,7 @@ public class Audio implements Runnable {
                 idle = 0;
             }
 
-            now = (float) (System.currentTimeMillis() - now);
+            now = System.currentTimeMillis() - now;
 
             clientTick(now);
 

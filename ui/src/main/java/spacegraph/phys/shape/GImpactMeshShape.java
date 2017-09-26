@@ -212,11 +212,7 @@ public class GImpactMeshShape extends GImpactShape {
 		return "GImpactMesh";
 	}
 
-	@Override
-	public void rayTest(v3 rayFrom, v3 rayTo, Collisions.RayResultCallback resultCallback) {
-	}
-
-	@Override
+    @Override
 	public void processAllTriangles(TriangleCallback callback, v3 aabbMin, v3 aabbMax) {
 		int i = mesh_parts.size();
 		while ((i--) != 0) {

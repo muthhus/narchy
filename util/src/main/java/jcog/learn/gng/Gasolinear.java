@@ -28,15 +28,13 @@ public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DCentroid> {
 
     public Gasolinear(int nodes, double min, double max) {
         super(1, nodes);
-        setAlpha(2f/nodes);
-        randomUniform(min, max);
-    }
-
-    public void randomUniform(double min, double max) {
         this.min = min;
         this.max = max;
-        nodeStream().forEach(x -> x.randomizeUniform(min, max));
+        for (int i = 0; i < nodes; i++) {
+            centroids[i].setEntry(0, (max-min)*(i/(nodes-1f))+min);
+        }
     }
+
 
     public static Gasolinear of(int nodes, double... points) {
         double min = Doubles.min(points);

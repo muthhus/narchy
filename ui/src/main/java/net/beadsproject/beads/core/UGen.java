@@ -251,16 +251,12 @@ public abstract class UGen extends Bead {
 			}
 			break;
 		case NULL:
-			for(int i = 0; i < outs; i++) {
-				bufOut[i] = null;
-			}
+			Arrays.fill(bufOut, 0, outs, null);
 			break;
 		case RETAIN:
 			break;
 		default:
-			for(int i = 0; i < outs; i++) {
-				bufOut[i] = null;
-			}
+			Arrays.fill(bufOut, 0, outs, null);
 			break;
 		}
 	}

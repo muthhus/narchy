@@ -11,8 +11,4 @@ public class Stacking extends Layout {
         super(children);
     }
 
-    @Override
-    public void layout() {
-        //?
-    }
 }

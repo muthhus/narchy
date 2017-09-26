@@ -123,7 +123,7 @@ public class BaseSlider extends Widget {
         , 800, 800 );
     }
 
-    private float p(v2 hitPoint) {
+    private static float p(v2 hitPoint) {
 
         //TODO interpret point coordinates according to the current drawn model, which could be a knob etc
 

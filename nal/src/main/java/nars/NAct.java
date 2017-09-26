@@ -408,7 +408,7 @@ public interface NAct {
 
             float restConf =
                     //n.confMin.floatValue() * 2;
-                    nar().confDefault(GOAL)/2f;
+                    nar().confDefault(GOAL);
 
             //n.confDefault(BELIEF);
             //0;

@@ -14,7 +14,7 @@ public class NAL2Test extends AbstractNALTest {
 //        super(b);
 //    }
 
-    static final int cycles = 100;
+    static final int cycles = 200;
 
 //    @Parameterized.Parameters(name = "{0}")
 //    public static Iterable<Supplier<NAR>> configurations() {
@@ -129,7 +129,7 @@ public class NAL2Test extends AbstractNALTest {
         TestNAR tester = test;
         tester.believe("<bird <-> swan>", 0.9f, 0.9f);//a bird is similar to a swan.");
         tester.ask("<swan --> bird>");//Is swan a type of bird?");
-        tester.mustBelieve(cycles, "<swan --> bird>", 0.9f, 0.81f);//A swan is a type of bird.");
+        tester.mustBelieve(cycles, "<swan --> bird>", 0.9f, 0.73f);//A swan is a type of bird.");
 
     }
 

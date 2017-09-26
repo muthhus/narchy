@@ -747,7 +747,7 @@ public class ExampleStereoTwoViewsOneCamera {
     public static class DisparityPointCloudViewer extends AbstractSpatial {
 
         final int capacity = 8000;
-        final CircularArrayList<ColorPoint3D> cloud = new CircularArrayList<ColorPoint3D>(capacity);
+        final CircularArrayList<ColorPoint3D> cloud = new CircularArrayList<>(capacity);
 
         // distance between the two camera centers
         double baseline;

@@ -38,7 +38,8 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         return
                 //(1f + t.evi()) *
                 //(1f + t.conf(start,end,dur));
-                (1f + t.conf()) * //raw because time is considered below. this covers cases where the task eternalizes
+                (1f + t.evi()) * //raw because time is considered below. this covers cases where the task eternalizes
+                //(1f + t.conf()) * //raw because time is considered below. this covers cases where the task eternalizes
                 //t.evi(start,end,dur) *
                 //t.conf(now, dur) *
                 //t.evi(now, dur) *

@@ -53,18 +53,21 @@ public class LinkClustering extends DurService {
 //
 //    };
 
-    final static BagClustering.Dimensionalize<Task> TimeClusterModel = new BagClustering.Dimensionalize<Task>(1) {
+    final static BagClustering.Dimensionalize<Task> TimeClusterModel = new BagClustering.Dimensionalize<Task>(2) {
 
         @Override
         public void coord(Task t, double[] c) {
             c[0] = t.mid();
+            c[1] = t.range();
         }
 
         @Override
         public double distanceSq(double[] a, double[] b) {
             return Util.sqr(
                       Math.abs(a[0] - b[0])
-                    );
+                    ) +
+
+                    Util.sqr( Math.abs(a[1] - b[1]) );
         }
     };
 

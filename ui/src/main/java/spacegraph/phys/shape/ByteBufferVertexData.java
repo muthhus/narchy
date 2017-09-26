@@ -72,14 +72,13 @@ public class ByteBufferVertexData extends VertexData {
 
 	@Override
 	public int getIndex(int idx) {
-		if (indexType == ScalarType.SHORT) {
-			return indexData.getShort(idx*indexStride) & 0xFFFF;
-		}
-		else if (indexType == ScalarType.INTEGER) {
-			return indexData.getInt(idx*indexStride);
-		}
-		else {
-			throw new IllegalStateException("indicies type must be short or integer");
+		switch (indexType) {
+			case SHORT:
+				return indexData.getShort(idx * indexStride) & 0xFFFF;
+			case INTEGER:
+				return indexData.getInt(idx * indexStride);
+			default:
+				throw new IllegalStateException("indicies type must be short or integer");
 		}
 	}
 

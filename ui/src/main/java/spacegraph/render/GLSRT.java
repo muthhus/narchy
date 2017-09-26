@@ -180,7 +180,7 @@ public class GLSRT {
 		}
 	}
 	
-	private static final Map<SphereKey,ImmModeSink> sphereDisplayLists = new HashMap<SphereKey,ImmModeSink>();
+	private static final Map<SphereKey,ImmModeSink> sphereDisplayLists = new HashMap<>();
 	private static final SphereKey sphereKey = new SphereKey();
 	
 	public void drawSphere(GL gl, float radius) {
@@ -228,7 +228,7 @@ public class GLSRT {
 			if (obj == null || !(obj instanceof CylinderKey)) return false;
 			CylinderKey other = (CylinderKey) obj;
 			if (radius != other.radius) return false;
-            return !(halfHeight != other.halfHeight);
+            return halfHeight == other.halfHeight;
         }
 
 		@Override
@@ -240,7 +240,7 @@ public class GLSRT {
 		}
 	}
 	
-	private static final Map<CylinderKey,ImmModeSink> cylinderDisplayLists = new HashMap<CylinderKey,ImmModeSink>();
+	private static final Map<CylinderKey,ImmModeSink> cylinderDisplayLists = new HashMap<>();
 	private static final CylinderKey cylinderKey = new CylinderKey();
 	
 	public void drawCylinder(GL2 gl, float radius, float halfHeight, int upAxis) {
