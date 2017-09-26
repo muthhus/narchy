@@ -172,6 +172,12 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals("(--,((P)==>(Q)))", $("((P)==>(--,(Q)))").toString());
         assertEquals(("((--,(P))==>(Q))"), $("((--,(P))==>(Q))").toString()); //SAME should not change
     }
+    @Test
+    public void testConjInhReflexive() throws Narsese.NarseseException {
+        assertEquals("((a &&+5 x)-->a)", $("((a &&+5 x)-->a)").toString());
+        assertEquals("(x-->(a &&+5 x))", $("(x-->(a &&+5 x))").toString());
+        assertEquals("((a&&b)-->(a&&c))", $("((a&&b)-->(a&&c))").toString());
+    }
 
     @Test
     public void testPointlessImplicationSubtermRepeat() throws Narsese.NarseseException {

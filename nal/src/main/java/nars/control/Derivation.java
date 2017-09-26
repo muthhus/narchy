@@ -103,7 +103,9 @@ public class Derivation extends Unify implements TermContext {
      */
     public boolean temporal;
 
-    public boolean cyclic, overlap;
+    //public boolean cyclic, overlap;
+    public float cyclic, overlap;
+
     public float premisePri;
     public short[] parentCause;
     public final long[] derivedOcc = new long[2];
@@ -276,7 +278,6 @@ public class Derivation extends Unify implements TermContext {
         this.beliefTerm = bt;
         this.parentComplexity = Math.max(taskTerm.complexity(), bt.complexity());
 
-        this.cyclic = task.cyclic(); //belief cyclic should not be considered because in single derivation its evidence will not be used any way
 
         switch (this.taskPunct = task.punc()) {
             case QUESTION:
@@ -287,6 +288,7 @@ public class Derivation extends Unify implements TermContext {
                 this.taskTruth = task.truth();
         }
 
+        long[] taskStamp = task.stamp();
         if (belief != null) {
             this.beliefTruthRaw = belief.truth();
 
@@ -305,11 +307,19 @@ public class Derivation extends Unify implements TermContext {
             }
 
 
-            overlap = (cyclic |= belief.cyclic()) || Stamp.overlapping(task, belief);
+
+            int cycNum = ((task.cyclic() ? 1 : 0) + (belief.cyclic() ? 1 : 0));
+
+            long[] beliefStamp = belief.stamp();
+
+            this.cyclic = cycNum == 0 ? 0f : (((float)cycNum) / ((taskStamp.length + beliefStamp.length) - cycNum));
+            this.overlap = Stamp.overlapFraction(taskStamp, beliefStamp);
 
         } else {
             this.beliefTruth = this.beliefTruthRaw = null;
-            this.overlap = false;
+
+            this.cyclic = task.cyclic() ? 1f / (taskStamp.length - 1f) : 0;
+            this.overlap = 0;
         }
 
 

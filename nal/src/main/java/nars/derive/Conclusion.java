@@ -118,6 +118,8 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
         } else {
             c2 = c1.temporalize(Retemporalize.retemporalizeAllToDTERNAL);
+            if (c2 == null)
+                return false;
         }
 
         c2 = c2.normalize();

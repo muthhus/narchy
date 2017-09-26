@@ -171,9 +171,16 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
         Task fg;
         Task fb;
+        long goalTime =
+                //now;
+                now-dur/2;
+        long beliefTime =
+                //now;
+                now+dur/2;
+
         in.input(
-            fg = feedGoal.set(term, g, stamper, now/*-dur/2*/, dur, nar),
-            fb = feedBelief.set(term, f, stamper, now/*+dur/2*/, dur, nar)
+            fg = feedGoal.set(term, g, stamper, goalTime, dur, nar),
+            fb = feedBelief.set(term, f, stamper, beliefTime, dur, nar)
         );
 
         beliefFeedback.accept(feedBelief.get() /* in case stretched */, nar);

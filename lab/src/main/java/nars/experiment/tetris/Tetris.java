@@ -503,7 +503,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
             Tetris a = null;
             try {
                 //n.truthResolution.setValue(0.05f);
-                a = new MyTetris(n);
+                a = new Tetris(n, Tetris.tetris_width, Tetris.tetris_height, 2);
                 //a.durations.setValue(2f);
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
@@ -526,7 +526,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            });
 
             return a;
-        }, 20f);
+        }, 10f);
 
 
 //
@@ -753,21 +753,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        });
     }
 
-    public static class MyTetris extends Tetris {
-
-        public MyTetris(NAR nar) throws Narsese.NarseseException {
-            super(nar, Tetris.tetris_width, Tetris.tetris_height, 1);
-
-//                view.plot1 =
-//                        Vis.emotionPlots(nar, 256);
-//
-//
-//                view.plot2 = Vis.agentBudgetPlot(this, 256);
-
-            //window(view, 600, 600);
-        }
-    }
-
     public static class OfflineTetris {
         public static void main(String[] args) throws Narsese.NarseseException {
             Param.DEBUG = true;
@@ -777,7 +762,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
             n.truthResolution.setValue(0.1f);
             //new Abbreviation(n, "z", 3, 8, 0.1f, 32);
 
-            new MyTetris(n);
+            new Tetris(n, Tetris.tetris_width, Tetris.tetris_height, 1);
             n.run(200);
 
             //n.concepts().map(x -> x.toString()).sorted().forEach(c -> {

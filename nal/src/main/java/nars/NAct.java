@@ -9,6 +9,7 @@ import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
 import nars.task.ITask;
 import nars.term.Term;
+import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
@@ -26,6 +27,8 @@ import static jcog.Util.unitize;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.c2wSafe;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Created by me on 9/30/16.
@@ -392,12 +395,14 @@ public interface NAct {
 
         //boolean highpass = true;
 
-        //final float evi[] = new float[2];
+
+        final float f[] = new float[2];
+        final float c[] = new float[2];
         final float exp[] = new float[2];
 
-        @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
+        @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (action, g) -> {
 
-            boolean p = c.term().equals(pt);
+            boolean p = action.term().equals(pt);
             float f0, c0;
 
             NAR n = nar();
@@ -408,12 +413,15 @@ public interface NAct {
 
             float restConf =
                     //n.confMin.floatValue() * 2;
+                    //nar().confDefault(GOAL)/2;
                     nar().confDefault(GOAL);
 
             //n.confDefault(BELIEF);
             //0;
 
             int ip = p ? 0 : 1;
+            f[ip] = g!=null ? g.freq() : 0f;
+            c[ip] = g!=null ? g.conf() : 0f;
             exp[ip] = g != null ? g.expectation() : 0f;
             //evi[ip] = g != null ? g.evi(): 0f;
 
@@ -429,6 +437,7 @@ public interface NAct {
                         rng.nextFloat(),
                         restConf
                     ) - 0.5f)*2f;
+                    c[0] = c[1] = restConf;
                 } else {
 
 //                    int winner =
@@ -450,13 +459,14 @@ public interface NAct {
 
                     //compare positive vs negative
                     x =
-                            ((exp[0]-0.5f) - (exp[1]-0.5f));  //-1..+1
+                            ((f[0]-0.5f) - (f[1]-0.5f));  //-1..+1
+                            //((exp[0]-0.5f) - (exp[1]-0.5f));  //-1..+1
+                            //(1 - Math.abs(exp[0] - exp[1])) * (f[0]-0.5f) - (f[1]-0.5f);  //-1..+1 discounted by difference in expectation
                 }
 
-                //int winner = ew >= 0f ? 0 : 1;
-//                int loser = 1 - winner;
 
-                Truth N, P;
+
+                PreciseTruth N, P;
 
                 float y = update.valueOf(x); //-1..+1
 
@@ -464,8 +474,11 @@ public interface NAct {
                 float conf = y == y ?
                             //restConf/2f,
                             //Math.abs(y) * Math.abs(x)
-                            Math.abs(y) * restConf
+                            //Math.abs(y) * restConf
                             //Math.abs(y)
+                            //w2c((c2wSafe(c[0]) + c2wSafe(c[1]))/2f)
+                            //Math.max(c[0],c[1])
+                            Math.min(c[0],c[1])
                         : 0;
 
                 //w2c(Math.abs(y) * c2w(restConf));
@@ -474,16 +487,25 @@ public interface NAct {
                     //0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
 
                     P = $.t(1, conf);
-                    N = $.t(0f, conf);
+                    N = $.t(0.5f, conf);
                 } else {
+                    //P = N = $.t(0.5f, conf);
                     N = P = null;
                 }
 
 
-                Truth pp = y >= 0 ? P : N;
-                ((GoalActionAsyncConcept) n.concept(pt)).feedback(pp, pp, n);
-                Truth nn = y >= 0 ? N : P;
-                ((GoalActionAsyncConcept) n.concept(nt)).feedback(nn, nn, n);
+                PreciseTruth pb = y >= 0 ? P : N;
+                PreciseTruth pg =
+                        //pb;
+                        //null;
+                        pb!=null ? pb.eviMult(0.5f) : null;
+                ((GoalActionAsyncConcept) n.concept(pt)).feedback(pb, pg, n);
+                PreciseTruth nb = y >= 0 ? N : P;
+                PreciseTruth ng =
+                        //nb;
+                        //null;
+                        nb!=null ? nb.eviMult(0.5f) : null;
+                ((GoalActionAsyncConcept) n.concept(nt)).feedback(nb, ng, n);
             }
         };
 

@@ -1250,7 +1250,7 @@ public enum Op implements $ {
             c -> !c.isAny(relationDelimeter);
 
     public static final Predicate<Term> onlyTemporal =
-            c -> c.op().temporal && !concurrent(c.dt());
+            c -> concurrent(c.dt());
     //c.op()!=CONJ || concurrent(c.dt()); //!c.op().temporal || concurrent(c.dt());
 
     private static final int InvalidImplicationSubj = or(IMPL);
@@ -1447,7 +1447,13 @@ public enum Op implements $ {
         }
 
 
-        Predicate<Term> delim = op == IMPL ? Op.onlyTemporal : Op.recursiveCommonalityDelimeter;
+        Predicate<Term> delim =
+                op == IMPL ?
+                    (dtConcurrent ? (x)->true :
+                            Op.recursiveCommonalityDelimeter) :
+                            //Op.onlyTemporal) :
+
+                    Op.recursiveCommonalityDelimeter;
 
         if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
                 (op != IMPL || dtConcurrent)) { //apply to: inh, sim, and current impl

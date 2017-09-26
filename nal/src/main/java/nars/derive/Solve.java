@@ -1,13 +1,12 @@
 package nars.derive;
 
-import nars.$;
 import nars.control.Derivation;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.Collections;
 
 import static nars.Op.*;
 
@@ -36,21 +35,23 @@ abstract public class Solve extends AbstractPred<Derivation> {
      * create a Pre-Solve predicate for quick filtering in the pre tests
      */
     public Iterable<PrediTerm<Derivation>> preSolve() {
-        List<PrediTerm<Derivation>> l = $.newArrayList();
-        boolean override = this instanceof SolvePuncOverride;
-        if (override) {
-            switch (((SolvePuncOverride) this).puncOverride) {
-                case QUESTION:
-                case QUEST:
-                    l.add(NotCyclic); //since this is the provided punctuation it will need tested always
-                    //TODO: other cases: single test, etc..
-                    break;
-            }
-        } else {
-            //determined by the derivation itself so needs tested in any case
-            l.add(NotCyclicIfTaskIsQuestionOrQuest);
-        }
-        return l;
+        return Collections.emptyList();
+
+//        List<PrediTerm<Derivation>> l = $.newArrayList();
+//        boolean override = this instanceof SolvePuncOverride;
+//        if (override) {
+//            switch (((SolvePuncOverride) this).puncOverride) {
+//                case QUESTION:
+//                case QUEST:
+//                    l.add(NotCyclic); //since this is the provided punctuation it will need tested always
+//                    //TODO: other cases: single test, etc..
+//                    break;
+//            }
+//        } else {
+//            //determined by the derivation itself so needs tested in any case
+//            l.add(NotCyclicIfTaskIsQuestionOrQuest);
+//        }
+//        return l;
     }
 
     @Override
@@ -69,14 +70,17 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
                 single = f.single();
 
-
                 if (!single) {
                     if ((beliefProjected ? d.beliefTruth : d.beliefTruthRaw) == null)
                         return false; //double premise requiring a belief, but belief is null
                 }
 
-                if (!f.allowOverlap() && (single ? d.cyclic : d.overlap))
-                    return false;
+                if (!f.allowOverlap()) {
+                    float co = (single ? d.cyclic : d.overlap);
+                    if (co >= 1f || d.random.nextFloat() < co) {
+                        return false;
+                    }
+                }
 
                 //truth function is single premise so set belief truth to be null to prevent any negations below:
                 float confMin = d.confMin;
@@ -96,7 +100,8 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
             case QUEST:
             case QUESTION:
-                //if (d.cyclic) return false; //HANDLED IN PRESOLVE CASES
+                if (d.cyclic >= 1f || d.cyclic > 0 && d.random.nextFloat() < d.cyclic)
+                    return false; //HANDLED IN PRESOLVE CASES
 
                 byte tp = d.taskPunct;
                 if ((tp == QUEST) || (tp == GOAL))
@@ -109,11 +114,6 @@ abstract public class Solve extends AbstractPred<Derivation> {
             default:
                 throw new InvalidPunctuationException(punc);
         }
-
-//        if (punct==GOAL && m.taskPunct!=GOAL && Stamp.isCyclic(ev)) {
-//            //when deriving a goal from a belief, reset any cyclic stamp state
-//            ev = Stamp.uncyclic(ev);
-//        }
 
         d.concTruth = t;
         d.concPunc = punc;
@@ -161,36 +161,36 @@ abstract public class Solve extends AbstractPred<Derivation> {
     }
 
 
-    static final AbstractPred<Derivation> NotCyclic = new AbstractPred<Derivation>($.the("notCyclic")) {
+//    static final AbstractPred<Derivation> NotCyclic = new AbstractPred<Derivation>($.the("notCyclic")) {
+//
+//        @Override
+//        public boolean test(Derivation d) {
+//            return !d.cyclic;
+//        }
+//
+//        @Override
+//        public float cost() {
+//            return 0.1f;
+//        }
+//    };
 
-        @Override
-        public boolean test(Derivation d) {
-            return !d.cyclic;
-        }
-
-        @Override
-        public float cost() {
-            return 0.1f;
-        }
-    };
-
-    static final AbstractPred<Derivation> NotCyclicIfTaskIsQuestionOrQuest = new AbstractPred<Derivation>($.the("notCyclicIfTaskQue")) {
-
-        @Override
-        public float cost() {
-            return 0.15f;
-        }
-
-        @Override
-        public boolean test(Derivation d) {
-            if (d.cyclic) {
-                byte p = d.taskPunct;
-                if (p == QUESTION || p == QUEST)
-                    return false;
-            }
-            return true;
-        }
-
-    };
+//    static final AbstractPred<Derivation> NotCyclicIfTaskIsQuestionOrQuest = new AbstractPred<Derivation>($.the("notCyclicIfTaskQue")) {
+//
+//        @Override
+//        public float cost() {
+//            return 0.15f;
+//        }
+//
+//        @Override
+//        public boolean test(Derivation d) {
+//            if (d.cyclic) {
+//                byte p = d.taskPunct;
+//                if (p == QUESTION || p == QUEST)
+//                    return false;
+//            }
+//            return true;
+//        }
+//
+//    };
 }
 

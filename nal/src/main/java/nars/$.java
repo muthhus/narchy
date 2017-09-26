@@ -645,12 +645,12 @@ public interface $ {
 
 
     @Nullable
-    static Truth t(float f, float c) {
+    static PreciseTruth t(float f, float c) {
         return t(f, c, 0);
     }
 
     @Nullable
-    static Truth t(float f, float c, float minConf) {
+    static PreciseTruth t(float f, float c, float minConf) {
         return new PreciseTruth(f, c);
     }
 

@@ -73,4 +73,7 @@ public class PreciseTruth implements Truth {
         return w2c(e);
     }
 
+    public PreciseTruth eviMult(float v) {
+        return v == 1 ? this : new PreciseTruth(f, e * v, false);
+    }
 }

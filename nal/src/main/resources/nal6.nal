@@ -130,10 +130,10 @@
 //Inference about the pre/postconditions
 
     Y, ((&&,X,A..+) ==> B), task(".") |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:Deduction)
-    Y, ((&&,(--,%X),A..+) ==> B), task(".") |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:DeductionN)
+    Y, ((&&,--X,A..+) ==> B), task(".") |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:DeductionN)
 
     Y, (B ==> (&&,X,A..+)), task(".") |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y), (Belief:Deduction)
-    Y, (B ==> (&&,(--,%X),A..+)), task(".") |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y), (Belief:DeductionN)
+    Y, (B ==> (&&,--X,A..+)), task(".") |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y), (Belief:DeductionN)
 
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
@@ -141,7 +141,7 @@
 //SUSPECT
     S, (&&,S,A..+), task(".") |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
         //S, (||,S,A..+) |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
-    S, (&&,(--,%S),A..+), task(".") |- (&&,A..+), (Belief:DecomposePositiveNegativeNegativeN)
+    S, (&&,--S,A..+), task(".") |- (&&,A..+), (Belief:DecomposePositiveNegativeNegativeN)
         //S, (||,(--,%S),A..+) |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
@@ -231,8 +231,8 @@
 //Anonymous Analogy (NAL5)
     //originally this only unified depvar (dep var elimination)
     //due to limitations in ellipsis matching, negation in the 2nd case is handled in the pattern.  this isn't optimal though
-     (&&,X,A..+), Y, task(".") |- subIfUnifiesAny((&&,A..+),X,Y), (Belief:AnonymousAnalogy)
-     (&&,(--,%X),A..+), Y, task(".") |- subIfUnifiesAny((&&,A..+),X,Y), (Belief:AnonymousAnalogyPN)
+     (&&,X,A..+), Y    |- subIfUnifiesAny((&&,A..+),X,Y), (Belief:AnonymousAnalogy)
+     (&&,--X,A..+), Y  |- subIfUnifiesAny((&&,A..+),X,Y), (Belief:AnonymousAnalogyPN)
 
 
      //((&&,X,A..+) && Z), Z |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)
