@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package nars.nlp;
+package nars.op.nlp;
 
 import jcog.io.Twokenize;
 import jcog.io.Twokenize.Span;

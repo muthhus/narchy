@@ -61,23 +61,23 @@
 //Same as for inheritance again
 
 
-    //(S ==> M), ((&&,S,A..+) ==> M) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositive)
+    (S ==> M), ((&&,S,A..+) ==> M) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositive)
         //(S ==> M), ((&&,(--,%S),A..+) ==> M) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositiveN)
         //(S ==> M), ((||,S,A..+) ==> M) |- ((||,A..+) ==>+- M), (Belief:DecomposePositiveNegativeNegative)
 
-    //(M ==> S), (M ==> (&&,S,A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegative)
+    (M ==> S), (M ==> (&&,S,A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegative)
         //(M ==> S), (M ==> (&&,(--,%S),A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
         //(M ==> S), (M ==> (||,S,A..+)) |- (M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
     (M ==> C), C, belief("&&") |- (M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
-          (M ==> C), D, belief("&&") |- (M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D, strict)), (Belief:StructuralDeduction)
-        (--M ==> C), C, belief("&&") |- (--M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
-          (--M ==> C), D, belief("&&") |- (--M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D, strict)), (Belief:StructuralDeduction)
+          //(M ==> C), D, belief("&&") |- (M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D)), (Belief:StructuralDeduction)
+        //(--M ==> C), C, belief("&&") |- (--M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
+          //(--M ==> C), D, belief("&&") |- (--M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D, strict)), (Belief:StructuralDeduction)
         //(M ==> (&&,(--,%S),A..+)), M |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
     (C ==> M), C, belief("&&") |- (dropAnyEvent(C) ==>+- M), (Belief:StructuralDeduction)
-          (C ==> M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D, strict) ==>+- M), (Belief:StructuralDeduction)
-        (C ==> --M), C, belief("&&") |- (dropAnyEvent(C) ==>+- --M), (Belief:StructuralDeduction)
-          (C ==> --M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D, strict) ==>+- --M), (Belief:StructuralDeduction)
+          //(C ==> M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D) ==>+- M), (Belief:StructuralDeduction)
+        //(C ==> --M), C, belief("&&") |- (dropAnyEvent(C) ==>+- --M), (Belief:StructuralDeduction)
+          //(C ==> --M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D, strict) ==>+- --M), (Belief:StructuralDeduction)
                 //((&&,(--,%S),A..+) ==> M), M |- ((&&,A..+) ==>+- M), (Belief:StructuralDeduction)
 
 
@@ -147,9 +147,9 @@
 
 //conditional abduction
 
-    //((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
-    //((&&,M,A..+) ==> C), ((&&,A..+) ==> C), task(".") |- M, (Belief:Abduction)
-    //(M ==> C), C, task(".") |- M, (Belief:Abduction)
+    ((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
+    ((&&,M,A..+) ==> C), ((&&,A..+) ==> C), task(".") |- M, (Belief:Abduction)
+    (M ==> C), C, task(".") |- M, (Belief:Abduction)
 
         //TODO modify ellipsis to allow these two rules to be expressed as one:
         // ((&&,M,A..+) ==> C), (A..+ ==> C) |- M, (Belief:Abduction)
@@ -193,15 +193,24 @@
     (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
         (B --> K), (($X --> L) ==> (&&,--(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogyN)
 
+    (Y --> P), (&&,(X-->P),A..+) |- subIfUnifiesAny((&&,(X-->P),A..+), X,Y,strict), (Belief:Deduction)
+        (Y --> P), (&&,--(X-->P),A..+) |- subIfUnifiesAny((&&,--(X-->P),A..+), X,Y,strict), (Belief:Deduction)
+    (Y --> P), ((&&,(X-->P),A..+) ==> Z) |- subIfUnifiesAny(((&&,(X-->P),A..+) ==>+- Z), X,Y,strict), (Belief:Deduction)
+        (Y --> P), ((&&,--(X-->P),A..+) ==> Z) |- subIfUnifiesAny(((&&,--(X-->P),A..+) ==>+- Z), X,Y,strict), (Belief:Deduction)
+    (Y --> P), (Z ==> (&&,(X-->P),A..+)) |- subIfUnifiesAny((Z ==>+- (&&,(X-->P),A..+)), X,Y,strict), (Belief:Deduction)
+        (Y --> P), (Z ==> (&&,--(X-->P),A..+)) |- subIfUnifiesAny((Z ==>+- (&&,--(X-->P),A..+)), X,Y,strict), (Belief:Deduction)
+
 
 //precondition combiner inference rule (variable_unification6):
-//  TODO can these also apply to goals somehow?
-//  TODO negative versions
 
-//    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Induction)
-//    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Induction)
-//    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Abduction)
-//    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Abduction)
+    ((&&,C,A..+) ==> X), ((&&,C,B..+) ==> Y) |- subIfUnifiesAny(((&&,A..+) ==>+- (&&,B..+)),X,Y), (Belief:Induction)
+    ((&&,C,A..+) ==> X), ((&&,C,B..+) ==> Y) |- subIfUnifiesAny(((&&,B..+) ==>+- (&&,A..+)),X,Y), (Belief:Induction)
+    (X ==> (&&,C,A..+)), (Y ==> (&&,C,B..+)) |- subIfUnifiesAny(((&&,A..+) ==>+- (&&,B..+)),X,Y), (Belief:Abduction)
+    (X ==> (&&,C,A..+)), (Y ==> (&&,C,B..+)) |- subIfUnifiesAny(((&&,B..+) ==>+- (&&,A..+)),X,Y), (Belief:Abduction)
+        //((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Induction)
+        //((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Induction)
+        //(Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Abduction)
+        //(Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Abduction)
 
 
 

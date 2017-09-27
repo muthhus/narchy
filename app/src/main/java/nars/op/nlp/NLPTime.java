@@ -1,4 +1,4 @@
-package nars.nlp;
+package nars.op.nlp;
 
 /**
  * Created by me on 12/2/16.

@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.Random;
 
+import static jcog.Texts.n2;
+
 /**
  * ArrayBag with a randomized sampling range
  */
@@ -40,9 +42,10 @@ public class CurveBag<X extends Priority> extends PriArrayBag<X> {
             if (diff > Prioritized.EPSILON * size) {
                 float i = random.nextFloat(); //uniform
                 //normalize to the lack of dynamic range
-                i = Util.lerp(diff, i /* flat */, (i*i*i) /* curved */);
-                int j = (int)(i * (size-0.5f));
-                if (j == size) j--;
+                i = Util.lerp(diff, i /* flat */, (i*i) /* curved */);
+                int j = (int) Math.floor(i * (size-0.5f));
+                if (j >= size) j = size-1;
+                if (j < 0) j = 0;
                 return j;
             } else {
                 return random.nextInt(size);

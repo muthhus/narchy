@@ -1,9 +1,10 @@
-package nars.table;
+package nars.task;
 
 import com.google.common.collect.Lists;
 import nars.*;
 import nars.concept.BaseConcept;
 import nars.concept.dynamic.DynamicBeliefTable;
+import nars.table.BeliefTable;
 import nars.task.Revision;
 import nars.test.TestNAR;
 import nars.test.analyze.BeliefAnalysis;

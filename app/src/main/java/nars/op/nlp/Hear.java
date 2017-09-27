@@ -1,4 +1,4 @@
-package nars.nlp;
+package nars.op.nlp;
 
 import com.google.common.collect.Lists;
 import jcog.event.On;

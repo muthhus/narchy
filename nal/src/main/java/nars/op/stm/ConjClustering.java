@@ -90,23 +90,8 @@ public class ConjClustering extends Causable {
         confMin = nar.confMin.floatValue();
         this.volMax = nar.termVolumeMax.intValue();
 
-        bag.commit(1, (sorted) -> {
-            List<Task> batch = $.newArrayList();
-            int current = -1;
-            int n = sorted.size();
-            int bs = -1;
-            for (int i = 0; i < n; i++) {
-                VLink<Task> x = sorted.get(i);
-                if (current != x.centroid) {
-                    current = x.centroid;
-                    if (bs != -1) {
-                        if (i - bs > 1)
-                            conjoin(nar, sorted, bs, i);
-                    }
-                    bs = i;
-                }
-            }
-        });
+        bag.commitGroups(1, nar, this::conjoin);
+
         return created;
     }
 
@@ -142,7 +127,7 @@ public class ConjClustering extends Causable {
 
     }
 
-    private void conjoin(NAR nar, List<VLink<Task>> sorted, int is, int ie) {
+    private void conjoin(List<VLink<Task>> group, NAR nar) {
 
         //get only the maximum confidence task for each term at its given starting time
         Map<ObjectLongPair<Term>, Task> vv = new HashMap();
@@ -151,7 +136,7 @@ public class ConjClustering extends Causable {
         final long[] start = {Long.MAX_VALUE};
 
 
-        chunk(sorted.subList(is, ie).stream().map(x -> x.id), maxConjSize, volMax).forEach(subs -> {
+        chunk(group.stream().map(x -> x.id), maxConjSize, volMax).forEach(subs -> {
             //
 //                    //if temporal clustering is close enough, allow up to maxGroupSize in &&, otherwise lmiit to 2
 //

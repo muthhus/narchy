@@ -400,28 +400,27 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR believe(@NotNull Term term, @NotNull Tense tense, float freq, float conf) {
+    public Task believe(@NotNull Term term, @NotNull Tense tense, float freq, float conf) {
         return believe(term, time(tense), freq, conf);
     }
 
     @NotNull
-    public NAR believe(@NotNull Term term, @NotNull long when, float freq, float conf) {
-        believe(priDefault(BELIEF), term, when, freq, conf);
-        return this;
+    public Task believe(@NotNull Term term, @NotNull long when, float freq, float conf) {
+        return believe(priDefault(BELIEF), term, when, freq, conf);
     }
 
     @NotNull
-    public NAR believe(@NotNull Term term, @NotNull Tense tense, float freq) {
+    public Task believe(@NotNull Term term, @NotNull Tense tense, float freq) {
         return believe(term, tense, freq, confDefault(BELIEF));
     }
 
     @NotNull
-    public NAR believe(@NotNull Term term, long when, float freq) {
+    public Task believe(@NotNull Term term, long when, float freq) {
         return believe(term, when, freq, confDefault(BELIEF));
     }
 
     @NotNull
-    public NAR believe(@NotNull Term term, float freq, float conf) {
+    public Task believe(@NotNull Term term, float freq, float conf) {
         return believe(term, Tense.Eternal, freq, conf);
     }
 
@@ -446,7 +445,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public NAR believe(@NotNull String termString, float freq, float conf) throws NarseseException {
-        return believe($.$(termString), freq, conf);
+        believe($.$(termString), freq, conf);
+        return this;
     }
 
     @NotNull
@@ -469,7 +469,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public NAR believe(@NotNull String termString, boolean isTrue) throws NarseseException {
-        return believe($.$(termString), isTrue);
+        believe($.$(termString), isTrue);
+        return this;
     }
 
     @NotNull
@@ -478,12 +479,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR believe(@NotNull Term term) {
+    public Task believe(@NotNull Term term) {
         return believe(term, true);
     }
 
     @NotNull
-    public NAR believe(@NotNull Term term, boolean trueOrFalse) {
+    public Task believe(@NotNull Term term, boolean trueOrFalse) {
         return believe(term, trueOrFalse, confDefault(BELIEF));
     }
 
@@ -498,7 +499,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR believe(@NotNull Term term, boolean trueOrFalse, float conf) {
+    public Task believe(@NotNull Term term, boolean trueOrFalse, float conf) {
         return believe(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
@@ -1359,7 +1360,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     public @NotNull NAR believe(@NotNull Term c, @NotNull Tense tense) {
-        return believe(c, tense, 1f);
+        believe(c, tense, 1f);
+        return this;
     }
 
     /**

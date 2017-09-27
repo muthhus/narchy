@@ -156,7 +156,7 @@ import static nars.time.Tense.*;
             case GOAL:
                 if (truth == null) {
                     //apply the default truth value for specified punctuation
-                    setTruth(n.truthDefault(punc));
+                    setTruth($.t(1, n.confDefault(punc)));
                 } else {
 
                     float confLimit = 1f - Param.TRUTH_EPSILON;

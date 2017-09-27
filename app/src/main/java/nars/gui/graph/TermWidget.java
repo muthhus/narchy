@@ -158,7 +158,7 @@ public class TermWidget extends Cuboid<Termed> {
 
                 this.a = Util.and(this.r * tasklinkBoost, this.g * termlinkBoost);
 
-                this.attraction = 0.1f * width;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attraction = 0.05f * width;// + priSum * 0.75f;// * 0.5f + 0.5f;
                 this.attractionDist = 1f + 2 * src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = -1;

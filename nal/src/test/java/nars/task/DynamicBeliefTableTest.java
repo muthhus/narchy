@@ -1,4 +1,4 @@
-package nars.table;
+package nars.task;
 
 import nars.$;
 import nars.NAR;

@@ -52,7 +52,7 @@ public class Premise extends UnaryTask {
     @Nullable
     public Collection<Concept> links;
 
-    public Premise(@Nullable Task tasklink, @Nullable Term termlink, float pri, Collection<Concept> links) {
+    public Premise(Task tasklink, Term termlink, float pri, Collection<Concept> links) {
         super(Tuples.pair(tasklink, termlink), pri);
         this.taskLink = tasklink;
         this.termLink = termlink;

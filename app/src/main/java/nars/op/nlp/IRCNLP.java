@@ -1,5 +1,5 @@
 
-package nars.nlp;
+package nars.op.nlp;
 
 import nars.*;
 import nars.bag.leak.TaskLeak;
@@ -301,8 +301,8 @@ public class IRCNLP extends IRC {
                 "patham10",
 
                 "irc.freenode.net",
-                //"#123xyz"
-                "#netention"
+                "#123xyz"
+                //"#netention"
                 //"#x"
         );
 

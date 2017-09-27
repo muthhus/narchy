@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package nars.analyze.experimental;
+package nars.perf.analyze.experimental;
 
 import org.jetbrains.annotations.NotNull;
 

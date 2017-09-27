@@ -372,7 +372,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each) {
 
         Random rng = random();
-        boolean direction =
+        final boolean direction =
                 true; //must always go down otherwise if it reverses then in curvebag's bias for early items, it will prioritize the last items yuk
         //rng == null || rng.nextBoolean();
 
@@ -396,21 +396,24 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                 if (items.array() != ii) //resized, due to another thread
                     continue newItemsArray;
 
-                Y x = (Y) ii[i];
+                Object x = ii[i];
 
                 if (x != null) {
-                    BagSample next = each.next(x);
+                    Y y = (Y) x;
+                    BagSample next = each.next(y);
                     if (next.remove)
-                        remove(key(x));
+                        remove(key(y));
 
                     if (next.stop)
                         return this;
                 }
 
                 if (direction) {
-                    if (++i == s) i = 0;
+                    if (++i == s)
+                        i = 0;
                 } else {
-                    if (--i == -1) i = s - 1;
+                    if (--i == -1)
+                        i = s - 1;
                 }
             }
 

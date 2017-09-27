@@ -1,4 +1,4 @@
-package nars.analyze;
+package nars.perf.analyze;
 
 /**
  * Captures stack trace dump of a test building a model

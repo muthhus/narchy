@@ -46,7 +46,7 @@ public class PatrickTests extends AbstractNALTest {
 
         TestNAR tt = test;
         tt.nar.truthResolution.setValue(0.05f);
-        tt.truthTolerance(0.1f);
+        tt.truthTolerance(0.2f);
 
         tt
 //.log()
@@ -117,17 +117,18 @@ public class PatrickTests extends AbstractNALTest {
         TestNAR tt = test;
         //Param.TRACE = true;
 
-        tt.truthTolerance(0.05f);
-        //tt.nar.truthResolution.setValue(0.2f);
+
+        tt.truthTolerance(0.2f);
+        tt.nar.truthResolution.setValue(0.2f);
         //tt.nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
-        tt.nar.time.dur(5);
+        tt.nar.time.dur(10);
 
         //tt.nar.termVolumeMax.setValue(18);
 
 //        tt.nar.onCycle(()->{
 //            System.err.println(tt.nar.time());
 //        });
-//        tt.log();
+        //tt.log();
         tt.input(
                 "made_of(toothbrush,plastic).",
                 "( ( made_of($1, plastic) &| lighter(I, $1) ) ==>+10 <$1 --> [heated]>).",
@@ -145,8 +146,8 @@ public class PatrickTests extends AbstractNALTest {
                 //"<toothbrush --> here>. :|:" //there is a toothbrush here NOW
         );
 
-        tt.mustGoal(1200, "lighter(I, toothbrush)", 1f,
-                0.16f,
+        tt.mustGoal(3000, "lighter(I, toothbrush)", 1f,
+                0.2f,
                 (t) -> t >= 0);
 
 

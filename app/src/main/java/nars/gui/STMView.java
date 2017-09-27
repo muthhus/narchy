@@ -362,10 +362,6 @@ public class STMView {
                 .show(w, h);
     }
 
-    public static void show2D(NAR n, BagClustering c, int w, int h) {
-        SpaceGraph.window(new BagClusterVis(n, c), w, h);
-    }
-
 //    public void update() {
 //        inputBagChart.update();
 //

@@ -1,9 +1,11 @@
-package nars.table;
+package nars.task;
 
 import jcog.math.MultiStatistics;
 import jcog.meter.event.CSVOutput;
 import nars.*;
 import nars.concept.BaseConcept;
+import nars.table.BeliefTable;
+import nars.table.RTreeBeliefTable;
 import nars.task.DerivedTask;
 import nars.term.Term;
 import nars.truth.Truth;

@@ -64,7 +64,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
             Activate a = activate(t, activationApplied, cc, n);
 //            if (t.isInput()) {
-                //sync run immediately
+            //sync run immediately
 //                a.run(n);
 //            }
 //
@@ -115,7 +115,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     @Override
     public List<Premise> run(NAR nar) {
         nar.emotion.conceptFires.increment();
-        //nar.terms.commit(id); //index cache update
+
 
         final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
         tasklinks.commit(tasklinks.forget(Param.LINK_FORGET_TEMPERATURE));
@@ -162,16 +162,21 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         for (int i = 0; i < tasklSize; i++) {
             PriReference<Task> tasklink = taskl.get(i);
 
+            final Task task = tasklink.get();
+            if (task != null) {
 
-            for (int j = 0; j < termlSize; j++) {
-                PriReference<Term> termlink = terml.get(j);
+                for (int j = 0; j < termlSize; j++) {
+                    PriReference<Term> termlink = terml.get(j);
 
-                final Task task = tasklink.get();
 
-                float pri = Param.tasktermLinkCombine.apply(task.priElseZero(), termlink.priElseZero());
+                    final Term term = termlink.get();
+                    if (term != null) {
 
-                Premise p = new Premise(task, termlink.get(), pri, localSubConcepts);
-                premises.add(p);
+                        float pri = Param.tasktermLinkCombine.apply(task.priElseZero(), termlink.priElseZero());
+                        Premise p = new Premise(task, term, pri, localSubConcepts);
+                        premises.add(p);
+                    }
+                }
             }
         }
 
@@ -240,7 +245,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 termlinks.putAsync(
                         new PLink(localSubTerm,
                                 subDecayForward)
-                                //reverseLinked ? subDecayForward : subDecay /* full */)
+                        //reverseLinked ? subDecayForward : subDecay /* full */)
                 );
 
             }

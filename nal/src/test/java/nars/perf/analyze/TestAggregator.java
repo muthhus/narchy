@@ -1,4 +1,4 @@
-package nars.analyze;
+package nars.perf.analyze;
 
 import com.google.common.base.Joiner;
 import nars.$;

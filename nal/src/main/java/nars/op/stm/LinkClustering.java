@@ -1,21 +1,17 @@
 package nars.op.stm;
 
 import jcog.Util;
+import jcog.pri.MultiLink;
+import jcog.pri.PLink;
 import jcog.pri.VLink;
 import nars.NAR;
 import nars.Task;
 import nars.bag.BagClustering;
-import nars.control.CauseChannel;
+import nars.concept.Concept;
 import nars.control.DurService;
-import nars.task.ITask;
-import nars.task.NALTask;
-import nars.task.util.InvalidTaskException;
 import nars.term.Term;
-import nars.truth.PreciseTruth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -94,7 +90,7 @@ public class LinkClustering extends DurService {
         nar.onTask((t) -> accept(nar, t));
     }
 
-    protected void linkClusters(List<VLink<Task>> sortedbyCentroid) {
+    protected void linkClustersChain(List<VLink<Task>> sortedbyCentroid) {
 
         int current = -1;
         int nTasks = sortedbyCentroid.size();
@@ -107,13 +103,38 @@ public class LinkClustering extends DurService {
                 //link to previous item
                 Task tx = x.get();
                 Task ty = y.get();
-                float linkPri = tx.pri() * ty.pri();
+                float linkPri =
+                        //tx.pri() * ty.pri();
+                        Util.or(tx.priElseZero(), ty.priElseZero());
                 STMLinkage.link(tx, linkPri, ty, nar);
             }
             x = y;
         }
     }
 
+    protected void linkClustersMulti(List<VLink<Task>> group, NAR nar) {
+        Task[] tasks = group.stream().map(PLink::get).toArray(Task[]::new);
+
+        MultiLink<Task,Task> task = new MultiLink<>(
+                tasks,
+                (x)->x,
+                Util.max(Task::priElseZero, tasks)
+        );
+        MultiLink<Task,Term> term = new MultiLink<>(
+                tasks,
+                Task::term,
+                Util.max(Task::priElseZero, tasks)
+        );
+
+        group.forEach(t -> {
+            Concept tc = t.get().concept(nar, false);
+            if (tc!=null) {
+                tc.tasklinks().putAsync(task);
+                tc.termlinks().putAsync(term);
+            }
+        });
+
+    }
 
     public void accept(NAR nar, @NotNull Task t) {
         long now = nar.time();
@@ -147,7 +168,9 @@ public class LinkClustering extends DurService {
 
         //int maxVol = nar.termVolumeMax.intValue() - 2;
 
-        bag.commit(1, this::linkClusters);
+        //bag.commit(1, this::linkClusters);
+        bag.commitGroups(1, nar, this::linkClustersMulti);
+
 
     }
 

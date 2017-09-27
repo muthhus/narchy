@@ -215,9 +215,12 @@ public class NAL6Test extends AbstractNALTest {
     public void variable_elimination6() {
 
         TestNAR tester = test;
-        tester.believe("((&&, flyer:{$x}, ($x --> [chirping]), food($x, worms)) ==> bird:$x)"); //en("If something can fly, chirp, and eats worms, then it is a bird.");
-        tester.believe("flyer:{Tweety}"); //en("Tweety can fly.");
-        tester.mustBelieve(cycles*2, "((({Tweety} --> [chirping]) && food({Tweety},worms)) ==> bird:{Tweety})", 1.00f, 0.81f); //en("If Tweety can chirp and eats worms, then it is a bird.");
+        tester.believe("((&&, flyer:$x, [chirping]:$x, food($x, worms)) ==> bird:$x)"); //en("If something can fly, chirp, and eats worms, then it is a bird.");
+        tester.believe("flyer:Tweety"); //en("Tweety can fly.");
+        tester.mustBelieve(cycles*2,
+                "(([chirping]:Tweety && food(Tweety,worms)) ==> bird:Tweety)",
+                1.0f, 0.73f); //en("If Tweety can chirp and eats worms, then it is a bird.");
+                //1.00f, 0.81f);
     }
 
 
@@ -471,8 +474,7 @@ public class NAL6Test extends AbstractNALTest {
         tester.believe("open(lock,lock1)");
         tester.mustBelieve(cycles,
                 "((open(lock,#1) && open($2,#1)) ==> key:$2)",
-                1.00f, 0.81f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
-        //tester.mustBelieve(cycles, "<(<$1 --> lock> && open($2,$1)) ==> <$2 --> key>>", 1.00f, 0.45f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
+                1.00f, 0.45f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
 
     }
 

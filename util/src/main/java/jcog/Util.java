@@ -1175,6 +1175,13 @@ public enum Util {
         return y;
     }
 
+    public static <X> float max(FloatFunction<X> value, X... xx) {
+        float y = Float.NEGATIVE_INFINITY;
+        for (X x : xx)
+            y = Math.max(y, value.floatValueOf(x));
+        return y;
+    }
+
     public static float sum(float... x) {
         float y = 0;
         for (float f : x)
@@ -1313,7 +1320,7 @@ public enum Util {
     public static int decideRoulette(final int count, IntToFloatFunction weight, float weight_sum, Random rng) {
 
         int i = rng.nextInt(count); //random start location
-        assert(i>=0);
+        assert (i >= 0);
         if (weight_sum < Pri.EPSILON) {
             return i; //flat, choose one at random
         }

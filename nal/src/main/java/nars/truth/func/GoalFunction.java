@@ -153,12 +153,6 @@ public enum GoalFunction implements TruthOperator {
 //    },
 
 
-    @NotNull
-    private static Truth defaultTruth(NAR m) {
-        return m.truthDefault(Op.GOAL);
-    }
-
-
     static final Map<Term, TruthOperator> atomToTruthModifier = $.newHashMap(GoalFunction.values().length);
 
     static {

@@ -96,8 +96,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     }
 
     @Override
-    protected Task[] newArray(int oldSize) {
-        return new Task[grow(oldSize)];
+    protected Task[] newArray(int s) {
+        return new Task[s];
     }
 
     public void setCapacity(int c) {

@@ -9,7 +9,7 @@ import static jcog.Texts.n4;
 
 public abstract class AbstractPLink<X> extends Pri implements PriReference<X> {
 
-    AbstractPLink(float p) {
+    protected AbstractPLink(float p) {
         super(p);
     }
 

@@ -80,7 +80,7 @@ public enum MetaGoal {
 
         final float epsilon = 0.01f;
 
-        final float momentum = 0.9f;
+        final float momentum = 0.95f;
 
         int goals = goal.length;
         float[] goalMagnitude = new float[goals];
@@ -163,8 +163,8 @@ public enum MetaGoal {
         int numCauses = effects.length;
 
         float vPer =
-                strength / numCauses; //flat
-        //strength;
+                //strength / numCauses; //flat
+                strength;
 
         for (int i = 0; i < numCauses; i++) {
             short c = effects[i];

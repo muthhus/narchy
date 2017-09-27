@@ -224,7 +224,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
         if (l.length == s) {
             if (grows()) {
                 int newLen = Math.max(l.length, s);
-                l = resize(newLen);
+                l = resize(grow(newLen));
             } else {
                 return -1;
             }
@@ -262,7 +262,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
             if (grows()) {
 
                 this.size++;
-                E[] newItems = newArray(oldSize); //new Object[this.sizePlusFiftyPercent(oldSize)];
+                E[] newItems = newArray(grow(oldSize)); //new Object[this.sizePlusFiftyPercent(oldSize)];
                 if (index > 0) {
                     System.arraycopy(list, 0, newItems, 0, index);
                 }

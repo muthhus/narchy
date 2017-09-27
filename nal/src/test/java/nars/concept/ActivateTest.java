@@ -1,4 +1,4 @@
-package nars.control;
+package nars.concept;
 
 import jcog.pri.PLink;
 import nars.$;
@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.concept.Concept;
+import nars.control.Activate;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
@@ -33,10 +34,11 @@ public class ActivateTest {
 
         Concept c = nar.conceptualize("a:b");
         for (int n = 0; n < count; n++) {
-            PLink<Term> inserted = new PLink<>($(n + ":a"), ((1+n)/((float)count)));
+            PLink<Term> inserted = new PLink<>($("x" + n + ":a"), ((1+n)/((float)count)));
             System.out.println(inserted);
             c.termlinks().put(inserted);
         }
+
 
         System.out.println();
 
@@ -74,8 +76,8 @@ public class ActivateTest {
         ObjectIntPair<String> top = termlinkHits.topOccurrences(1).get(0);
         ObjectIntPair<String> bottom = termlinkHits.bottomOccurrences(1).get(0);
         String min = bottom.getOne();
-        assertTrue("(a-->0)".equals(min) || "(a-->1)".equals(min)); //allow either 0 or 1
-        assertEquals("(a-->" + (count-1) + ")", top.getOne());
+        assertTrue("(a-->x0)".equals(min) || "(a-->x1)".equals(min)); //allow either 0 or 1
+        assertEquals("(a-->x" + (count-1) + ")", top.getOne());
 
     }
 

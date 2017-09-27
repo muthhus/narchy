@@ -14,6 +14,7 @@ import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
+import nars.gui.STMView;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
@@ -135,7 +136,7 @@ abstract public class NAgentX extends NAgent {
 
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
-        return runRT(init, fps * 2, fps, endTime);
+        return runRT(init, 25, fps, endTime);
     }
 
     public static NAR runRT(Function<NAR, NAgent> init, float narFPS, float agentFPS, long endTime) {
@@ -151,6 +152,7 @@ abstract public class NAgentX extends NAgent {
                 durFPS >= 10 / 2f ? /* nyquist threshold between decisecond (0.1) and centisecond (0.01) clock resolution */
                         new RealTime.CS(true) :
                         new RealTime.DSHalf(true);
+        clock.durFPS(agentFPS);
 
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.getDefault(8
                 , "motivation.nal", "relation_introduction.nal");
@@ -191,7 +193,7 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.9f);
 
 
-        float priFactor = 0.5f;
+        float priFactor = 0.25f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
@@ -205,8 +207,15 @@ abstract public class NAgentX extends NAgent {
 
         //STMLinkage stmLink = new STMLinkage(n, 1, false);
 
-        LinkClustering linkCluster = new LinkClustering(n, Prioritized::priElseZero /* anything temporal */, 16, 256);
-        //STMView.show2D(n, linkCluster.bag, 800, 600);
+        LinkClustering linkClusterPri = new LinkClustering(n, Prioritized::priElseZero /* anything temporal */,
+                32, 128);
+        LinkClustering linkClusterConf = new LinkClustering(n, (t)-> t.isBeliefOrGoal() ? t.conf() : Float.NaN,
+                4, 16);
+//        SpaceGraph.window(col(
+//                new STMView.BagClusterVis(n, linkClusterPri.bag),
+//                new STMView.BagClusterVis(n, linkClusterConf.bag)
+//        ), 800, 600);
+
 
         ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, 16, 64);
         ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, 16, 64);
@@ -615,9 +624,9 @@ abstract public class NAgentX extends NAgent {
                     Vis.beliefCharts(16, nar, a.reward),
                     new WindowButton("agent", () -> (a)),
                     col(
-                            new WindowButton("actionShort", () -> Vis.beliefCharts(a.nar.dur() * 4, a.actions.keySet(), a.nar)),
-                            new WindowButton("actionMed", () -> Vis.beliefCharts(a.nar.dur() * 32, a.actions.keySet(), a.nar)),
-                            new WindowButton("actionLong", () -> Vis.beliefCharts(a.nar.dur() * 64, a.actions.keySet(), a.nar))
+                            new WindowButton("actionShort", () -> Vis.beliefCharts(a.nar.dur() * 64, a.actions.keySet(), a.nar)),
+                            new WindowButton("actionMed", () -> Vis.beliefCharts(a.nar.dur() * 128, a.actions.keySet(), a.nar)),
+                            new WindowButton("actionLong", () -> Vis.beliefCharts(a.nar.dur() * 256, a.actions.keySet(), a.nar))
                     ),
                     //new WindowButton("predict", () -> Vis.beliefCharts(200, a.predictors, a.nar)),
                     //"agentActions",

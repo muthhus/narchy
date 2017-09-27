@@ -67,12 +67,16 @@ public class TemporalTermTest {
                 $("((a &&+1 b)-->(a && b))")
         );
         assertEquals(
-                Op.False,
-                $("(--(a &&+1 b)-->(a && b))")
+                Op.True,
+                $("(--(a &&+1 b) --> --(a && b))")
         );
-        assertEquals(
-                Op.False,
-                $("((a &&+1 b) --> --(a && b))")
+        assertEquals( //since one is negative it's allowed
+                "((--,(a &&+1 b))-->(a&&b))",
+                $("(--(a &&+1 b)-->(a && b))").toString()
+        );
+        assertEquals( //since one is negative it's allowed
+                "((a &&+1 b)-->(--,(a&&b)))",
+                $("((a &&+1 b) --> --(a && b))").toString()
         );
         assertEquals(
                 Op.True,

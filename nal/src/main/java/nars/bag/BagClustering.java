@@ -8,6 +8,7 @@ import jcog.pri.VLink;
 import jcog.pri.op.PriMerge;
 import jcog.util.DoubleBuffer;
 import nars.$;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -112,6 +114,24 @@ public class BagClustering<X> {
 
     public int size() {
         return bag.size();
+    }
+
+    public <Y> void commitGroups(int iter, Y y, BiConsumer<List<VLink<X>>,Y> each) {
+        commit(iter, (sorted) -> {
+            List<Task> batch = $.newArrayList();
+            int current = -1;
+            int n = sorted.size();
+            int bs = -1;
+            for (int i = 0; i < n; i++) {
+                VLink<X> x = sorted.get(i);
+                if (current != x.centroid) {
+                    current = x.centroid;
+                    if (bs != -1 && i - bs > 1)
+                        each.accept(sorted.subList(bs, i), y);
+                    bs = i;
+                }
+            }
+        });
     }
 
 

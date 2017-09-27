@@ -1,6 +1,6 @@
 package nars;
 
-import nars.nlp.Hear;
+import nars.op.nlp.Hear;
 import org.fusesource.jansi.AnsiConsole;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;

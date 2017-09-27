@@ -1211,8 +1211,8 @@ public class Narsese extends BaseParser<Object> {
 //            blen = 0;
 //
 
-        if (t1 == null) {
-            t1 = m.truthDefault(punct);
+        if (t1 == null && punct==BELIEF || punct==GOAL) {
+            t1 = $.t(1, m.confDefault(punct));
         }
 
         if (content.op() == NEG) {

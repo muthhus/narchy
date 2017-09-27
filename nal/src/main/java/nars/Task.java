@@ -228,14 +228,12 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
         if (s == ETERNAL) {
             return when;
-        } else if (e == s) {
-            return s; //point
-        } else if (when >= s && when <= e) {
-            return when; //internal
-        } else if (when < s) {
-            return s; //at or beyond the start
-        } else {
+        } else if (when <= s || e == s) {
+            return s; //point or at or beyond the start
+        } else if (when >= e) {
             return e; //at or beyond the end
+        } else {
+            return when; //internal
         }
 
     }
@@ -414,11 +412,11 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
     default float eternalizable() {
 
-        return 1f; //always
+        //return 1f; //always
         //return 0f; //never
 
-        //Term t = term();
-        //return t.op().temporal || t.vars() > 0 ? 1f : 0f;
+        Term t = term();
+        return t.op().temporal || t.vars() > 0 ? 1f : 0f;
         //return term().vars() > 0 ? 1f : 0f;
         //return term().vars() > 0 ? 1f : 0.5f;
         //return term().varIndep() > 0 ? 1f: 0f;

@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 
+import static nars.Op.NEG;
 import static nars.term.Terms.normalizedOrNull;
 
 public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Tasked> {
@@ -95,13 +96,29 @@ public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Ta
 
         this.creationStart = creationStart;
         this.creationEnd = creationEnd;
-        this.freqMax = Math.min(1.0f, freqMax);
-        this.freqMin = Math.max(0.0f, freqMin);
+
         this.confMax = Math.min(1.0f, confMax);
         this.confMin = Math.max(0.0f, confMin);
         this.punc = punc;
-        this.term =
+        Term term =
                 normalizedOrNull(Narsese.term(sentenceTerm, true).term());
+
+        if (term.op()==NEG) {
+            term = term.unneg();
+            freqMax = 1f - freqMax;
+            freqMin = 1f - freqMin;
+            if (freqMin > freqMax) {
+                float f = freqMin;
+                freqMin = freqMax;
+                freqMax = f;
+            }
+        }
+
+        this.freqMax = Math.min(1.0f, freqMax);
+        this.freqMin = Math.max(0.0f, freqMin);
+
+        this.term = term;
+
     }
 
     @NotNull

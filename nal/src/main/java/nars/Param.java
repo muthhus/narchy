@@ -92,6 +92,7 @@ public abstract class Param extends Services<Term,NAR> {
             Util::or;
             //UtilityFunctions::aveAri;
             //Util::and;
+            //Math::max;
 
     /** maximum time (in durations) that a signal task can latch its last value before it becomes unknown */
     public final static int SIGNAL_LATCH_TIME_MAX =
@@ -288,7 +289,7 @@ public abstract class Param extends Services<Term,NAR> {
 
 
 
-    private Truth defaultGoalTruth, defaultBeliefTruth;
+    private float defaultGoalConf, defaultBeliefConf;
 
 
     /** internal granularity which truth components are rounded to */
@@ -340,6 +341,10 @@ public abstract class Param extends Services<Term,NAR> {
      */
     public static float evidenceDecay(float evi, float dur, long dt) {
 
+        return evi / (1 + ( dt / dur) ); //inverse linear
+
+        //return evi / ( 1f + (dt*dt)/dur ); //inverse square
+
         //hard linear with half duration on either side of the task -> sum to 1.0 duration
 //        float scale = dt / dur;
 //        if (scale > 0.5f) return 0;
@@ -350,9 +355,6 @@ public abstract class Param extends Services<Term,NAR> {
 
         //return evi / (1 + (((float) Math.log(1+dt)) / dur)); //inverse log
 
-        return evi / (1 + ( dt / dur) ); //inverse linear
-
-        //return evi / ( 1f + (dt*dt)/dur ); //inverse square
 
         //return evi /( 1 + 2 * (dt/dur) ); //inverse linear * 2 (nyquist recovery period)
 
@@ -369,6 +371,7 @@ public abstract class Param extends Services<Term,NAR> {
 
         TruthPolation t =
                 new TruthPolation.TruthPolationBasic(start, end, dur);
+                //new TruthPolation.TruthPolationConf(start, end, dur);
                 //new TruthPolation.TruthPolationGreedy(start, end, dur);
                 //..SoftMax..
                 //new TruthPolation.TruthPolationRoulette(start, end, dur, ThreadLocalRandom.current());
@@ -385,14 +388,14 @@ public abstract class Param extends Services<Term,NAR> {
     }
 
 
-    public float confDefault(byte punctuation) {
+    public final float confDefault(byte punctuation) {
 
         switch (punctuation) {
             case BELIEF:
-                return defaultBeliefTruth.conf();
+                return defaultBeliefConf;
 
             case GOAL:
-                return defaultGoalTruth.conf();
+                return defaultGoalConf;
 
             default:
                 throw new RuntimeException("Invalid punctuation " + punctuation + " for a TruthValue");
@@ -449,27 +452,6 @@ public abstract class Param extends Services<Term,NAR> {
     }
 
 
-
-
-    @Nullable
-    public final Truth truthDefault(byte p) {
-        switch (p) {
-            case GOAL:
-                return defaultGoalTruth;
-            case BELIEF:
-                return defaultBeliefTruth;
-
-            case COMMAND:
-            case QUEST:
-            case QUESTION:
-                return null;
-
-            default:
-                throw new RuntimeException("invalid punctuation");
-        }
-    }
-
-
     Param(Executor exe) {
         super(null, exe);
         beliefConfidence(0.9f);
@@ -479,15 +461,15 @@ public abstract class Param extends Services<Term,NAR> {
     /**
      * sets the default input goal confidence
      */
-    public void goalConfidence(float theDefaultValue) {
-        defaultGoalTruth = new PreciseTruth(1.0f, theDefaultValue);
+    public void goalConfidence(float c) {
+        defaultGoalConf = c;
     }
 
     /**
      * sets the default input belief confidence
      */
-    public void beliefConfidence(float theDefaultValue) {
-        defaultBeliefTruth = new PreciseTruth(1.0f, theDefaultValue);
+    public void beliefConfidence(float c) {
+        defaultBeliefConf = c;
     }
 
 

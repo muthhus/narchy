@@ -437,7 +437,8 @@ public class Wiki implements Serializable
     private boolean zipped = true;
     private boolean markminor, markbot;
     private boolean resolveredirect;
-    private String protocol = "https://";
+    private String protocol =
+            "https://";
     private Level loglevel = Level.ALL;
     private static final Logger logger = Logger.getLogger("wiki");
 
@@ -7022,6 +7023,7 @@ public class Wiki implements Serializable
         connection.setConnectTimeout(CONNECTION_CONNECT_TIMEOUT_MSEC);
         connection.setReadTimeout(CONNECTION_READ_TIMEOUT_MSEC);
         setCookies(connection);
+
         connection.connect();
         grabCookies(connection);
 

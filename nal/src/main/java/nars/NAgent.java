@@ -65,8 +65,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
      */
     public final FloatParam predictAheadDurs = new FloatParam(16, 1, 32);
 
-
-    public final FloatParam predictorProbability = new FloatParam(0.5f);
     private final CauseChannel<ITask> predict;
 
 
@@ -206,11 +204,15 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
             /** set the sensor budget policy */
             {
-                Task e = nar.goal($.conj(happy.term(),sad.term().neg())); /* eternal */
+                Task e = nar.goal($.parallel(happy.term(),sad.term().neg())); /* eternal */
                 predictors.add(() -> {
                     e.priMax(nar.priDefault(GOAL));
                     return e;
                 });
+                Task f = nar.believe($.sim(happy.term(), sad.term().neg()));
+                predictors.add(() -> f);
+                Task g = nar.believe($.sim(happy.term().neg(), sad.term()));
+                predictors.add(() -> g);
             }
 //            {
 //                Task happyEternal = nar.goal(happy.term()); /* eternal */
@@ -256,9 +258,11 @@ abstract public class NAgent extends DurService implements NSense, NAct {
                         question($.impl(action, happy.term())),
                         question($.impl(notAction, happy.term())),
                         question($.impl(action, sad.term())),
-                        question($.impl(notAction, sad.term()))
-                        //question(impl(action, what)),
-                        //question(impl(notAction, what)),
+                        question($.impl(notAction, sad.term())),
+                        question($.impl(action, what)),
+                        question($.impl(notAction, what)),
+                        quest($.parallel(what, action)),
+                        quest($.parallel(what, notAction))
 
 //                        question(impl(parallel(what, action), happy)),
 //                        question(impl(parallel(what, notAction), happy)),
@@ -411,11 +415,9 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         this.now = nar.time();
 
-        if (nar.random().nextFloat() < predictorProbability.floatValue() * predict.gain()) {
-            //nar.exe.execute(() -> {
-            predict.input(predictions(now));
-            //});
-        }
+
+        predict.input(predictions(now, predict.amp()));
+
 
         this.now = nar.time();
 
@@ -468,8 +470,8 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         return loop;
     }
 
-    protected Stream<ITask> predictions(long now) {
-        return predictors.stream().map(x -> x.get().budget(nar));
+    protected Stream<ITask> predictions(long now, float prob) {
+        return predictors.stream().filter((x) -> nar.random().nextFloat() <= prob).map(x -> x.get().budget(nar));
     }
 
     /**

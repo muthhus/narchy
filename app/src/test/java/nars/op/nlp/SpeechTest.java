@@ -1,4 +1,4 @@
-package nars.nlp;
+package nars.op.nlp;
 
 import jcog.Util;
 import nars.*;

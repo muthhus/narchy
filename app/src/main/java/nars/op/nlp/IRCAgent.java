@@ -1,4 +1,4 @@
-package nars.nlp;
+package nars.op.nlp;
 
 import nars.NAR;
 import nars.NARS;
@@ -238,9 +238,9 @@ public class IRCAgent extends IRC {
 
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                //"#123xyz"
+                "#123xyz"
                 //"#netention"
-                "#nars"
+                //"#nars"
         );
 
         n.onOpArgs("trace", (arg, nn) -> {
@@ -303,21 +303,20 @@ public class IRCAgent extends IRC {
         }
         */
 
-        n.startFPS(100f);
-
 
         //new NARWeb(n, 8080);
+        n.startFPS(100f);
 
         try {
             bot.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (IrcException e) {
+        } catch (IOException | IrcException e) {
             e.printStackTrace();
         }
 
 
 //        nar.run(1);
+
+
 
     }
 
@@ -334,7 +333,7 @@ public class IRCAgent extends IRC {
         private final String[] channels;
 
         public MyLeakOut(NAR nar, String... channels) {
-            super(8, 0.03f, nar);
+            super(8, 1f, nar);
             this.nar = nar;
             this.channels = channels;
         }

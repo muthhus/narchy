@@ -408,10 +408,11 @@ public class NAL8Test extends AbstractNALTest {
     public void testInhibition0() {
 
         test
-                .goal("(reward)")
-                .believe("((bad) ==> --(reward))", 1, 0.9f)
-                .mustGoal(cycles, "(bad)", 0.0f, 0.45f)
-                .mustNotOutput(cycles, "(bad)", GOAL, 0.5f, 1f, 0f, 1f, ETERNAL);
+                .log()
+                .goal("reward")
+                .believe("(bad ==> --reward)", 1, 0.9f)
+                .mustGoal(cycles, "bad", 0.0f, 0.45f)
+                .mustNotOutput(cycles, "bad", GOAL, 0.5f, 1f, 0f, 1f, ETERNAL);
     }
 
     @Test
@@ -454,14 +455,14 @@ public class NAL8Test extends AbstractNALTest {
                 //.mustNotOutput(cycles, "(G)", GOAL, ETERNAL); // because <-> isnt symmetric
     }
 
-    @Test
-    public void testNegatedGoalSimilaritySpreading() {
-
-        test
-                .input("--(R)!")
-                .input("((G) <-> (R)).")
-                .mustNotOutput(cycles, "(G)", GOAL, ETERNAL); // because <-> isnt symmetric
-    }
+//    @Test
+//    public void testNegatedGoalSimilaritySpreading() {
+//
+//        test
+//                .input("--(R)!")
+//                .input("((G) <-> (R)).")
+//                .mustNotOutput(cycles, "(G)", GOAL, ETERNAL); // because <-> isnt symmetric
+//    }
     @Test
     public void testGoalPosNegSimilaritySpreading() {
 
@@ -469,7 +470,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .input("--(R)!")
                 .input("((G) <-> --(R)).")
-                .mustGoal(cycles, "(G)", 1f, 0.81f, GOAL, ETERNAL);
+                .mustGoal(cycles, "(G)", 1f, 0.4f, GOAL, ETERNAL);
     }
 
 //    @Test public void testInheritanceCompositionTemporal() {

@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import static nars.$.t;
+import static nars.Op.BELIEF;
 import static nars.truth.TruthFunctions.abduction;
 
 /**
@@ -30,7 +31,7 @@ public enum BeliefFunction implements TruthOperator {
     @AllowOverlap StructuralAbduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
-            return abduction(defaultTruth(m), B, minConf);
+            return abduction($.t(1, m.confDefault(BELIEF)), B, minConf);
         }
     },
 
@@ -336,14 +337,14 @@ public enum BeliefFunction implements TruthOperator {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
             if (B == null) return null;
-            return abduction(B, $.t(1f, defaultConfidence(m)), minConf);
+            return abduction($.t(1f, defaultConfidence(m)), B, minConf);
         }
     },
 
     @AllowOverlap BeliefStructuralIntersection() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
-            return B != null ? TruthFunctions.intersection(B, defaultTruth(m), minConf) : null;
+            return B != null ? TruthFunctions.intersection(B, $.t(1, m.confDefault(BELIEF)), minConf) : null;
         }
     },
 
@@ -375,13 +376,8 @@ public enum BeliefFunction implements TruthOperator {
 
     ;
 
-    /*@NotNull*/
-    private static Truth defaultTruth(/*@NotNull*/ NAR m) {
-        return m.truthDefault(Op.BELIEF);
-    }
-
     private static float defaultConfidence(/*@NotNull*/ NAR m) {
-        return m.confDefault(Op.BELIEF);
+        return m.confDefault(BELIEF);
     }
 
 

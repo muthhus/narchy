@@ -100,7 +100,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
             case QUEST:
             case QUESTION:
-                if (d.cyclic >= 1f || d.cyclic > 0 && d.random.nextFloat() < d.cyclic)
+                if (d.cyclic >= 1f || (d.cyclic > 0 && d.random.nextFloat() < d.cyclic))
                     return false; //HANDLED IN PRESOLVE CASES
 
                 byte tp = d.taskPunct;

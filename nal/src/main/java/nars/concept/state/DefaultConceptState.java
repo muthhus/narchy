@@ -17,17 +17,20 @@ public final class DefaultConceptState extends ConceptState {
     /** fall-off rate for belief table capacity */
     float beliefComplexityCapacity = 10;
 
-    public final MutableInteger beliefsMaxEte, goalsMaxEte;
+    public int beliefsMaxEte;
+    public int goalsMaxEte;
+    public final int beliefsMinEte;
+    public final int goalsMinEte;
     public final MutableInteger questionsMax;
 
     @NotNull
     //public final MutableInteger termLinksCapacityMax, termLinksCapacityMin, taskLinksCapacityMax, taskLinksCapacityMin;
     public final IntToIntFunction termlinksCapacity, tasklinksCapacity;
 
-    public final int beliefsMaxTemp;
-    public final int beliefsMinTemp;
-    public final int goalsMaxTemp;
-    public final int goalsMinTemp;
+    public int beliefsMaxTemp;
+    public int beliefsMinTemp;
+    public int goalsMaxTemp;
+    public int goalsMinTemp;
 
     /** minimum of 3 beliefs per belief table. for eternal, this allows revision between two goals to produce a third  */
     public DefaultConceptState(String id, int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
@@ -61,12 +64,14 @@ public final class DefaultConceptState extends ConceptState {
                         MutableInteger beliefsMaxTemp, MutableInteger goalsMaxTemp,
                         MutableInteger questionsMax, IntToIntFunction termlinksCapacity, IntToIntFunction taskLinksCapacity) {
         super("___" + id);
-        this.beliefsMaxEte = beliefsMaxEte;
+        this.beliefsMaxEte = beliefsMaxEte.intValue();
+        this.beliefsMinEte = 2;
         this.beliefsMaxTemp = beliefsMaxTemp.intValue();
-        this.beliefsMinTemp = beliefsMaxTemp.intValue()/8;
-        this.goalsMaxEte = goalsMaxEte;
+        this.beliefsMinTemp = 2;
+        this.goalsMaxEte = goalsMaxEte.intValue();
+        this.goalsMinEte = 2;
         this.goalsMaxTemp = goalsMaxTemp.intValue();
-        this.goalsMinTemp = goalsMaxTemp.intValue()/8;
+        this.goalsMinTemp = 2;
         this.questionsMax = questionsMax;
 
         this.termlinksCapacity = termlinksCapacity;
@@ -78,11 +83,11 @@ public final class DefaultConceptState extends ConceptState {
     public int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
         int max, min;
         if (beliefOrGoal) {
-            max = eternalOrTemporal ? beliefsMaxEte.intValue() : beliefsMaxTemp;
-            min = eternalOrTemporal ? beliefsMaxEte.intValue() : beliefsMinTemp;
+            max = eternalOrTemporal ? beliefsMaxEte : beliefsMaxTemp;
+            min = eternalOrTemporal ? beliefsMinEte : beliefsMinTemp;
         } else {
-            max = eternalOrTemporal ? goalsMaxEte.intValue() : goalsMaxTemp;
-            min = eternalOrTemporal ? goalsMaxEte.intValue() : goalsMinTemp;
+            max = eternalOrTemporal ? goalsMaxEte : goalsMaxTemp;
+            min = eternalOrTemporal ? goalsMinEte : goalsMinTemp;
         }
 
         return Util.lerp(Util.unitize((-1 + compoundConcept.complexity())/32f), max, min);

@@ -501,10 +501,10 @@ public interface NAct {
                     P = $.t(1, conf);
                     N = $.t(0f, conf);
                 } else {
-                    P = N = $.t(0.5f,
-                            n.confMin.floatValue() * 2);
-                            //restConf);
-                    //N = P = null;
+//                    P = N = $.t(0.5f,
+//                            n.confMin.floatValue() * 2);
+//                            //restConf);
+                    N = P = null;
                 }
 
 

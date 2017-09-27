@@ -6,6 +6,7 @@ import nars.NARS;
 import nars.Narsese;
 import nars.Param;
 import nars.test.analyze.EventCount;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -15,6 +16,7 @@ public class NALLevelTest {
 
 
 
+    @Ignore
     @Test
     public void testLevel1vs8() throws Narsese.NarseseException {
         Param.DEBUG = true;

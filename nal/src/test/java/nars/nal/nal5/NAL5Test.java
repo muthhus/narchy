@@ -134,7 +134,8 @@ public class NAL5Test extends AbstractNALTest {
         tester.believe("<<robin --> bird> ==> <robin --> animal>>", 0.70f, 0.90f); //.en("Usually if robin is a type of bird then robin is a type of animal.");
         tester.believe("<robin --> animal>"); //.en("Robin is a type of animal.");
         tester.mustBelieve(cycles, "<robin --> bird>",
-                0.7f, 0.9f); //.en("I guess robin is a type of bird.");
+                0.7f, 0.45f); //.en("I guess robin is a type of bird.");
+                //0.7f, 0.9f);
                 //1.00f, 0.36f);
 
     }
@@ -211,9 +212,9 @@ public class NAL5Test extends AbstractNALTest {
     public void compound_decomposition_two_premises1() {
 
         TestNAR tester = test;
-        tester.believe("<<robin --> bird> ==> (&&,<robin --> animal>,<robin --> [flying]>)>", 0.0f, 0.9f); //.en("If robin is a type of bird then robin is not a type of flying animal.");
-        tester.believe("<<robin --> bird> ==> <robin --> [flying]>>"); //.en("If robin is a type of bird then robin can fly.");
-        tester.mustBelieve(cycles * 2, " <<robin --> bird> ==> <robin --> animal>>", 0.00f, 0.81f); //.en("It is unlikely that if a robin is a type of bird then robin is a type of animal.");
+        tester.believe("--(bird:robin ==> (animal:robin && [flying]:robin))", 1.0f, 0.9f); //.en("If robin is a type of bird then robin is not a type of flying animal.");
+        tester.believe("(bird:robin ==> [flying]:robin)"); //.en("If robin is a type of bird then robin can fly.");
+        tester.mustBelieve(cycles * 2, "--(bird:robin ==> animal:robin)", 1.00f, 0.81f); //.en("It is unlikely that if a robin is a type of bird then robin is a type of animal.");
 
     }
 
@@ -223,7 +224,7 @@ public class NAL5Test extends AbstractNALTest {
 
         TestNAR tester = test;
 
-        tester.believe("(&&,<robin --> [flying]>,<robin --> swimmer>)", 1.0f, 0.9f); //.en("Robin cannot be both a flyer and a swimmer.");
+        tester.believe("(<robin --> [flying]> && <robin --> swimmer>)", 1.0f, 0.9f); //.en("Robin cannot be both a flyer and a swimmer.");
         tester.mustBelieve(cycles, "<robin --> swimmer>", 1.00f, 0.81f); //.en("Robin cannot swim.");
     }
 

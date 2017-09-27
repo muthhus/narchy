@@ -2,7 +2,7 @@ package nars;
 
 import com.google.common.base.Joiner;
 import jcog.Texts;
-import nars.nlp.Hear;
+import nars.op.nlp.Hear;
 import spacegraph.audio.MaryTTSpeech;
 
 public class NARchy extends NARS {

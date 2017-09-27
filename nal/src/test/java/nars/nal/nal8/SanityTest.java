@@ -2,6 +2,7 @@ package nars.nal.nal8;
 
 import nars.*;
 import nars.task.DerivedTask;
+import nars.time.Tense;
 import org.junit.Test;
 
 import java.util.SortedSet;
@@ -27,7 +28,9 @@ public class SanityTest {
 
             {
                 actionToggle($.the("mustBeOn"), (b) -> {
-                    score += (b == target[0]) ? +1 : -1;
+                    boolean good = b == target[0];
+                    System.out.println(good ? "=== GOOD ===" : "=== BADD ===");
+                    score += good ? +1 : -1;
                 });
 
             }
@@ -41,7 +44,7 @@ public class SanityTest {
             }
         };
 
-        n.termVolumeMax.setValue(7);
+        n.termVolumeMax.setValue(10);
         a.durations.setValue(1);
 
 
@@ -58,17 +61,21 @@ public class SanityTest {
              return f1;
         });
         n.onTask(t -> {
-            if (t instanceof DerivedTask && t.isBeliefOrGoal()) {
-                derived.add((DerivedTask)t);
+            if (t instanceof DerivedTask &&
+                    t.isGoal()) {
+                    //t.isBeliefOrGoal()) {
+                //derived.add((DerivedTask)t);
+                System.err.println(t.proof());
             }
         });
 
         //n.log();
-        int timeBatch = 25;
+        int timeBatch = 50;
 
-        for (int i = 0; i < 8; i++) {
-            a.curiosity.setValue(1+(1f/i));
+        int batches = 2;
+        for (int i = 0; i < batches; i++) {
             batchCycle(n, togglesPos, togglesNeg, target, a, derived, timeBatch);
+            a.curiosity.setValue(1+(1f/i)); //decrease
         }
     }
 
@@ -76,6 +83,7 @@ public class SanityTest {
         //System.out.println("ON");
         target[0] = true;
         togglesPos[0] = togglesNeg[0] = 0;
+        n.believe($.$safe("target:on"), Tense.Present);
         for (int i = 0; i < 1; i++) {
             batch(n, togglesPos[0], togglesNeg[0], a, derived, timeBatch);
         }
@@ -83,7 +91,7 @@ public class SanityTest {
         //System.out.println("OFF");
         target[0] = false;
         togglesPos[0] = togglesNeg[0] = 0;
-
+        n.believe($.$safe("(--,target:on)"), Tense.Present);
         for (int i = 0; i < 1; i++) {
             batch(n, togglesPos[0], togglesNeg[0], a, derived, timeBatch);
         }

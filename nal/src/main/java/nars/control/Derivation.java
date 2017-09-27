@@ -297,11 +297,12 @@ public class Derivation extends Unify implements TermContext {
              */
             if (!belief.isEternal()) {
 
-                long beliefTruthTime = task.isEternal() ?
+               //project belief truth to task's time
+               long beliefTruthTime = task.isEternal() ?
                         ETERNAL :
                         belief.nearestTimeBetween(task.start(), task.end());
 
-                this.beliefTruth = belief.truth(beliefTruthTime, dur, 0); //project belief truth to task's time
+                this.beliefTruth = belief.truth(beliefTruthTime, dur, confMin);
             } else {
                 this.beliefTruth = beliefTruthRaw;
             }

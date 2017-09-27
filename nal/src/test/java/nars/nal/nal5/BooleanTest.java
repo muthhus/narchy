@@ -38,22 +38,21 @@ public class BooleanTest {
 
     void testSAT2Individual(int i, int j) throws Narsese.NarseseException {
 
-        final float confThresh = 0.5f;
+        final float confThresh = 0.7f;
         Param.DEBUG = true;
 
 //        for (int i = 0; i < 2; i++) {
 //            for (int j = 0; j < 2; j++) {
         NAR d = new NARS().get();
-        //d.log();
         d.truthResolution.setValue(0.05f);
         d.nal(6);
         d.termVolumeMax.setValue(18);
 
         String[] outcomes = {
-                "(x-->(0,0))",
-                "(x-->(0,1))",
-                "(x-->(1,0))",
-                "(x-->(1,1))"};
+                "x:{0}", //"(x-->(0,0))",
+                "x:{1}", //"(x-->(0,1))",
+                "x:{2}", //"(x-->(1,0))",
+                "x:{3}"}; //"(x-->(1,1))"};
         //String expected = "(x --> (" + i + "," + j + "))";
 
         d.believe("( (--(x-->i) && --(x-->j)) ==> " + outcomes[0] + ")");
@@ -74,7 +73,7 @@ public class BooleanTest {
 
         d.run(1024);
 
-        System.out.println(i + " " + j);
+        System.out.println(i + " " + j + " ");
         for (int k = 0, outcomesLength = outcomes.length; k < outcomesLength; k++) {
             String s = outcomes[k];
             Concept dc = d.conceptualize(s);
@@ -82,7 +81,7 @@ public class BooleanTest {
             @Nullable Task t = d.belief(dc.term(), d.time());
             Truth b = t != null ? t.truth() : null;
 
-            System.out.println("\t" + s + "\t" + b);
+            System.out.println("\t" + s + "\t" + b + "\t" + outcomes[k]);
 
 
             int ex = -1, ey = -1;

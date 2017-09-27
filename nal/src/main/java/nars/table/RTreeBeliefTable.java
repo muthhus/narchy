@@ -52,7 +52,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      */
     static final float TRUTHPOLATED_MAX_FRACTION = 0.01f;
 
-    public static final float PRESENT_AND_FUTURE_BOOST = 2f;
+    public static final float PRESENT_AND_FUTURE_BOOST = 1.25f;
 
 
     private transient NAR nar;
@@ -594,8 +594,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
             return (float) ((1.0 / ((1 + awayFromNow)))
-                    * (1 + (r.range(0)) / awayFromNow) /* range, divided by the distance to emulate vanishing perspective proportion to distance */
-                    * (/*1 +*/ (r.range(2)) / 2)); /* conf */
+                    //* (1 + (r.range(0)) / awayFromNow) /* range, divided by the distance to emulate vanishing perspective proportion to distance */
+                    //* (/*1 +*/ (r.range(2)) / 2)); /* conf */
+                    * (1f + r.coord(true,2)));
 
 
             //maximize confidence, minimize frequency variability, minimize distance to now

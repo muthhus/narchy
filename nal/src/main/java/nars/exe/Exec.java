@@ -14,6 +14,7 @@ import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
@@ -60,7 +61,7 @@ abstract public class Exec implements Executor, PriMerge {
 
   /** visits any pending tasks */
     @Deprecated public final void forEach(Consumer<ITask> each) {
-        stream().forEach(each);
+        stream().filter(Objects::nonNull).forEach(each);
     }
 
 

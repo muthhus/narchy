@@ -71,10 +71,11 @@ public class RevectionTest {
 
         int dur = 1;
 
-        Task a = t(1f, 0.5f, 3).evidence(1).apply(n);
-        Task b = t(0f, 0.5f, 6).evidence(2).apply(n);
+        Task a = t(1f, 0.9f, 3).apply(n);
+        Task b = t(0f, 0.9f, 6).apply(n);
         for (int i = 0; i < 10; i++) {
-            System.out.println(i + " " + Param.truth(null, (long) i, i, dur, Lists.newArrayList(a, b)));
+            System.out.println(i + " " +
+                    Param.truth(null, (long) i, i, dur, Lists.newArrayList(a, b)));
         }
 
         System.out.println();
@@ -270,6 +271,7 @@ public class RevectionTest {
 
         BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
 
+
         //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
 
 
@@ -290,8 +292,8 @@ public class RevectionTest {
 
         n.run(3);
         b.print();
-        //assertEquals(4, b.capacity(true));
-        assertEquals(5, b.size(true));
+        assertEquals(4+4, b.capacity(true));
+        assertEquals(4, b.size(true));
 
         assertEquals(5, b.wave().start());
         assertEquals(12, b.wave().end());

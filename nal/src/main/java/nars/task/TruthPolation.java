@@ -65,6 +65,44 @@ public interface TruthPolation extends Consumer<Tasked> {
         }
     }
 
+    /** computes the linear combination in terms of the conf value, not evidence directly UNTESTED */
+    class TruthPolationConf implements TruthPolation {
+        float confSum, wFreqSum;
+        final long start, end;
+        final int dur;
+
+        public TruthPolationConf(long start, long end, int dur) {
+            this.start = start;
+            this.end = end;
+            this.dur = dur;
+        }
+
+        @Override
+        public void accept(Tasked t) {
+            Task task = t.task();
+            float tw = task.evi(start, end, dur);
+            if (tw > 0) {
+                float tc = w2c(tw);
+                this.confSum += tc;
+                wFreqSum += tc * task.freq();
+            }
+
+        }
+
+
+        @Override
+        public PreciseTruth truth() {
+            if (confSum > 0) {
+                float f = wFreqSum / confSum;
+                return new PreciseTruth(f, confSum);
+
+            } else {
+                return null;
+            }
+
+        }
+    }
+
     /** TODO this does not fairly handle equal values; the first will be chosen */
     class TruthPolationGreedy implements TruthPolation {
 

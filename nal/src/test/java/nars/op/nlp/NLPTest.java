@@ -1,4 +1,4 @@
-package nars.nlp;
+package nars.op.nlp;
 
 import com.google.common.base.Joiner;
 import nars.NAR;

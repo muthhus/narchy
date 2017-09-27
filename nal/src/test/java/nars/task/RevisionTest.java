@@ -28,10 +28,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class RevisionTest {
 
-    public static NAR newNAR(int maxBeliefs) {
+    public static NAR newNAR(int fixedNumBeliefs) {
         //this.activeTasks = activeTasks;
         NAR d = new NARS().get();
-        d.nal(7);// {
 
         /*
         @Override
@@ -44,7 +43,13 @@ public class RevisionTest {
         */
 
         //}
-        ((DefaultConceptState)d.terms.conceptBuilder.awake()).beliefsMaxEte.set(maxBeliefs);
+        DefaultConceptState cb = (DefaultConceptState) d.terms.conceptBuilder.awake();
+        cb.beliefsMaxEte = (fixedNumBeliefs);
+        cb.beliefsMaxTemp = (fixedNumBeliefs);
+        cb.beliefsMinTemp = (fixedNumBeliefs);
+        cb.goalsMaxEte = (fixedNumBeliefs);
+        cb.goalsMaxTemp = (fixedNumBeliefs);
+        cb.goalsMinTemp = (fixedNumBeliefs);
         return d;
     }
 
