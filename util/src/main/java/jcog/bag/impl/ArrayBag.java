@@ -647,9 +647,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
             trash = update(null, update);
 
             if (trash != null) {
-                trash.forEach(t -> {
-                    mapRemove(t);
-                });
+                trash.forEach(this::mapRemove);
             }
             ensureSorted();
         }

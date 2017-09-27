@@ -88,14 +88,15 @@ public class TruthWave {
         float start = Float.POSITIVE_INFINITY;
         float end = Float.NEGATIVE_INFINITY;
         for (int i = 0; i < size[0]; i++) {
-            float starts = t[i * ENTRY_SIZE + 0];
+            int ii = i * ENTRY_SIZE + 0;
+            float starts = t[ii];
             if (start == start) {
-                float ends = t[i * ENTRY_SIZE + 1];
+                float ends = t[ii + 1];
 
                 float oo = (starts + ends) / 2; //midpoint
 
-                if (oo > end) end = oo;
-                if (oo < start) start = oo;
+                if (ends > end) end = ends;
+                if (starts < start) start = starts;
             }
         }
         this.start = (long) start;
@@ -130,7 +131,7 @@ public class TruthWave {
     /**
      * fills the wave with evenly sampled points in a time range
      */
-    public void project(Concept c, @NotNull boolean beliefOrGoal, long minT, long maxT, int dur, int points, NAR nar) {
+    public void project(Concept c, boolean beliefOrGoal, long minT, long maxT, int dur, int points, NAR nar) {
         clear();
 
         if (minT == maxT) {

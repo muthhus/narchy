@@ -461,6 +461,9 @@ public class PremiseRule extends GenericCompound {
 
                 case "belief":
                     switch (XString) {
+                          case "containsTask":
+                            pres.add(TaskPolarity.beliefContainsTask);
+                            break;
                         case "negative":
                             pres.add(TaskPolarity.beliefNeg);
                             break;
@@ -488,6 +491,10 @@ public class PremiseRule extends GenericCompound {
 
                 case "task":
                     switch (XString) {
+                        case "containsBelief":
+                            pres.add(TaskPolarity.taskContainsBelief);
+                            break;
+
                         case "negative":
                             pres.add(TaskPolarity.taskNeg);
                             break;

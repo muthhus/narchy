@@ -232,7 +232,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                         reverseLinked = true;
 
 
-                        Activate a = localSubConcept.activate(subDecay, nar);
+                        Activate a = new Activate(localSubConcept, subDecay);
                         nar.input(a);
 
                         localSubConcepts.add(localSubConcept);

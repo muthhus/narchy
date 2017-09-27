@@ -128,7 +128,6 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
             if (cc != null) {
                 cp = 1f; /*nar.pri(cc);*/
-                if (cp != cp) cp = 0;
 
                 long nowStart = now - dur / 2;
                 long nowEnd = now + dur / 2;

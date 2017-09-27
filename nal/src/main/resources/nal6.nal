@@ -148,8 +148,10 @@
 //conditional abduction
 
     ((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
-    ((&&,M,A..+) ==> C), ((&&,A..+) ==> C), task(".") |- M, (Belief:Abduction)
-    (M ==> C), C, task(".") |- M, (Belief:Abduction)
+    //((&&,M,A..+) ==> C), ((&&,A..+) ==> C), task(".") |- M, (Belief:Abduction)
+    ((&&,M,A..+) ==> X), ((&&,A..+) ==> Y), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
+    //(M ==> C), C, task(".") |- M, (Belief:Abduction)
+    (M ==> X), Y, task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
 
         //TODO modify ellipsis to allow these two rules to be expressed as one:
         // ((&&,M,A..+) ==> C), (A..+ ==> C) |- M, (Belief:Abduction)
@@ -161,14 +163,14 @@
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
     //the strange composition of && is to preserve temporality
 
-    ((&&,M,A..+) ==> C), (B ==> M), neqRCom(C,B)  |- (((&&,A..+) &&+- B) ==>+- C), (Belief:Deduction)
-    ((&&,B,A..+) ==> C), (B ==> M), neqRCom(C,M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Induction)
-    ((&&,A..+) ==> C), M, neqRCom(C,M), notImpl(M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Induction)
+    ((&&,M,A..+) ==> C), (B ==> M)  |- (((&&,A..+) &&+- B) ==>+- C), (Belief:Deduction)
+    ((&&,B,A..+) ==> C), (B ==> M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Induction)
+    ((&&,A..+) ==> C), M,  notImpl(M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Induction)
 
-    ((&&,X,A..+) ==> C), ((&&,Y,A..+) ==> C), neqRCom(X,Y) |- (X ==>+- Y), (Belief:Induction)
-    ((&&,X,A..+) ==> C), ((&&,Y,A..+) ==> C), neqRCom(X,Y) |- (Y ==>+- X), (Belief:Abduction)
-    (C ==> (&&,X,A..+)), (C ==> (&&,Y,A..+)), neqRCom(X,Y) |- (X ==>+- Y), (Belief:Induction)
-    (C ==> (&&,X,A..+)), (C ==> (&&,Y,A..+)), neqRCom(X,Y) |- (Y ==>+- X), (Belief:Abduction)
+    ((&&,X,A..+) ==> C), ((&&,Y,A..+) ==> C) |- (X ==>+- Y), (Belief:Induction)
+    ((&&,X,A..+) ==> C), ((&&,Y,A..+) ==> C) |- (Y ==>+- X), (Belief:Abduction)
+    (C ==> (&&,X,A..+)), (C ==> (&&,Y,A..+)) |- (X ==>+- Y), (Belief:Induction)
+    (C ==> (&&,X,A..+)), (C ==> (&&,Y,A..+)) |- (Y ==>+- X), (Belief:Abduction)
         //((&&,B,A..+) ==> C), ((&&,A..+) ==> C) |- (B ==>+- C), (Belief:Induction)
 
 
@@ -225,14 +227,14 @@
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
 
-    B, C, belief("&&|"), task("!"), time(urgent) |- without(C,B), (Goal:Strong)
-    B, C, belief("&&|"), task("!"), time(urgent) |- without(C,--B), (Goal:StrongN)
+    B, C, belief("&&|"), belief(containsTask), task("!"), time(urgent) |- without(C,B), (Goal:Strong)
+    B, C, belief("&&|"), belief(containsTask), task("!"), time(urgent) |- without(C,--B), (Goal:StrongN)
 
     B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
     B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),--conjEvent(C,late),B), (Goal:StrongN)
 
-    C, B, task("&&"), task("!"), time(urgent) |- conjDropIfEarliest(C,B), (Goal:Strong)
-    C, B, task("&&"), task("!"), time(urgent) |- conjDropIfEarliest(C,--B), (Goal:StrongPN)
+    C, B, task("&&"), task(containsBelief), task("!"), time(urgent) |- conjDropIfEarliest(C,B), (Goal:Strong)
+    C, B, task("&&"), task(containsBelief), task("!"), time(urgent) |- conjDropIfEarliest(C,--B), (Goal:StrongPN)
 
     //(&&,A_1..n), A_i |- A_i, (Truth:StructuralDeduction, Desire:Strong)
     //SUSPECT:

@@ -55,9 +55,6 @@ public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
 
     /*@NotNull*/ QuestionTable quests();
 
-    Activate activate(float pri, NAR n);
-
-
     void delete(NAR nar);
 
     default boolean isDeleted() {

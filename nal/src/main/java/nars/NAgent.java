@@ -202,18 +202,28 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         nar.runLater(() -> {
             //this.curiosityAttention = reinforcementAttention / actions.size();
 
-            /** set the sensor budget policy */
-            {
-                Task e = nar.goal($.parallel(happy.term(),sad.term().neg())); /* eternal */
+                Task he = nar.goal(happy.term()); /* eternal */
                 predictors.add(() -> {
-                    e.priMax(nar.priDefault(GOAL));
-                    return e;
+                    he.priMax(nar.priDefault(GOAL));
+                    return he;
                 });
-                Task f = nar.believe($.sim(happy.term(), sad.term().neg()));
-                predictors.add(() -> f);
-                Task g = nar.believe($.sim(happy.term().neg(), sad.term()));
-                predictors.add(() -> g);
-            }
+                Task se = nar.goal(sad.term().neg()); /* eternal */
+                predictors.add(() -> {
+                    se.priMax(nar.priDefault(GOAL));
+                    return se;
+                });
+
+//            {
+//                Task e = nar.goal($.parallel(happy.term(),sad.term().neg())); /* eternal */
+//                predictors.add(() -> {
+//                    e.priMax(nar.priDefault(GOAL));
+//                    return e;
+//                });
+//                Task f = nar.believe($.sim(happy.term(), sad.term().neg()));
+//                predictors.add(() -> f);
+//                Task g = nar.believe($.sim(happy.term().neg(), sad.term()));
+//                predictors.add(() -> g);
+//            }
 //            {
 //                Task happyEternal = nar.goal(happy.term()); /* eternal */
 //                predictors.add(() -> {
@@ -228,14 +238,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 //                    return sadEternal;
 //                });
 //            }
-
-            //temporal happy
-//            predictors.add(
-//                    goal(happy,
-//                            t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL), nar.confDefault(/*BELIEF*/ BELIEF)))
-//                            //ETERNAL
-//                    )
-//            );
 
             //        p.add(
             //            question(seq($.varQuery(1), dur, happiness),

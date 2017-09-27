@@ -140,7 +140,7 @@ abstract public class NAgentX extends NAgent {
 
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
-        return runRT(init, 50, fps, endTime);
+        return runRT(init, 25, fps, endTime);
     }
 
     public static NAR runRT(Function<NAR, NAgent> init, float narFPS, float agentFPS, long endTime) {
@@ -163,13 +163,13 @@ abstract public class NAgentX extends NAgent {
         MultiExec exe = new MultiExec(THREADS, 64 * 1024);
         Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
 
-        exe.add(new FocusExec(), (x) -> true);
-        exe.add(new FocusExec() {
-                    {
-                        concepts.setCapacity(32);
-                    }
-                },
-                (x) -> true);
+//        exe.add(new FocusExec(), (x) -> true);
+//        exe.add(new FocusExec() {
+//                    {
+//                        concepts.setCapacity(32);
+//                    }
+//                },
+//                (x) -> true);
 
         NAR n = new NARS()
                 .exe(exe)

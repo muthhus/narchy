@@ -1,5 +1,6 @@
 package nars.derive.op;
 
+import nars.Op;
 import nars.control.Derivation;
 import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
@@ -10,6 +11,29 @@ import org.jetbrains.annotations.NotNull;
  * task truth is postiive
  */
 abstract public class TaskPolarity extends AbstractPred<Derivation>{
+
+    public static final PrediTerm<Derivation> beliefContainsTask = new TaskPolarity("BeliefContainsTask") {
+        @Override
+        public boolean test(@NotNull Derivation m) {
+            return m.beliefTerm.contains(m.taskTerm) || (m.beliefTerm.hasAny(Op.NEG) && m.beliefTerm.contains(m.taskTerm.neg()));
+        }
+
+        @Override
+        public float cost() {
+            return 0.5f;
+        }
+    };
+    public static final PrediTerm<Derivation> taskContainsBelief = new TaskPolarity("TaskContainsBelief") {
+        @Override
+        public boolean test(@NotNull Derivation m) {
+            return m.taskTerm.contains(m.beliefTerm) || (m.taskTerm.hasAny(Op.NEG) && m.taskTerm.contains(m.beliefTerm.neg()));
+        }
+
+        @Override
+        public float cost() {
+            return 0.5f;
+        }
+    };
 
     public static final PrediTerm<Derivation> taskPos = new TaskPolarity("TaskPos") {
         @Override

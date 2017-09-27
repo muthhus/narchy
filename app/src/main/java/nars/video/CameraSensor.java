@@ -212,9 +212,11 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
 
         resolution(Util.round(Math.min(0.01f, 0.5f * (1f - this.in.amp())), 0.01f));
 
+        final int WORK_FACTOR = Math.min(width, height);
+
         //frame-rate timeslicing
         int actualPixels = pixels.size();
-        int pixelsSize = Math.min(actualPixels, work);
+        int pixelsSize = Math.min(actualPixels, work * WORK_FACTOR);
         int start, end;
         if (pixelsSize == actualPixels) {
             update(0, actualPixels, nar);
@@ -235,7 +237,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         //System.out.println(value + " " + fraction + " "+ start + " " + end);
 
 
-        return pixelsSize;
+        return Math.max(1, pixelsSize/WORK_FACTOR);
     }
 
     private void update(int start, int end, NAR nar) {

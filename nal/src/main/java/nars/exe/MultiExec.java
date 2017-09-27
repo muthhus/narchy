@@ -1,25 +1,20 @@
 package nars.exe;
 
 import jcog.Util;
-import jcog.event.ListTopic;
 import jcog.event.On;
-import jcog.event.Topic;
-import jcog.exe.Loop;
 import jcog.pri.Prioritized;
 import jcog.sort.TopN;
 import nars.NAR;
-import nars.control.Activate;
-import nars.control.Causable;
-import nars.control.Cause;
 import nars.task.ITask;
 import nars.task.NativeTask;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.*;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 /**
@@ -37,11 +32,11 @@ public class MultiExec extends Exec {
     private final BlockingQueue<ITask> q;
     private ExecutorService exe;
 
-    final Topic<Activate> onActivate = new ListTopic();
-
-    //private final Worker[] workers;
+    final Sub[] sub;
     private final int num;
     private On onCycle;
+
+    final static int SUB_CAPACITY = 1024;
 
     @Override
     public void execute(@NotNull Runnable runnable) {
@@ -49,12 +44,13 @@ public class MultiExec extends Exec {
     }
 
     public Stream<ITask> stream() {
-        return q.stream();
+        return Stream.of(sub).flatMap(UniExec::stream);
     }
 
 
     public MultiExec(int threads, int qSize) {
         num = threads;
+        sub = new Sub[num];
         q = Util.blockingQueue(qSize);
     }
 
@@ -70,33 +66,78 @@ public class MultiExec extends Exec {
         super.start(nar);
         exe = Executors.newFixedThreadPool(num);
         for (int i = 0; i < num; i++) {
-            exe.execute(() -> {
-                int idle = 0;
-                while (true) {
-                    ITask r = q.poll();
-                    if (r != null) {
-                        execute(r);
-                        idle = 0;
-                    } else {
-                        Util.pauseNext(++idle);
-                    }
+
+            exe.execute( sub[i] = new Sub(nar, SUB_CAPACITY));
+
+//            exe.execute(() -> {
+//                int idle = 0;
+//                while (true) {
+//                    ITask r = q.poll();
+//                    if (r != null) {
+//                        execute(r);
+//                        idle = 0;
+//                    } else {
+//                        Util.pauseNext(++idle);
+//                    }
+//                }
+//            });
+        }
+    }
+
+
+    class Sub extends UniExec implements Runnable {
+
+        int batchSize;
+
+        Sub(NAR nar, int capacity) {
+            super(capacity);
+            this.batchSize = Math.max(1, capacity/16);
+            start(nar);
+        }
+
+        public void run() {
+            while (true) {
+
+                int pending = q.size();
+                if (pending > 0) {
+                    ITask i = q.poll();
+                    if (i != null)
+                        execute(i);
                 }
-            });
+
+                System.out.println(plan.size());
+
+                workRemaining = batchSize;
+                plan.commit(null)
+                        .sample( super::exeSample);
+
+
+            }
+        }
+
+        public void queue(ITask input) {
+            plan.putAsync(u(input));
+        }
+
+        @Override
+        public void add(ITask input) {
+            MultiExec.this.add(input);
+        }
+
+        protected void execute(ITask x) {
+            Iterable<? extends ITask> y;
+            try {
+                y = x.run(nar);
+                if (y!=null)
+                    y.forEach(MultiExec.this::add);
+            } catch (Throwable t) {
+                logger.error("{} {}", x, t);
+                return;
+            }
+
         }
     }
 
-    public void execute(ITask r) {
-        try {
-
-            r.run(nar);
-
-            if (r instanceof Activate)
-                onActivate.emit((Activate) r);
-
-        } catch (Throwable t) {
-            logger.error("{} {}", r, t);
-        }
-    }
 
     @Override
     public synchronized void stop() {
@@ -117,14 +158,29 @@ public class MultiExec extends Exec {
 //        if (!q.offer(t)) {
 //            drainEvict(t);
 //        }
-        int stall = 0;
-        while (!q.offer(t)) {
-            Util.pauseNext(stall++);
-            if (stall > 128) {
-                drainEvict(t);
-                break;
+        if (t instanceof NativeTask) {
+            int stall = 0;
+            while (!q.offer(t)) {
+                Util.pauseNext(stall++);
+                if (stall > 128) {
+                    drainEvict(t);
+                    break;
+                }
             }
+        } else {
+            sub[which(t)].queue(t);
         }
+    }
+
+    protected int which(ITask t) {
+        return Math.abs(t.hashCode()) % sub.length;
+    }
+
+    public boolean tryAdd(/*@NotNull*/ ITask t) {
+//        if (!q.offer(t)) {
+//            drainEvict(t);
+//        }
+        return q.offer(t);
     }
 
     private void drainEvict(ITask t) {
@@ -156,62 +212,6 @@ public class MultiExec extends Exec {
         tmpEvict.forEach(q::offer);
     }
 
-    public void add(FocusExec reasoner, Predicate<Activate> filter) {
-        execute((Runnable) () -> new Reasoner(reasoner, filter));
-    }
-
-    class Reasoner extends Causable /* TODO use Throttled */ implements Consumer<Activate> {
-        private final FocusExec sub;
-
-        /**
-         * customizable filter, or striping so that every reasoner doesnt get the same inputs
-         */
-        private final Predicate<Activate> filter;
-        private final Cause out;
-
-        public Reasoner(FocusExec focusExec, Predicate<Activate> filter) {
-            super(nar);
-            this.sub = focusExec;
-            this.filter = filter;
-            this.out = nar.newCauseChannel(this);
-            sub.cause = this.out.id;
-            sub.start(nar);
-        }
-
-        @Override
-        public boolean singleton() {
-            return true;
-        }
-
-        @Override
-        protected void start(NAR nar) {
-            super.start(nar);
-            ons.add(onActivate.on(this));
-        }
-
-        @Override
-        public float value() {
-            return out.amp();
-        }
-
-        @Override
-        protected int next(NAR n, int work) {
-            FocusExec f = (FocusExec) this.sub;
-            f.run(work);
-            return work; //TODO better estimate than this, even to the precision of the TTL spent
-        }
-
-        public void stop() {
-            sub.stop();
-        }
-
-        @Override
-        public void accept(Activate a) {
-            if (filter.test(a))
-                sub.add(a);
-        }
-    }
-
 
     @Override
     public int concurrency() {
@@ -224,70 +224,51 @@ public class MultiExec extends Exec {
     }
 
 
-    static class Sub extends Exec {
-
-        private final Exec model;
-        private Executor passive;
-        private Loop loop;
-
-        public Sub(Exec delegate) {
-            super();
-            this.model = delegate;
-        }
-
-        Loop start(NAR nar, int periodMS) {
-            this.start(nar);
-            model.start(nar);
-
-//            new CPUThrottle()
-            return this.loop = new Loop(periodMS) {
-                @Override
-                public boolean next() {
-                    //System.out.println(Thread.currentThread() + " " + model);
-                    ((Runnable) model).run(); //HACK
-                    return true;
-                }
-            };
-        }
-
-
-        //        @Override
-//        protected void actuallyRun(CLink<? extends ITask> x) {
-//
-//            super.actuallyRun(x);
-//
-//            ((RootExecutioner) exe).apply(x); //apply gain after running
-//
-//        }
-        @Override
-        public void execute(Runnable r) {
-            passive.execute(r);
-        }
-
-        @Override
-        public synchronized void stop() {
-            if (loop != null) {
-                loop.stop();
-                model.stop();
-                loop = null;
-            }
-        }
-
-        @Override
-        public Stream<ITask> stream() {
-            return model.stream();
-        }
-
-        @Override
-        public int concurrency() {
-            return model.concurrency();
-        }
-
-
-        @Override
-        public void add(@NotNull ITask input) {
-            model.add(input);
-        }
-    }
 
 }
+//class Reasoner extends Causable /* TODO use Throttled */ implements Consumer<Activate> {
+//        private final FocusExec sub;
+//
+//        /**
+//         * customizable filter, or striping so that every reasoner doesnt get the same inputs
+//         */
+//        private final Predicate<Activate> filter;
+//        private final Cause out;
+//
+//        public Reasoner(FocusExec focusExec, Predicate<Activate> filter) {
+//            super(nar);
+//            this.sub = focusExec;
+//            this.filter = filter;
+//            this.out = nar.newCauseChannel(this);
+//            sub.cause = this.out.id;
+//            sub.start(nar);
+//        }
+//
+//        @Override
+//        public boolean singleton() {
+//            return true;
+//        }
+//
+//
+//        @Override
+//        public float value() {
+//            return out.amp();
+//        }
+//
+//        @Override
+//        protected int next(NAR n, int work) {
+//            FocusExec f = (FocusExec) this.sub;
+//            f.run(work);
+//            return work; //TODO better estimate than this, even to the precision of the TTL spent
+//        }
+//
+//        public void stop() {
+//            sub.stop();
+//        }
+//
+//        @Override
+//        public void accept(Activate a) {
+//            if (filter.test(a))
+//                sub.add(a);
+//        }
+//    }

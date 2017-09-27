@@ -262,7 +262,7 @@ public enum MetaGoal {
         NARLoop l = nar.loop;
         long targetCycleTimeNS = 0;
         if (l.isRunning()) {
-            double frameTime = l.dutyTime.getMean();
+            //double frameTime = l.dutyTime.getMean();
             //if (frameTime > 1000*l.periodMS.intValue())
             //System.out.println("frameTime: " + n4(1000 *  frameTime) + " ms");
             targetCycleTimeNS = l.periodMS.intValue() * 1000000 * nar.exe.concurrency();
@@ -270,9 +270,8 @@ public enum MetaGoal {
 //                    l.periodMS.intValue() * 1000000 ,
 //                    Math.round(frameTime * 1.0E9)
 //            );
-        }
-
-        if (targetCycleTimeNS==0) {
+        } else {
+        //if (targetCycleTimeNS==0) {
             //some arbitrary default target duty cycle length
             targetCycleTimeNS = 100 * 1000000 * nar.exe.concurrency();
         }
@@ -310,12 +309,12 @@ public enum MetaGoal {
         Arrays.fill(iter, 1);
 
 
-        final int maxSamplesEach = 2 * cc;
-        final int[] samplingFactor = {
-                maxSamplesEach
+
+        final int[] samplesRemain = {
+                2 * cc
         };
 
-        float throttle = /*nar.exe.load() */ 1f / (maxSamplesEach);
+        float throttle = (1f - (float)Math.sqrt(nar.exe.load())) / samplesRemain[0];
 
         Util.decideRoulette(cc, (c) -> bcr[c], nar.random(), (j) -> {
 
@@ -328,7 +327,7 @@ public enum MetaGoal {
                 changedWeights = true;
             }
 
-            if (samplingFactor[0]-- <= 0) return STOP;
+            if (samplesRemain[0]-- <= 0) return STOP;
             else {
                 return changedWeights ? WEIGHTS_CHANGED : CONTINUE;
             }
@@ -337,7 +336,7 @@ public enum MetaGoal {
         //System.out.println(Arrays.toString(iter));
 
         for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
-            int ii = ( Math.round(iter[i]));
+            int ii = (int) Math.ceil(iter[i]);
             if (ii > 0)
                 nar.input(new InvokeCause(causables.get(i), ii));
         }

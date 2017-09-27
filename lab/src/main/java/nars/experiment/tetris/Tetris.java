@@ -522,6 +522,9 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //                if (t.isEternal() && !t.isInput()) {
 //                    System.err.println(t.proof());
 //                }
+//                if (t.isGoal() && (t.term().equals(aa.sad.term()) || t.term().equals(aa.happy.term()))) {
+//                    System.err.println(t.proof());
+//                }
 //
 //            });
 

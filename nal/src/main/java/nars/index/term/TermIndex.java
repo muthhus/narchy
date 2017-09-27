@@ -138,7 +138,6 @@ public abstract class TermIndex implements TermContext {
         }
 
         if (s == ConceptState.New) {
-            cc.activate(0, nar);
             cc.state(conceptBuilder.init());
         }
 

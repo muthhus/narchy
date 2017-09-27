@@ -295,8 +295,12 @@ public class RevectionTest {
         assertEquals(4+4, b.capacity(true));
         assertEquals(4, b.size(true));
 
+        b.print();
+
         assertEquals(5, b.wave().start());
         assertEquals(12, b.wave().end());
+
+
 
     }
 

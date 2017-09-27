@@ -84,16 +84,16 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termed {
     }
 
 
-    @Override
-    public Activate activate(float pri, NAR n) {
-        //store per 'self' term allowing a schizo NAR to assign different activations to each 'personality'
-        Activate a = (Activate) computeIfAbsent(n.self(), (s) ->
-                new Activate(BaseConcept.this, 0)
-        );
-        //TODO forget based on dt
-        a.priAdd(pri);
-        return a;
-    }
+//    @Override
+//    public Activate activate(float pri, NAR n) {
+//        //store per 'self' term allowing a schizo NAR to assign different activations to each 'personality'
+//        Activate a = (Activate) computeIfAbsent(n.self(), (s) ->
+//                new Activate(BaseConcept.this, 0)
+//        );
+//        //TODO forget based on dt
+//        a.priAdd(pri);
+//        return a;
+//    }
 
     @Override
     public final Term term() {

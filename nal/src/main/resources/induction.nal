@@ -24,9 +24,9 @@
         B, A, time(raw), belief(negative), task("."), time(dtEventsOrEternals), neqAndCom(A,B),   notImpl(A) |- varIntro((--A ==>+- B)), (Belief:InductionPN)
 
 //&&
-    B, A, task("."), time(raw), time(dtEvents), notImpl(A),notImpl(B)                            |- (polarize(B,task) &&+- polarize(A,belief)), (Belief:IntersectionDepolarized)
+    B, A, task("."), time(raw), time(dtEvents)                           |- (polarize(B,task) &&+- polarize(A,belief)), (Belief:IntersectionDepolarized)
         //B, A, task("."), time(raw), time(dtEvents), notImpl(A),notImpl(B)                            |- (B &&+- A), (Belief:Intersection)
-    B, A, task("."), time(raw), time(dtEventsOrEternals), neqAndCom(A,B), notImpl(A),notImpl(B)  |- varIntro((polarize(B,task) &&+- polarize(A,belief))), (Belief:IntersectionDepolarized)
+    B, A, task("."), time(raw), time(dtEventsOrEternals), neqAndCom(A,B)  |- varIntro((polarize(B,task) &&+- polarize(A,belief))), (Belief:IntersectionDepolarized)
         //B, A, task("."), time(raw), time(dtEventsOrEternals), neqAndCom(A,B), notImpl(A),notImpl(B)  |- varIntro((B &&+- A)), (Belief:Intersection)
 
 

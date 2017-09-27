@@ -1,2 +1,2 @@
-P, X, task("*"), contains(P, X) |- ((P, indices(P,X))-->X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+P, X, task("*"), task(containsBelief) |- ((P, indices(P,X))-->X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
     //ex:  (a,x,b,x)  x   |-   (((a,x,b,x), {1, 3}) --> x)

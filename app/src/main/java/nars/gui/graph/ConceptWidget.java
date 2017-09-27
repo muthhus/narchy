@@ -198,8 +198,10 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
         if (pri < 0)
             return;
 
-
         Termed ttt = tgt.get();
+        if (ttt == null)
+            return;
+
         Term tt = ttt.term();
         if (!tt.equals(key)) {
             ConceptWidget to = space.space.get(tt);
