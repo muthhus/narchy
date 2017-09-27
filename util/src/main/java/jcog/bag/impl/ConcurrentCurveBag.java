@@ -19,11 +19,13 @@ public class ConcurrentCurveBag<X extends Priority> extends CurveBag<X> {
     public ConcurrentCurveBag(@NotNull PriMerge mergeFunction, @NotNull Map<X, X> map, Random rng, int cap) {
         super(mergeFunction, map, rng, cap);
 
-        this.toPut = new QueueLock<X>(Util.blockingQueue(cap), super::putAsync, mustSort ? (batchSize) -> {
-            synchronized (items) {
-                super.ensureSorted();
+        this.toPut = new QueueLock<X>(Util.blockingQueue(cap), super::putAsync, (batchSize) -> {
+            if (mustSort) {
+                synchronized (items) {
+                    super.ensureSorted();
+                }
             }
-        } : null);
+        });
     }
 
     @Override

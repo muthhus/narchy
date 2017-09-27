@@ -48,11 +48,14 @@ public class QueueLock<X> implements Consumer<X> {
 
     @Override
     public void accept(@NotNull X x) {
-        try {
-            queue.put(x);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        if (!queue.offer(x)) {
+            proc.accept(x);
         }
+//        try {
+//
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
 
         boolean responsible = busy.compareAndSet(0, 1);
         if (!responsible)

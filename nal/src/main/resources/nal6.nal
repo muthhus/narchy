@@ -218,18 +218,21 @@
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
     //structural decompose any component of a conjunction.
-    C, C, task("&&") |- dropAnyEvent(C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    C, C, task("&&") |- dropAnyEvent(C), (Belief:StructuralDeduction)
     //(&&,X,A..+), X, task("!") |- X, (Goal:Strong)
     //(&&,--X,A..+), X, task("!") |- X, (Goal:StrongPN)
 
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
 
-    B, C, belief("&&|"), task("!"), task(positive), time(urgent) |- without(C,B), (Goal:Strong)
-    B, C, belief("&&|"), task("!"), task(negative), time(urgent) |- without(C,--B), (Goal:StrongN)
+    B, C, belief("&&|"), task("!"), time(urgent) |- without(C,B), (Goal:Strong)
+    B, C, belief("&&|"), task("!"), time(urgent) |- without(C,--B), (Goal:StrongN)
 
-    B, C, belief("&&+"), task("!"), task(positive), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
-    B, C, belief("&&+"), task("!"), task(negative), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),--conjEvent(C,late),B), (Goal:StrongN)
+    B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
+    B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),--conjEvent(C,late),B), (Goal:StrongN)
+
+    C, B, task("&&"), task("!"), time(urgent) |- conjDropIfEarliest(C,B), (Goal:Strong)
+    C, B, task("&&"), task("!"), time(urgent) |- conjDropIfEarliest(C,--B), (Goal:StrongPN)
 
     //(&&,A_1..n), A_i |- A_i, (Truth:StructuralDeduction, Desire:Strong)
     //SUSPECT:

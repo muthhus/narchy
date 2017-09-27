@@ -129,7 +129,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     int nal;
 
-    protected final NARLoop loop = new NARLoop(this);
+    public final NARLoop loop = new NARLoop(this);
 
     private final PrediTerm<Derivation> deriver;
 
@@ -1482,10 +1482,33 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         return this;
     }
+    @NotNull
+    public NAR outputText(@NotNull OutputStream o, @NotNull Function<Task, Task> each) {
+
+        //SnappyFramedOutputStream os = new SnappyFramedOutputStream(o);
+
+        PrintStream ps = new PrintStream(o);
+
+        MutableInteger total = new MutableInteger(0), wrote = new MutableInteger(0);
+
+        StringBuilder sb = new StringBuilder();
+        tasks().forEach(_x -> {
+
+            total.increment();
+            Task x = post(_x);
+            if (x.truth() != null && x.conf() < confMin.floatValue())
+                return; //ignore task if it is below confMin
+
+            sb.setLength(0);
+            ps.println(x.appendTo(sb, true));
+        });
+
+        return this;
+    }
 
     @NotNull
-    public NAR output(@NotNull File o) throws FileNotFoundException {
-        return output(new FileOutputStream(o));
+    public NAR output(@NotNull File o, boolean binary) throws FileNotFoundException {
+        return output(new FileOutputStream(o), binary);
     }
 
     @NotNull
@@ -1494,8 +1517,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR output(@NotNull OutputStream o) {
-        return outputBinary(o, x -> x.isDeleted() ? null : x);
+    public NAR output(@NotNull OutputStream o, boolean binary) {
+        if (binary) {
+            return outputBinary(o, x -> x.isDeleted() ? null : x);
+        } else {
+            return outputText(o, x -> x.isDeleted() ? null : x);
+        }
     }
 
     /**

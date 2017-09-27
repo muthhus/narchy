@@ -20,6 +20,7 @@ import nars.task.util.TaskRegion;
 import nars.task.util.TaskRegionLink;
 import nars.task.util.TimeRange;
 import nars.term.Term;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -28,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -62,36 +64,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
     public RTreeBeliefTable() {
-        Spatialization<TaskRegion> model = new Spatialization<TaskRegion>((t -> t),
-                SPLIT,
-                MIN_TASKS_PER_LEAF, MAX_TASKS_PER_LEAF) {
-
-
-            @Override
-            public void merge(TaskRegion existing, TaskRegion incoming) {
-
-                Task i = incoming.task();
-//                if (e == i)
-//                    return; //same instance
-
-                float activation = i.priElseZero();
-                if (activation < Prioritized.EPSILON)
-                    return;
-
-                Task e = existing.task();
-                float before = e.priElseZero();
-                ((NALTask) e).causeMerge(i);
-                float after = e.priMax(activation);
-                float activationApplied = (after - before);
-
-
-                if (activationApplied >= Prioritized.EPSILON) {
-                    i.log((Runnable) () -> {
-                        Activate.activate(e, activationApplied, nar);
-                    }); //store here so callee can activate outside of the lock
-                }
-            }
-        };
+        Spatialization<TaskRegion> model = new RTreeBeliefModel();
 
         this.tree = new ConcurrentRTree<>(
                 new RTree<TaskRegion>(model) {
@@ -596,7 +569,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             return (float) ((1.0 / ((1 + awayFromNow)))
                     //* (1 + (r.range(0)) / awayFromNow) /* range, divided by the distance to emulate vanishing perspective proportion to distance */
                     //* (/*1 +*/ (r.range(2)) / 2)); /* conf */
-                    * (1f + r.coord(true,2)));
+                    * (1f + r.coord(true, 2)));
 
 
             //maximize confidence, minimize frequency variability, minimize distance to now
@@ -716,6 +689,80 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         forEachTask(t -> out.println(t.toString(true)));
         tree.stats().print(out);
     }
+
+    private class RTreeBeliefModel extends Spatialization<TaskRegion> {
+
+
+        public RTreeBeliefModel() {
+            super((t -> t), RTreeBeliefTable.SPLIT, RTreeBeliefTable.MIN_TASKS_PER_LEAF, RTreeBeliefTable.MAX_TASKS_PER_LEAF);
+        }
+
+        @Override
+        public Node<TaskRegion, TaskRegion> newLeaf() {
+            return new BeliefLeaf(max);
+        }
+
+        @Override
+        public void merge(TaskRegion existing, TaskRegion incoming) {
+
+            Task i = incoming.task();
+//                if (e == i)
+//                    return; //same instance
+
+            float activation = i.priElseZero();
+            if (activation < Prioritized.EPSILON)
+                return;
+
+            Task e = existing.task();
+            float before = e.priElseZero();
+            ((NALTask) e).causeMerge(i);
+            float after = e.priMax(activation);
+            float activationApplied = (after - before);
+
+
+            if (activationApplied >= Prioritized.EPSILON) {
+                i.log((Runnable) () -> {
+                    Activate.activate(e, activationApplied, nar);
+                }); //store here so callee can activate outside of the lock
+            }
+        }
+
+    }
+
+    private static class BeliefLeaf extends Leaf<TaskRegion> {
+        public BeliefLeaf(int max) {
+            super(new TaskRegion[max]);
+        }
+
+        @Override
+        public boolean contains(TaskRegion t, Spatialization<TaskRegion> model) {
+            Task incomingTask = t.task();
+            for (int i = 0; i < size; i++) {
+                TaskRegion d = data[i];
+                if (d == t) {
+                    return true;
+                }
+                if (d.contains(t)) {
+                    if (d.equals(t)) {
+                        model.merge(d, t);
+                        return true;
+                    } else {
+                        NALTask existingTask = (NALTask) d.task();
+                        if (existingTask.term().equals(incomingTask.term())) {
+                            if (Stamp.equalsIgnoreCyclic(existingTask.stamp(), incomingTask.stamp())) {
+                                existingTask.causeMerge(incomingTask);
+                                existingTask.priMax(incomingTask.priElseZero());
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+
+        }
+    }
+
 }
 
 

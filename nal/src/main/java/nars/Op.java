@@ -1244,7 +1244,9 @@ public enum Op implements $ {
         return bits;
     }
 
-    /** ops across which reflexivity of terms is allowed */
+    /**
+     * ops across which reflexivity of terms is allowed
+     */
     final static int relationDelimeter = Op.or(Op.PROD, Op.CONJ, Op.NEG);
     public static final Predicate<Term> recursiveCommonalityDelimeter =
             c -> !c.isAny(relationDelimeter);
@@ -1325,7 +1327,7 @@ public enum Op implements $ {
                     if (subjConj && !predConj && subjComm) {
                         TermContainer subjs = subject.subterms();
                         int i = subjs.indexOf(predicate);
-                        if (i!=-1) {
+                        if (i != -1) {
                             //probably need to drop from both but for now the safest thing is just to return Null
                             //subject = conjDrop(subject, i);
                             return Null;
@@ -1333,13 +1335,14 @@ public enum Op implements $ {
                     } else if (!subjConj && predConj && predComm) {
                         TermContainer preds = predicate.subterms();
                         int i = preds.indexOf(subject);
-                        if (i!=-1) {
+                        if (i != -1) {
                             //probably need to drop from both but for now the safest thing is just to return Null
                             //predicate = conjDrop(predicate, i);
                             return Null;
                         }
 
-                    } if ((subjConj && predConj) && subjComm && predComm) {
+                    }
+                    if ((subjConj && predConj) && subjComm && predComm) {
                         final Term csub = subject;
                         TermContainer subjs = csub.subterms();
                         final Term cpred = predicate;
@@ -1449,11 +1452,11 @@ public enum Op implements $ {
 
         Predicate<Term> delim =
                 op == IMPL ?
-                    (dtConcurrent ? (x)->true :
-                            Op.recursiveCommonalityDelimeter) :
-                            //Op.onlyTemporal) :
+                        (dtConcurrent ? (x) -> true :
+                                Op.recursiveCommonalityDelimeter) :
+                        //Op.onlyTemporal) :
 
-                    Op.recursiveCommonalityDelimeter;
+                        Op.recursiveCommonalityDelimeter;
 
         if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
                 (op != IMPL || dtConcurrent)) { //apply to: inh, sim, and current impl
@@ -1506,15 +1509,15 @@ public enum Op implements $ {
     private static Term conjDrop(@NotNull Term conj, int i) {
         TermContainer cs = conj.subterms();
         if (cs.subs() == 2) {
-            return conj.sub(1-i);
+            return conj.sub(1 - i);
         } else {
             Term[] s = cs.theArray();
             int sl = s.length;
             Term[] t = new Term[sl - 1];
             if (i > 0)
                 System.arraycopy(s, 0, t, 0, i);
-            if (i < s.length-1)
-                System.arraycopy(s, i+1, t, i, sl - 1 - i);
+            if (i < s.length - 1)
+                System.arraycopy(s, i + 1, t, i, sl - 1 - i);
             return CONJ.the(conj.dt(), t);
         }
     }
@@ -1759,6 +1762,24 @@ public enum Op implements $ {
 
     public boolean isSet() {
         return false;
+    }
+
+    public static Term without(Term container, Term content) {
+
+        if (container.op().commutative) {
+            TermContainer cs = container.subterms();
+
+            int z = cs.subs();
+            if (z > 1 && cs.contains(content)) {
+                SortedSet<Term> s = cs.toSortedSet();
+                if (s.remove(content)) {
+                    return z == 2 ? s.first() : container.op().the(container.dt(), s);
+                }
+            }
+        } else {
+            throw new UnsupportedOperationException("TODO"); //this one is easy
+        }
+        return Null; //wasnt contained
     }
 
 

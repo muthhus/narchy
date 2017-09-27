@@ -1,6 +1,7 @@
 package nars.exe;
 
 import jcog.bag.Bag;
+import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
 import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
@@ -72,8 +73,8 @@ public class FocusExec extends Exec implements Runnable {
 
 
     public final Bag concepts =
-            //new ConcurrentCurveBag
-            new CurveBag
+            new ConcurrentCurveBag
+            //new CurveBag
                     <>(Param.activateMerge,
                     new ConcurrentHashMap<>(),
                     //new ConcurrentHashMapUnsafe<>(),

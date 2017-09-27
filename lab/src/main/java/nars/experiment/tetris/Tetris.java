@@ -526,7 +526,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            });
 
             return a;
-        }, 3f);
+        }, 10f);
 
 
 //

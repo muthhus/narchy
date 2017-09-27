@@ -20,6 +20,7 @@
  */
 package nars.truth;
 
+import jcog.Util;
 import jcog.io.BinTxt;
 import nars.Op;
 import nars.Param;
@@ -29,6 +30,7 @@ import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.impl.factory.primitive.LongSets;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -458,4 +460,19 @@ public interface Stamp {
         return y;
     }
 
+    static boolean equalsIgnoreCyclic(@NotNull long[] a, long[] b) {
+        boolean aCyclic = isCyclic(a);
+        if (aCyclic ^ isCyclic(b)) {
+            int alen = a.length;
+            if (aCyclic) {
+                if (alen != b.length+1) return false;
+                return Util.equals(a, b, alen-1);
+            } else {
+                if (alen != b.length-1) return false;
+                return Util.equals(a, b, alen);
+            }
+        } else {
+            return Util.equals(a, b);
+        }
+    }
 }

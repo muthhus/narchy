@@ -20,6 +20,7 @@ package jcog.tree.rtree;
  * #L%
  */
 
+import jcog.Util;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.NotNull;
@@ -43,8 +44,12 @@ public class Leaf<T> implements Node<T, T> {
     public HyperRegion region;
 
     protected Leaf(int mMax) {
+        this((T[]) new Object[mMax]);
+    }
+
+    protected Leaf(T[] arrayInit) {
         this.region = null;
-        this.data = (T[]) new Object[mMax];
+        this.data = arrayInit;
         this.size = 0;
     }
 
@@ -134,7 +139,6 @@ public class Leaf<T> implements Node<T, T> {
             }
         }
         return false;
-        //return size>0 && OR(e -> e == t || e.equals(t));
     }
 
 
@@ -293,15 +297,15 @@ public class Leaf<T> implements Node<T, T> {
         final double l2CostInc = Math.max(l2c - (l2Node.region().cost() + tCost), 0.0);
         if (l2CostInc > l1CostInc) {
             l1Node.add(t, this, model);
-        } else if (RTree.equals(l1CostInc, l2CostInc)) {
+        } else if (Util.equals(l1CostInc, l2CostInc, RTree.EPSILON)) {
             if (l1c < l2c) {
                 l1Node.add(t, this, model);
-            } else if (RTree.equals(l1c, l2c)) {
+            } else if (Util.equals(l1c, l2c, RTree.EPSILON)) {
                 final double l1MbrMargin = l1Mbr.perimeter();
                 final double l2MbrMargin = l2Mbr.perimeter();
                 if (l1MbrMargin < l2MbrMargin) {
                     l1Node.add(t, this, model);
-                } else if (RTree.equals(l1MbrMargin, l2MbrMargin)) {
+                } else if (Util.equals(l1MbrMargin, l2MbrMargin, RTree.EPSILON)) {
                     // break ties with least number
                     ((l1Node.size() < l2Node.size()) ? l1Node : l2Node).add(t, this, model);
 

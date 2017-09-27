@@ -161,7 +161,7 @@ public abstract class Param extends Services<Term,NAR> {
     /** how many durations above which to dither dt relations to dt=0 (parallel)
      *  set to zero to disable dithering.  typically the value will be 0..~1.0.
      */
-    public final MutableFloat dtDither = new MutableFloat(0f);
+    public final MutableFloat dtDither = new MutableFloat(1f);
 
 
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */

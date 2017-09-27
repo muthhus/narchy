@@ -681,13 +681,14 @@ public enum Util {
      * tests equivalence (according to epsilon precision)
      */
     public static boolean equals(float a, float b, float epsilon) {
-        return Math.abs(a - b) < epsilon;
+        return a == b || Math.abs(a - b) < epsilon;
     }
 
     public static boolean equals(float[] a, float[] b, float epsilon) {
         if (a == b) return true;
-        for (int i = 0; i < a.length; i++) {
-            if (!equals(a, b, epsilon))
+        int l = a.length;
+        for (int i = 0; i < l; i++) {
+            if (!Util.equals(a[i], b[i], epsilon))
                 return false;
         }
         return true;
@@ -697,7 +698,8 @@ public enum Util {
      * tests equivalence (according to epsilon precision)
      */
     public static boolean equals(double a, double b, double epsilon) {
-        return Math.abs(a - b) < epsilon;
+        return a == b || Math.abs(a - b) < epsilon;
+        //return Math.abs(a - b) < epsilon;
     }
 
 
@@ -1287,6 +1289,36 @@ public enum Util {
         return decideRoulette(weightCount, weight, weightSum(weightCount, weight), rng);
     }
 
+    public static boolean equals(double[] a, double[] b, double epsilon) {
+        if (a == b) return true;
+        int l = a.length;
+        for (int i = 0; i < l; i++) {
+            if (!equals(a[i], b[i], epsilon))
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean equals(@NotNull long[] a, long[] b, int firstN) {
+        if (a == b) return true;
+        for (int i = 0; i < firstN; i++) {
+            if (a[i]!=b[i])
+                return false;
+        }
+        return true;
+    }
+    public static boolean equals(@NotNull long[] a, long[] b) {
+        if (a == b) return true;
+        int l = a.length;
+        if (b.length!=l)
+            return false;
+        for (int i = 0; i < l; i++) {
+            if (a[i]!=b[i])
+                return false;
+        }
+        return true;
+    }
+
     public static enum RouletteControl {
         STOP, CONTINUE, WEIGHTS_CHANGED
     }
@@ -1464,7 +1496,7 @@ public enum Util {
 
 
     public static boolean sleep(long periodMS) {
-        if (periodMS < 0) {
+        if (periodMS <= 0) {
             Thread.yield();
         } else {
             try {

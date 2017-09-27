@@ -183,6 +183,7 @@ public class Derivation extends Unify implements TermContext {
                 nar.get(Atomic.the("differ")),
                 nar.get(Atomic.the("intersect")),
                 nar.get(Atomic.the("conjEvent")),
+                nar.get(Atomic.the("conjDropIfEarliest")),
                 nar.get(Atomic.the("without"))
         );
 
@@ -309,12 +310,12 @@ public class Derivation extends Unify implements TermContext {
 
 
 
-            int cycNum = ((task.cyclic() ? 1 : 0) + (belief.cyclic() ? 1 : 0));
+            //int cycNum = ((task.cyclic() ? 1 : 0) + (belief.cyclic() ? 1 : 0));
 
             long[] beliefStamp = belief.stamp();
 
-            this.cyclic = cycNum == 0 ? 0f : (((float)cycNum) / ((taskStamp.length + beliefStamp.length) - cycNum));
-            this.overlap = Stamp.overlapFraction(taskStamp, beliefStamp);
+            //this.cyclic = cycNum == 0 ? 0f : (((float)cycNum) / ((taskStamp.length + beliefStamp.length) - cycNum));
+            this.cyclic = this.overlap = Stamp.overlapFraction(taskStamp, beliefStamp);
 
         } else {
             this.beliefTruth = this.beliefTruthRaw = null;

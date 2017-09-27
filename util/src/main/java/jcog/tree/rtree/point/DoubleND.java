@@ -1,8 +1,8 @@
 package jcog.tree.rtree.point;
 
 
+import jcog.Util;
 import jcog.tree.rtree.HyperPoint;
-import jcog.tree.rtree.RTree;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -63,7 +63,7 @@ public class DoubleND implements HyperPoint, Serializable {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         DoubleND p = (DoubleND) obj;
-        return RTree.equals(coord, p.coord, FPSILON);
+        return Util.equals(coord, p.coord, FPSILON);
     }
 
     @Override

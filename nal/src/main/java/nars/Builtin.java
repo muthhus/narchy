@@ -1,6 +1,7 @@
 package nars;
 
 import jcog.Texts;
+import jcog.list.FasterList;
 import nars.concept.Concept;
 import nars.op.DepIndepVarIntroduction;
 import nars.op.Operator;
@@ -149,20 +150,10 @@ public class Builtin {
         }));
 
         nar.on(Functor.f2((Atom) $.the("without"), (Term container, Term content) -> {
-            if (container.op().commutative) {
-                TermContainer cs = container.subterms();
-                int z = cs.subs();
-                if (z > 1 && cs.contains(content)) {
-                    @NotNull SortedSet<Term> s = cs.toSortedSet();
-                    if (s.remove(content)) {
-                        return z == 2 ? s.first() : container.op().the(container.dt(), s);
-                    } else {
-                        return Null; //wasnt contained
-                    }
-                }
-            }
-
-            return Null;
+            Term t = Op.without(container, content);
+            if (t == null)
+                return Null; //wasnt contained
+            return t;
         }));
 
         /**
@@ -236,7 +227,7 @@ public class Builtin {
         }));
         nar.on(Functor.f2((Atom) $.the("conjEvent"), (Term c, Term when) -> {
             if (c.op() != CONJ || !(when instanceof Atom))
-                return null;
+                return Null;
             if (c.dt() == DTERNAL || c.dt() == 0) {
                 return c.sub(nar.random().nextInt(c.subs())); //choose a subterm at random
             }
@@ -256,6 +247,21 @@ public class Builtin {
                 target = 1 - target;
             return c.sub(target);
         }));
+
+        nar.on(Functor.f2((Atom) $.the("conjDropIfEarliest"), (Term conj, Term event) -> {
+            if (conj.op() != CONJ || conj.subtermTimeSafe(event)!=0)
+                return Null;
+            if (conj.dt()!=DTERNAL) {
+                FasterList<ObjectLongPair<Term>> events = conj.events();
+                boolean removed = events.removeIf(x -> x.getTwo() == 0 && x.getOne().equals(event));
+                if (!removed)
+                    return Null;
+                return Op.conj(events);
+            } else {
+                return Op.without(conj, event);
+            }
+        }));
+
         nar.onOp("assertEquals", (args, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';
             assertEquals(/*msg,*/ 2, args.subs());

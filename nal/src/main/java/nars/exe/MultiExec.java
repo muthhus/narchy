@@ -58,10 +58,11 @@ public class MultiExec extends Exec {
         q = Util.blockingQueue(qSize);
     }
 
-    @Override public float load() {
+    @Override
+    public float load() {
         int siz = q.size();
         int cap = q.remainingCapacity();
-        return ((float)siz)/(siz + cap);
+        return ((float) siz) / (siz + cap);
     }
 
     @Override
@@ -90,7 +91,7 @@ public class MultiExec extends Exec {
             r.run(nar);
 
             if (r instanceof Activate)
-                onActivate.emit((Activate)r);
+                onActivate.emit((Activate) r);
 
         } catch (Throwable t) {
             logger.error("{} {}", r, t);
@@ -133,7 +134,7 @@ public class MultiExec extends Exec {
         Util.pauseNext(0);
 
         //2. attempt to evict any weaker tasks consuming space
-        int sample = Math.max(4, q.size() / (num+1) / 8);
+        int sample = Math.max(4, q.size() / (num + 1) / 8);
 
         int survive = Math.round(sample * 0.5f);
 
@@ -156,13 +157,15 @@ public class MultiExec extends Exec {
     }
 
     public void add(FocusExec reasoner, Predicate<Activate> filter) {
-        execute((Runnable)()->new Reasoner(reasoner, filter));
+        execute((Runnable) () -> new Reasoner(reasoner, filter));
     }
 
     class Reasoner extends Causable /* TODO use Throttled */ implements Consumer<Activate> {
         private final FocusExec sub;
 
-        /** customizable filter, or striping so that every reasoner doesnt get the same inputs */
+        /**
+         * customizable filter, or striping so that every reasoner doesnt get the same inputs
+         */
         private final Predicate<Activate> filter;
         private final Cause out;
 
@@ -173,6 +176,11 @@ public class MultiExec extends Exec {
             this.out = nar.newCauseChannel(this);
             sub.cause = this.out.id;
             sub.start(nar);
+        }
+
+        @Override
+        public boolean singleton() {
+            return true;
         }
 
         @Override

@@ -153,23 +153,20 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
-    //below here: CONTINUE moving appropriate tests to NAL8EternalMixTest -------
-
-
-    @Test
-    public void testDeiredImpl() {
-        /*
-        $0.61;0.39;0.50$ (y)! :172: %1.00;0.45%
-              PARENT   $0.75;0.80;0.95$ <(x) ==> (y)>! :3: %1.00;0.90%
-              BELIEF   $0.50;0.80;0.95$ (x). :4: %1.00;0.90%
-         */
-
+    @Test public void testDeiredConjPos() {
         TestNAR t = test;
         t
-
                 .believe("(x)")
                 .goal("((x)&&(y))")
                 .mustGoal(cycles, "(y)", 1f, 0.81f);
+    }
+
+    @Test public void testDeiredConjNeg() {
+        TestNAR t = test;
+        t
+                .believe("--x")
+                .goal("(--x && y)")
+                .mustGoal(cycles, "y", 1f, 0.81f);
     }
 
     @Test
@@ -313,17 +310,33 @@ public class NAL8Test extends AbstractNALTest {
 
 
     @Test
-    public void testGoalConjunctionPostDecompose() {
+    public void testConjSeqGoalDecomposeForward() {
         //after a belief has been fedback, continue decomposing the conjunction goal to expose the (y) desire:
 
         test
-
-                .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
-                .believe("(x)", Tense.Present, 1f, 0.9f)
-                .mustGoal(cycles, "(y)", 1f, 0.81f, 3)
-                .mustNotOutput(cycles, "(y)", GOAL, ETERNAL);
+            .goal("(x &&+3 y)", Tense.Present, 1f, 0.9f)
+            .believe("x", Tense.Present, 1f, 0.9f)
+            .mustGoal(cycles, "y", 1f, 0.81f, 3)
+            .mustNotOutput(cycles, "y", GOAL, ETERNAL);
     }
-
+       @Test
+    public void testConjParGoalDecomposeForward() {
+        //after a belief has been fedback, continue decomposing the conjunction goal to expose the (y) desire:
+        test
+            .goal("(x &| y)", Tense.Present, 1f, 0.9f)
+            .believe("x", Tense.Present, 1f, 0.9f)
+            .mustGoal(cycles, "y", 1f, 0.81f, 0)
+            .mustNotOutput(cycles, "y", GOAL, ETERNAL);
+    }
+    @Test
+    public void testConjSeqGoalNegDecomposeForward() {
+        //after a belief has been fedback, continue decomposing the conjunction goal to expose the (y) desire:
+        test
+            .goal("(--x &&+3 y)", Tense.Present, 1f, 0.9f)
+            .believe("x", Tense.Present, 0f, 0.9f)
+            .mustGoal(cycles, "y", 1f, 0.81f, 3)
+            .mustNotOutput(cycles, "y", GOAL, ETERNAL);
+    }
 
     //        @Test
     //        public void subgoal_2_small()  {

@@ -323,7 +323,6 @@ public enum BeliefFunction implements TruthOperator {
 
     },
 
-    @AllowOverlap
     BeliefStructuralDeduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
@@ -332,7 +331,6 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap
     BeliefStructuralAbduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
@@ -341,14 +339,14 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap BeliefStructuralIntersection() {
+    BeliefStructuralIntersection() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
             return B != null ? TruthFunctions.intersection(B, $.t(1, m.confDefault(BELIEF)), minConf) : null;
         }
     },
 
-    //@AllowOverlap
+
     BeliefStructuralAnalogy() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
@@ -357,7 +355,6 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    //@AllowOverlap
     BeliefStructuralDifference() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {

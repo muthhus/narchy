@@ -14,7 +14,6 @@ import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
-import nars.gui.STMView;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
@@ -32,6 +31,8 @@ import net.beadsproject.beads.core.Bead;
 import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.ugens.*;
+import org.HdrHistogram.DoubleHistogram;
+import org.HdrHistogram.Histogram;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
@@ -45,6 +46,7 @@ import spacegraph.Surface;
 import spacegraph.layout.Grid;
 import spacegraph.render.Draw;
 import spacegraph.widget.button.CheckBox;
+import spacegraph.widget.button.PushButton;
 import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.meta.WindowButton;
 import spacegraph.widget.meter.BitmapMatrixView;
@@ -55,6 +57,8 @@ import spacegraph.widget.slider.FloatSlider;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -136,7 +140,7 @@ abstract public class NAgentX extends NAgent {
 
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
-        return runRT(init, 25, fps, endTime);
+        return runRT(init, 50, fps, endTime);
     }
 
     public static NAR runRT(Function<NAR, NAgent> init, float narFPS, float agentFPS, long endTime) {
@@ -144,12 +148,9 @@ abstract public class NAgentX extends NAgent {
         //Builder.Subterms.the = Builder.Subterms.WeakSubtermBuilder.get();
         //Builder.Compound.the = Builder.Compound.CaffeineCompoundBuilder.get();
 
-        float durFPS =
-                agentFPS;
-        //fps * 2f; //nyquist
 
         RealTime clock =
-                durFPS >= 10 / 2f ? /* nyquist threshold between decisecond (0.1) and centisecond (0.01) clock resolution */
+                narFPS >= 10 / 2f ? /* nyquist threshold between decisecond (0.1) and centisecond (0.01) clock resolution */
                         new RealTime.CS(true) :
                         new RealTime.DSHalf(true);
         clock.durFPS(agentFPS);
@@ -209,7 +210,7 @@ abstract public class NAgentX extends NAgent {
 
         LinkClustering linkClusterPri = new LinkClustering(n, Prioritized::priElseZero /* anything temporal */,
                 32, 128);
-        LinkClustering linkClusterConf = new LinkClustering(n, (t)-> t.isBeliefOrGoal() ? t.conf() : Float.NaN,
+        LinkClustering linkClusterConf = new LinkClustering(n, (t) -> t.isBeliefOrGoal() ? t.conf() : Float.NaN,
                 4, 16);
 //        SpaceGraph.window(col(
 //                new STMView.BagClusterVis(n, linkClusterPri.bag),
@@ -605,7 +606,24 @@ abstract public class NAgentX extends NAgent {
         a.nar.runLater(() -> {
             window(grid(
 
-                    new WindowButton("log", () -> Vis.logConsole(nar, 80, 25, new FloatParam(0f))),
+                    //new WindowButton("log", () -> Vis.logConsole(nar, 80, 25, new FloatParam(0f))),
+                    new PushButton("dump", () -> {
+                        try {
+                            nar.output(Files.createTempFile(a.toString(), "" + System.currentTimeMillis()).toFile(), false);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }),
+                    new PushButton("prune", () -> {
+                        DoubleHistogram i = new DoubleHistogram(2);
+                        nar.tasks(true, false, false, false).forEach(t ->
+                            i.recordValue(t.conf())
+                        );
+                        float confThresh = (float) i.getValueAtPercentile(25);
+                        nar.tasks(true, false, false, false).filter(t ->
+                                t.conf() < confThresh
+                        ).forEach(Task::delete);
+                    }),
                     new WindowButton("top", () -> (new ConsoleTerminal(new nars.TextUI(nar).session(20f)))),
                     new WindowButton("concept graph", () -> {
                         SpaceGraph s = new SpaceGraph<>(
@@ -624,8 +642,8 @@ abstract public class NAgentX extends NAgent {
                     Vis.beliefCharts(16, nar, a.reward),
                     new WindowButton("agent", () -> (a)),
                     col(
-                            new WindowButton("actionShort", () -> Vis.beliefCharts(a.nar.dur() * 64, a.actions.keySet(), a.nar)),
-                            new WindowButton("actionMed", () -> Vis.beliefCharts(a.nar.dur() * 128, a.actions.keySet(), a.nar)),
+                            new WindowButton("actionShort", () -> Vis.beliefCharts(a.nar.dur() * 16, a.actions.keySet(), a.nar)),
+                            new WindowButton("actionMed", () -> Vis.beliefCharts(a.nar.dur() * 64, a.actions.keySet(), a.nar)),
                             new WindowButton("actionLong", () -> Vis.beliefCharts(a.nar.dur() * 256, a.actions.keySet(), a.nar))
                     ),
                     //new WindowButton("predict", () -> Vis.beliefCharts(200, a.predictors, a.nar)),

@@ -22,6 +22,7 @@ package jcog.tree.rtree;
 
 
 import com.google.common.base.Joiner;
+import jcog.Util;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.NotNull;
@@ -302,7 +303,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
                     leastEnlargement = nodeEnlargement;
                     leastPerimeter = childMbr.perimeter();
                     bestNode = i;
-                } else if (RTree.equals(nodeEnlargement, leastEnlargement)) {
+                } else if (Util.equals(nodeEnlargement, leastEnlargement, RTree.EPSILON)) {
                     double perimeter = childMbr.perimeter();
                     if (perimeter < leastPerimeter) {
                         leastEnlargement = nodeEnlargement;

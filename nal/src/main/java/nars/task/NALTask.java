@@ -150,8 +150,9 @@ public class NALTask extends Pri implements Task {
     @Override
     public final boolean equals(Object that) {
         return this == that ||
-                (that!=null && hash == that.hashCode() &&
+                (that!=null &&
                         that instanceof Tasked &&
+                        hash == that.hashCode() &&
                         Task.equal(this, ((Tasked) that).task())
                 );
     }

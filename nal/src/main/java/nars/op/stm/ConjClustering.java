@@ -80,6 +80,10 @@ public class ConjClustering extends Causable {
         });
     }
 
+    @Override
+    public boolean singleton() {
+        return true;
+    }
 
     @Override
     protected int next(NAR nar, int iterations) {

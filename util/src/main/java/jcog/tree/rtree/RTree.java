@@ -21,6 +21,7 @@ package jcog.tree.rtree;
  */
 
 
+import jcog.Util;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +44,7 @@ import java.util.stream.Stream;
  * Created by jcairns on 4/30/15.</p>
  */
 public class RTree<T> implements Space<T> {
-    private static final double EPSILON = 1e-12;
+    public static final double EPSILON = 1e-12;
     public static final float FPSILON = (float) EPSILON;
 
     @NotNull
@@ -75,42 +76,6 @@ public class RTree<T> implements Space<T> {
     public final void clear() {
         this.size = 0;
         this.root = model.newLeaf();
-    }
-
-    public static boolean equals(float a, float b) {
-        return equals(a, b, FPSILON);
-    }
-
-    public static boolean equals(float a, float b, float epsilon) {
-        return a == b || Math.abs(a - b) < epsilon;
-    }
-
-    public static boolean equals(double a, double b) {
-        return equals(a, b, EPSILON);
-    }
-
-    public static boolean equals(double a, double b, double epsilon) {
-        return a == b || Math.abs(a - b) < epsilon;
-    }
-
-    public static boolean equals(float[] a, float[] b, float epsilon) {
-        if (a == b) return true;
-        int l = a.length;
-        for (int i = 0; i < l; i++) {
-            if (!equals(a[i], b[i], epsilon))
-                return false;
-        }
-        return true;
-    }
-
-    public static boolean equals(double[] a, double[] b, double epsilon) {
-        if (a == b) return true;
-        int l = a.length;
-        for (int i = 0; i < l; i++) {
-            if (!equals(a[i], b[i], epsilon))
-                return false;
-        }
-        return true;
     }
 
     /**

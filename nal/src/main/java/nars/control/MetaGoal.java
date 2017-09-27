@@ -5,7 +5,7 @@ import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Prioritized;
 import nars.NAR;
-import nars.op.data.flat;
+import nars.NARLoop;
 import nars.task.ITask;
 import nars.task.NativeTask;
 import org.jetbrains.annotations.Nullable;
@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
+import static jcog.Texts.n2;
+import static jcog.Texts.n4;
 import static jcog.Util.RouletteControl.*;
 
 /**
@@ -163,8 +165,7 @@ public enum MetaGoal {
         int numCauses = effects.length;
 
         float vPer =
-                //strength / numCauses; //flat
-                strength;
+                strength / numCauses; //fair
 
         for (int i = 0; i < numCauses; i++) {
             short c = effects[i];
@@ -258,10 +259,27 @@ public enum MetaGoal {
 
 
 //        /** set this to some cpu duty cycle fraction of the target fps */
-        final long targetCycleTimeNS = 100 * 1000000; // ms * threads
+        NARLoop l = nar.loop;
+        long targetCycleTimeNS = 0;
+        if (l.isRunning()) {
+            double frameTime = l.dutyTime.getMean();
+            //if (frameTime > 1000*l.periodMS.intValue())
+            //System.out.println("frameTime: " + n4(1000 *  frameTime) + " ms");
+            targetCycleTimeNS = l.periodMS.intValue() * 1000000 * nar.exe.concurrency();
+//            targetCycleTimeNS = Math.max( // ms * threads?
+//                    l.periodMS.intValue() * 1000000 ,
+//                    Math.round(frameTime * 1.0E9)
+//            );
+        }
+
+        if (targetCycleTimeNS==0) {
+            //some arbitrary default target duty cycle length
+            targetCycleTimeNS = 100 * 1000000 * nar.exe.concurrency();
+        }
+
 //
 //        /** if each recieved exactly the same amount of time, this would be how much is allocated to each */
-        final float targetCycleTimeNSperEach = targetCycleTimeNS / cc;
+        @Deprecated final float targetCycleTimeNSperEach = targetCycleTimeNS / cc;
 
         //Benefit to cost ratio (estimate)
         //https://en.wikipedia.org/wiki/Benefit%E2%80%93cost_ratio
@@ -277,14 +295,12 @@ public enum MetaGoal {
             float iters = (float) Math.max(1, c.iterationsMean());
             iterLimit[i] = Math.min(ITERATION_DEMAND_MAX, Math.round((iters + 1) * ITERATION_DEMAND_GROWTH));
 
-            float idealCycleTime = time / (targetCycleTimeNSperEach);
-
             float vv = Util.unitize(c.value());
 
             bcrStat.accept(
                     bcr[i] = vv / time
             );
-            granular[i] = iters / idealCycleTime;
+            granular[i] = iters / (time / targetCycleTimeNS);
         }
 //        for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
 //            bcr[i] = bcrStat.normalize(bcr[i]);
@@ -294,9 +310,9 @@ public enum MetaGoal {
         Arrays.fill(iter, 1);
 
 
-        final int maxSamplesEach = 8;
+        final int maxSamplesEach = 2 * cc;
         final int[] samplingFactor = {
-                cc * maxSamplesEach
+                maxSamplesEach
         };
 
         float throttle = /*nar.exe.load() */ 1f / (maxSamplesEach);

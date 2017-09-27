@@ -23,9 +23,8 @@ abstract public class Loop implements Runnable {
 
     private float lag, lagSum;
 
-    protected long prevTime;
-
-    public final DescriptiveStatistics frameTime = new DescriptiveStatistics(windowLength); //in millisecond
+    /** in seconds */
+    public final DescriptiveStatistics dutyTime = new DescriptiveStatistics(windowLength); //in millisecond
 
     public static Loop of(Runnable iteration) {
         return new Loop() {
@@ -41,13 +40,13 @@ abstract public class Loop implements Runnable {
      * 0: loop at full speed
      * > 0: delay in milliseconds
      */
-    protected final AtomicInteger periodMS = new AtomicInteger(-1);
+    public final AtomicInteger periodMS = new AtomicInteger(-1);
 
 
     @Override
     public String toString() {
         return super.toString() + " ideal=" + periodMS + "ms, " +
-                Texts.n4(frameTime.getMean()) + "+-" + Texts.n4(frameTime.getStandardDeviation()) + "ms avg";
+                Texts.n4(dutyTime.getMean()) + "+-" + Texts.n4(dutyTime.getStandardDeviation()) + "ms avg";
     }
 
     /**
@@ -135,8 +134,6 @@ abstract public class Loop implements Runnable {
 
         logger.info("start {} @ {}ms period", this, nextPeriodMS());
 
-        prevTime = System.currentTimeMillis();
-
         int periodMS;
         long beforeTime = System.currentTimeMillis();
         while ((periodMS = nextPeriodMS()) >= 0) {
@@ -158,28 +155,25 @@ abstract public class Loop implements Runnable {
 
 
             if (periodMS > 0) {
-                //if we have a set period time, delay as appropriate otherwise continue immediately with the next cycle
-                this.prevTime = beforeTime;
-                //periodMS <= 0 ? System.currentTimeMillis() : Util.pauseWaitUntil(prevPrevTime + periodMS);
-
                 long afterTime = System.currentTimeMillis();
+
+
                 long frameTime = afterTime - beforeTime;
 
                 lagSum += (this.lag = Math.max(0, (frameTime - periodMS) / ((float) periodMS)));
 
                 //System.out.println(getClass() + " " + frameTime + " " + periodMS + " " + lag);
 
-                this.frameTime.addValue(frameTime);
+                this.dutyTime.addValue((frameTime)/1000.0);
 
-                Util.sleep((int)( periodMS - ((long) this.frameTime.getMean()) ));
+                Util.pause((int)( periodMS - frameTime) ); //((long) this.dutyTime.getMean()) ));
 
                 beforeTime = System.currentTimeMillis();
 
             } else {
-                Thread.yield();
+                //Thread.yield();
                 //Thread.onSpinWait();
             }
-
 
         }
 

@@ -1,5 +1,6 @@
 package jcog.tree.rtree;
 
+import jcog.Util;
 import jcog.tree.rtree.point.Double2D;
 import jcog.tree.rtree.point.FloatND;
 import jcog.tree.rtree.rect.RectDouble2D;
@@ -196,10 +197,10 @@ public class RTreeNDTest {
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             for (int i = 0; i < resultCount; i++) {
                 Assert.assertTrue("Unexpected result found:" + results[i],
-                RTree.equals(results[i].min.x, i + 5) &&
-                        RTree.equals(results[i].min.y, i + 5) &&
-                        RTree.equals(results[i].max.x, i + 8) &&
-                        RTree.equals(results[i].max.y, i + 8));
+                Util.equals(results[i].min.x, (double) (i + 5), RTree.EPSILON) &&
+                        Util.equals(results[i].min.y, (double) (i + 5), RTree.EPSILON) &&
+                        Util.equals(results[i].max.x, (double) (i + 8), RTree.EPSILON) &&
+                        Util.equals(results[i].max.y, (double) (i + 8), RTree.EPSILON));
             }
         }
     }
@@ -236,10 +237,10 @@ public class RTreeNDTest {
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             for (int i = 0; i < resultCount; i++) {
                 Assert.assertTrue("Unexpected result found",
-                RTree.equals(results.get(i).min.x, i + 2) &&
-                        RTree.equals(results.get(i).min.y, i + 2) &&
-                        RTree.equals(results.get(i).max.x, i + 5) &&
-                        RTree.equals(results.get(i).max.y, i + 5));
+                Util.equals(results.get(i).min.x, (double) (i + 2), RTree.EPSILON) &&
+                        Util.equals(results.get(i).min.y, (double) (i + 2), RTree.EPSILON) &&
+                        Util.equals(results.get(i).max.x, (double) (i + 5), RTree.EPSILON) &&
+                        Util.equals(results.get(i).max.y, (double) (i + 5), RTree.EPSILON));
             }
         }
     }

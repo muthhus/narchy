@@ -8,6 +8,7 @@ import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
 import nars.task.ITask;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
@@ -26,9 +27,8 @@ import java.util.function.IntPredicate;
 import static jcog.Util.unitize;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
+import static nars.Op.ZeroProduct;
 import static nars.truth.TruthFunctions.c2w;
-import static nars.truth.TruthFunctions.c2wSafe;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Created by me on 9/30/16.
@@ -387,10 +387,10 @@ public interface NAct {
     default void actionBipolarExpectation(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         Term pt =
                 //$.inh( $.the("\"+\""), s);
-                $.p(s, s.neg());
+                $.p(s, ZeroProduct);
         Term nt =
                 //$.inh($.the("\"-\""), s);
-                $.p(s.neg(), s);
+                $.p(ZeroProduct, s);
 
 
         //boolean highpass = true;
@@ -400,6 +400,7 @@ public interface NAct {
         final float c[] = new float[2];
         final float exp[] = new float[2];
         final float[] px = {0};
+        GoalActionAsyncConcept[] CC = new GoalActionAsyncConcept[2]; //hack
 
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (action, g) -> {
 
@@ -407,7 +408,6 @@ public interface NAct {
             float f0, c0;
 
             NAR n = nar();
-
 
             float cur = curiosity().floatValue();
             Random rng = n.random();
@@ -421,6 +421,7 @@ public interface NAct {
             //0;
 
             int ip = p ? 0 : 1;
+            CC[ip] = action;
             f[ip] = g!=null ? g.freq() : 0f;
             c[ip] = g!=null ? g.conf() : 0f;
             exp[ip] = g != null ? g.expectation() : 0f;
@@ -513,13 +514,13 @@ public interface NAct {
                         //pb;
                         pb!=null ? pb.eviMult(0.5f) : null;
                         //null;
-                ((GoalActionAsyncConcept) n.concept(pt)).feedback(pb, pg, n);
+                CC[0].feedback(pb, pg, n);
                 PreciseTruth nb = y >= 0 ? N : P;
                 PreciseTruth ng =
                         //nb;
                         nb!=null ? nb.eviMult(0.5f) : null;
                         //null;
-                ((GoalActionAsyncConcept) n.concept(nt)).feedback(nb, ng, n);
+                CC[1].feedback(nb, ng, n);
             }
         };
 

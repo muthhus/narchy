@@ -147,7 +147,7 @@ public class PatrickTests extends AbstractNALTest {
         );
 
         tt.mustGoal(3000, "lighter(I, toothbrush)", 1f,
-                0.2f,
+                0.4f,
                 (t) -> t >= 0);
 
 
