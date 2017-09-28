@@ -16,6 +16,39 @@ public interface Truthed  {
     default float polarity() {
         return Math.abs(0.5f - freq())*2f;
     }
+    /**
+     * Check if the truth value is negative
+     * Note that values of 0.5 are not considered positive, being an unbiased
+     * midpoint value
+     *
+     * @return True if the frequence is less than 1/2
+     */
+    default boolean isNegative() {
+        return freq() < 0.5f;
+    }
+
+    /**
+     * Check if the truth value is negative.
+     * Note that values of 0.5 are not considered positive, being an unbiased
+     * midpoint value
+     *
+     * @return True if the frequence is greater than 1/2
+     */
+    default boolean isPositive() {
+        return freq() > 0.5f;
+    }
+
+    /**
+     * how expectation polarized (expectation distance from 0.5) a given truth value is:
+     *      expectation=0.5        -> polarization=0
+     *      expectation=0 or 1     -> polarization=1
+     */
+    default float expolarity() {
+        float exp = expectation();
+        if (exp < 0.5f)
+            exp = 1f - exp;
+        return (exp - 0.5f) * 2f;
+    }
 
 //    /** balanced form of expectation, where -1 = no, +1 = yes, and 0 = maybe */
 //    default float motivationUnweighted() {

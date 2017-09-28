@@ -93,7 +93,7 @@ public class MultiExec extends Exec {
 
         Sub(NAR nar, int capacity) {
             super(capacity);
-            this.batchSize = Math.max(1, capacity / 2);
+            this.batchSize = Math.max(1, capacity / 4);
             start(nar);
         }
 

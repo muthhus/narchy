@@ -182,9 +182,9 @@ public class TruthTest {
     }
 
     @Test public void testTruthPolarity() {
-        assertEquals(0f, $.t(0.5f, 0.9f).polarization(), 0.01f);
-        assertEquals(0.9f, $.t(0f, 0.9f).polarization(), 0.01f);
-        assertEquals(0.9f, $.t(1f, 0.9f).polarization(), 0.01f);
-        assertEquals(0.5f, $.t(1f, 0.5f).polarization(), 0.01f);
+        assertEquals(0f, $.t(0.5f, 0.9f).polarity(), 0.01f);
+        assertEquals(1f, $.t(0f, 0.9f).polarity(), 0.01f);
+        assertEquals(1f, $.t(1f, 0.9f).polarity(), 0.01f);
+        assertEquals(1f, $.t(1f, 0.5f).polarity(), 0.01f);
     }
 }

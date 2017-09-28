@@ -17,11 +17,10 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
-import nars.truth.TruthFunctions;
+import nars.truth.Truth;
 import nars.util.BudgetFunctions;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -65,7 +64,7 @@ public class ConjClustering extends Causable {
     private float truthRes, confMin;
     private int volMax;
 
-    public ConjClustering(NAR nar, int maxConjSize, byte punc, int centroids, int capacity) {
+    public ConjClustering(NAR nar, int maxConjSize, byte punc, boolean includeNeg, int centroids, int capacity) {
         super(nar);
 
         this.punc = punc;
@@ -74,8 +73,8 @@ public class ConjClustering extends Causable {
         this.maxConjSize = maxConjSize;
 
         nar.onTask(t -> {
-            if (!t.isEternal() && t.punc() == punc) {
-                bag.put(t, t.priElseZero());
+            if (!t.isEternal() && t.punc() == punc && (includeNeg || t.isPositive())) {
+                bag.put(t, t.polarity() * t.conf() * (1f + t.priElseZero()));
             }
         });
     }
@@ -106,21 +105,23 @@ public class ConjClustering extends Causable {
         final int[] group = {0};
         final int[] subterms = {0};
         final int[] currentVolume = {0};
-        return input.
-                filter(x -> !x.isDeleted())
+        final float[] currentConf = {1};
+        return input.filter(x -> !x.isDeleted())
                 .collect(Collectors.groupingBy(x -> {
 
                     int v = x.volume();
+                    float c = x.conf();
 
-                    if ((subterms[0] >= maxComponentsPerTerm) || (currentVolume[0] + v >= maxVolume)) {
+                    if ((subterms[0] >= maxComponentsPerTerm) || (currentVolume[0] + v >= maxVolume) || (currentConf[0] * c < confMin)) {
                         //next group
                         group[0]++;
                         subterms[0] = 1;
                         currentVolume[0] = v;
+                        currentConf[0] = c;
                     } else {
-
                         subterms[0]++;
                         currentVolume[0] += v;
+                        currentConf[0] *= c;
                     }
 
                     return group[0];
@@ -171,32 +172,56 @@ public class ConjClustering extends Causable {
 
             Task[] uu = vv.values().toArray(new Task[vs]);
 
-            @Nullable Term conj = conj(uu);
-            if (conj == null)
-                return;
-
-            @Nullable ObjectBooleanPair<Term> cp = Task.tryContent(conj, punc, true);
-            if (cp != null) {
-
-
-                float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
+            List<ObjectLongPair<Term>> pp = $.newArrayList(uu.length);
+            float freq = 1f;
+            float conf = 1f;
+            float priMax = Float.NEGATIVE_INFINITY;
+            for (Task x : uu) {
+                Truth tx = x.truth();
+                conf *= tx.conf();
                 if (conf < confMin)
                     return;
 
-                PreciseTruth t = $.t(1, conf).negIf(cp.getTwo()).ditherFreqConf(truthRes, confMin, 1f);
-                if (t != null) {
+                float p = x.priElseZero();
+                if (p > priMax)
+                    priMax = p;
+
+                Term tt = x.term();
+
+                float tf = tx.freq();
+                if (tx.isNegative()) {
+                    tt = tt.neg();
+                    freq *= (1f - tf);
+                } else {
+                    freq *= tf;
+                }
+
+                pp.add(pair(tt, x.start()));
+            }
+            PreciseTruth t = $.t(freq,conf).ditherFreqConf(truthRes, confMin, 1f);
+            if (t != null) {
+
+                @Nullable Term conj = Op.conj(pp);
+                if (conj == null)
+                    return;
+
+
+                @Nullable ObjectBooleanPair<Term> cp = Task.tryContent(conj, punc, true);
+                if (cp != null) {
+
 
                     int uuLen = uu.length;
-                    long[] evidence = Stamp.zip(() -> new ArrayIterator<>(uu), uuLen); //HACK
+                    FasterList<Task> uul = new FasterList<>(uuLen, uu);
+                    long[] evidence = Stamp.zip(uul, uuLen);
                     NALTask m = new STMClusterTask(cp, t, start, end, evidence, punc, now); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
                     for (Task u : uu)
                         m.causeMerge(u); //cause merge
 
-                    float maxPri = new FasterList<>(uuLen, uu)
-                            .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List
+                    float maxPri = priMax;
+                                   //priMax / uuLen; //HACK todo dont use List
 
-                    m.setPri(BudgetFunctions.fund(maxPri, false, uu));
+                    m.setPri(BudgetFunctions.fund(maxPri, true, uu));
                     in.input(m);
                 }
 
@@ -240,21 +265,6 @@ public class ConjClustering extends Causable {
 //
 //                    return n.chunk(gSize, maxVol).
 
-    //
-    @Nullable
-    private static Term conj(Task[] uu) {
-
-        return
-                Op.conj(
-                        new FasterList<ObjectLongPair<Term>>(
-                                Util.map(t -> pair(
-                                        t.term().negIf(t.truth().isNegative()),
-                                        t.start()), ObjectLongPair[]::new,
-                                        uu))
-                );
-
-
-    }
 
     public static class STMClusterTask extends NALTask {
         public STMClusterTask(@Nullable ObjectBooleanPair<Term> cp, PreciseTruth t, long[] start, long[] end, long[] evidence, byte punc, long now) throws InvalidTaskException {

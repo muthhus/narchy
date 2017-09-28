@@ -63,7 +63,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
     }
 
 
-    private final FloatToObjectFunction<Truth> brightnessTruth = (v) -> $.t(v, conf);
+    private final FloatToObjectFunction<Truth> brightnessTruth =
+            (v) -> $.t(v, conf);
+
 
     public static Int2Function<Compound> XY(Term root, int width, int height) {
         return (x, y) -> {

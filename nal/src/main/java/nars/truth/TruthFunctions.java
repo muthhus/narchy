@@ -557,13 +557,6 @@ public final class TruthFunctions {
         return w / (w + Param.HORIZON);
     }
 
-    public static float confAnd(Truthed... tt) {
-        float c = 1f;
-        for (Truthed x : tt)
-            c *= x.conf();
-        return c;
-    }
-
     public static float originality(int evidenceLength) {
         if (evidenceLength == 1) {
             return 1f;

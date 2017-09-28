@@ -218,8 +218,8 @@ abstract public class NAgentX extends NAgent {
 //        ), 800, 600);
 
 
-        ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, 16, 64);
-        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, 16, 64);
+        ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, true, 16, 64);
+        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL,true, 16, 64);
 
 //        n.runLater(() -> {
 ////            AudioContext ac = new AudioContext();
