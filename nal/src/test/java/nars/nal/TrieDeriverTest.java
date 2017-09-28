@@ -182,7 +182,7 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
         PrediTerm<Derivation> d = t.nar.derivation().deriver;
         TrieDeriver.print(d);
 
-        t.log().ask("(a-->b)").mustQuestion(16, "b");
+        t.log().ask("(a-->b)").mustQuestion(64, "(a==>b)");
 
     }
 

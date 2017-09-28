@@ -45,7 +45,9 @@ public class DynamicBeliefTableTest {
         NAR n = NARS.tmp();
         n.believe("a:x", 1f, 0.9f);
         n.believe("a:y", 1f, 0.9f);
+        n.believe("a:(--,y)", 0f, 0.9f);
         n.believe("a:z", 0f, 0.9f);
+        n.believe("a:(--,z)", 1f, 0.9f);
         n.believe("x:b", 1f, 0.9f);
         n.believe("y:b", 1f, 0.9f);
         n.believe("z:b", 0f, 0.9f);
@@ -59,10 +61,10 @@ public class DynamicBeliefTableTest {
             assertEquals($.t(1f, 0.81f), n.beliefTruth(n.conceptualize($("(b --> (x|z))")), now));
             assertEquals($.t(0f, 0.81f), n.beliefTruth(n.conceptualize($("(b --> (x&z))")), now));
 
-            Concept xIntNegY = n.conceptualize($("((x|(--,y))-->a)"));
+            Concept xIntNegY = n.conceptualize($("((x|--y)-->a)"));
             assertTrue(xIntNegY instanceof DynamicConcept);
-            assertEquals($.t(0f, 0.81f), n.beliefTruth(xIntNegY, now));
-            assertEquals($.t(1f, 0.81f), n.beliefTruth(n.conceptualize($("((x|(--,z))-->a)")), now));
+            assertEquals(now + " " + xIntNegY,$.t(0f, 0.81f), n.beliefTruth(xIntNegY, now));
+            assertEquals($.t(1f, 0.81f), n.beliefTruth(n.conceptualize($("((x|--z)-->a)")), now));
         }
     }
 
@@ -161,7 +163,7 @@ public class DynamicBeliefTableTest {
 
         DynTruth xt = xtable.truth(0, 0, template, true, n);
         assertNotNull(xt);
-        assertTrue(xt.truth().toString(), $.t(1f, 0.68f).equals(xt.truth(), 0.05f));
+        assertTrue(xt.truth().toString(), $.t(1f, 0.68f).equals(xt.truth(), 0.1f));
 
 //            for (int i = -4; i <= n.time() + 4; i++) {
 //                System.out.println(i + ": " + xtable.truth(i, template.dt(), true) + " " + xtable.generate(template, i));

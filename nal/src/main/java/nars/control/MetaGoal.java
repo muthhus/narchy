@@ -311,10 +311,14 @@ public enum MetaGoal {
 
 
         final int[] samplesRemain = {
-                2 * cc
+                3 * cc
         };
 
-        float throttle = (1f - (float)Math.sqrt(nar.exe.load())) / samplesRemain[0];
+        float throttle =
+                1f / samplesRemain[0];
+                //(1f - (float)Math.sqrt(nar.exe.load())) / samplesRemain[0];
+
+
 
         Util.decideRoulette(cc, (c) -> bcr[c], nar.random(), (j) -> {
 

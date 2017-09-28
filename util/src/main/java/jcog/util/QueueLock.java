@@ -50,6 +50,7 @@ public class QueueLock<X> implements Consumer<X> {
     public void accept(@NotNull X x) {
         if (!queue.offer(x)) {
             proc.accept(x);
+            return;
         }
 //        try {
 //

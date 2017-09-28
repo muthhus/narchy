@@ -1,10 +1,12 @@
 package nars.exe;
 
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.Util;
 import jcog.event.On;
 import jcog.pri.Prioritized;
 import jcog.sort.TopN;
 import nars.NAR;
+import nars.Task;
 import nars.task.ITask;
 import nars.task.NativeTask;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +38,7 @@ public class MultiExec extends Exec {
     private final int num;
     private On onCycle;
 
-    final static int SUB_CAPACITY = 1024;
+    final static int SUB_CAPACITY = 256;
 
     @Override
     public void execute(@NotNull Runnable runnable) {
@@ -67,7 +69,7 @@ public class MultiExec extends Exec {
         exe = Executors.newFixedThreadPool(num);
         for (int i = 0; i < num; i++) {
 
-            exe.execute( sub[i] = new Sub(nar, SUB_CAPACITY));
+            exe.execute(sub[i] = new Sub(nar, SUB_CAPACITY));
 
 //            exe.execute(() -> {
 //                int idle = 0;
@@ -91,26 +93,26 @@ public class MultiExec extends Exec {
 
         Sub(NAR nar, int capacity) {
             super(capacity);
-            this.batchSize = Math.max(1, capacity/16);
+            this.batchSize = Math.max(1, capacity / 2);
             start(nar);
         }
 
         public void run() {
             while (true) {
 
-                int pending = q.size();
-                if (pending > 0) {
-                    ITask i = q.poll();
-                    if (i != null)
-                        execute(i);
+                final float s = ((DisruptorBlockingQueue) q).size();
+                int maxToPoll = (int) (s / MultiExec.this.concurrency());
+                for (int i = 0; i < maxToPoll; i++) {
+                    ITask k = q.poll();
+                    if (k != null)
+                        execute(k);
+                    else
+                        break;
                 }
 
-                System.out.println(plan.size());
-
-                workRemaining = batchSize;
-                plan.commit(null)
-                        .sample( super::exeSample);
-
+                workRemaining = Math.min(batchSize, plan.size());
+                plan.commit()
+                        .sample(super::exeSample);
 
             }
         }
@@ -128,7 +130,7 @@ public class MultiExec extends Exec {
             Iterable<? extends ITask> y;
             try {
                 y = x.run(nar);
-                if (y!=null)
+                if (y != null)
                     y.forEach(MultiExec.this::add);
             } catch (Throwable t) {
                 logger.error("{} {}", x, t);
@@ -158,7 +160,11 @@ public class MultiExec extends Exec {
 //        if (!q.offer(t)) {
 //            drainEvict(t);
 //        }
-        if (t instanceof NativeTask) {
+        if (t instanceof Task) {
+            Iterable<? extends ITask> y = t.run(nar);
+            if (y != null)
+                y.forEach(q::add);
+        } else if (t instanceof NativeTask) {
             int stall = 0;
             while (!q.offer(t)) {
                 Util.pauseNext(stall++);
@@ -222,7 +228,6 @@ public class MultiExec extends Exec {
     public boolean concurrent() {
         return true;
     }
-
 
 
 }

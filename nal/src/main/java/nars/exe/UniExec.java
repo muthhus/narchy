@@ -173,9 +173,9 @@ public class UniExec extends Exec  {
         if (i!=i) return Float.NaN;
 
         if (key instanceof Activate) {
-            return Util.lerp(i, 0.25f, 5f);
+            return Util.lerp(i, 0f, 0.25f);
         } else if (key instanceof Premise) {
-            return Util.lerp(i, 0f, 0.5f);
+            return Util.lerp(i, 0.25f, 0.5f);
         } else {
             return Util.lerp(i, 0.5f, 1f);
         }

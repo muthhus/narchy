@@ -1,14 +1,15 @@
 package nars.bag.leak;
 
 import jcog.bag.Bag;
-import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Task;
+import nars.bag.ConcurrentArrayBag;
 import nars.control.Causable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,9 +28,14 @@ public abstract class TaskLeak extends Causable {
 
     protected TaskLeak(int capacity, float ratePerDuration, @NotNull NAR n) {
         this(
-                //new CurveBag
-                new ConcurrentCurveBag
-                        <>(PriMerge.max, new ConcurrentHashMap(capacity), n.random(), capacity), ratePerDuration, n);
+                new ConcurrentArrayBag<Task, PLink<Task>>(PriMerge.max, new ConcurrentHashMap(capacity), n.random(), capacity) {
+                    @Nullable
+                    @Override
+                    public Task key(@NotNull PLink<Task> t) {
+                        return t.get();
+                    }
+                }, ratePerDuration, n
+        );
     }
 
     TaskLeak(@NotNull Bag<Task, PLink<Task>> bag, @NotNull FloatParam rate, @NotNull NAR n) {

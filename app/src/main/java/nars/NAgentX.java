@@ -158,9 +158,9 @@ abstract public class NAgentX extends NAgent {
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.getDefault(8
                 , "motivation.nal", "relation_introduction.nal");
 
-        int THREADS = 4;
+        int THREADS = 5;
 
-        MultiExec exe = new MultiExec(THREADS, 64 * 1024);
+        MultiExec exe = new MultiExec(THREADS, 128);
         Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
 
 //        exe.add(new FocusExec(), (x) -> true);

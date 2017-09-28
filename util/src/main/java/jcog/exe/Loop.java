@@ -129,6 +129,7 @@ abstract public class Loop implements Runnable {
      */
     @Override
     public final void run() {
+        assert(thread.get() == Thread.currentThread());
 
         onStart();
 
@@ -166,7 +167,7 @@ abstract public class Loop implements Runnable {
 
                 this.dutyTime.addValue((frameTime)/1000.0);
 
-                Util.pause((int)( periodMS - frameTime) ); //((long) this.dutyTime.getMean()) ));
+                Util.sleep((int)( periodMS - frameTime) ); //((long) this.dutyTime.getMean()) ));
 
                 beforeTime = System.currentTimeMillis();
 
