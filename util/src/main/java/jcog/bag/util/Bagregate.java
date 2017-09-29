@@ -36,7 +36,7 @@ public class Bagregate<X extends Prioritized> extends PLinkArrayBag<X> {
     }
 
     public void update() {
-        if (!busy.compareAndSet(false, true))
+        if (src==null || !busy.compareAndSet(false, true))
             return;
 
         try {

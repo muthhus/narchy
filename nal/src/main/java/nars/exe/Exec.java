@@ -1,24 +1,34 @@
 package nars.exe;
 
+import jcog.Util;
 import jcog.event.On;
+import jcog.list.FasterList;
+import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
+import nars.NARLoop;
 import nars.Param;
 import nars.Task;
 import nars.control.Activate;
+import nars.control.Causable;
 import nars.control.Premise;
 import nars.task.ITask;
 import nars.task.NALTask;
+import nars.task.NativeTask;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+
+import static jcog.Util.RouletteControl.*;
 
 /**
  *
@@ -112,241 +122,144 @@ abstract public class Exec implements Executor, PriMerge {
         return 0;
     }
 
-    //    public class Periodic extends Loop {
+
+    public void cause(FasterList<Causable> causables) {
+
+        int cc = causables.size();
+        if (cc == 0)
+            return;
+
+        long dt = nar.time.sinceLast();
+
+
+        /** factor to multiply the mean iteration to determine demand for the next cycle.
+         *  this allows the # of iterations to continually increase.
+         either:
+         1) a cause will not be able to meet this demand and this value
+         will remain relatively constant
+         2) a cause will hit a point of diminishing returns where increasing
+         the demand does not yield any more value, and the system should
+         continue to tolerate this dynamic balance
+         3) a limit to the # of iterations that a cause is able to supply in a cycle
+         has not been determined (but is limited by the hard limit factor for safety).
+         */
+        float ITERATION_DEMAND_GROWTH = 2f;
+
+        final int ITERATION_DEMAND_MAX = 64 * 1024;
+
+
+//        /** set this to some cpu duty cycle fraction of the target fps */
+        NARLoop l = nar.loop;
+        long targetCycleTimeNS = 0;
+        if (l.isRunning()) {
+            //double frameTime = l.dutyTime.getMean();
+            //if (frameTime > 1000*l.periodMS.intValue())
+            //System.out.println("frameTime: " + n4(1000 *  frameTime) + " ms");
+            targetCycleTimeNS = l.periodMS.intValue() * 1000000 * nar.exe.concurrency();
+//            targetCycleTimeNS = Math.max( // ms * threads?
+//                    l.periodMS.intValue() * 1000000 ,
+//                    Math.round(frameTime * 1.0E9)
+//            );
+        } else {
+        //if (targetCycleTimeNS==0) {
+            //some arbitrary default target duty cycle length
+            targetCycleTimeNS = 100 * 1000000 * nar.exe.concurrency();
+        }
+
 //
-//        final AtomicBoolean busy = new AtomicBoolean(false);
-//        //private final FloatParam fps = new FloatParam(0);
-//        private final Runnable task;
-//        private long last;
-//
-//        public Periodic(float fps, Runnable task) {
-//            super(fps);
-//            this.task = task;
-//            this.last = nar.time();
+//        /** if each recieved exactly the same amount of time, this would be how much is allocated to each */
+        @Deprecated final float targetCycleTimeNSperEach = targetCycleTimeNS / cc;
+
+        //Benefit to cost ratio (estimate)
+        //https://en.wikipedia.org/wiki/Benefit%E2%80%93cost_ratio
+        //BCR = Discounted value of incremental benefits ÷ Discounted value of incremental costs
+        float[] bcr = new float[cc];
+        float[] granular = new float[cc];
+        int[] iterLimit = new int[cc];
+        float bcrTotal = 0;
+        RecycledSummaryStatistics bcrStat = new RecycledSummaryStatistics();
+        for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
+            Causable c = causables.get(i);
+            float time = (float) Math.max(1, c.exeTimeNS());
+            float iters = (float) Math.max(1, c.iterationsMean());
+            iterLimit[i] = Math.min(ITERATION_DEMAND_MAX, Math.round((iters + 1) * ITERATION_DEMAND_GROWTH));
+
+            float vv = Util.unitize(c.value());
+
+            bcrStat.accept(
+                    bcr[i] = vv / time
+            );
+            granular[i] = iters / (time / targetCycleTimeNS);
+        }
+//        for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
+//            bcr[i] = bcrStat.normalize(bcr[i]);
 //        }
-//
-//        @Override
-//        public boolean next() {
-//            if (nar.time() <= this.last)
-//                return true; //hasn't proceeded to next cycle
-//
-//            if (!busy.compareAndSet(false, true)) {
-//                return true; //black-out, the last frame didnt even finish yet
-//            }
-//
-//            //runLater(()->{
-//                try {
-//                    last = nar.time();
-//                    task.run();
-//                } finally {
-//                    busy.set(false);
-//                }
-//            //});
-//
-//            return true;
-//        }
-//
-//
-//    }
+
+        float[] iter = new float[cc];
+        Arrays.fill(iter, 1);
+
+
+
+        final int[] samplesRemain = {
+                3 * cc
+        };
+
+        float throttle =
+                1f / samplesRemain[0];
+                //(1f - (float)Math.sqrt(nar.exe.load())) / samplesRemain[0];
+
+
+
+        Util.decideRoulette(cc, (c) -> bcr[c], nar.random(), (j) -> {
+
+            iter[j] += granular[j] * throttle;
+            boolean changedWeights = false;
+            int li = iterLimit[j];
+            if (iter[j] >= li) {
+                iter[j] = li;
+                bcr[j] = 0;
+                changedWeights = true;
+            }
+
+            if (samplesRemain[0]-- <= 0) return STOP;
+            else {
+                return changedWeights ? WEIGHTS_CHANGED : CONTINUE;
+            }
+        });
+
+        //System.out.println(Arrays.toString(iter));
+
+        for (int i = 0, causablesSize = cc; i < causablesSize; i++) {
+            int ii = (int) Math.ceil(iter[i]);
+            if (ii > 0)
+                nar.input(new InvokeCause(causables.get(i), ii));
+        }
+    }
+
+    final private static class InvokeCause extends NativeTask {
+
+        public final Causable cause;
+        public final int iterations;
+
+        private InvokeCause(Causable cause, int iterations) {
+            assert (iterations > 0);
+            this.cause = cause;
+            this.iterations = iterations;
+        }
+        //TODO deadline? etc
+
+        @Override
+        public String toString() {
+            return cause + ":" + iterations + "x";
+        }
+
+        @Override
+        public @Nullable Iterable<? extends ITask> run(NAR n) {
+            cause.run(n, iterations);
+            return null;
+        }
+    }
+
+
 
 }
-
-//package nars.nar.exe;
-//
-//import nars.util.Texts;
-//import org.apache.commons.lang3.mutable.MutableFloat;
-//import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//
-//import java.lang.management.ManagementFactory;
-//import java.lang.management.ThreadMXBean;
-//
-///**
-// * Created by me on 10/17/16.
-// */
-//public class CPUThrottle {
-//
-//    protected final DescriptiveStatistics recentDuty;
-//    protected final DescriptiveStatistics recentPeriod;
-//
-//    private static final Logger logger = LoggerFactory.getLogger(CPUThrottle.class);
-//
-//    /**
-//     * cycles per second
-//     */
-//    protected final MutableFloat targetRate;
-//
-//
-//    long lastTime;
-//    protected float throttle;
-//
-//
-//    public CPUThrottle(MutableFloat targetRate /** cycles per second */) {
-//
-//        this.targetRate = targetRate;
-//
-//        float windowSeconds = 4;
-//        int windowSize = (int)(targetRate.floatValue() * windowSeconds);
-//        recentDuty = new DescriptiveStatistics(windowSize);
-//        recentPeriod = new DescriptiveStatistics(windowSize);
-//    }
-//
-//    public void next(Runnable r) {
-//        long periodStart = now();
-//
-//        //try {
-//        r.run();
-////            } catch (Throwable t) {
-////                logger.error(t);
-////            }
-//
-//        long dutyEnd = now();
-//        recentDuty.addValue(dutyEnd - periodStart);
-//        recentPeriod.addValue(-(lastTime - (this.lastTime = periodStart)));
-//
-//        //long meanDuty = (long) recentDuty.getMean();
-//        long tp = targetPeriod();
-//        long sleepTime = tp - ((long) recentPeriod.getMean());
-//        this.throttle = (float) (((double) (sleepTime)) / tp);
-//
-//        logger.info(" {}", summary());
-//
-//        if (sleepTime > 0) {
-//            //Util.pause(sleepTime);
-//            //logger.info("sleeping {}ms", sleepTime);
-//            try {
-//                Thread.sleep(sleepTime);
-//            } catch (InterruptedException e) {
-//            }
-//        }
-//
-//
-//    }
-//
-//    long targetPeriod() {
-//        return (long) (1000f / targetRate.floatValue());
-//    }
-//
-//    protected long now() {
-//        return System.currentTimeMillis();
-//    }
-//
-//    public String summary() {
-//        return (targetRate.floatValue() + " ideal hz, " +
-//                Texts.n2(1000f / recentPeriod.getMean()) + ".." + Texts.n2(1000f / recentDuty.getMean()) + " possible Hz: " +
-//                //Texts.n2(cpuMS) + " cpu time ms,  ==> " +
-//                Texts.n2(throttle) + " throttle"); //+ " cpu time (" + Texts.n2(cpuPercent) + "%)");
-//
-//
-//    }
-//
-//    /**
-//     * targets a specific CPU usage percentage
-//     * http://stackoverflow.com/a/1235519
-//     */
-//    public static class CPUPercentageThrottle extends CPUThrottle {
-//
-//        static final ThreadMXBean TMB = ManagementFactory.getThreadMXBean();
-//
-//        static {
-//            if (!TMB.isThreadCpuTimeSupported()) {
-//                System.err.println("CPU Time Management not supported by " + TMB);
-//                System.exit(1);
-//            }
-//            if (!TMB.isThreadCpuTimeEnabled()) {
-//                TMB.setThreadCpuTimeEnabled(true);
-//            }
-//        }
-//
-//        private final long[] threadIDs;
-//        private final long[] threadTime;
-//
-//        final MutableFloat targetCPU;
-//        float deltaCPU;
-//
-//
-//        public CPUPercentageThrottle(MutableFloat baseRate, MutableFloat targetCPU, long[] threadIDs) {
-//            super(baseRate);
-//
-//            this.targetCPU = targetCPU;
-//
-//            if (threadIDs.length == 0)
-//                throw new RuntimeException("no threads to measure");
-//
-//            this.threadIDs = threadIDs;
-//            this.threadTime = new long[threadIDs.length];
-//        }
-//
-//        @Override
-//        public void next(Runnable r) {
-//
-//            super.next(r);
-//
-//            long c = cputime();
-//            int numThreads = threadIDs.length;
-//            long cpuNS = c / numThreads;
-//            double cpuPct = cpuNS / 1.0E9;
-//            double cpuMS = cpuNS / 1.0E6;
-//
-//
-//            deltaCPU = (targetCPU.floatValue() - (float) cpuPct) / targetCPU.floatValue();
-//
-//
-//            //cpuperc = (TMB.getCurrentThreadCpuTime() - cput);// / (new Date().getTime() *  1000000.0 - time) * 100.0;
-//
-////If cpu usage is greater then 50%
-////            if (cpuperc > 50.0) {
-////                //sleep for a little bit.
-////                continue;
-////            }
-//
-//        }
-//
-//        /**
-//         * in nanoseconds
-//         */
-//        private long cputime() {
-//
-//            long sum = 0;
-//            for (int i = 0; i < threadIDs.length; i++) {
-//                long h = threadIDs[i];
-//                long prev = threadTime[i];
-//                long now = TMB.getThreadCpuTime(h);
-//                sum += now - prev;
-//                threadTime[i] = now;
-//            }
-//
-//            return sum;
-//        }
-//    }
-//
-//
-//}
-
-//    /**
-//     * run a procedure for each item in chunked stripes
-//     */
-//    public final <X> void runLater(@NotNull List<X> items, @NotNull Consumer<X> each, int maxChunkSize) {
-//
-//        int conc = exe.concurrency();
-//        if (conc == 1) {
-//            //special single-thread case: just execute all
-//            items.forEach(each);
-//        } else {
-//            int s = items.size();
-//            int chunkSize = Math.max(1, Math.min(maxChunkSize, (int) Math.floor(s / conc)));
-//            for (int i = 0; i < s; ) {
-//                int start = i;
-//                int end = Math.min(i + chunkSize, s);
-//                runLater(() -> {
-//                    for (int j = start; j < end; j++) {
-//                        X x = items.get(j);
-//                        if (x != null)
-//                            each.accept(x);
-//                    }
-//                });
-//                i += chunkSize;
-//            }
-//        }
-//    }

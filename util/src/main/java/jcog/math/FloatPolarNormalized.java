@@ -12,7 +12,7 @@ public class FloatPolarNormalized extends FloatNormalized {
     }
 
     public FloatPolarNormalized(FloatSupplier in) {
-        this(in, Pri.EPSILON*2);
+        this(in, Pri.EPSILON);
     }
 
     public FloatPolarNormalized(FloatSupplier in, float radius) {
@@ -25,11 +25,15 @@ public class FloatPolarNormalized extends FloatNormalized {
         if (raw==raw) {
             float araw = Math.abs(raw);
             updateRange(araw);
-            assert(min==0);
+            min = 0;
             return (raw / (max))/2f+0.5f;
         } else {
             return Float.NaN;
         }
+    }
+
+    public float normalizePolar(float raw) {
+        return (normalize(raw)-0.5f)*2f;
     }
 
     public FloatPolarNormalized radius(float radius) {

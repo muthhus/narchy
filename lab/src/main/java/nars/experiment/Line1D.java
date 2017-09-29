@@ -6,8 +6,10 @@ import jcog.Optimize;
 import jcog.Util;
 import jcog.math.FloatSupplier;
 import jcog.net.MeshOptimize;
+import jcog.pri.Prioritized;
 import nars.*;
 import nars.gui.Vis;
+import nars.op.stm.LinkClustering;
 import nars.task.DerivedTask;
 import nars.test.agent.Line1DSimplest;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -44,8 +46,9 @@ public class Line1D {
             Param.DEBUG = true;
             NAR n = NARS.threadSafe();
 
-            //new STMTemporalLinkage(n, 2, false);
-            n.time.dur(1);
+            LinkClustering linkClusterPri = new LinkClustering(n,
+                    Prioritized::priElseZero /* anything temporal */,
+                    32, 128);
 
 
             //n.log();
@@ -86,8 +89,11 @@ public class Line1D {
                     }).start();
                     a.nar.onTask(t -> {
                         if (!t.isInput() && t instanceof DerivedTask
-                            && t.isGoal()) {
-                            System.err.println(t.proof());
+                                && t.isGoal()) {
+
+                            String s = t.term().toString();
+                            if (s.equals("(y,())") || s.equals("((),y)"))
+                                System.err.println(t.proof());
                         }
                     });
 
@@ -110,7 +116,11 @@ public class Line1D {
                 }
             };
             exp.floatValueOf(n);
-            exp.agent.durations.setValue(1);
+
+            //new STMTemporalLinkage(n, 2, false);
+            n.time.dur(16);
+            exp.agent.runDur(2);
+
             //n.truthResolution.setValue(0.1f);
             n.termVolumeMax.set(16);
 
@@ -121,7 +131,7 @@ public class Line1D {
             n.run(100000);
 
             n.concepts().collect(Collectors2.toSortedSet()).forEach(x -> {
-                if (x.op()==IMPL) {
+                if (x.op() == IMPL) {
                     x.print();
                 }
             });
@@ -183,8 +193,6 @@ public class Line1D {
 
             onStart(agent);
 
-
-            agent.speed.setValue(yResolution);
 
             agent.in.resolution(yResolution);
 //            for (GoalActionConcept g : new GoalActionConcept[]{agent.up, agent.down})
@@ -323,7 +331,6 @@ public class Line1D {
             this.lastReward = a.rewardCurrent;
 
             NAR n = a.nar;
-            a.speed.setValue(0.02f);
 
 
             float speed = a.speed.floatValue();

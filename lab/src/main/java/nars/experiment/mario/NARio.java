@@ -111,20 +111,23 @@ public class NARio extends NAgentX {
                mario.scene.key(Mario.KEY_RIGHT, false);
                mario.scene.key(Mario.KEY_SPEED, x <= -thresh2);
                //return -1f;
-               return -1;
+               //return -1;
+               return x;
            } else if (x >= +thresh) {
                mario.scene.key(Mario.KEY_RIGHT, true);
                mario.scene.key(Mario.KEY_LEFT, false);
                mario.scene.key(Mario.KEY_SPEED, x >= +thresh2);
                //return +1f;
-               return +1;
+               //return +1;
+               return x;
            } else {
                mario.scene.key(Mario.KEY_LEFT, false);
                mario.scene.key(Mario.KEY_RIGHT, false);
                mario.scene.key(Mario.KEY_SPEED, false);
                //return 0f;
                //return x;
-               return 0;
+               //return 0;
+               return x;
            }
         });
         actionBipolar($.the("y"), (x) -> {
@@ -233,7 +236,7 @@ public class NARio extends NAgentX {
 
         float curX = mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : Float.NaN;
         if (lastX == lastX && lastX < curX) {
-            reward +=  unitize(curX - lastX)/4f;
+            reward +=  unitize((curX - lastX) * MoveRight.floatValue() );
         }
         lastX = curX;
 

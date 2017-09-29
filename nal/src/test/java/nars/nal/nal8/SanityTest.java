@@ -45,7 +45,7 @@ public class SanityTest {
         };
 
         n.termVolumeMax.setValue(10);
-        a.durations.setValue(1);
+        //a.durations.setValue(1);
 
 
 

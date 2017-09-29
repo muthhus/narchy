@@ -278,7 +278,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-
     public void setEmotion(Emotion emotion) {
         synchronized (self) { //lol
             this.emotion = emotion;
@@ -804,31 +803,39 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    /** simplified wrapper for use cases where only the arguments of an operation task, and not the task itself matter */
-    public final void onOpArgs(@NotNull String atom, @NotNull BiConsumer<TermContainer,NAR> exe) {
+    /**
+     * simplified wrapper for use cases where only the arguments of an operation task, and not the task itself matter
+     */
+    public final void onOpArgs(@NotNull String atom, @NotNull BiConsumer<TermContainer, NAR> exe) {
         onOp(atom, (task, nar) -> {
-            exe.accept( task.term().sub(0).subterms(), nar );
+            exe.accept(task.term().sub(0).subterms(), nar);
             return null;
         });
     }
 
-    /** simplified wrapper which converts the term result of the supplied lambda to a log event */
-    public final void onOpLogged(@NotNull String a, @NotNull BiFunction<Task,NAR,Term> exe) {
-        onOp(a, (BiFunction<Task,NAR,Task>)(t, n) -> Operator.log(exe.apply(t, n)));
+    /**
+     * simplified wrapper which converts the term result of the supplied lambda to a log event
+     */
+    public final void onOpLogged(@NotNull String a, @NotNull BiFunction<Task, NAR, Term> exe) {
+        onOp(a, (BiFunction<Task, NAR, Task>) (t, n) -> Operator.log(exe.apply(t, n)));
     }
 
-    /** registers an operator */
-    public final void onOp(@NotNull String a, @NotNull BiConsumer<Task,NAR> exe) {
-        onOp(a, (BiFunction<Task,NAR,Task>)(task, nar) -> {
-            exe.accept( task, nar );
+    /**
+     * registers an operator
+     */
+    public final void onOp(@NotNull String a, @NotNull BiConsumer<Task, NAR> exe) {
+        onOp(a, (BiFunction<Task, NAR, Task>) (task, nar) -> {
+            exe.accept(task, nar);
             return null;
         });
     }
 
-    /** registers an operator */
-    public final void onOp(@NotNull String a, @NotNull BiFunction<Task,NAR,Task> exe) {
+    /**
+     * registers an operator
+     */
+    public final void onOp(@NotNull String a, @NotNull BiFunction<Task, NAR, Task> exe) {
 
-        terms.set(new Operator( (Atom)Atomic.the(a), exe, this));
+        terms.set(new Operator((Atom) Atomic.the(a), exe, this));
 //        {
 //
 //            @Override
@@ -861,12 +868,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * provides a Random number generator
      */
-    public Random random() {
+    public final Random random() {
         return random;
     }
 
     @Nullable
-    public Truth truth(@Nullable Termed concept, byte punc, long when) {
+    public final Truth truth(Termed concept, byte punc, long when) {
         return truth(concept, punc, when, when);
     }
 
@@ -874,28 +881,27 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * returns concept belief/goal truth evaluated at a given time
      */
     @Nullable
-    public Truth truth(@Nullable Termed concept, byte punc, long start, long end) {
-        if (concept != null) {
+    public Truth truth(Termed concept, byte punc, long start, long end) {
 
-            assert (concept.op().conceptualizable) : "asking for truth of unconceptualizable: " + concept; //filter NEG etc
+        assert (concept.op().conceptualizable) : "asking for truth of unconceptualizable: " + concept; //filter NEG etc
 
-            @Nullable Concept c = concept(concept);
-            if (c instanceof BaseConcept) {
-                BaseConcept tc = (BaseConcept) c;
-                BeliefTable table;
-                switch (punc) {
-                    case BELIEF:
-                        table = tc.beliefs();
-                        break;
-                    case GOAL:
-                        table = tc.goals();
-                        break;
-                    default:
-                        throw new UnsupportedOperationException();
-                }
-                return table.truth(start, end, this);
+        @Nullable Concept c = concept(concept);
+        if (c instanceof BaseConcept) {
+            BaseConcept tc = (BaseConcept) c;
+            BeliefTable table;
+            switch (punc) {
+                case BELIEF:
+                    table = tc.beliefs();
+                    break;
+                case GOAL:
+                    table = tc.goals();
+                    break;
+                default:
+                    throw new UnsupportedOperationException();
             }
+            return table.truth(start, end, this);
         }
+
         return null;
     }
 
@@ -956,7 +962,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         time.cycle(this);
 
-        MetaGoal.cause(causables, this);
+        exe.cause(causables);
 
         eventCycle.emit(this); //synchronous only
 
@@ -1002,8 +1008,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     /* Print all statically known events (discovered via reflection)
-    *  for this reasoner to a stream
-    * */
+     *  for this reasoner to a stream
+     * */
     @NotNull
     public NAR trace(@NotNull Appendable out, Predicate<String> includeKey, @Nullable Predicate includeValue) {
 
@@ -1343,7 +1349,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     public final void input(Stream<? extends ITask> taskStream) {
-        if (taskStream==null) return;
+        if (taskStream == null) return;
         taskStream.filter(Objects::nonNull).forEach(this::input);
     }
 
@@ -1482,6 +1488,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         return this;
     }
+
     @NotNull
     public NAR outputText(@NotNull OutputStream o, @NotNull Function<Task, Task> each) {
 
@@ -1658,10 +1665,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     /**
      * computes an evaluation amplifier factor, in range 0..2.0.
-     *          VALUE -> AMP
-     *      -Infinity -> amp=0
-     *          0     -> amp=1
-     *      +Infinity -> amp=2
+     * VALUE -> AMP
+     * -Infinity -> amp=0
+     * 0     -> amp=1
+     * +Infinity -> amp=2
      */
     public float evaluate(short[] effect) {
         float value = MetaGoal.privaluate(causes, effect);
@@ -1762,7 +1769,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 ////    }
 
 
-
     /**
      * automatically adds the cause id to each input
      */
@@ -1777,7 +1783,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                     NALTask t = (NALTask) x;
                     int tcl = t.cause.length;
                     if (tcl == 0) {
-                        assert(sharedOneElement[0] == ci);
+                        assert (sharedOneElement[0] == ci);
                         t.cause = sharedOneElement;
                     } else {
                         //concat

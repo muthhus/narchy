@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 /**
@@ -67,6 +69,12 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         return -pCmp(y);
     }
 
+    @Override
+    public Stream<Y> stream() {
+        int s = size();
+        Object[] x = items.array();
+        return IntStream.range(0, s).mapToObj(i -> (Y)x[i]).filter(y -> y!=null && !y.isDeleted());
+    }
 
     /**
      * returns whether the capacity has changed

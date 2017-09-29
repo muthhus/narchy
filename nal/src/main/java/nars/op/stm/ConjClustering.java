@@ -40,8 +40,9 @@ public class ConjClustering extends Causable {
         @Override
         public void coord(Task t, double[] c) {
             c[0] = t.start();
-            c[1] = t.truth().isNegative() ? (1f - t.freq()) : t.freq(); //0..+1 //if negative, will be negated in subterms
-            c[2] = t.conf(); //0..+1
+            Truth tt = t.truth();
+            c[1] = tt.polarity(); //0..+1 //if negative, will be negated in subterms
+            c[2] = tt.conf(); //0..+1
         }
 
         @Override
@@ -74,7 +75,7 @@ public class ConjClustering extends Causable {
 
         nar.onTask(t -> {
             if (!t.isEternal() && t.punc() == punc && (includeNeg || t.isPositive())) {
-                bag.put(t, t.polarity() * t.conf() * (1f + t.priElseZero()));
+                bag.put(t, t.expolarity() * (1f + t.priElseZero()) / t.volume());
             }
         });
     }

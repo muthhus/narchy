@@ -176,7 +176,7 @@ public interface Bag<K, V> extends Table<K, V> {
     }
 
     default Stream<V> stream() {
-        return StreamSupport.stream(() -> this.spliterator(), 0, false);
+        return StreamSupport.stream(this::spliterator, 0, false);
     }
 
     default Bag<K, V> sample(int max, Consumer<? super V> each) {

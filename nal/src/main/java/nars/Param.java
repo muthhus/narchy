@@ -186,10 +186,11 @@ public abstract class Param extends Services<Term,NAR> {
 
             //prefer confidence, relative to the premise which formed it
             float parentConf = d.single ? d.premiseConfSingle : d.premiseConfDouble;
-            assert(parentConf > 0);
-            float relConf = unitize(tr.conf() / parentConf);
+            if (parentConf > 0) {
+                float relConf = unitize(tr.conf() / parentConf);
 
-            discount *= relConf;
+                discount *= relConf;
+            }
 
             //prefer polarized
             //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));

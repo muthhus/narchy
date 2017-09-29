@@ -1,6 +1,7 @@
 package nars;
 
 import jcog.data.FloatParam;
+import jcog.event.On;
 import jcog.event.Ons;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
@@ -12,6 +13,7 @@ import nars.concept.ScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
 import nars.control.DurService;
+import nars.control.NARService;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
@@ -40,7 +42,7 @@ import static nars.truth.TruthFunctions.w2c;
 /**
  * explicit management of sensor concepts and motor functions
  */
-abstract public class NAgent extends DurService implements NSense, NAct {
+abstract public class NAgent extends NARService implements NSense, NAct, Runnable {
 
     public static final Logger logger = LoggerFactory.getLogger(NAgent.class);
 
@@ -138,6 +140,24 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         this.predict = nar.newCauseChannel(id + " predict");
     }
 
+    @Deprecated public On runDur(int everyDurs) {
+        int dur = nar.dur();
+        int everyCycles = dur * everyDurs;
+        return nar.onCycle(i -> {
+            if (nar.time() % everyCycles == 0)
+                NAgent.this.run();
+        });
+    }
+
+    public Loop runFPS(float fps) {
+        return new Loop(fps) {
+            @Override public boolean next() {
+                NAgent.this.run();
+                return true;
+            }
+        };
+    }
+
     @Override
     public FloatParam curiosity() {
         return curiosity;
@@ -202,14 +222,18 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         nar.runLater(() -> {
             //this.curiosityAttention = reinforcementAttention / actions.size();
 
-                Task he = nar.goal(happy.term()); /* eternal */
+                float happysadPri = 1f;
+
+                Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nar.time(), ETERNAL, ETERNAL, nar.time.nextInputStamp());
+                he.pri(happysadPri);
                 predictors.add(() -> {
-                    he.priMax(nar.priDefault(GOAL));
+                    he.priMax(happysadPri);
                     return he;
                 });
-                Task se = nar.goal(sad.term().neg()); /* eternal */
+                Task se = new NALTask(sad.term(), GOAL, $.t(0f, nar.confDefault(GOAL)), nar.time(), ETERNAL, ETERNAL, nar.time.nextInputStamp());
+                se.pri(happysadPri);
                 predictors.add(() -> {
-                    se.priMax(nar.priDefault(GOAL));
+                    se.priMax(happysadPri);
                     return se;
                 });
 
@@ -249,20 +273,25 @@ abstract public class NAgent extends DurService implements NSense, NAct {
             //        predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
             //        predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
 
+            Variable what = $.varQuery(1);
+
+            predictors.add(question($.impl(happy.term(), what)));
+            predictors.add(question($.impl(sad.term(), what)));
+
             for (Concept a : actions.keySet()) {
                 Term action = a.term();
 
-                Variable what = $.varQuery(1);
                 Term notAction = action.neg();
 
                 ((FasterList) predictors).addAll(
 
                         question($.impl(action, happy.term())),
                         question($.impl(notAction, happy.term())),
-                        question($.impl(action, sad.term())),
-                        question($.impl(notAction, sad.term())),
+//                        question($.impl(action, sad.term())),
+//                        question($.impl(notAction, sad.term())),
                         question($.impl(action, what)),
                         question($.impl(notAction, what)),
+                        quest(action),
                         quest($.parallel(what, action)),
                         quest($.parallel(what, notAction))
 
@@ -393,8 +422,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 //    }
 
 
-    @Override
-    protected void run(NAR nar, long dt) {
+    public void run() {
         if (!enabled.get())
             return;
 
@@ -597,5 +625,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     public Ons onFrame(Runnable each) {
         return DurService.build(nar, each).ons;
     }
+
 
 }

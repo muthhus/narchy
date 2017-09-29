@@ -14,10 +14,10 @@ import spacegraph.SpaceGraph;
 
 public class Arkancide extends NAgentX {
 
-    static boolean numeric;
-    static boolean cam = true;
+    static boolean numeric = true;
+    static boolean cam = false;
 
-    public final FloatParam ballSpeed = new FloatParam(0.2f, 0.04f, 6f);
+    public final FloatParam ballSpeed = new FloatParam(0.8f, 0.04f, 6f);
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 
@@ -60,7 +60,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 10);
+        }, 20);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -113,10 +113,10 @@ public class Arkancide extends NAgentX {
 
 
         if (numeric) {
-            SensorConcept a = senseNumber("px", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
-            SensorConcept ab = senseNumber("dx", (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
-            SensorConcept b = senseNumber("bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
-            SensorConcept c = senseNumber("by", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
+            senseNumberBi($.the("px"), (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
+            senseNumberBi($.the("dx"), (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
+            senseNumberBi($.the("bx"), (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
+            senseNumberBi($.the("by"), (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
             //SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX)).resolution(0.25f);
             //SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY)).resolution(0.25f);
 
@@ -125,9 +125,9 @@ public class Arkancide extends NAgentX {
 //                      "--(ball-paddle):x! :|:"
 //            );
 
-            SpaceGraph.window(Vis.beliefCharts(100,
-                    Lists.newArrayList(ab.term(), a.term(), b.term(), c.term()),
-                    nar), 600, 600);
+//            SpaceGraph.window(Vis.beliefCharts(100,
+//                    Lists.newArrayList(ab.term(), a.term(), b.term(), c.term()),
+//                    nar), 600, 600);
 //            nar.onTask(t -> {
 //                if (t instanceof DerivedTask && t.isGoal()) {
 //                    if (t.term().equals(ab))

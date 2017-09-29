@@ -85,7 +85,7 @@ abstract public class Causable extends NARService {
         return false;
     }
 
-    protected final int run(NAR n, int iterations) {
+    public final int run(NAR n, int iterations) {
 
         if (singleton() && !busy.compareAndSet(false, true)) {
             return 0; //another thread running in here

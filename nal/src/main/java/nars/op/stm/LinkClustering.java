@@ -11,8 +11,10 @@ import nars.concept.Concept;
 import nars.control.DurService;
 import nars.term.Term;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.impl.block.factory.Comparators;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -114,6 +116,8 @@ public class LinkClustering extends DurService {
 
     protected void linkClustersMulti(List<VLink<Task>> group, NAR nar) {
         Task[] tasks = group.stream().map(PLink::get).toArray(Task[]::new);
+
+        Arrays.sort(tasks, Comparators.byIntFunction(Task::hashCode)); //keep them in a canonical ordering for equality testing purposes
 
         MultiLink<Task,Task> task = new MultiLink<>(
                 tasks,

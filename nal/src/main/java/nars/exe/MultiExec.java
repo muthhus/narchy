@@ -68,21 +68,7 @@ public class MultiExec extends Exec {
         super.start(nar);
         exe = Executors.newFixedThreadPool(num);
         for (int i = 0; i < num; i++) {
-
             exe.execute(sub[i] = new Sub(nar, SUB_CAPACITY));
-
-//            exe.execute(() -> {
-//                int idle = 0;
-//                while (true) {
-//                    ITask r = q.poll();
-//                    if (r != null) {
-//                        execute(r);
-//                        idle = 0;
-//                    } else {
-//                        Util.pauseNext(++idle);
-//                    }
-//                }
-//            });
         }
     }
 

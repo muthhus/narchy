@@ -1,6 +1,7 @@
 package jcog.math;
 
 import jcog.Util;
+import jcog.pri.Pri;
 
 import java.util.function.DoubleSupplier;
 
@@ -76,11 +77,11 @@ public class FloatNormalized implements FloatSupplier {
     /**
      * decay rate = 1 means unaffected.  values less than 1 constantly
      * try to shrink the range to zero.
-     * @param decayRate
+     * @param rate
      * @return
      */
-    public FloatNormalized relax(float decayRate) {
-        this.relax = decayRate;
+    public FloatNormalized relax(float rate) {
+        this.relax = rate;
         return this;
     }
 
@@ -101,10 +102,14 @@ public class FloatNormalized implements FloatSupplier {
         }
 
         if (relax > 0) {
-            if (!incMax)
-                max = Util.clamp(max - (max - min * relax), min, max);
-            if (!incMin)
-                min = Util.clamp(min + (max - min * relax), min, max);
+            float range = max - min;
+            if (range > Pri.EPSILON) {
+                float max0 = max;
+                if (incMax)
+                    max = Util.lerp(relax, max, min);
+                if (incMin)
+                    min = Util.lerp(relax, min, max0);
+            }
         }
 
         return this;

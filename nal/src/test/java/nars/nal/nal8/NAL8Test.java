@@ -153,7 +153,7 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
-    @Test public void testDeiredConjPos() {
+    @Test public void testDesiredConjPos() {
         TestNAR t = test;
         t
                 .believe("(x)")
@@ -161,7 +161,7 @@ public class NAL8Test extends AbstractNALTest {
                 .mustGoal(cycles, "(y)", 1f, 0.81f);
     }
 
-    @Test public void testDeiredConjNeg() {
+    @Test public void testDesiredConjNeg() {
         TestNAR t = test;
         t
                 .believe("--x")

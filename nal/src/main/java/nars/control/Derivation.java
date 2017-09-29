@@ -301,7 +301,9 @@ public class Derivation extends Unify implements TermContext {
                //project belief truth to task's time
                long beliefTruthTime = task.isEternal() ?
                         ETERNAL :
-                        belief.nearestTimeBetween(task.start(), task.end());
+                       task.start();
+                        //belief.nearestTimeBetween(task.start(), task.end());
+                        //nar.time(); //now
 
                 this.beliefTruth = belief.truth(beliefTruthTime, dur, confMin);
             } else {
@@ -342,7 +344,9 @@ public class Derivation extends Unify implements TermContext {
                 task.cause();
 
         this.premiseConfSingle = this.taskTruth != null ? taskTruth.conf() : 0;
-        this.premiseConfDouble = beliefTruth != null ? Math.max(premiseConfSingle, beliefTruth.conf()) : premiseConfSingle;
+        this.premiseConfDouble = beliefTruth != null ?
+                Math.min(premiseConfSingle, beliefTruth.conf()) : //to be fair to the lesser confidence
+                premiseConfSingle;
 
         setTTL(ttl); assert (ttl > 0);
 

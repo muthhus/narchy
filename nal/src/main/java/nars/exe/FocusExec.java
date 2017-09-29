@@ -123,7 +123,7 @@ public class FocusExec extends Exec implements Runnable {
 
     @Nullable
     protected NARService newTrigger() {
-        return !(nar.exe instanceof MultiExec) ? new MyTrigger() : null; //HACK
+        return (nar.exe instanceof FocusExec) ? new MyTrigger() : null; //HACK
     }
 
     @Override

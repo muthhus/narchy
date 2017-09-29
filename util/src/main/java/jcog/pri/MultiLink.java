@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 
@@ -23,7 +24,7 @@ public class MultiLink<X extends Prioritized,Y> extends AbstractPLink<Y> {
         super(p);
         this.x = x;
         this.transduce = transduce;
-        hash = Util.hashCombine(transduce.hashCode(), x.hashCode());
+        hash = Util.hashCombine(transduce.hashCode(), Arrays.hashCode(x));
     }
 
     @Override
@@ -42,20 +43,23 @@ public class MultiLink<X extends Prioritized,Y> extends AbstractPLink<Y> {
         float priSum = 0;
         int deleted = 0;
         int c = x.length;
+        float[] pri = new float[c];
         for (int i = 0; i < c; i++) {
             float p = x[i].pri();
             if (p!=p) {
                 deleted++;
+                p = 0;
             } else {
                 priSum += p;
             }
+            pri[i] = p;
         }
         if (deleted == c) {
             super.delete();
             return null;
         }
 
-        int s = Util.decideRoulette(c, i -> x[i].priElseZero(), ThreadLocalRandom.current());
+        int s = Util.decideRoulette(c, i -> pri[i], ThreadLocalRandom.current());
         return transduce.apply(x[s]);
     }
 

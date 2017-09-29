@@ -3,12 +3,13 @@ package nars;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatNormalized;
+import jcog.math.FloatPolarNormalized;
+import jcog.pri.Pri;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
 import nars.task.ITask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
@@ -25,9 +26,7 @@ import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 
 import static jcog.Util.unitize;
-import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
-import static nars.Op.ZeroProduct;
+import static nars.Op.*;
 import static nars.truth.TruthFunctions.c2w;
 
 /**
@@ -139,7 +138,9 @@ public interface NAct {
             f = f / 2f + 0.5f;
 
             //radius of center dead zone; diameter = 2x this
-            float deadZoneFreqRadius = 1f / 6;
+            float deadZoneFreqRadius =
+                    1 / 6f;
+                    //1/4f;
             int s;
             if (f > 0.5f + deadZoneFreqRadius)
                 s = +1;
@@ -374,7 +375,7 @@ public interface NAct {
 
     default void actionBipolarExpectationNormalized(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         float v[] = new float[1];
-        FloatNormalized f = new FloatNormalized(() -> v[0]).relax(0.995f);
+        FloatNormalized f = new FloatNormalized(() -> v[0]).relax(0.01f);
         actionBipolarExpectation(s, (x) -> {
             v[0] = Math.abs(x); //HACK
             float y = f.asFloat() * Math.signum(x);
@@ -402,6 +403,10 @@ public interface NAct {
         final float[] px = {0};
         GoalActionAsyncConcept[] CC = new GoalActionAsyncConcept[2]; //hack
 
+        float[] nf = new float[1];
+        FloatPolarNormalized normalize = new FloatPolarNormalized(()->nf[0]);
+        normalize.relax(0.1f);
+
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (action, g) -> {
 
             boolean p = action.term().equals(pt);
@@ -412,10 +417,13 @@ public interface NAct {
             float cur = curiosity().floatValue();
             Random rng = n.random();
 
-            float restConf =
-                    //n.confMin.floatValue() * 2;
+            float confWeak =
+                    n.confMin.floatValue() * 4;
+
+            float confStrong =
                     //nar().confDefault(GOAL)/2;
                     nar().confDefault(GOAL);
+            float confMin = nar().confMin.floatValue();
 
             //n.confDefault(BELIEF);
             //0;
@@ -427,20 +435,26 @@ public interface NAct {
             exp[ip] = g != null ? g.expectation() : 0f;
             //evi[ip] = g != null ? g.evi(): 0f;
 
+
             if (!p) {
 
 
                 float ew;
+                boolean curious;
 
 
                 float x; //0..+1
                 if (cur > 0 && rng.nextFloat() <= cur) {
+                    float curiConf = confWeak;
                     x = (TruthFunctions.expectation(
                         rng.nextFloat(),
-                        restConf
+                        curiConf
+                        //confWeak
                     ) - 0.5f)*2f;
-                    c[0] = c[1] = restConf;
+                    c[0] = c[1] = curiConf;
+                    curious = true;
                 } else {
+                    curious = false;
 
 //                    int winner =
 ////                            //Util.decideRoulette(2, (i) -> cc[i], n.random());
@@ -463,9 +477,25 @@ public interface NAct {
 //                        x = Float.NaN;
 //                    } else {
                         //compare positive vs negative
-                        x =
-                                //((f[0]-0.5f) - (f[1]-0.5f));  //-1..+1
-                                ((exp[0] - 0.5f) - (exp[1] - 0.5f));  //-1..+1
+//                    float ac = (Math.abs(exp[0]-0.5f) + Math.abs(exp[1]-0.5f));
+                    float ec =
+                            //(normalize.normalizePolar(exp[0] - 0.5f)) - (normalize.normalizePolar(exp[1] - 0.5f))
+                            (exp[0] - 0.5f) - (exp[1] - 0.5f)
+                            //+ (nar().random().nextFloat()-0.5f)*2f*confMin
+                    ;
+//                    if (ac < Pri.EPSILON) {
+//                        //quantize if information below threshold
+//                        if (ec > 0 && ec < Pri.EPSILON)
+//                            ec = Pri.EPSILON;
+//                        else if (ec < 0 && ec > -Pri.EPSILON)
+//                            ec = -Pri.EPSILON;
+//                        else
+//                            ec = (nar().random().nextInt(3) - 1) * Pri.EPSILON;
+//                    }
+
+                    x =
+                        //ec;
+                        normalize.normalizePolar(ec);  //-1..+1
                         //(1 - Math.abs(exp[0] - exp[1])) * (f[0]-0.5f) - (f[1]-0.5f);  //-1..+1 discounted by difference in expectation
 //                    }
                 }
@@ -487,38 +517,41 @@ public interface NAct {
                 float conf = y == y ?
                             //restConf/2f,
                             //Math.abs(y) * Math.abs(x)
-                            //Math.abs(y) * restConf
+                            Util.unitize(Math.abs(y)) * confStrong
                             //Math.abs(y)
                             //w2c((c2wSafe(c[0]) + c2wSafe(c[1]))/2f)
                             //Math.max(c[0],c[1])
-                            Math.max(c[0],c[1])
+                            //Math.max(c[0],c[1])
                         : 0;
 
                 //w2c(Math.abs(y) * c2w(restConf));
-                if (conf >= nar().confMin.floatValue()) {
+
+                if (conf >= confMin) {
                     //Math.max(cc[winner], nar().confMin.floatValue());
                     //0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
 
                     P = $.t(1, conf);
                     N = $.t(0f, conf);
                 } else {
-//                    P = N = $.t(0.5f,
-//                            n.confMin.floatValue() * 2);
-//                            //restConf);
-                    N = P = null;
+                    conf = Math.max(confWeak, Math.max(c[0], c[1]));
+                    P = N = $.t(0f, conf);
+                            //restConf);
+                    //N = P = null;
                 }
 
 
                 PreciseTruth pb = y >= 0 ? P : N;
                 PreciseTruth pg =
                         //pb;
-                        pb!=null ? pb.eviMult(0.5f) : null;
+                        //pb!=null ? pb.eviMult(0.5f) : null;
+                        curious ? pb : null; //only feedback artificial goal if input goal was null
                         //null;
                 CC[0].feedback(pb, pg, n);
                 PreciseTruth nb = y >= 0 ? N : P;
                 PreciseTruth ng =
                         //nb;
-                        nb!=null ? nb.eviMult(0.5f) : null;
+                        curious ? nb : null; //only feedback artificial goal if input goal was null
+                        //nb!=null ? nb.eviMult(0.5f) : null;
                         //null;
                 CC[1].feedback(nb, ng, n);
             }

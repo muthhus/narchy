@@ -3,22 +3,20 @@ package nars;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.Ons;
+import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.pri.Prioritized;
 import jcog.pri.mix.control.MixContRL;
-import nars.control.Activate;
 import nars.control.Cause;
 import nars.control.Derivation;
 import nars.control.MetaGoal;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
-import nars.exe.FocusExec;
-import nars.exe.MultiExec;
+import nars.exe.MultiExec2;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
 import nars.op.stm.LinkClustering;
 import nars.term.Term;
@@ -32,7 +30,6 @@ import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.ugens.*;
 import org.HdrHistogram.DoubleHistogram;
-import org.HdrHistogram.Histogram;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
@@ -61,10 +58,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -160,8 +155,8 @@ abstract public class NAgentX extends NAgent {
 
         int THREADS = 5;
 
-        MultiExec exe = new MultiExec(THREADS, 128);
-        Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
+        MultiExec2 exe = new MultiExec2(THREADS, 128);
+        //Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
 
 //        exe.add(new FocusExec(), (x) -> true);
 //        exe.add(new FocusExec() {
@@ -201,7 +196,7 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_QUEST_PRIORITY = 1f * priFactor;
 
         NAgent a = init.apply(n);
-        a.durations.setValue(1);
+        Loop aLoop = a.runFPS(agentFPS);
 
         //n.dtDither.setValue(0.25f);
         //n.dtMergeOrChoose.setValue(true);
@@ -210,8 +205,8 @@ abstract public class NAgentX extends NAgent {
 
         LinkClustering linkClusterPri = new LinkClustering(n, Prioritized::priElseZero /* anything temporal */,
                 32, 128);
-        LinkClustering linkClusterConf = new LinkClustering(n, (t) -> t.isBeliefOrGoal() ? t.conf() : Float.NaN,
-                4, 16);
+//        LinkClustering linkClusterConf = new LinkClustering(n, (t) -> t.isBeliefOrGoal() ? t.conf() : Float.NaN,
+//                4, 16);
 //        SpaceGraph.window(col(
 //                new STMView.BagClusterVis(n, linkClusterPri.bag),
 //                new STMView.BagClusterVis(n, linkClusterConf.bag)
@@ -219,7 +214,7 @@ abstract public class NAgentX extends NAgent {
 
 
         ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, true, 16, 64);
-        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL,true, 16, 64);
+        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, true, 16, 64);
 
 //        n.runLater(() -> {
 ////            AudioContext ac = new AudioContext();
@@ -231,9 +226,9 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-        //Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
+//        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
 //
-        Inperience inp = new Inperience(n, 4);
+        //Inperience inp = new Inperience(n, 4);
 //
 //        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
 //        reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);
@@ -615,14 +610,16 @@ abstract public class NAgentX extends NAgent {
                         }
                     }),
                     new PushButton("prune", () -> {
-                        DoubleHistogram i = new DoubleHistogram(2);
-                        nar.tasks(true, false, false, false).forEach(t ->
-                            i.recordValue(t.conf())
-                        );
-                        float confThresh = (float) i.getValueAtPercentile(25);
-                        nar.tasks(true, false, false, false).filter(t ->
-                                t.conf() < confThresh
-                        ).forEach(Task::delete);
+                        nar.runLater(() -> {
+                            DoubleHistogram i = new DoubleHistogram(2);
+                            nar.tasks(true, false, false, false).forEach(t ->
+                                    i.recordValue(t.conf())
+                            );
+                            float confThresh = (float) i.getValueAtPercentile(25);
+                            nar.tasks(true, false, false, false).filter(t ->
+                                    t.conf() < confThresh
+                            ).forEach(Task::delete);
+                        });
                     }),
                     new WindowButton("top", () -> (new ConsoleTerminal(new nars.TextUI(nar).session(20f)))),
                     new WindowButton("concept graph", () -> {

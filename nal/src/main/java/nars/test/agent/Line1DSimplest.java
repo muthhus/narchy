@@ -21,7 +21,7 @@ public class Line1DSimplest extends NAgent {
     public final FloatParam i = new FloatParam(0.5f, 0, 1f);
     public final FloatParam o = new FloatParam(0.5f, 0, 1f);
 
-    public final FloatParam speed = new FloatParam(0.04f, 0f, 0.5f);
+    public final FloatParam speed = new FloatParam(0.25f, 0f, 0.5f);
 
 //    @NotNull
 //    public GoalActionConcept up, down;
@@ -37,10 +37,10 @@ public class Line1DSimplest extends NAgent {
         super( n);
 
 
-        in = senseNumber($.p("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
+        in = senseNumber($.the("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
                 this.i
         );
-        senseNumber($.p("o"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
+        senseNumber($.the("o"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
                 this.o
         );
 //        in = senseNumber(

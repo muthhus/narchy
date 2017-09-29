@@ -6,7 +6,6 @@ import jcog.pri.PLink;
 import jcog.pri.PLinkUntilDeleted;
 import jcog.sort.TopN;
 import nars.NAR;
-import nars.Task;
 import nars.bag.ConcurrentArrayBag;
 import nars.control.Activate;
 import nars.control.Premise;
@@ -15,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
@@ -198,7 +198,7 @@ public class UniExec extends Exec  {
 
     @Override
     public Stream<ITask> stream() {
-        return plan.stream().map(PLink::get);
+        return plan.stream().map(PLink::get).filter(Objects::nonNull);
     }
 
 
