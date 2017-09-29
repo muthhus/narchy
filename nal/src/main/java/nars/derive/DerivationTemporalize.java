@@ -19,8 +19,8 @@ import java.util.*;
 
 import static nars.Op.CONJ;
 import static nars.Op.IMPL;
+import static nars.Op.NEG;
 import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.XTERNAL;
 
 /**
  * unknowns to solve otherwise the result is impossible:
@@ -120,8 +120,13 @@ public class DerivationTemporalize extends Temporalize {
         }
     }
 
+    /** HACK HACK */
+    private final static Set<Term> INDUCTION = Set.of(
+            $.$safe("Induction"), $.$safe("InductionN"),
+            $.$safe("InductionPN"),$.$safe("InductionNN"));
+
     @Nullable
-    public Term solve(@NotNull Derivation d, Term pattern, long[] occ, float[] confGain) {
+    public Term solve(Conclusion c, @NotNull Derivation d, Term pattern, long[] occ, float[] confGain) {
 
 
         Task belief;
@@ -132,16 +137,35 @@ public class DerivationTemporalize extends Temporalize {
             belief = this.belief;
             constraints = dbl;
 
-            //HACK special case: a repeat in temporal induction
+            //HACK HACK HACK special case: a repeat in temporal induction
             Op po = pattern.op();
             Term tt = task.term();
             if (po.temporal && !task.isEternal() && !belief.isEternal() && belief.term().equals(tt)) {
-                if (po==CONJ && pattern.subs()==2 && pattern.sub(0).unneg().equals(tt) && pattern.sub(0).unneg().equals(pattern.sub(1).unneg())) {
-                    occ[0] = task.start();
-                    return pattern.dt((int) (belief.start() - task.end()));
-                }/* else if (po == IMPL ...
-                    TODO
-                }*/
+                if (((po == CONJ || po == IMPL) && pattern.subs() == 2)) {
+                    Term p0 = pattern.sub(0);
+                    if (p0.unneg().equals(tt) && p0.unneg().equals(pattern.sub(1).unneg())) {
+                        occ[0] = task.start();
+
+                        int dt = (int) (belief.start() - task.end());
+
+                        //HACK HACK HACK
+                        Term beliefTruth = c.rule.POST[0].beliefTruth;
+                        boolean reverse = false;
+                        if (po == IMPL && INDUCTION.contains(beliefTruth)) {
+                            reverse = true;
+                            occ[0] = belief.start();
+                        } else if (po == CONJ) {
+                            if (belief.isNegative() && belief.isAfter(task.start()))
+                                reverse = true;
+                        }
+
+                        if (reverse) {
+                            dt = -dt;
+                        }
+
+                        return pattern.dt(dt);
+                    }
+                }
             }
 
         }

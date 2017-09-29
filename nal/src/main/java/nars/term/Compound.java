@@ -697,19 +697,25 @@ public interface Compound extends Term, IPair, TermContainer {
 
             if (!(dt == 0 && level > 0) && dt != DTERNAL && dt != XTERNAL) {
 
-                boolean reverse;
-                if (dt < 0) {
-                    dt = -dt;
-                    reverse = true;
-                } else reverse = false;
 
                 TermContainer tt = subterms();
                 int s = tt.subs();
                 long t = offset;
-                for (int i = 0; i < s; i++) {
-                    Term st = tt.sub(reverse ? (s - 1 - i) : i);
-                    st.events(events, t, level + 1); //recurse
-                    t += dt + st.dtRange();
+
+                //iterate from earliest to latest
+                boolean reverse = dt < 0;
+                if (!reverse) {
+                    for (int i = 0; i < s; i++) {
+                        Term st = tt.sub(i);
+                        st.events(events, t, level + 1); //recurse
+                        t += dt + st.dtRange();
+                    }
+                } else {
+                    for (int i = s-1; i >= 0; i--) {
+                        Term st = tt.sub(i);
+                        st.events(events, t, level + 1); //recurse
+                        t += -dt + st.dtRange();
+                    }
                 }
 
                 //if (dt!=0 || level==0) //allow dt==0 case to proceed below and add the (&| event as well as its components (which are precisely known)

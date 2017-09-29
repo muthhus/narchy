@@ -3,6 +3,7 @@ package nars.derive;
 import nars.NAR;
 import nars.Param;
 import nars.control.Derivation;
+import nars.derive.rule.PremiseRule;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
@@ -35,12 +36,14 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
 
     public final Set<Variable> uniqueVars;
+    public final PremiseRule rule;
 
-    public Conclusion(Term id, Term pattern, boolean goalUrgent) {
+    public Conclusion(Term id, Term pattern, PremiseRule rule) {
         super(id);
+        this.rule = rule;
         this.pattern = pattern;
         this.uniqueVars = pattern instanceof Compound ? ((PatternCompound)pattern).uniqueVars : Set.of();
-        this.goalUrgent = goalUrgent;
+        this.goalUrgent = rule.goalUrgent;
     }
 
 
@@ -76,7 +79,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
                     p.temporalize = dt = new DerivationTemporalize(p); //cache in derivation
                 }
 
-                c2 = dt.solve(p, c1, occ, confGain);
+                c2 = dt.solve(this, p, c1, occ, confGain);
 
             } catch (InvalidTermException t) {
                 if (Param.DEBUG) {

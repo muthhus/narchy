@@ -59,7 +59,7 @@ public final class Conclude {
                     $.func("derive", /*$.the(cid), */pattern/* prod args */) :
                     $.func("derive", /*$.the(cid), */pattern/* prod args */, GOAL_URGENT);
         return AndCondition.the(
-                new Conclusion(concID,pattern, rule.goalUrgent),
+                new Conclusion(concID,pattern, rule),
                 introVars ? //Fork.fork(
                         AndCondition.the(new IntroVars(), taskify)
                         //makeTask)

@@ -256,21 +256,14 @@ public class Builtin {
                 assert(events.get(0).getTwo()==0);
                 ObjectLongPair<Term> first = events.get(0);
                 Term firstTerm = first.getOne();
-                boolean neg;
-                if (firstTerm.equals(event)) {
-                    neg = false;
-                } else if (firstTerm.unneg().equals(event)) {
-                    neg = true;
-                } else {
+//
+//                boolean neg;
+                if (!firstTerm.equals(event)) {
                     return Null;
                 }
 
                 events.remove(0);
-
-                //boolean removed = events.removeIf(x -> x.getTwo() == 0 && x.getOne().equals(event));
-                //if (!removed)
-                    //return Null;
-                return Op.conj(events).negIf(neg);
+                return Op.conj(events);//.negIf(neg);
             } else {
                 return Op.without(conj, event);
             }
