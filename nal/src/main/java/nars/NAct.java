@@ -386,6 +386,7 @@ public interface NAct {
     }
 
     default void actionBipolarExpectation(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+
         Term pt =
                 //$.inh( $.the("\"+\""), s);
                 $.p(s, ZeroProduct);
@@ -445,7 +446,7 @@ public interface NAct {
 
                 float x; //0..+1
                 if (cur > 0 && rng.nextFloat() <= cur) {
-                    float curiConf = confWeak;
+                    float curiConf = confStrong;
                     x = (TruthFunctions.expectation(
                         rng.nextFloat(),
                         curiConf
@@ -480,7 +481,8 @@ public interface NAct {
 //                    float ac = (Math.abs(exp[0]-0.5f) + Math.abs(exp[1]-0.5f));
                     float ec =
                             //(normalize.normalizePolar(exp[0] - 0.5f)) - (normalize.normalizePolar(exp[1] - 0.5f))
-                            (exp[0] - 0.5f) - (exp[1] - 0.5f)
+                            //(exp[0] - 0.5f) - (exp[1] - 0.5f)
+                            2f * (Math.max(0, (exp[0] - 0.5f)) - Math.max(0,(exp[1] - 0.5f)))
                             //+ (nar().random().nextFloat()-0.5f)*2f*confMin
                     ;
 //                    if (ac < Pri.EPSILON) {

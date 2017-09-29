@@ -29,7 +29,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -52,7 +51,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * max fraction of the fully capacity table to compute in a single truthpolation
      */
-    static final float TRUTHPOLATED_MAX_FRACTION = 0.01f;
+    static final float SCAN_MAX_FRACTION = 0.1f;
 
     public static final float PRESENT_AND_FUTURE_BOOST = 2f;
 
@@ -134,7 +133,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task()));
 
 
-                int maxTruths = (int) Math.min(s, Math.max(2, Math.ceil(capacity * TRUTHPOLATED_MAX_FRACTION)));
+                int maxTruths = (int) Math.min(s, Math.max(2, Math.ceil(capacity * SCAN_MAX_FRACTION)));
                 TopN<TaskRegion> tt = scan(
                         new TopN<>(new TaskRegion[maxTruths], strongestTask),
                         start, end, maxTruths);
@@ -191,7 +190,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         FloatFunction<Task> ts = taskStrength(template, start, end, dur);
         FloatFunction<TaskRegion> strongestTask = t -> +ts.floatValueOf(t.task());
 
-        Top2<TaskRegion> tt = scan(new Top2(strongestTask), start, end, 2);
+
+        int maxTruths = (int) Math.min(s, Math.max(2, Math.ceil(capacity * SCAN_MAX_FRACTION)));
+        Top2<TaskRegion> tt = scan(new Top2(strongestTask), start, end, maxTruths);
+
         switch (tt.size()) {
 
             case 0:
@@ -233,7 +235,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
     }
 
-    private <X extends Collection<TaskRegion>> X scan(X u, long start, long end, int min) {
+    private <X extends Collection<TaskRegion>> X scan(X u, long start, long end, int maxAttempts) {
         //return ((ConcurrentRTree)tree).withReadLock() ?
 
         int s = size();
@@ -243,10 +245,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             tree.forEach(u::add);
         } else {
 
-            min = Math.min(s, min);
+            maxAttempts = Math.min(s, maxAttempts);
 
             //scan
+            final int[] attempts = {0};
             Predicate<TaskRegion> update = x -> {
+                attempts[0]++;
                 u.add(x);
                 return true;
             };
@@ -281,7 +285,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     else
                         done++;
 
-                    if (u.size() >= min)
+                    if (attempts[0] >= maxAttempts)
                         break;
 
                     scanStart = nextStart - 1;

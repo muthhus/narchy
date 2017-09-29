@@ -20,12 +20,12 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
-    float fwdSpeed = 12f;
-    float rotSpeed = 0.1f;
+    float fwdSpeed = 5;
+    float rotSpeed = 0.05f;
 
     public static void main(String[] args) {
 
-        float fps = 10f;
+        float fps = 16f;
 
         NAgentX.runRT((n) -> {
 
@@ -52,7 +52,7 @@ public class FZero extends NAgentX {
         this.fz = new FZeroGame();
 
         CameraSensor<Scale> c = senseCamera(id, new Scale(() -> fz.image,
-                48, 32)/*.blur()*/);//.resolution(0.01f)
+                24, 16)/*.blur()*/);//.resolution(0.01f)
 
 //        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
 //        cc.addActions($.the("fz"), this, false, false, true);

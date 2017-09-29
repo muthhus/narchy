@@ -952,40 +952,80 @@ public enum Op implements $ {
     @NotNull
     public static Term conj(List<ObjectLongPair<Term>> events) {
 
+        if (events.size() > 1) {
+            events.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
+            ListIterator<ObjectLongPair<Term>> ii = events.listIterator();
+            long prevtime = ETERNAL;
+            while (ii.hasNext()) {
+                ObjectLongPair<Term> x = ii.next();
+                long now = x.getTwo();
+                if (prevtime != ETERNAL && prevtime == now) {
+                    ii.remove();
+                    ObjectLongPair<Term> y = ii.previous();
+                    Term xyt = CONJ.the(0, x.getOne(), y.getOne());
+                    if (xyt == Null) return Null;
+                    if (xyt == False) return False;
+                    ObjectLongPair<Term> xy = pair(xyt, now);
+                    ii.set(xy);
+                    ii.next();
+                }
+                prevtime = now;
+            }
+        }
+
         int ee = events.size();
+
+
         switch (ee) {
             case 0:
                 return True;
             case 1:
                 return events.get(0).getOne();
-            default:
-                return conj(events, 0, events.size() - 1);
+            default: {
+
+
+                return conjSeq(events);
+            }
         }
     }
 
     /**
      * constructs a correctly merged conjunction from a list of events, in the sublist specified by from..to (inclusive)
+     * all of the events should have distinct times before calling here.
      */
-    public static Term conj(List<ObjectLongPair<Term>> events, int from, int to) {
-        int ee = to - from;
+    private static Term conjSeq(List<ObjectLongPair<Term>> events) {
+
+        int ee = events.size();
+
+
+        ObjectLongPair<Term> first = events.get(0);
         switch (ee) {
             case 0:
-                return events.get(from).getOne();
+                throw new NullPointerException("should not be called with empty events list");
             case 1:
-                Term left = events.get(from).getOne();
-                Term right = events.get(to).getOne();
+                return first.getOne();
+            case 2:
+                Term left = first.getOne();
+                ObjectLongPair<Term> second = events.get(1);
+                Term right = second.getOne();
                 return conjNonCommFinal(
-                        /* dt */ (int) (events.get(to).getTwo() - events.get(from).getTwo()),
+                        (int) (second.getTwo() - first.getTwo()),
                         left, right);
         }
 
-        int center = (from + to) / 2;
-        int dt = (int) (events.get(center + 1).getTwo() - events.get(center).getTwo());
+        int to = ee-1;
+        int center = to / 2;
 
+        Term left = conjSeq(events.subList(0, center+1));
+        if (left == Null) return Null;
+        if (left == False) return False; //early fail shortcut
 
-        Term left = conj(events, from, center);
+        Term right = conjSeq(events.subList(center + 1, to+1));
+        if (right == Null) return Null;
+        if (right == False) return False; //early fail shortcut
 
-        Term right = conj(events, center + 1, to);
+        int dt = (int) (events.get(center + 1).getTwo() - first.getTwo() - left.dtRange());
+
         return conjNonCommFinal(dt, left, right);
     }
 

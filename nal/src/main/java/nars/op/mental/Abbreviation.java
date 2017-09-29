@@ -191,21 +191,6 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
             final boolean[] succ = {false};
             a.computeIfAbsent(Abbreviation.class, (ac) -> {
                 String id = newSerialTerm();
-                Compound abbreviation = newRelation(abbreviated, id);
-                if (abbreviation == null)
-                    return null; //maybe could happen
-
-
-
-                Task abbreviationTask = Task.tryTask(abbreviation, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
-                        (te, tr) -> {
-
-                            NALTask ta = new NALTask(
-                                    te, BELIEF, tr,
-                                    nar.time(), ETERNAL, ETERNAL,
-                                    new long[]{nar.time.nextStamp()}
-                            );
-
 
                             AliasConcept a1 = new AliasConcept(id, a);
                             Concept alias = aliasConcept ?
@@ -215,22 +200,37 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
                             nar.terms.set(abbreviatedTerm, a1); //set the abbreviated term to resolve to the abbreviation
 
                             Termed aliasTerm = alias != null ? alias : Atomic.the(id);
-                            ta.meta(Abbreviation.class, new Term[]{abbreviatedTerm, aliasTerm.term()});
-                            ta.log("Abbreviate"); //, abbreviatedTerm, aliasTerm
-                            ta.setPri(b);
 
-                            nar.runLater(()->nar.input(ta));
-                            logger.info("+ {}", ta);
-
-                            succ[0] = true;
-
-                            return ta;
-
-                            //if (abbreviation != null) {
-
-                            //logger.info("{} <=== {}", alias, abbreviatedTerm);
-
-                        });
+//                Compound abbreviation = newRelation(abbreviated, id);
+//                if (abbreviation == null)
+//                    return null; //maybe could happen
+//
+//                Task abbreviationTask = Task.tryTask(abbreviation, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
+//                        (te, tr) -> {
+//
+//                            NALTask ta = new NALTask(
+//                                    te, BELIEF, tr,
+//                                    nar.time(), ETERNAL, ETERNAL,
+//                                    new long[]{nar.time.nextStamp()}
+//                            );
+//
+//
+//                            ta.meta(Abbreviation.class, new Term[]{abbreviatedTerm, aliasTerm.term()});
+//                            ta.log("Abbreviate"); //, abbreviatedTerm, aliasTerm
+//                            ta.setPri(b);
+//
+//                            nar.runLater(()->nar.input(ta));
+//                            logger.info("+ {}", ta);
+//
+//                            succ[0] = true;
+//
+//                            return ta;
+//
+//                            //if (abbreviation != null) {
+//
+//                            //logger.info("{} <=== {}", alias, abbreviatedTerm);
+//
+//                        });
 
 
                 //abbreviationTask.priority();

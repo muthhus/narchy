@@ -301,8 +301,8 @@ public class Derivation extends Unify implements TermContext {
                //project belief truth to task's time
                long beliefTruthTime = task.isEternal() ?
                         ETERNAL :
-                       task.start();
-                        //belief.nearestTimeBetween(task.start(), task.end());
+                        //task.start();
+                        belief.nearestTimeBetween(task.start(), task.end());
                         //nar.time(); //now
 
                 this.beliefTruth = belief.truth(beliefTruthTime, dur, confMin);

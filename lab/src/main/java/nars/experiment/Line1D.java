@@ -46,6 +46,7 @@ public class Line1D {
             Param.DEBUG = true;
             NAR n = NARS.threadSafe();
 
+
             LinkClustering linkClusterPri = new LinkClustering(n,
                     Prioritized::priElseZero /* anything temporal */,
                     32, 128);

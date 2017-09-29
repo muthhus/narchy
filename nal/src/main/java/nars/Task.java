@@ -967,9 +967,10 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         {
             Term x = term();
             Term y = x.eval(n);
+
             if (!x.equals(y)) {
 
-                @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), true);
+                @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), !isInput() && !Param.DEBUG_EXTRA);
                 /* the evaluated result here acts as a memoization of possibly many results
                    depending on whether the functor is purely static in which case
                    it would be the only one.

@@ -4,6 +4,7 @@
  */
 package nars.op.data;
 
+import jcog.Util;
 import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
 import nars.$;
@@ -148,12 +149,16 @@ public class reflect {
             Term r = $.func(REFLECT_OP, x).eval(n).normalize();
             if (x.equals(r)) //can happen
                 return 0f;
-            if (r != null && r.subs() > 0 && r.volume() <= n.termVolumeMax.intValue()) {
-                Task y = Task.clone(next, r);
-                if (y != null) {
-                    logger.info("+ {}", y);
-                    feedback(y);
-                    return 1;
+            if ((r != null && r.subs() > 0)) {
+                int yvol = r.volume();
+                if (yvol <= n.termVolumeMax.intValue()) {
+                    Task y = Task.clone(next, r);
+                    if (y != null) {
+                        y.pri(next.priElseZero() * Util.unitize(x.term().volume() / ((float)yvol)));
+                        logger.info("+ {}", y);
+                        feedback(y);
+                        return 1;
+                    }
                 }
             }
             return 0;
@@ -200,12 +205,15 @@ public class reflect {
 
             Term x = next.term().conceptual();
             Term reflectionSim = $.sim($.func(REFLECT_OP, x), x).eval(n).normalize();
-            if (reflectionSim != null && reflectionSim.subs() > 0 && reflectionSim.volume() <= n.termVolumeMax.intValue()) {
-                NALTask t = new NALTask(reflectionSim, BELIEF, $.t(1f, n.confDefault(BELIEF)), n.time(), ETERNAL, ETERNAL, n.time.nextInputStamp());
-                t.pri(n.priDefault(BELIEF));
-                feedback(t);
-                logger.info("+ {}", reflectionSim);
-                return 1;
+            if ((reflectionSim != null && reflectionSim.subs() > 0)) {
+                int rvol = reflectionSim.volume();
+                if (rvol <= n.termVolumeMax.intValue()) {
+                    NALTask t = new NALTask(reflectionSim, BELIEF, $.t(1f, n.confDefault(BELIEF)), n.time(), ETERNAL, ETERNAL, n.time.nextInputStamp());
+                    t.pri(next.priElseZero() * Util.unitize(x.term().volume() / ((float)rvol)));
+                    feedback(t);
+                    logger.info("+ {}", reflectionSim);
+                    return 1;
+                }
             }
             return 0;
         }

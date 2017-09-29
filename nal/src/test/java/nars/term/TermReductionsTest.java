@@ -9,6 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.List;
+
 import static nars.$.$;
 import static nars.$.conj;
 import static nars.$.diffe;
@@ -28,6 +30,7 @@ import static nars.Op.*;
 import static nars.term.TermTest.assertValid;
 import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static nars.time.Tense.DTERNAL;
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 import static org.junit.Assert.*;
 
 /**
@@ -251,6 +254,18 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals("((P&&R)==>Q)", $("<R==><P==>Q>>").toString());
         assertEquals("((R &&+2 P) ==>+1 Q)", $("(R ==>+2 (P ==>+1 Q))").toString());
         assertEquals("(((S &&+1 R) &&+2 P) ==>+1 Q)", $("((S &&+1 R) ==>+2 (P ==>+1 Q))").toString());
+    }
+
+    @Test public void testConjEvents() throws Narsese.NarseseException {
+        assertEquals(
+                "(a &&+16 ((--,a)&|b))",
+                Op.conj(
+                    $.newArrayList(
+                            pair($.$("a"), 298L),
+                            pair($.$("b"), 314L),
+                            pair($.$("(--,a)"), 314L))
+                ).toString()
+        );
     }
 
     @Test

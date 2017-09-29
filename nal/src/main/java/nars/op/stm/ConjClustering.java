@@ -177,7 +177,9 @@ public class ConjClustering extends Causable {
             float freq = 1f;
             float conf = 1f;
             float priMax = Float.NEGATIVE_INFINITY;
+            int vol = 0;
             for (Task x : uu) {
+
                 Truth tx = x.truth();
                 conf *= tx.conf();
                 if (conf < confMin)
@@ -188,6 +190,9 @@ public class ConjClustering extends Causable {
                     priMax = p;
 
                 Term tt = x.term();
+                vol += tt.volume();
+                if (vol > volMax)
+                    return;
 
                 float tf = tx.freq();
                 if (tx.isNegative()) {
@@ -203,8 +208,9 @@ public class ConjClustering extends Causable {
             if (t != null) {
 
                 @Nullable Term conj = Op.conj(pp);
-                if (conj == null)
+                if (!conj.op().conceptualizable) {
                     return;
+                }
 
 
                 @Nullable ObjectBooleanPair<Term> cp = Task.tryContent(conj, punc, true);

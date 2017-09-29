@@ -130,7 +130,10 @@ public enum TermGraph {
 
             Consumer<PriReference<? extends Termed>> each = ml -> {
 
-                Term l = ml.get().term().conceptual();
+                Termed termed = ml.get(); if (termed == null) return;
+                Term term = termed.term();  if (term == null) return;
+                Term l = term.conceptual();
+
                 if (l.op() == IMPL && !l.hasVarQuery() /*&& l.subterms().containsRecursively(t)*/ /* && m.vars()==0 */
                     //&& ((Compound)m).containsTermRecursively(t)) {
                         ) {

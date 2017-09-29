@@ -1,5 +1,6 @@
 package nars;
 
+import com.google.common.collect.Iterables;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.Ons;
@@ -7,6 +8,7 @@ import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.pri.Prioritized;
 import jcog.pri.mix.control.MixContRL;
+import nars.concept.ActionConcept;
 import nars.control.Cause;
 import nars.control.Derivation;
 import nars.control.MetaGoal;
@@ -17,6 +19,8 @@ import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
+import nars.op.Implier;
+import nars.op.mental.Abbreviation;
 import nars.op.stm.ConjClustering;
 import nars.op.stm.LinkClustering;
 import nars.term.Term;
@@ -56,6 +60,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -226,12 +231,12 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-//        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.001f, 4);
-//
+        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.1f, 4);
+
         //Inperience inp = new Inperience(n, 4);
 //
-//        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(4, n);
-//        reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(4, n);
+        //reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(16, n);
+        //reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(16, n);
 
 
         //a.trace = true;
@@ -257,12 +262,17 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-//        new Implier(a.nar,
-//                Iterables.concat(
-//                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
-//                        Collections.singleton(a.happy.term)
-//                )
-//        );
+        new Implier(a.nar,
+                Iterables.concat(
+                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
+                        Collections.singleton(a.happy.term)
+                ),
+                new float[]{
+                        //0 //now
+                        1,
+                        4
+                }
+        );
 
 //        AgentService p = new AgentService.AgentBuilder(
 //                //DQN::new,

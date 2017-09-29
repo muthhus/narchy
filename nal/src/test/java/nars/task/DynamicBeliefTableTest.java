@@ -175,7 +175,7 @@ public class DynamicBeliefTableTest {
 //            System.out.println( xtable.truth(when, template.dt(), true) + " " + xtable.generate(template, when));
 //        }
 
-        assertEquals(0.79f, xtable.generate($("((x) &&+6 (y))"), 0, 0, null, n).conf(), 0.05f);
+        assertEquals(0.74f, xtable.generate($("((x) &&+6 (y))"), 0, 0, null, n).conf(), 0.05f);
         assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0, 0, null, n).conf(), 0.05f); //best match to the input
         assertEquals(0.79f, xtable.generate($("((x) &&+2 (y))"), 0, 0, null, n).conf(), 0.05f);
         assertEquals(0.77f, xtable.generate($("((x) &&+0 (y))"), 0, 0, null, n).conf(), 0.05f);

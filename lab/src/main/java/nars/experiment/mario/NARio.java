@@ -20,7 +20,7 @@ public class NARio extends NAgentX {
 //    private final SensorConcept vx;
 
     public NARio(NAR nar) throws Narsese.NarseseException {
-        super( nar);
+        super( "nario", nar);
         //super(nar, HaiQAgent::new);
 
         //Param.ANSWER_REPORTING = false;
@@ -49,10 +49,10 @@ public class NARio extends NAgentX {
 
 
         PixelBag cc = PixelBag.of(() -> mario.image, 36, 28);
-        cc.addActions($.the("nario"), this, false, false, true);
+        cc.addActions(id, this, false, false, true);
         cc.actions.forEach(a -> a.resolution = ()->(0.25f));
         cc.setClarity(0.8f, 0.95f);
-        CameraSensor<PixelBag> sc = addCamera(new CameraSensor<>($("nario") /*"(nario,local)"*/, cc, this));
+        CameraSensor<PixelBag> sc = addCamera(new CameraSensor<>(id, cc, this));
 
         //new ShapeSensor($.the("shape"), new BufferedImageBitmap2D(()->mario.image),this);
 
@@ -98,12 +98,12 @@ public class NARio extends NAgentX {
 //        nar.believe("nario:{narioLocal, narioGlobal}");
 
 
-        senseNumberDifference($("vx"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).
+        senseNumberDifference($.inh($("vx"),id), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).
                 mario.x : 0).resolution(0.04f);
         senseNumberDifference($("vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).
                 mario.y : 0).resolution(0.04f);
 
-        actionBipolar($.the("x"), (x) -> {
+        actionBipolar($.inh($.the("x"),id), (x) -> {
             float thresh = 0.33f;
             float thresh2 = 0.9f;
             if (x <= -thresh) {
@@ -130,7 +130,7 @@ public class NARio extends NAgentX {
                return x;
            }
         });
-        actionBipolar($.the("y"), (x) -> {
+        actionBipolar($.inh($.the("y"),id), (x) -> {
             float thresh = 0.33f;
             if (x <= -thresh) {
                mario.scene.key(Mario.KEY_DOWN, true);

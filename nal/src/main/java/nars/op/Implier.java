@@ -44,7 +44,7 @@ public class Implier extends DurService {
 
     AdjGraph<Term, Term> impl;
 
-    private final float relativeTargetDur = +1f;
+    private final float[] relativeTargetDurs;
 
     /**
      * truth cache
@@ -58,19 +58,21 @@ public class Implier extends DurService {
 
     final static TruthOperator ded = GoalFunction.get($.the("DeciDeduction"));
     final static TruthOperator ind = GoalFunction.get($.the("DeciInduction"));
-    private long now;
-    private long next;
+    private long then;
     private final float strength = 0.5f;
 
-    public Implier(NAR n, Term... seeds) {
+    public Implier(NAR n, int targetTime, Term... seeds) {
         this(n, List.of(seeds));
     }
 
 
-    public Implier(NAR n, Iterable<Term> seeds) {
+    public Implier(NAR n, Iterable<Term> seeds, float... relativeTargetDurs) {
         super(n, 1f);
 
+        assert(relativeTargetDurs.length > 0);
+
         this.nar = n;
+        this.relativeTargetDurs = relativeTargetDurs;
         this.seeds = seeds;
         this.in = n.newCauseChannel(this);
         this.tg = new TermGraph.ImplGraph() {
@@ -84,9 +86,6 @@ public class Implier extends DurService {
     @Override
     protected void run(NAR nar, long dt) {
 
-        desire.clear();
-        belief.clear();
-        goalTruth.clear();
 
         if (impl != null && impl.edgeCount() > 256) { //HACK
 //            System.err.print("saved impl graph to file");
@@ -108,97 +107,106 @@ public class Implier extends DurService {
         float confSubMin = confMin / implCount;
 
         int dur = nar.dur();
-        now = nar.time();
-        next = now + dur;
+        long now = nar.time();
 
-        //System.out.println(impl);
+        for (float relativeTargetDur : relativeTargetDurs) {
 
-        impl.each((subj, pred, impl) -> {
+            desire.clear();
+            belief.clear();
+            goalTruth.clear();
 
-
-            Task SGimpl = belief(impl);
-            if (SGimpl == null)
-                return;
-
-            float implConf = w2c(SGimpl.evi(this.now, dur));
-            if (implConf < confSubMin)
-                return;
-
-            int implDT = SGimpl.dt();
-            if (implDT == DTERNAL)
-                implDT = 0;
+            then = now + Math.round(relativeTargetDur * dur);
 
 
-            float f = SGimpl.freq();
+            //System.out.println(impl);
+
+            impl.each((subj, pred, impl) -> {
 
 
-            //G, (S ==> G) |- S  (Goal:DeductionRecursivePB)
-            Truth Pg = desire(pred, this.now + implDT); //the desire at the predicate time
-            if (Pg == null)
-                return;
+                Task SGimpl = belief(impl);
+                if (SGimpl == null)
+                    return;
 
-            Truth Sg = ded.apply(Pg, $.t(f, implConf), nar, confSubMin);
+                float implConf = w2c(SGimpl.evi(this.then, dur));
+                if (implConf < confSubMin)
+                    return;
 
-            if (Sg != null) {
-                goal(goalTruth, subj, Sg);
-            }
-            //experimental:
-//            {
-//                //G, (G ==> P) |- P (Goal:InductionRecursivePB)
-//                //G, ((--,G) ==> P) |- P (Goal:InductionRecursivePBN)
-//
-//                //HACK only immediate future otherwise it needs scheduled further
-//                if (implDT >= 0 && implDT <= dur/2) {
-//
-//                    Truth Ps = desire(subj, nowStart, nowEnd); //subj desire now
-//                    if (Ps == null)
-//                        return;
-//
-//                    float implFreq = f;
-//
-//
-//
-//                    if (Ps.isNegative()) {
-//                        subj = subj.neg();
-//                        Ps = Ps.neg();
-//                    }
-//
-//                    //TODO invert g and choose indRec/indRecN
-//                    Truth Pg = indRec.apply(Ps, $.t(implFreq, implConf), nar, confSubMin);
-//                    if (Pg != null) {
-//                        goal(goalTruth, pred, Pg);
-//                    }
-//                }
-//            }
-
-        });
+                int implDT = SGimpl.dt();
+                if (implDT == DTERNAL)
+                    implDT = 0;
 
 
-//            List<IntHashSet> ws = new GraphMeter().weakly(s);
-//            ws.forEach(x -> {
-//                if (!x.isEmpty()) { //HACK
-//                    System.out.println( x.collect(i -> s.node(i)) );
-//                }
-//            });
+                float f = SGimpl.freq();
 
-        goalTruth.forEach((t, a) -> {
-            @Nullable Truth uu = a.commitSum();
-            if (uu != null) {
-                float c = uu.conf() * strength;
-                if (c >= confMin) {
-                    NALTask y = new NALTask(t, GOAL, uu, now, now, now + dur /* + dur */,
-                            nar.time.nextInputStamp());
-                    y.pri(nar.priDefault(GOAL));
-//                        if (Param.DEBUG)
-//                            y.log("")
-                    in.input(y);
-                    System.err.println("\t" + y);
+
+                //G, (S ==> G) |- S  (Goal:DeductionRecursivePB)
+                Truth Pg = desire(pred, this.then + implDT); //the desire at the predicate time
+                if (Pg == null)
+                    return;
+
+                Truth Sg = ded.apply(Pg, $.t(f, implConf), nar, confSubMin);
+
+                if (Sg != null) {
+                    goal(goalTruth, subj, Sg);
                 }
-            }
-        });
+                //experimental:
+                //            {
+                //                //G, (G ==> P) |- P (Goal:InductionRecursivePB)
+                //                //G, ((--,G) ==> P) |- P (Goal:InductionRecursivePBN)
+                //
+                //                //HACK only immediate future otherwise it needs scheduled further
+                //                if (implDT >= 0 && implDT <= dur/2) {
+                //
+                //                    Truth Ps = desire(subj, nowStart, nowEnd); //subj desire now
+                //                    if (Ps == null)
+                //                        return;
+                //
+                //                    float implFreq = f;
+                //
+                //
+                //
+                //                    if (Ps.isNegative()) {
+                //                        subj = subj.neg();
+                //                        Ps = Ps.neg();
+                //                    }
+                //
+                //                    //TODO invert g and choose indRec/indRecN
+                //                    Truth Pg = indRec.apply(Ps, $.t(implFreq, implConf), nar, confSubMin);
+                //                    if (Pg != null) {
+                //                        goal(goalTruth, pred, Pg);
+                //                    }
+                //                }
+                //            }
 
-//        if (s!=null)
-//            System.out.println(s.toString());
+            });
+
+
+            //            List<IntHashSet> ws = new GraphMeter().weakly(s);
+            //            ws.forEach(x -> {
+            //                if (!x.isEmpty()) { //HACK
+            //                    System.out.println( x.collect(i -> s.node(i)) );
+            //                }
+            //            });
+
+            goalTruth.forEach((t, a) -> {
+                @Nullable Truth uu = a.commitSum();
+                if (uu != null) {
+                    float c = uu.conf() * strength;
+                    if (c >= confMin) {
+                        NALTask y = new NALTask(t, GOAL, uu, then, then, then + dur /* + dur */,
+                                nar.time.nextInputStamp());
+                        y.pri(nar.priDefault(GOAL));
+                        //                        if (Param.DEBUG)
+                        //                            y.log("")
+                        in.input(y);
+                        System.err.println("\t" + y);
+                    }
+                }
+            });
+
+            //        if (s!=null)
+            //            System.out.println(s.toString());
+        }
 
     }
 
@@ -207,11 +215,11 @@ public class Implier extends DurService {
     }
 
     private Truth desire(Term x) {
-        return desire.computeIfAbsent(x, (xx) -> desire(xx, now));
+        return desire.computeIfAbsent(x, (xx) -> desire(xx, then));
     }
 
     private Task belief(Term x) {
-        return belief.computeIfAbsent(x, (xx) -> nar.belief(xx, now));
+        return belief.computeIfAbsent(x, (xx) -> nar.belief(xx, then));
     }
 
     public void goal(Map<Term, TruthAccumulator> goals, Term tt, Truth g) {
@@ -220,6 +228,9 @@ public class Implier extends DurService {
             tt = tt.unneg();
             g = g.neg();
         }
+
+        if (!tt.op().conceptualizable)
+            return;
 
         //recursively divide the desire among the conjunction events, emulating (not necessarily exactly) StructuralDeduction's
         if (tt.op() == CONJ) {
@@ -230,15 +241,15 @@ public class Implier extends DurService {
                 if (cSub >= nar.confMin.floatValue()) {
                     Truth gSub = $.t(g.freq(), cSub);
                     for (ObjectLongPair<Term> ee : e) {
-                        goal(goals, ee.getOne(), gSub);
+                        Term one = ee.getOne();
+                        if (one.op().conceptualizable)
+                            goal(goals, one, gSub);
                     }
                 }
                 return;
             }
         }
 
-        goals.computeIfAbsent(tt, (ttt) -> {
-            return new TruthAccumulator();
-        }).add(g);
+        goals.computeIfAbsent(tt, (ttt) -> new TruthAccumulator()).add(g);
     }
 }

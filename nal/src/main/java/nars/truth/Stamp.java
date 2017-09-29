@@ -330,10 +330,6 @@ public interface Stamp {
         return overlapFraction(LongSets.immutable.of(a), a.length, b);
     }
 
-    static float overlapFraction(/*@NotNull*/ LongSet aa, /*@NotNull*/ long[] b) {
-        return overlapFraction(aa, aa.size(), b);
-    }
-
 
     static float overlapFraction(/*@NotNull*/ LongSet aa, int aSize, /*@NotNull*/ long[] b) {
         int common = 0;

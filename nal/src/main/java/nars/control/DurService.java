@@ -3,18 +3,17 @@ package nars.control;
 import nars.NAR;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static nars.time.Tense.ETERNAL;
 
 /**
  * executes approximately once every N durations
  */
 abstract public class DurService extends NARService implements Runnable {
 
-    /** minimum durations to delay a repeat in the case of an already delayed predecessor task */
-    private static final float COALESCE_THRESHOLD_DUR = 0.1f;
+    static final Logger logger = LoggerFactory.getLogger(DurService.class);
 
     /** ideal duration multiple to be called, since time after implementation's procedure finished last*/
     public final MutableFloat durations;
@@ -68,7 +67,11 @@ abstract public class DurService extends NARService implements Runnable {
                 //TODO instrument here
                 long delta = (now - last);
                 if (delta >= durCycles) {
-                    run(nar, delta);
+                    try {
+                        run(nar, delta);
+                    } catch (Throwable t) {
+                        logger.error("{} {}", this, t);
+                    }
                     this.now = nar.time();
                 } else {
                     //too soon, reschedule
