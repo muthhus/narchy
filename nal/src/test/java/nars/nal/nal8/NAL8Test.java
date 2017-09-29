@@ -483,7 +483,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .input("--(R)!")
                 .input("((G) <-> --(R)).")
-                .mustGoal(cycles, "(G)", 1f, 0.4f, GOAL, ETERNAL);
+                .mustGoal(cycles, "(G)", 1f, 0.4f, (x)->x==ETERNAL);
     }
 
 //    @Test public void testInheritanceCompositionTemporal() {

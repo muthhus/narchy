@@ -68,7 +68,7 @@ public class BeliefTableTest {
         n.cycle();
         b.print();
         assertEquals(0.79, beliefs.match(ETERNAL, null, true, null).conf(), 0.02);
-        assertEquals(7, beliefs.size());
+        assertEquals(6, beliefs.size());
 
     }
 

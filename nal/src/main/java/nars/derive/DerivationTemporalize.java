@@ -1,6 +1,7 @@
 package nars.derive;
 
 import jcog.math.Interval;
+import nars.$;
 import nars.Op;
 import nars.Task;
 import nars.control.Derivation;
@@ -16,8 +17,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import static nars.Op.CONJ;
 import static nars.Op.IMPL;
 import static nars.time.Tense.ETERNAL;
+import static nars.time.Tense.XTERNAL;
 
 /**
  * unknowns to solve otherwise the result is impossible:
@@ -128,6 +131,19 @@ public class DerivationTemporalize extends Temporalize {
         } else {
             belief = this.belief;
             constraints = dbl;
+
+            //HACK special case: a repeat in temporal induction
+            Op po = pattern.op();
+            Term tt = task.term();
+            if (po.temporal && !task.isEternal() && !belief.isEternal() && belief.term().equals(tt)) {
+                if (po==CONJ && pattern.subs()==2 && pattern.sub(0).unneg().equals(tt) && pattern.sub(0).unneg().equals(pattern.sub(1).unneg())) {
+                    occ[0] = task.start();
+                    return pattern.dt((int) (belief.start() - task.end()));
+                }/* else if (po == IMPL ...
+                    TODO
+                }*/
+            }
+
         }
 
         Map<Term, Time> trail = new HashMap<>();

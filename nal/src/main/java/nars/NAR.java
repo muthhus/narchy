@@ -388,6 +388,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return goal($(goalTermString), tense, freq, conf);
     }
 
+    public Task goal(@NotNull Term goal, @NotNull Tense tense, float freq)  {
+        return goal(goal, tense, freq, confDefault(GOAL));
+    }
+
     /**
      * desire goal
      */

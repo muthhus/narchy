@@ -432,8 +432,8 @@ public interface NAct {
             int ip = p ? 0 : 1;
             CC[ip] = action;
             f[ip] = g!=null ? g.freq() : 0f;
-            c[ip] = g!=null ? g.conf() : 0f;
-            exp[ip] = g != null ? g.expectation() : 0f;
+            c[ip] = g!=null ? normalize.normalize(g.conf()) * nar().confDefault(GOAL) : 0f;
+            exp[ip] = g != null ? $.t(f[ip], c[ip]).expectation() : 0f;
             //evi[ip] = g != null ? g.evi(): 0f;
 
 
@@ -496,8 +496,8 @@ public interface NAct {
 //                    }
 
                     x =
-                        //ec;
-                        normalize.normalizePolar(ec);  //-1..+1
+                        ec;
+                        //normalize.normalizePolar(ec);  //-1..+1
                         //(1 - Math.abs(exp[0] - exp[1])) * (f[0]-0.5f) - (f[1]-0.5f);  //-1..+1 discounted by difference in expectation
 //                    }
                 }
@@ -519,9 +519,10 @@ public interface NAct {
                 float conf = y == y ?
                             //restConf/2f,
                             //Math.abs(y) * Math.abs(x)
-                            Util.unitize(Math.abs(y)) * confStrong
+                            //Util.unitize(Math.abs(y)) * confStrong
                             //Math.abs(y)
                             //w2c((c2wSafe(c[0]) + c2wSafe(c[1]))/2f)
+                            Math.abs(y) * Math.max(c[0],c[1])
                             //Math.max(c[0],c[1])
                             //Math.max(c[0],c[1])
                         : 0;

@@ -61,8 +61,8 @@ public class Implier extends DurService {
     private long then;
     private final float strength = 0.5f;
 
-    public Implier(NAR n, int targetTime, Term... seeds) {
-        this(n, List.of(seeds));
+    public Implier(NAR n, float relativeTargetDur, Term... seeds) {
+        this(n, List.of(seeds), relativeTargetDur);
     }
 
 

@@ -2,7 +2,9 @@ package nars.nal.nal8;
 
 import nars.*;
 import nars.task.DerivedTask;
+import nars.term.Term;
 import nars.time.Tense;
+import nars.truth.Truth;
 import org.junit.Test;
 
 import java.util.SortedSet;
@@ -12,11 +14,55 @@ import static jcog.Texts.n4;
 
 public class SanityTest {
 
-    @Test
-    public void testSanity1() {
+    @Test public void testSanity0() {
         Param.DEBUG = true;
 
+        Term happy = $.the("happy");
+        Term up = $.the("up");
+        Term down = $.the("down");
+
         NAR n = NARS.tmp();
+
+        n.truthResolution.setValue(0.1f);
+        n.termVolumeMax.setValue(10);
+
+        n.log();
+
+        n.goal(happy);
+
+        n.onCycle(()->{
+            long now = n.time();
+
+            Truth u = n.goalTruth(up, now);
+            float uu = u!=null ? Math.max(0.5f, u.expectation()) : 0f;
+            Truth d = n.goalTruth(down, now);
+            float dd = d!=null ? Math.max(0.5f, d.expectation()) : 0f;
+
+            n.believe(up, Tense.Present, uu);
+            n.believe(down, Tense.Present, dd);
+            n.believe(happy, Tense.Present, (uu-dd));
+        });
+
+        int STEP = 5;
+
+        n.run(STEP);
+
+        n.goal(up, Tense.Present, 1f);  n.run(STEP);
+        n.goal(up, Tense.Present, 0f);  n.run(STEP);
+
+        n.goal(down, Tense.Present, 1f); n.run(STEP);
+        n.goal(down, Tense.Present, 0f); n.run(STEP);
+
+        n.run(STEP*10);
+
+    }
+
+    @Test
+    public void testSanity1() {
+
+        Param.DEBUG = true;
+        NAR n = NARS.tmp();
+
         final int[] togglesPos = {0};
         final int[] togglesNeg = {0};
         boolean[] target = new boolean[1];

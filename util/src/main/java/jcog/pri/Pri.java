@@ -21,11 +21,11 @@ public class Pri implements Priority {
         pri = Float.NaN;
     }
 
-    public Pri(@NotNull Prioritized b, float scale) {
+    public Pri(Prioritized b, float scale) {
         this(b.pri()*scale);
     }
 
-    public Pri(@NotNull Prioritized b) {
+    public Pri(Prioritized b) {
         this(b.pri());
     }
 
@@ -99,7 +99,6 @@ public class Pri implements Priority {
      *
      * @return String representation of the value
      */
-    @NotNull
     @Override
     public String toString() {
         return getBudgetString();
@@ -110,7 +109,7 @@ public class Pri implements Priority {
         return this.pri = Util.unitize(p);
     }
 
-    @NotNull public Pri setPriThen(float p) {
+    public Pri setPriThen(float p) {
         setPri(p);
         return this;
     }

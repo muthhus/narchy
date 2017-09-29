@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Task Dimension Mapping:
@@ -119,16 +120,10 @@ public class LinkClustering extends DurService {
 
         Arrays.sort(tasks, Comparators.byIntFunction(Task::hashCode)); //keep them in a canonical ordering for equality testing purposes
 
-        MultiLink<Task,Task> task = new MultiLink<>(
-                tasks,
-                (x)->x,
-                Util.max(Task::priElseZero, tasks)
-        );
-        MultiLink<Task,Term> term = new MultiLink<>(
-                tasks,
-                Task::term,
-                Util.max(Task::priElseZero, tasks)
-        );
+        float pri = Util.sum(Task::priElseZero, tasks);
+
+        MultiLink<Task,Task> task = new MultiLink<>( tasks, Function.identity(), pri );
+        MultiLink<Task,Term> term = new MultiLink<>( tasks, Task::term, pri );
 
         group.forEach(t -> {
             Concept tc = t.get().concept(nar, false);

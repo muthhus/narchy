@@ -253,10 +253,24 @@ public class Builtin {
                 return Null;
             if (conj.dt()!=DTERNAL) {
                 FasterList<ObjectLongPair<Term>> events = conj.events();
-                boolean removed = events.removeIf(x -> x.getTwo() == 0 && x.getOne().equals(event));
-                if (!removed)
+                assert(events.get(0).getTwo()==0);
+                ObjectLongPair<Term> first = events.get(0);
+                Term firstTerm = first.getOne();
+                boolean neg;
+                if (firstTerm.equals(event)) {
+                    neg = false;
+                } else if (firstTerm.unneg().equals(event)) {
+                    neg = true;
+                } else {
                     return Null;
-                return Op.conj(events);
+                }
+
+                events.remove(0);
+
+                //boolean removed = events.removeIf(x -> x.getTwo() == 0 && x.getOne().equals(event));
+                //if (!removed)
+                    //return Null;
+                return Op.conj(events).negIf(neg);
             } else {
                 return Op.without(conj, event);
             }

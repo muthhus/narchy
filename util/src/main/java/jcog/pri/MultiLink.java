@@ -20,20 +20,41 @@ public class MultiLink<X extends Prioritized,Y> extends AbstractPLink<Y> {
     private final X[] x;
     private final Function<X, Y> transduce;
 
-    public MultiLink(@NotNull X[] x, Function<X,Y> transduce, float p) {
-        super(p);
+    public MultiLink(@NotNull X[] x, Function<X,Y> transduce, float pSum) {
+        super(pSum / x.length);
         this.x = x;
         this.transduce = transduce;
         hash = Util.hashCombine(transduce.hashCode(), Arrays.hashCode(x));
     }
 
     @Override
-    public boolean equals(@NotNull Object that) {
+    public float priAdd(float a) {
+        return super.priAdd(a/x.length);
+    }
+
+    @Override
+    public float priMult(float factor) {
+        return super.priMult( Util.lerp(1f/x.length, 1, factor));
+    }
+
+    @Override
+    public float priMax(float max) {
+        return super.priMax( Util.lerp(1/x.length, priElseZero(), max));
+    }
+
+    @Override
+    public void priMin(float min) {
+        super.priMin( Util.lerp(1/x.length, priElseZero(), min));
+    }
+
+
+    @Override
+    public final boolean equals(@NotNull Object that) {
         return this == that || hash==that.hashCode() || (that instanceof MultiLink && ((MultiLink)that).transduce.equals(transduce) && Arrays.equals(x, ((MultiLink)that).x));
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return hash;
     }
 

@@ -177,7 +177,7 @@ public class DynamicBeliefTableTest {
 
         assertEquals(0.74f, xtable.generate($("((x) &&+6 (y))"), 0, 0, null, n).conf(), 0.05f);
         assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0, 0, null, n).conf(), 0.05f); //best match to the input
-        assertEquals(0.79f, xtable.generate($("((x) &&+2 (y))"), 0, 0, null, n).conf(), 0.05f);
+        assertEquals(0.74f, xtable.generate($("((x) &&+2 (y))"), 0, 0, null, n).conf(), 0.05f);
         assertEquals(0.77f, xtable.generate($("((x) &&+0 (y))"), 0, 0, null, n).conf(), 0.05f);
         assertEquals(0.6f, xtable.generate($("((x) &&-32 (y))"), 0, 0, null, n).conf(), 0.1f);
 

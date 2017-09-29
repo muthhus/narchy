@@ -18,7 +18,7 @@ public interface Priority extends Prioritized {
      */
     float setPri(float p);
 
-    default float setPri(@NotNull Prioritized p) {
+    default float setPri(/*@NotNull*/ Prioritized p) {
         return setPri(p.pri());
     }
 
@@ -115,7 +115,6 @@ public interface Priority extends Prioritized {
     }
 
 
-    @NotNull
     default float priMult(float factor) {
         float p = pri();
         if (p == p)
@@ -124,7 +123,6 @@ public interface Priority extends Prioritized {
     }
 
 
-    @NotNull
     default Prioritized priLerp(float target, float speed) {
         float pri = pri();
         if (pri == pri)
@@ -194,24 +192,21 @@ public interface Priority extends Prioritized {
      * @return String representation of the value with 2-digit accuracy
      */
     @Override
-    @NotNull
     default Appendable toBudgetStringExternal() {
         return toBudgetStringExternal(null);
     }
 
     @Override
-    default @NotNull StringBuilder toBudgetStringExternal(StringBuilder sb) {
+    default StringBuilder toBudgetStringExternal(StringBuilder sb) {
         return Prioritized.toStringBuilder(sb, Texts.n2(pri()));
     }
 
     @Override
-    @NotNull
     default String toBudgetString() {
         return toBudgetStringExternal().toString();
     }
 
     @Override
-    @NotNull
     default String getBudgetString() {
         return Prioritized.toString(this);
     }
