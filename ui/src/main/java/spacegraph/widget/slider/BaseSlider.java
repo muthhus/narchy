@@ -6,6 +6,7 @@ import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedur
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
+import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
@@ -54,7 +55,7 @@ public class BaseSlider extends Widget {
     }
 
     @Override
-    protected boolean onTouching(v2 hitPoint, short[] buttons) {
+    protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
 
         if (leftButton(buttons)) {
             //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));

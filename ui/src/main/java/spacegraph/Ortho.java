@@ -1,8 +1,11 @@
 package spacegraph;
 
+import com.jogamp.nativewindow.util.Point;
 import com.jogamp.newt.event.*;
+import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
@@ -13,7 +16,7 @@ import static spacegraph.math.v3.v;
 /**
  * orthographic widget adapter. something which goes on the "face" of a HUD ("head"s-up-display)
  */
-public class Ortho implements WindowListener, KeyListener, MouseListener {
+public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyListener, MouseListener {
 
     protected final AnimVector2f translate;
     boolean visible;
@@ -42,29 +45,38 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
         this.translate = new AnimVector2f(3f);
     }
 
+    @Override
+    public SurfaceRoot root() {
+        return this;
+    }
+
     protected Finger newFinger() {
         return new Finger(this);
     }
 
-
+    @Override
     public Ortho translate(float x, float y) {
         translate.set(x, y);
         return this;
     }
 
+    @Override
     public Ortho move(float x, float y) {
         translate.add(x, y);
         return this;
     }
 
+    @Override
     public Ortho scale(float s) {
         return scale(s, s);
     }
 
+    @Override
     public v2 scale() {
         return scale;
     }
 
+    @Override
     public Ortho scale(float sx, float sy) {
         scale.set(sx, sy);
         return this;
@@ -78,11 +90,10 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
         s.addKeyListener(this);
         s.dyn.addAnimation(scale);
         s.dyn.addAnimation(translate);
-        surface.start(null);
+        surface.start(this);
         surface.layout();
         resized();
     }
-
 
 
     public void render(GL2 gl) {
@@ -93,7 +104,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
         surface.scaleLocal.set(scale);
         //surface.translateLocal.set(translate.x, translate.y);
-        surface.render(gl, v(1,1)
+        surface.render(gl, v(1, 1)
                 //(v2) v(window.getWidth(), window.getHeight())
                 //v(window.getWidth(),window.getHeight()).normalize().scale(Math.min(window.getWidth(),window.getHeight()))
         );
@@ -118,9 +129,9 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
     private void resized() {
         //TODO resize preserving aspect, translation, etc
-        if (maximize && window!=null) {
+        if (maximize && window != null) {
             scale(window.getWidth(), window.getHeight());
-            translate(0,0);
+            translate(0, 0);
         }
     }
 
@@ -140,7 +151,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
         stop();
     }
 
-    private void stop() {
+    public void stop() {
         surface.stop();
     }
 
@@ -203,7 +214,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
     }
 
     private void updateMouse(MouseEvent e) {
-        updateMouse(e, e!=null ? e.getButtonsDown() : null);
+        updateMouse(e, e != null ? e.getButtonsDown() : null);
     }
 
     private boolean updateMouse(MouseEvent e, short[] buttonsDown) {
@@ -215,23 +226,55 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
             float sx = e.getX();
             float sy = window.getHeight() - e.getY();
 
-            //screen to local
-            float lx = scale.x;
-            float ly = scale.y;
 
-            x = (sx - translate.x) / (lx);
-            y = (sy - translate.y) / (ly);
-            if (x >= 0 && y >= 0 && x<=1f && y<=1f) {
-                finger.update(e, x, y, buttonsDown);
+            x = (sx - translate.x) / (scale.x);
+            y = (sy - translate.y) / (scale.y);
+            if (x >= 0 && y >= 0 && x <= 1f && y <= 1f) {
+                updateMouse(e, x, y, buttonsDown);
                 return true;
             }
 
         }
 
         x = y = Float.NaN;
-        finger.update(null, x, y, null);
+        updateMouse(null, x, y, null);
 
         return false;
+    }
+
+    public Surface updateMouse(@Nullable MouseEvent e, float x, float y, short[] buttonsDown) {
+
+        if (e != null) {
+            SpaceGraph rw;
+            if (window != null) {
+                rw = window;
+                if (rw != null) {
+                    GLWindow rww = rw.window;
+                    if (rww != null) {
+                        Point p = rww.getLocationOnScreen(new Point());
+                        Finger.pointer.set(p.getX() + e.getX(), p.getY() + e.getY());
+                    }
+                }
+            }
+        }
+
+        /*if (e == null) {
+            off();
+        } else {*/
+        Surface s;
+        if ((s = finger.on(
+                scale.x, scale.y,
+                translate.x, translate.y,
+
+                v(x, y), buttonsDown)) != null) {
+            if (e != null)
+                e.setConsumed(true);
+            return s;
+        }
+
+        //}
+
+        return null;
     }
 
     @Override
@@ -239,7 +282,6 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
         updateMouse(e);
     }
-
 
 
     @Override

@@ -1,20 +1,18 @@
 package spacegraph.input;
 
 import com.jogamp.nativewindow.util.Point;
-import com.jogamp.newt.event.MouseEvent;
-import com.jogamp.newt.opengl.GLWindow;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Ortho;
-import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.v2;
+import spacegraph.math.v3;
 import spacegraph.widget.Widget;
 
 import java.util.Arrays;
 
 import static java.lang.System.arraycopy;
 import static java.util.Arrays.fill;
-import static spacegraph.math.v3.v;
 
 /**
  * gestural generalization of mouse cursor's (or touchpad's, etc)
@@ -30,6 +28,8 @@ public class Finger {
     public final boolean[] prevButtonDown = new boolean[5];
     private final Ortho root;
 
+    final MyFloatArrayList transformStack = new MyFloatArrayList();
+
     //TODO wheel state
 
     /** widget above which this finger currently hovers */
@@ -39,8 +39,15 @@ public class Finger {
         this.root = root;
     }
 
-    public Surface on(v2 nextHit, short[] nextButtonDown) {
-        this.hit.set(nextHit);
+    public Surface on(float sx, float sy, float tx, float ty, v2 nextHit, short[] nextButtonDown) {
+        push(sx, sy, tx, ty);
+        Surface r = on(nextHit, nextButtonDown);
+        pop();
+        return r;
+    }
+
+    public Surface on(v2 hit, short[] nextButtonDown) {
+        this.hit.set(hit);
 
         arraycopy(this.buttonDown, 0, prevButtonDown, 0, buttonDown.length);
 
@@ -52,7 +59,10 @@ public class Finger {
             }
         }
 
-        Surface s = root.surface.onTouch(nextHit, nextButtonDown);
+
+        //START DESCENT:
+
+        Surface s = root.surface.onTouch(this, hit, nextButtonDown);
         if (s instanceof Widget) {
             if (!on((Widget)s))
                 s = null;
@@ -99,42 +109,41 @@ public class Finger {
     /** global pointer screen coordinate, set by window the (main) cursor was last active in */
     public final static Point pointer = new Point();
 
-    public Surface update(@Nullable MouseEvent e, float x, float y, short[] buttonsDown) {
 
-        if (e!=null) {
-            SpaceGraph rw;
-            Ortho r = root;
-            if (r != null) {
-                if (r.window != null) {
-                    rw = r.window;
-                    if (rw != null) {
-                        GLWindow rww = rw.window;
-                        if (rww != null) {
-                            Point p = rww.getLocationOnScreen(new Point());
-                            pointer.set(p.getX() + e.getX() , p.getY() + e.getY() );
-                        }
-                    }
-                }
-            }
-        }
-
-        /*if (e == null) {
-            off();
-        } else {*/
-            Surface s;
-            if ((s = on(v(x, y), buttonsDown))!=null) {
-                if (e!=null)
-                    e.setConsumed(true);
-                return s;
-            }
-
-        //}
-
-        return null;
-    }
 
     public void print() {
         System.out.println(root.surface + " " + hit + " " + touching + " " + Arrays.toString(buttonDown));
     }
 
+    public void push(float sx, float sy, float tx, float ty) {
+        transformStack.addAll(sx, sy, tx, ty);
+    }
+
+    public void pop() {
+        transformStack.setSize(transformStack.size()-4);
+    }
+
+    public v2 localToGlobal(float nx, float ny) {
+        int p = transformStack.size();
+        float[] f = transformStack.array();
+        while ((p-=4) >= 0) {
+            float sx = f[p];
+            float sy = f[p+1];
+            float tx = f[p+2];
+            float ty = f[p+3];
+            nx = (nx*sx - tx);
+            ny = (ny*sy - ty);
+        }
+        return new v2(nx, ny);
+    }
+
+    private static class MyFloatArrayList extends FloatArrayList {
+        public void setSize(int newSize) {
+            size = newSize;
+        }
+
+        public float[] array() {
+            return items;
+        }
+    }
 }

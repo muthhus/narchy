@@ -275,7 +275,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
     public static SpaceGraph window(Surface s, int w, int h) {
-        SpaceGraph win = new SpaceGraphFlat(new ZoomOrtho(s)
+        SpaceGraph win = new SpaceGraphFlat(
+            new ZoomOrtho(s)
                 //.scale(Math.min(w,h))
                 .maximize()
         );

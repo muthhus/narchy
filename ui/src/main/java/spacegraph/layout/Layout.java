@@ -3,8 +3,8 @@ package spacegraph.layout;
 import com.google.common.collect.Lists;
 import com.jogamp.newt.event.KeyEvent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
+import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
 
@@ -88,20 +88,16 @@ import java.util.function.Consumer;
 
     }
 
-    @Override @Nullable
-    public final Surface onTouch(v2 hitPoint, short[] buttons) {
-        Surface x = super.onTouch(hitPoint, buttons);
+    @Override
+    public final Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
+        Surface x = super.onTouch(finger, hitPoint, buttons);
         if (x!=null || children == null)
             return x;
 
         //2. test children reaction
-        return onChildTouching(hitPoint, buttons);
-    }
-
-    protected final Surface onChildTouching(v2 hitPoint, short[] buttons) {
         if (hitPoint == null) {
             for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
-                children.get(i).onTouch(null, null);
+                children.get(i).onTouch(finger, null, null);
             }
             return null;
         } else {
@@ -115,11 +111,9 @@ import java.util.function.Consumer;
                 if (/*csx != csx || */csx <= 0 || /*csy != csy ||*/ csy <= 0)
                     continue;
 
-                v3 tc = c.translateLocal;
-
                 //project to child's space
                 v2 subHit = new v2(hitPoint);
-                subHit.sub(tc.x, tc.y);
+                subHit.sub(c.translateLocal.x, c.translateLocal.y);
 
                 subHit.scale(1f / csx, 1f / csy);
 
@@ -129,8 +123,12 @@ import java.util.function.Consumer;
                 if (!clipTouchBounds || (hx >= 0f && hx <= 1f && hy >= 0 && hy <= 1f)) {
                     //subHit.add(c.translateLocal.x*csx, c.translateLocal.y*csy);
 
+                    finger.push(c.scaleLocal.x, c.scaleLocal.y, c.translateLocal.x, c.translateLocal.y);
 
-                    Surface s = c.onTouch(subHit, buttons);
+                    Surface s = c.onTouch(finger, subHit, buttons);
+
+                    finger.pop();
+
                     if (s != null)
                         return s; //FIFO
                 }

@@ -8,6 +8,7 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
 import spacegraph.layout.Stacking;
+import spacegraph.math.v2;
 import spacegraph.render.Draw;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
@@ -53,7 +54,6 @@ public class Widget extends Stacking {
     protected void paint(GL2 gl) {
 
 
-
 //        /*if (Param.DEBUG)*/ {
 //            Draw.colorHash(gl, hashCode(), 0.5f);
 //            String s = "g:" + scaleGlobal;
@@ -83,7 +83,6 @@ public class Widget extends Stacking {
     }
 
 
-
 //    @Override
 //    protected boolean onTouching(v2 hitPoint, short[] buttons) {
 ////        int leftTransition = buttons[0] - (touchButtons[0] ? 1 : 0);
@@ -106,15 +105,30 @@ public class Widget extends Stacking {
     public void touch(@Nullable Finger finger) {
         touchedBy = finger;
         if (finger == null) {
-            onTouch(null,null);
+            onTouch(finger, null, null);
         }
     }
 
+    @Override
+    protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
+        if (buttons!=null && buttons.length > 0 && buttons[0] == 3) {
+//            System.out.println("right click " + root());
+//            System.out.println(scaleGlobal);
+//            System.out.println(scaleLocal);
+//            System.out.println(translateLocal);
+
+            v2 g = finger.localToGlobal(translateLocal.x + hitPoint.x, translateLocal.y + hitPoint.y);
+            root().translate(g.x, g.y);
+
+        }
+        return super.onTouching(finger, hitPoint, buttons);
+    }
 
     public static void main(String[] args) {
 
+        SpaceGraph s = SpaceGraph.window( widgetDemo()
+                , 800, 600);
 
-        SpaceGraph.window(widgetDemo(), 800, 600);
 
         //SpaceGraph dd = SpaceGraph.window(new Cuboid(widgetDemo(), 16, 8f).color(0.5f, 0.5f, 0.5f, 0.25f), 1000, 1000);
 
@@ -139,23 +153,23 @@ public class Widget extends Stacking {
 
     public static Surface widgetDemo() {
         return grid(
-                    new BaseSlider(.25f  /* pause */),
-                    grid(),
-                    col(new CheckBox("ABC"),new CheckBox("XYZ")),
-                        grid(new ScaleDebugLabel(), new ScaleDebugLabel(),
-                                row(new PushButton("x"), new PushButton("xyz")),
-                                col(new ScaleDebugLabel(), new PushButton("sdjfjsdfk"))
-                        ),
-                        new PushButton("clickMe()", (p) -> {
-                            p.setText(Texts.n2(Math.random()));
-                    }),
+                new BaseSlider(.25f  /* pause */),
+                grid(),
+                col(new CheckBox("ABC"), new CheckBox("XYZ")),
+                grid(new ScaleDebugLabel(), new ScaleDebugLabel(),
+                        row(new PushButton("x"), new PushButton("xyz")),
+                        col(new ScaleDebugLabel(), new PushButton("sdjfjsdfk"))
+                ),
+                new PushButton("clickMe()", (p) -> {
+                    p.setText(Texts.n2(Math.random()));
+                }),
 
-                    new XYSlider(),
-                    new DummyConsole()
-            );
+                new XYSlider(),
+                new DummyConsole()
+        );
     }
 
-    private static class  DummyConsole extends ConsoleTerminal implements Runnable {
+    private static class DummyConsole extends ConsoleTerminal implements Runnable {
 
         public DummyConsole() {
             super(40, 20);
@@ -165,7 +179,7 @@ public class Widget extends Stacking {
         @Override
         public void run() {
 
-            while(true) {
+            while (true) {
 
                 append((Math.random()) + " ");
 

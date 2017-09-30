@@ -2,6 +2,7 @@ package spacegraph.widget.slider;
 
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
+import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
 
@@ -20,7 +21,7 @@ public class XYSlider extends Surface {
     }
 
     @Override
-    protected boolean onTouching(v2 hitPoint, short[] buttons) {
+    protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
         if (leftButton(buttons)) {
             knob.set(hitPoint);
             return true;
