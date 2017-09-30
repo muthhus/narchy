@@ -30,8 +30,14 @@ public class NARService extends Services.AbstractService<NAR> implements Termed 
 
     @Override
     protected void stop(NAR nar) {
-        ons.off();
-        ons = null;
+        stop();
+    }
+
+    public synchronized void stop() {
+        if (ons!=null) {
+            ons.off();
+            ons = null;
+        }
     }
 
     @Override

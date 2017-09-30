@@ -65,7 +65,7 @@ public class ActiveQuestionTask extends NALTask implements Consumer<Task> {
     public @Nullable Iterable<? extends ITask> run(@NotNull NAR nar) {
         super.run(nar);
         this.random = nar.random();
-        this.ttl = nar.matchTTL.intValue();
+        this.ttl = nar.matchTTLmax.intValue();
         this.onTask = nar.onTask(this);
         return null;
     }

@@ -2,6 +2,7 @@ package nars.nal.nal8;
 
 import jcog.list.CircularArrayList;
 import nars.*;
+import nars.control.MetaGoal;
 import nars.op.Operator;
 import nars.task.DerivedTask;
 import nars.task.NALTask;
@@ -18,12 +19,20 @@ import java.util.TreeSet;
 
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
+import static nars.Op.QUEST;
 
 public class SanityTest {
 
-    @Test public void testTape1() throws Narsese.NarseseException {
+    @Test
+    public void testTape1() throws Narsese.NarseseException {
         Param.DEBUG = true;
         NAR n = NARS.tmp();
+
+        n.want[MetaGoal.Perceive.ordinal()] = -1f; //reduce spam
+        n.want[MetaGoal.Desire.ordinal()] = +1f; //act
+
+        n.truthResolution.setValue(0.1f);
+        n.termVolumeMax.setValue(16);
         n.log();
 
 
@@ -32,20 +41,32 @@ public class SanityTest {
         for (int i = 0; i < cap; i++)
             t.tape.add($.the(i));
 
-        n.onOp("get", new Operator.AtomicExec((xt, nn)->{
+        n.onOp("get", new Operator.AtomicExec((xt, nn) -> {
             @Nullable TermContainer aa = Operator.args(xt);
-            if (aa.subs()==2) {
+            if (aa.subs() == 2) {
                 Term tapeID = aa.sub(0);
-                if (tapeID.op().conceptualizable && aa.sub(1) instanceof Variable) {
-
-                    Term y = t.next();
-
+                if (tapeID.op().conceptualizable) {
                     long now = nn.time();
-                    NALTask u = new NALTask(
-                            $.func("get", tapeID, y), BELIEF, $.t(1f, nn.confDefault(BELIEF)),
-                            now, now, now, nn.time.nextInputStamp());
-                    u.pri(nn.priDefault(BELIEF));
-                    n.input(u);
+
+                    if (aa.sub(1) instanceof Variable) {
+
+                        Term y = t.next();
+
+                        NALTask u = new NALTask(
+                                $.func("get", tapeID, y).normalize(), BELIEF, $.t(1f, nn.confDefault(BELIEF)),
+                                now, now, now, nn.time.nextInputStamp());
+                        u.pri(nn.priDefault(BELIEF));
+                        n.input(u);
+                    } else {
+                        //maybe you mean this
+                        NALTask u = new NALTask(
+                                $.func("get", tapeID, $.varDep(1)).normalize(),
+                                QUEST, null,
+                                now, now, now, nn.time.nextInputStamp());
+                        u.pri(nn.priDefault(BELIEF));
+                        n.input(u);
+
+                    }
                 }
             }
         }, 0.75f));
@@ -68,7 +89,8 @@ public class SanityTest {
 
     }
 
-    @Test public void testSanity0() {
+    @Test
+    public void testSanity0() {
         Param.DEBUG = true;
 
         Term happy = $.the("happy");
@@ -84,30 +106,34 @@ public class SanityTest {
 
         n.goal(happy);
 
-        n.onCycle(()->{
+        n.onCycle(() -> {
             long now = n.time();
 
             Truth u = n.goalTruth(up, now);
-            float uu = u!=null ? Math.max(0.5f, u.expectation()) : 0f;
+            float uu = u != null ? Math.max(0.5f, u.expectation()) : 0f;
             Truth d = n.goalTruth(down, now);
-            float dd = d!=null ? Math.max(0.5f, d.expectation()) : 0f;
+            float dd = d != null ? Math.max(0.5f, d.expectation()) : 0f;
 
             n.believe(up, Tense.Present, uu);
             n.believe(down, Tense.Present, dd);
-            n.believe(happy, Tense.Present, (uu-dd));
+            n.believe(happy, Tense.Present, (uu - dd));
         });
 
         int STEP = 5;
 
         n.run(STEP);
 
-        n.goal(up, Tense.Present, 1f);  n.run(STEP);
-        n.goal(up, Tense.Present, 0f);  n.run(STEP);
+        n.goal(up, Tense.Present, 1f);
+        n.run(STEP);
+        n.goal(up, Tense.Present, 0f);
+        n.run(STEP);
 
-        n.goal(down, Tense.Present, 1f); n.run(STEP);
-        n.goal(down, Tense.Present, 0f); n.run(STEP);
+        n.goal(down, Tense.Present, 1f);
+        n.run(STEP);
+        n.goal(down, Tense.Present, 0f);
+        n.run(STEP);
 
-        n.run(STEP*10);
+        n.run(STEP * 10);
 
     }
 
@@ -148,22 +174,21 @@ public class SanityTest {
         //a.durations.setValue(1);
 
 
-
-        SortedSet<DerivedTask> derived = new TreeSet<>((y,x) -> {
-             int f1 = Float.compare(x.conf(), y.conf());
-             if (f1 == 0) {
-                 int f2 = x.term().compareTo(y.term());
-                 if (f2 == 0) {
-                     return Integer.compare(x.hashCode(), y.hashCode());
-                 }
-                 return f2;
-             }
-             return f1;
+        SortedSet<DerivedTask> derived = new TreeSet<>((y, x) -> {
+            int f1 = Float.compare(x.conf(), y.conf());
+            if (f1 == 0) {
+                int f2 = x.term().compareTo(y.term());
+                if (f2 == 0) {
+                    return Integer.compare(x.hashCode(), y.hashCode());
+                }
+                return f2;
+            }
+            return f1;
         });
         n.onTask(t -> {
             if (t instanceof DerivedTask &&
                     t.isGoal()) {
-                    //t.isBeliefOrGoal()) {
+                //t.isBeliefOrGoal()) {
                 //derived.add((DerivedTask)t);
                 System.err.println(t.proof());
             }
@@ -175,7 +200,7 @@ public class SanityTest {
         int batches = 2;
         for (int i = 0; i < batches; i++) {
             batchCycle(n, togglesPos, togglesNeg, target, a, derived, timeBatch);
-            a.curiosity.setValue(1+(1f/i)); //decrease
+            a.curiosity.setValue(1 + (1f / i)); //decrease
         }
     }
 
@@ -203,17 +228,17 @@ public class SanityTest {
 
         float averageReward = a.rewardSum / timeBatch;
         //System.out.println("time=" + n.time() + "\tavg reward=" + n4(averageReward) );
-        System.out.println(n.time() + ", "  + n4(averageReward) );
+        System.out.println(n.time() + ", " + n4(averageReward));
 //                "\ttoggles +" + togglesPo + "/-" + i);
         a.rewardSum = 0;
 
 
-            if (averageReward < 0) {
-                derived.forEach(t -> {
-                    if (t.isGoal())
-                        System.out.println(t.proof());
-                });
-            }
+        if (averageReward < 0) {
+            derived.forEach(t -> {
+                if (t.isGoal())
+                    System.out.println(t.proof());
+            });
+        }
         derived.clear();
     }
 
@@ -223,11 +248,13 @@ public class SanityTest {
         int pos = 0;
 
         public TermBuffer(int capacity) {
-             tape = new CircularArrayList<>(capacity);
+            tape = new CircularArrayList<>(capacity);
         }
+
         public synchronized void rewind() {
             pos = 0;
         }
+
         public synchronized Term next() {
             Term x = tape.get(pos);
             if (++pos >= tape.size())

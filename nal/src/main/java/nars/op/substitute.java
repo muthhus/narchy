@@ -18,6 +18,8 @@ public class substitute extends Functor {
 
     //TODO use special symbol encoding to avoid collision with equivalent normal input
     final static Term STRICT = Atomic.the("strict");
+    final static Term INDEP_VAR = $.quote("$");
+    final static Term DEP_VAR = $.quote("#");
     final static Term SAME = Atomic.the("same");
 
     public substitute() {

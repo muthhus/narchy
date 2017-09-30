@@ -34,7 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static nars.Op.*;
-import static nars.op.substituteIfUnifies.substituteIfUnifiesAny;
+import static nars.op.UniSub.uniSubAny;
 import static nars.time.Tense.ETERNAL;
 
 
@@ -149,7 +149,7 @@ public class Derivation extends Unify implements TermContext {
 //
 //        transformsCache = cb.builder();
 
-        final Functor substituteIfUnifiesAny = new substituteIfUnifiesAny(this);
+        final Functor substituteIfUnifiesAny = new uniSubAny(this);
 
         //final Functor substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
 

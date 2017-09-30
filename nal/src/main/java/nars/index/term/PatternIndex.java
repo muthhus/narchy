@@ -28,8 +28,6 @@ import static nars.Op.concurrent;
  */
 public class PatternIndex extends MapTermIndex {
 
-    /** HACK holds a deriverID allowing the cause channel to include it, for multiple derivers. this is messy */
-    public short deriverID = -1;
 
     public PatternIndex(@NotNull NAR n) {
         super(new HashMap<>());

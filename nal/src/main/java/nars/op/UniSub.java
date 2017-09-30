@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.Null;
+import static nars.Op.VAR_DEP;
+import static nars.Op.VAR_INDEP;
 
 /**
  * substituteIfUnifies....(term, varFrom, varTo)
@@ -63,12 +65,12 @@ import static nars.Op.Null;
  * <patham9_> and require at least one dep-var to be unified in dep-var unification.
  * <patham9_> in principle the restriction to have at least one dep-var unified could be skipped, but the additional weaker result doesn't add any value to the system
  */
-abstract public class substituteIfUnifies extends Functor {
+abstract public class UniSub extends Functor {
 
     //private final OneMatchFindSubst subMatcher;
     protected final Derivation parent; //parent matcher context
 
-    protected substituteIfUnifies(Atom id, Derivation parent) {
+    protected UniSub(Atom id, Derivation parent) {
         super(id);
         this.parent = parent;
         //this.subMatcher = sub;
@@ -94,24 +96,31 @@ abstract public class substituteIfUnifies extends Functor {
         Term y = a.sub(2);
         if (y == Null) return Null;
 
+        //parse parameters
+        int aa = a.subs();
+        boolean strict = false;
+        @Nullable Op op = null; // unifying();
+        for (int i = 3; i < aa; i++) {
+            if (a.subEquals(i, substitute.STRICT))
+                strict = true;
+            else if (a.subEquals(i, substitute.INDEP_VAR))
+                op = VAR_INDEP;
+            else if (a.subEquals(i, substitute.DEP_VAR))
+                op = VAR_DEP;
+        }
+
         if (x.equals(y)) {
-            boolean strict = a.subEquals(3, substitute.STRICT);
             return strict ? Null : input; //unification would occurr but no changes would result
         }
 
+        boolean hasAnyOp =
+                (op==null && (x.vars() + x.varPattern()  > 0))
+                ||
+                (op!=null && x.hasAny(op));
 
-//        if (y.equals(input))
-//            return failureTerm;
-
-        @Nullable Op op = null; // unifying();
-//        boolean hasAnyOp =
-//                (op==null && (x.vars() + x.varPattern()  > 0))
-//                ||
-//                (op!=null && x.hasAny(op));
-//
-//        if (!hasAnyOp/* && mustSubstitute()*/) {
-//            return False; //no change
-//        }
+        if (!hasAnyOp/* && mustSubstitute()*/) {
+            return Null; //no change
+        }
 
 
         int subTTL = Math.round(Param.BELIEF_MATCH_TTL_FRACTION * parent.ttl);
@@ -125,11 +134,11 @@ abstract public class substituteIfUnifies extends Functor {
         return Null;
     }
 
-    public static class substituteIfUnifiesAny extends substituteIfUnifies {
+    public static class uniSubAny extends UniSub {
 
         final static Atom func = (Atom) $.the("subIfUnifiesAny");
 
-        public substituteIfUnifiesAny(Derivation parent) {
+        public uniSubAny(Derivation parent) {
             super(func, parent);
         }
 

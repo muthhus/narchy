@@ -1,29 +1,37 @@
 package nars.derive;
 
 import jcog.Util;
+import jcog.pri.Pri;
 import nars.$;
 import nars.Param;
 import nars.control.Cause;
 import nars.control.Derivation;
 import org.roaringbitmap.IntIterator;
+import org.roaringbitmap.PeekableIntIterator;
 import org.roaringbitmap.RoaringBitmap;
 
 import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-/** set of branches, subsets of which a premise "can" "try" */
+/**
+ * set of branches, subsets of which a premise "can" "try"
+ */
 public class Try extends AbstractPred<Derivation> {
 
-    public final ValueCache values;
+    public final ValueCache cache;
     public final PrediTerm<Derivation>[] branches;
     private final Cause[] causes;
 
     Try(PrediTerm<Derivation>[] branches, Cause[] causes) {
+        this(branches, causes, new ValueCache(causes));
+    }
+
+    Try(PrediTerm<Derivation>[] branches, Cause[] causes, ValueCache cache) {
         super($.func("try", branches));
         this.branches = branches;
         this.causes = causes;
-        values = new ValueCache(c -> c::value, causes);
+        this.cache = cache;
     }
 
     public Try(ValueFork[] branches) {
@@ -33,7 +41,7 @@ public class Try extends AbstractPred<Derivation> {
     @Override
     public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
         return new Try(
-            PrediTerm.transform(f, branches), causes
+                PrediTerm.transform(f, branches), causes, cache
         );
     }
 
@@ -42,72 +50,83 @@ public class Try extends AbstractPred<Derivation> {
 
         RoaringBitmap choices = d.preToPost;
         int N = choices.getCardinality();
-        if (N == 0)
+        if (N == 0) {
             return false;
+        } else if (N == 1) {
 
-        values.update(d.time);
+            branches[choices.first()].test(d);
 
-        short[] routing = new short[N * 2]; //sequence of (choice, score) pairs
-        final int[] p = {0, Integer.MAX_VALUE, Integer.MIN_VALUE};
+        } else {
 
-        Random rng = d.random;
-        IntIterator ii = N==1 || rng.nextBoolean() ? choices.getIntIterator() : choices.getReverseIntIterator();
-        int denom = 10000;
-        values.getNormalized(ii, denom, (c, v) -> {
-            int pp = p[0]++ * 2;
-            routing[pp++] = (short) c;
-            routing[pp] = (short)v;
-            if (v < p[1]) p[1] = (int) v;
-            if (v > p[2]) p[2] = (int) v;
-            return true;
-        });
-        choices.clear();
+            cache.update(d.time);
 
-        int minVal = p[1];
-        int maxVal = p[2];
+            short[] routing = new short[N * 2]; //sequence of (choice, score) pairs
+            final int[] p = {0, Integer.MAX_VALUE, Integer.MIN_VALUE};
 
-        int startTTL = d.ttl;
-        int weightSum = 0;
-        for (int i = 0; i < N; i++) {
-            int t = i * 2 + 1;
-            short ti = (short) Math.max(Param.TTL_PREMISE_MIN*2, (routing[t] * startTTL / denom ));
-            weightSum += ti;
-            routing[t] = ti;
+            Random rng = d.random;
+            int startTTL = d.ttl;
+
+            short minTTL = Param.TTL_PREMISE_MIN;
+
+            int denom = startTTL - (minTTL * N);
+            short toApply;
+            if (denom > N) {
+                //bonus beyond minTTL according to their value
+                choices.runOptimize();
+
+                float[] minmax = cache.minmax(choices.getIntIterator());
+                if (!Util.equals(minmax[0], minmax[1], Pri.EPSILON)) {
+
+                    IntIterator ii = rng.nextBoolean() ? choices.getIntIterator() : choices.getReverseIntIterator();
+                    cache.getNormalized(minmax[0], minmax[1], ii, denom, (c, v) -> {
+                        int pp = p[0]++ * 2;
+                        routing[pp++] = (short) c;
+                        routing[pp] += (short) (v); //minTTL + v
+                        if (v < p[1]) p[1] = (int) v;
+                        if (v > p[2]) p[2] = (int) v;
+                        return true;
+                    });
+                    toApply = -1;
+
+                } else {
+                    toApply = (short) (startTTL / N); //evenly distribute
+                }
+            } else {
+                toApply = minTTL;
+            }
+
+            if (toApply >= 0) {
+                //have to assign route using the iterator as it was not done in the bonus mode
+                PeekableIntIterator ii = choices.getIntIterator();
+                int k = 0;
+                while (ii.hasNext()) {
+                    routing[k++] = (short) ii.next();
+                    routing[k++] = toApply;
+                }
+            }
+
+            int weightSum = 0;
+            for (int i = 0; i < N; i++) {
+                weightSum += routing[i * 2 + 1];
+            }
+
+            int before = d.now();
+            int ttlSaved;
+            do {
+
+                int sample = Util.decideRoulette(N, (choice) -> g2(routing, choice, VAL), weightSum, rng);
+
+                ttlSaved = tryBranch(d, routing, sample);
+                if (ttlSaved < 0)
+                    break;
+
+                a2(routing, sample, false, (short) -ttlSaved);
+                weightSum -= ttlSaved;
+
+            } while (d.addTTL(ttlSaved) >= 0);
         }
 
-        int before = d.now();
-        int ttlSaved;
-        do {
-
-            int sample = Util.decideRoulette(N, (choice) -> g2(routing, choice, VAL), weightSum, rng);
-//            int sample;
-//            if (numChoices > 1) {
-//                if (minVal == maxVal) {
-//                    //flat
-//                    sample = rng.nextInt(numChoices);
-//                } else {
-//                    //curvebag sampling of the above array
-//                    float x = rng.nextFloat();
-//                    float curve = Util.lerp(x, x*x, valRatio);
-//                    sample = (int) ((1f - curve) * (numChoices - 0.5f));
-//                    if (sample >= numChoices) sample = numChoices-1; //HACK happens rarely, rounding error?
-//                }
-//            } else {
-//                sample = 0;
-//            }
-
-//            if (d.ttl <= loopCost) {
-//                d.setTTL(0);
-//                break;
-//            }
-            ttlSaved = tryBranch(d, routing, sample);
-            if (ttlSaved < 0)
-                break;
-
-            a2(routing, sample, false, (short)-ttlSaved);
-            weightSum -= ttlSaved;
-
-        } while (d.addTTL(ttlSaved) >= 0);
+        choices.clear();
 
         return false;
     }
@@ -141,6 +160,7 @@ public class Try extends AbstractPred<Derivation> {
     private static short g2(short[] s, int i, boolean firstOrSecond) {
         return s[i * 2 + (firstOrSecond ? 0 : 1)];
     }
+
     private static void a2(short[] s, int i, boolean firstOrSecond, short amt) {
         s[i * 2 + (firstOrSecond ? 0 : 1)] += amt;
     }
@@ -200,12 +220,12 @@ public class Try extends AbstractPred<Derivation> {
                 short vi = g2(A, i, VAL);
                 if (vi == value) {
                     //swap(A[i], A[max]);
-                    short ki = g2(A,i,KEY);
-                    short km = g2(A,max,KEY);
-                    s2(A,i,KEY, km);
-                    s2(A,i,VAL, vm);
-                    s2(A,max,KEY, ki);
-                    s2(A,max,VAL, vi);
+                    short ki = g2(A, i, KEY);
+                    short km = g2(A, max, KEY);
+                    s2(A, i, KEY, km);
+                    s2(A, i, VAL, vm);
+                    s2(A, max, KEY, ki);
+                    s2(A, max, VAL, vi);
                     max--;
                 } else if (vi > vm)
                     vm = vi;

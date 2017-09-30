@@ -85,7 +85,7 @@ public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
                 try {
                     out.append(printIndent);
                     out.append(String.valueOf(b.get())).append(' ').append(b.toBudgetString());
-                    out.append(" ");
+                    out.append("\n");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

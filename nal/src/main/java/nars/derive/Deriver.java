@@ -73,7 +73,6 @@ public interface Deriver {
             Cause in = nar.newCause((cid)->new Cause(cid, "Derive(" + files + ")"));
 
             final PatternIndex p = new PatternIndex(nar);
-            p.deriverID = in.id; //HACK
 
             @NotNull PremiseRuleSet r = PremiseRuleSet.rules(nar, p,true, files.toArray(new String[files.size()]) );
 

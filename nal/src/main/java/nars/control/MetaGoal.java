@@ -72,23 +72,25 @@ public enum MetaGoal {
 
         final float epsilon = 0.01f;
 
-        final float momentum = 0.95f;
+        final float momentum = 0.1f;
 
         int goals = goal.length;
-        float[] goalMagnitude = new float[goals];
-        for (int i = 0; i < goals; i++) {
-            float m = causeSummary[i].magnitude();
-            goalMagnitude[i] = Util.equals(m, 0, epsilon) ? 1 : m;
+        float[] goalFactor = new float[goals];
+        for (int j = 0; j < goals; j++) {
+            float m = causeSummary[j].magnitude();
+            //strength / normalization_magnitude
+            goalFactor[j] = goal[j] / ( Util.equals(m, 0, epsilon) ? 1 : m );
         }
-
-        //RecycledSummaryStatistics goalCausePreNorm = causeSummary[goals /* the extra one */];
 
         for (int i = 0, causesSize = cc; i < causesSize; i++) {
             Cause c = causes.get(i);
             float v = 0;
+
+            Traffic[] cg = c.goalValue;
+
             //mix the weighted current values of each purpose, each independently normalized against the values (the reason for calculating summary statistics in previous step)
             for (int j = 0; j < goals; j++) {
-                v += goal[j] * c.goalValue[j].current / goalMagnitude[j];
+                v += goalFactor[j] * cg[j].current;
             }
 
             float nextValue = Util.lerp(momentum, v, c.value());

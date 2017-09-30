@@ -31,7 +31,6 @@ public final class Conclude {
     static public PrediTerm<Derivation> the(@NotNull PremiseRule rule, PatternIndex index) {
 
         NAR nar = index.nar;
-        short deriverID = index.deriverID; assert(deriverID!=-1);
 
         Term pattern = rule.conclusion().sub(0);
 
@@ -51,8 +50,7 @@ public final class Conclude {
 
         Term id = !rule.goalUrgent ? $.func("derive", pattern) : $.func("derive", pattern, $.the("urgent"));
 
-        Taskify taskify = new Taskify(rule, nar.newCause((channelID) ->
-                new RuleCause(channelID, deriverID)));
+        Taskify taskify = new Taskify(rule, nar.newCause(RuleCause::new));
 
         Term concID =
                 !rule.goalUrgent ?
@@ -183,12 +181,8 @@ public final class Conclude {
      * holds the deriver id also that it can be applied at the end of a derivation.
      */
     static class RuleCause extends Cause {
-
-        public final short deriver;
-
-        public RuleCause(short id, short deriverID) {
+        public RuleCause(short id) {
             super(id);
-            this.deriver = deriverID;
         }
     }
 

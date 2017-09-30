@@ -13,6 +13,7 @@ import nars.control.MetaGoal;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.MultiExec;
+import nars.gui.ConceptView;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
@@ -318,6 +319,8 @@ abstract public class NAgentX extends NAgent {
         a.nar.runLater(() -> {
 
             chart(a);
+
+//            window(new ConceptView(a.happy,n), 800, 600);
 
             window(new Vis.EmotionPlot(64, a), 500, 500);
 

@@ -225,7 +225,7 @@ public class NARS {
             if (nal >= 7)
                 new STMLinkage(nar, 1, false);
 
-            //nar.defaultWants();
+            nar.defaultWants();
 
         }
     }

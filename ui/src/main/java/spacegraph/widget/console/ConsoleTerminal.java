@@ -349,11 +349,11 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     Color cursorColor = Color.ORANGE;
 
 
-    private final int fontWidth;
+    private int fontWidth;
 
-    private final int fontHeight;
+    private int fontHeight;
 
-    private final Font font;
+    private Font font;
     boolean useAntiAliasing = false;
 
     {
@@ -375,10 +375,15 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
         this.blinkOn = true;
         this.needFullRedraw = false;
 
-        font = new Font("Monospaced", 0, 24);
+
+        setFontSize(24);
+
+    }
+
+    public void setFontSize(int s) {
+        this.font = new Font("Monospaced", 0, s);
         this.fontWidth = getFontWidth(font);
         this.fontHeight = getFontHeight(font);
-
     }
 
     private FontRenderContext getFontRenderContext() {

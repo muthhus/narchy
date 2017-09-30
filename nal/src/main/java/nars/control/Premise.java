@@ -90,7 +90,7 @@ public class Premise extends UnaryTask {
         if (task == null || task.isDeleted())
             return null;
 
-        int ttlMax = Util.lerp(task.priElseZero(), Param.TTL_PREMISE_MIN, n.matchTTL.intValue());
+        int ttlMax = Util.lerp(task.priElseZero(), n.matchTTLmin.intValue(), n.matchTTLmax.intValue());
 
         NAR nar = d.nar;
 

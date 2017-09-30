@@ -93,7 +93,7 @@ public class Taskify extends AbstractPred<Derivation> {
         if (Param.DEBUG)
             t.log(rule);
 
-        short[] cause = ArrayUtils.addAll(p.parentCause, channel.deriver, channel.id);
+        short[] cause = ArrayUtils.addAll(p.parentCause, channel.id);
         ((DerivedTask)t).cause = cause;
 
         if (p.derivations.merge(t, t, DUPLICATE_DERIVATION_MERGE) != t) {
