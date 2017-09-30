@@ -150,7 +150,7 @@ abstract public class NAgentX extends NAgent {
 
 
         RealTime clock =
-                narFPS >= 10 / 2f ? /* nyquist threshold between decisecond (0.1) and centisecond (0.01) clock resolution */
+                agentFPS >= 10 / 2f ? /* nyquist threshold between decisecond (0.1) and centisecond (0.01) clock resolution */
                         new RealTime.CS(true) :
                         new RealTime.DSHalf(true);
         clock.durFPS(agentFPS);

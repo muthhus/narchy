@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
-import spacegraph.math.v3;
 
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +39,7 @@ import java.util.function.Consumer;
     }
 
     public Layout<S> set(@NotNull List<? extends S> next) {
-        synchronized (scaleLocal) {
+        synchronized (scale) {
 
             if (!Objects.equals(this.children, next)) {
 
@@ -78,7 +77,7 @@ import java.util.function.Consumer;
 
     @Override
     public void stop() {
-        synchronized (scaleLocal) {
+        synchronized (scale) {
             if (children!=null) {
                 children.forEach(Surface::stop);
                 children = null;
@@ -105,7 +104,7 @@ import java.util.function.Consumer;
             for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
                 Surface c = children.get(i);
 
-                v2 sc = c.scaleLocal;
+                v2 sc = c.scale;
                 float csx = sc.x;
                 float csy = sc.y;
                 if (/*csx != csx || */csx <= 0 || /*csy != csy ||*/ csy <= 0)
@@ -113,7 +112,7 @@ import java.util.function.Consumer;
 
                 //project to child's space
                 v2 subHit = new v2(hitPoint);
-                subHit.sub(c.translateLocal.x, c.translateLocal.y);
+                subHit.sub(c.pos.x, c.pos.y);
 
                 subHit.scale(1f / csx, 1f / csy);
 
@@ -123,11 +122,7 @@ import java.util.function.Consumer;
                 if (!clipTouchBounds || (hx >= 0f && hx <= 1f && hy >= 0 && hy <= 1f)) {
                     //subHit.add(c.translateLocal.x*csx, c.translateLocal.y*csy);
 
-                    finger.push(c.scaleLocal.x, c.scaleLocal.y, c.translateLocal.x, c.translateLocal.y);
-
                     Surface s = c.onTouch(finger, subHit, buttons);
-
-                    finger.pop();
 
                     if (s != null)
                         return s; //FIFO

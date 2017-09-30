@@ -40,13 +40,13 @@ public class VSplit<X extends Surface, Y extends Surface> extends Layout {
         Surface top = top();
         if (top != null) {
             top.scale(1f, split);
-            top.translateLocal.set(x,  1f - (split), 0);
+            top.pos.set(x,  1f - (split), 0);
         }
 
         Surface bottom = bottom();
         if (bottom!=null) {
             bottom.scale(1f, 1f - split);
-            bottom.translateLocal.set(x, 0, 0);
+            bottom.pos.set(x, 0, 0);
         }
 
     }

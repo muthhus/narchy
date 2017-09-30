@@ -50,6 +50,7 @@ public class RecyclingPolynomialFitterTest {
             //0..4
             w.learn( x = (float) (Math.random() * 4), (float) (f.valueOf(x) + 2f*(Math.random()-0.5f)*noise));
         }
+
         //validate
         for (int x = 0; x < 4; x++) {
             float yActual = f.valueOf(x);

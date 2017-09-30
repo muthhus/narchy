@@ -99,16 +99,16 @@ public class ZoomOrtho extends Ortho {
         //if (mouse.touching == null) {
             //System.out.println(Arrays.toString(e.getRotation()) + " " + e.getRotationScale());
             float zoomMult = 1f + -e.getRotation()[1] * zoomRate;
-            AnimVector2f s = this.scale;
-            float psx = s.target.x;
-            float psy = s.target.y;
+
+            float psx = scale.x;
+            float psy = scale.y;
             float sx = psx * zoomMult;
             float sy = psy * zoomMult;
             int wx = window.getWidth();
             int wy = window.getHeight();
             if (sx/wx >= minZoom && sy/wy >= minZoom && sx/wx <= maxZoom && sy/wy <= maxZoom) {
 
-                s.set(sx, sy);
+                scale.set(sx, sy);
 
                 float epx, epy;
                 if (zoomMult > 1f) {

@@ -17,7 +17,6 @@ import java.util.List;
 public class Surface {
 
 
-    protected v2 scaleGlobal;
 
 
 
@@ -44,8 +43,8 @@ public class Surface {
         //TODO etc...
     }
 
-    public final v3 translateLocal;
-    public final v2 scaleLocal;
+    public final v3 pos;
+    public final v2 scale;
 
     public Surface parent;
 
@@ -60,8 +59,8 @@ public class Surface {
     protected float aspect = Float.NaN;
 
     public Surface() {
-        translateLocal = new v3();
-        scaleLocal = new v2(1f, 1f);
+        pos = new v3();
+        scale = new v2(1f, 1f);
     }
 
     public SurfaceRoot root() {
@@ -127,22 +126,22 @@ public class Surface {
     }
 
     public Surface move(float dx, float dy) {
-        translateLocal.add(dx, dy,0);
+        pos.add(dx, dy,0);
         return this;
     }
 
-    public final void render(GL2 gl, v2 globalScale) {
+    public final void render(GL2 gl) {
 
 
-        v2 s = this.scaleLocal;
-        float scaleX = s.x;
-        if (scaleX != scaleX || scaleX <= 0)
-            return; //invisible
-
+//        v2 s = this.scale;
+//        float scaleX = s.x;
+//        if (scaleX != scaleX || scaleX <= 0)
+//            return; //invisible
 
         gl.glPushMatrix();
 
-        transform(gl, globalScale);
+        gl.glTranslatef(pos.x, pos.y, pos.z);
+        gl.glScalef(scale.x, scale.y, 1f);
 
         //gl.glNormal3f(0,0,1);
 
@@ -150,12 +149,10 @@ public class Surface {
 
         List<? extends Surface> cc = children();
         if (cc != null) {
-            v2 childGlobal = new v2(this.scaleGlobal);
-            childGlobal.scale(s);
             for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
                 Surface ss = cc.get(i);
                 if (ss!=null)
-                    ss.render(gl, childGlobal);
+                    ss.render(gl);
             }
         }
 
@@ -167,58 +164,55 @@ public class Surface {
     }
 
 
-    public void transform(GL2 gl, v2 globalScale) {
-        final Surface c = this;
+//    public void transform(GL2 gl, v2 globalScale) {
+//        final Surface c = this;
+//
+//        this.scaleGlobal = globalScale;
+//
+//
+//        v2 scale = c.scale;
+//
+//        float sx, sy;
+//
+//        if (Float.isFinite(aspect)) {
+//            float globalAspect = globalScale.y / globalScale.x;
+//            float targetAspect = aspect/globalAspect;
+//            if (targetAspect < 1) {
+//                //wider, shrink y
+//                sx = scale.x;
+//                sy = scale.y * targetAspect;
+//            } else {
+//                //taller, shrink x
+//                sx = scale.x / targetAspect;
+//                sy = scale.y;
+//            }
+//
+//
+//        } else {
+//            //consume entire area, regardless of aspect
+//            sx = scale.x;
+//            sy = scale.y;
+//        }
+//
+//        float tx = translate.x, ty = translate.y;
+//        switch (align) {
+//
+//            //TODO others
+//
+//            case Center:
+//                //HACK TODO figure this out
+//                tx += (1f - (sx/scale.x))/2f;
+//                ty += (1f - (sy/scale.y))/2f;
+//                break;
+//
+//            case None:
+//            default:
+//                break;
+//
+//        }
 
-        this.scaleGlobal = globalScale;
-
-        v3 translate = c.translateLocal;
-
-        v2 scale = c.scaleLocal;
-
-        float sx, sy;
-
-        if (Float.isFinite(aspect)) {
-            float globalAspect = globalScale.y / globalScale.x;
-            float targetAspect = aspect/globalAspect;
-            if (targetAspect < 1) {
-                //wider, shrink y
-                sx = scale.x;
-                sy = scale.y * targetAspect;
-            } else {
-                //taller, shrink x
-                sx = scale.x / targetAspect;
-                sy = scale.y;
-            }
-
-
-        } else {
-            //consume entire area, regardless of aspect
-            sx = scale.x;
-            sy = scale.y;
-        }
-
-        float tx = translate.x, ty = translate.y;
-        switch (align) {
-
-            //TODO others
-
-            case Center:
-                //HACK TODO figure this out
-                tx += (1f - (sx/scale.x))/2f;
-                ty += (1f - (sy/scale.y))/2f;
-                break;
-
-            case None:
-            default:
-                break;
-
-        }
-
-        //System.out.println(this + " scale=" + sx + "," + sy + " (a=" + aspect + ") @ " + tx + ","+ ty + "," + translate.z);
-        gl.glTranslatef(tx, ty, translate.z);
-        gl.glScalef(sx, sy, 1f);
-    }
+//        v3 translate = c.pos;
+//    }
 
 
     public static boolean leftButton(short[] buttons) {
@@ -227,12 +221,12 @@ public class Surface {
 
 
     public Surface scale(float x, float y) {
-        scaleLocal.set(x, y);
+        scale.set(x, y);
         return this;
     }
 
     public Surface pos(float x, float y) {
-        translateLocal.set(x, y);
+        pos.set(x, y);
         return this;
     }
 
@@ -249,7 +243,7 @@ public class Surface {
     }
 
     public float radius() {
-        return Math.max(scaleLocal.x, scaleLocal.y);
+        return Math.max(scale.x, scale.y);
     }
 
     public Surface hide() {

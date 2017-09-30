@@ -29,12 +29,12 @@ public class Space2D<S extends Surface> extends Layout<S> {
     }
 
 
-    @Override
-    public void transform(GL2 gl, v2 globalScale) {
-        super.transform(gl, globalScale);
-
-        layout();
-    }
+//    @Override
+//    public void transform(GL2 gl) {
+//        super.transform(gl);
+//
+//        layout();
+//    }
 
     @Override
     public void layout() {
@@ -61,8 +61,8 @@ public class Space2D<S extends Surface> extends Layout<S> {
     private static void repel(Surface x, Surface y, float speed, float minDist, float maxDist, float sx, float sy) {
 
         v3 delta = new v3();
-        v3 xp = x.translateLocal;
-        v3 yp = y.translateLocal;
+        v3 xp = x.pos;
+        v3 yp = y.pos;
         delta.sub(xp, yp);
 
         float len = delta.normalize();

@@ -6,7 +6,6 @@ import jcog.event.On;
 import jcog.list.FasterList;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.Surface;
-import spacegraph.math.v3;
 import spacegraph.render.Draw;
 
 import java.util.List;
@@ -414,7 +413,7 @@ public class Plot2D extends Surface {
         @Override
         public void draw(List<Series> series, GL2 g, float minValue, float maxValue) {
             if (ready.get()) {
-                view.render(g, v3.one);
+                view.render(g);
             } else {
                 BitmapWave.this.series = series.get(0);
                 this.gl = g;

@@ -156,7 +156,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
             //float tw = t.x;
             //float th = t.y;
             gl.glDepthMask(false);
-            front.render(gl, v(1, 1));
+            front.render(gl);
             gl.glDepthMask(true);
 
             //gl.glPopMatrix();

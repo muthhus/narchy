@@ -13,6 +13,7 @@ import spacegraph.render.Draw;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
 import spacegraph.widget.console.ConsoleTerminal;
+import spacegraph.widget.console.TerminalUI;
 import spacegraph.widget.slider.BaseSlider;
 import spacegraph.widget.slider.XYSlider;
 
@@ -117,8 +118,7 @@ public class Widget extends Stacking {
 //            System.out.println(scaleLocal);
 //            System.out.println(translateLocal);
 
-            v2 g = finger.localToGlobal(translateLocal.x + hitPoint.x, translateLocal.y + hitPoint.y);
-            root().translate(g.x, g.y);
+//            root().translate(g.x, g.y);
 
         }
         return super.onTouching(finger, hitPoint, buttons);
@@ -126,7 +126,9 @@ public class Widget extends Stacking {
 
     public static void main(String[] args) {
 
-        SpaceGraph s = SpaceGraph.window( widgetDemo()
+        SpaceGraph s = SpaceGraph.window(
+
+                widgetDemo()
                 , 800, 600);
 
 
@@ -146,7 +148,7 @@ public class Widget extends Stacking {
 
         @Override
         public void paint(GL2 gl) {
-            set(scaleLocal.toString());
+            set(scale.toString());
             super.paint(gl);
         }
     }
@@ -172,7 +174,7 @@ public class Widget extends Stacking {
     private static class DummyConsole extends ConsoleTerminal implements Runnable {
 
         public DummyConsole() {
-            super(40, 20);
+            super(new TerminalUI(15,15));
             new Thread(this).start();
         }
 
@@ -182,6 +184,8 @@ public class Widget extends Stacking {
             while (true) {
 
                 append((Math.random()) + " ");
+
+                term.flush();
 
                 Util.sleep(200);
             }

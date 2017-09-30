@@ -45,8 +45,8 @@ public class MatrixPad extends Layout {
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
                 Surface s = components[x][y];
-                s.scaleLocal.set(sx, sy);
-                s.translateLocal.set(x * sx, y * sy);
+                s.scale.set(sx, sy);
+                s.pos.set(x * sx, y * sy);
             }
         }
     }

@@ -28,7 +28,6 @@ public class Finger {
     public final boolean[] prevButtonDown = new boolean[5];
     private final Ortho root;
 
-    final MyFloatArrayList transformStack = new MyFloatArrayList();
 
     //TODO wheel state
 
@@ -39,12 +38,6 @@ public class Finger {
         this.root = root;
     }
 
-    public Surface on(float sx, float sy, float tx, float ty, v2 nextHit, short[] nextButtonDown) {
-        push(sx, sy, tx, ty);
-        Surface r = on(nextHit, nextButtonDown);
-        pop();
-        return r;
-    }
 
     public Surface on(v2 hit, short[] nextButtonDown) {
         this.hit.set(hit);
@@ -115,35 +108,4 @@ public class Finger {
         System.out.println(root.surface + " " + hit + " " + touching + " " + Arrays.toString(buttonDown));
     }
 
-    public void push(float sx, float sy, float tx, float ty) {
-        transformStack.addAll(sx, sy, tx, ty);
-    }
-
-    public void pop() {
-        transformStack.setSize(transformStack.size()-4);
-    }
-
-    public v2 localToGlobal(float nx, float ny) {
-        int p = transformStack.size();
-        float[] f = transformStack.array();
-        while ((p-=4) >= 0) {
-            float sx = f[p];
-            float sy = f[p+1];
-            float tx = f[p+2];
-            float ty = f[p+3];
-            nx = (nx*sx - tx);
-            ny = (ny*sy - ty);
-        }
-        return new v2(nx, ny);
-    }
-
-    private static class MyFloatArrayList extends FloatArrayList {
-        public void setSize(int newSize) {
-            size = newSize;
-        }
-
-        public float[] array() {
-            return items;
-        }
-    }
 }

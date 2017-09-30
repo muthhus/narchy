@@ -58,20 +58,20 @@ public class Grid<S extends Surface> extends Layout<S> {
         return a!=0 && a!=Float.POSITIVE_INFINITY;
     }
 
-    @Override
-    public void transform(GL2 gl, v2 globalScale) {
-        super.transform(gl, globalScale);
-
-        if (!children.isEmpty() && isGrid())  {
-            float xx = scaleLocal.x * globalScale.x;
-            float yy = scaleLocal.y * globalScale.y;
-            //if ((lw != xx) || (lh != yy)) {
-                layout();
-                lw = xx;
-                lh = yy;
-            //}
-        }
-    }
+//    @Override
+//    public void transform(GL2 gl, v2 globalScale) {
+//        super.transform(gl, globalScale);
+//
+//        if (!children.isEmpty() && isGrid())  {
+//            float xx = scale.x * globalScale.x;
+//            float yy = scale.y * globalScale.y;
+//            //if ((lw != xx) || (lh != yy)) {
+//                layout();
+//                lw = xx;
+//                lh = yy;
+//            //}
+//        }
+//    }
 
     @Override
     public void layout() {
