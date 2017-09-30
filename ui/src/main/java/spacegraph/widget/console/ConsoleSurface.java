@@ -3,21 +3,17 @@ package spacegraph.widget.console;
 import com.googlecode.lanterna.TextCharacter;
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
+import spacegraph.render.BmpFont;
 import spacegraph.render.Draw;
 
 import java.awt.*;
 
-/**
- * Created by me on 4/1/16.
- */
-public abstract class ConsoleSurface extends Surface implements Appendable {
+
+public abstract class ConsoleSurface extends AbstractConsoleSurface {
 
 
     public static final float thickness = 3f;
     public static final Color TRANSLUCENT = new Color(Color.TRANSLUCENT);
-
-
-    private int cols, rows;
 
 
     /**
@@ -33,23 +29,15 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
     float bgAlpha = 0.35f;
     float fgAlpha = 0.9f;
-    private Color bg;
 
 
     public ConsoleSurface(int cols, int rows) {
         resize(cols, rows);
     }
 
-    public void resize(int cols, int rows) {
-        this.cols = cols;
-        this.rows = rows;
-        //align(Align.Center, cols/1.5f, rows);
-    }
-
 
     @Override
     public void paint(GL2 gl) {
-
 
         float charScaleX = this.charScaleX;
         float charScaleY = this.charScaleY;
@@ -91,6 +79,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
                 TextCharacter c = charAt(col, row);
 
+
                 if (setBackgroundColor(gl, c, col, row)) {
                     Draw.rect(gl,
                         Math.round((col - 0.5f) * 20/charScaleX), 0,
@@ -106,6 +95,8 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
 
                 char cc = visible(c.getCharacter());
+
+
                 if (cc != 0) {
 
                     //gl.glColor3f(1f, 1f, 1f);
@@ -117,6 +108,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
                     gl.glColor4f(fg.getRed()/256f,fg.getGreen()/256f,fg.getBlue()/256f, fgAlpha);
 
                     Draw.textNext(gl, cc, col/charScaleX);
+
                 }
             }
 
@@ -158,34 +150,6 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
         return false;
     }
 
-    /** x,y aka col,row */
-    public abstract int[] getCursorPos();
-
-    abstract public TextCharacter charAt(int col, int row);
-
-
-    public static char visible(char cc) {
-        //HACK: un-ANSIfy
-
-        //see: https://github.com/Hexworks/zircon/blob/master/src/main/kotlin/org/codetome/zircon/Symbols.kt
-
-        switch (cc) {
-            case ' ':
-                return 0;
-            case 9474:
-                cc = '|';
-                break;
-            case 9472:
-                cc = '-';
-                break;
-            case 9492:
-                //..
-            case 9496:
-                cc = '*';
-                break;
-        }
-        return cc;
-    }
 
     public ConsoleSurface opacity(float v) {
         fgAlpha = v;

@@ -6,43 +6,52 @@ import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
 import spacegraph.Surface;
 
-import java.io.File;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import static spacegraph.SpaceGraph.window;
 
-public class BmpFont extends Surface {
+public class BmpFont {
 
 
     private TextureData texture;
 
-    public static void main(String[] args) {
-        window(new BmpFont(), 800, 600);
-    }
 
     private int base;  // Base Display List For The Font
     private final int[] textures = new int[2];  // Storage For Our Font Texture
 
-    private float cnt1;    // 1st Counter Used To Move Text & For Coloring
-    private float cnt2;    // 2nd Counter Used To Move Text & For Coloring
-
 
     private ByteBuffer stringBuffer = ByteBuffer.allocate(256);
 
-    public void loadGLTextures(GL gl) {
+    private static final ThreadLocal<BmpFont> fonts = ThreadLocal.withInitial(BmpFont::new);
 
-        String tileNames [] =
-            {"font.png"/*, "bumps.png"*/};
+    private GL2 gl;
+
+    public static BmpFont the(GL2 g) {
+        BmpFont f = fonts.get();
+        if (!f.init)
+            f.init(g);
+        return f;
+    }
+
+
+
+    void loadGLTextures() {
+
+        String tileNames[] =
+                {"font2.png"/*, "bumps.png"*/};
 
 
         gl.glGenTextures(2, textures, 0);
 
         for (int i = 0; i < 1; i++) {
 
-            //InputStream r = BmpFont.class.getResourceAsStream(tileNames[i]);
+            InputStream r = Draw.class.getClassLoader().getResourceAsStream(tileNames[i]);
             try {
-                File r = new File("/home/me/n/lab/src/main/resources/" + tileNames[i]);
-                texture = TextureIO.newTextureData(gl.getGLProfile(), r, true, "png");
+                //File r = new File("/home/me/n/lab/src/main/resources/" + tileNames[i]);
+                boolean mipmap = false;
+                texture = TextureIO.newTextureData(gl.getGLProfile(), r,
+                        mipmap, "png");
             } catch (Throwable t) {
                 t.printStackTrace();
                 System.exit(1);
@@ -50,16 +59,17 @@ public class BmpFont extends Surface {
             //Create Nearest Filtered Texture
             gl.glBindTexture(GL2.GL_TEXTURE_2D, textures[i]);
 
-            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_LINEAR);
-            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MAG_FILTER, GL2.GL_NEAREST);
+            gl.glTexParameteri(GL2.GL_TEXTURE_2D, GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_NEAREST);
 
             gl.glTexImage2D(GL2.GL_TEXTURE_2D,
                     0,
+
                     3,
                     texture.getWidth(),
                     texture.getHeight(),
                     0,
-                    GL2.GL_RGB,
+                    GL2.GL_RGBA,
                     GL2.GL_UNSIGNED_BYTE,
                     texture.getBuffer());
 
@@ -67,7 +77,7 @@ public class BmpFont extends Surface {
         }
     }
 
-    private void buildFont(GL2 gl)  // Build Our Font Display List
+    private void buildFont()  // Build Our Font Display List
     {
         float cx;      // Holds Our X Character Coord
         float cy;      // Holds Our Y Character Coord
@@ -84,9 +94,9 @@ public class BmpFont extends Surface {
             gl.glTexCoord2f(cx, 1 - cy - 0.0625f);  // Texture Coord (Bottom Left)
             gl.glVertex2i(0, 0);      // Vertex Coord (Bottom Left)
             gl.glTexCoord2f(cx + 0.0625f, 1 - cy - 0.0625f);  // Texture Coord (Bottom Right)
-            gl.glVertex2i(16, 0);      // Vertex Coord (Bottom Right)
+            gl.glVertex2i(10, 0);      // Vertex Coord (Bottom Right)
             gl.glTexCoord2f(cx + 0.0625f, 1 - cy);  // Texture Coord (Top Right)
-            gl.glVertex2i(16, 16);      // Vertex Coord (Top Right)
+            gl.glVertex2i(10, 16);      // Vertex Coord (Top Right)
             gl.glTexCoord2f(cx, 1 - cy);    // Texture Coord (Top Left)
             gl.glVertex2i(0, 16);      // Vertex Coord (Top Left)
             gl.glEnd();          // Done Building Our Quad (Character)
@@ -96,8 +106,8 @@ public class BmpFont extends Surface {
     }
 
     // Where The Printing Happens
-    private void glPrint(GL2 gl, int x, int y, String string, int set)
-    {
+    public void write(int x, int y, String string, int set) {
+
         if (set > 1) {
             set = 1;
         }
@@ -127,16 +137,26 @@ public class BmpFont extends Surface {
         //gl.glMatrixMode(GL2.GL_PROJECTION);  // Select The Projection Matrix
 //        gl.glPopMatrix();      // Restore The Old Projection Matrix
         //gl.glMatrixMode(GL2.GL_MODELVIEW);  // Select The Modelview Matrix
-  //      gl.glPopMatrix();      // Restore The Old Projection Matrix
+        //      gl.glPopMatrix();      // Restore The Old Projection Matrix
         //gl.glEnable(GL2.GL_DEPTH_TEST);    // Enables Depth Testing
+
+        gl.glDisable(textures[0]);
     }
 
     boolean init;
-    public void init(GL2 gl) {
 
-        loadGLTextures(gl);
+    public synchronized void init(GL2 gl) {
 
-        buildFont(gl);
+        if (this.init)
+            return; //already init
+
+        this.gl = gl;
+
+        loadGLTextures();
+
+        buildFont();
+
+        this.init = true;
 
         //gl.glShadeModel(GL2.GL_SMOOTH);                 // Enables Smooth Color Shading
 
@@ -155,17 +175,56 @@ public class BmpFont extends Surface {
         gl.glEnable(GL2.GL_TEXTURE_2D);      // Enable 2D Texture Mapping
     }
 
-    @Override
-    public void paint(GL2 gl) {
+    public static void main(String[] args) {
+        window(new Surface() {
 
-        if (!init) {
-            init(gl);
-            init = true;
-        }
+            public BmpFont f;
+            private float cnt1;    // 1st Counter Used To Move Text & For Coloring
+            private float cnt2;    // 2nd Counter Used To Move Text & For Coloring
 
-        // Clear The Screen And The Depth Buffer
-        //gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
-        //gl.glLoadIdentity();  // Reset The View
+
+            @Override
+            protected void paint(GL2 gl) {
+                if (f == null)
+                    f = BmpFont.the(gl);
+
+                gl.glScalef(0.05f, 0.08f, 1f);
+                // Pulsing Colors Based On Text Position
+                gl.glColor3f((float) (Math.cos(cnt1)), (float)
+                        (Math.sin(cnt2)), 1.0f - 0.5f * (float) (Math.cos(cnt1 + cnt2)));
+
+                // Print GL Text To The Screen
+                f.write( (int) ((280 + 250 * Math.cos(cnt1))),
+                        (int) (235 + 200 * Math.sin(cnt2)), "NeHe", 0);
+
+                gl.glColor3f((float) (Math.sin(cnt2)), 1.0f - 0.5f *
+                        (float) (Math.cos(cnt1 + cnt2)), (float) (Math.cos(cnt1)));
+
+                // Print GL Text To The Screen
+                f.write((int) ((280 + 230 * Math.cos(cnt2))),
+                        (int) (235 + 200 * Math.sin(cnt1)), "OpenGL", 1);
+
+                gl.glColor3f(0.0f, 0.0f, 1.0f);
+                f.write( (int) (240 + 200 * Math.cos((cnt2 + cnt1) / 5)),
+                        2, "Giuseppe D'Agata", 0);
+
+                gl.glColor3f(1.0f, 1.0f, 1.0f);
+                f.write( (int) (242 + 200 * Math.cos((cnt2 + cnt1) / 5)),
+                        2, "Giuseppe D'Agata", 0);
+
+                cnt1 += 0.01f;      // Increase The First Counter
+                cnt2 += 0.0081f;    // Increase The Second Counter
+            }
+        }, 800, 600);
+    }
+
+
+}
+
+
+// Clear The Screen And The Depth Buffer
+//gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
+//gl.glLoadIdentity();  // Reset The View
 
 //        // Select Our Second Texture
 //        gl.glBindTexture(GL2.GL_TEXTURE_2D, textures[1]);
@@ -203,35 +262,7 @@ public class BmpFont extends Surface {
 //        gl.glEnd();                         // Done Drawing Our Second Quad
 //        gl.glEnable(GL2.GL_BLEND);           // Enable Blending
 
-        //gl.glLoadIdentity();                // Reset The View
-
-        gl.glScalef(0.05f,0.08f,1f);
-        // Pulsing Colors Based On Text Position
-        gl.glColor3f((float) (Math.cos(cnt1)), (float)
-                (Math.sin(cnt2)), 1.0f - 0.5f * (float) (Math.cos(cnt1 + cnt2)));
-
-        // Print GL Text To The Screen
-        glPrint(gl, (int) ((280 + 250 * Math.cos(cnt1))),
-                (int) (235 + 200 * Math.sin(cnt2)), "NeHe", 0);
-
-        gl.glColor3f((float) (Math.sin(cnt2)), 1.0f - 0.5f *
-                (float) (Math.cos(cnt1 + cnt2)), (float) (Math.cos(cnt1)));
-
-        // Print GL Text To The Screen
-        glPrint(gl, (int) ((280 + 230 * Math.cos(cnt2))),
-                (int) (235 + 200 * Math.sin(cnt1)), "OpenGL", 1);
-
-        gl.glColor3f(0.0f, 0.0f, 1.0f);
-        glPrint(gl, (int) (240 + 200 * Math.cos((cnt2 + cnt1) / 5)),
-                2, "Giuseppe D'Agata", 0);
-
-        gl.glColor3f(1.0f, 1.0f, 1.0f);
-        glPrint(gl, (int) (242 + 200 * Math.cos((cnt2 + cnt1) / 5)),
-                2, "Giuseppe D'Agata", 0);
-
-        cnt1 += 0.01f;      // Increase The First Counter
-        cnt2 += 0.0081f;    // Increase The Second Counter
-    }
+//gl.glLoadIdentity();                // Reset The View
 
 //    public void reshape(GL2 glDrawable, int x, int y, int w, int h) {
 //        if (h == 0) h = 1;
@@ -247,4 +278,3 @@ public class BmpFont extends Surface {
 //        gl.glMatrixMode(GL2.GL_MODELVIEW);    // Select The Modelview Matrix
 //        gl.glLoadIdentity();                 // Reset The ModalView Matrix
 //    }
-}

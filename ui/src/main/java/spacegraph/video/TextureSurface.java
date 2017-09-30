@@ -30,7 +30,7 @@ public class TextureSurface extends Surface {
     final AtomicBoolean textureUpdated = new AtomicBoolean(false);
     private GLProfile profile;
     private TextureData nextData;
-    private int[] array;
+    public int[] array;
     private IntBuffer buffer;
 
     public TextureSurface() {

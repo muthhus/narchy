@@ -331,39 +331,39 @@ public class Vis {
         return s;
     }
 
-    public static ConsoleSurface logConsole(NAR nar, int cols, int rows, FloatParam priMin) {
-        ConsoleSurface term = new ConsoleTerminal(cols, rows);
-        new TaskLeak(4, 0.25f, nar) {
-
-            @Override
-            public float value() {
-                return 1;
-            }
-
-            @Override
-            public boolean preFilter(@NotNull Task next) {
-                if (next.pri() >= priMin.floatValue()) {
-                    return super.preFilter(next);
-                }
-                return false;
-            }
-
-            @Override
-            protected float leak(Task next) {
-                if (next.pri() >= priMin.floatValue()) {
-                    try {
-                        next.appendTo(term);
-                        term.append('\n');
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return 1;
-                }
-                return 0;
-            }
-        };
-        return term;
-    }
+//    public static ConsoleSurface logConsole(NAR nar, int cols, int rows, FloatParam priMin) {
+//        ConsoleSurface term = new ConsoleTerminal(cols, rows);
+//        new TaskLeak(4, 0.25f, nar) {
+//
+//            @Override
+//            public float value() {
+//                return 1;
+//            }
+//
+//            @Override
+//            public boolean preFilter(@NotNull Task next) {
+//                if (next.pri() >= priMin.floatValue()) {
+//                    return super.preFilter(next);
+//                }
+//                return false;
+//            }
+//
+//            @Override
+//            protected float leak(Task next) {
+//                if (next.pri() >= priMin.floatValue()) {
+//                    try {
+//                        next.appendTo(term);
+//                        term.append('\n');
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    return 1;
+//                }
+//                return 0;
+//            }
+//        };
+//        return term;
+//    }
 
     public static ReflectionSurface reflect(Object c) {
         return new ReflectionSurface(c);
