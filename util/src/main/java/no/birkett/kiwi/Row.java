@@ -1,9 +1,7 @@
 package no.birkett.kiwi;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by alex on 30/01/15.
@@ -12,13 +10,14 @@ public class Row {
 
     private double constant;
 
-    private Map<Symbol, Double> cells = new LinkedHashMap<>();
+    public final Map<Symbol, Double> cells;
 
     public Row() {
         this(0);
     }
 
     public Row(double constant) {
+        this.cells = new LinkedHashMap<>();
         this.constant = constant;
     }
 
@@ -33,14 +32,6 @@ public class Row {
 
     public void setConstant(double constant) {
         this.constant = constant;
-    }
-
-    public Map<Symbol, Double> getCells() {
-        return cells;
-    }
-
-    public void setCells(Map<Symbol, Double> cells) {
-        this.cells = cells;
     }
 
     /**
@@ -59,18 +50,18 @@ public class Row {
      * added to the existing coefficient. If the resulting coefficient
      * is zero, the symbol will be removed from the row
      */
-    void insert(Symbol symbol, double coefficient) {
-        Double existingCoefficient = cells.get(symbol);
+    void insert(Symbol symbol, double _coefficient) {
+        cells.merge(symbol, _coefficient, (existingCoefficient, coefficient) -> {
+            if (existingCoefficient != null) {
+                coefficient += existingCoefficient;
+            }
 
-        if (existingCoefficient != null) {
-            coefficient += existingCoefficient;
-        }
-
-        if (Util.nearZero(coefficient)) {
-            cells.remove(symbol);
-        } else {
-            cells.put(symbol, Double.valueOf(coefficient));
-        }
+            if (Util.nearZero(coefficient)) {
+                return null;
+            } else {
+                return coefficient;
+            }
+        });
     }
 
     /**
@@ -96,21 +87,25 @@ public class Row {
     void insert(Row other, double coefficient) {
         this.constant += other.constant * coefficient;
 
-        for(Symbol s: other.cells.keySet()){
-            double coeff = other.cells.get(s) * coefficient;
+
+
+        for (Map.Entry<Symbol, Double> e : other.cells.entrySet()) {
 
             //insert(s, coeff);  this line looks different than the c++
 
             //changes start here
-            Double value = this.cells.get(s);
-            if(value == null){
-                this.cells.put(s, 0.0);
-            }
-            double temp = this.cells.get(s) + coeff;
-            this.cells.put(s, temp);
-            if(Util.nearZero(temp)){
-                this.cells.remove(s);
-            }
+
+
+            this.cells.merge(e.getKey(), e.getValue() * coefficient,
+                    (existing, cc)->{
+                        if (existing == null)
+                            existing = 0.0;
+                        double temp = existing + cc;
+                        if (!Util.nearZero(temp))
+                            return temp;
+                        else
+                            return null; //remove
+                    });
         }
     }
 
@@ -143,13 +138,7 @@ public class Row {
      */
     void reverseSign() {
         this.constant = -this.constant;
-
-        Map<Symbol, Double> newCells = new LinkedHashMap<>();
-        for(Symbol s: cells.keySet()){
-            double value = - cells.get(s);
-            newCells.put(s, value);
-        }
-        this.cells = newCells;
+        cells.replaceAll((k,v)->-v);
     }
 
     /**
@@ -165,16 +154,10 @@ public class Row {
      * @param symbol
      */
     void solveFor(Symbol symbol) {
-        double coeff = -1.0 / cells.get(symbol);
-        cells.remove(symbol);
+        double coeff = -1.0 / cells.remove(symbol);
         this.constant *= coeff;
 
-        HashMap<Symbol, Double> newCells = new LinkedHashMap<>();
-        for(Symbol s: cells.keySet()){
-            double value = cells.get(s) * coeff;
-            newCells.put(s, value);
-        }
-        this.cells = newCells;
+        cells.replaceAll((k,v)->v*coeff);
     }
 
     /**
@@ -203,11 +186,7 @@ public class Row {
      * @return
      */
     double coefficientFor(Symbol symbol) {
-        if (this.cells.containsKey(symbol)) {
-            return this.cells.get(symbol);
-        } else {
-            return 0.0;
-        }
+        return cells.getOrDefault(symbol, 0.0);
     }
 
     /**
@@ -219,11 +198,9 @@ public class Row {
      * If the symbol does not exist in the row, this is a no-op.
      */
     void substitute(Symbol symbol, Row row) {
-        if (cells.containsKey(symbol)) {
-            double coefficient = cells.get(symbol);
-            cells.remove(symbol);
+        Double coefficient = cells.remove(symbol);
+        if (coefficient!=null)
             insert(row, coefficient);
-        }
     }
 
 }

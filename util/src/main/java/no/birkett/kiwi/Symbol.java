@@ -13,7 +13,7 @@ public class Symbol {
         DUMMY
     }
 
-    private Type type;
+    private final Type type;
 
     public Symbol() {
         this(Type.INVALID);

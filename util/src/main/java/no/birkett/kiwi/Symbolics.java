@@ -40,7 +40,7 @@ public class Symbolics {
     // Expression multiply, divide, and unary invert
     public static Expression multiply(Expression expression, double coefficient) {
 
-        List<Term> terms = new ArrayList<Term>();
+        List<Term> terms = new ArrayList<>();
 
         for (Term term : expression.getTerms()) {
             terms.add(multiply(term, coefficient));
@@ -94,7 +94,7 @@ public class Symbolics {
     // Expression add and subtract
     public static Expression add(Expression first, Expression second) {
         //TODO do we need to copy term objects?
-        List<Term> terms = new ArrayList<Term>(first.getTerms().size() + second.getTerms().size());
+        List<Term> terms = new ArrayList<>(first.getTerms().size() + second.getTerms().size());
 
         terms.addAll(first.getTerms());
         terms.addAll(second.getTerms());
@@ -104,7 +104,7 @@ public class Symbolics {
 
     public static Expression add(Expression first, Term second) {
         //TODO do we need to copy term objects?
-        List<Term> terms = new ArrayList<Term>(first.getTerms().size() + 1);
+        List<Term> terms = new ArrayList<>(first.getTerms().size() + 1);
 
         terms.addAll(first.getTerms());
         terms.add(second);
@@ -142,7 +142,7 @@ public class Symbolics {
     }
 
     public static Expression add(Term first, Term second) {
-        List<Term> terms = new ArrayList<Term>(2);
+        List<Term> terms = new ArrayList<>(2);
         terms.add(first);
         terms.add(second);
         return new Expression(terms);
@@ -416,8 +416,8 @@ public class Symbolics {
         return new Constraint(constraint, strength);
     }
 
-    public static Constraint modifyStrength(double strength, Constraint constraint) {
-        return modifyStrength(strength, constraint);
-    }
+//    public static Constraint modifyStrength(double strength, Constraint constraint) {
+//        return modifyStrength(strength, constraint);
+//    }
 
 }

@@ -19,8 +19,8 @@ public class Solver {
     }
 
     private static class EditInfo {
-        Tag tag;
-        Constraint constraint;
+        final Tag tag;
+        final Constraint constraint;
         double constant;
 
         public EditInfo(Constraint constraint, Tag tag, double constant){
@@ -30,12 +30,12 @@ public class Solver {
         }
     }
 
-    private Map<Constraint, Tag> cns = new LinkedHashMap<Constraint, Tag>();
-    private Map<Symbol, Row> rows = new LinkedHashMap<Symbol, Row>();
-    private Map<Variable, Symbol> vars = new LinkedHashMap<Variable, Symbol>();
-    private Map<Variable, EditInfo> edits = new LinkedHashMap<Variable, EditInfo>();
-    private List<Symbol> infeasibleRows = new ArrayList<Symbol>();
-    private Row objective = new Row();
+    private final Map<Constraint, Tag> cns = new LinkedHashMap<>();
+    private final Map<Symbol, Row> rows = new LinkedHashMap<>();
+    private final Map<Variable, Symbol> vars = new LinkedHashMap<>();
+    private final Map<Variable, EditInfo> edits = new LinkedHashMap<>();
+    private final List<Symbol> infeasibleRows = new ArrayList<>();
+    private final Row objective = new Row();
     private Row artificial;
 
 
@@ -146,13 +146,13 @@ public class Solver {
         Row second = null;
         Row third = null;
 
-        for(Symbol s: rows.keySet()){
-            Row candidateRow = rows.get(s);
+        for(Map.Entry<Symbol, Row> symbolRowEntry : rows.entrySet()){
+            Row candidateRow = symbolRowEntry.getValue();
             double c = candidateRow.coefficientFor(marker);
             if(c == 0.0){
                 continue;
             }
-            if(s.getType() == Symbol.Type.EXTERNAL){
+            if((symbolRowEntry.getKey()).getType() == Symbol.Type.EXTERNAL){
                 third = candidateRow;
             }
             else if(c < 0.0){
@@ -201,9 +201,7 @@ public class Solver {
 
         try {
             addConstraint(constraint);
-        } catch (DuplicateConstraintException e) {
-            e.printStackTrace();
-        } catch (UnsatisfiableConstraintException e) {
+        } catch (DuplicateConstraintException | UnsatisfiableConstraintException e) {
             e.printStackTrace();
         }
 
@@ -258,11 +256,11 @@ public class Solver {
             return;
         }
 
-        for(Symbol s: rows.keySet()){
-            Row currentRow = rows.get(s);
+        for(Map.Entry<Symbol, Row> symbolRowEntry : rows.entrySet()){
+            Row currentRow = symbolRowEntry.getValue();
             double coefficient = currentRow.coefficientFor(info.tag.marker);
-            if(coefficient != 0.0 && currentRow.add(delta * coefficient) < 0.0 && s.getType() != Symbol.Type.EXTERNAL){
-                infeasibleRows.add(s);
+            if(coefficient != 0.0 && currentRow.add(delta * coefficient) < 0.0 && (symbolRowEntry.getKey()).getType() != Symbol.Type.EXTERNAL){
+                infeasibleRows.add(symbolRowEntry.getKey());
             }
         }
 
@@ -377,7 +375,7 @@ public class Solver {
      */
     private static Symbol chooseSubject(Row row, Tag tag) {
 
-        for (Map.Entry<Symbol, Double> cell : row.getCells().entrySet()) {
+        for (Map.Entry<Symbol, Double> cell : row.cells.entrySet()) {
             if (cell.getKey().getType() == Symbol.Type.EXTERNAL) {
                 return cell.getKey();
             }
@@ -425,9 +423,9 @@ public class Solver {
             //rows.remove(rowptr);
 
             LinkedList<Symbol> deleteQueue = new LinkedList<>();
-            for(Symbol s: rows.keySet()){
-                if(rows.get(s) == rowptr){
-                    deleteQueue.add(s);
+            for(Map.Entry<Symbol, Row> symbolRowEntry : rows.entrySet()){
+                if(symbolRowEntry.getValue() == rowptr){
+                    deleteQueue.add(symbolRowEntry.getKey());
                 }
             }
             while(!deleteQueue.isEmpty()){
@@ -435,7 +433,7 @@ public class Solver {
             }
             deleteQueue.clear();
 
-            if (rowptr.getCells().isEmpty()) {
+            if (rowptr.cells.isEmpty()) {
                 return success;
             }
 
@@ -548,7 +546,7 @@ public class Solver {
      */
     private static Symbol getEnteringSymbol(Row objective) {
 
-        for (Map.Entry<Symbol, Double> cell : objective.getCells().entrySet()) {
+        for (Map.Entry<Symbol, Double> cell : objective.cells.entrySet()) {
 
             if (cell.getKey().getType() != Symbol.Type.DUMMY && cell.getValue() < 0.0) {
                 return cell.getKey();
@@ -561,9 +559,9 @@ public class Solver {
     private Symbol getDualEnteringSymbol(Row row){
         Symbol entering = new Symbol();
         double ratio = Double.MAX_VALUE;
-        for(Symbol s: row.getCells().keySet()){
+        for(Symbol s: row.cells.keySet()){
             if(s.getType() != Symbol.Type.DUMMY){
-                double currentCell = row.getCells().get(s);
+                double currentCell = row.cells.get(s);
                 if(currentCell > 0.0){
                     double coefficient = objective.coefficientFor(s);
                     double r = coefficient / currentCell;
@@ -583,9 +581,9 @@ public class Solver {
      * <p/>
      * If no such symbol is present, and Invalid symbol will be returned.
      */
-    private Symbol anyPivotableSymbol(Row row) {
+    private static Symbol anyPivotableSymbol(Row row) {
         Symbol symbol = null;
-        for (Map.Entry<Symbol, Double> entry : row.getCells().entrySet()) {
+        for (Map.Entry<Symbol, Double> entry : row.cells.entrySet()) {
             if (entry.getKey().getType() == Symbol.Type.SLACK || entry.getKey().getType() == Symbol.Type.ERROR) {
                 symbol = entry.getKey();
             }
@@ -611,9 +609,9 @@ public class Solver {
         double ratio = Double.MAX_VALUE;
         Row row = null;
 
-        for(Symbol key: rows.keySet()){
-            if(key.getType() != Symbol.Type.EXTERNAL){
-                Row candidateRow = rows.get(key);
+        for(Map.Entry<Symbol, Row> symbolRowEntry : rows.entrySet()){
+            if((symbolRowEntry.getKey()).getType() != Symbol.Type.EXTERNAL){
+                Row candidateRow = symbolRowEntry.getValue();
                 double temp = candidateRow.coefficientFor(entering);
                 if(temp < 0){
                     double temp_ratio = (-candidateRow.getConstant() / temp);
@@ -647,7 +645,7 @@ public class Solver {
      * Test whether a row is composed of all dummy variables.
      */
     private static boolean allDummies(Row row) {
-        for (Map.Entry<Symbol, Double> cell : row.getCells().entrySet()) {
+        for (Map.Entry<Symbol, Double> cell : row.cells.entrySet()) {
             if (cell.getKey().getType() != Symbol.Type.DUMMY) {
                 return false;
             }

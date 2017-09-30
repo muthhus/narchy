@@ -5,7 +5,7 @@ package no.birkett.kiwi;
  */
 public class UnsatisfiableConstraintException extends KiwiException {
 
-    private Constraint constraint;
+    private final Constraint constraint;
     public UnsatisfiableConstraintException(Constraint constraint) {
         super(constraint.toString());
         this.constraint = constraint;

@@ -18,11 +18,11 @@ public class Expression {
 
     public Expression(double constant) {
         this.constant = constant;
-        this.terms = new ArrayList<Term>();
+        this.terms = new ArrayList<>();
     }
 
     public Expression(Term term, double constant) {
-        this.terms = new ArrayList<Term>();
+        this.terms = new ArrayList<>();
         terms.add(term);
         this.constant = constant;
     }
@@ -66,19 +66,19 @@ public class Expression {
     }
 
     public final boolean isConstant() {
-        return terms.size() == 0;
+        return terms.isEmpty();
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("isConstant: " + isConstant() + " constant: " + constant);
+        sb.append("isConstant: ").append(isConstant()).append(" constant: ").append(constant);
         if (!isConstant()) {
             sb.append(" terms: [");
             for (Term term: terms) {
-                sb.append("(");
+                sb.append('(');
                 sb.append(term);
-                sb.append(")");
+                sb.append(')');
             }
             sb.append("] ");
         }

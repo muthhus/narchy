@@ -5,7 +5,7 @@ package no.birkett.kiwi;
  */
 public class DuplicateConstraintException extends KiwiException {
 
-    private Constraint constraint;
+    private final Constraint constraint;
 
     public DuplicateConstraintException(Constraint constraint) {
         this.constraint = constraint;

@@ -41,8 +41,8 @@ public class Constraint {
         }
 
         List<Term> reducedTerms = new ArrayList<>();
-        for(Variable variable: vars.keySet()){
-            reducedTerms.add(new Term(variable, vars.get(variable)));
+        for(Map.Entry<Variable, Double> variableDoubleEntry : vars.entrySet()){
+            reducedTerms.add(new Term(variableDoubleEntry.getKey(), variableDoubleEntry.getValue()));
         }
 
         return new Expression(reducedTerms, expr.getConstant());
