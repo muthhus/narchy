@@ -1001,7 +1001,9 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                     //n.logger.error("{} {}", this, t);
                     return singleton(Operator.error(this, t, n.time()));
                 }
-                return null;
+                if (cmd)
+                    return null;
+                //otherwise: allow processing goal
             }
         }
 

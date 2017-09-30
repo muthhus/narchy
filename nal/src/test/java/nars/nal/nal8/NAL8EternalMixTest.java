@@ -257,7 +257,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
         tester.inputAt(0, "at(SELF,{t001}). :|:");
         tester.inputAt(0, "(at(SELF,{t001}) &&+5 open({t001}))!");
 
-        tester.mustGoal(cycles, "open({t001})", 1.0f, 0.81f, 5);
+        tester.mustGoal(cycles, "open({t001})", 1.0f, 0.43f, 5);
 
     }
 
@@ -317,7 +317,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
         test
                 .input("on({t002},{t003}). :|:")
                 .inputAt(2, "(on({t002},#1) &&+0 at(SELF,#1)).")
-                .mustBelieve(cycles, "at(SELF,{t003})", 1.0f, 0.43f, 0)
+                .mustBelieve(cycles, "at(SELF,{t003})", 1.0f, 0.23f, 0)
                 .mustNotOutput(cycles, "at(SELF,{t003})", BELIEF, 0, 1f, 0, 1f, ETERNAL);
     }
 
@@ -474,7 +474,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
 
                 .input("(a:b<->c:d).") //ETERNAL
                 .input("(e:f ==>+1 c:d). :|:") //PRESENT
-                .mustBelieve(cycles, "(e:f ==>+1 a:b)", 1.0f, 0.81f, 0)
+                .mustBelieve(cycles, "(e:f ==>+1 a:b)", 1.0f, 0.4f, 0)
                 .mustNotOutput(cycles, "(e:f ==>+1 a:b)", BELIEF, ETERNAL);
     }
 

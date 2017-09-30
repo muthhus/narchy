@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 import static nars.Op.ATOM;
@@ -104,13 +105,13 @@ public class Operator extends BaseConcept implements PermanentConcept {
         long lastActivity = ETERNAL;
         public static final Logger logger = LoggerFactory.getLogger(AtomicExec.class);
 
-        final BiFunction<Task,NAR,Task> exe;
+        final BiConsumer<Task,NAR> exe;
 
-        public AtomicExec(BiFunction<Task, NAR, Task> exe, float expThresh) {
+        public AtomicExec(BiConsumer<Task, NAR> exe, float expThresh) {
             this(exe, expThresh, 1);
         }
 
-        public AtomicExec(BiFunction<Task, NAR, Task> exe, float expThresh, float minPeriod /* dur's */) {
+        public AtomicExec(BiConsumer<Task, NAR> exe, float expThresh, float minPeriod /* dur's */) {
             this.exe = exe;
             this.minPeriod = minPeriod;
             this.expThresh = expThresh;
@@ -123,7 +124,7 @@ public class Operator extends BaseConcept implements PermanentConcept {
                 long now = n.time();
                 int dur = n.dur();
                 if (x.during(now - dur / 2, now + dur / 2)) {
-                    tryInvoke(x, n);
+                    return tryInvoke(x, n);
                 }
             }
             return x;
@@ -134,7 +135,7 @@ public class Operator extends BaseConcept implements PermanentConcept {
          */
         protected void invoke(Task x, NAR n) {
             try {
-                apply(x, n);
+                exe.accept(x, n);
             } catch (Throwable t) {
                 logger.info("{} {}", this, t);
             } finally {
@@ -144,15 +145,19 @@ public class Operator extends BaseConcept implements PermanentConcept {
             }
         }
 
-        public boolean tryInvoke(Task x, NAR n) {
+        public @Nullable Task tryInvoke(Task x, NAR n) {
 
             long now = n.time();
             if (lastActivity == ETERNAL || (now - lastActivity > minPeriod * n.dur()) && rise.compareAndSet(ETERNAL, now)) {
-                lastActivity = now;
-                n.runLater(() -> this.invoke(x, n));
-                return true;
+
+
+                n.runLater(() -> {
+                    invoke(x, n);
+                }); //async exec
+
+                //invoke(x, n); //inline exec
             }
-            return false;
+            return null;
         }
 
         public boolean isInvoked() {

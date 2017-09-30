@@ -464,7 +464,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .input("(R)!")
                 .input("((G) <-> (R)).")
-                .mustGoal(cycles, "(G)", 1.0f, 0.81f);
+                .mustGoal(cycles, "(G)", 1.0f, 0.4f);
                 //.mustNotOutput(cycles, "(G)", GOAL, ETERNAL); // because <-> isnt symmetric
     }
 

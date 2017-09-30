@@ -93,10 +93,11 @@ public abstract class NativeTask implements ITask {
 
         @Override
         public final @Nullable Iterable<? extends ITask> run(NAR n) {
-            if (then instanceof Runnable)
-                ((Runnable) then).run();
-            else
+            if (then instanceof Consumer)
                 ((Consumer) then).accept(n);
+            else if (then instanceof Runnable)
+                ((Runnable) then).run();
+
             return null;
         }
 

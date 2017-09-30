@@ -58,7 +58,6 @@ public class OperatorTest {
         n.onOp("x", new Operator.AtomicExec((x, nar) -> {
             System.err.println("INVOKE " + x);
             count[0]++;
-            return null;
         }, 0.66f, 2));
         n.run(1);
         n.input("x(1)! :|:");
@@ -84,12 +83,11 @@ public class OperatorTest {
                 } else if ($.the(0).equals(args[0])) {
                     r = $.the("good").neg();
                 } else {
-                    return null;
+                    return;
                 }
 
                 n.believe($.impl(x.term(), r), Tense.Present);
             }
-            return null;
         }, 0.51f, 1));
         n.log();
         n.input("x(1)! :|:");
@@ -109,7 +107,6 @@ public class OperatorTest {
             Term y = $.func("args", args);
             Term xy = $.impl(x, y);
             n.believe(xy, Tense.Present);
-            return null;
         }, 1));
         n.log();
         n.run(1);

@@ -26,7 +26,7 @@ public class MultiExec2 extends Exec {
     private final int num;
     private On onCycle;
 
-    final static int SUB_CAPACITY = 256;
+    final static int SUB_CAPACITY = 512;
     private On on;
 
     public MultiExec2(int threads, int qSize) {

@@ -160,7 +160,7 @@ abstract public class NAgentX extends NAgent {
 
         int THREADS = 5;
 
-        MultiExec2 exe = new MultiExec2(THREADS, 128);
+        MultiExec2 exe = new MultiExec2(THREADS, 64);
         //Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
 
 //        exe.add(new FocusExec(), (x) -> true);

@@ -276,19 +276,19 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
 //                AndCondition.last(d) instanceof UnifyTerm.UnifySubtermThenConclude);
     }
 
-    @Test
-    public void testSubstIfUnifies1() throws Narsese.NarseseException {
-
-
-        TestNAR tester = test(64, false,
-                "(B --> K), (($X --> L) ==> (&&,(#Y --> K),%A..+)) |- substitute((($X --> L) ==>+- (&&,%A..+)),#Y,B), (Belief:AnonymousAnalogy)");
-
-        tester.believe("(&&,<#x --> lock>,(key:$y ==> open($y,#x)))"); //en("There is a lock that can be opened by every key.");
-        tester.believe("lock:{lock1}"); //en("Lock-1 is a lock.");
-        tester.log();
-        tester.mustBelieve(500, "<<$1 --> key> ==> open($1,{lock1})>", 1.00f,
-                0.81f);
-    }
+//    @Test
+//    public void testSubstIfUnifies1() throws Narsese.NarseseException {
+//
+//
+//        TestNAR tester = test(64, false,
+//                "(B --> K), (($X --> L) ==> (&&,(#Y --> K),%A..+)) |- substitute((($X --> L) ==>+- (&&,%A..+)),#Y,B), (Belief:AnonymousAnalogy)");
+//
+//        tester.believe("(&&,<#x --> lock>,(key:$y ==> open($y,#x)))"); //en("There is a lock that can be opened by every key.");
+//        tester.believe("lock:{lock1}"); //en("Lock-1 is a lock.");
+//        tester.log();
+//        tester.mustBelieve(500, "<<$1 --> key> ==> open($1,{lock1})>", 1.00f,
+//                0.81f);
+//    }
 
     @Test
     public void testContrapositionWierdness() {

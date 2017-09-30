@@ -422,8 +422,8 @@ public interface NAct {
                     n.confMin.floatValue() * 4;
 
             float confStrong =
-                    //nar().confDefault(GOAL)/2;
-                    nar().confDefault(GOAL);
+                    nar().confDefault(GOAL)/2;
+                    //nar().confDefault(GOAL);
             float confMin = nar().confMin.floatValue();
 
             //n.confDefault(BELIEF);
@@ -536,8 +536,8 @@ public interface NAct {
                     P = $.t(1, conf);
                     N = $.t(0f, conf);
                 } else {
-                    conf = Math.max(confWeak, Math.max(c[0], c[1]));
-                    P = N = $.t(0f, conf);
+                    conf = Math.max(confStrong, Math.max(c[0], c[1]));
+                    P = N = $.t(0.5f, conf);
                             //restConf);
                     //N = P = null;
                 }
