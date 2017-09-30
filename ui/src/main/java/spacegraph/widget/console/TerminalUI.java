@@ -44,6 +44,7 @@ public class TerminalUI extends DefaultVirtualTerminal implements Runnable {
         try {
             TerminalScreen screen = new TerminalScreen(this);
             screen.startScreen();
+
             gui = new MultiWindowTextGUI(
                     new SameTextGUIThread.Factory(),
                     screen);
