@@ -1,13 +1,7 @@
 package no.birkett.kiwi.inequality;
 
+import no.birkett.kiwi.*;
 import org.junit.Test;
-
-import no.birkett.kiwi.DuplicateConstraintException;
-import no.birkett.kiwi.Expression;
-import no.birkett.kiwi.Solver;
-import no.birkett.kiwi.Symbolics;
-import no.birkett.kiwi.UnsatisfiableConstraintException;
-import no.birkett.kiwi.Variable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

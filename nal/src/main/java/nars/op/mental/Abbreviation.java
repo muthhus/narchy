@@ -13,7 +13,6 @@ import nars.bag.leak.DtLeak;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.control.TaskService;
-import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -30,7 +29,6 @@ import java.util.function.Consumer;
 
 import static nars.Op.BELIEF;
 import static nars.term.Terms.compoundOrNull;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * compound<->dynamic atom abbreviation.

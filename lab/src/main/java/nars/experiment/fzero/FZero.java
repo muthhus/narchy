@@ -10,7 +10,6 @@ import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.$.p;
-import static nars.term.atom.Atomic.the;
 import static spacegraph.SpaceGraph.window;
 
 /**

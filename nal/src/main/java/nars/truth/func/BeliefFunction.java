@@ -2,7 +2,6 @@ package nars.truth.func;
 
 import nars.$;
 import nars.NAR;
-import nars.Op;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;

@@ -4,8 +4,6 @@ import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.opengl.GL2;
 import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
-import spacegraph.render.Draw;
-import spacegraph.widget.Widget;
 
 import static spacegraph.math.v3.v;
 

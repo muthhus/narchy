@@ -2,7 +2,6 @@ package nars.term;
 
 import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
-import jcog.list.FasterList;
 import nars.IO;
 import nars.Op;
 import nars.Param;
@@ -12,11 +11,8 @@ import nars.term.container.TermContainer;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.Retemporalize;
 import org.eclipse.collections.api.list.primitive.ByteList;
-import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;

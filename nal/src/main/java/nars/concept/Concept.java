@@ -25,7 +25,6 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
 import nars.concept.state.ConceptState;
-import nars.control.Activate;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Term;

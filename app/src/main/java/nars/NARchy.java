@@ -1,7 +1,6 @@
 package nars;
 
 import com.google.common.base.Joiner;
-import jcog.Texts;
 import nars.op.nlp.Hear;
 import spacegraph.audio.MaryTTSpeech;
 

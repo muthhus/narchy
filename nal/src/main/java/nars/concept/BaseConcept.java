@@ -7,7 +7,6 @@ import nars.Op;
 import nars.Task;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
-import nars.control.Activate;
 import nars.control.MetaGoal;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;

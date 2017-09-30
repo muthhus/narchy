@@ -9,8 +9,6 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.List;
-
 import static nars.$.$;
 import static nars.$.conj;
 import static nars.$.diffe;

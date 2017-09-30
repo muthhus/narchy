@@ -1,7 +1,6 @@
 package nars.op.stm;
 
 import jcog.Util;
-import jcog.list.ArrayIterator;
 import jcog.list.FasterList;
 import jcog.pri.VLink;
 import nars.$;

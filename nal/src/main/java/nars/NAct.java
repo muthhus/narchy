@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
-import jcog.pri.Pri;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;

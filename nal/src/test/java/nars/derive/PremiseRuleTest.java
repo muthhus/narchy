@@ -1,6 +1,5 @@
 package nars.derive;
 
-import com.google.common.base.Joiner;
 import nars.*;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
@@ -9,8 +8,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-
-import java.util.Set;
 
 import static org.junit.Assert.*;
 

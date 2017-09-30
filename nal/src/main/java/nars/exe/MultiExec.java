@@ -8,7 +8,6 @@ import nars.Task;
 import nars.control.Activate;
 import nars.task.ITask;
 import nars.task.NativeTask;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

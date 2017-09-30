@@ -1,10 +1,10 @@
 package jcog.pri;
 
 import jcog.Texts;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jcog.Util.*;
+import static jcog.Util.lerp;
+import static jcog.Util.notNaN;
 
 /**
  * Mutable Prioritized

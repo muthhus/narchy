@@ -11,8 +11,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.task.ITask;
-import nars.task.NativeTask;
 import nars.task.UnaryTask;
 import nars.term.Term;
 import nars.term.Termed;
@@ -24,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;

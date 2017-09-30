@@ -5,7 +5,6 @@ import jcog.Util;
 import jcog.learn.gng.impl.Centroid;
 import jcog.learn.gng.impl.DenseIntUndirectedGraph;
 import jcog.learn.gng.impl.ShortUndirectedGraph;
-import jcog.pri.Pri;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

@@ -2,10 +2,8 @@ package nars.exe;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.pri.PLink;
 import jcog.sort.TopN;
 import nars.NAR;
-import nars.Task;
 import nars.bag.ConcurrentArrayBag;
 import nars.control.Activate;
 import nars.control.Premise;
@@ -14,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 

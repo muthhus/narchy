@@ -10,8 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.Random;
 
-import static jcog.Texts.n2;
-
 /**
  * ArrayBag with a randomized sampling range
  */

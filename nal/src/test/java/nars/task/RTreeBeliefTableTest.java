@@ -6,7 +6,6 @@ import nars.*;
 import nars.concept.BaseConcept;
 import nars.table.BeliefTable;
 import nars.table.RTreeBeliefTable;
-import nars.task.DerivedTask;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.LongToFloatFunction;

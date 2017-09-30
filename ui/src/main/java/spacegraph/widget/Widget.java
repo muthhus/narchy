@@ -17,8 +17,6 @@ import spacegraph.widget.console.TerminalUI;
 import spacegraph.widget.slider.BaseSlider;
 import spacegraph.widget.slider.XYSlider;
 
-import java.util.Arrays;
-
 import static spacegraph.layout.Grid.*;
 
 /**

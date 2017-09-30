@@ -5,18 +5,8 @@ import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Prioritized;
 import nars.NAR;
-import nars.NARLoop;
-import nars.task.ITask;
-import nars.task.NativeTask;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-
-import static jcog.Texts.n2;
-import static jcog.Texts.n4;
-import static jcog.Util.RouletteControl.*;
 
 /**
  * high-level reasoner control parameters

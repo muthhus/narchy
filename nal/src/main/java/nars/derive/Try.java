@@ -5,7 +5,6 @@ import nars.$;
 import nars.Param;
 import nars.control.Cause;
 import nars.control.Derivation;
-import nars.control.Premise;
 import org.roaringbitmap.IntIterator;
 import org.roaringbitmap.RoaringBitmap;
 

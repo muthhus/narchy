@@ -1,16 +1,12 @@
 package nars.experiment.arkanoid;
 
 
-import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
 import nars.*;
-import nars.concept.SensorConcept;
-import nars.gui.Vis;
 import nars.video.BufferedImageBitmap2D;
 import nars.video.CameraSensor;
 import nars.video.Scale;
 import nars.video.SwingBitmap2D;
-import spacegraph.SpaceGraph;
 
 public class Arkancide extends NAgentX {
 
