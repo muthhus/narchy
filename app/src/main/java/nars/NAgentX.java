@@ -477,17 +477,18 @@ abstract public class NAgentX extends NAgent {
                             r = 0;
                         }
 
-                        float t = Util.sum(p -> Math.abs(p.current + p.prev), c.goalValue) / 10f;
+                        float t = Util.sum(p -> Math.abs(p.current + p.prev), c.goalValue) / 2f;
 
                         b = Math.max(r, g) / 2f * Util.unitize(t);
 
-                        i.updateMomentum(
-                                //0.01f + Util.sqr(Util.tanhFast(v)+1),
-                                //Math.signum(v) *(1+Math.abs(v))*(t),
-                                //Math.signum(v) * t,
-                                v,
-                                0.25f,
-                                r, g, b);
+                        i.update(v, r, g, b);
+//                        i.updateMomentum(
+//                                //0.01f + Util.sqr(Util.tanhFast(v)+1),
+//                                //Math.signum(v) *(1+Math.abs(v))*(t),
+//                                //Math.signum(v) * t,
+//                                v,
+//                                0.25f,
+//                                r, g, b);
 
                     }, builder);
                 });

@@ -33,6 +33,7 @@ public class FloatPolarNormalized extends FloatNormalized {
         }
     }
 
+    /** to full unit range */
     public float normalizePolar(float raw) {
         return (normalize(raw)-0.5f)*2f;
     }

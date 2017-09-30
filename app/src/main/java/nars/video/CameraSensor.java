@@ -212,7 +212,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
 
         this.conf = nar.confDefault(Op.BELIEF);
 
-        resolution(Util.round(Math.min(0.01f, 0.5f * (1f - this.in.amp())), 0.01f));
+        //adjust resolution based on value - but can cause more noise in doing so
+        //resolution(Util.round(Math.min(0.01f, 0.5f * (1f - this.in.amp())), 0.01f));
 
         final int WORK_FACTOR = Math.min(width, height);
 

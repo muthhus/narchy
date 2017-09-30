@@ -314,7 +314,7 @@ public class Premise extends UnaryTask {
             return ETERNAL;
 
         if (task.isEternal())
-            return now;
+            return ETERNAL;
 
         //return task.nearestTimeTo(now);
         return nar.random().nextBoolean() ?

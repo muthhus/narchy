@@ -229,8 +229,8 @@
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),--conjEvent(C,late),B), (Goal:StrongN)
 
-    C, B, task("&&"), task(containsBelief), task("!"), time(urgent) |- conjDropIfEarliest(C,B), (Goal:Strong)
-    C, B, task("&&"), task(containsBelief), task("!"), time(urgent) |- conjDropIfEarliest(C,--B), (Goal:StrongPN)
+    C, B, task(positive), task("&&"), task(containsBelief), task("!"), time(urgent) |- conjDropIfEarliest(C,B), (Goal:Strong)
+    C, B, task(negative), task("&&"), task(containsBelief), task("!"), time(urgent) |- conjDropIfEarliest(C,--B), (Goal:StrongPN)
         //(&&,X,A..+), X, task("!") |- X, (Goal:Strong)
         //(&&,--X,A..+), X, task("!") |- X, (Goal:StrongPN)
 

@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
+import jcog.pri.Pri;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;
@@ -27,6 +28,7 @@ import java.util.function.IntPredicate;
 import static jcog.Util.unitize;
 import static nars.Op.*;
 import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.expectation;
 
 /**
  * Created by me on 9/30/16.
@@ -399,13 +401,13 @@ public interface NAct {
 
         final float f[] = new float[2];
         final float c[] = new float[2];
-        final float exp[] = new float[2];
+//        final float exp[] = new float[2];
         final float[] px = {0};
         GoalActionAsyncConcept[] CC = new GoalActionAsyncConcept[2]; //hack
 
         float[] nf = new float[1];
         FloatPolarNormalized normalize = new FloatPolarNormalized(()->nf[0]);
-        normalize.relax(0.01f);
+        normalize.relax(0.25f);
 
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (action, g) -> {
 
@@ -420,14 +422,15 @@ public interface NAct {
 
             float confMin = nar().confMin.floatValue();
             float confBase =
-                    Util.lerp(0.75f, confMin, n.confDefault(GOAL));
+                    n.confDefault(GOAL);
+                    //Util.lerp(0.75f, confMin, n.confDefault(GOAL));
 
 
             int ip = p ? 0 : 1;
             CC[ip] = action;
             f[ip] = g!=null ? g.freq() : 0f;
-            c[ip] = g!=null ? normalize.normalize(g.conf()) * nar().confDefault(GOAL) : 0f;
-            exp[ip] = g != null ? $.t(f[ip], c[ip]).expectation() : 0f;
+            c[ip] = g!=null ? normalize.normalizePolar(g.conf()) : 0f;
+//            exp[ip] = g != null ? TruthFunctions.expectation(f[ip], c[ip]) : 0f;
             //evi[ip] = g != null ? g.evi(): 0f;
 
 
@@ -441,7 +444,7 @@ public interface NAct {
                 float x; //0..+1
                 if (cur > 0 && rng.nextFloat() <= cur) {
                     float curiConf = confBase;
-                    x = (TruthFunctions.expectation(
+                    x = (expectation(
                         rng.nextFloat(),
                         curiConf
                     ) - 0.5f)*2f;
@@ -472,10 +475,20 @@ public interface NAct {
 //                    } else {
                         //compare positive vs negative
 //                    float ac = (Math.abs(exp[0]-0.5f) + Math.abs(exp[1]-0.5f));
+
+                    float fMax = Math.max(f[0],f[1]);
+                    if (!Util.equals(fMax, 0,  Pri.EPSILON)) {
+                        f[0] /= fMax;
+                        f[1] /= fMax;
+                    }
+                    float fAvg = (f[0] + f[1])/2f;
+
                     float ec =
                             //(normalize.normalizePolar(exp[0] - 0.5f)) - (normalize.normalizePolar(exp[1] - 0.5f))
                             //(exp[0] - 0.5f) - (exp[1] - 0.5f)
-                            2f * (Math.max(0, (exp[0] - 0.5f)) - Math.max(0,(exp[1] - 0.5f)))
+                            //2f * (Math.max(0, (exp[0] - 0.5f)) - Math.max(0,(exp[1] - 0.5f)))
+                            //2f * (exp[0] - 0.5f) - (exp[1] - 0.5f)
+                            Util.clamp(expectation(f[0] - fAvg, c[0]) - expectation(f[1] - fAvg, c[1]), -1, +1)
                             //+ (nar().random().nextFloat()-0.5f)*2f*confMin
                     ;
 //                    if (ac < Pri.EPSILON) {
@@ -515,9 +528,10 @@ public interface NAct {
                             //Util.unitize(Math.abs(y)) * confStrong
                             //Math.abs(y)
                             //w2c((c2wSafe(c[0]) + c2wSafe(c[1]))/2f)
-                            Math.abs(y) * Math.max(c[0],c[1])
+                            //Math.abs(y) * Math.max(c[0],c[1])
                             //Math.max(c[0],c[1])
                             //Math.max(c[0],c[1])
+                            confBase
                         : 0;
 
                 //w2c(Math.abs(y) * c2w(restConf));
@@ -526,11 +540,12 @@ public interface NAct {
                     //Math.max(cc[winner], nar().confMin.floatValue());
                     //0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
 
-                    P = $.t(1, conf);
-                    N = $.t(0f, conf);
+                    float pf = 0.5f + 0.5f * Util.unitize(Math.abs(y));
+                    P = $.t(pf, confBase);
+                    N = $.t(1-pf, confBase);
                 } else {
                     //conf = confBase; //Math.max(confBase, Math.max(c[0], c[1]));
-                    P = N = $.t(0f, confMin);
+                    P = N = $.t(0.5f, confBase);
                             //restConf);
                     //N = P = null;
                 }

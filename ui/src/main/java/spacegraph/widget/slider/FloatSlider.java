@@ -5,6 +5,8 @@ import jcog.Texts;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
+import org.jetbrains.annotations.Nullable;
+import spacegraph.Surface;
 import spacegraph.widget.Label;
 
 /**
@@ -44,6 +46,12 @@ public class FloatSlider extends BaseSlider {
         this.labelText = label;
         updateLabel();
         return this;
+    }
+
+    @Override
+    public void start(@Nullable Surface parent) {
+        super.start(parent);
+        updateLabel();
     }
 
     @Override
