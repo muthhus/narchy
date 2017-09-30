@@ -62,7 +62,7 @@ public abstract class Tuple3d implements java.io.Serializable, Cloneable {
      * @param y the y coordinate
      * @param z the z coordinate
      */
-    public Tuple3d(double x, double y, double z)
+    protected Tuple3d(double x, double y, double z)
     {
 	this.x = x;
 	this.y = y;
@@ -73,7 +73,7 @@ public abstract class Tuple3d implements java.io.Serializable, Cloneable {
      * Constructs and initializes a Tuple3d from the array of length 3.
      * @param t the array of length 3 containing xyz in order
      */
-    public Tuple3d(double[] t)
+    protected Tuple3d(double[] t)
     {
 	this.x = t[0];
 	this.y = t[1];
@@ -84,7 +84,7 @@ public abstract class Tuple3d implements java.io.Serializable, Cloneable {
      * Constructs and initializes a Tuple3d from the specified Tuple3d.
      * @param t1 the Tuple3d containing the initialization x y z data
      */
-    public Tuple3d(Tuple3d t1)
+    protected Tuple3d(Tuple3d t1)
     {
 	this.x = t1.x;
 	this.y = t1.y;
@@ -95,7 +95,7 @@ public abstract class Tuple3d implements java.io.Serializable, Cloneable {
      * Constructs and initializes a Tuple3d from the specified Tuple3f.
      * @param t1 the Tuple3f containing the initialization x y z data
      */
-    public Tuple3d(Tuple3f t1)
+    protected Tuple3d(Tuple3f t1)
     {
 	this.x = (double) t1.x;
 	this.y = (double) t1.y;
@@ -105,7 +105,7 @@ public abstract class Tuple3d implements java.io.Serializable, Cloneable {
     /**
      * Constructs and initializes a Tuple3d to (0,0,0).
      */
-    public Tuple3d()
+    protected Tuple3d()
     {
 	this.x = 0.0;
 	this.y = 0.0;

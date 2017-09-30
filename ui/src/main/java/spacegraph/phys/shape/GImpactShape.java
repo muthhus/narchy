@@ -45,7 +45,7 @@ public abstract class GImpactShape extends ConcaveShape {
     protected final v3 localScaling = new v3();
     GImpactBvh box_set = new GImpactBvh(); // optionally boxset
 
-	public GImpactShape() {
+	protected GImpactShape() {
 		localAABB.invalidate();
 		needs_update = true;
 		localScaling.set(1f, 1f, 1f);

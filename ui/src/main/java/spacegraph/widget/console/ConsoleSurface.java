@@ -2,8 +2,6 @@ package spacegraph.widget.console;
 
 import com.googlecode.lanterna.TextCharacter;
 import com.jogamp.opengl.GL2;
-import spacegraph.Surface;
-import spacegraph.render.BmpFont;
 import spacegraph.render.Draw;
 
 import java.awt.*;
@@ -31,7 +29,7 @@ public abstract class ConsoleSurface extends AbstractConsoleSurface {
     float fgAlpha = 0.9f;
 
 
-    public ConsoleSurface(int cols, int rows) {
+    protected ConsoleSurface(int cols, int rows) {
         resize(cols, rows);
     }
 

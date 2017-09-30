@@ -34,7 +34,7 @@ public class BulletStack {
 
 	public BulletStack() {}
 	
-	private static final ThreadLocal<BulletStack> threadLocal = ThreadLocal.withInitial(() -> new BulletStack());
+	private static final ThreadLocal<BulletStack> threadLocal = ThreadLocal.withInitial(BulletStack::new);
 	
 	/**
 	 * Returns stack for current thread, or create one if not present.

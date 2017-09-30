@@ -9,6 +9,7 @@ import jcog.net.MeshOptimize;
 import jcog.pri.Prioritized;
 import nars.*;
 import nars.gui.Vis;
+import nars.op.Implier;
 import nars.op.stm.LinkClustering;
 import nars.task.DerivedTask;
 import nars.test.agent.Line1DSimplest;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.PI;
+import static java.util.stream.Collectors.toList;
 import static nars.Op.IMPL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
@@ -50,6 +52,7 @@ public class Line1D {
             LinkClustering linkClusterPri = new LinkClustering(n,
                     Prioritized::priElseZero /* anything temporal */,
                     32, 128);
+
 
 
             //n.log();
@@ -120,13 +123,17 @@ public class Line1D {
 
             //new STMTemporalLinkage(n, 2, false);
             n.time.dur(16);
-            exp.agent.runDur(2);
+            exp.agent.runDur(1);
 
-            //n.truthResolution.setValue(0.1f);
-            n.termVolumeMax.set(16);
+            n.truthResolution.setValue(0.25f);
+            n.termVolumeMax.set(10);
 
 //            n.beliefConfidence(0.5f);
 //            n.goalConfidence(0.5f);
+
+            new Implier(n, exp.agent.actions.keySet().stream().map(x->x.term).collect(toList()),
+                    0f,1f, 2f, 3f, 4f);
+
 
             //n.start();
             n.run(100000);
@@ -165,7 +172,7 @@ public class Line1D {
     static class Line1DExperiment implements FloatFunction<NAR> {
 
 
-        float tHz = 0.005f; //in time units
+        float tHz = 0.05f; //in time units
         float yResolution = 0.05f; //in 0..1.0
         float periods = 16;
 

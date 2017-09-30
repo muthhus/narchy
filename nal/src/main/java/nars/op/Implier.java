@@ -12,6 +12,7 @@ import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.var.Variable;
+import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.truth.TruthAccumulator;
 import nars.truth.func.GoalFunction;
@@ -144,11 +145,14 @@ public class Implier extends DurService {
                 if (Pg == null)
                     return;
 
-                Truth Sg = ded.apply(Pg, $.t(f, implConf), nar, confSubMin);
+                PreciseTruth t = $.t(f, implConf);
+                    Truth Sg = ded.apply(Pg, t, nar, confSubMin);
 
-                if (Sg != null) {
-                    goal(goalTruth, subj, Sg);
-                }
+                    if (Sg != null) {
+                        goal(goalTruth, subj, Sg);
+                    }
+
+
                 //experimental:
                 //            {
                 //                //G, (G ==> P) |- P (Goal:InductionRecursivePB)
@@ -188,8 +192,10 @@ public class Implier extends DurService {
             //                }
             //            });
 
+            float truthRes = nar.truthResolution.floatValue();
+
             goalTruth.forEach((t, a) -> {
-                @Nullable Truth uu = a.commitSum();
+                @Nullable Truth uu = a.commitSum().ditherFreqConf(truthRes, confMin, 1f);
                 if (uu != null) {
                     float c = uu.conf() * strength;
                     if (c >= confMin) {

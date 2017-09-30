@@ -143,8 +143,6 @@ public class Premise extends UnaryTask {
 //                    }
 
                     beliefTerm = bs.term.unneg();
-                    if (beliefTerm == null)
-                        beliefTerm = beliefTermRaw; //HACK
 
                     if (!(nar.nal() >= 7 || !beliefTerm.isTemporal())) {
                         //HACK HACK HACK this is temporary until Temporalize correctly differnetiates between && and &| etc

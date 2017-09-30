@@ -336,11 +336,16 @@ public class Emotion extends ConcurrentMonitorRegistry {
     public void onAnswer(Task question, @Nullable Task answer) {
         //transfer budget from question to answer
         //transfer more of the budget from an unoriginal question to an answer than an original question
+        float qOrig = question.originality();
+        float ansConf = answer.conf();
+
         answer.take(question,
-            answer.conf() * (1 - question.originality()), false,false);
+            ansConf * (1 - qOrig), false,false);
 
         //reward answer for answering the question
-        float str = answer.conf() * question.priSafe(0);
+        float str = ansConf *
+                qOrig *
+                question.priSafe(0);
         MetaGoal.value(MetaGoal.Answer, answer.cause(), str, nar);
     }
 

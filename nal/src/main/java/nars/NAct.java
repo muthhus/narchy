@@ -406,7 +406,7 @@ public interface NAct {
 
         float[] nf = new float[1];
         FloatPolarNormalized normalize = new FloatPolarNormalized(()->nf[0]);
-        normalize.relax(0.1f);
+        normalize.relax(0.01f);
 
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (action, g) -> {
 

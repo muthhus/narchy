@@ -31,11 +31,11 @@ public abstract class Spatial<X> implements Active {
 
 
 
-    public Spatial() {
+    protected Spatial() {
         this(null);
     }
 
-    public Spatial(X k) {
+    protected Spatial(X k) {
         this.key = k!=null ? k : (X) this;
         this.hash = k!=null ? k.hashCode() : super.hashCode();
     }

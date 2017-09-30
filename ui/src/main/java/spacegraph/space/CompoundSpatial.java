@@ -20,7 +20,7 @@ public abstract class CompoundSpatial<X> extends AbstractSpatial<X> {
     private final List<Spatial> spatials = new FasterList();
     private final List<TypedConstraint> constraints = new FasterList();
 
-    public CompoundSpatial(X x) {
+    protected CompoundSpatial(X x) {
         super(x);
     }
 

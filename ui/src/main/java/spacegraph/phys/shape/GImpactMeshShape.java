@@ -28,7 +28,6 @@
 package spacegraph.phys.shape;
 
 import spacegraph.math.v3;
-import spacegraph.phys.Collisions;
 import spacegraph.phys.dynamics.gimpact.*;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.util.IntArrayList;

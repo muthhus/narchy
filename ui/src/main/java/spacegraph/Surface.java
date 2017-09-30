@@ -7,7 +7,6 @@ import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
 
-import java.util.Collections;
 import java.util.List;
 
 /**

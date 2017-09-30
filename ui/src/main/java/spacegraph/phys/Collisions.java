@@ -68,7 +68,7 @@ public abstract class Collisions<X> {
     /**
      * This constructor doesn't own the dispatcher and paircache/broadphase.
      */
-    public Collisions(Intersecter intersecter, Broadphase broadphase) {
+    protected Collisions(Intersecter intersecter, Broadphase broadphase) {
         this.intersecter = intersecter;
         this.broadphase = broadphase;
     }
@@ -218,7 +218,7 @@ public abstract class Collisions<X> {
 //		}
     }
 
-    private final void updateAabbsIfActive(Collidable<X> colObj) {
+    private void updateAabbsIfActive(Collidable<X> colObj) {
         // only update aabb of active objects
         if (colObj.isActive()) {
             updateSingleAabb(colObj);

@@ -1,12 +1,10 @@
 package spacegraph.input;
 
 import com.jogamp.nativewindow.util.Point;
-import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Ortho;
 import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.math.v3;
 import spacegraph.widget.Widget;
 
 import java.util.Arrays;
@@ -17,13 +15,19 @@ import static java.util.Arrays.fill;
 /**
  * gestural generalization of mouse cursor's (or touchpad's, etc)
  * possible intersection with a surface and/or its sub-surfaces.
- *
+ * <p>
  * tracks state changes and signals widgets of these
  */
 public class Finger {
 
+    /**
+     * global pointer screen coordinate, set by window the (main) cursor was last active in
+     */
+    public final static Point pointer = new Point();
+
 
     public final v2 hit = new v2();
+    public final v2[] hitOnDown = new v2[5];
     public final boolean[] buttonDown = new boolean[5];
     public final boolean[] prevButtonDown = new boolean[5];
     private final Ortho root;
@@ -31,8 +35,13 @@ public class Finger {
 
     //TODO wheel state
 
-    /** widget above which this finger currently hovers */
+    /**
+     * widget above which this finger currently hovers
+     */
     public @Nullable Widget touching;
+
+    /** TODO scale this to pixel coordinates, this spatial coordinate is tricky and resolution dependent anyway */
+    final static float DRAG_THRESHOLD = 0.0002f;
 
     public Finger(Ortho root) {
         this.root = root;
@@ -45,11 +54,20 @@ public class Finger {
         arraycopy(this.buttonDown, 0, prevButtonDown, 0, buttonDown.length);
 
         fill(this.buttonDown, false);
-        if (nextButtonDown!=null) {
+        if (nextButtonDown != null) {
             for (short s : nextButtonDown) {
                 if (s > 0) //ignore -1 values
                     this.buttonDown[s - 1 /* start at zero=left button */] = true;
             }
+
+            for (int j = 0, jj = hitOnDown.length; j < jj; j++) {
+                if (!prevButtonDown[j] && buttonDown[j]) {
+                    hitOnDown[j] = new v2(hit);
+                }
+            }
+
+        } else {
+            Arrays.fill(hitOnDown, null);
         }
 
 
@@ -57,26 +75,37 @@ public class Finger {
 
         Surface s = root.surface.onTouch(this, hit, nextButtonDown);
         if (s instanceof Widget) {
-            if (!on((Widget)s))
+            if (!on((Widget) s))
                 s = null;
         } else {
             s = null;
         }
 
-        if (s!=null)
-            on((Widget)s);
+        if (s != null)
+            on((Widget) s);
+
+         for (int j = 0, jj = hitOnDown.length; j < jj; j++) {
+            if (!buttonDown[j] && hitOnDown[j] != null) {
+                hitOnDown[j] = null; //release
+            }
+        }
+
         return s;
+    }
+
+    public boolean dragging(int button) {
+        return (hitOnDown[button] != null && hitOnDown[button].distanceSq(hit) >= DRAG_THRESHOLD * DRAG_THRESHOLD);
     }
 
     private boolean on(@Nullable Widget touched) {
 
-        if (touched!=touching && touching!=null) {
+        if (touched != touching && touching != null) {
             touching.touch(null);
         }
 
         touching = touched;
 
-        if (touching!=null) {
+        if (touching != null) {
             touching.touch(this);
             return true;
         }
@@ -85,7 +114,7 @@ public class Finger {
 
 
     public boolean off() {
-        if (touching!=null) {
+        if (touching != null) {
             touching.touch(null);
             touching = null;
             return true;
@@ -93,19 +122,20 @@ public class Finger {
         return false;
     }
 
-//    public void update(@Nullable MouseEvent e, GLWindow window) {
-//
-//        short[] buttonsDown = e!=null ? e.getButtonsDown() : null;
-//        update(e, buttonsDown, window);
-//    }
-
-    /** global pointer screen coordinate, set by window the (main) cursor was last active in */
-    public final static Point pointer = new Point();
-
-
 
     public void print() {
         System.out.println(root.surface + " " + hit + " " + touching + " " + Arrays.toString(buttonDown));
     }
 
+    public boolean released(int button) {
+        return prevButtonDown[button] && !buttonDown[button];
+    }
+
+    public boolean pressed(int button) {
+        return !prevButtonDown[button] && buttonDown[button];
+    }
+
+    public boolean clickReleased(int button) {
+        return released(button) && !dragging(button);
+    }
 }

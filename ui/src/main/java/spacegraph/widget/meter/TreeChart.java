@@ -25,7 +25,7 @@ import static jcog.map.CustomConcurrentHashMap.*;
 public class TreeChart<X> extends Surface {
 
 
-    private boolean sort = false;
+    private final boolean sort = false;
 
 
     enum LayoutOrient {

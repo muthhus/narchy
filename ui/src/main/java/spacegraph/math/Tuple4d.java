@@ -68,7 +68,7 @@ public abstract class Tuple4d implements java.io.Serializable, Cloneable {
      * @param z the z coordinate
      * @param w the w coordinate
      */
-    public Tuple4d(double x, double y, double z, double w) {
+    protected Tuple4d(double x, double y, double z, double w) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -82,7 +82,7 @@ public abstract class Tuple4d implements java.io.Serializable, Cloneable {
      *
      * @param t the array of length 4 containing xyzw in order
      */
-    public Tuple4d(double[] t) {
+    protected Tuple4d(double[] t) {
         this.x = t[0];
         this.y = t[1];
         this.z = t[2];
@@ -95,7 +95,7 @@ public abstract class Tuple4d implements java.io.Serializable, Cloneable {
      *
      * @param t1 the Tuple4d containing the initialization x y z w data
      */
-    public Tuple4d(Tuple4d t1) {
+    protected Tuple4d(Tuple4d t1) {
         this.x = t1.x;
         this.y = t1.y;
         this.z = t1.z;
@@ -108,7 +108,7 @@ public abstract class Tuple4d implements java.io.Serializable, Cloneable {
      *
      * @param t1 the Tuple4f containing the initialization x y z w data
      */
-    public Tuple4d(Tuple4f t1) {
+    protected Tuple4d(Tuple4f t1) {
         this.x = t1.x;
         this.y = t1.y;
         this.z = t1.z;
@@ -119,7 +119,7 @@ public abstract class Tuple4d implements java.io.Serializable, Cloneable {
     /**
      * Constructs and initializes a Tuple4d to (0,0,0,0).
      */
-    public Tuple4d() {
+    protected Tuple4d() {
         this.x = 0.0;
         this.y = 0.0;
         this.z = 0.0;

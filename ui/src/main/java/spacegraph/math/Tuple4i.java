@@ -70,7 +70,7 @@ public abstract class Tuple4i implements java.io.Serializable, Cloneable {
      * @param z the z coordinate
      * @param w the w coordinate
      */
-    public Tuple4i(int x, int y, int z, int w) {
+    protected Tuple4i(int x, int y, int z, int w) {
 	this.x = x;
 	this.y = y;
 	this.z = z;
@@ -82,7 +82,7 @@ public abstract class Tuple4i implements java.io.Serializable, Cloneable {
      * Constructs and initializes a Tuple4i from the array of length 4.
      * @param t the array of length 4 containing x, y, z, and w in order.
      */
-    public Tuple4i(int[] t) {
+    protected Tuple4i(int[] t) {
 	this.x = t[0];
 	this.y = t[1];
 	this.z = t[2];
@@ -95,7 +95,7 @@ public abstract class Tuple4i implements java.io.Serializable, Cloneable {
      * @param t1 the Tuple4i containing the initialization x, y, z,
      * and w data.
      */
-    public Tuple4i(Tuple4i t1) {
+    protected Tuple4i(Tuple4i t1) {
 	this.x = t1.x;
 	this.y = t1.y;
 	this.z = t1.z;
@@ -106,7 +106,7 @@ public abstract class Tuple4i implements java.io.Serializable, Cloneable {
     /**
      * Constructs and initializes a Tuple4i to (0,0,0,0).
      */
-    public Tuple4i() {
+    protected Tuple4i() {
 	this.x = 0;
 	this.y = 0;
 	this.z = 0;

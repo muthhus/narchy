@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  */
  public class Layout<S extends Surface> extends Surface {
 
-    public List<? extends S> children;
+    public List<S> children;
 
     protected boolean clipTouchBounds = true;
 
@@ -24,13 +24,13 @@ import java.util.function.Consumer;
         this(Lists.newArrayList(children));
     }
 
-    public Layout(List<? extends S> children) {
+    public Layout(List<S> children) {
         set(children);
     }
 
 
     @Override
-    public List<? extends S> children() {
+    public List<S> children() {
         return children;
     }
 
@@ -38,12 +38,12 @@ import java.util.function.Consumer;
         set(Lists.newArrayList(s));
     }
 
-    public Layout<S> set(@NotNull List<? extends S> next) {
+    public Layout<S> set(@NotNull List<S> next) {
         synchronized (scale) {
 
             if (!Objects.equals(this.children, next)) {
 
-                List<? extends S> existing = this.children;
+                List<S> existing = this.children;
                 if (existing != null) {
                     for (Surface x : existing)
                         if (!next.contains(x)) {

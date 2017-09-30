@@ -10,7 +10,7 @@ public abstract class SpaceMouse extends MouseAdapter {
 
     public final JoglPhysics space;
 
-    public SpaceMouse(JoglPhysics g) {
+    protected SpaceMouse(JoglPhysics g) {
         this.space = g;
     }
 }

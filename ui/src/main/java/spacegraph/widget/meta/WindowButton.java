@@ -6,7 +6,6 @@ import com.jogamp.newt.event.WindowUpdateEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import spacegraph.SpaceGraph;
 import spacegraph.input.Finger;
-import spacegraph.math.v2;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.ToggleButton;
 

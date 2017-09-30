@@ -7,7 +7,6 @@ import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.googlecode.lanterna.terminal.swing.SwingTerminalFontConfiguration;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminalListener;
@@ -24,9 +23,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.OutputStream;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by me on 11/14/16.
@@ -339,13 +335,13 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     private boolean enableInput;
 
 
-    private boolean blinkOn;
+    private final boolean blinkOn;
 
     private boolean needFullRedraw;
     private TerminalPosition lastDrawnCursorPosition;
     private int lastBufferUpdateScrollPosition;
-    private int lastComponentWidth;
-    private int lastComponentHeight;
+    private final int lastComponentWidth;
+    private final int lastComponentHeight;
     private BufferedImage backbuffer;
     //private BufferedImage copybuffer;
     Color cursorColor = Color.ORANGE;

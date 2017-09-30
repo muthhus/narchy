@@ -16,7 +16,7 @@ import java.util.List;
  */
 public abstract class AbstractSpatial<X> extends Spatial<X> {
 
-    public AbstractSpatial(X x) {
+    protected AbstractSpatial(X x) {
         super(x);
     }
 

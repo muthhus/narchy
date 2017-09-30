@@ -2,10 +2,10 @@ package spacegraph;
 
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.opengl.GL2;
-import spacegraph.input.Finger;
+import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
-import spacegraph.phys.util.AnimVector2f;
 import spacegraph.render.Draw;
+import spacegraph.widget.Widget;
 
 import static spacegraph.math.v3.v;
 
@@ -23,44 +23,49 @@ public class ZoomOrtho extends Ortho {
 
     v2 panStart;
 
+    final Stacking overlay = new Stacking();
+
     public ZoomOrtho(Surface surface) {
+
         super(surface);
+
+//        this.surface = new Stacking(this.surface, overlay);
+//        overlay.children().add(new Widget() {
+//
+//            @Override
+//            protected void paintComponent(GL2 gl) {
+//
+//                gl.glColor4f(1f, 0f, 1f, 0.3f);
+//
+//
+//                pos(cx(), cy());
+//
+//                float w = (ZoomOrtho.this.window.getWidth() / ZoomOrtho.this.scale.x);
+//                float h = (ZoomOrtho.this.window.getHeight() / ZoomOrtho.this.scale.y);
+//                scale(w, h);
+//
+//                Draw.rect(gl, 0.25f, 0.25f, 0.5f, 0.5f);
+//            }
+//
+//        });
     }
 
-    @Override
-    protected Finger newFinger() {
-        return new DebugFinger(this);
+    public float cw() {
+        return (ZoomOrtho.this.window.getWidth() / ZoomOrtho.this.scale.x);
+    }
+    public float ch() {
+        return (ZoomOrtho.this.window.getHeight() / ZoomOrtho.this.scale.y);
     }
 
-    class DebugFinger extends Finger {
+    public float cx() {
+        return (0.5f - pos.x)/scale.x;
+    }
 
-        final Surface overlay = new Surface() {
-
-            @Override
-            protected void paint(GL2 gl) {
-                super.paint(gl);
-
-                gl.glColor4f(1f,1f, 0f, 0.85f);
-                gl.glLineWidth(3f);
-                Draw.rectStroke(gl, 0,0,10,5);
-            }
-        };
-
-        public DebugFinger(Ortho root) {
-            super(root);
-        }
-
-        protected void start() {
-            //window.add(new Ortho(overlay).maximize());
-        }
+    public float cy() {
+        return (0.5f - pos.y)/scale.y;
     }
 
 
-    @Override
-    public void start(SpaceGraph s) {
-        super.start(s);
-        ((DebugFinger) finger).start();
-    }
 
     @Override
     public void mouseMoved(MouseEvent e) {
@@ -92,6 +97,18 @@ public class ZoomOrtho extends Ortho {
     }
 
     @Override
+    protected void paint(GL2 gl) {
+        super.paint(gl);
+
+//        {
+//            //local coordinate center 0.25..0.75x0.25..0.75
+//            gl.glColor4f(1f, 1f, 1f, 0.3f);
+//            Draw.rect(gl, 0.25f, 0.25f, 0.5f, 0.5f);
+//        }
+
+    }
+
+    @Override
     public void mouseWheelMoved(MouseEvent e) {
         super.mouseWheelMoved(e);
 
@@ -106,27 +123,53 @@ public class ZoomOrtho extends Ortho {
             float sy = psy * zoomMult;
             int wx = window.getWidth();
             int wy = window.getHeight();
+
             if (sx/wx >= minZoom && sy/wy >= minZoom && sx/wx <= maxZoom && sy/wy <= maxZoom) {
+
+                float pcx = cx();
+                float pcy = cy();
+                float pcw = cw();
+                float pch = ch();
 
                 scale.set(sx, sy);
 
-                float epx, epy;
-                if (zoomMult > 1f) {
-                    //TODO fix
-                    epx = -psx / 4f * ((float) e.getX() / wx - 0.5f);
-                    epy = psy / 4f * ((float) e.getY() / wy - 0.5f);
-                } else {
-                    //TODO calculate correctly based on viewed center
-//                    epx = -translate.target.x; //zoom out from center
-//                    epy = -translate.target.y;
-                    epx = epy = 0;
-                }
+                float ncx = cx();
+                float ncy = cy();
+                float ncw = cw();
+                float nch = ch();
 
-                float dsx = sx - psx;
-                float dsy = sy - psy;
-                move(-dsx/2f + epx, -dsy/2f + epy); //centered on mouse
+                //pos.set()
+                //TODO
+
             }
         //}
     }
 
 }
+//    @Override
+//    protected Finger newFinger() {
+//        return new DebugFinger(this);
+//    }
+//
+//    class DebugFinger extends Finger {
+//
+//        final Surface overlay = new Surface() {
+//
+//            @Override
+//            protected void paint(GL2 gl) {
+//                super.paint(gl);
+//
+//                gl.glColor4f(1f,1f, 0f, 0.85f);
+//                gl.glLineWidth(3f);
+//                Draw.rectStroke(gl, 0,0,10,5);
+//            }
+//        };
+//
+//        public DebugFinger(Ortho root) {
+//            super(root);
+//        }
+//
+//        protected void start() {
+//            //window.add(new Ortho(overlay).maximize());
+//        }
+//    }

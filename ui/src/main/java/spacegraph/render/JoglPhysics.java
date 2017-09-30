@@ -131,7 +131,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
 
 
 
-    public JoglPhysics() {
+    protected JoglPhysics() {
         super();
 
         debug |= DebugDrawModes.NO_HELP_TEXT;

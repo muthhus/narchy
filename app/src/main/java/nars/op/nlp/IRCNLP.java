@@ -265,7 +265,7 @@ public class IRCNLP extends IRC {
     }
 
 
-    public static void main(String[] args) throws IOException, IrcException {
+    public static void main(String[] args) {
 
         //Param.DEBUG = true;
 
@@ -371,7 +371,13 @@ public class IRCNLP extends IRC {
 
         n.start();
 
-        bot.start();
+        try {
+            bot.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (IrcException e) {
+            e.printStackTrace();
+        }
 
 
 //        n.on("say", (x, aa, nn) -> {

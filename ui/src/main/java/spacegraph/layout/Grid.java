@@ -1,10 +1,8 @@
 package spacegraph.layout;
 
 import com.google.common.collect.Iterables;
-import com.jogamp.opengl.GL2;
 import jcog.Util;
 import spacegraph.Surface;
-import spacegraph.math.v2;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,7 +30,7 @@ public class Grid<S extends Surface> extends Layout<S> {
         this(SQUARE, children);
     }
 
-    public Grid(List<? extends S> children) {
+    public Grid(List<S> children) {
         this(SQUARE, children);
     }
 
@@ -42,7 +40,7 @@ public class Grid<S extends Surface> extends Layout<S> {
         set(children);
     }
 
-    public Grid(float aspect, List<? extends S> children) {
+    public Grid(float aspect, List<S> children) {
         super();
         this.gridAspect = (aspect);
         set(children);

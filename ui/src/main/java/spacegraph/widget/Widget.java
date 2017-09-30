@@ -17,6 +17,8 @@ import spacegraph.widget.console.TerminalUI;
 import spacegraph.widget.slider.BaseSlider;
 import spacegraph.widget.slider.XYSlider;
 
+import java.util.Arrays;
+
 import static spacegraph.layout.Grid.*;
 
 /**
@@ -112,13 +114,9 @@ public class Widget extends Stacking {
 
     @Override
     protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
-        if (buttons!=null && buttons.length > 0 && buttons[0] == 3) {
-//            System.out.println("right click " + root());
-//            System.out.println(scaleGlobal);
-//            System.out.println(scaleLocal);
-//            System.out.println(translateLocal);
+        if (finger!=null && finger.clickReleased(2)) { //released right button
 
-//            root().translate(g.x, g.y);
+            root().zoom(pos.x, pos.y, scale.x, scale.y);
 
         }
         return super.onTouching(finger, hitPoint, buttons);

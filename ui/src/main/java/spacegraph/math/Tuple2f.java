@@ -60,7 +60,7 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
      * @param x the x coordinate
      * @param y the y coordinate
      */
-    public Tuple2f(float x, float y) {
+    protected Tuple2f(float x, float y) {
         this.x = x;
         this.y = y;
     }
@@ -71,7 +71,7 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
      *
      * @param t the array of length 2 containing xy in order
      */
-    public Tuple2f(float[] t) {
+    protected Tuple2f(float[] t) {
         this.x = t[0];
         this.y = t[1];
     }
@@ -109,7 +109,7 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
      *
      * @param t1 the Tuple2f containing the initialization x y data
      */
-    public Tuple2f(Tuple2f t1) {
+    protected Tuple2f(Tuple2f t1) {
         this.x = t1.x;
         this.y = t1.y;
     }
@@ -120,7 +120,7 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
      *
      * @param t1 the Tuple2d containing the initialization x y data
      */
-    public Tuple2f(Tuple2d t1) {
+    protected Tuple2f(Tuple2d t1) {
         this.x = (float) t1.x;
         this.y = (float) t1.y;
     }
@@ -129,7 +129,7 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
     /**
      * Constructs and initializes a Tuple2f to (0,0).
      */
-    public Tuple2f() {
+    protected Tuple2f() {
         this.x = 0.0f;
         this.y = 0.0f;
     }
@@ -626,5 +626,11 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
 
     public void add(float dx, float dy) {
         set(x + dx, y + dy);
+    }
+
+    public float distanceSq(v2 v) {
+        if (v == this) return 0;
+        float d = Util.sqr(x - v.x) + Util.sqr(y - v.y);
+        return d;
     }
 }

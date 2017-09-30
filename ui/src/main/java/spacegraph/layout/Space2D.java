@@ -1,9 +1,7 @@
 package spacegraph.layout;
 
-import com.jogamp.opengl.GL2;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.math.v2;
 import spacegraph.math.v3;
 import spacegraph.widget.Widget;
 
@@ -23,7 +21,7 @@ public class Space2D<S extends Surface> extends Layout<S> {
     private final float attractDist = 1f;
 
 
-    public Space2D(List<? extends S> content) {
+    public Space2D(List<S> content) {
         super();
         set(content);
     }

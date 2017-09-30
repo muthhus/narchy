@@ -55,7 +55,8 @@ public final class OArrayList<T> extends AbstractList<T> implements RandomAccess
 	}
 
 
-	public void addAll(T... v) {
+	@SafeVarargs
+	public final void addAll(T... v) {
 		if (size + v.length >= array.length) {
 			expand();
 			//HACK this might not have expanded enough, caution

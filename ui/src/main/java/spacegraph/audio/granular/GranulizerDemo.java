@@ -5,8 +5,6 @@ import spacegraph.audio.Audio;
 import spacegraph.audio.SoundSource;
 import spacegraph.audio.sample.SampleLoader;
 
-import javax.sound.sampled.LineUnavailableException;
-
 public enum GranulizerDemo {
     ;
 

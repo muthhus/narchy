@@ -17,19 +17,11 @@ import static spacegraph.math.v3.v;
  */
 public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyListener, MouseListener {
 
-//    protected final AnimVector2f pos;
     boolean visible;
 
     final Finger finger;
 
-
-//    public static void main(String[] args) {
-//        SpaceGraph s = new SpaceGraph();
-//        s.add(new Facial(new ConsoleSurface(80, 25)).scale(0.5f));
-//        s.show(800, 600);
-//    }
-
-    public final Surface surface;
+    public Surface surface;
     private boolean maximize;
     public SpaceGraph window;
 
@@ -38,7 +30,7 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         this.surface = content;
         surface.align = None;
 
-        this.finger = newFinger();
+        this.finger = new Finger(this);
 //        this.scale = new AnimVector2f(3f);
 //        this.pos = new AnimVector2f(3f);
     }
@@ -46,10 +38,6 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     @Override
     public SurfaceRoot root() {
         return this;
-    }
-
-    protected Finger newFinger() {
-        return new Finger(this);
     }
 
     @Override
@@ -70,8 +58,14 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     }
 
     @Override
-    public v2 scale() {
-        return scale;
+    public void zoom(float x, float y, float sx, float sy) {
+
+        v2 gs = scale;
+        float tx = x * gs.x;
+        float ty = y * gs.y;
+        translate(-tx, -ty);
+
+        //scale()
     }
 
     @Override
@@ -92,7 +86,6 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         surface.layout();
         resized();
     }
-
 
 
     @Override
@@ -138,6 +131,7 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         stop();
     }
 
+    @Override
     public void stop() {
         surface.stop();
     }
@@ -232,15 +226,12 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     public Surface updateMouse(@Nullable MouseEvent e, float x, float y, short[] buttonsDown) {
 
         if (e != null) {
-            SpaceGraph rw;
             if (window != null) {
-                rw = window;
-                if (rw != null) {
-                    GLWindow rww = rw.window;
-                    if (rww != null) {
-                        Point p = rww.getLocationOnScreen(new Point());
-                        Finger.pointer.set(p.getX() + e.getX(), p.getY() + e.getY());
-                    }
+                SpaceGraph rw = window;
+                GLWindow rww = rw.window;
+                if (rww != null) {
+                    Point p = rww.getLocationOnScreen(new Point());
+                    Finger.pointer.set(p.getX() + e.getX(), p.getY() + e.getY());
                 }
             }
         }
@@ -249,9 +240,7 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
             off();
         } else {*/
         Surface s;
-        if ((s = finger.on(
-
-                v(x, y), buttonsDown)) != null) {
+        if ((s = finger.on(v(x, y), buttonsDown)) != null) {
             if (e != null)
                 e.setConsumed(true);
             return s;

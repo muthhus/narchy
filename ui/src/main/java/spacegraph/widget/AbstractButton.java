@@ -24,8 +24,8 @@ public abstract class AbstractButton extends Widget {
     }
 
     public void paintBack(GL2 gl) {
-        float p = pushed /2f;
-        float dim = 1f - (pushed /* + if disabled, dim further */ ) * 3f;
+        float p = pushed / 2f;
+        float dim = 1f - (pushed /* + if disabled, dim further */) * 3f;
         gl.glColor3f(0.25f * dim, 0.25f * dim, 0.25f * dim);
         Draw.rect(gl, p, p, 1 - 2 * p, 1 - 2 * p);
     }
@@ -34,24 +34,20 @@ public abstract class AbstractButton extends Widget {
     public void touch(@Nullable Finger finger) {
         super.touch(finger);
 
-        boolean pressed = false;
-
-        if (finger == null) {
-            pushed = 0;
-        } else {
-            if (enabled && finger.buttonDown[0]) {
-                pushed = 0.1f;
-                pressed = true;
-            } else {
+        boolean nowPressed = false;
+        if (finger != null) {
+            if (finger.clickReleased(0)) {
+                pushed = 0;
+                onClick();
+            } else if (finger.pressed(0)) {
                 pushed = 0.05f;
+            } else {
+                pushed = 0;
             }
+        } else {
+            pushed = 0;
         }
 
-        boolean wasPressed = this.pressed;
-        this.pressed = pressed;
-        if (!pressed && wasPressed) {
-            onClick();
-        }
     }
 
     protected abstract void onClick();

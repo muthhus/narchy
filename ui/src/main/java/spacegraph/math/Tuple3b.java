@@ -71,7 +71,7 @@ public abstract class Tuple3b implements java.io.Serializable, Cloneable {
      * @param b2 the second value
      * @param b3 the third value
      */
-    public Tuple3b(byte b1, byte b2, byte b3)
+    protected Tuple3b(byte b1, byte b2, byte b3)
     {
 	this.x = b1;
 	this.y = b2;
@@ -83,7 +83,7 @@ public abstract class Tuple3b implements java.io.Serializable, Cloneable {
      * Constructs and initializes a Tuple3b from input array of length 3.
      * @param t the array of length 3 containing b1 b2 b3 in order
      */
-    public Tuple3b(byte[] t)
+    protected Tuple3b(byte[] t)
     {
 	this.x = t[0];
 	this.y = t[1];
@@ -95,7 +95,7 @@ public abstract class Tuple3b implements java.io.Serializable, Cloneable {
      * Constructs and initializes a Tuple3b from the specified Tuple3b.
      * @param t1  the Tuple3b containing the initialization x y z data
      */
-    public Tuple3b(Tuple3b t1)
+    protected Tuple3b(Tuple3b t1)
     {
 	this.x = t1.x;
 	this.y = t1.y;
@@ -106,7 +106,7 @@ public abstract class Tuple3b implements java.io.Serializable, Cloneable {
     /**
      * Constructs and initializes a Tuple3b to (0,0,0).
      */
-    public Tuple3b()
+    protected Tuple3b()
     {
 	this.x = (byte) 0;
 	this.y = (byte) 0;

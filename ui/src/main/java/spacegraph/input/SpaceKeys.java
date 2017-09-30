@@ -23,7 +23,7 @@ public abstract class SpaceKeys extends KeyAdapter implements Consumer<SpaceGrap
     final IntObjectHashMap<FloatProcedure> keyPressed = new IntObjectHashMap();
     final IntObjectHashMap<FloatProcedure> keyReleased = new IntObjectHashMap();
 
-    public SpaceKeys(SpaceGraph g) {
+    protected SpaceKeys(SpaceGraph g) {
         this.space = g;
 
 

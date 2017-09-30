@@ -25,8 +25,6 @@ package spacegraph.phys.util;
 
 import jcog.list.FasterList;
 
-import java.util.ArrayList;
-
 /**
  * Stack-based object pool, see the example for usage. You must use the {@link #returning}
  * method for returning stack-allocated instance.<p>
@@ -59,7 +57,7 @@ public abstract class StackList<T> extends FasterList<T>  {
 	
 	private int pos;
 	
-	public StackList() {
+	protected StackList() {
 		returnObj = create();
 	}
 	

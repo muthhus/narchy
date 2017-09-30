@@ -1,7 +1,5 @@
 package spacegraph;
 
-import spacegraph.math.v2;
-
 public interface SurfaceRoot {
 
     default SurfaceRoot root() {
@@ -14,7 +12,8 @@ public interface SurfaceRoot {
 
     Ortho scale(float s);
 
-    v2 scale();
-
     Ortho scale(float sx, float sy);
+
+    void zoom(float x, float y, float sx, float sy);
+
 }

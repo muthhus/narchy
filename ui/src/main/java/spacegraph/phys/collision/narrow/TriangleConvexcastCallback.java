@@ -42,7 +42,7 @@ public abstract class TriangleConvexcastCallback extends TriangleCallback {
 	public float hitFraction;
 	public float triangleCollisionMargin;
 
-	public TriangleConvexcastCallback(ConvexShape convexShape, Transform convexShapeFrom, Transform convexShapeTo, Transform triangleToWorld, float triangleCollisionMargin) {
+	protected TriangleConvexcastCallback(ConvexShape convexShape, Transform convexShapeFrom, Transform convexShapeTo, Transform triangleToWorld, float triangleCollisionMargin) {
 		this.convexShape = convexShape;
 		this.convexShapeFrom.set(convexShapeFrom);
 		this.convexShapeTo.set(convexShapeTo);

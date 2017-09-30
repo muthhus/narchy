@@ -68,7 +68,7 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      * @param y the y coordinate
      * @param z the z coordinate
      */
-    public Tuple3f(float x, float y, float z) {
+    protected Tuple3f(float x, float y, float z) {
         this.x = notNaN(x);
         this.y = notNaN(y);
         this.z = notNaN(z);
@@ -80,7 +80,7 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      *
      * @param t the array of length 3 containing xyz in order
      */
-    public Tuple3f(float[] t) {
+    protected Tuple3f(float[] t) {
         set(t);
     }
 
@@ -90,7 +90,7 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      *
      * @param t1 the Tuple3f containing the initialization x y z data
      */
-    public Tuple3f(Tuple3f t1) {
+    protected Tuple3f(Tuple3f t1) {
         set(t1);
     }
 
@@ -100,7 +100,7 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      *
      * @param t1 the Tuple3d containing the initialization x y z data
      */
-    public Tuple3f(Tuple3d t1) {
+    protected Tuple3f(Tuple3d t1) {
         set(t1);
     }
 
@@ -108,7 +108,7 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
     /**
      * Constructs and initializes a Tuple3f to (0,0,0).
      */
-    public Tuple3f() {
+    protected Tuple3f() {
     }
 
 

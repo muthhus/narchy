@@ -40,7 +40,7 @@ public abstract class TriangleRaycastCallback extends TriangleCallback {
 
 	public float hitFraction;
 
-	public TriangleRaycastCallback(v3 from, v3 to) {
+	protected TriangleRaycastCallback(v3 from, v3 to) {
 		this.from.set(from);
 		this.to.set(to);
 		this.hitFraction = 1f;

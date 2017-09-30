@@ -188,7 +188,7 @@ public enum TermGraph {
 //            boolean reverse = dt < 0;
 //            Term S = reverse ? pred.negIf(neg) : subj;
 //            Term P = reverse ? subj : pred.negIf(neg);
-            if (subj.op().conceptualizable && pred.op().conceptualizable) {
+            if (subj.op().conceptualizable && pred.op().conceptualizable ) {
                 g.addNode(subj);
                 g.addNode(pred);
                 g.setEdge(subj, pred, $.impl(subj, XTERNAL /* whatever best matches, regardless of time */, pred));

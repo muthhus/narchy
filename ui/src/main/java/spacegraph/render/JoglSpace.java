@@ -43,7 +43,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     protected GL2 gl;
 
 
-    public JoglSpace() {
+    protected JoglSpace() {
         super();
         //frameTimeMS = new PeriodMeter(toString(), 8);
     }

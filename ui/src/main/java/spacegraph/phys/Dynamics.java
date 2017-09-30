@@ -100,11 +100,11 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
     private final List<Animated> animations = new FasterList();
 
-    public Dynamics(Intersecter intersecter, Broadphase broadphase) {
+    protected Dynamics(Intersecter intersecter, Broadphase broadphase) {
         this(intersecter, broadphase, null);
     }
 
-    public Dynamics(Intersecter intersecter, Broadphase broadphase, Constrainer constrainer) {
+    protected Dynamics(Intersecter intersecter, Broadphase broadphase, Constrainer constrainer) {
         super(intersecter, broadphase);
         islands = new Islands();
         ownsIslandManager = true;

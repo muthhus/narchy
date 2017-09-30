@@ -2,8 +2,6 @@ package spacegraph.audio;
 
 import spacegraph.audio.sample.SoundSample;
 
-import javax.sound.sampled.LineUnavailableException;
-
 
 public class FakeSoundEngine extends Audio
 {

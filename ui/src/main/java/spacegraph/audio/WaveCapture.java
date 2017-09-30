@@ -59,6 +59,7 @@ public class WaveCapture extends Loop {
         runFPS(FRAME_RATE);
     }
 
+    @Override
     public void stop() {
         start(0);
     }

@@ -56,15 +56,15 @@ public abstract class TypedConstraint {
 	protected final Dynamic rbB;
 	protected float appliedImpulse;
 
-	public TypedConstraint(TypedConstraintType type) {
+	protected TypedConstraint(TypedConstraintType type) {
 		this(type, getFixed(), getFixed());
 	}
 	
-	public TypedConstraint(TypedConstraintType type, Dynamic rbA) {
+	protected TypedConstraint(TypedConstraintType type, Dynamic rbA) {
 		this(type, rbA, getFixed());
 	}
 	
-	public TypedConstraint(TypedConstraintType type, Dynamic rbA, Dynamic rbB) {
+	protected TypedConstraint(TypedConstraintType type, Dynamic rbA, Dynamic rbB) {
 		this.type = type;
 		this.rbA = rbA;
 		this.rbB = rbB;
