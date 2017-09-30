@@ -76,9 +76,7 @@ public class MultiExec extends Exec {
                 plan.commit()
                         .sample(super::exeSample);
 
-                Activate.BatchActivate.BatchActivateCommit ba = Activate.BatchActivate.get().commit();
-                if (ba!=null)
-                    MultiExec.this.add(ba);
+                Activate.BatchActivate.get().commit(nar);
             }
         }
 

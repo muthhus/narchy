@@ -131,44 +131,39 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         }
 
-        @Nullable
-        public BatchActivateCommit commit() {
-            int s = a.size();
-            if (s == 0) return null;
-
-            Activate[] l = new Activate[s];
-            final int[] n = {0};
-            a.forEachKeyValue((c,p)->{
-                l[n[0]++] = (new Activate(c, p));
-            });
-            BatchActivateCommit x = new BatchActivateCommit( l );
-            a.clear();
-            return x;
+        public void commit(NAR nar) {
+            try {
+                a.forEachKeyValue((c, p) -> nar.input(new Activate(c, p)));
+            } catch (Throwable t) {
+                t.printStackTrace();
+            } finally {
+                a.clear();
+            }
         }
 
         public void put(Concept c, float pri) {
             a.addToValue(c, pri);
         }
 
-        public static class BatchActivateCommit extends NativeTask {
-
-            private final Activate[] activations;
-
-            public BatchActivateCommit(Activate[] l) {
-                this.activations = l;
-            }
-
-            @Override
-            public String toString() {
-                return "ActivationBatch x" + activations.length;
-            }
-
-            @Override
-            public @Nullable Iterable<? extends ITask> run(NAR n) {
-                n.input(activations);
-                return null;
-            }
-        }
+//        public static class BatchActivateCommit extends NativeTask {
+//
+//            private final Activate[] activations;
+//
+//            public BatchActivateCommit(Activate[] l) {
+//                this.activations = l;
+//            }
+//
+//            @Override
+//            public String toString() {
+//                return "ActivationBatch x" + activations.length;
+//            }
+//
+//            @Override
+//            public @Nullable Iterable<? extends ITask> run(NAR n) {
+//                n.input(activations);
+//                return null;
+//            }
+//        }
     }
 
 

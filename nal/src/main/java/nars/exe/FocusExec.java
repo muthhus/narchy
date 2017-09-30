@@ -182,7 +182,7 @@ public class FocusExec extends Exec implements Runnable {
             //execute the next set of premises
             premises.commit().pop(subCyclePremises, this::execute);
 
-            nar.input(Activate.BatchActivate.get().commit());
+            Activate.BatchActivate.get().commit(nar);
         }
     }
 
