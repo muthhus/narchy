@@ -14,7 +14,7 @@ import nars.control.Derivation;
 import nars.control.MetaGoal;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
-import nars.exe.MultiExec2;
+import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
@@ -160,7 +160,7 @@ abstract public class NAgentX extends NAgent {
 
         int THREADS = 5;
 
-        MultiExec2 exe = new MultiExec2(THREADS, 64);
+        MultiExec exe = new MultiExec(THREADS, 1024);
         //Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
 
 //        exe.add(new FocusExec(), (x) -> true);

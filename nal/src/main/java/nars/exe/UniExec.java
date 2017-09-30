@@ -3,9 +3,9 @@ package nars.exe;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.pri.PLink;
-import jcog.pri.PLinkUntilDeleted;
 import jcog.sort.TopN;
 import nars.NAR;
+import nars.Task;
 import nars.bag.ConcurrentArrayBag;
 import nars.control.Activate;
 import nars.control.Premise;
@@ -29,19 +29,17 @@ public class UniExec extends Exec  {
 
     public final int CAPACITY;
 
-    public static class UTask extends PLinkUntilDeleted<ITask> {
+//    public static class ITask extends PLinkUntilDeleted<ITask> {
+//
+//        public ITask(@NotNull ITask id, float p) {
+//            super(id, p);
+//        }
+//    }
 
-        public UTask(@NotNull ITask id, float p) {
-            super(id, p);
-        }
-    }
-
-    Bag<ITask, UTask> plan;
+    Bag<ITask, ITask> plan;
 
     int workRemaining;
 
-    float activationFactor = 0.05f;
-    float premiseFactor = 0.5f;
 
     public UniExec(int capacity) {
         CAPACITY = capacity;
@@ -53,27 +51,18 @@ public class UniExec extends Exec  {
     }
 
     @Override
-    public void add(@NotNull ITask input) {
-        plan.putAsync(u(input));
+    public void add(/*@NotNull*/ ITask input) {
+        plan.putAsync((input));
     }
 
-    protected UTask u(@NotNull ITask input) {
-        return new UTask(input, pri(input));
-    }
+//    protected ITask u(/*@NotNull*/ ITask input) {
+//        return new ITask(input, pri(input));
+//    }
 
 
     public static final Logger logger = LoggerFactory.getLogger(UniExec.class);
 
-    protected BagSample exeSample(UTask xx) {
-        ITask x = xx.get();
-        if (x == null)
-            return Remove;
-
-        return exeSample(x);
-    }
-
-    @NotNull
-    private Bag.BagSample exeSample(ITask x) {
+    protected Bag.BagSample exeSample(ITask x) {
         Iterable<? extends ITask> next = null;
 
         try {
@@ -107,22 +96,22 @@ public class UniExec extends Exec  {
     public synchronized void start(NAR nar) {
 
         plan =
-                new ConcurrentArrayBag<ITask,UTask>(this, new ConcurrentHashMap(), nar.random(), CAPACITY) {
+                new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), nar.random(), CAPACITY) {
 
                     @Override
-                    public ITask key(UTask value) {
-                        return value.get();
+                    public ITask key(ITask value) {
+                        return value;
                     }
 
                     @Override
-                    public void onRemove(@NotNull UTask value) {
+                    public void onRemove(@NotNull ITask value) {
 //                        if (value instanceof Task) {
 //                            ignore((Task) value);
 //                        }
                     }
 
                     @Override
-                    public void onReject(@NotNull UTask value) {
+                    public void onReject(@NotNull ITask value) {
 //                        if (value instanceof Task) {
 //                            ignore((Task) value);
 //                        }
@@ -198,7 +187,7 @@ public class UniExec extends Exec  {
 
     @Override
     public Stream<ITask> stream() {
-        return plan.stream().map(PLink::get).filter(Objects::nonNull);
+        return plan.stream(); //.filter(Objects::nonNull);
     }
 
 
@@ -215,7 +204,7 @@ public class UniExec extends Exec  {
             windowTTL = WINDOW_RATIO;
             ITask t = top.pop();
             if (t!=null)
-                exeSample((UTask) t);
+                exeSample((ITask) t);
         }
 
         return BagSample.Next;

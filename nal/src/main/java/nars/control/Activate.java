@@ -1,6 +1,7 @@
 package nars.control;
 
 import jcog.bag.Bag;
+import jcog.map.SaneObjectFloatHashMap;
 import jcog.pri.PLink;
 import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.Pri;
@@ -10,16 +11,20 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
+import nars.task.ITask;
+import nars.task.NativeTask;
 import nars.task.UnaryTask;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -62,13 +67,12 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         Concept cc = t.concept(n, true);
         if (cc != null) {
 
-            Activate a = activate(t, activationApplied, cc, n);
+            activate(t, activationApplied, cc, n);
 //            if (t.isInput()) {
             //sync run immediately
 //                a.run(n);
 //            }
 //
-            n.input(a);
 
 //                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
 //                n.input(a);
@@ -83,7 +87,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         //}
     }
 
-    private static Activate activate(@NotNull Task t, float activation, Concept origin, NAR n) {
+    private static void activate(@NotNull Task t, float activation, Concept origin, NAR n) {
 
 
 //        if (activation < EPSILON) {
@@ -105,12 +109,68 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //            } else {
 //                //atomic activation)
 
-        return new Activate(origin, activation); /*, () -> {
+        BatchActivate.get().put(origin, activation);
+        //return new Activate(origin, activation); /*, () -> {
 
-            }*/
 //            }
 
     }
+
+    public static class BatchActivate {
+
+        final ObjectFloatHashMap<Concept> a = new SaneObjectFloatHashMap<>(64);
+
+
+        final static ThreadLocal<BatchActivate> batches = ThreadLocal.withInitial(BatchActivate::new);
+
+        public static BatchActivate get() {
+            return batches.get();
+        }
+
+        BatchActivate() {
+
+        }
+
+        @Nullable
+        public BatchActivateCommit commit() {
+            int s = a.size();
+            if (s == 0) return null;
+
+            Activate[] l = new Activate[s];
+            final int[] n = {0};
+            a.forEachKeyValue((c,p)->{
+                l[n[0]++] = (new Activate(c, p));
+            });
+            BatchActivateCommit x = new BatchActivateCommit( l );
+            a.clear();
+            return x;
+        }
+
+        public void put(Concept c, float pri) {
+            a.addToValue(c, pri);
+        }
+
+        public static class BatchActivateCommit extends NativeTask {
+
+            private final Activate[] activations;
+
+            public BatchActivateCommit(Activate[] l) {
+                this.activations = l;
+            }
+
+            @Override
+            public String toString() {
+                return "ActivationBatch x" + activations.length;
+            }
+
+            @Override
+            public @Nullable Iterable<? extends ITask> run(NAR n) {
+                n.input(activations);
+                return null;
+            }
+        }
+    }
+
 
     @Override
     public List<Premise> run(NAR nar) {
@@ -140,7 +200,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         termlinks.commit(termlinks.forget(Param.LINK_FORGET_TEMPERATURE));
 
 
-        Collection<Concept> localSubConcepts = linkTemplates(nar);
+        BatchActivate ba = BatchActivate.get();
+        Collection<Concept> localSubConcepts = linkTemplates(nar, ba);
 
 
         List<PriReference<Term>> terml;
@@ -186,7 +247,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
 
     @Nullable
-    public Collection<Concept> linkTemplates(NAR nar) {
+    public Collection<Concept> linkTemplates(NAR nar, BatchActivate ba) {
         float budgeted = priElseZero();
         float decayRate = 1f - nar.momentum.floatValue();
         float decayed = budgeted * decayRate;
@@ -231,9 +292,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                         );
                         reverseLinked = true;
 
-
-                        Activate a = new Activate(localSubConcept, subDecay);
-                        nar.input(a);
+                        ba.put(localSubConcept, subDecay);
 
                         localSubConcepts.add(localSubConcept);
 

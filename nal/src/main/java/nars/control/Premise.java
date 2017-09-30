@@ -78,7 +78,6 @@ public class Premise extends UnaryTask {
     @Override
     public @Nullable Iterable<? extends ITask> run(@NotNull NAR n) {
 
-        int ttlMax = Util.lerp(priElseZero(), Param.TTL_PREMISE_MIN, n.matchTTL.intValue());
 
         Derivation d = derivation(n);
         d.nar.emotion.conceptFirePremises.increment();
@@ -91,6 +90,7 @@ public class Premise extends UnaryTask {
         if (task == null || task.isDeleted())
             return null;
 
+        int ttlMax = Util.lerp(task.priElseZero(), Param.TTL_PREMISE_MIN, n.matchTTL.intValue());
 
         NAR nar = d.nar;
 

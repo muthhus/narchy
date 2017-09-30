@@ -418,16 +418,11 @@ public interface NAct {
             float cur = curiosity().floatValue();
             Random rng = n.random();
 
-            float confWeak =
-                    n.confMin.floatValue() * 4;
 
-            float confStrong =
-                    nar().confDefault(GOAL)/2;
-                    //nar().confDefault(GOAL);
             float confMin = nar().confMin.floatValue();
+            float confBase =
+                    Util.lerp(0.5f, confMin, n.confDefault(GOAL));
 
-            //n.confDefault(BELIEF);
-            //0;
 
             int ip = p ? 0 : 1;
             CC[ip] = action;
@@ -446,11 +441,10 @@ public interface NAct {
 
                 float x; //0..+1
                 if (cur > 0 && rng.nextFloat() <= cur) {
-                    float curiConf = confStrong;
+                    float curiConf = confBase;
                     x = (TruthFunctions.expectation(
                         rng.nextFloat(),
                         curiConf
-                        //confWeak
                     ) - 0.5f)*2f;
                     c[0] = c[1] = curiConf;
                     curious = true;
@@ -536,10 +530,10 @@ public interface NAct {
                     P = $.t(1, conf);
                     N = $.t(0f, conf);
                 } else {
-                    conf = Math.max(confStrong, Math.max(c[0], c[1]));
-                    P = N = $.t(0.5f, conf);
+                    //conf = confBase; //Math.max(confBase, Math.max(c[0], c[1]));
+                    //P = N = $.t(0.5f, conf);
                             //restConf);
-                    //N = P = null;
+                    N = P = null;
                 }
 
 

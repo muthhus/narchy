@@ -82,8 +82,8 @@ public abstract class Param extends Services<Term,NAR> {
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
             //UtilityFunctions::aveGeo;
             //UtilityFunctions::aveAri;
-            Util::or; //potentially explosive
-            //Util::and;
+            //Util::or; //potentially explosive
+            Util::and;
             //Math::min;
             //Math::max;
 
@@ -335,7 +335,7 @@ public abstract class Param extends Services<Term,NAR> {
      * values of 0 means all budget is transferred to subterms,
      * values of 1 means no budget is transferred
      */
-    public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
+    public final FloatParam momentum = new FloatParam(0.01f, 0, 1f);
 
     /**
      * dt > 0
