@@ -421,7 +421,7 @@ public interface NAct {
 
             float confMin = nar().confMin.floatValue();
             float confBase =
-                    Util.lerp(0.5f, confMin, n.confDefault(GOAL));
+                    Util.lerp(0.75f, confMin, n.confDefault(GOAL));
 
 
             int ip = p ? 0 : 1;
@@ -531,9 +531,9 @@ public interface NAct {
                     N = $.t(0f, conf);
                 } else {
                     //conf = confBase; //Math.max(confBase, Math.max(c[0], c[1]));
-                    //P = N = $.t(0.5f, conf);
+                    P = N = $.t(0f, confMin);
                             //restConf);
-                    N = P = null;
+                    //N = P = null;
                 }
 
 

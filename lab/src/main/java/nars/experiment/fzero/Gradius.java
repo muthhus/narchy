@@ -27,7 +27,7 @@ public class Gradius extends NAgentX {
 
         this.g = new Gradius4K();
 
-        g.updateMS = 20;
+        g.updateMS = 50;
 
         //BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
         CameraSensor<?> c1 = senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.01f);

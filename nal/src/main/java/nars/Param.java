@@ -14,6 +14,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
+import nars.util.UtilityFunctions;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -81,9 +82,9 @@ public abstract class Param extends Services<Term,NAR> {
     /** budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links) */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
             //UtilityFunctions::aveGeo;
-            //UtilityFunctions::aveAri;
+            UtilityFunctions::aveAri;
             //Util::or; //potentially explosive
-            Util::and;
+            //Util::and;
             //Math::min;
             //Math::max;
 

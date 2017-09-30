@@ -175,7 +175,7 @@ abstract public class NAgentX extends NAgent {
                 .exe(exe)
                 .time(clock)
                 .index(
-                        new CaffeineIndex(64 * 1024)
+                        new CaffeineIndex(128 * 1024)
                         //new CaffeineIndex2(64 * 1024)
                         //new CaffeineIndex2(-1)
                         //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
@@ -262,17 +262,17 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-        new Implier(a.nar,
-                Iterables.concat(
-                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
-                        Collections.singleton(a.happy.term)
-                ),
-                new float[]{
-                        //0 //now
-                        1,
-                        4
-                }
-        );
+//        new Implier(a.nar,
+//                Iterables.concat(
+//                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
+//                        Collections.singleton(a.happy.term)
+//                ),
+//                new float[]{
+//                        //0 //now
+//                        1,
+//                        4
+//                }
+//        );
 
 //        AgentService p = new AgentService.AgentBuilder(
 //                //DQN::new,
