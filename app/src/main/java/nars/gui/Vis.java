@@ -397,12 +397,12 @@ public class Vis {
             plot4.add("WantHpy", () -> {
                 return a.happy.goals().exp(a.now, a.nar);
             }, 0, 1f);
-            plot4.add("Sad", () -> {
-                return a.sad.beliefs().freq(a.now, a.nar);
-            }, 0, 1f);
-            plot4.add("WantSad", () -> {
-                return a.sad.goals().exp(a.now, a.nar);
-            }, 0, 1f);
+//            plot4.add("Sad", () -> {
+//                return a.sad.beliefs().freq(a.now, a.nar);
+//            }, 0, 1f);
+//            plot4.add("WantSad", () -> {
+//                return a.sad.goals().exp(a.now, a.nar);
+//            }, 0, 1f);
 
 //            plot4.add("Hapy", nar.emotion.happy::getSum);
 //            plot4.add("Sad", nar.emotion.sad::getSum);

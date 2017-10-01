@@ -96,7 +96,7 @@ public class PoleCart extends NAgentX {
         angleDot = 0.;
         action = 0;
 
-        reward.resolution(0.05f);
+        //reward.resolution(0.05f);
 
         /**
          returnObs.doubleArray[0] = theState.getX();

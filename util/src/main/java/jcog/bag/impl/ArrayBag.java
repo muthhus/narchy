@@ -134,34 +134,33 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         }
 
 
-        boolean rejection = false;
         if (toAdd != null) {
             int c = capacity();
             if (s < c) {
                 //room to add an item
                 items.add(toAdd, this);
                 this.mass += toAdd.priElseZero();
-                s++;
-
             } else {
                 //at capacity, size will remain the same
                 Y removed;
-                if (toAdd.priElseZero() > min) {
-                    //remove lowest
-                    assert (size() == s);
-                    assert (s > 0) : "size is " + s + " and capacity is " + c + " so why are we removing an item";
+                if (size() > 0) {
+                    if (toAdd.priElseZero() > min) {
+                        //remove lowest
+                        assert (size() == s);
+                        //assert (s > 0) : "size is " + s + " and capacity is " + c + " so why are we removing an item";
 
-                    removed = items.removeLast();
-                    this.mass -= removed.priElseZero();
-                    //add this
-                    items.add(toAdd, this);
-                    this.mass += toAdd.priElseZero();
-                } else {
-                    removed = toAdd;
-                    rejection = true;
+                        removed = items.removeLast();
+                        this.mass -= removed.priElseZero();
+                        //add this
+                        items.add(toAdd, this);
+                        this.mass += toAdd.priElseZero();
+
+                    } else {
+                        removed = toAdd;
+                    }
+
+                    trash.add(removed);
                 }
-
-                trash.add(removed);
             }
         }
 

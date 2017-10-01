@@ -18,7 +18,7 @@ public class WindowButton extends CheckBox implements ToggleButton.ToggleAction,
 
     private final Supplier spacer;
 
-    int width = 400, height = 240;
+    int width = 600, height = 300;
 
     SpaceGraph space;
 

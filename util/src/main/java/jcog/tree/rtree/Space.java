@@ -222,4 +222,9 @@ public interface Space<T> extends Nodelike<T> {
         iterator().forEachRemaining(l::add);
         return l;
     }
+
+    default boolean contains(T tr) {
+        return contains(tr, model());
+    }
+
 }

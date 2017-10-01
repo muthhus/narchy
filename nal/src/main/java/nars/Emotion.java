@@ -315,7 +315,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
             if (t.isCommand())
                 return x; //ignore
 
-            float cost = t.voluplexity();
+            float cost = t.voluplexity() * t.priElseZero();
 
             MetaGoal.value(MetaGoal.Perceive, t.cause(), cost, nar.causes);
         }

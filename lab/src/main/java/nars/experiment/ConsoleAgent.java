@@ -89,7 +89,7 @@ public abstract class ConsoleAgent extends NAgentX {
 //        });
 
 
-        senseNumberDifference($.func((Atomic) id, Atomic.the("joy")), reward);
+        //senseNumberDifference($.func((Atomic) id, Atomic.the("joy")), reward);
 
         CauseChannel<ITask> s = nar.newCauseChannel(this + "_HumanKeys");
         onFrame(() -> {

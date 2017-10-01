@@ -191,7 +191,7 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.9f);
 
 
-        float priFactor = 0.25f;
+        float priFactor = 0.1f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
@@ -646,7 +646,7 @@ abstract public class NAgentX extends NAgent {
 
                     //new WindowButton("prompt", () -> Vis.newInputEditor(), 300, 60)
 
-                    Vis.beliefCharts(16, nar, a.reward),
+                    //Vis.beliefCharts(16, nar, a.reward),
                     new WindowButton("agent", () -> (a)),
                     col(
                             new WindowButton("actionShort", () -> Vis.beliefCharts(a.nar.dur() * 16, a.actions.keySet(), a.nar)),
@@ -904,8 +904,8 @@ abstract public class NAgentX extends NAgent {
             NARchy.installSpeech(a.nar);
             try {
                 a.nar.goal($("speak(ready)"), Tense.Present, 1f, 0.9f);
-                a.nar.believe($("(" + a.sad + " =|> speak(sad))."));
-                a.nar.goal($("(" + a.sad + " &| speak(sad))"));
+//                a.nar.believe($("(" + a.sad + " =|> speak(sad))."));
+//                a.nar.goal($("(" + a.sad + " &| speak(sad))"));
                 a.nar.believe($("(" + a.happy + " =|> speak(happy))."));
                 a.nar.goal($("(" + a.happy + " &| speak(happy))"));
             } catch (Narsese.NarseseException e) {

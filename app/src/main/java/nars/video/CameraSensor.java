@@ -249,7 +249,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         long now = nar.time();
         int dur = nar.dur();
 
-        float pixelPri = nar.priDefault(BELIEF)/(end-start);
+        float pixelPri = nar.priDefault(BELIEF)
+                /2;
+                ///((float)Math.sqrt(end-start));
 
         for (int i = start; i < end; i++) {
             PixelConcept p = pixels.get(i);

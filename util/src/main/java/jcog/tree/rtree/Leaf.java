@@ -238,7 +238,7 @@ public class Leaf<T> implements Node<T, T> {
         return true;
     }
 
-    @NotNull
+    /*@NotNull*/
     @Override
     public HyperRegion region() {
         return region;

@@ -91,4 +91,5 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E> {
     public void removeFast(int index) {
         throw new UnsupportedOperationException();
     }
+
 }

@@ -55,11 +55,11 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
     public final Map<ActionConcept, CauseChannel<ITask>> actions = new LinkedHashMap();
 
-    /**
-     * the general reward signal for this agent
-     */
-    @NotNull
-    public final ScalarConcepts reward;
+//    /**
+//     * the general reward signal for this agent
+//     */
+//    @NotNull
+//    public final ScalarConcepts reward;
 
 
     /**
@@ -84,7 +84,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
     public final AtomicBoolean enabled = new AtomicBoolean(true);
 
     public final SensorConcept happy;
-    public final SensorConcept sad;
+    ///public final SensorConcept sad;
 
     public boolean trace;
 
@@ -119,16 +119,21 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         this.id = id;
         this.now = ETERNAL; //not started
 
-        this.reward = senseNumber(new FloatPolarNormalized(() -> rewardCurrent), ScalarConcepts.Mirror,
-                id == null ?
+        this.happy = senseNumber(id == null ?
                         $.the("happy") : //generally happy
                         $.p(id, $.the("happy")), //happy in this environment
-                id == null ?
-                        $.the("sad") : //generally sad
-                        $.p(id, $.the("sad")) //sad in this environment
-        );
-        happy = this.reward.sensors.get(0);
-        sad = this.reward.sensors.get(1);
+                 new FloatPolarNormalized(() -> rewardCurrent) );
+
+//        this.reward = senseNumber(new FloatPolarNormalized(() -> rewardCurrent), ScalarConcepts.Mirror,
+//                id == null ?
+//                        $.the("happy") : //generally happy
+//                        $.p(id, $.the("happy")), //happy in this environment
+//                id == null ?
+//                        $.the("sad") : //generally sad
+//                        $.p(id, $.the("sad")) //sad in this environment
+//        );
+        //happy = this.reward.sensors.get(0);
+        //sad = this.reward.sensors.get(1);
 
         //fireHappy = Activation.get(happy, 1f, new ConceptFire(happy, 1f);
 
@@ -222,7 +227,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         nar.runLater(() -> {
             //this.curiosityAttention = reinforcementAttention / actions.size();
 
-                float happysadPri = 1f;
+                float happysadPri = nar.priDefault(GOAL)*2f;
 
                 Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nar.time(), ETERNAL, ETERNAL, nar.time.nextInputStamp());
                 he.pri(happysadPri);
@@ -230,12 +235,12 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
                     he.priMax(happysadPri);
                     return he;
                 });
-                Task se = new NALTask(sad.term(), GOAL, $.t(0f, nar.confDefault(GOAL)), nar.time(), ETERNAL, ETERNAL, nar.time.nextInputStamp());
-                se.pri(happysadPri);
-                predictors.add(() -> {
-                    se.priMax(happysadPri);
-                    return se;
-                });
+//                Task se = new NALTask(sad.term(), GOAL, $.t(0f, nar.confDefault(GOAL)), nar.time(), ETERNAL, ETERNAL, nar.time.nextInputStamp());
+//                se.pri(happysadPri);
+//                predictors.add(() -> {
+//                    se.priMax(happysadPri);
+//                    return se;
+//                });
 
 //            {
 //                Task e = nar.goal($.parallel(happy.term(),sad.term().neg())); /* eternal */
@@ -276,7 +281,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
             Variable what = $.varQuery(1);
 
             predictors.add(question($.impl( happy.term(), 0, what)));
-            predictors.add(question($.impl(sad.term(), 0, what)));
+            //predictors.add(question($.impl(sad.term(), 0, what)));
 
             for (Concept a : actions.keySet()) {
                 Term action = a.term();
@@ -285,13 +290,13 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
                 ((FasterList) predictors).addAll(
 
-                        question($.impl(happy.term(), 0, action)),
-                        question($.impl(sad.term(), 0, action)),
+                        //question($.impl(happy.term(), 0, action)),
+                        //question($.impl(sad.term(), 0, action)),
 //                        question($.impl(action, sad.term())),
 //                        question($.impl(notAction, sad.term())),
-                        question($.impl(action, what)),
-                        question($.impl(notAction, what))
-//                        quest(action),
+//                        question($.impl(action, what)),
+//                        question($.impl(notAction, what))
+                        quest(action)
 //                        quest($.parallel(what, action)),
 //                        quest($.parallel(what, notAction))
 
