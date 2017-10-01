@@ -46,7 +46,6 @@ public class Cause {
 
     /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
     public float value() {
-        //assert(v==v && v >= -1f && v <= +1f);
         return value;
     }
 
@@ -66,7 +65,7 @@ public class Cause {
     }
 
     public void setValue(float nextValue) {
-        assert(nextValue==nextValue);
+        assert(nextValue==nextValue && nextValue >= -1f && nextValue <= +1f);
         value = nextValue;
     }
 
