@@ -11,9 +11,9 @@ import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
 import nars.task.ITask;
 import nars.term.Term;
+import nars.time.Tense;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import org.jetbrains.annotations.NotNull;
@@ -407,7 +407,7 @@ public interface NAct {
 
         float[] nf = new float[1];
         FloatPolarNormalized normalize = new FloatPolarNormalized(()->nf[0]);
-        normalize.relax(0.25f);
+        normalize.relax(0.1f);
 
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (action, g) -> {
 
@@ -476,21 +476,22 @@ public interface NAct {
                         //compare positive vs negative
 //                    float ac = (Math.abs(exp[0]-0.5f) + Math.abs(exp[1]-0.5f));
 
-                    float fMax = Math.max(f[0],f[1]);
-                    if (!Util.equals(fMax, 0,  Pri.EPSILON)) {
-                        f[0] /= fMax;
-                        f[1] /= fMax;
-                    }
-                    float fAvg = (f[0] + f[1])/2f;
+//                    float fMax = Math.max(f[0],f[1]);
+//                    if (!Util.equals(fMax, 0,  Pri.EPSILON)) {
+//                        f[0] /= fMax;
+//                        f[1] /= fMax;
+//                    }
+//                    float fAvg = (f[0] + f[1])/2f;
 
                     float ec =
                             //(normalize.normalizePolar(exp[0] - 0.5f)) - (normalize.normalizePolar(exp[1] - 0.5f))
                             //(exp[0] - 0.5f) - (exp[1] - 0.5f)
                             //2f * (Math.max(0, (exp[0] - 0.5f)) - Math.max(0,(exp[1] - 0.5f)))
                             //2f * (exp[0] - 0.5f) - (exp[1] - 0.5f)
-                            Util.clamp(expectation(f[0] - fAvg, c[0]) - expectation(f[1] - fAvg, c[1]), -1, +1)
+                            Util.clamp(expectation(f[0], c[0]) - expectation(f[1], c[1]), -1, +1)
                             //+ (nar().random().nextFloat()-0.5f)*2f*confMin
                     ;
+//                    ec += ((nar().random().nextFloat() - 0.5f)*2f)*0.01f;
 //                    if (ac < Pri.EPSILON) {
 //                        //quantize if information below threshold
 //                        if (ec > 0 && ec < Pri.EPSILON)
@@ -531,7 +532,7 @@ public interface NAct {
                             //Math.abs(y) * Math.max(c[0],c[1])
                             //Math.max(c[0],c[1])
                             //Math.max(c[0],c[1])
-                            confBase
+                            y * confBase
                         : 0;
 
                 //w2c(Math.abs(y) * c2w(restConf));
@@ -540,9 +541,9 @@ public interface NAct {
                     //Math.max(cc[winner], nar().confMin.floatValue());
                     //0.5f + cc[winner] * ((winner == 0 ? y : -y)) * 0.5f;
 
-                    float pf = 0.5f + 0.5f * Util.unitize(Math.abs(y));
-                    P = $.t(pf, confBase);
-                    N = $.t(1-pf, confBase);
+                    //float pf = 0.5f + 0.5f * Util.unitize(Math.abs(y));
+                    P = $.t(1, conf);
+                    N = $.t(0, conf);
                 } else {
                     //conf = confBase; //Math.max(confBase, Math.max(c[0], c[1]));
                     P = N = $.t(0.5f, confBase);
@@ -573,6 +574,10 @@ public interface NAct {
 
         addAction(p);
         addAction(n);
+//        nar().runLater(()->{
+//            nar().goal(p.term, Tense.Eternal, 0.5f, nar().confMin.floatValue()*2);
+//            nar().goal(n.term, Tense.Eternal, 0.5f, nar().confMin.floatValue()*2);
+//        });
 
     }
 
@@ -644,10 +649,11 @@ public interface NAct {
                 float conf =
                         //cc[winner];
                         //Util.max(cc[0], cc[1]);
-                        nar().confDefault(BELIEF);
+                        y*nar().confDefault(BELIEF);
 
                 Truth w = y == y ? $.t(
-                        (winner == 0 ? y : -y) / 2f + 0.5f, //un-map to unipolar frequency range
+                        //(winner == 0 ? y : -y) / 2f + 0.5f, //un-map to unipolar frequency range
+                        1f,
                         conf) : null;
 
                 Truth l;

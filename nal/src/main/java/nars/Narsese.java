@@ -1199,30 +1199,19 @@ public class Narsese extends BaseParser<Object> {
         if (t != null && !Float.isFinite(t.conf()))
             t = $.t(t.freq(), m.confDefault(punct));
 
-        @Nullable Truth t1 = t;
 
-//        if (p == null)
-//            throw new RuntimeException("character is null");
-//
-//        if ((t == null) && ((p == JUDGMENT) || (p == GOAL)))
-//            t = new DefaultTruth(p);
-//
-//        if ((blen > 0) && (Float.isFinite(b[0])))
-//            blen = 0;
-//
-
-        if (t1 == null && punct==BELIEF || punct==GOAL) {
-            t1 = $.t(1, m.confDefault(punct));
+        if (t == null && (punct==BELIEF || punct==GOAL)) {
+            t = $.t(1, m.confDefault(punct));
         }
 
         if (content.op() == NEG) {
             content = content.unneg();
-            if (t1 != null)
-                t1 = t1.neg();
+            if (t != null)
+                t = t.neg();
         }
 
         TaskBuilder ttt =
-                new TaskBuilder(content, punct, t1)
+                new TaskBuilder(content, punct, t)
                         .time(
                                 m.time(), //creation time
                                 Tense.getRelativeOccurrence(

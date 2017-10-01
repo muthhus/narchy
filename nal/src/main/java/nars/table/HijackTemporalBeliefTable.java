@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static java.lang.Math.abs;
 import static jcog.math.Interval.intersectLength;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal
@@ -466,6 +467,9 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     @Override
     public Task match(long start, long end, @Nullable Term against, NAR nar) {
 
+
+        if (start == ETERNAL)  start = end = nar.time();
+
         long now = nar.time();
         int dur = nar.dur();
 
@@ -486,6 +490,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     @Override
     public Truth truth(long start, long end,  @Nullable EternalTable eternal, NAR nar) {
+
+        if (start == ETERNAL)  start = end = nar.time();
 
         Truth x = Param.truth(
                 eternal != null ? eternal.strongest() : null,

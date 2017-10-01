@@ -13,6 +13,8 @@
     //If after S M happens, and after M P happens, so P happens after S
     (M ==> P), (S ==> M) |- (S ==>+- P), (Belief:Deduction)
         (S ==> M), (M ==> P) |- (S ==>+- P), (Belief:Deduction)
+        //experimental:
+            (S ==> M), (--M ==> P) |- (S ==>+- P), (Belief:DeductionN)
 
     (M ==> S), (M ==> P) |- (S ==>+- P), (Belief:Abduction)
         (M ==> P), (M ==> S) |- (S ==>+- P), (Belief:Abduction)
@@ -223,19 +225,22 @@
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
 
-    B, C, belief("&&|"), belief(containsTask), task("!"), time(urgent) |- without(C,B), (Goal:Strong)
-    B, C, belief("&&|"), belief(containsTask), task("!"), time(urgent) |- without(C,--B), (Goal:StrongN)
+    B, C, belief("&&|"), task("!"), time(urgent) |- without(C,B), (Goal:Strong)
+    B, C, belief("&&|"), task("!"), time(urgent) |- without(C,--B), (Goal:StrongN)
 
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),--conjEvent(C,late),B), (Goal:StrongN)
 
-    C, B, task(positive), task("&&"), task(containsBelief), task("!"), time(urgent) |- conjDropIfEarliest(C,B), (Goal:Strong)
-    C, B, task(negative), task("&&"), task(containsBelief), task("!"), time(urgent) |- conjDropIfEarliest(C,--B), (Goal:StrongPN)
+    C, B, task(positive), task("&&"), task("!"), time(urgent) |- conjDropIfEarliest(C,B), (Goal:Strong)
+    C, B, task(negative), task("&&"), task("!"), time(urgent) |- conjDropIfEarliest(C,--B), (Goal:StrongPN)
         //(&&,X,A..+), X, task("!") |- X, (Goal:Strong)
         //(&&,--X,A..+), X, task("!") |- X, (Goal:StrongPN)
 
     //structural decompose any component of a conjunction.
+    //for belief: any conj
     C, C, task("&&") |- dropAnyEvent(C), (Belief:StructuralDeduction)
+    //for goal: eternal and paral (goal seq must be decomposed sequentially
+    C, C, task("&&|") |- dropAnyEvent(C), (Goal:StructuralDeduction)
 
 
     //(&&,A_1..n), A_i |- A_i, (Truth:StructuralDeduction, Desire:Strong)
@@ -246,7 +251,6 @@
 
 //Anonymous Analogy (NAL5)
     //originally this only unified depvar (dep var elimination)
-    //due to limitations in ellipsis matching, negation in the 2nd case is handled in the pattern.  this isn't optimal though
      (&&,X,A..+), Y    |- subIfUnifiesAny((&&,A..+),X,Y,"#"), (Belief:AnonymousAnalogy)
      (&&,--X,A..+), Y  |- subIfUnifiesAny((&&,A..+),X,Y,"#"), (Belief:AnonymousAnalogyPN)
 
@@ -265,9 +269,6 @@
      //A, (A==>B),                task("?@") |- B, ()
      //A, ((--,%A)==>B),          task("?@") |- B, ()
 
-     //quest to 'how' question
-     //B, X, neqRCom(B,X), task("@"), notImpl(B) |- (B ==>+- X), (Punctuation:Question)
-     //B, X, neqRCom(B,X), task("@"), notImpl(B) |- ((--,%B) ==>+- X), (Punctuation:Question)
 
      //(&&,X,A..+), X, task("?@") |- (&&,A..+), ()
      //   (&&,(--,%X),A..+), X, task("?@") |- (&&,A..+), ()

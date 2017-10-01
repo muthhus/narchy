@@ -15,9 +15,9 @@ import static org.junit.Assert.*;
 
 public class NarseseBaseTest extends NarseseTest {
 
-        @Test
+    @Test
     public void testParseCompleteEternalTask() throws Narsese.NarseseException {
-        Task t = task("$0.99 <a --> b>! %0.93;0.95%");
+        Task t = task("$0.99 (a --> b)! %0.93;0.95%");
 
         assertNotNull(t);
         assertEquals('!', t.punc());
@@ -26,7 +26,23 @@ public class NarseseBaseTest extends NarseseTest {
         assertEquals(0.95f, t.conf(), 0.001);
     }
 
-    @Test public void testTruth() throws Narsese.NarseseException {
+    @Test
+    public void testTaskTruthParsing() throws Narsese.NarseseException {
+        {
+            Task u = task("(y,())! %0.50;0.50%");
+            assertEquals(0.5f, u.freq(), 0.001f);
+            assertEquals(0.5f, u.conf(), 0.001f);
+        }
+        {
+            Task u = task("(y,())! %0.5;0.5%");
+            assertEquals(0.5f, u.freq(), 0.001f);
+            assertEquals(0.5f, u.conf(), 0.001f);
+        }
+    }
+
+
+    @Test
+    public void testTruth() throws Narsese.NarseseException {
         testTruth("%1;0.9%", 1f, 0.9f);
         testTruth("%1.0;0.90%", 1f, 0.9f);
         testTruth("%1.00;0.90%", 1f, 0.9f);
@@ -95,8 +111,6 @@ public class NarseseBaseTest extends NarseseTest {
         assertNull(t.truth());
         assertEquals(7, t.term().complexity());
     }
-
-
 
 
     @Test
@@ -188,10 +202,9 @@ public class NarseseBaseTest extends NarseseTest {
     }
 
 
-
     private void testOperationStructure(@NotNull Compound t) {
         //Term[] aa = Operator.argArray(t);
-        Term[] aa = ((Compound)t.sub(0)).toArray();
+        Term[] aa = ((Compound) t.sub(0)).toArray();
         assertEquals(2, aa.length);
         assertEquals("believe", t.sub(1).toString());
         //assertEquals("^believe", Operator.operator(t).toString());
@@ -211,17 +224,18 @@ public class NarseseBaseTest extends NarseseTest {
     }
 
 
-
     @Test
     public void testOperation2() throws Narsese.NarseseException {
         testOperationStructure(term("believe(a,b)"));
         testOperationStructure(term("believe(a, b)"));
     }
+
     @Test
     public void testImplIsNotOperation() throws Narsese.NarseseException {
-        assertEquals( "((b)==>a)", $.impl($.$("(b)"), Atomic.the("a")).toString() );
-        assertEquals( "((b) ==>+1 a)", $.impl($.$("(b)"), 1, Atomic.the("a")).toString() );
+        assertEquals("((b)==>a)", $.impl($.$("(b)"), Atomic.the("a")).toString());
+        assertEquals("((b) ==>+1 a)", $.impl($.$("(b)"), 1, Atomic.the("a")).toString());
     }
+
     @Test
     public void testOperationEquivalence() throws Narsese.NarseseException {
         Term a, b;
@@ -231,6 +245,7 @@ public class NarseseBaseTest extends NarseseTest {
         assertEquals(a.getClass(), b.getClass());
         assertEquals(a, b);
     }
+
     @Test
     public void testOperationEquivalenceWithOper() throws Narsese.NarseseException {
         Term a;
@@ -250,7 +265,6 @@ public class NarseseBaseTest extends NarseseTest {
     public void testOperationTask() throws Narsese.NarseseException {
         taskParses("break({t001},SELF)! %1.00;0.95%");
     }
-
 
 
     @Test
@@ -299,14 +313,17 @@ public class NarseseBaseTest extends NarseseTest {
         assertTrue(v.hasVarQuery());
     }
 
-    @Test public void testQueryVariableTask() throws Narsese.NarseseException {
+    @Test
+    public void testQueryVariableTask() throws Narsese.NarseseException {
         String term = "hear(Time,(the,?x))";
-        assertEquals("hear(Time,(the,?x))", term( term ).toString());
+        assertEquals("hear(Time,(the,?x))", term(term).toString());
         assertEquals("$.25 hear(Time,(the,?1))?", task(term + "?").toString());
     }
-    @Test public void testQueryVariableTaskQuotes() throws Narsese.NarseseException {
+
+    @Test
+    public void testQueryVariableTaskQuotes() throws Narsese.NarseseException {
         String term = "hear(\"Time\",(\"the\",?x))";
-        assertEquals("hear(\"Time\",(\"the\",?x))", term( term ).toString());
+        assertEquals("hear(\"Time\",(\"the\",?x))", term(term).toString());
         assertEquals("$.25 hear(\"Time\",(\"the\",?1))?", task(term + "?").toString());
     }
 
@@ -346,11 +363,12 @@ public class NarseseBaseTest extends NarseseTest {
     @Test
     public void testQuoteEscape() throws Narsese.NarseseException {
         assertEquals("\"ab c\"", term("\"ab c\"").toString());
-        for (String x : new String[] { "a", "a b" }) {
+        for (String x : new String[]{"a", "a b"}) {
             taskParses("<a --> \"" + x + "\">.");
             assertTrue(task("<a --> \"" + x + "\">.").toString().contains("(a-->\"" + x + "\")."));
         }
     }
+
     @Test
     public void testQuoteEscapeBackslash() {
         //TODO
@@ -392,19 +410,23 @@ public class NarseseBaseTest extends NarseseTest {
         taskParses("$0.80 <<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>. %1.00;0.90%");
     }
 
-    @Test public void testNonNegativeIntegerAtoms() throws Narsese.NarseseException {
+    @Test
+    public void testNonNegativeIntegerAtoms() throws Narsese.NarseseException {
         //TODO test parsing to numeric atom types
         Term a = term("1");
         assertEquals("1", a.toString());
     }
 
-    @Test public void testNegativeIntegerAtoms() throws Narsese.NarseseException {
+    @Test
+    public void testNegativeIntegerAtoms() throws Narsese.NarseseException {
         //TODO test parsing to numeric atom types
         Term a = term("-1");
         assertNotNull(a);
         assertEquals("-1", a.toString());
     }
-    @Test public void testFloatAtom() throws Narsese.NarseseException {
+
+    @Test
+    public void testFloatAtom() throws Narsese.NarseseException {
         //TODO test parsing to numeric atom types
         float f = 1.24f;
         String ff = Float.toString(f);

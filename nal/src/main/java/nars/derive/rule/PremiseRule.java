@@ -533,7 +533,9 @@ public class PremiseRule extends GenericCompound {
                         case "\"&&\"":
                             pres.add(new TaskBeliefOp(CONJ, true, false));
                             break;
-
+                        case "\"&&|\"": //parallel or eternal
+                            pres.add(new TaskBeliefOp.TaskBeliefConjComm(true, false));
+                            break;
                         case "any":
                             taskPunc = ' ';
                             break;

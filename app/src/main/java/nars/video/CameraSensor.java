@@ -15,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.List;
 
+import static nars.Op.BELIEF;
+
 /**
  * manages reading a camera to a pixel grid of SensorConcepts
  * monochrome
@@ -210,7 +212,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         //stamp = nar.time.nextStamp();
 
 
-        this.conf = nar.confDefault(Op.BELIEF);
+        this.conf = nar.confDefault(BELIEF);
 
         //adjust resolution based on value - but can cause more noise in doing so
         //resolution(Util.round(Math.min(0.01f, 0.5f * (1f - this.in.amp())), 0.01f));
@@ -246,10 +248,14 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
     private void update(int start, int end, NAR nar) {
         long now = nar.time();
         int dur = nar.dur();
+
+        float pixelPri = nar.priDefault(BELIEF)/(end-start);
+
         for (int i = start; i < end; i++) {
             PixelConcept p = pixels.get(i);
             @Nullable Task t = p.update(now, dur, nar);
             if (t!=null) {
+                t.pri(pixelPri);
                 in.input(t);
             }
         }

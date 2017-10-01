@@ -206,7 +206,7 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test;
         tester.believe("<{Tweety} --> [withWings]>"); //en("Tweety has wings.");
         tester.believe("<(&&,<$x --> [chirping]>,<$x --> [withWings]>) ==> <$x --> bird>>"); //en("If something can chirp and has wings, then it is a bird.");
-        tester.mustBelieve(cycles, "<<{Tweety} --> [chirping]> ==> <{Tweety} --> bird>>", 1.00f, 0.81f /*0.73f*/); //en("If Tweety can chirp, then it is a bird.");
+        tester.mustBelieve(cycles, "<<{Tweety} --> [chirping]> ==> <{Tweety} --> bird>>", 1.00f, 0.73f); //en("If Tweety can chirp, then it is a bird.");
 
     }
 
@@ -442,7 +442,7 @@ public class NAL6Test extends AbstractNALTest {
         tester.believe("<<$1 --> lock> ==> (&&,<#2 --> key>,open(#2,$1))>", 1.00f, 0.90f); //en("all locks are opened by some key");
         tester.believe("<{key1} --> key>", 1.00f, 0.90f); //en("key1 is a key");
         tester.mustBelieve(cycles, "<<$1 --> lock> ==> open({key1},$1)>", 1.00f,
-                0.81f
+                0.73f
                 /*0.43f*/); //en("maybe all locks are opened by key1");
 
     }

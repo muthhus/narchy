@@ -275,8 +275,8 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
             Variable what = $.varQuery(1);
 
-            predictors.add(question($.impl(happy.term(), what)));
-            predictors.add(question($.impl(sad.term(), what)));
+            predictors.add(question($.impl( happy.term(), 0, what)));
+            predictors.add(question($.impl(sad.term(), 0, what)));
 
             for (Concept a : actions.keySet()) {
                 Term action = a.term();
@@ -285,15 +285,15 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
                 ((FasterList) predictors).addAll(
 
-                        question($.impl(action, happy.term())),
-                        question($.impl(notAction, happy.term())),
+                        question($.impl(happy.term(), 0, action)),
+                        question($.impl(sad.term(), 0, action)),
 //                        question($.impl(action, sad.term())),
 //                        question($.impl(notAction, sad.term())),
                         question($.impl(action, what)),
-                        question($.impl(notAction, what)),
-                        quest(action),
-                        quest($.parallel(what, action)),
-                        quest($.parallel(what, notAction))
+                        question($.impl(notAction, what))
+//                        quest(action),
+//                        quest($.parallel(what, action)),
+//                        quest($.parallel(what, notAction))
 
 //                        question(impl(parallel(what, action), happy)),
 //                        question(impl(parallel(what, notAction), happy)),

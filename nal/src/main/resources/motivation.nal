@@ -19,6 +19,9 @@
     //question the precondition state
     X, (Y==>X), task("!") |-          Y, (Punctuation:Question)
 
+    //quest to 'how' question
+    B, X, task("@"), notImpl(B) |- (B ==>+- X), (Punctuation:Question)
+    B, X, task("@"), notImpl(B) |- (--B ==>+- X), (Punctuation:Question)
 
     //(X ==> Y), (X ==> Y), task("?") |- (?1 ==>+- Y), (Punctuation:Question)
     //(X ==> Y), (X ==> Y), task("?") |- (X ==>+- ?1), (Punctuation:Question)

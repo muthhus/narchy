@@ -40,7 +40,9 @@ public class Finger {
      */
     public @Nullable Widget touching;
 
-    /** TODO scale this to pixel coordinates, this spatial coordinate is tricky and resolution dependent anyway */
+    /**
+     * TODO scale this to pixel coordinates, this spatial coordinate is tricky and resolution dependent anyway
+     */
     final static float DRAG_THRESHOLD = 0.0002f;
 
     public Finger(Ortho root) {
@@ -81,14 +83,15 @@ public class Finger {
             s = null;
         }
 
-        if (s != null)
-            on((Widget) s);
-
-         for (int j = 0, jj = hitOnDown.length; j < jj; j++) {
+        for (int j = 0, jj = hitOnDown.length; j < jj; j++) {
             if (!buttonDown[j] && hitOnDown[j] != null) {
                 hitOnDown[j] = null; //release
             }
         }
+
+//        if (s != null)
+//            on((Widget) s);
+
 
         return s;
     }

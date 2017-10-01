@@ -43,35 +43,57 @@ public class Line1D {
 //
             Param.DEBUG = true;
 
-            NAR n = new NARS().threadable().nal(8).deriver(
-                    "B, (A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:DeductionRecursivePB, Goal:DeciDeduction)",
-                    "B, (--A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)",
-                    "B, (C ==> A), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:AbductionRecursivePB, Goal:DeciInduction)",
-                    "B, C, belief(\"&&|\"), belief(containsTask), task(\"!\"), time(urgent) |- without(C,B), (Goal:Strong)",
-                    "B, C, belief(\"&&|\"), belief(containsTask), task(\"!\"), time(urgent) |- without(C,--B), (Goal:StrongN)"
-            ).get();
-
-//            n.input("((i-o) =|> (y,())).",
-//                    "((o-i) =|> ((),y))."
+            NARS nn = new NARS().threadable().nal(8);
+//            nn.deriver(
+//                    "B, (A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:DeductionRecursivePB, Goal:DeciDeduction)",
+//                    "B, (--A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)",
+//                    "B, (C ==> A), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:AbductionRecursivePB, Goal:DeciInduction)",
+//                    "B, C, belief(\"&&|\"), belief(containsTask), task(\"!\"), time(urgent) |- without(C,B), (Goal:Strong)",
+//                    "B, C, belief(\"&&|\"), belief(containsTask), task(\"!\"), time(urgent) |- without(C,--B), (Goal:StrongN)"
 //            );
-            n.input("$.99 ((i-o) &| (y,()))!",
-                    "$.99 ((o-i) &| ((),y))!"
-            );
+            NAR n = nn.get();
+
 
 
             LinkClustering linkClusterPri = new LinkClustering(n,
                     Prioritized::priElseZero /* anything temporal */,
                     4, 16);
 
-            //n.log();
             n.onTask(x -> {
                 if (x instanceof DerivedTask) {
-                    System.out.println(x);
+                    System.err.println(x);
+                }
+            });
+//            n.log();
+
+            n.runLater(()->{
+                try {
+                    n.input(""
+                        //"(y,())! %0.5;0.02%",
+                        //"((),y)! %0.5;0.02%"
+//                            "$0.99 ((&&, i, --o) &&+1 ((),y))!",
+//                            "$0.99 ((&&, --i, o) &&+1 (y,()))!"
+//                            "$0.99 ((&|, i, --o) =|> happy).",
+//                            "$0.99 ((&|, --i, o) =|> happy)."
+                    );
+
+                    //            n.input(
+                    //                "(i =|> (y,()))."
+                    //            );
+                    //            n.input("(happy =|> --(i-o)).",
+                    //                    "(happy =|> --(o-i)).",
+                    //                    "(i-o)?",
+                    //                    "(o-i)?"
+                    //            );
+                    //            n.input("$.99 ((i-o) &| (y,()))!",
+                    //                    "$.99 ((o-i) &| ((),y))!"
+                    //            );
+                } catch (Narsese.NarseseException e) {
+                    e.printStackTrace();
                 }
             });
 
 
-            //n.log();
 
             //n.beliefConfidence(0.9f);
             //n.goalConfidence(0.5f);
@@ -85,7 +107,7 @@ public class Line1D {
                 protected void onStart(Line1DSimplest a) {
 
                     new Thread(() -> {
-                        int history = 800;
+                        int history = 64;
                         window(
                                 row(
                                         conceptPlot(a.nar, Lists.newArrayList(
@@ -138,11 +160,12 @@ public class Line1D {
             exp.floatValueOf(n);
 
 
-            n.time.dur(16);
-            exp.agent.runDur(1);
+            n.time.dur(1);
+            exp.agent.curiosity.setValue(0f);
+            exp.agent.runDur(5);
 
-            n.truthResolution.setValue(0.25f);
-            n.termVolumeMax.set(10);
+            //n.truthResolution.setValue(0.25f);
+            n.termVolumeMax.set(12);
 
 //            n.beliefConfidence(0.5f);
 //            n.goalConfidence(0.5f);
@@ -152,7 +175,8 @@ public class Line1D {
 
 
             //n.start();
-            n.run(100000);
+            //n.run(100000);
+            n.startFPS(32f);
 
 //            n.concepts().collect(Collectors2.toSortedSet()).forEach(x -> {
 //                if (x.op() == IMPL) {

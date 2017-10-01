@@ -123,42 +123,42 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         final Task ete = eternal != null ? eternal.strongest() : null;
 
-        if (start != ETERNAL) {
-            int s = size();
-            if (s > 0) {
+        if (start == ETERNAL) start = end = nar.time();
 
-                int dur = nar.dur();
+        int s = size();
+        if (s > 0) {
 
-                FloatFunction<Task> ts = taskStrength(start, end, dur);
-                FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task()));
+            int dur = nar.dur();
 
-
-                int maxTruths = (int) Math.min(s, Math.max(2, Math.ceil(capacity * SCAN_MAX_FRACTION)));
-                TopN<TaskRegion> tt = scan(
-                        new TopN<>(new TaskRegion[maxTruths], strongestTask),
-                        start, end, maxTruths);
+            FloatFunction<Task> ts = taskStrength(start, end, dur);
+            FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task()));
 
 
-                if (!tt.isEmpty()) {
+            int maxTruths = (int) Math.min(s, Math.max(2, Math.ceil(capacity * SCAN_MAX_FRACTION)));
+            TopN<TaskRegion> tt = scan(
+                    new TopN<>(new TaskRegion[maxTruths], strongestTask),
+                    start, end, maxTruths);
 
-                    //                Iterable<? extends Tasked> ii;
-                    //                if (anyMatchTime) {
-                    //                    //tt.removeIf((x) -> !x.task().during(when));
-                    //                    ii = Iterables.filter(tt, (x) -> x.task().during(when));
-                    //                } else {
-                    //                    ii = tt;
-                    //                }
 
-                    //applying eternal should not influence the scan for temporal so it is left null here
-                    return Param.truth(ete, start, end, dur, tt);
+            if (!tt.isEmpty()) {
 
-                    //        if (t != null /*&& t.conf() >= confMin*/) {
-                    //            return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
-                    //        } else {
-                    //            return null;
-                    //        }
+                //                Iterable<? extends Tasked> ii;
+                //                if (anyMatchTime) {
+                //                    //tt.removeIf((x) -> !x.task().during(when));
+                //                    ii = Iterables.filter(tt, (x) -> x.task().during(when));
+                //                } else {
+                //                    ii = tt;
+                //                }
 
-                }
+                //applying eternal should not influence the scan for temporal so it is left null here
+                return Param.truth(ete, start, end, dur, tt);
+
+                //        if (t != null /*&& t.conf() >= confMin*/) {
+                //            return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+                //        } else {
+                //            return null;
+                //        }
+
             }
         }
 
@@ -178,8 +178,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public Task match(long start, long end, @Nullable Term template, NAR nar) {
 
+        if (start == ETERNAL) start = end = nar.time();
+
         assert (end >= start);
-        assert (start != ETERNAL);
+
 
         int s = size();
         if (s == 0)

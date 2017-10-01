@@ -234,6 +234,7 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
                     Finger.pointer.set(p.getX() + e.getX(), p.getY() + e.getY());
                 }
             }
+            e.setConsumed(true);
         }
 
         /*if (e == null) {
@@ -241,8 +242,6 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         } else {*/
         Surface s;
         if ((s = finger.on(v(x, y), buttonsDown)) != null) {
-            if (e != null)
-                e.setConsumed(true);
             return s;
         }
 
