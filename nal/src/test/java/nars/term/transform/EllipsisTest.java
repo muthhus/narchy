@@ -169,7 +169,7 @@ public class EllipsisTest {
             this.prefix = prefix;
             this.suffix = suffix;
             this.ellipsisTerm = ellipsisTerm;
-            p = patterns().pattern(
+            p = new PatternIndex().pattern(
                     getPattern(prefix, suffix)
             );
         }
@@ -200,11 +200,6 @@ public class EllipsisTest {
         public Compound getMatchable(int arity) throws Narsese.NarseseException {
             return $(prefix + termSequence(arity) + suffix);
         }
-    }
-
-    @NotNull
-    public static PatternIndex patterns() {
-        return new PatternIndex(NARS.shell());
     }
 
     public static class CommutiveEllipsisTest1 extends CommutiveEllipsisTest {
@@ -242,7 +237,7 @@ public class EllipsisTest {
         @NotNull
         @Override
         public Compound getPattern(String prefix, String suffix) throws Narsese.NarseseException {
-            PatternIndex pi = patterns();
+            PatternIndex pi = new PatternIndex();
             Compound pattern = (Compound) Narsese.term(prefix + "%1, " + ellipsisTerm + suffix, true).term();
             return pattern;
         }
@@ -251,7 +246,7 @@ public class EllipsisTest {
 
         @Override
         public @NotNull Term getResult() throws Narsese.NarseseException {
-            final PatternIndex pi = patterns();
+            final PatternIndex pi = new PatternIndex();
             return Narsese.term("<%1 --> (" + ellipsisTerm + ")>", true).normalize().term();
         }
 
@@ -345,7 +340,7 @@ public class EllipsisTest {
         assertTrue(_x.toString(), _x instanceof PremiseRule);
         PremiseRule x = (PremiseRule)_x;
         //System.out.println(x);
-        x = x.normalize(patterns());
+        x = x.normalize(new PatternIndex());
         //System.out.println(x);
 
         assertEquals(
@@ -391,7 +386,7 @@ public class EllipsisTest {
     }
 
     static void testCombinations(Compound X, @NotNull Compound Y, int expect) {
-        X = patterns().pattern(X);
+        X = new PatternIndex().pattern(X);
 
         for (int seed = 0; seed < 3 /*expect*5*/; seed++) {
 

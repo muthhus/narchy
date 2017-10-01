@@ -3,6 +3,7 @@ package nars.derive.rule;
 import com.google.common.collect.Sets;
 import jcog.list.FasterList;
 import nars.$;
+import nars.NAR;
 import nars.Op;
 import nars.control.Derivation;
 import nars.derive.*;
@@ -88,6 +89,11 @@ public class PremiseRule extends GenericCompound {
     final SortedSet<MatchConstraint> constraints = new TreeSet(PrediTerm.sortByCost);
     final List<PrediTerm<Derivation>> pre = $.newArrayList();
     final List<PrediTerm<Derivation>> post = $.newArrayList();
+
+    public PremiseRule(Pair<PremiseRule, String> x) {
+        this(x.getOne());
+        withSource(x.getTwo());
+    }
 
     /**
      * for printing complex terms as a recursive tree
@@ -178,8 +184,9 @@ public class PremiseRule extends GenericCompound {
     }
 
 
-    public void setSource(String source) {
+    public PremiseRule withSource(String source) {
         this.source = source;
+        return this;
     }
 
 
@@ -248,9 +255,7 @@ public class PremiseRule extends GenericCompound {
 
 
     @NotNull
-    public final PremiseRule setup(@NotNull PatternIndex index) /* throws PremiseRuleException */ {
-
-        assert (index.nar != null);
+    public final PremiseRule setup(@NotNull PatternIndex index, NAR nar) /* throws PremiseRuleException */ {
 
         compile(index);
 
@@ -291,14 +296,14 @@ public class PremiseRule extends GenericCompound {
             String predicateNameStr = predicate_name.toString();
 
             Term[] args;
-            Term X, Y, Z;
+            Term X, Y;
 
             //if (predicate.getSubject() instanceof SetExt) {
             //decode precondition predicate arguments
             args = ((Compound) (predicate.sub(0))).toArray();
             X = (args.length > 0) ? args[0] : null;
             Y = (args.length > 1) ? args[1] : null;
-            Z = (args.length > 2) ? args[2] : null;
+//            Z = (args.length > 2) ? args[2] : null;
             //..
 
             /*} else {
@@ -548,7 +553,7 @@ public class PremiseRule extends GenericCompound {
         Conclude.match(
                 this,
                 pre, post,
-                constraints, index);
+                constraints, index, nar);
 
         List<PostCondition> postConditions = newArrayList(postcons.length);
 
@@ -661,72 +666,72 @@ public class PremiseRule extends GenericCompound {
     }
 
 
-    /**
-     * for each calculable "question reverse" rule,
-     * supply to the consumer
-     * <p>
-     * ex:
-     * (A --> B), (B --> C), not_equal(A,C) |- (A --> C), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
-     * 1. Deriving of backward inference rules, since Derive:AllowBackward it allows deriving:
-     * (A --> B), (A --> C), not_equal(A,C), task("?") |- (B --> C), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
-     * (A --> C), (B --> C), not_equal(A,C), task("?") |- (A --> B), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
-     * so each premise gets exchanged with the conclusion in order to form a own rule,
-     * additionally task("?") is added to ensure that the derived rule is only used in backward inference.
-     */
-    public final void backwardPermutation(@NotNull PatternIndex index, @NotNull BiConsumer<PremiseRule, String> w) {
-
-        Term T = getTask(); //Task
-        Term B = getBelief(); //Belief
-        Term C = getConclusionTermPattern(); //Conclusion
-
-        // C, B, [pre], task_is_question() |- T, [post]
-        PremiseRule clone1 = clonePermutation(C, B, T, true, index);
-        if (clone1 != null)
-            w.accept(clone1, "C,B,question |- T");
-
-        // T, C, [pre], task_is_question() |- B, [post]
-        PremiseRule clone3 = clonePermutation(T, C, B, true, index);
-        if (clone3 != null)
-            w.accept(clone3, "T,C,question |- B");
-
-        //if needed, use Swap which would be applied before this recursively,
+//    /**
+//     * for each calculable "question reverse" rule,
+//     * supply to the consumer
+//     * <p>
+//     * ex:
+//     * (A --> B), (B --> C), not_equal(A,C) |- (A --> C), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
+//     * 1. Deriving of backward inference rules, since Derive:AllowBackward it allows deriving:
+//     * (A --> B), (A --> C), not_equal(A,C), task("?") |- (B --> C), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
+//     * (A --> C), (B --> C), not_equal(A,C), task("?") |- (A --> B), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
+//     * so each premise gets exchanged with the conclusion in order to form a own rule,
+//     * additionally task("?") is added to ensure that the derived rule is only used in backward inference.
+//     */
+//    public final void backwardPermutation(@NotNull PatternIndex index, @NotNull BiConsumer<PremiseRule, String> w) {
+//
+//        Term T = getTask(); //Task
+//        Term B = getBelief(); //Belief
+//        Term C = getConclusionTermPattern(); //Conclusion
+//
+//        // C, B, [pre], task_is_question() |- T, [post]
+//        PremiseRule clone1 = clonePermutation(C, B, T, true, index);
+//        if (clone1 != null)
+//            w.accept(clone1, "C,B,question |- T");
+//
 //        // T, C, [pre], task_is_question() |- B, [post]
-//        PremiseRule clone2 = clonePermutation(C, T, B, true, index);
-//        if (clone2 != null)
-//            w.accept(clone2, "C,T,question |- B");
+//        PremiseRule clone3 = clonePermutation(T, C, B, true, index);
+//        if (clone3 != null)
+//            w.accept(clone3, "T,C,question |- B");
+//
+//        //if needed, use Swap which would be applied before this recursively,
+////        // T, C, [pre], task_is_question() |- B, [post]
+////        PremiseRule clone2 = clonePermutation(C, T, B, true, index);
+////        if (clone2 != null)
+////            w.accept(clone2, "C,T,question |- B");
+//
+//
+//    }
 
 
-    }
-
-
-    /**
-     * for each calculable "question reverse" rule,
-     * supply to the consumer
-     * <p>
-     * 2. Deriving of forward inference rule by swapping the premises since !s.contains("task(") && !s.contains("after(") && !s.contains("measure_time(") && !s.contains("Structural") && !s.contains("Identity") && !s.contains("Negation"):
-     * (B --> C), (A --> B), not_equal(A,C) |- (A --> C), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
-     * <p>
-     * after generating, these are then backward permuted
-     */
-    @Nullable
-    public final PremiseRule swapPermutation(@NotNull PatternIndex index) {
-
-        // T, B, [pre] |- C, [post] ||--
-        Term T = getTask();
-        Term B = getBelief();
-
-        if (T.equals(B)) {
-            //no change, ignore the permutation
-            return null;
-        } else {
-            Term C = getConclusionTermPattern();
-            return clonePermutation(B, T, C, false, index);
-        }
-    }
+//    /**
+//     * for each calculable "question reverse" rule,
+//     * supply to the consumer
+//     * <p>
+//     * 2. Deriving of forward inference rule by swapping the premises since !s.contains("task(") && !s.contains("after(") && !s.contains("measure_time(") && !s.contains("Structural") && !s.contains("Identity") && !s.contains("Negation"):
+//     * (B --> C), (A --> B), not_equal(A,C) |- (A --> C), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
+//     * <p>
+//     * after generating, these are then backward permuted
+//     */
+//    @Nullable
+//    public final PremiseRule swapPermutation(@NotNull PatternIndex index) {
+//
+//        // T, B, [pre] |- C, [post] ||--
+//        Term T = getTask();
+//        Term B = getBelief();
+//
+//        if (T.equals(B)) {
+//            //no change, ignore the permutation
+//            return null;
+//        } else {
+//            Term C = getConclusionTermPattern();
+//            return clonePermutation(B, T, C, false, index);
+//        }
+//    }
 
 
     @NotNull
-    private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question, @NotNull PatternIndex index) {
+    private PremiseRule clonePermutation(Term newT, Term newB, Term newR, boolean question, @NotNull PatternIndex index, NAR nar) {
 
 
         Map<Term, Term> m = new HashMap(3);
@@ -776,7 +781,7 @@ public class PremiseRule extends GenericCompound {
         }
 
         return PremiseRuleSet.normalize(
-                new PremiseRule(TermVector.the(newPremise, newConclusion)), index);
+                new PremiseRule(TermVector.the(newPremise, newConclusion)), index, nar);
 
     }
 

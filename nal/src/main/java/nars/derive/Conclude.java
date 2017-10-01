@@ -28,9 +28,7 @@ public final class Conclude {
     private static final Term VAR_INTRO = $.the("varIntro");
     private static final Term GOAL_URGENT = $.the("urgent");
 
-    static public PrediTerm<Derivation> the(@NotNull PremiseRule rule, PatternIndex index) {
-
-        NAR nar = index.nar;
+    static public PrediTerm<Derivation> the(@NotNull PremiseRule rule, PatternIndex index, NAR nar) {
 
         Term pattern = rule.conclusion().sub(0);
 
@@ -66,13 +64,13 @@ public final class Conclude {
 
     }
 
-    public static void match(final PremiseRule rule, List<PrediTerm<Derivation>> pre, List<PrediTerm<Derivation>> post, @NotNull SortedSet<MatchConstraint> constraints, PatternIndex index) {
+    public static void match(final PremiseRule rule, List<PrediTerm<Derivation>> pre, List<PrediTerm<Derivation>> post, @NotNull SortedSet<MatchConstraint> constraints, PatternIndex index, NAR nar) {
 
         final Term taskPattern = rule.getTask();
         final Term beliefPattern = rule.getBelief();
 
 
-        PrediTerm<Derivation> conc = the(rule, index);
+        PrediTerm<Derivation> conc = the(rule, index, nar);
 
         boolean taskIsPatVar = taskPattern.op() == Op.VAR_PATTERN;
         boolean belIsPatVar = beliefPattern.op() == Op.VAR_PATTERN;

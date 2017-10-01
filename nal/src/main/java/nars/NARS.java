@@ -7,9 +7,12 @@ import nars.concept.builder.DefaultConceptBuilder;
 import nars.control.Derivation;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
+import nars.derive.PrediTrie;
+import nars.derive.rule.PremiseRuleSet;
 import nars.exe.Exec;
 import nars.exe.FocusExec;
 import nars.index.term.BasicTermIndex;
+import nars.index.term.PatternIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.stm.STMLinkage;
@@ -57,9 +60,11 @@ public class NARS {
 
     protected Supplier<ConceptBuilder> concepts;
 
-    protected Function<NAR,PrediTerm<Derivation>> deriver;
+    protected Function<NAR, PrediTerm<Derivation>> deriver;
 
-    /** applied in sequence as final step before returning the NAR */
+    /**
+     * applied in sequence as final step before returning the NAR
+     */
     protected final List<Consumer<NAR>> after = new FasterList();
 
 
@@ -83,13 +88,23 @@ public class NARS {
         return this;
     }
 
+    public NARS deriver(String... rules) {
+
+        deriver = (n) -> (PrediTrie.the(
+                new PremiseRuleSet(
+                        new PatternIndex(), n, rules
+                )));
+
+        return this;
+    }
+
     public NARS deriver(Function<NAR, PrediTerm<Derivation>> dBuilder) {
         this.deriver = dBuilder;
         return this;
     }
 
     public NARS deriver(PrediTerm<Derivation> d) {
-        return deriver((nar)->d);
+        return deriver((nar) -> d);
     }
 
     /**
@@ -104,7 +119,7 @@ public class NARS {
         time = new CycleTime();
 
         exe = FocusExec::new;
-                    //new UnifiedExec();
+        //new UnifiedExec();
 
         rng = () -> new XorShift128PlusRandom(1);
 
@@ -125,13 +140,15 @@ public class NARS {
     /**
      * temporary, disposable NAR. useful for unit tests or embedded components
      * safe for single-thread access only.
+     *
      * @param nal adjustable NAL level. level >= 7 include STM (short-term-memory) Linkage plugin
      */
     public static NAR tmp(int nal) {
         return new Default(nal, false).get();
     }
 
-    /** single-thread, limited to NAL6 so it should be more compact than .tmp()
+    /**
+     * single-thread, limited to NAL6 so it should be more compact than .tmp()
      */
     public static NAR tmpEternal() {
         return new Default(6, false).get();
@@ -139,23 +156,39 @@ public class NARS {
 
     /**
      * single thread but for multithread usage:
-     *      unbounded soft reference index
+     * unbounded soft reference index
      */
     public static NAR threadSafe() {
         return new Default(8, true).get();
     }
 
-    /** default: thread-safe, with centisecond (0.01) precision realtime clock */
+    public NARS nal(int nal) {
+        after.add((x) -> {
+            x.nal(nal);
+        });
+        return this;
+    }
+
+    public NARS threadable() {
+        index = () -> new CaffeineIndex(64 * 1024 /*HACK */);
+        return this;
+    }
+
+    /**
+     * default: thread-safe, with centisecond (0.01) precision realtime clock
+     */
     public static NARS realtime() {
         return new Default(8, true).time(new RealTime.CS());
     }
+
     public static NARS realtime(float durFPS) {
         return new Default(8, true).time(new RealTime.CS().durFPS(durFPS));
     }
 
-    /** provides only low level functionality.
-     *  an empty deriver, but allows any kind of term
-     * */
+    /**
+     * provides only low level functionality.
+     * an empty deriver, but allows any kind of term
+     */
     public static NAR shell() {
         return tmp(0).nal(8);
     }
@@ -183,7 +216,9 @@ public class NARS {
         });
     }
 
-    /** adds a post-processing step before ready NAR is returned */
+    /**
+     * adds a post-processing step before ready NAR is returned
+     */
     public NARS then(Consumer<NAR> n) {
         after.add(n);
         return this;
@@ -194,7 +229,10 @@ public class NARS {
     }
 
 
-    /** generic defaults */
+    /**
+     * generic defaults
+     */
+    @Deprecated
     public static class Default extends NARS {
 
         final int nal;
@@ -206,7 +244,7 @@ public class NARS {
 
 
             if (threadSafe)
-                index = ()->new CaffeineIndex(128 * 1024 /*HACK */);
+                index = () -> new CaffeineIndex(128 * 1024 /*HACK */);
 
         }
 

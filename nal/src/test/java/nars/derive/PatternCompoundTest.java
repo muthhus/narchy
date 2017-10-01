@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 
 public class PatternCompoundTest {
 
-    final PatternIndex i = new PatternIndex(NARS.shell());
+    final PatternIndex i = new PatternIndex();
 
     @Test
     public void testPatternCompoundWithXTERNAL() throws Narsese.NarseseException {

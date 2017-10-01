@@ -72,9 +72,9 @@ public interface Deriver {
 
             Cause in = nar.newCause((cid)->new Cause(cid, "Derive(" + files + ")"));
 
-            final PatternIndex p = new PatternIndex(nar);
+            final PatternIndex p = new PatternIndex();
 
-            @NotNull PremiseRuleSet r = PremiseRuleSet.rules(nar, p,true, files.toArray(new String[files.size()]) );
+            @NotNull PremiseRuleSet r = PremiseRuleSet.rules(nar, p, files.toArray(new String[files.size()]) );
 
             PrediTerm<Derivation> x = PrediTrie.the(r, xf);
 

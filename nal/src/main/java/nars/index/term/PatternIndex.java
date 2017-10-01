@@ -29,9 +29,8 @@ import static nars.Op.concurrent;
 public class PatternIndex extends MapTermIndex {
 
 
-    public PatternIndex(@NotNull NAR n) {
+    public PatternIndex() {
         super(new HashMap<>());
-        this.nar = n;
     }
 
     @SuppressWarnings("Java8MapApi")
@@ -40,6 +39,7 @@ public class PatternIndex extends MapTermIndex {
         if (x instanceof Variable)
             return x;
 
+        //avoid recursion-caused concurrent modifiation exception
         Termed y = concepts.get(x);
         if (y == null) {
             concepts.put(x, y = x instanceof Compound ? patternify((Compound) x) : x);

@@ -9,12 +9,10 @@ import jcog.net.MeshOptimize;
 import jcog.pri.Prioritized;
 import nars.*;
 import nars.gui.Vis;
-import nars.op.Implier;
 import nars.op.stm.LinkClustering;
 import nars.task.DerivedTask;
 import nars.test.agent.Line1DSimplest;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.eclipse.collections.impl.collector.Collectors2;
 import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 import spacegraph.layout.Grid;
 import spacegraph.widget.meta.ReflectionSurface;
@@ -25,8 +23,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.PI;
-import static java.util.stream.Collectors.toList;
-import static nars.Op.IMPL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
 
@@ -37,7 +33,7 @@ public class Line1D {
     public static class Line1DVis {
 
 
-        public static void main(String[] args) {
+        public static void main(String[] args) throws Narsese.NarseseException {
 
 
 //                InstrumentedExecutor exe =
@@ -46,13 +42,33 @@ public class Line1D {
 //                );
 //
             Param.DEBUG = true;
-            NAR n = NARS.threadSafe();
+
+            NAR n = new NARS().threadable().nal(8).deriver(
+                    "B, (A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:DeductionRecursivePB, Goal:DeciDeduction)",
+                    "B, (--A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)",
+                    "B, (C ==> A), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:AbductionRecursivePB, Goal:DeciInduction)",
+                    "B, C, belief(\"&&|\"), belief(containsTask), task(\"!\"), time(urgent) |- without(C,B), (Goal:Strong)",
+                    "B, C, belief(\"&&|\"), belief(containsTask), task(\"!\"), time(urgent) |- without(C,--B), (Goal:StrongN)"
+            ).get();
+
+//            n.input("((i-o) =|> (y,())).",
+//                    "((o-i) =|> ((),y))."
+//            );
+            n.input("$.99 ((i-o) &| (y,()))!",
+                    "$.99 ((o-i) &| ((),y))!"
+            );
 
 
             LinkClustering linkClusterPri = new LinkClustering(n,
                     Prioritized::priElseZero /* anything temporal */,
-                    32, 128);
+                    4, 16);
 
+            //n.log();
+            n.onTask(x -> {
+                if (x instanceof DerivedTask) {
+                    System.out.println(x);
+                }
+            });
 
 
             //n.log();
@@ -121,7 +137,7 @@ public class Line1D {
             };
             exp.floatValueOf(n);
 
-            //new STMTemporalLinkage(n, 2, false);
+
             n.time.dur(16);
             exp.agent.runDur(1);
 
@@ -131,18 +147,18 @@ public class Line1D {
 //            n.beliefConfidence(0.5f);
 //            n.goalConfidence(0.5f);
 
-            new Implier(n, exp.agent.actions.keySet().stream().map(x->x.term).collect(toList()),
-                    0f,1f, 2f, 3f, 4f);
+//            new Implier(n, exp.agent.actions.keySet().stream().map(x->x.term).collect(toList()),
+//                    0f,1f, 2f, 3f, 4f);
 
 
             //n.start();
             n.run(100000);
 
-            n.concepts().collect(Collectors2.toSortedSet()).forEach(x -> {
-                if (x.op() == IMPL) {
-                    x.print();
-                }
-            });
+//            n.concepts().collect(Collectors2.toSortedSet()).forEach(x -> {
+//                if (x.op() == IMPL) {
+//                    x.print();
+//                }
+//            });
 
 
         }

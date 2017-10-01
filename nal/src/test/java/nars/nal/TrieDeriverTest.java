@@ -56,7 +56,7 @@ public class TrieDeriverTest {
 
     @Test
     public void testConclusionWithXTERNAL() {
-        PatternIndex idx = new PatternIndex(NARS.tmp()) {
+        PatternIndex idx = new PatternIndex() {
             @Override
             public @Nullable Termed get(@NotNull Term x, boolean create) {
                 Termed u = super.get(x, create);
@@ -72,7 +72,7 @@ public class TrieDeriverTest {
         };
 
 
-        PrediTerm d = the(new PremiseRuleSet(idx, false,
+        PrediTerm d = the(new PremiseRuleSet(idx, NARS.shell(),
                 "Y, Y |- (?1 &&+0 Y), ()",
                 "X, X |- (?1 &&+- X), ()"
         ));
@@ -98,23 +98,22 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
         return PrediTrie.the(r, (x) -> x);
     }
 
+
     public static PrediTerm<Derivation> testCompile(String... rules) {
-        return testCompile(NARS.tmp(0), false, rules);
+        return testCompile(false, rules);
     }
 
-    public static PrediTerm<Derivation> testCompile(NAR n, String... rules) {
-        return testCompile(n, false, rules);
-    }
-
-    public static PrediTerm<Derivation> testCompile(@NotNull NAR n, boolean debug, String... rules) {
+    public static PrediTerm<Derivation> testCompile(boolean debug, String... rules) {
 
         assertNotEquals(0, rules.length);
 
-        @NotNull PatternIndex pi = new PatternIndex(n);
+        @NotNull PatternIndex pi = new PatternIndex();
 
         Stream<Pair<PremiseRule, String>> parsed = PremiseRuleSet.parse(Stream.of(rules));
 
-        PremiseRuleSet src = new PremiseRuleSet(parsed, pi, false);
+
+        PremiseRuleSet src =
+                new PremiseRuleSet(parsed, pi, NARS.shell());
         assertNotEquals(0, src.size());
         PrediTerm<Derivation> d = the(src);
 
@@ -216,7 +215,7 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
 
     public TestNAR test(int tlMax, boolean debug, String... rules) throws Narsese.NarseseException {
         NAR n = new NARS().deriver((NAR nar) -> {
-            PrediTerm<Derivation> d = testCompile(nar, debug, rules);
+            PrediTerm<Derivation> d = testCompile(debug, rules);
             TrieDeriver.print(d);
             return d;
         }).get();
@@ -228,7 +227,7 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
     public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax, boolean debug) throws Narsese.NarseseException {
         NAR n = NARS.tmp();
 
-        PrediTerm<Derivation> d = testCompile(n, debug, rules);
+        PrediTerm<Derivation> d = testCompile(debug, rules);
         if (debug)
             d = d.transform(DebugDerivationPredicate::new);
 
@@ -263,7 +262,7 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
         String s = "B, (A ==> C), neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionRecursive)";
 
         NAR n = NARS.tmp();
-        PrediTerm<Derivation> d = testCompile(n, false, s);
+        PrediTerm<Derivation> d = testCompile(false, s);
         TrieDeriver.print(d, System.out);
 
         assertTrue(d.subs(x -> x instanceof MatchConstraint) > 0);
@@ -292,7 +291,7 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
         String s = "( (--,%S) ==> P), ( (--,%S) ==> P) |- ( (--,%P) ==>+- S),       (Belief:Contraposition)";
 
         NAR n = NARS.tmp();
-        PrediTerm<Derivation> d = testCompile(n, false, s);
+        PrediTerm<Derivation> d = testCompile(false, s);
         TrieDeriver.print(d, System.out);
 
     }
