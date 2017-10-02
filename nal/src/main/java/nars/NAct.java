@@ -419,7 +419,7 @@ public interface NAct {
             Random rng = n.random();
 
 
-            float confMin = nar().confMin.floatValue();
+            float confMin = n.confMin.floatValue();
             float confBase =
                     confMin * 4;
                     //n.confDefault(GOAL);
@@ -432,7 +432,9 @@ public interface NAct {
             //evi[ip] = g != null ? g.evi(): 0f;
 
 
-            float cIn = Math.max(c[0],c[1]);
+            float cIn =
+                //Math.max(c[0],c[1]);
+                Util.mean(c[0],c[1]);
 
             if (!p) {
 

@@ -227,7 +227,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 return x;
             }
 
-            if (!Revision.isRevisible(y, x))
+            if (Stamp.overlapping(y, x))
                 continue;
 
 

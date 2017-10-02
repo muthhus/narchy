@@ -3,7 +3,9 @@ package nars.concept.dynamic;
 import jcog.list.FasterList;
 import jcog.pri.Prioritized;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
+import nars.control.Activate;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.task.NALTask;
@@ -30,7 +32,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     @Nullable
     public NALTask generate(@NotNull Term template, long start, long end, @Nullable Prioritized b, NAR nar) {
 
-        DynTruth yy = truth(start, end,  template, true, nar);
+        DynTruth yy = truth(start, end, template, true, nar);
         if (yy == null)
             return null;
 
@@ -70,80 +72,37 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     }
 
 
-
-
     @Nullable
     public DynTruth truth(long start, long end, @NotNull Term template, boolean evidence, NAR nar) {
         return model.eval(template, beliefOrGoal, start, end, evidence, nar); //newDyn(evidence);
     }
 
     @Override
-    public Task match(long start, long end, Term template, boolean noOverlap, NAR nar) {
-//        if (isEmpty())
-//            return null;
+    public Task match(long start, long end, @NotNull Term template, boolean noOverlap, NAR nar) {
         Task x = super.match(start, end, template, noOverlap, nar);
 
-        if (template == null) {
-            return x;
-//            if (target!=null) {
-//                template = target.term();
-//
-//            }
-//            if (template == null) {
-//                //HACK use the first held task
-//                try {
-//                    Task first = iterator().next();
-//                    template = first.term();
-//                } catch (NullPointerException ignored) {
-//                    return null;
-//                }
-//            }
+        Task y = generate(template, start, end, null, nar);
+        if (y == null || y.equals(x)) return x;
+
+        boolean dyn;
+        if (x == null) {
+            dyn = true;
+        } else {
+            //choose higher confidence
+            int dur = nar.dur();
+            float xc = x.evi(start, end, dur);
+            float yc = y.evi(start, end, dur);
+
+            //prefer the existing task within a small epsilon lower for efficiency
+            dyn = yc >= xc + Param.TRUTH_EPSILON;
         }
 
-//        Retemporalize tmp = target == null || target.isEternal() ?
-//                TermIndex.retemporalizeDTERNAL : TermIndex.retemporalizeZero;
-//        Term template2 = TermIndex.retemporalize(template, tmp);
-//
-//        if (template2 == null) {
-////            if (tmp == nar.terms.retemporalizeZero) {
-////                //try again with DTERNAL
-////                template2 = nar.terms.retemporalize(template, nar.terms.retemporalizeDTERNAL);
-////                if (template2 == null)
-////                    return null;
-////            }
-//            return null;
-//        }
-//
-//        template = template2;
+        if (dyn) {
+            Activate.activate(y, y.priElseZero(), nar);
+            return y;
+        } else {
+            return x;
+        }
 
-        Task y = generate(template, start, end, null, nar);
-
-
-        if (x == null) return y;
-        if (y == null || x.equals(y)) return x;
-
-//        //choose the non-overlapping one
-//        if (noOverlap && target != null) {
-//            if (Stamp.overlapping(y, target))
-//                return x;
-//            if (Stamp.overlapping(x, target))
-//                return y;
-//        }
-
-        //choose higher confidence
-        int dur = nar.dur();
-        float xc =
-                x.evi(start, end, dur);
-                //x.evi(); //use absolute evidence for its own time, not coercively projected to the specified time
-        float yc =
-                y.evi(start, end, dur);
-                //y.evi(); //use absolute evidence for its own time, not coercively projected to the specified time
-
-        //if (!Util.equals(xc, yc, TRUTH_EPSILON)) {
-        return xc >= yc ? x : y;
-        //}
-//
-//        //choose based on originality (includes cyclic), but by default prefer the existing task not the dynamic one
-//        return (x.originality() >= y.originality()) ? x : y;
     }
 }

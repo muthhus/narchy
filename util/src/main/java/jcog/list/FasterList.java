@@ -176,6 +176,11 @@ public class FasterList<X> extends FastList<X> {
         return items;
     }
 
+
+    public float meanValue(FloatFunction<? super X> function) {
+        return (float) (sumOfFloat(function)/size());
+    }
+
     public float maxValue(FloatFunction<? super X> function) {
         float max = Float.NEGATIVE_INFINITY;
         for (int i = 0, thisSize = this.size(); i < thisSize; i++) {
@@ -510,4 +515,6 @@ public class FasterList<X> extends FastList<X> {
     public void setSize(int s) {
         this.size = s;
     }
+
+
 }

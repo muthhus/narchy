@@ -43,7 +43,7 @@ public class Finger {
     /**
      * TODO scale this to pixel coordinates, this spatial coordinate is tricky and resolution dependent anyway
      */
-    final static float DRAG_THRESHOLD = 0.0002f;
+    final static float DRAG_THRESHOLD = 0.0004f;
 
     public Finger(Ortho root) {
         this.root = root;

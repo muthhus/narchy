@@ -108,7 +108,7 @@ public class BooleanTest {
                 assertTrue("unrecognized true case", false);
 
 
-            if (thisone && b != null && b.isNegative() && b.conf() > 0)
+            if (thisone && b.isNegative() && b.conf() > confThresh)
                 assertTrue("wrong true case:\n" + t.proof(), false);
 
             if (!thisone && b != null && b.isPositive() && b.conf() > confThresh)

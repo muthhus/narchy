@@ -46,70 +46,22 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
 
     public static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n) {
-//        if (n.exe.concurrent()) {
-//            n.exe.execute(() -> activate(t, activationApplied, n, true));
-//        } else {
 
-
-        float evalAmp = n.evaluate(t.cause());
-        activate(t,
-                activationApplied * evalAmp,
-                n, true);
-//        }
-    }
-
-    private static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n, boolean process) {
-        // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
-        //if (activation >= EPSILON) {
         Concept cc = t.concept(n, true);
         if (cc != null) {
+            float evalAmp = n.evaluate(t.cause());
 
-            activate(t, activationApplied, cc, n);
-//            if (t.isInput()) {
-            //sync run immediately
-//                a.run(n);
-//            }
-//
+            n.emotion.onActivate(t, activationApplied * evalAmp, cc, n);
 
-//                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
-//                n.input(a);
-        }
+            cc.tasklinks().putAsync(
+                    new PLinkUntilDeleted<>(t, activationApplied * evalAmp)
+                    //new PLink<>(t, activation)
+            );
 
-        if (process) {
-//            if (n.exe.concurrent())
-//                n.eventTask.emitAsync(/*post*/t, n.exe);
-//            else
+            BatchActivate.get().put(cc, activationApplied * evalAmp);
+
             n.eventTask.emit(t);
         }
-        //}
-    }
-
-    private static void activate(@NotNull Task t, float activation, Concept origin, NAR n) {
-
-
-//        if (activation < EPSILON) {
-//            return null;
-//        }
-
-        n.emotion.onActivate(t, activation, origin, n);
-
-        origin.tasklinks().putAsync(
-                new PLinkUntilDeleted<>(t, activation)
-                //new PLink<>(t, activation)
-        );
-
-
-//            if (origin instanceof CompoundConcept) {
-//
-//                //return new ConceptFire(origin, activation, new ActivateSubterms(t, activation));
-//                return new ConceptFire(origin, activation);
-//            } else {
-//                //atomic activation)
-
-        BatchActivate.get().put(origin, activation);
-        //return new Activate(origin, activation); /*, () -> {
-
-//            }
 
     }
 

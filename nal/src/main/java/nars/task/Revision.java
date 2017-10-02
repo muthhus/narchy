@@ -16,14 +16,18 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import static jcog.Util.lerp;
+import static nars.Op.CONJ;
 import static nars.time.Tense.*;
 import static nars.truth.TruthFunctions.c2w;
 
@@ -117,7 +121,7 @@ public class Revision {
 
             Op ao = a.op();
             Op bo = b.op();
-            assert (ao == bo): a + " and " + b + " have different op";
+            assert (ao == bo) : a + " and " + b + " have different op";
 
 
             if (ao.temporal && len == 2) {
@@ -226,24 +230,11 @@ public class Revision {
         return x;
     }
 
-    /**
-     * WARNING: this assumes the task's terms are already
-     * known to be equal.
-     */
-    public static boolean isRevisible(@NotNull Task newBelief, @NotNull Task oldBelief) {
-        //Term t = newBelief.term();
-        return
 
-
-                //!(t.op().isConjunctive() && t.hasVarDep()) &&  // t.hasVarDep());
-
-                //!newBelief.equals(oldBelief) &&  //if it overlaps it will be equal, so just do overlap test
-                !Stamp.overlapping(newBelief, oldBelief);
-    }
 
 
     @NotNull
-    public static Task chooseByConf(@NotNull Task t, @Nullable Task b, @NotNull Derivation p) {
+    public static Task chooseByConf(/*@NotNull*/ Task t, @Nullable Task b, /*@NotNull*/ Derivation p) {
 
         if ((b == null) || !b.isBeliefOrGoal())
             return t;
@@ -257,18 +248,18 @@ public class Revision {
 
     }
 
-    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, NAR nar) {
+    public static Term intermpolate(/*@NotNull*/ Term a, /*@NotNull*/ Term b, float aProp, NAR nar) {
         return intermpolate(a, b, aProp, nar.random(), nar.dtMergeOrChoose.booleanValue());
     }
 
-    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull Random rng, boolean mergeOrChoose) {
+    public static Term intermpolate(/*@NotNull*/ Term a, /*@NotNull*/ Term b, float aProp, /*@NotNull*/ Random rng, boolean mergeOrChoose) {
         return intermpolate(a, b, aProp, 1, rng, mergeOrChoose);
     }
 
     /**
      * t is the target time of the new merged task
      */
-    public static Task merge(@NotNull Task a, @NotNull Task b, long now, NAR nar) {
+    @Nullable public static Task merge(/*@NotNull*/ Task a, /*@NotNull*/ Task b, long now, NAR nar) {
 
 
         long as = a.start();
@@ -289,18 +280,22 @@ public class Revision {
 
         //relate high frequency difference with low confidence
         float freqDiscount =
-               0.5f + 0.5f * (1f - Math.abs(a.freq() - b.freq()));
-        factor *= freqDiscount; if (factor < Prioritized.EPSILON) return null;
+                0.5f + 0.5f * (1f - Math.abs(a.freq() - b.freq()));
+        factor *= freqDiscount;
+        if (factor < Prioritized.EPSILON) return null;
 
         //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
         float overlap = Stamp.overlapFraction(a.stamp(), b.stamp());
-        float stampDiscount = 1f - overlap/2f;
-        factor *= stampDiscount; if (factor < Prioritized.EPSILON) return null;
+        float stampDiscount = 1f - overlap / 2f;
+        factor *= stampDiscount;
+        if (factor < Prioritized.EPSILON) return null;
 
-        float intermvalDistance = dtDiff(a.term(), b.term());
         int dur = nar.dur();
-        factor *= (1f/(1f+intermvalDistance/ dur)); if (factor < Prioritized.EPSILON) return null;
+        float intermvalDistance = dtDiff(a.term(), b.term()) /
+                ((1 + Math.max(a.term().dtRange(), b.term().dtRange())) * dur);
+        factor *= (1f / (1f + intermvalDistance));
+        if (factor < Prioritized.EPSILON) return null;
 
 //            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
 //            float confMax = Util.lerp(temporalOverlap, Math.max(w2c(ae),w2c(be)),  1f);
@@ -383,9 +378,13 @@ public class Revision {
                 t = at;
                 i = Param.MAX_TERMPOLATE_RETRIES; //no need to retry
             } else {
-                t = intermpolate(at, bt, aProp, nar);
-                //if (!t.eternalEquals(atConceptual))
-                  //  continue;
+                try {
+                    t = intermpolate(at, bt, aProp, nar);
+                } catch (Throwable ett) {
+                    //TODO this probably means conjunction need to be merged by events
+                    logger.warn("{} + {} ==> {}", at, bt, ett.getMessage());
+                    return null;
+                }
             }
 
 
@@ -403,9 +402,6 @@ public class Revision {
 
         if (cc == null)
             return null;
-
-
-
 
 
         //        if (cc.op() == CONJ) {
@@ -457,15 +453,75 @@ public class Revision {
     static float dtDiff(Term a, Term b, int depth) {
         if (a.equals(b)) return 0f;
 
+        if (!a.isTemporal() || !b.isTemporal())
+            return 0f;
+
         Op ao = a.op();
         Op bo = b.op();
         if (ao != bo)
             return Float.POSITIVE_INFINITY; //why?
 
-        float dLocal = 0;
-        int adt = a.dt();
-        int bdt = b.dt();
-        if (adt != bdt && adt!=XTERNAL && bdt!=XTERNAL && adt!=DTERNAL && bdt!=DTERNAL) {
+
+        TermContainer aa = a.subterms();
+        int len = aa.subs();
+        TermContainer bb = b.subterms();
+
+        float d = 0;
+
+        int blen = bb.subs();
+        if (a.op() == CONJ && (len > 2 || blen > 2)) {
+            if (len>2 && blen>2) {
+
+                //parallel, eternal, or xternal commutive
+                for (int i = 0; i < len; i++)
+                    d += dtDiff(aa.sub(i), bb.sub(i), depth + 1);
+
+            } else {
+                //hard way: break down into events because there is a combination of parallel and seq
+
+                //a) inter-term distance if both are non-XTERNAL
+                if (a.dt() != XTERNAL && b.dt() != XTERNAL) {
+
+                    final float[] xd = {0};
+                    ObjectLongHashMap<Term> ab = new ObjectLongHashMap(len);
+                    a.events((tw) -> ab.put(tw.getOne().xternal(), tw.getTwo()));
+                    b.events((tw) -> ab.addToValue(tw.getOne().xternal(), -tw.getTwo()));
+
+                    ab.forEachValue(x -> xd[0] += Math.abs(x));
+                    d += xd[0];
+                }
+
+                Map<Term, Term[]> ab = new HashMap(len);
+
+                //TODO this collapses duplicates. ignore for now
+                a.events((tw) -> {
+                    Term tww = tw.getOne();
+                    if (tww.isTemporal())
+                        ab.put(tww.xternal(), new Term[]{tww, null});
+                });
+
+                b.events((tw) -> {
+                    Term tww = tw.getOne();
+                    if (tww.isTemporal()) {
+                        Term[] x = ab.computeIfAbsent(tww.xternal(), (nn) -> new Term[2]);
+                        x[1] = tww;
+                    }
+                });
+
+                for (Term[] xy : ab.values()) {
+                    if (xy[0] != null && xy[1] != null) {
+                        if (!xy[0].equals(xy[1]))
+                            d += dtDiff(xy[0], xy[1], depth + 1);
+                    } //else ?
+                }
+            }
+
+        } else {
+            int adt = a.dt();
+            int bdt = b.dt();
+            if (adt == XTERNAL) adt = bdt;
+            if (bdt == XTERNAL) bdt = adt;
+            if (adt != bdt && adt != DTERNAL && bdt != DTERNAL) {
 
 //            if (adt == DTERNAL) {
 //                adt = 0;
@@ -476,23 +532,14 @@ public class Revision {
 //                dLocal += 0.5f;
 //            }
 
-            dLocal += Math.abs(adt - bdt);
-            dLocal /= depth;
+                d += Math.abs(adt - bdt);
+            }
+
+            for (int i = 0; i < len; i++)
+                d += dtDiff(aa.sub(i), bb.sub(i), depth + 1);
         }
 
-        float d = dLocal;
-
-        TermContainer aa = a.subterms();
-        int len = aa.subs();
-        TermContainer bb = b.subterms();
-        if (bb.subs()!=len)
-            return Float.POSITIVE_INFINITY; //? why
-
-        for (int i = 0; i < len; i++) {
-            d += dtDiff(aa.sub(i), bb.sub(i), depth + 1);
-        }
-
-        return d;
+        return d / depth;
     }
 
 }

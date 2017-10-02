@@ -58,7 +58,8 @@ public final class DynTruth implements Truthed {
             //                BudgetMerge.plusBlend.apply(b, x.budget(), f);
             //            }
             //            return b;
-            return e.maxValue(Task::priElseZero); //use the maximum of their truths
+            //return e.maxValue(Task::priElseZero); //use the maximum of their truths
+            return e.meanValue(Task::priElseZero); //average value
         } else {
             return e.get(0).priElseZero();
         }
@@ -93,16 +94,9 @@ public final class DynTruth implements Truthed {
         if (tr == null)
             return null;
 
-        Prioritized priority;
-        if (b != null) {
-            if ((priority = b).isDeleted())
-                return null;
-        } else {
-             float p = budget();
-             if (p!=p)
-                 return null; //deleted
-            priority = new Pri(p);
-        }
+        float priority = b != null ? b.pri() : budget();
+        if (priority!=priority) //deleted
+            return null;
 
         Retemporalize r = start == ETERNAL ? Retemporalize.retemporalizeXTERNALToDTERNAL : Retemporalize.retemporalizeXTERNALToZero;
         if (null == (c = c.temporalize(r)))

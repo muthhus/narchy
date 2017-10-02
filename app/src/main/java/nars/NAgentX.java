@@ -183,6 +183,7 @@ abstract public class NAgentX extends NAgent {
                 )
                 .get();
 
+        n.dtMergeOrChoose.setValue(true);
 
         n.setEmotion(new Emotivation(n));
 
