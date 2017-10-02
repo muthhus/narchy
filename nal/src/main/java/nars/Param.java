@@ -100,7 +100,7 @@ public abstract class Param extends Services<Term,NAR> {
                     //0;
                     //Integer.MAX_VALUE;
                     //4;
-                    16;
+                    8;
 
     /** 'time to live', unification steps until unification is stopped */
     public final MutableInteger matchTTLmax = new MutableInteger(512);
@@ -262,8 +262,8 @@ public abstract class Param extends Services<Term,NAR> {
 
 
     /**
-     * Evidential Horizon, the amount of future evidence to be considered (during revision).
-     * Must be >=1.0, usually 1 .. 2
+     * Evidential Horizon, the amount of future evidence to be considered
+     * Must be >=1.0
      */
     public static final float HORIZON = 1f;
 

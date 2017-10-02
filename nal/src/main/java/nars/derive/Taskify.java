@@ -85,7 +85,10 @@ public class Taskify extends AbstractPred<Derivation> {
         }
 
 
-        float priority = nar.derivePriority(t, p) * channel.amp();
+        float priority = nar.derivePriority(t, p)
+                //* channel.amp()
+        ;
+
         assert (priority == priority);
 
         float tp = t.setPri(priority);

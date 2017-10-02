@@ -22,6 +22,7 @@ package nars.truth;
 
 import jcog.Texts;
 import jcog.Util;
+import nars.$;
 import nars.Op;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -218,6 +219,10 @@ public interface Truth extends Truthed {
 
     default float freqNegTimesConf() {
         return (1 - freq()) * conf();
+    }
+
+    default PreciseTruth withConf(float c) {
+        return $.t(freq(), c);
     }
 
 

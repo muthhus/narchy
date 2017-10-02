@@ -415,8 +415,8 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
     default float eternalizable() {
 
-        //return 1f; //always
-        return 0f; //never
+        return 1f; //always
+        //return 0f; //never
 
 //        Term t = term();
 //        return t.op().temporal || t.vars() > 0 ? 1f : 0f;

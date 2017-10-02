@@ -19,7 +19,7 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
-    float fwdSpeed = 5;
+    float fwdSpeed = 8;
     float rotSpeed = 0.05f;
 
     public static void main(String[] args) {
@@ -51,7 +51,7 @@ public class FZero extends NAgentX {
         this.fz = new FZeroGame();
 
         CameraSensor<Scale> c = senseCamera(id, new Scale(() -> fz.image,
-                24, 16)/*.blur()*/);//.resolution(0.01f)
+                24, 16)/*.blur()*/).resolution(0.1f);
 
 //        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
 //        cc.addActions($.the("fz"), this, false, false, true);
@@ -107,11 +107,11 @@ public class FZero extends NAgentX {
         //senseNumberDifference($.inh(the("joy"), id), happy).resolution.setValue(0.02f);
 //        senseNumberDifference($.prop(the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.02f);
 //        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
-        @NotNull ScalarConcepts ang = senseNumber(p("ang"), () ->
+        @NotNull ScalarConcepts ang = senseNumber($.the("ang"), () ->
                         (float) (0.5f + 0.5f * MathUtils.normalizeAngle(fz.playerAngle, 0) / (Math.PI)),
-                5,
-                //ScalarConcepts.Needle
-                ScalarConcepts.Fluid
+                9,
+                ScalarConcepts.Needle
+                //ScalarConcepts.Fluid
         ).resolution(0.1f);
         window(
                 Vis.conceptBeliefPlots(this, ang, 4), 500, 500);
@@ -278,11 +278,13 @@ public class FZero extends NAgentX {
         //System.out.println("head=" + fz.playerAngle%(2*3.14f) + " pow=" + fz.power + " vel=" + fz.vehicleMetrics[0][6] + " deltaDist=" + deltaDistance);
 
 
+        float ambientSadness = 0.25f;
+
         return Util.clamp(
                 //-0.5f /* bias */ +
                 (float) (-(FZeroGame.FULL_POWER - ((float) fz.power)) / FZeroGame.FULL_POWER +
                         //((float)fz.vehicleMetrics[0][6]/100f)+
-                        deltaDistance), -1f, +1f);
+                        deltaDistance), -1f, +1f) - ambientSadness;
     }
 
 

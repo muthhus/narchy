@@ -41,7 +41,10 @@ public class Arkancide extends NAgentX {
             Arkancide a = null;
 
             try {
+                n.truthResolution.setValue(.06f);
+
                 a = new Arkancide(n, cam, numeric);
+                a.curiosity.setValue(0.05f);
 
                 //a.trace = true;
                 //((RealTime)a.nar.time).durSeconds(0.05f);
@@ -56,7 +59,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 20);
+        }, 10);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -90,16 +93,16 @@ public class Arkancide extends NAgentX {
         };
 
 
-        paddleSpeed = 25 * noid.BALL_VELOCITY;
+        paddleSpeed = 60 * noid.BALL_VELOCITY;
 
-        float resX = 0.1f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
-        float resY = 0.1f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
+        float resX = 0.01f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
+        float resY = 0.01f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
 
             BufferedImageBitmap2D sw = new Scale(new SwingBitmap2D(noid), visW, visH).blur();
             CameraSensor cc = senseCamera("noid", sw, visW, visH)
-                    .resolution(0.1f);
+                    .resolution(0.25f);
 //            CameraSensor ccAe = senseCameraReduced($.the("noidAE"), sw, 16)
 //                    .resolution(0.25f);
 
@@ -109,10 +112,10 @@ public class Arkancide extends NAgentX {
 
 
         if (numeric) {
-            senseNumberBi($.the("px"), (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
-            senseNumberBi($.the("dx"), (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
-            senseNumberBi($.the("bx"), (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
-            senseNumberBi($.the("by"), (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
+            senseNumber($.the("px"), (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
+            senseNumber($.the("dx"), (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
+            senseNumber($.the("bx"), (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
+            senseNumber($.the("by"), (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
             //SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX)).resolution(0.25f);
             //SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY)).resolution(0.25f);
 

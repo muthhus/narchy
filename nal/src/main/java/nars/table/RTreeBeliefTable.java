@@ -53,7 +53,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      */
     static final float SCAN_MAX_FRACTION = 0.1f;
 
-    public static final float PRESENT_AND_FUTURE_BOOST = 2f;
+    public static final float PRESENT_AND_FUTURE_BOOST = 1.0f;
 
 
     private transient NAR nar;
@@ -283,7 +283,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
                 //scan outwards
 
-                TaskRegion bounds = (TaskRegion) tree.root().region();
+                TaskRegion bounds = (TaskRegion) (tree.root().region());
+                if (bounds == null) //?? why
+                    return null;
+
                 long expand = Math.max(1, (bounds.end() - bounds.start()) / 8);
 
                 long scanStart = start - 1, scanEnd = end + 1;

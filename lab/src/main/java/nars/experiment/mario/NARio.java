@@ -103,7 +103,7 @@ public class NARio extends NAgentX {
                 mario.y : 0).resolution(0.04f);
 
         actionBipolar($.inh($.the("x"),id), (x) -> {
-            float thresh = 0.33f;
+            float thresh = 0.25f;
             float thresh2 = 0.9f;
             if (x <= -thresh) {
                mario.scene.key(Mario.KEY_LEFT, true);
@@ -126,26 +126,26 @@ public class NARio extends NAgentX {
                //return 0f;
                //return x;
                //return 0;
-               return x;
+               return 0;
            }
         });
-        actionBipolar($.inh($.the("y"),id), (x) -> {
-            float thresh = 0.33f;
-            if (x <= -thresh) {
+        actionBipolar($.inh($.the("y"),id), (y) -> {
+            float thresh = 0.25f;
+            if (y <= -thresh) {
                mario.scene.key(Mario.KEY_DOWN, true);
                mario.scene.key(Mario.KEY_JUMP, false);
                //return -1f;
-               return x;
-           } else if (x >= +thresh) {
+               return y;
+           } else if (y >= +thresh) {
                mario.scene.key(Mario.KEY_JUMP, true);
                mario.scene.key(Mario.KEY_DOWN, false);
                //return +1f;
-               return x;
+               return y;
            } else {
                mario.scene.key(Mario.KEY_JUMP, false);
                mario.scene.key(Mario.KEY_DOWN, false);
                //return 0f;
-               return x;
+               return 0;
            }
         });
 //        actionToggle(p("left"), (n) -> {

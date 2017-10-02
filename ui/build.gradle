@@ -1,4 +1,9 @@
 description = ''
+
+repositories {
+  jcenter()
+}
+
 dependencies {
     compile project(':util')
 
@@ -25,16 +30,21 @@ dependencies {
             version: '2.3.2')
 
 
-    compile group: 'org.boofcv', name: 'sfm', version: '0.26'
-    compile group: 'org.boofcv', name: 'geo', version: '0.26'
-    compile group: 'org.boofcv', name: 'io', version: '0.26'
-    compile group: 'org.boofcv', name: 'ip', version: '0.26'
-    compile group: 'org.boofcv', name: 'WebcamCapture', version: '0.26'
+//    compile group: 'org.boofcv', name: 'sfm', version: '0.26'
+//    compile group: 'org.boofcv', name: 'geo', version: '0.26'
+//    compile group: 'org.boofcv', name: 'io', version: '0.26'
+//    compile group: 'org.boofcv', name: 'ip', version: '0.26'
+    compile(group: 'org.boofcv', name: 'WebcamCapture', version: '0.26') {
+        exclude(module: 'visualize')
+        exclude(module: 'ip')
+        exclude(module: 'lo')
+        exclude(module: 'io')
+    }
 
     compile group: 'org.jfxvnc', name: 'jfxvnc-net', version: '1.2.0'
 
     compile(group: 'de.dfki.mary', name: 'voice-cmu-slt-hsmm', version: '5.2') {
-        //exclude(group: 'log4j')
+//        exclude(group: 'log4j')
         exclude(group: 'org.codehaus.groovy')
         exclude(group: 'org.swinglabs')
         exclude(group: 'org.slf4j')
@@ -42,6 +52,7 @@ dependencies {
     }
 
     compile(group: 'org.pircbotx', name: 'pircbotx', version: '2.1') {
+        exclude(group: 'org.slf4j')
         exclude(module: 'commons-lang3')
         exclude(module: 'guava')
     }

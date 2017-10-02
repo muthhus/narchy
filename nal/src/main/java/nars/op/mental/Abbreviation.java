@@ -184,7 +184,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Prioritized b, NAR nar) {
 
         @Nullable Concept a = nar.concept(abbreviated);
-        if (a != null && !(a instanceof AliasConcept)) {
+        if (a != null && !(a instanceof AliasConcept) && !(a instanceof PermanentConcept)) {
 
             final boolean[] succ = {false};
             a.computeIfAbsent(Abbreviation.class, (ac) -> {

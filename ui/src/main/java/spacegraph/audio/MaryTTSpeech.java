@@ -5,6 +5,7 @@ import marytts.LocalMaryInterface;
 import marytts.MaryInterface;
 import marytts.exceptions.MaryConfigurationException;
 import marytts.exceptions.SynthesisException;
+import marytts.server.Mary;
 import marytts.util.data.BufferedDoubleDataSource;
 import marytts.util.data.audio.DDSAudioInputStream;
 import marytts.util.data.audio.MaryAudioUtils;
@@ -33,7 +34,7 @@ public class MaryTTSpeech {
         try {
             m = new LocalMaryInterface(); //this thing has a bad version check BAD BAD BAD
             //logger.info("Speech System READY");
-        } catch (MaryConfigurationException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             m = null;
         }
@@ -45,7 +46,6 @@ public class MaryTTSpeech {
 
 //    public static void main(String[] args) throws Exception {
 //
-//        System.out.println("I currently have " + marytts.getAvailableVoices() + " voices in "
 //                + marytts.getAvailableLocales() + " languages available.");
 //        System.out.println("Out of these, " + marytts.getAvailableVoices(Locale.US) + " are for US English.");
 //

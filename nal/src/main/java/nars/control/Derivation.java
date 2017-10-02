@@ -7,7 +7,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.derive.DerivationTemporalize;
+import nars.derive.TemporalizeDerived;
 import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
@@ -111,7 +111,7 @@ public class Derivation extends Unify implements TermContext {
     public final long[] derivedOcc = new long[2];
     public PrediTerm<Derivation> deriver;
     public boolean single;
-    public DerivationTemporalize temporalize;
+    public TemporalizeDerived temporalize;
     public int parentComplexity;
 
     /** choices mapping the available post targets */
@@ -184,6 +184,7 @@ public class Derivation extends Unify implements TermContext {
                 nar.get(Atomic.the("intersect")),
                 nar.get(Atomic.the("conjEvent")),
                 nar.get(Atomic.the("conjDropIfEarliest")),
+                nar.get(Atomic.the("ifConjCommNoDepVars")),
                 nar.get(Atomic.the("without"))
         );
 

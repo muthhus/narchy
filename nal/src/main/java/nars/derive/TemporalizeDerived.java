@@ -38,7 +38,7 @@ import static nars.time.Tense.ETERNAL;
  *
  * @param eviGain length-1 float array. the value will be set to 1f by default
  */
-public class DerivationTemporalize extends Temporalize {
+public class TemporalizeDerived extends Temporalize {
 
     private final Task task, belief;
 
@@ -49,7 +49,7 @@ public class DerivationTemporalize extends Temporalize {
      */
     public Map<Term, SortedSet<Event>> sng, dbl;
 
-    public DerivationTemporalize(Derivation d) {
+    public TemporalizeDerived(Derivation d) {
         super(d.random);
         task = d.task;
         belief = d.belief; //!d.single ? d.belief : null;

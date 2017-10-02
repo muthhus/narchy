@@ -74,9 +74,9 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
             try {
 
-                DerivationTemporalize dt = p.temporalize;
+                TemporalizeDerived dt = p.temporalize;
                 if (dt == null) {
-                    p.temporalize = dt = new DerivationTemporalize(p); //cache in derivation
+                    p.temporalize = dt = new TemporalizeDerived(p); //cache in derivation
                 }
 
                 c2 = dt.solve(this, p, c1, occ, confGain);

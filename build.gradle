@@ -32,6 +32,12 @@ subprojects {
         //options.incremental = true // one flag, and things will get MUCH faster
     }
 
+    test {
+        reports {
+            junitXml.enabled = false
+            html.enabled = true
+        }
+    }
 
     repositories {
         mavenLocal()

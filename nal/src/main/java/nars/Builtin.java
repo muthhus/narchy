@@ -19,6 +19,7 @@ import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.TreeSet;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
 
@@ -183,10 +184,26 @@ public class Builtin {
             }
         }));
 
+        /** depvar cleaning from commutive conj */
+        nar.on(Functor.f1((Atom) $.the("ifConjCommNoDepVars"), (Term t) -> {
+            if (!t.hasAny(VAR_DEP))
+                return t;
+            Op oo = t.op();
+            if (oo != CONJ)
+                return t;
+
+
+            TreeSet<Term> s = t.subterms().toSortedSet();
+            if (!s.removeIf(x -> x.unneg().op()==VAR_DEP))
+                return t;
+
+            return CONJ.the(t.dt(), s);
+        }));
+
         /** drops a random contained event, whether at first layer or below */
         nar.on(Functor.f1((Atom) $.the("dropAnyEvent"), (Term t) -> {
             Op oo = t.op();
-            if (oo!=CONJ)
+            if (oo != CONJ)
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
             int tdt = t.dt();
@@ -247,11 +264,11 @@ public class Builtin {
         }));
 
         nar.on(Functor.f2((Atom) $.the("conjDropIfEarliest"), (Term conj, Term event) -> {
-            if (conj.op() != CONJ || conj.subtermTimeSafe(event)!=0)
+            if (conj.op() != CONJ || conj.subtermTimeSafe(event) != 0)
                 return Null;
-            if (conj.dt()!=DTERNAL) {
+            if (conj.dt() != DTERNAL) {
                 FasterList<ObjectLongPair<Term>> events = conj.events();
-                assert(events.get(0).getTwo()==0);
+                assert (events.get(0).getTwo() == 0);
                 ObjectLongPair<Term> first = events.get(0);
                 Term firstTerm = first.getOne();
 //
@@ -276,8 +293,8 @@ public class Builtin {
         nar.on(f0("self", nar::self));
 
 
-        nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(n.belief( c.term(), n.time()))));
-        nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(n.goal( c.term(), n.time()))));
+        nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(n.belief(c.term(), n.time()))));
+        nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(n.goal(c.term(), n.time()))));
 
 //        nar.on("concept", (Operator) (op, a, nn) -> {
 //            Concept c = nn.concept(a[0]);
@@ -287,7 +304,7 @@ public class Builtin {
 //            );
 //        });
 
-        BiConsumer<Task,NAR> log = (t, n) -> NAR.logger.info(" {}", t);
+        BiConsumer<Task, NAR> log = (t, n) -> NAR.logger.info(" {}", t);
         nar.onOp("log", log);
         nar.onOp(Operator.LOG_FUNCTOR, log);
 
@@ -354,50 +371,48 @@ public class Builtin {
 //            selector :-
 //            a specific integer value index, from 0 to compound size
 //            (a,b) pair of integers, a range of indices */
-            nar.on(Functor.f("slice", (args) -> {
-                if (args.subs() == 2) {
-                    Term x = args.sub(0);
-                    if (x.subs() > 0) {
-                        int len = x.subs();
+        nar.on(Functor.f("slice", (args) -> {
+            if (args.subs() == 2) {
+                Term x = args.sub(0);
+                if (x.subs() > 0) {
+                    int len = x.subs();
 
-                        Term index = args.sub(1);
-                        Op o = index.op();
-                        if (o == INT) {
-                            //specific index
-                            int i = ((Int) index).id;
-                            if (i >= 0 && i < len)
-                                return x.sub(i);
-                            else
-                                return False;
+                    Term index = args.sub(1);
+                    Op o = index.op();
+                    if (o == INT) {
+                        //specific index
+                        int i = ((Int) index).id;
+                        if (i >= 0 && i < len)
+                            return x.sub(i);
+                        else
+                            return False;
 
-                        } else if (o == PROD && index.subs() == 2) {
-                            Term start = (index).sub(0);
-                            if (start.op() == INT) {
-                                Term end = (index).sub(1);
-                                if (end.op() == INT) {
-                                    int si = ((Int) start).id;
-                                    if (si >= 0 && si < len) {
-                                        int ei = ((Int) end).id;
-                                        if (ei >= 0 && ei <= len) {
-                                            if (si == ei)
-                                                return Op.ZeroProduct;
-                                            if (si < ei) {
-                                                return $.p(Arrays.copyOfRange(x.subterms().toArray(), si, ei));
-                                            }
+                    } else if (o == PROD && index.subs() == 2) {
+                        Term start = (index).sub(0);
+                        if (start.op() == INT) {
+                            Term end = (index).sub(1);
+                            if (end.op() == INT) {
+                                int si = ((Int) start).id;
+                                if (si >= 0 && si < len) {
+                                    int ei = ((Int) end).id;
+                                    if (ei >= 0 && ei <= len) {
+                                        if (si == ei)
+                                            return Op.ZeroProduct;
+                                        if (si < ei) {
+                                            return $.p(Arrays.copyOfRange(x.subterms().toArray(), si, ei));
                                         }
                                     }
-                                    //TODO maybe reverse order will return reversed subproduct
-                                    return False;
                                 }
+                                //TODO maybe reverse order will return reversed subproduct
+                                return False;
                             }
-
                         }
+
                     }
                 }
-                return null;
-            }));
-
-
+            }
+            return null;
+        }));
 
 
 //                Functor.f0("help", () -> {

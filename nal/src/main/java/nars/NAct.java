@@ -423,18 +423,23 @@ public interface NAct {
             float confMin = nar().confMin.floatValue();
             float confBase =
                     n.confDefault(GOAL);
-                    //Util.lerp(0.75f, confMin, n.confDefault(GOAL));
-
 
             int ip = p ? 0 : 1;
             CC[ip] = action;
             f[ip] = g!=null ? g.freq() : 0f;
-            c[ip] = g!=null ? normalize.normalizePolar(g.conf()) : 0f;
+            c[ip] = g!=null ? g.conf() : 0f;
 //            exp[ip] = g != null ? TruthFunctions.expectation(f[ip], c[ip]) : 0f;
             //evi[ip] = g != null ? g.evi(): 0f;
 
 
             if (!p) {
+
+
+                //randomly choose which is normalized first for fairness
+                int nn = rng.nextBoolean() ?  0 : 1;
+                c[nn] = normalize.normalize(c[nn]);
+                c[1-nn] = normalize.normalize(c[1-nn]);
+
 
 
                 float ew;
@@ -484,11 +489,16 @@ public interface NAct {
 //                    float fAvg = (f[0] + f[1])/2f;
 
                     float ec =
+
+                            //Util.clamp(expectation(f[0], c[0]) - expectation(f[1], c[1]), -1, +1)
+                            Util.clamp(
+                                    2 * (Math.max(0.5f, expectation(f[0], c[0])) - Math.max(0.5f,expectation(f[1], c[1]))),
+                                    -1, +1)
                             //(normalize.normalizePolar(exp[0] - 0.5f)) - (normalize.normalizePolar(exp[1] - 0.5f))
                             //(exp[0] - 0.5f) - (exp[1] - 0.5f)
                             //2f * (Math.max(0, (exp[0] - 0.5f)) - Math.max(0,(exp[1] - 0.5f)))
                             //2f * (exp[0] - 0.5f) - (exp[1] - 0.5f)
-                            Util.clamp(expectation(f[0], c[0]) - expectation(f[1], c[1]), -1, +1)
+
                             //+ (nar().random().nextFloat()-0.5f)*2f*confMin
                     ;
 //                    ec += ((nar().random().nextFloat() - 0.5f)*2f)*0.01f;
@@ -532,7 +542,8 @@ public interface NAct {
                             //Math.abs(y) * Math.max(c[0],c[1])
                             //Math.max(c[0],c[1])
                             //Math.max(c[0],c[1])
-                            y * confBase
+                            //Math.abs(y) * confBase
+                            (float)Math.sqrt(Math.abs(y)) * confBase //boost distortion
                         : 0;
 
                 //w2c(Math.abs(y) * c2w(restConf));
@@ -547,23 +558,24 @@ public interface NAct {
                 } else {
                     //conf = confBase; //Math.max(confBase, Math.max(c[0], c[1]));
                     P = N = $.t(0.5f, confBase);
+                    //P = N = $.t(0f, confBase);
                             //restConf);
                     //N = P = null;
                 }
 
 
-                PreciseTruth pb = y >= 0 ? P : N;
+                PreciseTruth pb = y > 0 ? P : N;
                 PreciseTruth pg =
                         //pb;
-                        //pb!=null ? pb.eviMult(0.5f) : null;
-                        curious ? pb : null; //only feedback artificial goal if input goal was null
+                        //curious ? pb : null; //only feedback artificial goal if input goal was null
+                        curious ? pb : pb.withConf(confMin*2);
                         //null;
                 CC[0].feedback(pb, pg, n);
-                PreciseTruth nb = y >= 0 ? N : P;
+                PreciseTruth nb = y < 0 ? P : N;
                 PreciseTruth ng =
                         //nb;
-                        curious ? nb : null; //only feedback artificial goal if input goal was null
-                        //nb!=null ? nb.eviMult(0.5f) : null;
+                        //curious ? nb : null; //only feedback artificial goal if input goal was null
+                        curious ? nb : nb.withConf(confMin*2);
                         //null;
                 CC[1].feedback(nb, ng, n);
             }

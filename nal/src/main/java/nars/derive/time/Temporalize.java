@@ -466,15 +466,29 @@ public class Temporalize implements ITemporalize {
 
         SortedSet<Event> cc = constraints.get(x);
         if (cc != null) {
+            Time best = null;
+            Event bestEvent = null;
             for (Event e : cc) {
 
                 //System.out.println(x + " " + i + "\t" + trail + "\t" + e);
 
                 Time xt = e.start(trail);
                 if (xt != null) {
-                    trail.put(x, xt);
-                    return e;
+                    int score = (xt.base != ETERNAL ? 1 : 0) + (xt.offset != DTERNAL ? 1 : 0);
+                    int bestScore = best == null ? 0 : ((best.base != ETERNAL ? 1 : 0) + (best.offset != DTERNAL ? 1 : 0));
+                    if (score > bestScore) {
+                        best = xt;
+                        bestEvent = e;
+                        if (score >= 1)
+                            break; //found the best possible
+                    }
                 }
+
+            }
+
+            if (best != null) {
+                trail.put(x, best);
+                return bestEvent;
             }
 
         }
