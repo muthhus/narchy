@@ -137,7 +137,7 @@ abstract public class NAgentX extends NAgent {
 
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
-        return runRT(init, 25, fps, endTime);
+        return runRT(init, 50, fps, endTime);
     }
 
     public static NAR runRT(Function<NAR, NAgent> init, float narFPS, float agentFPS, long endTime) {
@@ -146,11 +146,14 @@ abstract public class NAgentX extends NAgent {
         //Builder.Compound.the = Builder.Compound.CaffeineCompoundBuilder.get();
 
 
+        float durFPS = agentFPS;
+
         RealTime clock =
-                agentFPS >= 10 / 2f ? /* nyquist threshold between decisecond (0.1) and centisecond (0.01) clock resolution */
+                durFPS >= 10 / 2f ? /* nyquist threshold between decisecond (0.1) and centisecond (0.01) clock resolution */
                         new RealTime.CS(true) :
                         new RealTime.DSHalf(true);
-        clock.durFPS(agentFPS);
+
+        clock.durFPS(durFPS);
 
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.getDefault(8
                 , "motivation.nal", "relation_introduction.nal");

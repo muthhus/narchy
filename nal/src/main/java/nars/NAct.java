@@ -416,13 +416,13 @@ public interface NAct {
 
             NAR n = nar();
 
-            float cur = curiosity().floatValue();
             Random rng = n.random();
 
 
             float confMin = nar().confMin.floatValue();
             float confBase =
-                    n.confDefault(GOAL);
+                    confMin * 4;
+                    //n.confDefault(GOAL);
 
             int ip = p ? 0 : 1;
             CC[ip] = action;
@@ -431,6 +431,8 @@ public interface NAct {
 //            exp[ip] = g != null ? TruthFunctions.expectation(f[ip], c[ip]) : 0f;
             //evi[ip] = g != null ? g.evi(): 0f;
 
+
+            float cIn = Math.max(c[0],c[1]);
 
             if (!p) {
 
@@ -447,12 +449,10 @@ public interface NAct {
 
 
                 float x; //0..+1
-                if (cur > 0 && rng.nextFloat() <= cur) {
+                float cur = curiosity().floatValue();
+                if (cur > 0 && rng.nextFloat() * (1f - cIn) <= cur) {
                     float curiConf = confBase;
-                    x = (expectation(
-                        rng.nextFloat(),
-                        curiConf
-                    ) - 0.5f)*2f;
+                    x = (rng.nextFloat() - 0.5f)*2f;
                     c[0] = c[1] = curiConf;
                     curious = true;
                 } else {
@@ -556,8 +556,11 @@ public interface NAct {
                     P = $.t(1, conf);
                     N = $.t(0, conf);
                 } else {
-                    //conf = confBase; //Math.max(confBase, Math.max(c[0], c[1]));
-                    P = N = $.t(0.5f, confBase);
+
+                    P = N =
+                        cIn > 0 ? $.t(0.5f, cIn) : null;
+                        //$.t(0.5f, confBase);
+
                     //P = N = $.t(0f, confBase);
                             //restConf);
                     //N = P = null;
@@ -567,15 +570,15 @@ public interface NAct {
                 PreciseTruth pb = y > 0 ? P : N;
                 PreciseTruth pg =
                         //pb;
-                        //curious ? pb : null; //only feedback artificial goal if input goal was null
-                        curious ? pb : pb.withConf(confMin*2);
+                        curious ? pb : null; //only feedback artificial goal if input goal was null
+                        //curious ? pb : pb.withConf(confMin*2);
                         //null;
                 CC[0].feedback(pb, pg, n);
                 PreciseTruth nb = y < 0 ? P : N;
                 PreciseTruth ng =
                         //nb;
-                        //curious ? nb : null; //only feedback artificial goal if input goal was null
-                        curious ? nb : nb.withConf(confMin*2);
+                        curious ? nb : null; //only feedback artificial goal if input goal was null
+                        //curious ? nb : nb.withConf(confMin*2);
                         //null;
                 CC[1].feedback(nb, ng, n);
             }

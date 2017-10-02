@@ -14,7 +14,7 @@ import static nars.experiment.tetris.impl.TetrisState.*;
  */
 public class Tetris extends NAgentX implements Bitmap2D {
 
-    public final FloatParam timePerFall = new FloatParam(4f, 1f, 32f);
+    public final FloatParam timePerFall = new FloatParam(1f, 1f, 32f);
 
     public static final int tetris_width = 8;
     public static final int tetris_height = 16;
@@ -50,6 +50,10 @@ public class Tetris extends NAgentX implements Bitmap2D {
     //private final ActionConcept motorLeftRight;
 
     //private final boolean rotate = !easy;
+
+    public Tetris(NAR nar, int width, int height) throws Narsese.NarseseException {
+        this(nar, width, height, 1);
+    }
 
     /**
      * @param width
@@ -106,7 +110,10 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        });
 
 
-        addCamera(pixels = new CameraSensor<>($.the("tetris"), this, this));
+        addCamera(
+            pixels = new CameraSensor<>($.the("tetris"), this, this)
+                            .resolution(0.05f)
+        );
         //pixels.resolution(0.1f);
 
         //new ShapeSensor(pixels.src, this);
@@ -503,7 +510,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
             Tetris a = null;
             try {
                 //n.truthResolution.setValue(0.05f);
-                a = new Tetris(n, Tetris.tetris_width, Tetris.tetris_height, 1);
+                a = new Tetris(n, Tetris.tetris_width, Tetris.tetris_height);
                 //a.durations.setValue(2f);
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
@@ -529,7 +536,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            });
 
             return a;
-        }, 20f);
+        }, 5f);
 
 
 //

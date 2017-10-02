@@ -122,7 +122,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         this.happy = senseNumber(id == null ?
                         $.the("happy") : //generally happy
                         $.p(id, $.the("happy")), //happy in this environment
-                 new FloatPolarNormalized(() -> rewardCurrent) );
+                 new FloatPolarNormalized(() -> rewardCurrent).relax(0.002f) );
 
 //        this.reward = senseNumber(new FloatPolarNormalized(() -> rewardCurrent), ScalarConcepts.Mirror,
 //                id == null ?

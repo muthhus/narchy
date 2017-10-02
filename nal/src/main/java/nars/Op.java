@@ -1189,6 +1189,7 @@ public enum Op implements $ {
 
     @NotNull
     public static Term difference(/*@NotNull*/ Op o, @NotNull Term a, @NotNull Term b) {
+        assert(!o.temporal): "this impl currently assumes any constructed term will have dt=DTERNAL";
 
         if (a.equals(b))
             return Null; //empty set
@@ -1199,7 +1200,7 @@ public enum Op implements $ {
 //        }
 
         int size = a.subs();
-        List<Term> terms = $.newArrayList(size);
+        Collection<Term> terms = o.commutative ? new TreeSet() : $.newArrayList(size);
 
         for (int i = 0; i < size; i++) {
             Term x = a.sub(i);
@@ -1209,12 +1210,12 @@ public enum Op implements $ {
         }
 
         int retained = terms.size();
-        if (retained == size && a instanceof Term) { //same as 'a', quick re-use of instance
+        if (retained == size) { //same as 'a', quick re-use of instance
             return a;
         } else if (retained == 0) {
             return Null; //empty set
         } else {
-            return o.the(terms.toArray(new Term[retained]));
+            return o.the(DTERNAL, terms);
         }
 
     }

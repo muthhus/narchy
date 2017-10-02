@@ -65,101 +65,18 @@ public class GoalActionAsyncConcept extends ActionConcept {
     @Override
     public Stream<ITask> update(long now, int dur, NAR nar) {
 
-        long pStart = now;// - dur/2;
-        long pEnd = now;// + dur;
-        //LongSupplier stamper = nar.time::nextStamp;
+        long pStart =
+                //now;
+                now - dur/2;
+        long pEnd =
+                //now;
+                now + dur/2;
 
         Truth goal = this.goals().truth(pStart, pEnd, nar);
 
-//        //float curiPeriod = 2; //TODO vary this
-//        float cur = curiosity.floatValue();
-//
-//        Truth belief;
-//        Task fg;
-//        if (nar.random().nextFloat() < cur) {
-////            // curiosity override
-////
-//            float curiConf =
-////                    //nar.confDefault(GOAL);
-//                    //nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR;
-//                    Math.max(goal != null ? goal.conf() : 0,
-//                            nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR);
-//            //nar.confMin.floatValue()*2);
-////
-//////            float cc =
-//////                    //curiConf;
-//////                    curiConf - (goal != null ? goal.conf() : 0);
-//////            if (cc > 0) {
-////
-//            float f =
-//                    Util.round(nar.random().nextFloat(), resolution.floatValue());
-//////                    ((float)Math.sin(
-//////                        hashCode() /* for phase shift */
-//////                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
-////
-//            goal = $.t(f, curiConf);
-////            fg = action.set(term, goal, stamper, now, dur, nar);
-////            curious = true;
-////
-//////                Truth ct = $.t(f, cc);
-//////                goal = ct; //curiosity overrides goal
-////
-//////                if (goal == null) {
-//////                    goal = ct;
-//////                } else {
-//////                    goal = Revision.revise(goal, ct);
-//////                }
-//
-//
-//        }
-
-//        belief = this.beliefs().truth(pStart, pEnd, nar);
-
-
-//        //HACK try to improve this
-//        //if (goal == null) goal = belief; //use belief state, if exists (latch)
-//        boolean kickstart;
-//        if (((goal == null) || (goal.conf() < nar.confMin.floatValue())) && (feedback.current!=null)) {
-//            goal = $.t(feedback.current.truth.freq, nar.confMin.floatValue()); //if null, use the last feedback value (latch)
-//            kickstart = true;
-//        } else {
-//            kickstart = false;
-//        }
-
         this.motor.accept(this, goal);
-//        if (fbt==null && belief!=null) {
-//            fbt = belief;
-//        }
 
-        //1. check feedback
-        //2. check current belief
-        //3. check previous signal belief
-        //beliefFeedback != null ? beliefFeedback : belief; //latch
-
-
-
-//
-//        Task fg;
-//        boolean latchGoal = false; //experimental
-//        if (latchGoal) {
-//            if (goal!=null)
-//                fg = action.set(term, goal, stamper, now, dur, nar);
-//                        //+1 * nar.dur() /* next moment */);
-//            else
-//                fg = action.get(); //latch previous goal
-//        } else {
-//
-//            fg = action.set(term, goal, stamper, now, dur, nar);
-//                    //+1 * nar.dur() /* next moment */);
-//        }
-//        if (Param.DEBUG && curious) {
-//            fg.log("Curiosity");
-//        }
-
-        return null; //Stream.empty();
-        //return Stream.of(fb, fg).filter(Objects::nonNull);
-        //return Stream.of(fb).filter(Objects::nonNull);
-
+        return null;
     }
 
 
@@ -172,8 +89,8 @@ public class GoalActionAsyncConcept extends ActionConcept {
         Task fg;
         Task fb;
         long goalTime =
-                now;
-                //now-dur/2;
+                //now;
+                now-dur/2;
         long beliefTime =
                 //now;
                 now;//+dur/2;
