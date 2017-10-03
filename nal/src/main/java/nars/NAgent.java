@@ -9,7 +9,6 @@ import jcog.math.FloatPolarNormalized;
 import jcog.math.RecycledSummaryStatistics;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
-import nars.concept.ScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
 import nars.control.DurService;

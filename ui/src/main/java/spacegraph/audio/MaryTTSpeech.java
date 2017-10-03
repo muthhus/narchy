@@ -3,9 +3,7 @@ package spacegraph.audio;
 
 import marytts.LocalMaryInterface;
 import marytts.MaryInterface;
-import marytts.exceptions.MaryConfigurationException;
 import marytts.exceptions.SynthesisException;
-import marytts.server.Mary;
 import marytts.util.data.BufferedDoubleDataSource;
 import marytts.util.data.audio.DDSAudioInputStream;
 import marytts.util.data.audio.MaryAudioUtils;

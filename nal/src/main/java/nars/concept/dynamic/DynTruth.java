@@ -1,7 +1,6 @@
 package nars.concept.dynamic;
 
 import jcog.list.FasterList;
-import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Op;

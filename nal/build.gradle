@@ -15,15 +15,15 @@ apply plugin: 'com.github.johnrengelman.shadow'
 pitest {
 
     targetTests = [
-            //'nars.nal.nal1.NAL1Test',
+            'nars.nal.nal1.NAL1Test',
             //'nars.nal.nal1.NAL1MultistepTest',
             //'nars.nal.nal2.*',
-            'nars.derive.TemporalizeTest',
+            //'nars.derive.TemporalizeTest',
             //'nars.task.*'
     ]
     targetClasses = [
-        //'nars.term.*',
-        //'nars.nal.*',
+        'nars.term.*',
+        'nars.nal.*',
         //'nars.table.*',
         //'nars.concept.*',
         //'nars.control.*',
@@ -32,7 +32,7 @@ pitest {
 
 //    jvmArgs = ["-ea"]
 
-    pitestVersion = "1.2.3" //not needed when a default PIT version should be used
+    pitestVersion = "1.2.4" //not needed when a default PIT version should be used
 
     timeoutFactor = 3
     enableDefaultIncrementalAnalysis = true

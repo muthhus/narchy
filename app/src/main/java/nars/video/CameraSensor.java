@@ -1,7 +1,10 @@
 package nars.video;
 
 import jcog.Util;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.NAgent;
+import nars.Task;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
 import nars.task.ITask;

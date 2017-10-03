@@ -12,11 +12,9 @@ import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -31,7 +29,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
     private final int minVolumeNecessary;
     private final int size;
 
-    @Nullable public final Set<Variable> uniqueVars;
+//    @Nullable public final Set<Variable> uniqueVars;
 
     PatternCompound(/*@NotNull*/ Op op, int dt, @NotNull TermContainer subterms) {
         super(new GenericCompound(op, subterms), dt);
@@ -48,7 +46,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
         minVolumeNecessary = volume();
         size = subs();
 
-        this.uniqueVars = varsUnique(VAR_PATTERN);
+//        this.uniqueVars = varsUnique(VAR_PATTERN);
     }
 
 

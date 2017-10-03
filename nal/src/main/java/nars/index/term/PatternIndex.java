@@ -1,6 +1,5 @@
 package nars.index.term;
 
-import nars.NAR;
 import nars.Narsese;
 import nars.Op;
 import nars.derive.PatternCompound;

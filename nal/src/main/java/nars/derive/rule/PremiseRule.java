@@ -26,10 +26,8 @@ import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 
 import static java.lang.Math.max;
 import static java.util.Collections.addAll;

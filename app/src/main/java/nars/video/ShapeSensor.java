@@ -5,10 +5,6 @@ import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.shapes.ShapeFittingOps;
-import boofcv.gui.feature.VisualizeShapes;
-import boofcv.gui.image.ImagePanel;
-import boofcv.gui.image.ScaleOptions;
-import boofcv.gui.image.ShowImages;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.GrayU8;
@@ -31,6 +27,11 @@ import java.util.List;
 
 import static nars.Op.BELIEF;
 
+//import boofcv.gui.feature.VisualizeShapes;
+//import boofcv.gui.image.ImagePanel;
+//import boofcv.gui.image.ScaleOptions;
+//import boofcv.gui.image.ShowImages;
+
 public class ShapeSensor implements Runnable {
 
     private final Bitmap2D input;
@@ -46,7 +47,7 @@ public class ShapeSensor implements Runnable {
     static double splitFraction = 0.05;
     static double minimumSideFraction = 0.1;
 
-    static ImagePanel  gui = debug ? new ImagePanel(400,200) : null;
+//    static ImagePanel  gui = debug ? new ImagePanel(400,200) : null;
 
     private final float R = 1f;
     private final float G = 1f;
@@ -56,10 +57,10 @@ public class ShapeSensor implements Runnable {
         this.id = id;
         this.input = input;
 
-        if (debug) {
-            ShowImages.showWindow(gui, "poly", false);
-            gui.setScaling(ScaleOptions.ALL);
-        }
+//        if (debug) {
+//            ShowImages.showWindow(gui, "poly", false);
+//            gui.setScaling(ScaleOptions.ALL);
+//        }
 
         in = a.nar.newCauseChannel(this);
         this.nar = a.nar;
@@ -163,7 +164,7 @@ public class ShapeSensor implements Runnable {
 
             if (debug) {
                 g2.setColor(Color.getHSBColor(c.id/10f, 0.8f, 0.8f));
-                VisualizeShapes.drawPolygon(p,true,g2);
+//                VisualizeShapes.drawPolygon(p,true,g2);
                 //System.out.println(c + ": " + polygon);
             }
 
@@ -178,7 +179,7 @@ public class ShapeSensor implements Runnable {
 
         if (debug) {
 
-                gui.setBufferedImageSafe(polygon);
+//                gui.setBufferedImageSafe(polygon);
 
 
 //            gui.reset();

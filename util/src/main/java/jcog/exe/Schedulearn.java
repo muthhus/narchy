@@ -72,8 +72,10 @@ public class Schedulearn {
 
 
     public void solve(List<Can> can, double timeslice) {
-        Solver solver = new Solver();
+        if (can.isEmpty())
+            return;
 
+        Solver solver = new Solver();
 
         float totalValue = 0;
         for (int i = 0, canSize = can.size(); i < canSize; i++) {
@@ -116,9 +118,9 @@ public class Schedulearn {
 
         solver.update();
 
-        for (int i = 0, canSize = can.size(); i < canSize; i++) {
-            System.out.println(can.get(i).iterations);
-        }
+//        for (int i = 0, canSize = can.size(); i < canSize; i++) {
+//            System.out.println(can.get(i).iterations);
+//        }
     }
 
     public static void main(String[] args) {

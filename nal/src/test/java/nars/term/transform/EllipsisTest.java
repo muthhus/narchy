@@ -1,7 +1,10 @@
 package nars.term.transform;
 
 import jcog.random.XorShift128PlusRandom;
-import nars.*;
+import nars.$;
+import nars.Narsese;
+import nars.Op;
+import nars.Param;
 import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
 import nars.derive.match.EllipsisOneOrMore;

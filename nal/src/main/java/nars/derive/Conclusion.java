@@ -4,16 +4,12 @@ import nars.NAR;
 import nars.Param;
 import nars.control.Derivation;
 import nars.derive.rule.PremiseRule;
-import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.transform.Retemporalize;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Set;
 
 import static nars.Op.GOAL;
 import static nars.time.Tense.ETERNAL;
@@ -35,14 +31,14 @@ public final class Conclusion extends AbstractPred<Derivation> {
     private final boolean goalUrgent;
 
 
-    public final Set<Variable> uniqueVars;
+//    public final Set<Variable> uniqueVars;
     public final PremiseRule rule;
 
     public Conclusion(Term id, Term pattern, PremiseRule rule) {
         super(id);
         this.rule = rule;
         this.pattern = pattern;
-        this.uniqueVars = pattern instanceof Compound ? ((PatternCompound)pattern).uniqueVars : Set.of();
+//        this.uniqueVars = pattern instanceof Compound ? ((PatternCompound)pattern).uniqueVars : Set.of();
         this.goalUrgent = rule.goalUrgent;
     }
 

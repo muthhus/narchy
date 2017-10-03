@@ -12,9 +12,7 @@ import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.Null;
-import static nars.Op.VAR_DEP;
-import static nars.Op.VAR_INDEP;
+import static nars.Op.*;
 
 /**
  * substituteIfUnifies....(term, varFrom, varTo)

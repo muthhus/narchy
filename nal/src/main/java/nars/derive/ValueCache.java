@@ -1,13 +1,9 @@
 package nars.derive;
 
 import jcog.Util;
-import jcog.math.RecycledSummaryStatistics;
-import jcog.pri.Pri;
 import nars.control.Cause;
 import nars.time.Tense;
 import org.eclipse.collections.api.block.predicate.primitive.IntFloatPredicate;
-import org.eclipse.collections.api.map.primitive.ImmutableShortShortMap;
-import org.eclipse.collections.impl.map.mutable.primitive.ShortShortHashMap;
 import org.roaringbitmap.IntIterator;
 
 import java.util.concurrent.atomic.AtomicLong;

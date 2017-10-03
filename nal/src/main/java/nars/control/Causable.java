@@ -2,7 +2,6 @@ package nars.control;
 
 import jcog.exe.Schedulearn;
 import nars.NAR;
-import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
