@@ -217,8 +217,8 @@ public enum MetaGoal {
                 continue;
             }
 
-            if (cause.valuePrioritizes)
-                value += cause.value();
+
+            value += cause.value();
         }
 
 

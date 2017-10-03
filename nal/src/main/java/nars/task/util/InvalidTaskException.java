@@ -1,5 +1,6 @@
 package nars.task.util;
 
+import jcog.pri.Prioritized;
 import nars.Task;
 import nars.term.Termed;
 import nars.util.SoftException;
@@ -17,7 +18,7 @@ public final class InvalidTaskException extends SoftException {
         super(message);
         this.task = t;
         if (t instanceof Task)
-            ((Task) t).delete();
+            ((Prioritized) t).delete();
     }
 
     @NotNull

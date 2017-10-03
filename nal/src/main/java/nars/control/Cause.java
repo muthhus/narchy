@@ -37,13 +37,6 @@ public class Cause {
      *  these values are used in determining the scalar 'value' field on each update. */
     public final Traffic[] goalValue;
 
-
-//    protected float valuePreNorm;
-
-    /** flag indicating whether the value should be included in aggregations that adjust priority of items */
-    public boolean valuePrioritizes = true;
-
-
     /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
     public float value() {
         return value;

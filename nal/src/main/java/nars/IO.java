@@ -207,7 +207,7 @@ public class IO {
     }
 
     @NotNull
-    public static Atomic readAtomic(@NotNull DataInput in, /*@NotNull*/ Op o) throws IOException {
+    public static Atomic readAtomic(@NotNull DataInput in, /*@NotNull*/ Op o) throws IOException, UnsupportedEncodingException {
 
         switch (o) {
 
@@ -362,7 +362,7 @@ public class IO {
         return d.array(); //bs.toByteArray();
     }
 
-    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException {
+    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException, FileNotFoundException {
         Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".tsv");
         System.out.println("saving tasks: " + f);
         FileOutputStream os = new FileOutputStream(f.toFile());
@@ -377,7 +377,7 @@ public class IO {
         });
     }
 
-    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException {
+    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException, FileNotFoundException {
         Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".nal");
         System.out.println("saving tasks: file://" + f);
         FileOutputStream os = new FileOutputStream(f.toFile());

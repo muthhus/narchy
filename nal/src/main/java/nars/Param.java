@@ -167,7 +167,7 @@ public abstract class Param extends Services<Term,NAR> {
 
 
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
-    public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;
+    @Deprecated public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;
 
 
     public float derivePriority(Task t, @NotNull Derivation d) {

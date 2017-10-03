@@ -151,11 +151,6 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default boolean xternalEquals(Term x) {
-        return equals(x);
-    }
-
-    @Override
     default boolean ANDrecurse(@NotNull Predicate<Term> v) { return AND(v); }
 
     @Override

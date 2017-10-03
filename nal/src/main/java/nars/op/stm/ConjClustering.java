@@ -34,7 +34,7 @@ public class ConjClustering extends Causable {
     private final CauseChannel<ITask> in;
 
 
-    final static BagClustering.Dimensionalize<Task> ConjClusterModel = new BagClustering.Dimensionalize<Task>(3) {
+    final static BagClustering.Dimensionalize<Task> ConjClusterModel = new BagClustering.Dimensionalize<>(3) {
 
         @Override
         public void coord(Task t, double[] c) {

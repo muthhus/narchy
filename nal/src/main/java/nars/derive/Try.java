@@ -50,80 +50,84 @@ public class Try extends AbstractPred<Derivation> {
 
         RoaringBitmap choices = d.preToPost;
         int N = choices.getCardinality();
-        if (N == 0) {
-            return false;
-        } else if (N == 1) {
+        switch (N) {
+            case 0:
+                return false;
+            case 1:
 
-            branches[choices.first()].test(d);
+                branches[choices.first()].test(d);
 
-        } else {
+                break;
+            default:
 
-            cache.update(d.time);
+                cache.update(d.time);
 
-            short[] routing = new short[N * 2]; //sequence of (choice, score) pairs
-            final int[] p = {0, Integer.MAX_VALUE, Integer.MIN_VALUE};
+                short[] routing = new short[N * 2]; //sequence of (choice, score) pairs
 
-            Random rng = d.random;
-            int startTTL = d.ttl;
+                final int[] p = {0, Integer.MAX_VALUE, Integer.MIN_VALUE};
 
-            short minTTL = Param.TTL_PREMISE_MIN;
+                Random rng = d.random;
+                int startTTL = d.ttl;
 
-            int denom = startTTL - (minTTL * N);
-            short toApply;
-            if (denom > N) {
-                //bonus beyond minTTL according to their value
-                choices.runOptimize();
+                short minTTL = Param.TTL_PREMISE_MIN;
 
-                float[] minmax = cache.minmax(choices.getIntIterator());
-                if (!Util.equals(minmax[0], minmax[1], Pri.EPSILON)) {
+                int denom = startTTL - (minTTL * N);
+                short toApply;
+                if (denom > N) {
+                    //bonus beyond minTTL according to their value
+                    choices.runOptimize();
 
-                    IntIterator ii = rng.nextBoolean() ? choices.getIntIterator() : choices.getReverseIntIterator();
-                    cache.getNormalized(minmax[0], minmax[1], ii, denom, (c, v) -> {
-                        int pp = p[0]++ * 2;
-                        routing[pp++] = (short) c;
-                        routing[pp] += (short) (v); //minTTL + v
-                        if (v < p[1]) p[1] = (int) v;
-                        if (v > p[2]) p[2] = (int) v;
-                        return true;
-                    });
-                    toApply = -1;
+                    float[] minmax = cache.minmax(choices.getIntIterator());
+                    if (!Util.equals(minmax[0], minmax[1], Pri.EPSILON)) {
 
+                        IntIterator ii = rng.nextBoolean() ? choices.getIntIterator() : choices.getReverseIntIterator();
+                        cache.getNormalized(minmax[0], minmax[1], ii, denom, (c, v) -> {
+                            int pp = p[0]++ * 2;
+                            routing[pp++] = (short) c;
+                            routing[pp] += (short) (v); //minTTL + v
+                            if (v < p[1]) p[1] = (int) v;
+                            if (v > p[2]) p[2] = (int) v;
+                            return true;
+                        });
+                        toApply = -1;
+
+                    } else {
+                        toApply = (short) (startTTL / N); //evenly distribute
+                    }
                 } else {
-                    toApply = (short) (startTTL / N); //evenly distribute
+                    toApply = minTTL;
                 }
-            } else {
-                toApply = minTTL;
-            }
 
-            if (toApply >= 0) {
-                //have to assign route using the iterator as it was not done in the bonus mode
-                PeekableIntIterator ii = choices.getIntIterator();
-                int k = 0;
-                while (ii.hasNext()) {
-                    routing[k++] = (short) ii.next();
-                    routing[k++] = toApply;
+                if (toApply >= 0) {
+                    //have to assign route using the iterator as it was not done in the bonus mode
+                    PeekableIntIterator ii = choices.getIntIterator();
+                    int k = 0;
+                    while (ii.hasNext()) {
+                        routing[k++] = (short) ii.next();
+                        routing[k++] = toApply;
+                    }
                 }
-            }
 
-            int weightSum = 0;
-            for (int i = 0; i < N; i++) {
-                weightSum += routing[i * 2 + 1];
-            }
+                int weightSum = 0;
+                for (int i = 0; i < N; i++) {
+                    weightSum += routing[i * 2 + 1];
+                }
 
-            int before = d.now();
-            int ttlSaved;
-            do {
+                int before = d.now();
+                int ttlSaved;
+                do {
 
-                int sample = Util.decideRoulette(N, (choice) -> g2(routing, choice, VAL), weightSum, rng);
+                    int sample = Util.decideRoulette(N, (choice) -> g2(routing, choice, VAL), weightSum, rng);
 
-                ttlSaved = tryBranch(d, routing, sample);
-                if (ttlSaved < 0)
-                    break;
+                    ttlSaved = tryBranch(d, routing, sample);
+                    if (ttlSaved < 0)
+                        break;
 
-                a2(routing, sample, false, (short) -ttlSaved);
-                weightSum -= ttlSaved;
+                    a2(routing, sample, false, (short) -ttlSaved);
+                    weightSum -= ttlSaved;
 
-            } while (d.addTTL(ttlSaved) >= 0);
+                } while (d.addTTL(ttlSaved) >= 0);
+                break;
         }
 
         choices.clear();

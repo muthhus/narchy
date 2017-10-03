@@ -20,7 +20,6 @@ import java.util.Objects;
 import java.util.function.Function;
 
 import static nars.$.$;
-import static nars.$.newArrayList;
 import static nars.$.t;
 import static nars.Op.*;
 import static nars.time.Tense.*;
@@ -156,7 +155,7 @@ import static nars.time.Tense.*;
             case GOAL:
                 if (truth == null) {
                     //apply the default truth value for specified punctuation
-                    setTruth($.t(1, n.confDefault(punc)));
+                    setTruth(t(1, n.confDefault(punc)));
                 } else {
 
                     float confLimit = 1f - Param.TRUTH_EPSILON;
@@ -554,25 +553,13 @@ import static nars.time.Tense.*;
     @NotNull
     public final TaskBuilder pri(@NotNull Prioritized bb) {
         setPri(bb);
-        //        if (srcCopy == null) {
-//            delete();
-//        } else {
-//            float p = srcCopy.priSafe(-1);
-//            if (p < 0) {
-//                delete();
-//            } else {
-//                setPriority(p);
-//            }
-//        }
-//
-//        return this;
         return this;
     }
 
 
     public TaskBuilder log(String s) {
         if (log == null)
-            log = newArrayList(1);
+            log = $.newArrayList(1);
         log.add(s);
         return this;
     }

@@ -63,16 +63,11 @@ import static nars.time.Tense.DTERNAL;
  */
 public interface $ {
 
-
-//    public static final org.slf4j.Logger logger = LoggerFactory.getLogger($.class);
-//    public static final Function<Object, Term> ToStringToTerm = (x) -> Atomic.the(x.toString());
-
-    @NotNull
-    static <T extends Term> T $(@NotNull String term) throws Narsese.NarseseException {
+    public static <T extends Term> T $(String term) throws Narsese.NarseseException {
         return (T) Narsese.term(term, true);
     }
 
-    static <T extends Term> T $safe(@NotNull String term) {
+    public static <T extends Term> T $safe(String term) {
         try {
             return $(term);
         } catch (Narsese.NarseseException e) {
@@ -89,8 +84,7 @@ public interface $ {
     Escapers.Builder quoteEscaper = Escapers.builder().addEscape('\"', "\\\"");
 
 
-    @NotNull
-    static Atomic quote(@NotNull Object text) {
+    static Atomic quote(Object text) {
         String s = text.toString();
 
         int length = s.length();
@@ -112,8 +106,7 @@ public interface $ {
     }
 
 
-    @NotNull
-    static Term[] the(@NotNull String... id) {
+    static Term[] the(String... id) {
         int l = id.length;
         Term[] x = new Term[l];
         for (int i = 0; i < l; i++)
@@ -122,7 +115,6 @@ public interface $ {
     }
 
 
-    @NotNull
     static Atom the(char c) {
         return (Atom) Atomic.the(String.valueOf(c));
     }
@@ -131,7 +123,6 @@ public interface $ {
      * Op.INHERITANCE from 2 Terms: subj --> pred
      * returns a Term if the two inputs are equal to each other
      */
-    @Nullable
     static <T extends Term> T inh(Term subj, Term pred) {
         return (T) INH.the(DTERNAL, subj, pred);
     }
@@ -141,14 +132,12 @@ public interface $ {
     }
 
 
-    @Nullable
-    static <T extends Term> T inh(@NotNull String subj, @NotNull String pred) throws Narsese.NarseseException {
+    static <T extends Term> T inh( String subj,  String pred) throws Narsese.NarseseException {
         return (T) inh($(subj), $(pred));
     }
 
 
-    @NotNull
-    static <T extends Term> T sim(@NotNull Term subj, @NotNull Term pred) {
+    static <T extends Term> T sim( Term subj, Term pred) {
         return (T) SIM.the(DTERNAL, subj, pred);
     }
 
@@ -283,28 +272,16 @@ public interface $ {
      * @param pred The second component
      * @return A compound generated or null
      */
-    @Nullable
     static <T extends Term> T inst(@NotNull Term subj, Term pred) {
         return (T) INH.the(SETe.the(subj), pred);
     }
 
-    @Nullable
     static <T extends Term> T instprop(@NotNull Term subject, @NotNull Term predicate) {
         return (T) INH.the(SETe.the(subject), SETi.the(predicate));
     }
 
-    @Nullable
     static <T extends Term> T prop(Term subject, Term predicate) {
         return (T) INH.the(subject, SETi.the(predicate));
-    }
-
-//    public static Term term(final Op op, final Term... args) {
-//        return builder.term(op, args);
-//    }
-
-    @NotNull
-    static TaskBuilder belief(@NotNull Term term, @NotNull Truth copyFrom) {
-        return belief(term, copyFrom.freq(), copyFrom.conf());
     }
 
     @NotNull
@@ -322,17 +299,14 @@ public interface $ {
         return task($.$(term), punct, freq, conf);
     }
 
-    @NotNull
     static TaskBuilder task(@NotNull Term term, byte punct, float freq, float conf) {
         return task(term, punct, t(freq, conf));
     }
 
-    @NotNull
     static TaskBuilder task(@NotNull Term term, byte punct, Truth truth) {
         return new TaskBuilder(term, punct, truth);
     }
 
-    @NotNull
     static Term sete(@NotNull Collection<? extends Term> t) {
         return SETe.the(DTERNAL, (Collection) t);
     }
@@ -340,7 +314,6 @@ public interface $ {
     /**
      * construct set_ext of key,value pairs from a Map
      */
-    @NotNull
     static Term seteMap(@NotNull Map<Term, Term> map) {
         return $.sete(
                 map.entrySet().stream().map(
@@ -349,7 +322,6 @@ public interface $ {
         );
     }
 
-    @NotNull
     static Term p(@NotNull char[] c, @NotNull CharToObjectFunction<Term> f) {
         Term[] x = new Term[c.length];
         for (int i = 0; i < c.length; i++) {
@@ -358,7 +330,6 @@ public interface $ {
         return $.p(x);
     }
 
-    @NotNull
     static <X> Term p(@NotNull X[] x, @NotNull Function<X, Term> toTerm) {
         return $.p((Term[]) terms(x, toTerm));
     }
@@ -367,7 +338,6 @@ public interface $ {
         return Stream.of(map).map(toTerm::apply).toArray(Term[]::new);
     }
 
-    @NotNull
     static <X> Term seteMap(@NotNull Map<Term, ? extends X> map, @NotNull Function<X, Term> toTerm) {
         return $.sete(
                 map.entrySet().stream().map(
@@ -389,24 +359,22 @@ public interface $ {
         return tt;
     }
 
-    @NotNull
     static Term seti(@NotNull Collection<Term> t) {
         return $.seti(array(t));
     }
 
-    @NotNull
     static Term sete(Term... t) {
         return SETe.the(DTERNAL, t);
     }
 
-    @NotNull static Term sete(RoaringBitmap b) {
+    static Term sete(RoaringBitmap b) {
         return $.sete(the(b));
     }
-    @NotNull static Term p(RoaringBitmap b) {
+    static Term p(RoaringBitmap b) {
         return $.p(the(b));
     }
 
-    @NotNull static Term[] the(RoaringBitmap b) {
+    static Term[] the(RoaringBitmap b) {
         int size = b.getCardinality();
         PeekableIntIterator ii = b.getIntIterator();
         Term[] t = new Term[size];
@@ -420,12 +388,10 @@ public interface $ {
     /**
      * shorthand for extensional set
      */
-    @NotNull
     static Term s(Term... t) {
         return sete(t);
     }
 
-    @NotNull
     static Term seti(Term... t) {
         return SETi.the(DTERNAL, t);
     }
@@ -434,23 +400,21 @@ public interface $ {
     /**
      * unnormalized variable
      */
-    static @NotNull Variable v(char ch, @NotNull String name) {
+    static Variable v(char ch, @NotNull String name) {
         return v(AbstractVariable.typeIndex(ch), name);
     }
 
     /**
      * normalized variable
      */
-    static @NotNull AbstractVariable v(/*@NotNull*/ Op type, int id) {
+    static AbstractVariable v(/*@NotNull*/ Op type, int id) {
         return AbstractVariable.the(type, id);
     }
 
-    @Nullable
     static <T extends Term> T conj(Term... a) {
         return (T) CONJ.the(DTERNAL, a);
     }
 
-    @Nullable
     static Term conj(@NotNull Collection<Term> collection, @NotNull Term... append) {
         if (append.length == 0)
             throw new RuntimeException("unnecessary append");
@@ -468,17 +432,14 @@ public interface $ {
     /**
      * parallel conjunction &| aka &&+0
      */
-    @NotNull
     static Term parallel(Term... s) {
         return CONJ.the(0, s);
     }
 
-    @NotNull
     static Term parallel(@NotNull Collection<Term> s) {
         return CONJ.the(0, s);
     }
 
-    @NotNull
     static Term disj(@NotNull Term... a) {
         return DISJ.the(a);
     }
@@ -544,25 +505,18 @@ public interface $ {
 
     }
 
-
-    @Nullable
     static Term diffi(Term a, Term b) {
         return DIFFi.the(DTERNAL, a, b);
     }
 
-    @Nullable
     static Term diffe(Term a, Term b) {
         return DIFFe.the(DTERNAL, a, b);
     }
 
-
-    @Nullable
     static Term secte(Term... x) {
         return SECTe.the(DTERNAL, x);
     }
 
-
-    @Nullable
     static Term secti(Term... x) {
         return SECTi.the(DTERNAL, x);
     }
@@ -580,43 +534,15 @@ public interface $ {
     /**
      * gets the atomic term of an integer, with specific radix (up to 36)
      */
-    @NotNull
     static Atom the(int i, int radix) {
-//        //fast lookup for single digits
-//        if ((i >= 0) && (i <= 9)) {
-//            Term a = digits[i];
-//            if (a == null)
-//                a = digits[i] = the(Integer.toString(i, radix));
-//            return (Atom) a;
-//        }
-//        //return Atom.the(Utf8.toUtf8(name));
-
         return (Atom) Atomic.the(Integer.toString(i, radix));
-
-//        int olen = name.length();
-//        switch (olen) {
-//            case 0:
-//                throw new RuntimeException("empty atom name: " + name);
-//
-////            //re-use short term names
-////            case 1:
-////            case 2:
-////                return theCached(name);
-//
-//            default:
-//                if (olen > Short.MAX_VALUE/2)
-//                    throw new RuntimeException("atom name too long");
-
-        //  }
     }
 
 
-    @NotNull
     static Atomic the(int v) {
         return Int.the(v);
     }
 
-    @NotNull
     static Atomic the(float v) {
         if (Util.equals((float) Math.floor(v), v, Float.MIN_VALUE * 2)) {
             //close enough to be an int, so it doesnt need to be quoted
@@ -644,12 +570,10 @@ public interface $ {
     }
 
 
-    @Nullable
-    static PreciseTruth t(float f, float c) {
+    public static PreciseTruth t(float f, float c) {
         return t(f, c, 0);
     }
 
-    @Nullable
     static PreciseTruth t(float f, float c, float minConf) {
         return new PreciseTruth(f, c);
     }
@@ -663,29 +587,16 @@ public interface $ {
      */
     static void neg(@NotNull Term[] array) {
         Util.map(Term::neg, array, array);
-//        int l = array.length;
-//        for (int i = 0; i < l; i++) {
-//            array[i] = $.neg(array[i]);
-//        }
     }
 
-
-    /**
-     * static storeless term builder
-     */
-    StaticTermIndex terms = new StaticTermIndex();
-
-    @NotNull
     static Atomic the(@NotNull byte[] id) {
         return Atomic.the(new String(id));
     }
 
-    @NotNull
     static Atomic the(byte c) {
         return the(new byte[]{c});
     }
 
-    @NotNull
     static Term[] the(@NotNull int... i) {
         int l = i.length;
         Term[] x = new Term[l];
@@ -705,7 +616,7 @@ public interface $ {
 
         if (o instanceof Number) {
             if (o instanceof Integer)
-                return Int.the(((Integer) o).intValue());
+                return Int.the((Integer) o);
         }
 
         return Atomic.the(o.toString());
@@ -714,18 +625,15 @@ public interface $ {
     /**
      * conjunction sequence (2-ary)
      */
-    @Nullable
     static Term seq(Term x, int dt, Term y) {
         return CONJ.the(dt, x, y); //must be a vector, not set
     }
 
 
-    @NotNull
     static <K, V> Map<K, V> newHashMap() {
         return newHashMap(0);
     }
 
-    @NotNull
     static <K, V> Map<K, V> newHashMap(int capacity) {
         return new HashMap<>(capacity);
 
@@ -738,18 +646,17 @@ public interface $ {
         //return new LinkedHashMap(capacity);
     }
 
-    static @NotNull <X> List<X> newArrayList() {
+    static <X> List<X> newArrayList() {
         return new FasterList<>(0);
         //return new ArrayList();
     }
 
-    @NotNull
-    static <X> List<X> newArrayList(int capacity) {
+    public static <X> List<X> newArrayList(int capacity) {
         return new FasterList(capacity);
         //return new ArrayList(capacity);
     }
 
-    static @NotNull <X> Set<X> newHashSet(int capacity) {
+    static  <X> Set<X> newHashSet(int capacity) {
 //        if (capacity < 4) {
 //            return new UnifiedSet(0);
 //        } else {

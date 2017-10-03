@@ -1,6 +1,7 @@
 package nars.task.util;
 
 import nars.Task;
+import nars.task.Tasked;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +23,7 @@ public class TaskRegionLink extends TasksRegion {
 
     @Override
     public boolean equals(Object obj) {
-        return this == obj || (obj != null && Objects.equals(task, ((TaskRegion) obj).task()));
+        return this == obj || (obj != null && Objects.equals(task, ((Tasked) obj).task()));
     }
 
     @Override

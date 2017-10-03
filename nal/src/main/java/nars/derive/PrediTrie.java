@@ -86,7 +86,7 @@ public final class PrediTrie {
     public static PrediTerm<Derivation> the(PremiseRuleSet r, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
         PrediTrie t = new PrediTrie(r);
         return AndCondition.the(
-                t.compile(t.pre, each),
+                PrediTrie.compile(t.pre, each),
                 new Try(t.postChoices.toArray(ValueFork[]::new)));
 
     }
@@ -96,7 +96,7 @@ public final class PrediTrie {
         return compile(pre, each);
     }
 
-    public PrediTerm<Derivation> compile(TermTrie<PrediTerm<Derivation>, PrediTerm<Derivation>> trie, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
+    public static PrediTerm<Derivation> compile(TermTrie<PrediTerm<Derivation>, PrediTerm<Derivation>> trie, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
         List<PrediTerm<Derivation>> bb = compile(trie.root);
         PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
 

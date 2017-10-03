@@ -798,7 +798,7 @@ public class Narsese extends BaseParser<Object> {
                                 push(match()),
                                 Atom(),
                                 swap(),
-                                push($.v(((String) pop()).charAt(0), (String) pop()))
+                                push($.v(((CharSequence) pop()).charAt(0), (String) pop()))
                         )
                 );
     }
@@ -1191,7 +1191,7 @@ public class Narsese extends BaseParser<Object> {
 
         byte punct =
                 px instanceof Byte ?
-                        ((Byte) x[2]).byteValue()
+                        (Byte) x[2]
                         :
                         (byte) (((Character) x[2]).charValue());
 
@@ -1497,12 +1497,5 @@ public class Narsese extends BaseParser<Object> {
         }
     }
 
-    private static class MiniNullPointerException extends NullPointerException {
 
-        @Nullable
-        @Override
-        public Throwable fillInStackTrace() {
-            return null;
-        }
-    }
 }

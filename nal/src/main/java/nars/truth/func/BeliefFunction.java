@@ -125,8 +125,7 @@ public enum BeliefFunction implements TruthOperator {
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
 
             if (B.isNegative()) {
-                Truth x = abduction(T.neg(), B.neg(), minConf);
-                return x != null ? x : null;
+                return abduction(T.neg(), B.neg(), minConf);
             } else {
                 return abduction(T, B, minConf);
             }

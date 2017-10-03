@@ -61,17 +61,21 @@ public interface Termed extends Termlike {
         return x == null ? null : x.term();
     }
 
+    @Override
     default int volume() {
         Term t = term(); if (this!=t) return t.volume(); else return Termlike.super.volume();
     }
 
+    @Override
     default int complexity() {
         Term t = term(); if (this!=t) return t.complexity(); else return Termlike.super.complexity();
     }
 
+    @Override
     default int structure() {
         Term t = term(); if (this!=t) return t.structure(); else return Termlike.super.structure();
     }
+    @Override
     default int vars() {
         Term t = term(); if (this!=t) return t.vars(); else return Termlike.super.vars();
     }

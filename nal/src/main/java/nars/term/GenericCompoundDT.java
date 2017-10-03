@@ -69,11 +69,6 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
     @Override
-    public @Nullable Term temporalize(Retemporalize r) {
-        return Compound.super.temporalize(r);
-    }
-
-    @Override
     public /*@NotNull*/ Op op() {
         return ref.op();
     }
@@ -87,11 +82,6 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     @Override
     public int structure() {
         return ref.structure();
-    }
-
-    @Override
-    public void append(ByteArrayDataOutput out) {
-        Term.append(this, out);
     }
 
     @NotNull
@@ -111,16 +101,6 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
     @Override
-    public boolean xternalEquals(Term x) {
-        return Compound.super.xternalEquals(x);
-    }
-
-    @Override
-    public Term evalSafe(TermContext context, int remain) {
-        return Compound.super.evalSafe(context, remain);
-    }
-
-    @Override
     @Nullable
     public final Term xternal() {
         return Compound.super.xternal();
@@ -131,28 +111,8 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
     @Override
-    public @Nullable Term transform(int newDT, @NotNull CompoundTransform t) {
-        return Compound.super.transform(newDT, t);
-    }
-
-    @Override
-    public @NotNull Term conceptual() {
-        return Compound.super.conceptual();
-    }
-
-    @Override
     public @Nullable Term transform(@NotNull CompoundTransform t) {
         return t.transform(this, op(), dt);
-    }
-
-    @Override
-    public @Nullable Term transform(ByteList path, Term replacement) {
-        return Compound.super.transform(path, replacement);
-    }
-
-    @Override
-    public @Nullable Term transform(ByteList path, int depth, Term replacement) {
-        return Compound.super.transform(path, depth, replacement);
     }
 
     @Override

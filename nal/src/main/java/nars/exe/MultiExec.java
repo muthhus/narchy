@@ -1,5 +1,6 @@
 package nars.exe;
 
+import com.conversantmedia.util.concurrent.ConcurrentQueue;
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.Util;
 import jcog.event.On;
@@ -61,7 +62,7 @@ public class MultiExec extends Exec {
         public void run() {
             while (true) {
 
-                final float s = ((DisruptorBlockingQueue) q).size();
+                final float s = ((ConcurrentQueue) q).size();
                 int maxToPoll = (int) (s / MultiExec.this.concurrency());
                 for (int i = 0; i < maxToPoll; i++) {
                     ITask k = q.poll();
@@ -128,6 +129,7 @@ public class MultiExec extends Exec {
         return sub.length;
     }
 
+    @Override
     public Stream<ITask> stream() {
         return Stream.of(sub).flatMap(UniExec::stream);
     }

@@ -22,6 +22,7 @@ public abstract class MatchConstraint extends AbstractPred<Derivation> {
     /**
      * cost of testing this, for sorting. higher value will be tested later than lower
      */
+    @Override
     abstract public float cost();
 
     @Override

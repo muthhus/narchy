@@ -41,7 +41,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * evaluates a premise (task, belief, termlink, taskLink, ...) to derive 0 or more new tasks
  */
-public class Derivation extends Unify implements TermContext {
+public class Derivation extends Unify {
 
     public static final Atomic _taskTerm = Atomic.the("_taskTerm");
     public static final Atomic _beliefTerm = Atomic.the("_beliefTerm");
@@ -166,11 +166,6 @@ public class Derivation extends Unify implements TermContext {
                 return compared.isNegative() ? subterm.neg() : subterm;
         });
         final Functor substitute = new substitute() {
-            @Override
-            protected boolean onChange(Term from, Term x, Term y, Term to) {
-                //assert (Derivation.this.xy.tryPut(x, y));
-                return true;
-            }
         };
 
         derivationFunctors = functors(

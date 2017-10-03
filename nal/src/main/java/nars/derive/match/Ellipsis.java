@@ -311,11 +311,6 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
         return 1;
     }
 
-    @Override
-    public int vars() {
-        return 0;
-    } //varpattern doesnt count as var
-
     //    public static Ellipsis getFirstUnmatchedEllipsis(Compound X, Subst ff) {
 //        final int xsize = X.size();
 //        for (int i = 0; i < xsize; i++) {

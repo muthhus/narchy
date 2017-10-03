@@ -60,7 +60,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * gets subterm at index i
      */
-    /*@NotNull*/ Term sub(int i);
+    /*@NotNull*/
+    @Override
+    Term sub(int i);
 
 
     /*@NotNull*/

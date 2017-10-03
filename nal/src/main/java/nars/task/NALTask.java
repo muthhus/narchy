@@ -151,7 +151,7 @@ public class NALTask extends Pri implements Task {
     public final boolean equals(Object that) {
         if (this == that) return true;
         if (!(that instanceof Tasked)) return false;
-        Task t = ((Tasked)that).task();
+        Task t = ((Tasked) that).task();
         if (this == t) return true;
         if (hash != t.hashCode()) return false;
         return Task.equal(this, t);
@@ -252,14 +252,18 @@ public class NALTask extends Pri implements Task {
     }
 
     @Override
-    public synchronized void meta(Object key, Object value) {
-        //synchronized (this) {
-        if (meta == null) {
-            meta = UnifiedMap.newWithKeysValues(key, value); /* for compactness */
-        } else {
-            meta.put(key, value);
+    public void meta(Object key, Object value) {
+
+
+        synchronized (this) {
+            if (meta == null) {
+                meta = UnifiedMap.newWithKeysValues(key, value); /* for compactness */
+            } else {
+                meta.put(key, value);
+            }
         }
-        //}
+
+
     }
 
     @Override

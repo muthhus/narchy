@@ -691,6 +691,7 @@ public interface Term extends Termed, Comparable<Term> {
      * unwraps any negation superterm
      */
     /*@NotNull*/
+    @Override
     default Term unneg() {
         if (op() == NEG) {
             Term x = sub(0);

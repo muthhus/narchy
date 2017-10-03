@@ -80,7 +80,7 @@ public class Fork extends AbstractPred<Derivation> {
     }
 
     @Nullable
-    public static PrediTerm<Derivation> fork(@NotNull PrediTerm<Derivation>... n) {
+    public static PrediTerm<Derivation> fork(PrediTerm<Derivation>[] n) {
         switch (n.length) {
             case 0:
                 return null;

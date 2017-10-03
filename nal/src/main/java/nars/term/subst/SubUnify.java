@@ -24,11 +24,6 @@ public class SubUnify extends Unify {
         this.parent = parent;
     }
 
-    @Override
-    public boolean unify(@NotNull Term x, @NotNull Term y, boolean finish) {
-        return super.unify(x, y, finish);
-    }
-
     //    @Override
 //    public @Nullable Term resolve(@NotNull Term x) {
 //

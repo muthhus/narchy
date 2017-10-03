@@ -42,7 +42,7 @@ public class PreciseTruth implements Truth {
 
     @Override
     public boolean equals(@Nullable Object that) {
-        return this == that ||  (that!=null && equals( (Truth)that, Param.TRUTH_EPSILON ));
+        return this == that ||  (that!=null && equals((Truthed) that, Param.TRUTH_EPSILON ));
         //throw new UnsupportedOperationException();
     }
 

@@ -42,6 +42,7 @@ import org.HdrHistogram.Histogram;
 import org.HdrHistogram.ShortCountsHistogram;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.block.function.primitive.ShortToObjectFunction;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.fusesource.jansi.Ansi;
@@ -586,8 +587,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             if (v instanceof Prioritized) {
                 b = ((Prioritized) v);
             } else if (v instanceof Twin) {
-                if (((Twin) v).getOne() instanceof Prioritized) {
-                    b = (Prioritized) ((Twin) v).getOne();
+                if (((Pair) v).getOne() instanceof Prioritized) {
+                    b = (Prioritized) ((Pair) v).getOne();
                 }
             }
             return b != null && b.pri() > priThresh;
@@ -1422,7 +1423,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public @NotNull NAR inputBinary(@NotNull File input) throws IOException {
+    public @NotNull NAR inputBinary(@NotNull File input) throws IOException, FileNotFoundException {
         return inputBinary(new BufferedInputStream(new FileInputStream(input), 64 * 1024));
     }
 
@@ -1432,7 +1433,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException {
+    public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException, FileNotFoundException {
         FileOutputStream ff = new FileOutputStream(f, append);
         outputBinary(ff, each);
         ff.close();
@@ -1784,7 +1785,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         synchronized (causes) {
 
             final short ci = (short) (causes.size());
-            final short[] sharedOneElement = new short[]{ci};
+            final short[] sharedOneElement = {ci};
             CauseChannel c = new CauseChannel<ITask>(ci, id, (x) -> {
                 if (x instanceof NALTask) {
                     NALTask t = (NALTask) x;

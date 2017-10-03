@@ -127,7 +127,7 @@ abstract public class DynamicTruthModel {
      * in the table (if any exist).  if no dt can be calculated, return
      * a standard value (ex: 0 or DTERNAL)
      */
-    private int matchDT(Term term, boolean beliefOrGoal, long start, long end, NAR n) {
+    private static int matchDT(Term term, boolean beliefOrGoal, long start, long end, NAR n) {
 
         assert (term.op().temporal);
 

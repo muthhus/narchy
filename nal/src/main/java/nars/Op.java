@@ -980,11 +980,8 @@ public enum Op implements $ {
                 return True;
             case 1:
                 return events.get(0).getOne();
-            default: {
-
-
+            default:
                 return conjSeq(events);
-            }
         }
     }
 
@@ -1669,9 +1666,9 @@ public enum Op implements $ {
 
         TreeSet<Term> args = new TreeSet<>();
         if (o1 == intersection) {
-            ((TermContainer) term1).forEach(args::add);
+            ((Iterable<Term>) term1).forEach(args::add);
             if (o2 == intersection)
-                ((TermContainer) term2).forEach(args::add);
+                ((Iterable<Term>) term2).forEach(args::add);
             else
                 args.add(term2);
         } else {

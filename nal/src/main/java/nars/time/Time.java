@@ -116,7 +116,7 @@ public abstract class Time implements Clock, Serializable {
 
 
     /** flushes the pending work queued for the current time */
-    public synchronized void synch(NAR n) {
+    public void synch(NAR n) {
         n.input(exeScheduled());
     }
 

@@ -107,7 +107,7 @@ abstract public class Exec implements Executor, PriMerge {
             return Param.premiseMerge.merge(existing, incoming);
         }else {
             if (existing instanceof NALTask) {
-                ((NALTask)existing).causeMerge((NALTask) incoming);
+                ((NALTask)existing).causeMerge((Task) incoming);
             }
             return Param.taskMerge.merge(existing, incoming);
         }

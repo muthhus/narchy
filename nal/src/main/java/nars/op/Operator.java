@@ -45,7 +45,7 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Operator extends BaseConcept implements PermanentConcept {
 
-    public static String LOG_FUNCTOR = String.valueOf(Character.valueOf((char) 8594)); //RIGHT ARROW
+    public static final String LOG_FUNCTOR = String.valueOf(Character.valueOf((char) 8594)); //RIGHT ARROW
 
     public final BiFunction<Task, NAR, Task> execute;
 

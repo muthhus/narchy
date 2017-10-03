@@ -330,7 +330,7 @@ public final class TruthFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static final Truth desireDed(final Truth v1, final Truth v2, float confMin) {
+    public static Truth desireDed(final Truth v1, final Truth v2, float confMin) {
         final float f1 = v1.freq();
         final float f2 = v2.freq();
         final float c1 = v1.conf();
@@ -350,7 +350,7 @@ public final class TruthFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static final Truth desireInd(final Truth v1, final Truth v2, float confMin) {
+    public static Truth desireInd(final Truth v1, final Truth v2, float confMin) {
         final float f1 = v1.freq();
         final float f2 = v2.freq();
         final float c1 = v1.conf();

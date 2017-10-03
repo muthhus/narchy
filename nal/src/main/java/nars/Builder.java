@@ -105,7 +105,7 @@ public class Builder {
         public static final Supplier<BiFunction<Op, Term[], Term>> SoftCompoundBuilder = ()->
                 new BiFunction<>() {
 
-                    final SoftMemoize<NewCompound, Term> cache = new SoftMemoize<NewCompound, Term>((v) -> HeapCompoundBuilder.apply(v.op, v.subs), 64 * 1024, true);
+                    final SoftMemoize<NewCompound, Term> cache = new SoftMemoize<>((v) -> HeapCompoundBuilder.apply(v.op, v.subs), 64 * 1024, true);
 
                     @Override
                     public Term apply(Op op, Term[] terms) {

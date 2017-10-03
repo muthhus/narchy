@@ -6,7 +6,6 @@ import nars.concept.Concept;
 import nars.op.DepIndepVarIntroduction;
 import nars.op.Operator;
 import nars.op.data.*;
-import nars.op.data.intersect;
 import nars.op.substitute;
 import nars.term.Functor;
 import nars.term.Term;

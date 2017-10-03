@@ -30,7 +30,7 @@ import static nars.concept.state.ConceptState.New;
 /**
  * concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks
  */
-public class BaseConcept extends ConcurrentHashMap implements Concept, Termed {
+public class BaseConcept extends ConcurrentHashMap implements Concept {
 
     @NotNull
     public final Term term;
@@ -183,7 +183,7 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termed {
 
     @Override
     public final boolean equals(Object obj) {
-        return this == obj || (obj instanceof Concept && term.equals(((Concept) obj).term()));
+        return this == obj || (obj instanceof Concept && term.equals(((Termed) obj).term()));
     }
 
     @Override

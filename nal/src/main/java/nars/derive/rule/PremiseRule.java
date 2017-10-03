@@ -221,7 +221,7 @@ public class PremiseRule extends GenericCompound {
      * deduplicate and generate match-optimized compounds for rules
      */
     private void compile(@NotNull TermIndex index) {
-        Term[] premisePattern = ((Compound) sub(0)).toArray();
+        Term[] premisePattern = ((TermContainer) sub(0)).toArray();
         premisePattern[0] = index.get(premisePattern[0], true).term(); //task pattern
         premisePattern[1] = index.get(premisePattern[1], true).term(); //belief pattern
     }
@@ -260,8 +260,8 @@ public class PremiseRule extends GenericCompound {
         //1. construct precondition term array
         //Term[] terms = terms();
 
-        Term[] precon = ((Compound) sub(0)).toArray();
-        Term[] postcons = ((Compound) sub(1)).toArray();
+        Term[] precon = ((TermContainer) sub(0)).toArray();
+        Term[] postcons = ((TermContainer) sub(1)).toArray();
 
 
         Set<PrediTerm> pres =
@@ -298,7 +298,7 @@ public class PremiseRule extends GenericCompound {
 
             //if (predicate.getSubject() instanceof SetExt) {
             //decode precondition predicate arguments
-            args = ((Compound) (predicate.sub(0))).toArray();
+            args = ((TermContainer) (predicate.sub(0))).toArray();
             X = (args.length > 0) ? args[0] : null;
             Y = (args.length > 1) ? args[1] : null;
 //            Z = (args.length > 2) ? args[2] : null;
@@ -562,7 +562,7 @@ public class PremiseRule extends GenericCompound {
             if (i >= postcons.length)
                 throw new RuntimeException("invalid rule: missing meta term for postcondition involving " + t);
 
-            postConditions.add(PostCondition.make(this, t, Terms.sorted(((Compound) postcons[i++]).toArray())));
+            postConditions.add(PostCondition.make(this, t, Terms.sorted(((TermContainer) postcons[i++]).toArray())));
         }
 
 

@@ -113,21 +113,9 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
      * hard
      */
     public final static ScalarEncoder Needle = (v, i, indices) -> {
-
         float vv = v * indices;
-
         int which = (int) Math.floor(vv);
-        float f;
-        if (i < which) {
-            f = 0;
-        } else if (i > which) {
-            f = 0;
-        } else {
-            f = 1f;
-        }
-
-        return f;
-
+        return i == which ? 1 : 0;
     };
 
     /**

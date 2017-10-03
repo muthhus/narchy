@@ -47,7 +47,8 @@ public class TemporalizeDerived extends Temporalize {
     /**
      * constraints specific for specific double premise derivations
      */
-    public Map<Term, SortedSet<Event>> sng, dbl;
+    public final Map<Term, SortedSet<Event>> sng;
+    public final Map<Term, SortedSet<Event>> dbl;
 
     public TemporalizeDerived(Derivation d) {
         super(d.random);

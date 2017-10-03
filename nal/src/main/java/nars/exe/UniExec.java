@@ -100,21 +100,7 @@ public class UniExec extends Exec  {
                         return value;
                     }
 
-                    @Override
-                    public void onRemove(@NotNull ITask value) {
-//                        if (value instanceof Task) {
-//                            ignore((Task) value);
-//                        }
-                    }
-
-                    @Override
-                    public void onReject(@NotNull ITask value) {
-//                        if (value instanceof Task) {
-//                            ignore((Task) value);
-//                        }
-                    }
-
-//
+                    //
                 };
 //            new ConcurrentCurveBag(this,
 //                new ConcurrentHashMapUnsafe<>(1024), nar.random(), 1024);
