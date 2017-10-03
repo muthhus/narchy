@@ -52,15 +52,10 @@ public class Row {
      */
     void insert(Symbol symbol, double _coefficient) {
         cells.merge(symbol, _coefficient, (existingCoefficient, coefficient) -> {
-            if (existingCoefficient != null) {
+            if (existingCoefficient != null)
                 coefficient += existingCoefficient;
-            }
 
-            if (Util.nearZero(coefficient)) {
-                return null;
-            } else {
-                return coefficient;
-            }
+            return Util.nearZero(coefficient) ? null : coefficient;
         });
     }
 
@@ -100,11 +95,10 @@ public class Row {
                     (existing, cc)->{
                         if (existing == null)
                             existing = 0.0;
-                        double temp = existing + cc;
-                        if (!Util.nearZero(temp))
-                            return temp;
-                        else
-                            return null; //remove
+
+                        existing += cc;
+
+                        return Util.nearZero(existing) ? null : existing;
                     });
         }
     }

@@ -36,7 +36,7 @@ public class Benchmarks {
             }
         };
 
-        solver.addConstraint(ConstraintParser.parseConstraint("variable0 == 100", variableResolver));
+        solver.add(ConstraintParser.parseConstraint("variable0 == 100", variableResolver));
 
         for (int i = 1; i < 3000; i++) {
             String constraintString  = getVariableName(i) + " == 100 + " + getVariableName(i - 1);
@@ -46,7 +46,7 @@ public class Benchmarks {
             System.gc();
             long timeBefore = System.nanoTime();
 
-            solver.addConstraint(constraint);
+            solver.add(constraint);
 
             System.out.println(i + "," + ((System.nanoTime() - timeBefore) / 1000) );
         }

@@ -5,7 +5,7 @@ package no.birkett.kiwi;
  */
 public class Variable {
 
-    private String name;
+    public final String name;
 
     private double value;
 
@@ -13,24 +13,21 @@ public class Variable {
         this.name = name;
     }
 
-    public Variable(double value) {
-    }
-    
-    public double getValue() {
+    public double value() {
         return value;
     }
 
-    public void setValue(double value) {
+    public void value(double value) {
         this.value = value;
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override
     public String toString() {
-        return "name: " + name + " value: " + value;
+        return name + "=" + value;
     }
 
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

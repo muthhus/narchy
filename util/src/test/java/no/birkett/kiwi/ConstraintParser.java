@@ -31,7 +31,7 @@ public class ConstraintParser {
             Expression expression = resolveExpression(matcher.group(3), variableResolver);
             double strength = parseStrength(matcher.group(4));
 
-            return new Constraint(Symbolics.subtract(variable, expression), operator, strength);
+            return new Constraint(C.subtract(variable, expression), operator, strength);
         } else {
             throw new RuntimeException("could not parse " +   constraintString);
         }
@@ -73,18 +73,18 @@ public class ConstraintParser {
 
         for (String expression : postFixExpression) {
             if ("+".equals(expression)) {
-                expressionStack.push(Symbolics.add(expressionStack.pop(), (expressionStack.pop())));
+                expressionStack.push(C.add(expressionStack.pop(), (expressionStack.pop())));
             } else if ("-".equals(expression)) {
                 Expression a = expressionStack.pop();
                 Expression b = expressionStack.pop();
                 
-                expressionStack.push(Symbolics.subtract(b, a));
+                expressionStack.push(C.subtract(b, a));
             } else if ("/".equals(expression)) {
                 Expression denominator = expressionStack.pop();
                 Expression numerator = expressionStack.pop();
-                expressionStack.push(Symbolics.divide(numerator, denominator));
+                expressionStack.push(C.divide(numerator, denominator));
             } else if ("*".equals(expression)) {
-                expressionStack.push(Symbolics.multiply(expressionStack.pop(), (expressionStack.pop())));
+                expressionStack.push(C.multiply(expressionStack.pop(), (expressionStack.pop())));
             } else {
                 Expression linearExpression =  variableResolver.resolveConstant(expression);
                 if (linearExpression == null) {

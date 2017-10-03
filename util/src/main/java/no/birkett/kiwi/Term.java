@@ -5,40 +5,28 @@ package no.birkett.kiwi;
  */
 public class Term {
 
-    private Variable variable;
+    public final Variable var;
     double coefficient;
 
-    public Term(Variable variable, double coefficient) {
-        this.variable = variable;
+    public Term(Variable var, double coefficient) {
+        this.var = var;
         this.coefficient = coefficient;
     }
 
-    public Term(Variable variable) {
-        this(variable, 1.0);
-    }
-
-    public Variable getVariable() {
-        return variable;
-    }
-
-    public void setVariable(Variable variable) {
-        this.variable = variable;
-    }
-
-    public double getCoefficient() {
-        return coefficient;
+    public Term(Variable var) {
+        this(var, 1.0);
     }
 
     public void setCoefficient(double coefficient) {
         this.coefficient = coefficient;
     }
 
-    public double getValue() {
-        return coefficient * variable.getValue();
+    public double value() {
+        return coefficient * var.value();
     }
 
     @Override
     public String toString() {
-        return "variable: (" + variable + ") coefficient: "  + coefficient;
+        return "variable: (" + var + ") coefficient: "  + coefficient;
     }
 }

@@ -1,6 +1,7 @@
 package no.birkett.kiwi;
 
-import java.util.ArrayList;
+import jcog.list.FasterList;
+
 import java.util.List;
 
 /**
@@ -8,9 +9,9 @@ import java.util.List;
  */
 public class Expression {
 
-    private List<Term> terms;
+    public final List<Term> terms;
 
-    private double constant;
+    private final double constant;
 
     public Expression() {
         this(0);
@@ -18,11 +19,11 @@ public class Expression {
 
     public Expression(double constant) {
         this.constant = constant;
-        this.terms = new ArrayList<>();
+        this.terms = new FasterList<>();
     }
 
     public Expression(Term term, double constant) {
-        this.terms = new ArrayList<>();
+        this.terms = new FasterList<>();
         terms.add(term);
         this.constant = constant;
     }
@@ -44,23 +45,12 @@ public class Expression {
         return constant;
     }
 
-    public void setConstant(double constant) {
-        this.constant = constant;
-    }
-
-    public List<Term> getTerms() {
-        return terms;
-    }
-
-    public void setTerms(List<Term> terms) {
-        this.terms = terms;
-    }
 
     public double getValue() {
         double result = this.constant;
 
-        for (Term term : terms) {
-            result += term.getValue();
+        for (int i = 0, termsSize = terms.size(); i < termsSize; i++) {
+            result += terms.get(i).value();
         }
         return result;
     }
@@ -76,9 +66,7 @@ public class Expression {
         if (!isConstant()) {
             sb.append(" terms: [");
             for (Term term: terms) {
-                sb.append('(');
-                sb.append(term);
-                sb.append(')');
+                sb.append('(').append(term).append(')');
             }
             sb.append("] ");
         }

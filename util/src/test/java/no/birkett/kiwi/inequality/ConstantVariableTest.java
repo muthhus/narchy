@@ -17,45 +17,45 @@ public class ConstantVariableTest {
     public void lessThanEqualTo() throws DuplicateConstraintException, UnsatisfiableConstraintException {
         Variable x = new Variable("x");
         Solver solver = new Solver();
-        solver.addConstraint(Symbolics.lessThanOrEqualTo(100, x));
-        solver.updateVariables();
-        assertTrue(100 <= x.getValue());
-        solver.addConstraint(Symbolics.equals(x, 110));
-        solver.updateVariables();
-        assertEquals(x.getValue(), 110, EPSILON);
+        solver.add(C.lessThanOrEqualTo(100, x));
+        solver.update();
+        assertTrue(100 <= x.value());
+        solver.add(C.equals(x, 110));
+        solver.update();
+        assertEquals(x.value(), 110, EPSILON);
     }
 
     @Test(expected = UnsatisfiableConstraintException.class)
     public void lessThanEqualToUnsatisfiable() throws DuplicateConstraintException, UnsatisfiableConstraintException {
         Variable x = new Variable("x");
         Solver solver = new Solver();
-        solver.addConstraint(Symbolics.lessThanOrEqualTo(100, x));
-        solver.updateVariables();
-        assertTrue(x.getValue() <= 100);
-        solver.addConstraint(Symbolics.equals(x, 10));
-        solver.updateVariables();
+        solver.add(C.lessThanOrEqualTo(100, x));
+        solver.update();
+        assertTrue(x.value() <= 100);
+        solver.add(C.equals(x, 10));
+        solver.update();
     }
 
     @Test
     public void greaterThanEqualTo() throws DuplicateConstraintException, UnsatisfiableConstraintException {
         Variable x = new Variable("x");
         Solver solver = new Solver();
-        solver.addConstraint(Symbolics.greaterThanOrEqualTo(100, x));
-        solver.updateVariables();
-        assertTrue(100 >= x.getValue());
-        solver.addConstraint(Symbolics.equals(x, 90));
-        solver.updateVariables();
-        assertEquals(x.getValue(), 90, EPSILON);
+        solver.add(C.greaterThanOrEqualTo(100, x));
+        solver.update();
+        assertTrue(100 >= x.value());
+        solver.add(C.equals(x, 90));
+        solver.update();
+        assertEquals(x.value(), 90, EPSILON);
     }
 
     @Test(expected = UnsatisfiableConstraintException.class)
     public void greaterThanEqualToUnsatisfiable() throws DuplicateConstraintException, UnsatisfiableConstraintException {
         Variable x = new Variable("x");
         Solver solver = new Solver();
-        solver.addConstraint(Symbolics.greaterThanOrEqualTo(100, x));
-        solver.updateVariables();
-        assertTrue(100 >= x.getValue());
-        solver.addConstraint(Symbolics.equals(x, 110));
-        solver.updateVariables();
+        solver.add(C.greaterThanOrEqualTo(100, x));
+        solver.update();
+        assertTrue(100 >= x.value());
+        solver.add(C.equals(x, 110));
+        solver.update();
     }
 }

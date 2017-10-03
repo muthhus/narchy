@@ -1,6 +1,7 @@
 package no.birkett.kiwi;
 
-import java.util.ArrayList;
+import jcog.list.FasterList;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,12 +11,9 @@ import java.util.Map;
  */
 public class Constraint {
 
-    private Expression expression;
+    public final Expression expression;
     private double strength;
-    private RelationalOperator op;
-
-    public Constraint(){
-    }
+    public final RelationalOperator op;
 
     public Constraint(Expression expr, RelationalOperator op) {
         this(expr, op, Strength.REQUIRED);
@@ -34,29 +32,16 @@ public class Constraint {
     private static Expression reduce(Expression expr){
 
         Map<Variable, Double> vars = new LinkedHashMap<>();
-        for(Term term: expr.getTerms()){
-            Double value = vars.get(term.getVariable());
-            if(value == null){
-                value = 0.0;
-            }
-            value += term.coefficient;
-            vars.put(term.getVariable(), value);
+        for(Term term: expr.terms){
+            vars.merge(term.var, term.coefficient, (vv, val)-> val + vv);
         }
 
-        List<Term> reducedTerms = new ArrayList<>();
+        List<Term> reducedTerms = new FasterList<>(vars.size());
         for(Map.Entry<Variable, Double> variableDoubleEntry : vars.entrySet()){
             reducedTerms.add(new Term(variableDoubleEntry.getKey(), variableDoubleEntry.getValue()));
         }
 
         return new Expression(reducedTerms, expr.getConstant());
-    }
-
-    public Expression getExpression() {
-        return expression;
-    }
-
-    public void setExpression(Expression expression) {
-        this.expression = expression;
     }
 
     public double getStrength() {
@@ -66,14 +51,6 @@ public class Constraint {
     public Constraint setStrength(double strength) {
         this.strength = strength;
         return this;
-    }
-
-    public RelationalOperator getOp() {
-        return op;
-    }
-
-    public void setOp(RelationalOperator op) {
-        this.op = op;
     }
 
     @Override

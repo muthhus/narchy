@@ -128,9 +128,9 @@ public class RealWorldTests {
                         Variable variable = new Variable(variableName);
                         node.put(variableName, variable);
                         if (RIGHT.equals(variableName)) {
-                            solver.addConstraint(Symbolics.equals(variable, Symbolics.add(getVariableFromNode(node, LEFT), getVariableFromNode(node, WIDTH))));
+                            solver.add(C.equals(variable, C.add(getVariableFromNode(node, LEFT), getVariableFromNode(node, WIDTH))));
                         } else if (BOTTOM.equals(variableName)) {
-                            solver.addConstraint(Symbolics.equals(variable, Symbolics.add(getVariableFromNode(node, TOP), getVariableFromNode(node, HEIGHT))));
+                            solver.add(C.equals(variable, C.add(getVariableFromNode(node, TOP), getVariableFromNode(node, HEIGHT))));
                         } else if (CENTERX.equals(variableName)) {
                            // solver.addConstraint(Symbolics.equals(variable, Symbolics.add(Symbolics.divide(getVariableFromNode(node, WIDTH), 2), getVariableFromNode(node, LEFT)));
                         } else if (CENTERY.equals(variableName)) {
@@ -204,37 +204,37 @@ public class RealWorldTests {
 
         for (String constraint : CONSTRAINTS) {
             Constraint con = ConstraintParser.parseConstraint(constraint, variableResolver);
-            solver.addConstraint(con);
+            solver.add(con);
         }
 
-        solver.addConstraint(ConstraintParser.parseConstraint("container.width == 300", variableResolver));
-        solver.addConstraint(ConstraintParser.parseConstraint("title0.intrinsicHeight == 100", variableResolver));
-        solver.addConstraint(ConstraintParser.parseConstraint("title1.intrinsicHeight == 110", variableResolver));
-        solver.addConstraint(ConstraintParser.parseConstraint("title2.intrinsicHeight == 120", variableResolver));
-        solver.addConstraint(ConstraintParser.parseConstraint("title3.intrinsicHeight == 130", variableResolver));
-        solver.addConstraint(ConstraintParser.parseConstraint("title4.intrinsicHeight == 140", variableResolver));
-        solver.addConstraint(ConstraintParser.parseConstraint("title5.intrinsicHeight == 150", variableResolver));
-        solver.addConstraint(ConstraintParser.parseConstraint("more.intrinsicHeight == 160", variableResolver));
+        solver.add(ConstraintParser.parseConstraint("container.width == 300", variableResolver));
+        solver.add(ConstraintParser.parseConstraint("title0.intrinsicHeight == 100", variableResolver));
+        solver.add(ConstraintParser.parseConstraint("title1.intrinsicHeight == 110", variableResolver));
+        solver.add(ConstraintParser.parseConstraint("title2.intrinsicHeight == 120", variableResolver));
+        solver.add(ConstraintParser.parseConstraint("title3.intrinsicHeight == 130", variableResolver));
+        solver.add(ConstraintParser.parseConstraint("title4.intrinsicHeight == 140", variableResolver));
+        solver.add(ConstraintParser.parseConstraint("title5.intrinsicHeight == 150", variableResolver));
+        solver.add(ConstraintParser.parseConstraint("more.intrinsicHeight == 160", variableResolver));
 
-        solver.updateVariables();
+        solver.update();
 
-        assertEquals(20, nodeHashMap.get("thumb0").get("top").getValue(), EPSILON);
-        assertEquals(20, nodeHashMap.get("thumb1").get("top").getValue(), EPSILON);
+        assertEquals(20, nodeHashMap.get("thumb0").get("top").value(), EPSILON);
+        assertEquals(20, nodeHashMap.get("thumb1").get("top").value(), EPSILON);
 
-        assertEquals(85, nodeHashMap.get("title0").get("top").getValue(), EPSILON);
-        assertEquals(85, nodeHashMap.get("title1").get("top").getValue(), EPSILON);
+        assertEquals(85, nodeHashMap.get("title0").get("top").value(), EPSILON);
+        assertEquals(85, nodeHashMap.get("title1").get("top").value(), EPSILON);
 
-        assertEquals(210, nodeHashMap.get("thumb2").get("top").getValue(), EPSILON);
-        assertEquals(210, nodeHashMap.get("thumb3").get("top").getValue(), EPSILON);
+        assertEquals(210, nodeHashMap.get("thumb2").get("top").value(), EPSILON);
+        assertEquals(210, nodeHashMap.get("thumb3").get("top").value(), EPSILON);
 
-        assertEquals(275, nodeHashMap.get("title2").get("top").getValue(), EPSILON);
-        assertEquals(275, nodeHashMap.get("title3").get("top").getValue(), EPSILON);
+        assertEquals(275, nodeHashMap.get("title2").get("top").value(), EPSILON);
+        assertEquals(275, nodeHashMap.get("title3").get("top").value(), EPSILON);
 
-        assertEquals(420, nodeHashMap.get("thumb4").get("top").getValue(), EPSILON);
-        assertEquals(420, nodeHashMap.get("thumb5").get("top").getValue(), EPSILON);
+        assertEquals(420, nodeHashMap.get("thumb4").get("top").value(), EPSILON);
+        assertEquals(420, nodeHashMap.get("thumb5").get("top").value(), EPSILON);
 
-        assertEquals(485, nodeHashMap.get("title4").get("top").getValue(), EPSILON);
-        assertEquals(485, nodeHashMap.get("title5").get("top").getValue(), EPSILON);
+        assertEquals(485, nodeHashMap.get("title4").get("top").value(), EPSILON);
+        assertEquals(485, nodeHashMap.get("title5").get("top").value(), EPSILON);
     }
 
   /*  @Test
@@ -349,7 +349,7 @@ public class RealWorldTests {
         Iterator<Map.Entry<String, Variable>> it = variableHashMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Variable> pairs = it.next();
-            System.out.println(" " + pairs.getKey() + " = " + pairs.getValue().getValue() + " (address:" + pairs.getValue().hashCode() + ")");
+            System.out.println(" " + pairs.getKey() + " = " + pairs.getValue().value() + " (address:" + pairs.getValue().hashCode() + ")");
         }
     }
 

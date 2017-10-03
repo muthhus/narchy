@@ -1,14 +1,16 @@
 package no.birkett.kiwi;
 
+import jcog.list.FasterList;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by alex on 31/01/15.
  */
-public class Symbolics {
+public class C {
 
-    private Symbolics() {
+    private C() {
     }
 
     // Variable multiply, divide, and unary invert
@@ -26,7 +28,7 @@ public class Symbolics {
 
     // Term multiply, divide, and unary invert
     public static Term multiply(Term term, double coefficient) {
-        return new Term(term.getVariable(), term.getCoefficient() * coefficient);
+        return new Term(term.var, term.coefficient * coefficient);
     }
 
     public static Term divide(Term term, double denominator) {
@@ -42,7 +44,7 @@ public class Symbolics {
 
         List<Term> terms = new ArrayList<>();
 
-        for (Term term : expression.getTerms()) {
+        for (Term term : expression.terms) {
             terms.add(multiply(term, coefficient));
         }
 
@@ -94,19 +96,19 @@ public class Symbolics {
     // Expression add and subtract
     public static Expression add(Expression first, Expression second) {
         //TODO do we need to copy term objects?
-        List<Term> terms = new ArrayList<>(first.getTerms().size() + second.getTerms().size());
+        List<Term> terms = new ArrayList<>(first.terms.size() + second.terms.size());
 
-        terms.addAll(first.getTerms());
-        terms.addAll(second.getTerms());
+        terms.addAll(first.terms);
+        terms.addAll(second.terms);
 
         return new Expression(terms, first.getConstant() + second.getConstant());
     }
 
     public static Expression add(Expression first, Term second) {
         //TODO do we need to copy term objects?
-        List<Term> terms = new ArrayList<>(first.getTerms().size() + 1);
+        List<Term> terms = new ArrayList<>(first.terms.size() + 1);
 
-        terms.addAll(first.getTerms());
+        terms.addAll(first.terms);
         terms.add(second);
 
         return new Expression(terms, first.getConstant());
@@ -117,7 +119,7 @@ public class Symbolics {
     }
 
     public static Expression add(Expression expression, double constant) {
-        return new Expression(expression.getTerms(), expression.getConstant() + constant);
+        return new Expression(expression.terms, expression.getConstant() + constant);
     }
 
     public static Expression subtract(Expression first, Expression second) {
@@ -141,11 +143,19 @@ public class Symbolics {
         return add(expression, term);
     }
 
-    public static Expression add(Term first, Term second) {
-        List<Term> terms = new ArrayList<>(2);
-        terms.add(first);
-        terms.add(second);
-        return new Expression(terms);
+
+    public static Expression add(Term... t) {
+        return new Expression(new FasterList(t));
+    }
+
+
+
+//    public static Expression add(List<Variable> tt) {
+//        return new Expression(new FasterList<>(tt.stream().map(Term::new).toArray(Term[]::new)));
+//    }
+
+    public static Expression add(List<Term> tt) {
+        return new Expression(tt);
     }
 
     public static Expression add(Term term, Variable variable) {

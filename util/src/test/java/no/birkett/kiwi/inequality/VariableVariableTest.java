@@ -20,14 +20,14 @@ public class VariableVariableTest {
         Variable x = new Variable("x");
         Variable y = new Variable("y");
 
-        solver.addConstraint(Symbolics.equals(y, 100));
-        solver.addConstraint(Symbolics.lessThanOrEqualTo(x, y));
+        solver.add(C.equals(y, 100));
+        solver.add(C.lessThanOrEqualTo(x, y));
 
-        solver.updateVariables();
-        assertTrue(x.getValue() <= 100);
-        solver.addConstraint(Symbolics.equals(x, 90));
-        solver.updateVariables();
-        assertEquals(x.getValue(), 90, EPSILON);
+        solver.update();
+        assertTrue(x.value() <= 100);
+        solver.add(C.equals(x, 90));
+        solver.update();
+        assertEquals(x.value(), 90, EPSILON);
     }
 
     @Test(expected = UnsatisfiableConstraintException.class)
@@ -37,13 +37,13 @@ public class VariableVariableTest {
         Variable x = new Variable("x");
         Variable y = new Variable("y");
 
-        solver.addConstraint(Symbolics.equals(y, 100));
-        solver.addConstraint(Symbolics.lessThanOrEqualTo(x, y));
+        solver.add(C.equals(y, 100));
+        solver.add(C.lessThanOrEqualTo(x, y));
 
-        solver.updateVariables();
-        assertTrue(x.getValue() <= 100);
-        solver.addConstraint(Symbolics.equals(x, 110));
-        solver.updateVariables();
+        solver.update();
+        assertTrue(x.value() <= 100);
+        solver.add(C.equals(x, 110));
+        solver.update();
     }
 
     @Test
@@ -53,14 +53,14 @@ public class VariableVariableTest {
         Variable x = new Variable("x");
         Variable y = new Variable("y");
 
-        solver.addConstraint(Symbolics.equals(y, 100));
-        solver.addConstraint(Symbolics.greaterThanOrEqualTo(x, y));
+        solver.add(C.equals(y, 100));
+        solver.add(C.greaterThanOrEqualTo(x, y));
 
-        solver.updateVariables();
-        assertTrue(x.getValue() >= 100);
-        solver.addConstraint(Symbolics.equals(x, 110));
-        solver.updateVariables();
-        assertEquals(x.getValue(), 110, EPSILON);
+        solver.update();
+        assertTrue(x.value() >= 100);
+        solver.add(C.equals(x, 110));
+        solver.update();
+        assertEquals(x.value(), 110, EPSILON);
     }
 
     @Test(expected = UnsatisfiableConstraintException.class)
@@ -71,12 +71,12 @@ public class VariableVariableTest {
         Variable x = new Variable("x");
         Variable y = new Variable("y");
 
-        solver.addConstraint(Symbolics.equals(y, 100));
+        solver.add(C.equals(y, 100));
 
-        solver.addConstraint(Symbolics.greaterThanOrEqualTo(x, y));
-        solver.updateVariables();
-        assertTrue(x.getValue() >= 100);
-        solver.addConstraint(Symbolics.equals(x, 90));
-        solver.updateVariables();
+        solver.add(C.greaterThanOrEqualTo(x, y));
+        solver.update();
+        assertTrue(x.value() >= 100);
+        solver.add(C.equals(x, 90));
+        solver.update();
     }
 }

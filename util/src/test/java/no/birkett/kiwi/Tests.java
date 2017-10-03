@@ -15,11 +15,11 @@ public class Tests {
         Variable x = new Variable("x");
 
 
-        solver.addConstraint(Symbolics.equals(Symbolics.add(x, 2), 20));
+        solver.add(C.equals(C.add(x, 2), 20));
 
-        solver.updateVariables();
+        solver.update();
 
-        assertEquals(x.getValue(), 18, EPSILON);
+        assertEquals(x.value(), 18, EPSILON);
     }
 
     @Test
@@ -28,16 +28,16 @@ public class Tests {
         Variable x = new Variable("x");
         Variable y = new Variable("y");
 
-        solver.addConstraint(Symbolics.equals(x, 20));
+        solver.add(C.equals(x, 20));
 
-        solver.addConstraint(Symbolics.equals(Symbolics.add(x, 2), Symbolics.add(y, 10)));
+        solver.add(C.equals(C.add(x, 2), C.add(y, 10)));
 
-        solver.updateVariables();
+        solver.update();
 
-        System.out.println("x " + x.getValue() + " y " + y.getValue());
+        System.out.println("x " + x.value() + " y " + y.value());
 
-        assertEquals(y.getValue(), 12, EPSILON);
-        assertEquals(x.getValue(), 20, EPSILON);
+        assertEquals(y.value(), 12, EPSILON);
+        assertEquals(x.value(), 20, EPSILON);
     }
 
     @Test
@@ -45,9 +45,9 @@ public class Tests {
         Variable x = new Variable("x");
         Variable y = new Variable("y");
         Solver solver = new Solver();
-        solver.addConstraint(Symbolics.equals(x, y));
-        solver.updateVariables();
-        assertEquals(x.getValue(), y.getValue(), EPSILON);
+        solver.add(C.equals(x, y));
+        solver.update();
+        assertEquals(x.value(), y.value(), EPSILON);
     }
 
     @Test
@@ -56,19 +56,19 @@ public class Tests {
         Variable y = new Variable("y");
         Solver solver = new Solver();
 
-        solver.addConstraint(Symbolics.lessThanOrEqualTo(x, y));
-        solver.addConstraint(Symbolics.equals(y, Symbolics.add(x, 3.0)));
-        solver.addConstraint(Symbolics.equals(x, 10.0).setStrength(Strength.WEAK));
-        solver.addConstraint(Symbolics.equals(y, 10.0).setStrength(Strength.WEAK));
+        solver.add(C.lessThanOrEqualTo(x, y));
+        solver.add(C.equals(y, C.add(x, 3.0)));
+        solver.add(C.equals(x, 10.0).setStrength(Strength.WEAK));
+        solver.add(C.equals(y, 10.0).setStrength(Strength.WEAK));
 
-        solver.updateVariables();
+        solver.update();
 
-        if (Math.abs(x.getValue() - 10.0) < EPSILON) {
-            assertEquals(10, x.getValue(), EPSILON);
-            assertEquals(13, y.getValue(), EPSILON);
+        if (Math.abs(x.value() - 10.0) < EPSILON) {
+            assertEquals(10, x.value(), EPSILON);
+            assertEquals(13, y.value(), EPSILON);
         } else {
-            assertEquals(7, x.getValue(), EPSILON);
-            assertEquals(10, y.getValue(), EPSILON);
+            assertEquals(7, x.value(), EPSILON);
+            assertEquals(10, y.value(), EPSILON);
         }
     }
 
@@ -77,47 +77,47 @@ public class Tests {
         Variable x = new Variable("x");
         Solver solver = new Solver();
 
-        solver.addConstraint(Symbolics.lessThanOrEqualTo(x, 100).setStrength(Strength.WEAK));
+        solver.add(C.lessThanOrEqualTo(x, 100).setStrength(Strength.WEAK));
 
-        solver.updateVariables();
-        assertEquals(100, x.getValue(), EPSILON);
+        solver.update();
+        assertEquals(100, x.value(), EPSILON);
 
-        Constraint c10 = Symbolics.lessThanOrEqualTo(x, 10.0);
-        Constraint c20 = Symbolics.lessThanOrEqualTo(x, 20.0);
+        Constraint c10 = C.lessThanOrEqualTo(x, 10.0);
+        Constraint c20 = C.lessThanOrEqualTo(x, 20.0);
 
-        solver.addConstraint(c10);
-        solver.addConstraint(c20);
+        solver.add(c10);
+        solver.add(c20);
 
-        solver.updateVariables();
+        solver.update();
 
-        assertEquals(10, x.getValue(), EPSILON);
+        assertEquals(10, x.value(), EPSILON);
 
-        solver.removeConstraint(c10);
+        solver.remove(c10);
 
-        solver.updateVariables();
+        solver.update();
 
-        assertEquals(20, x.getValue(), EPSILON);
+        assertEquals(20, x.value(), EPSILON);
 
-        solver.removeConstraint(c20);
-        solver.updateVariables();
+        solver.remove(c20);
+        solver.update();
 
-        assertEquals(100, x.getValue(), EPSILON);
+        assertEquals(100, x.value(), EPSILON);
 
-        Constraint c10again = Symbolics.lessThanOrEqualTo(x, 10.0);
+        Constraint c10again = C.lessThanOrEqualTo(x, 10.0);
 
-        solver.addConstraint(c10again);
-        solver.addConstraint(c10);
-        solver.updateVariables();
+        solver.add(c10again);
+        solver.add(c10);
+        solver.update();
 
-        assertEquals(10, x.getValue(), EPSILON);
+        assertEquals(10, x.value(), EPSILON);
 
-        solver.removeConstraint(c10);
-        solver.updateVariables();
-        assertEquals(10, x.getValue(), EPSILON);
+        solver.remove(c10);
+        solver.update();
+        assertEquals(10, x.value(), EPSILON);
 
-        solver.removeConstraint(c10again);
-        solver.updateVariables();
-        assertEquals(100, x.getValue(), EPSILON);
+        solver.remove(c10again);
+        solver.update();
+        assertEquals(100, x.value(), EPSILON);
     }
 
     @Test
@@ -126,43 +126,43 @@ public class Tests {
         Variable y = new Variable("y");
         Solver solver = new Solver();
 
-        solver.addConstraint(Symbolics.equals(x, 100).setStrength(Strength.WEAK));
-        solver.addConstraint(Symbolics.equals(y, 120).setStrength(Strength.STRONG));
+        solver.add(C.equals(x, 100).setStrength(Strength.WEAK));
+        solver.add(C.equals(y, 120).setStrength(Strength.STRONG));
 
-        Constraint c10 = Symbolics.lessThanOrEqualTo(x, 10.0);
-        Constraint c20 = Symbolics.lessThanOrEqualTo(x, 20.0);
+        Constraint c10 = C.lessThanOrEqualTo(x, 10.0);
+        Constraint c20 = C.lessThanOrEqualTo(x, 20.0);
 
-        solver.addConstraint(c10);
-        solver.addConstraint(c20);
-        solver.updateVariables();
+        solver.add(c10);
+        solver.add(c20);
+        solver.update();
 
-        assertEquals(10, x.getValue(), EPSILON);
-        assertEquals(120, y.getValue(), EPSILON);
+        assertEquals(10, x.value(), EPSILON);
+        assertEquals(120, y.value(), EPSILON);
 
-        solver.removeConstraint(c10);
-        solver.updateVariables();
+        solver.remove(c10);
+        solver.update();
 
-        assertEquals(20, x.getValue(), EPSILON);
-        assertEquals(120, y.getValue(), EPSILON);
+        assertEquals(20, x.value(), EPSILON);
+        assertEquals(120, y.value(), EPSILON);
 
-        Constraint cxy = Symbolics.equals(Symbolics.multiply(x, 2.0), y);
-        solver.addConstraint(cxy);
-        solver.updateVariables();
+        Constraint cxy = C.equals(C.multiply(x, 2.0), y);
+        solver.add(cxy);
+        solver.update();
 
-        assertEquals(20, x.getValue(), EPSILON);
-        assertEquals(40, y.getValue(), EPSILON);
+        assertEquals(20, x.value(), EPSILON);
+        assertEquals(40, y.value(), EPSILON);
 
-        solver.removeConstraint(c20);
-        solver.updateVariables();
+        solver.remove(c20);
+        solver.update();
 
-        assertEquals(60, x.getValue(), EPSILON);
-        assertEquals(120, y.getValue(), EPSILON);
+        assertEquals(60, x.value(), EPSILON);
+        assertEquals(120, y.value(), EPSILON);
 
-        solver.removeConstraint(cxy);
-        solver.updateVariables();
+        solver.remove(cxy);
+        solver.update();
 
-        assertEquals(100, x.getValue(), EPSILON);
-        assertEquals(120, y.getValue(), EPSILON);
+        assertEquals(100, x.value(), EPSILON);
+        assertEquals(120, y.value(), EPSILON);
     }
 
     @Test(expected = UnsatisfiableConstraintException.class)
@@ -170,10 +170,10 @@ public class Tests {
         Variable x = new Variable("x");
         Solver solver = new Solver();
 
-        solver.addConstraint(Symbolics.equals(x, 10.0));
-        solver.addConstraint(Symbolics.equals(x, 5.0));
+        solver.add(C.equals(x, 10.0));
+        solver.add(C.equals(x, 5.0));
 
-        solver.updateVariables();
+        solver.update();
     }
 
     @Test(expected = UnsatisfiableConstraintException.class)
@@ -181,9 +181,9 @@ public class Tests {
         Variable x = new Variable("x");
         Solver solver = new Solver();
 
-        solver.addConstraint(Symbolics.greaterThanOrEqualTo(x, 10.0));
-        solver.addConstraint(Symbolics.lessThanOrEqualTo(x, 5.0));
-        solver.updateVariables();
+        solver.add(C.greaterThanOrEqualTo(x, 10.0));
+        solver.add(C.lessThanOrEqualTo(x, 5.0));
+        solver.update();
     }
 
     @Test(expected = UnsatisfiableConstraintException.class)
@@ -195,13 +195,13 @@ public class Tests {
         Variable z = new Variable("z");
         Solver solver = new Solver();
 
-        solver.addConstraint(Symbolics.greaterThanOrEqualTo(w, 10.0));
-        solver.addConstraint(Symbolics.greaterThanOrEqualTo(x, w));
-        solver.addConstraint(Symbolics.greaterThanOrEqualTo(y, x));
-        solver.addConstraint(Symbolics.greaterThanOrEqualTo(z, y));
-        solver.addConstraint(Symbolics.greaterThanOrEqualTo(z, 8.0));
-        solver.addConstraint(Symbolics.lessThanOrEqualTo(z, 4.0));
-        solver.updateVariables();
+        solver.add(C.greaterThanOrEqualTo(w, 10.0));
+        solver.add(C.greaterThanOrEqualTo(x, w));
+        solver.add(C.greaterThanOrEqualTo(y, x));
+        solver.add(C.greaterThanOrEqualTo(z, y));
+        solver.add(C.greaterThanOrEqualTo(z, 8.0));
+        solver.add(C.lessThanOrEqualTo(z, 4.0));
+        solver.update();
     }
 
 }
