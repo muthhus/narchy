@@ -13,6 +13,8 @@ import nars.time.Tense;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -32,8 +34,9 @@ public class SanityTest {
         n.want[MetaGoal.Desire.ordinal()] = +1f; //act
 
         n.truthResolution.setValue(0.1f);
-        n.termVolumeMax.setValue(16);
-        n.log();
+        n.termVolumeMax.setValue(24);
+        n.time.dur(1);
+        //n.log();
 
 
         int cap = 4;
@@ -41,51 +44,35 @@ public class SanityTest {
         for (int i = 0; i < cap; i++)
             t.tape.add($.the(i));
 
-        n.onOp("get", new Operator.AtomicExec((xt, nn) -> {
-            @Nullable TermContainer aa = Operator.args(xt);
-            if (aa.subs() == 2) {
-                Term tapeID = aa.sub(0);
-                if (tapeID.op().conceptualizable) {
-                    long now = nn.time();
+        t.on(n);
 
-                    if (aa.sub(1) instanceof Variable) {
+        n.log();
 
-                        Term y = t.next();
+        System.out.println("SET");
 
-                        NALTask u = new NALTask(
-                                $.func("get", tapeID, y).normalize(), BELIEF, $.t(1f, nn.confDefault(BELIEF)),
-                                now, now, now, nn.time.nextInputStamp());
-                        u.pri(nn.priDefault(BELIEF));
-                        n.input(u);
-                    } else {
-                        //maybe you mean this
-                        NALTask u = new NALTask(
-                                $.func("get", tapeID, $.varDep(1)).normalize(),
-                                QUEST, null,
-                                now, now, now, nn.time.nextInputStamp());
-                        u.pri(nn.priDefault(BELIEF));
-                        n.input(u);
+        for (int i = 0; i < 4; i++) {
+            n.input("$0.99 set(a, " + i + ")! :|:");
+            n.run(20);
+        }
 
-                    }
-                }
-            }
-        }, 0.75f));
+        n.run(20);
+
+        System.out.println("GET");
 
         for (int i = 0; i < 4; i++) {
             n.input("get(a, #x)! :|:");
             n.run(5);
-            n.input("get(a, #x)! :|:");
-            n.run(5);
-            n.input("get(a, #x)! :|:");
-            n.run(5);
-            n.input("get(a, #x)! :|:");
-            n.run(5);
-            n.run(55);
         }
+
+        n.run(10);
+
+        System.out.println("TEST GET");
+
         n.clear();
+
         System.out.println("clear");
-        n.input("get(a,3)! :|:");
-        n.run(100);
+        n.input("$0.9 get(a,3)! :|:");
+        n.run(1000);
 
     }
 
@@ -244,6 +231,8 @@ public class SanityTest {
 
     static class TermBuffer {
 
+        static final Logger logger = LoggerFactory.getLogger(TermBuffer.class);
+
         CircularArrayList<Term> tape;
         int pos = 0;
 
@@ -260,6 +249,89 @@ public class SanityTest {
             if (++pos >= tape.size())
                 pos = 0;
             return x;
+        }
+
+        public synchronized void push(Term x) {
+            tape.set(pos, x);
+            if (++pos >= tape.size())
+                pos = 0;
+        }
+
+        public void on(NAR n) {
+
+            float exeThresh = 0.51f;
+            Operator get = n.onOp("get", new Operator.AtomicExec((xt, nn) -> {
+                @Nullable TermContainer aa = Operator.args(xt);
+                if (aa.subs() == 2) {
+                    Term tapeID = aa.sub(0);
+                    if (tapeID.op().conceptualizable) {
+                        long now = nn.time();
+
+                        if (aa.sub(1) instanceof Variable) {
+
+                            Term y = next();
+
+                            Term c = $.impl(
+                                        $.func("get", tapeID, $.varDep(1)),
+                                        (int) (now - xt.start()),
+                                        $.func("get", tapeID, y)
+                                    ).normalize();
+
+                            NALTask u = new NALTask(
+                                    c, BELIEF, $.t(1f, nn.confDefault(BELIEF)),
+                                    now, now, now, nn.time.nextInputStamp());
+
+                            u.pri(nn.priDefault(BELIEF));
+
+                            logger.info("{} {}", this, u);
+
+                            n.input(u);
+
+                        } else {
+                            //maybe you mean this
+                            NALTask u = new NALTask(
+                                    $.func("get", tapeID, $.varDep(1)).normalize(),
+                                    QUEST, null,
+                                    now, now, now, nn.time.nextInputStamp());
+                            u.pri(nn.priDefault(BELIEF));
+                            n.input(u);
+
+                        }
+                    }
+                }
+            }, exeThresh));
+            //n.goal(get.term(), Tense.Eternal, 0f, 0.05f); //neg bias
+
+            Operator set = n.onOp("set", new Operator.AtomicExec((xt, nn) -> {
+                @Nullable TermContainer aa = Operator.args(xt);
+                if (aa.subs() == 2) {
+                    Term tapeID = aa.sub(0);
+                    if (tapeID.op().conceptualizable) {
+                        long now = nn.time();
+
+                        Term v = aa.sub(1);
+                        if (!(v instanceof Variable)) {
+
+                            push(v);
+
+                            Term c = $.func("set", tapeID, v);
+
+                            NALTask u = new NALTask(
+                                    c, BELIEF, $.t(1f, nn.confDefault(BELIEF)),
+                                    now, now, now, nn.time.nextInputStamp());
+
+                            u.pri(nn.priDefault(BELIEF));
+
+                            logger.info("{} {}", this, u);
+
+                            n.input(u);
+
+                        }
+                    }
+                }
+            }, exeThresh));
+            //n.goal(get.term(), Tense.Eternal, 0f, 0.05f); //neg bias
+
         }
     }
 }

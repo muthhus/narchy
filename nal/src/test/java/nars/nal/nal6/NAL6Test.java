@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 400;
+    final int cycles = 700;
 
     @Before
     public void nal() {
@@ -206,7 +206,7 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test;
         tester.believe("<{Tweety} --> [withWings]>"); //en("Tweety has wings.");
         tester.believe("<(&&,<$x --> [chirping]>,<$x --> [withWings]>) ==> <$x --> bird>>"); //en("If something can chirp and has wings, then it is a bird.");
-        tester.mustBelieve(cycles, "<<{Tweety} --> [chirping]> ==> <{Tweety} --> bird>>", 1.00f, 0.73f); //en("If Tweety can chirp, then it is a bird.");
+        tester.mustBelieve(cycles, "<<{Tweety} --> [chirping]> ==> <{Tweety} --> bird>>", 1.00f, 0.81f); //en("If Tweety can chirp, then it is a bird.");
 
     }
 
@@ -701,7 +701,7 @@ public class NAL6Test extends AbstractNALTest {
                 .ask("num(((x)))")
                 .mustBelieve(cycles * 10, "num(x)", 1.0f, 1.0f, 0.81f, 1.0f)
                 .mustBelieve(cycles * 10, "num((x))", 0.99f, 1.0f, 0.73f, 1.0f)
-                .mustBelieve(cycles * 10, "num(((x)))", 0.99f, 1.0f, 0.59f, 1.0f)
+                .mustBelieve(cycles * 10, "num(((x)))", 0.99f, 1.0f, 0.5f, 1.0f)
         //.mustBelieve(time, "num:((((0))))", 1.0f, 1.0f, 0.81f, 1.0f)
         // ''outputMustContain('<(((0))) --> num>. %1.00;0.26%')
         ;

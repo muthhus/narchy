@@ -1814,7 +1814,12 @@ public enum Op implements $ {
             if (z > 1 && cs.contains(content)) {
                 SortedSet<Term> s = cs.toSortedSet();
                 if (s.remove(content)) {
-                    return z == 2 ? s.first() : container.op().the(container.dt(), s);
+                    int zs = s.size();
+                    switch (zs) {
+                        case 0: return Null;
+                        case 1: return s.first();
+                        default: return container.op().the(container.dt(), s);
+                    }
                 }
             }
         } else {

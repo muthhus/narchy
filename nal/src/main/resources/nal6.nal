@@ -34,26 +34,30 @@
 
 
 // Contraposition (structural)
-// "If not smoking lets you be healthy, being not healthy may be the result of smoking"
+// "If not smoking causes health, being not healthy may be the result of smoking"
+// "If smoking causes not health, being healthy may be the result of not smoking"
+
 // original:	    ( --S ==> P),   P |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
 // original:	    ( --S ==> P), --S |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
 
-    ( --S ==> P), P, task(".") |- ( --P ==>+- S), (Belief:Contraposition)
+    ( --S ==> P), P |- ( --P ==>+- S), (Belief:Contraposition)
+    //( --S ==> P), P |- ( P ==>+- --S), (Belief:ContrapositionN)
+
 
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance
 
 
-    (P ==> M), (S ==> M), neqRCom(P,S) |- ((P &&+- S) ==>+- M), (Belief:Intersection)
-    (P ==> M), (S ==> M), neqRCom(P,S) |- (--(--P &&+- --S) ==>+- M), (Belief:Union)
+    (P ==> M), (S ==> M) |- ((P &&+- S) ==>+- M), (Belief:Intersection)
+    (P ==> M), (S ==> M) |- (--(--P &&+- --S) ==>+- M), (Belief:Union)
     //(P ==> M), (S ==> M) |- ((P &&+- --S) ==>+- M), (Belief:IntersectionPN)
         //(P ==> M), (S ==> M), neqCom(P,S) |- (--((--,%P) &&+- (--,%S)) ==>+- M), (Belief:Union)
                 //(P || S) ==>+-M
 
 
-    (M ==> P), (M ==> S), neqRCom(P,S) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
-    (P ==> M), (S ==> M), neqRCom(P,S) |- (M ==>+- --(--P &&+- --S)), (Belief:Union)
+    (M ==> P), (M ==> S) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
+    (P ==> M), (S ==> M) |- (M ==>+- --(--P &&+- --S)), (Belief:Union)
     //(M ==> P), (M ==> S) |- (M ==>+- (P &&+- --S)), (Belief:IntersectionPN)
         //(M ==> P), (M ==> S), neqCom(P,S) |- (M ==>+- --((--,%P) &&+- (--,%S))), (Belief:Union)
                 //M ==>+- (P || S)
@@ -71,12 +75,12 @@
         //(M ==> S), (M ==> (&&,(--,%S),A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
         //(M ==> S), (M ==> (||,S,A..+)) |- (M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
-    (M ==> C), C, belief("&&") |- (M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
+    (M ==> C), (M ==> C), belief("&&") |- (M ==>+- dropAnyEvent(ifConjCommNoDepVars(C))), (Belief:StructuralDeduction)
           //(M ==> C), D, belief("&&") |- (M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D)), (Belief:StructuralDeduction)
         //(--M ==> C), C, belief("&&") |- (--M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
           //(--M ==> C), D, belief("&&") |- (--M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D, strict)), (Belief:StructuralDeduction)
         //(M ==> (&&,(--,%S),A..+)), M |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
-    (C ==> M), C, belief("&&") |- (dropAnyEvent(C) ==>+- M), (Belief:StructuralDeduction)
+    (C ==> M), (C ==> M), belief("&&") |- (dropAnyEvent(ifConjCommNoDepVars(C)) ==>+- M), (Belief:StructuralDeduction)
           //(C ==> M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D) ==>+- M), (Belief:StructuralDeduction)
         //(C ==> --M), C, belief("&&") |- (dropAnyEvent(C) ==>+- --M), (Belief:StructuralDeduction)
           //(C ==> --M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D, strict) ==>+- --M), (Belief:StructuralDeduction)
@@ -153,7 +157,7 @@
     //((&&,M,A..+) ==> C), ((&&,A..+) ==> C), task(".") |- M, (Belief:Abduction)
     ((&&,M,A..+) ==> X), ((&&,A..+) ==> Y), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
     //(M ==> C), C, task(".") |- M, (Belief:Abduction)
-    (M ==> X), Y, task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
+    (M ==> X), Y, task(".") |- subIfUnifiesAny(M,X,Y,"$"), (Belief:Abduction)
 
         //TODO modify ellipsis to allow these two rules to be expressed as one:
         // ((&&,M,A..+) ==> C), (A..+ ==> C) |- M, (Belief:Abduction)

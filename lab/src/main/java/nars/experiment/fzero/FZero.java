@@ -112,9 +112,9 @@ public class FZero extends NAgentX {
                 9,
                 ScalarConcepts.Needle
                 //ScalarConcepts.Fluid
-        ).resolution(0.1f);
+        ).resolution(0.25f);
         window(
-                Vis.conceptBeliefPlots(this, ang, 4), 500, 500);
+                Vis.conceptBeliefPlots(this, ang, 16), 300, 300);
 
         //nar.mix.stream("Derive").setValue(1);
 

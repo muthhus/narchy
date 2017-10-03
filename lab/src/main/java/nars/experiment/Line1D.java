@@ -160,12 +160,12 @@ public class Line1D {
             exp.floatValueOf(n);
 
 
-            n.time.dur(1);
+            n.time.dur(100);
             exp.agent.curiosity.setValue(0f);
-            exp.agent.runDur(5);
+            exp.agent.runDur(1);
 
             //n.truthResolution.setValue(0.25f);
-            n.termVolumeMax.set(12);
+            n.termVolumeMax.set(20);
 
 //            n.beliefConfidence(0.5f);
 //            n.goalConfidence(0.5f);

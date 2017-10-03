@@ -837,9 +837,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * registers an operator
      */
-    public final void onOp(@NotNull String a, @NotNull BiFunction<Task, NAR, Task> exe) {
+    public final Operator onOp(@NotNull String a, @NotNull BiFunction<Task, NAR, Task> exe) {
 
-        terms.set(new Operator((Atom) Atomic.the(a), exe, this));
+        Operator op;
+        terms.set(op = new Operator((Atom) Atomic.the(a), exe, this));
+        return op;
+
 //        {
 //
 //            @Override

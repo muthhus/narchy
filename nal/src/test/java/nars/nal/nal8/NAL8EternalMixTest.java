@@ -142,7 +142,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
         tester.log();
         tester.input("x:y! :|:");
         tester.input("(goto(z) ==>+5 x:y).");
-        tester.mustGoal(cycles, "goto(z)", 1.0f, 0.81f, (t)->t>=0);
+        tester.mustGoal(cycles, "goto(z)", 1.0f, 0.45f, (t)->t>=0);
     }
 
     @Test
@@ -151,7 +151,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
         TestNAR tester = test;
         tester.input("x:y! :|:");
         tester.input("(goto(z) ==>-5 x:y).");
-        tester.mustGoal(cycles, "goto(z)", 1.0f, 0.81f, 0);
+        tester.mustGoal(cycles, "goto(z)", 1.0f, 0.45f, 0);
     }
 
     @Test
@@ -161,7 +161,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
 
         tester.input("x:y!");
         tester.inputAt(10, "(goto(z) ==>+5 x:y). :|:");
-        tester.mustGoal(cycles, "goto(z)", 1.0f, 0.81f, 10);
+        tester.mustGoal(cycles, "goto(z)", 1.0f, 0.45f, 10);
     }
 
 

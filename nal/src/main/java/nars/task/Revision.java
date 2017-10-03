@@ -382,8 +382,10 @@ public class Revision {
                     t = intermpolate(at, bt, aProp, nar);
                 } catch (Throwable ett) {
                     //TODO this probably means conjunction need to be merged by events
-                    logger.warn("{} + {} ==> {}", at, bt, ett.getMessage());
-                    return null;
+                    if (Param.DEBUG_EXTRA)
+                        logger.warn("{} + {} ==> {}", at, bt, ett.getMessage());
+                    continue;
+                    //return null;
                 }
             }
 

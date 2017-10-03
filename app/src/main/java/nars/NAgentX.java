@@ -1,5 +1,6 @@
 package nars;
 
+import com.google.common.collect.Iterables;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.Ons;
@@ -7,18 +8,18 @@ import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.pri.Prioritized;
 import jcog.pri.mix.control.MixContRL;
+import nars.concept.ActionConcept;
 import nars.control.Cause;
 import nars.control.Derivation;
 import nars.control.MetaGoal;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.MultiExec;
-import nars.gui.ConceptView;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.mental.Abbreviation;
+import nars.op.Implier;
 import nars.op.stm.ConjClustering;
 import nars.op.stm.LinkClustering;
 import nars.term.Term;
@@ -58,6 +59,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -195,7 +197,7 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.9f);
 
 
-        float priFactor = 0.1f;
+        float priFactor = 0.5f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;

@@ -60,9 +60,9 @@ public class Recog2D extends NAgentX {
 
 
     int image;
-    final int maxImages = 4;
+    final int maxImages = 3;
 
-    int imagePeriod = 8;
+    int imagePeriod = 24;
 
     //goal -> belief transfer function
     FloatToFloatFunction goalInfluence = (x) ->
@@ -309,8 +309,8 @@ public class Recog2D extends NAgentX {
         NAgentX.runRT((n) -> {
 
             Recog2D a = new Recog2D(n);
-            a.nar.truthResolution.setValue(0.05f);
-            a.nar.termVolumeMax.setValue(12);
+            a.nar.truthResolution.setValue(0.07f);
+            a.nar.termVolumeMax.setValue(16);
             return a;
 
         }, 15);

@@ -468,7 +468,7 @@ public class TestNAR {
      * tests for any truth value at the given occurrences
      */
     @NotNull
-    public TestNAR mustNotOutput(long withinCycles, @NotNull String term, byte punc, @NotNull long occ) {
+    public TestNAR mustNotOutput(long withinCycles, @NotNull String term, byte punc, long occ) {
         //assertTrue("no occurrence times specified", occs.length > 0);
         //LongHashSet badTimes = new LongHashSet(occs);
         mustNotOutput(withinCycles, term, punc, 0f, 1f, 0f, 1f, occ);

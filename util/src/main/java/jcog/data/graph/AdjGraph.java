@@ -29,6 +29,8 @@ import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 /**
@@ -252,6 +254,34 @@ public class AdjGraph<V, E> implements Graph<V, E>, java.io.Serializable {
         return antinodes.get(i).e;
     }
 
+//    public Iterable<V> neighbors(V v) {
+//        int i = nodes.getIfAbsent(v,-1);
+//        if (i < 0)
+//            return Collections.emptyList();
+//        return antinodes.get(i).e.collect((int k)->antinodes.get(k).v);
+//    }
+    public void neighborEdges(V v, BiConsumer<V,E> each) {
+        int i = nodes.getIfAbsent(v,-1);
+        if (i < 0)
+            return;
+        antinodes.get(i).e.forEach(ee -> {
+            E ej = edge(i, ee);
+            Node<V> nohd = antinodes.get(ee);
+            each.accept(nohd.v, ej);
+        });
+    }
+   public void neighborEdges(V v, BiFunction<V,E,E> each) {
+        int i = nodes.getIfAbsent(v,-1);
+        if (i < 0)
+            return;
+        antinodes.get(i).e.forEach(ee -> {
+            E ej = edge(i, ee);
+            Node<V> nohd = antinodes.get(ee);
+            E ej2 = each.apply(nohd.v, ej);
+            if (ej2!=ej)
+                setEdge(i, ee, ej2);
+        });
+    }
 // ---------------------------------------------------------------
 
     /**

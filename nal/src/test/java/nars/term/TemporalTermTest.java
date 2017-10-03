@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Comparator;
 import java.util.TreeSet;
 
 import static junit.framework.TestCase.assertNotNull;
@@ -662,9 +663,9 @@ public class TemporalTermTest {
         Param.DEBUG = true;
         NAR n = NARS.shell();
         n.input("((x) ==>+5 (y)).", "((y) ==>-5 (x)).");
-        n.run(1);
+        n.run(5);
 
-        TreeSet d = new TreeSet((x, y) -> x.toString().compareTo(y.toString()));
+        TreeSet d = new TreeSet(Comparator.comparing(Object::toString));
         n.forEachConceptActive(x -> d.add(x.get()));
 
         //2 unique impl concepts created
@@ -902,7 +903,6 @@ public class TemporalTermTest {
         assertConceptual("((--,(nario,zoom)) &&+- happy)", "((--,(nario,zoom)) &&+- happy)");
         assertConceptual("(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))", "(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))");
 
-
         String c = "((--,(nario,zoom)) &&+- (vx &&+- vy))";
         assertConceptual(
                 //WRONG:"((--,(nario,zoom)) &&+- (vx &&+- vy))"
@@ -911,16 +911,7 @@ public class TemporalTermTest {
                 c, "((vx &&+97 vy) &&+100 (--,(nario,zoom)))");
         assertConceptual(
                 "(((--,(nario,zoom)) &&+- vx) &&+- vy)", "((vx &&+97 vy) &&-100 (--,(nario,zoom)))");
-//        assertConceptual(
-//                c, "((vx &&-97 vy) &&-16 (--,(nario,zoom)))");
-//        assertConceptual(
-//                c, "((vx &&+97 vy) &&-16 (--,(nario,zoom)))");
-//        assertConceptual(
-//                c, "((vx && vy) && (--,(nario,zoom)))");
-//        assertConceptual(
-//                c, "((vx && vy) &&+- (--,(nario,zoom)))");
-//        assertConceptual(
-//                c, "--((vx &| vy) &&+1 (--,(nario,zoom)))");
+
     }
 
     @Test
@@ -936,6 +927,7 @@ public class TemporalTermTest {
                 "(((--,(happy &&+- vy)) &&+- (happy &&+- vy)) ==>+- ((--,(happy &&+- vy)) &&+- (--,vx)))",
                 "(((--,(vy &&+84 happy))&&(happy&|vy)) ==>+84 ((--,vx) &&+21 (--,(happy &&+146 vy))))");
     }
+
 
     static void assertConceptual(String cexp, String c) throws Narsese.NarseseException {
         Term p = $(c);

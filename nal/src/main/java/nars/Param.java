@@ -221,7 +221,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int MAX_INPUT_ANSWERS = 8;
 
     /** max retries for termpolation to produce a valid task content result during revision */
-    public static final int MAX_TERMPOLATE_RETRIES = 1;
+    public static final int MAX_TERMPOLATE_RETRIES = 2;
 
 
 
@@ -344,9 +344,9 @@ public abstract class Param extends Services<Term,NAR> {
      */
     public static float evidenceDecay(float evi, float dur, long dt) {
 
-        return evi / (1 + ( dt / dur) ); //inverse linear
+        //return evi / (1 + ( dt / dur) ); //inverse linear
 
-        //return evi / ( 1f + (dt*dt)/dur ); //inverse square
+        return evi / ( 1f + (dt*dt)/dur ); //inverse square
 
         //hard linear with half duration on either side of the task -> sum to 1.0 duration
 //        float scale = dt / dur;

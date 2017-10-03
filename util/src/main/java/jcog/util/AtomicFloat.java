@@ -32,6 +32,7 @@ public class AtomicFloat extends AtomicInteger {
     }
 
 
+
     public final void set(float newValue) {
         this.set(floatToIntBits(newValue));
     }
@@ -49,6 +50,12 @@ public class AtomicFloat extends AtomicInteger {
         return this.weakCompareAndSet(floatToIntBits(expect),
                                       floatToIntBits(update));
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(floatValue());
+    }
+
 
     @Override
     public double doubleValue() { return (double) floatValue(); }

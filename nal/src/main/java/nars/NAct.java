@@ -421,7 +421,8 @@ public interface NAct {
 
             float confMin = n.confMin.floatValue();
             float confBase =
-                    confMin * 4;
+                    //confMin * 4;
+                    n.confDefault(GOAL)/8f;
                     //n.confDefault(GOAL);
 
             int ip = p ? 0 : 1;
@@ -490,35 +491,15 @@ public interface NAct {
 //                    }
 //                    float fAvg = (f[0] + f[1])/2f;
 
-                    float ec =
+                    x =
 
-                            //Util.clamp(expectation(f[0], c[0]) - expectation(f[1], c[1]), -1, +1)
+//                            Util.clamp(expectation(f[0], c[0]) - expectation(f[1], c[1]), -1, +1)
+
                             Util.clamp(
                                     2 * (Math.max(0.5f, expectation(f[0], c[0])) - Math.max(0.5f,expectation(f[1], c[1]))),
                                     -1, +1)
-                            //(normalize.normalizePolar(exp[0] - 0.5f)) - (normalize.normalizePolar(exp[1] - 0.5f))
-                            //(exp[0] - 0.5f) - (exp[1] - 0.5f)
-                            //2f * (Math.max(0, (exp[0] - 0.5f)) - Math.max(0,(exp[1] - 0.5f)))
-                            //2f * (exp[0] - 0.5f) - (exp[1] - 0.5f)
 
-                            //+ (nar().random().nextFloat()-0.5f)*2f*confMin
                     ;
-//                    ec += ((nar().random().nextFloat() - 0.5f)*2f)*0.01f;
-//                    if (ac < Pri.EPSILON) {
-//                        //quantize if information below threshold
-//                        if (ec > 0 && ec < Pri.EPSILON)
-//                            ec = Pri.EPSILON;
-//                        else if (ec < 0 && ec > -Pri.EPSILON)
-//                            ec = -Pri.EPSILON;
-//                        else
-//                            ec = (nar().random().nextInt(3) - 1) * Pri.EPSILON;
-//                    }
-
-                    x =
-                        ec;
-                        //normalize.normalizePolar(ec);  //-1..+1
-                        //(1 - Math.abs(exp[0] - exp[1])) * (f[0]-0.5f) - (f[1]-0.5f);  //-1..+1 discounted by difference in expectation
-//                    }
                 }
 
 
