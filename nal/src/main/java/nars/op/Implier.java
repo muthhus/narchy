@@ -32,6 +32,7 @@ import static nars.truth.TruthFunctions.w2c;
 
 /**
  * causal implication booster / compiler
+ * TODO make Causable
  */
 public class Implier extends DurService {
 

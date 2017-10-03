@@ -69,7 +69,7 @@ public enum Op implements $ {
     SECTe("&", true, 3, Args.GTETwo) {
         @Override
         public Term _the(int dt, Term[] u) {
-            return intersect(u,
+            return intersect(Int.intersect(u),
                     SECTe,
                     SETe,
                     SETi);
@@ -82,8 +82,7 @@ public enum Op implements $ {
     SECTi("|", true, 3, Args.GTETwo) {
         @Override
         public Term _the(int dt, Term[] u) {
-            u = Int.intersect(u);
-            return intersect(u,
+            return intersect(Int.intersect(u),
                     SECTi,
                     SETi,
                     SETe);

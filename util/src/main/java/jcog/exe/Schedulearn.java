@@ -68,7 +68,7 @@ public class Schedulearn {
     }
 
 
-    float OVER_DEMAND = 1.5f; //factor for additional iterations to request above the observed supply, ie. demand growth rate
+    float OVER_DEMAND = 1.25f; //factor for additional iterations to request above the observed supply, ie. demand growth rate
 
 
     public void solve(List<Can> can, double timeslice) {
@@ -99,7 +99,10 @@ public class Schedulearn {
             solver.add(proportionalToValue);
 
             //demand slightly more than supply limit
-            Constraint meetsSupply = C.lessThanOrEqualTo(xi, Math.max(1, Math.ceil(x.supply() * OVER_DEMAND)));
+            int prevIter = x.supply();
+            double maxIter = Math.max(1, Math.ceil((1+prevIter) * OVER_DEMAND));
+
+            Constraint meetsSupply = C.lessThanOrEqualTo(xi, maxIter);
             meetsSupply.setStrength(2);
             solver.add(meetsSupply);
 

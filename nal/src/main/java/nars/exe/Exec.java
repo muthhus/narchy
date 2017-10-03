@@ -127,7 +127,13 @@ abstract public class Exec implements Executor, PriMerge {
         for (Causable c : causables)
             can.add(c.can);
 
-        sched.solve(can, nar.loop.isRunning() ? nar.loop.periodMS.intValue() * 0.001 : 1.0);
+        double defaultCycleTime = 1.0; //sec
+
+        double nextCycleTime = Math.max(1, nar.exe.concurrency() - 1) * (nar.loop.isRunning() ? nar.loop.periodMS.intValue() * 0.001 : defaultCycleTime);
+
+        sched.solve(can,
+            nextCycleTime
+        );
 
         //System.out.println(Arrays.toString(iter));
 

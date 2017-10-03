@@ -84,18 +84,23 @@ public class ConjClustering extends Causable {
         return true;
     }
 
+    private int tasksCreated, taskLimit;
+
     @Override
-    protected int next(NAR nar, int iterations) {
-        int created = 0;
+    protected int next(NAR nar, int work) {
+
+        tasksCreated = 0;
 
         now = nar.time();
         truthRes = nar.truthResolution.floatValue();
         confMin = nar.confMin.floatValue();
         this.volMax = nar.termVolumeMax.intValue();
 
+        taskLimit = work;
+
         bag.commitGroups(1, nar, this::conjoin);
 
-        return created;
+        return tasksCreated;
     }
 
     /**
@@ -150,6 +155,9 @@ public class ConjClustering extends Causable {
 
             subs.forEach(z -> {
 
+                if (tasksCreated >= taskLimit)
+                    return; //HACK find more direct way of early terminating
+
 
                 long zs = z.start();
                 long ze = z.end();
@@ -203,7 +211,7 @@ public class ConjClustering extends Causable {
 
                 pp.add(pair(tt, x.start()));
             }
-            PreciseTruth t = $.t(freq,conf).ditherFreqConf(truthRes, confMin, 1f);
+            PreciseTruth t = $.t(freq, conf).ditherFreqConf(truthRes, confMin, 1f);
             if (t != null) {
 
                 @Nullable Term conj = Op.conj(pp);
@@ -225,10 +233,11 @@ public class ConjClustering extends Causable {
                         m.causeMerge(u); //cause merge
 
                     float maxPri = priMax;
-                                   //priMax / uuLen; //HACK todo dont use List
+                    //priMax / uuLen; //HACK todo dont use List
 
                     m.setPri(BudgetFunctions.fund(maxPri, true, uu));
                     in.input(m);
+                    tasksCreated++;
                 }
 
             }

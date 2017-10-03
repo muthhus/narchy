@@ -4,6 +4,7 @@ import nars.*;
 import nars.io.NarseseTest;
 import nars.task.util.InvalidTaskException;
 import nars.term.atom.Atomic;
+import nars.term.atom.Int;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
@@ -173,6 +174,7 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals("(--,((P)==>(Q)))", $("((P)==>(--,(Q)))").toString());
         assertEquals(("((--,(P))==>(Q))"), $("((--,(P))==>(Q))").toString()); //SAME should not change
     }
+
     @Test
     public void testConjInhReflexive() throws Narsese.NarseseException {
         assertEquals("((a &&+5 x)-->a)", $("((a &&+5 x)-->a)").toString());
@@ -254,14 +256,15 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals("(((S &&+1 R) &&+2 P) ==>+1 Q)", $("((S &&+1 R) ==>+2 (P ==>+1 Q))").toString());
     }
 
-    @Test public void testConjEvents() throws Narsese.NarseseException {
+    @Test
+    public void testConjEvents() throws Narsese.NarseseException {
         assertEquals(
                 "(a &&+16 ((--,a)&|b))",
                 Op.conj(
-                    $.newArrayList(
-                            pair($.$("a"), 298L),
-                            pair($.$("b"), 314L),
-                            pair($.$("(--,a)"), 314L))
+                        $.newArrayList(
+                                pair($.$("a"), 298L),
+                                pair($.$("b"), 314L),
+                                pair($.$("(--,a)"), 314L))
                 ).toString()
         );
     }
@@ -307,6 +310,13 @@ public class TermReductionsTest extends NarseseTest {
             if (term1.op(Op.SET_EXT) && term2.op(Op.SET_EXT)) {
 
          */
+
+    @Test
+    public void testIntersectionRange() throws Narsese.NarseseException {
+        assertEquals("(8|4..5)", Op.SECTi.the(Int.the(4), Int.the(8), Int.range(4,5)).toString());
+        assertEquals("(8&4..5)", Op.SECTe.the(Int.the(4), Int.the(8), Int.range(4,5)).toString());
+        //TODO for Set's
+    }
 
     @Test
     public void testDisjunctEqual() {
@@ -807,20 +817,22 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals($("((a1) &&-1 (a1))"), $("((a1) &&+1 (a1))"));
         assertEquals($("((a1) <=>-1 (a1))"), $("((a1) <=>+1 (a1))"));
     }
+
     @Test
     public void testAllowInhNegationStatements() throws Narsese.NarseseException {
         assertEquals(True, $("(a-->a)"));
 
         assertEquals("((--,a)-->b)", $("((--,a) --> b)").toString());
-            assertNotEquals("(a-->b)", $("((--,a) --> b)").toString());
+        assertNotEquals("(a-->b)", $("((--,a) --> b)").toString());
         assertEquals("(b-->(--,a))", $("(b --> (--,a))").toString());
-            assertNotEquals("(a-->b)", $("(b --> (--,a))").toString());
+        assertNotEquals("(a-->b)", $("(b --> (--,a))").toString());
         assertEquals("((--,a)-->(--,b))", $("(--a --> --b)").toString());
 
         assertEquals("((--,a)-->a)", $("((--,a)-->a)").toString());
         assertEquals("(a-->(--,a))", $("(a-->(--,a))").toString());
 
     }
+
     @Test
     public void testAllowSimNegationStatements() throws Narsese.NarseseException {
         assertEquals(True, $("(a<->a)"));
@@ -828,9 +840,9 @@ public class TermReductionsTest extends NarseseTest {
         assertNotEquals($("(--a <-> b)"), $("(a <-> --b)"));
 
         assertEquals("((--,a)<->b)", $("((--,a) <-> b)").toString());
-            assertNotEquals("(a<->b)", $("((--,a) <-> b)").toString());
+        assertNotEquals("(a<->b)", $("((--,a) <-> b)").toString());
         assertEquals("((--,a)<->b)", $("(b <-> (--,a))").toString());
-            assertNotEquals("(a<->b)", $("(b <-> (--,a))").toString());
+        assertNotEquals("(a<->b)", $("(b <-> (--,a))").toString());
         assertEquals("((--,a)<->(--,b))", $("(--a <-> --b)").toString());
 
         assertEquals("((--,a)<->a)", $("((--,a)<->a)").toString());

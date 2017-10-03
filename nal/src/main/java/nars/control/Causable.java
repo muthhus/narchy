@@ -67,7 +67,7 @@ abstract public class Causable extends NARService {
         int completed = 0;
         try {
             completed = next(n, iterations);
-            assert (completed >=0 && completed <= iterations);
+            assert (completed >=0);
         } catch (Throwable t) {
             error = t;
         }

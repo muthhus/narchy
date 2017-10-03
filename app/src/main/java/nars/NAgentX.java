@@ -20,6 +20,8 @@ import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.Implier;
+import nars.op.data.reflect;
+import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
 import nars.op.stm.LinkClustering;
 import nars.term.Term;
@@ -177,13 +179,15 @@ abstract public class NAgentX extends NAgent {
                 .exe(exe)
                 .time(clock)
                 .index(
-                        new CaffeineIndex(128 * 1024)
+                        new CaffeineIndex(96 * 1024)
                         //new CaffeineIndex2(64 * 1024)
                         //new CaffeineIndex2(-1)
                         //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
                         //new MapTermIndex(new CustomConcurrentHashMap<>(STRONG, EQUALS, SOFT, EQUALS, 128*1024))
                 )
                 .get();
+
+        n.defaultWants();
 
         n.dtMergeOrChoose.setValue(true);
 
@@ -236,9 +240,9 @@ abstract public class NAgentX extends NAgent {
 
 //        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.1f, 4);
 
-        //Inperience inp = new Inperience(n, 4);
+        Inperience inp = new Inperience(n, 4);
 //
-        //reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(16, n);
+        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(16, n);
         //reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(16, n);
 
 
