@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.exe.Schedulearn;
 import nars.NAR;
 import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.slf4j.Logger;
@@ -20,43 +21,13 @@ abstract public class Causable extends NARService {
 
     private static final Logger logger = LoggerFactory.getLogger(Causable.class);
 
-    /** upper limit for each individual work unit */
-    private static final double OVERLOAD_NS = 500000; /* 0.5ms */
 
-    /** lower limit for each individual work unit */
-    private static final double UNDERLOAD_NS = 500; /* 0.5us */
-
-    /** how much swing (difference) should be sought between the mean and the max value */
-    private static final double COMPRESSION_RATIO = 3;
-
-    /** absolute upper limit for any assigned workload. this determines the maximum granularity
-     * of the scheduler, and should be quite finite. */
-    private static final int UNIT_MAX = 16 * 1024;
-
-
-//    /** value specific to this instance indicating the relative workload response */
-//    float workGranularity = 1;
-
-//    /**
-//     * basic estimator of: workUnits / realtime (ns)
-//     */
-//    final RecyclingPolynomialFitter workEstimator =
-//            new RecyclingPolynomialFitter(2, 16, Integer.MAX_VALUE)
-//                .tolerate(1 /* work unit */, 1 /* ns */);
-
-    final int WINDOW = 16;
-    final SynchronizedDescriptiveStatistics exeTimeNS = new SynchronizedDescriptiveStatistics(WINDOW);
-    final SynchronizedDescriptiveStatistics iterationCount = new SynchronizedDescriptiveStatistics(WINDOW);
-
+    public final Schedulearn.Can can = new Schedulearn.Can();
     private final AtomicBoolean busy;
 
     public Causable(NAR nar) {
         super(nar);
         busy = singleton() ? new AtomicBoolean(false) : null;
-
-        //initial values
-//        workEstimator.learn(0,0);
-//        workEstimator.learn(1,1);
     }
 
     @Override
@@ -102,8 +73,7 @@ abstract public class Causable extends NARService {
         }
         long end = System.nanoTime();
 
-        exeTimeNS.addValue(  (double)(end-start) );
-        iterationCount.addValue(completed);
+        can.update(completed, value(), (double)(end-start)/1.0E9);
 
         if (busy!=null)
             busy.set(false);
@@ -128,14 +98,5 @@ abstract public class Causable extends NARService {
 
     /** returns a system estimated value of invoking this. between 0..1.0 */
     public abstract float value();
-
-    public double exeTimeNS() {
-        double m = (exeTimeNS.getMean());
-        return m!= m ? 0 : m;
-    }
-    public double iterationsMean() {
-        double m = iterationCount.getMean();
-        return m != m ? 0 : m;
-    }
 
 }

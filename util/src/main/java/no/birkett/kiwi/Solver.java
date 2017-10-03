@@ -8,34 +8,33 @@ import java.util.*;
  */
 public class Solver {
 
-    private static class Tag {
+    protected static class Tag {
         Symbol marker;
         Symbol other;
 
-        public Tag(){
+        public Tag() {
             marker = new Symbol();
             other = new Symbol();
         }
     }
 
-    private static class EditInfo {
+    protected static class EditInfo {
         final Tag tag;
         final Constraint constraint;
         double constant;
 
-        public EditInfo(Constraint constraint, Tag tag, double constant){
+        public EditInfo(Constraint constraint, Tag tag, double constant) {
             this.constraint = constraint;
             this.tag = tag;
             this.constant = constant;
         }
     }
 
-    private final Map<Constraint, Tag> cns = new LinkedHashMap<>();
-    private final Map<Symbol, Row> rows = new LinkedHashMap<>();
-    private final Map<Variable, Symbol> vars = new LinkedHashMap<>();
-    private final Map<Variable, EditInfo> edits = new LinkedHashMap<>();
-    private final List<Symbol> infeasibleRows = new ArrayList<>();
-    private final Row objective = new Row();
+    protected final Map<Constraint, Tag> cns = new LinkedHashMap<>();
+    protected final Map<Symbol, Row> rows = new LinkedHashMap<>();
+    protected final Map<Variable, Symbol> vars = new LinkedHashMap<>();
+    protected final List<Symbol> infeasibleRows = new ArrayList<>();
+    protected final Row objective = new Row();
     private Row artificial;
 
 
@@ -43,8 +42,8 @@ public class Solver {
      * Add a constraint to the solver.
      *
      * @param constraint
-     * @throws DuplicateConstraintException The given constraint has already been added to the solver.
-     * @throws UnsatisfiableConstraintException      The given constraint is required and cannot be satisfied.
+     * @throws DuplicateConstraintException     The given constraint has already been added to the solver.
+     * @throws UnsatisfiableConstraintException The given constraint is required and cannot be satisfied.
      */
     public void add(Constraint constraint) throws DuplicateConstraintException, UnsatisfiableConstraintException {
 
@@ -56,7 +55,7 @@ public class Solver {
         Row row = createRow(constraint, tag);
         Symbol subject = chooseSubject(row, tag);
 
-        if(subject.getType() == Symbol.Type.INVALID && allDummies(row)){
+        if (subject.type == Symbol.Type.INVALID && allDummies(row)) {
             if (!Util.nearZero(row.getConstant())) {
                 throw new UnsatisfiableConstraintException(constraint);
             } else {
@@ -64,7 +63,7 @@ public class Solver {
             }
         }
 
-        if (subject.getType() == Symbol.Type.INVALID) {
+        if (subject.type == Symbol.Type.INVALID) {
             if (!addWithArtificialVariable(row)) {
                 throw new UnsatisfiableConstraintException(constraint);
             }
@@ -79,9 +78,9 @@ public class Solver {
         optimize(objective);
     }
 
-    public void remove(Constraint constraint) throws UnknownConstraintException, InternalSolverError{
+    public void remove(Constraint constraint) throws UnknownConstraintException, InternalSolverError {
         Tag tag = cns.get(constraint);
-        if(tag == null){
+        if (tag == null) {
             throw new UnknownConstraintException(constraint);
         }
 
@@ -89,12 +88,11 @@ public class Solver {
         removeConstraintEffects(constraint, tag);
 
         Row row = rows.get(tag.marker);
-        if(row != null){
+        if (row != null) {
             rows.remove(tag.marker);
-        }
-        else{
+        } else {
             row = getMarkerLeavingRow(tag.marker);
-            if(row == null){
+            if (row == null) {
                 throw new InternalSolverError("internal solver error");
             }
 
@@ -103,12 +101,12 @@ public class Solver {
             //rows.remove(tag.marker);
 
             Symbol leaving = null;
-            for(Symbol s: rows.keySet()){
-                if(rows.get(s) == row){
+            for (Symbol s : rows.keySet()) {
+                if (rows.get(s) == row) {
                     leaving = s;
                 }
             }
-            if(leaving == null){
+            if (leaving == null) {
                 throw new InternalSolverError("internal solver error");
             }
 
@@ -119,25 +117,24 @@ public class Solver {
         optimize(objective);
     }
 
-    void removeConstraintEffects(Constraint constraint, Tag tag){
-        if(tag.marker.getType() == Symbol.Type.ERROR){
+    void removeConstraintEffects(Constraint constraint, Tag tag) {
+        if (tag.marker.type == Symbol.Type.ERROR) {
             removeMarkerEffects(tag.marker, constraint.getStrength());
-        }
-        else if(tag.other.getType() == Symbol.Type.ERROR){
+        } else if (tag.other.type == Symbol.Type.ERROR) {
             removeMarkerEffects(tag.other, constraint.getStrength());
         }
     }
 
-    void removeMarkerEffects(Symbol marker, double strength){
+    void removeMarkerEffects(Symbol marker, double strength) {
         Row row = rows.get(marker);
-        if(row != null){
+        if (row != null) {
             objective.insert(row, -strength);
-        }else {
+        } else {
             objective.insert(marker, -strength);
         }
     }
 
-    Row getMarkerLeavingRow(Symbol marker){
+    Row getMarkerLeavingRow(Symbol marker) {
         double dmax = Double.MAX_VALUE;
         double r1 = dmax;
         double r2 = dmax;
@@ -146,125 +143,40 @@ public class Solver {
         Row second = null;
         Row third = null;
 
-        for(Map.Entry<Symbol, Row> symbolRowEntry : rows.entrySet()){
+        for (Map.Entry<Symbol, Row> symbolRowEntry : rows.entrySet()) {
             Row candidateRow = symbolRowEntry.getValue();
             double c = candidateRow.coefficientFor(marker);
-            if(c == 0.0){
+            if (c == 0.0) {
                 continue;
             }
-            if((symbolRowEntry.getKey()).getType() == Symbol.Type.EXTERNAL){
+            if ((symbolRowEntry.getKey()).type == Symbol.Type.EXTERNAL) {
                 third = candidateRow;
-            }
-            else if(c < 0.0){
-                double r = - candidateRow.getConstant() / c;
-                if(r < r1){
+            } else if (c < 0.0) {
+                double r = -candidateRow.getConstant() / c;
+                if (r < r1) {
                     r1 = r;
                     first = candidateRow;
                 }
-            }
-            else{
+            } else {
                 double r = candidateRow.getConstant() / c;
-                if(r < r2){
+                if (r < r2) {
                     r2 = r;
                     second = candidateRow;
                 }
             }
         }
 
-        if(first != null){
+        if (first != null) {
             return first;
         }
-        if(second != null){
+        if (second != null) {
             return second;
         }
         return third;
     }
 
-    public boolean hasConstraint(Constraint constraint){
+    public boolean hasConstraint(Constraint constraint) {
         return cns.containsKey(constraint);
-    }
-
-    public void addEditVariable(Variable variable, double strength) throws DuplicateEditVariableException, RequiredFailureException{
-        if(edits.containsKey(variable)){
-            throw new DuplicateEditVariableException();
-        }
-
-        strength = Strength.clip(strength);
-
-        if(strength == Strength.REQUIRED){
-            throw new RequiredFailureException();
-        }
-
-        List<Term> terms = new ArrayList<>();
-        terms.add(new Term(variable));
-        Constraint constraint = new Constraint(new Expression(terms), RelationalOperator.OP_EQ, strength);
-
-        try {
-            add(constraint);
-        } catch (DuplicateConstraintException | UnsatisfiableConstraintException e) {
-            e.printStackTrace();
-        }
-
-
-        EditInfo info = new EditInfo(constraint, cns.get(constraint), 0.0);
-        edits.put(variable, info);
-    }
-
-    public void removeEditVariable(Variable variable) throws UnknownEditVariableException{
-        EditInfo edit = edits.get(variable);
-        if(edit == null){
-            throw new UnknownEditVariableException();
-        }
-
-        try {
-            remove(edit.constraint);
-        } catch (UnknownConstraintException e) {
-            e.printStackTrace();
-        }
-
-        edits.remove(variable);
-    }
-
-    public boolean hasEditVariable(Variable variable){
-        return edits.containsKey(variable);
-    }
-
-    public void suggestValue(Variable variable, double value) throws UnknownEditVariableException{
-        EditInfo info = edits.get(variable);
-        if(info == null){
-            throw new UnknownEditVariableException();
-        }
-
-        double delta = value - info.constant;
-        info.constant = value;
-
-        Row row = rows.get(info.tag.marker);
-        if(row != null){
-            if(row.add(-delta) < 0.0){
-                infeasibleRows.add(info.tag.marker);
-            }
-			dualOptimize();
-            return;
-        }
-
-        row = rows.get(info.tag.other);
-        if(row != null){
-            if(row.add(delta) < 0.0){
-                infeasibleRows.add(info.tag.other);
-            }
-			dualOptimize();
-            return;
-        }
-
-        for(Map.Entry<Symbol, Row> symbolRowEntry : rows.entrySet()){
-            Row currentRow = symbolRowEntry.getValue();
-            double coefficient = currentRow.coefficientFor(info.tag.marker);
-            if(coefficient != 0.0 && currentRow.add(delta * coefficient) < 0.0 && (symbolRowEntry.getKey()).getType() != Symbol.Type.EXTERNAL){
-                infeasibleRows.add(symbolRowEntry.getKey());
-            }
-        }
-
-        dualOptimize();
     }
 
     /**
@@ -306,7 +218,9 @@ public class Solver {
         Expression expression = constraint.expression;
         Row row = new Row(expression.getConstant());
 
-        for (Term term : expression.terms) {
+        List<Term> terms = expression.terms;
+        for (int i = 0, termsSize = terms.size(); i < termsSize; i++) {
+            Term term = terms.get(i);
             double coefficient = term.coefficient;
             if (!Util.nearZero(coefficient)) {
 
@@ -322,6 +236,8 @@ public class Solver {
             }
         }
 
+        double str = constraint.getStrength();
+
         switch (constraint.op) {
             case OP_LE:
             case OP_GE: {
@@ -329,24 +245,24 @@ public class Solver {
                 Symbol slack = new Symbol(Symbol.Type.SLACK);
                 tag.marker = slack;
                 row.insert(slack, coeff);
-                if (constraint.getStrength() < Strength.REQUIRED) {
+                if (str < Strength.REQUIRED) {
                     Symbol error = new Symbol(Symbol.Type.ERROR);
                     tag.other = error;
                     row.insert(error, -coeff);
-                    this.objective.insert(error, constraint.getStrength());
+                    this.objective.insert(error, str);
                 }
                 break;
             }
             case OP_EQ: {
-                if (constraint.getStrength() < Strength.REQUIRED) {
+                if (str < Strength.REQUIRED) {
                     Symbol errplus = new Symbol(Symbol.Type.ERROR);
                     Symbol errminus = new Symbol(Symbol.Type.ERROR);
                     tag.marker = errplus;
                     tag.other = errminus;
                     row.insert(errplus, -1.0); // v = eplus - eminus
                     row.insert(errminus, 1.0); // v - eplus + eminus = 0
-                    this.objective.insert(errplus, constraint.getStrength());
-                    this.objective.insert(errminus, constraint.getStrength());
+                    this.objective.insert(errplus, str);
+                    this.objective.insert(errminus, str);
                 } else {
                     Symbol dummy = new Symbol(Symbol.Type.DUMMY);
                     tag.marker = dummy;
@@ -378,15 +294,15 @@ public class Solver {
     private static Symbol chooseSubject(Row row, Tag tag) {
 
         for (Map.Entry<Symbol, Double> cell : row.cells.entrySet()) {
-            if (cell.getKey().getType() == Symbol.Type.EXTERNAL) {
+            if (cell.getKey().type == Symbol.Type.EXTERNAL) {
                 return cell.getKey();
             }
         }
-        if (tag.marker.getType() == Symbol.Type.SLACK || tag.marker.getType() == Symbol.Type.ERROR) {
+        if (tag.marker.type == Symbol.Type.SLACK || tag.marker.type == Symbol.Type.ERROR) {
             if (row.coefficientFor(tag.marker) < 0.0)
                 return tag.marker;
         }
-        if (tag.other != null && (tag.other.getType() == Symbol.Type.SLACK || tag.other.getType() == Symbol.Type.ERROR)) {
+        if (tag.other != null && (tag.other.type == Symbol.Type.SLACK || tag.other.type == Symbol.Type.ERROR)) {
             if (row.coefficientFor(tag.other) < 0.0)
                 return tag.other;
         }
@@ -425,22 +341,23 @@ public class Solver {
             //rows.remove(rowptr);
 
             LinkedList<Symbol> deleteQueue = new LinkedList<>();
-            for(Map.Entry<Symbol, Row> symbolRowEntry : rows.entrySet()){
-                if(symbolRowEntry.getValue() == rowptr){
+            for (Map.Entry<Symbol, Row> symbolRowEntry : rows.entrySet()) {
+                if (symbolRowEntry.getValue() == rowptr) {
                     deleteQueue.add(symbolRowEntry.getKey());
                 }
             }
-            while(!deleteQueue.isEmpty()){
+            while (!deleteQueue.isEmpty()) {
                 rows.remove(deleteQueue.pop());
             }
-            deleteQueue.clear();
 
             if (rowptr.cells.isEmpty()) {
                 return success;
             }
 
+            deleteQueue.clear();
+
             Symbol entering = anyPivotableSymbol(rowptr);
-            if (entering.getType() == Symbol.Type.INVALID) {
+            if (entering.type == Symbol.Type.INVALID) {
                 return false; // unsatisfiable (will this ever happen?)
             }
             rowptr.solveFor(art, entering);
@@ -449,9 +366,7 @@ public class Solver {
         }
 
         // Remove the artificial variable from the tableau.
-        for (Map.Entry<Symbol, Row> rowEntry : rows.entrySet()) {
-            rowEntry.getValue().remove(art);
-        }
+        rows.values().forEach(r -> r.remove(art));
 
         objective.remove(art);
 
@@ -466,9 +381,11 @@ public class Solver {
      */
     void substitute(Symbol symbol, Row row) {
         for (Map.Entry<Symbol, Row> rowEntry : rows.entrySet()) {
-            rowEntry.getValue().substitute(symbol, row);
-            if (rowEntry.getKey().getType() != Symbol.Type.EXTERNAL && rowEntry.getValue().getConstant() < 0.0) {
-                infeasibleRows.add(rowEntry.getKey());
+            Row v = rowEntry.getValue();
+            v.substitute(symbol, row);
+            Symbol k = rowEntry.getKey();
+            if (k.type != Symbol.Type.EXTERNAL && v.getConstant() < 0.0) {
+                infeasibleRows.add(k);
             }
         }
 
@@ -490,49 +407,26 @@ public class Solver {
     void optimize(Row objective) {
         while (true) {
             Symbol entering = getEnteringSymbol(objective);
-            if (entering.getType() == Symbol.Type.INVALID) {
+            if (entering.type == Symbol.Type.INVALID) {
                 return;
             }
 
             Row entry = getLeavingRow(entering);
-            if(entry == null){
-                throw  new InternalSolverError("The objective is unbounded.");
+            if (entry == null) {
+                throw new InternalSolverError("The objective is unbounded.");
             }
+
             Symbol leaving = null;
-
-            for(Symbol key: rows.keySet()){
-                if(rows.get(key) == entry){
-                    leaving = key;
+            for (Map.Entry<Symbol, Row> key : rows.entrySet()) {
+                if (key.getValue() == entry) {
+                    leaving = key.getKey();
                 }
             }
 
-            Symbol entryKey = null;
-            for(Symbol key: rows.keySet()){
-                if(rows.get(key) == entry){
-                    entryKey = key;
-                }
-            }
-
-            rows.remove(entryKey);
+            rows.remove(leaving);
             entry.solveFor(leaving, entering);
             substitute(entering, entry);
             rows.put(entering, entry);
-        }
-    }
-
-    void dualOptimize() throws InternalSolverError{
-        while(!infeasibleRows.isEmpty()){
-            Symbol leaving = infeasibleRows.remove(infeasibleRows.size() - 1);
-            Row row = rows.remove(leaving);
-            if(row != null && row.getConstant() < 0.0){
-                Symbol entering = getDualEnteringSymbol(row);
-                if(entering.getType() == Symbol.Type.INVALID){
-                    throw new InternalSolverError("internal solver error");
-                }
-                row.solveFor(leaving, entering);
-                substitute(entering, row);
-                rows.put(entering, row);
-            }
         }
     }
 
@@ -549,31 +443,13 @@ public class Solver {
 
         for (Map.Entry<Symbol, Double> cell : objective.cells.entrySet()) {
 
-            if (cell.getKey().getType() != Symbol.Type.DUMMY && cell.getValue() < 0.0) {
-                return cell.getKey();
+            Symbol k = cell.getKey();
+            if (k.type != Symbol.Type.DUMMY && cell.getValue() < 0.0) {
+                return k;
             }
         }
         return new Symbol();
 
-    }
-
-    private Symbol getDualEnteringSymbol(Row row){
-        Symbol entering = new Symbol();
-        double ratio = Double.MAX_VALUE;
-        for(Symbol s: row.cells.keySet()){
-            if(s.getType() != Symbol.Type.DUMMY){
-                double currentCell = row.cells.get(s);
-                if(currentCell > 0.0){
-                    double coefficient = objective.coefficientFor(s);
-                    double r = coefficient / currentCell;
-                    if(r < ratio){
-                        ratio = r;
-                        entering = s;
-                    }
-                }
-            }
-        }
-        return entering;
     }
 
 
@@ -583,16 +459,20 @@ public class Solver {
      * If no such symbol is present, and Invalid symbol will be returned.
      */
     private static Symbol anyPivotableSymbol(Row row) {
-        Symbol symbol = null;
-        for (Map.Entry<Symbol, Double> entry : row.cells.entrySet()) {
-            Symbol k = entry.getKey();
-            if (k.getType() == Symbol.Type.SLACK || k.getType() == Symbol.Type.ERROR) {
-                symbol = k;
-            }
-        }
-        if (symbol == null) {
-            symbol = new Symbol();
-        }
+        Symbol symbol =
+                row.cells.keySet().stream()
+                        .filter(k -> k.type == Symbol.Type.SLACK || k.type == Symbol.Type.ERROR)
+                        .findFirst().orElseGet(Symbol::new);
+
+//        for (Map.Entry<Symbol, Double> entry : row.cells.entrySet()) {
+//            Symbol k = entry.getKey();
+//            if (k.type == Symbol.Type.SLACK || k.type == Symbol.Type.ERROR) {
+//                symbol = k;
+//            }
+//        }
+//        if (symbol == null) {
+//            symbol = new Symbol();
+//        }
         return symbol;
     }
 
@@ -611,13 +491,13 @@ public class Solver {
         double ratio = Double.MAX_VALUE;
         Row row = null;
 
-        for(Map.Entry<Symbol, Row> symbolRowEntry : rows.entrySet()){
-            if((symbolRowEntry.getKey()).getType() != Symbol.Type.EXTERNAL){
+        for (Map.Entry<Symbol, Row> symbolRowEntry : rows.entrySet()) {
+            if ((symbolRowEntry.getKey()).type != Symbol.Type.EXTERNAL) {
                 Row candidateRow = symbolRowEntry.getValue();
                 double temp = candidateRow.coefficientFor(entering);
-                if(temp < 0){
+                if (temp < 0) {
                     double temp_ratio = (-candidateRow.getConstant() / temp);
-                    if(temp_ratio < ratio){
+                    if (temp_ratio < ratio) {
                         ratio = temp_ratio;
                         row = candidateRow;
                     }
@@ -633,19 +513,14 @@ public class Solver {
      * If a symbol does not exist for the variable, one will be created.
      */
     private Symbol getVarSymbol(Variable variable) {
-        return vars.computeIfAbsent(variable, (v)-> new Symbol(Symbol.Type.EXTERNAL));
+        return vars.computeIfAbsent(variable, (v) -> new Symbol(Symbol.Type.EXTERNAL));
     }
 
     /**
      * Test whether a row is composed of all dummy variables.
      */
     private static boolean allDummies(Row row) {
-        for (Map.Entry<Symbol, Double> cell : row.cells.entrySet()) {
-            if (cell.getKey().getType() != Symbol.Type.DUMMY) {
-                return false;
-            }
-        }
-        return true;
+        return row.cells.keySet().stream().allMatch(x -> x.type == Symbol.Type.DUMMY);
     }
 
 }

@@ -13,7 +13,7 @@ public class Symbol {
         DUMMY
     }
 
-    private final Type type;
+    public final Type type;
 
     public Symbol() {
         this(Type.INVALID);
@@ -21,10 +21,6 @@ public class Symbol {
 
     public Symbol(Type type) {
         this.type = type;
-    }
-
-    public Type getType() {
-        return type;
     }
 
 }
