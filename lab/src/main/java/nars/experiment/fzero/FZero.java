@@ -53,7 +53,7 @@ public class FZero extends NAgentX {
 //        CameraSensor<Scale> c = senseCamera(id, new Scale(() -> fz.image,
 //                24, 16)/*.blur()*/).resolution(0.1f);
         CameraSensor<Scale> c = senseCameraReduced(id, new Scale(() -> fz.image,
-                64, 32), 16, 8, 2, 2).resolution(0.1f);
+                128, 64), 8, 8, 2, 2).resolution(0.1f);
 
 //        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
 //        cc.addActions($.the("fz"), this, false, false, true);

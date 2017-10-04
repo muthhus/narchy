@@ -138,7 +138,7 @@ public class MultiExec extends Exec {
 
                 long end = System.nanoTime();
 
-                System.err.println(premiseDone + "/" + work + " in " + loops + " loops\tvalue=" + can.value() + " " + n4((end - start) / 1.0E9) + "sec");
+                //System.err.println(premiseDone + "/" + work + " in " + loops + " loops\tvalue=" + can.value() + " " + n4((end - start) / 1.0E9) + "sec");
 
                 //? multiply the work done by concurrency to be consistent with how it is calculated
                 synchronized(can) { //synch to be safe

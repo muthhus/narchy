@@ -61,7 +61,7 @@ public class AutoencodedBitmap implements Bitmap2D {
                 }
                 assert(j==input.length);
 
-                ae.put(input, 0.02f, 0.002f, 0, true);
+                ae.put(input, 0.05f, 0.002f, 0, true);
 
                 float[] o = ae.output();
                 for (float anO : o) {

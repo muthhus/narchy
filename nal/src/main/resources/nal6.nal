@@ -75,12 +75,12 @@
         //(M ==> S), (M ==> (&&,(--,%S),A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
         //(M ==> S), (M ==> (||,S,A..+)) |- (M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
-    (M ==> C), (M ==> C), belief("&&") |- (M ==>+- dropAnyEvent(ifConjCommNoDepVars(C))), (Belief:StructuralDeduction)
+    (M ==> C), C, belief("&&") |- (M ==>+- dropAnyEvent(ifConjCommNoDepVars(C))), (Belief:StructuralDeduction)
           //(M ==> C), D, belief("&&") |- (M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D)), (Belief:StructuralDeduction)
         //(--M ==> C), C, belief("&&") |- (--M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
           //(--M ==> C), D, belief("&&") |- (--M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D, strict)), (Belief:StructuralDeduction)
         //(M ==> (&&,(--,%S),A..+)), M |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
-    (C ==> M), (C ==> M), belief("&&") |- (dropAnyEvent(ifConjCommNoDepVars(C)) ==>+- M), (Belief:StructuralDeduction)
+    (C ==> M), C, belief("&&") |- (dropAnyEvent(ifConjCommNoDepVars(C)) ==>+- M), (Belief:StructuralDeduction)
           //(C ==> M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D) ==>+- M), (Belief:StructuralDeduction)
         //(C ==> --M), C, belief("&&") |- (dropAnyEvent(C) ==>+- --M), (Belief:StructuralDeduction)
           //(C ==> --M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D, strict) ==>+- --M), (Belief:StructuralDeduction)
@@ -109,8 +109,7 @@
         //B, ((--,%C) ==> A), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
 
-    //variable elimination 4b:
-    (X --> A), ((#W --> A)<->(#W --> C)),  neq(X,C), neq(X,#W), time(urgent) |- (X-->C), (Belief:Analogy, Goal:Strong)
+
 
 
     //answering
@@ -154,8 +153,7 @@
 //conditional abduction
 
     ((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
-    //((&&,M,A..+) ==> C), ((&&,A..+) ==> C), task(".") |- M, (Belief:Abduction)
-    ((&&,M,A..+) ==> X), ((&&,A..+) ==> Y), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
+    ((&&,M,A..+) ==> X), ((&&,A..+) ==> Y), task(".") |- subIfUnifiesAny(M,X,Y,"$"), (Belief:Abduction)
     //(M ==> C), C, task(".") |- M, (Belief:Abduction)
     (M ==> X), Y, task(".") |- subIfUnifiesAny(M,X,Y,"$"), (Belief:Abduction)
 
@@ -201,12 +199,12 @@
     (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
         (B --> K), (($X --> L) ==> (&&,--(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogyN)
 
-    (Y --> P), (&&,(X-->P),A..+) |- subIfUnifiesAny((&&,(X-->P),A..+), X,Y,strict), (Belief:Deduction)
-        (Y --> P), (&&,--(X-->P),A..+) |- subIfUnifiesAny((&&,--(X-->P),A..+), X,Y,strict), (Belief:Deduction)
-    (Y --> P), ((&&,(X-->P),A..+) ==> Z) |- subIfUnifiesAny(((&&,(X-->P),A..+) ==>+- Z), X,Y,strict), (Belief:Deduction)
-        (Y --> P), ((&&,--(X-->P),A..+) ==> Z) |- subIfUnifiesAny(((&&,--(X-->P),A..+) ==>+- Z), X,Y,strict), (Belief:Deduction)
-    (Y --> P), (Z ==> (&&,(X-->P),A..+)) |- subIfUnifiesAny((Z ==>+- (&&,(X-->P),A..+)), X,Y,strict), (Belief:Deduction)
-        (Y --> P), (Z ==> (&&,--(X-->P),A..+)) |- subIfUnifiesAny((Z ==>+- (&&,--(X-->P),A..+)), X,Y,strict), (Belief:Deduction)
+    (Y --> P), (&&,(X-->P),A..+), task(positive) |- subIfUnifiesAny((&&,(X-->P),A..+), X,Y,strict), (Belief:Deduction)
+        (Y --> P), (&&,--(X-->P),A..+), task(negative) |- subIfUnifiesAny((&&,--(X-->P),A..+), X,Y,strict), (Belief:DeductionN)
+    (Y --> P), ((&&,(X-->P),A..+) ==> Z), task(positive) |- subIfUnifiesAny(((&&,(X-->P),A..+) ==>+- Z), X,Y,strict), (Belief:Deduction)
+        (Y --> P), ((&&,--(X-->P),A..+) ==> Z), task(negative) |- subIfUnifiesAny(((&&,--(X-->P),A..+) ==>+- Z), X,Y,strict), (Belief:DeductionN)
+    (Y --> P), (Z ==> (&&,(X-->P),A..+)), task(positive) |- subIfUnifiesAny((Z ==>+- (&&,(X-->P),A..+)), X,Y,strict), (Belief:Deduction)
+        (Y --> P), (Z ==> (&&,--(X-->P),A..+)), task(negative) |- subIfUnifiesAny((Z ==>+- (&&,--(X-->P),A..+)), X,Y,strict), (Belief:DeductionN)
 
 
 //precondition combiner inference rule (variable_unification6):
@@ -229,14 +227,14 @@
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
 
-    B, C, belief("&&"), task(positive), task("!"), time(urgent) |- ifConjCommNoDepVars(without(C,B)), (Goal:Strong)
-    B, C, belief("&&"), task(negative), task("!"), time(urgent) |- ifConjCommNoDepVars(without(C,--B)), (Goal:StrongN)
+    B, C, belief("&&"), task(positive), task("!") |- ifConjCommNoDepVars(without(C,B)), (Goal:Strong)
+    B, C, belief("&&"), task(negative), task("!") |- ifConjCommNoDepVars(without(C,--B)), (Goal:StrongN)
 
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),--conjEvent(C,late),B), (Goal:StrongN)
 
-    C, B, task(positive), task("&&"), task("!"), time(urgent) |- conjDropIfEarliest(ifConjCommNoDepVars(C),B), (Goal:Strong)
-    C, B, task(negative), task("&&"), task("!"), time(urgent) |- conjDropIfEarliest(ifConjCommNoDepVars(C),--B), (Goal:StrongPN)
+    C, B, task("&&"), task(positive), task("!") |- conjDropIfEarliest(ifConjCommNoDepVars(C),B), (Goal:Strong)
+    C, B, task("&&"), task(negative), task("!") |- conjDropIfEarliest(ifConjCommNoDepVars(C),--B), (Goal:StrongPN)
         //(&&,X,A..+), X, task("!") |- X, (Goal:Strong)
         //(&&,--X,A..+), X, task("!") |- X, (Goal:StrongPN)
 

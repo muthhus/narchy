@@ -345,12 +345,22 @@ public class NAL5Test extends AbstractNALTest {
         tester.mustBelieve(cycles, " <<robin --> [withWings]> ==> <robin --> bird>>", 1.00f, 0.81f); //.en("If robin has wings then robin is a bird");
 
     }
+    @Test
+    public void conditional_deduction_neg() {
+
+        TestNAR tester = test;
+        tester.believe("<(&&,--<robin --> [swimming]>,<robin --> [withWings]>) ==> <robin --> bird>>"); //.en("If robin can fly and has wings then robin is a bird.");
+        tester.believe("--<robin --> [swimming]>"); //.en("robin can fly.");
+        tester.mustBelieve(cycles, " <<robin --> [withWings]> ==> <robin --> bird>>", 1.00f, 0.81f); //.en("If robin has wings then robin is a bird");
+
+    }
 
 
     @Test
     public void conditional_deduction2() {
 
         TestNAR tester = test;
+        tester.log();
         tester.believe("<(&&,<robin --> [chirping]>,<robin --> [flying]>,<robin --> [withWings]>) ==> <robin --> bird>>"); //.en("If robin can fly, has wings, and chirps, then robin is a bird");
         tester.believe("<robin --> [flying]>"); //.en("robin can fly.");
         tester.mustBelieve(cycles * 2, " <(&&,<robin --> [chirping]>,<robin --> [withWings]>) ==> <robin --> bird>>", 1.00f, 0.81f); //.en("If robin has wings and chirps then robin is a bird.");

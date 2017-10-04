@@ -840,7 +840,7 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
-                .mustBelieve(cycles, "(x)", 0f, 0.72f /* some smaller conf since it is a prediction */, 4);
+                .mustBelieve(cycles, "(x)", 0f, 0.58f /* some smaller conf since it is a prediction */, 4);
     }
 
     @Test
