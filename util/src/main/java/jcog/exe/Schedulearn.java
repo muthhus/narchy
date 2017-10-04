@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Schedulearn {
 
-    float OVER_DEMAND = 2f; //factor for additional iterations to request above the observed supply, ie. demand growth rate
+    float OVER_DEMAND = 1.5f; //factor for additional iterations to request above the observed supply, ie. demand growth rate
 
     public static class Can {
 

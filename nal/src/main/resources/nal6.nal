@@ -199,12 +199,12 @@
     (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
         (B --> K), (($X --> L) ==> (&&,--(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogyN)
 
-    (Y --> P), (&&,(X-->P),A..+), task(positive) |- subIfUnifiesAny((&&,(X-->P),A..+), X,Y,strict), (Belief:Deduction)
-        (Y --> P), (&&,--(X-->P),A..+), task(negative) |- subIfUnifiesAny((&&,--(X-->P),A..+), X,Y,strict), (Belief:DeductionN)
-    (Y --> P), ((&&,(X-->P),A..+) ==> Z), task(positive) |- subIfUnifiesAny(((&&,(X-->P),A..+) ==>+- Z), X,Y,strict), (Belief:Deduction)
-        (Y --> P), ((&&,--(X-->P),A..+) ==> Z), task(negative) |- subIfUnifiesAny(((&&,--(X-->P),A..+) ==>+- Z), X,Y,strict), (Belief:DeductionN)
-    (Y --> P), (Z ==> (&&,(X-->P),A..+)), task(positive) |- subIfUnifiesAny((Z ==>+- (&&,(X-->P),A..+)), X,Y,strict), (Belief:Deduction)
-        (Y --> P), (Z ==> (&&,--(X-->P),A..+)), task(negative) |- subIfUnifiesAny((Z ==>+- (&&,--(X-->P),A..+)), X,Y,strict), (Belief:DeductionN)
+    (Y --> P), (&&,(X-->P),A..+) |- subIfUnifiesAny((&&,(X-->P),A..+), X,Y,strict), (Belief:Deduction)
+        (Y --> P), (&&,--(X-->P),A..+) |- subIfUnifiesAny((&&,--(X-->P),A..+), X,Y,strict), (Belief:DeductionN)
+    (Y --> P), ((&&,(X-->P),A..+) ==> Z) |- subIfUnifiesAny(((&&,(X-->P),A..+) ==>+- Z), X,Y,strict), (Belief:Deduction)
+        (Y --> P), ((&&,--(X-->P),A..+) ==> Z) |- subIfUnifiesAny(((&&,--(X-->P),A..+) ==>+- Z), X,Y,strict), (Belief:DeductionN)
+    (Y --> P), (Z ==> (&&,(X-->P),A..+)) |- subIfUnifiesAny((Z ==>+- (&&,(X-->P),A..+)), X,Y,strict), (Belief:Deduction)
+        (Y --> P), (Z ==> (&&,--(X-->P),A..+)) |- subIfUnifiesAny((Z ==>+- (&&,--(X-->P),A..+)), X,Y,strict), (Belief:DeductionN)
 
 
 //precondition combiner inference rule (variable_unification6):
@@ -227,14 +227,14 @@
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
 
-    B, C, belief("&&"), task(positive), task("!") |- ifConjCommNoDepVars(without(C,B)), (Goal:Strong)
-    B, C, belief("&&"), task(negative), task("!") |- ifConjCommNoDepVars(without(C,--B)), (Goal:StrongN)
+    B, C, belief("&&"), task("!") |- ifConjCommNoDepVars(without(C,B)), (Goal:Strong)
+    B, C, belief("&&"), task("!") |- ifConjCommNoDepVars(without(C,--B)), (Goal:StrongN)
 
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),--conjEvent(C,late),B), (Goal:StrongN)
 
-    C, B, task("&&"), task(positive), task("!") |- conjDropIfEarliest(ifConjCommNoDepVars(C),B), (Goal:Strong)
-    C, B, task("&&"), task(negative), task("!") |- conjDropIfEarliest(ifConjCommNoDepVars(C),--B), (Goal:StrongPN)
+    C, B, task("&&"), task("!") |- conjDropIfEarliest(ifConjCommNoDepVars(C),B), (Goal:Strong)
+    C, B, task("&&"), task("!") |- conjDropIfEarliest(ifConjCommNoDepVars(C),--B), (Goal:StrongPN)
         //(&&,X,A..+), X, task("!") |- X, (Goal:Strong)
         //(&&,--X,A..+), X, task("!") |- X, (Goal:StrongPN)
 
