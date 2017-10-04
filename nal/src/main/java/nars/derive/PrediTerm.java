@@ -3,6 +3,7 @@ package nars.derive;
 import jcog.Util;
 import nars.Op;
 import nars.control.Derivation;
+import nars.control.Deriver;
 import nars.term.Term;
 
 import java.util.Comparator;
@@ -18,12 +19,7 @@ import java.util.function.ToIntFunction;
 public interface PrediTerm<X> extends Term, Predicate<X> {
 
 
-    PrediTerm<Derivation> NullDeriver = new AbstractPred<Derivation>(Op.ZeroProduct) {
-        @Override
-        public boolean test(Derivation o) {
-            return true;
-        }
-    };
+
     static final Comparator<PrediTerm> sortByCost = (a, b) -> {
         if (a.equals(b)) return 0;
         float ac = a.cost();

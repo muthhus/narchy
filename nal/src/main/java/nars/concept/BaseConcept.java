@@ -288,7 +288,7 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
 
         byte punc = t.punc();
         if (punc == BELIEF || punc == GOAL) {
-            MetaGoal.value(
+            MetaGoal.learn(
                 punc == BELIEF ? MetaGoal.Believe : MetaGoal.Desire,
                 t.cause(), t.conf() * activation, n);
         }

@@ -7,10 +7,10 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
+import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.derive.TemporalizeDerived;
 import nars.derive.rule.PremiseRule;
-import nars.index.term.TermContext;
 import nars.op.substitute;
 import nars.task.DerivedTask;
 import nars.term.Functor;
@@ -109,6 +109,7 @@ public class Derivation extends Unify {
     public float premisePri;
     public short[] parentCause;
     public final long[] derivedOcc = new long[2];
+
     public PrediTerm<Derivation> deriver;
     public boolean single;
     public TemporalizeDerived temporalize;

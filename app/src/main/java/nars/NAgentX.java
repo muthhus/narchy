@@ -10,14 +10,12 @@ import jcog.pri.mix.control.MixContRL;
 import nars.control.Cause;
 import nars.control.Derivation;
 import nars.control.MetaGoal;
-import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.data.reflect;
 import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
 import nars.op.stm.LinkClustering;
@@ -155,7 +153,7 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        Function<NAR, PrediTerm<Derivation>> deriver = Deriver.getDefault(8
+        Function<NAR, PrediTerm<Derivation>> deriver = nars.control.Deriver.getDefault(8
                 , "motivation.nal", "relation_introduction.nal");
 
         int THREADS = 5;
@@ -197,7 +195,7 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.9f);
 
 
-        float priFactor = 0.5f;
+        float priFactor = 0.1f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;

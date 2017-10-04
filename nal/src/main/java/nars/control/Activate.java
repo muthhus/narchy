@@ -372,4 +372,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         return id.term();
     }
 
+    @Override
+    public boolean persist() {
+        return true;
+    }
 }

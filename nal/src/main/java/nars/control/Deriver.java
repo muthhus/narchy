@@ -1,9 +1,11 @@
-package nars.derive;
+package nars.control;
 
 import nars.NAR;
+import nars.Op;
 import nars.Param;
-import nars.control.Cause;
-import nars.control.Derivation;
+import nars.derive.AbstractPred;
+import nars.derive.PrediTerm;
+import nars.derive.PrediTrie;
 import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternIndex;
@@ -14,18 +16,51 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 
-/**
- * Implements a strategy for managing submitted derivation processes
- * ( via the run() methods )
- * <p>
- * Created by patrick.hammer on 30.07.2015.
- * <p>
- * TODO remove Deriver and just consider any BoolPred<Derivation> a deriver
- */
-public interface Deriver {
+public class Deriver extends AbstractPred<Derivation> {
 
 
-    static Set<String> defaultRules(int level, String... otherFiles) {
+    private final PrediTerm<Derivation> exe;
+
+    public Deriver(PrediTerm<Derivation> o) {
+        super(o);
+        this.exe = o;
+    }
+
+    @Override
+    public final boolean test(Derivation derivation) {
+        return exe.test(derivation);
+    }
+
+    private static final Function<NAR, PrediTerm<Derivation>> NullDeriver = (n) -> new AbstractPred<Derivation>(Op.Null) {
+        @Override
+        public boolean test(Derivation derivation) {
+            return true;
+        }
+    };
+
+    public static Function<NAR, PrediTerm<Derivation>> getDefault(int nal, String... additional) {
+        if (nal == 0)
+            return NullDeriver;
+
+        return (nar) -> {
+            Function<PrediTerm<Derivation>, PrediTerm<Derivation>> xf;
+            if (Param.TRACE)
+                xf = DebugDerivationPredicate::new;
+            else
+                xf = null;
+
+            Set<String> files = defaultRules(nal, additional);
+
+            final PatternIndex p = new PatternIndex();
+
+            @NotNull PremiseRuleSet r = PremiseRuleSet.rules(nar, p, files.toArray(new String[files.size()]) );
+
+            return new Deriver(PrediTrie.the(r, xf));
+        };
+    }
+
+
+    public static Set<String> defaultRules(int level, String... otherFiles) {
         Set<String> files = new TreeSet();
         switch (level) {
             case 8:
@@ -56,32 +91,7 @@ public interface Deriver {
         return files;
     }
 
-    static Function<NAR, PrediTerm<Derivation>> getDefault(int nal, String... additional) {
-        if (nal == 0) {
-            return (n) -> PrediTerm.NullDeriver;
-        }
-
-        return (nar) -> {
-            Function<PrediTerm<Derivation>, PrediTerm<Derivation>> xf;
-            if (Param.TRACE)
-                xf = DebugDerivationPredicate::new;
-            else
-                xf = null;
-
-            Set<String> files = defaultRules(nal, additional);
-
-            Cause in = nar.newCause((cid)->new Cause(cid, "Derive(" + files + ")"));
-
-            final PatternIndex p = new PatternIndex();
-
-            @NotNull PremiseRuleSet r = PremiseRuleSet.rules(nar, p, files.toArray(new String[files.size()]) );
-
-            PrediTerm<Derivation> x = PrediTrie.the(r, xf);
-
-            return x;
-        };
-    }
-
+}
 
 
     //    /**
@@ -178,5 +188,3 @@ public interface Deriver {
 //    static Stream<PremiseRule> load(String ruleFile) {
 //        return parsedRules(new PatternTermIndex(), ruleFile).map(Pair::getOne /* HACK */);
 //    }
-
-}

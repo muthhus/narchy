@@ -2,13 +2,12 @@ package nars.exe;
 
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.sort.TopN;
 import nars.NAR;
-import nars.bag.ConcurrentArrayBag;
 import nars.control.Activate;
 import nars.control.Premise;
 import nars.task.ITask;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,21 +67,20 @@ public class UniExec extends Exec  {
             logger.error("{} {}", x, e);
         }
 
-        boolean keep;
-        if (next == null) {
-            keep = false;
-        } else {
+
+        if (next != null) {
             next.forEach(this::add);
-            keep = true;
         }
 
-        if (done())
-            return keep ? Stop : RemoveAndStop;
+        boolean persist = x.persist();
+
+        if (done(x))
+            return persist ? Stop : RemoveAndStop;
         else
-            return keep ? Next : Remove;
+            return persist ? Next : Remove;
     }
 
-    private boolean done() {
+    protected boolean done(ITask x) {
         //realtime: System.currentTimeMillis() > nextCycle
 
         //iterative:
@@ -93,7 +91,7 @@ public class UniExec extends Exec  {
     public synchronized void start(NAR nar) {
 
         plan =
-                new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), nar.random(), CAPACITY) {
+                new ConcurrentCurveBag<ITask>(this, new ConcurrentHashMap(), nar.random(), CAPACITY) {
 
                     @Override
                     public ITask key(ITask value) {

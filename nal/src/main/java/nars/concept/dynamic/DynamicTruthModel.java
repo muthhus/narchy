@@ -129,7 +129,7 @@ abstract public class DynamicTruthModel {
      */
     private static int matchDT(Term term, boolean beliefOrGoal, long start, long end, NAR n) {
 
-        assert (term.op().temporal);
+        assert (term.op().temporal): term + " is non-temporal but matchDT'd";
 
         Concept c = n.concept(term);
         if (c != null) {

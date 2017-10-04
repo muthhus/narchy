@@ -5,7 +5,6 @@ import jcog.random.XorShift128PlusRandom;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
 import nars.control.Derivation;
-import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.derive.PrediTrie;
 import nars.derive.rule.PremiseRuleSet;
@@ -125,7 +124,7 @@ public class NARS {
 
         concepts = DefaultConceptBuilder::new;
 
-        deriver = Deriver.getDefault(8);
+        deriver = nars.control.Deriver.getDefault(8);
     }
 
     /**
@@ -240,7 +239,7 @@ public class NARS {
         public Default(int nal, boolean threadSafe) {
 
             this.nal = nal;
-            this.deriver = Deriver.getDefault(nal);
+            this.deriver = nars.control.Deriver.getDefault(nal);
 
 
             if (threadSafe)

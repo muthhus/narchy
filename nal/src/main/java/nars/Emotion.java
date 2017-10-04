@@ -317,7 +317,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
 
             float cost = t.voluplexity() * t.priElseZero();
 
-            MetaGoal.value(MetaGoal.Perceive, t.cause(), cost, nar.causes);
+            MetaGoal.learn(MetaGoal.Perceive, t.cause(), cost, nar);
         }
 
         return x;
@@ -346,7 +346,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
         float str = ansConf *
                 qOrig *
                 question.priSafe(0);
-        MetaGoal.value(MetaGoal.Answer, answer.cause(), str, nar);
+        MetaGoal.learn(MetaGoal.Answer, answer.cause(), str, nar);
     }
 
 

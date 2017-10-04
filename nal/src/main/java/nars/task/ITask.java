@@ -46,6 +46,7 @@ public interface ITask extends Priority {
         return false;
     }
 
+    default boolean persist() { return false; }
 
     /**
      * fluent form of setPri which returns this class

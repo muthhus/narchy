@@ -96,11 +96,11 @@ public enum MetaGoal {
 
             float nextValue = c.value();
 
-            nextValue = Util.tanhFast(nextValue);
 
             nextValue = Util.lerp(momentum, v, nextValue);
 
-            nextValue = Util.clamp(nextValue, -1, +1);
+            nextValue = Util.tanhFast(nextValue);
+            //nextValue = Util.clamp(nextValue, -1, +1);
 
             c.setValue(nextValue);
 
@@ -150,14 +150,14 @@ public enum MetaGoal {
 
     }
 
-    public static void value(MetaGoal p, short[] effects, float strength, NAR nar) {
-        value(p, effects, strength, nar.causes);
+    public static void learn(MetaGoal p, short[] effects, float strength, NAR nar) {
+        learn(p, effects, strength, nar.causes);
     }
 
     /**
      * learn that the given effects have a given value
      */
-    public static void value(MetaGoal p, short[] effects, float strength, FasterList<Cause> causes) {
+    public static void learn(MetaGoal p, short[] effects, float strength, FasterList<Cause> causes) {
 
         //assert(strength >= 0);
         if (Math.abs(strength) < Prioritized.EPSILON) return; //no change

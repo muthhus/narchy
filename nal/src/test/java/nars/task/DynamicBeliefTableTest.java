@@ -150,36 +150,19 @@ public class DynamicBeliefTableTest {
         n.run(2);
         n.time.dur(8);
         BaseConcept cc = (BaseConcept) n.conceptualize($("((x) && (y))"));
-//        cc.print();
-//
-//
-//        System.out.println("Instantaneous");
-//        for (int i = -4; i <= n.time()+4; i++) {
-//            System.out.println( i + ": " + cc.belief(i) );
-//        }
 
         DynamicBeliefTable xtable = (DynamicBeliefTable) (cc.beliefs());
         Compound template = $("((x) &&+4 (y))");
 
         DynTruth xt = xtable.truth(0, 0, template, true, n);
         assertNotNull(xt);
-        assertTrue(xt.truth().toString(), $.t(1f, 0.68f).equals(xt.truth(), 0.1f));
-
-//            for (int i = -4; i <= n.time() + 4; i++) {
-//                System.out.println(i + ": " + xtable.truth(i, template.dt(), true) + " " + xtable.generate(template, i));
-//            }
-
-//        long when = 0;
-//        for (int i = 0; i <= 8; i++) {
-//            Compound template = $("((x) &&+"+ i + " (y))");
-//            System.out.println( xtable.truth(when, template.dt(), true) + " " + xtable.generate(template, when));
-//        }
+        assertTrue(xt.truth().toString(), $.t(1f, 0.81f).equals(xt.truth(), 0.1f));
 
         assertEquals(0.74f, xtable.generate($("((x) &&+6 (y))"), 0, 0, null, n).conf(), 0.05f);
         assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0, 0, null, n).conf(), 0.05f); //best match to the input
         assertEquals(0.74f, xtable.generate($("((x) &&+2 (y))"), 0, 0, null, n).conf(), 0.05f);
         assertEquals(0.71f, xtable.generate($("((x) &&+0 (y))"), 0, 0, null, n).conf(), 0.05f);
-        assertEquals(0.6f, xtable.generate($("((x) &&-32 (y))"), 0, 0, null, n).conf(), 0.1f);
+        assertEquals(0.38f, xtable.generate($("((x) &&-32 (y))"), 0, 0, null, n).conf(), 0.1f);
 
 
     }

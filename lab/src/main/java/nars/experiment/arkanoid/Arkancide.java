@@ -13,7 +13,7 @@ public class Arkancide extends NAgentX {
     static boolean numeric = true;
     static boolean cam = true;
 
-    public final FloatParam ballSpeed = new FloatParam(0.8f, 0.04f, 6f);
+    public final FloatParam ballSpeed = new FloatParam(1.5f, 0.04f, 6f);
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 
@@ -31,7 +31,7 @@ public class Arkancide extends NAgentX {
     private float prevScore;
 
     public static void main(String[] args) {
-        Param.DEBUG = true;
+        Param.DEBUG = false;
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
@@ -41,10 +41,10 @@ public class Arkancide extends NAgentX {
             Arkancide a = null;
 
             try {
-                n.truthResolution.setValue(.06f);
+                //n.truthResolution.setValue(.06f);
 
                 a = new Arkancide(n, cam, numeric);
-                a.curiosity.setValue(0.05f);
+                //a.curiosity.setValue(0.05f);
 
                 //a.trace = true;
                 //((RealTime)a.nar.time).durSeconds(0.05f);
@@ -59,7 +59,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 10);
+        }, 20);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -93,7 +93,7 @@ public class Arkancide extends NAgentX {
         };
 
 
-        paddleSpeed = 60 * noid.BALL_VELOCITY;
+        paddleSpeed = 20 * noid.BALL_VELOCITY;
 
         float resX = 0.01f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
         float resY = 0.01f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
@@ -102,7 +102,7 @@ public class Arkancide extends NAgentX {
 
             BufferedImageBitmap2D sw = new Scale(new SwingBitmap2D(noid), visW, visH).blur();
             CameraSensor cc = senseCamera("noid", sw, visW, visH)
-                    .resolution(0.25f);
+                    .resolution(0.05f);
 //            CameraSensor ccAe = senseCameraReduced($.the("noidAE"), sw, 16)
 //                    .resolution(0.25f);
 

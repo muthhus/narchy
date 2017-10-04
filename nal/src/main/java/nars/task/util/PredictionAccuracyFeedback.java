@@ -73,13 +73,13 @@ public class PredictionAccuracyFeedback {
                 //reward
                 v = coherence * 2f * confFraction * headstart * strength;
 
-                MetaGoal.value(MetaGoal.Accurate, cause, v, nar);
+                MetaGoal.learn(MetaGoal.Accurate, cause, v, nar);
 
             } else {
                 //punish
                 v = (1f - coherence) * 2f * confFraction / headstart * strength;
 
-                MetaGoal.value(MetaGoal.Inaccurate, cause, v, nar);
+                MetaGoal.learn(MetaGoal.Inaccurate, cause, v, nar);
                 if (deleteIfIncoherent)
                     y.delete();
                 else

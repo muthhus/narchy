@@ -3,6 +3,7 @@ package nars.io;
 import nars.*;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Int;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -261,6 +262,10 @@ public class NarseseExtendedTest extends NarseseTest {
 
         //THIS IS A PARSER PROBLEM:
         assertEquals("(x &&+2 (&|,(a),(b),(c)))", term("(x &&+2 (&|,(a), (b), (c)))").toString());
+    }
+    
+    @Test public void testIntRanges() throws Narsese.NarseseException {
+        assertEquals(Int.range(0,2), term("0..2"));
     }
 
     @Test public void testImdex() throws Narsese.NarseseException {
