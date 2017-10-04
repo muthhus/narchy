@@ -96,11 +96,11 @@ public enum MetaGoal {
 
             float nextValue = c.value();
 
+            nextValue = Util.tanhFast(nextValue);
 
             nextValue = Util.lerp(momentum, v, nextValue);
 
-            nextValue = Util.tanhFast(nextValue);
-            //nextValue = Util.clamp(nextValue, -1, +1);
+            nextValue = Util.clamp(nextValue, -1, +1);
 
             c.setValue(nextValue);
 

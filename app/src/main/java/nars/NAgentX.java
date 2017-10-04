@@ -791,8 +791,8 @@ abstract public class NAgentX extends NAgent {
         return addCamera(new CameraSensor(id, bc, this));
     }
 
-    protected <C extends Bitmap2D> CameraSensor<C> senseCameraReduced(@Nullable Term id, C bc, int outputPixels) {
-        return addCamera(new CameraSensor(id, new AutoencodedBitmap(bc, outputPixels), this));
+    protected <C extends Bitmap2D> CameraSensor<C> senseCameraReduced(@Nullable Term id, C bc, int sx, int sy, int ox, int oy) {
+        return addCamera(new CameraSensor(id, new AutoencodedBitmap(bc, sx, sy, ox, oy), this));
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> addCamera(CameraSensor<C> c) {

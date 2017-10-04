@@ -14,42 +14,78 @@ public class AutoencodedBitmap implements Bitmap2D {
     public final float[] input;
 
     final Autoencoder ae;
+    private final int ox, oy, sx, sy;
+    private final int w;
+    private final int h;
 
-    public AutoencodedBitmap(Bitmap2D b, int o) {
+    public AutoencodedBitmap(Bitmap2D b, int sx, int sy, int ox, int oy) {
         this.source = b;
-        int i = b.width() * b.height();
+
+        int w = b.width();
+        int h = b.height();
+        this.ox = ox;
+        this.sx = sx;
+        this.oy = oy;
+        this.sy = sy;
+
+
+        int i = sx * sy;
         this.input = new float[i];
-        this.ae = new Autoencoder(i, o, new XorShift128PlusRandom(1));
-        this.output = ae.output();
+        this.ae = new Autoencoder(i, ox * oy, new XorShift128PlusRandom(1));
+
+        this.w = w / sx * ox;
+        this.h = h / sy * oy;
+        this.output = new float[this.w * this.h];
     }
 
     @Override
     public void update(float frameRate) {
+        source.update(frameRate);
+
         //image = ConvertBufferedImage.convertFrom(source.get(), image);
         int w = source.width();
         int h = source.height();
-        int j = 0;
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                input[j++] = source.brightness(x, y);
+
+        int k = 0;
+        for (int Y = 0; Y < h; Y+=sy) {
+            for (int X = 0; X < w; X+=sx) {
+
+                int j = 0;
+                for (int y = 0; y < sy; y++) {
+                    for (int x = 0; x < sx; x++) {
+                        float b = source.brightness(X + x, Y + y);
+                        if (b!=b)
+                            b = 0.5f;
+                        input[j++] = b;
+                    }
+                }
+                assert(j==input.length);
+
+                ae.put(input, 0.02f, 0.002f, 0, true);
+
+                float[] o = ae.output();
+                for (float anO : o) {
+                    output[k++] = anO;
+                }
             }
         }
-        ae.put(input, 0.1f, 0.02f, 0, true);
+        assert(k == output.length);
+
     }
 
     @Override
     public int width() {
-        return output.length;
+        return w;
     }
 
     @Override
     public int height() {
-        return 1;
+        return h;
     }
 
     @Override
     public float brightness(int xx, int yy) {
-        return output[xx];
+        return output[yy * w + xx];
     }
 
 
