@@ -8,6 +8,7 @@ import jcog.data.MutableInteger;
 import jcog.event.ListTopic;
 import jcog.event.On;
 import jcog.event.Topic;
+import jcog.exe.Schedulearn;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Prioritized;
@@ -970,7 +971,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         time.cycle(this);
 
-        exe.cause(causables);
+        exe.cause(can);
 
         eventCycle.emit(this); //synchronous only
 
@@ -1639,7 +1640,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * table of values influencing reasoner heuristics
      */
     public final FasterList<Cause> causes = new FasterList(256);
-    public final FasterList<Causable> causables = new FasterList(16);
+
+    /** optional actions whose potential invocation is heuristically controlled */
+    public final FasterList<Schedulearn.Can> can = new FasterList(8);
+
 
     private final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[want.length + 1 /* for global norm */];
 

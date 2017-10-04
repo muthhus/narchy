@@ -17,7 +17,7 @@ public class Schedulearn {
 
         final static AtomicInteger ids = new AtomicInteger();
 
-        final static int WINDOW = 4;
+        final static int WINDOW = 8;
 
         final DescriptiveStatistics iterationTime = new DescriptiveStatistics(WINDOW);
         final DescriptiveStatistics supply = new DescriptiveStatistics(WINDOW);
@@ -65,6 +65,10 @@ public class Schedulearn {
             iterationTime.addValue(totalTime / supplied);
         }
 
+        /** called after the iterations has been determined */
+        public void commit() {
+
+        }
     }
 
 

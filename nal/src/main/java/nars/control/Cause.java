@@ -52,11 +52,6 @@ public class Cause {
          return value+1f;
     }
 
-    /** convenience procedure to set value to zero */
-    public void setValueZero() {
-        value = 0;
-    }
-
     public void setValue(float nextValue) {
         assert(nextValue==nextValue && nextValue >= -1f && nextValue <= +1f);
         value = nextValue;

@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static nars.Op.BELIEF;
+import static nars.Op.VAR_QUERY;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -134,7 +135,7 @@ public class reflect {
         public boolean preFilter(Task next) {
             if (super.preFilter(next)) {
                 Term tt = next.term();
-                if (tt.subs() > 1) {
+                if (tt.subs() > 1 && !tt.hasAny(VAR_QUERY)) {
                     if (tt.volume() <= n.termVolumeMax.intValue() * 0.75f)
                         if (filter.addIfMissing(next, 0.01f))
                             return true;
@@ -187,7 +188,7 @@ public class reflect {
         public boolean preFilter(Task next) {
             if (super.preFilter(next)) {
                 Term tt = next.term();
-                if (tt.subs() > 1)
+                if (tt.subs() > 1 && !tt.hasAny(VAR_QUERY))
                     if (tt.volume() <= n.termVolumeMax.intValue() * VOL_RATIO_MAX)
                         if (filter.addIfMissing(tt.term().conceptual(), 0.01f))
                             return true;

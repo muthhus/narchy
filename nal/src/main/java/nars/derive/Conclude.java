@@ -178,7 +178,7 @@ public final class Conclude {
      * derivation inputs are batched for input by another method
      * holds the deriver id also that it can be applied at the end of a derivation.
      */
-    static class RuleCause extends Cause {
+    public static class RuleCause extends Cause {
         public RuleCause(short id) {
             super(id);
         }

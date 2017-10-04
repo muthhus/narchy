@@ -72,15 +72,16 @@ public enum MetaGoal {
 
         final float epsilon = 0.01f;
 
-        final float momentum = 0.9f;
+        final float momentum = 0.5f;
 
         int goals = goal.length;
-        float[] goalFactor = new float[goals];
-        for (int j = 0; j < goals; j++) {
-            float m = causeSummary[j].magnitude();
-            //strength / normalization_magnitude
-            goalFactor[j] = goal[j] / ( Util.equals(m, 0, epsilon) ? 1 : m );
-        }
+//        float[] goalFactor = new float[goals];
+//        for (int j = 0; j < goals; j++) {
+//            float m = 1;
+//                        // causeSummary[j].magnitude();
+//            //strength / normalization_magnitude
+//            goalFactor[j] = goal[j] / ( Util.equals(m, 0, epsilon) ? 1 : m );
+//        }
 
         for (int i = 0, causesSize = cc; i < causesSize; i++) {
             Cause c = causes.get(i);
@@ -90,10 +91,17 @@ public enum MetaGoal {
 
             //mix the weighted current values of each purpose, each independently normalized against the values (the reason for calculating summary statistics in previous step)
             for (int j = 0; j < goals; j++) {
-                v += goalFactor[j] * cg[j].current;
+                v += goal[j] * cg[j].current;
             }
 
-            float nextValue = Util.lerp(momentum, v, c.value());
+            float nextValue = c.value();
+
+            nextValue = Util.tanhFast(nextValue);
+
+            nextValue = Util.lerp(momentum, v, nextValue);
+
+            nextValue = Util.clamp(nextValue, -1, +1);
+
             c.setValue(nextValue);
 
         }

@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
@@ -121,11 +120,7 @@ abstract public class Exec implements Executor, PriMerge {
 
     final Schedulearn sched = new Schedulearn();
 
-    public void cause(FasterList<Causable> causables) {
-
-        List<Schedulearn.Can> can = new FasterList(causables.size());
-        for (Causable c : causables)
-            can.add(c.can);
+    public void cause(FasterList<Schedulearn.Can> can) {
 
         double defaultCycleTime = 1.0; //sec
 
@@ -135,40 +130,8 @@ abstract public class Exec implements Executor, PriMerge {
             nextCycleTime
         );
 
-        //System.out.println(Arrays.toString(iter));
-
-        for (int i = 0, causablesSize = causables.size(); i < causablesSize; i++) {
-            Causable c = causables.get(i);
-            int ii = (int) Math.ceil(c.can.iterations.value());
-            if (ii > 0)
-                nar.input(new InvokeCause(causables.get(i), ii));
-        }
+        can.forEach(Schedulearn.Can::commit);
     }
-
-    final private static class InvokeCause extends NativeTask {
-
-        public final Causable cause;
-        public final int iterations;
-
-        private InvokeCause(Causable cause, int iterations) {
-            assert (iterations > 0);
-            this.cause = cause;
-            this.iterations = iterations;
-        }
-        //TODO deadline? etc
-
-        @Override
-        public String toString() {
-            return cause + ":" + iterations + "x";
-        }
-
-        @Override
-        public @Nullable Iterable<? extends ITask> run(NAR n) {
-            cause.run(n, iterations);
-            return null;
-        }
-    }
-
 
 
 }

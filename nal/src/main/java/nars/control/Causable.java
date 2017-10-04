@@ -2,6 +2,9 @@ package nars.control;
 
 import jcog.exe.Schedulearn;
 import nars.NAR;
+import nars.task.ITask;
+import nars.task.NativeTask;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,20 +24,29 @@ abstract public class Causable extends NARService {
     private static final Logger logger = LoggerFactory.getLogger(Causable.class);
 
 
-    public final Schedulearn.Can can = new Schedulearn.Can();
+    public final Schedulearn.Can can;
+
     private final AtomicBoolean busy;
 
     public Causable(NAR nar) {
         super(nar);
         busy = singleton() ? new AtomicBoolean(false) : null;
+
+        can = new Schedulearn.Can() {
+            @Override public void commit() {
+                int ii = (int) Math.ceil(can.iterations.value());
+                if (ii > 0)
+                    nar.input(new InvokeCause(Causable.this, ii));
+            }
+        };
     }
 
     @Override
     protected void start(NAR nar) {
         super.start(nar);
 
-        synchronized (nar.causables) {
-            nar.causables.add(this);
+        synchronized (nar.can) {
+            nar.can.add(can);
         }
 
     }
@@ -42,15 +54,17 @@ abstract public class Causable extends NARService {
     @Override
     protected void stop(NAR nar) {
 
-        synchronized (nar.causables) {
-            boolean removed = nar.causables.remove(this);
-            assert(removed);
+        synchronized (nar.can) {
+            boolean removed = nar.can.remove(this);
+            assert (removed);
         }
 
         super.stop(nar);
     }
 
-    /** if true, allows multiple threads to execute on this instance */
+    /**
+     * if true, allows multiple threads to execute on this instance
+     */
     public boolean singleton() {
         return false;
     }
@@ -66,15 +80,15 @@ abstract public class Causable extends NARService {
         int completed = 0;
         try {
             completed = next(n, iterations);
-            assert (completed >=0);
+            assert (completed >= 0);
         } catch (Throwable t) {
             error = t;
         }
         long end = System.nanoTime();
 
-        can.update(completed, value(), (double)(end-start)/1.0E9);
+        can.update(completed, value(), (double) (end - start) / 1.0E9);
 
-        if (busy!=null)
+        if (busy != null)
             busy.set(false);
 
         if (error != null) {
@@ -92,10 +106,37 @@ abstract public class Causable extends NARService {
 //    }
 
 
-    /** returns iterations actually completed */
+    /**
+     * returns iterations actually completed
+     */
     protected abstract int next(NAR n, int iterations);
 
-    /** returns a system estimated value of invoking this. between 0..1.0 */
+    /**
+     * returns a system estimated value of invoking this. between 0..1.0
+     */
     public abstract float value();
 
+    public final static class InvokeCause extends NativeTask {
+
+        public final Causable cause;
+        public final int iterations;
+
+        private InvokeCause(Causable cause, int iterations) {
+            assert (iterations > 0);
+            this.cause = cause;
+            this.iterations = iterations;
+        }
+        //TODO deadline? etc
+
+        @Override
+        public String toString() {
+            return cause + ":" + iterations + "x";
+        }
+
+        @Override
+        public @Nullable Iterable<? extends ITask> run(NAR n) {
+            cause.run(n, iterations);
+            return null;
+        }
+    }
 }
