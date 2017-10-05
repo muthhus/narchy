@@ -420,7 +420,7 @@ public interface NAct {
             float confMin = n.confMin.floatValue();
             float confBase =
                     //confMin * 4;
-                    n.confDefault(GOAL)/8f;
+                    n.confDefault(GOAL)/6f;
                     //n.confDefault(GOAL);
 
             int ip = p ? 0 : 1;

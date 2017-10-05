@@ -28,7 +28,7 @@ import java.util.function.Function;
 public class LinkClustering extends DurService {
 
     //private static final Logger logger = LoggerFactory.getLogger(MySTMClustered.class);
-    final static int NEW_CENTROID_DUR_SCAN_RADIUS = 1;
+
 
     public final BagClustering<Task> bag;
 
@@ -123,13 +123,13 @@ public class LinkClustering extends DurService {
         float pri = Util.sum(Task::priElseZero, tasks);
 
         MultiLink<Task,Task> task = new MultiLink<>( tasks, Function.identity(), pri );
-        MultiLink<Task,Term> term = new MultiLink<>( tasks, Task::term, pri );
+        //MultiLink<Task,Term> term = new MultiLink<>( tasks, Task::term, pri );
 
         group.forEach(t -> {
             Concept tc = t.get().concept(nar, false);
             if (tc!=null) {
                 tc.tasklinks().putAsync(task);
-                tc.termlinks().putAsync(term);
+                //tc.termlinks().putAsync(term);
             }
         });
 

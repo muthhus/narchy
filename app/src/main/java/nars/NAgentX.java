@@ -209,10 +209,12 @@ abstract public class NAgentX extends NAgent {
 
         //STMLinkage stmLink = new STMLinkage(n, 1, false);
 
-        LinkClustering linkClusterPri = new LinkClustering(n, Prioritized::priElseZero /* anything temporal */,
-                32, 128);
+//        LinkClustering linkClusterPri = new LinkClustering(n, Prioritized::priElseZero /* anything temporal */,
+//                32, 128);
+
 //        LinkClustering linkClusterConf = new LinkClustering(n, (t) -> t.isBeliefOrGoal() ? t.conf() : Float.NaN,
 //                4, 16);
+
 //        SpaceGraph.window(col(
 //                new STMView.BagClusterVis(n, linkClusterPri.bag),
 //                new STMView.BagClusterVis(n, linkClusterConf.bag)

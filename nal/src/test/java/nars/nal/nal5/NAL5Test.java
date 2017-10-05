@@ -119,10 +119,10 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void detachment() {
 
-        TestNAR tester = test;
-        tester.believe("<<robin --> bird> ==> <robin --> animal>>"); //.en("If robin is a type of bird then robin can fly.");
-        tester.believe("<robin --> bird>"); //.en("Robin is a type of bird.");
-        tester.mustBelieve(cycles, "<robin --> animal>", 1.00f, 0.81f); //.en("Robin is a type of animal.");
+        test
+            .believe("<<robin --> bird> ==> <robin --> animal>>") //.en("If robin is a type of bird then robin can fly.");
+            .believe("<robin --> bird>") //.en("Robin is a type of bird.");
+            .mustBelieve(cycles, "<robin --> animal>", 1.00f, 0.81f); //.en("Robin is a type of animal.");
 
     }
 

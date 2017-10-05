@@ -235,7 +235,7 @@ public class NARio extends NAgentX {
 
         float curX = mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : Float.NaN;
         if (lastX == lastX && lastX < curX) {
-            reward +=  unitize((curX - lastX) * MoveRight.floatValue() );
+            reward +=  unitize(Math.max(0,(curX - lastX)) * MoveRight.floatValue() );
         }
         lastX = curX;
 

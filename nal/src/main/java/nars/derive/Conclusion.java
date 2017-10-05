@@ -28,7 +28,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
     private final static Logger logger = LoggerFactory.getLogger(Conclusion.class);
     public final Term pattern;
-    private final boolean goalUrgent;
+    @Deprecated private final boolean goalUrgent;
 
 
 //    public final Set<Variable> uniqueVars;

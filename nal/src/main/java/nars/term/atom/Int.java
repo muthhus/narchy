@@ -10,6 +10,7 @@ import nars.Param;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.subst.Unify;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
@@ -113,20 +114,20 @@ public class Int implements Intlike {
     }
 
 
-//    @Override
-//    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-//        if (Intlike.super.unify(y, subst))
-//            return true;
-//        //if (equals(y)) return true;
-//        if (y instanceof IntRange) {
-//            IntRange ir = (IntRange) y;
-//            if (ir.min <= id && ir.max >= id) {
-//                //return subst.putXY(y, this); //specialize from the range to this int
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+    @Override
+    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+        if (Intlike.super.unify(y, subst))
+            return true;
+        //if (equals(y)) return true;
+        if (y instanceof IntRange) {
+            IntRange ir = (IntRange) y;
+            if (ir.min <= id && ir.max >= id) {
+                //return subst.putXY(y, this); //specialize from the range to this int
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static Intlike the(Range<Integer> span) {
         return range(span.lowerEndpoint(), span.upperEndpoint() - ((span.upperBoundType() == OPEN ? 1 : 0)));
@@ -152,17 +153,17 @@ public class Int implements Intlike {
             this.hash = Util.hashCombine(INT_RANGE, min, max);
         }
 
-//        @Override
-//        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-//            if (Intlike.super.unify(y, subst)) return true;
-//            if (y instanceof Int) {
-//                return intersects((Int)y);
-//            } else if (y instanceof IntRange) {
-//                IntRange z = (IntRange) y;
-//                return contains(z) || z.contains(this);
-//            }
-//            return false;
-//        }
+        @Override
+        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+            if (Intlike.super.unify(y, subst)) return true;
+            if (y instanceof Int) {
+                return intersects((Int)y);
+            } else if (y instanceof IntRange) {
+                IntRange z = (IntRange) y;
+                return contains(z) || z.contains(this);
+            }
+            return false;
+        }
 
         public boolean intersects(Int y) {
             int i = y.id;

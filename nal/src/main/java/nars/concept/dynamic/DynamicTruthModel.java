@@ -142,7 +142,7 @@ abstract public class DynamicTruthModel {
                 Consumer<Task> tx = x -> {
                     int xdt = x.dt();
                     if (xdt != DTERNAL) {
-                        sum[0] += (xdt);
+                        sum[0] += xdt;
                         count[0]++;
                     }
                 };
@@ -186,7 +186,7 @@ abstract public class DynamicTruthModel {
         }
 
         @Override
-        public float f(float freq) {
+        protected float f(float freq) {
             return 1f - freq;
         }
 
@@ -225,7 +225,7 @@ abstract public class DynamicTruthModel {
 
         }
 
-        public float f(float freq) {
+        protected float f(float freq) {
             return freq;
         }
 

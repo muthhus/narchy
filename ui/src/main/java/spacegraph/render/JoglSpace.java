@@ -157,8 +157,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         GLCapabilities config = new GLCapabilities(
 
                 //GLProfile.getMinimum(true)
-                //GLProfile.getDefault()
-                GLProfile.getMaximum(true)
+                GLProfile.getDefault()
+                //GLProfile.getMaximum(true)
 
 
         );

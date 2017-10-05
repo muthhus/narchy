@@ -177,7 +177,7 @@ public class Line1DSimplest extends NAgent {
 
         //dist = (float)(Math.sqrt(dist)); //more challenging
 
-        float h = 1f - dist;
+        float h = ((1f - dist)-0.5f)*2f;
         //System.out.println(h + " " + happy.sensor.get());
         return h;
         //return (float) Math.pow((1f - dist), 2);

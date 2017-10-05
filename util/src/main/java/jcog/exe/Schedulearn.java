@@ -98,7 +98,7 @@ public class Schedulearn {
             times.add(xt);
 
             //fraction of component time is proportional to
-            Constraint proportionalToValue = C.lessThanOrEqualTo(
+            Constraint proportionalToValue = C.equals(
                     C.divide(xt, timeslice),
                     x.value() / totalValue
             );
@@ -110,7 +110,7 @@ public class Schedulearn {
             double maxIter = Math.max(1, Math.ceil((1+prevIter) * OVER_DEMAND));
 
             Constraint meetsSupply = C.lessThanOrEqualTo(xi, maxIter);
-            meetsSupply.setStrength(2);
+            meetsSupply.setStrength(1);
             solver.add(meetsSupply);
 
         }

@@ -14,6 +14,8 @@ import nars.term.atom.Bool;
 import nars.term.subst.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -40,6 +42,8 @@ import static nars.time.Tense.ETERNAL;
  */
 public class TemporalizeDerived extends Temporalize {
 
+    private final static Logger logger = LoggerFactory.getLogger(TemporalizeDerived.class);
+
     private final Task task, belief;
 
     protected static final boolean knowTransformed = true;
@@ -56,9 +60,16 @@ public class TemporalizeDerived extends Temporalize {
         belief = d.belief; //!d.single ? d.belief : null;
         dur = Math.max(1, Math.round(d.nar.dtDither.floatValue() * d.dur));
 
+        long taskStart = task.start();
+        long taskEnd = task.end();
+//        if (taskStart == ETERNAL && task.isGoal() && belief!=null && !belief.isEternal()) {
+//            //pretend this is a temporal goal task at the present time, since present time does occur within the eternal task
+//            taskStart = taskEnd = d.time;
+//        }
+
         knowDerivedAbsolute(d,
                 polarizedTaskTerm(task),
-                task.start(), task.end());
+                taskStart, taskEnd);
 
 
         if (!task.term().equals(d.beliefTerm)) { //dont re-know the term
@@ -73,9 +84,7 @@ public class TemporalizeDerived extends Temporalize {
         if (belief != null && !belief.equals(task)) {
 
             this.constraints = dbl = new HashMap(); //clone
-            sng.forEach((k,v)->{
-                dbl.put(k, new TreeSet(v));
-            });
+            sng.forEach((k,v)-> dbl.put(k, new TreeSet(v)));
 
             knowDerivedAbsolute(d,
                     polarizedTaskTerm(belief),
@@ -175,10 +184,7 @@ public class TemporalizeDerived extends Temporalize {
         try {
             e = solve(pattern, trail);
         } catch (StackOverflowError ignored) {
-            System.err.println(
-                    Arrays.toString(new Object[]{"temporalize stack overflow:\n{} {}\n\t{}", pattern, d, trail})
-                    //logger.error(
-            );
+            logger.error("temporalize stack overflow:\n{} {}\n\t{}", pattern, d, trail);
 //            trail.clear();
 //            model.solve(pattern, trail);
             return null;
@@ -246,6 +252,7 @@ public class TemporalizeDerived extends Temporalize {
 //                    k = ts;
 //                }
             } else if (te) {
+                //TODO maybe this should be 'now'
                 occ[0] = belief.start();
                 occ[1] = belief.end();
             } else /*if (be)*/ {

@@ -119,7 +119,7 @@ public class PatrickTests extends AbstractNALTest {
 
 
         tt.truthTolerance(0.2f);
-        tt.nar.truthResolution.setValue(0.05f);
+        tt.nar.truthResolution.setValue(0.1f);
         //tt.nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
         tt.nar.time.dur(10);
 
@@ -146,7 +146,7 @@ public class PatrickTests extends AbstractNALTest {
                 //"<toothbrush --> here>. :|:" //there is a toothbrush here NOW
         );
 
-        tt.mustGoal(3000, "lighter(I, toothbrush)", 1f,
+        tt.mustGoal(5000, "lighter(I, toothbrush)", 1f,
                 0.2f,
                 (t) -> t >= 0);
 
