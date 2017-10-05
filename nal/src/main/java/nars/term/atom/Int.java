@@ -156,12 +156,19 @@ public class Int implements Intlike {
         @Override
         public boolean unify(@NotNull Term y, @NotNull Unify subst) {
             if (Intlike.super.unify(y, subst)) return true;
-            if (y instanceof Int) {
-                return intersects((Int)y);
-            } else if (y instanceof IntRange) {
+
+            //one way:
+            if (y instanceof IntRange) {
                 IntRange z = (IntRange) y;
-                return contains(z) || z.contains(this);
+                return z.contains(this);
             }
+
+//            if (y instanceof Int) {
+//                return intersects((Int)y);
+//            } else if (y instanceof IntRange) {
+//                IntRange z = (IntRange) y;
+//                return contains(z) || z.contains(this);
+//            }
             return false;
         }
 
@@ -264,6 +271,18 @@ public class Int implements Intlike {
 //    }
 
     public static Term[] intersect(Term[] subs) {
+
+
+        boolean anyInts = false;
+        for (Term x : subs) {
+            if (x.hasAny(Op.INT)) {
+                anyInts = true;
+                break;
+            }
+        }
+        if (!anyInts)
+            return subs;
+
         //paths * extracted sequence of numbers at given path for each subterm
         Map<ByteList, Pair<ByteHashSet, List<Term>>> data = new HashMap();
 
