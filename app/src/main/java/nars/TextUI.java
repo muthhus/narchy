@@ -26,6 +26,7 @@ import jcog.pri.op.PriMerge;
 import nars.control.Activate;
 import nars.control.NARService;
 import nars.op.Operator;
+import nars.op.nlp.Hear;
 import nars.task.ITask;
 import org.slf4j.LoggerFactory;
 
@@ -80,19 +81,21 @@ public class TextUI {
 
         NAR nar = NARchy.all();
 
-        try {
-            //new NoteFS("/tmp/nal", nar);
+//        try {
+//            //new NoteFS("/tmp/nal", nar);
+//
+//            InterNAR i = new InterNAR(nar, 8, 0);
+//            i.recv.preAmp(0.1f);
+//            i.runFPS(2);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
-            InterNAR i = new InterNAR(nar, 8, 0);
-            i.recv.preAmp(0.1f);
-            i.runFPS(2);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        nar.time.dur(100); //100 x centisecond = 1 sec
+
+        nar.startFPS(100f);
 
         new TextUI(nar, 1024);
-
-        nar.startFPS(10f);
 
     }
 
@@ -298,11 +301,19 @@ public class TextUI {
 
 
                     if (!t.isEmpty()) {
+
                         try {
                             nar.input(t);
                         } catch (Narsese.NarseseException e) {
-                            nar.input(Operator.log(nar.time(), e));
+
+                            try {
+                                Hear.hear(nar, t, "console", 100);
+                            } catch (Exception e1) {
+                                nar.input(Operator.log(nar.time(), e1));
+                            }
+
                         }
+
                     }
                 }
                 return r;

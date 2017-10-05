@@ -139,16 +139,18 @@ public class UniExec extends Exec  {
 
 
     public float pri(ITask key) {
-        float i = key.pri();
-        if (i!=i) return Float.NaN;
+        return key.pri();
 
-        if (key instanceof Activate) {
-            return Util.lerp(i, 0f, 0.25f);
-        } else if (key instanceof Premise) {
-            return Util.lerp(i, 0.25f, 0.5f);
-        } else {
-            return Util.lerp(i, 0.5f, 1f);
-        }
+//        float i = key.pri();
+//        if (i!=i) return Float.NaN;
+//
+//        if (key instanceof Activate) {
+//            return Util.lerp(i, 0f, 0.25f);
+//        } else if (key instanceof Premise) {
+//            return Util.lerp(i, 0.25f, 0.5f);
+//        } else {
+//            return Util.lerp(i, 0.5f, 1f);
+//        }
     }
 
     @Override
