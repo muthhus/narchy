@@ -1,7 +1,10 @@
 package nars.derive;
 
+import jcog.Util;
+import nars.Param;
 import nars.control.Derivation;
 import nars.term.Compound;
+import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 
 import static nars.Op.*;
+import static nars.truth.TruthFunctions.c2w;
 
 /**
  * Evaluates the truth of a premise
@@ -82,15 +86,33 @@ abstract public class Solve extends AbstractPred<Derivation> {
                     }
                 }
 
-                //truth function is single premise so set belief truth to be null to prevent any negations below:
                 float confMin = d.confMin;
 
-                if ((t = f.apply(
-                        d.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
-                        single ? null : beliefProjected ? d.beliefTruth : d.beliefTruthRaw,
-                        d.nar, confMin
-                )) == null)
-                    return false;
+                float s = d.nar.deriverity.floatValue();
+                if (s == 1.0) {
+                    //truth function is single premise so set belief truth to be null to prevent any negations below:
+
+
+                    if ((t = f.apply(
+                            d.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
+                            single ? null : beliefProjected ? d.beliefTruth : d.beliefTruthRaw,
+                            d.nar, confMin
+                    )) == null)
+                        return false;
+                } else {
+
+                    float baseConf = single ? d.premiseConfSingle : d.premiseConfDouble;
+
+                    if ((t = f.apply(
+                            d.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
+                            single ? null : beliefProjected ? d.beliefTruth : d.beliefTruthRaw,
+                            d.nar, Param.TRUTH_EPSILON
+                    )) == null)
+                        return false;
+
+                    float newEvi = Util.lerp(s, c2w(baseConf), t.evi());
+                    t = new PreciseTruth(t.freq(), newEvi, false);
+                }
 
                 t = t.ditherFreqConf(d.truthResolution, confMin, 1f);
                 if (t == null)

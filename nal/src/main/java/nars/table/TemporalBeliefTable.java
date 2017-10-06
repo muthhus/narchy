@@ -23,34 +23,35 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
      * will be infinity) so it can exit early if it will not rank
      */
     static float temporalTaskPriority(Task t, long start, long end, int dur) {
-        if (t.isDeleted())
-            return Float.NEGATIVE_INFINITY;
-
-        //float fdur = dur;
-        //float range = t.range();
+        return ((1+t.conf()) * (1+t.priElseZero())) / (1f + Math.abs((start+end)/2 - t.mid())/((float)dur));
+//        if (t.isDeleted())
+//            return Float.NEGATIVE_INFINITY;
+//
+//        //float fdur = dur;
+//        //float range = t.range();
+////        return
+////                t.evi(start, end, dur)
+////                //t.conf(now, dur) *
+////                //t.evi(now, dur) *
+////                //* range == 0 ? 1f : (float) (1f + Math.sqrt(t.range()) / dur); ///(1+t.distanceTo(start, end)))); ///fdur
+////        ;
+//        float fdur = dur;
 //        return
-//                t.evi(start, end, dur)
+//                //(1f + t.evi()) *
+//                //(t.evi(start,end,dur))
+//                (t.conf(start,end,dur))
+//                * (float)Math.sqrt(1f + t.range()/fdur) //boost for duration
+//                ;
+//
+//                //(1f + t.evi()) * //raw because time is considered below. this covers cases where the task eternalizes
+//                //(1f / (1 + t.distanceTo(start, end)/fdur));
+//
+//                //(1f + t.conf()) * //raw because time is considered below. this covers cases where the task eternalizes
+//                //t.evi(start,end,dur) *
 //                //t.conf(now, dur) *
 //                //t.evi(now, dur) *
-//                //* range == 0 ? 1f : (float) (1f + Math.sqrt(t.range()) / dur); ///(1+t.distanceTo(start, end)))); ///fdur
-//        ;
-        float fdur = dur;
-        return
-                //(1f + t.evi()) *
-                //(t.evi(start,end,dur))
-                (t.conf(start,end,dur))
-                * (float)Math.sqrt(1f + t.range()/fdur) //boost for duration
-                ;
-
-                //(1f + t.evi()) * //raw because time is considered below. this covers cases where the task eternalizes
-                //(1f / (1 + t.distanceTo(start, end)/fdur));
-
-                //(1f + t.conf()) * //raw because time is considered below. this covers cases where the task eternalizes
-                //t.evi(start,end,dur) *
-                //t.conf(now, dur) *
-                //t.evi(now, dur) *
-                /* ((float)Math.sqrt(1+t.range()/fdur)) */
-                 //1 / ((1 + t.distanceTo(start, end)/fdur));
+//                /* ((float)Math.sqrt(1+t.range()/fdur)) */
+//                 //1 / ((1 + t.distanceTo(start, end)/fdur));
     }
 
     /** finds or generates the strongest match to the specified parameters.

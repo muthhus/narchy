@@ -3,6 +3,7 @@ package nars.experiment.arkanoid;
 
 import jcog.data.FloatParam;
 import nars.*;
+import nars.task.DerivedTask;
 import nars.video.BufferedImageBitmap2D;
 import nars.video.CameraSensor;
 import nars.video.Scale;
@@ -128,9 +129,10 @@ public class Arkancide extends NAgentX {
 //                    Lists.newArrayList(ab.term(), a.term(), b.term(), c.term()),
 //                    nar), 600, 600);
 //            nar.onTask(t -> {
-//                if (t instanceof DerivedTask && t.isGoal()) {
-//                    if (t.term().equals(ab))
-//                        System.err.println(t.proof());
+//                if (//t instanceof DerivedTask &&
+//                        t.isEternal()) {
+//                        //t.isGoal()) {
+//                    System.err.println(t.proof());
 //                }
 //            });
         }

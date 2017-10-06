@@ -70,12 +70,12 @@ public abstract class Param extends Services<Term,NAR> {
 
 
     public static final PriMerge termlinkMerge =
-            //PriMerge.max;
-            PriMerge.plus;
+            PriMerge.max;
+            //PriMerge.plus;
 
     public static final PriMerge tasklinkMerge =
-            //PriMerge.max; //not safe to plus without enough headroom
-            PriMerge.plus;
+            PriMerge.max;
+            //PriMerge.plus; //not safe to plus without enough headroom
 
     /** for pending tasks to be processed */
     public static final PriMerge taskMerge = PriMerge.max;
@@ -106,6 +106,9 @@ public abstract class Param extends Services<Term,NAR> {
                     //Integer.MAX_VALUE;
                     //4;
                     8;
+
+    /** derivation severity - how much confidence is reduced in derivation (default: 1.0) */
+    public final MutableFloat deriverity = new MutableFloat(1.0f);
 
     /** 'time to live', unification steps until unification is stopped */
     public final MutableInteger matchTTLmax = new MutableInteger(256);

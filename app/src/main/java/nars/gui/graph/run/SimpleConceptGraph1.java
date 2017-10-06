@@ -57,12 +57,12 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
     public static void main(String[] args) throws Narsese.NarseseException {
 
-        Param.DEBUG = true;
+//        Param.DEBUG = true;
         //Param.TRACE = true;
         NAR n = NARS.threadSafe();
         //n.DEFAULT_BELIEF_PRIORITY = 0.1f;
         //n.DEFAULT_QUESTION_PRIORITY = 0.1f;
-        float fps = 50f;
+        float fps = 1f;
 
         //csvPriority(n, "/tmp/x.csv");
 
@@ -105,7 +105,6 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        );
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-
                 /* TODO */ 64, 64, 7, 15);
 
 
@@ -143,22 +142,21 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //            n.inputAt(i*2,"(" + ((char)('a' + i)) + "). :|:");
 
         //new DeductiveMeshTest(n, new int[]{3, 2}, 16384);
-        //n.log();
-        n.input(
-                "(a-->b).", "(b-->c).","(c-->d)."
 
-                //"$.50 at(SELF,{t001}). :|: %1.0;.90%", "$.70 (at(SELF,{t001}) &&+5 open({t001}))! %1.0;.90%" // //goal_ded_2
-        );
-        //n.log();
 
         //n.onCycle(nn->{System.out.println(nn.time() + "\n" + n.exe.stats() + "\n\n");});
 
         n.printServices(System.out);
 
-        n.startFPS(fps).join();
+        n.startFPS(fps);
 
         //n.run(600);
+        n.log();
+        n.input(
+                "(a-->b).", "(b-->c).","(c-->d)."
 
+                //"$.50 at(SELF,{t001}). :|: %1.0;.90%", "$.70 (at(SELF,{t001}) &&+5 open({t001}))! %1.0;.90%" // //goal_ded_2
+        );
 
 
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));

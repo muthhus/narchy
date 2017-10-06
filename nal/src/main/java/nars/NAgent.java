@@ -228,7 +228,11 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
                 float happysadPri = nar.priDefault(GOAL)*2f;
 
-                Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nar.time(), ETERNAL, ETERNAL, nar.time.nextInputStamp());
+                long nt = nar.time();
+                Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nt,
+                        //ETERNAL, ETERNAL,
+                        nt, nt,
+                        nar.time.nextInputStamp());
                 he.pri(happysadPri);
                 predictors.add(() -> {
                     he.priMax(happysadPri);
@@ -600,9 +604,9 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         Term term = _term.normalize();
 
         long now = nar.time();
-        //long start = now;
-        //long end = now + Math.round(predictAheadDurs.floatValue() * nar.dur());
-        long start = ETERNAL, end = ETERNAL;
+        long start = now;
+        long end = now + Math.round(predictAheadDurs.floatValue() * nar.dur());
+        //long start = ETERNAL, end = ETERNAL;
 
         NALTask t = new NALTask(term, punct, truth, now,
                 start, end,
@@ -613,8 +617,16 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 //        if (truth == null && !(punct == QUESTION || punct == QUEST))
 //            return null; //0 conf or something
 
+            Task u;
+            if (t.isEternal()) {
+                u = t;
+            } else {
+                long nownow = nar.time();
+                //TODO handle task duration
+                u = new NALTask(t.term(), t.punc(), t.truth(), nownow, nownow, nownow, new long[]{nar.time.nextStamp()} );
+            }
 
-            return t;
+            return u;
         };
     }
 

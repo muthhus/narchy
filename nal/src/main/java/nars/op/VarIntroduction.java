@@ -63,7 +63,7 @@ public abstract class VarIntroduction {
 
 
         Term y = x.replace(substs);
-        if (!y.equals(x)) {
+        if (y!=null && !y.equals(x)) {
             if (inputWasNormalized) {
                 y = y.normalize();
                 if (y == null) return null;

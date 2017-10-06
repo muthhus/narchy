@@ -6,10 +6,9 @@ import jcog.Optimize;
 import jcog.Util;
 import jcog.math.FloatSupplier;
 import jcog.net.MeshOptimize;
-import jcog.pri.Prioritized;
 import nars.*;
 import nars.gui.Vis;
-import nars.op.stm.LinkClustering;
+import nars.op.stm.ConjClustering;
 import nars.task.DerivedTask;
 import nars.test.agent.Line1DSimplest;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -23,6 +22,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.PI;
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
 
@@ -54,10 +55,12 @@ public class Line1D {
             NAR n = nn.get();
 
 
+        ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, true, 16, 64);
+        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, true, 16, 64);
 
-            LinkClustering linkClusterPri = new LinkClustering(n,
-                    Prioritized::priElseZero /* anything temporal */,
-                    4, 16);
+//            LinkClustering linkClusterPri = new LinkClustering(n,
+//                    Prioritized::priElseZero /* anything temporal */,
+//                    4, 16);
 
             n.onTask(x -> {
                 if (x instanceof DerivedTask) {
