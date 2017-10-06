@@ -2,9 +2,11 @@ package nars.table;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
+import jcog.Util;
 import jcog.pri.Prioritized;
 import jcog.sort.TopN;
 import jcog.tree.rtree.*;
+import jcog.util.CachedFloatFunction;
 import jcog.util.Top;
 import jcog.util.Top2;
 import nars.NAR;
@@ -419,8 +421,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
         FloatFunction<Task> taskStrength =
-                //taskStrength(now-dur/2, now+dur/2, dur);
-                taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, dur);
+                new CachedFloatFunction(
+                    //taskStrength(now-dur/2, now+dur/2, dur);
+                    taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, dur)
+                );
+
         FloatFunction<TaskRegion> weakestTask = (t -> -taskStrength.floatValueOf(t.task()));
 
         float inputStrength = inputRegion != null ? taskStrength.floatValueOf(inputRegion.task()) : Float.POSITIVE_INFINITY;

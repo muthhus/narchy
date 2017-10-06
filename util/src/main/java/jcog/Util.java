@@ -1318,7 +1318,17 @@ public enum Util {
         }
         return true;
     }
-
+    public static boolean equals(@NotNull short[] a, short[] b) {
+        if (a == b) return true;
+        int l = a.length;
+        if (b.length!=l)
+            return false;
+        for (int i = 0; i < l; i++) {
+            if (a[i]!=b[i])
+                return false;
+        }
+        return true;
+    }
     public static enum RouletteControl {
         STOP, CONTINUE, WEIGHTS_CHANGED
     }

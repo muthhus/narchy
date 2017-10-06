@@ -56,7 +56,7 @@ public class Line1D {
 
 
         ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, true, 16, 64);
-        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, true, 16, 64);
+//        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, true, 16, 64);
 
 //            LinkClustering linkClusterPri = new LinkClustering(n,
 //                    Prioritized::priElseZero /* anything temporal */,
@@ -295,8 +295,6 @@ public class Line1D {
     public static class Line1DOptimize {
 
         public static void main(String[] args) {
-
-            Param.ANSWER_REPORTING = false;
 
             int maxIterations = 1024;
             int repeats = 2;

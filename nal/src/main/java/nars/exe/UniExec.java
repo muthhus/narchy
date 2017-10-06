@@ -174,24 +174,24 @@ public class UniExec extends Exec  {
     }
 
 
-    final int WINDOW_SIZE = 32;
-    final int WINDOW_RATIO = 8;
-    private final TopN<ITask> top = new TopN<>(new ITask[WINDOW_SIZE], this::pri);
-    int windowTTL = WINDOW_RATIO;
-
-    private BagSample top(ITask x) {
-
-        top.add(x);
-
-        if (--windowTTL <= 0) {
-            windowTTL = WINDOW_RATIO;
-            ITask t = top.pop();
-            if (t!=null)
-                exeSample((ITask) t);
-        }
-
-        return BagSample.Next;
-    }
+//    final int WINDOW_SIZE = 32;
+//    final int WINDOW_RATIO = 8;
+//    private final TopN<ITask> top = new TopN<>(new ITask[WINDOW_SIZE], this::pri);
+//    int windowTTL = WINDOW_RATIO;
+//
+//    private BagSample top(ITask x) {
+//
+//        top.add(x);
+//
+//        if (--windowTTL <= 0) {
+//            windowTTL = WINDOW_RATIO;
+//            ITask t = top.pop();
+//            if (t!=null)
+//                exeSample((ITask) t);
+//        }
+//
+//        return BagSample.Next;
+//    }
 
 //    public static void main(String... args) {
 //        NARS n = NARS.realtime();

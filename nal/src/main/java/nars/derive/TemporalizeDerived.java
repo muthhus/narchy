@@ -86,9 +86,14 @@ public class TemporalizeDerived extends Temporalize {
             this.constraints = dbl = new HashMap(); //clone
             sng.forEach((k,v)-> dbl.put(k, new TreeSet(v)));
 
+            long beliefStart = belief.start();
+            long beliefEnd = belief.end();
+//            if (belief.op().temporal && taskStart!=ETERNAL) {
+//                beliefStart = beliefEnd = ETERNAL; //pretend as if belief is eternal, allowing task to override the result determination
+//            }
             knowDerivedAbsolute(d,
                     polarizedTaskTerm(belief),
-                    belief.start(), belief.end()); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
+                    beliefStart, beliefEnd); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
 
 
         } else {

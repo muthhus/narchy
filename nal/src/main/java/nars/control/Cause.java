@@ -83,10 +83,17 @@ public class Cause {
 
 
     public static short[] zip(@Nullable Task... e) {
+        short[] a = e[0].cause();
         switch (e.length) {
             case 0: throw new NullPointerException();
-            case 1: return e[0].cause();
-            case 2: return zip(CAUSE_CAPACITY, e[0].cause(), e[1].cause());
+            case 1: return a;
+            case 2:
+                short[] b = e[1].cause();
+
+                if (Util.equals(a,b))
+                    return a;
+
+                return zip(CAUSE_CAPACITY, a, b);
             default:
                 return zip(CAUSE_CAPACITY, Util.map(Task::cause, short[][]::new, e)); //HACK
         }
@@ -112,14 +119,12 @@ public class Cause {
 //        }
 //    }
 
-
-
-    public static short[] zip(int maxLen, Supplier<short[]>[] s) {
-        if (s.length == 1) {
-            return s[0].get();
-        }
-        return zip(maxLen, Util.map(Supplier::get, short[][]::new, s));
-    }
+//    public static short[] zip(int maxLen, Supplier<short[]>[] s) {
+//        if (s.length == 1) {
+//            return s[0].get();
+//        }
+//        return zip(maxLen, Util.map(Supplier::get, short[][]::new, s));
+//    }
 
     public static short[] zip(int maxLen, short[]... s) {
 

@@ -125,10 +125,12 @@ public interface QuestionTable extends TaskTable {
                     return prev;
                 });
             }
-            if (u != t)
+            if (u != t) {
                 ((NALTask) u).causeMerge(t);
-            else
+                t.delete();
+            } else {
                 act[0] = u.priElseZero();
+            }
 
             if (act[0] > Pri.EPSILON) {
                 Activate.activate(u, act[0], n, c);

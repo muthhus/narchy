@@ -74,7 +74,10 @@ public class ConjClustering extends Causable {
 
         nar.onTask(t -> {
             if (!t.isEternal() && t.punc() == punc && (includeNeg || t.isPositive())) {
-                bag.put(t, t.expolarity() * (1f + t.priElseZero()) / t.volume());
+                bag.put(t,
+                    (1f + t.expolarity()) * (1f + t.conf())
+                );
+                        //* (1f + t.priElseZero()));// / t.volume());
             }
         });
     }

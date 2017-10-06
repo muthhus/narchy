@@ -8,24 +8,25 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.op.Operator;
+import org.eclipse.collections.api.tuple.Twin;
 import org.jetbrains.annotations.NotNull;
 
-public final class AnswerBag extends PLinkArrayBag<Task> {
+/** stores Question & Answer pairs per concept */
+public final class AnswerBag extends PLinkArrayBag<Twin<Task>> {
 
     private final NAR nar;
-    private final Task question;
 
-    public AnswerBag(@NotNull NAR nar, Task question, int capacity) {
+    public AnswerBag(@NotNull NAR nar, int capacity) {
         super(capacity, PriMerge.max, new SynchronizedHashMap<>(capacity));
 
         this.nar = nar;
-        this.question = question;
-
     }
 
     @Override
-    public void onAdd(@NotNull PriReference<Task> x) {
-        if (Param.ANSWER_REPORTING)
-            nar.input(Operator.log(nar.time(), question + "  " + x.get()));
+    public void onAdd(@NotNull PriReference<Twin<Task>> x) {
+        if (Param.ANSWER_REPORTING) {
+            Twin<Task> qa = x.get();
+            nar.input(Operator.log(nar.time(), qa.getOne() + "  " + qa.getTwo()));
+        }
     }
 }

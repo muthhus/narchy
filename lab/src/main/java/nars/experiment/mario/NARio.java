@@ -19,7 +19,7 @@ public class NARio extends NAgentX {
 //    private final SensorConcept vx;
 
     public NARio(NAR nar) throws Narsese.NarseseException {
-        super( "nario", nar);
+        super("nario", nar);
         //super(nar, HaiQAgent::new);
 
         //Param.ANSWER_REPORTING = false;
@@ -49,12 +49,11 @@ public class NARio extends NAgentX {
 
         PixelBag cc = PixelBag.of(() -> mario.image, 36, 28);
         cc.addActions(id, this, false, false, true);
-        cc.actions.forEach(a -> a.resolution = ()->(0.25f));
+        cc.actions.forEach(a -> a.resolution = () -> (0.25f));
         cc.setClarity(0.8f, 0.95f);
         CameraSensor<PixelBag> sc = addCamera(new CameraSensor<>(id, cc, this));
 
         //new ShapeSensor($.the("shape"), new BufferedImageBitmap2D(()->mario.image),this);
-
 
 
 //        try {
@@ -63,8 +62,8 @@ public class NARio extends NAgentX {
 //            e.printStackTrace();
 //        }
 
-        onFrame((z)->{
-        //nar.onCycle(() -> {
+        onFrame((z) -> {
+            //nar.onCycle(() -> {
 
             Scene scene1 = mario.scene;
 
@@ -73,8 +72,8 @@ public class NARio extends NAgentX {
                 float xCam = scene.xCam;
                 float yCam = scene.yCam;
                 Mario M = ((LevelScene) this.mario.scene).mario;
-                float x = ( M.x - xCam) / 320f;
-                float y = ( M.y - yCam) / 240f;
+                float x = (M.x - xCam) / 320f;
+                float y = (M.y - yCam) / 240f;
                 cc.setXRelative(x);
                 cc.setYRelative(y);
                 //cc.setZoom(0.4f);
@@ -89,7 +88,6 @@ public class NARio extends NAgentX {
         //ccAe.pri(0.1f);
 
 
-
 //        //new CameraGasNet($.the("camF"), cc, this, 64);
 //        senseCameraRetina("narioGlobal", ()->mario.image, 16, 16, (v) -> t(v, alpha()));//.setResolution(0.1f);
 //        sc.setResolution(0.1f);
@@ -97,56 +95,56 @@ public class NARio extends NAgentX {
 //        nar.believe("nario:{narioLocal, narioGlobal}");
 
 
-        senseNumberDifference($.inh($("vx"),id), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).
+        senseNumberDifference($.inh($("vx"), id), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).
                 mario.x : 0).resolution(0.04f);
         senseNumberDifference($("vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).
                 mario.y : 0).resolution(0.04f);
 
-        actionBipolar($.inh($.the("x"),id), (x) -> {
+        actionBipolar($.inh($.the("x"), id), (x) -> {
             float thresh = 0.25f;
             float thresh2 = 0.9f;
             if (x <= -thresh) {
-               mario.scene.key(Mario.KEY_LEFT, true);
-               mario.scene.key(Mario.KEY_RIGHT, false);
-               mario.scene.key(Mario.KEY_SPEED, x <= -thresh2);
-               //return -1f;
-               //return -1;
-               return x;
-           } else if (x >= +thresh) {
-               mario.scene.key(Mario.KEY_RIGHT, true);
-               mario.scene.key(Mario.KEY_LEFT, false);
-               mario.scene.key(Mario.KEY_SPEED, x >= +thresh2);
-               //return +1f;
-               //return +1;
-               return x;
-           } else {
-               mario.scene.key(Mario.KEY_LEFT, false);
-               mario.scene.key(Mario.KEY_RIGHT, false);
-               mario.scene.key(Mario.KEY_SPEED, false);
-               //return 0f;
-               //return x;
-               //return 0;
-               return 0;
-           }
+                mario.scene.key(Mario.KEY_LEFT, true);
+                mario.scene.key(Mario.KEY_RIGHT, false);
+                mario.scene.key(Mario.KEY_SPEED, x <= -thresh2);
+                //return -1f;
+                //return -1;
+                return x;
+            } else if (x >= +thresh) {
+                mario.scene.key(Mario.KEY_RIGHT, true);
+                mario.scene.key(Mario.KEY_LEFT, false);
+                mario.scene.key(Mario.KEY_SPEED, x >= +thresh2);
+                //return +1f;
+                //return +1;
+                return x;
+            } else {
+                mario.scene.key(Mario.KEY_LEFT, false);
+                mario.scene.key(Mario.KEY_RIGHT, false);
+                mario.scene.key(Mario.KEY_SPEED, false);
+                //return 0f;
+                //return x;
+                //return 0;
+                return 0;
+            }
         });
-        actionBipolar($.inh($.the("y"),id), (y) -> {
+        actionBipolar($.inh($.the("y"), id), (y) -> {
             float thresh = 0.25f;
             if (y <= -thresh) {
-               mario.scene.key(Mario.KEY_DOWN, true);
-               mario.scene.key(Mario.KEY_JUMP, false);
-               //return -1f;
-               return y;
-           } else if (y >= +thresh) {
-               mario.scene.key(Mario.KEY_JUMP, true);
-               mario.scene.key(Mario.KEY_DOWN, false);
-               //return +1f;
-               return y;
-           } else {
-               mario.scene.key(Mario.KEY_JUMP, false);
-               mario.scene.key(Mario.KEY_DOWN, false);
-               //return 0f;
-               return 0;
-           }
+                mario.scene.key(Mario.KEY_DOWN, true);
+                mario.scene.key(Mario.KEY_JUMP, false);
+                //return -1f;
+                return y;
+            } else if (y >= +thresh) {
+                mario.scene.key(Mario.KEY_JUMP, true);
+                mario.scene.key(Mario.KEY_DOWN, false);
+                //return +1f;
+                return y;
+            } else {
+                mario.scene.key(Mario.KEY_JUMP, false);
+                mario.scene.key(Mario.KEY_DOWN, false);
+                //return 0f;
+                return 0;
+            }
         });
 //        actionToggle(p("left"), (n) -> {
 //            //if (n) mario.scene.key(Mario.KEY_RIGHT, false); //mutex
@@ -212,7 +210,6 @@ public class NARio extends NAgentX {
 //
 
 
-
 //        frame.addKeyListener(mario);
 //        frame.addFocusListener(mario);
     }
@@ -235,7 +232,7 @@ public class NARio extends NAgentX {
 
         float curX = mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : Float.NaN;
         if (lastX == lastX && lastX < curX) {
-            reward +=  unitize(Math.max(0,(curX - lastX)) * MoveRight.floatValue() );
+            reward += unitize(Math.max(0, (curX - lastX)) * MoveRight.floatValue());
         }
         lastX = curX;
 
@@ -254,23 +251,30 @@ public class NARio extends NAgentX {
 
         NAR nar = runRT((NAR n) -> {
 
-            n.onTask(t -> {
-                if (t.isEternal() && !t.isInput()) {
-                    System.err.println(t.proof());
-                }
-                if (t.isGoal() && !t.isInput()) {
-                    System.err.println(t.proof());
-                }
-            });
 
-            NAgentX x = null;
+            NARio x;
             try {
                 x = new NARio(n);
                 //x.durations.setValue(2f);
                 x.trace = true;
+
+                n.onTask(t -> {
+                    if (t.isEternal() && !t.isInput()) {
+                        System.err.println(t.proof());
+                    }
+//                    if (t.isGoal() && !t.isInput()) {
+//                        System.err.println(t.proof());
+//                    }
+                    if (t.isGoal() && t.term().equals(x.happy.term())) {
+                        System.err.println(t.proof());
+                    }
+                });
+                return x;
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
+                return null;
             }
+
 
             //n.termVolumeMax.setValue(60);
 
@@ -292,10 +296,8 @@ public class NARio extends NAgentX {
 //                e.printStackTrace();
 //            }
 
-            return x;
 
         }, 25);
-
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

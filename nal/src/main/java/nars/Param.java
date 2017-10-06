@@ -107,8 +107,8 @@ public abstract class Param extends Services<Term,NAR> {
                     //4;
                     8;
 
-    /** derivation severity - how much confidence is reduced in derivation (default: 1.0) */
-    public final MutableFloat deriverity = new MutableFloat(1.0f);
+    /** derivation severity - how completely confidence is reduced in derivation (default: 1.0) */
+    public final FloatParam deriverity = new FloatParam(1.0f, 0f, 1f);
 
     /** 'time to live', unification steps until unification is stopped */
     public final MutableInteger matchTTLmax = new MutableInteger(256);

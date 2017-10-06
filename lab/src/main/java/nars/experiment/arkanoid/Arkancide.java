@@ -3,7 +3,8 @@ package nars.experiment.arkanoid;
 
 import jcog.data.FloatParam;
 import nars.*;
-import nars.task.DerivedTask;
+import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.video.BufferedImageBitmap2D;
 import nars.video.CameraSensor;
 import nars.video.Scale;
@@ -81,7 +82,7 @@ public class Arkancide extends NAgentX {
 
 
     public Arkancide(NAR nar, boolean cam, boolean numeric) throws Narsese.NarseseException {
-        super(nar);
+        super("noid", nar);
         //super(nar, HaiQAgent::new);
 
 
@@ -113,10 +114,10 @@ public class Arkancide extends NAgentX {
 
 
         if (numeric) {
-            senseNumber($.the("px"), (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
-            senseNumber($.the("dx"), (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
-            senseNumber($.the("bx"), (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
-            senseNumber($.the("by"), (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
+            senseNumber($.func((Atom)id,$.the("px")), (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
+            senseNumber($.func((Atom)id,$.the("dx")), (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
+            senseNumber($.func((Atom)id,$.the("b"), $.the("x")), (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
+            senseNumber($.func((Atom)id,$.the("b"), $.the("y")), (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
             //SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX)).resolution(0.25f);
             //SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY)).resolution(0.25f);
 

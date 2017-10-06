@@ -158,7 +158,7 @@ abstract public class NAgentX extends NAgent {
 
         int THREADS = 5;
 
-        MultiExec exe = new MultiExec(THREADS, 1024);
+
         //Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
 
 //        exe.add(new FocusExec(), (x) -> true);
@@ -170,7 +170,7 @@ abstract public class NAgentX extends NAgent {
 //                (x) -> true);
 
         NAR n = new NARS()
-                .exe(exe)
+                .exe(new MultiExec(THREADS))
                 .time(clock)
                 .index(
                         new CaffeineIndex(96 * 1024)
@@ -221,8 +221,8 @@ abstract public class NAgentX extends NAgent {
 //        ), 800, 600);
 
 
-        ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, true, 16, 64);
-        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, true, 16, 64);
+        ConjClustering conjClusterB = new ConjClustering(n, 5, BELIEF, true, 16, 64);
+        ConjClustering conjClusterG = new ConjClustering(n, 2, GOAL, true, 16, 64);
 
 //        n.runLater(() -> {
 ////            AudioContext ac = new AudioContext();

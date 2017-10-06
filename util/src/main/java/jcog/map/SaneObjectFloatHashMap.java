@@ -2,7 +2,7 @@ package jcog.map;
 
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 
-/** adds some size managemenet to avoid it growing too large. also avoids unnecessary
+/** adds some size management to avoid it growing too large. also avoids unnecessary
  * clear when already empty which superclass probably should be responsible for */
 public class SaneObjectFloatHashMap<X> extends ObjectFloatHashMap<X> {
 

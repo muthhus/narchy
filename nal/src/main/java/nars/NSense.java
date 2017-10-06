@@ -178,7 +178,7 @@ public interface NSense {
         return senseNumberBi(id, new FloatPolarNormalized( new FirstOrderDifferenceFloat(()->nar().time(), v)) );
     }
 
-    default SensorConcept senseNumber(@NotNull Term id, FloatSupplier v) {
+    default SensorConcept senseNumber(Term id, FloatSupplier v) {
         SensorConcept c = new SensorConcept(id, nar(), v,
                 (x) -> t(Util.unitize(x), nar().confDefault(Op.BELIEF))
         );

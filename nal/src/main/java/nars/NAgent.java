@@ -6,7 +6,6 @@ import jcog.event.Ons;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.math.FloatPolarNormalized;
-import jcog.math.RecycledSummaryStatistics;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
@@ -121,7 +120,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         this.happy = senseNumber(id == null ?
                         $.the("happy") : //generally happy
                         $.p(id, $.the("happy")), //happy in this environment
-                 new FloatPolarNormalized(() -> rewardCurrent).relax(0.002f) );
+                new FloatPolarNormalized(() -> rewardCurrent).relax(0.002f));
 
 //        this.reward = senseNumber(new FloatPolarNormalized(() -> rewardCurrent), ScalarConcepts.Mirror,
 //                id == null ?
@@ -144,7 +143,8 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         this.predict = nar.newCauseChannel(id + " predict");
     }
 
-    @Deprecated public On runDur(int everyDurs) {
+    @Deprecated
+    public On runDur(int everyDurs) {
         int dur = nar.dur();
         int everyCycles = dur * everyDurs;
         return nar.onCycle(i -> {
@@ -155,7 +155,8 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
     public Loop runFPS(float fps) {
         return new Loop(fps) {
-            @Override public boolean next() {
+            @Override
+            public boolean next() {
                 NAgent.this.run();
                 return true;
             }
@@ -226,18 +227,23 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         nar.runLater(() -> {
             //this.curiosityAttention = reinforcementAttention / actions.size();
 
-                float happysadPri = nar.priDefault(GOAL)*2f;
 
+//                long nt = nar.time();
+//                Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nt,
+//                        //ETERNAL, ETERNAL,
+//                        nt, nt,
+//                        nar.time.nextInputStamp());
+
+            predictors.add(() -> {
+                float happysadPri = nar.priDefault(GOAL);// * 2f;
                 long nt = nar.time();
                 Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nt,
                         //ETERNAL, ETERNAL,
                         nt, nt,
                         nar.time.nextInputStamp());
-                he.pri(happysadPri);
-                predictors.add(() -> {
-                    he.priMax(happysadPri);
-                    return he;
-                });
+                he.priMax(happysadPri);
+                return he;
+            });
 //                Task se = new NALTask(sad.term(), GOAL, $.t(0f, nar.confDefault(GOAL)), nar.time(), ETERNAL, ETERNAL, nar.time.nextInputStamp());
 //                se.pri(happysadPri);
 //                predictors.add(() -> {
@@ -283,7 +289,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
             Variable what = $.varQuery(1);
 
-            predictors.add(question($.impl( happy.term(), 0, what)));
+            predictors.add(question($.impl(what, happy.term())));
             //predictors.add(question($.impl(sad.term(), 0, what)));
 
             for (Concept a : actions.keySet()) {
@@ -464,7 +470,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         actions.forEach((a, c) -> {
             //nar.exe.execute(() -> {
             Stream<ITask> s = a.update(now, dur, nar);
-            if (s!=null)
+            if (s != null)
                 c.input(s);
             //});
         });
@@ -572,24 +578,17 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         return rewardSum;
     }
 
-    public static float varPct(NAR nar) {
-        if (nar instanceof NAR) {
-            RecycledSummaryStatistics is = new RecycledSummaryStatistics();
-            nar.forEachConceptActive(xx -> {
-                Term tt = xx.term();
-                float v = tt.volume();
-                int c = tt.complexity();
-                is.accept((v - c) / v);
-            });
-
-            return (float) is.getMean();
-        }
-        return Float.NaN;
-    }
-
-
-//    public Supplier<Task> goal(@NotNull Term term, Truth truth) {
-//        return prediction(term, GOAL, new DiscreteTruth(truth.freq(), truth.conf()));
+//    public static float varPct(NAR nar) {
+//            RecycledSummaryStatistics is = new RecycledSummaryStatistics();
+//            nar.forEachConceptActive(xx -> {
+//                Term tt = xx.term();
+//                float v = tt.volume();
+//                int c = tt.complexity();
+//                is.accept((v - c) / v);
+//            });
+//
+//            return (float) is.getMean();
+//
 //    }
 
     public Supplier<Task> question(@NotNull Term term) {
@@ -614,17 +613,16 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
         return () -> {
 
-//        if (truth == null && !(punct == QUESTION || punct == QUEST))
-//            return null; //0 conf or something
-
             Task u;
             if (t.isEternal()) {
                 u = t;
             } else {
                 long nownow = nar.time();
                 //TODO handle task duration
-                u = new NALTask(t.term(), t.punc(), t.truth(), nownow, nownow, nownow, new long[]{nar.time.nextStamp()} );
+                u = new NALTask(t.term(), t.punc(), t.truth(), nownow, nownow, nownow, new long[]{nar.time.nextStamp()});
             }
+
+            u.priMax(nar.priDefault(u.punc()));
 
             return u;
         };
@@ -637,7 +635,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
     @Override
     public Ons onFrame(Consumer each) {
-        return DurService.build(nar, ()->each.accept(this)).ons;
+        return DurService.build(nar, () -> each.accept(this)).ons;
     }
 
     public Ons onFrame(Runnable each) {

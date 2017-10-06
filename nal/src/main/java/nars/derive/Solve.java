@@ -13,6 +13,7 @@ import java.util.Collections;
 
 import static nars.Op.*;
 import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.c2wSafe;
 
 /**
  * Evaluates the truth of a premise
@@ -110,7 +111,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
                     )) == null)
                         return false;
 
-                    float newEvi = Util.lerp(s, c2w(baseConf), t.evi());
+                    float newEvi = Util.lerp(s, c2wSafe(baseConf, Param.HORIZON), t.evi());
                     t = new PreciseTruth(t.freq(), newEvi, false);
                 }
 

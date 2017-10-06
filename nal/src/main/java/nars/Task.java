@@ -1,14 +1,18 @@
 package nars;
 
 import jcog.Texts;
+import jcog.bag.impl.ArrayBag;
 import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
 import jcog.math.Interval;
+import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.concept.Concept;
 import nars.op.Operator;
 import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.NALTask;
+import nars.task.util.AnswerBag;
 import nars.task.util.InvalidTaskException;
 import nars.task.util.TaskRegion;
 import nars.term.Term;
@@ -36,6 +40,7 @@ import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
+import static org.eclipse.collections.impl.tuple.Tuples.twin;
 
 /**
  * NAL Task to be processed, consists of a Sentence, stamp, time, and budget.
@@ -96,7 +101,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                 new BytesHashProvider<>(IO::taskToBytes));
     }
 
-    @Nullable
     static boolean taskContentValid(@NotNull Term t, byte punc, @Nullable NAR nar, boolean safe) {
 
         if (t.op() == NEG)
@@ -584,18 +588,18 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
      */
     @Nullable
     default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
-//        if (isInput()) {
-//            Concept concept = concept(nar, true);
-//            if (concept != null) {
-//                ArrayBag<Task, PriReference<Task>> answers = (ArrayBag<Task, PriReference<Task>>) concept.computeIfAbsent(Op.QUESTION, (q) ->
-//                        new AnswerBag(nar, this, Param.MAX_INPUT_ANSWERS));
-//                answers.commit();
-//
-//                float confEffective = answer.conf();//nearestTimeTo(nar.time()), nar.dur());
-//                answers.put(new PLink<>(answer, confEffective * 1f));
-//            }
-//
-//        }
+        if (isInput()) {
+
+            Concept concept = concept(nar, true);
+            if (concept != null) {
+                AnswerBag answers = (AnswerBag) concept.computeIfAbsent(Op.QUESTION, (x) ->
+                        new AnswerBag(nar, Param.MAX_INPUT_ANSWERS)
+                );
+                answers.commit().putAsync(new PLink<>(twin(this, answer),
+                        (this.priElseZero()) * (answer.conf())));
+            }
+
+        }
 
         return answer;
     }
@@ -1006,8 +1010,10 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                     //n.logger.error("{} {}", this, t);
                     return singleton(Operator.error(this, t, n.time()));
                 }
-                if (cmd)
+                if (cmd) {
+                    n.eventTask.emit(this);
                     return null;
+                }
                 //otherwise: allow processing goal
             }
         }

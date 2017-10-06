@@ -4,12 +4,14 @@ import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
+import nars.control.Activate;
 import nars.control.Derivation;
 import nars.derive.PrediTerm;
 import nars.derive.PrediTrie;
 import nars.derive.rule.PremiseRuleSet;
 import nars.exe.Exec;
 import nars.exe.FocusExec;
+import nars.exe.MultiExec;
 import nars.index.term.BasicTermIndex;
 import nars.index.term.PatternIndex;
 import nars.index.term.TermIndex;
@@ -173,11 +175,17 @@ public class NARS {
         return this;
     }
 
+    public static NARS realtime() {
+        return realtime(1);
+    }
+
     /**
      * default: thread-safe, with centisecond (0.01) precision realtime clock
      */
-    public static NARS realtime() {
-        return new Default(8, true).time(new RealTime.CS());
+    public static NARS realtime(int threads) {
+        return new Default(8, true)
+                .exe(new MultiExec(threads))
+                .time(new RealTime.CS());
     }
 
     public static NARS realtime(float durFPS) {
@@ -243,8 +251,11 @@ public class NARS {
 
 
             if (threadSafe)
-                index = () -> new CaffeineIndex(128 * 1024 /*HACK */);
-
+                index = () -> new CaffeineIndex(64 * 1024 );
+            else {
+                //assume this thread is what will use it
+                Activate.BatchActivate.enable();
+            }
         }
 
         @Override

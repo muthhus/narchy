@@ -1,9 +1,6 @@
 package nars.op.nlp;
 
-import nars.NAR;
-import nars.NARS;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.bag.leak.TaskLeak;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.exception.IrcException;
@@ -38,7 +35,7 @@ public class IRCAgent extends IRC {
 
     private final boolean hearTwenglish = false;
 
-    final int wordDelayMS = 200; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
+    final int wordDelayMS = 100; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
     private final MyLeakOut out;
 
     boolean trace;
@@ -208,16 +205,16 @@ public class IRCAgent extends IRC {
 
         //Param.DEBUG = true;
 
-        @NotNull NAR n = NARS.realtime().get();
+        @NotNull NAR n = NARchy.all(); //NARS.realtime().get();
                 //newRealtimeNAR(1024, 25, 2);
 
 
-        float priFactor = 0.01f;
+        float priFactor = 0.5f;
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
-        n.termVolumeMax.setValue(32);
+        n.termVolumeMax.setValue(20);
 
 
 //        Control c = n.getControl();
@@ -234,12 +231,11 @@ public class IRCAgent extends IRC {
 //        });
 
 
-        Hear.wiki(n);
 
         IRCAgent bot = new IRCAgent(n,
                 "experiment1", "irc.freenode.net",
-                "#123xyz"
-                //"#netention"
+                //"#123xyz"
+                "#netention"
                 //"#nars"
         );
 
@@ -305,7 +301,7 @@ public class IRCAgent extends IRC {
 
 
         //new NARWeb(n, 8080);
-        n.startFPS(100f);
+        n.startFPS(10f);
 
         try {
             bot.start();
@@ -337,6 +333,7 @@ public class IRCAgent extends IRC {
             this.nar = nar;
             this.channels = channels;
         }
+
 
         @Override
         protected float leak(Task next) {

@@ -62,6 +62,10 @@ public class MultiExec extends Exec {
         }
     };
 
+    public MultiExec(int threads) {
+        this(threads, threads * 64);
+    }
+
     public MultiExec(int threads, int qSize) {
         num = threads;
         sub = new Sub[num];
@@ -97,6 +101,8 @@ public class MultiExec extends Exec {
 
         @Override
         public void run() {
+
+            Activate.BatchActivate.enable();
 
             while (true) {
                 int conc = MultiExec.this.concurrency();

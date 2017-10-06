@@ -267,18 +267,6 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
 
 
-    @Override
-    public boolean containing(final HyperRegion rect, final Predicate<T> t, Spatialization<T> model) {
-
-        for (int i = 0; i < size; i++) {
-            Node c = child[i];
-            if (c.region().intersects(rect)) {
-                if (!c.containing(rect, t, model))
-                    return false;
-            }
-        }
-        return true;
-    }
 
     /**
      * @return number of child nodes
@@ -351,8 +339,10 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     }
 
     private boolean nodeAND(Predicate<Node<T, ?>> p) {
-        for (int i = 0; i < size; i++) {
-            if (!p.test(child[i]))
+        Node<T, ?>[] c = this.child;
+        int s = size;
+        for (int i = 0; i < s; i++) {
+            if (!p.test(c[i]))
                 return false;
         }
         return true;
@@ -366,9 +356,22 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
         return false;
     }
 
+        @Override
+    public boolean containing(final HyperRegion rect, final Predicate<T> t, Spatialization<T> model) {
+
+        for (int i = 0; i < size; i++) {
+            Node c = child[i];
+            if (c.region().intersects(rect)) {
+                if (!c.containing(rect, t, model))
+                    return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
-        return nodeAND(ci -> !(ci.region().intersects(rect) && !ci.intersecting(rect, t, model)));
+        return region.intersects(rect) && nodeAND(ci -> !(ci.region().intersects(rect) && !ci.intersecting(rect, t, model)));
     }
 
     @Override

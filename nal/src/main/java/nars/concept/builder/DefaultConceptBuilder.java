@@ -272,6 +272,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         //TemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
         //return new HijackTemporalBeliefTable(tCap);
         //return new RTreeBeliefTable(tCap);
+        if (c.hasAny(Op.VAR_QUERY)) {
+            return BeliefTable.Empty;
+        }
+
         Op o = c.op();
         if (beliefOrGoal ? o.beliefable : goalable(c)) {
             DefaultBeliefTable b = new DefaultBeliefTable(newTemporalBeliefTable(c));

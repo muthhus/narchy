@@ -16,7 +16,7 @@ import static nars.truth.TruthFunctions.*;
 
 public enum GoalFunction implements TruthOperator {
 
-    @AllowOverlap Strong() {
+    Strong() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return desireStrongOriginal(T, B, minConf);
@@ -24,7 +24,7 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap Weak() {
+    Weak() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return desireWeakOriginal(T, B, minConf);
@@ -67,34 +67,33 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    @AllowOverlap DecomposePositiveNegativeNegative() {
+    DecomposePositiveNegativeNegative() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return decompose(T, B, true, false, false, minConf);
         }
     },
 
-    @AllowOverlap DecomposePositiveNegativePositive() {
+    DecomposePositiveNegativePositive() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return TruthFunctions.decompose(T, B, true, false, true, minConf);
         }
     },
 
-    @AllowOverlap DecomposeNegativeNegativeNegative() {
+    DecomposeNegativeNegativeNegative() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return decompose(T, B, false, false, false, minConf);
         }
     },
 
-    @AllowOverlap DecomposeNegativePositivePositive() {
+    DecomposeNegativePositivePositive() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return TruthFunctions.decompose(T, B, false, true, true, minConf);
         }
     },
-
 
 
     @SinglePremise
@@ -130,7 +129,8 @@ public enum GoalFunction implements TruthOperator {
             return union(T, B, minConf);
         }
     },
-   Intersection() {
+
+    Intersection() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return intersection(T, B, minConf);

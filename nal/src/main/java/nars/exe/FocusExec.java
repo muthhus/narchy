@@ -89,8 +89,6 @@ public class FocusExec extends Exec implements Runnable {
     @Nullable
     private NARService trigger;
 
-    /** if >= 0, adds this cause before executing any Tasks */
-    public short cause = -1;
 
     public FocusExec() {
 
@@ -237,9 +235,6 @@ public class FocusExec extends Exec implements Runnable {
     public void add(/*@NotNull*/ ITask x) {
         if (x instanceof Task) {
             //if (x.isInput()) {
-
-            if (cause!=-1)
-                ((NALTask)x).causeMerge(cause);
 
             execute(x); //execute immediately
 //            } else {

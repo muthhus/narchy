@@ -1,6 +1,7 @@
 package nars;
 
 import jcog.exe.Loop;
+import nars.control.Activate;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -53,7 +54,8 @@ public class NARLoop extends Loop {
         return true;
     }
 
-
-
-
+    @Override
+    protected void onStart() {
+        Activate.BatchActivate.enable();
+    }
 }

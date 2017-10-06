@@ -163,6 +163,8 @@ public class Inperience extends LeakBack {
 
         boolean full = in.bag.isFull();
 
+        if (next.op()==INH && operators.contains(next.sub(1)) )
+            return false; //prevent directly re-experiencing an inperience
 
         if (next.isBeliefOrGoal()) {
             //check for sufficient truth polarization

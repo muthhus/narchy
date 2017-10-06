@@ -18,6 +18,7 @@ import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,7 +65,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 //new PLink<>(t, activation)
         );
 
-        BatchActivate.get().put(cc, activationApplied * evalAmp);
+        BatchActivate.add(cc, activationApplied * evalAmp, n);
 
         n.eventTask.emit(t);
     }
@@ -76,7 +77,10 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         final static ThreadLocal<BatchActivate> batches = ThreadLocal.withInitial(BatchActivate::new);
 
+        final static LongHashSet active = new LongHashSet();
+
         public static BatchActivate get() {
+            assert(active.contains(Thread.currentThread().getId()));
             return batches.get();
         }
 
@@ -85,17 +89,33 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
 
         public void commit(NAR nar) {
-            try {
-                a.forEachKeyValue((c, p) -> nar.input(new Activate(c, p)));
-            } catch (Throwable t) {
-                t.printStackTrace();
-            } finally {
-                a.clear();
+            if (!a.isEmpty()) {
+                try {
+                    a.forEachKeyValue((c, p) -> nar.input(new Activate(c, p)));
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                } finally {
+                    a.clear();
+                }
             }
         }
 
         public void put(Concept c, float pri) {
             a.addToValue(c, pri);
+        }
+
+        /** enable for the current thread */
+        public static void enable() {
+            synchronized (active) {
+                active.add(Thread.currentThread().getId());
+            }
+        }
+
+        public static void add(Concept cc, float v, NAR n) {
+            if (active.contains(Thread.currentThread().getId()))
+                get().put(cc, v);
+            else
+                n.input(new Activate(cc, v));
         }
 
 //        public static class BatchActivateCommit extends NativeTask {
