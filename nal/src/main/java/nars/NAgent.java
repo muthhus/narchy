@@ -299,14 +299,14 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
                 ((FasterList) predictors).addAll(
 
-                        question($.impl(happy.term(), action)),
-                        question($.impl(happy.term().neg(), action)),
+                        question($.impl($.conj(what, happy.term()), action)),
+                        question($.impl($.conj(what, happy.term().neg()), action))
                         //question($.impl(sad.term(), 0, action)),
 //                        question($.impl(action, sad.term())),
 //                        question($.impl(notAction, sad.term())),
 //                        question($.impl(action, what)),
 //                        question($.impl(notAction, what))
-                        quest(action)
+                        //quest(action)
 //                        quest($.parallel(what, action)),
 //                        quest($.parallel(what, notAction))
 

@@ -105,50 +105,53 @@ public class MultiExec extends Exec {
             Activate.BatchActivate.enable();
 
             while (true) {
-                int conc = MultiExec.this.concurrency();
+                try {
+                    int conc = MultiExec.this.concurrency();
 
-                //share task work
-                final float s = ((ConcurrentQueue) q).size();
-                int maxToPoll = (int) (s / Math.max(1, (conc -1)) );
-                for (int i = 0; i < maxToPoll; i++) {
-                    ITask k = q.poll();
-                    if (k != null)
-                        execute(k);
-                    else
-                        break;
-                }
+                    //share task work
+                    final float s = ((ConcurrentQueue) q).size();
+                    int maxToPoll = (int) (s / Math.max(1, (conc - 1)));
+                    for (int i = 0; i < maxToPoll; i++) {
+                        ITask k = q.poll();
+                        if (k != null)
+                            execute(k);
+                        else
+                            break;
+                    }
 
 
+                    int work = premiseRemaining = Math.max(1, (int) Math.ceil(can.iterations.value()));
+                    premiseDone = 0;
 
-                int work = premiseRemaining = Math.max(1, (int) Math.ceil(can.iterations.value()));
-                premiseDone = 0;
+                    long start = System.nanoTime();
+                    int loops = 0;
+                    while (premiseRemaining > 0) {
 
-                long start = System.nanoTime();
-                int loops = 0;
-                while (premiseRemaining > 0) {
+                        int premiseDoneAtStart = premiseDone;
 
-                    int premiseDoneAtStart = premiseDone;
+                        workRemaining = plan.size();
 
-                    workRemaining = plan.size();
+                        plan.commit()
+                                .sample(super::exeSample);
 
-                    plan.commit()
-                            .sample(super::exeSample);
+                        loops++;
 
-                    loops++;
+                        if (premiseDone == premiseDoneAtStart)
+                            break; //bag contained no premises that could have been processed
+                    }
 
-                    if (premiseDone == premiseDoneAtStart)
-                        break; //bag contained no premises that could have been processed
-                }
+                    Activate.BatchActivate.get().commit(nar);
 
-                Activate.BatchActivate.get().commit(nar);
+                    long end = System.nanoTime();
 
-                long end = System.nanoTime();
+                    //System.err.println(premiseDone + "/" + work + " in " + loops + " loops\tvalue=" + can.value() + " " + n4((end - start) / 1.0E9) + "sec");
 
-                //System.err.println(premiseDone + "/" + work + " in " + loops + " loops\tvalue=" + can.value() + " " + n4((end - start) / 1.0E9) + "sec");
-
-                //? multiply the work done by concurrency to be consistent with how it is calculated
-                synchronized(can) { //synch to be safe
-                    can.update(premiseDone, 0 /* ignored, uses per-cycle cached value */, ((end - start) / 1.0E9));
+                    //? multiply the work done by concurrency to be consistent with how it is calculated
+                    synchronized (can) { //synch to be safe
+                        can.update(premiseDone, 0 /* ignored, uses per-cycle cached value */, ((end - start) / 1.0E9));
+                    }
+                } catch (Throwable t) {
+                    logger.error("{} {}", this, t);
                 }
             }
         }

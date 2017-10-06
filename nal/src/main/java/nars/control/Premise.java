@@ -28,8 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.BELIEF;
 import static nars.control.Activate.activateSubterms;
@@ -407,7 +408,9 @@ public class Premise extends UnaryTask {
         }
 
         if (!(target instanceof Set)) {
-            Set<Concept> merge = new HashSet(target.size() + add.size());
+            Set<Concept> merge =
+                    //new HashSet(target.size() + add.size());
+                    Collections.newSetFromMap(new ConcurrentHashMap<>(target.size() + add.size()));
             this.links = merge;
             merge.addAll(target);
             merge.addAll(add);
