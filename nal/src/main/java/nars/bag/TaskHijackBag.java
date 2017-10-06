@@ -92,7 +92,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
             }
         }
 
-        Activate.activate(y, activation, n);
+        Activate.activate(y, activation, n, c);
     }
 
 

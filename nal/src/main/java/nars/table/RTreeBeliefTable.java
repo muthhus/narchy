@@ -378,7 +378,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             if (pri != pri) {
                 //somehow it was added then immediately removed during compression, ie. rejected
             } else {
-                Activate.activate(x, pri, nar);
+                Activate.activate(x, pri, nar, c);
             }
         } else {
 

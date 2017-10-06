@@ -4,10 +4,12 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.Param;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class PtrManTests {
     
+    @Ignore
     @Test
     public void testOps1() throws Narsese.NarseseException {
 

@@ -43,6 +43,8 @@ import static nars.truth.TruthFunctions.w2c;
 public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
 
+    final Task[] EmptyArray = new Task[0];
+
     static boolean equal(@NotNull Task a, @NotNull Task b) {
 
         @NotNull long[] evidence = a.stamp();

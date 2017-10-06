@@ -283,12 +283,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @Override
     public TemporalBeliefTable newTemporalBeliefTable(Term c) {
-        if (c.complexity() < 12) {
+//        if (c.complexity() < 12) {
             return new RTreeBeliefTable();
             //c.complexity() < 6 ? new DisruptorBlockingQueue() : new LinkedBlockingQueue<>()/
-        } else {
-            return new HijackTemporalBeliefTable();
-        }
+//        } else {
+//            return new HijackTemporalBeliefTable();
+//        }
     }
 
 
@@ -296,7 +296,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     public QuestionTable newQuestionTable(Term term, boolean questionOrQuest) {
         Op o = term.op();
         if (questionOrQuest ? o.beliefable : o.goalable) {
-            return new HijackQuestionTable(0, 2);
+            //return new HijackQuestionTable(0, 4);
+            return new QuestionTable.DefaultQuestionTable();
         } else {
             return QuestionTable.Empty;
         }
