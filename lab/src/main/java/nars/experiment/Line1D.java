@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.PI;
 import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
 

@@ -21,7 +21,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
-import static jcog.Texts.n4;
 import static nars.time.Tense.ETERNAL;
 
 public class MultiExec extends Exec {

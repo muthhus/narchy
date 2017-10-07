@@ -9,7 +9,6 @@ import nars.Task;
 import nars.bag.BagClustering;
 import nars.concept.Concept;
 import nars.control.DurService;
-import nars.term.Term;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.impl.block.factory.Comparators;
 import org.jetbrains.annotations.NotNull;

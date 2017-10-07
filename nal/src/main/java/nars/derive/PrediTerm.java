@@ -1,9 +1,6 @@
 package nars.derive;
 
 import jcog.Util;
-import nars.Op;
-import nars.control.Derivation;
-import nars.control.Deriver;
 import nars.term.Term;
 
 import java.util.Comparator;

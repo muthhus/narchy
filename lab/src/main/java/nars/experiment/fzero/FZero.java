@@ -61,25 +61,9 @@ public class FZero extends NAgentX {
 //                .resolution(0.05f);
 
 
-        actionBipolar(p("fwd"), (f) -> {
-            //if (f > 0) {
-            //accelerator
-            //if (f > 0.5f)
-            if (f > 0)
-                fz.vehicleMetrics[0][6] = /*+=*/ (f) * (fwdSpeed);
-            else
-                fz.vehicleMetrics[0][6] *= 1 - (-f);
-//            else {
-//                float brake = 0.5f - f;
-//                fz.vehicleMetrics[0][6] *= (1f - brake);
-//            }
-            return f;
-        });//.resolution.setValue(0.02f);
+        initToggle();
+        //initBipolar();
 
-        actionBipolar($.p("x"), (x) -> {
-            fz.playerAngle += (x) * rotSpeed;
-            return x;
-        });
 //        actionUnipolar(p("left"), (r) -> {
 //            //if (r > 0.5f)
 //                fz.playerAngle -= (r) * rotSpeed;
@@ -252,6 +236,37 @@ public class FZero extends NAgentX {
 //        actionToggle($.inh($.the("left"), $.the("fz")), (b)->{ fz.left = b; });
 //        actionToggle($.inh($.the("right"), $.the("fz")), (b)->{ fz.right = b; });
 
+    }
+
+    private void initToggle() {
+
+        fwdSpeed=2;
+        actionToggle($.inh($.the("left"), $.the("fz")), (b)->{ fz.left = b; });
+        actionToggle($.inh($.the("right"), $.the("fz")), (b)->{ fz.right = b; });
+        actionToggle($.inh($.the("fwd"), $.the("fz")), (b)->{ fz.thrust = b; });
+
+    }
+
+    public void initBipolar() {
+        actionBipolar(p("fwd"), (f) -> {
+            //if (f > 0) {
+            //accelerator
+            //if (f > 0.5f)
+            if (f > 0)
+                fz.vehicleMetrics[0][6] = /*+=*/ (f) * (fwdSpeed);
+            else
+                fz.vehicleMetrics[0][6] *= 1 - (-f);
+//            else {
+//                float brake = 0.5f - f;
+//                fz.vehicleMetrics[0][6] *= (1f - brake);
+//            }
+            return f;
+        });//.resolution.setValue(0.02f);
+
+        actionBipolar($.p("x"), (x) -> {
+            fz.playerAngle += (x) * rotSpeed;
+            return x;
+        });
     }
 
     protected boolean polarized(@NotNull Task task) {

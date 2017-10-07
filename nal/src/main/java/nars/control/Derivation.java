@@ -7,7 +7,6 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.derive.TemporalizeDerived;
 import nars.derive.rule.PremiseRule;

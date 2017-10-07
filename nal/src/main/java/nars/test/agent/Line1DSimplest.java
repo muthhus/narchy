@@ -43,6 +43,11 @@ public class Line1DSimplest extends NAgent {
         senseNumber($.the("o"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
                 this.o
         );
+
+        initDualToggle();
+        //initDualUnipolar();
+        //initBipolar();
+
 //        in = senseNumber(
 //                //$.inh($.the("i"), id),
 //                $.the("i"),
@@ -54,52 +59,8 @@ public class Line1DSimplest extends NAgent {
 //            }
 //        }));
 
-//        float[] x = new float[2];
-//        onFrame(() -> {
-//            float d = x[0] - x[1];
-//            this.o.setValue(Util.unitize(o.floatValue() + d * speed.floatValue()));
-//        });
 
-//        up = actionUnipolar($.p("up"), d -> {
-//            //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
-//            synchronized (o) {
-//                //float prev = o.floatValue();
-//                //float sp = speed.floatValue();
-//                //float next = Math.min(1, prev + d * sp);
-////                if (!Util.equals(prev, next, sp )) {
-//
-////                if (d > 0.5f)
-////                    x[0] = d - 0.5f;
-////                else
-////                    x[0] = 0;
-//                    //this.o.setValue(next);
-//                return x[0] = d;
-////                } else {
-////                    return 0f;
-////                }
-//            }
-//        });
 
-//        down = actionUnipolar($.p("down"), d -> {
-//            //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
-//            synchronized (o) {
-//                //float prev = o.floatValue();
-//                //float sp = speed.floatValue();
-//                //float next = Math.max(0, prev - d * sp);
-//                //if (!Util.equals(prev, next, sp )) {
-//                    //this.o.setValue(next);
-////                if (d > 0.5f)
-////                    x[1] = d - 0.5f;
-////                else
-////                    x[1] = 0;
-//                return x[1] = d;
-////                } else {
-////                    return 0f;
-////                }
-//            }
-//        });
-//        n.goal(up.term(), Eternal, 0f, 0.01f);
-//        n.goal(down.term(), Eternal, 0f, 0.01f);
 
 //        out = actionUnipolar(O, (d) -> {
 //            this.o.setValue(d);
@@ -114,30 +75,6 @@ public class Line1DSimplest extends NAgent {
 //            }
 //        });
 
-        actionBipolar($.the("y"), v -> {
-            if (v == v) {
-                o.setValue(
-                        Util.unitize(o.floatValue() + v * speed.floatValue())
-                );
-
-//                o.setValue( (v/2f)+0.5f );
-
-            }
-
-            return v;
-
-            //float current = this.o.floatValue();
-
-            //if (!Util.equals(nv, o.floatValue(), Param.TRUTH_EPSILON)) {
-//                o.setValue(
-//                        //Util.unitize( current + v * speed.floatValue())
-//                        v
-//                );
-//            }
-//            return o.floatValue();
-            //}
-            //return false;
-        });
 
 //        out = action(
 //                //$.inh($.the("o"), id),
@@ -166,6 +103,98 @@ public class Line1DSimplest extends NAgent {
 //        });
 
 
+    }
+
+    private void initDualToggle() {
+        actionToggle($.p("up"), (b) -> {
+            if(b) {
+                o.setValue(Util.unitize(o.floatValue() + speed.floatValue()));
+                System.out.println(o);
+            }
+        });
+        actionToggle($.p("down"), (b) -> {
+            if (b) {
+                o.setValue(Util.unitize(o.floatValue() - speed.floatValue()));
+                System.out.println(o);
+            }
+        });
+    }
+
+
+    private void initDualUnipolar() {
+        float[] x = new float[2];
+        onFrame(() -> {
+            float d = x[0] - x[1];
+            this.o.setValue(Util.unitize(o.floatValue() + d * speed.floatValue()));
+        });
+        actionUnipolar($.p("up"), d -> {
+            //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
+            synchronized (o) {
+                //float prev = o.floatValue();
+                //float sp = speed.floatValue();
+                //float next = Math.min(1, prev + d * sp);
+//                if (!Util.equals(prev, next, sp )) {
+
+//                if (d > 0.5f)
+//                    x[0] = d - 0.5f;
+//                else
+//                    x[0] = 0;
+                    //this.o.setValue(next);
+                return x[0] = d;
+//                } else {
+//                    return 0f;
+//                }
+            }
+        });
+
+        actionUnipolar($.p("down"), d -> {
+            //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
+            synchronized (o) {
+                //float prev = o.floatValue();
+                //float sp = speed.floatValue();
+                //float next = Math.max(0, prev - d * sp);
+                //if (!Util.equals(prev, next, sp )) {
+                    //this.o.setValue(next);
+//                if (d > 0.5f)
+//                    x[1] = d - 0.5f;
+//                else
+//                    x[1] = 0;
+                return x[1] = d;
+//                } else {
+//                    return 0f;
+//                }
+            }
+        });
+//        n.goal(up.term(), Eternal, 0f, 0.01f);
+//        n.goal(down.term(), Eternal, 0f, 0.01f);
+
+    }
+
+    public void initBipolar() {
+        actionBipolar($.the("y"), v -> {
+            if (v == v) {
+                o.setValue(
+                        Util.unitize(o.floatValue() + v * speed.floatValue())
+                );
+
+//                o.setValue( (v/2f)+0.5f );
+
+            }
+
+            return v;
+
+            //float current = this.o.floatValue();
+
+            //if (!Util.equals(nv, o.floatValue(), Param.TRUTH_EPSILON)) {
+//                o.setValue(
+//                        //Util.unitize( current + v * speed.floatValue())
+//                        v
+//                );
+//            }
+//            return o.floatValue();
+            //}
+            //return false;
+        });
     }
 
     @Override

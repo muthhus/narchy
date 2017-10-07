@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import com.google.common.io.Resources;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.net.URISyntaxException;
 
 public class TestGolog {
     
+    @Ignore
     @Test
     public void golog1() throws Exception {
 

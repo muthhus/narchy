@@ -229,8 +229,8 @@
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
 
-    B, C, belief("&&"), task("!") |- ifConjCommNoDepVars(without(C,B)), (Goal:Strong)
-    B, C, belief("&&"), task("!") |- ifConjCommNoDepVars(without(C,--B)), (Goal:StrongN)
+    B, C, belief("&&"), time(urgent), task("!") |- ifConjCommNoDepVars(without(C,B)), (Goal:Strong)
+    B, C, belief("&&"), time(urgent), task("!") |- ifConjCommNoDepVars(without(C,--B)), (Goal:StrongN)
 
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),--conjEvent(C,late),B), (Goal:StrongN)

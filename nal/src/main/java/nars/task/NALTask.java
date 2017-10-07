@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import static nars.Op.*;
-import static nars.Param.CAUSE_CAPACITY;
 import static nars.time.Tense.ETERNAL;
 
 /**

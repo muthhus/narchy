@@ -10,13 +10,10 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.control.Activate;
-import nars.control.Causable;
 import nars.control.Premise;
 import nars.task.ITask;
 import nars.task.NALTask;
-import nars.task.NativeTask;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Objects;

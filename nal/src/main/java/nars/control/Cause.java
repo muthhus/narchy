@@ -9,8 +9,6 @@ import org.eclipse.collections.api.block.predicate.primitive.ShortPredicate;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Supplier;
-
 import static nars.Param.CAUSE_CAPACITY;
 
 /**

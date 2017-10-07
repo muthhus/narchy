@@ -13,7 +13,6 @@ import nars.control.CycleService;
 import nars.control.NARService;
 import nars.control.Premise;
 import nars.task.ITask;
-import nars.task.NALTask;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

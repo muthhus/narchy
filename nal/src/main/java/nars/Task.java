@@ -1,12 +1,10 @@
 package nars;
 
 import jcog.Texts;
-import jcog.bag.impl.ArrayBag;
 import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
 import jcog.math.Interval;
 import jcog.pri.PLink;
-import jcog.pri.PriReference;
 import nars.concept.Concept;
 import nars.op.Operator;
 import nars.task.DerivedTask;

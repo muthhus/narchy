@@ -269,7 +269,7 @@ public class TextUI {
                 try {
                     screen.stopScreen();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
 
@@ -277,7 +277,7 @@ public class TextUI {
                 try {
                     terminal.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
 

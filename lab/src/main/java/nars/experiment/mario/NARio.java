@@ -11,6 +11,7 @@ import javax.swing.*;
 
 import static jcog.Util.unitize;
 import static nars.$.$;
+import static nars.$.p;
 
 public class NARio extends NAgentX {
 
@@ -100,67 +101,8 @@ public class NARio extends NAgentX {
         senseNumberDifference($("vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).
                 mario.y : 0).resolution(0.04f);
 
-        actionBipolar($.inh($.the("x"), id), (x) -> {
-            float thresh = 0.25f;
-            float thresh2 = 0.9f;
-            if (x <= -thresh) {
-                mario.scene.key(Mario.KEY_LEFT, true);
-                mario.scene.key(Mario.KEY_RIGHT, false);
-                mario.scene.key(Mario.KEY_SPEED, x <= -thresh2);
-                //return -1f;
-                //return -1;
-                return x;
-            } else if (x >= +thresh) {
-                mario.scene.key(Mario.KEY_RIGHT, true);
-                mario.scene.key(Mario.KEY_LEFT, false);
-                mario.scene.key(Mario.KEY_SPEED, x >= +thresh2);
-                //return +1f;
-                //return +1;
-                return x;
-            } else {
-                mario.scene.key(Mario.KEY_LEFT, false);
-                mario.scene.key(Mario.KEY_RIGHT, false);
-                mario.scene.key(Mario.KEY_SPEED, false);
-                //return 0f;
-                //return x;
-                //return 0;
-                return 0;
-            }
-        });
-        actionBipolar($.inh($.the("y"), id), (y) -> {
-            float thresh = 0.25f;
-            if (y <= -thresh) {
-                mario.scene.key(Mario.KEY_DOWN, true);
-                mario.scene.key(Mario.KEY_JUMP, false);
-                //return -1f;
-                return y;
-            } else if (y >= +thresh) {
-                mario.scene.key(Mario.KEY_JUMP, true);
-                mario.scene.key(Mario.KEY_DOWN, false);
-                //return +1f;
-                return y;
-            } else {
-                mario.scene.key(Mario.KEY_JUMP, false);
-                mario.scene.key(Mario.KEY_DOWN, false);
-                //return 0f;
-                return 0;
-            }
-        });
-//        actionToggle(p("left"), (n) -> {
-//            //if (n) mario.scene.key(Mario.KEY_RIGHT, false); //mutex
-//            mario.scene.key(Mario.KEY_LEFT, n);
-//        });
-//        actionToggle(p("right"), (n) -> {
-//            //if (n) mario.scene.key(Mario.KEY_LEFT, false); //mutex
-//            mario.scene.key(Mario.KEY_RIGHT, n);
-//        });
-//        actionToggle(p("jmp"), (n) -> {
-//            mario.scene.key(Mario.KEY_JUMP, n);
-//        });
-//        actionToggle(p("down"), (n) -> {
-//            mario.scene.key(Mario.KEY_DOWN, n);
-//        });
-        //actionToggle($("speed"), (b) -> mario.scene.key(Mario.KEY_SPEED, b));
+        //initBipolar();
+        initToggle();
 
 //        actionTriState($("x"), i -> {
 //            boolean n, p;
@@ -214,6 +156,64 @@ public class NARio extends NAgentX {
 //        frame.addFocusListener(mario);
     }
 
+    private void initToggle() {
+        actionToggle(p("left"), (n) -> mario.scene.key(Mario.KEY_LEFT, n));
+        actionToggle(p("right"), (n) -> mario.scene.key(Mario.KEY_RIGHT, n));
+        actionToggle(p("jmp"), (n) -> mario.scene.key(Mario.KEY_JUMP, n));
+        actionToggle(p("down"), (n) -> mario.scene.key(Mario.KEY_DOWN, n));
+        actionToggle(p("speed"), (b) -> mario.scene.key(Mario.KEY_SPEED, b));
+
+    }
+
+    public void initBipolar() {
+        actionBipolar($.inh($.the("x"), id), (x) -> {
+            float thresh = 0.25f;
+            float thresh2 = 0.9f;
+            if (x <= -thresh) {
+                mario.scene.key(Mario.KEY_LEFT, true);
+                mario.scene.key(Mario.KEY_RIGHT, false);
+                mario.scene.key(Mario.KEY_SPEED, x <= -thresh2);
+                //return -1f;
+                //return -1;
+                return x;
+            } else if (x >= +thresh) {
+                mario.scene.key(Mario.KEY_RIGHT, true);
+                mario.scene.key(Mario.KEY_LEFT, false);
+                mario.scene.key(Mario.KEY_SPEED, x >= +thresh2);
+                //return +1f;
+                //return +1;
+                return x;
+            } else {
+                mario.scene.key(Mario.KEY_LEFT, false);
+                mario.scene.key(Mario.KEY_RIGHT, false);
+                mario.scene.key(Mario.KEY_SPEED, false);
+                //return 0f;
+                //return x;
+                //return 0;
+                return 0;
+            }
+        });
+        actionBipolar($.inh($.the("y"), id), (y) -> {
+            float thresh = 0.25f;
+            if (y <= -thresh) {
+                mario.scene.key(Mario.KEY_DOWN, true);
+                mario.scene.key(Mario.KEY_JUMP, false);
+                //return -1f;
+                return y;
+            } else if (y >= +thresh) {
+                mario.scene.key(Mario.KEY_JUMP, true);
+                mario.scene.key(Mario.KEY_DOWN, false);
+                //return +1f;
+                return y;
+            } else {
+                mario.scene.key(Mario.KEY_JUMP, false);
+                mario.scene.key(Mario.KEY_DOWN, false);
+                //return 0f;
+                return 0;
+            }
+        });
+    }
+
     int lastCoins;
 
     public final FloatParam Depress = new FloatParam(0.01f, 0f, 1f);
@@ -247,7 +247,7 @@ public class NARio extends NAgentX {
     public static void main(String[] args) {
 
 
-        Param.DEBUG = false;
+        Param.DEBUG = true;
 
         NAR nar = runRT((NAR n) -> {
 
@@ -262,12 +262,12 @@ public class NARio extends NAgentX {
                     if (t.isEternal() && !t.isInput()) {
                         System.err.println(t.proof());
                     }
-//                    if (t.isGoal() && !t.isInput()) {
-//                        System.err.println(t.proof());
-//                    }
-                    if (t.isGoal() && t.term().equals(x.happy.term())) {
+                    if (t.isGoal() && !t.isInput()) {
                         System.err.println(t.proof());
                     }
+//                    if (t.isGoal() && t.term().equals(x.happy.term())) {
+//                        System.err.println(t.proof());
+//                    }
                 });
                 return x;
             } catch (Narsese.NarseseException e) {

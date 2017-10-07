@@ -83,10 +83,11 @@ public class GoalActionConcept extends ActionConcept {
 //            // curiosity override
 //
             float curiConf =
-//                    //nar.confDefault(GOAL);
+                        nar.confDefault(GOAL)/4;
                     //nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR;
-                    Math.max(goal != null ? goal.conf() : 0,
-                            nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR);
+//                    Math.max(goal != null ? goal.conf() : 0,
+//                            nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR);
+
             //nar.confMin.floatValue()*2);
 //
 ////            float cc =

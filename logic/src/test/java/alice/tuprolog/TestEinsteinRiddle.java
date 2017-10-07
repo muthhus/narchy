@@ -1,5 +1,6 @@
 package alice.tuprolog;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TestEinsteinRiddle {
     
+    @Ignore
     @Test
     public void einsteinsRiddle() throws InterruptedException, IOException, URISyntaxException, InvalidTheoryException {
 

@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 
 import static nars.Op.*;
-import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.c2wSafe;
 
 /**

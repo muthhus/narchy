@@ -13,7 +13,6 @@ import jcog.pri.Prioritized;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.derive.LambdaPred;
 import nars.derive.PrediTerm;
-import nars.index.term.StaticTermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;

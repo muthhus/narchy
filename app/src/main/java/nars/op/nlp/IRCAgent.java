@@ -1,6 +1,9 @@
 package nars.op.nlp;
 
-import nars.*;
+import nars.NAR;
+import nars.NARchy;
+import nars.Param;
+import nars.Task;
 import nars.bag.leak.TaskLeak;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.exception.IrcException;

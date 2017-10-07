@@ -42,14 +42,27 @@ public interface NAct {
      */
     FloatParam curiosity();
 
+    default void actionToggle(@NotNull Term t, @NotNull Runnable on, @NotNull Runnable off) {
+
+        float thresh = 0.5f;
+        actionUnipolar(t, (f) -> {
+            if (f > thresh) {
+                on.run();
+                return 1f;
+            } else {
+                off.run();
+                return 0f;
+            }
+        });
+    }
+
     /**
      * latches to either one of 2 states until it shifts to the other one. suitable for representing
      * push-buttons like keyboard keys. by default with no desire the state is off.  the 'on' and 'off'
      * procedures will be called only as necessary (when state changes).  the off procedure will not be called immediately.
      * its initial state will remain indetermined until the first feedback is generated.
      */
-    @Nullable
-    default void actionToggle(@NotNull Term t, @NotNull Runnable on, @NotNull Runnable off) {
+    default void actionToggleBi(@NotNull Term t, @NotNull Runnable on, @NotNull Runnable off) {
         //float THRESH = 0.5f;
 //        GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
 //            boolean next = d != null && d.freq() > THRESH;

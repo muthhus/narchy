@@ -1,16 +1,12 @@
 package nars.term;
 
-import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
 import nars.IO;
 import nars.Op;
 import nars.Param;
 import nars.derive.PatternCompound;
-import nars.index.term.TermContext;
 import nars.term.container.TermContainer;
 import nars.term.transform.CompoundTransform;
-import nars.term.transform.Retemporalize;
-import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -28,7 +28,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
     private final static Logger logger = LoggerFactory.getLogger(Conclusion.class);
     public final Term pattern;
-    @Deprecated private final boolean goalUrgent;
+    @Deprecated private final boolean urgent;
 
 
 //    public final Set<Variable> uniqueVars;
@@ -39,7 +39,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
         this.rule = rule;
         this.pattern = pattern;
 //        this.uniqueVars = pattern instanceof Compound ? ((PatternCompound)pattern).uniqueVars : Set.of();
-        this.goalUrgent = rule.goalUrgent;
+        this.urgent = rule.goalUrgent;
     }
 
 
@@ -99,14 +99,14 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
             if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
 
-            if (goalUrgent && p.concPunc == GOAL) {
+            if (urgent && p.concPunc == GOAL) {
                 long taskStart = p.task.start();
 
-                if (taskStart == ETERNAL)
-                    taskStart = p.time;
+                if (taskStart == ETERNAL) {
+                    occ[0] = occ[1] = p.time;
 
-                //if (taskStart != ETERNAL) {
-                if (occ[0] != ETERNAL && taskStart != ETERNAL && occ[0] < taskStart) {
+                    //if (taskStart != ETERNAL) {
+                } else if (occ[0] != ETERNAL && occ[0] < taskStart) {
 
                     long taskDur = occ[1] - occ[0];
                     occ[0] = taskStart;
