@@ -1,11 +1,9 @@
 package nars.concept.dynamic;
 
 import jcog.list.FasterList;
-import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.control.Activate;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.task.NALTask;
@@ -30,7 +28,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     }
 
     @Nullable
-    public NALTask generate(@NotNull Term template, long start, long end, @Nullable Prioritized b, NAR nar) {
+    public NALTask generate(@NotNull Term template, long start, long end, NAR nar) {
 
         DynTruth yy = truth(start, end, template, true, nar);
         if (yy == null)
@@ -61,7 +59,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 //        }
 
 
-        return yy.task(template, beliefOrGoal, nar.time(), start, end, b, nar);
+        return yy.task(template, beliefOrGoal, nar.time(), start, end, nar);
     }
 
     @Override
@@ -81,7 +79,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     public Task match(long start, long end, @NotNull Term template, boolean noOverlap, NAR nar) {
         Task x = super.match(start, end, template, noOverlap, nar);
 
-        Task y = generate(template, start, end, null, nar);
+        Task y = generate(template, start, end, nar);
         if (y == null || y.equals(x)) return x;
 
         boolean dyn;
@@ -98,7 +96,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         }
 
         if (dyn) {
-            Activate.activate(y, y.priElseZero(), nar);
+            //Activate.activate(y, y.priElseZero(), nar);
             return y;
         } else {
             return x;

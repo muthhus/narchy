@@ -228,11 +228,11 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
             //this.curiosityAttention = reinforcementAttention / actions.size();
 
 
-//                long nt = nar.time();
-//                Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nt,
-//                        //ETERNAL, ETERNAL,
-//                        nt, nt,
-//                        nar.time.nextInputStamp());
+                long nt = nar.time();
+                Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nt,
+                        ETERNAL, ETERNAL,
+                        //nt, nt,
+                        nar.time.nextInputStamp());
 
 //            final Task[] prevHappy = new Task[1];
             predictors.add(() -> {
@@ -240,11 +240,11 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 //                    prevHappy[0].delete();
 
                 float happysadPri = nar.priDefault(GOAL);// * 2f;
-                long nt = nar.time();
-                Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nt,
-                        //ETERNAL, ETERNAL,
-                        nt, nt + nar.dur(),
-                        nar.time.nextInputStamp());
+//                long nt = nar.time();
+//                Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nt,
+//                        //ETERNAL, ETERNAL,
+//                        nt, nt + nar.dur(),
+//                        nar.time.nextInputStamp());
                 he.priMax(happysadPri);
 //                prevHappy[0] = he;
                 return he;
@@ -604,13 +604,15 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         return prediction(term, QUEST, null);
     }
 
-    public Supplier<Task> prediction(@NotNull Term _term, byte punct, DiscreteTruth truth) {
+    Supplier<Task> prediction(@NotNull Term _term, byte punct, DiscreteTruth truth) {
         Term term = _term.normalize();
 
         long now = nar.time();
-        long start = now;
-        long end = now + Math.round(predictAheadDurs.floatValue() * nar.dur());
-        //long start = ETERNAL, end = ETERNAL;
+
+//        long start = now;
+//        long end = now + Math.round(predictAheadDurs.floatValue() * nar.dur());
+
+        long start = ETERNAL, end = ETERNAL;
 
         NALTask t = new NALTask(term, punct, truth, now,
                 start, end,

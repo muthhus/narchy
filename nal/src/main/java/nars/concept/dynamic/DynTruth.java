@@ -1,7 +1,6 @@
 package nars.concept.dynamic;
 
 import jcog.list.FasterList;
-import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -26,7 +25,8 @@ import static nars.time.Tense.ETERNAL;
  */
 public final class DynTruth implements Truthed {
 
-    @Nullable public final FasterList<Task> e;
+    @Nullable
+    public final FasterList<Task> e;
     public Truthed truth;
 
     public float freq;
@@ -70,15 +70,16 @@ public final class DynTruth implements Truthed {
         //return e == null ? null :
         return Stamp.zip(e);
     }
+
     @Nullable
     public short[] cause() {
-        return e != null ? Cause.zip(e.array(Task[]::new) /* HACK */ ) : ArrayUtils.EMPTY_SHORT_ARRAY;
+        return e != null ? Cause.zip(e.array(Task[]::new) /* HACK */) : ArrayUtils.EMPTY_SHORT_ARRAY;
     }
 
     @Override
     @Nullable
     public PreciseTruth truth() {
-        return conf==conf && conf <= 0 ? null : new PreciseTruth(freq, conf);
+        return conf == conf && conf <= 0 ? null : new PreciseTruth(freq, conf);
     }
 
 
@@ -87,14 +88,23 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    public NALTask task(@NotNull Term c, boolean beliefOrGoal, long cre, long start, long end, @Nullable Prioritized b, NAR nar) {
+    public NALTask task(@NotNull Term c, boolean beliefOrGoal, long cre, long start, long end, NAR nar) {
 
-        Truth tr = truth().ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+        Truth tr0 = truth();
+        if (tr0 == null)
+            return null;
+
+        if (c.op() == NEG) {
+            c = c.unneg();
+            tr0 = tr0.neg();
+        }
+
+        Truth tr = tr0.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
         if (tr == null)
             return null;
 
-        float priority = b != null ? b.pri() : budget();
-        if (priority!=priority) //deleted
+        float priority = budget();
+        if (priority != priority) //deleted
             return null;
 
         Retemporalize r = start == ETERNAL ? Retemporalize.retemporalizeXTERNALToDTERNAL : Retemporalize.retemporalizeXTERNALToZero;
@@ -103,34 +113,19 @@ public final class DynTruth implements Truthed {
 
 
         // then if the term is valid, see if it is valid for a task
-        if (!Task.taskContentValid(c, beliefOrGoal ? BELIEF : GOAL, null, true)) {
+        if (!Task.taskContentValid(c, beliefOrGoal ? BELIEF : GOAL, nar, true))
             return null;
-        }
 
-        //long dur = (start!=ETERNAL && c.op() == CONJ) ? c.dtRange() : 0;
 
-        if (c.op() == NEG) {
-            c = c.unneg();
-            tr = tr.neg();
-        }
+        long[] se = Task.range(e);
+        start = se[0];
+        end = se[1];
 
         NALTask dyn = new NALTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 tr, cre, start, end /*+ dur*/, evidence());
         dyn.cause = cause();
         dyn.setPri(priority);
 
-        //        if (srcCopy == null) {
-//            delete();
-//        } else {
-//            float p = srcCopy.priSafe(-1);
-//            if (p < 0) {
-//                delete();
-//            } else {
-//                setPriority(p);
-//            }
-//        }
-//
-//        return this;
         if (Param.DEBUG)
             dyn.log("Dynamic");
 

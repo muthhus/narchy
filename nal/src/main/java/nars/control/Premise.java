@@ -311,8 +311,7 @@ public class Premise extends UnaryTask {
      * temporal focus control: determines when a matching belief or answer should be projected to
      */
     static long matchFocus(Task task, long now, int dur, NAR nar) {
-        if (now == ETERNAL)
-            return ETERNAL;
+        assert(now!=ETERNAL);
 
         if (task.isEternal())
             return ETERNAL;

@@ -118,14 +118,6 @@ public class DefaultBeliefTable implements BeliefTable {
     public Task match(long start, long end, Term template, boolean noOverlap, NAR nar) {
 
         final Task ete = eternal.strongest();
-        if (ete != null && start == ETERNAL) {
-            return ete;
-        }
-
-        if (start == ETERNAL) {
-            long now = nar.time();
-            start = end = now;
-        }
 
         Task tmp = temporal.match(start, end, template, nar);
 
@@ -139,23 +131,12 @@ public class DefaultBeliefTable implements BeliefTable {
                         ete : tmp;
             }
         }
-
-
-        //return null;
-
     }
 
 
     @Override
     public void add(@NotNull Task input, @NotNull BaseConcept concept, @NotNull NAR nar) {
-        if (input.isEternal()) {
-
-            eternal.add(input, concept, nar);
-
-        } else {
-
-            temporal.add(input, concept, nar);
-        }
+        (input.isEternal() ? eternal : temporal).add(input, concept, nar);
     }
 
 

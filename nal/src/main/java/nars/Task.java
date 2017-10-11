@@ -3,6 +3,7 @@ package nars;
 import jcog.Texts;
 import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
+import jcog.list.FasterList;
 import jcog.math.Interval;
 import jcog.pri.PLink;
 import nars.concept.Concept;
@@ -26,10 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiFunction;
 
 import static java.util.Collections.singleton;
@@ -47,6 +45,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
 
     final Task[] EmptyArray = new Task[0];
+    final long[] ETERNAL_ETERNAL = new long[] { Tense.ETERNAL, Tense.ETERNAL };
 
     static boolean equal(@NotNull Task a, @NotNull Task b) {
 
@@ -1096,4 +1095,23 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
             }
         }
     }
+
+    static long[] range(@Nullable Iterable<Task> ie) {
+        long start = Long.MAX_VALUE, end = Long.MIN_VALUE;
+        Iterator<Task> ee = ie.iterator();
+        while (ee.hasNext()) {
+            Task x = ee.next();
+            long s = x.start();
+            if (s == ETERNAL)
+                continue; //return Task.ETERNAL_ETERNAL;
+            if (s < start) start = s;
+            long e = x.end();
+            if (e > end) end = e;
+        }
+        if (start == Long.MAX_VALUE) //nothing or all eternal
+            return Task.ETERNAL_ETERNAL;
+        else
+            return new long[] { start, end };
+    }
+
 }

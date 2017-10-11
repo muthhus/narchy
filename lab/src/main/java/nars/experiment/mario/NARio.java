@@ -262,9 +262,9 @@ public class NARio extends NAgentX {
                     if (t.isEternal() && !t.isInput()) {
                         System.err.println(t.proof());
                     }
-                    if (t.isGoal() && !t.isInput()) {
-                        System.err.println(t.proof());
-                    }
+//                    if (t.isGoal() && !t.isInput()) {
+//                        System.err.println(t.proof());
+//                    }
 //                    if (t.isGoal() && t.term().equals(x.happy.term())) {
 //                        System.err.println(t.proof());
 //                    }

@@ -158,11 +158,11 @@ public class DynamicBeliefTableTest {
         assertNotNull(xt);
         assertTrue(xt.truth().toString(), $.t(1f, 0.81f).equals(xt.truth(), 0.1f));
 
-        assertEquals(0.74f, xtable.generate($("((x) &&+6 (y))"), 0, 0, null, n).conf(), 0.05f);
-        assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0, 0, null, n).conf(), 0.05f); //best match to the input
-        assertEquals(0.74f, xtable.generate($("((x) &&+2 (y))"), 0, 0, null, n).conf(), 0.05f);
-        assertEquals(0.71f, xtable.generate($("((x) &&+0 (y))"), 0, 0, null, n).conf(), 0.05f);
-        assertEquals(0.38f, xtable.generate($("((x) &&-32 (y))"), 0, 0, null, n).conf(), 0.1f);
+        assertEquals(0.74f, xtable.generate($("((x) &&+6 (y))"), 0, 0, n).conf(), 0.05f);
+        assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0, 0, n).conf(), 0.05f); //best match to the input
+        assertEquals(0.74f, xtable.generate($("((x) &&+2 (y))"), 0, 0, n).conf(), 0.05f);
+        assertEquals(0.71f, xtable.generate($("((x) &&+0 (y))"), 0, 0, n).conf(), 0.05f);
+        assertEquals(0.38f, xtable.generate($("((x) &&-32 (y))"), 0, 0, n).conf(), 0.1f);
 
 
     }
