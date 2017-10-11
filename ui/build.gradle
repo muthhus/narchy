@@ -1,7 +1,7 @@
 description = ''
 
 repositories {
-  jcenter()
+    jcenter()
 }
 
 dependencies {
@@ -25,10 +25,9 @@ dependencies {
 //    compile group: 'com.airhacks', name: 'afterburner.fx', version:'1.7.0'
 
     compile group: 'org.jogamp.gluegen', name: 'gluegen-rt-main', version: '2.3.2'
-    compile (group: 'org.jogamp.jogl',
+    compile(group: 'org.jogamp.jogl',
             name: 'jogl-all-noawt-main',
             version: '2.3.2')
-
 
 //    compile group: 'org.boofcv', name: 'sfm', version: '0.26'
 //    compile group: 'org.boofcv', name: 'geo', version: '0.26'
@@ -41,7 +40,10 @@ dependencies {
         exclude(module: 'io')
     }
 
-    compile group: 'org.jfxvnc', name: 'jfxvnc-net', version: '1.2.0'
+//    compile group: 'org.jfxvnc', name: 'jfxvnc-net', version: '1.2.0'
+
+    compile group: 'gnu.getopt', name: 'java-getopt', version: '1.0.13'
+
 
     compile(group: 'de.dfki.mary', name: 'voice-cmu-slt-hsmm', version: '5.2') {
 //        exclude(group: 'log4j')
