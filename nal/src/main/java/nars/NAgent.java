@@ -234,10 +234,10 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 //                        nt, nt,
 //                        nar.time.nextInputStamp());
 
-            final Task[] prevHappy = new Task[1];
+//            final Task[] prevHappy = new Task[1];
             predictors.add(() -> {
-                if (prevHappy[0]!=null)
-                    prevHappy[0].delete();
+//                if (prevHappy[0]!=null)
+//                    prevHappy[0].delete();
 
                 float happysadPri = nar.priDefault(GOAL);// * 2f;
                 long nt = nar.time();
@@ -246,7 +246,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
                         nt, nt + nar.dur(),
                         nar.time.nextInputStamp());
                 he.priMax(happysadPri);
-                prevHappy[0] = he;
+//                prevHappy[0] = he;
                 return he;
             });
 //                Task se = new NALTask(sad.term(), GOAL, $.t(0f, nar.confDefault(GOAL)), nar.time(), ETERNAL, ETERNAL, nar.time.nextInputStamp());
