@@ -203,7 +203,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
     }
 
     @Override public float value() {
-        return in.amp();
+        return in.value();
     }
 
     @Override

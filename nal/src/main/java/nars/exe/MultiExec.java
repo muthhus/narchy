@@ -62,7 +62,7 @@ public class MultiExec extends Exec {
     };
 
     public MultiExec(int threads) {
-        this(threads, threads * 64);
+        this(threads, threads * 32);
     }
 
     public MultiExec(int threads, int qSize) {
@@ -105,7 +105,7 @@ public class MultiExec extends Exec {
                 try {
                     int conc = MultiExec.this.concurrency();
 
-                    //share task work
+                    //share task work, slightly more per each than if fairly distributed to ensure it is done ASAP
                     final float s = ((ConcurrentQueue) q).size();
                     int maxToPoll = (int) (s / Math.max(1, (conc - 1)));
                     for (int i = 0; i < maxToPoll; i++) {
@@ -145,7 +145,10 @@ public class MultiExec extends Exec {
 
                     //? multiply the work done by concurrency to be consistent with how it is calculated
                     synchronized (can) { //synch to be safe
-                        can.update(premiseDone, 0 /* ignored, uses per-cycle cached value */, ((end - start) / 1.0E9));
+                        can.update(premiseDone,
+                                0, /* ignored, uses per-cycle cached value */
+                        ((end - start) / 1.0E9) / nar.exe.concurrency()
+                        );
                     }
                 } catch (Throwable t) {
                     logger.error("{} {}", this, t);

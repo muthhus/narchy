@@ -1,11 +1,11 @@
 package jcog.exe;
 
 import jcog.list.FasterList;
+import jcog.pri.Pri;
 import no.birkett.kiwi.*;
 
+import java.util.Arrays;
 import java.util.List;
-
-import static jcog.Texts.strNS;
 
 /**
  * learning cost/benefit multi-iteration stochastic scheduler
@@ -13,11 +13,13 @@ import static jcog.Texts.strNS;
  */
 public class Schedulearn {
 
-    float OVER_DEMAND = 1.5f; //factor for additional iterations to request above the observed supply, ie. demand growth rate
-    float OVER_DEMAND_IMPL = 1.5f; //factor to hard multiply total iterations after solution.  this effectively boosts the demand even further, but beyond the solution's expectations
+    float OVER_DEMAND = 1.25f; //factor for additional iterations to request above the observed supply, ie. demand growth rate
+    float OVER_DEMAND_IMPL = 1.25f; //factor to hard multiply total iterations after solution.  this effectively boosts the demand even further, but beyond the solution's expectations
 
 
-    /** timeslice in seconds */
+    /**
+     * timeslice in seconds
+     */
     public void solve(List<Can> can, double timeslice) {
         int canSize = can.size();
         if (canSize == 0)
@@ -26,8 +28,8 @@ public class Schedulearn {
         Solver solver = new Solver();
 
         float minValue = Float.POSITIVE_INFINITY,
-              maxValue = Float.NEGATIVE_INFINITY,
-              totalValue = 0;
+                maxValue = Float.NEGATIVE_INFINITY,
+                totalValue = 0;
         float[] v = new float[canSize];
         for (int i = 0; i < canSize; i++) {
             float cv = can.get(i).value();
@@ -38,10 +40,17 @@ public class Schedulearn {
 
         //normalize
         float range = maxValue - minValue;
+        if (jcog.Util.equals(range, 0, Pri.EPSILON)) {
+            range = 1f;
+            minValue = 0f;
+            Arrays.fill(v, 0.5f);
+        }
+
         for (int i = 0; i < canSize; i++) {
             v[i] = (v[i] - minValue) / range;
             totalValue += v[i];
         }
+
 
         List<Term> times = new FasterList(canSize);
 
@@ -54,19 +63,22 @@ public class Schedulearn {
             times.add(xt);
 
             //fraction of component time is proportional to
-            Constraint proportionalToValue = C.equals(
-                    C.divide(xt, timeslice),
-                    v[i] / totalValue
+            Constraint proportionalToValue =
+                C.equals(
+                //C.lessThanOrEqualTo(
+                    v[i] / totalValue,
+                    C.divide(xt, timeslice)
+
             );
             proportionalToValue.setStrength(1);
             solver.add(proportionalToValue);
 
             //demand slightly more than supply limit
             double prevIter = x.supply();
-            double maxIter = Math.max(1, Math.ceil((1+prevIter) * OVER_DEMAND));
+            double maxIter = Math.max(1, Math.ceil((1 + prevIter) * OVER_DEMAND));
 
             Constraint meetsSupply = C.lessThanOrEqualTo(xi, maxIter);
-            meetsSupply.setStrength(0.5f);
+            meetsSupply.setStrength(1f);
             solver.add(meetsSupply);
 
         }

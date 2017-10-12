@@ -1,6 +1,5 @@
 package nars.exe;
 
-import jcog.Texts;
 import jcog.event.On;
 import jcog.exe.Can;
 import jcog.exe.Schedulearn;
@@ -15,7 +14,10 @@ import nars.control.Activate;
 import nars.control.Premise;
 import nars.task.ITask;
 import nars.task.NALTask;
+import no.birkett.kiwi.InternalSolverError;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.util.Objects;
@@ -30,6 +32,8 @@ import java.util.stream.Stream;
  *
  */
 abstract public class Exec implements Executor, PriMerge {
+
+    private static final Logger logger = LoggerFactory.getLogger(Exec.class);
 
     protected NAR nar;
 
@@ -127,9 +131,13 @@ abstract public class Exec implements Executor, PriMerge {
                 nar.loop.isRunning() ? nar.loop.periodMS.intValue() * 0.001 : defaultCycleTime
         ) * (1f - nar.exe.load());
 
-        sched.solve(can, nextCycleTime );
+        try {
+            sched.solve(can, nextCycleTime);
 
-        sched.estimatedTimeTotal(can);
+            sched.estimatedTimeTotal(can);
+        } catch (InternalSolverError e) {
+            logger.error("{} {}", can, e);
+        }
 
     }
 

@@ -252,7 +252,7 @@ public class ConjClustering extends Causable {
 
     @Override
     public float value() {
-        return in.amp();
+        return in.value();
     }
 
 

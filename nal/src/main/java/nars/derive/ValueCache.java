@@ -30,7 +30,7 @@ public class ValueCache  {
     public void update() {
         int i = 0;
         for (Cause c : src) {
-            value[i++] = c.amp();
+            value[i++] = c.value();
         }
     }
 

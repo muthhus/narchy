@@ -70,7 +70,7 @@ public enum MetaGoal {
             causes.get(i).commit(causeSummary);
         }
 
-        final float momentum = 0.9f;
+        final float momentum = 0.5f;
 
         int goals = goal.length;
 //        float[] goalFactor = new float[goals];
