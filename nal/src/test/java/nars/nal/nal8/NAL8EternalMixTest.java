@@ -158,6 +158,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
     public void goal_deduction_delayed_impl() {
 
         TestNAR tester = test;
+        tester.truthTolerance(0.2f);
 
         tester.input("x:y!");
         tester.inputAt(10, "(goto(z) ==>+5 x:y). :|:");
@@ -222,7 +223,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
                 .input("a:b!")
                 .inputAt(10, "(( c:d &&+5 e:f ) ==> a:b).")
                 .mustGoal(cycles, "( c:d &&+5 e:f)", 1.0f, 0.45f, ETERNAL)
-                .mustNotOutput(cycles, "( c:d &&+5 e:f)", GOAL, 0)
+                .mustNotOutput(cycles, "( c:d &&+5 e:f)", GOAL, (t) -> t > 0)
         ;
     }
 
@@ -315,6 +316,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
     public void condition_belief_deduction_2() {
 
         test
+                .truthTolerance(0.1f)
                 .input("on({t002},{t003}). :|:")
                 .inputAt(2, "(on({t002},#1) &&+0 at(SELF,#1)).")
                 .mustBelieve(cycles, "at(SELF,{t003})", 1.0f, 0.23f, 0)

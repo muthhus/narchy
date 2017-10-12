@@ -1,8 +1,8 @@
 package jcog.exe;
 
+import jcog.constraint.continuous.*;
 import jcog.list.FasterList;
 import jcog.pri.Pri;
-import no.birkett.kiwi.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +25,7 @@ public class Schedulearn {
         if (canSize == 0)
             return;
 
-        Solver solver = new Solver();
+        ContinuousConstraintSolver solver = new ContinuousConstraintSolver();
 
         float minValue = Float.POSITIVE_INFINITY,
                 maxValue = Float.NEGATIVE_INFINITY,
@@ -53,18 +53,18 @@ public class Schedulearn {
         }
 
 
-        List<Term> times = new FasterList(canSize);
+        List<DoubleTerm> times = new FasterList(canSize);
 
         for (int i = 0; i < canSize; i++) {
             Can x = can.get(i);
 
-            Variable xi = x.iterations;
+            DoubleVar xi = x.iterations;
 
-            Term xt = C.multiply(xi, x.iterationTimeMean());
+            DoubleTerm xt = C.multiply(xi, x.iterationTimeMean());
             times.add(xt);
 
             //fraction of component time is proportional to
-            Constraint proportionalToValue =
+            ContinuousConstraint proportionalToValue =
                 C.equals(
                 //C.lessThanOrEqualTo(
                     v[i] / totalValue,
@@ -78,14 +78,14 @@ public class Schedulearn {
             double prevIter = x.supply();
             double maxIter = Math.max(1, Math.ceil((1 + prevIter) * OVER_DEMAND));
 
-            Constraint meetsSupply = C.lessThanOrEqualTo(xi, maxIter);
+            ContinuousConstraint meetsSupply = C.lessThanOrEqualTo(xi, maxIter);
             meetsSupply.setStrength(0.5f);
             solver.add(meetsSupply);
 
         }
 
         //sum to entire timeslice
-        Constraint totalTimeConstraint = C.lessThanOrEqualTo(C.add(times), timeslice);
+        ContinuousConstraint totalTimeConstraint = C.lessThanOrEqualTo(C.add(times), timeslice);
         totalTimeConstraint.setStrength(2);
 
         solver.add(totalTimeConstraint);

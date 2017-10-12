@@ -232,7 +232,7 @@ public class PremiseRule extends GenericCompound {
                 if (!PostCondition.reservedMetaInfoCategories.contains(v)) { //do not alter keywords
                     String name = v.toString();
                     if (name.length() == 1 && Character.isUpperCase(name.charAt(0))) {
-                        return v(Op.VAR_PATTERN, v.toString());
+                        return $.v(Op.VAR_PATTERN, v.toString());
                     }
                 }
             }

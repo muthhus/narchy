@@ -72,7 +72,7 @@ abstract public class TaskMatch  implements Consumer<Task>, Predicate<Task> {
     //HACK
     public Term id() {
         return $.func(getClass().getSimpleName(),
-            $.nonNull(term), $.nonNull(punctuation)
+            (term), (punctuation)
                 //, $.nonNull(truth), $.nonNull(time), $.nonNull(budget)
             );
     }

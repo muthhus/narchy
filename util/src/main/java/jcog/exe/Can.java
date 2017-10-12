@@ -1,7 +1,7 @@
 package jcog.exe;
 
 import jcog.Texts;
-import no.birkett.kiwi.Variable;
+import jcog.constraint.continuous.DoubleVar;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,14 +23,14 @@ public class Can {
     /**
      * next iterations, to be solved
      */
-    public final Variable iterations;
+    public final DoubleVar iterations;
 
     public Can() {
         this(String.valueOf(ids.incrementAndGet()));
     }
 
     public Can(String id) {
-        iterations = new Variable(id);
+        iterations = new DoubleVar(id);
     }
 
     /**

@@ -1,9 +1,10 @@
 package nars;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.core.ConsoleAppender;
+//import ch.qos.logback.classic.Logger;
+//import ch.qos.logback.classic.LoggerContext;
+//import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+//import ch.qos.logback.core.ConsoleAppender;
+
 import com.google.common.base.Strings;
 import com.google.common.escape.Escapers;
 import jcog.Util;
@@ -33,10 +34,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.roaringbitmap.PeekableIntIterator;
 import org.roaringbitmap.RoaringBitmap;
+import org.slf4j.ILoggerFactory;
+import org.slf4j.IMarkerFactory;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.BasicMDCAdapter;
+import org.slf4j.helpers.BasicMarkerFactory;
+import org.slf4j.spi.MDCAdapter;
+import org.slf4j.spi.SLF4JServiceProvider;
 
 import javax.script.ScriptEngineManager;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -60,7 +70,8 @@ import static nars.time.Tense.DTERNAL;
  *                                              NARquery
  *                                          Core Utility Class
  */
-public interface $ {
+public enum $ {
+    ;
 
     public static <T extends Term> T $(String term) throws Narsese.NarseseException {
         return (T) Narsese.term(term, true);
@@ -78,12 +89,12 @@ public interface $ {
 //        return new ObjRef(term, instance);
 //    }
 
-    Atom emptyQuote = (Atom) Atomic.the("\"\"");
+    static final Atom emptyQuote = (Atom) Atomic.the("\"\"");
 
-    Escapers.Builder quoteEscaper = Escapers.builder().addEscape('\"', "\\\"");
+    static final Escapers.Builder quoteEscaper = Escapers.builder().addEscape('\"', "\\\"");
 
 
-    static Atomic quote(Object text) {
+    public static Atomic quote(Object text) {
         String s = text.toString();
 
         int length = s.length();
@@ -105,7 +116,7 @@ public interface $ {
     }
 
 
-    static Term[] the(String... id) {
+    public static Term[] the(String... id) {
         int l = id.length;
         Term[] x = new Term[l];
         for (int i = 0; i < l; i++)
@@ -114,7 +125,7 @@ public interface $ {
     }
 
 
-    static Atom the(char c) {
+    public static Atom the(char c) {
         return (Atom) Atomic.the(String.valueOf(c));
     }
 
@@ -122,31 +133,31 @@ public interface $ {
      * Op.INHERITANCE from 2 Terms: subj --> pred
      * returns a Term if the two inputs are equal to each other
      */
-    static <T extends Term> T inh(Term subj, Term pred) {
+    public static <T extends Term> T inh(Term subj, Term pred) {
         return (T) INH.the(DTERNAL, subj, pred);
     }
 
-    static <T extends Term> T inh(Term subj, String pred) {
+    public static <T extends Term> T inh(Term subj, String pred) {
         return $.inh(subj, $.the(pred));
     }
 
 
-    static <T extends Term> T inh( String subj,  String pred) throws Narsese.NarseseException {
+    public static <T extends Term> T inh(String subj, String pred) throws Narsese.NarseseException {
         return (T) inh($(subj), $(pred));
     }
 
 
-    static <T extends Term> T sim( Term subj, Term pred) {
+    public static <T extends Term> T sim(Term subj, Term pred) {
         return (T) SIM.the(DTERNAL, subj, pred);
     }
 
 
-    static @NotNull Term func(@NotNull String opTerm, @NotNull Term... arg) {
+    public static @NotNull Term func(@NotNull String opTerm, @NotNull Term... arg) {
         return func(Atomic.the(opTerm), arg);
     }
 
 
-    static @NotNull Term func(@NotNull String opTerm, @NotNull String... arg) throws Narsese.NarseseException {
+    public static @NotNull Term func(@NotNull String opTerm, @NotNull String... arg) throws Narsese.NarseseException {
         return func(Atomic.the(opTerm), $.array(arg));
     }
 
@@ -154,38 +165,38 @@ public interface $ {
      * function ((a,b)==>c) aka: c(a,b)
      */
     @NotNull
-    static Term func(@NotNull Atomic opTerm, @NotNull Term... arg) {
+    public static Term func(@NotNull Atomic opTerm, @NotNull Term... arg) {
         return INH.the($.p(arg), opTerm);
     }
 
     @NotNull
-    static Term func(@NotNull Atomic opTerm, @NotNull Collection<Term> arg) {
+    public static Term func(@NotNull Atomic opTerm, @NotNull Collection<Term> arg) {
         return INH.the($.p(arg), opTerm);
     }
 
 
     @NotNull
-    static <T extends Term> T impl(@NotNull Term a, @NotNull Term b) {
+    public static <T extends Term> T impl(@NotNull Term a, @NotNull Term b) {
         return (T) IMPL.the(DTERNAL, a, b);
     }
 
     @NotNull
-    static <T extends Term> T impl(@NotNull Term a, int dt, @NotNull Term b) {
+    public static <T extends Term> T impl(@NotNull Term a, int dt, @NotNull Term b) {
         return (T) IMPL.the(dt, a, b);
     }
 
     @NotNull
-    static Term p(@NotNull Collection<? super Term> t) {
+    public static Term p(@NotNull Collection<? super Term> t) {
         return $.p(t.toArray(new Term[t.size()]));
     }
 
     @NotNull
-    static Term p(@NotNull Term... t) {
+    public static Term p(@NotNull Term... t) {
         return (t.length == 0) ? ZeroProduct : PROD.the(DTERNAL, t);
     }
 
     @NotNull
-    static Term p(@NotNull TermContainer t) {
+    public static Term p(@NotNull TermContainer t) {
         return p((Term[]) t.toArray());
     }
 
@@ -193,7 +204,7 @@ public interface $ {
      * creates from a sublist of a list
      */
     @NotNull
-    static Term p(@NotNull List<Term> l, int from, int to) {
+    public static Term p(@NotNull List<Term> l, int from, int to) {
         Term[] x = new Term[to - from];
 
         for (int j = 0, i = from; i < to; i++)
@@ -203,19 +214,19 @@ public interface $ {
     }
 
     @NotNull
-    static Term p(@NotNull String... t) {
+    public static Term p(@NotNull String... t) {
         return $.p((Term[]) $.the(t));
     }
 
     @NotNull
-    static Term p(@NotNull int... t) {
+    public static Term p(@NotNull int... t) {
         return $.p((Term[]) $.the(t));
     }
 
     /**
      * warning: generic variable
      */
-    static @NotNull Variable v(/*@NotNull*/ Op type, @NotNull String name) {
+    public static @NotNull Variable v(/*@NotNull*/ Op type, @NotNull String name) {
 
 //        if (name.length()==1) {
 //            char c = name.charAt(0);
@@ -229,35 +240,35 @@ public interface $ {
 
     @NotNull
     @Deprecated
-    static Variable varDep(int i) {
+    public static Variable varDep(int i) {
         return v(VAR_DEP, i);
     }
 
-    static @NotNull Variable varDep(@NotNull String s) {
+    public static @NotNull Variable varDep(@NotNull String s) {
         return v(VAR_DEP, s);
     }
 
     @NotNull
     @Deprecated
-    static Variable varIndep(int i) {
+    public static Variable varIndep(int i) {
         return v(VAR_INDEP, i);
     }
 
-    static @NotNull Variable varIndep(@NotNull String s) {
+    public static @NotNull Variable varIndep(@NotNull String s) {
         return v(VAR_INDEP, s);
     }
 
     @NotNull
-    static Variable varQuery(int i) {
+    public static Variable varQuery(int i) {
         return v(VAR_QUERY, i);
     }
 
-    static @NotNull Variable varQuery(@NotNull String s) {
+    public static @NotNull Variable varQuery(@NotNull String s) {
         return v(VAR_QUERY, s);
     }
 
     @NotNull
-    static VarPattern varPattern(int i) {
+    public static VarPattern varPattern(int i) {
         return (VarPattern) v(VAR_PATTERN, i);
     }
 
@@ -271,49 +282,49 @@ public interface $ {
      * @param pred The second component
      * @return A compound generated or null
      */
-    static <T extends Term> T inst(@NotNull Term subj, Term pred) {
+    public static <T extends Term> T inst(@NotNull Term subj, Term pred) {
         return (T) INH.the(SETe.the(subj), pred);
     }
 
-    static <T extends Term> T instprop(@NotNull Term subject, @NotNull Term predicate) {
+    public static <T extends Term> T instprop(@NotNull Term subject, @NotNull Term predicate) {
         return (T) INH.the(SETe.the(subject), SETi.the(predicate));
     }
 
-    static <T extends Term> T prop(Term subject, Term predicate) {
+    public static <T extends Term> T prop(Term subject, Term predicate) {
         return (T) INH.the(subject, SETi.the(predicate));
     }
 
     @NotNull
-    static TaskBuilder belief(@NotNull Term term, float freq, float conf) {
+    public static TaskBuilder belief(@NotNull Term term, float freq, float conf) {
         return task(term, BELIEF, freq, conf);
     }
 
     @NotNull
-    static TaskBuilder goal(@NotNull Term term, float freq, float conf) {
+    public static TaskBuilder goal(@NotNull Term term, float freq, float conf) {
         return task(term, GOAL, freq, conf);
     }
 
     @NotNull
-    static TaskBuilder task(@NotNull String term, byte punct, float freq, float conf) throws Narsese.NarseseException {
+    public static TaskBuilder task(@NotNull String term, byte punct, float freq, float conf) throws Narsese.NarseseException {
         return task($.$(term), punct, freq, conf);
     }
 
-    static TaskBuilder task(@NotNull Term term, byte punct, float freq, float conf) {
+    public static TaskBuilder task(@NotNull Term term, byte punct, float freq, float conf) {
         return task(term, punct, t(freq, conf));
     }
 
-    static TaskBuilder task(@NotNull Term term, byte punct, Truth truth) {
+    public static TaskBuilder task(@NotNull Term term, byte punct, Truth truth) {
         return new TaskBuilder(term, punct, truth);
     }
 
-    static Term sete(@NotNull Collection<? extends Term> t) {
+    public static Term sete(@NotNull Collection<? extends Term> t) {
         return SETe.the(DTERNAL, (Collection) t);
     }
 
     /**
      * construct set_ext of key,value pairs from a Map
      */
-    static Term seteMap(@NotNull Map<Term, Term> map) {
+    public static Term seteMap(@NotNull Map<Term, Term> map) {
         return $.sete(
                 map.entrySet().stream().map(
                         e -> $.p(e.getKey(), e.getValue()))
@@ -321,7 +332,7 @@ public interface $ {
         );
     }
 
-    static Term p(@NotNull char[] c, @NotNull CharToObjectFunction<Term> f) {
+    public static Term p(@NotNull char[] c, @NotNull CharToObjectFunction<Term> f) {
         Term[] x = new Term[c.length];
         for (int i = 0; i < c.length; i++) {
             x[i] = f.valueOf(c[i]);
@@ -329,15 +340,15 @@ public interface $ {
         return $.p(x);
     }
 
-    static <X> Term p(@NotNull X[] x, @NotNull Function<X, Term> toTerm) {
+    public static <X> Term p(@NotNull X[] x, @NotNull Function<X, Term> toTerm) {
         return $.p((Term[]) terms(x, toTerm));
     }
 
-    static <X> Term[] terms(@NotNull X[] map, @NotNull Function<X, Term> toTerm) {
+    public static <X> Term[] terms(@NotNull X[] map, @NotNull Function<X, Term> toTerm) {
         return Stream.of(map).map(toTerm::apply).toArray(Term[]::new);
     }
 
-    static <X> Term seteMap(@NotNull Map<Term, ? extends X> map, @NotNull Function<X, Term> toTerm) {
+    public static <X> Term seteMap(@NotNull Map<Term, ? extends X> map, @NotNull Function<X, Term> toTerm) {
         return $.sete(
                 map.entrySet().stream().map(
                         e -> $.p(e.getKey(), toTerm.apply(e.getValue())))
@@ -358,22 +369,23 @@ public interface $ {
         return tt;
     }
 
-    static Term seti(@NotNull Collection<Term> t) {
+    public static Term seti(@NotNull Collection<Term> t) {
         return $.seti(array(t));
     }
 
-    static Term sete(Term... t) {
+    public static Term sete(Term... t) {
         return SETe.the(DTERNAL, t);
     }
 
-    static Term sete(RoaringBitmap b) {
+    public static Term sete(RoaringBitmap b) {
         return $.sete(the(b));
     }
-    static Term p(RoaringBitmap b) {
+
+    public static Term p(RoaringBitmap b) {
         return $.p(the(b));
     }
 
-    static Term[] the(RoaringBitmap b) {
+    public static Term[] the(RoaringBitmap b) {
         int size = b.getCardinality();
         PeekableIntIterator ii = b.getIntIterator();
         Term[] t = new Term[size];
@@ -387,11 +399,11 @@ public interface $ {
     /**
      * shorthand for extensional set
      */
-    static Term s(Term... t) {
+    public static Term s(Term... t) {
         return sete(t);
     }
 
-    static Term seti(Term... t) {
+    public static Term seti(Term... t) {
         return SETi.the(DTERNAL, t);
     }
 
@@ -399,22 +411,22 @@ public interface $ {
     /**
      * unnormalized variable
      */
-    static Variable v(char ch, @NotNull String name) {
+    public static Variable v(char ch, @NotNull String name) {
         return v(AbstractVariable.typeIndex(ch), name);
     }
 
     /**
      * normalized variable
      */
-    static AbstractVariable v(/*@NotNull*/ Op type, int id) {
+    public static AbstractVariable v(/*@NotNull*/ Op type, int id) {
         return AbstractVariable.the(type, id);
     }
 
-    static <T extends Term> T conj(Term... a) {
+    public static <T extends Term> T conj(Term... a) {
         return (T) CONJ.the(DTERNAL, a);
     }
 
-    static Term conj(@NotNull Collection<Term> collection, @NotNull Term... append) {
+    public static Term conj(@NotNull Collection<Term> collection, @NotNull Term... append) {
         if (append.length == 0)
             throw new RuntimeException("unnecessary append");
         int cs = collection.size();
@@ -431,92 +443,102 @@ public interface $ {
     /**
      * parallel conjunction &| aka &&+0
      */
-    static Term parallel(Term... s) {
+    public static Term parallel(Term... s) {
         return CONJ.the(0, s);
     }
 
-    static Term parallel(@NotNull Collection<Term> s) {
+    public static Term parallel(@NotNull Collection<Term> s) {
         return CONJ.the(0, s);
     }
 
-    static Term disj(@NotNull Term... a) {
+    public static Term disj(@NotNull Term... a) {
         return DISJ.the(a);
     }
 
-    class Logging {
-        static {
-            Thread.currentThread().setName("$");
 
-            //http://logback.qos.ch/manual/layouts.html
+    //class Logging {
+    static {
+        Thread.currentThread().setName("$");
 
-            Logger LOG = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-            LoggerContext loggerContext = LOG.getLoggerContext();
-            // we are not interested in auto-configuration
-            loggerContext.reset();
+//        ServiceLoader.loadInstalled(DoesntSuckLoggerFactory.class);
+//
+//        DoesntSuckLoggerFactory f = (DoesntSuckLoggerFactory) LoggerFactory.getILoggerFactory();
 
-            PatternLayoutEncoder logEncoder = new PatternLayoutEncoder();
-            logEncoder.setContext(loggerContext);
-            //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
-            logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
-
-            logEncoder.start();
+//        SimpleLogger LOG = (SimpleLogger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+//        System.out.println(LOG);
 
 
-            ConsoleAppender c = new ConsoleAppender();
-            c.setContext(loggerContext);
-            c.setEncoder(logEncoder);
-            c.setImmediateFlush(false);
-            //c.setWithJansi(true);
-            c.start();
+//            //http://logback.qos.ch/manual/layouts.html
+//
+//            Logger LOG = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+//            LoggerContext loggerContext = LOG.getLoggerContext();
+//            // we are not interested in auto-configuration
+//            loggerContext.reset();
+//
+//            PatternLayoutEncoder logEncoder = new PatternLayoutEncoder();
+//            logEncoder.setContext(loggerContext);
+//            //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
+//            logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
+//
+//            logEncoder.start();
+//
+//
+//            ConsoleAppender c = new ConsoleAppender();
+//            c.setContext(loggerContext);
+//            c.setEncoder(logEncoder);
+//            c.setImmediateFlush(false);
+//            //c.setWithJansi(true);
+//            c.start();
+//
+//            LOG.addAppender(c);
 
-            LOG.addAppender(c);
-
-//            SyslogAppender syslog = new SyslogAppender();
-//            syslog.setPort(5000);
-//            syslog.setFacility("LOCAL6");
-//            syslog.setContext(loggerContext);
-//            syslog.setCharset(Charset.forName("UTF8"));
-//            syslog.start();
-//            LOG.addAppender(syslog);
-
-//            SocketAppender sa = new SocketAppender();
-//            sa.setName("socketlog");
-//            sa.setContext(loggerContext);
-//            sa.setQueueSize(1);
-//            sa.setEventDelayLimit(Duration.buildByMilliseconds(100));
-//            sa.setRemoteHost("localhost");
-//            sa.setPort(4560);
-//            sa.setIncludeCallerData(true);
-//            sa.setReconnectionDelay(Duration.buildByMilliseconds(200));
-//            sa.start();
-//            LOG.addAppender(sa);
-
-//        logRoot.debug("Message 1");
-//        logRoot.info("Message 1");
-//        logRoot.warn("Message 2");
-//        logRoot.error("Message 2");
-
-
-//        } catch (Throwable t) {
-//            System.err.println("Logging Disabled: " + t);
+////            SyslogAppender syslog = new SyslogAppender();
+////            syslog.setPort(5000);
+////            syslog.setFacility("LOCAL6");
+////            syslog.setContext(loggerContext);
+////            syslog.setCharset(Charset.forName("UTF8"));
+////            syslog.start();
+////            LOG.addAppender(syslog);
+//
+////            SocketAppender sa = new SocketAppender();
+////            sa.setName("socketlog");
+////            sa.setContext(loggerContext);
+////            sa.setQueueSize(1);
+////            sa.setEventDelayLimit(Duration.buildByMilliseconds(100));
+////            sa.setRemoteHost("localhost");
+////            sa.setPort(4560);
+////            sa.setIncludeCallerData(true);
+////            sa.setReconnectionDelay(Duration.buildByMilliseconds(200));
+////            sa.start();
+////            LOG.addAppender(sa);
+//
+////        logRoot.debug("Message 1");
+////        logRoot.info("Message 1");
+////        logRoot.warn("Message 2");
+////        logRoot.error("Message 2");
+//
+//
+////        } catch (Throwable t) {
+////            System.err.println("Logging Disabled: " + t);
+////        }
 //        }
-        }
 
     }
 
-    static Term diffi(Term a, Term b) {
+
+    public static Term diffi(Term a, Term b) {
         return DIFFi.the(DTERNAL, a, b);
     }
 
-    static Term diffe(Term a, Term b) {
+    public static Term diffe(Term a, Term b) {
         return DIFFe.the(DTERNAL, a, b);
     }
 
-    static Term secte(Term... x) {
+    public static Term secte(Term... x) {
         return SECTe.the(DTERNAL, x);
     }
 
-    static Term secti(Term... x) {
+    public static Term secti(Term... x) {
         return SECTi.the(DTERNAL, x);
     }
 
@@ -525,7 +547,7 @@ public interface $ {
      * create a literal atom from a class (it's name)
      */
     @NotNull
-    static Atom the(@NotNull Class c) {
+    public static Atom the(@NotNull Class c) {
         return (Atom) Atomic.the(c.getName());
     }
 
@@ -533,16 +555,16 @@ public interface $ {
     /**
      * gets the atomic term of an integer, with specific radix (up to 36)
      */
-    static Atom the(int i, int radix) {
+    public static Atom the(int i, int radix) {
         return (Atom) Atomic.the(Integer.toString(i, radix));
     }
 
 
-    static Atomic the(int v) {
+    public static Atomic the(int v) {
         return Int.the(v);
     }
 
-    static Atomic the(float v) {
+    public static Atomic the(float v) {
         if (Util.equals((float) Math.floor(v), v, Float.MIN_VALUE * 2)) {
             //close enough to be an int, so it doesnt need to be quoted
             return the((int) v);
@@ -573,30 +595,30 @@ public interface $ {
         return t(f, c, 0);
     }
 
-    static PreciseTruth t(float f, float c, float minConf) {
+    public static PreciseTruth t(float f, float c, float minConf) {
         return new PreciseTruth(f, c);
     }
 
-    static Prioritized b(float p) {
+    public static Prioritized b(float p) {
         return new Pri(p);
     }
 
     /**
      * negates each entry in the array
      */
-    static void neg(@NotNull Term[] array) {
+    public static void neg(@NotNull Term[] array) {
         Util.map(Term::neg, array, array);
     }
 
-    static Atomic the(@NotNull byte[] id) {
+    public static Atomic the(@NotNull byte[] id) {
         return Atomic.the(new String(id));
     }
 
-    static Atomic the(byte c) {
+    public static Atomic the(byte c) {
         return the(new byte[]{c});
     }
 
-    static Term[] the(@NotNull int... i) {
+    public static Term[] the(@NotNull int... i) {
         int l = i.length;
         Term[] x = new Term[l];
         for (int j = 0; j < l; j++) {
@@ -605,11 +627,11 @@ public interface $ {
         return x;
     }
 
-    static Term the(boolean b) {
+    public static Term the(boolean b) {
         return b ? Op.True : Op.False;
     }
 
-    static Term the(Object o) {
+    public static Term the(Object o) {
         if (o instanceof Term)
             return ((Term) o);
 
@@ -624,16 +646,16 @@ public interface $ {
     /**
      * conjunction sequence (2-ary)
      */
-    static Term seq(Term x, int dt, Term y) {
+    public static Term seq(Term x, int dt, Term y) {
         return CONJ.the(dt, x, y); //must be a vector, not set
     }
 
 
-    static <K, V> Map<K, V> newHashMap() {
+    public static <K, V> Map<K, V> newHashMap() {
         return newHashMap(0);
     }
 
-    static <K, V> Map<K, V> newHashMap(int capacity) {
+    public static <K, V> Map<K, V> newHashMap(int capacity) {
         return new HashMap<>(capacity);
 
         //return new UnifiedMap(capacity);
@@ -645,7 +667,7 @@ public interface $ {
         //return new LinkedHashMap(capacity);
     }
 
-    static <X> List<X> newArrayList() {
+    public static <X> List<X> newArrayList() {
         return new FasterList<>(0);
         //return new ArrayList();
     }
@@ -655,7 +677,7 @@ public interface $ {
         //return new ArrayList(capacity);
     }
 
-    static  <X> Set<X> newHashSet(int capacity) {
+    public static <X> Set<X> newHashSet(int capacity) {
 //        if (capacity < 4) {
 //            return new UnifiedSet(0);
 //        } else {
@@ -716,14 +738,14 @@ public interface $ {
 
 
     @NotNull
-    static <X> List<X> newArrayList(@NotNull X... x) {
+    public static <X> List<X> newArrayList(@NotNull X... x) {
         return new FasterList(x);
 //        FasterList<X> l = (FasterList) $.newArrayList(x.length);
 //        l.addAll(x);
 //        return l;
     }
 
-    static Term pRadix(int x, int radix, int maxX) {
+    public static Term pRadix(int x, int radix, int maxX) {
         Term[] tt = radixArray(x, radix, maxX);
         return $.p(tt);
     }
@@ -732,7 +754,7 @@ public interface $ {
     /**
      * most significant digit first, least last. padded with zeros
      */
-    static @NotNull Term[] radixArray(int x, int radix, int maxX) {
+    public static @NotNull Term[] radixArray(int x, int radix, int maxX) {
         String xs = Integer.toString(x, radix);
         String xx = Integer.toString(maxX, radix);
         Term[] tt = new Term[xx.length()];
@@ -753,25 +775,23 @@ public interface $ {
     }
 
 
-    static @NotNull Term pRecurseIntersect(char prefix, @NotNull Term... t) {
+    public static @NotNull Term pRecurseIntersect(char prefix, @NotNull Term... t) {
         final int[] index = {0};
-        return $.secte($.terms(t, x -> {
-            return Atomic.the(Strings.repeat(String.valueOf(prefix), ++index[0]) + x);
-        }));
+        return $.secte($.terms(t, x -> Atomic.the(Strings.repeat(String.valueOf(prefix), ++index[0]) + x)));
     }
 
-    static @NotNull Term pRecurse(@NotNull Term... t) {
+    public static @NotNull Term pRecurse(@NotNull Term... t) {
         int tl = t.length;
         Term inner = t[--tl];
-        Term nextInner = inner.op()!=PROD ? $.p(inner) : inner; //wrap innermost item in product too, for fairness
+        Term nextInner = inner.op() != PROD ? $.p(inner) : inner; //wrap innermost item in product too, for fairness
         while (tl > 0) {
             Term next = t[--tl];
-            nextInner = next.op()!=PROD ? $.p(next, nextInner) : $.p( ArrayUtils.add(next.subterms().theArray(), nextInner) );
+            nextInner = next.op() != PROD ? $.p(next, nextInner) : $.p(ArrayUtils.add(next.subterms().theArray(), nextInner));
         }
         return nextInner;
     }
 
-    static @Nullable Compound inhRecurse(@NotNull Term... t) {
+    public static @Nullable Compound inhRecurse(@NotNull Term... t) {
         int tl = t.length;
         @NotNull Term bottom = t[--tl];
         Compound nextInner = $.inh(t[--tl], bottom); //wrap innermost item in product too, for fairness
@@ -800,12 +820,12 @@ public interface $ {
 //    }
 
     @NotNull
-    static String unquote(@NotNull Term s) {
+    public static String unquote(@NotNull Term s) {
         return unquote(s.toString());
     }
 
     @NotNull
-    static String unquote(String x) {
+    public static String unquote(String x) {
         while (true) {
             int len = x.length();
             if (len > 0 && x.charAt(0) == '\"' && x.charAt(len - 1) == '\"') {
@@ -820,31 +840,27 @@ public interface $ {
     /**
      * instantiate new Javascript context
      */
-    static NashornScriptEngine JS() {
+    public static NashornScriptEngine JS() {
         return (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
     }
 
-    static Term nonNull(@Nullable Term term) {
-        return term != null ? term : Null;
-    }
-
-    static <X> PrediTerm<X> IF(Term t, Predicate<X> test) {
+    public static <X> PrediTerm<X> IF(Term t, Predicate<X> test) {
         return new LambdaPred<>(t, test);
     }
 
-    static <X> PrediTerm<X> AND(PrediTerm<X> a, PrediTerm<X> b) {
+    public static <X> PrediTerm<X> AND(PrediTerm<X> a, PrediTerm<X> b) {
         return new LambdaPred<>($.conj(a, b), (X x) -> {
             return a.test(x) && b.test(x);
         });
     }
 
-    static <X> PrediTerm<X> OR(PrediTerm<X> a, PrediTerm<X> b) {
+    public static <X> PrediTerm<X> OR(PrediTerm<X> a, PrediTerm<X> b) {
         return new LambdaPred<>($.disj(a, b), (X x) -> {
             return a.test(x) || b.test(x);
         });
     }
 
-    static int intValue(Term intTerm) throws NumberFormatException {
+    public static int intValue(Term intTerm) throws NumberFormatException {
         if (intTerm instanceof Int)
             return ((Int) intTerm).id;
 //        if (intTerm instanceof Atom) {
@@ -855,14 +871,14 @@ public interface $ {
         //   }
     }
 
-    static int intValue(Term intTerm, int ifNotInt) {
+    public static int intValue(Term intTerm, int ifNotInt) {
         if (intTerm instanceof Int)
             return ((Int) intTerm).id;
         else
             return ifNotInt;
     }
 
-    static Term fromJSON(String j) {
+    public static Term fromJSON(String j) {
         return JsonTerm.the(j);
     }
 

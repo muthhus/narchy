@@ -40,7 +40,7 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 /**
  * NAL symbol table
  */
-public enum Op implements $ {
+public enum Op  {
 
 
     ATOM(".", Op.ANY_LEVEL, OpType.Other),

@@ -1733,14 +1733,15 @@ public enum Util {
         return msgPackMapper/*.reader(type)*/.readValue(msgPacked, 0, len, type);
     }
 
-    static final Logger jsonLogger = LoggerFactory.getLogger(JsonNode.class);
+    //static final Logger jsonLogger = LoggerFactory.getLogger(JsonNode.class);
 
     public static JsonNode jsonNode(Object x) {
         if (x instanceof String) {
             try {
                 return msgPackMapper.readTree(x.toString());
             } catch (IOException e) {
-                jsonLogger.error(" {}", e);
+                e.printStackTrace();
+                //jsonLogger.error(" {}", e);
             }
         }
 

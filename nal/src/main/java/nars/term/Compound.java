@@ -806,16 +806,14 @@ public interface Compound extends Term, IPair, TermContainer {
                 assert (u != this) : "equality tested previously should have included identity check";
                 return u.evalSafe(context, remain);
             } catch (StackOverflowError e) {
-                logger.error("eval stack overflow: {} -> {}", this, u);
+                //logger.error("eval stack overflow: {} -> {}", this, u);
+                System.err.println("eval stack overflow: " + this + ", " + u);
                 return Null;
                 //throw new RuntimeException("stack overflow on eval : " + t);
             }
         }
 
     }
-
-
-    Logger logger = LoggerFactory.getLogger(Compound.class);
 
     @Override
     @Nullable

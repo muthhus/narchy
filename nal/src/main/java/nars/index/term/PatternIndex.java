@@ -1,5 +1,6 @@
 package nars.index.term;
 
+import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.derive.PatternCompound;
@@ -18,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
-import static nars.$.v;
 import static nars.Op.VAR_PATTERN;
 import static nars.Op.concurrent;
 
@@ -170,7 +170,7 @@ public class PatternIndex extends MapTermIndex {
         }
 
         public static AbstractVariable varPattern(int i) {
-            return v(VAR_PATTERN, i);
+            return $.v(VAR_PATTERN, i);
         }
 
         @NotNull

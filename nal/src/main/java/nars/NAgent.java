@@ -42,6 +42,7 @@ import static nars.truth.TruthFunctions.w2c;
  */
 abstract public class NAgent extends NARService implements NSense, NAct, Runnable {
 
+
     public static final Logger logger = LoggerFactory.getLogger(NAgent.class);
 
     /**

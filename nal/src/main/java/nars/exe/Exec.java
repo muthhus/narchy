@@ -14,7 +14,7 @@ import nars.control.Activate;
 import nars.control.Premise;
 import nars.task.ITask;
 import nars.task.NALTask;
-import no.birkett.kiwi.InternalSolverError;
+import jcog.constraint.continuous.exceptions.InternalSolverError;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1362,7 +1362,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(4, "(b). :|:")
                 .mustBelieve(cycles,
                         "(((a) &&+3 ((b) &| (c))) &&+4 (e))",
-                        1f, 0.73f, 1, 8);
+                        1f, 0.81f, 1, 8);
     }
 
     @Test
