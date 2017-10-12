@@ -96,7 +96,7 @@ public class MultiExec extends Exec {
                     }
 
 
-                    premiseRemaining = (int) Math.max(1, Math.round(can.iterationsRaw()/conc)); //factor for multithreading shared
+                    premiseRemaining = can.share(1f/conc);
 
                     premiseDone = 0;
 
@@ -188,11 +188,21 @@ public class MultiExec extends Exec {
 
     private class SharedCan extends Can {
 
-        final AtomicInteger work = new AtomicInteger(0);
+        final AtomicInteger workDone = new AtomicInteger(0);
+        final AtomicInteger workRemain = new AtomicInteger(0);
         final AtomicDouble time = new AtomicDouble(0);
 
         final AtomicLong valueCachedAt = new AtomicLong(ETERNAL);
         float valueCached = 0;
+
+        @Override
+        public void commit() {
+            workRemain.set(iterations());
+        }
+
+        public int share(float prop) {
+            return (int) Math.ceil(workRemain.get() * prop);
+        }
 
         @Override
         public float value() {
@@ -209,7 +219,7 @@ public class MultiExec extends Exec {
 
                 this.valueCached = valueSum;
 
-                int w = work.getAndSet(0);
+                int w = workDone.getAndSet(0);
                 double t = time.getAndSet(0);
 
                 this.update(w, valueCached, t);
@@ -219,7 +229,7 @@ public class MultiExec extends Exec {
         }
 
         public void update(int work, double time) {
-            this.work.addAndGet(work);
+            this.workDone.addAndGet(work);
             this.time.addAndGet(time);
         }
 

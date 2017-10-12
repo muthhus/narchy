@@ -342,7 +342,7 @@ public class ConcurrentRTree<T> implements Space<T> {
         readLock.lock();
         boolean result;
         try {
-            result = tree.intersecting(rect, consumer);
+            result = size() > 0 && tree.intersecting(rect, consumer);
         } finally {
             readLock.unlock();
         }

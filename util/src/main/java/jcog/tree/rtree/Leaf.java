@@ -145,6 +145,7 @@ public class Leaf<T> implements Node<T, T> {
     public Node<T, ?> remove(final T t, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
 
         int i = 0;
+        T[] data = this.data;
 
         while (i < size && (data[i] != t) && (!data[i].equals(t))) {
             i++;
@@ -180,7 +181,9 @@ public class Leaf<T> implements Node<T, T> {
     @Override
     public double perimeter(Spatialization<T> model) {
         double maxVolume = 0;
-        for (int i = 0; i < size; i++) {
+        final int s = size;
+        T[] data = this.data;
+        for (int i = 0; i < s; i++) {
             T c = data[i];
             double vol = model.perimeter(c);
             if (vol > maxVolume)
@@ -192,21 +195,40 @@ public class Leaf<T> implements Node<T, T> {
 
     @Override
     public Node<T, ?> update(final T told, final T tnew, Spatialization<T> model) {
-        if (size <= 0)
+        final int s = size;
+        if (s <= 0)
             return this;
 
-        for (int i = 0; i < size; i++) {
+        T[] data = this.data;
+        HyperRegion r = this.region;
+        for (int i = 0; i < s; i++) {
             if (data[i].equals(told)) {
                 data[i] = tnew;
             }
 
-            region = i == 0 ? model.region(data[0]) : region.mbr(model.region(data[i]));
+            r = i == 0 ? model.region(data[0]) : r.mbr(model.region(data[i]));
         }
+
+        this.region = r;
 
         return this;
     }
 
 
+
+    @Override
+    public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
+        short s = this.size;
+        T[] data = this.data;
+        for (int i = 0; i < s; i++) {
+            T d = data[i];
+            if (model.region(d).intersects(rect)) {
+                if (!t.test(d))
+                    return false;
+            }
+        }
+        return true;
+    }
     @Override
     public boolean containing(HyperRegion R, Predicate<T> t, Spatialization<T> model) {
         for (int i = 0; i < size; i++) {
@@ -253,19 +275,6 @@ public class Leaf<T> implements Node<T, T> {
         }
     }
 
-    @Override
-    public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
-        short s = this.size;
-        T[] data = this.data;
-        for (int i = 0; i < s; i++) {
-            T d = data[i];
-            if (model.region(d).intersects(rect)) {
-                if (!t.test(d))
-                    return false;
-            }
-        }
-        return true;
-    }
 
     @Override
     public void collectStats(Stats stats, int depth) {

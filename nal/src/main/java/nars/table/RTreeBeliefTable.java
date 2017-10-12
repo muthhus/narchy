@@ -82,7 +82,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 });
     }
 
-    private static class TopDeleteVictims extends TopN<TaskRegion> {
+    private static final class TopDeleteVictims extends TopN<TaskRegion> {
 
         private final float inputStrength;
 
@@ -732,7 +732,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         tree.stats().print(out);
     }
 
-    private class RTreeBeliefModel extends Spatialization<TaskRegion> {
+    private final class RTreeBeliefModel extends Spatialization<TaskRegion> {
 
 
         public RTreeBeliefModel() {
@@ -776,10 +776,18 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             super(new TaskRegion[max]);
         }
 
+
         @Override
         public boolean contains(TaskRegion t, Spatialization<TaskRegion> model) {
+            if (region == null)
+                return false;
+            if (!region.contains(t))
+                return false;
+
             Task incomingTask = t.task();
-            for (int i = 0; i < size; i++) {
+            TaskRegion[] data = this.data;
+            final int s = size;
+            for (int i = 0; i < s; i++) {
                 TaskRegion d = data[i];
                 if (d == t) {
                     return true;

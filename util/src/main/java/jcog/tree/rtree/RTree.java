@@ -46,7 +46,7 @@ public class RTree<T> implements Space<T> {
     public static final double EPSILON = 1e-12;
     public static final float FPSILON = (float) EPSILON;
 
-    @NotNull
+    /*@NotNull*/
     private Node<T, ?> root;
     private int size;
     public final Spatialization<T> model;
@@ -81,7 +81,7 @@ public class RTree<T> implements Space<T> {
      * TODO handle duplicate items (ie: dont increase entryCount if exists)
      */
     @Override
-    public boolean add(@NotNull final T t) {
+    public boolean add(/*@NotNull*/ final T t) {
         int before = size;
         Node<T, ?> nextRoot = root.add(t, this, model);
         if (nextRoot!=null) {
@@ -155,7 +155,7 @@ public class RTree<T> implements Space<T> {
 
     @Override
     public boolean intersecting(HyperRegion intersecting, Predicate<T> consumer) {
-        return root.intersecting(intersecting, consumer, model);
+        return size() > 0 && root.intersecting(intersecting, consumer, model);
     }
 
     /** returns how many items were filled */

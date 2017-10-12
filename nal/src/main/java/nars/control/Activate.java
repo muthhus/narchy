@@ -56,16 +56,20 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     }
 
     public static void activate(Task t, float activationApplied, NAR n, Concept cc) {
+
+        n.emotion.onActivate(t, activationApplied, cc, n);
+
+
         float evalAmp = n.evaluate(t.cause());
 
-        n.emotion.onActivate(t, activationApplied * evalAmp, cc, n);
+        activationApplied *= evalAmp;
 
         cc.tasklinks().putAsync(
-                new PLinkUntilDeleted<>(t, activationApplied * evalAmp)
+                new PLinkUntilDeleted<>(t, activationApplied)
                 //new PLink<>(t, activation)
         );
 
-        BatchActivate.add(cc, activationApplied * evalAmp, n);
+        BatchActivate.add(cc, activationApplied, n);
 
         n.eventTask.emit(t);
     }
@@ -111,7 +115,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             }
         }
 
-        public static void add(Concept cc, float v, NAR n) {
+        static void add(Concept cc, float v, NAR n) {
             if (active.contains(Thread.currentThread().getId()))
                 get().put(cc, v);
             else

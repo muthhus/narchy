@@ -70,7 +70,7 @@ public enum MetaGoal {
             causes.get(i).commit(causeSummary);
         }
 
-        final float momentum = 0.5f;
+        //final float momentum = 0.99f;
 
         int goals = goal.length;
 //        float[] goalFactor = new float[goals];
@@ -92,7 +92,17 @@ public enum MetaGoal {
                 v += goal[j] * cg[j].current;
             }
 
-            c.setValue(Util.lerp(momentum, v, c.value()));
+            c.setValue(Util.lerp(0.9f, v, c.value()));
+
+            //TODO
+            //variation of volume weighted moving average
+//            float prev = c.value();
+//            float aPrev = Math.abs(prev);
+//            float av = Math.abs(v);
+//            float momentum = 0.5f;
+//            float momDenom = Math.max(av, momentum * aPrev);
+//            if (momDenom > 0)
+//                c.setValue(Util.lerp((av / momDenom), prev, v));
         }
 
 //        float max = (float) goalCausePreNorm.getMax();

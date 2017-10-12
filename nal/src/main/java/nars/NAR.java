@@ -609,7 +609,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final void input(ITask x) {
         if (x == null) return;
 
-        ITask y = emotion.onInput(x);
+        ITask y = emotion.onInput(x, this);
         if (y != null)
             exe.add(y);
     }

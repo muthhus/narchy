@@ -34,7 +34,7 @@ public class SchedulearnTest {
         assertTrue(c.iterations() > a.iterations());
 
         //overdemand
-        assertTrue(b.iterations() > b.supply());
+        assertTrue(a.iterations() > a.supply());
 
         double te = Schedulearn.estimatedTimeTotal(List.of(a, b, c));
         assertEquals(te, timeSlice, timeSlice/4f /* within 25% of the target */);

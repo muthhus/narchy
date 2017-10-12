@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.SortedMap;
 
 import static jcog.Texts.n4;
+import static jcog.Util.unitize;
 import static nars.NInner.id;
 
 /**
@@ -309,13 +310,13 @@ public class Emotion extends ConcurrentMonitorRegistry {
      * sensory prefilter
      */
     @Nullable
-    public ITask onInput(@NotNull ITask x) {
+    public ITask onInput(ITask x, NAR nar) {
         if (x instanceof Task) {
             Task t = (Task) x;
             if (t.isCommand())
                 return x; //ignore
 
-            float cost = t.voluplexity() * t.priElseZero();
+            float cost = unitize(t.voluplexity()/((float)nar.termVolumeMax.floatValue())) * t.priElseZero();
 
             MetaGoal.learn(MetaGoal.Perceive, t.cause(), cost, nar);
         }
@@ -323,7 +324,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
         return x;
     }
 
-    public void onActivate(@NotNull Task t, float activation, Concept origin, NAR n) {
+    public void onActivate(Task t, float activation, Concept origin, NAR n) {
         n.emotion.taskActivations.increment();
 
         short[] effect = t.cause();
