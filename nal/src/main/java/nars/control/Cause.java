@@ -35,23 +35,23 @@ public class Cause {
      *  these values are used in determining the scalar 'value' field on each update. */
     public final Traffic[] goalValue;
 
-    /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
+
     public float value() {
         return value;
     }
 
     /** 0..+1 */
     public float amp() {
-        return (value+1)/2f;
+        return gain()/2f;
     }
 
     /** 0..+2 */
     public float gain() {
-         return value+1f;
+         return Util.tanhFast(value)+1f;
     }
 
+    /** value may be in any range (not normalized); 0 is neutral */
     public void setValue(float nextValue) {
-        assert(nextValue==nextValue && nextValue >= -1f && nextValue <= +1f);
         value = nextValue;
     }
 
@@ -84,9 +84,17 @@ public class Cause {
         short[] a = e[0].cause();
         switch (e.length) {
             case 0: throw new NullPointerException();
-            case 1: return a;
+            case 1:
+                return a;
+
             case 2:
                 short[] b = e[1].cause();
+
+                if (a.length == 0)
+                    return b;
+
+                if (b.length == 0)
+                    return a;
 
                 if (Util.equals(a,b))
                     return a;

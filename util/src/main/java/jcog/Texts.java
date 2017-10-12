@@ -625,15 +625,20 @@ public enum Texts {
         return formatter.format(date);
     }
 
+
     /**
      * string repr of an amount of milliseconds
      * from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java
      */
-    public static String stringifyMS(long msec) {
-        if (msec < 1000) return msec + "ms";
-        if (msec < 3000) return String.format("%.2f", msec / 1000d);
-        if (msec < 60 * 1000) return (msec / 1000) + "s";
-        long sec = msec / 1000;
+    public static String strNS(double ns) {
+        if (ns < 1000) return n4(ns) + "ns";
+        ns /= 1E3;
+        if (ns < 1000) return n4(ns) + "us";
+        ns /= 1E3;
+        if (ns < 1000) return n4(ns) + "ms";
+        if (ns < 3000) return String.format("%.2f", ns / 1000d);
+        if (ns < 60 * 1000) return (ns / 1000) + "s";
+        long sec = Math.round(ns / 1000);
         if (sec < 5 * 60) return (sec / 60) + "m" + (sec % 60) + 's';
         long min = sec / 60;
         if (min < 60) return min + "m";

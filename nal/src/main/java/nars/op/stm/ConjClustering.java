@@ -1,6 +1,7 @@
 package nars.op.stm;
 
 import jcog.Util;
+import jcog.list.ArrayIterator;
 import jcog.list.FasterList;
 import jcog.pri.VLink;
 import nars.$;
@@ -9,6 +10,7 @@ import nars.Op;
 import nars.Task;
 import nars.bag.BagClustering;
 import nars.control.Causable;
+import nars.control.Cause;
 import nars.control.CauseChannel;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -229,14 +231,13 @@ public class ConjClustering extends Causable {
 
                     int uuLen = uu.length;
                     FasterList<Task> uul = new FasterList<>(uuLen, uu);
-                    long[] evidence = Stamp.zip(uul, uuLen);
+                    long[] evidence = Stamp.zip(new ArrayIterator(uu), uuLen);
                     NALTask m = new STMClusterTask(cp, t, start, end, evidence, punc, now); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
-                    for (Task u : uu)
-                        m.causeMerge(u); //cause merge
+                    m.cause = Cause.zip(uu);
 
                     float maxPri = priMax;
-                    //priMax / uuLen; //HACK todo dont use List
+                        //priMax / uuLen; //HACK
 
                     m.setPri(BudgetFunctions.fund(maxPri, true, uu));
                     in.input(m);

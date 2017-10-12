@@ -8,9 +8,10 @@ import jcog.data.MutableInteger;
 import jcog.event.ListTopic;
 import jcog.event.On;
 import jcog.event.Topic;
-import jcog.exe.Schedulearn;
+import jcog.exe.Can;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
+import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.util.IterableThreadLocal;
 import nars.Narsese.NarseseException;
@@ -1642,7 +1643,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final FasterList<Cause> causes = new FasterList(256);
 
     /** optional actions whose potential invocation is heuristically controlled */
-    public final FasterList<Schedulearn.Can> can = new FasterList(8);
+    public final FasterList<Can> can = new FasterList(8);
 
 
     private final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[want.length + 1 /* for global norm */];
@@ -1683,8 +1684,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * +Infinity -> amp=2
      */
     public float evaluate(short[] effect) {
-        float value = MetaGoal.privaluate(causes, effect);
-        return 1f + Util.tanhFast(value);
+        return Math.max(Pri.EPSILON,  1f + Util.tanhFast( MetaGoal.privaluate(causes, effect) ));
     }
 
 //    /**

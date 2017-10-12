@@ -3,7 +3,7 @@ package nars.exe;
 import com.conversantmedia.util.concurrent.ConcurrentQueue;
 import jcog.Util;
 import jcog.event.On;
-import jcog.exe.Schedulearn;
+import jcog.exe.Can;
 import nars.NAR;
 import nars.Task;
 import nars.control.Activate;
@@ -32,12 +32,11 @@ public class MultiExec extends Exec {
 
     final Sub[] sub;
     private final int num;
-    private On onCycle;
 
-    final static int SUB_CAPACITY = 256;
-    private On on;
+    final static int SUB_CAPACITY = 512;
 
-    @Deprecated final Schedulearn.Can deriver = new Schedulearn.Can() {
+
+    @Deprecated final Can deriver = new Can() {
 
         final AtomicLong valueCachedAt = new AtomicLong(ETERNAL);
         float valueCached = 0;
@@ -54,11 +53,12 @@ public class MultiExec extends Exec {
                     }
                 }
 
-                this.valueCached = (Util.tanhFast(valueSum) + 1f) / 2f;
+                this.valueCached = valueSum;
             }
 
             return valueCached;
         }
+
     };
 
     public MultiExec(int threads) {
@@ -81,16 +81,14 @@ public class MultiExec extends Exec {
         }
 
         nar.can.add(deriver);
-
-        on = nar.onCycle(this::cycle);
     }
 
     class Sub extends UniExec implements Runnable {
 
 
-        private final Schedulearn.Can can;
+        private final Can can;
 
-        public Sub(int capacity, Schedulearn.Can deriver) {
+        public Sub(int capacity, Can deriver) {
             super(capacity);
             this.can = deriver;
             start(MultiExec.this.nar);
@@ -119,7 +117,7 @@ public class MultiExec extends Exec {
                     }
 
 
-                    int work = premiseRemaining = Math.max(1, (int) Math.ceil(can.iterations.value()));
+                    int work = premiseRemaining = Math.max(1, can.iterations());
                     premiseDone = 0;
 
                     long start = System.nanoTime();
@@ -181,16 +179,6 @@ public class MultiExec extends Exec {
     }
 
     @Override
-    public synchronized void stop() {
-        on.off();
-        super.stop();
-    }
-
-    public void cycle() {
-
-    }
-
-    @Override
     public void add(ITask t) {
         if (t instanceof Task) {
 
@@ -207,7 +195,7 @@ public class MultiExec extends Exec {
 
 
     protected int which(ITask t) {
-        return Math.abs(t.hashCode()) % sub.length;
+        return Math.abs(t.hashCode() % sub.length);
     }
 
     @Override

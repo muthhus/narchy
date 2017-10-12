@@ -61,11 +61,11 @@ abstract public class DynamicTruthModel {
             int dt;
             if (superterm.op() == CONJ) {
                 dt = superterm.subtermTimeSafe(actualSubterm);
-                if (dt == DTERNAL) {
-                    if (sdt != DTERNAL && sdt != XTERNAL) {
-                        return null; //dt = 0; //TODO maybe this should never happen, and if it does there is an error
-                    }
-                }
+//                if (dt == DTERNAL) {
+//                    if (sdt != DTERNAL && sdt != XTERNAL) {
+//                        return null; //dt = 0; //TODO maybe this should never happen, and if it does there is an error
+//                    }
+//                }
             } else {
                 dt = DTERNAL; //
             }
@@ -129,7 +129,7 @@ abstract public class DynamicTruthModel {
      */
     private static int matchDT(Term term, boolean beliefOrGoal, long start, long end, NAR n) {
 
-        assert (term.op().temporal): term + " is non-temporal but matchDT'd";
+        //assert (term.op().temporal): term + " is non-temporal but matchDT'd";
 
         Concept c = n.concept(term);
         if (c != null) {

@@ -1,8 +1,10 @@
 package jcog.list;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Iterator;
 
-public class ArrayIterator<E> implements Iterator<E> {
+public class ArrayIterator<E> implements Iterator<E>, Iterable<E> {
 
     private final E[] _array;
     int _index;
@@ -24,5 +26,15 @@ public class ArrayIterator<E> implements Iterator<E> {
     @Override
     public void remove() {
         throw new UnsupportedOperationException();
+    }
+
+    @NotNull
+    @Override
+    public Iterator<E> iterator() {
+        synchronized (this) {
+            if (_index != 0)
+                throw new RuntimeException("iterator() method can only be called once");
+        }
+        return this;
     }
 }

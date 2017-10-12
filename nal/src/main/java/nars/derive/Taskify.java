@@ -131,9 +131,11 @@ public class Taskify extends AbstractPred<Derivation> {
                         if (Param.DEBUG_SIMILAR_DERIVATIONS)
                             logger.warn("similar derivation to parent:\n\t{} {}\n\t{}", derived, parent, rule);
 
-                        //((NALTask)parent).merge(derived);
-                        parent.priMax(derived.priElseZero());
-                        ((NALTask) parent).causeMerge(derived); //merge cause
+
+                        if (parent instanceof DerivedTask) {
+                            parent.priMax(derived.priElseZero());
+                            ((NALTask) parent).causeMerge(derived); //merge cause
+                        }
                         return true;
                     }
                 }

@@ -11,7 +11,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.transform.CompoundTransform;
-import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Sets;
@@ -163,7 +162,7 @@ public class Inperience extends LeakBack {
 
         boolean full = in.bag.isFull();
 
-        if (next.op()==INH && operators.contains(next.sub(1)) )
+        if (next.op() == INH && operators.contains(next.sub(1)))
             return false; //prevent directly re-experiencing an inperience
 
         if (next.isBeliefOrGoal()) {
@@ -213,7 +212,7 @@ public class Inperience extends LeakBack {
     }
 
     @Override
-    protected float leak(Task next) {
+    protected float leak(Task x) {
 
         //try {
         //        if (r == null)
@@ -253,27 +252,26 @@ public class Inperience extends LeakBack {
 //        }
 //        //its a normal negated compound, which will be unnegated in task constructor
 //        return (Compound) s;
-        Term r = normalizedOrNull(compoundOrNull(reify(next, nar.self())));
+        Term r = normalizedOrNull(compoundOrNull(reify(x, nar.self())));
         if (r != null) {
 
             long now = nar.time();
 
-            long start = next.start();
+            long start = x.start();
             long end;
             if (start == ETERNAL)
                 end = start = now;
             else {
-                end = next.end();
+                end = x.end();
             }
 
-            feedback( (Task)
-                new NALTask(r, BELIEF,
-                    new DiscreteTruth(1, nar.confDefault(Op.BELIEF)),
-                    now, start, end, next.stamp()
-                )
-                    .log("Inperience")
-                    .pri(next.priElseZero() * priFactor)
+            NALTask y = new NALTask(r, BELIEF,
+                    $.t(1, nar.confDefault(Op.BELIEF)),
+                    now, start, end, x.stamp()
             );
+            y.causeMerge(x);
+
+            feedback((Task) (y.log("Inperience").pri(x.priElseZero() * priFactor)) );
 
             return 1;
         }
@@ -326,7 +324,7 @@ public class Inperience extends LeakBack {
         Term x = s.term().negIf(tr != null && tr.isNegative());
         arg[k/*++*/] =
                 x instanceof Compound && x.hasAny(VAR_QUERY) ? x
-                    .transform(CompoundTransform.queryToDepVar) : x; //unwrapping negation here isnt necessary sice the term of a task will be non-negated
+                        .transform(CompoundTransform.queryToDepVar) : x; //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
         try {
             Term ff = $.func(reify(s.punc()), arg);

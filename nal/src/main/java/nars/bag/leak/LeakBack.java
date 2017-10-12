@@ -28,6 +28,6 @@ abstract public class LeakBack extends TaskLeak {
     
 
     @Override public float value() {
-        return out.amp();
+        return out.value();
     }
 }

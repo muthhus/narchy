@@ -1,6 +1,8 @@
 package nars.exe;
 
+import jcog.Texts;
 import jcog.event.On;
+import jcog.exe.Can;
 import jcog.exe.Schedulearn;
 import jcog.list.FasterList;
 import jcog.pri.Prioritized;
@@ -117,17 +119,18 @@ abstract public class Exec implements Executor, PriMerge {
 
     final Schedulearn sched = new Schedulearn();
 
-    public void cause(FasterList<Schedulearn.Can> can) {
+    public void cause(FasterList<Can> can) {
 
         double defaultCycleTime = 1.0; //sec
 
-        double nextCycleTime = Math.max(1, nar.exe.concurrency() - 1) * (nar.loop.isRunning() ? nar.loop.periodMS.intValue() * 0.001 : defaultCycleTime);
+        double nextCycleTime = Math.max(1, nar.exe.concurrency() - 1) * (
+                nar.loop.isRunning() ? nar.loop.periodMS.intValue() * 0.001 : defaultCycleTime
+        ) * (1f - nar.exe.load());
 
-        sched.solve(can,
-            nextCycleTime
-        );
+        sched.solve(can, nextCycleTime );
 
-        can.forEach(Schedulearn.Can::commit);
+        sched.estimatedTimeTotal(can);
+
     }
 
 

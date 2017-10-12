@@ -220,7 +220,7 @@ abstract public class NAgentX extends NAgent {
 
 
         ConjClustering conjClusterB = new ConjClustering(n, 5, BELIEF, true, 16, 64);
-        ConjClustering conjClusterG = new ConjClustering(n, 2, GOAL, true, 16, 64);
+        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, true, 16, 64);
 
 //        n.runLater(() -> {
 ////            AudioContext ac = new AudioContext();
@@ -514,7 +514,7 @@ abstract public class NAgentX extends NAgent {
         FloatParam gain = new FloatParam(1f, 0f, 10f);
 
         BitmapMatrixView bmp = new BitmapMatrixView((i) ->
-                gain.floatValue() * nar.causes.get(i).value(),
+                gain.floatValue() * Util.tanhFast(nar.causes.get(i).value()),
                 s, Math.max(1, (int) Math.sqrt(s)),
                 Draw::colorBipolar) {
 

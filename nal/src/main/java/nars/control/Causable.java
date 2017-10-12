@@ -1,6 +1,6 @@
 package nars.control;
 
-import jcog.exe.Schedulearn;
+import jcog.exe.Can;
 import nars.NAR;
 import nars.task.ITask;
 import nars.task.NativeTask;
@@ -24,7 +24,7 @@ abstract public class Causable extends NARService {
     private static final Logger logger = LoggerFactory.getLogger(Causable.class);
 
 
-    public final Schedulearn.Can can;
+    public final Can can;
 
     private final AtomicBoolean busy;
 
@@ -32,13 +32,7 @@ abstract public class Causable extends NARService {
         super(nar);
         busy = singleton() ? new AtomicBoolean(false) : null;
 
-        can = new Schedulearn.Can() {
-            @Override public void commit() {
-                int ii = (int) Math.ceil(can.iterations.value());
-                if (ii > 0)
-                    nar.input(new InvokeCause(Causable.this, ii));
-            }
-        };
+        can = new MyCan(nar, term().toString());
     }
 
     @Override
@@ -137,6 +131,21 @@ abstract public class Causable extends NARService {
         public @Nullable Iterable<? extends ITask> run(NAR n) {
             cause.run(n, iterations);
             return null;
+        }
+    }
+
+    private final class MyCan extends Can {
+        private final NAR nar;
+
+        public MyCan(NAR nar, String id) {
+            super(id);
+            this.nar = nar;
+        }
+
+        @Override public void commit() {
+            int ii = iterations();
+            if (ii > 0)
+                nar.input(new InvokeCause(Causable.this, ii));
         }
     }
 }
