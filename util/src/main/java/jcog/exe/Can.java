@@ -91,5 +91,10 @@ public class Can {
     public int iterations() {
         return (int) Math.ceil(iterations.value());
     }
+    public double iterationsRaw() {
+        return iterations.value();
+    }
+
+
 
 }

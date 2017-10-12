@@ -11,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.transform.CompoundTransform;
+import nars.term.var.Variable;
 import nars.truth.Truth;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Sets;
@@ -19,10 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
-
 import static nars.Op.*;
-import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.term.atom.Atomic.the;
 import static nars.time.Tense.ETERNAL;
@@ -39,24 +37,8 @@ public class Inperience extends LeakBack {
     public static final Logger logger = LoggerFactory.getLogger(Inperience.class);
 
 
-//    //internal experience has less durability?
-//    public static final float INTERNAL_EXPERIENCE_PROBABILITY = 0.01f;
-//    public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE = 0.75f; //0.92
-//    public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE = 0.92f;
-//
-//    //less probable form
-//    public static final float INTERNAL_EXPERIENCE_RARE_PROBABILITY =
-//            INTERNAL_EXPERIENCE_PROBABILITY / 2.0f;
-
-
-//    //internal experience has less durability?
-//    public static float INTERNAL_EXPERIENCE_DURABILITY_MUL = 0.1f; //0.1
-//    //internal experience has less priority?
-//    public static float INTERNAL_EXPERIENCE_PRIORITY_MUL = 0.1f; //0.1
-
-
     /**
-     * minimum conf necessary to create a concept
+     * minimum conf necessary to create a concept. factor of the NAR's current default confidence
      * original value: 0.66
      */
     @NotNull
@@ -69,37 +51,12 @@ public class Inperience extends LeakBack {
     @NotNull
     public final FloatParam freqMax = new FloatParam(0.1f);
 
-//    float beliefFactor = 1f;
-//    float questionFactor = 0.5f;
 
     /**
      * multiplier for he sensory task priority to determine inperienced task priority
+     * should be < 1.0 to avoid feedback overload
      */
     private final float priFactor = 0.5f;
-
-//    public boolean isEnableWantBelieve() {
-//        return enableWantBelieve;
-//    }
-//    public void setEnableWantBelieve(boolean val) {
-//        enableWantBelieve =val;
-//    }
-
-//    public static double getMinCreationBudgetSummary() {
-//        return MINIMUM_BUDGET_SUMMARY_TO_CREATE;
-//    }
-//
-//    public static void setMinCreationBudgetSummary(double val) {
-//        MINIMUM_BUDGET_SUMMARY_TO_CREATE = (float) val;
-//    }
-//
-//    public static double getMinCreationBudgetSummaryWonderEvaluate() {
-//        return MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE;
-//    }
-//
-//    public static void setMinCreationBudgetSummaryWonderEvaluate(double val) {
-//        MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE = (float) val;
-//    }
-
 
     public static final Atomic believe = the("believe");
     public static final Atomic want = the("want");
@@ -110,16 +67,20 @@ public class Inperience extends LeakBack {
     public static final ImmutableSet<Atomic> operators = Sets.immutable.of(
             believe, want, wonder, evaluate, reflect);
 
-    static final Atomic[] NON_INNATE_BELIEF_ATOMICs = {
-            the("remind"),
-            the("doubt"),
-            the("consider"),
-            evaluate,
-            the("hestitate"),
-            wonder,
-            believe,
-            want
-    };
+//    static final Atomic[] NON_INNATE_BELIEF_ATOMICs = {
+////            the("remind"),
+////            the("doubt"),
+////            the("consider"),
+//            evaluate,
+////            the("hestitate"),
+//            wonder,
+//            believe,
+//            want
+//    };
+//    public static Atomic randomNonInnate(@NotNull Random r) {
+//        return NON_INNATE_BELIEF_ATOMICs[r.nextInt(NON_INNATE_BELIEF_ATOMICs.length)];
+//    }
+
     @NotNull
     private final NAR nar;
 
@@ -162,18 +123,17 @@ public class Inperience extends LeakBack {
 
         boolean full = in.bag.isFull();
 
-        if (next.op() == INH && operators.contains(next.sub(1)))
+        if (next.op() == INH && next.subIs(1, ATOM) && operators.contains(next.sub(1)))
             return false; //prevent directly re-experiencing an inperience
 
         if (next.isBeliefOrGoal()) {
             //check for sufficient truth polarization
-            if (full && next.conf() <= confMin.floatValue())
+            if (full && next.conf() <= confMin.floatValue() * nar.confDefault(next.punc()))
                 return false; //too low confidence
 
             float f = next.freq();
             float fm = freqMax.floatValue();
-            if (!(f <= fm) && !(f >= (1f - fm)))
-                return false;
+            return f <= fm || f >= (1f - fm);
 
             //belief = true;
         } else {
@@ -214,80 +174,34 @@ public class Inperience extends LeakBack {
     @Override
     protected float leak(Task x) {
 
-        //try {
-        //        if (r == null)
-//            return null;
-//
-//        //unnegate and check for an apparent atomic term which may need decompressed in order to be the task's content
-//        boolean negated;
-//        Term s = r;
-//        if (r.op() == NEG) {
-//            s = r.unneg();
-//            if (s instanceof Variable)
-//                return null; //throw new InvalidTaskException(r, "unwrapped variable"); //should have been prevented earlier
-//
-//            negated = true;
-//            if (s instanceof Compound) {
-//                return (Compound) r; //its normal compound inside the negation, handle it in Task constructor
-//            }
-//        } else if (r instanceof Compound) {
-//            return (Compound) r; //do not uncompress any further
-//        } else if (r instanceof Variable) {
-//            return null;
-//        } else {
-//            negated = false;
-//        }
-//
-//        if (!(s instanceof Compound)) {
-//            Compound t = compoundOrNull(nar.post(s));
-//            if (t == null)
-//                return null; //throw new InvalidTaskException(r, "undecompressible");
-//            else
-//                return (Compound) $.negIf(t, negated); //done
-////            else
-////            else if (s.op()==NEG)
-////                return (Compound) $.negIf(post(s.unneg(), nar));
-////            else
-////                return (Compound) $.negIf(s, negated);
-//        }
-//        //its a normal negated compound, which will be unnegated in task constructor
-//        return (Compound) s;
-        Term r = normalizedOrNull(compoundOrNull(reify(x, nar.self())));
-        if (r != null) {
+        Term c = reify(x, nar.self());
+        if (c == null || !c.op().conceptualizable)
+            return 0;
 
-            long now = nar.time();
+        Term r = normalizedOrNull(c);
+        if (r == null)
+            return 0;
 
-            long start = x.start();
-            long end;
-            if (start == ETERNAL)
-                end = start = now;
-            else {
-                end = x.end();
-            }
+        long now = nar.time();
 
-            NALTask y = new NALTask(r, BELIEF,
-                    $.t(1, nar.confDefault(Op.BELIEF)),
-                    now, start, end, x.stamp()
-            );
-            y.causeMerge(x);
-
-            feedback((Task) (y.log("Inperience").pri(x.priElseZero() * priFactor)) );
-
-            return 1;
+        long start = x.start();
+        long end;
+        if (start == ETERNAL)
+            end = start = now;
+        else {
+            end = x.end();
         }
-//        } catch (ClassCastException ignored) {
-//            //happens rarely, due to circularity while trying to create something like: want((x<->want),...
-//
-//            //System.err.println(task);
-//        }
 
-        return 0;
+        NALTask y = new NALTask(r, BELIEF,
+                $.t(1, nar.confDefault(Op.BELIEF)),
+                now, start, end, x.stamp()
+        );
+        y.causeMerge(x);
+
+        feedback((Task) (y.log("Inperience").pri(x.priElseZero() * priFactor)));
+
+        return 1;
     }
-
-
-//    private boolean isExperienceTerm(@NotNull Compound term) {
-//        return term.op() == INH && operators.contains(term.subterm(1) /* predicate of the inheritance */);
-//    }
 
 
     @NotNull
@@ -316,32 +230,56 @@ public class Inperience extends LeakBack {
     public static Term reify(@NotNull Task s, Term self) {
 
         Truth tr = s.truth();
-        Term[] arg = new Term[1 + 1];
 
-        int k = 0;
-
-        arg[k++] = self;
         Term x = s.term().negIf(tr != null && tr.isNegative());
-        arg[k/*++*/] =
-                x instanceof Compound && x.hasAny(VAR_QUERY) ? x
-                        .transform(CompoundTransform.queryToDepVar) : x; //unwrapping negation here isnt necessary sice the term of a task will be non-negated
+        Term xx = x instanceof Compound && x.hasAny(VAR_QUERY) ? x
+                .transform(CompoundTransform.queryToDepVar) : x;
+        if (!xx.op().conceptualizable)
+            return null;
 
-        try {
-            Term ff = $.func(reify(s.punc()), arg);
-            return ff.negIf(false);
-
-        } catch (RuntimeException e) {
-            logger.error(" {}", e);
-
-        }
-
-        return null;
+        Term ff = $.func(reify(s.punc()), self, xx);
+        return ff.negIf(false);
     }
 
 
-    public static Atomic randomNonInnate(@NotNull Random r) {
-        return NON_INNATE_BELIEF_ATOMICs[r.nextInt(NON_INNATE_BELIEF_ATOMICs.length)];
-    }
+//    //internal experience has less durability?
+//    public static final float INTERNAL_EXPERIENCE_PROBABILITY = 0.01f;
+//    public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE = 0.75f; //0.92
+//    public static float MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE = 0.92f;
+//
+//    //less probable form
+//    public static final float INTERNAL_EXPERIENCE_RARE_PROBABILITY =
+//            INTERNAL_EXPERIENCE_PROBABILITY / 2.0f;
+
+
+//    //internal experience has less durability?
+//    public static float INTERNAL_EXPERIENCE_DURABILITY_MUL = 0.1f; //0.1
+//    //internal experience has less priority?
+//    public static float INTERNAL_EXPERIENCE_PRIORITY_MUL = 0.1f; //0.1
+
+//    public boolean isEnableWantBelieve() {
+//        return enableWantBelieve;
+//    }
+//    public void setEnableWantBelieve(boolean val) {
+//        enableWantBelieve =val;
+//    }
+
+//    public static double getMinCreationBudgetSummary() {
+//        return MINIMUM_BUDGET_SUMMARY_TO_CREATE;
+//    }
+//
+//    public static void setMinCreationBudgetSummary(double val) {
+//        MINIMUM_BUDGET_SUMMARY_TO_CREATE = (float) val;
+//    }
+//
+//    public static double getMinCreationBudgetSummaryWonderEvaluate() {
+//        return MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE;
+//    }
+//
+//    public static void setMinCreationBudgetSummaryWonderEvaluate(double val) {
+//        MINIMUM_BUDGET_SUMMARY_TO_CREATE_WONDER_EVALUATE = (float) val;
+//    }
+
 
 //    private static class InperienceTask extends NALTask {
 //

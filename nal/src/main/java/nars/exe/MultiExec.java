@@ -1,8 +1,8 @@
 package nars.exe;
 
 import com.conversantmedia.util.concurrent.ConcurrentQueue;
+import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
-import jcog.event.On;
 import jcog.exe.Can;
 import nars.NAR;
 import nars.Task;
@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
@@ -36,30 +37,8 @@ public class MultiExec extends Exec {
     final static int SUB_CAPACITY = 512;
 
 
-    @Deprecated final Can deriver = new Can() {
-
-        final AtomicLong valueCachedAt = new AtomicLong(ETERNAL);
-        float valueCached = 0;
-
-        @Override
-        public float value() {
-            long now = nar.time();
-            if (valueCachedAt.getAndSet(now)!=now) {
-                //HACK
-                float valueSum = 0;
-                for (Cause c : nar.causes) {
-                    if (c instanceof Conclude.RuleCause) {
-                        valueSum += c.value();
-                    }
-                }
-
-                this.valueCached = valueSum;
-            }
-
-            return valueCached;
-        }
-
-    };
+    @Deprecated
+    final SharedCan deriver = new SharedCan();
 
     public MultiExec(int threads) {
         this(threads, threads * 32);
@@ -86,9 +65,9 @@ public class MultiExec extends Exec {
     class Sub extends UniExec implements Runnable {
 
 
-        private final Can can;
+        private final SharedCan can;
 
-        public Sub(int capacity, Can deriver) {
+        public Sub(int capacity, SharedCan deriver) {
             super(capacity);
             this.can = deriver;
             start(MultiExec.this.nar);
@@ -117,7 +96,8 @@ public class MultiExec extends Exec {
                     }
 
 
-                    int work = premiseRemaining = Math.max(1, can.iterations());
+                    premiseRemaining = (int) Math.max(1, Math.round(can.iterationsRaw()/conc)); //factor for multithreading shared
+
                     premiseDone = 0;
 
                     long start = System.nanoTime();
@@ -143,13 +123,8 @@ public class MultiExec extends Exec {
 
                     //System.err.println(premiseDone + "/" + work + " in " + loops + " loops\tvalue=" + can.value() + " " + n4((end - start) / 1.0E9) + "sec");
 
-                    //? multiply the work done by concurrency to be consistent with how it is calculated
-                    synchronized (can) { //synch to be safe
-                        can.update(premiseDone,
-                                0, /* ignored, uses per-cycle cached value */
-                        ((end - start) / 1.0E9) / nar.exe.concurrency()
-                        );
-                    }
+                    can.update(premiseDone, (end - start) / 1.0E9);
+
                 } catch (Throwable t) {
                     logger.error("{} {}", this, t);
                 }
@@ -211,4 +186,42 @@ public class MultiExec extends Exec {
         return Stream.of(sub).flatMap(UniExec::stream);
     }
 
+    private class SharedCan extends Can {
+
+        final AtomicInteger work = new AtomicInteger(0);
+        final AtomicDouble time = new AtomicDouble(0);
+
+        final AtomicLong valueCachedAt = new AtomicLong(ETERNAL);
+        float valueCached = 0;
+
+        @Override
+        public float value() {
+            long now = nar.time();
+            if (valueCachedAt.getAndSet(now) != now) {
+
+                //HACK
+                float valueSum = 0;
+                for (Cause c : nar.causes) {
+                    if (c instanceof Conclude.RuleCause) {
+                        valueSum += c.value();
+                    }
+                }
+
+                this.valueCached = valueSum;
+
+                int w = work.getAndSet(0);
+                double t = time.getAndSet(0);
+
+                this.update(w, valueCached, t);
+            }
+
+            return valueCached;
+        }
+
+        public void update(int work, double time) {
+            this.work.addAndGet(work);
+            this.time.addAndGet(time);
+        }
+
+    }
 }
