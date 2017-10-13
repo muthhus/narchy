@@ -111,8 +111,8 @@ public abstract class Param extends Services<Term,NAR> {
     public final FloatParam deriverity = new FloatParam(1.0f, 0f, 1f);
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTLmax = new MutableInteger(96);
-    public final MutableInteger matchTTLmin = new MutableInteger(24);
+    public final MutableInteger matchTTLmax = new MutableInteger(512);
+    public final MutableInteger matchTTLmin = new MutableInteger(128);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.25f;

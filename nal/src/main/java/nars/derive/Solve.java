@@ -79,7 +79,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
 //                }
 
                 if (overlap > 0) {
-                    float e = t.evi() * (1f-overlap/2f);
+                    float e = t.evi() * (1f-overlap);
                     if (e < Pri.EPSILON) //yes Pri epsilon
                         return false;
 
