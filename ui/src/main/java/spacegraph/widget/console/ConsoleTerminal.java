@@ -12,6 +12,8 @@ import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminalListener;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
+import org.eclipse.collections.api.set.primitive.ImmutableCharSet;
+import org.eclipse.collections.impl.factory.primitive.CharSets;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.video.TextureSurface;
@@ -22,9 +24,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by me on 11/14/16.
@@ -49,9 +48,9 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
         needFullRedraw = true;
 
         if (needFullRedraw) {
-            updateBackBuffer(0);
-            texture.update(backbuffer);
+            updateBackBuffer();
             this.needFullRedraw = false;
+            texture.update(backbuffer);
         }
     }
 
@@ -231,108 +230,13 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
             //...
         }
 
-        //AtomicBoolean busy = new AtomicBoolean(false);
-        //if (busy.compareAndSet(false,true)) {
-
-        //this.term.flush();
-
-//        if (eterm instanceof TerminalUI) {
-//            TerminalUI ee = (TerminalUI) eterm;
-////            ee.gui.getGUIThread().invokeLater(() -> {
-//                try {
-//                    ee.gui.processInput();
-//                    //ee.gui.updateScreen();
-//                } catch (IOException e1) {
-//                    e1.printStackTrace();
-//                }
-////            });
-//        }
         return true;
     }
 
-//    static class DirtyCellsLookupTable {
-//        private final java.util.List<BitSet> table = new ArrayList();
-//        private int firstRowIndex = -1;
-//        private boolean allDirty = false;
-//
-//        DirtyCellsLookupTable() {
-//        }
-//
-//        void resetAndInitialize(int firstRowIndex, int lastRowIndex, int columns) {
-//            this.firstRowIndex = firstRowIndex;
-//            this.allDirty = false;
-//            int rows = lastRowIndex - firstRowIndex + 1;
-//
-//            while (this.table.size() < rows) {
-//                this.table.add(new BitSet(columns));
-//            }
-//
-//            while (this.table.size() > rows) {
-//                this.table.remove(this.table.size() - 1);
-//            }
-//
-//            for (int index = 0; index < this.table.size(); ++index) {
-//                if (((BitSet) this.table.get(index)).size() != columns) {
-//                    this.table.set(index, new BitSet(columns));
-//                } else {
-//                    ((BitSet) this.table.get(index)).clear();
-//                }
-//            }
-//
-//        }
-//
-//        void setAllDirty() {
-//            this.allDirty = true;
-//        }
-//
-//        boolean isAllDirty() {
-//            return this.allDirty;
-//        }
-//
-//        void setDirty(TerminalPosition position) {
-//            if (position.getRow() >= this.firstRowIndex && position.getRow() < this.firstRowIndex + this.table.size()) {
-//                BitSet tableRow = (BitSet) this.table.get(position.getRow() - this.firstRowIndex);
-//                if (position.getColumn() < tableRow.size()) {
-//                    tableRow.set(position.getColumn());
-//                }
-//
-//            }
-//        }
-//
-//        void setRowDirty(int rowNumber) {
-//            BitSet row = (BitSet) this.table.get(rowNumber - this.firstRowIndex);
-//            row.set(0, row.size());
-//        }
-//
-//        void setColumnDirty(int column) {
-//            Iterator var2 = this.table.iterator();
-//
-//            while (var2.hasNext()) {
-//                BitSet row = (BitSet) var2.next();
-//                if (column < row.size()) {
-//                    row.set(column);
-//                }
-//            }
-//
-//        }
-//
-//        boolean isDirty(int row, int column) {
-//            if (row >= this.firstRowIndex && row < this.firstRowIndex + this.table.size()) {
-//                BitSet tableRow = (BitSet) this.table.get(row - this.firstRowIndex);
-//                return column < tableRow.size() ? tableRow.get(column) : false;
-//            } else {
-//                return false;
-//            }
-//        }
-//    }
 
 
-    private static final Set<Character> TYPED_KEYS_TO_IGNORE = new HashSet(Arrays.asList('\n', '\t', '\r', '\b', '\u001b', '\u007f'));
+    private static final ImmutableCharSet TYPED_KEYS_TO_IGNORE = CharSets.immutable.of('\n', '\t', '\r', '\b', '\u001b', '\u007f');
 
-    //abstract class GraphicalTerminalImplementation implements IOSafeTerminal {
-//        private final TerminalEmulatorDeviceConfiguration deviceConfiguration;
-//        private final TerminalEmulatorColorConfiguration colorConfiguration;
-//    private final DirtyCellsLookupTable dirtyCellsLookupTable;
     private boolean cursorIsVisible;
     private boolean enableInput;
 
@@ -341,11 +245,10 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 
     private boolean needFullRedraw;
     private TerminalPosition lastDrawnCursorPosition;
-    private int lastBufferUpdateScrollPosition;
+
     private final int lastComponentWidth;
     private final int lastComponentHeight;
     private BufferedImage backbuffer;
-    //private BufferedImage copybuffer;
     Color cursorColor = Color.ORANGE;
 
 
@@ -354,24 +257,18 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     private int fontHeight;
 
     private Font font;
-    boolean useAntiAliasing = false;
+    boolean antialias = true;
+    boolean quality = false;
 
     {
-
-
-//            term = new DefaultVirtualTerminal(initialTerminalSize);
-//            this.deviceConfiguration = deviceConfiguration;
-//            this.colorConfiguration = colorConfiguration;
 
 
         this.cursorIsVisible = true;
         this.enableInput = false;
         this.lastDrawnCursorPosition = null;
-        this.lastBufferUpdateScrollPosition = 0;
         this.lastComponentHeight = 0;
         this.lastComponentWidth = 0;
         this.backbuffer = null;
-        //this.copybuffer = null;
         this.blinkOn = true;
         this.needFullRedraw = false;
 
@@ -387,7 +284,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     }
 
     private FontRenderContext getFontRenderContext() {
-        return new FontRenderContext((AffineTransform) null, useAntiAliasing ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
+        return new FontRenderContext((AffineTransform) null, antialias ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
     }
 
     private int getFontWidth(Font font) {
@@ -461,19 +358,21 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 //        this.notifyAll();
 //    }
 
-    private synchronized void updateBackBuffer(final int scrollOffsetFromTopInPixels) {
+    private synchronized void updateBackBuffer() {
         final int fontWidth = this.getFontWidth();
         final int fontHeight = this.getFontHeight();
         final TerminalPosition cursorPosition = term.getCursorBufferPosition();
         final TerminalSize viewportSize = term.getTerminalSize();
-        int firstVisibleRowIndex = scrollOffsetFromTopInPixels / fontHeight;
-        int lastVisibleRowIndex = (scrollOffsetFromTopInPixels + this.getHeight()) / fontHeight;
+        int firstVisibleRowIndex = 0 / fontHeight;
+        int lastVisibleRowIndex = (this.getHeight()) / fontHeight;
         this.ensureGraphicBufferHasRightSize();
         final Graphics2D backbufferGraphics = this.backbuffer.createGraphics();
 
         backbufferGraphics.setFont(font);
-        if (useAntiAliasing) { //if (this.isTextAntiAliased()) {
+        if (antialias) { //if (this.isTextAntiAliased()) {
             backbufferGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        }
+        if (quality) {
             backbufferGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         }
 
@@ -482,125 +381,36 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
         int previousLastVisibleRowIndex;
         Graphics2D graphics;
         int previousFirstVisibleRowIndex;
-//        if (this.lastBufferUpdateScrollPosition < scrollOffsetFromTopInPixels) {
-//            previousLastVisibleRowIndex = scrollOffsetFromTopInPixels - this.lastBufferUpdateScrollPosition;
-////            if (previousLastVisibleRowIndex / fontHeight < viewportSize.getRows()) {
-////                graphics = this.copybuffer.createGraphics();
-////                graphics.setClip(0, 0, this.getWidth(), this.getHeight() - previousLastVisibleRowIndex);
-////                graphics.drawImage(this.backbuffer, 0, -previousLastVisibleRowIndex, (ImageObserver) null);
-////                graphics.dispose();
-////                backbufferGraphics.drawImage(this.copybuffer, 0, 0, this.getWidth(), this.getHeight(), 0, 0, this.getWidth(), this.getHeight(), (ImageObserver) null);
-////                if (!this.dirtyCellsLookupTable.isAllDirty()) {
-////                    previousFirstVisibleRowIndex = (this.lastBufferUpdateScrollPosition + this.getHeight()) / fontHeight;
-////
-////                    for (int row = previousFirstVisibleRowIndex; row <= lastVisibleRowIndex; ++row) {
-////                        this.dirtyCellsLookupTable.setRowDirty(row);
-////                    }
-////                }
-////            } else {
-//            this.dirtyCellsLookupTable.setAllDirty();
-////            }
-//        } else if (this.lastBufferUpdateScrollPosition > scrollOffsetFromTopInPixels) {
-//            previousLastVisibleRowIndex = this.lastBufferUpdateScrollPosition - scrollOffsetFromTopInPixels;
-////            if (previousLastVisibleRowIndex / fontHeight < viewportSize.getRows()) {
-////                graphics = this.copybuffer.createGraphics();
-////                graphics.setClip(0, 0, this.getWidth(), this.getHeight() - previousLastVisibleRowIndex);
-////                graphics.drawImage(this.backbuffer, 0, 0, (ImageObserver) null);
-////                graphics.dispose();
-////                backbufferGraphics.drawImage(this.copybuffer, 0, previousLastVisibleRowIndex, this.getWidth(), this.getHeight(), 0, 0, this.getWidth(), this.getHeight() - previousLastVisibleRowIndex, (ImageObserver) null);
-////                if (!this.dirtyCellsLookupTable.isAllDirty()) {
-////                    previousFirstVisibleRowIndex = this.lastBufferUpdateScrollPosition / fontHeight;
-////
-////                    for (int row = firstVisibleRowIndex; row <= previousFirstVisibleRowIndex; ++row) {
-////                        this.dirtyCellsLookupTable.setRowDirty(row);
-////                    }
-////                }
-////            } else {
-//            this.dirtyCellsLookupTable.setAllDirty();
-////            }
-//        }
-//
-//        if (this.lastComponentWidth < this.getWidth() && !this.dirtyCellsLookupTable.isAllDirty()) {
-//            previousLastVisibleRowIndex = this.getWidth() / fontWidth;
-//            int row = this.lastComponentWidth / fontWidth;
-//
-//            for (previousFirstVisibleRowIndex = row; previousFirstVisibleRowIndex <= previousLastVisibleRowIndex; ++previousFirstVisibleRowIndex) {
-//                this.dirtyCellsLookupTable.setColumnDirty(previousFirstVisibleRowIndex);
-//            }
-//        }
-//
-//        if (this.lastComponentHeight < this.getHeight() && !this.dirtyCellsLookupTable.isAllDirty()) {
-//            previousLastVisibleRowIndex = (scrollOffsetFromTopInPixels + this.lastComponentHeight) / fontHeight;
-//
-//            for (int row = previousLastVisibleRowIndex; row <= lastVisibleRowIndex; ++row) {
-//                this.dirtyCellsLookupTable.setRowDirty(row);
-//            }
-//        }
 
         int cols = viewportSize.getColumns();
         int cursorCol = cursorPosition.getColumn();
         int cursorRow = cursorPosition.getRow();
+        int characterWidth = fontWidth * 1; //(TerminalTextUtils.isCharCJK(textCharacter.getCharacter()) ? 2 : 1);
 
-        term.forEachLine(firstVisibleRowIndex, lastVisibleRowIndex, (rowNumber, bufferLine) -> {
+        term.forEachLine(firstVisibleRowIndex, lastVisibleRowIndex, (row, bufferLine) -> {
+
             for (int column = 0; column < cols; ++column) {
                 TextCharacter textCharacter = bufferLine.getCharacterAt(column);
-                boolean atCursorLocation = cursorPosition.equals(column, rowNumber);
-                if (!atCursorLocation && cursorCol == column + 1 && cursorRow == rowNumber && TerminalTextUtils.isCharCJK(textCharacter.getCharacter())) {
-                    atCursorLocation = true;
-                }
+                boolean atCursorLocation = column == cursorCol && row == cursorRow; //cursorPosition.equals(column, row);
 
-
-                //if (dirtyCellsLookupTable.isAllDirty() || dirtyCellsLookupTable.isDirty(rowNumber, column)) {
-                int characterWidth = fontWidth * (TerminalTextUtils.isCharCJK(textCharacter.getCharacter()) ? 2 : 1);
                 Color foregroundColor = textCharacter.getForegroundColor().toColor();
                 Color backgroundColor = textCharacter.getBackgroundColor().toColor();
 
-                drawCharacter(backbufferGraphics, textCharacter, column, rowNumber, foregroundColor, backgroundColor, fontWidth, fontHeight, characterWidth, scrollOffsetFromTopInPixels, atCursorLocation);
-                //}
+                drawCharacter(backbufferGraphics, textCharacter, column, row, foregroundColor, backgroundColor, fontWidth, fontHeight, characterWidth, atCursorLocation);
 
-                if (TerminalTextUtils.isCharCJK(textCharacter.getCharacter())) {
-                    ++column;
-                }
+//                if (TerminalTextUtils.isCharCJK(textCharacter.getCharacter())) {
+//                    ++column;
+//                }
             }
 
         });
         backbufferGraphics.dispose();
 
         this.lastDrawnCursorPosition = cursorPosition;
-        this.lastBufferUpdateScrollPosition = scrollOffsetFromTopInPixels;
+
         this.needFullRedraw = false;
     }
 
-//    private void buildDirtyCellsLookupTable(int firstRowOffset, int lastRowOffset) {
-//        if (!(term instanceof DefaultVirtualTerminal && ((DefaultVirtualTerminal) term).isWholeBufferDirtyThenReset() && !this.needFullRedraw)) {
-//            TerminalSize viewportSize = term.getTerminalSize();
-//            TerminalPosition cursorPosition = term.getCursorBufferPosition();
-//            this.dirtyCellsLookupTable.resetAndInitialize(firstRowOffset, lastRowOffset, viewportSize.getColumns());
-//            this.dirtyCellsLookupTable.setDirty(cursorPosition);
-//            if (this.lastDrawnCursorPosition != null && !this.lastDrawnCursorPosition.equals(cursorPosition)) {
-//                if (term.getCharacter(this.lastDrawnCursorPosition).isDoubleWidth()) {
-//                    this.dirtyCellsLookupTable.setDirty(this.lastDrawnCursorPosition.withRelativeColumn(1));
-//                }
-//
-//                if (this.lastDrawnCursorPosition.getColumn() > 0 && term.getCharacter(this.lastDrawnCursorPosition.withRelativeColumn(-1)).isDoubleWidth()) {
-//                    this.dirtyCellsLookupTable.setDirty(this.lastDrawnCursorPosition.withRelativeColumn(-1));
-//                }
-//
-//                this.dirtyCellsLookupTable.setDirty(this.lastDrawnCursorPosition);
-//            }
-//
-//            TreeSet<TerminalPosition> dirtyCells = ((DefaultVirtualTerminal) term).getAndResetDirtyCells();
-//            Iterator var6 = dirtyCells.iterator();
-//
-//            while (var6.hasNext()) {
-//                TerminalPosition position = (TerminalPosition) var6.next();
-//                this.dirtyCellsLookupTable.setDirty(position);
-//            }
-//
-//        } else {
-//            this.dirtyCellsLookupTable.setAllDirty();
-//        }
-//    }
 
     private void ensureGraphicBufferHasRightSize() {
 
@@ -616,9 +426,9 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 
     }
 
-    private void drawCharacter(Graphics g, TextCharacter character, int columnIndex, int rowIndex, Color foregroundColor, Color backgroundColor, int fontWidth, int fontHeight, int characterWidth, int scrollingOffsetInPixels, boolean drawCursor) {
+    private void drawCharacter(Graphics g, TextCharacter character, int columnIndex, int rowIndex, Color foregroundColor, Color backgroundColor, int fontWidth, int fontHeight, int characterWidth, boolean drawCursor) {
         int x = columnIndex * fontWidth;
-        int y = rowIndex * fontHeight - scrollingOffsetInPixels;
+        int y = rowIndex * fontHeight;
         g.setColor(backgroundColor);
         //g.setClip(x, y, characterWidth, fontHeight);
         g.fillRect(x, y, characterWidth, fontHeight);
@@ -627,7 +437,11 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
         //FontMetrics fontMetrics = g.getFontMetrics();
         //g.drawString(Character.toString(character.getCharacter()), x, y + fontHeight - fontMetrics.getDescent() + 1);
         final int descent = 4;
-        g.drawChars(new char[] { character.getCharacter() }, 0, 1, x, y + fontHeight + 1 - descent);
+        char c = character.getCharacter();
+        if (c!=' ')
+            g.drawChars(new char[] {c}, 0, 1, x, y + fontHeight + 1 - descent);
+
+
         int lineStartY;
         int lineEndX;
         if (character.isCrossedOut()) {

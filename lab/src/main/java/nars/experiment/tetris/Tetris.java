@@ -61,7 +61,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
      * @param timePerFall larger is slower gravity
      */
     public Tetris(NAR nar, int width, int height, int timePerFall) throws Narsese.NarseseException {
-        super(nar);
+        super("tetris", nar);
 
         state = new TetrisState(width, height, timePerFall) {
             @Override
@@ -111,7 +111,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
 
         addCamera(
-            pixels = new CameraSensor<>($.the("tetris"), this, this)
+            pixels = new CameraSensor<>(id, this, this)
                             .resolution(0.05f)
         );
         //pixels.resolution(0.1f);

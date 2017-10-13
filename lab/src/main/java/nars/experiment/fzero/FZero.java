@@ -19,12 +19,12 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
-    float fwdSpeed = 8;
+    float fwdSpeed = 2;
     float rotSpeed = 0.05f;
 
     public static void main(String[] args) {
 
-        float fps = 16f;
+        float fps = 12f;
 
         NAgentX.runRT((n) -> {
 
@@ -46,7 +46,7 @@ public class FZero extends NAgentX {
     }
 
     public FZero(NAR nar) throws Narsese.NarseseException {
-        super(nar);
+        super("fz", nar);
 
         this.fz = new FZeroGame();
 
@@ -240,10 +240,27 @@ public class FZero extends NAgentX {
 
     private void initToggle() {
 
-        fwdSpeed=2;
-        actionToggle($.inh($.the("left"), $.the("fz")), (b)->{ fz.left = b; });
-        actionToggle($.inh($.the("right"), $.the("fz")), (b)->{ fz.right = b; });
-        actionToggle($.inh($.the("fwd"), $.the("fz")), (b)->{ fz.thrust = b; });
+        actionToggle($.inh($.the("left"), id), (b) -> {
+            if (b && fz.right) {
+                fz.left = fz.right = false;
+            } else {
+                fz.left = b;
+            }
+        });
+        actionToggle($.inh($.the("right"), id), (b) -> {
+            if (b && fz.left) {
+                fz.left = fz.right = false;
+            } else {
+                fz.right = b;
+            }
+        });
+        actionToggle($.inh($.the("fwd"), id), (b) -> {
+            fz.thrust = b;
+        });
+        actionToggle($.inh($.the("brake"), id), () -> {
+            //fz.left = fz.right = false;
+            fz.vehicleMetrics[0][6] *= 0.9f;
+        });
 
     }
 

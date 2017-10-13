@@ -8,11 +8,11 @@ public interface TaskRegion extends HyperRegion, Tasked {
     /**
      * relative to time sameness (1)
      */
-    float FREQ_SAMENESS_IMPORTANCE = 0.5f;
+    float FREQ_SAMENESS_IMPORTANCE = 0.25f;
     /**
      * relative to time sameness (1)
      */
-    float CONF_SAMENESS_IMPORTANCE = 0.1f;
+    float CONF_SAMENESS_IMPORTANCE = 0.05f;
 
     @Override
     boolean equals(Object obj);
@@ -41,12 +41,12 @@ public interface TaskRegion extends HyperRegion, Tasked {
 
     default float freqCost() {
         float d = (float) range(1);
-        return 1 + d * timeCost() * FREQ_SAMENESS_IMPORTANCE;
+        return 1 + d /* * timeCost()*/ * FREQ_SAMENESS_IMPORTANCE;
     }
 
     default float confCost() {
         float d = (float) range(2);
-        return 1 + d * timeCost() * CONF_SAMENESS_IMPORTANCE;
+        return 1 + d /* * timeCost()*/ * CONF_SAMENESS_IMPORTANCE;
     }
 
 

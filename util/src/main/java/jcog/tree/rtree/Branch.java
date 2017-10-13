@@ -204,10 +204,11 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
         grow(child[i]);
     }
 
-    private void grow(Node<T, ?> node) {
+    private void grow(Node node) {
         region = region.mbr(node.region());
     }
-    private static <T> HyperRegion grow(HyperRegion region, Node<T, ?> node) {
+
+    private static HyperRegion grow(HyperRegion region, Node node) {
         return region.mbr(node.region());
     }
 
@@ -258,17 +259,20 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
         //TODO may be able to avoid recomputing bounds if the old was not found
         boolean found = false;
+        Node<T, ?>[] cc = this.child;
+        HyperRegion region = null;
         for (int i = 0; i < size; i++) {
-            if (!found && tRect.intersects(child[i].region())) {
-                child[i] = child[i].update(OLD, NEW, model);
+            if (!found && tRect.intersects(cc[i].region())) {
+                cc[i] = cc[i].update(OLD, NEW, model);
                 found = true;
             }
             if (i == 0) {
-                region = child[0].region();
+                region = cc[0].region();
             } else {
-                grow(child[i]);
+                region = grow(region, cc[i]);
             }
         }
+        this.region = region;
 
         return this;
 

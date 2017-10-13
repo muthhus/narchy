@@ -23,6 +23,7 @@ package jcog.tree.rtree;
 import jcog.Util;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -111,6 +112,7 @@ public class Leaf<T> implements Node<T, T> {
 
     @Override
     public boolean AND(Predicate<T> p) {
+        T[] data = this.data;
         for (int i = 0; i < size; i++)
             if (!p.test(data[i]))
                 return false;
@@ -119,6 +121,7 @@ public class Leaf<T> implements Node<T, T> {
 
     @Override
     public boolean OR(Predicate<T> p) {
+        T[] data = this.data;
         for (int i = 0; i < size; i++)
             if (p.test(data[i]))
                 return true;
@@ -146,21 +149,33 @@ public class Leaf<T> implements Node<T, T> {
     @Override
     public Node<T, ?> remove(final T t, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
 
-        int i = 0;
+
+//        while (i < size && (data[i] != t) && (!data[i].equals(t))) {
+//            i++;
+//        }
+//
+//        int j = i;
+//
+//        while (j < size && ((data[j] == t) || data[j].equals(t))) {
+//            j++;
+//        }
+
+        final int size = this.size;
+        if (size == 0)
+            return this;
         T[] data = this.data;
-
-        while (i < size && (data[i] != t) && (!data[i].equals(t))) {
-            i++;
+        int i;
+        for (i = 0; i < size; i++) {
+            T d = data[i];
+            if (t == d || t.equals(d))
+                break; //found
         }
+        if (i == size)
+            return this; //not found
 
-        int j = i;
-
-        while (j < size && ((data[j] == t) || data[j].equals(t))) {
-            j++;
-        }
-
-        if (i < j) {
-            final int nRemoved = j - i;
+        {
+            final int j = i + 1;
+            final int nRemoved = 1; //j - i;
             if (j < size) {
                 final int nRemaining = size - j;
                 System.arraycopy(data, j, data, i, nRemaining);
@@ -169,10 +184,10 @@ public class Leaf<T> implements Node<T, T> {
                 Arrays.fill(data, i, size, null);
             }
 
-            size -= nRemoved;
+            this.size -= nRemoved;
             parent.reportSizeDelta(-nRemoved);
 
-            region = size > 0 ? HyperRegion.mbr(model.region, data, size) : null;
+            region = this.size > 0 ? HyperRegion.mbr(model.region, data, this.size) : null;
 
         }
 

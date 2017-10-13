@@ -64,7 +64,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
     /**
      * lookahead time in durations (multiples of duration)
      */
-    public final FloatParam predictAheadDurs = new FloatParam(1, 1, 32);
+//    public final FloatParam predictAheadDurs = new FloatParam(1, 1, 32);
 
     private final CauseChannel<ITask> predict;
 
