@@ -102,14 +102,21 @@ public class MultiExec extends Exec {
 
                     long start = System.nanoTime();
                     int loops = 0;
+
+                    plan.commit();
+
+                    //spread the sampling over N batches for fairness
+                    int batches = 8;
+                    int batchSize = plan.capacity()/batches;
+
                     while (premiseRemaining > 0) {
 
                         int premiseDoneAtStart = premiseDone;
 
-                        workRemaining = plan.size();
-
-                        plan.commit()
-                                .sample(super::exeSample);
+                        for (int i = 0; i < batches; i++) {
+                            workRemaining = batchSize;
+                            plan.sample(super::exeSample);
+                        }
 
                         loops++;
 

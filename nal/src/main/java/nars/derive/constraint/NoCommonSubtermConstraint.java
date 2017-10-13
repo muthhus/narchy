@@ -36,7 +36,7 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
 
 
         final static Predicate<Term> limit =
-                Op.recursiveCommonalityDelimeter;
+                Op.recursiveCommonalityDelimeterWeak;
 
 
     static boolean isSubtermOfTheOther(@NotNull Term a, @NotNull Term b, boolean recurse, boolean excludeVariables) {

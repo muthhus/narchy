@@ -10,25 +10,13 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static nars.$.$;
+import static nars.$.*;
 import static nars.$.conj;
-import static nars.$.diffe;
-import static nars.$.diffi;
-import static nars.$.disj;
-import static nars.$.p;
-import static nars.$.parallel;
-import static nars.$.secte;
-import static nars.$.secti;
-import static nars.$.sete;
-import static nars.$.seti;
-import static nars.$.sim;
-import static nars.$.t;
-import static nars.$.task;
-import static nars.$.varDep;
 import static nars.Op.*;
 import static nars.term.TermTest.assertValid;
 import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 import static org.junit.Assert.*;
 
@@ -257,6 +245,23 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
+    public void testConjParallelConceptualShouldntBeXTERNAL() throws Narsese.NarseseException {
+
+
+        for (int dt : new int[] { XTERNAL, DTERNAL, 0 }) {
+            assertEquals("(&&,a,b,c)",
+                    CONJ.the(
+                            dt,
+                            $.$("a"),
+                            $.$("b"),
+                            $.$("c")
+                    ).conceptual().toString());
+        }
+
+
+    }
+
+    @Test
     public void testConjEvents() throws Narsese.NarseseException {
         assertEquals(
                 "(a &&+16 ((--,a)&|b))",
@@ -313,8 +318,8 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testIntersectionRange() throws Narsese.NarseseException {
-        assertEquals("(8|4..5)", Op.SECTi.the(Int.the(4), Int.the(8), Int.range(4,5)).toString());
-        assertEquals("(8&4..5)", Op.SECTe.the(Int.the(4), Int.the(8), Int.range(4,5)).toString());
+        assertEquals("(8|4..5)", Op.SECTi.the(Int.the(4), Int.the(8), Int.range(4, 5)).toString());
+        assertEquals("(8&4..5)", Op.SECTe.the(Int.the(4), Int.the(8), Int.range(4, 5)).toString());
         //TODO for Set's
     }
 

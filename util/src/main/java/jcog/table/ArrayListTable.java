@@ -26,7 +26,7 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
     abstract public int size();
 
     @Override
-    public void forEachKey(@NotNull Consumer<? super K> each) {
+    public void forEachKey(Consumer<? super K> each) {
         forEach(t -> each.accept(key(t)));
     }
 
@@ -49,14 +49,14 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
      * @param k An item
      * @return Whether the Item is in the Bag
      */
-    public final boolean contains(@NotNull K k) {
+    public final boolean contains(/*@NotNull*/ K k) {
         return this.containsKey(k);
     }
 
 
     @Nullable
     @Override
-    protected final V removeItem(@NotNull V removed) {
+    protected final V removeItem(/*@NotNull*/ V removed) {
         return listRemove(removed) ? removed : null;
     }
 
@@ -76,27 +76,27 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
 
 
 
-    /**
-     * Take out the first or last E in a level from the itemTable
-     * @return The first Item
-     */
-    public final V removeItem(int index) {
-
-        V ii = get(index);
-        if (ii == null)
-            return null;
-
-        /*if (ii == null)
-            throw new RuntimeException("invalid index: " + index + ", size=" + size());*/
-
-        //        if (ii!=jj) {
-//            throw new RuntimeException("removal fault");
-//        }
-
-        removeItem(ii);
-        removeKeyForValue(ii);
-        return ii;
-    }
+//    /**
+//     * Take out the first or last E in a level from the itemTable
+//     * @return The first Item
+//     */
+//    public final V removeItem(int index) {
+//
+//        V ii = get(index);
+//        if (ii == null)
+//            return null;
+//
+//        /*if (ii == null)
+//            throw new RuntimeException("invalid index: " + index + ", size=" + size());*/
+//
+//        //        if (ii!=jj) {
+////            throw new RuntimeException("removal fault");
+////        }
+//
+//        removeItem(ii);
+//        removeKeyForValue(ii);
+//        return ii;
+//    }
 
 
     @Override

@@ -117,7 +117,7 @@ public abstract class CollectorMap<K, V> {
 //        return removed;
 //    }
 
-    @Nullable public V remove(@NotNull K x) {
+    @Nullable public V remove(/*@NotNull*/ K x) {
         final Object[] removed = {null};
         map.computeIfPresent(x, (k,v) -> {
             removeItem(v);
@@ -135,10 +135,10 @@ public abstract class CollectorMap<K, V> {
 //            throw new RuntimeException("Bag fault while trying to remove key by item value");
 //    }
 
-    protected final @Nullable V removeKeyForValue(@NotNull V value) {
-        @Nullable K key = key(value);
-        return key != null ? map.remove(key) : null;
-    }
+//    protected final @Nullable V removeKeyForValue(@NotNull V value) {
+//        @Nullable K key = key(value);
+//        return key != null ? map.remove(key) : null;
+//    }
 
 
 //    public final boolean containsValue(V it) {

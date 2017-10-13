@@ -113,7 +113,7 @@ public class DefaultBeliefTable implements BeliefTable {
      * get the most relevant belief/goal with respect to a specific time.
      */
     @Override
-    public Task match(long start, long end, Term template, boolean noOverlap, NAR nar) {
+    public Task match(long start, long end, Term template, NAR nar) {
 
         final Task ete = eternal.strongest();
 

@@ -96,7 +96,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Task match(long start, long end, @Nullable Term template, boolean noOverlap, NAR nar) {
+        public Task match(long start, long end, @Nullable Term template, NAR nar) {
             return null;
         }
 
@@ -218,10 +218,10 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return truth(when, when, nar);
     }
 
-    Task match(long start, long end, @Nullable Term template, boolean noOverlap, NAR nar);
+    Task match(long start, long end, @Nullable Term template, NAR nar);
 
-    default Task match(long when, @Nullable Term template, boolean noOverlap, NAR nar) {
-        return match(when, when, template, noOverlap, nar);
+    default Task match(long when, @Nullable Term template, NAR nar) {
+        return match(when, when, template, nar);
     }
 
     default Task answer(long start, long end, Term template, NAR nar) {
@@ -234,7 +234,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     default Task answer(long start, long end, int dur, @Nullable Task question, Term template, NAR nar) {
 
 
-        Task answer = match(start, end, template, false, nar);
+        Task answer = match(start, end, template, nar);
         if (answer == null || answer.isDeleted())
             return null;
 

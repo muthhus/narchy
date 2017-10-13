@@ -704,6 +704,11 @@ public enum Op  {
      */
     @NotNull
     private static Term compound(Op o, Term... subterms) {
+
+        for (Term x : subterms)
+            if (x instanceof Bool)
+                return Null;
+
         return Builder.Compound.the.apply(o, subterms);
     }
 
@@ -1167,14 +1172,14 @@ public enum Op  {
             case 2:
                 Term et0 = t[0], et1 = t[1];
                 if (et0.equals(et1)
-                        || et0.containsRecursively(et1, recursiveCommonalityDelimeter)
-                        || et1.containsRecursively(et0, recursiveCommonalityDelimeter))
+                        || et0.containsRecursively(et1, recursiveCommonalityDelimeterWeak)
+                        || et1.containsRecursively(et0, recursiveCommonalityDelimeterWeak))
 
                     return Null;
                 else if ((et0.op() == set && et1.op() == set))
                     return difference(set, et0, et1);
                 else
-                    return compound(op, DTERNAL, t);
+                    return compound(op, t);
 
 
         }
@@ -1243,13 +1248,8 @@ public enum Op  {
      * last stage constructor: use with caution
      */
     @NotNull
-    public static Term compound(Op op, int dt, Term... subterms) {
-
-        //if (!subterms.internable())
-        Term c = compound(op, subterms);
-
-        //allow temporalization:
-        return compound(c, dt);
+    static Term compound(Op op, int dt, Term... subterms) {
+        return compound(compound(op, subterms), dt);
     }
 
 
@@ -1284,12 +1284,15 @@ public enum Op  {
     /**
      * ops across which reflexivity of terms is allowed
      */
-    final static int relationDelimeter = Op.or(Op.PROD, Op.CONJ, Op.NEG);
-    public static final Predicate<Term> recursiveCommonalityDelimeter =
-            c -> !c.isAny(relationDelimeter);
+    final static int relationDelimeterWeak = Op.or(Op.PROD, Op.CONJ, Op.NEG);
+    public static final Predicate<Term> recursiveCommonalityDelimeterWeak =
+            c -> !c.isAny(relationDelimeterWeak);
+    final static int relationDelimeterStrong = Op.or(Op.PROD);
+    public static final Predicate<Term> recursiveCommonalityDelimeterStrong =
+            c -> !c.isAny(relationDelimeterStrong);
 
-    public static final Predicate<Term> onlyTemporal =
-            c -> concurrent(c.dt());
+//    public static final Predicate<Term> onlyTemporal =
+//            c -> concurrent(c.dt());
     //c.op()!=CONJ || concurrent(c.dt()); //!c.op().temporal || concurrent(c.dt());
 
     private static final int InvalidImplicationSubj = or(IMPL);
@@ -1487,13 +1490,8 @@ public enum Op  {
         }
 
 
-        Predicate<Term> delim =
-                op == IMPL ?
-                        (dtConcurrent ? (x) -> true :
-                                Op.recursiveCommonalityDelimeter) :
-                        //Op.onlyTemporal) :
-
-                        Op.recursiveCommonalityDelimeter;
+        Predicate<Term> delim = (op == IMPL && dtConcurrent) ?
+                    recursiveCommonalityDelimeterStrong : Op.recursiveCommonalityDelimeterWeak;
 
         if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
                 (op != IMPL || dtConcurrent)) { //apply to: inh, sim, and current impl
@@ -1680,7 +1678,7 @@ public enum Op  {
         if (aa.length == 1)
             return aa[0]; //reduction to one element
 
-        return compound(intersection, DTERNAL, aa);
+        return compound(intersection, aa);
     }
 
     public static boolean goalable(Term c) {
@@ -1765,7 +1763,7 @@ public enum Op  {
 
     @NotNull
     public final Term the(@NotNull Term... u) {
-        return the(DTERNAL, u);
+        return commutative ? the(DTERNAL, u) : _the(DTERNAL, u);
     }
 
     public final Term the(int dt, @NotNull Collection<Term> sub) {

@@ -1651,7 +1651,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * default deriver
      */
-    public Derivation derivation() {
+    @Deprecated public Derivation derivation() {
         return derivation(deriver);
     }
 

@@ -14,7 +14,7 @@ abstract public class ConcurrentArrayBag<K,X extends Priority> extends ArrayBag<
 
     private final QueueLock<X> toPut;
 
-    public ConcurrentArrayBag(@NotNull PriMerge mergeFunction, @NotNull Map<K, X> map, Random rng, int cap) {
+    public ConcurrentArrayBag(@NotNull PriMerge mergeFunction, @NotNull Map<K, X> map, int cap) {
         super(mergeFunction, map);
         setCapacity(cap);
 
@@ -33,7 +33,7 @@ abstract public class ConcurrentArrayBag<K,X extends Priority> extends ArrayBag<
     }
 
     @Override
-    public void putAsync(@NotNull X b) {
+    public void putAsync(X b) {
         toPut.accept(b);
     }
 

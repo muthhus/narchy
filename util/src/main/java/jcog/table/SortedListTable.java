@@ -44,7 +44,7 @@ abstract public class SortedListTable<X, Y> extends ArrayListTable<X, Y> impleme
 
     @Override
     public final Y get(int i) {
-        return (Y) items.array()[i];
+        return (Y) items.list[i];//array()[i];
     }
 
     @Override
@@ -77,9 +77,9 @@ abstract public class SortedListTable<X, Y> extends ArrayListTable<X, Y> impleme
 
 
 
-    /** gets the key associated with a value */
-    @Nullable @Override
-    abstract public X key(@NotNull Y l);
+//    /** gets the key associated with a value */
+//    @Nullable @Override
+//    abstract public X key(@NotNull Y l);
 
 
 
@@ -112,7 +112,7 @@ abstract public class SortedListTable<X, Y> extends ArrayListTable<X, Y> impleme
 //    }
 
     @NotNull
-    @Deprecated public List<Y> listCopy() {
+    public List<Y> listCopy() {
         List<Y> l = new ArrayList(size());
         forEach((Consumer<Y>) l::add);
         return l;

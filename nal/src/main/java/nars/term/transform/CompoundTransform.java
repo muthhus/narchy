@@ -42,7 +42,7 @@ public interface CompoundTransform extends TermContext {
         return c.dt();
     }
 
-    default Term transform(Compound x, Op op, int dt) {
+    @Nullable default Term transform(Compound x, Op op, int dt) {
 
         boolean boolFilter = !op.allowsBool;
 

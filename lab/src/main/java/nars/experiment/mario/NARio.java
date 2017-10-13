@@ -247,7 +247,7 @@ public class NARio extends NAgentX {
     public static void main(String[] args) {
 
 
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
         NAR nar = runRT((NAR n) -> {
 

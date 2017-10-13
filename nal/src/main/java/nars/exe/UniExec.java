@@ -3,6 +3,7 @@ package nars.exe;
 import jcog.bag.Bag;
 import jcog.bag.impl.ConcurrentCurveBag;
 import nars.NAR;
+import nars.bag.ConcurrentArrayBag;
 import nars.task.ITask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +87,7 @@ public class UniExec extends Exec  {
     public synchronized void start(NAR nar) {
 
         plan =
+                //new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), CAPACITY) {
                 new ConcurrentCurveBag<ITask>(this, new ConcurrentHashMap(), nar.random(), CAPACITY) {
 
                     @Override

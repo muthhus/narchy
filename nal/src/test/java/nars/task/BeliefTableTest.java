@@ -43,7 +43,7 @@ public class BeliefTableTest {
 
         BeliefTable beliefs = b.concept().beliefs();
 
-        assertEquals(0.5, beliefs.match(ETERNAL, null, true, n).conf(), 0.001);
+        assertEquals(0.5, beliefs.match(ETERNAL, null, n).conf(), 0.001);
         Truth bt = n.beliefTruth(b, n.time());
         assertNotNull(bt);
         assertEquals(0.5, bt.conf(), 0.001);
@@ -53,20 +53,20 @@ public class BeliefTableTest {
         n.cycle();
         b.print();
         assertEquals(3 /* revision */, beliefs.size());
-        assertEquals(0.669, beliefs.match(ETERNAL, null, true, n).conf(), 0.01);
+        assertEquals(0.669, beliefs.match(ETERNAL, null, n).conf(), 0.01);
 
         b.believe(1.0f, 0.5f);
         n.cycle();
         b.print();
         assertEquals(5, beliefs.size());
         @NotNull BeliefTable bb = beliefs;
-        assertEquals(0.75, bb.match(ETERNAL, null, true, n).conf(), 0.001);
+        assertEquals(0.75, bb.match(ETERNAL, null, n).conf(), 0.001);
         assertEquals(0.75, n.beliefTruth(b, n.time()).conf(), 0.01);
 
         b.believe(1.0f, 0.5f);
         n.cycle();
         b.print();
-        assertEquals(0.79, beliefs.match(ETERNAL, null, true, n).conf(), 0.02);
+        assertEquals(0.79, beliefs.match(ETERNAL, null, n).conf(), 0.02);
         assertEquals(6, beliefs.size());
 
     }
@@ -113,7 +113,7 @@ public class BeliefTableTest {
             float fExpected = freqPattern[i];
             assertEquals("exact truth @" + w + " == " + fExpected, fExpected, truth.freq(), 0.01f);
 
-            Task match = table.match(w, null, false, n);
+            Task match = table.match(w, null, n);
             assertEquals("exact belief @" + w + " == " + fExpected, fExpected, match.freq(), 0.01f);
         }
 
@@ -256,7 +256,7 @@ public class BeliefTableTest {
 
             //test belief match interpolated a result
             long when = t == Present ? 0 : ETERNAL;
-            assertEquals(correctMerge, cc.beliefs().match(when, null, true, n).term().toString());
+            assertEquals(correctMerge, cc.beliefs().match(when, null, n).term().toString());
 
 
             //test merge after capacity shrink:
@@ -268,7 +268,7 @@ public class BeliefTableTest {
             //n.forEachTask(System.out::println);
 
             //INTERMPOLATION APPLIED AFTER REVECTION:
-            assertEquals(correctMerge, cc.beliefs().match((long) 0, null, true, n).term().toString());
+            assertEquals(correctMerge, cc.beliefs().match((long) 0, null, n).term().toString());
         }
     }
 

@@ -879,16 +879,34 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     @NotNull
     default Term conceptual() {
-        Term term = unneg().xternal();
+        Term term;
+
+        switch (op()) {
+            case NEG:
+                term = unneg().xternal();
+                break;
+            case CONJ:
+                if (subs() > 2) {
+                    //for commutive conj, the conceptual form is && for simplicity.  a &&+- here is pointless
+                    term = dt(DTERNAL);
+                } else {
+                    term = xternal();
+                }
+                break;
+            default:
+                term = xternal();
+                break;
+        }
         if (term == null)
             return Null;
 
+        term = term.unneg(); //just in case
 
-        //atemporalizing can reset normalization state of the result instance
-        //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
+        if (!term.op().conceptualizable)
+            return Null;
 
         term = term.normalize();
-        return term == null ? Null : term.unneg();
+        return term == null ? Null : term;
     }
 
 

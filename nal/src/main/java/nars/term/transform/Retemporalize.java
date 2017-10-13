@@ -3,6 +3,7 @@ package nars.term.transform;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.TemporalBits;
 import static nars.time.Tense.DTERNAL;
@@ -16,6 +17,7 @@ abstract public class Retemporalize implements CompoundTransform {
     public static final Retemporalize retemporalizeXTERNALToDTERNAL = new RetemporalizeFromTo(XTERNAL, DTERNAL);
     public static final Retemporalize retemporalizeXTERNALToZero = new RetemporalizeFromTo(XTERNAL, 0);
 
+    @Nullable
     @Override
     public Term transform(Compound x, Op op, int dt) {
         if (!x.hasAny(TemporalBits)) {

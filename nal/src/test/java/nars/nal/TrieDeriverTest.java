@@ -197,9 +197,9 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
         assertTrue(d.containsRecursively(Derivation._taskTerm));
     }
 
-    public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax) throws Narsese.NarseseException {
-        return testDerivation(rules, task, belief, ttlMax, false);
-    }
+//    public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax) throws Narsese.NarseseException {
+//        return testDerivation(rules, task, belief, ttlMax, false);
+//    }
 
 
     private final List<TestNAR> tests = $.newArrayList();
@@ -224,37 +224,37 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
         return t;
     }
 
-    public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax, boolean debug) throws Narsese.NarseseException {
-        NAR n = NARS.tmp();
-
-        PrediTerm<Derivation> d = testCompile(debug, rules);
-        if (debug)
-            d = d.transform(DebugDerivationPredicate::new);
-
-        Set<Task> tasks = new LinkedHashSet();
-        n.onTask(tasks::add);
-        n.log();
-
-        Task t = Narsese.parse().task(task, n);
-        assertNotNull(t);
-        Term b = $.$(belief);
-        assertNotNull(b);
-
-        PrediTerm<Derivation> dd = d;
-        Iterable<? extends ITask> derived = new Premise(t, b, 0.5f, Collections.emptySet()) {
-            @Override
-            protected Derivation derivation(@NotNull NAR n) {
-                return n.derivation(dd);
-            }
-        }.run(n);
-        if (derived != null) {
-            derived.forEach(x ->
-                    tasks.add((Task) x)
-            );
-        }
-
-        return tasks;
-    }
+//    public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax, boolean debug) throws Narsese.NarseseException {
+//        NAR n = NARS.tmp();
+//
+//        PrediTerm<Derivation> d = testCompile(debug, rules);
+//        if (debug)
+//            d = d.transform(DebugDerivationPredicate::new);
+//
+//        Set<Task> tasks = new LinkedHashSet();
+//        n.onTask(tasks::add);
+//        n.log();
+//
+//        Task t = Narsese.parse().task(task, n);
+//        assertNotNull(t);
+//        Term b = $.$(belief);
+//        assertNotNull(b);
+//
+//        PrediTerm<Derivation> dd = d;
+//        Iterable<? extends ITask> derived = new Premise(t, b, 0.5f, Collections.emptySet()) {
+//            @Override
+//            protected Derivation derivation(@NotNull NAR n) {
+//                return n.derivation(dd);
+//            }
+//        }.run(n);
+//        if (derived != null) {
+//            derived.forEach(x ->
+//                    tasks.add((Task) x)
+//            );
+//        }
+//
+//        return tasks;
+//    }
 
     @Test
     public void testConstraints() {

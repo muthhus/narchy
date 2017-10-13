@@ -80,8 +80,8 @@ public class Premise extends UnaryTask {
     public @Nullable Iterable<? extends ITask> run(@NotNull NAR n) {
 
 
-        Derivation d = derivation(n);
-        d.nar.emotion.conceptFirePremises.increment();
+
+        n.emotion.conceptFirePremises.increment();
 
 
         //nar.emotion.count("Premise_run");
@@ -93,9 +93,9 @@ public class Premise extends UnaryTask {
 
         int ttlMax = Util.lerp(task.priElseZero(), n.matchTTLmin.intValue(), n.matchTTLmax.intValue());
 
-        NAR nar = d.nar;
 
-        Concept taskConcept = task.concept(nar, true);
+
+        Concept taskConcept = task.concept(n, true);
         if (taskConcept == null) {
             if (Param.DEBUG) {
                 logger.warn("{} unconceptualizable", task); //WHY was task even created
@@ -121,12 +121,13 @@ public class Premise extends UnaryTask {
         //float taskPri = task.priElseZero();
 
 
+        Derivation d = n.derivation();
         int dur = d.dur;
         long now = d.time;
 
 
         Term beliefTerm = termLink;
-        Term beliefTermRaw = beliefTerm;
+
 
         Term taskTerm = task.term();
         if (beliefTerm.isTemporal()) {
@@ -145,8 +146,11 @@ public class Premise extends UnaryTask {
 
                     beliefTerm = bs.term.unneg();
 
-                    if (!(nar.nal() >= 7 || !beliefTerm.isTemporal())) {
-                        //HACK HACK HACK this is temporary until Temporalize correctly differnetiates between && and &| etc
+                    //HACK HACK HACK this is temporary until Temporalize correctly differnetiates between && and &| etc
+                    if (beliefTerm.isTemporal() && n.nal() < 7) {
+
+                        Term beliefTermRaw = beliefTerm;
+
                         beliefTerm = beliefTerm.temporalize(Retemporalize.retemporalizeAllToDTERNAL);
 
                         if (beliefTerm == null)
@@ -186,7 +190,7 @@ public class Premise extends UnaryTask {
             boolean beliefHasVars = beliefTerm.vars() > 0;
             if (taskTerm.vars() > 0 || beliefHasVars) {
                 int[] matchTTL = {Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION)};
-                Unify u = unify(taskTerm, beliefTerm, nar, matchTTL);
+                Unify u = unify(taskTerm, beliefTerm, n, matchTTL);
                 if (u != null) {
                     if (beliefHasVars) {
                         beliefTerm = beliefTerm.transform(u);
@@ -201,14 +205,11 @@ public class Premise extends UnaryTask {
             }
         }
 
-        if (beliefTerm == null)
-            beliefTerm = beliefTermRaw; //HACK
-
         beliefTerm = beliefTerm.unneg(); //HACK ?? assert(beliefTerm.op()!=NEG);
 
         //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
         Task belief = null;
-        Concept beliefConcept = nar.conceptualize(beliefTerm);
+        Concept beliefConcept = n.conceptualize(beliefTerm);
 
 
         if (beliefConcept != null && !beliefTerm.hasVarQuery()) { //doesnt make sense to look for a belief in a term with query var, it will have none
@@ -230,19 +231,19 @@ public class Premise extends UnaryTask {
 //
 //                            }
 
-                match = answerTable.answer(task.start(), task.end(), dur, task, beliefTerm, nar);
+                match = answerTable.answer(task.start(), task.end(), dur, task, beliefTerm, n);
                 if (match != null) {
                     assert (task.isQuest() || match.punc() == BELIEF) : "quest answered with a belief but should be a goal";
 
-                    @Nullable Task answered = task.onAnswered(match, nar);
+                    @Nullable Task answered = task.onAnswered(match, n);
                     if (answered != null) {
 
-                        nar.emotion.onAnswer(taskLink, answered);
+                        n.emotion.onAnswer(taskLink, answered);
 
                     }
                 }
             } else {
-                long focus = matchFocus(task, now, dur, nar);
+                long focus = matchFocus(task, now, dur, n);
                 long focusStart, focusEnd;
                 if (focus == ETERNAL) {
                     focusStart = focusEnd = ETERNAL;
@@ -262,7 +263,7 @@ public class Premise extends UnaryTask {
 //                    }
 //                }
                 if (tryMatch) {
-                    match = beliefConcept.beliefs().match(focusStart, focusEnd, beliefTermRaw, true, nar);
+                    match = beliefConcept.beliefs().match(focusStart, focusEnd, beliefTerm, n);
                 } else {
                     match = null;
                 }
@@ -289,7 +290,7 @@ public class Premise extends UnaryTask {
         Collection<DerivedTask> dd = d.run(this, task, belief, beliefTerm, ttlMax);
         if (dd != null) {
             int dds = dd.size();
-            nar.emotion.taskDerived.increment(dds);
+            n.emotion.taskDerived.increment(dds);
             return dd;
         } else {
             return null;
@@ -303,9 +304,6 @@ public class Premise extends UnaryTask {
 
     }
 
-    protected Derivation derivation(@NotNull NAR n) {
-        return n.derivation();
-    }
 
     /**
      * temporal focus control: determines when a matching belief or answer should be projected to

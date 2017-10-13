@@ -12,6 +12,11 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
+
 
 public class DynamicBeliefTable extends DefaultBeliefTable {
 
@@ -39,27 +44,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         if (ee == null || ee.isEmpty())
             return null;
 
-//        boolean ete = false;
-//        long end = Long.MIN_VALUE;
-//        long start = Long.MAX_VALUE;
-//        for (int i = 0, e1Size = ee.size(); i < e1Size; i++) {
-//            Task x = ee.get(i);
-//            long s = x.start();
-//            if (s!=ETERNAL) {
-//                long e = x.end();
-//                if (s < start) start = s;
-//                if (e > end) end = e;
-//            } else {
-//                ete = true;
-//            }
-//        }
-//        if (end == Long.MIN_VALUE) {
-//            assert(ete); //should be eternal in this case
-//            start = end = ETERNAL;
-//        }
 
-
-        return yy.task(template, beliefOrGoal, nar.time(), start, end, nar);
+        return yy.task(template, beliefOrGoal, nar);
     }
 
     @Override
@@ -75,9 +61,50 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         return model.eval(template, beliefOrGoal, start, end, evidence, nar); //newDyn(evidence);
     }
 
+    /**
+     * returns an appropriate dt by sampling the existing beliefs
+     * in the table (if any exist).  if no dt can be calculated, return
+     * a standard value (ex: 0 or DTERNAL)
+     */
+    private int matchDT(Term term, long start, long end) {
+
+        //assert (term.op().temporal): term + " is non-temporal but matchDT'd";
+
+        int s = size();
+        if (s > 0) {
+            final int[] count = {0};
+            final long[] sum = {0};
+
+            Consumer<Task> tx = x -> {
+                int xdt = x.dt();
+                if (xdt != DTERNAL) {
+                    sum[0] += xdt;
+                    count[0]++;
+                }
+            };
+
+            final int MAX_TASKS_FOR_COMPLETE_ITERATION = 8;
+            if (s < MAX_TASKS_FOR_COMPLETE_ITERATION)
+                forEachTask(tx);
+            else
+                forEachTask(false, start, end, tx); //just the matching subrange, should be cheaper if # of tasks is high
+
+            if (count[0] > 0) {
+                return (int) (sum[0] / count[0]);
+            }
+        }
+
+        return DTERNAL;
+    }
+
     @Override
-    public Task match(long start, long end, @NotNull Term template, boolean noOverlap, NAR nar) {
-        Task x = super.match(start, end, template, noOverlap, nar);
+    public Task match(long start, long end, @NotNull Term template, NAR nar) {
+        Task x = super.match(start, end, template, nar);
+
+        if (template.dt() == XTERNAL) {
+            int newDT = matchDT(template, start, end);
+            template = template.dt(newDT);
+        }
 
         Task y = generate(template, start, end, nar);
         if (y == null || y.equals(x)) return x;

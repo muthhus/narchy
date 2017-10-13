@@ -73,7 +73,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     public Stream<Y> stream() {
         int s = size();
         Object[] x = items.array();
-        return IntStream.range(0, s).mapToObj(i -> (Y)x[i]).filter(y -> y!=null && !y.isDeleted());
+        return IntStream.range(0, s).mapToObj(i -> (Y) x[i]).filter(y -> y != null && !y.isDeleted());
     }
 
     /**
@@ -136,15 +136,16 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
         if (toAdd != null) {
             int c = capacity();
+            float toAddPri = toAdd.priElseZero();
             if (s < c) {
                 //room to add an item
                 items.add(toAdd, this);
-                this.mass += toAdd.priElseZero();
+                this.mass += toAddPri;
             } else {
                 //at capacity, size will remain the same
                 Y removed;
                 if (size() > 0) {
-                    if (toAdd.priElseZero() > min) {
+                    if (toAddPri > min) {
                         //remove lowest
                         assert (size() == s);
                         //assert (s > 0) : "size is " + s + " and capacity is " + c + " so why are we removing an item";
@@ -153,7 +154,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                         this.mass -= removed.priElseZero();
                         //add this
                         items.add(toAdd, this);
-                        this.mass += toAdd.priElseZero();
+                        this.mass += toAddPri;
 
                     } else {
                         removed = toAdd;
@@ -272,12 +273,12 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 //    }
 
 
-    /**
-     * true iff o1 > o2
-     */
-    static boolean cmpGT(@Nullable Priority o1, @Nullable Priority o2) {
-        return cmpGT(o1, pCmp(o2));
-    }
+//    /**
+//     * true iff o1 > o2
+//     */
+//    static boolean cmpGT(@Nullable Priority o1, @Nullable Priority o2) {
+//        return cmpGT(o1, pCmp(o2));
+//    }
 
     static boolean cmpGT(@Nullable Priority o1, float o2) {
         return (pCmp(o1) < o2);
@@ -432,7 +433,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
     @Nullable
     @Override
-    public Y remove(@NotNull X x) {
+    public Y remove(/*@NotNull*/ X x) {
         synchronized (items) {
             return super.remove(x);
         }
@@ -444,7 +445,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 //    }
 
     @Override
-    public final Y put(@NotNull final Y incoming, @Nullable final MutableFloat overflow) {
+    public final Y put(/*@NotNull*/ final Y incoming, @Nullable final MutableFloat overflow) {
 
         if (capacity == 0)
             return null;
@@ -635,8 +636,6 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 //    }
 
 
-
-
     @Override
     @NotNull
     public Bag<X, Y> commit(Consumer<Y> update) {
@@ -723,24 +722,6 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         //throw new UnsupportedOperationException("TODO currently this bag works with PLink.pri() directly");
     }
 
-    @Override
-    public void forEach(int max, @NotNull Consumer<? super Y> action) {
-        Object[] x = items.array();
-        for (Object a : (x)) {
-            if (a != null) {
-                Y b = (Y) a;
-                float p = b.pri();
-                if (p == p) {
-                    action.accept(b);
-                    if (--max <= 0)
-                        break;
-                }
-            }
-
-
-        }
-
-    }
 
     @Override
     public void forEachKey(@NotNull Consumer<? super X> each) {
@@ -751,7 +732,17 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     @Override
     public void forEach(Consumer<? super Y> action) {
 
-        forEach(Integer.MAX_VALUE, action);
+        Object[] x = items.array();
+        for (Object a : (x)) {
+            if (a != null) {
+                Y b = (Y) a;
+                float p = pri(b);
+                if (p == p) {
+                    action.accept(b);
+                }
+            }
+        }
+
     }
 
 

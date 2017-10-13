@@ -535,7 +535,7 @@ public enum $ {
     }
 
     public static Term secte(Term... x) {
-        return SECTe.the(DTERNAL, x);
+        return SECTe.the(x);
     }
 
     public static Term secti(Term... x) {

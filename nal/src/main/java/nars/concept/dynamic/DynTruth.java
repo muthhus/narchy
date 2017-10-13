@@ -88,7 +88,7 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    public NALTask task(@NotNull Term c, boolean beliefOrGoal, long cre, long start, long end, NAR nar) {
+    NALTask task(@NotNull Term c, boolean beliefOrGoal, NAR nar) {
 
         Truth tr0 = truth();
         if (tr0 == null)
@@ -107,6 +107,10 @@ public final class DynTruth implements Truthed {
         if (priority != priority) //deleted
             return null;
 
+        long[] se = Task.range(e);
+        long start = se[0];
+        long end = se[1];
+
         Retemporalize r = start == ETERNAL ? Retemporalize.retemporalizeXTERNALToDTERNAL : Retemporalize.retemporalizeXTERNALToZero;
         if (null == (c = c.temporalize(r)))
             return null;
@@ -117,12 +121,10 @@ public final class DynTruth implements Truthed {
             return null;
 
 
-        long[] se = Task.range(e);
-        start = se[0];
-        end = se[1];
+
 
         NALTask dyn = new NALTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
-                tr, cre, start, end /*+ dur*/, evidence());
+                tr, nar.time(), start, end /*+ dur*/, evidence());
         dyn.cause = cause();
         dyn.setPri(priority);
 
