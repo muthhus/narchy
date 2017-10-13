@@ -26,6 +26,7 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.iterator.MutableLongIterator;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.impl.factory.primitive.LongSets;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
@@ -38,10 +39,6 @@ import static nars.time.Tense.ETERNAL;
 
 public interface Stamp {
 
-    /** "default" zipping config: prefer newest */
-    /*@NotNull*/ static long[] zip(/*@NotNull*/ long[] a, /*@NotNull*/ long[] b) {
-        return zip(a, b, 0.5f);
-    }
 
     /*@NotNull*/ static long[] zip(/*@NotNull*/ long[] a, /*@NotNull*/ long[] b, float aToB) {
         return zip(a, b, aToB,
@@ -130,6 +127,12 @@ public interface Stamp {
         }
 
         return toSetArray(c, maxLen);
+    }
+
+    /** computes an estimate of self-overlap of a stamp
+     * TODO refine */
+    static float cyclicity(long[] s) {
+        return isCyclic(s) ? (1f / (s.length)) : 0;
     }
 
     /*@NotNull*/
@@ -231,13 +234,7 @@ public interface Stamp {
         //copy evidentialBase and sort it
         return (l < 2) ? x : _toSetArray(outputLen, Arrays.copyOf(x, l));
     }
-    /*@NotNull*/
-    static long[] toSetArray(/*@NotNull*/ LongArrayList x) {
-        int l = x.size();
 
-        //copy evidentialBase and sort it
-        return l < 2 ? x.toArray() : _toSetArray(l, x.toArray());
-    }
 
     /*@NotNull*/
     static long[] _toSetArray(int outputLen, /*@NotNull*/ long[] sorted) {
@@ -275,7 +272,7 @@ public interface Stamp {
         return dedupAndTrimmed;
     }
 
-    static boolean overlapping(/*@NotNull*/ Stamp a, /*@NotNull*/ Stamp b) {
+    @Deprecated static boolean overlapping(/*@NotNull*/ Stamp a, /*@NotNull*/ Stamp b) {
         return ((a == b) || overlapping(a.stamp(), b.stamp()));
     }
 
@@ -286,7 +283,7 @@ public interface Stamp {
      * @param a evidence stamp in sorted order
      * @param b evidence stamp in sorted order
      */
-    static boolean overlapping(/*@NotNull*/ long[] a, /*@NotNull*/ long[] b) {
+    @Deprecated static boolean overlapping(/*@NotNull*/ long[] a, /*@NotNull*/ long[] b) {
 
         if (Param.DEBUG) {
 //            if (a == null || b == null)
@@ -327,11 +324,16 @@ public interface Stamp {
      */
     static float overlapFraction(long[] a, long[] b) {
         //prefer to make a set of the shorter length input
-        if (a.length < b.length) {
-            return overlapFraction(LongSets.immutable.of(a), a.length, b);
-        } else {
-            return overlapFraction(LongSets.immutable.of(b), b.length, a);
+        if (a.length > b.length) {
+            //swap
+            long[] ab = a;
+            a = b;
+            b = ab;
         }
+
+        //TODO fast impl for simple cases where a.length=1
+
+        return overlapFraction(LongSets.immutable.of(a), a.length, b);
     }
 
 
@@ -386,49 +388,66 @@ public interface Stamp {
 //                Stamp.zip(aa, bb);
 //    }
 
-    static int evidenceLength(int aLen, int bLen) {
-        return Math.max(Param.STAMP_CAPACITY, aLen + bLen);
-    }
-    static int evidenceLength(/*@NotNull*/ Task a, /*@NotNull*/ Task b) {
-        return evidenceLength(a.stamp().length, b.stamp().length);
-    }
+//    static int evidenceLength(int aLen, int bLen) {
+//        return Math.max(Param.STAMP_CAPACITY, aLen + bLen);
+//    }
+//    static int evidenceLength(/*@NotNull*/ Task a, /*@NotNull*/ Task b) {
+//        return evidenceLength(a.stamp().length, b.stamp().length);
+//    }
 
 //    static long[] zip(/*@NotNull*/ TemporalBeliefTable s) {
 //        return zip(s, s.size(), Param.STAMP_CAPACITY);
 //    }
 
-    static long[] zip(/*@NotNull*/ Collection<? extends Stamp> s) {
-        assert(!s.isEmpty());
-        return zip(s, Param.STAMP_CAPACITY);
-    }
+//    static long[] zip(/*@NotNull*/ Collection<? extends Stamp> s) {
+//        assert(!s.isEmpty());
+//        return zip(s, Param.STAMP_CAPACITY);
+//    }
 
-    static long[] zip(/*@NotNull*/ Iterable<? extends Stamp> s) {
-        return zip(s, Param.STAMP_CAPACITY);
-    }
 
-    static long[] zip(/*@NotNull*/ Iterable<? extends Stamp> s, int maxLen) {
+
+    static long[] zip(Stamp[] s, int maxLen) {
 //        final int extra = 1;
 //        int maxPer = Math.max(1, Math.round((float)maxLen / num)) + extra;
         LongHashSet l = new LongHashSet(maxLen);
-        final boolean[] cyclic = {false};
-        s.forEach( (Stamp t) -> {
-            long[] e = t.stamp();
-            int el = e.length;
-            for (int i = 0; i < el; i++) {
-                long ee = e[i];
-                if (ee != Long.MAX_VALUE) {
-                    if (!l.add(ee) || isCyclic(e))
-                        cyclic[0] = true;
+        boolean cyclic = false;
+        int done = 0;
+        int S = s.length;
+        int p = 0;
+        while (done<S && l.size() < (maxLen - (cyclic ? 1 : 0))) {
+            done = 0;
+            for (int i = 0; i < S; i++) {
+                long[] x = s[i].stamp();
+                int xl = x.length;
+                boolean c = (xl > 1 && x[xl-1]==Long.MAX_VALUE);
+
+                int xi = xl - 1 - p - (c ? 1 : 0);
+                if (xi < 0) {
+                    done++;
+                    continue;
                 }
+
+                long v = x[xi]; //skip cyclic
+                cyclic |= (!l.add(v)) || c;
             }
-        } );
+            p++;
+        }
 
 
         int ls = l.size();
 
-        long[] e = ArrayUtils.subarray(l.toSortedArray(), Math.max(0, ls - maxLen), ls);
-        if (cyclic[0])
-            e = cyclic(e); //TODO avoid needing to realloc
+        long[] e = new long[ls + (cyclic ? 1 : 0)];
+        MutableLongIterator ll = l.longIterator();
+        int k = 0;
+        while (ll.hasNext()) {
+            e[k++] = ll.next();
+        }
+
+        if (cyclic)
+            e[k] = Long.MAX_VALUE;
+
+        Arrays.sort(e);
+
         return e;
     }
 

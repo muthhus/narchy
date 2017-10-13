@@ -4,10 +4,7 @@ import jcog.Util;
 import jcog.list.ArrayIterator;
 import jcog.list.FasterList;
 import jcog.pri.VLink;
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Task;
+import nars.*;
 import nars.bag.BagClustering;
 import nars.control.Causable;
 import nars.control.Cause;
@@ -216,6 +213,9 @@ public class ConjClustering extends Causable {
 
                 pp.add(pair(tt, x.start()));
             }
+
+            //TODO discount based on evidential overlap? needs N-way overlapFraction function
+
             PreciseTruth t = $.t(freq, conf).ditherFreqConf(truthRes, confMin, 1f);
             if (t != null) {
 
@@ -230,8 +230,7 @@ public class ConjClustering extends Causable {
 
 
                     int uuLen = uu.length;
-                    FasterList<Task> uul = new FasterList<>(uuLen, uu);
-                    long[] evidence = Stamp.zip(new ArrayIterator(uu));
+                    long[] evidence = Stamp.zip(uu, Param.STAMP_CAPACITY);
                     NALTask m = new STMClusterTask(cp, t, start, end, evidence, punc, now); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
                     m.cause = Cause.zip(uu);

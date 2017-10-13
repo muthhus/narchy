@@ -164,16 +164,16 @@ public class FasterList<X> extends FastList<X> {
     /**
      * returns the array directly, or reconstructs it for the target type for the exact size required
      */
-    public final X[] array(IntFunction<X[]> arrayBuilder) {
+    public final <Y> Y[] array(IntFunction<Y[]> arrayBuilder) {
         Object[] i = items;
         int s = size;
         if (i.length != s || i.getClass() == Object[].class) {
-            X[] x = arrayBuilder.apply(s);
+            Y[] x = arrayBuilder.apply(s);
             if (s > 0)
                 System.arraycopy(items, 0, x, 0, s);
             return x;
         }
-        return items;
+        return (Y[])i;
     }
 
 

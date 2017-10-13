@@ -11,7 +11,6 @@ import nars.truth.func.TruthOperator;
 
 import static nars.Op.*;
 import static nars.truth.TruthFunctions.c2wSafe;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Evaluates the truth of a premise
@@ -76,7 +75,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
 //                if (f.allowOverlap()) {
 //                    overlap = 0;
 //                } else {
-                    float overlap = (single ? d.cyclic : Util.or(d.cyclic, d.overlap));
+                float overlap = (single ? d.overlapSingle : d.overlapDouble);
 //                }
 
                 if (overlap > 0) {
@@ -97,7 +96,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
             case QUEST:
             case QUESTION:
-                if (d.cyclic > 0 && d.random.nextFloat() <= d.cyclic)
+                if (d.overlapSingle > 0 && d.random.nextFloat() <= d.overlapSingle)
                     return false;
 
 //                byte tp = d.taskPunct;

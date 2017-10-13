@@ -66,9 +66,7 @@ public final class DynTruth implements Truthed {
 
     @Nullable
     public long[] evidence() {
-
-        //return e == null ? null :
-        return Stamp.zip(e);
+        return Stamp.zip(e.array(Stamp[]::new), Param.STAMP_CAPACITY);
     }
 
     @Nullable

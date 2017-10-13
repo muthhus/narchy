@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.Util;
 import jcog.math.ByteShuffler;
 import jcog.pri.Pri;
 import jcog.version.Versioned;
@@ -103,11 +104,9 @@ public class Derivation extends Unify {
     public boolean temporal;
 
 
-    /** evidential overlap of task against itself */
-    public float cyclic;
 
-    /** evidential overlap of task against belief */
-    public float overlap;
+    /** evidential overlap */
+    public float overlapDouble, overlapSingle;
 
     public float premisePri;
     public short[] parentCause;
@@ -290,6 +289,8 @@ public class Derivation extends Unify {
         }
 
         long[] taskStamp = task.stamp();
+        this.overlapSingle = Stamp.cyclicity(taskStamp);
+
         if (belief != null) {
             this.beliefTruthRaw = belief.truth();
 
@@ -310,14 +311,20 @@ public class Derivation extends Unify {
                 this.beliefTruth = beliefTruthRaw;
             }
 
-            this.overlap = Stamp.overlapFraction(taskStamp, belief.stamp());
-
+            long[] beliefStamp = belief.stamp();
+            this.overlapDouble =
+                    Util.or(
+                        overlapSingle,
+                        Stamp.overlapFraction(taskStamp, beliefStamp),
+                        Stamp.cyclicity(beliefStamp)
+                    );
         } else {
             this.beliefTruth = this.beliefTruthRaw = null;
-            this.overlap = 0;
+            this.overlapDouble = 0;
         }
 
-        this.cyclic = Stamp.isCyclic(taskStamp) ? (1f - 1f / (taskStamp.length - 1f)) : 0;
+
+
 
 
         this.termSub1Struct = beliefTerm.structure();
@@ -325,8 +332,8 @@ public class Derivation extends Unify {
         Op bOp = beliefTerm.op();
         this.termSub1op = bOp.id;
 
-        this.temporal = (!task.isEternal() || task.term().isTemporal()) ||
-                (belief!=null && (!belief.isEternal() || belief.term().isTemporal()));
+        this.temporal = (!task.isEternal() || taskTerm.isTemporal()) ||
+                (belief!=null && (!belief.isEternal() || beliefTerm.isTemporal()));
 
         this.premisePri =
                 //p.priElseZero();
@@ -353,7 +360,6 @@ public class Derivation extends Unify {
         }
 
     }
-
 
 
     @Override

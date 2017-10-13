@@ -227,6 +227,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 return x;
             }
 
+            //TODO use overlappingFraction
             if (Stamp.overlapping(y, x))
                 continue;
 
