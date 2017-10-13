@@ -149,9 +149,6 @@ public abstract class Param extends Services<Term,NAR> {
      * so 0.5 is equal amounts for both. */
     public static final float TERMLINK_BALANCE = 0.5f;
 
-    /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
-    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS = 2;
-
 
     public final float[] want = newWants();
 

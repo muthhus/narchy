@@ -324,18 +324,24 @@ public class Revision {
 
         Interval uu = ai.union(bi);
         long u = uu.length();
-        long s = ai.length() + bi.length();
-        long start = uu.a;
-        long end = uu.b;
+        int al = (int) ai.length();
+        int bl = (int) bi.length();
+        int s = al + bl;
+
         /** account for how much the merge stretches the truth beyond the range of the inputs */
         long separation = u - s;
         if (separation > 0) {
-            if (separation <= dur * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS) {
-                factor *= Math.max(1f, s) / u;
+            int shortest = Math.min(al, bl);
+            if (separation < shortest) {
+                factor *= 1f - separation / ((float) shortest);
                 if (factor < Prioritized.EPSILON) return null;
             } else {
-                return null; //too separate
+                return null;
             }
+
+//            } else {
+//                return null; //too separate
+//            }
         }
 
 
@@ -359,6 +365,9 @@ public class Revision {
 
 
         assert (a.punc() == b.punc());
+
+        long start = uu.a;
+        long end = uu.b;
 
         float aw = a.isQuestOrQuestion() ? 0 : a.conf(start, end, dur); //question
         float bw = b.conf(start, end, dur);
@@ -472,7 +481,7 @@ public class Revision {
 
         int blen = bb.subs();
         if (a.op() == CONJ && (len > 2 || blen > 2)) {
-            if (len>2 && blen>2) {
+            if (len>2 && blen==len) {
 
                 //parallel, eternal, or xternal commutive
                 for (int i = 0; i < len; i++)

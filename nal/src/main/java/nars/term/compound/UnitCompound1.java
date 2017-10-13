@@ -36,14 +36,6 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
 
 
-//    @Override
-//    public int init(@NotNull int[] meta) {
-//        the.init(meta);
-//        //meta[5] |= op.bit;
-//        return hash;
-//    }
-
-
     @Override
     public final int structure() {
         return structure;
@@ -52,7 +44,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
 
     @Override
-    public void init(@NotNull int[] meta) {
+    public void init(int[] meta) {
         super.init(meta);
         meta[5] |= op.bit;
     }

@@ -99,7 +99,7 @@ public class Atom extends AtomicConst {
     }
 
     @Override
-    public final void init(@NotNull int[] meta) {
+    public final void init(int[] meta) {
 
         meta[4] ++; //volume
         meta[5] |= ATOM.bit; //structure();

@@ -2,6 +2,7 @@ package nars.derive.mutate;
 
 import jcog.math.Combinations;
 import nars.$;
+import nars.Op;
 import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
@@ -19,19 +20,19 @@ import java.util.SortedSet;
  */
 public class Choose2 extends Termutator.AbstractTermutator {
 
-    @NotNull
+    /*@NotNull*/
     final Combinations comb;
-    //@NotNull private final Term[] yFree;
-    @NotNull
+    ///*@NotNull*/ private final Term[] yFree;
+    /*@NotNull*/
     private final Term[] x;
-    @NotNull
+    /*@NotNull*/
     private final Ellipsis xEllipsis;
-    @NotNull
+    /*@NotNull*/
     private final Unify f;
-    @NotNull
+    /*@NotNull*/
     private final ShuffledSubterms yy;
 
-    public Choose2(@NotNull Ellipsis xEllipsis, @NotNull Unify f, @NotNull SortedSet<Term> x, @NotNull SortedSet<Term> yFree) {
+    public Choose2(/*@NotNull*/ Ellipsis xEllipsis, /*@NotNull*/ Unify f, /*@NotNull*/ SortedSet<Term> x, /*@NotNull*/ SortedSet<Term> yFree) {
         super($.p(x), xEllipsis, $.p(yFree));
         this.f = f;
         this.xEllipsis = xEllipsis;
@@ -39,7 +40,7 @@ public class Choose2 extends Termutator.AbstractTermutator {
 
         int yFreeSize = yFree.size();
 
-        this.yy = new ShuffledSubterms(f.random, new ArrayTermVector(yFree));
+        this.yy = new ShuffledSubterms(f.random, Op.subterms(yFree) /*new ArrayTermVector(yFree)*/);
 
         this.comb = new Combinations(yFreeSize, 2);
     }
@@ -52,13 +53,13 @@ public class Choose2 extends Termutator.AbstractTermutator {
     @Override
     public void mutate(Unify versioneds, Termutator[] chain, int current) {
 
-        @NotNull Combinations ccc = this.comb;
+        /*@NotNull*/ Combinations ccc = this.comb;
         ccc.reset();
 
         boolean phase = true;
 
         int start = f.now();
-        @NotNull ShuffledSubterms yy = this.yy;
+        /*@NotNull*/ ShuffledSubterms yy = this.yy;
 
         Term[] m = new Term[this.yy.subs()-2];
 

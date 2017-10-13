@@ -225,7 +225,7 @@ public class RevisionTest {
                 "(a). %0.1;0.5%"
                 );
         n.run(1);
-        Task t = n.conceptualize("(a)").beliefs().match(ETERNAL, null, true, null);
+        Task t = n.conceptualize("(a)").beliefs().match(ETERNAL, null, true, n);
         assertEquals(0.37f, t.freq(), 0.02f);
         assertEquals(0.75f, t.conf(), 0.02f);
     }
@@ -265,7 +265,7 @@ public class RevisionTest {
 
         Bag<Task,?> tasklinks = b.concept().tasklinks();
 
-        assertEquals(0.5f, b.beliefs().match(ETERNAL, null, true, null).truth().conf(), 0.01f);
+        assertEquals(0.5f, b.beliefs().match(ETERNAL, null, true, n).truth().conf(), 0.01f);
 
         printTaskLinks(b);        System.out.println("--------");
 
@@ -291,7 +291,7 @@ public class RevisionTest {
 
         //assertEquals(linksBeforeRevisionLink, tasklinks.priSum(), 0.01f);
 
-        assertEquals(0.71f, b.beliefs().match(ETERNAL, null, true, null).truth().conf(), 0.06f); //the revised task on top
+        assertEquals(0.71f, b.beliefs().match(ETERNAL, null, true, n).truth().conf(), 0.06f); //the revised task on top
 
         b.print();
 

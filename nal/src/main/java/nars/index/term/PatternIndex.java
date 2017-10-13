@@ -34,7 +34,7 @@ public class PatternIndex extends MapTermIndex {
 
     @SuppressWarnings("Java8MapApi")
     @Override
-    public Termed get(@NotNull Term x, boolean createIfMissing) {
+    public Termed get(/*@NotNull*/ Term x, boolean createIfMissing) {
         if (x instanceof Variable)
             return x;
 
@@ -47,8 +47,8 @@ public class PatternIndex extends MapTermIndex {
     }
 
 
-    @NotNull
-    protected Term patternify(@NotNull Compound x) {
+    /*@NotNull*/
+    protected Term patternify(/*@NotNull*/ Compound x) {
 
 
         TermContainer s = x.subterms();
@@ -89,7 +89,7 @@ public class PatternIndex extends MapTermIndex {
                 new PatternCompound.PatternCompoundSimple(x.op(), x.dt(), v);
     }
 
-//    static boolean canBuildConcept(@NotNull Term y) {
+//    static boolean canBuildConcept(/*@NotNull*/ Term y) {
 //        if (y instanceof Compound) {
 //            return y.op() != NEG;
 //        } else {
@@ -99,8 +99,8 @@ public class PatternIndex extends MapTermIndex {
 //    }
 
 
-    @NotNull
-    private static PatternCompound ellipsis(@NotNull Compound seed, @NotNull TermContainer v, @NotNull Ellipsis e) {
+    /*@NotNull*/
+    private static PatternCompound ellipsis(/*@NotNull*/ Compound seed, /*@NotNull*/ TermContainer v, /*@NotNull*/ Ellipsis e) {
 
 
         //this.ellipsisTransform = hasEllipsisTransform(this);
@@ -144,7 +144,7 @@ public class PatternIndex extends MapTermIndex {
     /**
      * returns an normalized, optimized pattern term for the given compound
      */
-    public @NotNull Compound pattern(Compound x) {
+    public /*@NotNull*/ Compound pattern(Compound x) {
 
         Term y = x.transform(new PremiseRuleVariableNormalization());
 
@@ -154,7 +154,7 @@ public class PatternIndex extends MapTermIndex {
 
     }
 
-    public @NotNull Compound pattern(@NotNull String s) throws Narsese.NarseseException {
+    public /*@NotNull*/ Compound pattern(/*@NotNull*/ String s) throws Narsese.NarseseException {
         return pattern( (Compound) Narsese.parse().term(s, false) );
     }
 
@@ -173,9 +173,9 @@ public class PatternIndex extends MapTermIndex {
             return $.v(VAR_PATTERN, i);
         }
 
-        @NotNull
+        /*@NotNull*/
         @Override
-        protected Variable newVariable(@NotNull Variable x) {
+        protected Variable newVariable(/*@NotNull*/ Variable x) {
 
 
             int actualSerial = count;
@@ -226,13 +226,13 @@ public class PatternIndex extends MapTermIndex {
         }
 
 //        @Override
-//        public final boolean testSuperTerm(@NotNull Compound t) {
+//        public final boolean testSuperTerm(/*@NotNull*/ Compound t) {
 //            //descend all, because VAR_PATTERN is not yet always considered a variable
 //            return true;
 //        }
 
-//        @NotNull
-//        public Term applyAfter(@NotNull Variable secondary) {
+//        /*@NotNull*/
+//        public Term applyAfter(/*@NotNull*/ Variable secondary) {
 //            if (secondary.equals(Op.Imdex))
 //                return secondary; //dont try to normalize any imdex
 //            else

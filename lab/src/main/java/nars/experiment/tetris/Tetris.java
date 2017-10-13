@@ -116,9 +116,8 @@ public class Tetris extends NAgentX implements Bitmap2D {
         );
         //pixels.resolution(0.1f);
 
-        //new ShapeSensor(pixels.src, this);
-
-        actions(state);
+        //actionsTriState();
+        actionsToggle();
 
         state.reset();
 
@@ -177,7 +176,14 @@ public class Tetris extends NAgentX implements Bitmap2D {
     }
 
 
-    public void actions(TetrisState state) throws Narsese.NarseseException {
+    void actionsToggle() throws Narsese.NarseseException {
+        actionToggle($.p("left"), ()-> state.take_action(LEFT));
+        actionToggle($.p("right"), ()-> state.take_action(RIGHT));
+        actionToggle($.p("rotCW"), ()-> state.take_action(CW));
+        //actionToggle($.p("rotCCW"), ()-> state.take_action(CCW));
+    }
+
+    void actionsTriState() throws Narsese.NarseseException {
 
 
         actionTriState($("X"), (i) -> {

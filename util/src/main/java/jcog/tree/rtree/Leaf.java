@@ -127,7 +127,9 @@ public class Leaf<T> implements Node<T, T> {
 
     @Override
     public boolean contains(T t, Spatialization<T> model) {
-        for (int i = 0; i < size; i++) {
+        T[] data = this.data;
+        final int s = size;
+        for (int i = 0; i < s; i++) {
             T d = data[i];
             if (d == t) {
                 return true;

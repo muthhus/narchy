@@ -43,7 +43,7 @@ public class BeliefTableTest {
 
         BeliefTable beliefs = b.concept().beliefs();
 
-        assertEquals(0.5, beliefs.match(ETERNAL, null, true, null).conf(), 0.001);
+        assertEquals(0.5, beliefs.match(ETERNAL, null, true, n).conf(), 0.001);
         Truth bt = n.beliefTruth(b, n.time());
         assertNotNull(bt);
         assertEquals(0.5, bt.conf(), 0.001);
@@ -53,20 +53,20 @@ public class BeliefTableTest {
         n.cycle();
         b.print();
         assertEquals(3 /* revision */, beliefs.size());
-        assertEquals(0.669, beliefs.match(ETERNAL, null, true, null).conf(), 0.01);
+        assertEquals(0.669, beliefs.match(ETERNAL, null, true, n).conf(), 0.01);
 
         b.believe(1.0f, 0.5f);
         n.cycle();
         b.print();
         assertEquals(5, beliefs.size());
         @NotNull BeliefTable bb = beliefs;
-        assertEquals(0.75, bb.match(ETERNAL, null, true, null).conf(), 0.001);
+        assertEquals(0.75, bb.match(ETERNAL, null, true, n).conf(), 0.001);
         assertEquals(0.75, n.beliefTruth(b, n.time()).conf(), 0.01);
 
         b.believe(1.0f, 0.5f);
         n.cycle();
         b.print();
-        assertEquals(0.79, beliefs.match(ETERNAL, null, true, null).conf(), 0.02);
+        assertEquals(0.79, beliefs.match(ETERNAL, null, true, n).conf(), 0.02);
         assertEquals(6, beliefs.size());
 
     }
@@ -153,12 +153,12 @@ public class BeliefTableTest {
 
         n.conceptualize("(x)").print();
 
-        assertEquals(0.85f, n.beliefTruth("(x)", 7).conf(), 0.05f);
-        assertEquals(0.86f, n.beliefTruth("(x)", 8).conf(), 0.05f);
-        assertEquals(0.88f, n.beliefTruth("(x)", 9).conf(), 0.05f);
-        assertEquals(0.90f, n.beliefTruth("(x)", 10).conf(), 0.05f);
-        assertEquals(0.88f, n.beliefTruth("(x)", 11).conf(), 0.05f);
-        assertEquals(0.86f, n.beliefTruth("(x)", 12).conf(), 0.05f);
+        assertEquals(0.85f, n.beliefTruth("(x)", 7).conf(), 0.1f);
+        assertEquals(0.86f, n.beliefTruth("(x)", 8).conf(), 0.1f);
+        assertEquals(0.88f, n.beliefTruth("(x)", 9).conf(), 0.1f);
+        assertEquals(0.90f, n.beliefTruth("(x)", 10).conf(), 0.1f);
+        assertEquals(0.88f, n.beliefTruth("(x)", 11).conf(), 0.1f);
+        assertEquals(0.86f, n.beliefTruth("(x)", 12).conf(), 0.1f);
         //assertNull( n.beliefTruth("(x)", 13000) );
 
     }

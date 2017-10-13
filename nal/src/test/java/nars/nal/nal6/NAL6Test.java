@@ -494,7 +494,7 @@ public class NAL6Test extends AbstractNALTest {
         test
                 .believe("((&&, --(#1 --> lock), open($2,#1)) ==> ($2 --> key))") //en("there is not a lock with the property that when opened by something, this something is a key");
                 .believe("--(lock1 --> lock)") //en("lock1 is not a lock");
-                .mustBelieve(cycles, "(open($1,lock1) ==> ($1 --> key))", 1.00f, 0.81f); //en("whatever opens lock1 is a key");
+                .mustBelieve(cycles, "(open($1,lock1) ==> ($1 --> key))", 1.00f, 0.73f); //en("whatever opens lock1 is a key");
     }
 
 

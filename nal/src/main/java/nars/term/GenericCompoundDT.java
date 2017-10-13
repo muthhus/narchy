@@ -121,18 +121,21 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
         if (that instanceof GenericCompoundDT) {
             GenericCompoundDT cthat = (GenericCompoundDT) that;
             if (dt != cthat.dt) return false;
-            Compound cThatRef = cthat.ref;
-            if (this.ref == cThatRef) return true;
-            else if (this.ref.equals(cThatRef)) {
-                this.ref = cThatRef; //share
+            Compound thatRef = cthat.ref;
+            Compound myRef = this.ref;
+            if (myRef == thatRef) {
                 return true;
+            } else if (myRef.equals(thatRef)) {
+                this.ref = thatRef; //share
+                return true;
+            } else {
+                return false;
             }
-            return false;
+        } else {
+
+            return Compound.equals(this, that);
         }
-
-        return Compound.equals(this, that);
     }
-
 
 
     //    @Override

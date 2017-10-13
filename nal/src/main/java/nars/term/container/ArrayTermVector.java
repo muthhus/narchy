@@ -18,36 +18,38 @@ import static nars.Op.Null;
  */
 public class ArrayTermVector extends TermVector {
 
-    @NotNull
+    /*@NotNull*/
     private Term[] terms;
 
-    public ArrayTermVector(@NotNull Collection<Term> terms) {
+    public ArrayTermVector(/*@NotNull */Collection<Term> terms) {
         this(terms.toArray(new Term[terms.size()]));
     }
 
-    public ArrayTermVector(@NotNull Term... terms) {
+    public ArrayTermVector(/*@NotNull */Term... terms) {
          super(terms);
          this.terms = terms;
     }
 
     @Override
-    public final boolean equals(@NotNull Object obj) {
+    public final boolean equals(/*@NotNull*/ Object obj) {
         if (this == obj) return true;
 
-        @NotNull final Term[] x = this.terms;
         if (obj instanceof ArrayTermVector) {
             //special case for ArrayTermVector fast compare and sharing
-            ArrayTermVector c = (ArrayTermVector) obj;
-            Term[] y = c.terms;
+            ArrayTermVector that = (ArrayTermVector) obj;
+            Term[] y = that.terms;
+            final Term[] x = this.terms;
             if (x == y)
                 return true;
 
-            if (hash != c.hash)
+            if (hash != that.hash)
                 return false;
 
             int s = x.length;
             if (s != y.length)
                 return false;
+
+            boolean srcXorY = System.identityHashCode(x) < System.identityHashCode(y);
             for (int i = 0; i < s; i++) {
                 Term xx = x[i];
                 Term yy = y[i];
@@ -56,11 +58,20 @@ public class ArrayTermVector extends TermVector {
                 } else if (!xx.equals(yy)) {
                     return false;
                 } else {
-                    x[i] = yy; //share
+                    //share since subterm is equal
+                    if (srcXorY)
+                        y[i] = xx;
+                    else
+                        x[i] = yy;
+
                 }
             }
 
-            terms = y; //share since array is equal
+            //share since array is equal
+            if (srcXorY)
+                that.terms = x;
+            else
+                this.terms = y;
 
             return true;
 
@@ -70,6 +81,7 @@ public class ArrayTermVector extends TermVector {
             if (hash != c.hashCodeSubTerms())
                 return false;
 
+            final Term[] x = this.terms;
             int s = x.length;
             if (s != c.subs())
                 return false;
@@ -83,12 +95,18 @@ public class ArrayTermVector extends TermVector {
 
 
     @Override
-    @NotNull public final Term sub(int i) {
-        return terms.length > i ? terms[i] : Null;
+    /*@NotNull*/ public final Term sub(int i) {
+        return terms[i];
+        //return terms.length > i ? terms[i] : Null;
     }
 
-    @NotNull @Override public final Term[] toArray() {
+    @Override public final Term[] toArray() {
         return terms.clone();
+    }
+
+    @Override
+    public final Term[] theArray() {
+        return terms;
     }
 
     @Override
@@ -103,33 +121,39 @@ public class ArrayTermVector extends TermVector {
 
     @Override
     public final void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {
-        for (int i = start; i < stop; i++)
-            action.accept(terms[i]);
+        Term[] t = this.terms;
+        for (int i = start; i < stop; i++) {
+            action.accept(t[i]);
+        }
     }
 
     @Override
-    public final void forEach(@NotNull Consumer<? super Term> action) {
-        for (Term x : terms)
+    public final void forEach(Consumer<? super Term> action) {
+        Term[] t = this.terms;
+        for (Term x : t)
             action.accept(x);
     }
 
     @Override
-    public final boolean OR(@NotNull Predicate<Term> p) {
-        for (Term i : terms)
+    public final boolean OR(Predicate<Term> p) {
+        Term[] t = this.terms;
+        for (Term i : t)
             if (p.test(i))
                 return true;
         return false;
     }
 
-    @Override public final boolean AND(@NotNull Predicate<Term> p) {
-        for (Term i : terms)
+    @Override public final boolean AND(Predicate<Term> p) {
+        Term[] t = this.terms;
+        for (Term i : t)
             if (!p.test(i))
                 return false;
         return true;
     }
 
-    @Override public final void recurseTerms(@NotNull Consumer<Term> v) {
-        for (Term sub : terms)
+    @Override public final void recurseTerms(Consumer<Term> v) {
+        Term[] t = this.terms;
+        for (Term sub : t)
             sub.recurseTerms(v);
     }
 

@@ -643,7 +643,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(13, "(happy)! :|:")
                 .mustGoal(cycles, "(out)", 1f, 0.81f, 13)
                 .mustNotOutput(cycles, "(out)", GOAL,
-                        t -> t == 3 /*|| t == 16*/ || t == 0
+                        t -> t == 10
                 );
     }
 

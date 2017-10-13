@@ -137,7 +137,15 @@ public class GenericCompound implements Compound {
 
     /** data sharing */
     private void equivalent(GenericCompound that) {
-        subterms = ((GenericCompound) that).subterms;
+        TermContainer otherSubterms = that.subterms;
+        TermContainer mySubterms = this.subterms;
+        if (mySubterms!=otherSubterms) {
+            if (System.identityHashCode(mySubterms) < System.identityHashCode(otherSubterms))
+                that.subterms = mySubterms;
+            else
+                this.subterms = otherSubterms;
+        }
+
         if (normalized ^ that.normalized) {
             //one of them is normalized so both must be
             this.normalized = that.normalized = true;

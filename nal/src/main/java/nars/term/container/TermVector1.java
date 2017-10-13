@@ -29,11 +29,15 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public void init(@NotNull int[] meta) {
+    public void init(int[] meta) {
         sub.init(meta);
         meta[4]++; //for wrapping it
     }
 
+    @Override
+    public final boolean isTemporal() {
+        return sub.isTemporal();
+    }
 
     @Override
     public int hashCode() {
@@ -64,8 +68,8 @@ public class TermVector1 implements TermContainer {
 
     @Override
     public final @NotNull Term sub(int i) {
-        assert(i == 0);
-        //if (i != 0) throw new ArrayIndexOutOfBoundsException();
+        if (i != 0)
+            throw new ArrayIndexOutOfBoundsException();
         return sub;
     }
 
@@ -75,7 +79,7 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public @Nullable boolean subEquals(int i, @NotNull Term x) {
+    public boolean subEquals(int i, @NotNull Term x) {
         return i == 0 && sub.equals(x);
     }
 
@@ -101,7 +105,7 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public int subs() {
+    public final int subs() {
         return 1;
     }
 

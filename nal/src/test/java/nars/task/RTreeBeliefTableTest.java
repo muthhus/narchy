@@ -37,7 +37,10 @@ public class RTreeBeliefTableTest {
         Task a = add(r, x, freq, conf, start, end, n);
         assertEquals(1, r.size());
 
-        r.add(a, X, n); assertEquals(1, r.size()); //no change for inserted duplicate
+
+        r.add(a, X, n);
+        r.print(System.out);
+        assertEquals(1, r.size()); //no change for inserted duplicate
 
         Task b = add(r, x, 0f, 0.5f, 1, 1, n); //WEAKer
         assertEquals(2, r.size());

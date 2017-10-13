@@ -39,8 +39,6 @@ import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -60,30 +58,18 @@ import static nars.time.Tense.XTERNAL;
 public interface Compound extends Term, IPair, TermContainer {
 
 
-    static boolean equals(@NotNull Term a, @Nullable Object b) {
+    static boolean equals(/*@NotNull*/ Term a, @Nullable Object b) {
         assert (a != b) : "instance check should have already been performed before calling this";
 
         Term bb = (Term) b;
 
         return
+                (a.subterms().equals(bb.subterms()))
+                        &&
                 (a.opX() == bb.opX())
                         &&
-                        (a.subterms().equals(bb.subterms()))
-                        &&
-                        (a.dt() == bb.dt())
-                ;
-
-        //subterm sharing:
-//        if (as != cs) {
-//            if (!as.equivalent(cs)) {
-//                return false;
-//            } else {
-//                //share the subterms vector
-//                if (cthat instanceof GenericCompound) {
-//                    this.subterms = cs; //HACK cast sucks
-//                }
-//            }
-//        }
+                (a.dt() == bb.dt())
+        ;
     }
 
     /**
@@ -91,10 +77,9 @@ public interface Compound extends Term, IPair, TermContainer {
      * non-DTernal temporal relation
      */
     default boolean isTemporal() {
-        return hasAny(Op.TemporalBits) &&
-                ((op().temporal && (dt() != DTERNAL))
+        return  (dt()!=DTERNAL && op().temporal)
                         ||
-                        (subterms().isTemporal()));
+                (subterms().isTemporal());
     }
 
     @Override
@@ -104,7 +89,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    @NotNull
+    /*@NotNull*/
     TermContainer subterms();
 
     @Override
@@ -155,7 +140,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    default int subtermTimeSafe(@NotNull Term x) {
+    default int subtermTimeSafe(Term x) {
         if (equals(x))
             return 0;
 
@@ -241,7 +226,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    default void recurseTerms(@NotNull Consumer<Term> v) {
+    default void recurseTerms(Consumer<Term> v) {
         v.accept(this);
         //subterms().forEach(s -> s.recurseTerms(v));
         subterms().recurseTerms(v);
@@ -249,21 +234,21 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    default boolean ORrecurse(@NotNull Predicate<Term> p) {
+    default boolean ORrecurse( Predicate<Term> p) {
         if (p.test(this))
             return true;
         return subterms().ORrecurse(p);
     }
 
     @Override
-    default boolean ANDrecurse(@NotNull Predicate<Term> p) {
+    default boolean ANDrecurse( Predicate<Term> p) {
         if (!p.test(this))
             return false;
         return subterms().ANDrecurse(p);
     }
 
     @Override
-    default void init(@NotNull int[] meta) {
+    default void init(int[] meta) {
 
         subterms().init(meta);
 
@@ -274,7 +259,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     @NotNull
-    default ByteList structureKey(@NotNull ByteArrayList appendTo) {
+    default ByteList structureKey(ByteArrayList appendTo) {
         appendTo.add(op().id);
         appendTo.add((byte) subs());
         forEach(x -> {
@@ -460,7 +445,9 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    default boolean contains(Term t) { return subterms().contains(t); }
+    default boolean contains(Term t) {
+        return subterms().contains(t);
+    }
 
     @Override
     default boolean OR(@NotNull Predicate<Term> p) {
@@ -711,7 +698,7 @@ public interface Compound extends Term, IPair, TermContainer {
                         t += dt + st.dtRange();
                     }
                 } else {
-                    for (int i = s-1; i >= 0; i--) {
+                    for (int i = s - 1; i >= 0; i--) {
                         Term st = tt.sub(i);
                         st.events(events, t, level + 1); //recurse
                         t += -dt + st.dtRange();
@@ -743,76 +730,72 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default Term evalSafe(TermContext context, int remain) {
 
-        if (remain-- <= 0)
-            return Null;
+        if (hasAll(opBits)) {
 
+            if (remain-- <= 0)
+                return Null;
 
-        Term u;
-        Op o = op();
+            if (subterms().hasAll(opBits)) {
+                final Term[] xy = toArray();
+                //any contained evaluables
+                boolean subsModified = false;
 
-        @NotNull final Term[] xy = toArray();
-        //any contained evaluables
-        boolean subsModified = false;
+                int s = xy.length;
+                for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
+                    Term x = xy[i];
+                    Term y = x.evalSafe(context, remain);
+                    if (y == null) {
+                        //if a functor returns null, it means unmodified
+                    } else if (!x.equals(y)) { //(x != y) {
+                        //the result comparing with the x
+                        subsModified = true;
+                        xy[i] = y;
+                    }
+                }
 
-        if (subterms().hasAll(opBits)) {
-            int s = xy.length;
-            for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
-                Term x = xy[i];
-                Term y = x.evalSafe(context, remain);
-                if (y == null) {
-                    //if a functor returns null, it means unmodified
-                } else if (x != y) {
-                    //the result comparing with the x
-                    subsModified = true;
-                    xy[i] = y;
+                if (subsModified) {
+                    return op().the(dt(), xy).evalSafe(context, remain);
                 }
             }
-        }
 
-        if (subsModified) {
-            u = o.the(dt(), xy);
-            if (u.subs() == 0)
-                return u; //atomic, including Bool short-circuits on invalid term
-        } else {
-            u = this;
-        }
 
-        //recursively compute contained subterm functors
-        if (u.op() == INH /*&& u.size() == 2*/) {
-            Term possibleArgs = u.sub(0);
-            if (possibleArgs.op() == PROD) {
-                Term possibleFunc = u.sub(1);
-                if (possibleFunc.op() == ATOM) {
-                    Termed ff = context.applyIfPossible(possibleFunc);
-                    if (ff instanceof Functor) {
-                        u = ((Functor) ff).apply(possibleArgs.subterms());
-                        if (u instanceof AbstractPred) {
-                            u = $.the(((AbstractPred) u).test(null));
-                        } else if (u == null)
-                            u = this; //null means to keep the same
+            //recursively compute contained subterm functors
+            if (op() == INH /*&& u.size() == 2*/) {
+                Term u = this;
+                Term possibleArgs = sub(0);
+                if (possibleArgs.op() == PROD) {
+                    Term possibleFunc = sub(1);
+                    if (possibleFunc.op() == ATOM) {
+                        Termed ff = context.applyIfPossible(possibleFunc);
+                        if (ff instanceof Functor) {
+                            u = ((Functor) ff).apply(possibleArgs.subterms());
+                            if (u instanceof AbstractPred) {
+                                u = $.the(((AbstractPred) u).test(null));
+                            } else if (u == null)
+                                u = this; //null means to keep the same
+                        }
+                    }
+                }
 
+                if (u == this || (!(u.op().conceptualizable) || u.equals(this))) {
+                    return u; //return u and not this
+                } else {
+
+                    //it has been changed, so eval recursively until stable
+                    try {
+                        assert (u != this) : "equality tested previously should have included identity check";
+                        return u.evalSafe(context, remain);
+                    } catch (StackOverflowError e) {
+                        //logger.error("eval stack overflow: {} -> {}", this, u);
+                        System.err.println("eval stack overflow: " + this + ", " + u);
+                        return Null;
+                        //throw new RuntimeException("stack overflow on eval : " + t);
                     }
                 }
             }
         }
 
-
-        if (u == this || (!(u.op().conceptualizable) || u.equals(this))) {
-            return u; //return u and not this
-        } else {
-
-            //it has been changed, so eval recursively until stable
-            try {
-                assert (u != this) : "equality tested previously should have included identity check";
-                return u.evalSafe(context, remain);
-            } catch (StackOverflowError e) {
-                //logger.error("eval stack overflow: {} -> {}", this, u);
-                System.err.println("eval stack overflow: " + this + ", " + u);
-                return Null;
-                //throw new RuntimeException("stack overflow on eval : " + t);
-            }
-        }
-
+        return this;
     }
 
     @Override

@@ -56,42 +56,42 @@ public interface NAct {
         });
     }
 
-    /**
-     * latches to either one of 2 states until it shifts to the other one. suitable for representing
-     * push-buttons like keyboard keys. by default with no desire the state is off.  the 'on' and 'off'
-     * procedures will be called only as necessary (when state changes).  the off procedure will not be called immediately.
-     * its initial state will remain indetermined until the first feedback is generated.
-     */
-    default void actionToggleBi(@NotNull Term t, @NotNull Runnable on, @NotNull Runnable off) {
-        //float THRESH = 0.5f;
-//        GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
-//            boolean next = d != null && d.freq() > THRESH;
-//            return toggle(d, on, off, next);
+//    /**
+//     * latches to either one of 2 states until it shifts to the other one. suitable for representing
+//     * push-buttons like keyboard keys. by default with no desire the state is off.  the 'on' and 'off'
+//     * procedures will be called only as necessary (when state changes).  the off procedure will not be called immediately.
+//     * its initial state will remain indetermined until the first feedback is generated.
+//     */
+//    default void actionToggleBi(@NotNull Term t, @NotNull Runnable on, @NotNull Runnable off) {
+//        //float THRESH = 0.5f;
+////        GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
+////            boolean next = d != null && d.freq() > THRESH;
+////            return toggle(d, on, off, next);
+////        });
+//
+//        //m.resolution(0.5f);
+//        float deadZoneFreqRadius = 1f / 6;
+//
+//        final boolean[] last = {false};
+//        actionBipolar(t, (float f) -> {
+//
+//            //radius of center dead zone; diameter = 2x this
+//
+//            if (f > deadZoneFreqRadius) {
+//                on.run();
+//                last[0] = true;
+//                return 1f;
+//            } else if (f < -deadZoneFreqRadius) {
+//                off.run();
+//                last[0] = false;
+//                return -1f;
+//            } else {
+//                return last[0] ? 1f : -1f;
+//            }
 //        });
-
-        //m.resolution(0.5f);
-        float deadZoneFreqRadius = 1f / 6;
-
-        final boolean[] last = {false};
-        actionBipolar(t, (float f) -> {
-
-            //radius of center dead zone; diameter = 2x this
-
-            if (f > deadZoneFreqRadius) {
-                on.run();
-                last[0] = true;
-                return 1f;
-            } else if (f < -deadZoneFreqRadius) {
-                off.run();
-                last[0] = false;
-                return -1f;
-            } else {
-                return last[0] ? 1f : -1f;
-            }
-        });
-        //m.resolution(1f);
-        //return addAction(m);
-    }
+//        //m.resolution(1f);
+//        //return addAction(m);
+//    }
 
 //    /** softmax-like signal corruption that emulates PWM (pulse-width modulation) modulated by desire frequency */
 //    @Nullable default ActionConcept actionTogglePWM(@NotNull Compound s, @NotNull Runnable on, @NotNull Runnable off) {
@@ -293,7 +293,11 @@ public interface NAct {
         return addAction(m);
     }
 
-    @Nullable
+
+    default void actionToggle(@NotNull Term s, @NotNull Runnable r) {
+        actionToggle(s, (b) -> { if (b) { r.run(); } } );
+    }
+
     default void actionToggle(@NotNull Term s, @NotNull BooleanProcedure onChange) {
         actionToggle(s, () -> onChange.value(true), () -> onChange.value(false));
     }

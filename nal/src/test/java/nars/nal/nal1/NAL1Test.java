@@ -9,7 +9,7 @@ import org.junit.Test;
 
 public class NAL1Test extends AbstractNALTest {
 
-    final int CYCLES = 175;
+    final int CYCLES = 275;
     static {
         Param.DEBUG = true;
         //Param.TRACE = true;

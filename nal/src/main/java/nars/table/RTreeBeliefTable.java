@@ -33,6 +33,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -56,18 +57,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     public static final float PRESENT_AND_FUTURE_BOOST = 1.5f;
 
-
-    private transient NAR nar;
-
-
     final Space<TaskRegion> tree;
 
-
     public RTreeBeliefTable() {
-        Spatialization<TaskRegion> model = new RTreeBeliefModel();
+
 
         this.tree = new ConcurrentRTree<>(
-                new RTree<TaskRegion>(model) {
+                new RTree<TaskRegion>(RTreeBeliefModel.the) {
 
 //                    @Override
 //                    public boolean add(TaskRegion tr) {
@@ -333,9 +329,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 //        if (x instanceof SignalTask && ((SignalTask) x).stretchKey != null)
 //            return; //already added and being managed
-
-        this.nar = n;
-
         boolean isSignal = x instanceof SignalTask;
 
         if (isSignal) {
@@ -370,7 +363,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             added[0] = treeRW.add(tr);
 
             if (added[0])
-                ensureCapacity(treeRW, tr);
+                ensureCapacity(treeRW, tr, n);
         });
 
 
@@ -379,21 +372,21 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             if (pri != pri) {
                 //somehow it was added then immediately removed during compression, ie. rejected
             } else {
-                Activate.activate(x, pri, nar, c);
+                Activate.activate(x, pri, n, c);
             }
         } else {
 
             Object ar = x.lastLogged();
-            if (ar instanceof Runnable) {
+            if (ar instanceof Consumer) {
                 x.log().remove(ar);
-                ((Runnable) ar).run();
+                ((Consumer) ar).accept(n);
             }
 
         }
 
     }
 
-    boolean ensureCapacity(Space<TaskRegion> treeRW, TaskRegion inputRegion) {
+    boolean ensureCapacity(Space<TaskRegion> treeRW, TaskRegion inputRegion, NAR nar) {
         int cap = this.capacity;
         if (treeRW.size() <= cap)
             return true;
@@ -732,8 +725,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         tree.stats().print(out);
     }
 
-    private final class RTreeBeliefModel extends Spatialization<TaskRegion> {
+    private static final class RTreeBeliefModel extends Spatialization<TaskRegion> {
 
+
+        public static Spatialization<TaskRegion> the = new RTreeBeliefModel();;
 
         public RTreeBeliefModel() {
             super((t -> t), RTreeBeliefTable.SPLIT, RTreeBeliefTable.MIN_TASKS_PER_LEAF, RTreeBeliefTable.MAX_TASKS_PER_LEAF);
@@ -763,7 +758,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
             if (activationApplied >= Prioritized.EPSILON) {
-                i.log((Runnable) () -> {
+                i.log((Consumer<NAR>) (nar) -> {
                     Activate.activate(e, activationApplied, nar);
                 }); //store here so callee can activate outside of the lock
             }
@@ -781,8 +776,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         public boolean contains(TaskRegion t, Spatialization<TaskRegion> model) {
             if (region == null)
                 return false;
-            if (!region.contains(t))
-                return false;
+//            if (!region.contains(t))
+//                return false;
 
             Task incomingTask = t.task();
             TaskRegion[] data = this.data;
