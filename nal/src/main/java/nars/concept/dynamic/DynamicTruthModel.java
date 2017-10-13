@@ -29,6 +29,7 @@ abstract public class DynamicTruthModel {
     @Nullable
     public DynTruth eval(Term superterm, boolean beliefOrGoal, long start, long end, boolean stamp, NAR n) {
 
+
         int sdt = superterm.dt();
         if (sdt == XTERNAL) {
             throw new RuntimeException("XTERNAL should not happen here");

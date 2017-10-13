@@ -225,6 +225,10 @@ public interface Truth extends Truthed {
         return $.t(freq(), c);
     }
 
+    default PreciseTruth withEvi(float e) {
+        return new PreciseTruth(freq(), e, false);
+    }
+
 
 //    default Truth eternalized() {
 //        return $.t(freq(), eternalizedConf());

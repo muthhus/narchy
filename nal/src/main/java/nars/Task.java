@@ -772,9 +772,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         }
     }
 
-    default boolean cyclic() {
-        return Stamp.isCyclic(stamp());
-    }
 
     default int dt() {
         return term().dt();

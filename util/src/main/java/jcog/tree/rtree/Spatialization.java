@@ -46,7 +46,7 @@ public class Spatialization<T> {
     }
 
     /** called when add encounters an equivalent (but different) instance */
-    public void merge(T existing, T incoming) {
+    protected void merge(T existing, T incoming) {
 
     }
 

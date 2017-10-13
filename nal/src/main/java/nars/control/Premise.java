@@ -194,7 +194,7 @@ public class Premise extends UnaryTask {
                 if (u != null) {
                     if (beliefHasVars) {
                         beliefTerm = beliefTerm.transform(u);
-                        if (beliefTerm instanceof Bool)
+                        if (beliefTerm == null || beliefTerm instanceof Bool)
                             return null;
 
                     }

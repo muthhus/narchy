@@ -8,6 +8,7 @@ import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.task.NALTask;
 import nars.term.Term;
+import nars.term.transform.Retemporalize;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +34,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     }
 
     @Nullable
-    public NALTask generate(@NotNull Term template, long start, long end, NAR nar) {
+    protected NALTask generate(Term template, long start, long end, NAR nar) {
 
         DynTruth yy = truth(start, end, template, true, nar);
         if (yy == null)
@@ -50,14 +51,23 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public Truth truth(long start, long end, NAR nar) {
-        DynTruth d = truth(start, end, term, false, nar);
+        DynTruth d = truth(start, end, template(term, start, end), false, nar);
         return Truth.maxConf(d != null ? d.truth() : null,
                 super.truth(start, end, nar) /* includes only non-dynamic beliefs */);
     }
 
+    /** prepare a term, if necessary, for use as template  */
+    private Term template(Term template, long start, long end) {
+        if (template.dt() == XTERNAL) {
+            int newDT = matchDT(template, start, end);
+            template = template.dt(newDT);
+        }
+        return template.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
+    }
+
 
     @Nullable
-    public DynTruth truth(long start, long end, @NotNull Term template, boolean evidence, NAR nar) {
+    protected DynTruth truth(long start, long end, Term template, boolean evidence, NAR nar) {
         return model.eval(template, beliefOrGoal, start, end, evidence, nar); //newDyn(evidence);
     }
 
@@ -77,7 +87,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
             Consumer<Task> tx = x -> {
                 int xdt = x.dt();
-                if (xdt != DTERNAL) {
+                if (xdt!=XTERNAL && xdt != DTERNAL) {
                     sum[0] += xdt;
                     count[0]++;
                 }
@@ -101,10 +111,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     public Task match(long start, long end, @NotNull Term template, NAR nar) {
         Task x = super.match(start, end, template, nar);
 
-        if (template.dt() == XTERNAL) {
-            int newDT = matchDT(template, start, end);
-            template = template.dt(newDT);
-        }
+        template = template(template, start, end);
 
         Task y = generate(template, start, end, nar);
         if (y == null || y.equals(x)) return x;

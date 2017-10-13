@@ -114,27 +114,31 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
         final HyperRegion tRect = model.region(t);
 
-        //MERGE STAGE:
-        for (int i = 0; i < size; i++) {
-            Node ci = child[i];
-            if (ci.region().contains(tRect)) {
-                //check for existing item
-//                if (ci.contains(t, model))
-//                    return this; // duplicate detected (subtree not changed)
+        Node<T, ?>[] child = this.child;
 
-                Node<T, ?> m = ci.add(t, null, model);
-                if (m == null)
-                    return null; //merged
-//                if (reportNextSizeDelta(parent)) {
-//                    child[i] = m;
-//                    grow(m); //subtree was changed
-//                    return this;
-//                }
+        if (region.contains(tRect)) {
+            //MERGE STAGE:
+            for (int i = 0; i < size; i++) {
+                Node ci = child[i];
+                if (ci.region().contains(tRect)) {
+                    //check for existing item
+                    //                if (ci.contains(t, model))
+                    //                    return this; // duplicate detected (subtree not changed)
+
+                    Node<T, ?> m = ci.add(t, null, model);
+                    if (m == null)
+                        return null; //merged
+                    //                if (reportNextSizeDelta(parent)) {
+                    //                    child[i] = m;
+                    //                    grow(m); //subtree was changed
+                    //                    return this;
+                    //                }
+                }
             }
+            if (parent == null)
+                return this; //done for this stage
         }
 
-        if (parent == null)
-            return this; //done for this stage
 
 
         //INSERTION STAGE:
@@ -158,14 +162,14 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
             child[bestLeaf] = nextBest;
 
             if (reportNextSizeDelta(parent)) {
-                grow(bestLeaf);
+                grow(nextBest);
 
                 // optimize on split to remove the extra created branch when there
                 // is space for the children here
-                if (child[bestLeaf].size() == 2 &&
-                        size < child.length &&
-                        !child[bestLeaf].isLeaf()) {
-                    final Branch<T> branch = (Branch<T>) child[bestLeaf];
+                if (size < child.length && nextBest.size() == 2 &&
+
+                        !nextBest.isLeaf()) {
+                    final Branch<T> branch = (Branch<T>) nextBest;
                     child[bestLeaf] = branch.child[0];
                     child[size++] = branch.child[1];
                 }
@@ -203,6 +207,9 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     private void grow(Node<T, ?> node) {
         region = region.mbr(node.region());
     }
+    private static <T> HyperRegion grow(HyperRegion region, Node<T, ?> node) {
+        return region.mbr(node.region());
+    }
 
     @Override
     public Node<T, ?> remove(final T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
@@ -227,10 +234,12 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
                 return child[0];
             }
 
-            region = child[0].region();
+            Node<T, ?>[] cc = this.child;
+            HyperRegion region = cc[0].region();
             for (int i = 1; i < size; i++) {
-                grow(child[i]);
+                region = grow(region, cc[i]);
             }
+            this.region = region;
         }
 
         return this;
@@ -277,14 +286,16 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     }
 
     private int chooseLeaf(final T t, final HyperRegion tRect, Nodelike<T> parent, Spatialization<T> model) {
+        Node<T, ?>[] cc = this.child;
         if (size > 0) {
             int bestNode = -1;
             double tCost = Double.POSITIVE_INFINITY;
             double leastEnlargement = Double.POSITIVE_INFINITY;
             double leastPerimeter = Double.POSITIVE_INFINITY;
 
-            for (int i = 0; i < size; i++) {
-                HyperRegion cir = child[i].region();
+            short s = this.size;
+            for (int i = 0; i < s; i++) {
+                HyperRegion cir = cc[i].region();
                 HyperRegion childMbr = tRect.mbr(cir);
                 final double nodeEnlargement = childMbr.cost() - (cir.cost() + tCost);
                 if (nodeEnlargement < leastEnlargement) {
@@ -308,7 +319,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
             return bestNode;
         } else {
             final Node<T, ?> n = model.newLeaf();
-            child[size++] = n;
+            cc[size++] = n;
             return size - 1;
         }
     }
@@ -324,8 +335,10 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
     @Override
     public void forEach(Consumer<? super T> consumer) {
-        for (int i = 0; i < size; i++) {
-            child[i].forEach(consumer);
+        Node<T, ?>[] cc = this.child;
+        short s = this.size;
+        for (int i = 0; i < s; i++) {
+            cc[i].forEach(consumer);
         }
     }
 

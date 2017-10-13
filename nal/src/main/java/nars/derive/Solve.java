@@ -1,18 +1,17 @@
 package nars.derive;
 
 import jcog.Util;
+import jcog.pri.Pri;
 import nars.Param;
 import nars.control.Derivation;
 import nars.term.Compound;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Collections;
 
 import static nars.Op.*;
 import static nars.truth.TruthFunctions.c2wSafe;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Evaluates the truth of a premise
@@ -35,31 +34,8 @@ abstract public class Solve extends AbstractPred<Derivation> {
         return 2f;
     }
 
-    /**
-     * create a Pre-Solve predicate for quick filtering in the pre tests
-     */
-    public Iterable<PrediTerm<Derivation>> preSolve() {
-        return Collections.emptyList();
-
-//        List<PrediTerm<Derivation>> l = $.newArrayList();
-//        boolean override = this instanceof SolvePuncOverride;
-//        if (override) {
-//            switch (((SolvePuncOverride) this).puncOverride) {
-//                case QUESTION:
-//                case QUEST:
-//                    l.add(NotCyclic); //since this is the provided punctuation it will need tested always
-//                    //TODO: other cases: single test, etc..
-//                    break;
-//            }
-//        } else {
-//            //determined by the derivation itself so needs tested in any case
-//            l.add(NotCyclicIfTaskIsQuestionOrQuest);
-//        }
-//        return l;
-    }
-
     @Override
-    public final boolean test(@NotNull Derivation d) {
+    public final boolean test(Derivation d) {
 
         boolean single;
         Truth t;
@@ -79,39 +55,38 @@ abstract public class Solve extends AbstractPred<Derivation> {
                         return false; //double premise requiring a belief, but belief is null
                 }
 
-                if (!f.allowOverlap()) {
-                    float co = (single ? d.cyclic : d.overlap);
-                    if (co >= 1f || d.random.nextFloat() < co) {
-                        return false;
-                    }
-                }
+                float s = d.nar.deriverity.floatValue();
 
                 float confMin = d.confMin;
+                if ((t = f.apply(
+                        d.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
+                        single ? null : beliefProjected ? d.beliefTruth : d.beliefTruthRaw,
+                        d.nar, (s!=1.0 ? Param.TRUTH_EPSILON /* to be safe */ : confMin)
+                )) == null)
+                    return false;
 
-                float s = d.nar.deriverity.floatValue();
-                if (s == 1.0) {
-                    //truth function is single premise so set belief truth to be null to prevent any negations below:
-
-
-                    if ((t = f.apply(
-                            d.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
-                            single ? null : beliefProjected ? d.beliefTruth : d.beliefTruthRaw,
-                            d.nar, confMin
-                    )) == null)
-                        return false;
-                } else {
-
+                if (s != 1.0) {
                     float baseConf = single ? d.premiseConfSingle : d.premiseConfDouble;
-
-                    if ((t = f.apply(
-                            d.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
-                            single ? null : beliefProjected ? d.beliefTruth : d.beliefTruthRaw,
-                            d.nar, Param.TRUTH_EPSILON
-                    )) == null)
-                        return false;
-
                     float newEvi = Util.lerp(s, c2wSafe(baseConf, Param.HORIZON), t.evi());
                     t = new PreciseTruth(t.freq(), newEvi, false);
+                }
+
+
+                float overlap;
+//                if (f.allowOverlap()) {
+//                    overlap = 0;
+//                } else {
+                    overlap = (single ? d.cyclic : d.overlap);
+//                }
+
+                if (overlap > 0) {
+                    float e = t.evi() * (1f-overlap/2f);
+                    if (e < Pri.EPSILON) //yes Pri epsilon
+                        return false;
+
+                    t = t.withEvi(e);
+                    if (t.conf() < confMin)
+                        return false;
                 }
 
                 t = t.ditherFreqConf(d.truthResolution, confMin, 1f);
@@ -122,12 +97,12 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
             case QUEST:
             case QUESTION:
-                if (d.cyclic >= 1f || (d.cyclic > 0 && d.random.nextFloat() < d.cyclic))
-                    return false; //HANDLED IN PRESOLVE CASES
+                if (d.cyclic > 0 && d.random.nextFloat() <= d.cyclic)
+                    return false;
 
-                byte tp = d.taskPunct;
-                if ((tp == QUEST) || (tp == GOAL))
-                    punc = QUEST; //use QUEST in relation to GOAL or QUEST task
+//                byte tp = d.taskPunct;
+//                if ((tp == QUEST) || (tp == GOAL))
+//                    punc = QUEST; //use QUEST in relation to GOAL or QUEST task
 
                 single = true;
                 t = null;

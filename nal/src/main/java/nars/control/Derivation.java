@@ -102,7 +102,6 @@ public class Derivation extends Unify {
      */
     public boolean temporal;
 
-    //public boolean cyclic, overlap;
     public float cyclic, overlap;
 
     public float premisePri;
@@ -306,21 +305,14 @@ public class Derivation extends Unify {
                 this.beliefTruth = beliefTruthRaw;
             }
 
-
-
-            //int cycNum = ((task.cyclic() ? 1 : 0) + (belief.cyclic() ? 1 : 0));
-
-            long[] beliefStamp = belief.stamp();
-
-            //this.cyclic = cycNum == 0 ? 0f : (((float)cycNum) / ((taskStamp.length + beliefStamp.length) - cycNum));
-            this.cyclic = this.overlap = Stamp.overlapFraction(taskStamp, beliefStamp);
+            this.overlap = Stamp.overlapFraction(taskStamp, belief.stamp());
 
         } else {
             this.beliefTruth = this.beliefTruthRaw = null;
-
-            this.cyclic = task.cyclic() ? 1f / (taskStamp.length - 1f) : 0;
             this.overlap = 0;
         }
+
+        this.cyclic = Stamp.isCyclic(taskStamp) ? (1f - 1f / (taskStamp.length - 1f)) : 0;
 
 
         this.termSub1Struct = beliefTerm.structure();

@@ -159,7 +159,6 @@ public class PremiseRule extends GenericCompound {
 
         precon.addAll(this.pre);
 
-        truth.preSolve().forEach(precon::add);
 
         ////-------------------
         //below here are predicates which affect the derivation

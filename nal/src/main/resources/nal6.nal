@@ -93,12 +93,12 @@
 // Conditional syllogism && Independent Variable Elimination
 //      If after M, P usually happens, and M happens, it means P is expected to happen
 
-    B, (A ==> C),  notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionRecursivePB, Goal:DeciDeduction)
+    B, (A ==> C),  notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:Deduction, Goal:DeciDeduction)
         //B, (A ==> C), time(urgent),  notImpl(B) |- varIntro(subIfUnifiesAny(C,A,B)), (Belief:DeductionRecursivePB, Goal:DeciDeduction)
-    B, (--A ==> C),  notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
+    B, (--A ==> C),  notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionN, Goal:DeciDeductionN)
         //B, (--A ==> C), time(urgent),  notImpl(B) |- varIntro(subIfUnifiesAny(C,A,B)), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
 
-    B, (C ==> A), time(urgent), notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:AbductionRecursivePB, Goal:DeciInduction)
+    B, (C ==> A), time(urgent), notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:Abduction, Goal:DeciInduction)
 
         //has(A,"$"),
     //B, ((--,%A) ==> C), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursiveN, Goal:InductionRecursiveN)

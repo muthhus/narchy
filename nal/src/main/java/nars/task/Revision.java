@@ -286,9 +286,8 @@ public class Revision {
 
         //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
-        float overlap = Stamp.overlapFraction(a.stamp(), b.stamp());
-        float stampDiscount = 1f - overlap / 2f;
-        factor *= stampDiscount;
+        float overlapDiscount = 1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
+        factor *= overlapDiscount;
         if (factor < Prioritized.EPSILON) return null;
 
         int dur = nar.dur();

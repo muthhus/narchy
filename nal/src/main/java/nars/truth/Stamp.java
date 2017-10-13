@@ -30,7 +30,6 @@ import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.impl.factory.primitive.LongSets;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -394,34 +393,36 @@ public interface Stamp {
 
     static long[] zip(/*@NotNull*/ Collection<? extends Stamp> s) {
         assert(!s.isEmpty());
-        return zip(s, s.size());
+        return zip(s, Param.STAMP_CAPACITY);
     }
 
-    static long[] zip(/*@NotNull*/ Iterable<? extends Stamp> s, @Deprecated int num) {
-        return zip(s, num, Param.STAMP_CAPACITY);
+    static long[] zip(/*@NotNull*/ Iterable<? extends Stamp> s) {
+        return zip(s, Param.STAMP_CAPACITY);
     }
 
-    static long[] zip(/*@NotNull*/ Iterable<? extends Stamp> s, @Deprecated int num, int maxLen) {
-        final int extra = 1;
-        int maxPer = Math.max(1, Math.round((float)maxLen / num)) + extra;
+    static long[] zip(/*@NotNull*/ Iterable<? extends Stamp> s, int maxLen) {
+//        final int extra = 1;
+//        int maxPer = Math.max(1, Math.round((float)maxLen / num)) + extra;
         LongHashSet l = new LongHashSet(maxLen);
-        //final boolean[] cyclic = {false};
+        final boolean[] cyclic = {false};
         s.forEach( (Stamp t) -> {
             long[] e = t.stamp();
             int el = e.length;
-            for (int i = Math.max(0, el - maxPer); i < el; i++) {
+            for (int i = 0; i < el; i++) {
                 long ee = e[i];
-                if (ee !=Long.MAX_VALUE) {
-                    l.add(ee);
-//                    if (!l.add(ee) || isCyclic(e))
-//                        cyclic[0] = true;
+                if (ee != Long.MAX_VALUE) {
+                    if (!l.add(ee) || isCyclic(e))
+                        cyclic[0] = true;
                 }
             }
         } );
+
+
         int ls = l.size();
+
         long[] e = ArrayUtils.subarray(l.toSortedArray(), Math.max(0, ls - maxLen), ls);
-//        if (cyclic[0])
-//            e = cyclic(e);
+        if (cyclic[0])
+            e = cyclic(e); //TODO avoid needing to realloc
         return e;
     }
 
@@ -456,7 +457,7 @@ public interface Stamp {
         return y;
     }
 
-    static boolean equalsIgnoreCyclic(@NotNull long[] a, long[] b) {
+    static boolean equalsIgnoreCyclic(long[] a, long[] b) {
         boolean aCyclic = isCyclic(a);
         if (aCyclic ^ isCyclic(b)) {
             int alen = a.length;

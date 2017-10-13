@@ -734,13 +734,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             super((t -> t), RTreeBeliefTable.SPLIT, RTreeBeliefTable.MIN_TASKS_PER_LEAF, RTreeBeliefTable.MAX_TASKS_PER_LEAF);
         }
 
-        @Override
-        public Node<TaskRegion, TaskRegion> newLeaf() {
-            return new BeliefLeaf(max);
-        }
+//        @Override
+//        public Node<TaskRegion, TaskRegion> newLeaf() {
+//            return new BeliefLeaf(max);
+//        }
 
         @Override
-        public void merge(TaskRegion existing, TaskRegion incoming) {
+        protected void merge(TaskRegion existing, TaskRegion incoming) {
 
             Task i = incoming.task();
 //                if (e == i)
@@ -766,47 +766,47 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     }
 
-    private static class BeliefLeaf extends Leaf<TaskRegion> {
-        public BeliefLeaf(int max) {
-            super(new TaskRegion[max]);
-        }
-
-
-        @Override
-        public boolean contains(TaskRegion t, Spatialization<TaskRegion> model) {
-            if (region == null)
-                return false;
-//            if (!region.contains(t))
-//                return false;
-
-            Task incomingTask = t.task();
-            TaskRegion[] data = this.data;
-            final int s = size;
-            for (int i = 0; i < s; i++) {
-                TaskRegion d = data[i];
-                if (d == t) {
-                    return true;
-                }
-                if (d.contains(t)) {
-                    if (d.equals(t)) {
-                        model.merge(d, t);
-                        return true;
-                    } else {
-                        NALTask existingTask = (NALTask) d.task();
-                        if (existingTask.term().equals(incomingTask.term())) {
-                            if (Stamp.equalsIgnoreCyclic(existingTask.stamp(), incomingTask.stamp())) {
-                                existingTask.causeMerge(incomingTask);
-                                existingTask.priMax(incomingTask.priElseZero());
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-            return false;
-
-        }
-    }
+//    private static class BeliefLeaf extends Leaf<TaskRegion> {
+//        public BeliefLeaf(int max) {
+//            super(new TaskRegion[max]);
+//        }
+//
+//
+////        @Override
+////        public boolean contains(TaskRegion t, Spatialization<TaskRegion> model) {
+////            if (region == null)
+////                return false;
+//////            if (!region.contains(t))
+//////                return false;
+////
+////            Task incomingTask = t.task();
+////            TaskRegion[] data = this.data;
+////            final int s = size;
+////            for (int i = 0; i < s; i++) {
+////                TaskRegion d = data[i];
+////                if (d == t) {
+////                    return true;
+////                }
+////                if (d.contains(t)) {
+////                    if (d.equals(t)) {
+////                        model.merge(d, t);
+////                        return true;
+////                    } else {
+////                        NALTask existingTask = (NALTask) d.task();
+////                        if (existingTask.term().equals(incomingTask.term())) {
+////                            if (Stamp.equalsIgnoreCyclic(existingTask.stamp(), incomingTask.stamp())) {
+////                                existingTask.causeMerge(incomingTask);
+////                                existingTask.priMax(incomingTask.priElseZero());
+////                                return true;
+////                            }
+////                        }
+////                    }
+////                }
+////            }
+////            return false;
+////
+////        }
+//    }
 
 }
 

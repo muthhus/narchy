@@ -1,4 +1,4 @@
-package nars.task;
+package nars.concept.dynamic;
 
 import nars.$;
 import nars.NAR;

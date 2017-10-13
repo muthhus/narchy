@@ -4,6 +4,7 @@ import nars.*;
 import nars.concept.Concept;
 import nars.time.Tense;
 import nars.truth.DiscreteTruth;
+import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -162,7 +163,7 @@ public class TaskTest {
         long[] ev = {1, 2};
         d.eventTask.on(t -> {
 
-            if (t instanceof DerivedTask && ((DerivedTask)t).getParentBelief()!=null && !t.cyclic())
+            if (t instanceof DerivedTask && ((DerivedTask)t).getParentBelief()!=null && !Stamp.isCyclic(t.stamp()))
                 assertArrayEquals("all double-premise derived terms have this evidence: "
                         + t + ": " + Arrays.toString(ev) + "!=" + Arrays.toString(t.stamp()), ev, t.stamp());
 

@@ -231,7 +231,7 @@ public class ConjClustering extends Causable {
 
                     int uuLen = uu.length;
                     FasterList<Task> uul = new FasterList<>(uuLen, uu);
-                    long[] evidence = Stamp.zip(new ArrayIterator(uu), uuLen);
+                    long[] evidence = Stamp.zip(new ArrayIterator(uu));
                     NALTask m = new STMClusterTask(cp, t, start, end, evidence, punc, now); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
                     m.cause = Cause.zip(uu);

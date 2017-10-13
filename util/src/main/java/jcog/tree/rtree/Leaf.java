@@ -134,7 +134,7 @@ public class Leaf<T> implements Node<T, T> {
             if (d == t) {
                 return true;
             }
-            if (d.equals(t)) {
+            if (t.equals(d)) {
                 model.merge(d, t);
                 return true;
             }

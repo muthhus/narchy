@@ -592,10 +592,6 @@ public enum $ {
 
 
     public static PreciseTruth t(float f, float c) {
-        return t(f, c, 0);
-    }
-
-    public static PreciseTruth t(float f, float c, float minConf) {
         return new PreciseTruth(f, c);
     }
 
