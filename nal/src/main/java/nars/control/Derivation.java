@@ -102,7 +102,12 @@ public class Derivation extends Unify {
      */
     public boolean temporal;
 
-    public float cyclic, overlap;
+
+    /** evidential overlap of task against itself */
+    public float cyclic;
+
+    /** evidential overlap of task against belief */
+    public float overlap;
 
     public float premisePri;
     public short[] parentCause;

@@ -326,10 +326,16 @@ public interface Stamp {
      * assumes the arrays are sorted and contain no duplicates
      */
     static float overlapFraction(long[] a, long[] b) {
-        return overlapFraction(LongSets.immutable.of(a), a.length, b);
+        //prefer to make a set of the shorter length input
+        if (a.length < b.length) {
+            return overlapFraction(LongSets.immutable.of(a), a.length, b);
+        } else {
+            return overlapFraction(LongSets.immutable.of(b), b.length, a);
+        }
     }
 
 
+    /** ignores any cyclic element */
     static float overlapFraction(/*@NotNull*/ LongSet aa, int aSize, /*@NotNull*/ long[] b) {
         int common = 0;
         for (long x: b) {

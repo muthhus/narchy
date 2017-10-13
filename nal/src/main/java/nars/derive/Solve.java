@@ -72,11 +72,11 @@ abstract public class Solve extends AbstractPred<Derivation> {
                 }
 
 
-                float overlap;
+//                float overlap;
 //                if (f.allowOverlap()) {
 //                    overlap = 0;
 //                } else {
-                    overlap = (single ? d.cyclic : d.overlap);
+                    float overlap = (single ? d.cyclic : Util.or(d.cyclic, d.overlap));
 //                }
 
                 if (overlap > 0) {
