@@ -141,6 +141,10 @@ public enum $ {
         return $.inh(subj, $.the(pred));
     }
 
+    public static <T extends Term> T inh(String subj, Term pred) {
+        return $.inh($.the(subj), pred);
+    }
+
 
     public static <T extends Term> T inh(String subj, String pred) throws Narsese.NarseseException {
         return (T) inh($(subj), $(pred));

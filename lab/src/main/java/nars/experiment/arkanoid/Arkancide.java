@@ -85,25 +85,26 @@ public class Arkancide extends NAgentX {
         //super(nar, HaiQAgent::new);
 
 
-        noid = new Arkanoid(true) {
-            @Override
-            protected void die() {
-                //nar.time.tick(afterlife); //wont quite work in realtime mode
-                super.die();
-            }
-        };
+        noid = new Arkanoid(true);
+//        {
+//            @Override
+//            protected void die() {
+//                //nar.time.tick(afterlife); //wont quite work in realtime mode
+//                super.die();
+//            }
+//        };
 
 
-        paddleSpeed = 20 * noid.BALL_VELOCITY;
+        paddleSpeed = 40 * noid.BALL_VELOCITY;
 
-        float resX = 0.01f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
-        float resY = 0.01f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
+        float resX = 0.1f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
+        float resY = 0.1f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
 
             BufferedImageBitmap2D sw = new Scale(new SwingBitmap2D(noid), visW, visH).blur();
             CameraSensor cc = senseCamera("noid", sw, visW, visH)
-                    .resolution(0.05f);
+                    .resolution(0.1f);
 //            CameraSensor ccAe = senseCameraReduced($.the("noidAE"), sw, 16)
 //                    .resolution(0.25f);
 
@@ -113,10 +114,10 @@ public class Arkancide extends NAgentX {
 
 
         if (numeric) {
-            senseNumber($.func((Atom)id,$.the("px")), (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
-            senseNumber($.func((Atom)id,$.the("dx")), (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
-            senseNumber($.func((Atom)id,$.the("b"), $.the("x")), (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
-            senseNumber($.func((Atom)id,$.the("b"), $.the("y")), (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
+            senseNumber($.inh("px", id), (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
+            senseNumber($.inh("dx",id), (() -> Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth())).resolution(resX);
+            senseNumber($.inh("bx", id), (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
+            senseNumber($.inh("by", id), (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
             //SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX)).resolution(0.25f);
             //SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY)).resolution(0.25f);
 
@@ -174,22 +175,10 @@ public class Arkancide extends NAgentX {
             }
         });
 
-        actionBipolar($.the("X"), (dx) -> {
-            if (noid.paddle.move(dx * paddleSpeed))
-                return dx;
-            else
-                return Float.NaN;
-        });
-//        actionToggle($.p("L"), d -> {
-//            if (d)
-//                noid.paddle.move(-paddleSpeed);
-//        });
-//        actionToggle($.p("R"), d -> {
-//            if (d)
-//                noid.paddle.move(+paddleSpeed);
-//        });
+        //initBipolar();
+        initToggle();
 
-        //nar.truthResolution.setValue(0.05f);
+
 
 //        Param.DEBUG = true;
 //        nar.onTask(x -> {
@@ -224,6 +213,21 @@ public class Arkancide extends NAgentX {
 //                //"(((noid) --> #y) && (add(#x,1) <-> #y))?"
 //                "((cam --> ($x,$y)) && (camdiff($x,$y) --> similaritree($x,$y))). %1.00;0.99%"
 //        ).get(0) );
+
+    }
+
+    private void initBipolar() {
+        actionBipolar($.inh("X", id), (dx) -> {
+            if (noid.paddle.move(dx * paddleSpeed))
+                return dx;
+            else
+                return Float.NaN;
+        });
+    }
+
+    private void initToggle() {
+        actionToggle($.inh("L", id), () -> noid.paddle.move(-paddleSpeed));
+        actionToggle($.inh("R", id), () -> noid.paddle.move(+paddleSpeed));
 
     }
 

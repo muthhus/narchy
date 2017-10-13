@@ -12,7 +12,7 @@ abstract public class UnaryTask<X> extends PLink<X> implements ITask {
 
     private final int hash;
 
-    protected UnaryTask(@NotNull X id, float pri) {
+    protected UnaryTask(X id, float pri) {
         super(id, pri);
         this.hash = id.hashCode();
     }

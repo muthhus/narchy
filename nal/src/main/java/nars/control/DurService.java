@@ -18,7 +18,7 @@ abstract public class DurService extends NARService implements Runnable {
     /** ideal duration multiple to be called, since time after implementation's procedure finished last*/
     public final MutableFloat durations;
 
-    private final NAR nar;
+    protected final NAR nar;
     private long now;
     final AtomicBoolean busy = new AtomicBoolean(false);
 

@@ -630,7 +630,7 @@ public class NAL6Test extends AbstractNALTest {
 
     @Test
     public void testDecomposeImplSubj1b() {
-        test
+        test.truthTolerance(0.03f)
                 .believe("( (&&, y, z, w) ==> x )")
                 .mustBelieve(cycles, "( y ==> x )", 1f, 0.73f)
                 .mustBelieve(cycles, "( z ==> x )", 1f, 0.73f)
@@ -640,7 +640,7 @@ public class NAL6Test extends AbstractNALTest {
 
     @Test
     public void testDecomposeImplPred1b() {
-        test
+        test.truthTolerance(0.03f)
                 .believe("( x ==> (&&, y, z, w) )")
                 .mustBelieve(cycles, "( x ==> y )", 1f, 0.73f)
                 .mustBelieve(cycles, "( x ==> z )", 1f, 0.73f)

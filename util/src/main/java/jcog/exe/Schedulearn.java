@@ -71,7 +71,7 @@ public class Schedulearn {
                     C.divide(xt, timeslice)
 
             );
-            proportionalToValue.setStrength(1);
+            proportionalToValue.setStrength(Strength.MEDIUM);
             solver.add(proportionalToValue);
 
             //demand slightly more than supply limit
@@ -79,14 +79,17 @@ public class Schedulearn {
             double maxIter = Math.max(1, Math.ceil((1 + prevIter) * OVER_DEMAND));
 
             ContinuousConstraint meetsSupply = C.lessThanOrEqualTo(xi, maxIter);
-            meetsSupply.setStrength(0.5f);
+            meetsSupply.setStrength(Strength.WEAK);
             solver.add(meetsSupply);
 
         }
 
         //sum to entire timeslice
-        ContinuousConstraint totalTimeConstraint = C.lessThanOrEqualTo(C.add(times), timeslice);
-        totalTimeConstraint.setStrength(2);
+        ContinuousConstraint totalTimeConstraint =
+                //C.lessThanOrEqualTo
+                C.equals
+                        (C.add(times), timeslice);
+        totalTimeConstraint.setStrength(Strength.REQUIRED);
 
         solver.add(totalTimeConstraint);
 

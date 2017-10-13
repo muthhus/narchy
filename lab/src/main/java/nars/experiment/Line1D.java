@@ -281,7 +281,8 @@ public class Line1D {
 
 //            a.runCycles(runtime);
 
-            return agent.rewardSum / runtime;
+            //return agent.rewardSum / runtime;
+            return 0f;
 
         }
 

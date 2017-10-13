@@ -541,7 +541,7 @@ public class NAL5Test extends AbstractNALTest {
                 .input("(--,x).")
                 .input("((--,x) ==> (--,y)).")
                 .mustBelieve(cycles * 2, "y", 0.0f, 0.81f)
-                .mustNotOutput(cycles * 2, "y", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
+                .mustNotOutput(cycles * 2, "y", BELIEF, 0.5f, 1f, 0.1f, 1, ETERNAL)
         ;
     }
 
@@ -595,8 +595,8 @@ public class NAL5Test extends AbstractNALTest {
     public void testDeductionPosNegImplicationPred() {
 
         test
-                .input("(y). %1.0;0.90%")
-                .input("(--,((y) ==> (x))).")
+                .believe("(y)")
+                .believe("((y) ==> --(x))")
                 .mustBelieve(cycles, "(x)", 0.0f, 0.81f)
                 .mustNotOutput(cycles, "(x)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
         ;

@@ -106,14 +106,12 @@ public abstract class ConsoleAgent extends NAgentX {
     }
 
     @Override
-    protected Stream<ITask> predictions(long next, float prob) {
-        return Stream.concat(
-                Stream.concat(
-                        W.input(),
-                        R.input()
-                ),
-                super.predictions(next, prob)
-        );
+    public void run() {
+        super.run();
+        nar.input(Stream.concat(
+                W.input(),
+                R.input()
+        ));
     }
 
     @Override
@@ -317,8 +315,8 @@ public abstract class ConsoleAgent extends NAgentX {
             char value = chars[cx][cy];
 
             if (prev == 0 || (value != prev)) {
-                Task prevBelief = beliefs[cx][cy]!=null ? beliefs[cx][cy].get() : null;
-                if (prevBelief!=null) {
+                Task prevBelief = beliefs[cx][cy] != null ? beliefs[cx][cy].get() : null;
+                if (prevBelief != null) {
                     //..
                 }
 

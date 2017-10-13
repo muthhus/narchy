@@ -116,6 +116,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         }
 
         return DTERNAL;
+        //return 0; //parallel
     }
 
     @Override

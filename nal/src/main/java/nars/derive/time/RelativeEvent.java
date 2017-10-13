@@ -13,6 +13,7 @@ public class RelativeEvent extends Event {
     public final int start;
     public final int end;
     protected final ITemporalize t;
+    final boolean inverts;
 
 
     protected RelativeEvent(ITemporalize t, Term term, Term relativeTo, int start, int end) {
@@ -25,6 +26,7 @@ public class RelativeEvent extends Event {
         this.rel = relativeTo;
         this.start = start;
         this.end = end;
+        this.inverts = term.unneg().equals(relativeTo.unneg());
     }
 
 
@@ -76,4 +78,11 @@ public class RelativeEvent extends Event {
         }
     }
 
+    public boolean inverts() {
+        return inverts;
+    }
+
+    public boolean zero() {
+        return start == 0;
+    }
 }

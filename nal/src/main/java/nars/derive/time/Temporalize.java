@@ -254,8 +254,11 @@ public class Temporalize implements ITemporalize {
                 } else {
                     if (!implSubj.equals(implPred)) {
                         int predFromSubj = implDT + implSubj.dtRange();
-                        know(implPred, relative(implPred, implSubj, predFromSubj));
+
+                        //crosslink
                         know(implSubj, relative(implSubj, implPred, -predFromSubj));
+                        know(implPred, relative(implPred, implSubj, predFromSubj));
+
 
                         if (implSubj.hasAny(CONJ)) {
 
@@ -294,10 +297,7 @@ public class Temporalize implements ITemporalize {
 
             case NEG:
                 Term u = x.unneg();
-
-
                 know(u, relative(u, x, 0));
-
                 break;
             case CONJ:
                 int tdt = x.dt();

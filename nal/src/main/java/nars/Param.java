@@ -36,7 +36,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int MAX_EVAL_RECURSION = 16;
 
     /** rate that integers in integer-containing termlink compounds will be dynamically mutated on activation */
-    public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.5f;
+    public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.25f;
 
     /** TODO if a task is deleted by this, the system should replace it with a question about the state sometime in the future */
     public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
@@ -85,16 +85,16 @@ public abstract class Param extends Services<Term,NAR> {
 
 
     /** budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links) */
-    public static final FloatFloatToFloatFunction tasktermLinkCombine =
+    public static final FloatFloatToFloatFunction linksToPremise =
             //UtilityFunctions::aveGeo;
-            UtilityFunctions::aveAri;
-            //Util::or; //potentially explosive
+            //UtilityFunctions::aveAri;
+            Util::or;
             //Util::and;
             //Math::min;
             //Math::max;
 
-    /** budgets derivations from the task and optional belief budget */
-    public static final FloatFloatToFloatFunction TaskBeliefCombine =
+    /** max budget for derivations from the task and optional belief budget */
+    public static final FloatFloatToFloatFunction TaskBeliefDerivationMax =
             Util::or;
             //UtilityFunctions::aveAri;
             //Util::and;
@@ -104,18 +104,18 @@ public abstract class Param extends Services<Term,NAR> {
     public final static int SIGNAL_LATCH_TIME_MAX =
                     //0;
                     //Integer.MAX_VALUE;
-                    //4;
-                    8;
+                    6;
+                    //8;
 
     /** derivation severity - how completely confidence is reduced in derivation (default: 1.0) */
     public final FloatParam deriverity = new FloatParam(1.0f, 0f, 1f);
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTLmax = new MutableInteger(256);
-    public final MutableInteger matchTTLmin = new MutableInteger(64);
+    public final MutableInteger matchTTLmax = new MutableInteger(96);
+    public final MutableInteger matchTTLmin = new MutableInteger(24);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
-    public static final float BELIEF_MATCH_TTL_FRACTION = 0.1f;
+    public static final float BELIEF_MATCH_TTL_FRACTION = 0.25f;
 
     public static final int TTL_PREMISE_MIN =
             Param.TTL_UNIFY * 2 +
@@ -276,7 +276,7 @@ public abstract class Param extends Services<Term,NAR> {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 10;
+    public static final int STAMP_CAPACITY = 16;
     public static final int CAUSE_CAPACITY = 32;
 
     public final static int UnificationStackMax = 32; //how many assignments can be stored in the 'versioning' maps

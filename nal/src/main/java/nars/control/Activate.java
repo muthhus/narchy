@@ -32,14 +32,12 @@ import static nars.Op.INT;
 /**
  * concept firing, activation, etc
  */
-public class Activate extends UnaryTask<Concept> implements Termed {
+public class Activate extends UnaryTask<Concept>  {
 
     static final int TASKLINKS_SAMPLED = 2;
-    static final int TERMLINKS_SAMPLED = 2;
-    //private final BiFunction<Task,Term,Premise> premiseBuilder ;
+    static final int TERMLINKS_SAMPLED = 3;
 
-
-    public Activate(@NotNull Concept c, float pri) {
+    public Activate(Concept c, float pri) {
         super(c, pri);
         assert (c.isNormalized()) :
                 c + " not normalized";
@@ -205,7 +203,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                     final Term term = termlink.get();
                     if (term != null) {
 
-                        float pri = Param.tasktermLinkCombine.apply(task.priElseZero(), termlink.priElseZero());
+                        float pri = Param.linksToPremise.apply(task.priElseZero(), termlink.priElseZero());
                         Premise p = new Premise(task, term, pri, localSubConcepts);
                         premises.add(p);
                     }
@@ -395,10 +393,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //        return ttl;
 //    }
 
-    @Override
-    public final Term term() {
-        return id.term();
-    }
 
     @Override
     public boolean persist() {

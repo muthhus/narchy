@@ -2,7 +2,6 @@ package nars.derive.time;
 
 import nars.term.Term;
 import nars.term.atom.Bool;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -14,7 +13,7 @@ public abstract class Event implements Comparable<Event> {
     public final Term term;
 
     Event(Term term) {
-        assert(!(term instanceof Bool));
+        assert (!(term instanceof Bool));
         this.term = term;
     }
 
@@ -47,7 +46,7 @@ public abstract class Event implements Comparable<Event> {
 
 
     @Override
-    public int compareTo(@NotNull Event that) {
+    public int compareTo(Event that) {
         if (this == that) return 0;
 
         if (getClass() == that.getClass()) {
@@ -55,9 +54,27 @@ public abstract class Event implements Comparable<Event> {
 
             if (this instanceof RelativeEvent) {
                 RelativeEvent THIS = (RelativeEvent) this;
-                Term x = THIS.rel.term();
                 RelativeEvent THAT = (RelativeEvent) that;
+
+                if (THIS.inverts() && THAT.inverts()) {
+                    //prefer the one with the non-zero delta. the zero delta is likely the least useful case
+                    //the non-zero delta is indicating a temporal relationship between an event and its inverse
+                    if (THIS.zero() && !THAT.zero())
+                        return +1;
+                    else if (THAT.zero() && !THIS.zero())
+                        return -1;
+                }
+
+
+                //always prefer non-inverting, ie. negation as a last resort
+                if (THIS.inverts() && !THAT.inverts())
+                    return +1;
+                if (THAT.inverts() && !THIS.inverts())
+                    return -1;
+
+                Term x = THIS.rel.term();
                 Term y = THAT.rel.term();
+
                 if (x.equals(y)) {
                     int c1 = Integer.compare(THIS.start, THAT.start);
                     if (c1 != 0)
@@ -70,14 +87,14 @@ public abstract class Event implements Comparable<Event> {
 //                    if (xs != ys) {
 //                        return Float.compare(ys, xs);
 //                    } else {
-                        //prefer lower volume
-                        int xv = x.volume();
-                        int yv = y.volume();
-                        if (xv == yv)
-                            return x.compareTo(y);
-                        else
-                            return Integer.compare(yv, xv);
-           //         }
+                    //prefer larger complexity (variables arent helpful)
+                    int xv = x.complexity();
+                    int yv = y.complexity();
+                    if (xv == yv)
+                        return x.compareTo(y);
+                    else
+                        return Integer.compare(yv, xv);
+                    //         }
                 }
 
             } else if (this instanceof AbsoluteEvent) {

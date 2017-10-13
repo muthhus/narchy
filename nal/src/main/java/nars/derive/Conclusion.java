@@ -99,21 +99,21 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
             if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
 
-            if (urgent && p.concPunc == GOAL) {
-                long taskStart = p.task.start();
-
-                if (taskStart == ETERNAL) {
-                    occ[0] = occ[1] = p.time;
-
-                    //if (taskStart != ETERNAL) {
-                } else if (occ[0] != ETERNAL && occ[0] < taskStart) {
-
-                    long taskDur = occ[1] - occ[0];
-                    occ[0] = taskStart;
-                    occ[1] = occ[0] + taskDur;
-
-                }
-            }
+//            if (urgent && p.concPunc == GOAL) {
+//                long taskStart = p.task.start();
+//
+//                if (taskStart == ETERNAL) {
+//                    occ[0] = occ[1] = p.time;
+//
+//                    //if (taskStart != ETERNAL) {
+//                } else if (occ[0] != ETERNAL && occ[0] < taskStart) {
+//
+//                    long taskDur = occ[1] - occ[0];
+//                    occ[0] = taskStart;
+//                    occ[1] = occ[0] + taskDur;
+//
+//                }
+//            }
 
         } else {
             c2 = c1.temporalize(Retemporalize.retemporalizeAllToDTERNAL);

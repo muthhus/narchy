@@ -91,7 +91,6 @@ public class Premise extends UnaryTask {
         if (task == null || task.isDeleted())
             return null;
 
-        int ttlMax = Util.lerp(task.priElseZero(), n.matchTTLmin.intValue(), n.matchTTLmax.intValue());
 
 
 
@@ -185,6 +184,8 @@ public class Premise extends UnaryTask {
 
 
         boolean beliefConceptCanAnswerTaskConcept = false;
+        int ttlMax = Util.lerp(Util.unitize(task.priElseZero()/n.priDefault(task.punc())),
+                n.matchTTLmin.intValue(), n.matchTTLmax.intValue());
 
         if (!taskTerm.equals(beliefTerm)) {
             boolean beliefHasVars = beliefTerm.vars() > 0;
@@ -314,11 +315,14 @@ public class Premise extends UnaryTask {
         if (task.isEternal())
             return ETERNAL;
 
+        return now;
+
         //return task.nearestTimeTo(now);
-        return nar.random().nextBoolean() ?
-                task.nearestTimeTo(now) :
-                now + Math.round((-0.5f + nar.random().nextFloat()) * 2f * (Math.abs(now - task.mid())));
-        //return now;
+
+//        return nar.random().nextBoolean() ?
+//                task.nearestTimeTo(now) :
+//                now + Math.round((-0.5f + nar.random().nextFloat()) * 2f * (Math.abs(now - task.mid())));
+
         //return now + dur;
 
 //        if (task.isEternal()) {

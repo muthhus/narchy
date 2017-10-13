@@ -66,19 +66,12 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
      */
 //    public final FloatParam predictAheadDurs = new FloatParam(1, 1, 32);
 
-    private final CauseChannel<ITask> predict;
-
 
     /**
      * action exploration rate; analogous to epsilon in QLearning
      */
     public final FloatParam curiosity;
 
-
-    /**
-     * prediction templates
-     */
-    public final List<Supplier<Task>> predictors = $.newArrayList();
 
     public final AtomicBoolean enabled = new AtomicBoolean(true);
 
@@ -89,7 +82,6 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
     public long now;
 
-    public float rewardSum;
 
 
     /**
@@ -99,6 +91,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
     private Loop loop;
     public NAR nar;
     private int dur;
+    private final NALTask happyGoal;
     //final private ConceptFire fireHappy;
 
 
@@ -120,8 +113,13 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
         this.happy = senseNumber(id == null ?
                         $.the("happy") : //generally happy
-                        $.p(id, $.the("happy")), //happy in this environment
+                        //$.p(id, $.the("happy")), //happy in this environment
+                        $.inh($.the("happy"), id),
                 new FloatPolarNormalized(() -> rewardCurrent).relax(0.002f));
+
+        this.happyGoal = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), now,
+                ETERNAL, ETERNAL,
+                nar.time.nextInputStamp());
 
 //        this.reward = senseNumber(new FloatPolarNormalized(() -> rewardCurrent), ScalarConcepts.Mirror,
 //                id == null ?
@@ -139,9 +137,8 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         curiosity = new FloatParam(0.10f, 0f, 1f);
 
 
-        if (id == null) id = $.quote(getClass().toString());
+//        if (id == null) id = $.quote(getClass().toString());
 
-        this.predict = nar.newCauseChannel(id + " predict");
     }
 
     @Deprecated
@@ -220,35 +217,93 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
         this.nar = nar;
 
+        this.now = nar.time();
+
         super.start(nar);
 
-        now = nar.time();
 
 
-        nar.runLater(() -> {
-            //this.curiosityAttention = reinforcementAttention / actions.size();
+    }
+
+    private void happy() {
+        happyGoal.priMax(nar.priDefault(GOAL));
+        nar.input(happyGoal);
+    }
 
 
-                long nt = nar.time();
-                Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nt,
-                        ETERNAL, ETERNAL,
-                        //nt, nt,
-                        nar.time.nextInputStamp());
+    @Override
+    public void run() {
+        if (!enabled.get())
+            return;
 
-//            final Task[] prevHappy = new Task[1];
+        this.dur = nar.dur();
+
+        this.now = nar.time();
+
+        happy();
+
+        float r = rewardCurrent = act();
+
+        this.now = nar.time();
+
+        sensors.forEach((s, c) -> {
+            //nar.exe.execute(() -> {
+            c.input(s.update(now, dur, nar));
+            //});
+        });
+
+        this.now = nar.time();
+
+        actions.forEach((a, c) -> {
+            //nar.exe.execute(() -> {
+            Stream<ITask> s = a.update(now, dur, nar);
+            if (s != null)
+                c.input(s);
+            //});
+        });
+
+        Truth happynowT = nar.beliefTruth(happy, now);
+        float happynow = happynowT != null ? (happynowT.freq() - 0.5f) * 2f : 0;
+        nar.emotion.happy(dexterity() * happynow /* /nar.confDefault(GOAL) */);
+
+        if (trace)
+            logger.info(summary());
+    }
+
+
+
+    /**
+     * experimental nagging question feed about how to make an agent happy
+     */
+    public static class AgentPredictions extends DurService {
+
+
+        /**
+         * prediction templates
+         */
+        public final List<Supplier<Task>> predictors = $.newArrayList();
+        private final CauseChannel<ITask> predict;
+
+        public AgentPredictions(NAgent a) {
+            super(a.nar);
+
+            this.predict = nar.newCauseChannel(a.id + " predict");
+
+
+            //            final Task[] prevHappy = new Task[1];
             predictors.add(() -> {
 //                if (prevHappy[0]!=null)
 //                    prevHappy[0].delete();
 
-                float happysadPri = nar.priDefault(GOAL);// * 2f;
+                float happysadPri = a.nar.priDefault(GOAL);// * 2f;
 //                long nt = nar.time();
 //                Task he = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), nt,
 //                        //ETERNAL, ETERNAL,
 //                        nt, nt + nar.dur(),
 //                        nar.time.nextInputStamp());
-                he.priMax(happysadPri);
+                a.happyGoal.priMax(happysadPri);
 //                prevHappy[0] = he;
-                return he;
+                return a.happyGoal;
             });
 //                Task se = new NALTask(sad.term(), GOAL, $.t(0f, nar.confDefault(GOAL)), nar.time(), ETERNAL, ETERNAL, nar.time.nextInputStamp());
 //                se.pri(happysadPri);
@@ -295,18 +350,18 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
             Variable what = $.varQuery(1);
 
-            predictors.add(question($.impl(what, happy.term())));
+            predictors.add(question($.impl(what, a.happy.term())));
             //predictors.add(question($.impl(sad.term(), 0, what)));
 
-            for (Concept a : actions.keySet()) {
-                Term action = a.term();
+            for (Concept c : a.actions.keySet()) {
+                Term action = c.term();
 
                 Term notAction = action.neg();
 
                 ((FasterList) predictors).addAll(
 
-                        question($.impl($.conj(what, happy.term()), action)),
-                        question($.impl($.conj(what, happy.term().neg()), action))
+                        question($.impl($.conj(what, a.happy.term()), action)),
+                        question($.impl($.conj(what, a.happy.term().neg()), action))
                         //question($.impl(sad.term(), 0, action)),
 //                        question($.impl(action, sad.term())),
 //                        question($.impl(notAction, sad.term())),
@@ -429,102 +484,58 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
 
             //System.out.println(Joiner.on('\n').join(predictors));
-        });
-    }
 
-//    public SensorConcept randomSensor() {
-//        //quest(parallel((Compound) (action.term()), randomSensor()), now+dur),
-//        return sensors.get(nar.random().nextInt(sensors.size()));
-//    }
-
-
-//    public NAgent runCycles(final int totalCycles) {
-//        return runCycles(nar.dur(), totalCycles);
-//    }
-
-
-    @Override
-    public void run() {
-        if (!enabled.get())
-            return;
-
-        this.dur = nar.dur();
-
-        this.now = nar.time();
-
-        float r = rewardCurrent = doAct();
-        if (r == r) {
-            rewardSum += r;
         }
 
-        this.now = nar.time();
+        public Supplier<Task> question(@NotNull Term term) {
+            return prediction(term, QUESTION, null);
+        }
 
-        sensors.forEach((s, c) -> {
-            //nar.exe.execute(() -> {
-            c.input(s.update(now, dur, nar));
-            //});
-        });
+        public Supplier<Task> quest(@NotNull Term term) {
+            return prediction(term, QUEST, null);
+        }
 
-        this.now = nar.time();
+        Supplier<Task> prediction(@NotNull Term _term, byte punct, DiscreteTruth truth) {
+            Term term = _term.normalize();
 
+            long now = nar.time();
 
-        predict.input(predictions(now, predict.amp()));
+//        long start = now;
+//        long end = now + Math.round(predictAheadDurs.floatValue() * nar.dur());
 
+            long start = ETERNAL, end = ETERNAL;
 
-        this.now = nar.time();
+            NALTask t = new NALTask(term, punct, truth, now,
+                    start, end,
+                    new long[]{nar.time.nextStamp()});
 
-        actions.forEach((a, c) -> {
-            //nar.exe.execute(() -> {
-            Stream<ITask> s = a.update(now, dur, nar);
-            if (s != null)
-                c.input(s);
-            //});
-        });
+            return () -> {
 
-        nar.emotion.happy(dexterity() /* /nar.confDefault(GOAL) */);
+                Task u;
+                if (t.isEternal()) {
+                    u = t;
+                } else {
+                    long nownow = nar.time();
+                    //TODO handle task duration
+                    u = new NALTask(t.term(), t.punc(), t.truth(), nownow, nownow, nownow, new long[]{nar.time.nextStamp()});
+                }
 
-        this.now = nar.time();
+                u.priMax(nar.priDefault(u.punc()));
 
-//        if (nar.exe.concurrent())
-//            eventFrame.emitAsync(this, nar.exe); //not safe for use with some features, ex: bipolar currently demands a specific ordering sequence for processing its two concpets
-//        else
+                return u;
+            };
+        }
 
-        if (trace)
-            logger.info(summary());
+        @Override
+        protected void run(NAR n, long dt) {
+            predict.input(predictions(nar.time(), predict.amp()));
+        }
+
+        protected Stream<ITask> predictions(long now, float prob) {
+            return predictors.stream().filter((x) -> nar.random().nextFloat() <= prob).map(x -> x.get().budget(nar));
+        }
     }
 
-    protected float doAct() {
-        return act();
-    }
-
-//    /**
-//     * synchronous execution
-//     */
-//    public synchronized NAgent runCycles(final int cyclesPerFrame, final int totalFrames) {
-//
-//        //init();
-//
-//        @NotNull On active = nar.onCycle((n) -> {
-//            if (enabled.get()) {
-//                next(cyclesPerFrame);
-//            }
-//        });
-//
-//        nar.run(totalFrames);
-//
-//        active.off();
-//
-//        return this;
-//    }
-
-
-    public Loop running() {
-        return loop;
-    }
-
-    protected Stream<ITask> predictions(long now, float prob) {
-        return predictors.stream().filter((x) -> nar.random().nextFloat() <= prob).map(x -> x.get().budget(nar));
-    }
 
     /**
      * average confidence of actions
@@ -580,9 +591,6 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 //                ;
 //    }
 
-    public float rewardSum() {
-        return rewardSum;
-    }
 
 //    public static float varPct(NAR nar) {
 //            RecycledSummaryStatistics is = new RecycledSummaryStatistics();
@@ -597,44 +605,6 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 //
 //    }
 
-    public Supplier<Task> question(@NotNull Term term) {
-        return prediction(term, QUESTION, null);
-    }
-
-    public Supplier<Task> quest(@NotNull Term term) {
-        return prediction(term, QUEST, null);
-    }
-
-    Supplier<Task> prediction(@NotNull Term _term, byte punct, DiscreteTruth truth) {
-        Term term = _term.normalize();
-
-        long now = nar.time();
-
-//        long start = now;
-//        long end = now + Math.round(predictAheadDurs.floatValue() * nar.dur());
-
-        long start = ETERNAL, end = ETERNAL;
-
-        NALTask t = new NALTask(term, punct, truth, now,
-                start, end,
-                new long[]{nar.time.nextStamp()});
-
-        return () -> {
-
-            Task u;
-            if (t.isEternal()) {
-                u = t;
-            } else {
-                long nownow = nar.time();
-                //TODO handle task duration
-                u = new NALTask(t.term(), t.punc(), t.truth(), nownow, nownow, nownow, new long[]{nar.time.nextStamp()});
-            }
-
-            u.priMax(nar.priDefault(u.punc()));
-
-            return u;
-        };
-    }
 
     @Override
     public final float alpha() {

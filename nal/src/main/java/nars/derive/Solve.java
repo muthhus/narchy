@@ -96,7 +96,8 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
             case QUEST:
             case QUESTION:
-                if (d.overlapSingle > 0 && d.random.nextFloat() <= d.overlapSingle)
+                float o = d.overlapSingle;
+                if (o > 0 && d.random.nextFloat() <= o)
                     return false;
 
 //                byte tp = d.taskPunct;

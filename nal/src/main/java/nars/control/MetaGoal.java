@@ -83,16 +83,17 @@ public enum MetaGoal {
 
         for (int i = 0, causesSize = cc; i < causesSize; i++) {
             Cause c = causes.get(i);
-            float v = 0;
 
             Traffic[] cg = c.goalValue;
 
             //mix the weighted current values of each purpose, each independently normalized against the values (the reason for calculating summary statistics in previous step)
+            float v = 0;
             for (int j = 0; j < goals; j++) {
                 v += goal[j] * cg[j].current;
             }
 
-            c.setValue(Util.lerp(0.9f, v, c.value()));
+            final float momentum = 0.5f;
+            c.setValue(Util.lerp(momentum, v, c.value()));
 
             //TODO
             //variation of volume weighted moving average

@@ -2,6 +2,7 @@ package nars.derive;
 
 import com.google.common.base.Joiner;
 import jcog.list.FasterList;
+import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
@@ -815,6 +816,28 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         }
 
         //result.forEach(System.out::println);
+    }
+
+    @Test
+    public void testImplInvert() throws Narsese.NarseseException {
+
+        int start = 1;
+        Temporalize t = new Temporalize();
+        t.knowAbsolute($("(--x ==>+10 x)"), start, start);
+
+         {
+            HashMap h = new HashMap();
+            Event st = t.solve($.the("x").neg(), h);
+            assertEquals("(--,x)", st.term.toString());
+            assertEquals(0, st.start(h).offset);
+        }
+        {
+            HashMap h = new HashMap();
+            Event st = t.solve($.the("x"), h);
+            assertEquals("x", st.term.toString());
+            assertEquals("x@10->(--,x)", st.toString());
+        }
+
     }
 
 //    @Test

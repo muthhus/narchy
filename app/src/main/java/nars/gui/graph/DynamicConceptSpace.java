@@ -33,7 +33,7 @@ public class DynamicConceptSpace extends TermSpace {
         bag = new Bagregate<Activate>(concepts, maxNodes + bufferedNodes, bagUpdateRate) {
             @Override
             protected boolean include(Activate x) {
-                return DynamicConceptSpace.this.include(x.term());
+                return DynamicConceptSpace.this.include(x.id.term());
             }
 
             @Override

@@ -49,11 +49,6 @@ abstract public class NAgentY extends NAgentX {
         super.start(nar);
     }
 
-    @Override
-    protected float doAct() {
-        //agent.run(nar);
-        return super.doAct();
-    }
 
     @Override
     public void addSensor(SensorConcept c) {

@@ -1,11 +1,15 @@
 package nars.op;
 
+import com.google.common.collect.Iterables;
+import jcog.data.FloatParam;
 import jcog.data.graph.AdjGraph;
 import jcog.list.FasterList;
 import jcog.pri.Prioritized;
 import nars.$;
 import nars.NAR;
+import nars.NAgent;
 import nars.Task;
+import nars.concept.ActionConcept;
 import nars.control.CauseChannel;
 import nars.control.DurService;
 import nars.task.ITask;
@@ -21,6 +25,7 @@ import nars.util.graph.TermGraph;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +47,7 @@ public class Implier extends DurService {
     private final CauseChannel<ITask> in;
 
     float min = Prioritized.EPSILON; //even though it's for truth
-    Map<Term, TruthAccumulator> goalTruth = new HashMap();
+    final Map<Term, TruthAccumulator> goalTruth = new HashMap();
 
     AdjGraph<Term, Term> impl;
 
@@ -61,17 +66,27 @@ public class Implier extends DurService {
     final static TruthOperator ded = GoalFunction.get($.the("DeciDeduction"));
     final static TruthOperator ind = GoalFunction.get($.the("DeciInduction"));
     private long then;
-    private final float strength = 0.5f;
+    private final FloatParam strength = new FloatParam(0.5f, 0f, 1f);
 
     public Implier(NAR n, float relativeTargetDur, Term... seeds) {
         this(n, List.of(seeds), relativeTargetDur);
     }
 
 
+    public Implier(NAgent a, float... relativeTargetDurs) {
+        this(a.nar,
+                Iterables.concat(
+                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
+                        Collections.singleton(a.happy.term)
+                ),
+                relativeTargetDurs
+        );
+    }
+
     public Implier(NAR n, Iterable<Term> seeds, float... relativeTargetDurs) {
         super(n, 1f);
 
-        assert(relativeTargetDurs.length > 0);
+        assert (relativeTargetDurs.length > 0);
 
         this.nar = n;
         this.relativeTargetDurs = relativeTargetDurs;
@@ -147,11 +162,11 @@ public class Implier extends DurService {
                     return;
 
                 PreciseTruth t = $.t(f, implConf);
-                    Truth Sg = ded.apply(Pg, t, nar, confSubMin);
+                Truth Sg = ded.apply(Pg, t, nar, confSubMin);
 
-                    if (Sg != null) {
-                        goal(goalTruth, subj, Sg);
-                    }
+                if (Sg != null) {
+                    goal(goalTruth, subj, Sg);
+                }
 
 
                 //experimental:
@@ -194,6 +209,8 @@ public class Implier extends DurService {
             //            });
 
             float truthRes = nar.truthResolution.floatValue();
+
+            float strength = this.strength.floatValue();
 
             goalTruth.forEach((t, a) -> {
                 @Nullable Truth uu = a.commitSum().ditherFreqConf(truthRes, confMin, 1f);

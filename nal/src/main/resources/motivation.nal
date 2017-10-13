@@ -2,26 +2,31 @@
     X, X, task("!") |-          (?1 ==>+- X), (Punctuation:Question)
     X, X, task("!") |-          (X ==>+- ?1), (Punctuation:Question)
     X, X, task("!") |-        (--X ==>+- ?1), (Punctuation:Question)
+    X, Y, task("!") |-          ((Y &&+- ?1) ==>+- X), (Punctuation:Question)
 
-//    X, X, task("!") |-           (?1 && X), (Punctuation:Question)
-    X, X, task("!") |-           (?1 &&+- X), (Punctuation:Question)
-    X, X, task("!") |-           (?1 &&+- X), (Punctuation:Quest)
-    X, X, task("!") |-         (?1 &&+- --X), (Punctuation:Question)
-    X, X, task("!") |-         (?1 &&+- --X), (Punctuation:Quest)
+////    X, X, task("!") |-           (?1 && X), (Punctuation:Question)
+//    X, X, task("!") |-           (?1 &&+- X), (Punctuation:Question)
+//    X, X, task("!") |-           (?1 &&+- X), (Punctuation:Quest)
+//    X, X, task("!") |-         (?1 &&+- --X), (Punctuation:Question)
+//    X, X, task("!") |-         (?1 &&+- --X), (Punctuation:Quest)
 
     //X, X, task("!") |-           (#1 && X), (Goal:StructuralDeduction)
     //X, X, task("!") |- (--,(#1 && (--,X))), (Goal:StructuralDeduction)
 
-    X, (Y==>X), task("!") |-          Y, (Punctuation:Quest)
-    X, (X==>Y), task("!") |-          Y, (Punctuation:Quest)
-    X,  (X&&Y), task("!") |-          Y, (Punctuation:Quest)
+    X, (Y==>X), task("!")  |-          Y, (Punctuation:Quest)
+    X, (X==>Y), task("!")  |-          Y, (Punctuation:Quest)
+    X, (X && Y), task("!") |-          Y, (Punctuation:Quest)
 
     //question the precondition state
     X, (Y==>X), task("!") |-          Y, (Punctuation:Question)
 
+
     //quest to 'how' question
     B, X, task("@"), notImpl(B) |- (B ==>+- X), (Punctuation:Question)
     B, X, task("@"), notImpl(B) |- (--B ==>+- X), (Punctuation:Question)
+    B, X, task("@"), notImpl(X) |- (X ==>+- B), (Punctuation:Question)
+    B, X, task("@"), notImpl(X) |- (--X ==>+- B), (Punctuation:Question)
+
 
     //(X ==> Y), (X ==> Y), task("?") |- (?1 ==>+- Y), (Punctuation:Question)
     //(X ==> Y), (X ==> Y), task("?") |- (X ==>+- ?1), (Punctuation:Question)

@@ -1,11 +1,13 @@
 package nars;
 
+import com.google.common.collect.Iterables;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.Ons;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.pri.mix.control.MixContRL;
+import nars.concept.ActionConcept;
 import nars.control.Cause;
 import nars.control.Derivation;
 import nars.control.MetaGoal;
@@ -15,6 +17,7 @@ import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
+import nars.op.Implier;
 import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
 import nars.term.Term;
@@ -54,6 +57,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -170,6 +174,7 @@ abstract public class NAgentX extends NAgent {
         NAR n = new NARS()
                 .exe(new MultiExec(THREADS))
                 .time(clock)
+                .deriver(deriver)
                 .index(
                         new CaffeineIndex(96 * 1024)
                         //new CaffeineIndex2(64 * 1024)
@@ -263,16 +268,9 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-//        new Implier(a.nar,
-//                Iterables.concat(
-//                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
-//                        Collections.singleton(a.happy.term)
-//                ),
-//                new float[]{
-//                        //0 //now
-//                        1,
-//                        4
-//                }
+//        new Implier(a,
+//                2
+//                //0,1,4
 //        );
 
 //        AgentService p = new AgentService.AgentBuilder(
@@ -347,7 +345,7 @@ abstract public class NAgentX extends NAgent {
         return grid(
                 Stream.concat(
                         Stream.of(new CheckBox("Auto", (BooleanProcedure) (enable) -> {
-                            System.out.println("x");
+                            System.out.println("TODO");
                         })),
                         IntStream.range(0, n.want.length).mapToObj(
                                 w -> new FloatSlider(n.want[w], -1f, +1f)
