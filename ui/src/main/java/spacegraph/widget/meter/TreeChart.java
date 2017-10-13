@@ -50,7 +50,6 @@ public class TreeChart<X> extends Surface {
 
     @Override
     protected void paint(GL2 gl) {
-        super.paint(gl);
 
         double totalArea = width * height;
         for (ItemVis v : phase.read()) {

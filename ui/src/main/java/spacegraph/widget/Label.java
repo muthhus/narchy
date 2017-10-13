@@ -32,7 +32,7 @@ public class Label extends Surface {
         color.apply(gl);
         gl.glLineWidth(lineWidth);
         //float dz = 0.1f;
-        Draw.text(gl, value(), fontScale, 1f, 0f, 0f, 0, Draw.TextAlignment.Left);
+        Draw.text(gl, value(), fontScale, 1, 0f, 0f, 0, Draw.TextAlignment.Left);
 
     }
 
@@ -44,18 +44,8 @@ public class Label extends Surface {
         this.value = newValue;
 
         int len = newValue.length();
-        this.aspect = 1f / (len);
+        this.aspect = 1.6f / (len);
         this.fontScale = 1f / len;
-
-        //0.5f;
-                //0.5f;
-
-                //0.5f; //(1f/ConsoleSurface.fontWidth)/value.length();
-//        if (len > 0) {
-//            this.aspect = 0.5f; ///0.5f / len;
-//        } else {
-//            this.aspect = Float.NaN;
-//        }
     }
 
     public String value() {

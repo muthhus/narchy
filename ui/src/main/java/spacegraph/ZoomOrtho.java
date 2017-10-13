@@ -94,17 +94,6 @@ public class ZoomOrtho extends Ortho {
         }
     }
 
-    @Override
-    protected void paint(GL2 gl) {
-        super.paint(gl);
-
-//        {
-//            //local coordinate center 0.25..0.75x0.25..0.75
-//            gl.glColor4f(1f, 1f, 1f, 0.3f);
-//            Draw.rect(gl, 0.25f, 0.25f, 0.5f, 0.5f);
-//        }
-
-    }
 
     @Override
     public void mouseWheelMoved(MouseEvent e) {

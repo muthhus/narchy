@@ -2,6 +2,7 @@ package spacegraph.layout;
 
 import com.google.common.collect.Lists;
 import com.jogamp.newt.event.KeyEvent;
+import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
@@ -14,7 +15,7 @@ import java.util.function.Consumer;
 /**
  * Created by me on 7/20/16.
  */
- public class Layout<S extends Surface> extends Surface {
+public class Layout<S extends Surface> extends Surface {
 
     public List<S> children;
 
@@ -28,10 +29,18 @@ import java.util.function.Consumer;
         set(children);
     }
 
-
-    @Override
     public List<S> children() {
         return children;
+    }
+
+    @Override
+    protected void paint(GL2 gl) {
+
+        List<? extends Surface> cc = children;
+        for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
+            cc.get(i).render(gl);
+        }
+
     }
 
     public final void set(S... s) {
@@ -78,10 +87,8 @@ import java.util.function.Consumer;
     @Override
     public void stop() {
         synchronized (scale) {
-            if (children!=null) {
-                children.forEach(Surface::stop);
-                children = null;
-            }
+            children.forEach(Surface::stop);
+            children = null;
             super.stop();
         }
 
@@ -90,19 +97,21 @@ import java.util.function.Consumer;
     @Override
     public final Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
         Surface x = super.onTouch(finger, hitPoint, buttons);
-        if (x!=null || children == null)
+        if (x != null)
             return x;
 
         //2. test children reaction
+        List<S> cc = this.children;
+
         if (hitPoint == null) {
-            for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
-                children.get(i).onTouch(finger, null, null);
+            for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
+                cc.get(i).onTouch(finger, null, null);
             }
             return null;
         } else {
 
-            for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
-                Surface c = children.get(i);
+            for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
+                Surface c = cc.get(i);
 
                 v2 sc = c.scale;
                 float csx = sc.x;
@@ -136,11 +145,10 @@ import java.util.function.Consumer;
     @Override
     public boolean onKey(KeyEvent e, boolean pressed) {
         if (!super.onKey(e, pressed)) {
-            if (children != null) {
-                for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
-                    if (children.get(i).onKey(e, pressed))
-                        return true;
-                }
+
+            for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
+                if (children.get(i).onKey(e, pressed))
+                    return true;
             }
         }
         return false;
@@ -149,18 +157,18 @@ import java.util.function.Consumer;
     @Override
     public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
         if (!super.onKey(hitPoint, charCode, pressed)) {
-            if (children != null) {
-                for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
-                    if (children.get(i).onKey(hitPoint, charCode, pressed))
-                        return true;
-                }
+
+            List<S> cc = this.children;
+            for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
+                if (cc.get(i).onKey(hitPoint, charCode, pressed))
+                    return true;
             }
         }
         return false;
     }
 
     public void forEach(Consumer<S> o) {
-        children.forEach(o::accept);
+        children.forEach(o);
     }
 
 }

@@ -176,9 +176,12 @@ public class BitmapMatrixView extends TextureSurface {
         }
 
         int i = 0;
+        int[] rr = this.rasInt;
+        final int h = this.h;
+        final int w = this.w;
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                rasInt[i++] = view.update(x, y);
+                rr[i++] = view.update(x, y);
             }
         }
 

@@ -206,8 +206,6 @@ public class STMView {
 
         @Override
         protected void paint(GL2 gl) {
-            super.paint(gl);
-
             if (range[0] != range[0])
                 return; //nothing to show
 

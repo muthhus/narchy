@@ -13,10 +13,7 @@ import java.util.List;
  * planar subspace.
  * (fractal) 2D Surface embedded relative to a parent 2D surface or 3D space
  */
-public class Surface {
-
-
-
+abstract public class Surface {
 
 
     public enum Align {
@@ -120,9 +117,7 @@ public class Surface {
     }
 
 
-    protected void paint(GL2 gl) {
-
-    }
+    abstract protected void paint(GL2 gl);
 
     public Surface move(float dx, float dy) {
         pos.add(dx, dy,0);
@@ -132,86 +127,65 @@ public class Surface {
     public final void render(GL2 gl) {
 
 
-//        v2 s = this.scale;
-//        float scaleX = s.x;
-//        if (scaleX != scaleX || scaleX <= 0)
-//            return; //invisible
+        v2 s = this.scale;
+        float scaleX = s.x;
+        if (scaleX != scaleX || scaleX <= 0)
+            return; //invisible
+
+        v2 scale = this.scale;
+
+        float sx, sy;
+
+        float aspect = this.aspect;
+        if (aspect==aspect /* not NaN */) {
+
+            if (scale.y/scale.x > aspect) {
+                //wider, shrink y
+                sx = scale.x;
+                sy = scale.y * aspect;
+            } else {
+                //taller, shrink x
+                sx = scale.x / aspect;
+                sy = scale.y;
+            }
+
+
+        } else {
+            //consume entire area, regardless of aspect
+            sx = scale.x;
+            sy = scale.y;
+        }
+
+        float tx = pos.x, ty = pos.y;
+        switch (align) {
+
+            //TODO others
+
+            case Center:
+                //HACK TODO figure this out
+                tx += (1f - (sx/scale.x))/2f;
+                ty += (1f - (sy/scale.y))/2f;
+                break;
+
+            case None:
+            default:
+                break;
+
+        }
+
 
         gl.glPushMatrix();
 
-        gl.glTranslatef(pos.x, pos.y, pos.z);
-        gl.glScalef(scale.x, scale.y, 1f);
+        gl.glTranslatef(tx, ty, pos.z);
+        gl.glScalef(sx, sy, 1f);
 
         //gl.glNormal3f(0,0,1);
 
         paint(gl);
 
-        List<? extends Surface> cc = children();
-        if (cc != null) {
-            for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
-                Surface ss = cc.get(i);
-                if (ss!=null)
-                    ss.render(gl);
-            }
-        }
-
         gl.glPopMatrix();
     }
 
-    @Nullable public List<? extends Surface> children() {
-        return null;
-    }
-
-
-//    public void transform(GL2 gl, v2 globalScale) {
-//        final Surface c = this;
-//
-//        this.scaleGlobal = globalScale;
-//
-//
-//        v2 scale = c.scale;
-//
-//        float sx, sy;
-//
-//        if (Float.isFinite(aspect)) {
-//            float globalAspect = globalScale.y / globalScale.x;
-//            float targetAspect = aspect/globalAspect;
-//            if (targetAspect < 1) {
-//                //wider, shrink y
-//                sx = scale.x;
-//                sy = scale.y * targetAspect;
-//            } else {
-//                //taller, shrink x
-//                sx = scale.x / targetAspect;
-//                sy = scale.y;
-//            }
-//
-//
-//        } else {
-//            //consume entire area, regardless of aspect
-//            sx = scale.x;
-//            sy = scale.y;
-//        }
-//
-//        float tx = translate.x, ty = translate.y;
-//        switch (align) {
-//
-//            //TODO others
-//
-//            case Center:
-//                //HACK TODO figure this out
-//                tx += (1f - (sx/scale.x))/2f;
-//                ty += (1f - (sy/scale.y))/2f;
-//                break;
-//
-//            case None:
-//            default:
-//                break;
-//
-//        }
-
-//        v3 translate = c.pos;
-//    }
 
 
     public static boolean leftButton(short[] buttons) {

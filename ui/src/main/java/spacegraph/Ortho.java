@@ -29,6 +29,7 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
 
         this.surface = content;
         surface.align = None;
+        surface.aspect = 1f;
 
         this.finger = new Finger(this);
 //        this.scale = new AnimVector2f(3f);

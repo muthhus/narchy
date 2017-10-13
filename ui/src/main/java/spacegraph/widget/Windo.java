@@ -1,5 +1,6 @@
 package spacegraph.widget;
 
+import com.jogamp.opengl.GL2;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.layout.Layout;
@@ -72,6 +73,11 @@ public class Windo extends Widget {
 
             set(initial);
         }
+
+    }
+
+    @Override
+    protected void paintComponent(GL2 gl) {
 
     }
 

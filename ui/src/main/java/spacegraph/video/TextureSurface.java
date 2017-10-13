@@ -32,6 +32,7 @@ public class TextureSurface extends Surface {
     private TextureData nextData;
     public int[] array;
     private IntBuffer buffer;
+    private Object src;
 
     public TextureSurface() {
 
@@ -68,12 +69,14 @@ public class TextureSurface extends Surface {
         if (profile == null)
             return;
 
-        int pixels = iimage.getWidth() * iimage.getHeight();
 
-        if (nextData == null) {
+        if (nextData == null || this.src!=iimage) {
 
-            buffer = IntBuffer.allocate(pixels);
-            array = buffer.array();
+            this.src = iimage;
+            array = ((DataBufferInt)(iimage.getRaster().getDataBuffer())).getData();
+
+            //buffer = IntBuffer.allocate(pixels);
+            buffer = IntBuffer.wrap(array);
             nextData = new TextureData(profile, GL_RGB,
                     iimage.getWidth(), iimage.getHeight(),
                     0 /* border */,
@@ -85,43 +88,9 @@ public class TextureSurface extends Surface {
             );
         }
 
-
-        if (array!=null) {
-            //TODO eliminate need for BufferedImage and move to subclass
-
-            int[] aa = ((DataBufferInt)(iimage.getRaster().getDataBuffer())).getData();
-            arraycopy(aa, 0, array, 0, aa.length);
-
-//            int i = 0;
-//            for (int j = 0; j < pixels; ) {
-//                byte r = aa[i++];
-//                byte g = aa[i++];
-//                byte b = aa[i++];
-//                byte a = aa[i++];
-//                array[j++] = Ints.fromBytes(r, g, b, a);
-//            }
-        }
-
-
-//        bb.rewind();
-//        OutputStream out = new ByteBufferBackedOutputStream(bb); //ByteArrayOutputStream(aa);
-//
-//        try {
-//
-//
-//            ImageIO.write(iimage, internalFormat, out);
-//            out.close();
-//
-//            InputStream in = new ByteArrayInputStream(aa);
-//            nextData = TextureIO.newTextureData(profile, in, mipmap, internalFormat);
-//
-//
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
         textureUpdated.set(true);
+
+
     }
 
 }

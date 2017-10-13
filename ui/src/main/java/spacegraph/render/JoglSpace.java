@@ -35,8 +35,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     protected static final GameAnimatorControl a;
 
 
-    public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
     public static final GLU glu = new GLU();
+    public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
     public static final GLUT glut = new GLUT();
 
     public GLWindow window;
@@ -49,19 +49,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     }
 
     public static GLWindow window(JoglSpace j) {
-        return window(newDefaultConfig(), j);
-    }
-
-
-    //static final GLAutoDrawable sharedDrawable;
-
-    static {
-//        GLCapabilitiesImmutable cfg = newDefaultConfig();
-//        sharedDrawable = GLDrawableFactory.getFactory(cfg.getGLProfile()).createDummyAutoDrawable(null, true, cfg, null);
-//        sharedDrawable.display(); // triggers GLContext object creation and native realization.
-//        Draw.init(sharedDrawable.getGL().getGL2());
-        a = new GameAnimatorControl(FPS_IDEAL);
-        a.start();
+        return window(config(), j);
     }
 
     public static GLWindow window(GLCapabilitiesImmutable config, JoglSpace j) {
@@ -81,7 +69,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     public static final Set<GLWindow> windows = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-    public static final Logger logger = LoggerFactory.getLogger(JoglSpace.class);
+    static final Logger logger = LoggerFactory.getLogger(JoglSpace.class);
 
     private static void animate(GLWindow w) {
 
@@ -151,14 +139,14 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         System.err.println(gl.glGetString(GL.GL_EXTENSIONS));
     }
 
-    public static GLCapabilitiesImmutable newDefaultConfig() {
+    static GLCapabilitiesImmutable config() {
 
 
         GLCapabilities config = new GLCapabilities(
 
                 //GLProfile.getMinimum(true)
-                GLProfile.getDefault()
-                //GLProfile.getMaximum(true)
+                //GLProfile.getDefault()
+                GLProfile.getMaximum(true)
 
 
         );
@@ -633,4 +621,14 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 //        gl2.glViewport(0, 0, getWidth(), getHeight());
 //
 //    }
+
+    static {
+//        GLCapabilitiesImmutable cfg = newDefaultConfig();
+//        sharedDrawable = GLDrawableFactory.getFactory(cfg.getGLProfile()).createDummyAutoDrawable(null, true, cfg, null);
+//        sharedDrawable.display(); // triggers GLContext object creation and native realization.
+//        Draw.init(sharedDrawable.getGL().getGL2());
+        a = new GameAnimatorControl(FPS_IDEAL);
+        a.start();
+    }
+
 }

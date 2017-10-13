@@ -158,8 +158,6 @@ public class Recog2D extends NAgentX {
                         Concept c = ccnn.getKey();
                         Outputs.Neuron nn = ccnn.getValue();
 
-                        super.paint(gl);
-
                         float freq, conf;
 
                         Truth t = nar.beliefTruth(c, nar.time());

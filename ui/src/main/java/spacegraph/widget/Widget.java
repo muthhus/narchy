@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
+import spacegraph.layout.Layout;
 import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
@@ -22,7 +23,7 @@ import static spacegraph.layout.Grid.*;
 /**
  * Base class for GUI widgets, similarly designed to JComponent
  */
-public class Widget extends Stacking {
+abstract public class Widget extends Stacking {
 
     @Nullable Finger touchedBy;
 
@@ -54,6 +55,9 @@ public class Widget extends Stacking {
     @Override
     protected void paint(GL2 gl) {
 
+        paintComponent(gl);
+
+        super.paint(gl);
 
 //        /*if (Param.DEBUG)*/ {
 //            Draw.colorHash(gl, hashCode(), 0.5f);
@@ -75,13 +79,10 @@ public class Widget extends Stacking {
             Draw.rectStroke(gl, 0, 0, 1, 1);
         }
 
-        paintComponent(gl);
 
     }
 
-    protected void paintComponent(GL2 gl) {
-
-    }
+    abstract protected void paintComponent(GL2 gl);
 
 
 //    @Override
@@ -149,7 +150,7 @@ public class Widget extends Stacking {
         }
     }
 
-    public static Surface widgetDemo() {
+    public static Layout widgetDemo() {
         return grid(
                 new BaseSlider(.25f  /* pause */),
                 grid(),
