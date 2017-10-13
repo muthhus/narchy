@@ -5,6 +5,9 @@ import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.IntSupplier;
+
 import static nars.Op.TemporalBits;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -17,6 +20,7 @@ abstract public class Retemporalize implements CompoundTransform {
     public static final Retemporalize retemporalizeXTERNALToDTERNAL = new RetemporalizeFromTo(XTERNAL, DTERNAL);
     public static final Retemporalize retemporalizeXTERNALToZero = new RetemporalizeFromTo(XTERNAL, 0);
 
+
     @Nullable
     @Override
     public Term transform(Compound x, Op op, int dt) {
@@ -28,27 +32,8 @@ abstract public class Retemporalize implements CompoundTransform {
     }
 
 
-//    @Nullable
-//    @Override
-//    public final Term apply(@NotNull Term x) {
-//
-//        if (!(x instanceof Compound) || !x.hasAny(TemporalBits))
-//            return x;
-//
-//        Compound cx = (Compound) x;
-//        Op o = cx.op();
-//        boolean temporal = o.temporal;
-//        int tdt = temporal ? dt(cx) : DTERNAL;
-//        if (parent != null) {
-//
-//            return transform(cx, o, tdt);
-//
-//        } else {
-//            return temporal ? cx.dt(tdt) : cx;
-//        }
-//    }
-
-    @Override abstract public int dt(Compound x);
+    @Override
+    abstract public int dt(Compound x);
 
     @Deprecated
     public static final class RetemporalizeAll extends Retemporalize {
@@ -81,4 +66,20 @@ abstract public class Retemporalize implements CompoundTransform {
         }
     }
 
+    public static final class RetemporalizeFromToFunc extends Retemporalize {
+
+        final int from;
+        final IntSupplier to;
+
+        public RetemporalizeFromToFunc(int from, IntSupplier to) {
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        public int dt(Compound x) {
+            int dt = x.dt();
+            return dt == from ? to.getAsInt() : dt;
+        }
+    }
 }

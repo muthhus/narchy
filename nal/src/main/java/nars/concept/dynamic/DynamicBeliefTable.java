@@ -13,6 +13,8 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.DTERNAL;
@@ -51,18 +53,27 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public Truth truth(long start, long end, NAR nar) {
-        DynTruth d = truth(start, end, template(term, start, end), false, nar);
+        DynTruth d = truth(start, end, template(term, start, end, nar), false, nar);
         return Truth.maxConf(d != null ? d.truth() : null,
                 super.truth(start, end, nar) /* includes only non-dynamic beliefs */);
     }
 
     /** prepare a term, if necessary, for use as template  */
-    private Term template(Term template, long start, long end) {
+    private Term template(Term template, long start, long end, NAR nar) {
         if (template.dt() == XTERNAL) {
             int newDT = matchDT(template, start, end);
             template = template.dt(newDT);
         }
-        return template.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
+        @Nullable Term t2 = template.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
+        if (t2 == null) {
+            //for some reason, retemporalizing to DTERNAL failed (ex: conj collision)
+            //so as a backup plan, use dt=+/-1
+            int dur = nar.dur();
+            Random rng = nar.random();
+            t2 = template.temporalize(new Retemporalize.RetemporalizeFromToFunc(XTERNAL,
+                    () -> rng.nextBoolean() ? +dur : -dur));
+        }
+        return t2;
     }
 
 
@@ -111,9 +122,9 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     public Task match(long start, long end, @NotNull Term template, NAR nar) {
         Task x = super.match(start, end, template, nar);
 
-        template = template(template, start, end);
+        template = template(template, start, end, nar);
 
-        Task y = generate(template, start, end, nar);
+        Task y = template!=null ? generate(template, start, end, nar) : null;
         if (y == null || y.equals(x)) return x;
 
         boolean dyn;
