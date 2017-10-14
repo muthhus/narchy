@@ -209,7 +209,12 @@ public class reflect {
             if ((reflectionSim != null && reflectionSim.subs() > 0)) {
                 int rvol = reflectionSim.volume();
                 if (rvol <= n.termVolumeMax.intValue()) {
-                    NALTask t = new NALTask(reflectionSim, BELIEF, $.t(1f, n.confDefault(BELIEF)), n.time(), ETERNAL, ETERNAL, n.time.nextInputStamp());
+
+                    float c = x.vars() == 0 ?
+                            n.confDefault(BELIEF) :
+                            n.confMin.floatValue(); //if there is a variable, avoid becoming overconfident about linking across it. maybe this is too extreme of a conf discount
+
+                    NALTask t = new NALTask(reflectionSim, BELIEF, $.t(1f, c), n.time(), ETERNAL, ETERNAL, n.time.nextInputStamp());
                     t.pri(next.priElseZero() * Util.unitize(x.term().volume() / ((float)rvol)));
                     feedback(t);
                     logger.info("+ {}", reflectionSim);

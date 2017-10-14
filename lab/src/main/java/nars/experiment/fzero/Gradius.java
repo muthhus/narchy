@@ -31,9 +31,9 @@ public class Gradius extends NAgentX {
 
         g.updateMS = 30;
 
-        senseCameraReduced($.p(id,$.the("ae")), (Supplier)()->g.image, 32,32,2,2).resolution(0.5f);
+        //senseCameraReduced($.p(id,$.the("ae")), (Supplier)()->g.image, 32,32,2,2).resolution(0.5f);
 
-        senseCamera($.p(id, $.the("global")), new Scale(() -> g.image, 9, 9)).resolution(0.1f);
+        senseCamera($.p(id, $.the("global")), new Scale(() -> g.image, 16, 16)).resolution(0.05f);
 
         senseCameraRetina($.p(id,$.the("local")), () -> g.image, 24, 16).resolution(0.25f);
 
