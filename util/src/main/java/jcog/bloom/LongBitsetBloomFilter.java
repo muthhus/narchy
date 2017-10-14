@@ -19,6 +19,7 @@ import jcog.bit.LongArrayBitset;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 
 /**
@@ -39,7 +40,7 @@ import java.util.List;
  * collisions for specific sequence of repeating bytes. Check the following link for more info
  * https://code.google.com/p/smhasher/wiki/MurmurHash2Flaw
  */
-public class ByteBloomFilter {
+public class LongBitsetBloomFilter {
     private static final double DEFAULT_FPP = 0.05;
     private LongArrayBitset bitSet;
     private final int m;
@@ -47,11 +48,11 @@ public class ByteBloomFilter {
     private final double fpp;
     private final long n;
 
-    public ByteBloomFilter(long maxNumEntries) {
+    public LongBitsetBloomFilter(long maxNumEntries) {
         this(maxNumEntries, DEFAULT_FPP);
     }
 
-    public ByteBloomFilter(long maxNumEntries, double fpp) {
+    public LongBitsetBloomFilter(long maxNumEntries, double fpp) {
         if (maxNumEntries <= 0)
             throw new AssertionError("maxNumEntries should be > 0");
         if (fpp <= 0.0 || fpp >= 1.0)
@@ -65,7 +66,7 @@ public class ByteBloomFilter {
     }
 
     // deserialize bloomfilter. see serialize() for the format.
-    public ByteBloomFilter(List<Long> serializedBloom) {
+    public LongBitsetBloomFilter(List<Long> serializedBloom) {
         this(serializedBloom.get(0), Double.longBitsToDouble(serializedBloom.get(1)));
         List<Long> bitSet = serializedBloom.subList(2, serializedBloom.size());
         long[] data = new long[bitSet.size()];
@@ -94,10 +95,7 @@ public class ByteBloomFilter {
         return bitSet.bitSize() / 8;
     }
 
-    public void add(byte[] val) {
-        addBytes(val);
-    }
-    public boolean testBytes(byte[] val) {
+    public boolean test(byte[] val) {
         long hash64 = Murmur3Hash.hash64(val);
         int hash1 = (int) hash64;
         int hash2 = (int) (hash64 >>> 32);
@@ -117,8 +115,15 @@ public class ByteBloomFilter {
     }
 
 
+    public final <X> void add(X x, Function<X,byte[]> f) {
+        add(f.apply(x));
+    }
 
-    public final void addBytes(byte[] val) {
+    public final <X> boolean test(X x, Function<X,byte[]> f) {
+        return test(f.apply(x));
+    }
+
+    public final void add(byte[] val) {
         // We use the trick mentioned in "Less Hashing, Same Performance: Building a Better Bloom Filter"
         // by Kirsch et.al. From abstract 'only two hash functions are necessary to effectively
         // implement a Bloom filter without any loss in the asymptotic false positive probability'
@@ -149,22 +154,22 @@ public class ByteBloomFilter {
     }
 
     public void addString(String val) {
-        addBytes(val.getBytes());
+        add(val.getBytes());
     }
 
     public void addByte(byte val) {
-        addBytes(new byte[]{val});
+        add(new byte[]{val});
     }
 
     public void addInt(int val) {
         // puts int in little endian order
-        addBytes(intToByteArrayLE(val));
+        add(intToByteArrayLE(val));
     }
 
 
     public void addLong(long val) {
         // puts long in little endian order
-        addBytes(longToByteArrayLE(val));
+        add(longToByteArrayLE(val));
     }
 
     public void addFloat(float val) {
@@ -178,19 +183,19 @@ public class ByteBloomFilter {
 
 
     public boolean testString(String val) {
-        return testBytes(val.getBytes());
+        return test(val.getBytes());
     }
 
     public boolean testByte(byte val) {
-        return testBytes(new byte[]{val});
+        return test(new byte[]{val});
     }
 
     public boolean testInt(int val) {
-        return testBytes(intToByteArrayLE(val));
+        return test(intToByteArrayLE(val));
     }
 
     public boolean testLong(long val) {
-        return testBytes(longToByteArrayLE(val));
+        return test(longToByteArrayLE(val));
     }
 
     public boolean testFloat(float val) {
@@ -257,7 +262,7 @@ public class ByteBloomFilter {
      * @param that - bloom filter to check compatibility
      * @return true if compatible false otherwise
      */
-    public boolean isCompatible(ByteBloomFilter that) {
+    public boolean isCompatible(LongBitsetBloomFilter that) {
         return this != that &&
                 getBitSize() == that.getBitSize() &&
                 getNumHashFunctions() == that.getNumHashFunctions();
@@ -269,7 +274,7 @@ public class ByteBloomFilter {
      *
      * @param that - bloom filter to merge
      */
-    public void merge(ByteBloomFilter that) {
+    public void merge(LongBitsetBloomFilter that) {
         bitSet.putAll(that.bitSet);
     }
 

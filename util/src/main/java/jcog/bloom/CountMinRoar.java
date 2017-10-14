@@ -7,6 +7,7 @@ import org.roaringbitmap.RoaringBitmap;
 
 /** fusion of count-min-sketch with roaring bitmap for fast
  *  iteration of the measured values
+ *  TODO not finished
  */
 public class CountMinRoar extends CountMinSketch {
     final RoaringBitmap set = new RoaringBitmap();
