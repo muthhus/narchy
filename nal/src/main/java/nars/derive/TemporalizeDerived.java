@@ -9,6 +9,7 @@ import nars.derive.time.AbsoluteEvent;
 import nars.derive.time.Event;
 import nars.derive.time.Temporalize;
 import nars.derive.time.Time;
+import nars.task.Revision;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.Subst;
@@ -84,7 +85,7 @@ public class TemporalizeDerived extends Temporalize {
         if (belief != null && !belief.equals(task)) {
 
             this.constraints = dbl = new HashMap(); //clone
-            sng.forEach((k,v)-> dbl.put(k, new TreeSet(v)));
+            sng.forEach((k, v) -> dbl.put(k, new TreeSet(v)));
 
             long beliefStart = belief.start();
             long beliefEnd = belief.end();
@@ -112,7 +113,7 @@ public class TemporalizeDerived extends Temporalize {
         knowAmbient(x);
         if (knowTransformed) {
             Term y = x.transform(d);
-            if (y!=null && !y.equals(x) && !(y instanceof Bool))
+            if (y != null && !y.equals(x) && !(y instanceof Bool))
                 knowAmbient(y);
         }
     }
@@ -128,16 +129,18 @@ public class TemporalizeDerived extends Temporalize {
 
         if (knowTransformed) {
             Term y = x.transform(d);
-            if (y!=null && !y.equals(x) && !(y instanceof Bool)) {
+            if (y != null && !y.equals(x) && !(y instanceof Bool)) {
                 knowAbsolute(y, start, end);
             }
         }
     }
 
-    /** HACK HACK */
+    /**
+     * HACK HACK
+     */
     private final static Set<Term> INDUCTION = Set.of(
             $.$safe("Induction"), $.$safe("InductionN"),
-            $.$safe("InductionPN"),$.$safe("InductionNN"));
+            $.$safe("InductionPN"), $.$safe("InductionNN"));
 
     @Nullable
     public Term solve(Conclusion c, @NotNull Derivation d, Term pattern, long[] occ, float[] confGain) {
@@ -188,15 +191,16 @@ public class TemporalizeDerived extends Temporalize {
         Event e;
         try {
             e = solve(pattern, trail);
+            if (e == null) {
+                return null;
+            }
         } catch (StackOverflowError ignored) {
             logger.error("temporalize stack overflow:\n{} {}\n\t{}", pattern, d, trail);
 //            trail.clear();
 //            model.solve(pattern, trail);
             return null;
         }
-        if (e == null) {
-            return null;
-        }
+
         Op eop = e.term.op();
         if (!eop.conceptualizable) {
             return null;
@@ -226,36 +230,11 @@ public class TemporalizeDerived extends Temporalize {
             long ts = task.start();
             long k;
             if (!te && (belief != null && !belief.isEternal())) {
-                Interval common = Interval.intersect(ts, task.end(), belief.start(), belief.end());
-                if (common == null)
-                    return null;
-                occ[0] = common.a;
-                occ[1] = common.b;
-                float overlapFactor = (1f + (common.b - common.a)) / (1 + Math.max(task.range(), belief.range()));
-                confGain[0] *= overlapFactor;
+                Revision.TemporalProximity tp = new Revision.TemporalProximity(ts, task.end(), belief.start(), belief.end());
+                occ[0] = tp.unionStart;
+                occ[1] = tp.unionEnd;
+                confGain[0] *= tp.factor;
 
-//                //interpolate
-//                ts = task.nearestTimeBetween(belief.start(), belief.end());
-//                long bs = belief.nearestTimeBetween(ts, task.end());
-//                if (ts != bs) {
-//                    //confidence decay in proportion to lack of coherence
-//                    if (task.isBeliefOrGoal()) {
-//                        float taskEvi = task.evi();
-//                        float beliefEvi = belief.evi();
-//                        float taskToBeliefEvi = taskEvi / (taskEvi + beliefEvi);
-//                        k = Util.lerp(taskToBeliefEvi, bs, ts); //TODO any duration?
-//                        long distSum =
-//                                Math.abs(task.nearestTimeTo(k) - k) +
-//                                        Math.abs(belief.nearestTimeTo(k) - k);
-//                        if (distSum > 0) {
-//                            eviGain[0] *= Param.evidenceDecay(1, d.dur, distSum);
-//                        }
-//                    } else {
-//                        k = bs;
-//                    }
-//                } else {
-//                    k = ts;
-//                }
             } else if (te) {
                 //TODO maybe this should be 'now'
                 occ[0] = belief.start();

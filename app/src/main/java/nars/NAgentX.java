@@ -234,7 +234,7 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-        Abbreviation abb = new Abbreviation(n, "z", 4, 10, 0.06f, 16);
+        Abbreviation abb = new Abbreviation(n, "z", 3, 10, 0.01f, 64);
 
         Inperience inp = new Inperience(n, 16);
 //

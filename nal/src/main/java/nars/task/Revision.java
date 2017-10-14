@@ -231,8 +231,6 @@ public class Revision {
     }
 
 
-
-
     @NotNull
     public static Task chooseByConf(/*@NotNull*/ Task t, @Nullable Task b, /*@NotNull*/ Derivation p) {
 
@@ -259,15 +257,14 @@ public class Revision {
     /**
      * t is the target time of the new merged task
      */
-    @Nullable public static Task merge(/*@NotNull*/ Task a, /*@NotNull*/ Task b, long now, NAR nar) {
+    @Nullable
+    public static Task merge(/*@NotNull*/ Task a, /*@NotNull*/ Task b, long now, NAR nar) {
 
 
         long as = a.start();
         assert (as != ETERNAL);
-        Interval ai = new Interval(as, a.end());
         long bs = b.start();
         assert (bs != ETERNAL);
-        Interval bi = new Interval(bs, b.end());
 
 
         //            float ae = a.evi();
@@ -290,11 +287,6 @@ public class Revision {
         factor *= overlapDiscount;
         if (factor < Prioritized.EPSILON) return null;
 
-        int dur = nar.dur();
-        float intermvalDistance = dtDiff(a.term(), b.term()) /
-                ((1 + Math.max(a.term().dtRange(), b.term().dtRange())) * dur);
-        factor *= (1f / (1f + intermvalDistance));
-        if (factor < Prioritized.EPSILON) return null;
 
 //            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
 //            float confMax = Util.lerp(temporalOverlap, Math.max(w2c(ae),w2c(be)),  1f);
@@ -321,28 +313,16 @@ public class Revision {
 //            if (expected == null)
 //                return null;
 
-        Interval uu = ai.union(bi);
-        long u = uu.length();
-        int al = (int) ai.length();
-        int bl = (int) bi.length();
-        int s = al + bl;
 
-        /** account for how much the merge stretches the truth beyond the range of the inputs */
-        long separation = u - s;
-        if (separation > 0) {
-            int shortest = Math.min(al, bl);
-            if (separation < shortest) {
-                factor *= 1f - separation / ((float) shortest);
-                if (factor < Prioritized.EPSILON) return null;
-            } else {
-                return null;
-            }
+        TemporalProximity temporalProximity = new TemporalProximity(as, a.end(), bs, b.end());
+        factor *= temporalProximity.factor;
+        if (factor < Prioritized.EPSILON) return null;
 
-//            } else {
-//                return null; //too separate
-//            }
-        }
-
+        int dur = nar.dur();
+        float intermvalDistance = dtDiff(a.term(), b.term()) /
+                ((1 + Math.max(a.term().dtRange(), b.term().dtRange())) * dur);
+        factor *= (1f / (1f + intermvalDistance));
+        if (factor < Prioritized.EPSILON) return null;
 
         float confMin = nar.confMin.floatValue();
         Truth rawTruth = revise(a, b, factor, c2w(confMin));
@@ -365,8 +345,8 @@ public class Revision {
 
         assert (a.punc() == b.punc());
 
-        long start = uu.a;
-        long end = uu.b;
+        long start = temporalProximity.unionStart;
+        long end = temporalProximity.unionEnd;
 
         float aw = a.isQuestOrQuestion() ? 0 : a.conf(start, end, dur); //question
         float bw = b.conf(start, end, dur);
@@ -480,7 +460,7 @@ public class Revision {
 
         int blen = bb.subs();
         if (a.op() == CONJ && (len > 2 || blen > 2)) {
-            if (len>2 && blen==len) {
+            if (len > 2 && blen == len) {
 
                 //parallel, eternal, or xternal commutive
                 for (int i = 0; i < len; i++)
@@ -552,6 +532,41 @@ public class Revision {
         return d / depth;
     }
 
+    public static final class TemporalProximity {
+
+        public final float factor;
+        public final long unionStart;
+        public final long unionEnd;
+
+        public TemporalProximity(long as, long ae, long bs, long be) {
+            Interval ai = new Interval(as, ae);
+            Interval bi = new Interval(bs, be);
+
+            Interval uu = ai.union(bi);
+            this.unionStart = uu.a;
+            this.unionEnd = uu.b;
+
+            long u = uu.length();
+            int al = (int) ai.length();
+            int bl = (int) bi.length();
+            int s = al + bl;
+
+            /** account for how much the merge stretches the truth beyond the range of the inputs */
+            float factor = 1f;
+            long separation = u - s;
+            if (separation > 0) {
+                int shortest = Math.min(al, bl);
+                if (separation < shortest) {
+                    factor = 1f - separation / ((float) shortest);
+                } else {
+                    factor = 0; //too separate
+                }
+            }
+
+            this.factor = factor;
+
+        }
+    }
 }
 
 //    /** get the task which occurrs nearest to the target time */

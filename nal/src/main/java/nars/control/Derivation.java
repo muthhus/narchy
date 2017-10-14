@@ -66,6 +66,7 @@ public class Derivation extends Unify {
      * cached values ==========================================
      */
     public float confMin;
+    public int termVolMax;
     public Truth concTruth;
     public byte concPunc;
 
@@ -126,6 +127,7 @@ public class Derivation extends Unify {
     public float premiseConfSingle;
     public float premiseConfDouble;
     private long[] evidenceDouble, evidenceSingle;
+
 
 //    private transient Term[][] currentMatch;
 
@@ -223,6 +225,7 @@ public class Derivation extends Unify {
             this.dur = nar.dur();
             this.truthResolution = nar.truthResolution.floatValue();
             this.confMin = nar.confMin.floatValue();
+            this.termVolMax = nar.termVolumeMax.intValue();
             //transformsCache.cleanUp();
         }
         this.deriver = deriver;

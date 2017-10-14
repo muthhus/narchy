@@ -56,7 +56,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
         Term c1 = pattern.transform(p); //SUBSTITUTE and EVAL
 
-        int volMax = nar.termVolumeMax.intValue();
+        int volMax = p.termVolMax;
         if (c1 == null || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
             return false;
 
