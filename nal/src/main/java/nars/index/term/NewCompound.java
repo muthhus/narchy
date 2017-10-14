@@ -36,7 +36,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
     int hash;
 
 
-    public NewCompound(Op op, @NotNull Term[] prepopulated) {
+    public NewCompound(@Nullable Op op, @NotNull Term[] prepopulated) {
         super();
         this.op = op;
         this.subs = prepopulated; //zero-copy direct usage

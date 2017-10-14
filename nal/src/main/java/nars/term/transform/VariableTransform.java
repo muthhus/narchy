@@ -21,7 +21,7 @@ public abstract class VariableTransform implements CompoundTransform {
     }
 
     @Override public final Term transform(Compound t, Op op, int dt) {
-        return t.vars() > 0 || t.varPattern() > 0 ? CompoundTransform.super.transform(t, op, dt) : t;
+        return t.hasAny(Op.varBits) ? CompoundTransform.super.transform(t, op, dt) : t;
     }
 
 }

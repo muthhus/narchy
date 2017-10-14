@@ -2,6 +2,7 @@ package nars;
 
 
 import jcog.list.FasterList;
+import nars.derive.match.EllipsisMatch;
 import nars.derive.match.Ellipsislike;
 import nars.op.mental.AliasConcept;
 import nars.term.*;
@@ -40,22 +41,26 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 /**
  * NAL symbol table
  */
-public enum Op  {
+public enum Op {
 
 
     ATOM(".", Op.ANY_LEVEL, OpType.Other),
 
-    NEG("--", 5, Args.One) {
+    NEG("--", 1, Args.One) {
         @Override
-        public Term _the(int dt, Term[] u) {
-            assert (u.length == 1); //assert (dt == DTERNAL || dt == XTERNAL);
+        public Term _the(int dt, Term... u) {
+            //assert (u.length == 1); //assert (dt == DTERNAL || dt == XTERNAL);
+            if (u.length != 1)
+                throw new RuntimeException("negation with more than 1 arg wtf");
+
             Term x = u[0];
             switch (x.op()) {
                 case BOOL:
+                    return x.neg();
                 case NEG:
                     return x.unneg();
                 default:
-                    return new UnitCompound1(NEG, x);
+                    return compound(NEG, x);
             }
         }
     },
@@ -125,8 +130,6 @@ public enum Op  {
     CONJ("&&", true, 5, Args.GTETwo) {
         @Override
         public Term _the(int dt, Term... tt) {
-            //Term[] u = uu.length > 1 ? conjTrueFalseFilter(uu) : uu /* avoid true false filter if fall-through only-term anyway */;
-
 
             final int n = tt.length;
             switch (n) {
@@ -136,6 +139,13 @@ public enum Op  {
 
                 case 1:
                     Term only = tt[0];
+
+                    if (only instanceof EllipsisMatch) {
+                        EllipsisMatch em = (EllipsisMatch) only;
+                        Term[] x = em.theArray();
+                        return _the(dt, x); //unwrap
+                    }
+
                     //preserve unitary ellipsis for patterns etc
                     return only instanceof Ellipsislike ?
                             new UnitCompound1(CONJ, only) //special; preserve the surrounding conjunction
@@ -519,8 +529,8 @@ public enum Op  {
 
     public static final int StatementBits = Op.or(Op.INH, Op.SIM, Op.IMPL);
 
-    public static final int opBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
-    public static final int EvalBits = opBits; //just an alias for code readabiliy
+    public static final int funcBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
+    public static final int funcInnerBits = Op.or(Op.ATOM, Op.PROD);
 
     public static final byte BELIEF = '.';
     public static final byte QUESTION = '?';
@@ -561,6 +571,7 @@ public enum Op  {
      * bitvector of non-variable terms which can not be part of a goal term
      */
     public static final int NonGoalable = or(IMPL);
+    public static int varBits = Op.or(VAR_PATTERN, VAR_DEP, VAR_QUERY, VAR_INDEP);
 
 
     public final boolean allowsBool;
@@ -703,7 +714,7 @@ public enum Op  {
      * creates new instance
      */
     @NotNull
-    private static Term compound(Op o, Term... subterms) {
+    protected static Term compound(Op o, Term... subterms) {
         return Builder.Compound.the.apply(o, subterms);
     }
 
@@ -754,8 +765,10 @@ public enum Op  {
      */
     public final char ch;
     public final OpType type;
+
     /**
      * arity limits, range is inclusive >= <=
+     * TODO replace with an IntPredicate
      */
     public final int minSize, maxSize;
     /**
@@ -838,7 +851,7 @@ public enum Op  {
         //negation does not contribute to structure vector
         this.bit = (1 << ordinal());
 
-        final Set<String> ATOMICS = Set.of(".", "+");
+        final Set<String> ATOMICS = Set.of(".", "+", "B");
         this.atomic = var || ATOMICS.contains(str);
 
         switch (str) {
@@ -855,9 +868,8 @@ public enum Op  {
 
         switch (str) {
             case "==>":
-            case "<=>":
             case "&&":
-            case "*":
+            case "*": //HACK necessary for ellipsematch
                 allowsBool = true;
                 break;
             default:
@@ -1009,14 +1021,14 @@ public enum Op  {
                         left, right);
         }
 
-        int to = ee-1;
+        int to = ee - 1;
         int center = to / 2;
 
-        Term left = conjSeq(events.subList(0, center+1));
+        Term left = conjSeq(events.subList(0, center + 1));
         if (left == Null) return Null;
         if (left == False) return False; //early fail shortcut
 
-        Term right = conjSeq(events.subList(center + 1, to+1));
+        Term right = conjSeq(events.subList(center + 1, to + 1));
         if (right == Null) return Null;
         if (right == False) return False; //early fail shortcut
 
@@ -1038,19 +1050,31 @@ public enum Op  {
         if (left == True) return right;
         if (right == True) return left;
 
-        //System.out.println(left + " " + right + " " + left.compareTo(right));
-        //return CONJ.the(dt, left, right);
-        if (left.compareTo(right) > 0) {
-            //larger on left
-            dt = -dt;
-            Term t = right;
-            right = left;
-            left = t;
-        }
 
         if (dt == 0 || dt == DTERNAL) {
             return CONJ.the(dt, left, right); //send through again
         } else {
+
+            //System.out.println(left + " " + right + " " + left.compareTo(right));
+            //return CONJ.the(dt, left, right);
+            if (left.compareTo(right) > 0) {
+                //larger on left
+                if (dt!=XTERNAL)
+                    dt = -dt;
+                Term t = right;
+                right = left;
+                left = t;
+            }
+
+            int ldt = left.dt();
+            int rdt = right.dt();
+            if (left.op() == CONJ && !concurrent(ldt) && ldt!=XTERNAL &&
+                    right.op() == CONJ && !concurrent(rdt) && rdt!=XTERNAL &&
+                    ((left.subs() > 1 + right.subs()) || (right.subs() > left.subs()))) {
+                //seq imbalance
+                return CONJ.the(dt, left, right); //send through again
+            }
+
             return implInConjReduction(compound(compound(CONJ, left, right), dt));
         }
     }
@@ -1185,7 +1209,7 @@ public enum Op  {
 
     @NotNull
     public static Term difference(/*@NotNull*/ Op o, @NotNull Term a, @NotNull Term b) {
-        assert(!o.temporal): "this impl currently assumes any constructed term will have dt=DTERNAL";
+        assert (!o.temporal) : "this impl currently assumes any constructed term will have dt=DTERNAL";
 
         if (a.equals(b))
             return Null; //empty set
@@ -1220,8 +1244,8 @@ public enum Op  {
      * decode a term which may be a functor, return null if it isnt
      */
     @Nullable
-    public static <X> Pair<X, Term> functor(@NotNull Term maybeOperation, Function<Term, X> invokes) {
-        if (maybeOperation.hasAll(Op.opBits)) {
+    public static <X> Pair<X, Term> functor(Term maybeOperation, Function<Term, X> invokes) {
+        if (maybeOperation.hasAll(Op.funcBits)) {
             Term c = maybeOperation;
             if (c.op() == INH) {
                 Term s0 = c.sub(0);
@@ -1486,7 +1510,7 @@ public enum Op  {
 
 
         Predicate<Term> delim = (op == IMPL && dtConcurrent) ?
-                    recursiveCommonalityDelimeterStrong : Op.recursiveCommonalityDelimeterWeak;
+                recursiveCommonalityDelimeterStrong : Op.recursiveCommonalityDelimeterWeak;
 
         if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
                 (op != IMPL || dtConcurrent)) { //apply to: inh, sim, and current impl
@@ -1805,9 +1829,12 @@ public enum Op  {
                 if (s.remove(content)) {
                     int zs = s.size();
                     switch (zs) {
-                        case 0: return Null;
-                        case 1: return s.first();
-                        default: return container.op().the(container.dt(), s);
+                        case 0:
+                            return Null;
+                        case 1:
+                            return s.first();
+                        default:
+                            return container.op().the(container.dt(), s);
                     }
                 }
             }
@@ -1863,6 +1890,11 @@ public enum Op  {
         }
 
         @Override
+        public Term neg() {
+            return this;
+        }
+
+        @Override
         public @NotNull Term unneg() {
             return this;
         }
@@ -1883,6 +1915,11 @@ public enum Op  {
         @Override
         public boolean xternalEquals(Term x) {
             return x == this;
+        }
+
+        @Override
+        public Term neg() {
+            return True;
         }
 
         @NotNull
@@ -1909,10 +1946,15 @@ public enum Op  {
             return x == this;
         }
 
+        @Override
+        public Term neg() {
+            return False;
+        }
+
         @NotNull
         @Override
         public Term unneg() {
-            return False;
-        }
+            return True;
+        } //doesnt change
     }
 }

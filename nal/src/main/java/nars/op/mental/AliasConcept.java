@@ -28,11 +28,10 @@ import java.util.Collection;
 public final class AliasConcept extends BaseConcept {
 
 
-    private final Collection<Termed> templates;
 
     public static class AliasAtom extends Atom {
 
-        //TODO encapsulate
+        //TODO weakref?
         public final Term target;
 
         protected AliasAtom(String id, Term target) {
@@ -82,43 +81,38 @@ public final class AliasConcept extends BaseConcept {
     public final Concept abbr;
 
     AliasConcept(@NotNull String abbreviation, Concept decompressed, NAR nar) {
-        super(new AliasAtom(abbreviation, nar.applyTermIfPossible(decompressed.term())),
+        super(new AliasAtom(abbreviation, decompressed.term()),
                 null, null, null, null,
                 new Bag[]{decompressed.termlinks(), decompressed.tasklinks()});
 
         this.abbr = decompressed;
 
-        Term decompressedTerm = ((AliasAtom)term).target;
-
-
-        Collection<Termed> baseTemplates = decompressed.templates();
-        this.templates = new FasterList(baseTemplates.size());
-        //try to resolve all the templates to their abbreviated forms to maximize the usage of abbreviations.  then add this term to it
-
-        templates.add(this);
-        for (Termed t : baseTemplates) {
-            Term x = t.term();
-            if (x.equals(decompressedTerm))
-                continue; //ignore the term itself
-            Termed y = nar.applyIfPossible(x);
-            templates.add(y);
-        }
+//        Term decompressedTerm = ((AliasAtom)term).target;
+//        Collection<Termed> baseTemplates = decompressed.templates();
+//        this.templates = new FasterList(baseTemplates.size());
+//        //try to resolve all the templates to their abbreviated forms to maximize the usage of abbreviations.  then add this term to it
+//
+//        templates.add(this);
+//        for (Termed t : baseTemplates) {
+//            Term x = t.term();
+//            if (x.equals(decompressedTerm))
+//                continue; //ignore the term itself
+//            Termed y = nar.applyIfPossible(x);
+//            templates.add(y);
+//        }
 
         //rewriteLinks(nar);
     }
 
-
-
-
     @Override
     public Collection<Termed> templates() {
-        return templates;
+        return abbr.templates();
     }
 
-    @Override
-    public boolean isDeleted() {
-        return abbr.isDeleted() || super.isDeleted();
-    }
+//    @Override
+//    public boolean isDeleted() {
+//        return abbr.isDeleted() || super.isDeleted();
+//    }
 
     @Override
     public void delete(NAR nar) {
@@ -129,12 +123,11 @@ public final class AliasConcept extends BaseConcept {
 
             //dont delete the bags and tables as invoking the super method would,
             // since they may be held by the abbreviated concept if it still exists
-            state(ConceptState.Deleted);
-            clear();
-        }/* else { //dont just call delete it will erase the abbreviant's links too!
-            super.delete(nar);
-        }*/
+        }
 
+        //dont just call super.delete since it will erase the abbreviant's links too!
+        state(ConceptState.Deleted);
+        clear();
     }
 
     @Override

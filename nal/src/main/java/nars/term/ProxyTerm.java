@@ -324,10 +324,10 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
         return ref.varPattern();
     }
 
-    @Override
-    public boolean isDynamic() {
-        return ref.isDynamic();
-    }
+//    @Override
+//    public boolean isDynamic() {
+//        return ref.isDynamic();
+//    }
 
 
     @Override

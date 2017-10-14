@@ -1,12 +1,16 @@
 package nars.derive.match;
 
 import nars.Op;
+import nars.index.term.TermContext;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.Unify;
+import nars.term.transform.CompoundTransform;
+import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.SortedSet;
@@ -15,7 +19,7 @@ import java.util.function.Predicate;
 /**
  * Holds results of an ellipsis match and
 */
-public class EllipsisMatch extends GenericCompound {
+public class EllipsisMatch extends GenericCompound implements Ellipsislike {
 
     //    public static ArrayEllipsisMatch matchedSubterms(Compound Y, IntObjectPredicate<Term> filter) {
 //        Function<IntObjectPredicate,Term[]> arrayGen =
@@ -33,6 +37,39 @@ public class EllipsisMatch extends GenericCompound {
     protected EllipsisMatch(Term[] t) {
         super(Op.PROD, TermVector.the(t));
     }
+
+    @Override
+    public Term evalSafe(TermContext context, int remain) {
+        //dont eval until it's unwrapped
+        return this;
+    }
+
+    @Override
+    public @Nullable Term transform(CompoundTransform t) {
+        //dont eval until it's unwrapped
+        return this;
+    }
+
+    @Override
+    public Term neg() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Term unneg() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @NotNull Term conceptual() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @Nullable Term temporalize(Retemporalize r) {
+        throw new UnsupportedOperationException();
+    }
+
 
     public static Term match(@NotNull Term[] matched) {
         switch (matched.length) {

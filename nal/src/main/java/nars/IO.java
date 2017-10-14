@@ -549,7 +549,7 @@ public class IO {
             if (op.statement || c.subs() == 2) {
 
                 //special case: functional form
-                if (c.hasAll(Op.opBits)) {
+                if (c.hasAll(Op.funcBits)) {
                     Term subj = c.sub(0);
                     if (op == INH && subj.op() == Op.PROD) {
                         Term pred = c.sub(1);

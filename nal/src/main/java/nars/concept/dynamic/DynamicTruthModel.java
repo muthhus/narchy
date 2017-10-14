@@ -90,7 +90,9 @@ abstract public class DynamicTruthModel {
             Truth nt;
             if (evi) {
                 //task
-                bt = ((BeliefTable) ((BaseConcept) subConcept).table(beliefOrGoal ? BELIEF : GOAL))
+                BeliefTable table = (BeliefTable) ((BaseConcept) subConcept).table(beliefOrGoal ? BELIEF : GOAL);
+
+                bt = table
                         .match(subStart, subEnd, subterm, n);
                 if (bt == null) {
                     return null;

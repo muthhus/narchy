@@ -65,12 +65,12 @@ public abstract class TermVector implements TermContainer {
 
 
     @NotNull
-    public static TermContainer the(@NotNull Term... t) {
+    public static TermContainer the(Term... t) {
         switch (t.length) {
             case 0:
                 return TermContainer.NoSubterms;
-            //case 1:
-                //return new TermVector1(t[0]);
+            case 1:
+                return new TermVector1(t[0]);
             //case 2:
                 //return new TermVector2(t);
             default:
@@ -80,7 +80,7 @@ public abstract class TermVector implements TermContainer {
 
 
     @Override
-    public void forEach(@NotNull Consumer<? super Term> action) {
+    public void forEach(Consumer<? super Term> action) {
         forEach(action, 0, subs());
     }
 

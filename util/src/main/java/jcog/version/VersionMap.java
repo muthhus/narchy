@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 
 public class VersionMap<X, Y> extends AbstractMap<X, Y> {
@@ -150,6 +151,18 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
                 if (!each.test(e.getKey(), y)) {
                     return false;
                 }
+            }
+        }
+        return true;
+    }
+
+    public boolean replace(Function<? super Y, Y> eachValue) {
+        Set<Entry<X, Versioned<Y>>> eee = map.entrySet();
+        for (Entry<X, Versioned<Y>> e : eee) {
+            Versioned<Y> ee = e.getValue();
+            Y x = ee.get();
+            if (x != null) {
+                ee.replaceTop(eachValue.apply(x));
             }
         }
         return true;

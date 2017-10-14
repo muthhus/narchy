@@ -65,10 +65,13 @@ public class Derivation extends Unify {
     /**
      * cached values ==========================================
      */
-    public float confMin;
     public int termVolMax;
+    public float confMin;
+
     public Truth concTruth;
     public byte concPunc;
+    public float concConfFactor;
+    public final long[] concOcc = new long[2];
 
 //    /**
 //     * the current premise being evaluated in this context TODO make private again
@@ -114,7 +117,6 @@ public class Derivation extends Unify {
 
     public float premisePri;
     public short[] parentCause;
-    public final long[] derivedOcc = new long[2];
 
     public PrediTerm<Derivation> deriver;
     public boolean single;
@@ -127,6 +129,7 @@ public class Derivation extends Unify {
     public float premiseConfSingle;
     public float premiseConfDouble;
     private long[] evidenceDouble, evidenceSingle;
+
 
 
 //    private transient Term[][] currentMatch;
@@ -217,7 +220,6 @@ public class Derivation extends Unify {
         return super.apply(x);
     }
 
-
     public Derivation cycle(PrediTerm<Derivation> deriver) {
         long now = this.nar.time();
         if (now != this.time) {
@@ -272,7 +274,7 @@ public class Derivation extends Unify {
 
         Term bt = beliefTerm.unneg(); assert (!(bt instanceof Bool));
 
-        this.derivedOcc[0] = this.derivedOcc[1] = ETERNAL;
+        this.concOcc[0] = this.concOcc[1] = ETERNAL;
 
 //        int ttv = taskTerm.vars();
 //        if (ttv > 0 && bt.vars() > 0) {
@@ -372,6 +374,7 @@ public class Derivation extends Unify {
 
         int now = now();
         try {
+            //xy.replace(nar::applyTermIfPossible); //resolve to an abbreviation or other indexed term
             forEachMatch.test(this);
         } finally {
             revert(now); //undo any changes applied in conclusion

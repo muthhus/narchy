@@ -272,14 +272,14 @@ public interface Termlike {
 //        return (t == null) ? hasAny(Op.VariableBits) : hasAny(t);
 //    }
 
-    /**
-     * used to decide if a compound is "potentially" dynamic, or
-     * whether it can safely be cached/memoized -- or if it must be evaluated.
-     * if unsure, err on the side of caution and return true.
-     */
-    default boolean isDynamic() {
-        return OR(Term::isDynamic);
-    }
+//    /**
+//     * used to decide if a compound is "potentially" dynamic, or
+//     * whether it can safely be cached/memoized -- or if it must be evaluated.
+//     * if unsure, err on the side of caution and return true.
+//     */
+//    default boolean isDynamic() {
+//        return OR(Term::isDynamic);
+//    }
 
     /**
      * counts subterms matching the predicate

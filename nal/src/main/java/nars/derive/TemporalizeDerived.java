@@ -111,7 +111,8 @@ public class TemporalizeDerived extends Temporalize {
     void knowDerivedAmbient(Subst d, Term x) {
         knowAmbient(x);
         if (knowTransformed) {
-            Term y = x.transform(d);
+            Term y = //x.transform(d);
+                x.eval(d);
             if (y != null && !y.equals(x) && !(y instanceof Bool))
                 knowAmbient(y);
         }
@@ -127,7 +128,8 @@ public class TemporalizeDerived extends Temporalize {
         knowAbsolute(x, start, end);
 
         if (knowTransformed) {
-            Term y = x.transform(d);
+            Term y = //x.transform(d);
+                x.eval(d);
             if (y != null && !y.equals(x) && !(y instanceof Bool)) {
                 knowAbsolute(y, start, end);
             }
@@ -142,8 +144,9 @@ public class TemporalizeDerived extends Temporalize {
             $.$safe("InductionPN"), $.$safe("InductionNN"));
 
     @Nullable
-    public Term solve(Conclusion c, @NotNull Derivation d, Term pattern, long[] occ, float[] confGain) {
+    public Term solve(Conclusion c, @NotNull Derivation d, Term pattern) {
 
+        long[] occ = d.concOcc;
 
         Task belief;
         if (d.single) {
@@ -232,7 +235,7 @@ public class TemporalizeDerived extends Temporalize {
                 Revision.TaskTimeJoint joint = new Revision.TaskTimeJoint(ts, task.end(), belief.start(), belief.end(), d.nar);
                 occ[0] = joint.unionStart;
                 occ[1] = joint.unionEnd;
-                confGain[0] *= joint.factor;
+                d.concConfFactor *= joint.factor;
 
             } else if (te) {
                 //TODO maybe this should be 'now'

@@ -204,7 +204,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
             abbrConcept.computeIfAbsent(Abbreviation.class, (ac) -> {
 
-                Term abbreviatedTerm = nar.applyTermIfPossible(abbreviated.term());
+                Term abbreviatedTerm =abbreviated.term();
 
                 AliasConcept a1 = new AliasConcept(newSerialTerm(), abbrConcept, nar);
 

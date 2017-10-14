@@ -1237,7 +1237,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * resolves a term or concept to its currrent Concept
      */
     @Nullable
-    public Concept concept(Termed termed) {
+    public final Concept concept(Termed termed) {
         return concept(termed, false);
     }
 
@@ -1245,13 +1245,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * resolves a term to its Concept; if it doesnt exist, its construction will be attempted
      */
     @Nullable
-    public final Concept conceptualize(@NotNull Termed termed) {
+    public final Concept conceptualize(/*@NotNull*/ Termed termed) {
         return concept(termed, true);
     }
 
     @Nullable
     public Concept concept(/*@NotNull */Termed x, boolean createIfMissing) {
-        x = x.term().eval(this);
+        //x = x.term().eval(this);
         return terms.concept(x, createIfMissing);
     }
 

@@ -42,10 +42,10 @@ public interface Atomic extends Term {
         return false;
     }
 
-    @Override
-    default boolean isDynamic() {
-        return false;
-    }
+//    @Override
+//    default boolean isDynamic() {
+//        return false;
+//    }
 
     @Override
     default boolean isTemporal() { return false; }
@@ -131,7 +131,6 @@ public interface Atomic extends Term {
         return remain <= 0 ? null : context.applyTermIfPossible(this);
     }
 
-    @NotNull
     @Override
     String toString();
 
@@ -146,26 +145,18 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default void recurseTerms(@NotNull Consumer<Term> v) {
+    default void recurseTerms(Consumer<Term> v) {
         v.accept(this);
     }
 
     @Override
-    default boolean ANDrecurse(@NotNull Predicate<Term> v) { return AND(v); }
+    default boolean ANDrecurse(Predicate<Term> v) { return AND(v); }
 
     @Override
-    default boolean ORrecurse(@NotNull Predicate<Term> v) { return AND(v); }
-
-//    @Override
-//    default String toString() {
-//        return toString();
-//    }
-
-
-
+    default boolean ORrecurse(Predicate<Term> v) { return AND(v); }
 
     @Override
-    default void append(@NotNull Appendable w) throws IOException {
+    default void append(Appendable w) throws IOException {
         w.append(toString());
     }
 
@@ -215,7 +206,7 @@ public interface Atomic extends Term {
     /**
      * determines if the string is invalid as an unquoted term according to the characters present
      */
-    static boolean isQuoteNecessary(@NotNull CharSequence t) {
+    static boolean isQuoteNecessary(CharSequence t) {
         int len = t.length();
 
         if (len > 1 && (t.charAt(0) == '\"') &&

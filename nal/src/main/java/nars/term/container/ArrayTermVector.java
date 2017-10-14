@@ -21,9 +21,9 @@ public class ArrayTermVector extends TermVector {
     /*@NotNull*/
     private Term[] terms;
 
-    public ArrayTermVector(/*@NotNull */Collection<Term> terms) {
-        this(terms.toArray(new Term[terms.size()]));
-    }
+//    public ArrayTermVector(/*@NotNull */Collection<Term> terms) {
+//        this(terms.toArray(new Term[terms.size()]));
+//    }
 
     public ArrayTermVector(/*@NotNull */Term... terms) {
          super(terms);

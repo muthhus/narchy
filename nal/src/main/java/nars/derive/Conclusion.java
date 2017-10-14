@@ -7,7 +7,6 @@ import nars.derive.rule.PremiseRule;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.transform.Retemporalize;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,39 +46,48 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
 
     @Override
-    public final boolean test(@NotNull Derivation p) {
+    public final boolean test(Derivation d) {
 
-        NAR nar = p.nar;
+        NAR nar = d.nar;
 
-        p.use(Param.TTL_DERIVE_TRY);
+        d.use(Param.TTL_DERIVE_TRY);
         nar.emotion.derivationEval.increment();
 
-        Term c1 = pattern.transform(p); //SUBSTITUTE and EVAL
+        Term c1 =
+            pattern.eval(d);
 
-        int volMax = p.termVolMax;
+        int volMax = d.termVolMax;
         if (c1 == null || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
             return false;
 
-        final long[] occ = p.derivedOcc;
+//        c1 = c1.eval(p);
+//        if (c1 == null || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
+//            return false;
+
+
+        d.concConfFactor = 1f;
+        final long[] occ = d.concOcc;
         occ[0] = occ[1] = ETERNAL;
 
-        final float[] confGain = {1f}; //flat by default
 
         Term c2;
-        if (p.temporal) {
+        if (d.temporal) {
 
             try {
 
-                TemporalizeDerived dt = p.temporalize;
+                TemporalizeDerived dt = d.temporalize;
                 if (dt == null) {
-                    p.temporalize = dt = new TemporalizeDerived(p); //cache in derivation
+                    d.temporalize = dt = new TemporalizeDerived(d); //cache in derivation
                 }
 
-                c2 = dt.solve(this, p, c1, occ, confGain);
+
+                c2 = dt.solve(this, d, c1);
+                if (d.concConfFactor < Param.TRUTH_EPSILON)
+                    return false;
 
             } catch (InvalidTermException t) {
                 if (Param.DEBUG) {
-                    logger.error("temporalize error: {} {} {}", p, c1, t.getMessage());
+                    logger.error("temporalize error: {} {} {}", d, c1, t.getMessage());
                 }
                 return false;
             }
@@ -99,11 +107,11 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
             if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
 
-            if (urgent && p.concPunc == GOAL) {
-                long taskStart = p.task.start();
+            if (urgent && d.concPunc == GOAL) {
+                long taskStart = d.task.start();
 
                 if (taskStart == ETERNAL) {
-                    occ[0] = occ[1] = p.time;
+                    occ[0] = occ[1] = d.time;
 
                     //if (taskStart != ETERNAL) {
                 } else if (occ[0] != ETERNAL && occ[0] < taskStart) {
@@ -125,8 +133,8 @@ public final class Conclusion extends AbstractPred<Derivation> {
         if (c2 == null)
             return false;
 
-        if (p.live()) {
-            p.derivedTerm.set(c2);
+        if (d.live()) {
+            d.derivedTerm.set(c2);
             return true;
         } else {
             return false;

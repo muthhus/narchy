@@ -552,17 +552,22 @@ public class Revision {
             int s = al + bl;
 
             /** tolerance in cycles to ignore a separation in computing discount - allows smoothing over relatively imperceptible gaps */
-            int tolerance = nar.dur()/2;
+            int tolerance = 0; // nar.dur()/2;
 
-            /** account for how much the merge stretches the truth beyond the range of the inputs */
             float factor = 1f;
-            long separation = u - s - tolerance;
-            if (separation > 0) {
-                int shortest = Math.min(al, bl);
-                if (separation < shortest) {
-                    factor = 1f - separation / ((float) shortest);
-                } else {
-                    factor = 0; //too separate
+            if (u > s) {
+
+                /** account for how much the merge stretches the truth beyond the range of the inputs */
+                long separation = u - s - tolerance;
+                if (separation > 0) {
+                    factor = 1f - (separation / ((float) u));
+
+                    //                int shortest = Math.min(al, bl);
+                    //                if (separation < shortest) {
+                    //                    factor = 1f - separation / ((float) shortest);
+                    //                } else {
+                    //                    factor = 0; //too separate
+                    //                }
                 }
             }
 

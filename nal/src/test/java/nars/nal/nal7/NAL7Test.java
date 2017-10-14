@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class NAL7Test extends AbstractNALTest {
 
-    public int cycles = 550;
+    public int cycles = 150;
 
     @Test
     public void inductionDiffEventsAtom() {

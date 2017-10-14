@@ -217,10 +217,10 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
         return term.varQuery();
     }
 
-    @Override
-    public boolean isDynamic() {
-        return false;
-    }
+//    @Override
+//    public boolean isDynamic() {
+//        return false;
+//    }
 
     @Deprecated
     @Override

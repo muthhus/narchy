@@ -11,6 +11,7 @@ import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
 import nars.task.NALTask;
 import nars.term.Term;
+import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -45,30 +46,37 @@ public class Taskify extends AbstractPred<Derivation> {
     }
 
     @Override
-    public boolean test(Derivation p) {
-        Term x = p.derivedTerm.get();
+    public boolean test(Derivation d) {
+        Term x = d.derivedTerm.get();
         if (x == null)
             return false;
 
-        long[] occ = p.derivedOcc;
-        byte punc = p.concPunc;
+        long[] occ = d.concOcc;
+        byte punc = d.concPunc;
         assert (punc != 0) : "no punctuation assigned";
 
-        final NAR nar = p.nar;
-        DerivedTask t = (DerivedTask) Task.tryTask(x, punc, p.concTruth, (C, tr) -> {
+        Truth tru = d.concTruth;
+        if (tru!=null) {
+            tru = d.concTruth.ditherFreqConf(d.truthResolution, d.confMin, d.concConfFactor);
+            if (tru == null)
+                return false;
+        }
+
+        final NAR nar = d.nar;
+        DerivedTask t = (DerivedTask) Task.tryTask(x, punc, tru, (C, tr) -> {
 
             long start = occ[0];
             long end = occ[1];
             assert (end >= start);
 
 
-            long[] evi = p.single ? p.evidenceSingle() : p.evidenceDouble();
+            long[] evi = d.single ? d.evidenceSingle() : d.evidenceDouble();
 
-            long now = p.time;
+            long now = d.time;
 
             DerivedTask derived =
                     Param.DEBUG ?
-                            new DebugDerivedTask(C, punc, tr, now, start, end, evi, p.task, !p.single ? p.belief : null) :
+                            new DebugDerivedTask(C, punc, tr, now, start, end, evi, d.task, !d.single ? d.belief : null) :
                             new DerivedTask(C, punc, tr, now, start, end, evi);
 
 
@@ -76,16 +84,16 @@ public class Taskify extends AbstractPred<Derivation> {
         });
 
         if (t == null) {
-            return spam(p, Param.TTL_DERIVE_TASK_FAIL);
+            return spam(d, Param.TTL_DERIVE_TASK_FAIL);
         }
 
-        if (same(t, p.task, p.truthResolution) || (p.belief != null && same(t, p.belief, p.truthResolution))) {
+        if (same(t, d.task, d.truthResolution) || (d.belief != null && same(t, d.belief, d.truthResolution))) {
             //created a duplicate of the task
-            return spam(p, Param.TTL_DERIVE_TASK_SAME);
+            return spam(d, Param.TTL_DERIVE_TASK_SAME);
         }
 
 
-        float priority = nar.derivePriority(t, p)
+        float priority = nar.derivePriority(t, d)
                 //* channel.amp()
         ;
 
@@ -96,13 +104,13 @@ public class Taskify extends AbstractPred<Derivation> {
         if (Param.DEBUG)
             t.log(rule);
 
-        short[] cause = ArrayUtils.addAll(p.parentCause, channel.id);
+        short[] cause = ArrayUtils.addAll(d.parentCause, channel.id);
         ((DerivedTask)t).cause = cause;
 
-        if (p.derivations.merge(t, t, DUPLICATE_DERIVATION_MERGE) != t) {
-            spam(p, Param.TTL_DERIVE_TASK_REPEAT);
+        if (d.derivations.merge(t, t, DUPLICATE_DERIVATION_MERGE) != t) {
+            spam(d, Param.TTL_DERIVE_TASK_REPEAT);
         } else {
-            p.use(Param.TTL_DERIVE_TASK_SUCCESS);
+            d.use(Param.TTL_DERIVE_TASK_SUCCESS);
         }
 
         return true;

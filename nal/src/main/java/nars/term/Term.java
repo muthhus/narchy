@@ -697,13 +697,6 @@ public interface Term extends Termed, Comparable<Termed> {
     /*@NotNull*/
     @Override
     default Term unneg() {
-        if (op() == NEG) {
-            Term x = sub(0);
-            if (!x.isNormalized() && this.isNormalized()) { //the unnegated content will also be normalized if this is
-                ((Compound) x).setNormalized();
-            }
-            return x;
-        }
         return this;
     }
 
@@ -870,11 +863,11 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
     default Term neg() {
-        return NEG.the(this);
+        return NEG.the(DTERNAL,this); //the DTERNAL gets it directly to it
     }
 
     default Term negIf(boolean negate) {
-        return negate ? NEG.the(this) : this;
+        return negate ? neg() : this;
     }
 
     @Nullable

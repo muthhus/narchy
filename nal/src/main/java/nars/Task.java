@@ -15,7 +15,6 @@ import nars.task.util.InvalidTaskException;
 import nars.task.util.TaskRegion;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Bool;
 import nars.time.Tense;
 import nars.truth.*;
 import org.eclipse.collections.api.tuple.Pair;
@@ -45,7 +44,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
 
     final Task[] EmptyArray = new Task[0];
-    final long[] ETERNAL_ETERNAL = new long[] { Tense.ETERNAL, Tense.ETERNAL };
+    final long[] ETERNAL_ETERNAL = new long[]{Tense.ETERNAL, Tense.ETERNAL};
 
     static boolean equal(@NotNull Task a, @NotNull Task b) {
 
@@ -969,33 +968,13 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
         //invoke possible functor and apply aliases
 
-            Term x = term();
-            Term y = x.eval(n);
+        Term x = term();
 
-            if (!x.equals(y)) { //x!=y) { //instances could have been substituted and this matters
-
-                if (y instanceof Bool)
-                    return null;
-
-                @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), !isInput() || !Param.DEBUG_EXTRA);
-                /* the evaluated result here acts as a memoization of possibly many results
-                   depending on whether the functor is purely static in which case
-                   it would be the only one.
-                 */
-                Task result = yy != null ? clone(this, yy.getOne().negIf(yy.getTwo())) : null;
-                if (result == null) {
-                    //result = Operator.log(n.time(), $.p(x, y));
-                    return null;
-                }
-
-                return result.run(n);
-            }
-
-
-        //invoke possible Operation
+                //invoke possible Operation
         boolean cmd = isCommand();
-        if (y!=null && cmd || (isGoal() && !isEternal())) {
-            Pair<Operator, Term> o = Op.functor(y /* in case of some instance substutition */, (i) -> {
+
+        if (cmd || (isGoal() && !isEternal())) {
+            Pair<Operator, Term> o = Op.functor(term() /* in case of some instance substutition */, (i) -> {
                 Concept operation = n.concept(i);
                 return operation instanceof Operator ? (Operator) operation : null;
             });
@@ -1006,9 +985,9 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                     if (yy != null && !this.equals(yy)) {
                         return singleton(yy);
                     }
-                } catch (Throwable t) {
+                } catch (Throwable xtt) {
                     //n.logger.error("{} {}", this, t);
-                    return singleton(Operator.error(this, t, n.time()));
+                    return singleton(Operator.error(this, xtt, n.time()));
                 }
                 if (cmd) {
                     n.eventTask.emit(this);
@@ -1018,17 +997,51 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
             }
         }
 
-        if (!cmd) {
-            Concept c = n.concept(y, true);
-            if (c != null) {
 
-                n.emotion.busy(priElseZero(), this.volume());
 
-                c.process(this, n);
+        Term y = x.eval(n.terms.intern());
+
+        if (y == null)
+            return null;
+
+        Task t = this;
+        if (!x.equals(y)) { //instances could have been substituted and this matters
+
+            if (y.hasAny(Op.BOOL))
+                return null;
+
+            @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), !isInput() || !Param.DEBUG_EXTRA);
+                /* the evaluated result here acts as a memoization of possibly many results
+                   depending on whether the functor is purely static in which case
+                   it would be the only one.
+                 */
+            Task result = yy != null ? clone(this, yy.getOne().negIf(yy.getTwo())) : null;
+
+            delete();
+
+            if (result == null) {
+                return null; //result = Operator.log(n.time(), $.p(x, y));
+            } else {
+                t = result;
             }
         }
 
+        if (!cmd)
+            t.process(n);
+
         return null;
+    }
+
+    default void process(NAR n) {
+
+        Concept c = concept(n, true);
+        if (c != null) {
+
+            n.emotion.busy(priElseZero(), this.volume());
+
+            c.process(this, n);
+        }
+
     }
 
     /**
@@ -1117,7 +1130,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         if (start == Long.MAX_VALUE) //nothing or all eternal
             return Task.ETERNAL_ETERNAL;
         else
-            return new long[] { start, end };
+            return new long[]{start, end};
     }
 
 }

@@ -88,10 +88,6 @@ abstract public class Solve extends AbstractPred<Derivation> {
                         return false;
                 }
 
-                t = t.ditherFreqConf(d.truthResolution, confMin, 1f);
-                if (t == null)
-                    return false;
-
                 break;
 
             case QUEST:

@@ -28,7 +28,6 @@ import nars.IO;
 import nars.Op;
 import nars.derive.AbstractPred;
 import nars.index.term.TermContext;
-import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
@@ -716,18 +715,32 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
+//    @Override
+//    default boolean isDynamic() {
+//        int c = complexity();
+//        if (c >= 2 && hasAll(EvalBits)) {
+//            return
+//                    ((op() == INH && subIs(0, PROD) && subIs(1, ATOM)) /* potential function */
+//                            ||
+//                            (c >= 3 && OR(Termlike::isDynamic))); /* possible function in subterms */
+//        }
+//        return false;
+//    }
+
     @Override
-    default boolean isDynamic() {
-        int c = complexity();
-        if (c >= 2 && hasAll(EvalBits)) {
-            return
-                    ((op() == INH && subIs(0, PROD) && subIs(1, ATOM)) /* potential function */
-                            ||
-                            (c >= 3 && OR(Termlike::isDynamic))); /* possible function in subterms */
+    default Term unneg() {
+        if (op() == NEG) {
+            Term x = sub(0);
+            if (!x.isNormalized() && this.isNormalized()) { //the unnegated content will also be normalized if this is
+                ((Compound) x).setNormalized();
+            }
+            return x;
+        } else {
+            return this;
         }
-        return false;
     }
 
+    /*@NotNull*/
     @Override
     default Term evalSafe(TermContext context, int remain) {
 
@@ -737,62 +750,61 @@ public interface Compound extends Term, IPair, TermContainer {
         if (remain-- <= 0)
             return Null;
 
-        Termed ff = context.applyIfPossible(this);
-        if (!ff.equals(this))
-            return ff.term();
+//        Termed ff = context.applyIfPossible(this);
+//        if (!ff.equals(this))
+//            return ff.term();
 
         /*if (subterms().hasAll(opBits))*/
 
-        final Term[] xy = toArray();
+        Term[] xy = theArray();
         //any contained evaluables
-        boolean subsModified = false;
+        Op o = op();
+        int necessaryBits = o ==INH ? Op.funcInnerBits : Op.funcBits;
+        boolean changed = false, recurseChange = false;
 
         for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
-            Term x = xy[i];
-            Term y = x.evalSafe(context, remain);
-                    //context.applyTermIfPossible(x);
-            if (y == null) {
-                //if a functor returns null, it means unmodified
-            } else if (x != y) { //!x.equals(y)) { //(x != y) {
-                //the result comparing with the x
-                subsModified = true;
-                xy[i] = y;
+            Term xi = xy[i];
+            Term yi = xi.evalSafe(context, remain);
+            if (yi == null) {
+                return Null;
+            } else if (xi != yi && (yi.getClass()!=xi.getClass()  || !xi.equals(yi))) {
+                if (!changed) {
+                    xy = toArray(); //begin clone copy
+                    changed = true;
+                }
+                xy[i] = yi;
+                recurseChange |= yi.hasAll(necessaryBits);
             }
+
         }
 
-        Op op = op();
+        Term u;
+        if (changed) {
+            u = o.the(dt(), xy);
+
+            if (recurseChange)
+                return u.evalSafe(context, remain);
+        } else
+            u = this;
+
 
         //recursively compute contained subterm functors
         //compute this without necessarily constructing the superterm, which happens after this if it doesnt recurse
-        if (op == INH /*&& u.size() == 2*/ && xy[1] instanceof Functor && xy[0].op() == PROD) {
-            Term u = this;
+        if (o == INH /*&& u.size() == 2*/ && xy[1] instanceof Functor && xy[0].op() == PROD) {
 
 
             u = ((Functor) xy[1]).apply(xy[0].subterms());
             if (u instanceof AbstractPred) {
                 u = $.the(((AbstractPred) u).test(null));
-            } else if (u == null) {
+            } else if (u == null ) {
                 u = this; //null means to keep the same
-            }
-
-
-            if (u == this || u.equals(this) || !u.op().conceptualizable) {
-                return u; //return u and not this
-            } else {
-
-                //it has been changed, so eval recursively until stable
-                try {
-                    return u.evalSafe(context, remain);
-                } catch (StackOverflowError e) {
-                    //logger.error("eval stack overflow: {} -> {}", this, u);
-                    System.err.println("eval stack overflow: " + this + ", " + u);
-                    return Null;
-                    //throw new RuntimeException("stack overflow on eval : " + t);
-                }
             }
         }
 
-        return subsModified ? op.the(dt(), xy).evalSafe(context, remain) : this;
+        return context.intern(u);
+
+        //it has been changed, so eval recursively until stable
+        //return context.intern(subsModified ? op.the(dt(), xy).evalSafe(context, remain) : this);
     }
 
     @Override
@@ -829,7 +841,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     @Nullable
-    default Term transform(@NotNull CompoundTransform t) {
+    default Term transform(CompoundTransform t) {
         return t.transform(this, op(), DTERNAL);
     }
 
@@ -856,7 +868,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     @Nullable
     default Term temporalize(Retemporalize r) {
-        return r.transform(this, op(), DTERNAL /*will be replaced with r's decision*/);
+        return r.transform(this, op(), DTERNAL);
 //        if (!hasAny(Op.TemporalBits))
 //            return this;
 //        else {

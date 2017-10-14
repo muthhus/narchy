@@ -1,13 +1,16 @@
 package nars.index.term;
 
 import nars.NAR;
+import nars.Op;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
 import nars.concept.state.ConceptState;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.transform.CompoundTransform;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -162,4 +165,41 @@ public abstract class TermIndex implements TermContext {
 
     }
 
+    /** accesses the interning termcontext which recursively replaces subterms with what this index resolves them to */
+    public final TermContext intern() {
+        return intern;
+    }
+
+    private final TermContext intern = new InterningContext();
+
+    private class InterningContext implements CompoundTransform , TermContext {
+
+        @Override
+        public Termed apply(Term x) {
+            if (!x.op().conceptualizable || x instanceof PermanentConcept)
+                return x; //skip the nonsense
+            else
+                return TermIndex.this.applyIfPossible(x);
+        }
+
+        @Override
+        public @Nullable Term transform(Compound x, Op op, int dt) {
+            //TODO recurse
+            return TermIndex.this.applyTermIfPossible(x);
+        }
+
+//        @Override
+//        public Term applyTermIfPossible(Term x) {
+//            return x.op().conceptualizable ? //skip the nonsense if it's constant
+//                    CompoundTransform.super.applyTermIfPossible(x) : x;
+//        }
+
+        @Override
+        public Term intern(Term x) {
+            if (x instanceof Compound)
+                return x.transform(this);
+            if (x.op().conceptualizable) return TermIndex.this.applyTermIfPossible(x);
+            else return x;
+        }
+    }
 }

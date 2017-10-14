@@ -39,6 +39,11 @@ public interface TermContext extends Function<Term,Termed> {
             return null;
     }
 
+    /** by default does nothing */
+    default Term intern(Term x) {
+        return x;
+    }
+
 //    /**
 //     * internal get procedure: get if not absent
 //     */

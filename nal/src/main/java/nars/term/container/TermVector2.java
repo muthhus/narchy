@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import static nars.Op.Null;
 
 /**
- * Size 1 TermVector
+ * Size 2 TermVector
  */
 public final class TermVector2 extends TermVector {
 
@@ -94,9 +94,9 @@ public final class TermVector2 extends TermVector {
         y.recurseTerms(v);
     }
 
-    @Override
-    public boolean isDynamic() {
-        return x.isDynamic() || y.isDynamic();
-    }
+//    @Override
+//    public boolean isDynamic() {
+//        return x.isDynamic() || y.isDynamic();
+//    }
 
 }

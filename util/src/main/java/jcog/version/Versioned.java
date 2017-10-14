@@ -111,4 +111,10 @@ public class Versioned<X> extends
             //}
 
     }
+
+    /** transparently replace the leading value */
+    public void replaceTop(X newValue) {
+        items[size-1] = newValue;
+    }
+
 }

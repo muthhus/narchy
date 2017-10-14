@@ -38,6 +38,10 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     @Nullable
     protected NALTask generate(Term template, long start, long end, NAR nar) {
 
+        template = template(template, start, end, nar);
+        if (template == null)
+            return null;
+
         DynTruth yy = truth(start, end, template, true, nar);
         if (yy == null)
             return null;
@@ -73,6 +77,10 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             t2 = template.temporalize(new Retemporalize.RetemporalizeFromToFunc(XTERNAL,
                     () -> rng.nextBoolean() ? +dur : -dur));
         }
+//        if (t2!=null && t2.dt()==XTERNAL) {
+//            return template(t2, start, end ,nar);//temporary
+//            //throw new RuntimeException("wtf xternal");
+//        }
         return t2;
     }
 
@@ -123,9 +131,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     public Task match(long start, long end, @NotNull Term template, NAR nar) {
         Task x = super.match(start, end, template, nar);
 
-        template = template(template, start, end, nar);
 
-        Task y = template!=null ? generate(template, start, end, nar) : null;
+        Task y = generate(template, start, end, nar);
         if (y == null || y.equals(x)) return x;
 
         boolean dyn;

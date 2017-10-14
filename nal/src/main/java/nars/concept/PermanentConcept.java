@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public interface PermanentConcept extends Concept {
 
     @Override
-    default void delete(@NotNull NAR nar) {
+    default void delete(NAR nar) {
         throw new RuntimeException("permanent concept deleted: " + this);
     }
 
