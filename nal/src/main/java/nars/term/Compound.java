@@ -28,6 +28,7 @@ import nars.IO;
 import nars.Op;
 import nars.derive.AbstractPred;
 import nars.index.term.TermContext;
+import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
@@ -66,10 +67,10 @@ public interface Compound extends Term, IPair, TermContainer {
         return
                 (a.subterms().equals(bb.subterms()))
                         &&
-                (a.opX() == bb.opX())
+                        (a.opX() == bb.opX())
                         &&
-                (a.dt() == bb.dt())
-        ;
+                        (a.dt() == bb.dt())
+                ;
     }
 
     /**
@@ -77,8 +78,8 @@ public interface Compound extends Term, IPair, TermContainer {
      * non-DTernal temporal relation
      */
     default boolean isTemporal() {
-        return  (dt()!=DTERNAL && op().temporal)
-                        ||
+        return (dt() != DTERNAL && op().temporal)
+                ||
                 (subterms().isTemporal());
     }
 
@@ -89,7 +90,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    /*@NotNull*/
+        /*@NotNull*/
     TermContainer subterms();
 
     @Override
@@ -234,14 +235,14 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    default boolean ORrecurse( Predicate<Term> p) {
+    default boolean ORrecurse(Predicate<Term> p) {
         if (p.test(this))
             return true;
         return subterms().ORrecurse(p);
     }
 
     @Override
-    default boolean ANDrecurse( Predicate<Term> p) {
+    default boolean ANDrecurse(Predicate<Term> p) {
         if (!p.test(this))
             return false;
         return subterms().ANDrecurse(p);
@@ -730,72 +731,74 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default Term evalSafe(TermContext context, int remain) {
 
-        if (hasAll(opBits)) {
+        /*if (hasAll(opBits))*/
 
-            if (remain-- <= 0)
-                return Null;
 
-            if (subterms().hasAll(opBits)) {
-                final Term[] xy = toArray();
-                //any contained evaluables
-                boolean subsModified = false;
+        if (remain-- <= 0)
+            return Null;
 
-                int s = xy.length;
-                for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
-                    Term x = xy[i];
-                    Term y = x.evalSafe(context, remain);
-                    if (y == null) {
-                        //if a functor returns null, it means unmodified
-                    } else if (!x.equals(y)) { //(x != y) {
-                        //the result comparing with the x
-                        subsModified = true;
-                        xy[i] = y;
-                    }
+//        Termed ff = context.applyIfPossible(this);
+//        if (!ff.equals(this))
+//            return ff.term();
+
+        /*if (subterms().hasAll(opBits))*/
+
+        final Term[] xy = toArray();
+        //any contained evaluables
+        boolean subsModified = false;
+
+        for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
+            Term x = xy[i];
+            Term y = context.applyTermIfPossible(x);//x.evalSafe(context, remain);
+            if (y == null) {
+                //if a functor returns null, it means unmodified
+            } else if (x != y) { //!x.equals(y)) { //(x != y) {
+                if (y instanceof Bool)
+                    return Null;
+                //the result comparing with the x
+                subsModified = true;
+                xy[i] = y;
+            }
+        }
+
+        Op op = op();
+
+        //recursively compute contained subterm functors
+        //compute this without necessarily constructing the superterm, which happens after this if it doesnt recurse
+        if (op == INH /*&& u.size() == 2*/ && xy[1] instanceof Functor && xy[0].op() == PROD) {
+            Term u = this;
+
+
+            Term possibleArgs = xy[0];
+            if (possibleArgs.op() == PROD) {
+
+                u = ((Functor) xy[1]).apply(possibleArgs.subterms());
+                if (u instanceof AbstractPred) {
+                    u = $.the(((AbstractPred) u).test(null));
+                } else if (u == null) {
+                    u = this; //null means to keep the same
                 }
 
-                if (subsModified) {
-                    return op().the(dt(), xy).evalSafe(context, remain);
-                }
             }
 
 
-            //recursively compute contained subterm functors
-            if (op() == INH /*&& u.size() == 2*/) {
-                Term u = this;
-                Term possibleArgs = sub(0);
-                if (possibleArgs.op() == PROD) {
-                    Term possibleFunc = sub(1);
-                    if (possibleFunc.op() == ATOM) {
-                        Termed ff = context.applyIfPossible(possibleFunc);
-                        if (ff instanceof Functor) {
-                            u = ((Functor) ff).apply(possibleArgs.subterms());
-                            if (u instanceof AbstractPred) {
-                                u = $.the(((AbstractPred) u).test(null));
-                            } else if (u == null)
-                                u = this; //null means to keep the same
-                        }
-                    }
-                }
+            if (u == this || u.equals(this) || !u.op().conceptualizable) {
+                return u; //return u and not this
+            } else {
 
-                if (u == this || (!(u.op().conceptualizable) || u.equals(this))) {
-                    return u; //return u and not this
-                } else {
-
-                    //it has been changed, so eval recursively until stable
-                    try {
-                        assert (u != this) : "equality tested previously should have included identity check";
-                        return u.evalSafe(context, remain);
-                    } catch (StackOverflowError e) {
-                        //logger.error("eval stack overflow: {} -> {}", this, u);
-                        System.err.println("eval stack overflow: " + this + ", " + u);
-                        return Null;
-                        //throw new RuntimeException("stack overflow on eval : " + t);
-                    }
+                //it has been changed, so eval recursively until stable
+                try {
+                    return u.evalSafe(context, remain);
+                } catch (StackOverflowError e) {
+                    //logger.error("eval stack overflow: {} -> {}", this, u);
+                    System.err.println("eval stack overflow: " + this + ", " + u);
+                    return Null;
+                    //throw new RuntimeException("stack overflow on eval : " + t);
                 }
             }
         }
 
-        return this;
+        return subsModified ? op.the(dt(), xy).evalSafe(context, remain) : this;
     }
 
     @Override

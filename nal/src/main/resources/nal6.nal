@@ -17,10 +17,11 @@
             (S ==> M), (--M ==> P) |- (S ==>+- P), (Belief:DeductionN)
 
     (M ==> S), (M ==> P) |- (S ==>+- P), (Belief:Abduction)
-        (M ==> P), (M ==> S) |- (S ==>+- P), (Belief:Abduction)
+        (M ==> S), (M ==> P) |- (P ==>+- S), (Belief:Abduction)
 
-    (P ==> M), (S ==> M) |- (P ==>+- S), (Belief:Induction)
-        (S ==> M), (P ==> M) |- (P ==>+- S), (Belief:Induction)
+    //polar balance is possible here, if the impl are both neg ie. --M (as it would unwrap)
+    (P ==> M), (S ==> M) |- (P ==>+- S), (Belief:InductionPB)
+        (P ==> M), (S ==> M) |- (S ==>+- P), (Belief:InductionPB)
 
     (P ==> M), (M ==> S) |- (S ==>+- P), (Belief:Exemplification)
         (M ==> S), (P ==> M) |- (S ==>+- P), (Belief:Exemplification)
@@ -43,7 +44,7 @@
 // original:	    ( --S ==> P), --S |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
 
     ( --S ==> P), P |- ( --P ==>+- S), (Belief:Contraposition)
-    //( --S ==> P), P |- ( P ==>+- --S), (Belief:ContrapositionN)
+    ( --S ==> P), P |- ( P ==>+- S), (Belief:ContrapositionN)
 
 
 
@@ -83,7 +84,6 @@
           //(--M ==> C), D, belief("&&") |- (--M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D, strict)), (Belief:StructuralDeduction)
         //(M ==> (&&,(--,%S),A..+)), M |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
     (C ==> M), C, belief("&&") |- (dropAnyEvent(ifConjCommNoDepVars(C)) ==>+- M), (Belief:StructuralDeduction)
-    (--C ==> M), C, belief("&&") |- (dropAnyEvent(ifConjCommNoDepVars(C)) ==>+- M), (Belief:StructuralDeductionPN)
           //(C ==> M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D) ==>+- M), (Belief:StructuralDeduction)
         //(C ==> --M), C, belief("&&") |- (dropAnyEvent(C) ==>+- --M), (Belief:StructuralDeduction)
           //(C ==> --M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D, strict) ==>+- --M), (Belief:StructuralDeduction)
@@ -100,6 +100,13 @@
         //B, (--A ==> C), time(urgent),  notImpl(B) |- varIntro(subIfUnifiesAny(C,A,B)), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
 
     B, (C ==> A), time(urgent), notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:AbductionPB, Goal:DeciInduction)
+
+//conditional abduction
+
+    ((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:AbductionPB)
+    ((&&,M,A..+) ==> X), ((&&,A..+) ==> Y), task(".") |- subIfUnifiesAny(M,X,Y,"$"), (Belief:AbductionPB)
+    //(M ==> C), C, task(".") |- M, (Belief:Abduction)
+    //(M ==> X), Y, task(".") |- subIfUnifiesAny(M,X,Y,"$"), (Belief:Abduction)
 
         //has(A,"$"),
     //B, ((--,%A) ==> C), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursiveN, Goal:InductionRecursiveN)
@@ -119,6 +126,7 @@
     Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Z), Y, Z, "$", strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
         //Z, (X==>Y), task("?") |- subIfUnifiesAny(Y, X, Z, strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
     Z, (X==>Y), task("?") |- subIfUnifiesAny((Z ==>+- Y), X, Z, "$", strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
+    Z, (--X==>Y), task("?") |- subIfUnifiesAny((--Z ==>+- Y), X, Z, "$", strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
         //Z, (X==>Y), task("?") |- subIfUnifiesAny(X, Y, Z, strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
 
     //strong unification
@@ -137,11 +145,11 @@
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B), task(".") |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,"$"), (Belief:Deduction)
-    Y, ((&&,--X,A..+) ==> B), task(".") |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,"$"), (Belief:DeductionN)
+    Y, ((&&,X,A..+) ==> B), task(".") |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,"$"), (Belief:DeductionPB)
+    Y, ((&&,--X,A..+) ==> B), task(".") |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,"$"), (Belief:DeductionPBN)
 
-    Y, (B ==> (&&,X,A..+)), task(".") |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,"$"), (Belief:Deduction)
-    Y, (B ==> (&&,--X,A..+)), task(".") |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,"$"), (Belief:DeductionN)
+    Y, (B ==> (&&,X,A..+)), task(".") |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,"$"), (Belief:DeductionPB)
+    Y, (B ==> (&&,--X,A..+)), task(".") |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,"$"), (Belief:DeductionPBN)
 
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
@@ -153,12 +161,6 @@
         //S, (||,(--,%S),A..+) |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
-//conditional abduction
-
-    ((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
-    ((&&,M,A..+) ==> X), ((&&,A..+) ==> Y), task(".") |- subIfUnifiesAny(M,X,Y,"$"), (Belief:Abduction)
-    //(M ==> C), C, task(".") |- M, (Belief:Abduction)
-    (M ==> X), Y, task(".") |- subIfUnifiesAny(M,X,Y,"$"), (Belief:Abduction)
 
         //TODO modify ellipsis to allow these two rules to be expressed as one:
         // ((&&,M,A..+) ==> C), (A..+ ==> C) |- M, (Belief:Abduction)
@@ -174,18 +176,18 @@
     ((&&,B,A..+) ==> C), (B ==> M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Induction)
     ((&&,A..+) ==> C), M,  notImpl(M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Induction)
 
-    ((&&,X,A..+) ==> C), ((&&,Y,A..+) ==> C) |- (X ==>+- Y), (Belief:Induction)
-    ((&&,X,A..+) ==> C), ((&&,Y,A..+) ==> C) |- (Y ==>+- X), (Belief:Induction)
-    (C ==> (&&,X,A..+)), (C ==> (&&,Y,A..+)) |- (X ==>+- Y), (Belief:Abduction)
-    (C ==> (&&,X,A..+)), (C ==> (&&,Y,A..+)) |- (Y ==>+- X), (Belief:Abduction)
+    ((&&,X,A..+) ==> C), ((&&,Y,A..+) ==> C) |- (X ==>+- Y), (Belief:InductionPB)
+    ((&&,X,A..+) ==> C), ((&&,Y,A..+) ==> C) |- (Y ==>+- X), (Belief:InductionPB)
+    (C ==> (&&,X,A..+)), (C ==> (&&,Y,A..+)) |- (X ==>+- Y), (Belief:AbductionPB)
+    (C ==> (&&,X,A..+)), (C ==> (&&,Y,A..+)) |- (Y ==>+- X), (Belief:AbductionPB)
         //((&&,B,A..+) ==> C), ((&&,A..+) ==> C) |- (B ==>+- C), (Belief:Induction)
 
 //precondition combiner inference rule (variable_unification6):
 
-    ((&&,C,A..+) ==> X), ((&&,C,B..+) ==> Y) |- subIfUnifiesAny(((&&,A..+) ==>+- (&&,B..+)),X,Y), (Belief:Induction)
-    ((&&,C,A..+) ==> X), ((&&,C,B..+) ==> Y) |- subIfUnifiesAny(((&&,B..+) ==>+- (&&,A..+)),X,Y), (Belief:Induction)
-    (X ==> (&&,C,A..+)), (Y ==> (&&,C,B..+)) |- subIfUnifiesAny(((&&,A..+) ==>+- (&&,B..+)),X,Y), (Belief:Abduction)
-    (X ==> (&&,C,A..+)), (Y ==> (&&,C,B..+)) |- subIfUnifiesAny(((&&,B..+) ==>+- (&&,A..+)),X,Y), (Belief:Abduction)
+    ((&&,C,A..+) ==> X), ((&&,C,B..+) ==> Y) |- subIfUnifiesAny(((&&,A..+) ==>+- (&&,B..+)),X,Y,"$"), (Belief:InductionPB)
+    ((&&,C,A..+) ==> X), ((&&,C,B..+) ==> Y) |- subIfUnifiesAny(((&&,B..+) ==>+- (&&,A..+)),X,Y,"$"), (Belief:InductionPB)
+    (X ==> (&&,C,A..+)), (Y ==> (&&,C,B..+)) |- subIfUnifiesAny(((&&,A..+) ==>+- (&&,B..+)),X,Y,"$"), (Belief:AbductionPB)
+    (X ==> (&&,C,A..+)), (Y ==> (&&,C,B..+)) |- subIfUnifiesAny(((&&,B..+) ==>+- (&&,A..+)),X,Y,"$"), (Belief:AbductionPB)
         //((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Induction)
         //((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Induction)
         //(Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Abduction)
@@ -196,8 +198,8 @@
 
 //conditional abduction by dependent variable
 
-    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z)  |- (X --> B), (Belief:Abduction)
-        ((X --> R) ==> Z), ((&&,(#Y --> B),--(#Y --> R),A..*) ==> Z) |- (X --> B), (Belief:AbductionN)
+    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z)  |- (X --> B), (Belief:AbductionPB)
+        ((X --> R) ==> Z), ((&&,(#Y --> B),--(#Y --> R),A..*) ==> Z) |- (X --> B), (Belief:AbductionPBN)
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 

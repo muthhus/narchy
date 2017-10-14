@@ -22,11 +22,14 @@ public class substitute extends Functor {
     final static Term DEP_VAR = $.quote("#");
     final static Term SAME = Atomic.the("same");
 
-    public substitute() {
+
+    public static final substitute the = new substitute();
+
+    private substitute() {
         super((Atom) $.the("substitute"));
     }
 
-    @Nullable @Override public Term apply(@NotNull TermContainer xx) {
+    @Nullable @Override public Term apply( TermContainer xx) {
 
         final Term input = xx.sub(0); //term to possibly transform
 

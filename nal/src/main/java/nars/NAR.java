@@ -1237,7 +1237,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * resolves a term or concept to its currrent Concept
      */
     @Nullable
-    public Concept concept(@NotNull Termed termed) {
+    public Concept concept(Termed termed) {
         return concept(termed, false);
     }
 
@@ -1387,7 +1387,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     @NotNull
     public final Concept on(@NotNull Concept c) {
 
-        Concept existing = concept(c.term());
+        Concept existing = concept(c);
         if ((existing != null) && (existing != c))
             throw new RuntimeException("concept already indexed for term: " + c.term());
 

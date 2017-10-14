@@ -132,7 +132,7 @@ public interface Stamp {
     /** computes an estimate of self-overlap of a stamp
      * TODO refine */
     static float cyclicity(long[] s) {
-        return isCyclic(s) ? (1f / (s.length-1)) : 0;
+        return isCyclic(s) ? (1f / (s.length)) : 0;
     }
 
     /*@NotNull*/

@@ -71,7 +71,7 @@ import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
 
-public interface Term extends Termed, Comparable<Term> {
+public interface Term extends Termed, Comparable<Termed> {
 
 
     //@NotNull public static final int[] ZeroIntArray = new int[0];
@@ -374,7 +374,9 @@ public interface Term extends Termed, Comparable<Term> {
      * @return whether unification succeeded
      */
     default boolean unify(/*@NotNull */Term y, Unify u) {
-        if (y instanceof Variable)
+        if (this == y)
+            return true;
+        else if (y instanceof Variable)
             return y.unify(this, u);
         else if (y instanceof AliasConcept.AliasAtom) {
             Term abbreviated = ((AliasConcept.AliasAtom) y).target;
@@ -624,7 +626,9 @@ public interface Term extends Termed, Comparable<Term> {
      * GLOBAL TERM COMPARATOR FUNCTION
      */
     @Override
-    default int compareTo(/*@NotNull*/ Term y) {
+    default int compareTo(/*@NotNull*/ Termed yy) {
+        if (this == yy) return 0;
+        Term y = yy.term();
         if (this.equals(y)) return 0;
 
         //order first by volume. this is important for conjunctions which rely on volume-dependent ordering for balancing

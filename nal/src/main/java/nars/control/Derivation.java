@@ -11,6 +11,9 @@ import nars.Task;
 import nars.derive.PrediTerm;
 import nars.derive.TemporalizeDerived;
 import nars.derive.rule.PremiseRule;
+import nars.op.data.differ;
+import nars.op.data.intersect;
+import nars.op.data.union;
 import nars.op.substitute;
 import nars.task.DerivedTask;
 import nars.term.Functor;
@@ -152,8 +155,6 @@ public class Derivation extends Unify {
 //
 //        transformsCache = cb.builder();
 
-        final Functor substituteIfUnifiesAny = new uniSubAny(this);
-
         //final Functor substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
 
         final Functor polarize = Functor.f2("polarize", (subterm, whichTask) -> {
@@ -168,18 +169,17 @@ public class Derivation extends Unify {
             else
                 return compared.isNegative() ? subterm.neg() : subterm;
         });
-        final Functor substitute = new substitute() {
-        };
+
 
         derivationFunctors = functors(
-                substituteIfUnifiesAny,
+                new uniSubAny(this),
                 polarize,
-                substitute,
+                substitute.the,
+                union.the,
+                differ.the,
+                intersect.the,
                 nar.get(Atomic.the("dropAnyEvent")),
                 nar.get(Atomic.the("dropAnySet")),
-                nar.get(Atomic.the("union")),
-                nar.get(Atomic.the("differ")),
-                nar.get(Atomic.the("intersect")),
                 nar.get(Atomic.the("conjEvent")),
                 nar.get(Atomic.the("conjDropIfEarliest")),
                 nar.get(Atomic.the("ifConjCommNoDepVars")),

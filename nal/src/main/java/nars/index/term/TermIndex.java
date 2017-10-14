@@ -37,7 +37,7 @@ public abstract class TermIndex implements TermContext {
 
     @Override
     public final Termed apply(Term term) {
-        return term.op().conceptualizable ? get(term, false) : term;
+        return get(term, false);
     }
 
     /**

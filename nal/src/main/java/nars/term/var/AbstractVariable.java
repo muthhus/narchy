@@ -69,13 +69,13 @@ public abstract class AbstractVariable implements Variable {
         //((obj instanceof Variable) && ((Variable)obj).hash == hash);
     }
 
-    static boolean commonalizableVariable(@NotNull Term x) {
+    static boolean commonalizableVariable(Term x) {
         return x instanceof VarDep || x instanceof VarIndep;
     }
 
 
     @Override
-    public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
+    public final boolean unify(Term y, Unify subst) {
 
         //do not test for equality
         //var pattern will unify anything (below)

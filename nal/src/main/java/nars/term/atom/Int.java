@@ -154,7 +154,7 @@ public class Int implements Intlike {
         }
 
         @Override
-        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+        public boolean unify(Term y, Unify subst) {
             if (Intlike.super.unify(y, subst)) return true;
 
             //one way:
@@ -270,7 +270,7 @@ public class Int implements Intlike {
 //
 //    }
 
-    public static Term[] intersect(Term[] subs) {
+    public static Term[] intersect(final Term[] subs) {
 
 
         boolean anyInts = false;
@@ -405,8 +405,7 @@ public class Int implements Intlike {
         }
     }
 
-    @NotNull
-    private static List<Intlike> features(@NotNull List<Term> nnnt) {
+    private static List<Intlike> features( List<Term> nnnt) {
 
         RangeSet<Integer> intIntervals = ranges(nnnt);
 

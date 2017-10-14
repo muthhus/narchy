@@ -963,16 +963,15 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
     @Override
     default @Nullable Iterable<? extends ITask> run(NAR n) {
 
-        n.emotion.busy(priElseZero(), this.volume());
 
-        //invoke possible functor
+        //invoke possible functor and apply aliases
         {
             Term x = term();
             Term y = x.eval(n);
 
-            if (!x.equals(y)) {
+            if (x!=y) { //instances could have been substituted and this matters
 
-                @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), !isInput() && !Param.DEBUG_EXTRA);
+                @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), !isInput() || !Param.DEBUG_EXTRA);
                 /* the evaluated result here acts as a memoization of possibly many results
                    depending on whether the functor is purely static in which case
                    it would be the only one.
@@ -981,7 +980,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                 if (result == null)
                     result = Operator.log(n.time(), $.p(x, y));
 
-                return singleton(result);
+                return result.run(n);
             }
         }
 
@@ -1014,6 +1013,9 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         if (!cmd) {
             Concept c = concept(n, true);
             if (c != null) {
+
+                n.emotion.busy(priElseZero(), this.volume());
+
                 c.process(this, n);
             }
         }

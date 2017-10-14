@@ -7,6 +7,7 @@ import nars.derive.match.EllipsisMatch;
 import nars.index.term.NewCompound;
 import nars.index.term.TermContext;
 import nars.term.Compound;
+import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;

@@ -87,7 +87,7 @@ public interface Atomic extends Term {
     }
 
     @NotNull
-    static Atomic the(@NotNull String id) {
+    static Atomic the(String id) {
         int l = id.length();
         assert(l>0): "attempted zero-length Atomic id";
 

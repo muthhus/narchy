@@ -6,11 +6,13 @@ import nars.NAR;
 import nars.NAgentX;
 import nars.concept.ScalarConcepts;
 import nars.gui.Vis;
-import nars.video.CameraSensor;
+import nars.video.BufferedImageBitmap2D;
+import nars.video.Scale;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Supplier;
+
 import static java4k.gradius4k.Gradius4K.*;
-import static nars.term.atom.Atomic.the;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.col;
 
@@ -27,11 +29,15 @@ public class Gradius extends NAgentX {
 
         this.g = new Gradius4K();
 
-        g.updateMS = 50;
+        g.updateMS = 30;
+
+        senseCameraReduced($.p(id,$.the("ae")), (Supplier)()->g.image, 32,32,2,2).resolution(0.5f);
+
+        senseCamera($.p(id, $.the("global")), new Scale(() -> g.image, 9, 9)).resolution(0.1f);
+
+        senseCameraRetina($.p(id,$.the("local")), () -> g.image, 24, 16).resolution(0.25f);
 
         //BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
-        CameraSensor<?> c1 = senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.01f);
-
 //        senseCamera($.p(id, $.the("r")), new Scale(() -> g.image, 4, 4).mode(BufferedImageBitmap2D.ColorMode.R)).resolution(0.1f);
 //        senseCamera($.p(id, $.the("g")), new Scale(() -> g.image, 4, 4).mode(BufferedImageBitmap2D.ColorMode.G)).resolution(0.1f);
 //        senseCamera($.p(id, $.the("b")), new Scale(() -> g.image, 4, 4).mode(BufferedImageBitmap2D.ColorMode.B)).resolution(0.1f);
@@ -40,14 +46,14 @@ public class Gradius extends NAgentX {
 
         float width = g.getWidth();
         float height = g.getHeight();
-        @NotNull ScalarConcepts yPos = senseNumber(the("Y"),
+        @NotNull ScalarConcepts yPos = senseNumber($.inh("Y", id),
                 ()->g.player[OBJ_Y] / height,
-                4, ScalarConcepts.FuzzyNeedle
-        ).resolution(0.1f);
-        @NotNull ScalarConcepts xPos = senseNumber(the("X"),
+                5, ScalarConcepts.FuzzyNeedle
+        ).resolution(0.5f);
+        @NotNull ScalarConcepts xPos = senseNumber($.inh("X", id),
                 ()->g.player[OBJ_X] / width,
-                4, ScalarConcepts.FuzzyNeedle
-        ).resolution(0.1f);
+                5, ScalarConcepts.FuzzyNeedle
+        ).resolution(0.5f);
         window(
                 col(
                         Vis.conceptBeliefPlots(this, xPos, 4),
@@ -97,36 +103,8 @@ public class Gradius extends NAgentX {
         actionToggle($.p("fire"),
                 (b) -> g.keys[VK_SHOOT] = b);
 
-        actionBipolar($.the("y"), (dy) -> {
-            float thresh = 0.33f;
-            if (dy < -thresh) {
-                g.keys[VK_UP] = false; g.keys[VK_DOWN] = true;
-            } else if (dy > +thresh) {
-                g.keys[VK_UP] = true; g.keys[VK_DOWN] = false;
-            } else {
-                g.keys[VK_UP] = false; g.keys[VK_DOWN] = false;
-            }
-            return dy;
-        });
-         actionBipolar($.the("x"), (dx) -> {
-            float thresh = 0.33f;
-            if (dx < -thresh) {
-                g.keys[VK_LEFT] = false; g.keys[VK_RIGHT] = true;
-            } else if (dx > +thresh) {
-                g.keys[VK_LEFT] = true; g.keys[VK_RIGHT] = false;
-            } else {
-                g.keys[VK_LEFT] = false; g.keys[VK_RIGHT] = false;
-            }
-            return dx;
-        });
-//        actionToggle($.p("up"),
-//                (b) -> ).term();
-//        actionToggle($.p("down"),
-//                (b) -> g.keys[VK_DOWN] = b).term();
-//        actionToggle($.p("left"),
-//                (b) -> g.keys[VK_LEFT] = b).term();
-//        actionToggle($.p("right"),
-//                (b) -> g.keys[VK_RIGHT] = b).term();
+        //initBipolar();
+        initToggle();
 
 //        actionTriState($.p(Atomic.the("dx")), (dh) -> {
 //            g.keys[Gradius4K.VK_LEFT] = false;
@@ -157,6 +135,42 @@ public class Gradius extends NAgentX {
 
     }
 
+    void initToggle() {
+        actionToggle($.inh("up", id),
+                (b) -> g.keys[VK_UP] = b);
+        actionToggle($.inh("down", id),
+                (b) -> g.keys[VK_DOWN] = b);
+        actionToggle($.inh("left", id),
+                (b) -> g.keys[VK_LEFT] = b);
+        actionToggle($.inh("right", id),
+                (b) -> g.keys[VK_RIGHT] = b);
+    }
+
+    void initBipolar() {
+        actionBipolar($.the("y"), (dy) -> {
+            float thresh = 0.33f;
+            if (dy < -thresh) {
+                g.keys[VK_UP] = false; g.keys[VK_DOWN] = true;
+            } else if (dy > +thresh) {
+                g.keys[VK_UP] = true; g.keys[VK_DOWN] = false;
+            } else {
+                g.keys[VK_UP] = false; g.keys[VK_DOWN] = false;
+            }
+            return dy;
+        });
+        actionBipolar($.the("x"), (dx) -> {
+           float thresh = 0.33f;
+           if (dx < -thresh) {
+               g.keys[VK_LEFT] = false; g.keys[VK_RIGHT] = true;
+           } else if (dx > +thresh) {
+               g.keys[VK_LEFT] = true; g.keys[VK_RIGHT] = false;
+           } else {
+               g.keys[VK_LEFT] = false; g.keys[VK_RIGHT] = false;
+           }
+           return dx;
+       });
+    }
+
 
     int lastScore;
 
@@ -179,15 +193,7 @@ public class Gradius extends NAgentX {
 
     public static void main(String[] args) {
 
-        NAgentX.runRT((n) -> {
-
-
-            Gradius a = null;
-                a = new Gradius(n);
-
-            return a;
-
-        }, 20f);
+        NAgentX.runRT(Gradius::new, 50f);
 
     }
 

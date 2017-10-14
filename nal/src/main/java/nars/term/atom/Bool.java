@@ -2,6 +2,7 @@ package nars.term.atom;
 
 import nars.Op;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +59,7 @@ abstract public class Bool extends AtomicConst {
     }
 
     @Override
-    public int compareTo(@NotNull Term y) {
+    public int compareTo(Termed y) {
         if (this == y) {
             return 0;
         } else {
@@ -74,7 +75,7 @@ abstract public class Bool extends AtomicConst {
 
 
     @Override
-    public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
+    public final boolean unify(Term y, Unify subst) {
         throw never("unify");
     }
 

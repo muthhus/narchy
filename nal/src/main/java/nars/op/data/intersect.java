@@ -8,7 +8,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class intersect extends Functor.BinaryFunctor {
 
-    public intersect() {
+    public static final intersect the = new intersect();
+
+    intersect() {
         super("intersect");
     }
 

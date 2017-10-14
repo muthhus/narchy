@@ -704,11 +704,6 @@ public enum Op  {
      */
     @NotNull
     private static Term compound(Op o, Term... subterms) {
-
-        for (Term x : subterms)
-            if (x instanceof Bool)
-                return Null;
-
         return Builder.Compound.the.apply(o, subterms);
     }
 

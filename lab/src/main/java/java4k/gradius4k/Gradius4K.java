@@ -1,25 +1,25 @@
 package java4k.gradius4k;
 
-/*
- * Gradius 4K
- * Copyright (C) 2011 meatfighter.com
- *
- * This file is part of Gradius 4K.
- *
- * Gradius 4K is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published
- * by the Free Software Foundation; either version 3 of the License, or
- * (at your option) any later version.
- *
- * Gradius 4K is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+        /*
+         * Gradius 4K
+         * Copyright (C) 2011 meatfighter.com
+         *
+         * This file is part of Gradius 4K.
+         *
+         * Gradius 4K is free software; you can redistribute it and/or modify
+         * it under the terms of the GNU Lesser General Public License as published
+         * by the Free Software Foundation; either version 3 of the License, or
+         * (at your option) any later version.
+         *
+         * Gradius 4K is distributed in the hope that it will be useful,
+         * but WITHOUT ANY WARRANTY; without even the implied warranty of
+         * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+         * GNU Lesser General Public License for more details.
+         *
+         * You should have received a copy of the GNU Lesser General Public License
+         * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+         *
+         */
 
 import java4k.GamePanel;
 import jcog.Util;
@@ -92,11 +92,6 @@ public class Gradius4K extends GamePanel {
     }
 
     public Gradius4K() {
-        start();
-    }
-
-    @Override
-    public void start() {
         enableEvents(8);
 
         JFrame f = new JFrame();
@@ -104,10 +99,11 @@ public class Gradius4K extends GamePanel {
         f.setSize(500, 500);
         f.setVisible(true);
 
+        image = new BufferedImage(256, 256, 1);
+
         new Thread(this).start();
-
-
     }
+
 
     @Override
     public void run() {
@@ -138,7 +134,6 @@ public class Gradius4K extends GamePanel {
         Graphics2D g2 = null;
         int[][] levelMap = null;
 
-        image = new BufferedImage(256, 256, 1);
         BufferedImage[] sprites = new BufferedImage[14 * 4096];
         Graphics2D g = (Graphics2D) image.getGraphics();
 

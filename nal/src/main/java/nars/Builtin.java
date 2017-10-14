@@ -39,10 +39,10 @@ public class Builtin {
 
     public static final Concept[] statik = {
 
-            new intersect(),
-            new differ(),
-            new union(),
-            new substitute(),
+            intersect.the,
+            differ.the,
+            union.the,
+            substitute.the,
 
             Functor.f1("varIntro", (x) -> {
                 Term y = DepIndepVarIntroduction.varIntro(x, ThreadLocalRandom.current());
@@ -105,8 +105,9 @@ public class Builtin {
      * generate all NAR-contextualized functors
      */
     public static void load(NAR nar) {
-        for (Concept t : Builtin.statik)
-            nar.terms.set(t);
+        for (Concept t : Builtin.statik) {
+            nar.on(t);
+        }
 
         nar.on(Functor.f("service", (TermContainer c) ->
                 $.sete(

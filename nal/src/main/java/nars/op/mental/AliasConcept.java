@@ -32,21 +32,21 @@ public final class AliasConcept extends BaseConcept {
     public static class AliasAtom extends Atom {
 
         //TODO encapsulate
-        public Term target;
+        public final Term target;
 
-        protected AliasAtom(@NotNull String id, Term target) {
+        protected AliasAtom(String id, Term target) {
             super(id);
             this.target = target;
         }
 
-        @Override
-        public Term evalSafe(TermContext context, int remain) {
-            Term e = target.evalSafe(context, remain);
-            if (e != target)
-                return e; //if a dynamic result, return that
-            else
-                return this; //otherwise if constant, return this
-        }
+//        @Override
+//        public Term evalSafe(TermContext context, int remain) {
+//            Term e = target.evalSafe(context, remain);
+//            if (e != target)
+//                return e; //if a dynamic result, return that
+//            else
+//                return this; //otherwise if constant, return this
+//        }
 
 
 //        @Override
@@ -55,7 +55,7 @@ public final class AliasConcept extends BaseConcept {
 //        }
 
         @Override
-        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+        public boolean unify(Term y, Unify subst) {
 
             if (super.unify(y, subst))
                 return true;
@@ -111,7 +111,7 @@ public final class AliasConcept extends BaseConcept {
     @Override
     public void delete(@NotNull NAR nar) {
         //unreference the target. this avoids creating a GC nightmare
-        ((AliasAtom)term).target = ((AliasAtom)term);
+        //((AliasAtom)term).target = ((AliasAtom)term);
         if (!abbr.isDeleted()) {
             nar.terms.set(abbr.term(), abbr); //restore abbr's entry in the index
 

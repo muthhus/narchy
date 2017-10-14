@@ -15,7 +15,6 @@ import nars.concept.PermanentConcept;
 import nars.control.TaskService;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.atom.Atomic;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +47,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     /**
      * whether to use a (strong, proxying) alias atom concept
      */
-    boolean aliasConcept = true;
+
 
     private static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
 
@@ -65,7 +64,9 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     public Abbreviation(@NotNull NAR nar, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(nar);
         bag = new DtLeak<>(new ArrayBag<Compound, PLink<Compound>>(PriMerge.plus, new ConcurrentHashMap<>(capacity)) {
-            @Nullable @Override public Compound key(@NotNull PLink<Compound> l) {
+            @Nullable
+            @Override
+            public Compound key(@NotNull PLink<Compound> l) {
                 return l.get();
             }
         }, new FloatParam(selectionRate)) {
@@ -97,20 +98,18 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     }
 
     @Override
-    public void accept(NAR nar, @NotNull Task task) {
+    public void accept(NAR nar, Task task) {
 
         Term taskTerm = task.term();
-        if ((!(taskTerm instanceof Compound)) || task.meta(Abbreviation.class) != null)
+        if ((!(taskTerm instanceof Compound)) || taskTerm.vars() > 0 || task.meta(Abbreviation.class) != null)
             return;
 
         Prioritized b = task;
-        if (b != null) {
 
-            input(b, bag.bag::put, (Compound) taskTerm, 1f, nar);
-        }
+        input(b, bag.bag::put, (Compound) taskTerm, 1f, nar);
     }
 
-    private void input(@NotNull Prioritized b, @NotNull Consumer<PLink<Compound>> each, @NotNull Compound t, float scale, NAR nar) {
+    private void input( Prioritized b, Consumer<PLink<Compound>> each, Compound t, float scale, NAR nar) {
         int vol = t.volume();
         if (vol < volume.lo())
             return;
@@ -183,21 +182,19 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
     protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Prioritized b, NAR nar) {
 
-        @Nullable Concept a = nar.concept(abbreviated);
-        if (a != null && !(a instanceof AliasConcept) && !(a instanceof PermanentConcept)) {
+        @Nullable Concept abbrConcept = nar.concept(abbreviated);
+        if (abbrConcept != null && !(abbrConcept instanceof AliasConcept) && !(abbrConcept instanceof PermanentConcept)) {
 
             final boolean[] succ = {false};
-            a.computeIfAbsent(Abbreviation.class, (ac) -> {
-                String id = newSerialTerm();
 
-                            AliasConcept a1 = new AliasConcept(id, a);
-                            Concept alias = aliasConcept ?
-                                    nar.on(a1) : null;
+            abbrConcept.computeIfAbsent(Abbreviation.class, (ac) -> {
 
-                            Term abbreviatedTerm = abbreviated.term();
-                            nar.terms.set(abbreviatedTerm, a1); //set the abbreviated term to resolve to the abbreviation
+                Term abbreviatedTerm = abbreviated.term();
 
-                            Termed aliasTerm = alias != null ? alias : Atomic.the(id);
+                AliasConcept a1 = new AliasConcept(newSerialTerm(), abbrConcept);
+                nar.on(a1);
+                nar.terms.set(abbreviatedTerm, a1); //set the abbreviated term to resolve to the abbreviation
+                a1.state(nar.terms.conceptBuilder.awake());
 
 //                Compound abbreviation = newRelation(abbreviated, id);
 //                if (abbreviation == null)
@@ -218,7 +215,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 //                            ta.setPri(b);
 //
 //                            nar.runLater(()->nar.input(ta));
-//                            logger.info("+ {}", ta);
+                logger.info("{} => {}", a1, abbreviatedTerm);
 //
 //                            succ[0] = true;
 //
@@ -246,11 +243,10 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 //        return this;
 
 
-                return id;
+                return a1.term();
 
             });
 
-            return succ[0];
 
         }
 

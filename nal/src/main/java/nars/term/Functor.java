@@ -10,6 +10,8 @@ import nars.concept.PermanentConcept;
 import nars.concept.builder.ConceptBuilder;
 import nars.derive.AbstractPred;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
+import nars.term.atom.AtomicConst;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +29,7 @@ import static nars.term.atom.Atomic.the;
  *  a result Term from the TermContainer arguments of
  *  a function term, for example: f(x) or f(x, y).
  */
-abstract public class Functor extends BaseConcept implements PermanentConcept, Function<TermContainer,Term> {
+abstract public class Functor extends BaseConcept implements PermanentConcept, Function<TermContainer,Term>, Atomic {
 
     protected Functor(@NotNull String atom) {
         this(fName(atom));
@@ -35,6 +37,27 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
 
     protected Functor(@NotNull Atom atom) {
         super(atom, ConceptBuilder.Null);
+    }
+
+//    @Override
+//    public boolean equals(Object obj) {
+//        return this == obj || obj instanceof Termed && term.equals(obj);
+//    }
+
+    @Override
+    public final Term term() {
+        return this;
+    }
+
+
+    @Override
+    public final int opX() {
+        return term.opX();
+    }
+
+    @Override
+    public final int compareTo(Termed o) {
+        return term.compareTo(o);
     }
 
     public static Atom fName(@NotNull String termAtom) {
@@ -164,7 +187,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
         }
 
         @Nullable
-        @Override public Term apply(@NotNull TermContainer terms) {
+        @Override public final Term apply(TermContainer terms) {
             return f.apply(terms);
         }
     }
@@ -179,7 +202,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
         }
 
         @Nullable
-        @Override public final Term apply(@NotNull TermContainer x) {
+        @Override public final Term apply( TermContainer x) {
             if (x.subs()!=1)
                 return null;
                 //throw new UnsupportedOperationException("# args must equal 1");
@@ -188,7 +211,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
         }
 
         @Nullable
-        public abstract Term apply(@NotNull Term x);
+        public abstract Term apply(Term x);
     }
 
     /**
@@ -205,7 +228,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
         }
 
         @Nullable
-        @Override public final Term apply(@NotNull TermContainer x) {
+        @Override public final Term apply( TermContainer x) {
             if (x.subs()!=2)
                 throw new UnsupportedOperationException("# args must equal 2");
 
@@ -222,7 +245,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
         }
 
         @Nullable
-        public abstract Term apply(@NotNull Term a, @NotNull Term b);
+        public abstract Term apply(Term a, Term b);
     }
 
 }

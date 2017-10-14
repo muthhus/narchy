@@ -9,7 +9,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class union extends Functor.BinaryFunctor {
 
-    public union() {
+    public static final union the = new union();
+
+    union() {
         super("union");
     }
 

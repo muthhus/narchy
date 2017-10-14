@@ -10,7 +10,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class differ extends Functor.BinaryFunctor {
 
-    public differ() {
+    public static final differ the = new differ();
+
+    differ() {
         super("differ");
     }
 

@@ -95,7 +95,7 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
 //    }
 
     @Override
-    public final Term term() {
+    public Term term() {
         return term;
     }
 
@@ -182,8 +182,8 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
 
 
     @Override
-    public final boolean equals(Object obj) {
-        return this == obj || (obj instanceof Concept && term.equals(((Termed) obj).term()));
+    public boolean equals(Object obj) {
+        return this == obj || (obj instanceof Termed && term.equals(((Termed) obj).term()));
     }
 
     @Override

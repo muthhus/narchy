@@ -23,22 +23,30 @@ public abstract class AtomicConst implements Atomic {
         int slen = s.length();
 
         byte[] stringbytes = s.getBytes();
-        byte[] sbytes = new byte[ stringbytes.length + 3 ];
-        sbytes[0] = (op!=null ? op : op()).id;
-        sbytes[1] = (byte)(slen>>8 & 0xff);
-        sbytes[2] = (byte)(slen&0xff);
+        byte[] sbytes = new byte[stringbytes.length + 3];
+        sbytes[0] = (op != null ? op : op()).id;
+        sbytes[1] = (byte) (slen >> 8 & 0xff);
+        sbytes[2] = (byte) (slen & 0xff);
         arraycopy(stringbytes, 0, sbytes, 3, stringbytes.length);
         this.bytesCached = sbytes;
 
-        this.hashCached = Util.hashWangJenkins( s.hashCode() );
+        this.hashCached = Util.hashWangJenkins(s.hashCode());
     }
 
-    @Override public boolean equals(Object u) {
+    @Override
+    public boolean equals(Object u) {
         if (this == u) return true;
-        if (!(u instanceof AtomicConst))
-            return false;
-        AtomicConst c = (AtomicConst)u;
-        return hashCached==c.hashCached && Arrays.equals(bytesCached, c.bytesCached);
+
+        if (u instanceof AtomicConst) {
+            AtomicConst c = (AtomicConst) u;
+            return hashCached == c.hashCached && Arrays.equals(bytesCached, c.bytesCached);
+        } else if (u instanceof Atomic) {
+            if (hashCached != u.hashCode())
+                return false;
+            Atomic a = (Atomic) u;
+            return opX() == a.opX() && toString().equals(a.toString());
+        }
+        return false;
     }
 
     @Override
@@ -50,7 +58,8 @@ public abstract class AtomicConst implements Atomic {
         out.write(bytesCached);
     }
 
-    @Override abstract public String toString();
+    @Override
+    abstract public String toString();
 
     @Override
     public int complexity() {
@@ -58,7 +67,9 @@ public abstract class AtomicConst implements Atomic {
     }
 
     @Override
-    public float voluplexity() { return 1;     }
+    public float voluplexity() {
+        return 1;
+    }
 
     @Override
     public int hashCode() {

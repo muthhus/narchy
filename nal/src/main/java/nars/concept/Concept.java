@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
+public interface Concept extends Termed, ConcurrentMap, Comparable<Termed> {
 
 
     /*@NotNull*/ Bag<Task,PriReference<Task>> tasklinks();
@@ -163,7 +163,7 @@ public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
     }
 
     @Override
-    default int compareTo(/*@NotNull*/ Concept o) {
+    default int compareTo(/*@NotNull*/ Termed o) {
         return term().compareTo(o.term());
     }
 

@@ -8,6 +8,7 @@ import nars.Op;
 import nars.Param;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
@@ -97,7 +98,7 @@ public class SerialCompound extends DynBytes implements Compound {
     }
 
     @Override
-    public int compareTo(@NotNull Term y) {
+    public int compareTo(@NotNull Termed y) {
         throw new UnsupportedOperationException(); //TODO impl in a subclass
     }
 

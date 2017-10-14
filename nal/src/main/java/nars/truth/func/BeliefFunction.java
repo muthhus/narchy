@@ -52,6 +52,18 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
+//    /** similar to structural deduction but preserves the frequency of the task */
+//   @SinglePremise @AllowOverlap StructuralDecompose() {
+//        @Override
+//        public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
+//            float conf = T.conf() * defaultConfidence(m);
+//            if (conf >= minConf)
+//                return $.t(T.freq(), conf);
+//            else
+//                return null;
+//        }
+//    },
+
     /**
      * polarizes according to an implication belief and its effective negation reduction
      */
@@ -89,7 +101,16 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.induction(T, B, minConf);
         }
     },
-
+   InductionPB() {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            if (B.isNegative()) {
+                return TruthFunctions.induction(T.neg(), B.neg(), minConf);
+            } else {
+                return TruthFunctions.induction(T, B, minConf);
+            }
+        }
+    },
 
 //    /** task frequency negated induction */
 //    InductionNeg() {

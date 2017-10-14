@@ -71,7 +71,9 @@ abstract public class PatternCompound extends GenericCompoundDT {
      * slightly modified from general compound unification
      */
     @Override
-    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+    public boolean unify(Term y, Unify subst) {
+        if (this == y)
+            return true;
 
         if (y instanceof AliasConcept.AliasAtom) {
             return unify(((AliasConcept.AliasAtom) y).target, subst);

@@ -1,13 +1,11 @@
 package nars;
 
-import com.google.common.collect.Iterables;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.Ons;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.pri.mix.control.MixContRL;
-import nars.concept.ActionConcept;
 import nars.control.Cause;
 import nars.control.Derivation;
 import nars.control.MetaGoal;
@@ -17,7 +15,7 @@ import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.Implier;
+import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
 import nars.term.Term;
@@ -57,7 +55,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -176,7 +173,7 @@ abstract public class NAgentX extends NAgent {
                 .time(clock)
                 .deriver(deriver)
                 .index(
-                        new CaffeineIndex(96 * 1024)
+                        new CaffeineIndex(128 * 1024)
                         //new CaffeineIndex2(64 * 1024)
                         //new CaffeineIndex2(-1)
                         //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
@@ -192,7 +189,7 @@ abstract public class NAgentX extends NAgent {
 
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
-        n.termVolumeMax.setValue(24);
+        n.termVolumeMax.setValue(32);
 
         n.beliefConfidence(0.9f);
         n.goalConfidence(0.9f);
@@ -237,7 +234,7 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-//        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.1f, 4);
+        Abbreviation abb = new Abbreviation(n, "z", 4, 10, 0.06f, 16);
 
         Inperience inp = new Inperience(n, 16);
 //
@@ -787,6 +784,10 @@ abstract public class NAgentX extends NAgent {
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(@Nullable Term id, C bc) {
         return addCamera(new CameraSensor(id, bc, this));
+    }
+
+    protected <C extends Bitmap2D> CameraSensor<C> senseCameraReduced(@Nullable Term id, Supplier<BufferedImage> bc, int sx, int sy, int ox, int oy) {
+        return addCamera(new CameraSensor(id, new AutoencodedBitmap(new BufferedImageBitmap2D(bc), sx, sy, ox, oy), this));
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCameraReduced(@Nullable Term id, C bc, int sx, int sy, int ox, int oy) {
