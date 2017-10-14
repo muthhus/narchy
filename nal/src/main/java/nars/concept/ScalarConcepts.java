@@ -1,5 +1,6 @@
 package nars.concept;
 
+import com.google.common.collect.Streams;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.math.FloatSupplier;
@@ -17,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import static nars.Op.BELIEF;
 
@@ -38,12 +38,12 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
     public final CauseChannel<ITask> in;
 
     @Override
-    public float asFloat() {
-        return (float) value.get();
+    public final float asFloat() {
+        return value.floatValue();
     }
 
     public Stream<SensorConcept> stream() {
-        return StreamSupport.stream(spliterator(), false);
+        return sensors.stream();
     }
 
 
@@ -222,9 +222,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
 
         value.set(input.asFloat());
 
-        in.input(sensors.stream().map(x -> {
-            return x.update(now, dur, n);
-        }));
+        in.input(sensors.stream().map(x -> x.update(now, dur, n)));
     }
 
 

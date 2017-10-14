@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * executes approximately once every N durations
@@ -39,6 +40,13 @@ abstract public class DurService extends NARService implements Runnable {
         return new DurService(nar) {
             @Override protected void run(NAR n, long dt) {
                 r.run();
+            }
+        };
+    }
+    public static DurService build(NAR nar, Consumer<NAR> r) {
+        return new DurService(nar) {
+            @Override protected void run(NAR n, long dt) {
+                r.accept(n);
             }
         };
     }

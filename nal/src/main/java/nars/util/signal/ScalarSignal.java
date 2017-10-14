@@ -38,7 +38,7 @@ public class ScalarSignal extends Signal implements  DoubleSupplier {
     private final FloatToObjectFunction<Truth> truthFloatFunction;
 
 
-    public float currentValue = Float.NaN;
+    public float currentValue;
 
 
     public final static FloatToFloatFunction direct = n -> n;

@@ -20,7 +20,7 @@ import static nars.time.Tense.ETERNAL;
  */
 public abstract class DtLeak<X, Y> extends Leak<X, Y> {
 
-    float RATE_THRESH = 0.5f;
+    float RATE_THRESH = 1f;
 
     @NotNull
     public final FloatParam rate /* base rate items per dt */;
@@ -43,16 +43,15 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
             return 0;
 
         try {
-            bag.commit();
 
-            if (bag.size() >= min()) {
+            if (!bag.commit().isEmpty()) {
 
                 long last = this.lastLeak;
                 if (last == ETERNAL) {
                     this.lastLeak = last = now;
                 }
 
-                return commit(now, now - last, dur, work);
+                return commit(now, last, dur, work);
 
             }
         } finally {
@@ -93,7 +92,7 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
             return Bag.BagSample.Remove; //continue
         });
 
-        this.lastBudget = Math.min(0, budget[0]); //only store deficit, which will be added to the next. otherwise if positive is also stored, it can explode
+        this.lastBudget = Math.min(0, budget[0]); //only store surplus, which will be added to the next. otherwise if positive is also stored, it can explode
 
         return nextBudget - budget[0];
 

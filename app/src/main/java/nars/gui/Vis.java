@@ -150,18 +150,19 @@ public class Vis {
         Grid grid = new Grid();
         List<Plot2D> plots = $.newArrayList();
         for (Termed t : concepts) {
+            final Truth[] bb = new Truth[] { $.t(0.5f, 0.5f) };
             Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/) {
 
                 @Override
                 protected void paint(GL2 gl) {
                     Concept concept = a.nar.concept(t);
 
-                    Truth t = a.nar.beliefTruth(concept, a.nar.time());
+                    bb[0] = a.nar.beliefTruth(concept, a.nar.time());
                     float b;
-                    if (t == null)
+                    if (bb[0] == null)
                         b = 0f;
                     else
-                         b = 2f * (t.freq()) -1f;
+                         b = 2f * (bb[0].freq()) -1f;
 
                     backgroundColor[0] = b < 0 ? -b/4f : 0;
                     backgroundColor[1] = 0;
@@ -170,14 +171,12 @@ public class Vis {
 
                     super.paint(gl);
                 }
-
             };
             p.setTitle(t.toString());
 //            p.add("P", () -> a.nar.pri(t, Float.NaN), 0f, 1f);
 //            p.add("G", () -> a.nar.concept(t).goalFreq(nar.time(), nar.dur()), 0f, 1f);
             p.add("B", () -> {
-                Truth b = a.nar.beliefTruth(t, a.nar.time());
-                return b!=null ? b.freq() : Float.NaN;
+                return bb[0] !=null ? bb[0].freq() : Float.NaN;
             }, 0f, 1f);
             p.add("G", () -> {
                 Truth b = a.nar.goalTruth(t, a.nar.time());

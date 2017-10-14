@@ -46,14 +46,14 @@ public class Gradius extends NAgentX {
 
         float width = g.getWidth();
         float height = g.getHeight();
-        @NotNull ScalarConcepts yPos = senseNumber($.inh("Y", id),
+        ScalarConcepts yPos = senseNumber($.inh("Y", id),
                 ()->g.player[OBJ_Y] / height,
-                5, ScalarConcepts.FuzzyNeedle
-        ).resolution(0.5f);
-        @NotNull ScalarConcepts xPos = senseNumber($.inh("X", id),
+                3, ScalarConcepts.FuzzyNeedle
+        ).resolution(0.25f);
+        ScalarConcepts xPos = senseNumber($.inh("X", id),
                 ()->g.player[OBJ_X] / width,
-                5, ScalarConcepts.FuzzyNeedle
-        ).resolution(0.5f);
+                3, ScalarConcepts.FuzzyNeedle
+        ).resolution(0.25f);
         window(
                 col(
                         Vis.conceptBeliefPlots(this, xPos, 4),

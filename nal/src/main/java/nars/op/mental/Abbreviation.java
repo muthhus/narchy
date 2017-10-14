@@ -1,6 +1,5 @@
 package nars.op.mental;
 
-import jcog.bag.impl.ArrayBag;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.pri.PLink;
@@ -9,9 +8,11 @@ import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
 import nars.Task;
+import nars.bag.ConcurrentArrayBag;
 import nars.bag.leak.DtLeak;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
+import nars.control.DurService;
 import nars.control.TaskService;
 import nars.term.Compound;
 import nars.term.Term;
@@ -59,11 +60,12 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
      * accepted volume range, inclusive
      */
     public final MutableIntRange volume;
+    private DurService onDur;
 
 
     public Abbreviation(@NotNull NAR nar, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(nar);
-        bag = new DtLeak<>(new ArrayBag<Compound, PLink<Compound>>(PriMerge.plus, new ConcurrentHashMap<>(capacity)) {
+        bag = new DtLeak<>(new ConcurrentArrayBag<Compound, PLink<Compound>>(PriMerge.plus, capacity) {
             @Nullable
             @Override
             public Compound key(@NotNull PLink<Compound> l) {
@@ -89,8 +91,21 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     @Override
     protected void start(NAR nar) {
         super.start(nar);
-        ons.add(nar.onCycle(nn -> bag.commit(nn.time(), nn.dur(), 1f)));
+
+        onDur = DurService.build(nar, this::update);
     }
+
+    @Override
+    public synchronized void stop() {
+        onDur.stop();
+        super.stop();
+    }
+
+    protected void update(NAR nar) {
+        bag.commit(nar.time(), nar.dur(), 1f);
+    }
+
+
 
     @Override
     public void clear() {
@@ -117,7 +132,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
         if (vol <= volume.hi()) {
             if (t.conceptual().equals(t) /* identical to its conceptualize */) {
                 Concept abbreviable = nar.concept(t);
-                if ((abbreviable == null) ||
+                if ((abbreviable != null) &&
                         !(abbreviable instanceof PermanentConcept) &&
                                 abbreviable.get(Abbreviation.class) == null) {
 
@@ -189,12 +204,14 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
             abbrConcept.computeIfAbsent(Abbreviation.class, (ac) -> {
 
-                Term abbreviatedTerm = abbreviated.term();
+                Term abbreviatedTerm = nar.applyTermIfPossible(abbreviated.term());
 
-                AliasConcept a1 = new AliasConcept(newSerialTerm(), abbrConcept);
+                AliasConcept a1 = new AliasConcept(newSerialTerm(), abbrConcept, nar);
+
                 nar.on(a1);
-                nar.terms.set(abbreviatedTerm, a1); //set the abbreviated term to resolve to the abbreviation
-                a1.state(nar.terms.conceptBuilder.awake());
+                nar.terms.set(abbreviated.term(), a1); //set the abbreviated term to resolve to the abbreviation
+                if (!abbreviatedTerm.equals(abbreviated.term()))
+                    nar.terms.set(abbreviatedTerm, a1); //set the abbreviated term to resolve to the abbreviation
 
 //                Compound abbreviation = newRelation(abbreviated, id);
 //                if (abbreviation == null)
@@ -217,7 +234,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 //                            nar.runLater(()->nar.input(ta));
                 logger.info("{} => {}", a1, abbreviatedTerm);
 //
-//                            succ[0] = true;
+
 //
 //                            return ta;
 //
@@ -243,10 +260,12 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 //        return this;
 
 
-                return a1.term();
+                succ[0] = true;
+                return a1;
 
             });
 
+            return succ[0];
 
         }
 

@@ -1,6 +1,8 @@
 package nars.term.atom;
 
 import nars.Op;
+import nars.Param;
+import nars.index.term.TermContext;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.subst.Unify;
@@ -72,11 +74,22 @@ abstract public class Bool extends AtomicConst {
     }
 
 
+    @Override
+    public final Term eval(TermContext context) {
+        return this;
+    }
 
+    @Override
+    public final Term evalSafe(TermContext context, int remain) {
+        return this;
+    }
 
     @Override
     public final boolean unify(Term y, Unify subst) {
-        throw never("unify");
+        if (Param.DEBUG_EXTRA)
+            throw never("unify");
+        else
+            return this == y;
     }
 
     @Override

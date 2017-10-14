@@ -9,10 +9,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 abstract public class ConcurrentArrayBag<K,X extends Priority> extends ArrayBag<K,X> {
 
     private final QueueLock<X> toPut;
+
+
+    public ConcurrentArrayBag(@NotNull PriMerge mergeFunction, int cap) {
+        this(mergeFunction, new ConcurrentHashMap<>(cap), cap);
+    }
 
     public ConcurrentArrayBag(@NotNull PriMerge mergeFunction, @NotNull Map<K, X> map, int cap) {
         super(mergeFunction, map);

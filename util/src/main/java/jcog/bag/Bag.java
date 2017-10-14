@@ -276,7 +276,7 @@ public interface Bag<K, V> extends Table<K, V> {
      * @param it An item
      * @return Whether the Item is in the Bag
      */
-    default boolean contains(@NotNull K it) {
+    default boolean contains(/*@NotNull*/ K it) {
         return get(it) != null;
     }
 
@@ -301,18 +301,18 @@ public interface Bag<K, V> extends Table<K, V> {
     /**
      * @return null if this is an event which was rejected on input, non-null if it was a re
      */
-    default void onRemove(@NotNull V value) {
+    default void onRemove(/*@NotNull*/ V value) {
 
     }
 
     /**
      * called if an item which was attempted to be inserted was not
      */
-    default void onReject(@NotNull V value) {
+    default void onReject(/*@NotNull*/ V value) {
 
     }
 
-    default void onAdd(@NotNull V v) {
+    default void onAdd(/*@NotNull*/ V v) {
 
     }
 
@@ -329,7 +329,7 @@ public interface Bag<K, V> extends Table<K, V> {
             return priElse(x, ifMissing);
     }
 
-    default boolean active(@NotNull V key) {
+    default boolean active(V key) {
         float x = pri(key);
         return (x == x);
         //return priSafe(key, -1) >= 0;

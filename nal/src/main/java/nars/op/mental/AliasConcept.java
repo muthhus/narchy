@@ -6,7 +6,8 @@ import nars.NAR;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.state.ConceptState;
-import nars.index.term.TermContext;
+import nars.table.BeliefTable;
+import nars.table.QuestionTable;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
@@ -80,22 +81,33 @@ public final class AliasConcept extends BaseConcept {
     @NotNull
     public final Concept abbr;
 
-    AliasConcept(@NotNull String abbreviation, Concept decompressed) {
-        super(new AliasAtom(abbreviation, decompressed.term()),
-                decompressed.beliefs(), decompressed.goals(), decompressed.questions(), decompressed.quests(),
+    AliasConcept(@NotNull String abbreviation, Concept decompressed, NAR nar) {
+        super(new AliasAtom(abbreviation, nar.applyTermIfPossible(decompressed.term())),
+                null, null, null, null,
                 new Bag[]{decompressed.termlinks(), decompressed.tasklinks()});
 
         this.abbr = decompressed;
-        put(Abbreviation.class, decompressed.term());
 
-//            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
-//            if (additionalTerms.length > 0)
-//                tl = ArrayUtils.addAll(tl, additionalTerms);
-        this.templates =
-                new FasterList(decompressed.templates()).with(term);
+        Term decompressedTerm = ((AliasAtom)term).target;
+
+
+        Collection<Termed> baseTemplates = decompressed.templates();
+        this.templates = new FasterList(baseTemplates.size());
+        //try to resolve all the templates to their abbreviated forms to maximize the usage of abbreviations.  then add this term to it
+
+        templates.add(this);
+        for (Termed t : baseTemplates) {
+            Term x = t.term();
+            if (x.equals(decompressedTerm))
+                continue; //ignore the term itself
+            Termed y = nar.applyIfPossible(x);
+            templates.add(y);
+        }
 
         //rewriteLinks(nar);
     }
+
+
 
 
     @Override
@@ -109,7 +121,7 @@ public final class AliasConcept extends BaseConcept {
     }
 
     @Override
-    public void delete(@NotNull NAR nar) {
+    public void delete(NAR nar) {
         //unreference the target. this avoids creating a GC nightmare
         //((AliasAtom)term).target = ((AliasAtom)term);
         if (!abbr.isDeleted()) {
@@ -119,10 +131,15 @@ public final class AliasConcept extends BaseConcept {
             // since they may be held by the abbreviated concept if it still exists
             state(ConceptState.Deleted);
             clear();
-        } else {
+        }/* else { //dont just call delete it will erase the abbreviant's links too!
             super.delete(nar);
-        }
+        }*/
 
+    }
+
+    @Override
+    protected void beliefCapacity(int be, int bt, int ge, int gt) {
+        //ignore
     }
 
     //
@@ -171,27 +188,27 @@ public final class AliasConcept extends BaseConcept {
 //        }
 
 
-//        @NotNull
-//        @Override
-//        public BeliefTable beliefs() {
-//            return abbr.beliefs();
-//        }
-//
-//        @NotNull
-//        @Override
-//        public BeliefTable goals() {
-//            return abbr.goals();
-//        }
-//
-//        @NotNull
-//        @Override
-//        public QuestionTable questions() {
-//            return abbr.questions();
-//        }
-//
-//        @NotNull
-//        @Override
-//        public QuestionTable quests() {
-//            return abbr.quests();
-//        }
+        @NotNull
+        @Override
+        public BeliefTable beliefs() {
+            return abbr.beliefs();
+        }
+
+        @NotNull
+        @Override
+        public BeliefTable goals() {
+            return abbr.goals();
+        }
+
+        @NotNull
+        @Override
+        public QuestionTable questions() {
+            return abbr.questions();
+        }
+
+        @NotNull
+        @Override
+        public QuestionTable quests() {
+            return abbr.quests();
+        }
 }

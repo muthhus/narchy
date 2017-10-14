@@ -35,13 +35,13 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
     @NotNull
     public final Term term;
     @NotNull
-    public final BeliefTable beliefs;
+    protected final BeliefTable beliefs;
     @NotNull
-    public final BeliefTable goals;
+    protected final BeliefTable goals;
     @NotNull
-    public final QuestionTable quests;
+    protected final QuestionTable quests;
     @NotNull
-    public final QuestionTable questions;
+    protected final QuestionTable questions;
     @NotNull
     public final Bag<Task, PriReference<Task>> taskLinks;
     @NotNull
@@ -65,8 +65,8 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
      * @param taskLinks
      */
     public BaseConcept(@NotNull Term term,
-                       @NotNull BeliefTable beliefs, @NotNull BeliefTable goals,
-                       @NotNull QuestionTable questions, @NotNull QuestionTable quests,
+                       BeliefTable beliefs, BeliefTable goals,
+                       QuestionTable questions, QuestionTable quests,
                        @NotNull Bag[] bags) {
         super(0);
         assert (term.op().conceptualizable);
@@ -160,7 +160,7 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
      */
     @Override
     @NotNull
-    public final BeliefTable beliefs() {
+    public BeliefTable beliefs() {
         return beliefs;
     }
 
@@ -169,11 +169,11 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
      */
     @Override
     @NotNull
-    public final BeliefTable goals() {
+    public BeliefTable goals() {
         return goals;
     }
 
-    protected final void beliefCapacity(int be, int bt, int ge, int gt) {
+    protected void beliefCapacity(int be, int bt, int ge, int gt) {
 
         beliefs.setCapacity(be, bt);
         goals.setCapacity(ge, gt);
@@ -267,8 +267,11 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
             int gt = p.beliefCap(this, false, false);
 
             beliefCapacity(be, bt, ge, gt);
-            questions.capacity(p.questionCap(true));
-            quests.capacity(p.questionCap(false));
+
+            if (questions!=null)
+                questions.capacity(p.questionCap(true));
+            if (quests!=null)
+                quests.capacity(p.questionCap(false));
 
         }
         return p;
@@ -322,38 +325,38 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
     }
 
 
-    @Nullable
-    public TaskTable table(byte punc) {
+    /*@NotNull*/
+    public final TaskTable table(byte punc) {
         switch (punc) {
             case BELIEF:
-                return beliefs;
+                return beliefs();
             case GOAL:
-                return goals;
+                return goals();
             case QUESTION:
-                return questions;
+                return questions();
             case QUEST:
-                return quests;
+                return quests();
             default:
                 throw new UnsupportedOperationException("what kind of punctuation is: '" + punc + "'");
         }
     }
 
     public void forEachTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests, @NotNull Consumer<Task> each) {
-        if (includeConceptBeliefs) beliefs.forEachTask(each);
-        if (includeConceptQuestions) questions.forEachTask(each);
-        if (includeConceptGoals) goals.forEachTask(each);
-        if (includeConceptQuests) quests.forEachTask(each);
+        if (includeConceptBeliefs && beliefs!=null) beliefs.forEachTask(each);
+        if (includeConceptQuestions && questions!=null) questions.forEachTask(each);
+        if (includeConceptGoals && goals!=null) goals.forEachTask(each);
+        if (includeConceptQuests && quests!=null) quests.forEachTask(each);
     }
 
     public void forEachTask(@NotNull Consumer<Task> each) {
-        beliefs.forEachTask(each);
-        questions.forEachTask(each);
-        goals.forEachTask(each);
-        quests.forEachTask(each);
+        if (beliefs!=null) beliefs.forEachTask(each);
+        if (questions!=null) questions.forEachTask(each);
+        if (goals!=null) goals.forEachTask(each);
+        if (quests!=null) quests.forEachTask(each);
     }
 
     @Override
-    public void delete(@NotNull NAR nar) {
+    public void delete( NAR nar) {
         termLinks.delete();
         taskLinks.delete();
         beliefs.clear();

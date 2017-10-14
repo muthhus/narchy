@@ -737,9 +737,9 @@ public interface Compound extends Term, IPair, TermContainer {
         if (remain-- <= 0)
             return Null;
 
-//        Termed ff = context.applyIfPossible(this);
-//        if (!ff.equals(this))
-//            return ff.term();
+        Termed ff = context.applyIfPossible(this);
+        if (!ff.equals(this))
+            return ff.term();
 
         /*if (subterms().hasAll(opBits))*/
 
@@ -749,12 +749,11 @@ public interface Compound extends Term, IPair, TermContainer {
 
         for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
             Term x = xy[i];
-            Term y = context.applyTermIfPossible(x);//x.evalSafe(context, remain);
+            Term y = x.evalSafe(context, remain);
+                    //context.applyTermIfPossible(x);
             if (y == null) {
                 //if a functor returns null, it means unmodified
             } else if (x != y) { //!x.equals(y)) { //(x != y) {
-                if (y instanceof Bool)
-                    return Null;
                 //the result comparing with the x
                 subsModified = true;
                 xy[i] = y;
@@ -769,16 +768,11 @@ public interface Compound extends Term, IPair, TermContainer {
             Term u = this;
 
 
-            Term possibleArgs = xy[0];
-            if (possibleArgs.op() == PROD) {
-
-                u = ((Functor) xy[1]).apply(possibleArgs.subterms());
-                if (u instanceof AbstractPred) {
-                    u = $.the(((AbstractPred) u).test(null));
-                } else if (u == null) {
-                    u = this; //null means to keep the same
-                }
-
+            u = ((Functor) xy[1]).apply(xy[0].subterms());
+            if (u instanceof AbstractPred) {
+                u = $.the(((AbstractPred) u).test(null));
+            } else if (u == null) {
+                u = this; //null means to keep the same
             }
 
 

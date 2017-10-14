@@ -797,7 +797,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 //begin at random offset to shuffle the order of the match sequence
                 int jj = u.random.nextInt();
                 int j = Math.abs(jj) % s;
-                boolean direction = (jj & 1) == 0;
+                boolean direction = (jj & (1<<15)) == 0;
                 for (int i = s - 1; ;) {
                     if (!sub(j).unify(Y.sub(j), u))
                         return false;

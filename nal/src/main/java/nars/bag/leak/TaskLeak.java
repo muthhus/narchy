@@ -28,10 +28,10 @@ public abstract class TaskLeak extends Causable {
 
     protected TaskLeak(int capacity, float ratePerDuration, @NotNull NAR n) {
         this(
-                new ConcurrentArrayBag<Task, PLink<Task>>(PriMerge.max, new ConcurrentHashMap(capacity), capacity) {
+                new ConcurrentArrayBag<>(PriMerge.max, capacity) {
                     @Nullable
                     @Override
-                    public Task key(@NotNull PLink<Task> t) {
+                    public Task key(PLink<Task> t) {
                         return t.get();
                     }
                 }, ratePerDuration, n

@@ -51,7 +51,7 @@ public class FZero extends NAgentX {
         this.fz = new FZeroGame();
 
         CameraSensor<Scale> c = senseCamera(id, new Scale(() -> fz.image,
-                24, 16)/*.blur()*/).resolution(0.1f);
+                32, 24)/*.blur()*/).resolution(0.05f);
 //        CameraSensor<Scale> c = senseCameraReduced(id, new Scale(() -> fz.image,
 //                128, 64), 8, 8, 2, 2).resolution(0.1f);
 
@@ -95,10 +95,10 @@ public class FZero extends NAgentX {
 //        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
         @NotNull ScalarConcepts ang = senseNumber($.the("ang"), () ->
                         (float) (0.5f + 0.5f * MathUtils.normalizeAngle(fz.playerAngle, 0) / (Math.PI)),
-                9,
+                5,
                 ScalarConcepts.Needle
                 //ScalarConcepts.Fluid
-        ).resolution(0.25f);
+        ).resolution(0.2f);
         window(
                 Vis.conceptBeliefPlots(this, ang, 16), 300, 300);
 

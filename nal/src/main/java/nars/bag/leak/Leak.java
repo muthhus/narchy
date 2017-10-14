@@ -21,12 +21,6 @@ public class Leak<X, Y> {
         this.bag = bag;
     }
 
-    /**
-     * minimum bag size allowed before leak
-     */
-    public int min() {
-        return 1;
-    }
 
     public void setCapacity(int capacity) {
         bag.setCapacity(capacity);

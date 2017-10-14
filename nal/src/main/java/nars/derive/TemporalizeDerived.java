@@ -1,6 +1,5 @@
 package nars.derive;
 
-import jcog.math.Interval;
 import nars.$;
 import nars.Op;
 import nars.Task;
@@ -230,10 +229,10 @@ public class TemporalizeDerived extends Temporalize {
             long ts = task.start();
             long k;
             if (!te && (belief != null && !belief.isEternal())) {
-                Revision.TemporalProximity tp = new Revision.TemporalProximity(ts, task.end(), belief.start(), belief.end());
-                occ[0] = tp.unionStart;
-                occ[1] = tp.unionEnd;
-                confGain[0] *= tp.factor;
+                Revision.TaskTimeJoint joint = new Revision.TaskTimeJoint(ts, task.end(), belief.start(), belief.end(), d.nar);
+                occ[0] = joint.unionStart;
+                occ[1] = joint.unionEnd;
+                confGain[0] *= joint.factor;
 
             } else if (te) {
                 //TODO maybe this should be 'now'

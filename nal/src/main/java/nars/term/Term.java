@@ -716,11 +716,7 @@ public interface Term extends Termed, Comparable<Termed> {
 
     /*@NotNull*/
     default Term evalSafe(TermContext context, int remain) {
-        Termed t = context.apply(this);
-        if (t != null)
-            return t.term();
-        else
-            return this;
+        return context.applyTermIfPossible(this);
     }
 
     /* collects any contained events */

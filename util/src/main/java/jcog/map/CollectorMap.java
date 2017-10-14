@@ -23,7 +23,7 @@ public abstract class CollectorMap<K, V> {
     }
 
     @Nullable
-    abstract public K key(@NotNull V v);
+    abstract public K key(V v);
 //
 //    @Override
 //    public String toString() {

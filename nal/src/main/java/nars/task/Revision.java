@@ -314,8 +314,8 @@ public class Revision {
 //                return null;
 
 
-        TemporalProximity temporalProximity = new TemporalProximity(as, a.end(), bs, b.end());
-        factor *= temporalProximity.factor;
+        TaskTimeJoint joint = new TaskTimeJoint(as, a.end(), bs, b.end(), nar);
+        factor *= joint.factor;
         if (factor < Prioritized.EPSILON) return null;
 
         int dur = nar.dur();
@@ -345,8 +345,8 @@ public class Revision {
 
         assert (a.punc() == b.punc());
 
-        long start = temporalProximity.unionStart;
-        long end = temporalProximity.unionEnd;
+        long start = joint.unionStart;
+        long end = joint.unionEnd;
 
         float aw = a.isQuestOrQuestion() ? 0 : a.conf(start, end, dur); //question
         float bw = b.conf(start, end, dur);
@@ -532,13 +532,13 @@ public class Revision {
         return d / depth;
     }
 
-    public static final class TemporalProximity {
+    public static final class TaskTimeJoint {
 
         public final float factor;
         public final long unionStart;
         public final long unionEnd;
 
-        public TemporalProximity(long as, long ae, long bs, long be) {
+        public TaskTimeJoint(long as, long ae, long bs, long be, NAR nar) {
             Interval ai = new Interval(as, ae);
             Interval bi = new Interval(bs, be);
 
@@ -551,9 +551,12 @@ public class Revision {
             int bl = (int) bi.length();
             int s = al + bl;
 
+            /** tolerance in cycles to ignore a separation in computing discount - allows smoothing over relatively imperceptible gaps */
+            int tolerance = nar.dur()/2;
+
             /** account for how much the merge stretches the truth beyond the range of the inputs */
             float factor = 1f;
-            long separation = u - s;
+            long separation = u - s - tolerance;
             if (separation > 0) {
                 int shortest = Math.min(al, bl);
                 if (separation < shortest) {

@@ -15,6 +15,7 @@ import nars.task.util.InvalidTaskException;
 import nars.task.util.TaskRegion;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Bool;
 import nars.time.Tense;
 import nars.truth.*;
 import org.eclipse.collections.api.tuple.Pair;
@@ -297,11 +298,13 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
         Op o = t.op();
 
-        boolean negated = false;
+        boolean negated;
         if (o == NEG) {
             t = t.unneg();
             o = t.op();
-            negated = !negated;
+            negated = true;
+        } else {
+            negated = false;
         }
 
         if (!o.conceptualizable) {
@@ -965,11 +968,14 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
 
         //invoke possible functor and apply aliases
-        {
+
             Term x = term();
             Term y = x.eval(n);
 
-            if (x!=y) { //instances could have been substituted and this matters
+            if (!x.equals(y)) { //x!=y) { //instances could have been substituted and this matters
+
+                if (y instanceof Bool)
+                    return null;
 
                 @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), !isInput() || !Param.DEBUG_EXTRA);
                 /* the evaluated result here acts as a memoization of possibly many results
@@ -977,26 +983,28 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                    it would be the only one.
                  */
                 Task result = yy != null ? clone(this, yy.getOne().negIf(yy.getTwo())) : null;
-                if (result == null)
-                    result = Operator.log(n.time(), $.p(x, y));
+                if (result == null) {
+                    //result = Operator.log(n.time(), $.p(x, y));
+                    return null;
+                }
 
                 return result.run(n);
             }
-        }
+
 
         //invoke possible Operation
         boolean cmd = isCommand();
-        if (cmd || (isGoal() && !isEternal())) {
-            Pair<Operator, Term> o = Op.functor(term(), (i) -> {
+        if (y!=null && cmd || (isGoal() && !isEternal())) {
+            Pair<Operator, Term> o = Op.functor(y /* in case of some instance substutition */, (i) -> {
                 Concept operation = n.concept(i);
                 return operation instanceof Operator ? (Operator) operation : null;
             });
             if (o != null) {
                 try {
                     //TODO add a pre-test guard here to avoid executing a task which will be inconsequential anyway
-                    Task y = o.getOne().execute.apply(this, n);
-                    if (y != null && !this.equals(y)) {
-                        return singleton(y);
+                    Task yy = o.getOne().execute.apply(this, n);
+                    if (yy != null && !this.equals(yy)) {
+                        return singleton(yy);
                     }
                 } catch (Throwable t) {
                     //n.logger.error("{} {}", this, t);
@@ -1011,7 +1019,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         }
 
         if (!cmd) {
-            Concept c = concept(n, true);
+            Concept c = n.concept(y, true);
             if (c != null) {
 
                 n.emotion.busy(priElseZero(), this.volume());

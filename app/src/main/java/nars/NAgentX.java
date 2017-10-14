@@ -15,6 +15,7 @@ import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
+import nars.op.data.reflect;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
@@ -153,7 +154,10 @@ abstract public class NAgentX extends NAgent {
         clock.durFPS(durFPS);
 
         Function<NAR, PrediTerm<Derivation>> deriver = nars.control.Deriver.getDefault(8
-                , "motivation.nal", "relation_introduction.nal");
+                , "motivation.nal"
+                //., "relation_introduction.nal"
+        );
+
 
         int THREADS = 5;
 
@@ -189,7 +193,7 @@ abstract public class NAgentX extends NAgent {
 
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
-        n.termVolumeMax.setValue(32);
+        n.termVolumeMax.setValue(28);
 
         n.beliefConfidence(0.9f);
         n.goalConfidence(0.9f);
@@ -221,8 +225,8 @@ abstract public class NAgentX extends NAgent {
 //        ), 800, 600);
 
 
-        ConjClustering conjClusterB = new ConjClustering(n, 5, BELIEF, true, 16, 64);
-        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, true, 16, 64);
+        ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, true, 32, 128);
+        ConjClustering conjClusterG = new ConjClustering(n, 2, GOAL, true, 16, 64);
 
 //        n.runLater(() -> {
 ////            AudioContext ac = new AudioContext();
@@ -234,11 +238,11 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-        Abbreviation abb = new Abbreviation(n, "z", 3, 10, 0.01f, 64);
+        Abbreviation abb = new Abbreviation(n, "z", 3, 12, 10f, 32);
 
-        Inperience inp = new Inperience(n, 16);
+        Inperience inp = new Inperience(n, 32);
 //
-//        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(16, n);
+        reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(16, n);
         //reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(16, n);
 
 
