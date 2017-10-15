@@ -83,9 +83,9 @@ public abstract class Param extends Services<Term,NAR> {
    /** budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links) */
     public static final FloatFloatToFloatFunction termTaskLinkToPremise =
             //Util::or;
-            //Util::and;
+            Util::and;
             //UtilityFunctions::aveGeo;
-            UtilityFunctions::aveAri;
+            //UtilityFunctions::aveAri;
             //Math::min;
             //Math::max;
 

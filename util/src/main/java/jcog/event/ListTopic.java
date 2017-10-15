@@ -43,7 +43,7 @@ public class ListTopic<V> extends FasterList<Consumer<V>> implements Topic<V> {
 
     private final void commit() {
         this.copy = (size == 0) ? EMPTY :
-                                  toArray(new Consumer[size]);
+                                  toArrayRecycled(Consumer[]::new);
     }
 
     private static final Consumer[] EMPTY = new Consumer[0];

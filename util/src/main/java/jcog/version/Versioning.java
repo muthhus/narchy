@@ -62,7 +62,7 @@ public class Versioning<X> extends
     }
 
     @Override
-    public final boolean add(@NotNull Versioned<X> newItem) {
+    public final boolean add(/*@NotNull*/ Versioned<X> newItem) {
         Versioned<X>[] ii = this.items;
         if (ii.length > this.size) {
             ii[this.size++] = newItem; //cap

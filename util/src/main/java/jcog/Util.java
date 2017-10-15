@@ -27,7 +27,9 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import jcog.bit.MetalBitSet;
 import jcog.io.BinTxt;
+import jcog.list.FasterList;
 import jcog.math.NumberException;
 import jcog.math.OneDHaar;
 import jcog.pri.Pri;
@@ -47,7 +49,6 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -1329,6 +1330,31 @@ public enum Util {
         }
         return true;
     }
+
+    public static <X> Collection<X> select(int sampled, Random random, X[] x) {
+        int choices = x.length;
+        sampled = Math.min(choices, sampled);
+        if (sampled == 0) return Collections.emptyList();
+        if (sampled == choices) {
+            return List.of(x);
+        } else {
+            //TODO better selection method
+
+            List<X> l = new FasterList(sampled);
+            MetalBitSet b = new MetalBitSet(choices);
+            int limit = sampled * 4;
+            int c = 0;
+            for (int i = 0; c < sampled && i < limit; i++) {
+                int w = random.nextInt(choices); //<- TODO weighted roullette selection here
+                if (!b.getAndSet(w, true)) {
+                    l.add(x[w]);
+                    c++;
+                }
+            }
+            return l;
+        }
+    }
+
     public static enum RouletteControl {
         STOP, CONTINUE, WEIGHTS_CHANGED
     }

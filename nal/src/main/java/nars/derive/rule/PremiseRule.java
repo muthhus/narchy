@@ -140,7 +140,7 @@ public class PremiseRule extends GenericCompound {
             args.add(UNPROJ);
         }
 
-        Compound ii = (Compound) $.func("truth", args.toArray(Term[]::new));
+        Compound ii = (Compound) $.func("truth", args.toArrayRecycled(Term[]::new));
 
 
         Solve truth = (puncOverride == 0) ?

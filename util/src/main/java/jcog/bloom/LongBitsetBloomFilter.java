@@ -15,7 +15,7 @@
  */
 package jcog.bloom;
 
-import jcog.bit.LongArrayBitset;
+import jcog.bit.MetalBitSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ import java.util.function.Function;
  */
 public class LongBitsetBloomFilter {
     private static final double DEFAULT_FPP = 0.05;
-    private LongArrayBitset bitSet;
+    private MetalBitSet bitSet;
     private final int m;
     private final int k;
     private final double fpp;
@@ -62,7 +62,7 @@ public class LongBitsetBloomFilter {
         n = maxNumEntries;
         m = optimalNumOfBits(maxNumEntries, fpp);
         k = optimalNumOfHashFunctions(maxNumEntries, m);
-        bitSet = new LongArrayBitset(m);
+        bitSet = new MetalBitSet(m);
     }
 
     // deserialize bloomfilter. see serialize() for the format.
@@ -73,7 +73,7 @@ public class LongBitsetBloomFilter {
         for (int i = 0; i < bitSet.size(); i++) {
             data[i] = bitSet.get(i);
         }
-        this.bitSet = new LongArrayBitset(data);
+        this.bitSet = new MetalBitSet(data);
     }
 
     public void clear() {
@@ -103,7 +103,7 @@ public class LongBitsetBloomFilter {
 
         int k = this.k;
         int m = this.m;
-        LongArrayBitset bits = bitSet;
+        MetalBitSet bits = bitSet;
 
         for (int i = 1; i <= k; i++) {
             int combinedHash = combineHash(hash1, hash2, i);
@@ -136,7 +136,7 @@ public class LongBitsetBloomFilter {
 
         int k = this.k;
         int m = this.m;
-        LongArrayBitset bits = bitSet;
+        MetalBitSet bits = bitSet;
 
         for (int i = 1; i <= k; i++) {
             int combinedHash = combineHash(hash1, hash2, i);

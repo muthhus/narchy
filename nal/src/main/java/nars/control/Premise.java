@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -77,7 +78,7 @@ public class Premise extends UnaryTask {
      * returns ttl used, -1 if failed before starting
      */
     @Override
-    public @Nullable Iterable<? extends ITask> run(@NotNull NAR n) {
+    public @Nullable Iterable<? extends ITask> run(NAR n) {
 
 
 
@@ -410,11 +411,11 @@ public class Premise extends UnaryTask {
 
         if (!(target instanceof Set)) {
             Set<Concept> merge =
-                    //new HashSet(target.size() + add.size());
-                    Collections.newSetFromMap(new ConcurrentHashMap<>(target.size() + add.size()));
-            this.links = merge;
+                    new HashSet(target.size() + add.size());
+                    //Collections.newSetFromMap(new ConcurrentHashMap<>(target.size() + add.size()));
             merge.addAll(target);
             merge.addAll(add);
+            this.links = merge;
         } else {
             target.addAll(add);
         }

@@ -129,7 +129,7 @@ public class FasterList<X> extends FastList<X> {
 //    }
 
     @Override
-    public int indexOf(@NotNull Object object) {
+    public int indexOf(/*@NotNull*/ Object object) {
         //return InternalArrayIterate.indexOf(this.items, this.size, object);
         int s = size;
         X[] items = this.items;
@@ -286,12 +286,9 @@ public class FasterList<X> extends FastList<X> {
         return false;
     }
 
+    /** try to use toArrayRecycled where possible */
     public X[] toArray(IntFunction<X[]> arrayBuilder) {
-//HACK broken return the internal array if of the necessary size, otherwise returns a new array of precise size
-//        X[] current = this.array();
-//        if (size() == current.length)
-//            return current;
-        return fillArray(arrayBuilder.apply(size()));
+        return fillArray(arrayBuilder.apply(size));
     }
 
 
@@ -361,7 +358,7 @@ public class FasterList<X> extends FastList<X> {
     /**
      * remove, but with Map.remove semantics
      */
-    public X removed(@NotNull X object) {
+    public X removed(/*@NotNull*/ X object) {
         int index = this.indexOf(object);
         if (index >= 0) {
             X r = get(index);
@@ -468,10 +465,16 @@ public class FasterList<X> extends FastList<X> {
         this.items[this.size++] = x;
     }
 
+    @Override
+    @Deprecated /* try to use toArrayRecycled where possible */
+    public <E> E[] toArray(E[] array) {
+        return super.toArray(array);
+    }
+
     public X[] toArrayRecycled(IntFunction<X[]> ii) {
         X[] a = array();
         int s = size;
-        if (s == a.length)
+        if (s == a.length && a.getClass() != Object[].class)
             return a;
         else
             return toArray(ii);

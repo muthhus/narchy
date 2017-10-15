@@ -87,7 +87,7 @@ public final class PrediTrie {
         PrediTrie t = new PrediTrie(r);
         return AndCondition.the(
                 PrediTrie.compile(t.pre, each),
-                new Try(t.postChoices.toArray(ValueFork[]::new)));
+                new Try(t.postChoices.toArrayRecycled(ValueFork[]::new)));
 
     }
 

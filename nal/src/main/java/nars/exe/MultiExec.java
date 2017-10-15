@@ -37,14 +37,14 @@ public class MultiExec extends Exec {
     final Sub[] sub;
     private final int num;
 
-    final static int SUB_CAPACITY = 1024;
+    final static int SUB_CAPACITY = 256;
 
 
     @Deprecated
     final SharedCan deriver = new SharedCan();
 
     public MultiExec(int threads) {
-        this(threads, threads * 16);
+        this(threads, threads * 64);
     }
 
     public MultiExec(int threads, int qSize) {
@@ -82,7 +82,7 @@ public class MultiExec extends Exec {
 
         @Override
         public void add(ITask t) {
-            throw new UnsupportedOperationException("called?");
+            MultiExec.this.add(t); //to master
         }
 
         @Override
@@ -177,32 +177,21 @@ public class MultiExec extends Exec {
             return super.done(x);
         }
 
-        protected void execute(ITask x) {
-            Iterable<? extends ITask> y;
-            try {
-                y = x.run(nar);
-                if (y != null)
-                    y.forEach(MultiExec.this::add);
-            } catch (Throwable t) {
-                logger.error("{} {}", x, t);
-                return;
-            }
 
-        }
     }
 
     @Override
     public void add(ITask t) {
-        if (t instanceof Task) {
+        if (t instanceof Activate) {
+            sub[which(t)].plan.putAsync(t);
+        } else if (t instanceof Task) {
 
-            Iterable<? extends ITask> y = t.run(nar);
-            if (y != null)
-                y.forEach(q::add);
+            execute(t);
 
-        } else if (t instanceof NativeTask) {
-            q.add(t);
-        } else {
-            sub[which(t)].plan.putAsync((t));
+        } else  {
+            if (!q.offer(t)) {
+                execute(t); //in same thread, dangerous could deadlock
+            }
         }
     }
 

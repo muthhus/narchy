@@ -135,7 +135,9 @@ public abstract class NativeTask implements ITask {
 
         @Override
         public @Nullable Iterable<? extends ITask> run(NAR n) {
-            Util.pause(ms);
+            /** min executor load to allow sleeping */
+            if (n.exe.load() < 1f-1f/(1+n.exe.concurrency()))
+                Util.pause(ms);
             return null;
         }
     }

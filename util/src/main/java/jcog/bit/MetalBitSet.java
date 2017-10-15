@@ -7,10 +7,11 @@ import java.util.Arrays;
  * implementation does not check for index bounds nor expand the bitset size if
  * the specified index is greater than the size.
  */
-public class LongArrayBitset {
+public class MetalBitSet {
+
 	final long[] data;
 
-	public LongArrayBitset(long bits) {
+	public MetalBitSet(long bits) {
 		this(new long[(int) Math.ceil((double) bits / Long.SIZE)]);
 	}
 
@@ -19,7 +20,7 @@ public class LongArrayBitset {
 	 * 
 	 * @param data
 	 */
-	public LongArrayBitset(long[] data) {
+	public MetalBitSet(long[] data) {
         assert data.length > 0;
         this.data = data;
     }
@@ -35,6 +36,22 @@ public class LongArrayBitset {
 	 */
 	public void set(long index) {
 		data[(int) (index >>> 6)] |= (1L << index);
+	}
+
+	public boolean getAndSet(int index, boolean next) {
+		int i = (int) (index >>> 6);
+		int j = (int) (1L << index);
+		long[] d = this.data;
+		boolean prev = (d[i] & j) != 0;
+		if (prev!=next) {
+			if (next) {
+				d[i] |= j;
+			} else {
+				//clear
+				d[i] &= ~j;
+			}
+		}
+		return prev;
 	}
 
 	/**
@@ -61,11 +78,13 @@ public class LongArrayBitset {
 	/**
 	 * Combines the two BitArrays using bitwise OR.
 	 */
-	public void putAll(LongArrayBitset array) {
+	public void putAll(MetalBitSet array) {
         assert data.length == array.data.length :
                 "BitArrays must be of equal length (" + data.length + "!= " + array.data.length + ')';
         for (int i = 0; i < data.length; i++) {
             data[i] |= array.data[i];
         }
     }
+
+
 }

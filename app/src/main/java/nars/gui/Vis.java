@@ -9,7 +9,6 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.Concept;
-import nars.exe.FocusExec;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.term.Term;

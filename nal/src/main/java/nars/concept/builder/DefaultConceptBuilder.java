@@ -46,8 +46,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
         this(
-                new DefaultConceptState("sleep", 64, 64, 8, 32, 24),
-                new DefaultConceptState("awake", 64, 64, 8, 32, 24)
+                new DefaultConceptState("sleep", 64, 64, 8),
+                new DefaultConceptState("awake", 64, 64, 8)
         );
     }
 
@@ -111,7 +111,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
                         if (validUnwrappableSubterms(subj.subterms())) {
                             int s = subj.subs();
-                            FasterList<Term> lx = new FasterList(s);
+                            FasterList<Term> lx = new FasterList(0, new Term[s]);
                             if (subj instanceof Int.IntRange || so == PROD && subj.hasAny(INT)) {
                                 Int.unroll(subj).forEachRemaining(dsi -> lx.add(INH.the(dsi, pred)));
                             }
@@ -133,7 +133,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
 
                             if (lx.size() > 1 && validUnwrappableSubterms(lx)) {
-                                Term[] x = lx.toArray(Term[]::new);
+                                Term[] x = lx.toArrayRecycled(Term[]::new);
                                 switch (so) {
                                     case INT:
                                     case PROD:
@@ -383,7 +383,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @NotNull
     public Map newBagMap(int volume) {
         //int defaultInitialCap = 0;
-        float loadFactor = 0.9f;
+        float loadFactor = 0.75f;
 
         if (concurrent()) {
 //            //return new ConcurrentHashMap(defaultInitialCap, 1f);

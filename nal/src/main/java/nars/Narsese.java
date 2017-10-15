@@ -976,7 +976,7 @@ public class Narsese extends BaseParser<Object> {
 
         Op[] opp = new Op[1];
         opp[0] = op;
-        List<Term> vectorterms = popTerms(opp);
+        FasterList<Term> vectorterms = popTerms(opp);
         op = opp[0];
 
         if (op == null)
@@ -985,7 +985,7 @@ public class Narsese extends BaseParser<Object> {
         return op.the(DTERNAL, vectorterms);
     }
 
-    List<Term> popTerms(Op[] op /* hint */) {
+    FasterList<Term> popTerms(Op[] op /* hint */) {
 
         FasterList tt = new FasterList(1);
 
