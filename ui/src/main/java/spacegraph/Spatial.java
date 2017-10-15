@@ -20,6 +20,7 @@ public abstract class Spatial<X> implements Active {
 
     public final X key;
     public final int hash;
+    public boolean preactive;
 
 
     /**
@@ -27,7 +28,7 @@ public abstract class Spatial<X> implements Active {
      * order = -1: inactive
      * order > =0: live
      */
-    transient public short order;
+    public short order;
 
 
 
@@ -63,7 +64,6 @@ public abstract class Spatial<X> implements Active {
     }
 
 
-    public boolean preactive;
 
 
 
@@ -81,9 +81,8 @@ public abstract class Spatial<X> implements Active {
 
     @Override
     public boolean active() {
-        return order >= 0;
+        return order >= 0 || preactive;
     }
-
 
     @Override
     public void preActivate(boolean b) {
@@ -107,15 +106,7 @@ public abstract class Spatial<X> implements Active {
         return false;
     }
 
-    /** schedules this node for removal from the engine, where it will call stop(s) to complete the removal */
-    @Override public void hide() {
-        order = -1;
-        preactive = false;
-    }
 
-    public boolean hidden() {
-        return (order < 0 || !preactive);
-    }
 
     //abstract public Iterable<Collidable> bodies();
     abstract public void forEachBody(Consumer<Collidable> c);
@@ -127,8 +118,8 @@ public abstract class Spatial<X> implements Active {
     public abstract void renderRelative(GL2 gl, Collidable body);
 
     public void delete(Dynamics dyn) {
-
-        hide();
+        order = -1;
+        preactive = false;
     }
 
     public void stabilize(v3 boundsMin, v3 boundsMax) {

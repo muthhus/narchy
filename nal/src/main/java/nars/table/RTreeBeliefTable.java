@@ -12,6 +12,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
+import nars.concept.Concept;
 import nars.control.Activate;
 import nars.task.NALTask;
 import nars.task.Revision;
@@ -21,7 +22,6 @@ import nars.task.util.TaskRegion;
 import nars.task.util.TaskRegionLink;
 import nars.task.util.TimeRange;
 import nars.term.Term;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -32,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -324,7 +324,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     @Override
-    public void add(@NotNull Task x, BaseConcept c, NAR n) {
+    public void add(Task x, BaseConcept c, NAR n) {
 
 
 //        if (x instanceof SignalTask && ((SignalTask) x).stretchKey != null)
@@ -377,9 +377,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         } else {
 
             Object ar = x.lastLogged();
-            if (ar instanceof Consumer) {
+            if (ar instanceof BiConsumer) {
                 x.log().remove(ar);
-                ((Consumer) ar).accept(n);
+                ((BiConsumer) ar).accept(n, c);
             }
 
         }
@@ -758,8 +758,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
             if (activationApplied >= Prioritized.EPSILON) {
-                i.log((Consumer<NAR>) (nar) -> {
-                    Activate.activate(e, activationApplied, nar);
+                i.log((BiConsumer<NAR,Concept>) (nar, c) -> {
+                    Activate.activate(e, activationApplied, nar, c);
                 }); //store here so callee can activate outside of the lock
             }
         }

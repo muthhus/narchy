@@ -8,6 +8,7 @@ import nars.control.Activate;
 import nars.control.DurService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.SpaceGraph;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,20 +18,22 @@ public class DynamicConceptSpace extends TermSpace {
     final Bagregate<Activate> bag;
 
     private final List next;
-    final float bagUpdateRate = 0.25f;
-    private final DurService on;
+    final float bagUpdateRate = 0.5f;
+    private final int maxNodes;
+    private DurService on;
 
 
     private ConceptWidget.TermVis vis = ConceptWidget.visDefault;
 
-    public DynamicConceptSpace(NAR nar, @Nullable Iterable<Activate> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+    public DynamicConceptSpace(NAR nar, @Nullable Iterable<Activate> concepts, int maxNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         super(nar, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
 
+        this.maxNodes = maxNodes;
 
         if (concepts == null)
             concepts = (Iterable) this;
 
-        bag = new Bagregate<Activate>(concepts, maxNodes + bufferedNodes, bagUpdateRate) {
+        bag = new Bagregate<Activate>(concepts, maxNodes , bagUpdateRate) {
             @Override
             protected boolean include(Activate x) {
                 return DynamicConceptSpace.this.include(x.id.term());
@@ -42,12 +45,18 @@ public class DynamicConceptSpace extends TermSpace {
             }
 
             @Override
-            public void onRemove(@NotNull PriReference<Activate> value) {
+            public void onRemove(PriReference<Activate> value) {
                 removeNode(value.get());
             }
         };
 
         next = $.newArrayList();
+
+    }
+
+    @Override
+    public void start(SpaceGraph space) {
+        super.start(space);
         on = DurService.build(nar, () -> {
             bag.update();
             next.clear();
@@ -62,6 +71,13 @@ public class DynamicConceptSpace extends TermSpace {
         });
     }
 
+    @Override
+    public synchronized void stop() {
+        on.stop();
+        on = null;
+        super.stop();
+    }
+
     protected ConceptWidget conceptWidgetActivation(PriReference<Activate> clink) {
         Activate c = clink.get();
         if (c != null) {
@@ -69,9 +85,9 @@ public class DynamicConceptSpace extends TermSpace {
             ConceptWidget cw = space.getOrAdd(c.id.term(), ConceptWidget.nodeBuilder);
             cw.concept = c.id;
 
-                cw.activate();
-                //cw.pri = clink.priElseZero();
-                return cw;
+
+            //cw.pri = clink.priElseZero();
+            return cw;
 
         }
         return null;
@@ -92,12 +108,14 @@ public class DynamicConceptSpace extends TermSpace {
     }
 
 
-    /** HACK */
+    /**
+     * HACK
+     */
     protected void update() {
         for (int i = 0, activeSize = active.size(); i < activeSize; i++) {
             TermWidget a = active.get(i);
             if (a instanceof ConceptWidget) {
-                ((ConceptWidget)a).commit(vis, this);
+                ((ConceptWidget) a).commit(vis, this);
             }
         }
     }

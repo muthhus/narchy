@@ -242,7 +242,7 @@ abstract public class NAgentX extends NAgent {
         Inperience inp = new Inperience(n, 32);
 //
 
-        Abbreviation abb = new Abbreviation(n, "z", 3, 6, 10f, 32);
+//        Abbreviation abb = new Abbreviation(n, "z", 3, 6, 10f, 32);
 
         //reflect.ReflectSimilarToTaskTerm refSim = new reflect.ReflectSimilarToTaskTerm(16, n);
         //reflect.ReflectClonedTask refTask = new reflect.ReflectClonedTask(16, n);
@@ -640,7 +640,7 @@ abstract public class NAgentX extends NAgent {
                     new WindowButton("concept graph", () -> {
                         SpaceGraph s = new SpaceGraph<>(
                                 new SimpleConceptGraph1(nar,
-                                        64, 128, 1, 6)
+                                        128, 196, 16, 16)
                         );
                         EdgeDirected fd = new EdgeDirected();
                         s.dyn.addBroadConstraint(fd);

@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.BELIEF;
-import static nars.control.Activate.activateSubterms;
+import static nars.control.Activate.taskActivate;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -112,7 +112,7 @@ public class Premise extends UnaryTask {
         if (l != null) {
             links = null;
 
-            activateSubterms(this.taskLink, l,
+            taskActivate(this.taskLink, l,
                     1f
                     /*decayed*/);
         }

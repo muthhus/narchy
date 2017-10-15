@@ -39,6 +39,8 @@ abstract public class Exec implements Executor, PriMerge {
 
     private On onClear;
 
+    /** overload tripping calibration */
+    final static float SAFETY_LOAD_THRESHOLD = 0.95f;
 
     /** schedules the task for execution but makes no guarantee it will ever actually execute */
     abstract public void add(/*@NotNull*/ ITask input);
@@ -127,9 +129,13 @@ abstract public class Exec implements Executor, PriMerge {
 
         double defaultCycleTime = 1.0; //sec
 
+        if (nar.exe.load() > SAFETY_LOAD_THRESHOLD)
+            return;
+
         double nextCycleTime = Math.max(1, nar.exe.concurrency() - 1) * (
                 nar.loop.isRunning() ? nar.loop.periodMS.intValue() * 0.001 : defaultCycleTime
-        ) * (1f - nar.exe.load());
+        );
+        // * (1f - nar.exe.load());
 
         try {
             sched.solve(can, nextCycleTime);

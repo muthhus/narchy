@@ -1,5 +1,6 @@
 package jcog.pri.op;
 
+import jcog.Util;
 import jcog.pri.Priority;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.Nullable;
@@ -14,10 +15,10 @@ public class PriForget<P extends Priority> implements Consumer<P> {
 
     public static final float FORGET_TEMPERATURE_DEFAULT = 0.5f;
 
-    public final float priFactor;
+    public final float priRemoved;
 
-    public PriForget(float priFactor) {
-        this.priFactor = priFactor;
+    public PriForget(float priRemoved) {
+        this.priRemoved = priRemoved;
     }
 
 
@@ -38,19 +39,24 @@ public class PriForget<P extends Priority> implements Consumer<P> {
 
         if ((s > 0) && (pressure > 0) && (c > 0) && temperature > 0) {
 
-            float priFactor =
-                    Math.max(0, 1f - Math.min(1f,
-                            temperature * (pressure)/(c+(c-s /* free space */)))
-                    );
-            if (priFactor < 1 - 2 * priEpsilon)
-                 return f.valueOf(priFactor);
+            float eachForget = (temperature * pressure)/c;
+
+            if (eachForget > priEpsilon)
+                return f.valueOf(Math.min(0.5f /*max removed */, eachForget));
+
         }
         return null;
     }
 
     @Override
     public void accept(P b) {
-        b.priMult(priFactor);
+
+        b.priSub(priRemoved);
+
+//        float bp = b.pri();
+//        if (bp==bp)
+//            b.setPri(bp * (1f - ((1f - bp) * (1f - priFactor))) );
+
         //b.priSub(avgToBeRemoved);
 
 //        b.priSub(avgToBeRemoved

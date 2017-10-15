@@ -16,6 +16,6 @@ public interface Active {
 
     boolean active();
 
-    void hide();
+
 
 }

@@ -20,6 +20,8 @@ import spacegraph.widget.meta.ReflectionSurface;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -61,7 +63,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         atoms = new MRUCache<>(MAX_ATOMS) {
             @Override
             protected void onEvict(Map.Entry<X, Spatial<X>> entry) {
-                entry.getValue().delete(dyn);
+                SpaceGraph.this.remove(entry.getValue());
             }
         };
 //        Cache<X, Spatial<X>> atoms =
@@ -149,13 +151,18 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             y.activate();
         return (Y) y;
     }
+
+    final Queue<Spatial> toRemove = new ConcurrentLinkedQueue();
+
     public void remove(X x) {
-        @NotNull Spatial<X> y = get(x);
+        Spatial<X> y = atoms.remove(x);
         if (y!=null) {
-            y.hide();
-            //atoms.invalidate(x);
-            atoms.remove(x);
+            remove(y);
         }
+    }
+
+    public void remove(Spatial<X> y) {
+            toRemove.add(y);
     }
 
 
@@ -219,12 +226,13 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     @Override
     protected void update() {
 
+        toRemove.forEach(x -> x.delete(dyn));
+
         this.inputs.forEach(this::update);
 
         super.update();
 
         frameListeners.forEach(f -> f.accept(this));
-
     }
 
     protected void renderHUD() {
@@ -253,6 +261,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         s.update(this);
 
     }
+
     public String summary() {
         return this.atoms.size() + " cached; " + "\t" + dyn.summary();
     }

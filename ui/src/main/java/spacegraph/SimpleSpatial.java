@@ -62,11 +62,18 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
         super.delete(dyn);
 
-        if (body!=null) {
-            body.destroy(dyn);
-            body = null;
+        synchronized(key) {
+            if (body != null) {
+                body.destroy(dyn);
+                body = null;
+            }
         }
 
+    }
+
+    @Override
+    public boolean active() {
+        return body!=null && super.active();
     }
 
     protected String label(X x) {

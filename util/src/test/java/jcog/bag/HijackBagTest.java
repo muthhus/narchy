@@ -18,7 +18,7 @@ import static jcog.pri.op.PriMerge.plus;
 import static org.junit.Assert.*;
 
 /**
- * Created by me on 2/9/17.
+ * TODO test packing efficiency (lack of sparsity)
  */
 public class HijackBagTest {
 

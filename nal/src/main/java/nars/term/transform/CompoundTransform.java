@@ -64,6 +64,9 @@ public interface CompoundTransform extends TermContext {
 
             Term yi = xi.transform(this);
 
+            if (yi == null)
+                return null;
+
             if (yi instanceof EllipsisMatch) {
                 EllipsisMatch xx = (EllipsisMatch) yi;
                 int xxs = xx.subs();

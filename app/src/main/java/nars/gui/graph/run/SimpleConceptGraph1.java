@@ -30,7 +30,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
     }
 
     public SimpleConceptGraph1(NAR nar, @NotNull Iterable<Activate> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
-        super(nar, concepts, maxNodes, bufferedNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
+        super(nar, concepts, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
     }
 
     @Override
@@ -59,9 +59,11 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        Param.DEBUG = true;
         //Param.TRACE = true;
         NAR n = NARS.threadSafe();
-        //n.DEFAULT_BELIEF_PRIORITY = 0.1f;
-        //n.DEFAULT_QUESTION_PRIORITY = 0.1f;
-        float fps = 1f;
+        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.5f;
+        n.DEFAULT_GOAL_PRIORITY= 0.5f;
+        n.DEFAULT_QUEST_PRIORITY = 0.5f;
+        float fps = 5f;
 
         //csvPriority(n, "/tmp/x.csv");
 
@@ -152,7 +154,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         //n.run(600);
         n.log();
         n.input(
-                "(a-->b).", "(b-->c).","(c-->d)."
+                "(a-->b).", "(b-->c).","(c-->d).","(a &&+1 b). :|:"
 
                 //"$.50 at(SELF,{t001}). :|: %1.0;.90%", "$.70 (at(SELF,{t001}) &&+5 open({t001}))! %1.0;.90%" // //goal_ded_2
         );

@@ -203,8 +203,8 @@
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 
-    (U --> L), ((&&,(#X --> L),(#X --> R),A..*) ==> Z) |- substitute((((&&,A..*) &&+- (U --> R)) ==>+- Z),#X,U), (Belief:Deduction)
-        (U --> L), ((&&,--(#X --> L),(#X --> R),A..*) ==> Z) |- substitute((((&&,A..*) &&+- (U --> R)) ==>+- Z),#X,U), (Belief:DeductionN)
+    (U --> L), ((&&,(#X --> L),(#X --> R),A..*) ==> Z), neq(U,R) |- substitute((((&&,A..*) &&+- (U --> R)) ==>+- Z),#X,U), (Belief:Deduction)
+        (U --> L), ((&&,--(#X --> L),(#X --> R),A..*) ==> Z), neq(U,R) |- substitute((((&&,A..*) &&+- (U --> R)) ==>+- Z),#X,U), (Belief:DeductionN)
 
 
 

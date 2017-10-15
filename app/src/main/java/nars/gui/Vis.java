@@ -225,7 +225,7 @@ public class Vis {
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
                 ((FocusExec)n.exe).concepts //TODO generalize
-                /* TODO */, 128, 256, 2, 7);
+                /* TODO */, 128, 256, 16, 16);
 
 
         SpaceGraph<Term> s = new SpaceGraph(

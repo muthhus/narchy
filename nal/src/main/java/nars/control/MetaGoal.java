@@ -92,7 +92,7 @@ public enum MetaGoal {
                 v += goal[j] * cg[j].current;
             }
 
-            final float momentum = 0.5f;
+            final float momentum = 0.9f;
             c.setValue(Util.lerp(momentum, v, c.value()));
 
             //TODO

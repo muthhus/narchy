@@ -33,7 +33,7 @@ public abstract class Param extends Services<Term,NAR> {
 
 
     /** must be big enough to support as many layers of compound terms as exist in an eval */
-    public static final int MAX_EVAL_RECURSION = 64;
+    public static final int MAX_EVAL_RECURSION = 32;
 
     /** rate that integers in integer-containing termlink compounds will be dynamically mutated on activation */
     public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.25f;
@@ -70,26 +70,25 @@ public abstract class Param extends Services<Term,NAR> {
 
 
     public static final PriMerge termlinkMerge =
-            PriMerge.max;
-            //PriMerge.plus;
+            //PriMerge.max;
+            PriMerge.plus;
 
     public static final PriMerge tasklinkMerge =
             PriMerge.max;
             //PriMerge.plus; //not safe to plus without enough headroom
 
-    /** for pending tasks to be processed */
-    public static final PriMerge taskMerge = PriMerge.max;
 
     public static final PriMerge activateMerge = PriMerge.plus;
-    public static final PriMerge premiseMerge = PriMerge.plus;
+    public static final PriMerge premiseMerge = PriMerge.max;
+    public static final PriMerge taskMerge = PriMerge.max;
 
 
     /** budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links) */
     public static final FloatFloatToFloatFunction linksToPremise =
             //UtilityFunctions::aveGeo;
             //UtilityFunctions::aveAri;
-            Util::or;
-            //Util::and;
+            //Util::or;
+            Util::and;
             //Math::min;
             //Math::max;
 
@@ -342,7 +341,7 @@ public abstract class Param extends Services<Term,NAR> {
      * values of 0 means all budget is transferred to subterms,
      * values of 1 means no budget is transferred
      */
-    public final FloatParam momentum = new FloatParam(0.01f, 0, 1f);
+    public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
 
     /**
      * dt > 0

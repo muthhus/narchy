@@ -58,16 +58,15 @@ public abstract class NARSpace<X extends Termed, Y extends Spatial<X>> extends L
     }
 
     @Override
-    public final void stop() {
+    public synchronized void stop() {
         super.stop();
-        if (on!=null) {
-            active.forEach(Active::hide);
+        //if (on!=null) {
+            space.dyn.removeAnimation(this);
+            active.forEach(space::remove);
             active.clear();
             on.off();
-            space.dyn.removeAnimation(this);
-
             on = null;
-        }
+        //}
     }
 
     public final boolean running() {
@@ -82,6 +81,7 @@ public abstract class NARSpace<X extends Termed, Y extends Spatial<X>> extends L
         space.dyn.addAnimation(this);
         //on = nar.onCycle(nn -> updateIfNotBusy(this::update));
     }
+
 
 
     /** swap buffers */

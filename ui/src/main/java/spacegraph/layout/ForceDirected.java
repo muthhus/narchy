@@ -69,7 +69,11 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         if (n == 0)
             return;
 
-        objects.forEach(c -> ((Spatial)c.data()).stabilize(boundsMin, boundsMax));
+        objects.forEach(c -> {
+            Spatial x = ((Spatial) c.data());
+            if (x!=null)
+                x.stabilize(boundsMin, boundsMax);
+        });
 
         //System.out.print("Force direct " + objects.size() + ": ");
         //final int[] count = {0};
@@ -148,7 +152,12 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     private static void repel(Collidable x, Collidable y, float speed, float maxDist) {
         SimpleSpatial xp = ((SimpleSpatial) x.data());
+        if (xp == null)
+            return;
         SimpleSpatial yp = ((SimpleSpatial) y.data());
+        if (yp == null)
+            return;
+
 
         v3 delta = v();
         delta.sub(xp.transform(), yp.transform());

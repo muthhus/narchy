@@ -96,15 +96,16 @@ public class EllipsisMatch extends GenericCompound implements Ellipsislike {
 
     }
 
-    public static Term match(@NotNull SortedSet<Term> term) {
-        switch (term.size()) {
+    public static Term match(SortedSet<Term> term) {
+        int num = term.size();
+        switch (num) {
             case 0: return empty;
             case 1: return term.first();
-            default: return new EllipsisMatch(term.toArray(new Term[term.size()]));
+            default: return new EllipsisMatch(term.toArray(new Term[num]));
         }
     }
 
-    public final boolean forEachWhile(@NotNull Predicate<? super Term> c) {
+    public final boolean forEachWhile(Predicate<? super Term> c) {
         int s = subs();
         for (int i = 0; i < s; i++) {
             if (!c.test(sub(i)))

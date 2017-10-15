@@ -3,7 +3,6 @@ package nars.gui.graph;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.pri.Deleteable;
-import jcog.pri.PriReference;
 import nars.concept.Concept;
 import nars.gui.TermIcon;
 import nars.term.Term;
@@ -93,6 +92,7 @@ public class TermWidget extends Cuboid<Termed> {
             this.hash = target.key.hashCode();
         }
 
+
         protected void decay(float rate) {
             //termlinkPri = tasklinkPri = 0;
 
@@ -102,8 +102,7 @@ public class TermWidget extends Cuboid<Termed> {
         }
 
 
-        public void add(PriReference b, boolean termOrTask) {
-            float p = b.priElseZero();
+        public void add(float p, boolean termOrTask) {
             if (termOrTask) {
                 termlinkPri += p;
             } else {
@@ -135,12 +134,11 @@ public class TermWidget extends Cuboid<Termed> {
 
                 //float priAvg = priSum/2f;
 
-                float minLineWidth = 1f;
-                float priToWidth = 3f;
+                float minLineWidth = 0.1f;
 
-                float widthSqrt = priToWidth * edgeSum;
-                final float MaxEdgeWidth = 10;
-                this.width = Math.min(MaxEdgeWidth, Util.sqr(minLineWidth + widthSqrt));
+                final float MaxEdgeWidth = 4;
+
+                this.width = minLineWidth + Util.sqr( 1 + pri * MaxEdgeWidth  );
 
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
 //                float qEst = ff.qua();
@@ -148,17 +146,15 @@ public class TermWidget extends Cuboid<Termed> {
 //                    qEst = 0f;
 
 
-                if (edgeSum > 0) {
-                    this.b = 0.1f;
-                    this.r = 0.1f + 0.8f * (tasklinkPri / edgeSum);
-                    this.g = 0.1f + 0.8f * (termlinkPri / edgeSum);
-                } else {
-                    this.r = this.g = this.b = 0.1f;
-                }
 
-                this.a = Util.and(this.r * tasklinkBoost, this.g * termlinkBoost);
+                this.r = 0.05f + 0.9f * (tasklinkPri / edgeSum);
+                this.g = 0.05f + 0.9f * (termlinkPri / edgeSum);
+                this.b = 0.5f * (1f - (r + g)/2f);
 
-                this.attraction = 0.05f * width;// + priSum * 0.75f;// * 0.5f + 0.5f;
+
+                this.a = 0.05f + 0.9f * Util.and(this.r * tasklinkBoost, this.g * termlinkBoost);
+
+                this.attraction = 0.01f * width;// + priSum * 0.75f;// * 0.5f + 0.5f;
                 this.attractionDist = 1f + 2 * src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = -1;
@@ -169,7 +165,7 @@ public class TermWidget extends Cuboid<Termed> {
 
         @Override
         public boolean isDeleted() {
-            return !target.active();
+            return super.isDeleted() || target.active();
         }
     }
 }

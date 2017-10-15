@@ -144,7 +144,7 @@ public class Derivation extends Unify {
      * if using this, must set: nar, index, random, DerivationBudgeting
      */
     public Derivation(NAR nar) {
-        super(null, nar.random(), Param.UnificationStackMax, 0);
+        super(VAR_PATTERN, nar.random(), Param.UnificationStackMax, 0);
 
         this.nar = nar;
 

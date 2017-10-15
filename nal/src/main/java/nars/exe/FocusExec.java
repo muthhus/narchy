@@ -35,8 +35,8 @@ public class FocusExec extends Exec implements Runnable {
 
 
     public int subCycles = 1;
-    final int subCycleConcepts = 2;
-    final int subCyclePremises = subCycleConcepts * 3;
+    final int subCycleConcepts = 6;
+    final int subCyclePremises = subCycleConcepts; //subCycleConcepts * 3;
 
     final int MAX_PREMISES = subCyclePremises * 2;
     final int MAX_CONCEPTS = 16;

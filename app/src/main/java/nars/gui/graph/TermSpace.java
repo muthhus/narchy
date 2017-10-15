@@ -24,7 +24,7 @@ abstract public class TermSpace extends NARSpace<Termed, TermWidget> {
     public long now;
     public int dur;
 
-    final Map edgeBagSharedMap = new MRUCache(1024);
+//    final Map edgeBagSharedMap = new MRUCache(1024);
 
 
 
@@ -58,7 +58,7 @@ abstract public class TermSpace extends NARSpace<Termed, TermWidget> {
 
 
     public final Memoize<Pair<Concept, ConceptWidget /* target */>, ConceptWidget.TermEdge> edges =
-            new LinkedMRUMemoize<>((to) -> edgeBuilder.apply(to.getTwo()), 4096);
+            new LinkedMRUMemoize<>((to) -> edgeBuilder.apply(to.getTwo()), 8192);
 
 
     void removeNode(Activate concept) {

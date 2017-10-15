@@ -18,6 +18,10 @@ import java.util.function.Predicate;
  * <p>
  * thread safe
  * <p>
+ *
+ * TODO add ability to consult the shadow version when the current one is in doubt
+ * and only clear the shadow copy right before swapping out the active one.
+ * this means 4 bloom filter comparisons for the byte[] key
  */
 public class YesNoMaybe<X> extends DoubleBuffer<Twin<LongBitsetBloomFilter>> {
 

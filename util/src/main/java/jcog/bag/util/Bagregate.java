@@ -28,7 +28,7 @@ public class Bagregate<X extends Prioritized> extends PLinkArrayBag<X> {
     }
 
     public Bagregate(@NotNull Iterable<X> src, int capacity, float scale) {
-        super(capacity, PriMerge.avg, new ConcurrentHashMap<>(capacity));
+        super(capacity, PriMerge.plus, new ConcurrentHashMap<>(capacity));
 
         this.src = src;
         this.scale = new FloatParam(scale);
@@ -41,17 +41,18 @@ public class Bagregate<X extends Prioritized> extends PLinkArrayBag<X> {
 
         try {
 
+            commit();
 
-            float scale = this.scale.floatValue();
+            float scale = this.scale.floatValue()/((1+size())/2f);
 
             src.forEach(x -> {
                 if (include(x)) {
                     float pri = x.pri();
                     if (pri==pri)
-                        put(new PLink(x, pri * scale), null);
+                        putAsync(new PLink(x, pri * scale));
                 }
             });
-            commit();
+
 
         } finally {
             busy.set(false);

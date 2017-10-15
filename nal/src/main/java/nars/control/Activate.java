@@ -1,6 +1,8 @@
 package nars.control;
 
+import com.google.common.collect.Collections2;
 import jcog.bag.Bag;
+import jcog.list.FasterList;
 import jcog.map.SaneObjectFloatHashMap;
 import jcog.pri.PLink;
 import jcog.pri.PLinkUntilDeleted;
@@ -14,17 +16,14 @@ import nars.concept.Concept;
 import nars.task.UnaryTask;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static nars.Op.INT;
@@ -32,10 +31,22 @@ import static nars.Op.INT;
 /**
  * concept firing, activation, etc
  */
-public class Activate extends UnaryTask<Concept>  {
+public class Activate extends UnaryTask<Concept> {
 
+    /**
+     * per batch, on empty
+     */
     static final int TASKLINKS_SAMPLED = 2;
-    static final int TERMLINKS_SAMPLED = 3;
+    /**
+     * per batch, on empty
+     */
+    static final int TERMLINKS_SAMPLED = 2;
+
+    final Deque<Premise> pending = new ArrayDeque(TASKLINKS_SAMPLED * TERMLINKS_SAMPLED); //may need to be concurrent
+
+    private List<Termed> targets;
+    private Collection<Concept> targetConcepts;
+    int nextTarget = 0;
 
     public Activate(Concept c, float pri) {
         super(c, pri);
@@ -44,14 +55,14 @@ public class Activate extends UnaryTask<Concept>  {
     }
 
 
-    public static void activate(Task t, float activationApplied, NAR n) {
-
-        Concept cc = t.concept(n, true);
-        if (cc != null) {
-            activate(t, activationApplied, n, cc);
-        }
-
-    }
+//    public static void activate(Task t, float activationApplied, NAR n) {
+//
+//        Concept cc = t.concept(n, true);
+//        if (cc != null) {
+//            activate(t, activationApplied, n, cc);
+//        }
+//
+//    }
 
     public static void activate(Task t, float activationApplied, NAR n, Concept cc) {
 
@@ -82,7 +93,7 @@ public class Activate extends UnaryTask<Concept>  {
         final static LongHashSet active = new LongHashSet();
 
         public static BatchActivate get() {
-            assert(active.contains(Thread.currentThread().getId()));
+            assert (active.contains(Thread.currentThread().getId()));
             return batches.get();
         }
 
@@ -106,7 +117,9 @@ public class Activate extends UnaryTask<Concept>  {
             a.addToValue(c, pri);
         }
 
-        /** enable for the current thread */
+        /**
+         * enable for the current thread
+         */
         public static void enable() {
             synchronized (active) {
                 active.add(Thread.currentThread().getId());
@@ -143,151 +156,177 @@ public class Activate extends UnaryTask<Concept>  {
 
 
     @Override
-    public List<Premise> run(NAR nar) {
+    public Iterable<Premise> run(NAR nar) {
+
         nar.emotion.conceptFires.increment();
 
-
-        final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
-        tasklinks.commit(tasklinks.forget(Param.LINK_FORGET_TEMPERATURE));
-
-        int talSampled = Math.min(tasklinks.size(), TASKLINKS_SAMPLED);
-        if (talSampled == 0)
-            return null;
-
-        List<PriReference<Task>> taskl = $.newArrayList(talSampled);
-        tasklinks.sample(talSampled, ((Consumer<PriReference>) taskl::add));
-        if (taskl.isEmpty()) {
-            //nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
-            return null;
+        if (targets == null) {
+            this.targets = linkTemplates(nar);
+            this.targetConcepts = Collections2.filter((List)targets, (x)->x instanceof Concept);
         }
 
+        activateTemplates(nar);
 
-        //concept priority transfers into:
-        //      its termlinks to subterms
-        //      and their reverse links back to this
-
-        final Bag<Term, PriReference<Term>> termlinks = id.termlinks();
-        termlinks.commit(termlinks.forget(Param.LINK_FORGET_TEMPERATURE));
-
-
-        BatchActivate ba = BatchActivate.get();
-        Collection<Concept> localSubConcepts = linkTemplates(nar, ba);
-
-
-        List<PriReference<Term>> terml;
-        int tlSampled = Math.min(termlinks.size(), TERMLINKS_SAMPLED);
-        if (tlSampled == 0) {
-            return null;
-        } else {
-            terml = $.newArrayList(tlSampled);
-            termlinks.sample(tlSampled, ((Consumer<PriReference>) terml::add));
-        }
-
-        int tasklSize = taskl.size();
-        if (tasklSize == 0) return null;
-        int termlSize = terml.size();
-        if (termlSize == 0) return null;
-
-        List<Premise> premises = $.newArrayList(tasklSize * termlSize);
-
-        for (int i = 0; i < tasklSize; i++) {
-            PriReference<Task> tasklink = taskl.get(i);
-
-            final Task task = tasklink.get();
-            if (task != null) {
-
-                for (int j = 0; j < termlSize; j++) {
-                    PriReference<Term> termlink = terml.get(j);
-
-
-                    final Term term = termlink.get();
-                    if (term != null) {
-
-                        float pri = Param.linksToPremise.apply(task.priElseZero(), termlink.priElseZero());
-                        Premise p = new Premise(task, term, pri, localSubConcepts);
-                        premises.add(p);
-                    }
-                }
-            }
-        }
-
-
-        return premises;
+        return hypothesize();
     }
 
 
     @Nullable
-    public Collection<Concept> linkTemplates(NAR nar, BatchActivate ba) {
-        float budgeted = priElseZero();
-        float decayRate = 1f - nar.momentum.floatValue();
-        float decayed = budgeted * decayRate;
+    Iterable<Premise> hypothesize() {
+        if (pending.isEmpty()) {
 
-        priSub(decayed); //for balanced budgeting: important
+            final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
+            int ntasklinks = tasklinks.size();
+            if (ntasklinks == 0)
+                return null;
+
+            final Bag<Term, PriReference<Term>> termlinks = id.termlinks();
+            int ntermlinks = termlinks.size();
+            if (ntermlinks == 0)
+                return null;
+
+            tasklinks.commit(tasklinks.forget(Param.LINK_FORGET_TEMPERATURE));
+            termlinks.commit(termlinks.forget(Param.LINK_FORGET_TEMPERATURE));
+
+            int tlSampled = Math.min(ntermlinks, TERMLINKS_SAMPLED);
+            FasterList<PriReference> terml = new FasterList(tlSampled);
+            termlinks.sample(tlSampled, ((Consumer<PriReference>) terml::add));
+            int termlSize = terml.size();
+            if (termlSize <= 0)
+                return null;
+
+            tasklinks.sample(Math.min(ntasklinks, TASKLINKS_SAMPLED), (tasklink) -> {
+                final Task task = tasklink.get();
+                if (task != null) {
+
+                    for (int j = 0; j < termlSize; j++) {
+                        PriReference<Term> termlink = terml.get(j);
+
+                        final Term term = termlink.get();
+                        if (term != null) {
+
+                            float pri = Param.linksToPremise.apply(task.priElseZero(), termlink.priElseZero());
+                            Premise p = new Premise(task, term, pri, targetConcepts);
+                            pending.add(p);
+                        }
+                    }
+                }
+            });
+
+            if (pending.isEmpty())
+                return null;
+        }
+
+        return Collections.singleton(pending.removeFirst());
+    }
+
+
+    /** send some activation */
+    private void activateTemplates(NAR nar) {
+
+        int n = targets.size();
+        if (n == 0)
+            return;
+
+        float freed = 1f - nar.momentum.floatValue();
+        int toFire = (int) Math.ceil(n * freed);
+
+        float budgeted = priElseZero() * freed;
+        float budgetedToEach = budgeted / n;
+        if (budgetedToEach < Pri.EPSILON)
+            return;
+
+        priSub(budgeted);
+
+        MutableFloat refund = new MutableFloat(0);
+        BatchActivate ba = BatchActivate.get();
+
+        int numTargets = targets.size();
+        for (int i = 0; i < toFire; i++) {
+            Termed t = targets.get(nextTarget++);
+            if (nextTarget == numTargets)
+                nextTarget = 0;
+            linkTemplate(t, budgetedToEach/2f, budgetedToEach/2f, ba, nar, refund);
+        }
+
+        float r = refund.floatValue();
+        if (r > Pri.EPSILON) {
+            priAdd(r);
+        }
+
+    }
+
+    private void linkTemplate(Termed target, float priForward, float priReverse, BatchActivate a, NAR nar, MutableFloat refund) {
+        float decayRate = 1f - nar.momentum.floatValue();
+        float budgeted = priElseZero() * decayRate;
+        if (budgeted < Pri.EPSILON)
+            return;
+
+        priSub(budgeted); //for balanced budgeting: important
+
+        if (target instanceof Concept) {
+            Concept c = (Concept) target;
+            c.termlinks().put(
+                    new PLink(id.term(), priReverse), refund
+            );
+            a.put(c, priForward);
+        } else {
+            refund.add(priForward);
+        }
+
+        id.termlinks().put(
+                new PLink(target.term(), priForward), refund
+        );
+
+
+    }
+
+
+    @Nullable
+    public List<Termed> linkTemplates(NAR nar) {
+
 
         Collection<Termed> localTemplates = id.templates();
         int n = localTemplates.size();
-        if (n > 0) {
-            float subDecay = budgeted / n;
-            Term thisTerm = id.term();
+        if (n <= 0)
+            return null;
 
-            Collection<Concept> localSubConcepts =
-                    //new HashSet<>(); //temporary for this function call only, so as not to retain refs to Concepts
-                    //new UnifiedSet(); //allows concurrent read
-                    $.newArrayList(n); //maybe contain duplicates but its ok, this is fast to construct
+        Term thisTerm = id.term();
 
-            Random rng = nar.random();
-            //float balance = Param.TERMLINK_BALANCE;
-            float subDecayReverse = subDecay;// * (1f - balance);
-            float subDecayForward = subDecay;// * balance;
-            Bag<Term, PriReference<Term>> termlinks = id.termlinks();
+        List<Termed> localSubConcepts =
+                //new HashSet<>(); //temporary for this function call only, so as not to retain refs to Concepts
+                //new UnifiedSet(); //allows concurrent read
+                $.newArrayList(n); //maybe contain duplicates but its ok, this is fast to construct
 
-            float spent = 0;
-            for (Termed localSub : localTemplates) {
+        //Random rng = nar.random();
+        //float balance = Param.TERMLINK_BALANCE;
 
-                localSub = mutateTermlink(localSub.term(), rng); //for special Termed instances, ex: RotatedInt etc
-                if (localSub instanceof Bool)
-                    continue; //unlucky mutation
+        float spent = 0;
+        for (Termed localSub : localTemplates) {
 
-                Term localSubTerm = localSub.term(); //if mutated then localSubTerm would change so do it here
+            //localSub = mutateTermlink(localSub.term(), rng); //for special Termed instances, ex: RotatedInt etc
+//                if (localSub instanceof Bool)
+//                    continue; //unlucky mutation
 
-                float d;
-                boolean reverseLinked = false;
-                if (localSubTerm.op().conceptualizable && !localSubTerm.equals(thisTerm)) {
 
-                    Concept localSubConcept = nar.conceptualize(localSub);
-                    if (localSubConcept != null) {
+            Termed target = localSub.term(); //if mutated then localSubTerm would change so do it here
 
-                        localSubConcept.termlinks().putAsync(
-                                new PLink(thisTerm, subDecayReverse)
-                        );
-                        reverseLinked = true;
+            float d;
 
-                        ba.put(localSubConcept, subDecay);
+            if (target.op().conceptualizable && !target.equals(thisTerm)) {
 
-                        localSubConcepts.add(localSubConcept);
-
-                        spent += subDecay;
-                    }
+                Concept targetConcept = nar.conceptualize(localSub);
+                if (targetConcept != null) {
+                    target = (targetConcept);
 
                 }
-
-                termlinks.putAsync(
-                        new PLink(localSubTerm,
-                                subDecayForward)
-                        //reverseLinked ? subDecayForward : subDecay /* full */)
-                );
-
-            }
-            float refund = budgeted - spent;
-            if (refund > Pri.EPSILON) {
-                priAdd(refund);
             }
 
-            if (!localSubConcepts.isEmpty())
-                return localSubConcepts;
+            localSubConcepts.add(target);
         }
 
-        return null;
+        return !localSubConcepts.isEmpty() ? localSubConcepts : null;
+
     }
 
     /**
@@ -330,7 +369,7 @@ public class Activate extends UnaryTask<Concept>  {
         return t;
     }
 
-    static void activateSubterms(Task task, Collection<Concept> subs, float cPri) {
+    static void taskActivate(Task task, Collection<Concept> subs, float cPri) {
         int numSubs = subs.size();
         if (numSubs == 0)
             return;

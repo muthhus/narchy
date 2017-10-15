@@ -1,7 +1,6 @@
 package nars.gui.graph;
 
 import com.jogamp.opengl.GL2;
-import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.FloatParam;
@@ -29,6 +28,7 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
 
     public Bag<TermEdge, TermEdge> edges;
 
+
     public ConceptWidget(Term x) {
         super(x, 1, 1);
 
@@ -37,7 +37,7 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
                 new PLinkArrayBag<>(0,
                         //PriMerge.max,
                         //PriMerge.replace,
-                        PriMerge.max,
+                        PriMerge.plus,
                         //new UnifiedMap()
                         //new LinkedHashMap()
                         new LinkedHashMap() //maybe: edgeBagSharedMap
@@ -94,9 +94,12 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
         if (c != null /* && !c.isDeleted() */) {
 
 
-            int newCap = Util.lerp(pri, space.maxEdgesPerNodeMin, space.maxEdgesPerNodeMax);
-            edges.setCapacity(newCap);
-            if (newCap > 0) {
+
+            //int newCap = Util.lerp(pri, space.maxEdgesPerNodeMin, space.maxEdgesPerNodeMax);
+            edges.setCapacity(space.maxEdgesPerNodeMax);
+            edges.commit();
+
+            {
 
                 //phase 1: collect
                 //edgeStats.clear();
@@ -210,9 +213,9 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
 //                if (c != null) {
                 TermEdge ate =
                         space.edges.apply(Tuples.pair(to.concept, to));
-                ate.priAdd(pri);
-                ate.add(tgt, !(ttt instanceof Task));
-                edges.put(ate);
+                ate.priAdd(pri );
+                ate.add(pri, !(ttt instanceof Task));
+                edges.putAsync(ate);
                 //new PLinkUntilDeleted(ate, pri)
                 //new PLink(ate, pri)
 
@@ -269,13 +272,12 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
 //            float b = conceptWidget.concept.beliefs().eviSum(now);
 //            float g = conceptWidget.concept.goals().eviSum(now);
 //            float q = conceptWidget.concept.questions().priSum();
-            float ec = p;// + w2c((b + g + q)/2f);
 
             //sqrt because the area will be the sqr of this dimension
+            float ep = 1 + p;
             float minSize = this.minSize.floatValue();
-            float nodeScale = (float) (minSize + Math.sqrt(ec) *
-                    minSize * maxSizeMult.floatValue()
-            );//1f + 2f * p;
+            float nodeScale = (float) (minSize + (ep*ep*ep) * maxSizeMult.floatValue());
+            //1f + 2f * p;
             float l = nodeScale * 1.618f;
             float w = nodeScale;
             float h = 1; //nodeScale / (1.618f * 2);
