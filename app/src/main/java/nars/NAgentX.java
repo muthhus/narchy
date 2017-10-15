@@ -1,14 +1,13 @@
 package nars;
 
+import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.Ons;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.pri.mix.control.MixContRL;
-import nars.control.Cause;
-import nars.control.Derivation;
-import nars.control.MetaGoal;
+import nars.control.*;
 import nars.derive.PrediTerm;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
@@ -30,7 +29,6 @@ import net.beadsproject.beads.ugens.*;
 import org.HdrHistogram.DoubleHistogram;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
-import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
@@ -260,6 +258,8 @@ abstract public class NAgentX extends NAgent {
         nin.start();
 
 
+        AgentService mc = MetaGoal.newController(a);
+
         //init();
 
 
@@ -352,20 +352,33 @@ abstract public class NAgentX extends NAgent {
     }
 
     private static Surface metaGoalControls(NAR n) {
-        return grid(
+        CheckBox auto = new CheckBox("Auto");
+        auto.set(true);
+
+
+        Grid g = grid(
                 Stream.concat(
-                        Stream.of(new CheckBox("Auto", (BooleanProcedure) (enable) -> {
-                            System.out.println("TODO");
-                        })),
+                        Stream.of(auto),
                         IntStream.range(0, n.want.length).mapToObj(
-                                w -> new FloatSlider(n.want[w], -1f, +1f)
+                                w -> new FloatSlider(n.want[w], -2f, +2f) {
+
+                                    @Override
+                                    protected void paint(GL2 gl) {
+                                        if (auto.on()) {
+                                            value(n.want[w]);
+                                        }
+                                        super.paint(gl);
+                                    }
+                                }
                                         .label(MetaGoal.values()[w].name())
                                         .draw(BaseSlider.Knob)
                                         .on((s, v) -> {
-                                            n.want[w] = v;
+                                            if (!auto.on())
+                                                n.want[w] = v;
                                         })
                         )).toArray(Surface[]::new));
 
+        return g;
     }
 
     /**

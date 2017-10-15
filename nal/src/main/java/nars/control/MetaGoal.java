@@ -1,12 +1,18 @@
 package nars.control;
 
 import jcog.Util;
+import jcog.learn.ql.HaiQAgent;
 import jcog.list.FasterList;
+import jcog.math.FirstOrderDifferenceFloat;
+import jcog.math.FloatNormalized;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Prioritized;
 import nars.NAR;
+import nars.NAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 /**
  * high-level reasoner control parameters
@@ -69,7 +75,6 @@ public enum MetaGoal {
         for (int i = 0, causesSize = cc; i < causesSize; i++) {
             causes.get(i).commit(causeSummary);
         }
-
 
 
         int goals = goal.length;
@@ -238,5 +243,68 @@ public enum MetaGoal {
         return value / effects;
     }
 
+    public static AgentService newController(NAgent a) {
+        NAR n = a.nar;
+        AgentService.AgentBuilder b = new AgentService.AgentBuilder(
+                //DQN::new,
+                HaiQAgent::new,
+                //() -> Util.tanhFast(a.dexterity())) //reward function
+                () -> a.dexterity() * Util.tanhFast(a.rewardCurrent) /* - lag */) //reward function
+
+                .in(a::dexterity)
+                .in(a.happy)
+//                .in(new FloatNormalized(
+//                        ((Emotivation) n.emotion).cycleDTRealMean::getValue)
+//                        .decay(0.9f)
+//                )
+                .in(new FloatNormalized(
+                        //TODO use a Long-specific impl of this:
+                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.taskDerived.getValue().longValue())
+                ).relax(0.1f))
+                .in(new FloatNormalized(
+                                //TODO use a Long-specific impl of this:
+                                new FirstOrderDifferenceFloat(n::time, () -> n.emotion.conceptFirePremises.getValue().longValue())
+                        ).relax(0.1f)
+                ).in(new FloatNormalized(
+                                () -> n.emotion.busyVol.getSum()
+                        ).relax(0.1f)
+                );
+
+        Arrays.fill(n.want, 0);
+
+        for (MetaGoal g : values()) {
+            final int gg = g.ordinal();
+            float min = -2;
+            float max = +2;
+            b.in(new FloatNormalized(  () -> n.want[gg], min, max ));
+
+            float step = 0.25f;
+
+            b.out(2, (w) -> {
+                float str = 0.05f + step * Math.abs(n.want[gg] / 4f);
+                switch (w) {
+                    case 0:
+                        n.want[gg] = Math.min(max, n.want[gg] + str);
+                        break;
+                    case 1:
+                        n.want[gg] = Math.max(min, n.want[gg] - str);
+                        break;
+                }
+            });
+        }
+
+//        .out(
+//                        new StepController((x) -> n.time.dur(Math.round(x)), 1, n.dur(), n.dur() * 2)
+//                ).out(
+//                        StepController.harmonic(n.confMin::setValue, 0.01f, 0.08f)
+//                ).out(
+//                        StepController.harmonic(n.truthResolution::setValue, 0.01f, 0.08f)
+//                ).out(
+//                        StepController.harmonic(a.curiosity::setValue, 0.01f, 0.16f)
+//                ).get(n);
+
+        return b.get(n);
+
+    }
 
 }
