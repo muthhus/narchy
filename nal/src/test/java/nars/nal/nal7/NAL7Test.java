@@ -171,8 +171,8 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(1, "(a). :|:") //try to ignore this
                 .inputAt(2, "(b). :|:")
                 .inputAt(5, "(c). :|:")
-                .mustBelieve(cycles, "((b) &&+3 (c))", 1.00f, 0.77f, 2, 5)
-                .mustNotOutput(cycles, "(c)", BELIEF, 7)
+                .mustBelieve(cycles, "((b) &&+3 (c))", 1.00f, 0.81f, 2, 5)
+                .mustNotOutput(cycles, "(c)", BELIEF, (t) -> t!=5)
         ;
     }
     @Test

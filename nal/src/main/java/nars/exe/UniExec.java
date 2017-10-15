@@ -3,7 +3,7 @@ package nars.exe;
 import jcog.bag.Bag;
 import jcog.bag.impl.ConcurrentCurveBag;
 import nars.NAR;
-import nars.bag.ConcurrentArrayBag;
+import nars.control.Activate;
 import nars.task.ITask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ import static jcog.bag.Bag.BagSample.*;
  * unified executor
  * probabalistic continuation kernel
  */
-public class UniExec extends Exec  {
+public class UniExec extends Exec {
 
     public final int CAPACITY;
 
@@ -28,9 +28,9 @@ public class UniExec extends Exec  {
 //        }
 //    }
 
-    Bag<ITask, ITask> plan;
+    protected Bag<ITask, ITask> plan;
 
-    int workRemaining;
+    protected int workRemaining;
 
 
     public UniExec(int capacity) {
@@ -39,22 +39,29 @@ public class UniExec extends Exec  {
 
     @Override
     protected synchronized void clear() {
-        plan.clear();
+        if (plan!=null)
+            plan.clear();
     }
 
     @Override
-    public void add(/*@NotNull*/ ITask input) {
-        plan.putAsync((input));
+    public void add(ITask t) {
+        if (t instanceof Activate) {
+            plan.putAsync(t);
+        } else {
+            execute(t);
+        }
     }
 
-//    protected ITask u(/*@NotNull*/ ITask input) {
-//        return new ITask(input, pri(input));
-//    }
+
+    protected void run(int i) {
+        workRemaining = i;
+        plan.commit().sample(this::exeSample);
+    }
 
 
     public static final Logger logger = LoggerFactory.getLogger(UniExec.class);
 
-    protected Bag.BagSample exeSample(ITask x) {
+    public Bag.BagSample exeSample(ITask x) {
         Iterable<? extends ITask> next = null;
 
         try {
@@ -99,7 +106,7 @@ public class UniExec extends Exec  {
                 };
 //            new ConcurrentCurveBag(this,
 //                new ConcurrentHashMapUnsafe<>(1024), nar.random(), 1024);
-                //new PriorityHijackBag<>(CAPACITY,2) {
+        //new PriorityHijackBag<>(CAPACITY,2) {
 //
 //                    @Override
 //                    public void setCapacity(int _newCapacity) {

@@ -79,11 +79,6 @@ public class PremiseRule extends GenericCompound {
      */
     private boolean beliefProjected = true;
 
-    /**
-     * when a rule with time(urgent) derives a goal, the occurrence time is set to the task time
-     */
-    public boolean goalUrgent;
-
     final SortedSet<MatchConstraint> constraints = new TreeSet(PrediTerm.sortByCost);
     final List<PrediTerm<Derivation>> pre = $.newArrayList();
     final List<PrediTerm<Derivation>> post = $.newArrayList();
@@ -381,10 +376,6 @@ public class PremiseRule extends GenericCompound {
                     switch (XString) {
                         case "raw":
                             beliefProjected = false;
-                            break;
-
-                        case "urgent":
-                            goalUrgent = true;
                             break;
 
                         case "dtEvents":

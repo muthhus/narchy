@@ -10,8 +10,8 @@ import nars.derive.PrediTerm;
 import nars.derive.PrediTrie;
 import nars.derive.rule.PremiseRuleSet;
 import nars.exe.Exec;
-import nars.exe.FocusExec;
 import nars.exe.MultiExec;
+import nars.exe.SynchExec;
 import nars.index.term.BasicTermIndex;
 import nars.index.term.PatternIndex;
 import nars.index.term.TermIndex;
@@ -119,8 +119,9 @@ public class NARS {
 
         time = new CycleTime();
 
-        exe = FocusExec::new;
-        //new UnifiedExec();
+        //exe = FocusExec::new;
+
+        exe = () -> new SynchExec(24, 4);
 
         rng = () -> new XorShift128PlusRandom(1);
 

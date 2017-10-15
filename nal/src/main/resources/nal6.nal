@@ -53,17 +53,13 @@
 
 
     (P ==> M), (S ==> M), neq(P,S) |- ((P &&+- S) ==>+- M), (Belief:Intersection)
+        (P ==> M), (S ==> M), neq(P,S) |- ((P &&+- --S) ==>+- M), (Belief:IntersectionPN)
     (P ==> M), (S ==> M), neq(P,S) |- (--(--P &&+- --S) ==>+- M), (Belief:Union)
-    //(P ==> M), (S ==> M) |- ((P &&+- --S) ==>+- M), (Belief:IntersectionPN)
-        //(P ==> M), (S ==> M), neqCom(P,S) |- (--((--,%P) &&+- (--,%S)) ==>+- M), (Belief:Union)
-                //(P || S) ==>+-M
 
 
     (M ==> P), (M ==> S), neq(P,S) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
+        (M ==> P), (M ==> S), neq(P,S) |- (M ==>+- (P &&+- --S)), (Belief:IntersectionPN)
     (P ==> M), (S ==> M), neq(P,S) |- (M ==>+- --(--P &&+- --S)), (Belief:Union)
-    //(M ==> P), (M ==> S) |- (M ==>+- (P &&+- --S)), (Belief:IntersectionPN)
-        //(M ==> P), (M ==> S), neqCom(P,S) |- (M ==>+- --((--,%P) &&+- (--,%S))), (Belief:Union)
-                //M ==>+- (P || S)
 
 
 //// implication-based decomposition ////////////////////////////////////////////////////////////////////////////////////
@@ -78,12 +74,12 @@
         //(M ==> S), (M ==> (&&,(--,%S),A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
         //(M ==> S), (M ==> (||,S,A..+)) |- (M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
-    (M ==> C), C, belief("&&") |- (M ==>+- dropAnyEvent(ifConjCommNoDepVars(C))), (Belief:StructuralDeduction)
+    (M ==> C), C, belief("&&") |- (M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
           //(M ==> C), D, belief("&&") |- (M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D)), (Belief:StructuralDeduction)
         //(--M ==> C), C, belief("&&") |- (--M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
           //(--M ==> C), D, belief("&&") |- (--M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D, strict)), (Belief:StructuralDeduction)
         //(M ==> (&&,(--,%S),A..+)), M |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
-    (C ==> M), C, belief("&&") |- (dropAnyEvent(ifConjCommNoDepVars(C)) ==>+- M), (Belief:StructuralDeduction)
+    (C ==> M), C, belief("&&") |- (dropAnyEvent(C) ==>+- M), (Belief:StructuralDeduction)
           //(C ==> M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D) ==>+- M), (Belief:StructuralDeduction)
         //(C ==> --M), C, belief("&&") |- (dropAnyEvent(C) ==>+- --M), (Belief:StructuralDeduction)
           //(C ==> --M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D, strict) ==>+- --M), (Belief:StructuralDeduction)
@@ -99,7 +95,7 @@
     B, (--A ==> C),  notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionPBN, Goal:DeciDeductionN)
         //B, (--A ==> C), time(urgent),  notImpl(B) |- varIntro(subIfUnifiesAny(C,A,B)), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
 
-    B, (C ==> A), time(urgent), notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:AbductionPB, Goal:DeciInduction)
+    B, (C ==> A), notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:AbductionPB, Goal:DeciInduction)
 
 //conditional abduction
 
@@ -232,22 +228,22 @@
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
 
-    B, C, belief("&&"), time(urgent), task("!") |- ifConjCommNoDepVars(without(C,B)), (Goal:Strong)
-    B, C, belief("&&"), time(urgent), task("!") |- ifConjCommNoDepVars(without(C,--B)), (Goal:StrongN)
+    B, C, belief("&&"), task("!") |- without(C,B), (Goal:Strong)
+    B, C, belief("&&"), task("!") |- without(C,--B), (Goal:StrongN)
 
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
     //B, C, belief("&&+"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),--conjEvent(C,late),B), (Goal:StrongN)
 
-    C, B, task("&&"), task("!") |- conjDropIfEarliest(ifConjCommNoDepVars(C),B), (Goal:Strong)
-    C, B, task("&&"), task("!") |- conjDropIfEarliest(ifConjCommNoDepVars(C),--B), (Goal:StrongPN)
+    C, B, task("&&"), task("!") |- conjDropIfEarliest(C,B), (Goal:Strong)
+    C, B, task("&&"), task("!") |- conjDropIfEarliest(C,--B), (Goal:StrongPN)
         //(&&,X,A..+), X, task("!") |- X, (Goal:Strong)
         //(&&,--X,A..+), X, task("!") |- X, (Goal:StrongPN)
 
     //structural decompose any component of a conjunction.
     //for belief: any conj
-    C, C, task("&&") |- dropAnyEvent(ifConjCommNoDepVars(C)), (Belief:StructuralDeduction)
+    C, C, task("&&") |- dropAnyEvent(C), (Belief:StructuralDeduction)
     //for goal: eternal and paral (goal seq must be decomposed sequentially
-    C, C, task("&&|") |- dropAnyEvent(ifConjCommNoDepVars(C)), (Goal:StructuralDeduction)
+    C, C, task("&&|") |- dropAnyEvent(C), (Goal:StructuralDeduction)
 
 
     //(&&,A_1..n), A_i |- A_i, (Truth:StructuralDeduction, Desire:Strong)

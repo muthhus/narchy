@@ -26,7 +26,7 @@ import java.util.SortedSet;
 public final class Conclude {
 
     private static final Term VAR_INTRO = $.the("varIntro");
-    private static final Term GOAL_URGENT = $.the("urgent");
+
 
     static public PrediTerm<Derivation> the(@NotNull PremiseRule rule, PatternIndex index, NAR nar) {
 
@@ -46,14 +46,11 @@ public final class Conclude {
             introVars = false;
         }
 
-        Term id = !rule.goalUrgent ? $.func("derive", pattern) : $.func("derive", pattern, $.the("urgent"));
+        Term id = $.func("derive", pattern);
 
         Taskify taskify = new Taskify(rule, nar.newCause(RuleCause::new));
 
-        Term concID =
-                !rule.goalUrgent ?
-                    $.func("derive", /*$.the(cid), */pattern/* prod args */) :
-                    $.func("derive", /*$.the(cid), */pattern/* prod args */, GOAL_URGENT);
+        Term concID = $.func("derive", /*$.the(cid), */pattern/* prod args */);
         return AndCondition.the(
                 new Conclusion(concID,pattern, rule),
                 introVars ? //Fork.fork(

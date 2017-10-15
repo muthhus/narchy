@@ -1,7 +1,6 @@
 package nars;
 
 import jcog.pri.op.PriMerge;
-import nars.exe.FocusExec;
 import nars.nal.nal1.NAL1Test;
 import nars.nal.nal2.NAL2Test;
 import nars.nal.nal3.NAL3Test;
@@ -50,9 +49,9 @@ public class Repair {
                         return new OptiUnit.Tweaks<>(x)
 
                                 //.set("cycles", 100)
-                                .call("subCycles", (n, v) -> {
-                                    ((FocusExec) (n.nar.exe)).subCycles = v;
-                                }, subCycles)
+//                                .call("subCycles", (n, v) -> {
+//                                    ((FocusExec) (n.nar.exe)).subCycles = v;
+//                                }, subCycles)
 //                                .call("termlinkMerge", (n, v) -> {
 //                                    Param.termlinkMerge = termlinkMerge;
 //                                }, termlinkMerge)

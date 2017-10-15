@@ -82,10 +82,10 @@ public abstract class Param extends Services<Term,NAR> {
 
    /** budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links) */
     public static final FloatFloatToFloatFunction termTaskLinkToPremise =
-            Util::or;
+            //Util::or;
             //Util::and;
             //UtilityFunctions::aveGeo;
-            //UtilityFunctions::aveAri;
+            UtilityFunctions::aveAri;
             //Math::min;
             //Math::max;
 
@@ -108,7 +108,7 @@ public abstract class Param extends Services<Term,NAR> {
     public final static int SIGNAL_LATCH_TIME_MAX =
                     //0;
                     //Integer.MAX_VALUE;
-                    6;
+                    16;
                     //8;
 
     /** derivation severity - how completely confidence is reduced in derivation (default: 1.0) */
@@ -166,9 +166,9 @@ public abstract class Param extends Services<Term,NAR> {
     }
 
     /** how many durations above which to dither dt relations to dt=0 (parallel)
-     *  set to zero to disable dithering.  typically the value will be 0..~1.0.
+     *  set to zero to disable dithering.  typically the value will be 0..1.0.
      */
-    public final MutableFloat dtDither = new MutableFloat(1f);
+    public final MutableFloat dtDither = new MutableFloat(0.5f);
 
 
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
@@ -340,7 +340,7 @@ public abstract class Param extends Services<Term,NAR> {
      * 0 momentum means an activation is fired completely and suddenly
      * 1 momentum means it retains all activation
      * */
-    public final FloatParam momentum = new FloatParam(0.9f, 0, 1f);
+    public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
 
     /**
      * dt > 0

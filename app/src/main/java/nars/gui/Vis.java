@@ -220,38 +220,6 @@ public class Vis {
         return new LabeledPane(k, s);
     }
 
-    public static SimpleConceptGraph1 conceptsWindow3D(NAR n, int maxNodes, int maxEdges) {
-
-
-        SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                ((FocusExec)n.exe).concepts //TODO generalize
-                /* TODO */, 128, 256, 16, 16);
-
-
-        SpaceGraph<Term> s = new SpaceGraph(
-
-                cs.with( new Flatten() )
-        );
-
-        EdgeDirected fd = new EdgeDirected();
-        s.dyn.addBroadConstraint(fd);
-
-        s.camPos(0, 0, 90).show(1300, 900);
-        //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
-
-
-        //Vis.conceptsWindow2D
-
-                //.add(new ZoomOrtho(logConsole(n, 120, 40, new FloatParam(0.25f)).opacity(0.5f)))
-                //.ortho( logConsole(n, 40, 10, 0.0f) )
-
-        window(reflect(fd), 500, 500);
-
-        //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
-
-        return cs;
-
-    }
 
 //    public static SpaceGraph<Term> conceptsWindow2D(NAR nar, int maxNodes, int maxEdges) {
 //        return conceptsWindow(new ConceptsSpace(nar, maxNodes, 1, maxEdges));

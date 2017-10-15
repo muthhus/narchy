@@ -81,6 +81,11 @@ public class MultiExec extends Exec {
         int premiseRemaining, premiseDone;
 
         @Override
+        public void add(ITask t) {
+            throw new UnsupportedOperationException("called?");
+        }
+
+        @Override
         public void run() {
 
             Activate.BatchActivate.enable();

@@ -355,8 +355,7 @@ abstract public class NAgentX extends NAgent {
 
     private static Surface metaGoalControls(NAR n) {
         CheckBox auto = new CheckBox("Auto");
-        auto.set(true);
-
+        //auto.set(true);
 
         Grid g = grid(
                 Stream.concat(
