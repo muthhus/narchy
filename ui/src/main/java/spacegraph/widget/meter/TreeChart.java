@@ -5,7 +5,7 @@ import jcog.Util;
 import jcog.list.CircularArrayList;
 import jcog.list.FasterList;
 import jcog.map.CustomConcurrentHashMap;
-import jcog.util.DoubleBuffer;
+import jcog.util.Flip;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
@@ -40,7 +40,7 @@ public class TreeChart<X> extends Surface {
     private double top;
     private LayoutOrient layoutOrient = LayoutOrient.HORIZONTAL;
 
-    final DoubleBuffer<CircularArrayList<ItemVis<X>>> phase = new DoubleBuffer(CircularArrayList::new);
+    final Flip<CircularArrayList<ItemVis<X>>> phase = new Flip(CircularArrayList::new);
 
 
     public TreeChart() {
@@ -86,7 +86,7 @@ public class TreeChart<X> extends Surface {
         left = 0.0;
         top = 0.0;
 
-        CircularArrayList<ItemVis<X>> display = phase.write();
+        CircularArrayList<ItemVis<X>> display = phase.commit();
         int ns = next.size();
         int cs = display.capacity();
         if (cs < ns) {

@@ -34,7 +34,7 @@ public class UnionFind2 {
 
     // Optimization: could use short ints instead of ints (halving memory, would limit the number of rigid bodies to 64k, sounds reasonable).
 
-    protected int[][] elements = new int[0][2];
+    protected int[][] ele = new int[0][2];
     int numElements;
 
     /**
@@ -44,7 +44,7 @@ public class UnionFind2 {
     public void sortIslands() {
         // first store the original body index, and islandId
 
-        int[][] elements = this.elements;
+        int[][] elements = this.ele;
         int n = this.numElements;
         for (int i = 0; i < n; i++) {
             //return array[index];
@@ -63,13 +63,13 @@ public class UnionFind2 {
     }
 
     public void reset(int N) {
-        if (elements == null || elements.length < N) {
-            elements = new int[N][2];
+        if (ele == null || ele.length < N) {
+            ele = new int[N][2];
         }
 
         numElements = N;
 
-        int[][] ee = this.elements;
+        int[][] ee = this.ele;
         for (int i = 0; i < N; i++) {
             int[] e = ee[i];
             e[0] = i;
@@ -77,7 +77,7 @@ public class UnionFind2 {
         }
 
         //empty any remaining entries
-        for (int j = N; j < elements.length; j++) {
+        for (int j = N; j < ele.length; j++) {
             int[] e = ee[j];
             e[0] = -1;
             e[1] = -1;
@@ -90,13 +90,7 @@ public class UnionFind2 {
 
     public boolean isRoot(int x) {
         //return array[index];
-        return (x == elements[x][0]);
-    }
-
-    public final int[] get(int index) {
-        //valid(index);
-        return elements[index];
-        //return array[index];
+        return (x == ele[x][0]);
     }
 
     public void free() {
@@ -128,12 +122,12 @@ public class UnionFind2 {
         //}
         //#else
         //return array[index];
-        int[] ei = elements[i];
+        int[] ei = ele[i];
 
         ei[0] = j;
         //return array[index];
         //return array[index];
-        elements[j][1] += ei[1];
+        ele[j][1] += ei[1];
         //#endif //USE_PATH_COMPRESSION
     }
 
@@ -144,7 +138,7 @@ public class UnionFind2 {
         int numElements = this.numElements;
 
         //return array[index];
-        int[][] e = this.elements;
+        int[][] e = this.ele;
         while (x != e[x][0]) {
             // not really a reason not to use path compression, and it flattens the trees/improves find performance dramatically
 
@@ -179,11 +173,15 @@ public class UnionFind2 {
             ///throw new RuntimeException("overflow");
     }
 
-    public final int getId(int i) {
-        return get(i)[0];
+    public final int id(int i) {
+        //valid(index);
+        //return array[index];
+        return ele[i][0];
     }
-    public final int getSz(int i) {
-        return get(i)[1];
+    public final int sz(int i) {
+        //valid(index);
+        //return array[index];
+        return ele[i][1];
     }
 
     ////////////////////////////////////////////////////////////////////////////

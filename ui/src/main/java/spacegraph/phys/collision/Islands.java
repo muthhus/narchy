@@ -64,7 +64,7 @@ public class Islands {
             if (colObj0!=null && ((colObj0).mergesSimulationIslands())) {
                 Collidable colObj1 = collisionPair.pProxy1.data;
                 if (colObj1 != null && ((colObj1).mergesSimulationIslands())) {
-                    find.unite((colObj0).getIslandTag(), (colObj1).getIslandTag());
+                    find.unite((colObj0).tag(), (colObj1).tag());
                 }
             }
         }
@@ -110,10 +110,10 @@ public class Islands {
     private static int getIslandId(PersistentManifold lhs) {
         int islandId;
         Collidable rcolObj0 = (Collidable) lhs.getBody0();
+        int t0 = rcolObj0.tag();
+        if (t0 >= 0) return t0;
         Collidable rcolObj1 = (Collidable) lhs.getBody1();
-        int t0 = rcolObj0.getIslandTag();
-        islandId = t0 >= 0 ? t0 : rcolObj1.getIslandTag();
-        return islandId;
+        return rcolObj1.tag();
     }
 
     public void buildIslands(Intersecter intersecter, List<Collidable> collidables) {
@@ -134,8 +134,8 @@ public class Islands {
 
             // update the sleeping state for bodies, if all are sleeping
             for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
-                int islandId = find.getId(startIslandIndex);
-                for (endIslandIndex = startIslandIndex + 1; (endIslandIndex < numElem) && (find.getId(endIslandIndex) == islandId); endIslandIndex++) {
+                int islandId = find.id(startIslandIndex);
+                for (endIslandIndex = startIslandIndex + 1; (endIslandIndex < numElem) && (find.id(endIslandIndex) == islandId); endIslandIndex++) {
                 }
 
                 //int numSleeping = 0;
@@ -144,23 +144,21 @@ public class Islands {
 
                 int idx;
                 for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                    int i = find.getSz(idx);
+                    int i = find.sz(idx);
 
                     //return array[index];
                     final Collidable colObj0 = collidables.get(i);
-                    final int tag0 = colObj0.getIslandTag();
+                    final int tag0 = colObj0.tag();
 
                     if ((tag0 != islandId) && (tag0 != -1)) {
                         islandError(colObj0);
                         continue;
                     }
 
-                    assert ((tag0 == islandId) || (tag0 == -1));
+                    //assert ((tag0 == islandId) || (tag0 == -1));
                     if (tag0 == islandId) {
-                        if (colObj0.getActivationState() == Collidable.ACTIVE_TAG) {
-                            allSleeping = false;
-                        }
-                        if (colObj0.getActivationState() == Collidable.DISABLE_DEACTIVATION) {
+                        int s = colObj0.getActivationState();
+                        if (s == Collidable.ACTIVE_TAG || s == Collidable.DISABLE_DEACTIVATION) {
                             allSleeping = false;
                         }
                     }
@@ -170,16 +168,14 @@ public class Islands {
                 if (allSleeping) {
                     //int idx;
                     for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                        int i = find.getSz(idx);
+                        int i = find.sz(idx);
                         //return array[index];
                         final Collidable colObj0 = collidables.get(i);
-                        int tag0 = colObj0.getIslandTag();
+                        int tag0 = colObj0.tag();
                         if ((tag0 != islandId) && (tag0 != -1)) {
                             islandError(colObj0);
                             continue;
                         }
-
-                        assert ((tag0 == islandId) || (tag0 == -1));
 
                         if (tag0 == islandId) {
                             colObj0.setActivationState(Collidable.ISLAND_SLEEPING);
@@ -189,17 +185,15 @@ public class Islands {
 
                     //int idx;
                     for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
-                        int i = find.getSz(idx);
+                        int i = find.sz(idx);
 
                         //return array[index];
                         Collidable colObj0 = collidables.get(i);
-                        int tag0 = colObj0.getIslandTag();
+                        int tag0 = colObj0.tag();
                         if ((tag0 != islandId) && (tag0 != -1)) {
                             islandError(colObj0);
                             continue;
                         }
-
-                        assert ((tag0 == islandId) || (tag0 == -1));
 
                         if (tag0 == islandId) {
                             if (colObj0.getActivationState() == Collidable.ISLAND_SLEEPING) {
@@ -252,8 +246,8 @@ public class Islands {
 
     }
 
-    public static void islandError(Collidable colObj0) {
-        System.err.println("error in island management: " + colObj0 + " " + colObj0.data());
+    static void islandError(Collidable colObj0) {
+        System.err.println("error in island management, maybe spatial is in the display list multiple times: " + colObj0 + " " + colObj0.data());
     }
 
     public <X> void buildAndProcessIslands(Intersecter intersecter, List<Collidable> collidables, IslandCallback callback) {
@@ -293,11 +287,11 @@ public class Islands {
 
             // traverse the simulation islands, and call the solver, unless all objects are sleeping/deactivated
             for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
-                int islandId = find.getId(startIslandIndex);
+                int islandId = find.id(startIslandIndex);
                 boolean islandSleeping = false;
 
-                for (endIslandIndex = startIslandIndex; (endIslandIndex < numElem) && ((find.getId(endIslandIndex) == islandId)); endIslandIndex++) {
-                    int i = find.getSz(endIslandIndex);
+                for (endIslandIndex = startIslandIndex; (endIslandIndex < numElem) && ((find.id(endIslandIndex) == islandId)); endIslandIndex++) {
+                    int i = find.sz(endIslandIndex);
                     //return array[index];
                     Collidable colObj0 = collidables.get(i);
                     islandBodies.add(colObj0);

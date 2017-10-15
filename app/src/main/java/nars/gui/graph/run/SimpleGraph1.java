@@ -130,7 +130,7 @@ public class SimpleGraph1 extends TermSpace {
     }
 
     @Override
-    protected void get(Collection<TermWidget> displayNext) {
+    protected List<TermWidget> get() {
 //        if (next!=null) {
 //            nodes = next;
 //            next = null;

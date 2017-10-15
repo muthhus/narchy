@@ -24,7 +24,7 @@
 package spacegraph.phys;
 
 import jcog.list.FasterList;
-import jcog.util.DoubleBuffer;
+import jcog.util.Flip;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.v3;
@@ -78,7 +78,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     @Nullable protected v3 gravity;
 
 
-    DoubleBuffer<List<Collidable>> coll = new DoubleBuffer(FasterList::new);
+    Flip<List<Collidable>> coll = new Flip(FasterList::new);
     private List<Collidable> collidable = new FasterList();
 
     final FasterList<BroadConstraint> broadConstraints = new FasterList<>(0);
@@ -240,7 +240,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
     protected final void updateObjects() {
 
-        List<Collidable> nextCollidables = coll.preWrite();
+        List<Collidable> nextCollidables = coll.write();
         nextCollidables.clear();
 
         forEachIntSpatial((i, s) -> {
@@ -292,7 +292,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
 
         //List<Collidable> prevCollidables = collidable;
-        this.collidable = coll.write();
+        this.collidable = coll.commit();
 
     }
 
@@ -577,7 +577,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     private static int getConstraintIslandId(TypedConstraint lhs) {
         Collidable rcolObj0 = lhs.getRigidBodyA();
         Collidable rcolObj1 = lhs.getRigidBodyB();
-        return rcolObj0.getIslandTag() >= 0 ? rcolObj0.getIslandTag() : rcolObj1.getIslandTag();
+        return rcolObj0.tag() >= 0 ? rcolObj0.tag() : rcolObj1.tag();
     }
 
     /**
@@ -630,7 +630,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
                 if (colObj1 == null || !colObj1.isActive() || colObj1.isStaticOrKinematicObject())
                     return;
 
-                islands.find.unite(colObj0.getIslandTag(), colObj1.getIslandTag());
+                islands.find.unite(colObj0.tag(), colObj1.tag());
             });
 
 

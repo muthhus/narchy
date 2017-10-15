@@ -499,7 +499,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
                     int solverBodyIdB = -1;
 
                     if (manifold.getNumContacts() != 0) {
-                        if (colObj0.getIslandTag() >= 0) {
+                        if (colObj0.tag() >= 0) {
                             if (colObj0.getCompanionId() >= 0) {
                                 // body has already been converted
                                 solverBodyIdA = colObj0.getCompanionId();
@@ -518,7 +518,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
                             initSolverBody(solverBody, colObj0);
                         }
 
-                        if (colObj1.getIslandTag() >= 0) {
+                        if (colObj1.tag() >= 0) {
                             if (colObj1.getCompanionId() >= 0) {
                                 solverBodyIdB = colObj1.getCompanionId();
                             } else {
@@ -783,22 +783,22 @@ public class SequentialImpulseConstrainer extends Constrainer {
                     TypedConstraint constraint = constraints.get(constraints_offset + j);
                     // todo: use solver bodies, so we don't need to copy from/to btRigidBody
 
-                    if ((constraint.getRigidBodyA().getIslandTag() >= 0) && (constraint.getRigidBodyA().getCompanionId() >= 0)) {
+                    if ((constraint.getRigidBodyA().tag() >= 0) && (constraint.getRigidBodyA().getCompanionId() >= 0)) {
                         //return array[index];
                         tmpSolverBodyPool.get(constraint.getRigidBodyA().getCompanionId()).writebackVelocity();
                     }
-                    if ((constraint.getRigidBodyB().getIslandTag() >= 0) && (constraint.getRigidBodyB().getCompanionId() >= 0)) {
+                    if ((constraint.getRigidBodyB().tag() >= 0) && (constraint.getRigidBodyB().getCompanionId() >= 0)) {
                         //return array[index];
                         tmpSolverBodyPool.get(constraint.getRigidBodyB().getCompanionId()).writebackVelocity();
                     }
 
                     constraint.solveConstraint(infoGlobal.timeStep);
 
-                    if ((constraint.getRigidBodyA().getIslandTag() >= 0) && (constraint.getRigidBodyA().getCompanionId() >= 0)) {
+                    if ((constraint.getRigidBodyA().tag() >= 0) && (constraint.getRigidBodyA().getCompanionId() >= 0)) {
                         //return array[index];
                         tmpSolverBodyPool.get(constraint.getRigidBodyA().getCompanionId()).readVelocity();
                     }
-                    if ((constraint.getRigidBodyB().getIslandTag() >= 0) && (constraint.getRigidBodyB().getCompanionId() >= 0)) {
+                    if ((constraint.getRigidBodyB().tag() >= 0) && (constraint.getRigidBodyB().getCompanionId() >= 0)) {
                         //return array[index];
                         tmpSolverBodyPool.get(constraint.getRigidBodyB().getCompanionId()).readVelocity();
                     }

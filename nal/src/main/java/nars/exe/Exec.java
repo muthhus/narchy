@@ -50,26 +50,21 @@ abstract public class Exec implements Executor, PriMerge {
 
     protected void execute(ITask x) {
 
-        Iterable<? extends ITask> y = null;
-
         try {
 
-            y = x.run(nar);
+            Iterable<? extends ITask> y = x.run(nar);
+            if (y != null)
+                y.forEach(this::add);
 
-        } catch (RuntimeException e) {
-            e.printStackTrace();
         } catch (Throwable e) {
             if (Param.DEBUG) {
                 throw e;
             } else {
-                logger.error("exe {} {}", x, e /*(Param.DEBUG) ? e : e.getMessage()*/);
+                logger.error("{} {}", x, (Param.DEBUG) ? e : e.getMessage());
                 x.delete();
             }
         }
 
-        if (y != null) {
-            y.forEach(this::add);
-        }
 
     }
 
@@ -179,13 +174,12 @@ abstract public class Exec implements Executor, PriMerge {
         }
 
         final double MIN_SLEEP_TIME = 0.001f; //1 ms
-        double sleepEach = sleepTime / concurrency();
-        if (sleepEach > MIN_SLEEP_TIME) {
-            int msToSleep = (int)Math.ceil(sleepEach*1000);
-            NativeTask.SleepTask replicated = new NativeTask.SleepTask(msToSleep);
-            for (int i = 0; i < concurrency(); i++) {
-                nar.exe.add(replicated);
-            }
+        final int sleepGranularity = 2;
+        int divisor = sleepGranularity * concurrency();
+        double sleepEach = sleepTime / divisor;
+        if (sleepEach >= MIN_SLEEP_TIME) {
+            int msToSleep = (int)Math.ceil(sleepTime*1000);
+            nar.exe.add(new NativeTask.SleepTask(msToSleep, divisor));
         }
 
     }

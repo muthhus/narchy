@@ -3,6 +3,7 @@ package nars.gui;
 import jcog.event.On;
 import jcog.list.FasterList;
 import nars.gui.graph.EdgeDirected;
+import nars.gui.graph.TermWidget;
 import nars.term.Term;
 import nars.term.Termed;
 import spacegraph.AbstractSpace;
@@ -13,7 +14,6 @@ import spacegraph.layout.Flatten;
 import spacegraph.phys.util.Animated;
 import spacegraph.space.ListSpace;
 
-import java.util.Collection;
 import java.util.List;
 
 
@@ -88,15 +88,16 @@ public abstract class NARSpace<X extends Termed, Y extends Spatial<X>> extends L
     protected void render() {
 
         List<Y> prev = this.active;
+
         prev.forEach(Active::deactivate);
 
-        List<Y> next = new FasterList(prev.size() /* estimate */);
-        get(next);
+        List<Y> next = get();
 
         //System.out.println(space.dyn.summary() + " " +  prev.size() + " prev " + next.size() + " next");
 
         this.active = next;
 
+        //disable the undisplayed
         prev.forEach(x -> {
             if (!x.preactive)
                 x.order = -1;
@@ -108,7 +109,7 @@ public abstract class NARSpace<X extends Termed, Y extends Spatial<X>> extends L
         return true;
     }
 
-    abstract protected void get(Collection<Y> displayNext);
+    abstract protected List<Y> get();
 
 
 
@@ -142,6 +143,7 @@ public abstract class NARSpace<X extends Termed, Y extends Spatial<X>> extends L
 
         EdgeDirected fd = new EdgeDirected();
         s.dyn.addBroadConstraint(fd);
+
         s.camPos(0, 0, 90);
 
         //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));

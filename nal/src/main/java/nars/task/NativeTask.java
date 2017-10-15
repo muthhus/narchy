@@ -7,6 +7,7 @@ import nars.NAR;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
@@ -122,10 +123,12 @@ public abstract class NativeTask implements ITask {
 
     public static class SleepTask extends NativeTask {
 
-        private final long ms;
+        private final AtomicInteger ms;
+        final int toSleep;
 
-        public SleepTask(long ms) {
-            this.ms = ms;
+        public SleepTask(int ms, int divisor) {
+            this.ms = new AtomicInteger(ms);
+            this.toSleep = Math.max(1,ms/divisor);
         }
 
         @Override
@@ -136,8 +139,16 @@ public abstract class NativeTask implements ITask {
         @Override
         public @Nullable Iterable<? extends ITask> run(NAR n) {
             /** min executor load to allow sleeping */
-            if (n.exe.load() < 1f-1f/(1+n.exe.concurrency()))
-                Util.pause(ms);
+
+            if (n.exe.load() >= 1f-1f/(1+n.exe.concurrency())) //<-TODO estimate this without seeing the sleep or maybe this is just a hack and a different throttle system will work better
+                return null;
+
+            if (ms.addAndGet(-toSleep) >= toSleep) {
+                n.exe.add(this); //re-input for another thread to continue sleeping
+            }
+
+            Util.pause(toSleep);
+
             return null;
         }
     }

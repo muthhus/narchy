@@ -307,13 +307,6 @@ public class TextUI {
                 }
             }
 
-
-            try {
-                terminal.close();
-            } catch (IOException e) {
-                //e.printStackTrace();
-            }
-
             sessions.remove(this);
         }
 

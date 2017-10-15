@@ -5,6 +5,7 @@ import jcog.Util;
 import jcog.bag.impl.ArrayBag;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Centroid;
+import jcog.list.FasterList;
 import jcog.pri.Pri;
 import jcog.pri.VLink;
 import nars.$;
@@ -20,7 +21,7 @@ import spacegraph.phys.Dynamic;
 import spacegraph.render.Draw;
 import spacegraph.space.Cuboid;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
@@ -114,7 +115,7 @@ public class STMView {
 
 
         @Override
-        protected void get(Collection displayNext) {
+        protected List<SimpleSpatial<X>> get() {
 
             updateRange();
 
@@ -147,16 +148,17 @@ public class STMView {
                 position(cc, ii.getDataRef());
             }
 
-            for (ConceptWidget c : centroids) {
-                if (c != null)
-                    displayNext.add(c);
-            }
-
-            this.bag.forEach(t -> {
-                if (t.isDeleted())
-                    return;
-                displayNext.add(task(widgetize(t.id), t.coord));
-            });
+//            for (ConceptWidget c : centroids) {
+//                if (c != null)
+//                    displayNext.add(c);
+//            }
+//
+//            this.bag.forEach(t -> {
+//                if (t.isDeleted())
+//                    return;
+//                displayNext.add(task(widgetize(t.id), t.coord));
+//            });
+            return new FasterList(centroids);
 
         }
 

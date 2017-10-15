@@ -35,15 +35,15 @@ public class Bagregate<X extends Prioritized> extends PLinkArrayBag<X> {
 
     }
 
-    public void update() {
+    public boolean update() {
         if (src==null || !busy.compareAndSet(false, true))
-            return;
+            return false;
 
         try {
 
             commit();
 
-            float scale = this.scale.floatValue()/((1+size())/2f);
+            float scale = this.scale.floatValue();
 
             src.forEach(x -> {
                 if (include(x)) {
@@ -57,6 +57,7 @@ public class Bagregate<X extends Prioritized> extends PLinkArrayBag<X> {
         } finally {
             busy.set(false);
         }
+        return true;
     }
 
     /**

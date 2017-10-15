@@ -193,7 +193,7 @@ public class Gradius extends NAgentX {
 
     public static void main(String[] args) {
 
-        NAgentX.runRT(Gradius::new, 50f);
+        NAgentX.runRT(Gradius::new, 20f);
 
     }
 

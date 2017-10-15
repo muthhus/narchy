@@ -1,6 +1,6 @@
 package jcog.bloom;
 
-import jcog.util.DoubleBuffer;
+import jcog.util.Flip;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
 
@@ -23,7 +23,7 @@ import java.util.function.Predicate;
  * and only clear the shadow copy right before swapping out the active one.
  * this means 4 bloom filter comparisons for the byte[] key
  */
-public class YesNoMaybe<X> extends DoubleBuffer<Twin<LongBitsetBloomFilter>> {
+public class YesNoMaybe<X> extends Flip<Twin<LongBitsetBloomFilter>> {
 
     public final AtomicLong hit = new AtomicLong();
     public final AtomicLong miss = new AtomicLong();
@@ -72,11 +72,11 @@ public class YesNoMaybe<X> extends DoubleBuffer<Twin<LongBitsetBloomFilter>> {
 
         if (this.count.incrementAndGet() == capacity && this.count.compareAndSet(capacity, -1)) {
             //responsiblity of this thread to clear, then set the value to normal
-            Twin<LongBitsetBloomFilter> pw = preWrite();
+            Twin<LongBitsetBloomFilter> pw = write();
             pw.getOne().clear();
             pw.getTwo().clear();
 
-            pw = write();
+            pw = commit();
             ny = pw.getOne();
             nn = pw.getTwo();
 

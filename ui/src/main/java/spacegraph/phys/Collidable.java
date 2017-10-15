@@ -263,7 +263,7 @@ public class Collidable<X> {
 		return out;
 	}
 
-	public final int getIslandTag() {
+	public final int tag() {
 		return islandTag1;
 	}
 

@@ -6,7 +6,7 @@ import jcog.learn.gng.impl.Centroid;
 import jcog.list.FasterList;
 import jcog.pri.VLink;
 import jcog.pri.op.PriMerge;
-import jcog.util.DoubleBuffer;
+import jcog.util.Flip;
 import nars.$;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +40,7 @@ public class BagClustering<X> {
      * TODO allow dynamic change
      */
     private final short clusters;
-    public DoubleBuffer<List<VLink<X>>> sorted = new DoubleBuffer(FasterList::new);
+    public Flip<List<VLink<X>>> sorted = new Flip(FasterList::new);
 
     public BagClustering(Dimensionalize<X> model, int centroids, int initialCap) {
 
@@ -179,12 +179,12 @@ public class BagClustering<X> {
                         bag.forEach(this::learn);
                     }
 
-                    List<VLink<X>> x = sorted.preWrite();
+                    List<VLink<X>> x = sorted.write();
                     x.clear();
                     bag.forEach((Consumer<VLink<X>>) x::add);
                     x.sort(Comparator.comparingInt(a -> a.centroid));
                     takeSortedClusters.accept(x);
-                    sorted.write();
+                    sorted.commit();
                 }
             } catch (Throwable t) {
                 throw new RuntimeException(t);

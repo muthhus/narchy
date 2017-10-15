@@ -156,8 +156,7 @@ abstract public class NAgentX extends NAgent {
         );
 
 
-        int THREADS = 5;
-
+        int THREADS = 4;
 
         //Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
 
@@ -190,7 +189,7 @@ abstract public class NAgentX extends NAgent {
 
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
-        n.termVolumeMax.setValue(28);
+        n.termVolumeMax.setValue(24);
 
         n.beliefConfidence(0.9f);
         n.goalConfidence(0.9f);

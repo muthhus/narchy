@@ -73,14 +73,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
 
 
     public static Int2Function<Compound> XY(Term root, int width, int height) {
-        return (x, y) -> {
-            return $.inh($.p(x, y), root);
-        };
+        return (x, y) -> $.inh($.p(x, y), root);
     }
     public static Int2Function<Compound> XY(Term root, int radix, int width, int height) {
-        return (x, y) -> {
-            return $.inh($.p($.pRadix(x, radix, width), $.pRadix(y, radix, height)), root);
-        };
+        return (x, y) -> $.inh($.p($.pRadix(x, radix, width), $.pRadix(y, radix, height)), root);
     }
 
     private static Int2Function<Term> RadixProduct(@Nullable Term root, int width, int height, int radix) {
@@ -251,7 +247,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         long now = nar.time();
         int dur = nar.dur();
 
-        float pixelPri = nar.priDefault(BELIEF);
+        float pixelPri =
+                //nar.priDefault(BELIEF);
+                (float) (nar.priDefault(BELIEF)/(Math.sqrt(numPixels)));
                 ///2;
                 ///((float)Math.sqrt(end-start));
 

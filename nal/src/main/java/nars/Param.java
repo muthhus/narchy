@@ -92,12 +92,12 @@ public abstract class Param extends Services<Term,NAR> {
     public static final PriMerge premiseMerge = PriMerge.max;
 
 
-//    /** max budget for derivations from the task and optional belief budget */
-//    public static final FloatFloatToFloatFunction TaskBeliefDerivationMax =
-//            //Util::or;
-//            //UtilityFunctions::aveAri;
-//            Util::and;
-//            //Math::max;
+    /** max budget for derivations from the task and optional belief budget */
+    public static final FloatFloatToFloatFunction TaskBeliefDerivationMax =
+            Util::or;
+            //Util::and;
+            //UtilityFunctions::aveAri;
+            //Math::max;
 
     public static final PriMerge taskMerge = PriMerge.max;
 
