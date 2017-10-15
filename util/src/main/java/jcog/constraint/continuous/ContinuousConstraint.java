@@ -31,7 +31,7 @@ public class ContinuousConstraint {
 
     private static Expression reduce(Expression expr){
 
-        Map<DoubleVar, Double> vars = new LinkedHashMap<>();
+        Map<DoubleVar, Double> vars = new LinkedHashMap<>(expr.terms.size());
         for(DoubleTerm term: expr.terms){
             vars.merge(term.var, term.coefficient, (vv, val)-> val + vv);
         }

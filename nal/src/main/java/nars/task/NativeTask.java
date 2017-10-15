@@ -1,6 +1,7 @@
 package nars.task;
 
 import com.google.common.primitives.Longs;
+import jcog.Util;
 import jcog.pri.Priority;
 import nars.NAR;
 import org.jetbrains.annotations.NotNull;
@@ -116,6 +117,26 @@ public abstract class NativeTask implements ITask {
             if (aa == bb) return 0;
             //as a last resort, compare their system ID
             return Integer.compare(System.identityHashCode(aa), System.identityHashCode(bb)); //maintains uniqueness in case they occupy the same time
+        }
+    }
+
+    public static class SleepTask extends NativeTask {
+
+        private final long ms;
+
+        public SleepTask(long ms) {
+            this.ms = ms;
+        }
+
+        @Override
+        public String toString() {
+            return "sleep(" + ms + "ms)";
+        }
+
+        @Override
+        public @Nullable Iterable<? extends ITask> run(NAR n) {
+            Util.pause(ms);
+            return null;
         }
     }
 

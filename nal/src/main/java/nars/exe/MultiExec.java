@@ -3,6 +3,7 @@ package nars.exe;
 import com.conversantmedia.util.concurrent.ConcurrentQueue;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
+import jcog.exe.AffinityExecutor;
 import jcog.exe.Can;
 import nars.NAR;
 import nars.Task;
@@ -12,6 +13,8 @@ import nars.control.Premise;
 import nars.derive.Conclude;
 import nars.task.ITask;
 import nars.task.NativeTask;
+import net.openhft.affinity.Affinity;
+import net.openhft.affinity.AffinitySupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,19 +32,19 @@ public class MultiExec extends Exec {
     public static final Logger logger = LoggerFactory.getLogger(MultiExec.class);
 
     private final BlockingQueue<ITask> q;
-    private ExecutorService exe;
+    private AffinityExecutor exe;
 
     final Sub[] sub;
     private final int num;
 
-    final static int SUB_CAPACITY = 512;
+    final static int SUB_CAPACITY = 1024;
 
 
     @Deprecated
     final SharedCan deriver = new SharedCan();
 
     public MultiExec(int threads) {
-        this(threads, threads * 32);
+        this(threads, threads * 16);
     }
 
     public MultiExec(int threads, int qSize) {
@@ -53,7 +56,9 @@ public class MultiExec extends Exec {
     @Override
     public synchronized void start(NAR nar) {
         super.start(nar);
-        exe = Executors.newFixedThreadPool(num);
+
+        //exe = Executors.newFixedThreadPool(num);
+        exe = new AffinityExecutor();
 
         for (int i = 0; i < num; i++) {
             exe.execute(sub[i] = new Sub(SUB_CAPACITY, deriver));
@@ -80,62 +85,80 @@ public class MultiExec extends Exec {
 
             Activate.BatchActivate.enable();
 
+            int conc = MultiExec.this.concurrency();
+            int idle = 0;
             while (true) {
                 try {
-                    int conc = MultiExec.this.concurrency();
 
-                    //share task work, slightly more per each than if fairly distributed to ensure it is done ASAP
-                    final float s = ((ConcurrentQueue) q).size();
-                    int maxToPoll = (int) (s / Math.max(1, (conc - 1)));
-                    for (int i = 0; i < maxToPoll; i++) {
-                        ITask k = q.poll();
-                        if (k != null)
-                            execute(k);
-                        else
-                            break;
+                    int s = work(conc);
+
+                    int p = think(conc);
+
+                    if ((s == 0) && (p== 0)) {
+                        Util.pauseNext(idle++);
+                    } else {
+                        Activate.BatchActivate.get().commit(nar);
+                        idle = 0;
                     }
-
-
-                    premiseRemaining = can.share(1f/conc);
-
-                    premiseDone = 0;
-
-                    long start = System.nanoTime();
-                    int loops = 0;
-
-                    plan.commit();
-
-                    //spread the sampling over N batches for fairness
-                    int batches = 8;
-                    int batchSize = plan.capacity()/batches;
-
-                    while (premiseRemaining > 0) {
-
-                        int premiseDoneAtStart = premiseDone;
-
-                        for (int i = 0; i < batches; i++) {
-                            workRemaining = batchSize;
-                            plan.sample(super::exeSample);
-                        }
-
-                        loops++;
-
-                        if (premiseDone == premiseDoneAtStart)
-                            break; //bag contained no premises that could have been processed
-                    }
-
-                    Activate.BatchActivate.get().commit(nar);
-
-                    long end = System.nanoTime();
-
-                    //System.err.println(premiseDone + "/" + work + " in " + loops + " loops\tvalue=" + can.value() + " " + n4((end - start) / 1.0E9) + "sec");
-
-                    can.update(premiseDone, (end - start) / 1.0E9);
 
                 } catch (Throwable t) {
                     logger.error("{} {}", this, t);
                 }
             }
+        }
+
+        public int think(int conc) {
+            int p;
+            if ((p = premiseRemaining = can.share(1f / conc)) > 0) {
+                premiseDone = 0;
+
+                int loops = 0;
+
+
+                //spread the sampling over N batches for fairness
+                int batches = 8;
+                int batchSize = plan.capacity() / batches;
+
+                long start = System.nanoTime();
+
+                while (premiseRemaining > 0) {
+
+                    int premiseDoneAtStart = premiseDone;
+
+                    workRemaining = batchSize;
+                    plan.commit().sample(super::exeSample);
+
+                    loops++;
+
+                    if (premiseDone == premiseDoneAtStart)
+                        break; //encountered no premises in this batch that could have been processed
+                }
+
+                long end = System.nanoTime();
+
+                //System.err.println(premiseDone + "/" + work + " in " + loops + " loops\tvalue=" + can.value() + " " + n4((end - start) / 1.0E9) + "sec");
+
+                can.update(premiseDone, (end - start) / 1.0E9);
+            }
+            return p;
+        }
+
+        public int work(int conc) {
+            int s;
+            float qs = ((ConcurrentQueue) q).size();
+            if (qs > 0) {
+                s = (int) Math.ceil(qs / Math.max(1, (conc - 1)));
+                for (int i = 0; i < s; i++) {
+                    ITask k = q.poll();
+                    if (k != null)
+                        execute(k);
+                    else
+                        break;
+                }
+            } else {
+                s = 0;
+            }
+            return s;
         }
 
         @Override
@@ -235,9 +258,9 @@ public class MultiExec extends Exec {
             return valueCached;
         }
 
-        public void update(int work, double time) {
+        public void update(int work, double timeSec) {
             this.workDone.addAndGet(work);
-            this.time.addAndGet(time);
+            this.time.addAndGet(timeSec);
         }
 
     }

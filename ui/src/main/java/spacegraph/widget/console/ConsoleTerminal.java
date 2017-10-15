@@ -34,6 +34,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 
     public final VirtualTerminal term;
     private final int[] cursorPos = new int[2];
+    private VirtualTerminalListener listener;
 
     public ConsoleTerminal(int cols, int rows) {
         this(new DefaultVirtualTerminal(new TerminalSize(cols, rows)));
@@ -93,7 +94,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     @Override
     public void start(@Nullable Surface parent) {
 
-        term.addVirtualTerminalListener(new VirtualTerminalListener() {
+        term.addVirtualTerminalListener(listener = new VirtualTerminalListener() {
 
 
             @Override
@@ -127,8 +128,13 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     @Override
     public void stop() {
         super.stop();
-        term.close();
+
         onDestroyed();
+
+
+        term.close();
+        term.removeVirtualTerminalListener(listener);
+
     }
 
     @Override

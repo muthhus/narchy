@@ -341,8 +341,8 @@ public class Derivation extends Unify {
                 (belief!=null && (!belief.isEternal() || beliefTerm.isTemporal()));
 
         this.premisePri =
-                //p.priElseZero();
-                belief == null ? task.priElseZero() : Param.TaskBeliefDerivationMax.apply(task.priElseZero(), belief.priElseZero());
+                p.priElseZero();
+                //belief == null ? task.priElseZero() : Param.TaskBeliefDerivationMax.apply(task.priElseZero(), belief.priElseZero());
 
         this.parentCause = belief != null ?
                 Cause.zip(task, belief) :

@@ -154,7 +154,13 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         //n.run(600);
         n.log();
         n.input(
-                "(a-->b).", "(b-->c).","(c-->d).","(a &&+1 b). :|:"
+//                "(a-->b).", "(b-->c).","(c-->d)."
+//                ,"(d-->e).","(e-->a)."
+
+                "{a,b}.", "{b,c}.","{c,d}."
+                ,"{d,e}.","{e,a}."
+
+                //,"(a &&+1 b). :|:"
 
                 //"$.50 at(SELF,{t001}). :|: %1.0;.90%", "$.70 (at(SELF,{t001}) &&+5 open({t001}))! %1.0;.90%" // //goal_ded_2
         );

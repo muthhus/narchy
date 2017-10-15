@@ -309,19 +309,19 @@ public class Emotion extends ConcurrentMonitorRegistry {
     /**
      * sensory prefilter
      */
-    @Nullable
-    public ITask onInput(ITask x, NAR nar) {
-        if (x instanceof Task) {
+    public void onInput(Task x, NAR nar) {
+
             Task t = (Task) x;
             if (t.isCommand())
-                return x; //ignore
+                return; //ignore
 
-            float cost = unitize(t.voluplexity()/((float)nar.termVolumeMax.floatValue())) * t.priElseZero();
+            float cost = unitize(t.voluplexity()/((float)nar.termVolumeMax.floatValue()))
+                    * t.priElseZero()
+            ;
 
             MetaGoal.learn(MetaGoal.Perceive, t.cause(), cost, nar);
-        }
 
-        return x;
+
     }
 
     public void onActivate(Task t, float activation, Concept origin, NAR n) {

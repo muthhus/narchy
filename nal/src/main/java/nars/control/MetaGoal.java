@@ -70,7 +70,7 @@ public enum MetaGoal {
             causes.get(i).commit(causeSummary);
         }
 
-        //final float momentum = 0.99f;
+
 
         int goals = goal.length;
 //        float[] goalFactor = new float[goals];
@@ -87,13 +87,18 @@ public enum MetaGoal {
             Traffic[] cg = c.goalValue;
 
             //mix the weighted current values of each purpose, each independently normalized against the values (the reason for calculating summary statistics in previous step)
-            float v = 0;
+            float next = 0;
             for (int j = 0; j < goals; j++) {
-                v += goal[j] * cg[j].current;
+                next += goal[j] * cg[j].current;
             }
 
-            final float momentum = 0.9f;
-            c.setValue(Util.lerp(momentum, v, c.value()));
+            float prev = c.value();
+            final float momentum =
+                    //0.9f;
+                    0.99f * (1f - Util.unitize(
+                            Math.abs(next) / (1 + Math.max(Math.abs(next), Math.abs(prev)))));
+
+            c.setValue(Util.lerp(momentum, next, prev));
 
             //TODO
             //variation of volume weighted moving average
@@ -160,12 +165,13 @@ public enum MetaGoal {
     public static void learn(MetaGoal p, short[] effects, float strength, FasterList<Cause> causes) {
 
         //assert(strength >= 0);
-        if (Math.abs(strength) < Prioritized.EPSILON) return; //no change
 
         int numCauses = effects.length;
 
         float vPer =
-                strength / numCauses; //fair
+                //strength;
+                strength / numCauses; //divided equally
+        if (Math.abs(vPer) < Prioritized.EPSILON) return; //no change
 
         for (int i = 0; i < numCauses; i++) {
             short c = effects[i];
@@ -175,9 +181,8 @@ public enum MetaGoal {
             /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
 
             //float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
-            if (vPer != 0) {
-                cc.learn(p, vPer);
-            }
+            cc.learn(p, vPer);
+
         }
     }
 

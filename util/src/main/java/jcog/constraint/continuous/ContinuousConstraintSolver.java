@@ -112,9 +112,10 @@ public class ContinuousConstraintSolver {
             //rows.remove(tag.marker);
 
             Symbol leaving = null;
-            for (Symbol s : rows.keySet()) {
-                if (rows.get(s) == row) {
-                    leaving = s;
+            for (Map.Entry<Symbol, Row> s : rows.entrySet()) {
+                if (s.getValue() == row) {
+                    leaving = s.getKey();
+                    break;
                 }
             }
             if (leaving == null) {
@@ -199,11 +200,7 @@ public class ContinuousConstraintSolver {
             DoubleVar variable = varEntry.getKey();
             Row row = this.rows.get(varEntry.getValue());
 
-            if (row == null) {
-                variable.value(0);
-            } else {
-                variable.value(row.getConstant());
-            }
+            variable.value(row == null ? 0 : row.getConstant());
         }
     }
 

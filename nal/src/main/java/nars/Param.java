@@ -68,6 +68,9 @@ public abstract class Param extends Services<Term,NAR> {
     public static boolean TRACE;
 
 
+    //Budget Merging: the sequence listed here is important
+
+    public static final PriMerge activateMerge = PriMerge.plus;
 
     public static final PriMerge termlinkMerge =
             //PriMerge.max;
@@ -77,27 +80,29 @@ public abstract class Param extends Services<Term,NAR> {
             PriMerge.max;
             //PriMerge.plus; //not safe to plus without enough headroom
 
-
-    public static final PriMerge activateMerge = PriMerge.plus;
-    public static final PriMerge premiseMerge = PriMerge.max;
-    public static final PriMerge taskMerge = PriMerge.max;
-
-
-    /** budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links) */
-    public static final FloatFloatToFloatFunction linksToPremise =
+   /** budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links) */
+    public static final FloatFloatToFloatFunction termTaskLinkToPremise =
+            Util::or;
+            //Util::and;
             //UtilityFunctions::aveGeo;
             //UtilityFunctions::aveAri;
-            //Util::or;
-            Util::and;
             //Math::min;
             //Math::max;
 
-    /** max budget for derivations from the task and optional belief budget */
-    public static final FloatFloatToFloatFunction TaskBeliefDerivationMax =
-            Util::or;
-            //UtilityFunctions::aveAri;
-            //Util::and;
-            //Math::max;
+    public static final PriMerge premiseMerge = PriMerge.max;
+
+
+//    /** max budget for derivations from the task and optional belief budget */
+//    public static final FloatFloatToFloatFunction TaskBeliefDerivationMax =
+//            //Util::or;
+//            //UtilityFunctions::aveAri;
+//            Util::and;
+//            //Math::max;
+
+    public static final PriMerge taskMerge = PriMerge.max;
+
+
+
 
     /** maximum time (in durations) that a signal task can latch its last value before it becomes unknown */
     public final static int SIGNAL_LATCH_TIME_MAX =
@@ -110,7 +115,7 @@ public abstract class Param extends Services<Term,NAR> {
     public final FloatParam deriverity = new FloatParam(1.0f, 0f, 1f);
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTLmax = new MutableInteger(96);
+    public final MutableInteger matchTTLmax = new MutableInteger(128);
     public final MutableInteger matchTTLmin = new MutableInteger(24);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
@@ -118,7 +123,6 @@ public abstract class Param extends Services<Term,NAR> {
 
     public static final int TTL_PREMISE_MIN =
             Param.TTL_UNIFY * 2 +
-            Param.TTL_DERIVE_TRY +
             Param.TTL_DERIVE_TASK_SUCCESS;
 
     /** cost of attempting a unification */
@@ -126,9 +130,6 @@ public abstract class Param extends Services<Term,NAR> {
 
     /** cost of executing a termute permutation */
     public static final int TTL_MUTATE = 1;
-
-    /** cost of substitution/evaluating a derived term */
-    public static final int TTL_DERIVE_TRY = 1;
 
     /** cost of a successful task derivation */
     public static final int TTL_DERIVE_TASK_SUCCESS = 4;
@@ -335,13 +336,11 @@ public abstract class Param extends Services<Term,NAR> {
 
     /**
      * controls the speed (0..+1.0) of budget propagating from compound
-     * terms to their subterms by adjusting the proportion of priority
-     * retained by a compound vs. its subterms during an activation
-
-     * values of 0 means all budget is transferred to subterms,
-     * values of 1 means no budget is transferred
-     */
-    public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
+     * terms to their subterms
+     * 0 momentum means an activation is fired completely and suddenly
+     * 1 momentum means it retains all activation
+     * */
+    public final FloatParam momentum = new FloatParam(0.9f, 0, 1f);
 
     /**
      * dt > 0

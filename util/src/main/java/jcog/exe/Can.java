@@ -64,11 +64,11 @@ public class Can {
     /**
      * totalTime in sec
      */
-    public void update(int supplied, double totalValue, double totalTime) {
+    public void update(int supplied, double totalValue, double totalTimeSec) {
         supply.addValue(supplied);
         if (supplied > 0) {
             value.addValue(totalValue / supplied);
-            iterationTime.addValue(totalTime / supplied);
+            iterationTime.addValue(totalTimeSec / supplied);
         }
     }
 

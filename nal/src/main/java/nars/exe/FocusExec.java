@@ -191,30 +191,6 @@ public class FocusExec extends Exec implements Runnable {
         }
     }
 
-    protected void execute(ITask x) {
-
-        Iterable<? extends ITask> y = null;
-
-        try {
-
-            y = x.run(nar);
-
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        } catch (Throwable e) {
-            if (Param.DEBUG) {
-                throw e;
-            } else {
-                logger.error("exe {} {}", x, e /*(Param.DEBUG) ? e : e.getMessage()*/);
-                x.delete();
-            }
-        }
-
-        if (y != null) {
-            y.forEach(this::add);
-        }
-
-    }
 
 
     @Override

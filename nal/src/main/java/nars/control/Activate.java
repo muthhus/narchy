@@ -205,7 +205,7 @@ public class Activate extends UnaryTask<Concept> {
                         final Term term = termlink.get();
                         if (term != null) {
 
-                            float pri = Param.linksToPremise.apply(task.priElseZero(), termlink.priElseZero());
+                            float pri = Param.termTaskLinkToPremise.apply(task.priElseZero(), termlink.priElseZero());
                             Premise p = new Premise(task, term, pri, targetConcepts);
                             pending.add(p);
                         }
@@ -232,7 +232,7 @@ public class Activate extends UnaryTask<Concept> {
         int toFire = (int) Math.ceil(n * freed);
 
         float budgeted = priElseZero() * freed;
-        float budgetedToEach = budgeted / n;
+        float budgetedToEach = budgeted / toFire;
         if (budgetedToEach < Pri.EPSILON)
             return;
 
@@ -246,7 +246,7 @@ public class Activate extends UnaryTask<Concept> {
             Termed t = targets.get(nextTarget++);
             if (nextTarget == numTargets)
                 nextTarget = 0;
-            linkTemplate(t, budgetedToEach/2f, budgetedToEach/2f, ba, nar, refund);
+            linkTemplate(t, budgetedToEach, budgetedToEach, ba, nar, refund);
         }
 
         float r = refund.floatValue();

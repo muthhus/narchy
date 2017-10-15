@@ -16,6 +16,8 @@ import com.googlecode.lanterna.terminal.ansi.ANSITerminal;
 import com.googlecode.lanterna.terminal.ansi.TelnetTerminal;
 import com.googlecode.lanterna.terminal.ansi.TelnetTerminalServer;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
+import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
+import com.googlecode.lanterna.terminal.virtual.VirtualTerminalListener;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,6 +110,7 @@ public class TextUI {
         private final Terminal terminal;
         private TerminalScreen screen;
         private Thread thread;
+        private MultiWindowTextGUI tui;
 
         public TextGUI(NAR nar, Terminal terminal, float fps) {
             super(nar);
@@ -129,10 +133,7 @@ public class TextUI {
 
         @Override
         protected void stop(NAR nar) {
-            synchronized (terminal) {
-                thread.interrupt();
-                thread = null;
-            }
+            end();
             super.stop(nar);
         }
 
@@ -144,6 +145,29 @@ public class TextUI {
                 if (terminal instanceof ANSITerminal)
                     ((ANSITerminal) terminal).setMouseCaptureMode(MouseCaptureMode.CLICK);
 
+                if  (terminal instanceof VirtualTerminal)
+                    ((VirtualTerminal)terminal).addVirtualTerminalListener(new VirtualTerminalListener() {
+                        @Override
+                        public void onFlush() {
+
+                        }
+
+                        @Override
+                        public void onBell() {
+
+                        }
+
+                        @Override
+                        public void onClose() {
+                            end();
+                        }
+
+                        @Override
+                        public void onResized(Terminal terminal, TerminalSize terminalSize) {
+
+                        }
+                    });
+
                 screen = new TerminalScreen(terminal);
                 screen.startScreen();
             } catch (IOException e) {
@@ -153,9 +177,9 @@ public class TextUI {
             }
 
 
-            final MultiWindowTextGUI textGUI = new MultiWindowTextGUI(screen);
-            textGUI.setBlockingIO(false);
-            //textGUI.setEOFWhenNoWindows(true);
+            tui = new MultiWindowTextGUI(screen);
+            //tui.setBlockingIO(true);
+            tui.setEOFWhenNoWindows(true);
 
 
             TextColor.Indexed limegreen = TextColor.ANSI.Indexed.fromRGB(127, 255, 0);
@@ -181,7 +205,7 @@ public class TextUI {
 
             st.setWindowPostRenderer(null);
 
-            textGUI.setTheme(st);
+            tui.setTheme(st);
 
             final BasicWindow window = new BasicWindow();
             window.setHints(List.of(Window.Hint.FULL_SCREEN, NO_POST_RENDERING));
@@ -256,14 +280,13 @@ public class TextUI {
             p.addComponent(input, BOTTOM);
             window.setComponent(p);
 
-            textGUI.getGUIThread().invokeLater(defaultMenu);
-            textGUI.getGUIThread().invokeLater(input::takeFocus);
+            tui.getGUIThread().invokeLater(defaultMenu);
+            tui.getGUIThread().invokeLater(input::takeFocus);
 
-            textGUI.addWindowAndWait(window);
-
+            tui.addWindowAndWait(window);
         }
 
-        final void end() {
+        final synchronized void end() {
 
             if (screen != null) {
                 try {
@@ -273,12 +296,22 @@ public class TextUI {
                 }
             }
 
-            if (terminal != null) {
-                try {
-                    terminal.close();
-                } catch (IOException e) {
-                    //e.printStackTrace();
+            Collection<Window> w = tui.getWindows();
+            w.forEach(Window::close);
+            w.forEach(tui::removeWindow);
+
+            synchronized (terminal) {
+                if (thread!=null) {
+                    thread.interrupt();
+                    thread = null;
                 }
+            }
+
+
+            try {
+                terminal.close();
+            } catch (IOException e) {
+                //e.printStackTrace();
             }
 
             sessions.remove(this);
@@ -412,6 +445,8 @@ public class TextUI {
 
             @Override
             public synchronized void onRemoved(Container container) {
+                super.onRemoved(container);
+                removeAllComponents();
                 on.off();
             }
 
@@ -494,6 +529,7 @@ public class TextUI {
             @Override
             public synchronized void onRemoved(Container container) {
                 super.onRemoved(container);
+                clearItems();
                 onCycle.off();
             }
 
@@ -524,6 +560,7 @@ public class TextUI {
             @Override
             public synchronized void onRemoved(Container container) {
                 super.onRemoved(container);
+                clearItems();
                 onTask.off();
             }
 

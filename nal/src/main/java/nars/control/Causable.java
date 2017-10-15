@@ -145,7 +145,7 @@ abstract public class Causable extends NARService {
         @Override public void commit() {
             int ii = iterations();
             if (ii > 0)
-                nar.input(new InvokeCause(Causable.this, ii));
+                nar.exe.add(new InvokeCause(Causable.this, ii));
         }
     }
 }

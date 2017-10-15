@@ -15,8 +15,6 @@ import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.data.reflect;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
 import nars.term.Term;
@@ -41,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
+import spacegraph.layout.VSplit;
 import spacegraph.render.Draw;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
@@ -321,6 +320,7 @@ abstract public class NAgentX extends NAgent {
 
         NARLoop loop = a.nar.startFPS(narFPS);
 
+
         a.nar.runLater(() -> {
 
             chart(a);
@@ -331,13 +331,20 @@ abstract public class NAgentX extends NAgent {
 
             window(grid(Vis.reflect(n)), 700, 600);
 
-            window(col(
-                    metaGoalChart(a),
-                    row(
-                            metaGoalPlot(a),
-                            metaGoalControls(n)
-                    )
-            ), 800, 500);
+            Surface exePanel = row(
+                Vis.reflect(n.loop)
+            );
+
+
+            window(
+                new VSplit(exePanel,
+                    col(
+                        metaGoalChart(a),
+                        row(
+                                metaGoalPlot(a),
+                                metaGoalControls(n)
+                        )),
+            0.1f), 800, 800);
 
         });
 
@@ -515,7 +522,8 @@ abstract public class NAgentX extends NAgent {
         FloatParam gain = new FloatParam(1f, 0f, 10f);
 
         BitmapMatrixView bmp = new BitmapMatrixView((i) ->
-                gain.floatValue() * Util.tanhFast(nar.causes.get(i).value()),
+                gain.floatValue() * nar.causes.get(i).value(),
+                        //Util.tanhFast(nar.causes.get(i).value()),
                 s, Math.max(1, (int) Math.sqrt(s)),
                 Draw::colorBipolar) {
 

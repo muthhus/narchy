@@ -50,7 +50,6 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
         NAR nar = d.nar;
 
-        d.use(Param.TTL_DERIVE_TRY);
         nar.emotion.derivationEval.increment();
 
         Term c1 =

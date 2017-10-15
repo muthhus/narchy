@@ -8,6 +8,7 @@ import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
+import nars.NARLoop;
 import nars.Param;
 import nars.Task;
 import nars.control.Activate;
@@ -15,6 +16,7 @@ import nars.control.Premise;
 import nars.task.ITask;
 import nars.task.NALTask;
 import jcog.constraint.continuous.exceptions.InternalSolverError;
+import nars.task.NativeTask;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+
+import static jcog.Util.sqr;
 
 /**
  *
@@ -39,11 +43,35 @@ abstract public class Exec implements Executor, PriMerge {
 
     private On onClear;
 
-    /** overload tripping calibration */
-    final static float SAFETY_LOAD_THRESHOLD = 0.95f;
 
     /** schedules the task for execution but makes no guarantee it will ever actually execute */
     abstract public void add(/*@NotNull*/ ITask input);
+
+
+    protected void execute(ITask x) {
+
+        Iterable<? extends ITask> y = null;
+
+        try {
+
+            y = x.run(nar);
+
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        } catch (Throwable e) {
+            if (Param.DEBUG) {
+                throw e;
+            } else {
+                logger.error("exe {} {}", x, e /*(Param.DEBUG) ? e : e.getMessage()*/);
+                x.delete();
+            }
+        }
+
+        if (y != null) {
+            y.forEach(this::add);
+        }
+
+    }
 
     /** an estimate or exact number of parallel processes this runs */
     abstract public int concurrency();
@@ -129,20 +157,35 @@ abstract public class Exec implements Executor, PriMerge {
 
         double defaultCycleTime = 1.0; //sec
 
-        if (nar.exe.load() > SAFETY_LOAD_THRESHOLD)
-            return;
 
-        double nextCycleTime = Math.max(1, nar.exe.concurrency() - 1) * (
-                nar.loop.isRunning() ? nar.loop.periodMS.intValue() * 0.001 : defaultCycleTime
+        NARLoop loop = nar.loop;
+
+        double nextCycleTime = Math.max(1, concurrency() - 1) * (
+                loop.isRunning() ? loop.periodMS.intValue() * 0.001 : defaultCycleTime
         );
-        // * (1f - nar.exe.load());
 
-        try {
-            sched.solve(can, nextCycleTime);
+        float throttle = loop.cpuThrottle.floatValue();
+        double dutyCycleTime = nextCycleTime * throttle * (1f - sqr(nar.exe.load()));
+        double sleepTime = nextCycleTime * (1f - throttle);
 
-            sched.estimatedTimeTotal(can);
-        } catch (InternalSolverError e) {
-            logger.error("{} {}", can, e);
+        if (dutyCycleTime > 0) {
+            try {
+                sched.solve(can, dutyCycleTime);
+
+                //sched.estimatedTimeTotal(can);
+            } catch (InternalSolverError e) {
+                logger.error("{} {}", can, e);
+            }
+        }
+
+        final double MIN_SLEEP_TIME = 0.001f; //1 ms
+        double sleepEach = sleepTime / concurrency();
+        if (sleepEach > MIN_SLEEP_TIME) {
+            int msToSleep = (int)Math.ceil(sleepEach*1000);
+            NativeTask.SleepTask replicated = new NativeTask.SleepTask(msToSleep);
+            for (int i = 0; i < concurrency(); i++) {
+                nar.exe.add(replicated);
+            }
         }
 
     }

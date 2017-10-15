@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.data.FloatParam;
 import jcog.exe.Loop;
 import nars.control.Activate;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,8 @@ public class NARLoop extends Loop {
 
     @NotNull
     public final NAR nar;
+
+    public final FloatParam cpuThrottle = new FloatParam(1f, 0f, 1f);
 
     /**
      * starts paused; thread is not automatically created
