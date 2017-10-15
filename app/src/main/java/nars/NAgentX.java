@@ -258,9 +258,9 @@ abstract public class NAgentX extends NAgent {
         nin.start();
 
 
-        AgentService mc = MetaGoal.newController(a);
+//        AgentService mc = MetaGoal.newController(a);
 
-        MetaGoal.newValueSynergizer(n);
+//        MetaGoal.newValueSynergizer(n);
 
         //init();
 

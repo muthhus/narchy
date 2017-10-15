@@ -37,7 +37,7 @@ abstract public class TaskBeliefOccurrence extends AbstractPred<Derivation> {
     public static final PrediTerm eventsOrEternals = new TaskBeliefOccurrence("eventsOrEternals") {
 
         @Override
-        public boolean test(@NotNull Derivation m) {
+        public boolean test(Derivation m) {
             Task b = m.belief;
             if (b == null)
                 return false;
@@ -46,33 +46,33 @@ abstract public class TaskBeliefOccurrence extends AbstractPred<Derivation> {
     };
 
     /**
-     * both task and belief are temporal and task precedes belief
+     * both task and belief are temporal or belief precedes task
      */
     public static final PrediTerm after = new TaskBeliefOccurrence("after") {
 
         @Override
-        public boolean test(@NotNull Derivation m) {
+        public boolean test(Derivation m) {
             Task b = m.belief;
             if (b == null)
                 return false;
             Task t = m.task;
-            return (!t.isEternal() && !b.isEternal()) && (t.start() <= b.end());
+            return (!t.isEternal() && !b.isEternal()) && (t.start() >= b.end());
         }
     };
 
     /**
-     * both task and belief are eternal, or task precedes belief
+     * both task and belief are eternal, or belief precedes task
      */
     public static final PrediTerm afterOrEternals = new TaskBeliefOccurrence("afterOrEternals") {
 
         @Override
-        public boolean test(@NotNull Derivation m) {
+        public boolean test(Derivation m) {
             Task b = m.belief;
             if (b == null)
                 return false;
             Task t = m.task;
             boolean ete = t.isEternal();
-            return (ete == b.isEternal()) && (ete || t.start() <= b.end());
+            return (ete == b.isEternal()) && (ete || t.start() >= b.end());
         }
     };
 

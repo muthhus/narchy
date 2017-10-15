@@ -10,7 +10,6 @@ import nars.term.transform.Retemporalize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static nars.Op.GOAL;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -27,10 +26,11 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
     private final static Logger logger = LoggerFactory.getLogger(Conclusion.class);
     public final Term pattern;
-    @Deprecated private final boolean urgent;
+    @Deprecated
+    private final boolean urgent;
 
 
-//    public final Set<Variable> uniqueVars;
+    //    public final Set<Variable> uniqueVars;
     public final PremiseRule rule;
 
     public Conclusion(Term id, Term pattern, PremiseRule rule) {
@@ -42,9 +42,6 @@ public final class Conclusion extends AbstractPred<Derivation> {
     }
 
 
-
-
-
     @Override
     public final boolean test(Derivation d) {
 
@@ -53,7 +50,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
         nar.emotion.derivationEval.increment();
 
         Term c1 =
-            pattern.eval(d);
+                pattern.eval(d);
 
         int volMax = d.termVolMax;
         if (c1 == null || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
@@ -106,21 +103,21 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
             if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
 
-            if (urgent && d.concPunc == GOAL) {
-                long taskStart = d.task.start();
-
-                if (taskStart == ETERNAL) {
-                    occ[0] = occ[1] = d.time;
-
-                    //if (taskStart != ETERNAL) {
-                } else if (occ[0] != ETERNAL && occ[0] < taskStart) {
-
-                    long taskDur = occ[1] - occ[0];
-                    occ[0] = taskStart;
-                    occ[1] = occ[0] + taskDur;
-
-                }
-            }
+//            if (urgent && d.concPunc == GOAL) {
+//                long taskStart = d.task.start();
+//
+//                if (taskStart == ETERNAL) {
+//                    occ[0] = occ[1] = d.time;
+//
+//                    //if (taskStart != ETERNAL) {
+//                } else if (occ[0] != ETERNAL && occ[0] < taskStart) {
+//
+//                    long taskDur = occ[1] - occ[0];
+//                    occ[0] = taskStart;
+//                    occ[1] = occ[0] + taskDur;
+//
+//                }
+//            }
 
         } else {
             c2 = c1.temporalize(Retemporalize.retemporalizeAllToDTERNAL);
@@ -132,12 +129,10 @@ public final class Conclusion extends AbstractPred<Derivation> {
         if (c2 == null)
             return false;
 
-        if (d.live()) {
-            d.derivedTerm.set(c2);
-            return true;
-        } else {
-            return false;
-        }
+
+        d.derivedTerm.set(c2);
+        return true;
+
     }
 
 

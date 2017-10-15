@@ -14,14 +14,15 @@
 //    B, A, time(raw), task("."), time(dtEvents)                       notImpl(A) |- (A ==>+- B), (Belief:Induction)
 //    B, A, time(raw), task("."), time(dtEventsOrEternals), neqAndCom(A,B),       notImpl(A) |- varIntro((A ==>+- B)), (Belief:Induction)
 
-    B, A, time(raw), task("."), time(dtEvents), notImpl(B) |- (B ==>+- A), (Belief:Abduction)
-    B, A, time(raw), task("."), time(dtEventsOrEternals), neqAndCom(A,B),         notImpl(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
-        B, A, time(raw), task("."), time(dtEvents), notImpl(B) |- (--B ==>+- A), (Belief:AbductionN)
-        B, A, time(raw), task("."), time(dtEventsOrEternals), neqAndCom(A,B),     notImpl(B) |- varIntro((--B ==>+- A)), (Belief:AbductionN)
-    B, A, time(raw), task("."), time(dtEvents),  notImpl(A) |- (A ==>+- B), (Belief:Induction)
-    B, A, time(raw), task("."), time(dtEventsOrEternals), neqAndCom(A,B),       notImpl(A) |- varIntro((A ==>+- B)), (Belief:Induction)
-        B, A, time(raw), task("."), time(dtEvents), notImpl(A) |- (--A ==>+- B), (Belief:InductionPN)
-        B, A, time(raw), task("."), time(dtEventsOrEternals), neqAndCom(A,B),   notImpl(A) |- varIntro((--A ==>+- B)), (Belief:InductionPN)
+    B, A, time(raw), task("."), time(dtAfter),  notImpl(A) |- (A ==>+- B), (Belief:Induction)
+    B, A, time(raw), task("."), time(dtAfterOrEternals), neqAndCom(A,B),       notImpl(A) |- varIntro((A ==>+- B)), (Belief:Induction)
+        B, A, time(raw), task("."), time(dtAfter), notImpl(A) |- (--A ==>+- B), (Belief:InductionPN)
+        B, A, time(raw), task("."), time(dtAfterOrEternals), neqAndCom(A,B),   notImpl(A) |- varIntro((--A ==>+- B)), (Belief:InductionPN)
+
+    B, A, time(raw), task("."), time(dtAfter), notImpl(B) |- (B ==>+- A), (Belief:AbductionPB)
+    B, A, time(raw), task("."), time(dtAfterOrEternals), neqAndCom(A,B),         notImpl(B) |- varIntro((B ==>+- A)), (Belief:AbductionPB)
+        B, A, time(raw), task("."), time(dtAfter), notImpl(B) |- (--B ==>+- A), (Belief:AbductionPBN)
+        B, A, time(raw), task("."), time(dtAfterOrEternals), neqAndCom(A,B),     notImpl(B) |- varIntro((--B ==>+- A)), (Belief:AbductionPBN)
 
 //    B, A, time(raw), task(positive), task("."), time(dtEvents), notImpl(B) |- (B ==>+- A), (Belief:Abduction)
 //    B, A, time(raw), task(positive), task("."), time(dtEventsOrEternals), neqAndCom(A,B),         notImpl(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
