@@ -28,13 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.BELIEF;
-import static nars.control.Activate.taskActivate;
+import static nars.concept.TermLinks.linkTask;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -113,7 +111,7 @@ public class Premise extends UnaryTask {
         if (l != null) {
             links = null;
 
-            taskActivate(this.taskLink, l,
+            linkTask(this.taskLink, l,
                     1f
                     /*decayed*/);
         }

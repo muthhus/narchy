@@ -115,8 +115,8 @@ public abstract class Param extends Services<Term,NAR> {
     public final FloatParam deriverity = new FloatParam(1.0f, 0f, 1f);
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTLmax = new MutableInteger(128);
-    public final MutableInteger matchTTLmin = new MutableInteger(24);
+    public final MutableInteger matchTTLmax = new MutableInteger(256);
+    public final MutableInteger matchTTLmin = new MutableInteger(64);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.25f;
@@ -156,7 +156,7 @@ public abstract class Param extends Services<Term,NAR> {
         float[] w = this.want;
 
         //follows the pos/neg guidelines described in the comment of each MetaGoal
-        Perceive.want(w, -0.01f);
+        Perceive.want(w, -0.05f);
         Believe.want(w, 0.1f);
         Desire.want(w, 0.1f);
         Accurate.want(w, 0.1f);

@@ -18,6 +18,7 @@ package nars.term;
 
 import nars.*;
 import nars.concept.Concept;
+import nars.derive.match.EllipsisMatch;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.container.ArrayTermVector;
@@ -35,6 +36,7 @@ import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.Op.*;
 import static nars.task.RevisionTest.x;
+import static nars.time.Tense.DTERNAL;
 import static org.junit.Assert.*;
 
 /**
@@ -241,6 +243,7 @@ public class TermTest {
 
 
 
+
 //    @Test
 //    public void testEscaping() {
 //        bidiEscape("c d", "x$# x", "\\\"sdkf sdfjk", "_ _");
@@ -336,6 +339,17 @@ public class TermTest {
     }
 
 
+    @Test public void testFromEllipsisMatch() {
+        Term xy = EllipsisMatch.match($.the("x"), $.the("y"));
+
+        for (Op o : new Op[] { Op.SECTi, SECTe, DIFFe, DIFFi, CONJ }) {
+            Term z = o.the(DTERNAL, xy);
+            assertEquals("(x" + o.str + "y)", z.toString());
+            assertEquals(3, z.volume());
+            assertEquals(Op.ATOM, z.sub(0).op());
+            assertEquals(Op.ATOM, z.sub(1).op());
+        }
+    }
 
 //    public void nullCachedName(String term) {
 //        NAR n = NARS.shell();

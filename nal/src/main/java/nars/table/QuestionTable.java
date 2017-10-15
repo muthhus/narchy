@@ -7,7 +7,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
-import nars.control.Activate;
+import nars.concept.TermLinks;
 import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
 
@@ -133,7 +133,7 @@ public interface QuestionTable extends TaskTable {
             }
 
             if (act[0] > Pri.EPSILON) {
-                Activate.activate(u, act[0], n, c);
+                TermLinks.linkTask(u, act[0], n, c);
             }
         }
 

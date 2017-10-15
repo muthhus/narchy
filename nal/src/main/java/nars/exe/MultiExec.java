@@ -8,19 +8,15 @@ import jcog.exe.Can;
 import nars.NAR;
 import nars.Task;
 import nars.control.Activate;
+import nars.control.BatchActivate;
 import nars.control.Cause;
 import nars.control.Premise;
 import nars.derive.Conclude;
 import nars.task.ITask;
-import nars.task.NativeTask;
-import net.openhft.affinity.Affinity;
-import net.openhft.affinity.AffinitySupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
@@ -88,7 +84,7 @@ public class MultiExec extends Exec {
         @Override
         public void run() {
 
-            Activate.BatchActivate.enable();
+            BatchActivate ba = BatchActivate.get();
 
             int conc = MultiExec.this.concurrency();
             int idle = 0;
@@ -102,7 +98,7 @@ public class MultiExec extends Exec {
                     if ((s == 0) && (p== 0)) {
                         Util.pauseNext(idle++);
                     } else {
-                        Activate.BatchActivate.get().commit(nar);
+                        ba.commit(nar);
                         idle = 0;
                     }
 
@@ -121,8 +117,8 @@ public class MultiExec extends Exec {
 
 
                 //spread the sampling over N batches for fairness
-                int batches = 8;
-                int batchSize = plan.capacity() / batches;
+                int batches = 4;
+                int batchSize = Math.max(8, plan.size() / batches);
 
                 long start = System.nanoTime();
 

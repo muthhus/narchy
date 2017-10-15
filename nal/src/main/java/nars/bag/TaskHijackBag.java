@@ -5,7 +5,7 @@ import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.concept.BaseConcept;
-import nars.control.Activate;
+import nars.concept.TermLinks;
 import nars.table.TaskTable;
 import nars.task.NALTask;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -92,7 +92,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
             }
         }
 
-        Activate.activate(y, activation, n, c);
+        TermLinks.linkTask(y, activation, n, c);
     }
 
 

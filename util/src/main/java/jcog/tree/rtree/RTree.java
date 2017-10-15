@@ -1,29 +1,28 @@
 package jcog.tree.rtree;
 
-/*
- * #%L
- * Conversant RTree
- * ~~
- * Conversantmedia.com © 2016, Conversant, Inc. Conversant® is a trademark of Conversant, Inc.
- * ~~
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
+        /*
+         * #%L
+         * Conversant RTree
+         * ~~
+         * Conversantmedia.com © 2016, Conversant, Inc. Conversant® is a trademark of Conversant, Inc.
+         * ~~
+         * Licensed under the Apache License, Version 2.0 (the "License");
+         * you may not use this file except in compliance with the License.
+         * You may obtain a copy of the License at
+         *
+         *      http://www.apache.org/licenses/LICENSE-2.0
+         *
+         * Unless required by applicable law or agreed to in writing, software
+         * distributed under the License is distributed on an "AS IS" BASIS,
+         * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+         * See the License for the specific language governing permissions and
+         * limitations under the License.
+         * #L%
+         */
 
 
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
@@ -84,7 +83,7 @@ public class RTree<T> implements Space<T> {
     public boolean add(/*@NotNull*/ final T t) {
         int before = size;
         Node<T, ?> nextRoot = root.add(t, this, model);
-        if (nextRoot!=null) {
+        if (nextRoot != null) {
             this.root = nextRoot;
             int after = size;
             assert (after == before || after == before + 1) : "after=" + after + ", before=" + before;
@@ -95,9 +94,8 @@ public class RTree<T> implements Space<T> {
     }
 
 
-
-
-    @Override public Spatialization<T> model() {
+    @Override
+    public Spatialization<T> model() {
         return model;
     }
 
@@ -154,12 +152,22 @@ public class RTree<T> implements Space<T> {
     }
 
     @Override
-    public boolean intersecting(HyperRegion intersecting, Predicate<T> consumer) {
-        return size() > 0 && root.intersecting(intersecting, consumer, model);
+    public void intersecting(HyperRegion rect, Predicate<T> t) {
+        if (size > 0)
+            root.intersecting(rect, t, model);
     }
 
-    /** returns how many items were filled */
-    @Override public int containedToArray(HyperRegion rect, final T[] t) {
+    @Override
+    public void containing(HyperRegion rect, final Predicate<T> t) {
+        if (size > 0)
+            root.containing(rect, t, model);
+    }
+
+    /**
+     * returns how many items were filled
+     */
+    @Override
+    public int containedToArray(HyperRegion rect, final T[] t) {
         final int[] i = {0};
         root.containing(rect, (x) -> {
             t[i[0]++] = x;
@@ -172,10 +180,6 @@ public class RTree<T> implements Space<T> {
         return root.containedSet(rect, model);
     }
 
-    @Override
-    public boolean containing(HyperRegion rect, final Predicate<T> t) {
-        return root.containing(rect, t, model);
-    }
 
     void instrumentTree() {
         root = root.instrument();

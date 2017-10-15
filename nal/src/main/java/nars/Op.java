@@ -129,16 +129,16 @@ public enum Op {
      */
     CONJ("&&", true, 5, Args.GTETwo) {
         @Override
-        public Term _the(int dt, Term... tt) {
+        public Term _the(int dt, Term... u) {
 
-            final int n = tt.length;
+            final int n = u.length;
             switch (n) {
 
                 case 0:
                     return True;
 
                 case 1:
-                    Term only = tt[0];
+                    Term only = u[0];
 
                     if (only instanceof EllipsisMatch) {
                         EllipsisMatch em = (EllipsisMatch) only;
@@ -160,7 +160,7 @@ public enum Op {
 
 
             int absoluteness = 0, trues = 0;
-            for (Term t : tt) {
+            for (Term t : u) {
                 if (t instanceof Bool) {
                     if (t == Null) return Null;
                     if (t == False) {
@@ -180,14 +180,14 @@ public enum Op {
 
                     //filter out all boolean terms
 
-                    int size = tt.length - trues;
+                    int size = u.length - trues;
                     if (size == 0)
                         return True;
 
                     Term[] y = new Term[size];
                     int j = 0;
                     for (int i = 0; j < y.length; i++) {
-                        Term uu = tt[i];
+                        Term uu = u[i];
                         if (uu != True) // && (!uu.equals(False)))
                             y[j++] = uu;
                     }
@@ -204,13 +204,13 @@ public enum Op {
 
             if (dt == XTERNAL) {
                 //only sort (but dont deduplicate, allowing repeat)
-                Arrays.sort(tt);
-                return compound(CONJ, XTERNAL, tt);
+                Arrays.sort(u);
+                return compound(CONJ, XTERNAL, u);
             }
 
             if (dt == DTERNAL || dt == 0) {
 
-                Term f = junctionFlat(dt, tt);
+                Term f = junctionFlat(dt, u);
                 return implInConjReduction(f);
 
             } else {
@@ -220,8 +220,8 @@ public enum Op {
                 if (n > 2)
                     return Null; //"invalid non-commutive conjunction arity!=2, arity=" + n;
 
-                Term a = tt[0];
-                Term b = tt[1];
+                Term a = u[0];
+                Term b = u[1];
 
                 //convention: left align all sequences
                 //ex: (x &&+ (y &&+ z))
@@ -263,14 +263,14 @@ public enum Op {
                     dt = Math.abs(dt);
                 } else if (order > 0) {
                     //ensure lexicographic ordering
-                    Term x = tt[0];
-                    tt[0] = tt[1];
-                    tt[1] = x; //swap
+                    Term x = u[0];
+                    u[0] = u[1];
+                    u[1] = x; //swap
                     dt = -dt;
                 }
 
                 return implInConjReduction(
-                        compound(CONJ, dt, tt)
+                        compound(CONJ, dt, u)
                 );
 
             }
@@ -475,27 +475,27 @@ public enum Op {
     @Deprecated
     INSTANCE("-{-", 2, OpType.Statement, Args.Two) {
         @Override
-        @NotNull Term _the(int dt, Term[] uu) {
-            assert (uu.length == 2);
-            return INH.the(SETe.the(uu[0]), uu[1]);
+        @NotNull Term _the(int dt, Term[] u) {
+            assert (u.length == 2);
+            return INH.the(SETe.the(u[0]), u[1]);
         }
     },
 
     @Deprecated
     PROPERTY("-]-", 2, OpType.Statement, Args.Two) {
         @Override
-        @NotNull Term _the(int dt, Term[] uu) {
-            assert (uu.length == 2);
-            return INH.the(uu[0], SETi.the(uu[1]));
+        @NotNull Term _the(int dt, Term[] u) {
+            assert (u.length == 2);
+            return INH.the(u[0], SETi.the(u[1]));
         }
     },
 
     @Deprecated
     INSTANCE_PROPERTY("{-]", 2, OpType.Statement, Args.Two) {
         @Override
-        @NotNull Term _the(int dt, Term[] uu) {
-            assert (uu.length == 2);
-            return INH.the(SETe.the(uu[0]), SETi.the(uu[1]));
+        @NotNull Term _the(int dt, Term[] u) {
+            assert (u.length == 2);
+            return INH.the(SETe.the(u[0]), SETi.the(u[1]));
         }
     },
 
@@ -1266,7 +1266,7 @@ public enum Op {
     /**
      * last stage constructor: use with caution
      */
-    @NotNull
+    /*@NotNull*/
     static Term compound(Op op, int dt, Term... subterms) {
         return compound(compound(op, subterms), dt);
     }
@@ -1316,8 +1316,8 @@ public enum Op {
 
     private static final int InvalidImplicationSubj = or(IMPL);
 
-    @NotNull
-    static Term statement(/*@NotNull*/ Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
+    /*@NotNull*/
+    static Term statement(/*@NotNull*/ Op op, int dt, /*@NotNull*/ Term subject, /*@NotNull*/ Term predicate) {
 
         if (subject == Null || predicate == Null)
             return Null;
@@ -1780,30 +1780,43 @@ public enum Op {
                 ;
     }
 
-    @NotNull
-    public final Term the(@NotNull Term... u) {
-        return commutative ? the(DTERNAL, u) : _the(DTERNAL, u);
+
+    public final Term the(/*@NotNull*/ Term... u) {
+        return the(DTERNAL, u);
     }
 
-    public final Term the(int dt, @NotNull Collection<Term> sub) {
+    public final Term the(int dt, /*@NotNull*/ Collection<Term> sub) {
         int s = sub.size();
         return _the(dt, commute(dt, s) ? Terms.sorted(sub) : sub.toArray(new Term[s]));
     }
 
-    @NotNull
-    public final Term the(int dt, @NotNull Term... u) {
+    /*@NotNull*/
+    public final Term the(int dt, Term... u) {
         return _the(dt, commute(dt, u.length) ? Terms.sorted(u) : u);
     }
 
-    @NotNull Term _the(int dt, Term[] uu) {
+    /*@NotNull*/ Term _the(int dt, Term[] u) {
+
+        //HACK special case find why this happens
+        if (u[0] instanceof EllipsisMatch) {
+            if (u.length > 1)
+                throw new UnsupportedOperationException("TODO");
+
+            Term[] v = ((EllipsisMatch) u[0]).theArray();
+            if (commute(dt, v.length))
+                u = Terms.sorted(v);
+            else
+                u = v;
+        }
+
         if (statement) {
-            if (uu.length == 1) { //similarity has been reduced
+            if (u.length == 1) { //similarity has been reduced
                 assert (this == SIM);
-                return uu[0] == Null ? Null : True;
+                return u[0] == Null ? Null : True;
             }
-            return statement(this, dt, uu[0], uu[1]);
+            return statement(this, dt, u[0], u[1]);
         } else {
-            return compound(this, dt, uu);
+            return compound(this, dt, u);
         }
     }
 

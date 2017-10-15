@@ -158,7 +158,6 @@ public interface Node<L, V> extends Nodelike<L> {
      */
     Node<L, ?> instrument();
 
-    double perimeter(Spatialization<L> model);
 
 //    default FasterList<V> childMinList(FloatFunction<V> rank, int limit) {
 //        return new FasterList(streamNodes().sorted(new FloatFunctionComparator(rank)).limit(limit).toArray());

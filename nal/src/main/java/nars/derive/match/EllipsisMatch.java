@@ -71,7 +71,7 @@ public class EllipsisMatch extends GenericCompound implements Ellipsislike {
     }
 
 
-    public static Term match(@NotNull Term[] matched) {
+    public static Term match(Term... matched) {
         switch (matched.length) {
             case 0: return empty;
             case 1: return matched[0]; //if length==1 it should not be an ellipsismatch, just the raw term

@@ -8,7 +8,7 @@ import java.util.Collections;
  * essentially holds a list of registrations but forms an activity context
  * from the dynamics of its event reactivity
  */
-public class Ons extends FasterList<On<?>> {
+public class Ons extends FasterList<On> {
 
     Ons(int length) {
         super(length);

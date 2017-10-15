@@ -4,7 +4,7 @@ import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
-import nars.control.Activate;
+import nars.control.BatchActivate;
 import nars.control.Derivation;
 import nars.derive.PrediTerm;
 import nars.derive.PrediTrie;
@@ -66,7 +66,7 @@ public class NARS {
     /**
      * applied in sequence as final step before returning the NAR
      */
-    protected final List<Consumer<NAR>> after = new FasterList();
+    protected final List<Consumer<NAR>> after = new FasterList(0);
 
 
     public NARS index(@NotNull TermIndex concepts) {
@@ -115,11 +115,9 @@ public class NARS {
 
         index = () ->
                 //new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
-                new BasicTermIndex(1 * 1024);
+                new BasicTermIndex(1 * 256);
 
         time = new CycleTime();
-
-        //exe = FocusExec::new;
 
         exe = () -> new SynchExec(24, 4);
 
@@ -253,10 +251,7 @@ public class NARS {
 
             if (threadSafe)
                 index = () -> new CaffeineIndex(64 * 1024 );
-            else {
-                //assume this thread is what will use it
-                Activate.BatchActivate.enable();
-            }
+
         }
 
         @Override
@@ -269,7 +264,7 @@ public class NARS {
 
             nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
             nar.DEFAULT_GOAL_PRIORITY = 0.5f;
-            nar.DEFAULT_QUEST_PRIORITY = nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
+            nar.DEFAULT_QUEST_PRIORITY = nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
 
             if (nal >= 7)
                 new STMLinkage(nar, 1, false);

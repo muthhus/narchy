@@ -122,9 +122,11 @@ public interface Space<T> extends Nodelike<T> {
 //        });
 //    }
 
-    boolean intersecting(HyperRegion rect, Predicate<T> consumer);
+    /** continues finding intersecting regions until the predicate returns false */
+    void intersecting(HyperRegion rect, Predicate<T> t);
 
-    boolean containing(HyperRegion rect, Predicate<T> consumer);
+    /** continues finding containing regions until the predicate returns false */
+    void containing(HyperRegion rect, Predicate<T> t);
 
     /**
      * Search for entries intersecting given bounding rect
@@ -178,7 +180,7 @@ public interface Space<T> extends Nodelike<T> {
         return new RTreeCursor<>(this).in(start);
     }
 
-    @NotNull Node<T, ?> root();
+    Node<T, ?> root();
 
     void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile);
 

@@ -13,7 +13,7 @@ import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.control.Activate;
+import nars.concept.TermLinks;
 import nars.task.NALTask;
 import nars.task.Revision;
 import nars.task.SignalTask;
@@ -26,7 +26,6 @@ import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -53,7 +52,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * max fraction of the fully capacity table to compute in a single truthpolation
      */
-    static final float SCAN_MAX_FRACTION = 0.25f;
+    static final float SCAN_MAX_FRACTION = 0.1f;
 
     public static final float PRESENT_AND_FUTURE_BOOST = 1.5f;
 
@@ -145,10 +144,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             int dur = nar.dur();
 
             FloatFunction<Task> ts = taskStrength(start, end, dur);
-            FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task()));
+            FloatFunction<TaskRegion> strongestTask =
+                    new CachedFloatFunction<>(t -> +ts.floatValueOf(t.task()));
 
 
-            int maxTruths = (int) Math.min(s, Math.max(2, Math.ceil(capacity * SCAN_MAX_FRACTION)));
+            int maxTruths = (int) Math.min(s, Math.max(1, Math.ceil(capacity * SCAN_MAX_FRACTION)));
             TopN<TaskRegion> tt = scan(
                     new TopN<>(new TaskRegion[maxTruths], strongestTask),
                     start, end, maxTruths);
@@ -203,10 +203,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         int dur = nar.dur();
 
-        FloatFunction<Task> ts = (template!=null && template.isTemporal()) ?
+        FloatFunction<Task> ts = (template != null && template.isTemporal()) ?
                 taskStrength(template, start, end, dur) :
                 taskStrength(start, end, dur);
-        FloatFunction<TaskRegion> strongestTask = t -> +ts.floatValueOf(t.task());
+        FloatFunction<TaskRegion> strongestTask =
+                new CachedFloatFunction<>(t -> +ts.floatValueOf(t.task()));
 
 
         int maxTruths = (int) Math.min(s, Math.max(2, Math.ceil(capacity * SCAN_MAX_FRACTION)));
@@ -263,7 +264,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             tree.forEach(u::add);
         } else {
 
-            maxAttempts = Math.min(s, maxAttempts);
+            int maxTries = Math.min(s, maxAttempts);
 
             //scan
             final int[] attempts = {0};
@@ -275,44 +276,47 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             TimeRange r = new TimeRange(); //recycled
 
-            //check the precise range first
-            tree.intersecting(r.set(start, end), update);
+            ((ConcurrentRTree<TaskRegion>) tree).read( (RTree<TaskRegion> tree) -> {
+                //check the precise range first
+                tree.intersecting(r.set(start, end), update);
 
-            if (u.isEmpty()) {
+                if (u.isEmpty()) {
 
-                //scan outwards
+                    //scan outwards
 
-                TaskRegion bounds = (TaskRegion) (tree.root().region());
-                if (bounds == null) //?? why
-                    return null;
+                    TaskRegion bounds = (TaskRegion) (tree.root().region());
+                    if (bounds == null) //?? why
+                        return;
 
-                long expand = Math.max(1, (bounds.end() - bounds.start()) / 8);
+                    long expand = Math.max(1, (bounds.end() - bounds.start()) / 8);
 
-                long scanStart = start - 1, scanEnd = end + 1;
-                long nextStart = start, nextEnd = end;
-                int done;
-                do {
-                    nextStart -= expand;
-                    nextEnd += expand;
-                    done = 0;
+                    long scanStart = start - 1, scanEnd = end + 1;
+                    long nextStart = start, nextEnd = end;
+                    int done;
+                    do {
+                        nextStart -= expand;
+                        nextEnd += expand;
+                        done = 0;
 
-                    if (nextStart >= bounds.start())
-                        tree.intersecting(r.set(nextStart, scanStart), update);
-                    else
-                        done++;
+                        if (nextStart >= bounds.start())
+                            tree.intersecting(r.set(nextStart, scanStart), update);
+                        else
+                            done++;
 
-                    if (nextEnd <= bounds.end())
-                        tree.intersecting(r.set(scanEnd, nextEnd), update);
-                    else
-                        done++;
+                        if (nextEnd <= bounds.end())
+                            tree.intersecting(r.set(scanEnd, nextEnd), update);
+                        else
+                            done++;
 
-                    if (attempts[0] >= maxAttempts)
-                        break;
+                        if (attempts[0] >= maxTries)
+                            break;
 
-                    scanStart = nextStart - 1;
-                    scanEnd = nextEnd + 1;
-                } while (done < 2);
-            }
+                        scanStart = nextStart - 1;
+                        scanEnd = nextEnd + 1;
+                    } while (done < 2);
+                }
+            });
+
         }
         return u;
     }
@@ -372,7 +376,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             if (pri != pri) {
                 //somehow it was added then immediately removed during compression, ie. rejected
             } else {
-                Activate.activate(x, pri, n, c);
+                TermLinks.linkTask(x, pri, n, c);
             }
         } else {
 
@@ -405,7 +409,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * assumes called with writeLock
      * returns false if the input was rejected as too weak
      */
-    @NotNull
+    /*@NotNull*/
     private boolean compress(Space<TaskRegion> treeRW, @Nullable TaskRegion inputRegion, NAR nar, int cap) {
 
         long now = nar.time();
@@ -414,8 +418,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         FloatFunction<Task> taskStrength =
                 new CachedFloatFunction(
-                    //taskStrength(now-dur/2, now+dur/2, dur);
-                    taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, dur)
+                        //taskStrength(now-dur/2, now+dur/2, dur);
+                        taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, dur)
                 );
 
         FloatFunction<TaskRegion> weakestTask = (t -> -taskStrength.floatValueOf(t.task()));
@@ -438,7 +442,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         //1.
         findEvictable(treeRW, treeRW.root(), deleteVictim, mergeVictim);
-        if (treeRW.size() <= cap) return true; //done, due to a removal of deleted items while finding eviction candiates
+        if (treeRW.size() <= cap)
+            return true; //done, due to a removal of deleted items while finding eviction candiates
 
         //2.
         @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
@@ -653,11 +658,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
 
-    protected Task find(@NotNull TaskRegion t) {
+    protected Task find(/*@NotNull*/ TaskRegion t) {
         final Task[] found = {null};
         tree.intersecting(t, (x) -> {
             if (x.equals(t)) {
-                @Nullable Task xt = x.task();
+                Task xt = x.task();
                 if (xt != null) {
                     found[0] = xt;
                     return false; //finished
@@ -728,7 +733,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     private static final class RTreeBeliefModel extends Spatialization<TaskRegion> {
 
 
-        public static Spatialization<TaskRegion> the = new RTreeBeliefModel();;
+        public static Spatialization<TaskRegion> the = new RTreeBeliefModel();
+        ;
 
         public RTreeBeliefModel() {
             super((t -> t), RTreeBeliefTable.SPLIT, RTreeBeliefTable.MIN_TASKS_PER_LEAF, RTreeBeliefTable.MAX_TASKS_PER_LEAF);
@@ -758,8 +764,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
             if (activationApplied >= Prioritized.EPSILON) {
-                i.log((BiConsumer<NAR,Concept>) (nar, c) -> {
-                    Activate.activate(e, activationApplied, nar, c);
+                i.log((BiConsumer<NAR, Concept>) (nar, c) -> {
+                    TermLinks.linkTask(e, activationApplied, nar, c);
                 }); //store here so callee can activate outside of the lock
             }
         }
@@ -895,7 +901,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //            this.task = null;
 //        }
 //
-//        public TaskRegion(@NotNull Task task) {
+//        public TaskRegion(/*@NotNull*/ Task task) {
 //            this.task = task;
 //            this.start = task.start();
 //            this.end = task.end();
@@ -1160,7 +1166,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //    }
 //
 //    @Override
-//    public void add(@NotNull Task x, TaskConcept c, NAR n) {
+//    public void add(/*@NotNull*/ Task x, TaskConcept c, NAR n) {
 //
 //        this.nar = n;
 //
@@ -1210,14 +1216,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //
 //    }
 //
-//    private void add(@NotNull Task t) {
+//    private void add(/*@NotNull*/ Task t) {
 //        tree.addAsync(new TaskRegion(t));
 //    }
 //
 //    /**
 //     * assumes called with writeLock
 //     */
-//    @NotNull
+//    /*@NotNull*/
 //    private List<Task> addAfterCompressing(TaskRegion tr, NAR nar) {
 //        //if (compressing.compareAndSet(false, true)) {
 //        try {
@@ -1435,7 +1441,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //    }
 //
 //
-//    protected Task find(@NotNull TaskRegion t) {
+//    protected Task find(/*@NotNull*/ TaskRegion t) {
 //        final Task[] found = {null};
 //        tree.intersecting(t, (x) -> {
 //            if (x.equals(t)) {

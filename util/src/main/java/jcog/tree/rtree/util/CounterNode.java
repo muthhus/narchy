@@ -125,10 +125,10 @@ public final class CounterNode<T> implements Node<T, Object> {
         return this;
     }
 
-    @Override
-    public double perimeter(Spatialization<T> model) {
-        return node.perimeter(model);
-    }
+//    @Override
+//    public double perimeter(Spatialization<T> model) {
+//        return node.perimeter(model);
+//    }
 
     @Override
     public void reportSizeDelta(int i) {

@@ -29,13 +29,13 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         //return ((1+t.conf()) * (1+t.priElseZero())) / (1f + Math.abs((start+end)/2 - t.mid())/((float)dur));
         //return t.conf() / (1f + t.distanceTo(start, end)/((float)dur));
         //return (float) (t.conf() / (1f + Math.log(1f+t.distanceTo(start, end)/((float)dur))));
-        return t.conf() / (1f + t.distanceTo(start, end)/dur);
+        //return t.conf() / (1f + t.distanceTo(start, end)/dur);
 
 //
 //        //float fdur = dur;
 //        //float range = t.range();
-////        return
-////                t.evi(start, end, dur)
+        return
+                t.evi(start, end, dur);
 ////                //t.conf(now, dur) *
 ////                //t.evi(now, dur) *
 ////                //* range == 0 ? 1f : (float) (1f + Math.sqrt(t.range()) / dur); ///(1+t.distanceTo(start, end)))); ///fdur

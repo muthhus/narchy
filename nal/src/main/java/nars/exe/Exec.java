@@ -159,7 +159,7 @@ abstract public class Exec implements Executor, PriMerge {
                 loop.isRunning() ? loop.periodMS.intValue() * 0.001 : defaultCycleTime
         );
 
-        float throttle = loop.cpuThrottle.floatValue();
+        float throttle = loop.throttle.floatValue();
         double dutyCycleTime = nextCycleTime * throttle * (1f - sqr(nar.exe.load()));
         double sleepTime = nextCycleTime * (1f - throttle);
 

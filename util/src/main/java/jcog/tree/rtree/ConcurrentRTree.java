@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  */
 public class ConcurrentRTree<T> implements Space<T> {
 
-    public final Space<T> tree;
+    public final RTree<T> tree;
 
 //  TODO move this to a subclass
 //    final QueueLock<T> toAdd, toRemove;
@@ -168,7 +168,7 @@ public class ConcurrentRTree<T> implements Space<T> {
     }
 
 
-    public void read(Consumer<Space<T>> x) {
+    public void read(Consumer<RTree<T>> x) {
         readLock.lock();
         try {
             x.accept(tree);
@@ -326,27 +326,23 @@ public class ConcurrentRTree<T> implements Space<T> {
     }
 
     @Override
-    public boolean containing(HyperRegion rect, Predicate<T> consumer) {
+    public void containing(HyperRegion rect, Predicate<T> t) {
         readLock.lock();
-        boolean result;
         try {
-            result = tree.containing(rect, consumer);
+            tree.containing(rect, t);
         } finally {
             readLock.unlock();
         }
-        return result;
     }
 
     @Override
-    public boolean intersecting(HyperRegion rect, Predicate<T> consumer) {
+    public void intersecting(HyperRegion rect, Predicate<T> t) {
         readLock.lock();
-        boolean result;
         try {
-            result = size() > 0 && tree.intersecting(rect, consumer);
+            tree.intersecting(rect, t);
         } finally {
             readLock.unlock();
         }
-        return result;
     }
 
 

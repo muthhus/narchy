@@ -33,7 +33,7 @@ public class ActivateTest {
 
         Concept c = nar.conceptualize("a:b");
         for (int n = 0; n < count; n++) {
-            PLink<Term> inserted = new PLink<>($("x" + n + ":a"), ((1+n)/((float)count)));
+            PLink<Term> inserted = new PLink<>($("x" + n + ":a"), ((1 + n) / ((float) count)));
             System.out.println(inserted);
             c.termlinks().put(inserted);
         }
@@ -50,7 +50,7 @@ public class ActivateTest {
             cf.run(nar).forEach(p -> {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
                 if (p.termLink instanceof Atom || !A.equals(p.termLink.sub(0)))
-                    return ; //ignore
+                    return; //ignore
                 String tls = p.termLink.toString();
 
                 premiseHits.addOccurrences(p.toString(), 1);
@@ -76,14 +76,14 @@ public class ActivateTest {
         ObjectIntPair<String> bottom = termlinkHits.bottomOccurrences(1).get(0);
         String min = bottom.getOne();
         assertTrue("(a-->x0)".equals(min) || "(a-->x1)".equals(min)); //allow either 0 or 1
-        assertEquals("(a-->x" + (count-1) + ")", top.getOne());
+        assertEquals("(a-->x" + (count - 1) + ")", top.getOne());
 
     }
 
-        @Test
+    @Test
     public void testDerivedBudgets() throws Narsese.NarseseException {
 
-        NAR n= new NARS().get();
+        NAR n = new NARS().get();
 
         //TODO System.err.println("TextOutput.out impl in progress");
         //n.stdout();
@@ -97,36 +97,49 @@ public class ActivateTest {
         n.forEachConceptActive(System.out::println);
     }
 
-    @Test public void testTemplates1() throws Narsese.NarseseException {
+    @Test
+    public void testTemplates1() throws Narsese.NarseseException {
 
         //layer 1:
         testTemplates("open:door",
                 "[(door-->open), door, open]");
     }
-    @Test public void testTemplates2() throws Narsese.NarseseException {
+
+    @Test
+    public void testTemplates2() throws Narsese.NarseseException {
         //layer 2:
         testTemplates("open(John,door)",
                 "[open, door, open(John,door), John, (John,door)]");
     }
-    @Test public void testTemplates3() throws Narsese.NarseseException {
+
+    @Test
+    public void testTemplates3() throws Narsese.NarseseException {
         //layer 3:
         testTemplates("(open(John,door) ==> #x)",
                 "[(open(John,door) ==>+- #1), open, door, open(John,door), John, (John,door)]");
     }
-    @Test public void testTemplates4() throws Narsese.NarseseException {
+
+    @Test
+    public void testTemplates4() throws Narsese.NarseseException {
         //dont descend past layer 3:
         testTemplates("(open(John,portal:interdimensional) ==> #x)",
                 "[(John,(interdimensional-->portal)), (open(John,(interdimensional-->portal)) ==>+- #1), open(John,(interdimensional-->portal)), open, (interdimensional-->portal), John]");
     }
-   @Test public void testTemplates4b() throws Narsese.NarseseException {
+
+    @Test
+    public void testTemplates4b() throws Narsese.NarseseException {
         testTemplates("(open(John,portal(a(d),b,c)) ==> #x)",
                 "[portal(a(d),b,c), open(John,portal(a(d),b,c)), (John,portal(a(d),b,c)), (open(John,portal(a(d),b,c)) ==>+- #1), open, John]");
     }
-   @Test public void testTemplatesWithInt2() throws Narsese.NarseseException {
+
+    @Test
+    public void testTemplatesWithInt2() throws Narsese.NarseseException {
         testTemplates("num((0))",
                 "[(0), ((0)), num((0)), num]");
     }
-  @Test public void testTemplatesWithInt1() throws Narsese.NarseseException {
+
+    @Test
+    public void testTemplatesWithInt1() throws Narsese.NarseseException {
         testTemplates("(0)",
                 "[(0)]");
     }
@@ -136,31 +149,50 @@ public class ActivateTest {
         testTemplates("(x --> ?1)",
                 "[(x-->?1), x]");
     }
-    @Test public void testTemplateConj1() throws Narsese.NarseseException {
+
+    @Test
+    public void testTemplateConj1() throws Narsese.NarseseException {
         testTemplates("(x && y)",
                 "[(x &&+- y), y, x]");
     }
-    @Test public void testTemplateConj2() throws Narsese.NarseseException {
+
+    @Test
+    public void testTemplateConj2() throws Narsese.NarseseException {
         testTemplates("(&&,<#x --> lock>,(<$y --> key> ==> open($y,#x)))",
                 "[(($1-->key) &&+- (#2-->lock)), ((($1-->key) &&+- (#2-->lock)) ==>+- open($1,#2)), (#2-->lock), ($1,#2), key, open($1,#2), open, ($1-->key), lock]");
 
     }
 
-    @Test public void testTemplateDiffRaw() throws Narsese.NarseseException {
+    @Test
+    public void testTemplateDiffRaw() throws Narsese.NarseseException {
         testTemplates("(x-y)",
                 "[(x-y), y, x]");
     }
-    @Test public void testTemplateDiffRaw2() throws Narsese.NarseseException {
+
+    @Test
+    public void testTemplateDiffRaw2() throws Narsese.NarseseException {
         testTemplates("((a,b)-y)",
                 "[((a,b)-y), (a,b), y]");
     }
-    @Test public void testTemplateSimProd1() throws Narsese.NarseseException {
+
+    @Test
+    public void testTemplateProd() throws Narsese.NarseseException {
+        testTemplates("(a,b)",
+                "[a, (a,b), b]");
+        testTemplates("(a,(b,c))",
+                "[(a,(b,c)), (b,c), a]");
+    }
+
+    @Test
+    public void testTemplateSimProd1() throws Narsese.NarseseException {
         testTemplates("((a,b)<->#1)",
                 "[(a,b), a, ((a,b)<->#1), b]");
         testTemplates("(c<->a)",
                 "[(a<->c), a, c]");
     }
-  @Test public void testTemplatesAreEternal() throws Narsese.NarseseException {
+
+    @Test
+    public void testTemplatesAreEternal() throws Narsese.NarseseException {
         testTemplates("((x ==>+1 y),(x ==>+2 y))",
                 "[((x ==>+- y),(x ==>+- y)), (x ==>+- y), x, y]");
     }

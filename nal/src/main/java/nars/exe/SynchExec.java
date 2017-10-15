@@ -1,44 +1,51 @@
 package nars.exe;
 
 import jcog.event.On;
+import jcog.event.Ons;
 import nars.NAR;
-import nars.control.Activate;
+import nars.control.BatchActivate;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 public class SynchExec extends UniExec {
 
-    public On onCycle;
+
 
     public final MutableInt activationsPerCycle = new MutableInt();
+    private Ons on;
 
     public SynchExec(int capacity, int firePerCycle) {
         super(capacity);
         activationsPerCycle.setValue(firePerCycle);
     }
 
-    private Thread lastThread = null;
+    private BatchActivate activate = null;
 
     @Override
     public synchronized void start(NAR nar) {
         super.start(nar);
 
-        onCycle = nar.onCycle((n)->{
-            if (lastThread == null || lastThread!=Thread.currentThread()) {
-                lastThread = Thread.currentThread();
-                Activate.BatchActivate.enable();
+        on = new Ons(nar.eventClear.on((n)->{
+            if (activate!=null) {
+                activate.clear();
+                activate = null;
+            }
+        }),
+        nar.onCycle((n)->{
+            if (activate ==null) {
+                activate = BatchActivate.get();
             }
 
             run(activationsPerCycle.intValue() );
 
-            Activate.BatchActivate.get().commit(n);
-        });
+            activate.commit(n);
+        }));
     }
 
 
 
     @Override
     public synchronized void stop() {
-        onCycle.off();
+        on.off();
         super.stop();
     }
 }

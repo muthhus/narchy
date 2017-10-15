@@ -195,19 +195,19 @@ public class Leaf<T> implements Node<T, T> {
 
     }
 
-    @Override
-    public double perimeter(Spatialization<T> model) {
-        double maxVolume = 0;
-        final int s = size;
-        T[] data = this.data;
-        for (int i = 0; i < s; i++) {
-            T c = data[i];
-            double vol = model.perimeter(c);
-            if (vol > maxVolume)
-                maxVolume = vol;
-        }
-        return maxVolume;
-    }
+//    @Override
+//    public double perimeter(Spatialization<T> model) {
+//        double maxVolume = 0;
+//        final int s = size;
+//        T[] data = this.data;
+//        for (int i = 0; i < s; i++) {
+//            T c = data[i];
+//            double vol = model.perimeter(c);
+//            if (vol > maxVolume)
+//                maxVolume = vol;
+//        }
+//        return maxVolume;
+//    }
 
 
     @Override
@@ -236,22 +236,25 @@ public class Leaf<T> implements Node<T, T> {
     @Override
     public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
         short s = this.size;
-        T[] data = this.data;
-        for (int i = 0; i < s; i++) {
-            T d = data[i];
-            if (model.region(d).intersects(rect)) {
-                if (!t.test(d))
+        if (s > 0 && rect.intersects(region)) {
+            T[] data = this.data;
+            for (int i = 0; i < s; i++) {
+                T d = data[i];
+                if (rect.intersects(model.region(d)) && !t.test(d))
                     return false;
             }
         }
         return true;
     }
+
     @Override
-    public boolean containing(HyperRegion R, Predicate<T> t, Spatialization<T> model) {
-        for (int i = 0; i < size; i++) {
-            T d = data[i];
-            if (R.contains(model.region(d))) {
-                if (!t.test(d))
+    public boolean containing(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
+        short s = this.size;
+        if (s > 0 && rect.intersects(region)) {
+            T[] data = this.data;
+            for (int i = 0; i < s; i++) {
+                T d = data[i];
+                if (rect.contains(model.region(d)) && !t.test(d))
                     return false;
             }
         }

@@ -11,13 +11,9 @@ import java.util.HashMap;
  */
 public class BasicTermIndex extends MapTermIndex {
 
-    public BasicTermIndex(int capacity) {
-        this(capacity, new DefaultConceptBuilder());
-    }
-
-    public BasicTermIndex(int capacity, ConceptBuilder cb) {
+    public BasicTermIndex(int estimatedCapacity) {
         super(
-                new HashMap<>(capacity/*, 0.9f*/)
+                new HashMap<>(estimatedCapacity/*, 0.9f*/)
                 //new UnifiedMap(capacity, 0.9f),
                 //new UnifiedMap(capacity, 0.9f)
                 //new ConcurrentHashMap<>(capacity),

@@ -1,13 +1,14 @@
 package nars.task.util;
 
 import jcog.tree.rtree.HyperRegion;
+import nars.task.NALTask;
 
 /**
  * only valid for comparison during rtree iteration
  */
 public class TimeRange implements HyperRegion {
 
-    long start, end;
+    long start = Long.MIN_VALUE, end = Long.MAX_VALUE;
 
     public TimeRange() {
 
@@ -34,6 +35,27 @@ public class TimeRange implements HyperRegion {
     }
 
     @Override
+    public boolean intersects(HyperRegion x) {
+        TaskRegion t = (TaskRegion)x;
+        return !(
+                start > t.end()
+                        ||
+                end < t.start()
+        );
+    }
+
+
+    @Override
+    public boolean contains(HyperRegion x) {
+        TaskRegion t = (TaskRegion)x;
+        return !(
+                start > t.start()
+                        ||
+                end < t.end()
+        );
+    }
+
+    @Override
     public double coord(boolean maxOrMin, int dimension) {
 //            switch (dimension) {
 //                case 0: return maxOrMin ? end : start;
@@ -41,10 +63,5 @@ public class TimeRange implements HyperRegion {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public boolean contains(HyperRegion x) {
-//            TaskRegion t = (TaskRegion)x;
-//            return !((start > t.start) || (end < t.end));
-        throw new UnsupportedOperationException();
-    }
+
 }

@@ -1,24 +1,24 @@
 package jcog.tree.rtree;
 
-/*
- * #%L
- * Conversant RTree
- * ~~
- * Conversantmedia.com © 2016, Conversant, Inc. Conversant® is a trademark of Conversant, Inc.
- * ~~
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
+        /*
+         * #%L
+         * Conversant RTree
+         * ~~
+         * Conversantmedia.com © 2016, Conversant, Inc. Conversant® is a trademark of Conversant, Inc.
+         * ~~
+         * Licensed under the Apache License, Version 2.0 (the "License");
+         * you may not use this file except in compliance with the License.
+         * You may obtain a copy of the License at
+         *
+         *      http://www.apache.org/licenses/LICENSE-2.0
+         *
+         * Unless required by applicable law or agreed to in writing, software
+         * distributed under the License is distributed on an "AS IS" BASIS,
+         * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+         * See the License for the specific language governing permissions and
+         * limitations under the License.
+         * #L%
+         */
 
 
 import com.google.common.base.Joiner;
@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  * <p>
  * Created by jcairns on 4/30/15.
  */
-public final class Branch<T> implements Node<T, Node<T,?>> {
+public final class Branch<T> implements Node<T, Node<T, ?>> {
 
     public final Node<T, ?>[] child;
 
@@ -140,7 +140,6 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
         }
 
 
-
         //INSERTION STAGE:
 
         if (size < child.length) {
@@ -181,7 +180,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
                 if (nextBest.contains(t, model))
                     return null;
 
-                assert(false): "what to do with: " + t + " in " + parent;
+                assert (false) : "what to do with: " + t + " in " + parent;
                 //probably ok, just merged with a subbranch?
                 //return null;
             }
@@ -279,8 +278,6 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     }
 
 
-
-
     /**
      * @return number of child nodes
      */
@@ -373,13 +370,12 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
         return false;
     }
 
-        @Override
+    @Override
     public boolean containing(final HyperRegion rect, final Predicate<T> t, Spatialization<T> model) {
-
-        for (int i = 0; i < size; i++) {
-            Node c = child[i];
-            if (c.region().intersects(rect)) {
-                if (!c.containing(rect, t, model))
+        if (rect.intersects(region)) {
+            Node[] data = this.child;
+            for (int i = 0; i < size; i++) {
+                if (!data[i].containing(rect, t, model))
                     return false;
             }
         }
@@ -388,7 +384,15 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
     @Override
     public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
-        return region.intersects(rect) && nodeAND(ci -> !(ci.region().intersects(rect) && !ci.intersecting(rect, t, model)));
+        if (rect.intersects(region)) {
+            short s = this.size;
+            Node[] data = this.child;
+            for (int i = 0; i < s; i++) {
+                if (!data[i].intersecting(rect, t, model))
+                    return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -405,7 +409,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
         short s = this.size;
         for (int i = 0; i < s; i++) {
             Node<T, ?> c = children[i];
-            if (c!=null)
+            if (c != null)
                 c.intersectingNodes(rect, t, model);
         }
     }
@@ -430,16 +434,15 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     }
 
 
-
-    @Override
-    public double perimeter(Spatialization<T> model) {
-        double maxVolume = 0;
-        for (int i = 0; i < size; i++) {
-            Node<T, ?> c = child[i];
-            double vol = c.perimeter(model);
-            if (vol > maxVolume)
-                maxVolume = vol;
-        }
-        return maxVolume;
-    }
+//    @Override
+//    public double perimeter(Spatialization<T> model) {
+//        double maxVolume = 0;
+//        for (int i = 0; i < size; i++) {
+//            Node<T, ?> c = child[i];
+//            double vol = c.perimeter(model);
+//            if (vol > maxVolume)
+//                maxVolume = vol;
+//        }
+//        return maxVolume;
+//    }
 }

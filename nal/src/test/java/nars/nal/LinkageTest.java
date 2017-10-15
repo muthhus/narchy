@@ -353,10 +353,10 @@ public class LinkageTest extends AbstractNALTest {
         ProperlyLinkedIndirectlyTest("(&&, <#1 --> lock>, <<$2 --> key> ==> ($2, #1):open>)", "<{key1} --> key>");
     }
 
-    @Test
-    public void Indirect_Linkage_NAL6_second_level_variable_unification_alt() throws Exception {
-        ProperlyLinkedIndirectlyTest("(&&, <#1 --> lock>, <<$2 --> key> ==> open($2, #1)>)", "<{key1} --> key>");
-    }
+//    @Test
+//    public void Indirect_Linkage_NAL6_second_level_variable_unification_alt() throws Exception {
+//        ProperlyLinkedIndirectlyTest("(&&, <#1 --> lock>, <<$2 --> key> ==> open($2, #1)>)", "<{key1} --> key>");
+//    }
 
     @Test
     public void Indirect_Linkage_Basic() throws Exception {
