@@ -260,6 +260,8 @@ abstract public class NAgentX extends NAgent {
 
         AgentService mc = MetaGoal.newController(a);
 
+        MetaGoal.newValueSynergizer(n);
+
         //init();
 
 
@@ -537,7 +539,7 @@ abstract public class NAgentX extends NAgent {
         BitmapMatrixView bmp = new BitmapMatrixView((i) ->
                 gain.floatValue() * nar.causes.get(i).value(),
                         //Util.tanhFast(nar.causes.get(i).value()),
-                s, Math.max(1, (int) Math.sqrt(s)),
+                s, Math.max(1, (int)Math.ceil(Math.sqrt(s))),
                 Draw::colorBipolar) {
 
             final Ons on;

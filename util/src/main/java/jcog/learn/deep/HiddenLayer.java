@@ -1,10 +1,10 @@
-package jcog.learn.DeepLearning;
+package jcog.learn.deep;
 
 import java.util.Random;
 import java.util.function.DoubleFunction;
 
-import static jcog.learn.DeepLearning.utils.binomial;
-import static jcog.learn.DeepLearning.utils.uniform;
+import static jcog.learn.deep.utils.binomial;
+import static jcog.learn.deep.utils.uniform;
 
 public class HiddenLayer {
     public int n_in;

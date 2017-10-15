@@ -1,8 +1,8 @@
-package jcog.learn.DeepLearning;
+package jcog.learn.deep;
 
 import java.util.Random;
 
-import static jcog.learn.DeepLearning.utils.*;
+import static jcog.learn.deep.utils.*;
 
 public class HiddenLayerDiscrete extends HiddenLayer {
     public int N;

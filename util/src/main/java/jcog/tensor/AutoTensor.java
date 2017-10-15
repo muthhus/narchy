@@ -1,7 +1,7 @@
 package jcog.tensor;
 
 import jcog.Util;
-import jcog.learn.DeepLearning.dA;
+import jcog.learn.deep.dA;
 import jcog.random.XorShift128PlusRandom;
 
 /**

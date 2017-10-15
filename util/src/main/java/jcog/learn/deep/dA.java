@@ -1,8 +1,6 @@
-package jcog.learn.DeepLearning;
+package jcog.learn.deep;
 
 import java.util.Random;
-
-import static jcog.learn.DeepLearning.utils.*;
 
 public class dA {
     public int n_visible;
@@ -30,7 +28,7 @@ public class dA {
 
             for (int i = 0; i < this.n_hidden; i++) {
                 for (int j = 0; j < this.n_visible; j++) {
-                    this.W[i][j] = uniform(-a, a, rng);
+                    this.W[i][j] = utils.uniform(-a, a, rng);
                 }
             }
         } else {
@@ -57,7 +55,7 @@ public class dA {
             if (x[i] == 0) {
                 tilde_x[i] = 0;
             } else {
-                tilde_x[i] = binomial(1, p, rng);
+                tilde_x[i] = utils.binomial(1, p, rng);
             }
         }
     }
@@ -70,7 +68,7 @@ public class dA {
                 y[i] += W[i][j] * x[j];
             }
             y[i] += hbias[i];
-            y[i] = sigmoid(y[i]);
+            y[i] = utils.sigmoid(y[i]);
         }
         return y;
     }
@@ -83,7 +81,7 @@ public class dA {
                 z[i] += W[j][i] * y[j];
             }
             z[i] += vbias[i];
-            z[i] = sigmoid(z[i]);
+            z[i] = utils.sigmoid(z[i]);
         }
     }
 

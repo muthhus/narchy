@@ -1752,7 +1752,7 @@ public enum Util {
      * x in -1..+1, y in -1..+1.   typical value for sharpen will be ~ >5
      * http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoMS8oMStleHAoLTUqeCkpLTAuNSkqMiIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0xIiwiMSIsIi0xIiwiMSJdfV0-
      */
-    public static float sigmoidSymmetric(float x, float sharpen) {
+    public static float sigmoidBipolar(float x, float sharpen) {
         return (float) ((1.0 / (1 + Math.exp(-sharpen * x)) - 0.5) * 2);
     }
 

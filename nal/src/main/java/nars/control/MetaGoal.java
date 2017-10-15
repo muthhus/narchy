@@ -1,6 +1,7 @@
 package nars.control;
 
 import jcog.Util;
+import jcog.learn.deep.RBM;
 import jcog.learn.ql.HaiQAgent;
 import jcog.list.FasterList;
 import jcog.math.FirstOrderDifferenceFloat;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * high-level reasoner control parameters
@@ -99,11 +101,13 @@ public enum MetaGoal {
 
             float prev = c.value();
             final float momentum =
-                    //0.9f;
-                    0.99f * (1f - Util.unitize(
-                            Math.abs(next) / (1 + Math.max(Math.abs(next), Math.abs(prev)))));
+//                    0f;
+                    0.9f;
+//                    0.99f * (1f - Util.unitize(
+//                            Math.abs(next) / (1 + Math.max(Math.abs(next), Math.abs(prev)))));
 
-            c.setValue(Util.lerp(momentum, next, prev));
+            //c.setValue(Util.lerp(momentum, next, prev));
+            c.setValue(0.9f * (next + prev));
 
             //TODO
             //variation of volume weighted moving average
@@ -163,6 +167,7 @@ public enum MetaGoal {
     public static void learn(MetaGoal p, short[] effects, float strength, NAR nar) {
         learn(p, effects, strength, nar.causes);
     }
+
 
     /**
      * learn that the given effects have a given value
@@ -243,6 +248,63 @@ public enum MetaGoal {
         return value / effects;
     }
 
+    /**
+     * creates an unsupervised network to learn and propagate co-occurring value between coherent Causes
+     */
+    public static CycleService newValueSynergizer(NAR n) {
+        return new CycleService(n) {
+
+            public double[] next;
+            public int learning_iters = 5;
+            public double learning_rate = 0.01f;
+
+            public double[] cur;
+            public RBM rbm;
+
+
+            @Override
+            protected void run(NAR nar) {
+                int numCauses = nar.causes.size();
+                if (numCauses < 2)
+                    return;
+
+                if (rbm == null || rbm.n_visible != numCauses) {
+                    int numHidden = numCauses / 4;
+
+                    rbm = new RBM(numCauses, numHidden, null, null, null, nar.random()) {
+                        @Override
+                        public double activate(double a) {
+                            return super.activate(a);
+                            //return Util.tanhFast((float) a);
+                            //return Util.sigmoidBipolar((float) a, 5);
+                        }
+                    };
+                    cur = new double[numCauses];
+                    next = new double[numCauses];
+                }
+
+                FasterList<Cause> cause = nar.causes;
+                for (int i = 0; i < numCauses; i++)
+                    cur[i] = cause.get(i).value();
+
+                rbm.reconstruct(cur, next);
+                rbm.contrastive_divergence(cur, learning_rate, learning_iters);
+
+                //float momentum = 0.5f;
+                Random rng = nar.random();
+                float noise = 0.1f;
+                for (int i = 0; i < numCauses; i++) {
+                    //float j = Util.tanhFast((float) (cur[i] + next[i]));
+                    float j = /*((rng.nextFloat()-0.5f)*2*noise)*/ +
+                            0.5f * (float) (cur[i]) + 0.5f * ((float) (next[i]));
+                    cause.get(i).setValue(j);
+                }
+
+            }
+        };
+
+    }
+
     public static AgentService newController(NAgent a) {
         NAR n = a.nar;
         AgentService.AgentBuilder b = new AgentService.AgentBuilder(
@@ -276,7 +338,7 @@ public enum MetaGoal {
             final int gg = g.ordinal();
             float min = -2;
             float max = +2;
-            b.in(new FloatNormalized(  () -> n.want[gg], min, max ));
+            b.in(new FloatNormalized(() -> n.want[gg], min, max));
 
             float step = 0.25f;
 

@@ -1,4 +1,4 @@
-package jcog.learn.DeepLearning;
+package jcog.learn.deep;
 
 import jcog.Util;
 

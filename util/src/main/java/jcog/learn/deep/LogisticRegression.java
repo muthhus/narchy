@@ -1,22 +1,19 @@
-package jcog.learn.DeepLearning;
+package jcog.learn.deep;
 
-public class LogisticRegressionDiscrete extends LogisticRegression {
+public class LogisticRegression {
     public int n_in;
     public int n_out;
     public double[][] W;
     public double[] b;
 
-    public LogisticRegressionDiscrete(int n_in, int n_out) {
-        super(n_in, n_out);
-
+    public LogisticRegression(int n_in, int n_out) {
         this.n_in = n_in;
         this.n_out = n_out;
 
-        W = new double[this.n_out][this.n_in];
-        b = new double[this.n_out];
+        W = new double[n_out][n_in];
+        b = new double[n_out];
     }
 
-    @Override
     public double[] train(double[] x, double[] y, double lr) {
         double[] p_y_given_x = new double[n_out];
         double[] dy = new double[n_out];
@@ -39,12 +36,27 @@ public class LogisticRegressionDiscrete extends LogisticRegression {
 
             b[i] += lr * dy[i];
         }
-        return p_y_given_x;
+
+        return dy;
     }
 
-    public void predict(int[] x, double[] y) {
+    public void softmax(double[] x) {
+        double max = 0.0;
+        double sum = 0.0;
+
+        for(int i=0; i<n_out; i++) if(max < x[i]) max = x[i];
+
         for(int i=0; i<n_out; i++) {
-            y[i] = 0;
+            x[i] = Math.exp(x[i] - max);
+            sum += x[i];
+        }
+
+        for(int i=0; i<n_out; i++) x[i] /= sum;
+    }
+
+    public void predict(double[] x, double[] y) {
+        for(int i=0; i<n_out; i++) {
+            y[i] = 0.;
             for(int j=0; j<n_in; j++) {
                 y[i] += W[i][j] * x[j];
             }
@@ -64,12 +76,12 @@ public class LogisticRegressionDiscrete extends LogisticRegression {
         int n_out = 2;
 
         double[][] train_X = {
-                {1, 1, 1, 0, 0, 0},
-                {1, 0, 1, 0, 0, 0},
-                {1, 1, 1, 0, 0, 0},
-                {0, 0, 1, 1, 1, 0},
-                {0, 0, 1, 1, 0, 0},
-                {0, 0, 1, 1, 1, 0}
+                {1., 1., 1., 0., 0., 0.},
+                {1., 0., 1., 0., 0., 0.},
+                {1., 1., 1., 0., 0., 0.},
+                {0., 0., 1., 1., 1., 0.},
+                {0., 0., 1., 1., 0., 0.},
+                {0., 0., 1., 1., 1., 0.}
         };
 
         double[][] train_Y = {
@@ -82,7 +94,7 @@ public class LogisticRegressionDiscrete extends LogisticRegression {
         };
 
         // construct
-        LogisticRegressionDiscrete classifier = new LogisticRegressionDiscrete(n_in, n_out);
+        LogisticRegression classifier = new LogisticRegression(n_in, n_out);
 
         // train
         for(int epoch=0; epoch<n_epochs; epoch++) {
@@ -93,9 +105,9 @@ public class LogisticRegressionDiscrete extends LogisticRegression {
         }
 
         // test data
-        int[][] test_X = {
-                {1, 0, 1, 0, 0, 0},
-                {0, 0, 1, 1, 1, 0}
+        double[][] test_X = {
+                {1., 0., 1., 0., 0., 0.},
+                {0., 0., 1., 1., 1., 0.}
         };
 
         double[][] test_Y = new double[test_N][n_out];
