@@ -6,14 +6,17 @@ import jcog.data.FloatParam;
 import jcog.event.Ons;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
+import jcog.pri.PriMap;
 import jcog.pri.mix.control.MixContRL;
-import nars.control.*;
+import nars.control.Cause;
+import nars.control.Derivation;
+import nars.control.MetaGoal;
 import nars.derive.PrediTerm;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
-import nars.index.term.map.CaffeineIndex;
+import nars.index.term.map.MapTermIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
 import nars.term.Term;
@@ -173,7 +176,8 @@ abstract public class NAgentX extends NAgent {
                 .time(clock)
                 .deriver(deriver)
                 .index(
-                        new CaffeineIndex(128 * 1024)
+                        //new CaffeineIndex(128 * 1024)
+                        new MapTermIndex(new PriMap(null))
                         //new CaffeineIndex2(64 * 1024)
                         //new CaffeineIndex2(-1)
                         //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)
