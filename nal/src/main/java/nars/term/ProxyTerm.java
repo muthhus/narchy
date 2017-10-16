@@ -100,8 +100,8 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
 
 
     @Override
-    public @NotNull Term xternal() {
-        return ref.xternal();
+    public Term root() {
+        return ref.root();
     }
 
     @Override
@@ -109,10 +109,6 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
         return ref.conceptual();
     }
 
-    @Override
-    public boolean xternalEquals(Term x) {
-        return ref.xternalEquals(x);
-    }
 
     @Override
     public boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent) {

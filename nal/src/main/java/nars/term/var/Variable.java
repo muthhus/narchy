@@ -61,11 +61,6 @@ public interface Variable extends Atomic {
     }
 
 
-    @Override
-    @NotNull
-    default Term conceptual() {
-        return Null;
-    }
 
     @Override
     @Nullable

@@ -1339,7 +1339,7 @@ public enum Op {
                 if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
                     return $.the(subject.equals(predicate));
 
-                if (subject.xternalEquals(predicate))
+                if (subject.equals(predicate) || subject.root().equals(predicate.root()))
                     return True;
 
                 break;
@@ -1891,11 +1891,6 @@ public enum Op {
         }
 
         @Override
-        public boolean xternalEquals(Term x) {
-            return false;
-        }
-
-        @Override
         public Term neg() {
             return this;
         }
@@ -1916,11 +1911,6 @@ public enum Op {
         @Override
         public final int opX() {
             return rankBoolFalse;
-        }
-
-        @Override
-        public boolean xternalEquals(Term x) {
-            return x == this;
         }
 
         @Override
@@ -1945,11 +1935,6 @@ public enum Op {
         @Override
         public final int opX() {
             return rankBoolTrue;
-        }
-
-        @Override
-        public boolean xternalEquals(Term x) {
-            return x == this;
         }
 
         @Override

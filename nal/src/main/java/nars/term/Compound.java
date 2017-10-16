@@ -877,13 +877,6 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    @Override
-    default boolean xternalEquals(Term x) {
-        return structure() == x.structure() && volume() == x.volume() && subs() == x.subs() && op() == x.op() &&
-                xternal().equals(x.xternal());
-    }
-
-    @Override
     @Nullable
     default Term xternal() {
         return temporalize(Retemporalize.retemporalizeAllToXTERNAL);
@@ -909,6 +902,11 @@ public interface Compound extends Term, IPair, TermContainer {
 //        }
     }
 
+    /*@NotNull*/ @Override default Term root() {
+        Term term = temporalize(Retemporalize.retemporalizeConceptual);
+        return term == null ? Null : term;
+    }
+
     @Override
     /*@NotNull*/
     default Term conceptual() {
@@ -916,11 +914,7 @@ public interface Compound extends Term, IPair, TermContainer {
         if (op()==NEG)
             return unneg().conceptual();
 
-        Term term = temporalize(Retemporalize.retemporalizeConceptual);
-        if (term == null)
-            return Null;
-
-        term = term.unneg(); //just in case
+        Term term = root().unneg(); //just in case
 
         if (!term.op().conceptualizable)
             return Null;

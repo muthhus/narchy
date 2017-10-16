@@ -98,8 +98,8 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
 
     @Override
     @Nullable
-    public final Term xternal() {
-        return Compound.super.xternal();
+    public final Term root() {
+        return Compound.super.root();
     }
 
     public @Nullable Term transform(@NotNull CompoundTransform t, Compound parent) {

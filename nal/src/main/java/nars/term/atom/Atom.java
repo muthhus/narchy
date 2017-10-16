@@ -20,6 +20,10 @@ public class Atom extends AtomicConst {
         this.id = validateAtomID(id);
     }
 
+    @Override
+    public Term conceptual() {
+        return this;
+    }
 
     @NotNull
     private static String validateAtomID(@NotNull String id) {

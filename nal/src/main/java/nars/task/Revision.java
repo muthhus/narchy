@@ -488,8 +488,8 @@ public class Revision {
 
                     final float[] xd = {0};
                     ObjectLongHashMap<Term> ab = new ObjectLongHashMap(len);
-                    a.events((tw) -> ab.put(tw.getOne().xternal(), tw.getTwo()));
-                    b.events((tw) -> ab.addToValue(tw.getOne().xternal(), -tw.getTwo()));
+                    a.events((tw) -> ab.put(tw.getOne().root(), tw.getTwo()));
+                    b.events((tw) -> ab.addToValue(tw.getOne().root(), -tw.getTwo()));
 
                     ab.forEachValue(x -> xd[0] += Math.abs(x));
                     d += xd[0];
@@ -501,13 +501,13 @@ public class Revision {
                 a.events((tw) -> {
                     Term tww = tw.getOne();
                     if (tww.isTemporal())
-                        ab.put(tww.xternal(), new Term[]{tww, null});
+                        ab.put(tww.root(), new Term[]{tww, null});
                 });
 
                 b.events((tw) -> {
                     Term tww = tw.getOne();
                     if (tww.isTemporal()) {
-                        Term[] x = ab.computeIfAbsent(tww.xternal(), (nn) -> new Term[2]);
+                        Term[] x = ab.computeIfAbsent(tww.root(), (nn) -> new Term[2]);
                         x[1] = tww;
                     }
                 });

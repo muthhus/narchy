@@ -63,10 +63,6 @@ public class Int implements Intlike {
         this.id = i;
     }
 
-    @Override
-    public @NotNull Term conceptual() {
-        return Null;
-    }
 
     @Override
     public void append(ByteArrayDataOutput out) {

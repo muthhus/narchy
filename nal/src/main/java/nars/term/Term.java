@@ -809,23 +809,18 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
     /**
-     * TODO override in Compound implementations for accelerated root comparison without root() instantiation
-     */
-    default boolean xternalEquals(Term x) {
-        return equals(x);
-    }
-
-    /**
      * returns this term in a form which can identify a concept, or Null if it can't
+     * generally this is equivalent to root() but for compound it includes
+     * unnegation and normalization steps. this is why conceptual() and root() are
+     * different
      */
     default Term conceptual() {
-        return this;
+        return Null;
     }
 
-    /**
-     * erases any temporal information
+    /** the skeleton of a term, without any temporal or other meta-assumptions
      */
-    default Term xternal() {
+    default Term root() {
         return this;
     }
 
@@ -872,6 +867,8 @@ public interface Term extends Termed, Comparable<Termed> {
 
     @Nullable
     Term temporalize(Retemporalize r);
+
+
 
 }
 

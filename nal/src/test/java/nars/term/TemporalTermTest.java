@@ -94,17 +94,17 @@ public class TemporalTermTest {
 
         Term b = $("(x,((--,R) &&+6 (--,happy)))");
         assertTrue(b.isTemporal());
-        Term bx = b.xternal();
+        Term bx = b.root();
         assertEquals(XTERNAL, bx.sub(1).dt());
         assertFalse(bx.equals(b));
 
         Term a = $("(x,((--,R)&&(--,happy)))");
-        Term ax = a.xternal();
+        Term ax = a.root();
         assertEquals(XTERNAL, ax.sub(1).dt());
         assertFalse(ax.equals(a));
 
-        assertTrue(b.xternalEquals(a));
-        assertTrue(a.xternalEquals(b));
+        assertTrue(b.root().equals(a.root()));
+        assertTrue(a.root().equals(b.root()));
         assertEquals(
                 Op.True,
                 $("((x,((--,R) &&+6 (--,happy)))-->(x,((--,R)&&(--,happy))))")
@@ -172,7 +172,7 @@ public class TemporalTermTest {
         //maintain temporal information that would otherwise be factored out if non-temporal
 
         assertEquals("((x &&+- $1) ==>+- (y &&+- $1))",
-                $.$("(($1 && x) ==>+1 ($1 &&+1 y))").xternal().toString());
+                $.$("(($1 && x) ==>+1 ($1 &&+1 y))").root().toString());
     }
 
 
@@ -183,7 +183,7 @@ public class TemporalTermTest {
             assertTrue(c instanceof Compound);
 
             assertEquals("((x ==>+- y) &&+- y)",
-                    c.xternal().toString());
+                    c.root().toString());
         }
     }
 
@@ -437,7 +437,7 @@ public class TemporalTermTest {
 
             Term f0 = $("(y " + op + "+- x)");
             assertEquals("(x " + op + "+- y)", f0.toString());
-            assertEquals("(x " + op + "+- y)", f0.xternal().toString());
+            assertEquals("(x " + op + "+- y)", f0.root().toString());
 
             Concept f = n.conceptualize(f0);
             assertTrue(e + "==" + f, e == f);
@@ -527,7 +527,7 @@ public class TemporalTermTest {
     public void testConceptualization() throws Narsese.NarseseException {
 
         Term t = $("(x==>y)");
-        Term x = t.xternal();
+        Term x = t.root();
         assertEquals(XTERNAL, x.dt());
         assertEquals("(x ==>+- y)", x.toString());
 
@@ -732,10 +732,10 @@ public class TemporalTermTest {
         @NotNull Term a = $("(x && y)");
 
         Term b = $.$("(x &&+1 y)");
-        assertEquals("(x &&+- y)", b.xternal().toString());
+        assertEquals("(x &&+- y)", b.root().toString());
 
         Term c = $.$("(x &&+1 x)");
-        assertEquals("(x &&+- x)", c.xternal().toString());
+        assertEquals("(x &&+- x)", c.root().toString());
     }
 
     @Test
@@ -776,8 +776,8 @@ public class TemporalTermTest {
 //        }
         Term f = $("(x ==> y)");
         Term g = $("(y ==>+1 x)");
-        assertEquals("(x ==>+- y)", f.xternal().toString());
-        assertEquals("(y ==>+- x)", g.xternal().toString());
+        assertEquals("(x ==>+- y)", f.root().toString());
+        assertEquals("(y ==>+- x)", g.root().toString());
     }
 
     @Ignore
