@@ -35,7 +35,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 //        //float fdur = dur;
 //        //float range = t.range();
         return
-                t.evi(start, end, dur);
+                t.conf(start, end, dur);
 ////                //t.conf(now, dur) *
 ////                //t.evi(now, dur) *
 ////                //* range == 0 ? 1f : (float) (1f + Math.sqrt(t.range()) / dur); ///(1+t.distanceTo(start, end)))); ///fdur

@@ -3,6 +3,7 @@ package nars.term.container;
 import com.google.common.collect.Iterators;
 import jcog.Util;
 import nars.Op;
+import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,7 @@ public class TermVector1 implements TermContainer {
     private final int hash1;
 
     public TermVector1(Term sub) {
+        assert(!(sub instanceof EllipsisMatch));
 
         this.sub = sub;
         this.hash1 = Util.hashCombine(sub.hashCode(), 1); //HACK consistent with Terms.hash(..)

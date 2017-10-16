@@ -27,6 +27,8 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.derive.AbstractPred;
+import nars.derive.match.Ellipsis;
+import nars.derive.match.EllipsisMatch;
 import nars.index.term.TermContext;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
@@ -759,15 +761,16 @@ public interface Compound extends Term, IPair, TermContainer {
         Term[] xy = theArray();
         //any contained evaluables
         Op o = op();
-        int necessaryBits = o ==INH ? Op.funcInnerBits : Op.funcBits;
+        int necessaryBits = o == INH ? Op.funcInnerBits : Op.funcBits;
         boolean changed = false, recurseChange = false;
+        int ellipsisAddition = 0, ellipsisSub = 0;
 
         for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
             Term xi = xy[i];
             Term yi = xi.evalSafe(context, remain);
             if (yi == null) {
                 return Null;
-            } else if (xi != yi && (yi.getClass()!=xi.getClass()  || !xi.equals(yi))) {
+            } else if (xi != yi && (!xi.equals(yi) || yi.getClass() != xi.getClass())) {
                 if (!changed) {
                     xy = toArray(); //begin clone copy
                     changed = true;
@@ -775,11 +778,34 @@ public interface Compound extends Term, IPair, TermContainer {
                 xy[i] = yi;
                 recurseChange |= yi.hasAll(necessaryBits);
             }
+            if (yi instanceof EllipsisMatch) {
+                ellipsisAddition += ((EllipsisMatch) yi).subs();
+                ellipsisSub++;
+            }
+        }
 
+        if (ellipsisAddition > 0) {
+            //flatten ellipsis
+            Term[] z = new Term[xy.length + ellipsisAddition - ellipsisSub];
+            int k = 0;
+            for (int i = 0; i < xy.length; i++) {
+                Term x = xy[i];
+                if (x instanceof EllipsisMatch) {
+                    Term[] xx = ((EllipsisMatch)x).theArray();
+                    for (Term xxx : xx)
+                        z[k++] = xxx;
+                } else {
+                    z[k++] = x;
+                }
+            }
+            assert(k==z.length);
+            changed = true;
+            xy = z;
         }
 
         Term u;
         if (changed) {
+
             u = o.the(dt(), xy);
 
             if (recurseChange)
@@ -796,7 +822,7 @@ public interface Compound extends Term, IPair, TermContainer {
             u = ((Functor) xy[1]).apply(xy[0].subterms());
             if (u instanceof AbstractPred) {
                 u = $.the(((AbstractPred) u).test(null));
-            } else if (u == null ) {
+            } else if (u == null) {
                 u = this; //null means to keep the same
             }
         }

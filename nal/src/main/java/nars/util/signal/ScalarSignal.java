@@ -70,7 +70,7 @@ public class ScalarSignal extends Signal implements  DoubleSupplier {
      *  the time is specified instead of obtained from NAR so that
      *  all sensor readings can be timed with perfect consistency within the same cycle
      * */
-    public Task update(@NotNull NAR nar, long now, int dur) {
+    public Task update( NAR nar, long now, int dur) {
 
         //long now = nar.time();
 

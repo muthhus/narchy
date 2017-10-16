@@ -400,19 +400,19 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
         return streamNodes().flatMap(Node::stream);
     }
 
-    @Override
-    public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
-        if (!region.intersects(rect) || !t.test(this))
-            return;
-
-        Node<T, ?>[] children = this.child;
-        short s = this.size;
-        for (int i = 0; i < s; i++) {
-            Node<T, ?> c = children[i];
-            if (c != null)
-                c.intersectingNodes(rect, t, model);
-        }
-    }
+//    @Override
+//    public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
+//        if (!region.intersects(rect) || !t.test(this))
+//            return;
+//
+//        Node<T, ?>[] children = this.child;
+//        short s = this.size;
+//        for (int i = 0; i < s; i++) {
+//            Node<T, ?> c = children[i];
+//            if (c != null)
+//                c.intersectingNodes(rect, t, model);
+//        }
+//    }
 
     @Override
     public void collectStats(Stats stats, int depth) {

@@ -176,13 +176,13 @@ public interface Space<T> extends Nodelike<T> {
         throw new UnsupportedOperationException();
     }
 
-    default RTreeCursor<T> cursor(HyperRegion start) {
-        return new RTreeCursor<>(this).in(start);
-    }
+//    default RTreeCursor<T> cursor(HyperRegion start) {
+//        return new RTreeCursor<>(this).in(start);
+//    }
 
     Node<T, ?> root();
 
-    void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile);
+//    void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile);
 
     HyperRegion bounds(T task);
 

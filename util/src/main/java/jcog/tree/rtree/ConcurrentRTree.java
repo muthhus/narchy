@@ -104,15 +104,15 @@ public class ConcurrentRTree<T> implements Space<T> {
         }
     }
 
-    @Override
-    public void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile) {
-        readLock.lock();
-        try {
-            tree.intersectingNodes(start, eachWhile);
-        } finally {
-            readLock.unlock();
-        }
-    }
+//    @Override
+//    public void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile) {
+//        readLock.lock();
+//        try {
+//            tree.intersectingNodes(start, eachWhile);
+//        } finally {
+//            readLock.unlock();
+//        }
+//    }
 
     /**
      * prefer this instead of add() in multithread environments, because it elides what might ordinarily involve a lock wait

@@ -25,7 +25,7 @@ public class Spatialization<T> {
         this.split = split;
     }
 
-    public HyperRegion region(@NotNull T t) {
+    public HyperRegion region(/*@NotNull*/ T t) {
         return region.apply(t);
     }
 

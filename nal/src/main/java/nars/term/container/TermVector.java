@@ -2,6 +2,7 @@ package nars.term.container;
 
 import com.google.common.base.Joiner;
 import nars.Param;
+import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
@@ -66,6 +67,10 @@ public abstract class TermVector implements TermContainer {
 
     @NotNull
     public static TermContainer the(Term... t) {
+        for (Term x : t)
+            if (x instanceof EllipsisMatch)
+                throw new RuntimeException("ellipsis match should not be a subterm of ANYTHING");
+
         switch (t.length) {
             case 0:
                 return TermContainer.NoSubterms;

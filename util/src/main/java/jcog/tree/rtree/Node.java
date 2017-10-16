@@ -141,7 +141,7 @@ public interface Node<L, V> extends Nodelike<L> {
         return (Set<L>) containing(rect, new HashSet(), model);
     }
 
-    void intersectingNodes(HyperRegion rect, Predicate<Node<L, ?>> t, Spatialization<L> model);
+//    void intersectingNodes(HyperRegion rect, Predicate<Node<L, ?>> t, Spatialization<L> model);
 
     /**
      * Recurses over index collecting stats

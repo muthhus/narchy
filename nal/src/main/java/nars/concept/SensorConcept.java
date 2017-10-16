@@ -3,7 +3,7 @@ package nars.concept;
 import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Task;
-import nars.task.util.PredictionAccuracyFeedback;
+import nars.task.util.PredictionFeedback;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.ScalarSignal;
@@ -28,7 +28,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
-    final PredictionAccuracyFeedback beliefFeedback;
+    final PredictionFeedback beliefFeedback;
 
     public SensorConcept(@NotNull Term c, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
         super(c,
@@ -44,7 +44,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         };
         //((SensorBeliefTable)beliefs).sensor = sensor;
 
-        beliefFeedback = new PredictionAccuracyFeedback(beliefs);
+        beliefFeedback = new PredictionFeedback(beliefs);
 
         this.signal = signal;
 

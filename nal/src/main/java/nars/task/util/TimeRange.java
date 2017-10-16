@@ -6,7 +6,7 @@ import nars.task.NALTask;
 /**
  * only valid for comparison during rtree iteration
  */
-public class TimeRange implements HyperRegion {
+public final class TimeRange implements HyperRegion {
 
     long start = Long.MIN_VALUE, end = Long.MAX_VALUE;
 

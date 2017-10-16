@@ -94,10 +94,10 @@ public final class CounterNode<T> implements Node<T, Object> {
         return this.node.containing(rect, t, model);
     }
 
-    @Override
-    public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
-        node.intersectingNodes(rect, t, model);
-    }
+//    @Override
+//    public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
+//        node.intersectingNodes(rect, t, model);
+//    }
 
     @Override
     public int size() {

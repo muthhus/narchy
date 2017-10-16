@@ -343,13 +343,15 @@ public abstract class Param extends Services<Term,NAR> {
     public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
 
     /**
-     * dt > 0
+     * computes the projected evidence at a specific distance (dt) from a perceptual moment evidence
+     * with a perceptual duration used as a time constant
+     * dt >= 0
      */
-    public static float evidenceDecay(float evi, float dur, long dt) {
+    public static float evi(float evi, float dur, long dt) {
 
         //return evi / (1 + ( dt / dur) ); //inverse linear
 
-        return evi / ( 1f + (dt*dt)/dur ); //inverse square
+        return evi / Util.sqr( 1f + dt / dur ); //inverse square
 
         //hard linear with half duration on either side of the task -> sum to 1.0 duration
 //        float scale = dt / dur;

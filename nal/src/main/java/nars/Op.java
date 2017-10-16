@@ -1774,7 +1774,7 @@ public enum Op {
         }
     }
 
-    boolean commute(int dt, int size) {
+    public boolean commute(int dt, int size) {
         return size > 1 &&
                 (commutative && Op.concurrent(dt))
                 ;
@@ -1796,18 +1796,6 @@ public enum Op {
     }
 
     /*@NotNull*/ Term _the(int dt, Term[] u) {
-
-        //HACK special case find why this happens
-        if (u[0] instanceof EllipsisMatch) {
-            if (u.length > 1)
-                throw new UnsupportedOperationException("TODO");
-
-            Term[] v = ((EllipsisMatch) u[0]).theArray();
-            if (commute(dt, v.length))
-                u = Terms.sorted(v);
-            else
-                u = v;
-        }
 
         if (statement) {
             if (u.length == 1) { //similarity has been reduced

@@ -5,7 +5,7 @@ import nars.NAct;
 import nars.Task;
 import nars.control.CauseChannel;
 import nars.task.ITask;
-import nars.task.util.PredictionAccuracyFeedback;
+import nars.task.util.PredictionFeedback;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
@@ -31,7 +31,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
     @NotNull
     private final BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor;
-    private final PredictionAccuracyFeedback beliefFeedback;
+    private final PredictionFeedback beliefFeedback;
     final CauseChannel<ITask> in;
 
     public GoalActionAsyncConcept(@NotNull Term c, @NotNull NAct act, @NotNull BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor) {
@@ -56,7 +56,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create
 
-        beliefFeedback = new PredictionAccuracyFeedback(beliefs);
+        beliefFeedback = new PredictionFeedback(beliefs);
 
     }
 

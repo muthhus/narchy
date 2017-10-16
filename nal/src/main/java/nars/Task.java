@@ -397,7 +397,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                 float ete = eternalizable();
                 float ecw = ete > 0 ? this.eviEternalized() * ete : 0;
                 float dcw = cw - ecw; //delta to eternalization
-                cw = ecw + Param.evidenceDecay(dcw, durAdjusted, dist); //decay
+                cw = ecw + Param.evi(dcw, durAdjusted, dist); //decay
 
                 //cw = 0; //immediate cut-off
 

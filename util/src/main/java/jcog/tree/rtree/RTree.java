@@ -198,12 +198,12 @@ public class RTree<T> implements Space<T> {
     }
 
 
-    @Override
-    public void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile) {
-        if (size == 0)
-            return;
-        root.intersectingNodes(start, eachWhile, model);
-    }
+//    @Override
+//    public void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile) {
+//        if (size == 0)
+//            return;
+//        root.intersectingNodes(start, eachWhile, model);
+//    }
 
     @Override
     public String toString() {

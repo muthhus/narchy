@@ -17,7 +17,7 @@ public class TaskRegionLink extends TasksRegion {
         this.task = task;
     }
 
-    public static TaskRegionLink link(@NotNull Task task) {
+    public static TaskRegionLink link(Task task) {
         return new TaskRegionLink(task, task.freq(), task.conf());
     }
 

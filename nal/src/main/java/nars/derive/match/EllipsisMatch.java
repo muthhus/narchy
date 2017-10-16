@@ -51,6 +51,11 @@ public class EllipsisMatch extends GenericCompound implements Ellipsislike {
     }
 
     @Override
+    public void init(int[] meta) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Term neg() {
         throw new UnsupportedOperationException();
     }
@@ -61,7 +66,7 @@ public class EllipsisMatch extends GenericCompound implements Ellipsislike {
     }
 
     @Override
-    public @NotNull Term conceptual() {
+    public /*@NotNull*/ Term conceptual() {
         throw new UnsupportedOperationException();
     }
 
@@ -80,7 +85,7 @@ public class EllipsisMatch extends GenericCompound implements Ellipsislike {
     }
 
 
-    public static Term match(@NotNull TermContainer y, int from, int to) {
+    public static Term match(/*@NotNull*/ TermContainer y, int from, int to) {
 
 
         if (from == to) {
@@ -114,7 +119,7 @@ public class EllipsisMatch extends GenericCompound implements Ellipsislike {
         return true;
     }
 
-    public boolean linearMatch(TermContainer y, int from, @NotNull Unify subst) {
+    public boolean linearMatch(TermContainer y, int from, /*@NotNull*/ Unify subst) {
         int s = subs();
 
         if (s + from > y.subs())
@@ -128,18 +133,18 @@ public class EllipsisMatch extends GenericCompound implements Ellipsislike {
     }
 
 //    /** HACK */
-//    @NotNull
+//    /*@NotNull*/
 //    static Term[] expand(Term raw) {
 //        return raw instanceof EllipsisMatch ?
 //                ((EllipsisMatch)raw).terms :
 //                new Term[] { raw };
 //    }
 
-//    public EllipsisMatch(@NotNull Collection<Term> term, Term except) {
+//    public EllipsisMatch(/*@NotNull*/ Collection<Term> term, Term except) {
 //        this(term.stream().filter(t -> ((t!=except) )).collect(toList()));
 //    }
 
-//    @Deprecated public EllipsisMatch(@NotNull Collection<Term> term, Term except, Term except2) {
+//    @Deprecated public EllipsisMatch(/*@NotNull*/ Collection<Term> term, Term except, Term except2) {
 //        this(term.stream().filter(t -> ((t!=except) && (t!=except2) )).collect(toList()));
 //    }
 
@@ -154,8 +159,8 @@ public class EllipsisMatch extends GenericCompound implements Ellipsislike {
     }
 
 
-    public boolean rematch(@NotNull TermContainer y, @NotNull Collection<Term> yFree) {
-        @NotNull TermContainer x = subterms();
+    public boolean rematch(/*@NotNull*/ TermContainer y, /*@NotNull*/ Collection<Term> yFree) {
+        /*@NotNull*/ TermContainer x = subterms();
         int xs = x.subs();
         for (int i = 0; i < xs; i++) {
             Term e = x.sub(i);
