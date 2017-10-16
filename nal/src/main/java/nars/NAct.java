@@ -463,12 +463,12 @@ public interface NAct {
 
                 PreciseTruth pb = y > 0 ? P : N;
                 PreciseTruth pg =
-                        curious ? $.t(y >= 0 ? 1 : 0, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
+                        curious && y==y ? $.t(y >= 0 ? 1 : 0, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
                         //null;
                 CC[0].feedback(pb, pg, n);
                 PreciseTruth nb = y < 0 ? P : N;
                 PreciseTruth ng =
-                        curious ? $.t(y >= 0 ? 0 : 1, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
+                        curious && y==y  ? $.t(y >= 0 ? 0 : 1, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
                         //null;
                 CC[1].feedback(nb, ng, n);
 

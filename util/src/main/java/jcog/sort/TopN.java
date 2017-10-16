@@ -26,6 +26,12 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E> {
     }
 
     @Override
+    public void clear() {
+        this.minSeen = Float.POSITIVE_INFINITY;
+        super.clear();
+    }
+
+    @Override
     public int add(E element, float elementRank, FloatFunction<E> cmp) {
         if (size == list.length) {
 //            assert (last() == min):
@@ -92,4 +98,14 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E> {
         throw new UnsupportedOperationException();
     }
 
+    public E[] drain(E[] next) {
+
+        E[] current = this.list;
+
+        this.list = next;
+        this.minSeen = Float.POSITIVE_INFINITY;
+        this.size = 0;
+
+        return current;
+    }
 }

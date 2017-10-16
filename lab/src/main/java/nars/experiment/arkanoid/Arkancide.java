@@ -168,12 +168,12 @@ public class Arkancide extends NAgentX {
 //
 //        });///.resolution(0.1f);
 
-        Param.DEBUG = true;
-        nar.onTask((t) -> {
-            if (!t.isInput() && (t.isGoal() || t.isEternal())) {
-                System.err.println(t.proof());
-            }
-        });
+//        Param.DEBUG = true;
+//        nar.onTask((t) -> {
+//            if (!t.isInput() && (t.isGoal() || t.isEternal())) {
+//                System.err.println(t.proof());
+//            }
+//        });
 
         initBipolar();
         //initToggle();

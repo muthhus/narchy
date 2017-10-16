@@ -32,7 +32,7 @@ public class StaticTermIndex extends TermIndex {
     @Override
     public
     @Nullable
-    Termed get(@NotNull Term t, boolean createIfMissing) {
+    Termed get(Term t, boolean createIfMissing) {
         return createIfMissing ? t : null;
     }
 
@@ -48,7 +48,7 @@ public class StaticTermIndex extends TermIndex {
     }
 
     @Override
-    public void remove(@NotNull Term entry) {
+    public void remove(Term entry) {
 
     }
 

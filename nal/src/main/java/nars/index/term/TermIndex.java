@@ -84,7 +84,7 @@ public abstract class TermIndex implements TermContext {
     public abstract void remove(@NotNull Term entry);
 
     public void print(@NotNull PrintStream out) {
-        forEach(out::println);
+        stream().forEach(out::println);
         out.println();
     }
 

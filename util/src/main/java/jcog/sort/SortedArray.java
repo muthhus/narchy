@@ -110,7 +110,6 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
     public void clear() {
         this.list = (E[]) ArrayUtils.EMPTY_OBJECT_ARRAY;
         this.size = 0;
-
     }
 
 //    /**

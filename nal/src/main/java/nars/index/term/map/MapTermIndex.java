@@ -25,27 +25,10 @@ public class MapTermIndex extends MaplikeTermIndex {
         return concepts.values().stream();
     }
 
-    @NotNull
-    @Override
-    public String summary() {
-        return concepts.size() + " concepts";
-    }
-
-    @Override
-    public void print(@NotNull PrintStream out) {
-
-        super.print(out);
-
-        //subterms.forEach((k,v) -> System.out.println(k + "\t" + v));
-        //data.forEach((k,v) -> System.out.println(k + "\t" + v));
-
-        concepts.keySet().forEach(System.out::println);
-
-    }
 
     @Nullable
     @Override
-    public Termed get(@NotNull Term x, boolean createIfMissing) {
+    public Termed get(Term x, boolean createIfMissing) {
 
         //assert(!(x instanceof Variable)): "variables should not be stored in index";
         if (x instanceof Variable)
@@ -58,6 +41,13 @@ public class MapTermIndex extends MaplikeTermIndex {
             return concepts.get(x);
         }
     }
+
+    @NotNull
+    @Override
+    public String summary() {
+        return concepts.size() + " concepts";
+    }
+
 
     @Override
     public void remove(Term entry) {

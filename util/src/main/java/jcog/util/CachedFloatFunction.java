@@ -1,5 +1,6 @@
 package jcog.util;
 
+import jcog.map.MRUCache;
 import jcog.map.SaneObjectFloatHashMap;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 

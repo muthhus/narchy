@@ -1,6 +1,8 @@
 package jcog.pri;
 
 import com.google.common.collect.Iterators;
+import jcog.TODO;
+import jcog.Util;
 import jcog.exe.Loop;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,6 +16,8 @@ import java.util.function.Function;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
+import static jcog.pri.PriMap.State.FREE;
+
 /**
  * next-gen bag experiment
  * hybrid strong/weak + prioritized + forgetting bounded cache
@@ -23,6 +27,14 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
     public enum Hold {
         STRONG, WEAK, SOFT
     }
+
+    public enum State {
+        FREE,
+        ALERT,
+        CRITICAL
+    }
+
+    public State state = FREE;
 
     private Hold defaultMode = Hold.STRONG;
 
@@ -68,18 +80,30 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
 
     TLink<X, Y> link(@Nullable TLink<X, Y> t, X k, Y v, Hold mode) {
 
+        if (v == null) {
+            //if (t!=null) t.delete();
+            return null; //pass-through for map removal
+        }
+
         switch (mode) {
+
             case STRONG:
-                if (t == null)
+                if (!(t instanceof BasicTLink))
                     t = new BasicTLink(k);
                 ((BasicTLink) t).setValue(v);
                 break;
 
             case SOFT:
-                return new ProxyTLink(k, new MySoftReference(k, v, refq));
+                if (!(t instanceof ProxyTLink))
+                    t = new ProxyTLink(k);
+                ((ProxyTLink) t).setValue(new MySoftReference(k, v, refq));
+                break;
 
             case WEAK:
-                return new ProxyTLink(k, new MyWeakReference(k, v, refq));
+                if (!(t instanceof ProxyTLink))
+                    t = new ProxyTLink(k);
+                ((ProxyTLink) t).setValue(new MyWeakReference(k, v, refq));
+                break;
 
             default:
                 throw new UnsupportedOperationException();
@@ -89,11 +113,14 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
 
     public static class ProxyTLink<X, Y> extends TLink<X, Y> {
 
-        private final Supplier<Y> value;
+        private Supplier<Y> value = () -> null;
 
-        public ProxyTLink(X key, Supplier<Y> provider) {
+        public ProxyTLink(X key) {
             super(key);
-            this.value = provider;
+        }
+
+        public void setValue(Supplier<Y> value) {
+            this.value = value;
         }
 
         @Override
@@ -124,54 +151,100 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
 
     private final LongSupplier clock;
     public final ReferenceQueue refq = new ReferenceQueue();
-    private final Loop cleaner;
+    protected final Loop cleaner;
+
+    public PriMap() {
+        this(System::currentTimeMillis);
+    }
 
     public PriMap(LongSupplier clock) {
         this.clock = clock;
 
-        this.cleaner = new Loop(200) {
-            @Override
-            public boolean next() {
-
-                try {
-                    Object ref;
-                    for (ref = refq.remove(); ref != null; ref = refq.poll()) {
-                        removeGC(ref);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                return true;
-            }
-        };
-
+        this.cleaner = new Cleaner();
     }
 
     public Y get(Object x) {
-        TLink<X, Y> t = map.get(x);
+        TLink<X, Y> t = link(x);
         return t != null ? t.get() : null;
+    }
+
+    protected TLink<X, Y> link(Object x) {
+        return map.get(x);
     }
 
     public Y computeIfAbsent(X x, Hold mode, Function<X, Y> builder) {
         TLink<X, Y> r = map.computeIfAbsent(x, (xx) -> link(null, xx, builder.apply(xx), mode));
-        return r!=null ? r.get() : null;
+        return r != null ? r.get() : null;
+    }
+
+    @Override
+    public boolean containsKey(Object key) {
+        return map.containsKey(key);
+    }
+
+    @Override
+    public Y computeIfAbsent(X key, Function<? super X, ? extends Y> mappingFunction) {
+        throw new TODO("TODO");
+    }
+
+    @Override
+    public Y computeIfPresent(X key, BiFunction<? super X, ? super Y, ? extends Y> remappingFunction) {
+        throw new TODO("TODO");
+    }
+
+    @Override
+    public Y compute(X x, BiFunction<? super X, ? super Y, ? extends Y> remap) {
+        TLink<X, Y> r = map.compute(x, (xx, prev) -> link(prev, xx, remap.apply(xx, prev != null ? prev.get(): null) , mode(x)));
+        return r != null ? r.get() : null;
+    }
+
+    /** selects the default mode for an entry */
+    protected Hold mode(X x) {
+        return defaultMode;
     }
 
     @Override
     public Y merge(X x, Y value, BiFunction<? super Y, ? super Y, ? extends Y> remap) {
-        TLink<X, Y> r = map.compute(x, (xx, pv) -> link(null, xx, remap.apply(pv != null ? pv.get() : null, value), defaultMode));
-        return r!=null ? r.get() : null;
+        TLink<X, Y> r = map.compute(x, (xx, prev) -> link(prev, xx, remap.apply(prev != null ? prev.get() : null, value), mode(x)));
+        return r != null ? r.get() : null;
     }
 
     public Y put(X x, Hold mode, Y y) {
-        TLink<X, Y> r = map.compute(x, (xx, prev) -> link(prev, xx , y, mode));
-        return r!=null ? r.get() : null;
+        final Object[] previous = {null};
+        TLink<X, Y> cur = map.compute(x, (xx, prev) -> {
+            if (prev!=null)
+                previous[0] = prev.get();
+            return link(prev, xx, y, mode);
+        });
+        Object p = previous[0];
+        if (p != null) {
+            Y py = (Y) p;
+            onRemove(x, py);
+            return py;
+        } else {
+            return null;
+        }
+    }
+
+    protected void onRemove(X x, Y y) {
+
     }
 
     @Override
     public Y put(X x, Y y) {
-        return put(x, defaultMode, y);
+        return put(x, mode(x), y);
+    }
+
+    @Override
+    public Y remove(Object key) {
+        TLink<X, Y> r = map.remove(key);
+        if (r != null) {
+            Y v = r.get();
+            onRemove(r.key, v);
+            return v;
+        } else {
+            return null;
+        }
     }
 
     protected void removeGC(Object x) {
@@ -183,13 +256,22 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
         } else {
             throw new UnsupportedOperationException();
         }
-        map.remove(key);
+        remove(key);
     }
 
     @Override
     public Set<Entry<X, Y>> entrySet() {
-
         return new MyEntrySet();
+    }
+
+    @Override
+    public Set<X> keySet() {
+        throw new TODO();
+    }
+
+    @Override
+    public Collection<Y> values() {
+        throw new TODO();
     }
 
     private class MyEntrySet extends AbstractSet<Entry<X, Y>> {
@@ -198,6 +280,7 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
 
         @Override
         public Iterator iterator() {
+            //TODO this SimpleEntry can be recycled
             return Iterators.transform(e.iterator(), ee -> new SimpleEntry(ee.getKey(), ee.getValue().get()));
         }
 
@@ -208,4 +291,60 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
     }
 
 
+    /** TODO abstract this into a general purpose PriMap-independent resource watcher which triggers the various eviction options as well as controls other controllable parameters as plugins like AgentService */
+    protected class Cleaner extends Loop {
+
+        final float alertThreshold = 0.75f;
+        int minPeriod = 1, maxPeriod = 200;
+
+        public Cleaner() {
+            super();
+            setPeriodMS(maxPeriod);
+        }
+
+        @Override
+        public boolean next() {
+
+
+            Object ref;
+            for (ref = refq.poll(); ref != null; ref = refq.poll()) {
+                removeGC(ref);
+            }
+
+            float evictPower = updateMemory(Util.memoryUsed());
+            evict(evictPower);
+
+            //TODO adjust cycle time in proportion to eviction power
+            setPeriodMS(Util.lerp(Util.round( 1f - evictPower, 0.2f), minPeriod, maxPeriod));
+
+            return true;
+        }
+
+
+    }
+
+    @Override
+    public int size() {
+        return map.size();
+    }
+
+    /**
+     * returns the decided strength of the active eviction to run, if any
+     */
+    protected float updateMemory(float used) {
+        if (used > 0.9f) {
+            state = State.CRITICAL;
+            return used;
+        } else if (used > 0.5f) {
+            state = State.ALERT;
+            return used;
+        } else {
+            state = State.FREE;
+            return 0;
+        }
+    }
+
+    public void evict(float strength) {
+
+    }
 }
