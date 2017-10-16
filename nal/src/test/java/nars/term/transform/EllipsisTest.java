@@ -10,9 +10,9 @@ import nars.derive.match.EllipsisMatch;
 import nars.derive.match.EllipsisOneOrMore;
 import nars.derive.match.EllipsisZeroOrMore;
 import nars.derive.rule.PremiseRule;
-import nars.index.term.BasicTermIndex;
 import nars.index.term.PatternIndex;
 import nars.index.term.TermIndex;
+import nars.index.term.map.MapTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 
@@ -50,7 +51,7 @@ public class EllipsisTest {
         default Set<Term> test(int arity, int repeats) throws Narsese.NarseseException {
             Set<Term> selectedFixed = $.newHashSet(arity);
 
-            TermIndex index = new BasicTermIndex(1024);
+            TermIndex index = new MapTermIndex(new HashMap(128));
 
             Compound y = getMatchable(arity);
             assertNotNull(y);

@@ -258,7 +258,17 @@ public class TermReductionsTest extends NarseseTest {
                     ).conceptual().toString());
         }
 
+        //"(&&,(--,(&&,(bx-->noid),(happy-->noid),#1)),(--,(&&,(bx-->noid),(happy-->noid),#1)),(--,(dx-->noid)))",
+        //$("(&&,(--,(&|,(bx-->noid),(happy-->noid),#1)),(--,( &&+- ,(bx-->noid),(happy-->noid),#1)),(--,(dx-->noid)))")
 
+        assertEquals(
+                "(&&,(bx-->noid),(happy-->noid),#1)",
+                $("(--,(((bx-->noid) &| (happy-->noid)) &| #1))")
+                        .conceptual().toString());
+        assertEquals(
+                "(x,(--,(&&,a,b,c)))",
+                $("(x,(--,(( a &| b) &| c)))")
+                        .conceptual().toString());
     }
 
     @Test

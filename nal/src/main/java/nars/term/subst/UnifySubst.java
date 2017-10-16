@@ -13,7 +13,7 @@ public class UnifySubst extends Unify {
 
     //static final Logger logger = LoggerFactory.getLogger(UnifySubst.class);
 
-    @NotNull
+    /*@NotNull*/
     public final NAR nar;
 
 
@@ -21,7 +21,7 @@ public class UnifySubst extends Unify {
     private Term a;
 
 
-    public UnifySubst(Op varType, @NotNull NAR n, Predicate<Term> target, int ttl) {
+    public UnifySubst(Op varType, /*@NotNull*/ NAR n, Predicate<Term> target, int ttl) {
         super(varType, n.random(), Param.UnificationStackMax, ttl);
 
         this.nar = n;
@@ -30,7 +30,7 @@ public class UnifySubst extends Unify {
     }
 
     @Override
-    public boolean unify(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public boolean unify(/*@NotNull*/ Term x, /*@NotNull*/ Term y, boolean finish) {
         this.a = x;
         return super.unify(x, y, finish);
     }

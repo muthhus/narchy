@@ -63,12 +63,12 @@ import static nars.Op.*;
  * <patham9_> and require at least one dep-var to be unified in dep-var unification.
  * <patham9_> in principle the restriction to have at least one dep-var unified could be skipped, but the additional weaker result doesn't add any value to the system
  */
-abstract public class UniSub extends Functor {
+abstract public class SubstUnified extends Functor {
 
     //private final OneMatchFindSubst subMatcher;
     protected final Derivation parent; //parent matcher context
 
-    protected UniSub(Atom id, Derivation parent) {
+    protected SubstUnified(Atom id, Derivation parent) {
         super(id);
         this.parent = parent;
         //this.subMatcher = sub;
@@ -79,16 +79,16 @@ abstract public class UniSub extends Functor {
 //    }
 
 
-    @NotNull
+    /*@NotNull*/
     @Override
-    public Term apply(@NotNull TermContainer a) {
+    public Term apply(/*@NotNull*/ TermContainer a) {
 
         Term input = a.sub(0);
         if (input == Null) return Null;
 
         Term x = a.sub(1);
         if (x == Null) return Null;
-        if (x.equals(substitute.SAME))
+        if (x.equals(Subst.SAME))
             x = input;
 
         Term y = a.sub(2);
@@ -99,11 +99,11 @@ abstract public class UniSub extends Functor {
         boolean strict = false;
         @Nullable Op op = null; // unifying();
         for (int i = 3; i < aa; i++) {
-            if (a.subEquals(i, substitute.STRICT))
+            if (a.subEquals(i, Subst.STRICT))
                 strict = true;
-            else if (a.subEquals(i, substitute.INDEP_VAR))
+            else if (a.subEquals(i, Subst.INDEP_VAR))
                 op = VAR_INDEP;
-            else if (a.subEquals(i, substitute.DEP_VAR))
+            else if (a.subEquals(i, Subst.DEP_VAR))
                 op = VAR_DEP;
         }
 
@@ -132,7 +132,7 @@ abstract public class UniSub extends Functor {
         return Null;
     }
 
-    public static class uniSubAny extends UniSub {
+    public static class uniSubAny extends SubstUnified {
 
         final static Atom func = (Atom) $.the("subIfUnifiesAny");
 
@@ -161,7 +161,7 @@ abstract public class UniSub extends Functor {
 //        }
 //
 //
-//        @NotNull
+//        /*@NotNull*/
 //        @Override
 //        public Op unifying() {
 //            return Op.VAR_INDEP;
@@ -178,7 +178,7 @@ abstract public class UniSub extends Functor {
 //            return true;
 //        }
 //
-//        @NotNull
+//        /*@NotNull*/
 //        @Override
 //        public Op unifying() {
 //            return Op.VAR_DEP;
@@ -192,7 +192,7 @@ abstract public class UniSub extends Functor {
 //        }
 //
 //
-//        @NotNull
+//        /*@NotNull*/
 //        @Override
 //        public Op unifying() {
 //            return Op.VAR_INDEP;
@@ -236,7 +236,7 @@ abstract public class UniSub extends Functor {
 //            return true;
 //        }
 //
-//        @NotNull
+//        /*@NotNull*/
 //        @Override
 //        public Op unifying() {
 //            return Op.VAR_INDEP;

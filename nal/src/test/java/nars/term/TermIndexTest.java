@@ -3,14 +3,15 @@ package nars.term;
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.builder.DefaultConceptBuilder;
-import nars.index.term.BasicTermIndex;
 import nars.index.term.TermIndex;
+import nars.index.term.map.MapTermIndex;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -74,7 +75,7 @@ public class TermIndexTest {
 //    }
     @Ignore @Test public void testTermSharing5c() throws Narsese.NarseseException {
         testIndex(
-                new BasicTermIndex(1024)
+                new MapTermIndex(new HashMap(1024))
         );
         //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
     }

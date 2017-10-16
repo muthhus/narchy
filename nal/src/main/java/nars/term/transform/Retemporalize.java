@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.IntSupplier;
 
+import static nars.Op.CONJ;
 import static nars.Op.TemporalBits;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -20,6 +21,13 @@ abstract public class Retemporalize implements CompoundTransform {
     public static final Retemporalize retemporalizeXTERNALToDTERNAL = new RetemporalizeFromTo(XTERNAL, DTERNAL);
     public static final Retemporalize retemporalizeXTERNALToZero = new RetemporalizeFromTo(XTERNAL, 0);
 
+    public static final Retemporalize retemporalizeConceptual = new Retemporalize() {
+        @Override public int dt(Compound x) {
+            if (x.op()==CONJ && x.subs() > 2) return DTERNAL;
+            return XTERNAL;
+        }
+    };
+
 
     @Nullable
     @Override
@@ -27,7 +35,7 @@ abstract public class Retemporalize implements CompoundTransform {
         if (!x.hasAny(TemporalBits)) {
             return x;
         } else {
-            return CompoundTransform.super.transform(x, op, dt(x));
+            return CompoundTransform.super.transform(x, op, op.temporal ? dt(x) : DTERNAL);
         }
     }
 

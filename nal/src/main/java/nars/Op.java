@@ -49,9 +49,7 @@ public enum Op {
     NEG("--", 1, Args.One) {
         @Override
         public Term _the(int dt, Term... u) {
-            //assert (u.length == 1); //assert (dt == DTERNAL || dt == XTERNAL);
-            if (u.length != 1)
-                throw new RuntimeException("negation with more than 1 arg wtf");
+            assert (u.length == 1); //assert (dt == DTERNAL || dt == XTERNAL);
 
             Term x = u[0];
             switch (x.op()) {
@@ -621,7 +619,12 @@ public enum Op {
     public static final int[] NALLevelEqualAndAbove = new int[8 + 1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
 
 
+    /** whether it is a special or atomic term that isnt conceptualizable.
+     * negation is an exception to this, being unconceptualizable itself
+     * but it will have conceptualizable=true.
+     */
     public final boolean conceptualizable;
+
     public final boolean beliefable, goalable;
 
 //    public interface TermInstancer {
@@ -877,7 +880,9 @@ public enum Op {
                 break;
         }
 
-        conceptualizable = !(var || virtual || str.equals("+") /* INT */ || str.equals("B") /* Bool */);
+        conceptualizable = !(var || virtual ||
+                str.equals("+") /* INT */ || str.equals("B") /* Bool */ );
+
         goalable = conceptualizable && !str.equals("==>");
 
         beliefable = conceptualizable;

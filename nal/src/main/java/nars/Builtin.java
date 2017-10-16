@@ -7,7 +7,7 @@ import nars.op.DepIndepVarIntroduction;
 import nars.op.Operator;
 import nars.op.data.*;
 import nars.op.data.intersect;
-import nars.op.substitute;
+import nars.op.Subst;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -42,7 +42,7 @@ public class Builtin {
             intersect.the,
             differ.the,
             union.the,
-            substitute.the,
+            Subst.the,
 
             Functor.f1("varIntro", (x) -> {
                 Term y = DepIndepVarIntroduction.varIntro(x, ThreadLocalRandom.current());

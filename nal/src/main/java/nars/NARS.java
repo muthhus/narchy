@@ -4,7 +4,6 @@ import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
-import nars.control.BatchActivate;
 import nars.control.Derivation;
 import nars.derive.PrediTerm;
 import nars.derive.PrediTrie;
@@ -12,10 +11,10 @@ import nars.derive.rule.PremiseRuleSet;
 import nars.exe.Exec;
 import nars.exe.MultiExec;
 import nars.exe.SynchExec;
-import nars.index.term.BasicTermIndex;
 import nars.index.term.PatternIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
+import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMLinkage;
 import nars.time.CycleTime;
 import nars.time.RealTime;
@@ -25,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -115,7 +115,7 @@ public class NARS {
 
         index = () ->
                 //new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
-                new BasicTermIndex(1 * 256);
+                new MapTermIndex(new LinkedHashMap(512));
 
         time = new CycleTime();
 

@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 //@RunWith(Parameterized.class)
 public class NAL5Test extends AbstractNALTest {
 
-    final int cycles = 500;
+    final int cycles = 150;
 
     @Before
     public void nal() {
@@ -570,10 +570,10 @@ public class NAL5Test extends AbstractNALTest {
 
         test
                 //.log()
-                .input("(y). %1.0;0.90%")
-                .input("((--,(x)) ==> (y)).")
-                .mustBelieve(cycles, "(x)", 0.0f, 0.45f)
-                .mustNotOutput(cycles, "(x)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
+                .input("y. %1.0;0.90%")
+                .input("(--x ==> y).")
+                .mustBelieve(cycles, "x", 0.0f, 0.45f)
+                .mustNotOutput(cycles, "x", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
         ;
     }
 

@@ -14,7 +14,7 @@ import nars.derive.rule.PremiseRule;
 import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
-import nars.op.substitute;
+import nars.op.Subst;
 import nars.task.DerivedTask;
 import nars.term.Functor;
 import nars.term.Term;
@@ -37,7 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static nars.Op.*;
-import static nars.op.UniSub.uniSubAny;
+import static nars.op.SubstUnified.uniSubAny;
 import static nars.time.Tense.ETERNAL;
 
 
@@ -179,7 +179,7 @@ public class Derivation extends Unify {
         derivationFunctors = functors(
                 new uniSubAny(this),
                 polarize,
-                substitute.the,
+                Subst.the,
                 union.the,
                 differ.the,
                 intersect.the,

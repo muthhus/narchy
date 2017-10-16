@@ -27,7 +27,6 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.derive.AbstractPred;
-import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
 import nars.index.term.TermContext;
 import nars.term.container.TermContainer;
@@ -39,7 +38,6 @@ import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -91,7 +89,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-        /*@NotNull*/
+    /*@NotNull*/
     TermContainer subterms();
 
     @Override
@@ -108,7 +106,7 @@ public interface Compound extends Term, IPair, TermContainer {
     void setNormalized();
 
 
-    //    @NotNull
+    //    /*@NotNull*/
 //    default MutableSet<Term> termsToSet(boolean recurse, int inStructure, MutableSet<Term> t) {
 //        if (recurse) {
 //            recurseTerms((s) -> {
@@ -116,7 +114,7 @@ public interface Compound extends Term, IPair, TermContainer {
 //            });
 //        } else {
 //            for (int i = 0; i < size(); i++) {
-//                @NotNull T s = term(i);
+//                /*@NotNull*/ T s = term(i);
 //                if ((s.structure() & inStructure) > 0)
 //                    t.add(s);
 //            }
@@ -161,7 +159,7 @@ public interface Compound extends Term, IPair, TermContainer {
             if (dt == XTERNAL) //unknown
                 return DTERNAL;
 
-            @NotNull TermContainer yy = subterms();
+            /*@NotNull*/ TermContainer yy = subterms();
 
             if (op == IMPL) {
                 //only two options
@@ -260,7 +258,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    @NotNull
+    /*@NotNull*/
     default ByteList structureKey(ByteArrayList appendTo) {
         appendTo.add(op().id);
         appendTo.add((byte) subs());
@@ -286,7 +284,7 @@ public interface Compound extends Term, IPair, TermContainer {
      * @return whether match was successful or not, possibly having modified subst regardless
      */
     @Override
-    default boolean unify(@NotNull Term ty, @NotNull Unify subst) {
+    default boolean unify(/*@NotNull*/ Term ty, /*@NotNull*/ Unify subst) {
 
         if (Term.super.unify(ty, subst))
             return true;
@@ -345,13 +343,13 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    default void append(@NotNull Appendable p) throws IOException {
+    default void append(/*@NotNull*/ Appendable p) throws IOException {
         IO.Printer.append(this, p);
     }
 
 
 //    @Nullable
-//    default Term subterm(@NotNull int... path) {
+//    default Term subterm(/*@NotNull*/ int... path) {
 //        Term ptr = this;
 //        for (int i : path) {
 //            if ((ptr = ptr.termOr(i, null)) == null)
@@ -401,13 +399,13 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    @NotNull
+    /*@NotNull*/
     @Override
     default Object setFirst(Object first) {
         throw new UnsupportedOperationException();
     }
 
-    @NotNull
+    /*@NotNull*/
     @Override
     default Object setRest(Object rest) {
         throw new UnsupportedOperationException();
@@ -440,7 +438,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    @NotNull
+    /*@NotNull*/
     @Override
     default Term sub(int i) {
         return subterms().sub(i);
@@ -452,16 +450,16 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    default boolean OR(@NotNull Predicate<Term> p) {
+    default boolean OR(/*@NotNull*/ Predicate<Term> p) {
         return subterms().OR(p);
     }
 
     @Override
-    default boolean AND(@NotNull Predicate<Term> p) {
+    default boolean AND(/*@NotNull*/ Predicate<Term> p) {
         return subterms().AND(p);
     }
 
-    @NotNull
+    /*@NotNull*/
     @Override
     default Term[] toArray() {
         return subterms().toArray();
@@ -469,7 +467,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    default void forEach(@NotNull Consumer<? super Term> c) {
+    default void forEach(/*@NotNull*/ Consumer<? super Term> c) {
         subterms().forEach(c);
     }
 
@@ -520,7 +518,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    default void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {
+    default void forEach(/*@NotNull*/ Consumer<? super Term> action, int start, int stop) {
         subterms().forEach(action, start, stop);
     }
 
@@ -531,7 +529,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    default void copyInto(@NotNull Collection<Term> set) {
+    default void copyInto(/*@NotNull*/ Collection<Term> set) {
         subterms().copyInto(set);
     }
 
@@ -548,7 +546,7 @@ public interface Compound extends Term, IPair, TermContainer {
     boolean isNormalized();
 
 //    /** whether the anonymized form of this term equals x */
-//    @Override default boolean equalsAnonymously(@NotNull Term x) {
+//    @Override default boolean equalsAnonymously(/*@NotNull*/ Term x) {
 //
 //        if ((opRel()==x.opRel()) && (structure()==x.structure()) && (volume()==x.volume())) { //some simple pre-tests to hopefully avoid needing to anonymize
 //
@@ -581,7 +579,7 @@ public interface Compound extends Term, IPair, TermContainer {
             Compound b = this instanceof GenericCompoundDT ?
                     ((GenericCompoundDT) this).ref : this;
 
-            @NotNull TermContainer subs = subterms();
+            /*@NotNull*/ TermContainer subs = subterms();
             if ((nextDT != XTERNAL && !concurrent(nextDT)) && subs.subs() > 2)
                 return Null; //tried to temporalize what can only be commutive
 
@@ -609,7 +607,7 @@ public interface Compound extends Term, IPair, TermContainer {
      * or null if none was found
      */
     @Nullable
-    default byte[] isSubterm(@NotNull Term t) {
+    default byte[] isSubterm(/*@NotNull*/ Term t) {
         if (!impossibleSubTerm(t)) {
             ByteArrayList l = new ByteArrayList();
 
@@ -627,7 +625,7 @@ public interface Compound extends Term, IPair, TermContainer {
      * to 't'
      */
 
-    static boolean pathFirst(@NotNull Compound container, @NotNull Term t, @NotNull ByteArrayList l) {
+    static boolean pathFirst(/*@NotNull*/ Compound container, /*@NotNull*/ Term t, /*@NotNull*/ ByteArrayList l) {
         int s = container.subs();
         for (int i = 0; i < s; i++) {
             Term xx = container.sub(i);
@@ -642,7 +640,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
 //    @Override
-//    default boolean equalsIgnoringVariables(@NotNull Term other, boolean requireSameTime) {
+//    default boolean equalsIgnoringVariables(/*@NotNull*/ Term other, boolean requireSameTime) {
 //        if (other instanceof Variable)
 //            return true;
 //
@@ -912,26 +910,13 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    @NotNull
+    /*@NotNull*/
     default Term conceptual() {
-        Term term;
 
-        switch (op()) {
-            case NEG:
-                term = unneg().xternal();
-                break;
-            case CONJ:
-                if (subs() > 2) {
-                    //for commutive conj, the conceptual form is && for simplicity.  a &&+- here is pointless
-                    term = dt(DTERNAL);
-                } else {
-                    term = xternal();
-                }
-                break;
-            default:
-                term = xternal();
-                break;
-        }
+        if (op()==NEG)
+            return unneg().conceptual();
+
+        Term term = temporalize(Retemporalize.retemporalizeConceptual);
         if (term == null)
             return Null;
 
@@ -941,18 +926,10 @@ public interface Compound extends Term, IPair, TermContainer {
             return Null;
 
         term = term.normalize();
-        return term == null ? Null : term;
+
+        return term != null ? term : Null;
     }
 
-
-    //    default MutableSet<Term> toSetAtemporal() {
-//        int ss = size();
-//        MutableSet<Term> s = new UnifiedSet<>(ss);
-//        for (int i = 0; i < ss; i++) {
-//            s.add(Terms.atemporalize(term(i)));
-//        }
-//        return s;
-//    }
 
 
     //    public int countOccurrences(final Term t) {
@@ -1581,21 +1558,21 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
 
-//    @NotNull
+//    /*@NotNull*/
 //    default Set<Term> recurseTermsToSet() {
 //        Set<Term> t = $.newHashSet(volume() /* estimate */);
 //        recurseTerms(t::add);
 //        return t;
 //    }
 
-//    @NotNull
+//    /*@NotNull*/
 //    default SortedSet<Term> recurseTermsToSortedSet() {
 //        TreeSet<Term> t = new TreeSet();
 //        recurseTerms((x) -> t.add(x));
 //        return t;
 //    }
 //
-//    @NotNull
+//    /*@NotNull*/
 //    default MutableBiMap<Term, Short> recurseTermsToBiMap() {
 //        MutableBiMap<Term, Short> t = new HashBiMap(volume() /* estimate */); //BiMaps.mutable.empty();
 //        recurseTerms((x) -> t.putIfAbsent(x, (short) t.size()));
@@ -1603,7 +1580,7 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
 //
-//    @NotNull
-//    default boolean termsToSet(@NotNull Collection<Term> t, boolean addOrRemoved) {
+//    /*@NotNull*/
+//    default boolean termsToSet(/*@NotNull*/ Collection<Term> t, boolean addOrRemoved) {
 //        return termsToSet(-1, t, addOrRemoved);
 //    }

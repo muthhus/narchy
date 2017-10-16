@@ -26,7 +26,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     /** cached */
     transient private final int structure;
 
-    public UnitCompound1(/*@NotNull*/ Op op, @NotNull Term arg) {
+    public UnitCompound1(/*@NotNull*/ Op op, /*@NotNull*/ Term arg) {
         super(arg);
 
         this.op = op;
@@ -50,11 +50,12 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     }
 
     @Override
-    public void recurseTerms(@NotNull Consumer<Term> v) {
+    public void recurseTerms(/*@NotNull*/ Consumer<Term> v) {
         v.accept(this);
         sub.recurseTerms(v);
     }
 
+    
 
     @Override
     public int hashCode() {
@@ -96,7 +97,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     }
 
 
-    @NotNull
+    /*@NotNull*/
     @Override
     public String toString() {
         return IO.Printer.stringify(this).toString();
@@ -109,7 +110,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
     @Deprecated /* HACK */
     @Override
-    public @NotNull TermContainer subterms() {
+    public /*@NotNull*/ TermContainer subterms() {
         return new TermVector1(sub);
         //return new SubtermView(this);
     }
@@ -197,7 +198,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 //        }
 //
 //        @Override
-//        public @NotNull Term sub(int i) {
+//        public /*@NotNull*/ Term sub(int i) {
 //            assert(i == 0);
 //            return c.sub;
 //        }
@@ -226,7 +227,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 //            action.accept(c.sub);
 //        }
 //
-//        @NotNull
+//        /*@NotNull*/
 //        @Override
 //        public Iterator<Term> iterator() {
 //            return singletonIterator(c.sub);

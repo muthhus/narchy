@@ -17,7 +17,7 @@ public class MapSubst1 implements Subst {
     /**
      * creates a substitution of one variable; more efficient than supplying a Map
      */
-    public MapSubst1(@NotNull Term from, @NotNull Term to) {
+    public MapSubst1(/*@NotNull*/ Term from, /*@NotNull*/ Term to) {
         assert(!from.equals(to)): "pointless substitution";
 
         this.from = from;
@@ -48,7 +48,7 @@ public class MapSubst1 implements Subst {
     }
 
 //    @Override
-//    public boolean put(@NotNull Unify copied) {
+//    public boolean put(/*@NotNull*/ Unify copied) {
 //        throw new UnsupportedOperationException();
 //    }
 }

@@ -4,7 +4,7 @@ import jcog.bag.Bag;
 import jcog.pri.PriMap;
 import jcog.pri.PriReference;
 import jcog.sort.TopN;
-import jcog.util.LimitedCachedFloatFunction;
+import jcog.util.BoundedFloatFunctionCache;
 import nars.Task;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -47,7 +47,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
 
     final int activeVictims = 32;
 
-    final LimitedCachedFloatFunction<Concept> victimScore = new LimitedCachedFloatFunction<>((x) -> -value(x), 512);
+    final BoundedFloatFunctionCache<Concept> victimScore = new BoundedFloatFunctionCache<>((x) -> -value(x), 512);
     final TopN<Concept> victims = new TopN<>(new Concept[activeVictims], victimScore);
 
     public PriMapTermIndex() {
@@ -67,6 +67,12 @@ public class PriMapTermIndex extends MaplikeTermIndex {
                 return y;
             }
 
+
+            @Override
+            protected float updateMemory(float used) {
+                System.err.println("memory: " + used + ", concepts=" + size());
+                return super.updateMemory(used);
+            }
 
             @Override
             public void evict(float strength) {
@@ -104,11 +110,13 @@ public class PriMapTermIndex extends MaplikeTermIndex {
                         }
                     }
                 }
+
+                victimScore.forget(0.25f);
             }
 
             @Override
             protected Hold mode(Term term) {
-                return term.complexity() > 8 ? SOFT : STRONG;
+                return term.volume() > 19 ? SOFT : STRONG;
             }
 
             @Override

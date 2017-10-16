@@ -8,13 +8,12 @@ import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst1;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.Null;
 
 
-public class substitute extends Functor {
+public class Subst extends Functor {
 
     //TODO use special symbol encoding to avoid collision with equivalent normal input
     final static Term STRICT = Atomic.the("strict");
@@ -23,9 +22,9 @@ public class substitute extends Functor {
     final static Term SAME = Atomic.the("same");
 
 
-    public static final substitute the = new substitute();
+    public static final Subst the = new Subst();
 
-    private substitute() {
+    private Subst() {
         super((Atom) $.the("substitute"));
     }
 
