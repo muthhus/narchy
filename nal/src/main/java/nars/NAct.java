@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
+import jcog.pri.Pri;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;
@@ -25,8 +26,7 @@ import java.util.function.IntPredicate;
 
 import static jcog.Util.unitize;
 import static nars.Op.*;
-import static nars.truth.TruthFunctions.c2w;
-import static nars.truth.TruthFunctions.expectation;
+import static nars.truth.TruthFunctions.*;
 
 /**
  * Created by me on 9/30/16.
@@ -44,7 +44,7 @@ public interface NAct {
 
     default void actionToggle(@NotNull Term t, @NotNull Runnable on, @NotNull Runnable off) {
 
-        float thresh = 0.5f;
+        float thresh = 0.5f + Param.TRUTH_EPSILON;
         actionUnipolar(t, (f) -> {
             if (f > thresh) {
                 on.run();
@@ -383,10 +383,104 @@ public interface NAct {
     }
 
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        actionBipolarExpectation(s, update);
+        actionBipolarFrequencyDifferential(s, update);
+        //actionBipolarExpectation(s, update);
         //actionBipolarExpectationNormalized(s, update);
         //actionBipolarGreedy(s, update);
         //actionBipolarMutex3(s, update);
+    }
+    default void actionBipolarFrequencyDifferential(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+
+        Term pt =
+                //$.inh( $.the("\"+\""), s);
+                $.p(s, ZeroProduct);
+        Term nt =
+                //$.inh($.the("\"-\""), s);
+                $.p(ZeroProduct, s);
+
+        final float f[] = new float[2];
+        final float e[] = new float[2];
+
+        GoalActionAsyncConcept[] CC = new GoalActionAsyncConcept[2]; //hack
+
+        @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (action, g) -> {
+
+            boolean p = action.term().equals(pt);
+            float f0, c0;
+
+            NAR n = nar();
+
+            Random rng = n.random();
+
+            float confMin = n.confMin.floatValue();
+            float confBase =
+                    //confMin * 4;
+                    n.confDefault(GOAL);
+            float curiEvi = c2w(confBase);
+
+            int ip = p ? 0 : 1;
+            CC[ip] = action;
+            f[ip] = g != null ? g.freq() : 0.5f;
+            e[ip] = g != null ? g.evi() : 0f;
+
+
+            float x; //-1..+1
+
+            boolean curious;
+            if (!p) {
+
+                float cur = curiosity().floatValue();
+                if (cur > 0 && rng.nextFloat() <= cur) {
+                    float curiConf = confBase;
+                    x = (rng.nextFloat() - 0.5f) * 2f;
+                    e[0] = e[1] = curiEvi/2;
+                    curious = true;
+                } else {
+                    curious = false;
+                    x = Util.clamp((f[0]-0.5f) - (f[1]-0.5f), -1f, +1f);
+                }
+
+
+
+                float y = update.valueOf(x); //-1..+1
+
+                float eviSum = e[0] + e[1];
+                float conf = ((y == y) && (eviSum > Pri.EPSILON)) ?
+                            w2c(eviSum) : 0;
+
+                //w2c(Math.abs(y) * c2w(restConf));
+                PreciseTruth N, P;
+
+                if (conf >= confMin) {
+                    float yf = (y / 2f)+0.5f; //0..+1
+                    P = $.t(yf, conf);
+                    N = $.t(1-yf, conf);
+                } else {
+
+                    P = N = null;
+                }
+
+
+                PreciseTruth pb = y > 0 ? P : N;
+                PreciseTruth pg =
+                        curious ? $.t(y >= 0 ? 1 : 0, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
+                        //null;
+                CC[0].feedback(pb, pg, n);
+                PreciseTruth nb = y < 0 ? P : N;
+                PreciseTruth ng =
+                        curious ? $.t(y >= 0 ? 0 : 1, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
+                        //null;
+                CC[1].feedback(nb, ng, n);
+
+
+            }
+        };
+        GoalActionAsyncConcept p = new GoalActionAsyncConcept(pt, this, u);
+        GoalActionAsyncConcept n = new GoalActionAsyncConcept(nt, this, u);
+
+        addAction(p);
+        addAction(n);
+
     }
 
     default void actionBipolarExpectationNormalized(@NotNull Term s, @NotNull FloatToFloatFunction update) {

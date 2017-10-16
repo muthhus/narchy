@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.NAct;
 import nars.Task;
 import nars.task.ITask;
+import nars.task.Revision;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
@@ -69,21 +70,24 @@ public class GoalActionConcept extends ActionConcept {
 
 
         long pStart = now;
-        long pEnd = now + dur;
+        long pEnd = now + dur/2;
         LongSupplier stamper = nar.time::nextStamp;
 
-        Truth goal = this.goals().truth(pStart, pEnd, nar);
 
         //float curiPeriod = 2; //TODO vary this
         float cur = curiosity.floatValue();
 
-        Truth belief;
+
+        Truth belief, goal;
         ITask fg;
+
+        belief = this.beliefs().truth(pStart, pEnd, nar);
+
         if (nar.random().nextFloat() < cur) {
 //            // curiosity override
 //
             float curiConf =
-                        nar.confDefault(GOAL)/4;
+                        nar.confDefault(GOAL);
                     //nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR;
 //                    Math.max(goal != null ? goal.conf() : 0,
 //                            nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR);
@@ -116,60 +120,36 @@ public class GoalActionConcept extends ActionConcept {
 
 
         } else {
-            fg = null;
-            action.set(term(), null, stamper, now, dur, nar);
+
+            //action.set(term(), null, stamper, now, dur, nar);
+
+            goal = this.goals().truth(pStart, pEnd, nar);
+
+            //HACK EXPERIMENT combine belief and goal
+            if (belief!=null) {
+
+                float hope = belief.eviEternalized();
+
+                if (goal == null) {
+                    goal = belief.withEvi(hope); //what one images will happen maybe is what one wants
+                } else {
+                    goal = Revision.revise(goal, belief.withEvi(hope), Math.abs(belief.freq()-goal.freq()), 0 );
+                }
+
+            }
+
+            fg = action.set(term(), goal, stamper, now, dur, nar);
         }
 
-        belief = this.beliefs().truth(pStart, pEnd, nar);
 
 
-//        //HACK try to improve this
-//        //if (goal == null) goal = belief; //use belief state, if exists (latch)
-//        boolean kickstart;
-//        if (((goal == null) || (goal.conf() < nar.confMin.floatValue())) && (feedback.current!=null)) {
-//            goal = $.t(feedback.current.truth.freq, nar.confMin.floatValue()); //if null, use the last feedback value (latch)
-//            kickstart = true;
-//        } else {
-//            kickstart = false;
-//        }
+        Truth motorFeedback = this.motor.motor(belief, goal);
 
-        Truth beliefFeedback = this.motor.motor(belief, goal);
-//        if (fbt==null && belief!=null) {
-//            fbt = belief;
-//        }
-
-        //1. check feedback
-        //2. check current belief
-        //3. check previous signal belief
-        //beliefFeedback != null ? beliefFeedback : belief; //latch
-
-
-        Task fb = feedback.set(term, beliefFeedback, stamper, now, dur, nar);
-//        if (fb != null) {
-//            SensorConcept.feedback(fb, beliefs(), now, nar);
-//        }
-//
-//        Task fg;
-//        boolean latchGoal = false; //experimental
-//        if (latchGoal) {
-//            if (goal!=null)
-//                fg = action.set(term, goal, stamper, now, dur, nar);
-//                        //+1 * nar.dur() /* next moment */);
-//            else
-//                fg = action.get(); //latch previous goal
-//        } else {
-//
-//            fg = action.set(term, goal, stamper, now, dur, nar);
-//                    //+1 * nar.dur() /* next moment */);
-//        }
-//        if (Param.DEBUG && curious) {
-//            fg.log("Curiosity");
-//        }
+        Task fb = feedback.set(term, motorFeedback, stamper, now, dur, nar);
 
         return Stream.of(fb, fg).filter(Objects::nonNull);
         //return Stream.of(fb, fg).filter(Objects::nonNull);
         //return Stream.of(fb).filter(Objects::nonNull);
-
     }
 
 

@@ -108,7 +108,7 @@ public abstract class Param extends Services<Term,NAR> {
     public final static int SIGNAL_LATCH_TIME_MAX =
                     //0;
                     //Integer.MAX_VALUE;
-                    16;
+                    8;
                     //8;
 
     /** derivation severity - how completely confidence is reduced in derivation (default: 1.0) */
@@ -351,7 +351,9 @@ public abstract class Param extends Services<Term,NAR> {
 
         //return evi / (1 + ( dt / dur) ); //inverse linear
 
-        return evi / Util.sqr( 1f + dt / dur ); //inverse square
+        return evi / ( 1f + dt*dt / dur ); //inverse square
+
+        //return evi / Util.sqr( 1f + dt / dur ); //inverse square suck
 
         //hard linear with half duration on either side of the task -> sum to 1.0 duration
 //        float scale = dt / dur;

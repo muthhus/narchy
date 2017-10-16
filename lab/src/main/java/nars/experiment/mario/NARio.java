@@ -101,8 +101,8 @@ public class NARio extends NAgentX {
         senseNumberDifference($("vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).
                 mario.y : 0).resolution(0.04f);
 
-        //initBipolar();
-        initToggle();
+        initBipolar();
+        //initToggle();
 
 //        actionTriState($("x"), i -> {
 //            boolean n, p;

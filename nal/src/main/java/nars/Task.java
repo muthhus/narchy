@@ -218,6 +218,10 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
     }
 
     static long nearestStartOrEnd(long a, long b, long x, long y) {
+        if (a == x && b == y) {
+            return (a+b)/2; //midpoint
+        }
+
         long u = nearestBetween(a, b, x);
         long v = nearestBetween(a, b, y);
         if (Math.min(Math.abs(u - a), Math.abs(u - b)) <
@@ -233,14 +237,13 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
         if (s == ETERNAL) {
             return when;
-        } else if (when <= s || e == s) {
+        } else if (when < s || e == s) {
             return s; //point or at or beyond the start
-        } else if (when >= e) {
+        } else if (when > e) {
             return e; //at or beyond the end
         } else {
             return when; //internal
         }
-
     }
 
 
@@ -373,45 +376,20 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                 //nearest endpoint of the interval
 
                 long touched =
-                        //nearestTimeTo(when);
-                        (a + z) / 2; //midpoint: to be fair to other more precisely endured tasks
+                        nearestTimeTo(when);
+                        //(a + z) / 2; //midpoint: to be fair to other more precisely endured tasks
 
                 long dist = Math.abs(when - touched);
                 assert (dist > 0) : "what time is " + a + ".." + z + " supposed to mean relative to " + when;
-
-
-                //experimental: decay slower according to complexity, ie. more complex learned rules will persist longer
-                float durAdjusted = dur *
-                        1
-                        //volume()
-                        ;
-
-//                long r = z - a;
-//                cw = r != 0 ?
-//                        (cw / (1f + ((float) r) / dur)) //dilute the endured task in proportion to how many durations it consumes beyond point-like (=0)
-//                        :
-//                        cw;
-
                 assert (dur > 0);
 
                 float ete = eternalizable();
                 float ecw = ete > 0 ? this.eviEternalized() * ete : 0;
                 float dcw = cw - ecw; //delta to eternalization
-                cw = ecw + Param.evi(dcw, durAdjusted, dist); //decay
-
-                //cw = 0; //immediate cut-off
-
-
-//                if (ete > 0) {
-//                    float et = t.eviEternalized() * ete;
-//                    if (et > cw)
-//                        cw = et;
-//                }
-
+                cw = ecw + Param.evi(dcw, dur, dist); //decay
             }
 
             return cw;
-
         }
 
     }
@@ -612,14 +590,15 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
         long b = this.end();
         if (x == y) {
-            return nearestBetween(a, b, x);
+            if (a == b) return a;
+            else return Math.abs(a-x) < Math.abs(b-x) ? a : b;
         } else if (a == b) {
             return nearestBetween(x, y, a);
-        } else if (x <= a && y >= b) {
+        } else /*if (x <= a && y >= b) {
             return (a + b) / 2; //midpoint of this within the range
         } else if ((x > a) && (y < b)) {
             return (x + y) / 2; //midpoint of the contained range
-        } else {
+        } else*/ {
             return nearestStartOrEnd(a, b, x, y); //overlap or no overlap
         }
     }

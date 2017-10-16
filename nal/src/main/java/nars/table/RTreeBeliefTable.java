@@ -30,6 +30,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -40,22 +41,30 @@ import static nars.truth.TruthFunctions.w2c;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    public static final int MIN_TASKS_PER_LEAF = 2;
-    public static final int MAX_TASKS_PER_LEAF = 3;
-    public static final Spatialization.DefaultSplits SPLIT =
-            Spatialization.DefaultSplits.AXIAL;
-    //Spatialization.DefaultSplits.LINEAR; //<- probably doesnt work here
+    /** max fraction of the fully capacity table to compute in a single truthpolation */
+    static final float SCAN_QUALITY = 0.5f;
 
-    private int capacity;
-
-    /**
-     * max fraction of the fully capacity table to compute in a single truthpolation
-     */
-    static final float SCAN_MAX_FRACTION = 0.5f;
+    /** max allowed truths to be truthpolated in one test */
+    static final int TRUTHPOLATION_LIMIT = 4;
 
     public static final float PRESENT_AND_FUTURE_BOOST = 1f;
 
+
+    public static final int MIN_TASKS_PER_LEAF = 2;
+    public static final int MAX_TASKS_PER_LEAF = 4;
+    public static final Spatialization.DefaultSplits SPLIT =
+            Spatialization.DefaultSplits.AXIAL; //Spatialization.DefaultSplits.LINEAR; //<- probably doesnt work here
+
+    public static final BiPredicate<Collection, TimeRange> ONLY_NEED_ONE_AFTER_THAT_SCANNED_RANGE_THANKS = (u, r) -> {
+        return u.isEmpty(); //quit after even only one, now that an entire range has been scanned
+    };
+
+
+
+    private int capacity;
+
     final Space<TaskRegion> tree;
+    final LongObjectProcedure<SignalTask> stretch;
 
     public RTreeBeliefTable() {
 
@@ -92,7 +101,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
 
-    final LongObjectProcedure<SignalTask> stretch;
 
 
     @Override
@@ -113,10 +121,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     new CachedFloatFunction<>(t -> +ts.floatValueOf((Task) t));
 
 
-            int maxTruths = (int) Math.max(1, Math.ceil(capacity * SCAN_MAX_FRACTION));
-            TopN<TaskRegion> tt = scan(
-                    new TopN<>(new TaskRegion[maxTruths], strongestTask),
-                    start, end, maxTruths);
+            int maxTruths = TRUTHPOLATION_LIMIT;
+            int maxTries = (int) Math.max(1, Math.ceil(capacity * SCAN_QUALITY));
+            TopN<TaskRegion> tt = new TopN<>(new TaskRegion[maxTruths], strongestTask);
+            scan(tt, start, end, maxTries, RTreeBeliefTable.ONLY_NEED_ONE_AFTER_THAT_SCANNED_RANGE_THANKS );
 
 
             if (!tt.isEmpty()) {
@@ -171,8 +179,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         FloatFunction<TaskRegion> strongestTask =
                 new CachedFloatFunction<>(t -> +ts.floatValueOf((Task) t));
 
-        int maxTruths = (int) Math.max(1, Math.ceil(capacity * SCAN_MAX_FRACTION));
-        Top2<TaskRegion> tt = scan(new Top2(strongestTask), start, end, maxTruths);
+        int maxTries = (int) Math.max(1, Math.ceil(capacity * SCAN_QUALITY));
+        Top2<TaskRegion> tt = new Top2<>(strongestTask);
+        scan(tt, start, end, maxTries, ONLY_NEED_ONE_AFTER_THAT_SCANNED_RANGE_THANKS);
 
         switch (tt.size()) {
 
@@ -185,8 +194,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             default:
                 Task a = tt.a.task();
                 Task b = tt.b.task();
-                if (a.during(start, end) && !b.during(start, end))
-                    return a; //only 'a' is for that time
 
                 if (template != null) {
                     //choose if either one (but not both or neither) matches template's time
@@ -202,30 +209,35 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 //otherwise interpolate
                 Task c = Revision.merge(a, b, start, nar);
                 if (c != null) {
-//                    if (c.equals(a))
-//                        return a;
-//                    if (c.equals(b))
-//                        return b;
 
-                    return c;
-                } else {
-                    return a;
+                    int dur = nar.dur();
+                    if (c.evi(start, end, dur) > a.evi(start, end, dur))
+                        return c;
                 }
+
+                return a;
+
 
         }
     }
 
-    private <X extends Collection<TaskRegion>> X scan(X u, long start, long end, int maxAttempts) {
+    /** TODO add a Random argument so it can decide randomly whether to scan the left or right zone first.
+     * order matters because the quality limit may terminate it.
+     * however maybe the quality can be specified in terms that are compared
+     * only after the pair has been scanned making the order irrelevant.
+     */
+    private <X extends Collection> X scan(X u, long _start, long _end, int maxAttempts, BiPredicate<X,TimeRange> continueScanning) {
 
         ((ConcurrentRTree<TaskRegion>) tree).read((RTree<TaskRegion> tree) -> {
 
             int s = tree.size();
-
-            if (s < MAX_TASKS_PER_LEAF) {
-                //all
+            if (s == 0)
+                return;
+            if (s == 1) {
                 tree.forEach(u::add);
                 return;
             }
+
 
             int maxTries = Math.min(s, maxAttempts);
 
@@ -236,40 +248,52 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 return attempts[0]++ < maxTries;
             };
 
-
             TaskRegion bounds = (TaskRegion) (tree.root().region());
 
+            long boundsStart = bounds.start();
+            long boundsEnd = bounds.end();
+
+            long start = Math.max(boundsStart, _start);
+            long end = Math.min(boundsEnd, _end);
+
+            float timeRange = boundsEnd-boundsStart;
             int divisions = 4;
-            long expand = Math.max(1, Math.round(bounds.range(0) / (1 << divisions)));
+            long expand = Math.max(1, Math.round(timeRange / (1 << divisions)));
 
             //TODO use a polynomial or exponential scan expansion, to start narrow and grow wider faster
 
-            long scanStart = start, scanEnd = end;
-            long nextStart = start, nextEnd = end;
-            int done;
+
+            long mid = (start+end)/2;
+            long leftStart = start, leftMid = mid, rightMid = mid, rightEnd = end;
+            int complete;
+            //TODO float complete and use this as the metric for limiting with scan quality parameter
             TimeRange r = new TimeRange(); //recycled
             do {
-                nextStart -= expand;
-                nextEnd += expand;
-                done = 0;
+                complete = 0;
 
-                if (nextStart >= bounds.start())
-                    tree.intersecting(r.set(nextStart, scanStart), update);
+                if (leftStart >= boundsStart)
+                    tree.intersecting(r.set(leftStart, leftMid), update);
                 else
-                    done++;
+                    complete++;
 
-                if (nextEnd <= bounds.end())
-                    tree.intersecting(r.set(scanEnd, nextEnd), update);
+                if (rightEnd <= boundsEnd && !(leftStart==rightMid && leftMid==rightEnd))
+                    tree.intersecting(r.set(rightMid, rightEnd), update);
                 else
-                    done++;
+                    complete++;
 
-                if (done == 2 || attempts[0] >= maxTries)
+                if (complete == 2 || attempts[0] >= maxTries)
                     break;
 
-                scanStart = nextStart - 1;
-                scanEnd = nextEnd + 1;
+                if (!continueScanning.test(u, r.set(leftStart, rightEnd)))
+                    break;
 
-                expand *= 2; //accelerate
+                leftStart = leftStart - expand - 1;
+                 leftMid = leftMid - 1;
+                rightMid = rightMid + 1;
+                rightEnd = rightEnd + expand + 1;
+
+
+                expand *= 2; //accelerate on the next cycle
 
             } while (true);
 
@@ -287,25 +311,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public void add(Task x, BaseConcept c, NAR n) {
 
-
-//        if (x instanceof SignalTask && ((SignalTask) x).stretchKey != null)
-//            return; //already added and being managed
-        boolean isSignal = x instanceof SignalTask;
-
-        if (isSignal) {
+        if (x instanceof SignalTask) {
             SignalTask sx = (SignalTask) x;
-            if (sx.stretch==this.stretch) {
-                //ignore, it is already present; this actually should never be reached if the Signal works right
-                return;
-            }
-        }
 
-
-
-        if (isSignal) {
-            SignalTask sx = (SignalTask) x;
             if (sx.stretch == null) {
                 sx.stretch = this.stretch;
+            } else {
+                assert(sx.stretch == null); //should only be input once, when it has no stretch to update otherwise
             }
         }
 

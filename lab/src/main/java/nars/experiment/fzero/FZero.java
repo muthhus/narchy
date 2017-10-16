@@ -24,7 +24,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
 
-        float fps = 12f;
+        float fps = 16f;
 
         NAgentX.runRT((n) -> {
 
@@ -61,8 +61,8 @@ public class FZero extends NAgentX {
 //                .resolution(0.05f);
 
 
-        initToggle();
-        //initBipolar();
+        //initToggle();
+        initBipolar();
 
 //        actionUnipolar(p("left"), (r) -> {
 //            //if (r > 0.5f)

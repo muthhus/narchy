@@ -105,7 +105,7 @@ public class Revision {
 //    }
 
 
-    static Truth revise(@NotNull Truthed a, @NotNull Truthed b) {
+    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b) {
         return revise(a, b, 1f, 0f);
     }
 

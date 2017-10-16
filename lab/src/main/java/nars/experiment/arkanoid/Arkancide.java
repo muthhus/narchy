@@ -175,8 +175,8 @@ public class Arkancide extends NAgentX {
             }
         });
 
-        //initBipolar();
-        initToggle();
+        initBipolar();
+        //initToggle();
 
 
 
