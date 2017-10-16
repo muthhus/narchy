@@ -5,13 +5,13 @@ import java.util.Arrays;
 /**
  * simple delay line; shifts data on each access
  */
-public class DelayedFloat implements FloatSupplier {
+public class FloatDelay implements FloatSupplier {
 
     final FloatSupplier input;
 
     public final float[] data;
 
-    public DelayedFloat(FloatSupplier input, int history) {
+    public FloatDelay(FloatSupplier input, int history) {
         assert(history > 0);
         this.input = input;
         this.data = new float[history];

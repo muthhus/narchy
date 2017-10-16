@@ -5,6 +5,7 @@ import jcog.event.On;
 import jcog.event.Ons;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
+import jcog.math.FloatHighPass;
 import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
@@ -115,7 +116,11 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
                         $.the("happy") : //generally happy
                         //$.p(id, $.the("happy")), //happy in this environment
                         $.inh($.the("happy"), id),
-                new FloatPolarNormalized(() -> rewardCurrent).relax(0.002f));
+                new FloatPolarNormalized(
+                        new FloatHighPass(
+                                () -> rewardCurrent
+                        )
+                ).relax(0.002f));
 
         this.happyGoal = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), now,
                 ETERNAL, ETERNAL,

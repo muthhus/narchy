@@ -2,11 +2,11 @@ package jcog.pri;
 
 
 import jcog.Util;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * default mutable prioritized implementation
+ * float 32 bit
  */
 public class Pri implements Priority {
 
@@ -15,13 +15,8 @@ public class Pri implements Priority {
      */
     protected float pri;
 
-
     public Pri() {
         pri = Float.NaN;
-    }
-
-    public Pri(Prioritized b, float scale) {
-        this(b.pri()*scale);
     }
 
     public Pri(Prioritized b) {
@@ -104,7 +99,7 @@ public class Pri implements Priority {
     }
 
     @Override
-    public final float setPri(float p) {
+    public float setPri(float p) {
         return this.pri = Util.unitize(p);
     }
 
@@ -114,7 +109,6 @@ public class Pri implements Priority {
     }
 
 
-    public static final FloatFunction<? extends Pri> floatValue = Pri::pri;
 
     public static float sum(Prioritized... src) {
         return Util.sum(Prioritized::priElseZero, src);

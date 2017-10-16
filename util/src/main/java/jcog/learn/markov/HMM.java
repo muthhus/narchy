@@ -22,11 +22,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package jcog.learn.hmm;
+package jcog.learn.markov;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
-import java.util.Vector;
+
 
 /**
  * This is a Hidden Markov Model implementation which internally provides
@@ -125,7 +125,7 @@ public class HMM implements Serializable{
 	 * application to isolated user-dependent hand gesture recognition". 
 	 * 
 	 */
-	public void train(Vector<int[]> trainsequence) {
+	public void train(Iterable<int[]> trainsequence) {
 
 		double[][] a_new = new double[a.length][a.length];
 		double[][] b_new = new double[b.length][b[0].length];
@@ -134,10 +134,9 @@ public class HMM implements Serializable{
 			for(int j=0; j<a[i].length; j++) {	
 				double zaehler=0;
 				double nenner=0;
-			
-				for(int k=0; k<trainsequence.size(); k++) {
-					int[] sequence = trainsequence.elementAt(k);
-					
+
+				for (int[] sequence : trainsequence) {
+
 					double[][] fwd = this.forwardProc(sequence);
 					double[][] bwd = this.backwardProc(sequence);
 					double prob = this.getProbability(sequence);
@@ -164,8 +163,7 @@ public class HMM implements Serializable{
 				double zaehler=0;
 				double nenner=0;
 			
-				for(int k=0; k<trainsequence.size(); k++) {
-					int[] sequence = trainsequence.elementAt(k);
+				for (int[] sequence : trainsequence) {
 					
 					double[][] fwd = this.forwardProc(sequence);
 					double[][] bwd = this.backwardProc(sequence);

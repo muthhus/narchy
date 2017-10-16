@@ -8,10 +8,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class PLink<X> extends AbstractPLink<X> {
 
-    @NotNull
     public final X id;
 
-    public PLink(@NotNull X x, float p) {
+    public PLink(X x, float p) {
         super(p);
         this.id = x;
     }
@@ -28,7 +27,6 @@ public class PLink<X> extends AbstractPLink<X> {
     }
 
     @Override
-    @NotNull
     final public X get() {
         return id;
     }

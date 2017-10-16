@@ -15,7 +15,7 @@ public abstract class AbstractPLink<X> extends Pri implements PriReference<X> {
 
 
     @Override
-    public boolean equals(@NotNull Object that) {
+    public boolean equals(/*@NotNull*/ Object that) {
         if (this == that) return true;
 
         final X x = get();

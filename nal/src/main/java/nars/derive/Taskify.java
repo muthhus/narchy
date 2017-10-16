@@ -99,7 +99,7 @@ public class Taskify extends AbstractPred<Derivation> {
 
         assert (priority == priority);
 
-        float tp = t.setPri(priority);
+        t.setPri(priority);
 
         if (Param.DEBUG)
             t.log(rule);

@@ -1,16 +1,15 @@
 package spacegraph.space;
 
 
-import jcog.pri.Pri;
-import jcog.pri.PriReference;
+import jcog.pri.PLink;
 import spacegraph.SimpleSpatial;
 
 /**
  * Drawn edge, lightweight
  */
-public class EDraw<X,Y extends SimpleSpatial<X>> extends Pri implements PriReference {
+public class EDraw<Y extends SimpleSpatial<?>> extends PLink<Y> {
 
-    public final Y target;
+    //TODO use pri as 'width' or 'a'
     public float width, r, g, b, a;
 
     /** additional attraction force multiplier */
@@ -20,14 +19,7 @@ public class EDraw<X,Y extends SimpleSpatial<X>> extends Pri implements PriRefer
     public float attractionDist = 1f;
 
     public EDraw(Y target) {
-        this.target = target;
+        super(target, 0);
     }
-
-    @Override
-    public Object get() {
-        return this;
-    }
-
-    //abstract public void update(BLink ff);
 
 }

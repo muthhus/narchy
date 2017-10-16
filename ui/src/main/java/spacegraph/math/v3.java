@@ -183,6 +183,10 @@ public class v3 extends Tuple3f {
 
     }
 
+    public final v3 cross(v3 v2) {
+        return cross(this, v2);
+    }
+
     /**
      * Computes the dot product of this vector and vector v1.
      *
@@ -221,9 +225,11 @@ public class v3 extends Tuple3f {
     }
 
 
-//    public final v3 normalized(float scale)     {
-//        return normalized().scale(scale);
-//    }
+    public final v3 normalized(float scale)     {
+        normalize();
+        scale(scale);
+        return this;
+    }
 
     /**
      * Returns the angle in radians between this vector and the vector

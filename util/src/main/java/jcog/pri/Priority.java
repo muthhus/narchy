@@ -18,8 +18,8 @@ public interface Priority extends Prioritized {
      */
     float setPri(float p);
 
-    default float setPri(/*@NotNull*/ Prioritized p) {
-        return setPri(p.pri());
+    default void setPri(/*@NotNull*/ Prioritized p) {
+        setPri(p.pri());
     }
 
     /**
@@ -29,7 +29,7 @@ public interface Priority extends Prioritized {
 
 
     default float priMax(float max) {
-        return setPri(Math.max(priElseZero(), max));
+        setPri(Math.max(priElseZero(), max)); return pri();
     }
 
     default void priMin(float min) {
@@ -71,6 +71,10 @@ public interface Priority extends Prioritized {
         }
     }
 
+    /** the result of this should be that pri() is not finite (ex: NaN)
+     * returns false if already deleted (allowing overriding subclasses to know if they shold also delete) */
+    boolean delete();
+
 
 //    default void priAvg(float pOther, float rate) {
 //        float cu = priElseZero();
@@ -81,7 +85,6 @@ public interface Priority extends Prioritized {
 //        return priAddOverflow(toAdd, null);
 //    }
 
-    @Override
     default float priAddOverflow(float toAdd, @Nullable float[] pressurized) {
         if (Math.abs(toAdd) <= EPSILON) {
             return 0; //no change
@@ -98,21 +101,6 @@ public interface Priority extends Prioritized {
         return excess;
     }
 
-    /**
-     * returns overflow
-     */
-    @Override
-    default float priAddOverflow(float toAdd) {
-        if (Math.abs(toAdd) <= EPSILON) {
-            return 0; //no change
-        }
-
-        float before = priElseZero();
-        float next = priAdd(toAdd);
-        float delta = next - before;
-
-        return toAdd - delta;
-    }
 
 
     default float priMult(float factor) {
@@ -123,11 +111,17 @@ public interface Priority extends Prioritized {
     }
 
 
-    default Prioritized priLerp(float target, float speed) {
-        float pri = pri();
-        if (pri == pri)
-            setPri(lerp(speed, pri, target));
-        return this;
+
+    default float priAddOverflow(float toAdd) {
+        if (Math.abs(toAdd) <= EPSILON) {
+            return 0; //no change
+        }
+
+        float before = priElseZero();
+        float next = priAdd(toAdd);
+        float delta = next - before;
+
+        return toAdd - delta;
     }
 
     default void take(Priority source, float p, boolean amountOrFraction, boolean copyOrMove) {
@@ -211,16 +205,11 @@ public interface Priority extends Prioritized {
         return Prioritized.toString(this);
     }
 
-    @Override
-    default void normalizePri(float min, float range) {
-        //setPri( (p - min)/range );
-        normalizePri(min, range, 1f);
-    }
+
 
     /**
      * normalizes the current value to within: min..(range+min), (range=max-min)
      */
-    @Override
     default void normalizePri(float min, float range, float lerp) {
         float p = priElseNeg1();
         if (p < 0) return; //dont normalize if deleted
@@ -228,6 +217,12 @@ public interface Priority extends Prioritized {
         priLerp((p - min) / range, lerp);
     }
 
+     default Priority priLerp(float target, float speed) {
+        float pri = pri();
+        if (pri == pri)
+            setPri(lerp(speed, pri, target));
+        return this;
+    }
 
 //    void orPriority(float v);
 //

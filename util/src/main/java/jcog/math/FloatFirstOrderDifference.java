@@ -3,15 +3,15 @@ package jcog.math;
 import java.util.function.LongSupplier;
 
 
-public class FirstOrderDifferenceFloat implements FloatSupplier {
+public class FloatFirstOrderDifference implements FloatSupplier {
 
     final FloatSupplier in;
 
-    float lastValue = Float.NaN;
+    float lastValue;
     private long lastUpdate;
     private final LongSupplier clock;
 
-    public FirstOrderDifferenceFloat(LongSupplier clock, FloatSupplier in) {
+    public FloatFirstOrderDifference(LongSupplier clock, FloatSupplier in) {
         this.in = in;
         this.clock = clock;
         this.lastUpdate = clock.getAsLong();

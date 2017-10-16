@@ -4,7 +4,7 @@ import jcog.Util;
 import jcog.learn.deep.RBM;
 import jcog.learn.ql.HaiQAgent;
 import jcog.list.FasterList;
-import jcog.math.FirstOrderDifferenceFloat;
+import jcog.math.FloatFirstOrderDifference;
 import jcog.math.FloatNormalized;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Prioritized;
@@ -321,11 +321,11 @@ public enum MetaGoal {
 //                )
                 .in(new FloatNormalized(
                         //TODO use a Long-specific impl of this:
-                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.taskDerived.getValue().longValue())
+                        new FloatFirstOrderDifference(n::time, () -> n.emotion.taskDerived.getValue().longValue())
                 ).relax(0.1f))
                 .in(new FloatNormalized(
                                 //TODO use a Long-specific impl of this:
-                                new FirstOrderDifferenceFloat(n::time, () -> n.emotion.conceptFirePremises.getValue().longValue())
+                                new FloatFirstOrderDifference(n::time, () -> n.emotion.conceptFirePremises.getValue().longValue())
                         ).relax(0.1f)
                 ).in(new FloatNormalized(
                                 () -> n.emotion.busyVol.getSum()

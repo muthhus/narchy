@@ -21,11 +21,11 @@ public class EdgeDirected extends ForceDirected {
 
             //TODO abstract the Edges as a feature to optionally add to a TermWidget, not just for ConceptWidgets
             if (A instanceof ConceptWidget) {
-                ((ConceptWidget) A).edges.forEachKey(e -> {
+                ((ConceptWidget) A).edges.forEach(e -> {
 
                     float attraction = e.attraction;
                     if (attraction > 0) {
-                        TermWidget B = e.target;
+                        TermWidget B = e.id;
 
                         if ((B.body != null)) {
 

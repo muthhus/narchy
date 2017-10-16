@@ -7,7 +7,6 @@ import nars.concept.Concept;
 import nars.gui.TermIcon;
 import nars.term.Term;
 import nars.term.Termed;
-import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamics;
@@ -67,7 +66,7 @@ public class TermWidget extends Cuboid<Termed> {
     }
 
 
-    public void render(@NotNull GL2 gl, @NotNull EDraw e) {
+    public void render( GL2 gl,  EDraw e) {
 
 
         float width = e.width;
@@ -76,18 +75,17 @@ public class TermWidget extends Cuboid<Termed> {
             gl.glColor4f(e.r, e.g, e.b, e.a * (width / thresh) /* fade opacity */);
             Draw.renderLineEdge(gl, this, e, width);
         } else {
-            gl.glColor4f(e.r, e.g, e.b, e.a);
             Draw.renderHalfTriEdge(gl, this, e, width / 9f, e.r * 2f /* hack */);
         }
     }
 
-    public static class TermEdge extends EDraw<Termed, TermWidget> implements Termed, Deleteable {
+    public static class TermEdge extends EDraw<TermWidget> implements Termed, Deleteable {
 
         float termlinkPri, tasklinkPri;
 
         private final int hash;
 
-        public TermEdge(@NotNull TermWidget target) {
+        public TermEdge( TermWidget target) {
             super(target);
             this.hash = target.key.hashCode();
         }
@@ -112,12 +110,12 @@ public class TermWidget extends Cuboid<Termed> {
 
         @Override
         public Term term() {
-            return target.key.term();
+            return id.key.term();
         }
 
         @Override
         public boolean equals(Object o) {
-            return this == o || target.key.equals(o);
+            return this == o || id.key.equals(o);
         }
 
         @Override
@@ -155,7 +153,7 @@ public class TermWidget extends Cuboid<Termed> {
                 this.a = 0.05f + 0.9f * Util.and(this.r * tasklinkBoost, this.g * termlinkBoost);
 
                 this.attraction = 0.01f * width;// + priSum * 0.75f;// * 0.5f + 0.5f;
-                this.attractionDist = 1f + 2 * src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+                this.attractionDist = 1f + 2 * src.radius() + id.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = -1;
                 this.attraction = 0;
@@ -165,7 +163,7 @@ public class TermWidget extends Cuboid<Termed> {
 
         @Override
         public boolean isDeleted() {
-            return super.isDeleted() || target.active();
+            return super.isDeleted() || id.active();
         }
     }
 }

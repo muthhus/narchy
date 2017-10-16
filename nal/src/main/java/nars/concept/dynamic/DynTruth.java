@@ -86,7 +86,7 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    NALTask task(@NotNull Term c, boolean beliefOrGoal, NAR nar) {
+    NALTask task(/*@NotNull*/ Term c, boolean beliefOrGoal, NAR nar) {
 
         Truth tr0 = truth();
         if (tr0 == null)

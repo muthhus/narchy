@@ -25,7 +25,7 @@ public class MarkovSentence extends MarkovChain<String> {
 //    private String mTerminateChars;
 
     public MarkovSentence(int tupleLength) {
-        super(new HashMap<>(), tupleLength, new Random());
+        super(new HashMap<>(), tupleLength);
     }
 
 //    public void setTokenChars(String chars) {
@@ -68,7 +68,7 @@ public class MarkovSentence extends MarkovChain<String> {
      */
     public String generateSentence(int len) {
         // Get our phrase as an unwieldy ArrayList
-        List<String> phrase = generate(len);
+        List<String> phrase = sample().generate(len);
 
         // Get our StringBuffer ready and calculate the size beforehand BECAUSE IT'S SO MUCH FASTER.
         StringBuilder sb = new StringBuilder();

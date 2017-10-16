@@ -2,7 +2,7 @@ package nars;
 
 import jcog.Util;
 import jcog.event.Ons;
-import jcog.math.FirstOrderDifferenceFloat;
+import jcog.math.FloatFirstOrderDifference;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.FloatSupplier;
 import nars.concept.ScalarConcepts;
@@ -175,7 +175,7 @@ public interface NSense {
 
 
     default ScalarConcepts senseNumberDifference(Term id, FloatSupplier v) {
-        return senseNumberBi(id, new FloatPolarNormalized( new FirstOrderDifferenceFloat(()->nar().time(), v)) );
+        return senseNumberBi(id, new FloatPolarNormalized( new FloatFirstOrderDifference(()->nar().time(), v)) );
     }
 
     default SensorConcept senseNumber(Term id, FloatSupplier v) {

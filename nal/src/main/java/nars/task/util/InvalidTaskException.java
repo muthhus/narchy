@@ -18,7 +18,7 @@ public final class InvalidTaskException extends SoftException {
         super(message);
         this.task = t;
         if (t instanceof Task)
-            ((Prioritized) t).delete();
+            ((Task) t).delete();
     }
 
     @NotNull

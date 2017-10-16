@@ -287,7 +287,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             );
 
 
-            r.setPri(BudgetFunctions.fund(Math.max(prevBelief.priSafe(0), y.priSafe(0)), false, prevBelief, y));
+            r.setPri(BudgetFunctions.fund(Math.max(prevBelief.priElseZero(), y.priElseZero()), false, prevBelief, y));
             r.cause = Cause.zip(y, prevBelief);
 
             if (Param.DEBUG)

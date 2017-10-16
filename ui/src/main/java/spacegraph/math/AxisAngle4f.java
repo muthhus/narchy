@@ -40,8 +40,6 @@ import com.jogamp.opengl.math.Quaternion;
  */
 public class AxisAngle4f implements java.io.Serializable, Cloneable {
 
-    // Compatible with 1.1
-    static final long serialVersionUID = -163246355858070601L;
 
     /**
      * The x coordinate.

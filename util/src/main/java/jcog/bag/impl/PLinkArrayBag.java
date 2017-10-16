@@ -14,7 +14,7 @@ public class PLinkArrayBag<X> extends ArrayBag<X, PriReference<X>> {
 
     @Override
     @NotNull
-    public final X key(@NotNull PriReference<X> l) {
+    public final X key( PriReference<X> l) {
         return l.get();
     }
 

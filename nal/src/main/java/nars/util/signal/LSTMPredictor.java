@@ -3,7 +3,7 @@ package nars.util.signal;
 import jcog.learn.lstm.Interaction;
 import jcog.learn.lstm.test.LiveSTM;
 import jcog.list.FasterList;
-import jcog.math.DelayedFloat;
+import jcog.math.FloatDelay;
 import jcog.math.FloatSupplier;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -86,13 +86,13 @@ public class LSTMPredictor {
 
     }
 
-    public static class DelayedFloats extends FasterList<DelayedFloat> {
+    public static class DelayedFloats extends FasterList<FloatDelay> {
 
         public DelayedFloats(int size) {
             super(size);
         }
         public void next() {
-            forEach(DelayedFloat::next);
+            forEach(FloatDelay::next);
         }
     }
 
@@ -101,7 +101,7 @@ public class LSTMPredictor {
     public static DelayedFloats delay(@NotNull FloatSupplier[] vector, int history) {
         DelayedFloats delayed = new DelayedFloats(vector.length);
         for (FloatSupplier f : vector)
-            delayed.add( new DelayedFloat(f, history) );
+            delayed.add( new FloatDelay(f, history) );
         return delayed;
     }
 
@@ -138,10 +138,10 @@ public class LSTMPredictor {
     }
 
     @NotNull
-    static double[] dH(@NotNull Collection<? extends DelayedFloat> f, int history) {
+    static double[] dH(@NotNull Collection<? extends FloatDelay> f, int history) {
         double[] d = new double[f.size() * history];
         int i = 0;
-        for (DelayedFloat g : f) {
+        for (FloatDelay g : f) {
             float[] gd = g.data;
             for (int k = 0; k < gd.length; k++)
                 d[i++] = gd[k];

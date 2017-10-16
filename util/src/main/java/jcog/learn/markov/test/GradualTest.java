@@ -2,6 +2,7 @@ package jcog.learn.markov.test;
 
 
 import jcog.learn.markov.MarkovChain;
+import jcog.learn.markov.MarkovSampler;
 
 /**
  * Tests the gradual chaining methods of the data structure.
@@ -24,15 +25,17 @@ public class GradualTest {
         shortChain.learn(shortPhrase1);
         shortChain.learn(shortPhrase2);
 
+        MarkovSampler<String> longChainSampler = longChain.sample();
+        MarkovSampler<String> shortChainSampler = shortChain.sample();
         String shorty, longy;
-        while ((longy = longChain.next()) != null) {
-            shorty = shortChain.nextLoop();
+        while ((longy = longChainSampler.next()) != null) {
+            shorty = shortChainSampler.nextLoop();
             System.out.printf("%s (%s)\n", longy, shorty);
         }
 
-        longChain.reset();
+        longChainSampler.reset();
 
-        while ((longy = longChain.next()) != null) {
+        while ((longy = longChainSampler.next()) != null) {
             System.out.printf("%s", longy);
         }
         System.out.println();

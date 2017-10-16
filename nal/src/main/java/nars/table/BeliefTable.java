@@ -32,7 +32,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return iterator();
     }
 
-    @NotNull
+    /*@NotNull*/
     BeliefTable Empty = new BeliefTable() {
 
         @Override
@@ -91,7 +91,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public void add(@NotNull Task input, BaseConcept concept, @NotNull NAR nar) {
+        public void add(/*@NotNull*/ Task input, BaseConcept concept, /*@NotNull*/ NAR nar) {
 
         }
 
@@ -106,7 +106,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public void print(@NotNull PrintStream out) {
+        public void print(/*@NotNull*/ PrintStream out) {
 
         }
 
@@ -144,7 +144,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return project(t, Stamp.TIMELESS);
     }*/
 
-//    static float rankEternalByConfAndOriginality(@NotNull Task b) {
+//    static float rankEternalByConfAndOriginality(/*@NotNull*/ Task b) {
 //        return rankEternalByConfAndOriginality(b.conf(), b.originality());
 //    }
 //
@@ -161,11 +161,11 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      * attempt to insert a task; returns what was input or null if nothing changed (rejected)
      */
     @Override
-    void add(@NotNull Task input, BaseConcept concept, @NotNull NAR nar);
+    void add(/*@NotNull*/ Task input, BaseConcept concept, /*@NotNull*/ NAR nar);
 
 
 
-    default void print(@NotNull PrintStream out) {
+    default void print(/*@NotNull*/ PrintStream out) {
         this.forEachTask(t -> out.println(t + " " + Arrays.toString(t.stamp()))); //TODO print Stamp using same methods Task uses
     }
 
@@ -239,8 +239,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             return null;
 
         boolean novel = false; //(answer instanceof AnswerTask); //includes: answers, revision, or dynamic
-        //&& !(answer instanceof DynamicBeliefTask);
-
 
         //project if different occurrence
 
@@ -281,7 +279,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             }
         }
 
-        if (novel && question != null && relevantTime && question.isQuestOrQuestion()) {
+        if (novel && question != null && question.isQuestOrQuestion()) {
             nar.input(answer);
         }
 
@@ -304,7 +302,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 //    void range(long[] t);
 
 
-    //void remove(Task belief, @NotNull NAR nar);
+    //void remove(Task belief, /*@NotNull*/ NAR nar);
 
 
 
@@ -338,7 +336,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 //     *  only item that does not have disqualifying rank (MIN_VALUE)
 //     * */
 //    @Nullable
-//    default Task top(@NotNull Ranker r) {
+//    default Task top(/*@NotNull*/ Ranker r) {
 //
 //        float s = Float.MIN_VALUE;
 //        Task b = null;
@@ -357,19 +355,19 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 //    final class SolutionQualityMatchingOrderRanker implements Ranker {
 //
-//        @NotNull
+//        /*@NotNull*/
 //        private final Task query;
 //        private final long now;
 //        private final boolean hasQueryVar; //cache hasQueryVar
 //
-//        public SolutionQualityMatchingOrderRanker(@NotNull Task query, long now) {
+//        public SolutionQualityMatchingOrderRanker(/*@NotNull*/ Task query, long now) {
 //            this.query = query;
 //            this.now = now;
 //            this.hasQueryVar = query.hasQueryVar();
 //        }
 //
 //        @Override
-//        public float rank(@NotNull Task t, float bestToBeat) {
+//        public float rank(/*@NotNull*/ Task t, float bestToBeat) {
 //            Task q = query;
 //
 //            if (t.equals(q)) return Float.NaN; //dont compare to self
@@ -506,7 +504,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 //    }
 }
 //    /** returns value <= 1f */
-//    static float relevance(@NotNull Task t, long time, float ageFactor) {
+//    static float relevance(/*@NotNull*/ Task t, long time, float ageFactor) {
 //        return relevance(t.occurrence(), time, ageFactor);
 //    }
 
@@ -531,16 +529,16 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 //        return relevance(Math.abs(from - to), ageFactor);
 //    }
 
-//    @NotNull
-//    static Task stronger(@NotNull Task a, @NotNull Task b) {
+//    /*@NotNull*/
+//    static Task stronger(/*@NotNull*/ Task a, /*@NotNull*/ Task b) {
 //        return a.conf() > b.conf() ? a : b;
 //    }
 
-//    static float rankTemporalByConfidenceAndOriginality(@NotNull Task t, long when, long now, float bestSoFar) {
+//    static float rankTemporalByConfidenceAndOriginality(/*@NotNull*/ Task t, long when, long now, float bestSoFar) {
 //        return rankTemporalByConfidence(t, when, now, bestSoFar) * t.originality();
 //    }
 
-//    static float rankTemporalByOriginality(@NotNull Task b, long when) {
+//    static float rankTemporalByOriginality(/*@NotNull*/ Task b, long when) {
 //        return BeliefTable.rankEternalByOriginality(b) *
 //                BeliefTable.relevance(b, when, 1);
 //    }
@@ -577,7 +575,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 //        return dd / size;
 //
 //    }
-//    static float projectionQuality(float freq, float conf, @NotNull Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
+//    static float projectionQuality(float freq, float conf, /*@NotNull*/ Task t, long targetTime, long currentTime, boolean problemHasQueryVar) {
 ////        float freq = getFrequency();
 ////        float conf = getConfidence();
 //

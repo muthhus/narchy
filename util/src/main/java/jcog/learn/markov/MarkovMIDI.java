@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-public class MarkovTrack extends MarkovChain<MarkovTrack.MidiMessageWrapper> {
+public class MarkovMIDI extends MarkovSampler<MarkovMIDI.MidiMessageWrapper> {
 
     private final MarkovChain<Long> mLengthChain;
 
-    public MarkovTrack(int n) {
-        super(new HashMap(), n, new Random());
+    public MarkovMIDI(int n) {
+        super(new MarkovChain<>(n), new Random());
         mLengthChain = new MarkovChain<Long>(n);
     }
 
@@ -57,7 +57,7 @@ public class MarkovTrack extends MarkovChain<MarkovTrack.MidiMessageWrapper> {
 
         if (msgs.size() > 0) {
             adds++;
-            this.learn(msgs);
+            model.learn(msgs);
         }
 
         mLengthChain.learn(times);
@@ -76,9 +76,12 @@ public class MarkovTrack extends MarkovChain<MarkovTrack.MidiMessageWrapper> {
 
     public void exportTrack(File file, float divisionType, int resolution, int fileType, int maxLength)
             throws InvalidMidiDataException, IOException {
+
         Sequence s = new Sequence(divisionType, resolution, 1);
         Track t = s.createTrack();
         reset();
+
+        MarkovSampler<Long> mLengthSampler = mLengthChain.sample();
 
         int ticks = 0;
         MidiMessageWrapper wrpmsg;
@@ -86,7 +89,7 @@ public class MarkovTrack extends MarkovChain<MarkovTrack.MidiMessageWrapper> {
         while ((wrpmsg = next(maxLength)) != null) {
             MidiMessage msg = wrpmsg.getMessage();
 
-            long dt = mLengthChain.nextLoop();
+            long dt = mLengthSampler.nextLoop();
             ticks += dt;
             MidiEvent event = new MidiEvent(msg, ticks);
 

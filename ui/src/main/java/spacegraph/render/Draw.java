@@ -593,28 +593,28 @@ public enum Draw {
 //    }
 
     //    static final float[] tmpV = new float[3];
-    static final v3 ww = new v3();
-    static final v3 vv = new v3();
-    static final Quat4f tmpQ = new Quat4f();
+
     //    static final Matrix4f tmpM4 = new Matrix4f();
 //    static final Matrix3f tmpM3 = new Matrix3f();
     static final AxisAngle4f tmpA = new AxisAngle4f();
 
-    static public void renderHalfTriEdge(GL2 gl, SimpleSpatial src, EDraw e, float width, float twist) {
-        SimpleSpatial tgt = e.target;
+    static public void renderHalfTriEdge(GL2 gl, SimpleSpatial src, EDraw<?> e, float width, float twist) {
 
-        Transform st = src.transform();
-        st.getRotation(tmpQ);
+
+        Transform st = src.transform;
+
+        final Quat4f tmpQ = st.getRotation(new Quat4f());
 
         if (twist != 0)
             tmpQ.setAngle(0, 1, 0, twist);
 
-        ww.set(0, 0, 1);
+        v3 ww = new v3(0, 0, 1);
         tmpQ.rotateVector(ww, ww);
 
-        ww.normalize();
+        //ww.normalize();
 
-        Transform tt = tgt.transform();
+        SimpleSpatial tgt = e.id;
+        Transform tt = tgt.transform;
 
         float sx = st.x;
         float tx = tt.x;
@@ -625,36 +625,35 @@ public enum Draw {
         float sz = st.z;
         float tz = tt.z;
         float dz = tz - sz;
-        vv.set(dx, dy, dz);
+        v3 vv = new v3(dx, dy, dz).cross(ww).normalized(width);
 
-        vv.cross(vv, ww);
-        vv.normalize();
-        vv.scale(width);
+        gl.glPushMatrix();
 
-        push(gl);
         gl.glBegin(GL2.GL_TRIANGLES);
 
+        gl.glColor4f(e.r, e.g, e.b, e.a);
         gl.glNormal3f(ww.x, ww.y, ww.z);
+
         gl.glVertex3f(sx + vv.x, sy + vv.y, sz + vv.z); //right base
         gl.glVertex3f( //right base
                 sx + -vv.x, sy + -vv.y, sz + -vv.z //full triangle
                 //sx, sy, sz  //half triangle
         );
-        gl.glVertex3f(tx, ty, tz); //right base
 
+        gl.glVertex3f(tx, ty, tz); //tip
 
         gl.glEnd();
 
-        pop(gl);
+        gl.glPopMatrix();
 
     }
 
-    public static void renderLineEdge(GL2 gl, SimpleSpatial src, EDraw e, float width) {
+    public static void renderLineEdge(GL2 gl, SimpleSpatial src, EDraw<?> e, float width) {
         gl.glLineWidth(width);
         gl.glBegin(GL.GL_LINES);
         v3 s = src.transform();
         gl.glVertex3f(s.x, s.y, s.z);
-        v3 t = e.target.transform();
+        v3 t = e.id.transform();
         gl.glVertex3f(t.x, t.y, t.z);
         gl.glEnd();
     }

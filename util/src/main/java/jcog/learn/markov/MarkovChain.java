@@ -1,11 +1,13 @@
 package jcog.learn.markov;
 
+import com.google.common.collect.Streams;
 import jcog.list.FasterList;
+import jcog.pri.WLink;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * A class for generating a Markov phrase out of some sort of
@@ -19,55 +21,32 @@ public class MarkovChain<T> {
     /**
      * HashMap to help us resolve data to the node that contains it
      */
-    public final Map<List<T>, Node> nodes;
+    public final Map<List<T>, Chain<T>> nodes;
 
-    /**
-     * Node that marks the beginning of a phrase. All Markov phrases start here.
-     */
-    private final Node header = makeNode();
-    /**
-     * Node that signals the end of a phrase. This node should have no edges.
-     */
-    private final Node trailer = makeNode();
     /**
      * Stores how long our tuple length is (how many data elements a node has)
      */
     public final int arity;
 
-    /**
-     * Pointer to the current node. Methods next() uses this
-     */
-    @Deprecated private Node<T> mCurrent;
-    /**
-     * Index for which data element is next in our tuple
-     */
-    @Deprecated private int mTupleIndex;
-
-    /**
-     * Keeps up with how long our gradual chain is
-     */
-    @Deprecated private int mElements;
-
-    /**
-     * Nodes use this to find the next node
-     */
-    private final Random rng;
-
     public MarkovChain(int n) {
-        this(n, new Random());
+        this(new HashMap(), n);
     }
 
-    public MarkovChain(int n, Random rng) {
-        this(new HashMap(), n, rng);
-    }
-
-    public MarkovChain(Map<List<T>, Node> nodes, int n, Random rng) {
+    public MarkovChain(Map<List<T>, Chain<T>> nodes, int n) {
         this.nodes = nodes;
-        this.rng = rng;
-        if (n <= 0) throw new IllegalArgumentException("Can't have MarkovChain with tuple length <= 0");
+        this.arity = n;
 
-        arity = n;
+        if (n <= 0) throw new IllegalArgumentException("Can't have MarkovChain with tuple length <= 0");
     }
+
+    /**
+     * Node that marks the beginning of a phrase. All Markov phrases start here.
+     */
+    public final Chain START = new Chain(List.of());
+    /**
+     * Node that signals the end of a phrase. This node should have no edges.
+     */
+    public final Chain END = new Chain(List.of());
 
 
     /**
@@ -75,112 +54,17 @@ public class MarkovChain<T> {
      */
     public void clear() {
         nodes.clear();
-        header.clear();
-        trailer.clear();
+        START.clear();
+        END.clear();
     }
 
 
-
-    /**
-     * Get the number of nodes in this graph.
-     *
-     * @return number of nodes
-     */
-    public int getNodeCount() {
-        return nodes.size();
+    public MarkovChain learn(@NotNull Iterable<T> phrase) {
+        return learn(Streams.stream(phrase));
     }
 
-    /**
-     * Re-initialize the chain pointer  and
-     * tuple index to start from the top.
-     */
-    public void reset() {
-        mCurrent = null;
-        mTupleIndex = 0;
-    }
-
-    /**
-     * Returns the next element in our gradual chain.
-     * Ignores maximum length.
-     *
-     * @return next data element
-     */
-    public T next() {
-        return next(false, 0);
-    }
-
-    /**
-     * Returns the next element and loops to the front of chain
-     * on termination.
-     *
-     * @return next element
-     */
-    public T nextLoop() {
-        return next(true, 0);
-    }
-
-    public T next(int maxLength) {
-        return next(false, maxLength);
-    }
-
-    public T next(boolean loop) {
-        return next(loop, 0);
-    }
-
-    /**
-     * Get next element pointed by our single-element.
-     * This will also update the data structure to get ready
-     * to serve the next data element.
-     *
-     * @param loop if you would like to loop
-     * @return data element at the current node tuple index
-     */
-    public T next(boolean loop, int maxLength) {
-
-        if (nodes.isEmpty())
-            return null;
-
-        // In case mCurrent hasn't been initialized yet.
-        if (mCurrent == null || mCurrent == header) mCurrent = header.next(rng);
-
-        // Handle behavior in case we're at the trailer at the start.
-        if (mCurrent == trailer) {
-            if (loop == true) {
-
-                if (maxLength > 0 && mElements >= maxLength) mCurrent = header.nextTerminal(rng);
-                else mCurrent = header.next(rng);
-
-                mTupleIndex = 0;
-            }
-            // No more data for non-loopers
-            else {
-                return null;
-            }
-        }
-
-        T returnValue = mCurrent.getData(mTupleIndex);
-
-        mTupleIndex++;
-        mElements++;
-
-        // We've reached the end of this tuple.
-        if (mTupleIndex >= mCurrent.size()) {
-
-            if (maxLength > 0 && mElements >= maxLength) mCurrent = mCurrent.nextTerminal(rng);
-            else mCurrent = mCurrent.next(rng);
-
-            mTupleIndex = 0;
-        }
-
-        return returnValue;
-    }
-
-    public void learn(@NotNull Iterable<T> phrase) {
-        learn(StreamSupport.stream(phrase.spliterator(), false));
-    }
-
-    public void learn(@NotNull Stream<T> phrase) {
-        learn(phrase, 1f);
+    public MarkovChain learn(@NotNull Stream<T> phrase) {
+        return learn(phrase, 1f);
     }
 
     /**
@@ -188,10 +72,10 @@ public class MarkovChain<T> {
      *
      * @param phrase to learn
      */
-    public void learn(@NotNull Stream<T> phrase, float strength) {
+    public MarkovChain learn(Stream<T> phrase, float strength) {
 
         // All phrases start at the header.
-        final Node[] current = {header};
+        final Chain[] current = {START};
 
         // Make temporary lists to help us resolve nodes.
         final List<T>[] tuple = new List[]{new FasterList<T>()};
@@ -205,25 +89,24 @@ public class MarkovChain<T> {
             if (sz < arity) {
                 tu.add(t);
             } else {
-                Node n = findOrCreate(tu);
-                current[0] = current[0].learn(n, strength);
-                tuple[0] = new FasterList<T>();
+                current[0] = current[0].learn(getOrAdd(tu), strength);
+                tuple[0] = new FasterList<T>(1);
                 tuple[0].add(t);
                 //tuple[0].add(t);
             }
         });
 
-        Node c = current[0];
+        Chain c = current[0];
         List<T> t = tuple[0];
 
         // Add any incomplete tuples if needed.
         if (!t.isEmpty()) {
-            Node n = findOrCreate(t);
-            c = c.learn(n, strength);
+            c = c.learn(getOrAdd(t), strength);
         }
 
         // We've reached the end of the phrase, add an edge to the trailer node.
-        c.learn(trailer, strength);
+        c.learn(END, strength);
+        return this;
     }
 
     /**
@@ -231,84 +114,39 @@ public class MarkovChain<T> {
      *
      * @param phrase to interpret
      */
-    public void learn(T phrase[]) {
-        learn(Stream.of(phrase));
+    public MarkovChain learn(T phrase[]) {
+        return learn(Stream.of(phrase));
     }
 
-    public List<T> generate() {
-        return generate(-1);
+    public MarkovChain learnAll(T[]... phrases) {
+        for (T[] p : phrases)
+            learn(p);
+        return this;
     }
 
-    /**
-     * Use our graph to randomly generate a possibly valid phrase
-     * from our data structure.
-     *
-     * @param max sequence length, or -1 for unlimited
-     * @return generated phrase
-     */
-    public List<T> generate(int maxLen) {
-        // Go ahead and choose our first node
-        Node<T> current = header.next(rng);
+    public MarkovSampler<T> sample() {
+        return sample(ThreadLocalRandom.current());
+    }
 
-        // We will put our generated phrase in here.
-        List<T> phrase = new FasterList<T>();
-
-        // As a safety, check for nulls
-        // Iterate til we get to the trailer
-        int s = 0;
-        while (current != null && current != trailer) {
-            // Iterate over the data tuple in the node and add stuff to the phrase
-            // if it is non-null
-            List<T> cd = current.data;
-
-            if (maxLen!=-1 && (s + cd.size() >= maxLen)) {
-
-                //only get the prefix up to a certain length to avoid
-                for (int i = 0; i < maxLen - s; i++) {
-                    phrase.add(cd.get(i));
-                    s++;
-                }
-                break;
-
-            } else {
-                phrase.addAll(cd);
-                s += cd.size();
-            }
-
-            if (maxLen!=-1 && s == maxLen)
-                break;
-
-            current = current.next(rng);
-        }
-
-        // Out pops pure genius
-        return phrase;
+    public MarkovSampler<T> sample(Random rng) {
+        return new MarkovSampler(this, rng);
     }
 
     /**
      * This method is an alias to find a node if it
      * exists or create it if it doesn't.
      *
-     * @param data to find a node for
+     * @param x to find a node for
      * @return the newly created node, or resolved node
      */
-    private Node findOrCreate(List<T> data) {
-        if (data.size() > arity) {
+    private Chain getOrAdd(List<T> x) {
+        if (x.size() > arity) {
             throw new IllegalArgumentException(
-                    String.format("Invalid tuple length %d. This structure: %d", data.size(), arity)
+                    String.format("Invalid tuple length %d. This structure: %d", x.size(), arity)
             );
         }
 
-        return nodes.computeIfAbsent(data, this::makeNode);
-    }
-
-    private Node makeNode() {
-        return makeNode(null);
-    }
-
-    private Node makeNode(List<T> data) {
-        Node n = new Node(data);
-        return n;
+        return nodes.computeIfAbsent(x, Chain::new);
     }
 
 
@@ -319,7 +157,9 @@ public class MarkovChain<T> {
      *
      * @author pkilgo
      */
-    public static class Node<T> {
+    public static class Chain<T> {
+
+
         /**
          * The data this node represents
          */
@@ -329,12 +169,13 @@ public class MarkovChain<T> {
         /**
          * A list of edges to other nodes
          */
-        protected final List<Edge> edges = new FasterList<Edge>();
+        protected final Map<Chain<T>, WLink<Chain<T>>> edges = new LinkedHashMap();
+        private final int hash;
 
         /**
          * Blank constructor for data-less nodes (the header or trailer)
          */
-        public Node() {
+        public Chain() {
             this(Collections.emptyList());
         }
 
@@ -343,8 +184,19 @@ public class MarkovChain<T> {
          *
          * @param d the data this node should represent
          */
-        public Node(List<T> d) {
+        public Chain(List<T> d) {
             this.data = d;
+            this.hash = data.hashCode();
+        }
+
+        @Override
+        public final int hashCode() {
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            throw new UnsupportedOperationException();
         }
 
         /**
@@ -353,7 +205,7 @@ public class MarkovChain<T> {
          * @param i the index of the data
          * @return data at index
          */
-        public T getData(int i) {
+        public T get(int i) {
             return data.get(i);
         }
 
@@ -409,7 +261,6 @@ public class MarkovChain<T> {
         }
 
         public void clear() {
-            data.clear();
             edges.clear();
         }
 
@@ -418,7 +269,7 @@ public class MarkovChain<T> {
          *
          * @return size of tuple represented by this node
          */
-        public int size() {
+        public int length() {
             return data.size();
         }
 
@@ -430,18 +281,11 @@ public class MarkovChain<T> {
          * @param n node to add more weight to
          * @return the node that was learned
          */
-        public Node<T> learn(Node<T> n, float strength) {
+        public Chain<T> learn(final Chain<T> n, float strength) {
             // Iterate through the edges and see if we can find that node.
-            for (Edge<T> e : edges) {
-                if (e.node.equals(n)) {
-                    e.weight+=strength;
-                    return e.node;
-                }
-            }
-
-            // Elsewise, create an edge.
-            edges.add(new Edge<>(n));
-            return n;
+            WLink<Chain<T>> e = edges.computeIfAbsent(n, nn -> new WLink<>(nn, 0));
+            e.priAdd(strength);
+            return e.get();
         }
 
         /**
@@ -450,87 +294,75 @@ public class MarkovChain<T> {
          *
          * @return next node, or null if we could not choose a next node
          */
-        protected Node next(Random rng) {
+        protected Chain next(Random rng) {
             if (edges.isEmpty()) return null;
-            Edge choice = chooseEdge(rng, edges);
-            return choice.node;
+            return selectRoulette(rng, edges.values()).get();
         }
 
-        protected Node nextTerminal(Random rng) {
-            if (edges.isEmpty()) return null;
+//        protected Node nextTerminal(Random rng) {
+//            if (edges.isEmpty()) return null;
+//
+//            List<Edge> candidates = new ArrayList<Edge>();
+//            Edge e = edges.get(0);
+//            candidates.add(e);
+//            //int min = e.node.getTerminalPathLength(mNodeCount);
+//
+//            for (int i = 1; i < edges.size(); i++) {
+//                e = edges.get(i);
+//                //int pathLength = e.node.getTerminalPathLength(mNodeCount);
+//                //if (pathLength == min) {
+//                    candidates.add(e);
+//                //} else if (pathLength < min) {
+//                  //  candidates.clear();
+//                    //candidates.add(e);
+//                    //min = pathLength;
+//                //}
+//            }
+//
+//            //if (min == Integer.MAX_VALUE) return null;
+//
+//            Edge choice = selectRoulette(rng, candidates);
+////			System.out.printf("Terminal path: %d\n", min);
+////			System.out.printf("%s --> %s\n", data.toString(), choice.node.data.toString());
+//            return choice.node;
+//        }
 
-            List<Edge> candidates = new ArrayList<Edge>();
-            Edge e = edges.get(0);
-            candidates.add(e);
-            //int min = e.node.getTerminalPathLength(mNodeCount);
-
-            for (int i = 1; i < edges.size(); i++) {
-                e = edges.get(i);
-                //int pathLength = e.node.getTerminalPathLength(mNodeCount);
-                //if (pathLength == min) {
-                    candidates.add(e);
-                //} else if (pathLength < min) {
-                  //  candidates.clear();
-                    //candidates.add(e);
-                    //min = pathLength;
-                //}
-            }
-
-            //if (min == Integer.MAX_VALUE) return null;
-
-            Edge choice = chooseEdge(rng, candidates);
-//			System.out.printf("Terminal path: %d\n", min);
-//			System.out.printf("%s --> %s\n", data.toString(), choice.node.data.toString());
-            return choice.node;
-        }
-
-        private static Edge chooseEdge(Random RNG, List<Edge> edges) {
-            if (edges.size() == 1)
-                return edges.get(0);
+        static <T> WLink<T> selectRoulette(Random RNG, Collection<WLink<T>> edges) {
+            int s = edges.size();
+            if (s == 0)
+                return null;
+            if (s == 1)
+                return edges.iterator().next();
 
             // First things first: count up the entirety of all the weight.
             float totalScore = 0;
-            for (int i = 0; i < edges.size(); i++) totalScore += edges.get(i).weight;
+            for (WLink e : edges)
+                totalScore += e.pri();
 
             // Choose a random number that is less than or equal to that weight
-            float r = RNG.nextFloat()*totalScore;
+            float r = RNG.nextFloat() * totalScore;
 
             // This variable contains how much weight we have "seen" in our loop.
             int current = 0;
 
-            Edge e = null;
-
             // Iterate through the edges and find out where our generated number landed.
-            for (int i = 0; i < edges.size()-1; i++) {
-                e = edges.get(i);
+            for (WLink e : edges) {
 
                 // Is it between the weight we've seen and the weight of this node?
-                if (r >= current && r < current + e.weight) {
-                    break;
+                float dw = e.pri();
+
+                if (r >= current && r < current + dw) {
+                    return e;
                 }
 
                 // Add the weight we've seen
-                current += e.weight;
+                current += dw;
             }
 
-            return e;
+            //accident here
+            return edges.iterator().next();
         }
 
     }
 
-    /**
-     * Simple container class that holds the node this edge represents and the weight
-     * of the edge.
-     *
-     * @author pkilgo
-     */
-    protected static class Edge<T> {
-        public final Node<T> node;
-        float weight = 1;
-
-        public Edge(Node<T> n) {
-            node = n;
-            weight = 1;
-        }
-    }
 }

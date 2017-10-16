@@ -1,7 +1,7 @@
 package jcog.learn.markov.test;
 
 
-import jcog.learn.markov.MarkovTrack;
+import jcog.learn.markov.MarkovMIDI;
 
 import javax.sound.midi.*;
 import java.io.File;
@@ -54,12 +54,11 @@ public class TrackTest {
         System.out.println("Tracks: " + tracks.length);
 
         for (int i = 30; i <= 35; i++) {
-            MarkovTrack track = new MarkovTrack(i);
+            MarkovMIDI track = new MarkovMIDI(i);
             try {
 //				track.learnSequence(seq,fmt);
                 track.learnTrack(tracks[1], fmt);
                 System.out.printf("Writing output-%d.mid...\n", i);
-                System.out.println("Complexity: " + track.getNodeCount());
                 track.exportTrack(String.format("output-%d.mid", i), fmt.getDivisionType(), fmt.getResolution(), fmt.getType(), tracks[1].size());
             } catch (InvalidMidiDataException | IOException e) {
             } catch (OutOfMemoryError e) {

@@ -150,7 +150,7 @@ public interface PriMerge extends BiConsumer<Priority, Prioritized> {
     PriMerge max = (tgt, src) -> blend(tgt, src, MAX);
 
     /** avg priority, LERP other components in proportion to the priorities */
-    PriMerge replace = (tgt, src) -> src.priSafe(tgt.priElseZero());
+    PriMerge replace = (tgt, src) -> src.priElse(tgt.priElseZero());
 
 //
 //

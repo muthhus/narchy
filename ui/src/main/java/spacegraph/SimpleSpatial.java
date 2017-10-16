@@ -37,7 +37,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
 
     public final float[] shapeColor;
-    private final Transform transform = new Transform();
+    public final Transform transform = new Transform();
 
     public SimpleSpatial(X x) {
         super(x);

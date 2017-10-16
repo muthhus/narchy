@@ -134,9 +134,13 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
 //        if ((x!=x) || (y!=y) || (z!=z))
 //            throw new UnsupportedOperationException();
 
-        this.x = notNaN(x);
-        this.y = notNaN(y);
-        this.z = notNaN(z);
+        this.x = (x);
+        this.y = (y);
+        this.z = (z);
+
+//        this.x = notNaN(x);
+//        this.y = notNaN(y);
+//        this.z = notNaN(z);
     }
 
     /** assumes z=0 */

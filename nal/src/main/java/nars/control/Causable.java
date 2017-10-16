@@ -50,7 +50,6 @@ abstract public class Causable extends NARService {
 
         synchronized (nar.can) {
             boolean removed = nar.can.remove(this);
-            assert (removed);
         }
 
         super.stop(nar);

@@ -2,6 +2,7 @@ package nars.task;
 
 import jcog.Util;
 import jcog.math.Interval;
+import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Op;
@@ -276,16 +277,11 @@ public class Revision {
         float factor = 1f;
 
         //relate high frequency difference with low confidence
-        float freqDiscount =
-                0.5f + 0.5f * (1f - Math.abs(a.freq() - b.freq()));
-        factor *= freqDiscount;
-        if (factor < Prioritized.EPSILON) return null;
+//        float freqDiscount =
+//                0.5f + 0.5f * (1f - Math.abs(a.freq() - b.freq()));
+//        factor *= freqDiscount;
+//        if (factor < Prioritized.EPSILON) return null;
 
-        //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
-        //TODO weight the contributed overlap amount by the relative confidence provided by each task
-        float overlapDiscount = 1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
-        factor *= overlapDiscount;
-        if (factor < Prioritized.EPSILON) return null;
 
 
 //            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
@@ -328,6 +324,24 @@ public class Revision {
         Truth rawTruth = revise(a, b, factor, c2w(confMin));
         if (rawTruth == null)
             return null;
+
+        float maxEviAB = Math.max(a.evi(), b.evi());
+        float evi = rawTruth.evi();
+        if (maxEviAB < evi) {
+            //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
+            //TODO weight the contributed overlap amount by the relative confidence provided by each task
+            float overlapDiscount = 1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
+    //        factor *= overlapDiscount;
+    //        if (factor < Prioritized.EPSILON) return null;
+
+            float eviDiscount = (evi - maxEviAB) * overlapDiscount;
+            float newEvi = evi - eviDiscount;
+            if (!Util.equals(evi, newEvi, Pri.EPSILON)) {
+                rawTruth = rawTruth.withEvi(newEvi);
+            }
+
+        }
+
 
         Truth newTruth1 = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), confMin, 1);
         if (newTruth1 == null)

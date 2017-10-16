@@ -724,7 +724,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
 
     @Override
-    public void forEachKey(@NotNull Consumer<? super X> each) {
+    public void forEachKey( Consumer<? super X> each) {
 
         forEach(x -> each.accept(key(x)));
     }

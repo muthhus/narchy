@@ -174,9 +174,9 @@ public class Cuboid<X> extends SimpleSpatial<X> {
             gl.glScalef(0.25f, 0.25f, 0.25f);
             gl.glColor4f(1f, 1f, 1f, 0.5f);
             gl.glRotated(Math.random() * 360.0, Math.random() - 0.5f, Math.random() - 0.5f, Math.random() - 0.5f);
-            gl.glDepthMask(false);
+            //gl.glDepthMask(false);
             Draw.rect(gl, -0.5f, -0.5f, 1, 1);
-            gl.glDepthMask(true);
+            //gl.glDepthMask(true);
             gl.glPopMatrix();
         }
     }

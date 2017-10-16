@@ -22,7 +22,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package jcog.learn.hmm;
+package jcog.learn.markov;
 
 import java.text.DecimalFormat;
 import java.util.Vector;

@@ -346,7 +346,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
         //reward answer for answering the question
         float str = ansConf *
                 qOrig *
-                question.priSafe(0);
+                question.priElseZero();
         MetaGoal.learn(MetaGoal.Answer, answer.cause(), str, nar);
     }
 
