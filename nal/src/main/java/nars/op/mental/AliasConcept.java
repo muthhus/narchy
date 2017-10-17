@@ -126,7 +126,7 @@ public final class AliasConcept extends BaseConcept {
 
         //dont just call super.delete since it will erase the abbreviant's links too!
         state(ConceptState.Deleted);
-        clear();
+        meta.clear();
     }
 
     @Override

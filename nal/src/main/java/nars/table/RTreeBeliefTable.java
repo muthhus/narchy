@@ -333,7 +333,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             if (!changes.getIfAbsent(x, true))
                 return; //this can theoretically happen if a duplicate is inserted that the pre-compress just extracted. this catches it
 
-
             if (treeRW.add(x)) {
                 changes.put(x, true);
                 ensureCapacity(treeRW, x, changes, n);
@@ -496,7 +495,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     allowMerge = strengthAdded >= strengthRemoved;
                 }
 
-
                 if (allowMerge) {
 
                     treeRW.remove(at);
@@ -504,6 +502,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     changes.put(at, false);
                     changes.put(bt, false);
                     changes.put(c, true);
+
+                    ((NALTask)at).delete(c); //forward
+                    ((NALTask)bt).delete(c); //forward
 
                     return true;
                 } else {

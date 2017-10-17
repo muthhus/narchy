@@ -183,8 +183,10 @@ public class NALTask extends Pri implements Task {
     @Override
     public boolean delete() {
         if (super.delete()) {
-            if (!Param.DEBUG)
+            if (!Param.DEBUG) {
+                assert(meta.get("@")==null); //TODO temporary
                 this.meta.clear();
+            }
             return true;
         }
         return false;

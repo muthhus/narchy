@@ -277,23 +277,29 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         Truth revisionTruth = conclusion;
         Task prevBelief = oldBelief;
-        return Task.tryTask(t, y.punc(), conclusion, (term, truth) -> {
+        Task x = Task.tryTask(t, y.punc(), conclusion, (term, truth) -> {
             NALTask r = new NALTask(t,
                     y.punc(),
                     revisionTruth,
-                    nar != null ? nar.time() : ETERNAL /* creation time */,
+                    nar.time() /* creation time */,
                     ETERNAL, ETERNAL,
                     Stamp.zip(prevBelief.stamp(), y.stamp(), 0.5f /* TODO proportionalize */)
             );
-
-
-            r.setPri(BudgetFunctions.fund(Math.max(prevBelief.priElseZero(), y.priElseZero()), false, prevBelief, y));
-            r.cause = Cause.zip(y, prevBelief);
-
-            if (Param.DEBUG)
-                r.log("Insertion Revision");
             return r;
         });
+        if (x!=null) {
+            x.setPri(BudgetFunctions.fund(Math.max(prevBelief.priElseZero(), y.priElseZero()), false, prevBelief, y));
+            ((NALTask)x).cause = Cause.zip(y, prevBelief);
+
+            if (Param.DEBUG)
+                x.log("Insertion Revision");
+
+            ((NALTask)y).delete(x);
+            ((NALTask)prevBelief).delete(x);
+
+        }
+
+        return x;
     }
 
     @Nullable

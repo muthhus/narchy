@@ -4,6 +4,7 @@ import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
+import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
@@ -70,13 +71,40 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     public Bag[] newLinkBags(Term t) {
         int v = t.volume();
         //if (/*v > 3 && */v < 16) {
-            Map sharedMap = newBagMap(v);
-            Random rng = nar.random();
-            @NotNull Bag<Term, PriReference<Term>> termbag =
-                    new CurveBag<>(Param.termlinkMerge, sharedMap, rng, 0);
-            @NotNull Bag<Task, PriReference<Task>> taskbag =
-                    new CurveBag<>(Param.tasklinkMerge, sharedMap, rng, 0);
-            return new Bag[]{termbag, taskbag};
+        Map sharedMap = newBagMap(v);
+        Random rng = nar.random();
+        @NotNull Bag<Term, PriReference<Term>> termbag =
+                new CurveBag<>(Param.termlinkMerge, sharedMap, rng, 0);
+        @NotNull CurveBag<PriReference<Task>> taskbag =
+                new CurveBag<PriReference<Task>>(Param.tasklinkMerge, sharedMap, rng, 0) {
+                    @Override
+                    public void onRemove(PriReference<Task> value) {
+                        Task x = value.get();
+                        Task px = x;
+                        Task y = null;
+
+                        //TODO maybe a hard limit should be here for safety in case anyone wants to create loops of forwarding tasks
+                        do {
+                            y = x.meta("@");
+                            if (y != null)
+                                x = y;
+                        } while (y != null);
+
+                        if (x != px && !x.isDeleted()) {
+
+                            float pre = value.pri();
+                            if (pre!=pre) {
+                                //if the original tasklink has been deleted, estimate the new priority based on the average pri of the table
+                                pre = isEmpty() ? 0.5f : priAvg();
+                            }
+
+                            putAsync(new PLinkUntilDeleted<>(
+                                    x, pre));
+
+                        }
+                    }
+                };
+        return new Bag[]{termbag, taskbag};
 //        } else {
 //            return new Bag[]{
 //                    new MyDefaultHijackBag(Param.termlinkMerge),
@@ -85,7 +113,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //        }
 
     }
-
 
 
     private BaseConcept newTaskConcept(final Term t) {
@@ -125,7 +152,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                                     ////                                            Int.unroll(subj).forEachRemaining(dsi -> lx.add(INH.the(dsi, pred)));
                                     //                                } else {
                                     Term x = INH.the(csi, pred);
-                                    assert(!(x instanceof Bool) && !(x instanceof Variable));
+                                    assert (!(x instanceof Bool) && !(x instanceof Variable));
                                     lx.add(x);
                                     //                                }
                                 }
@@ -288,8 +315,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @Override
     public TemporalBeliefTable newTemporalBeliefTable(Term c) {
 //        if (c.complexity() < 12) {
-            return new RTreeBeliefTable();
-            //c.complexity() < 6 ? new DisruptorBlockingQueue() : new LinkedBlockingQueue<>()/
+        return new RTreeBeliefTable();
+        //c.complexity() < 6 ? new DisruptorBlockingQueue() : new LinkedBlockingQueue<>()/
 //        } else {
 //            return new HijackTemporalBeliefTable();
 //        }
@@ -313,6 +340,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     private static boolean validUnwrappableSubterms(@NotNull TermContainer subterms) {
         return subterms.AND(validUnwrappableSubterm);
     }
+
     private static boolean validUnwrappableSubterms(@NotNull List<Term> subterms) {
         for (Term t : subterms)
             if (!validUnwrappableSubterm.test(t))
@@ -329,9 +357,9 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @Override
     @Nullable
     public Termed apply(@NotNull Term t, Termed prev) {
-        if (prev!=null) {
+        if (prev != null) {
             if (prev instanceof Concept) {
-                Concept c = ((Concept)prev);
+                Concept c = ((Concept) prev);
                 if (!c.isDeleted())
                     return c;
             }
@@ -414,7 +442,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     private class MyDefaultHijackBag extends DefaultHijackBag {
         public MyDefaultHijackBag(PriMerge merge) {
-            super(merge, 0,5);
+            super(merge, 0, 5);
         }
 
         @Override

@@ -42,7 +42,7 @@ import static org.eclipse.collections.impl.tuple.Tuples.twin;
 /**
  * NAL Task to be processed, consists of a Sentence, stamp, time, and budget.
  */
-public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
+public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.map.MetaMap {
 
 
     final Task[] EmptyArray = new Task[0];
@@ -571,7 +571,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
             Concept concept = concept(nar, true);
             if (concept != null) {
-                AnswerBag answers = (AnswerBag) concept.computeIfAbsent(Op.QUESTION, (x) ->
+                AnswerBag answers = (AnswerBag) concept.meta("?", (x) ->
                         new AnswerBag(nar, Param.MAX_INPUT_ANSWERS)
                 );
                 answers.commit().putAsync(new PLink<>(twin(this, answer),
@@ -850,15 +850,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         log(true).add(entry);
         return this;
     }
-
-    /** Map.get */
-    <X> X meta(String key);
-
-    /** Map.put */
-    void meta(String key, Object value);
-
-    /** Map.computeIfAbsent */
-    <X> X meta(String key, Function<String,Object> valueIfAbsent);
 
     @Nullable
     default List log(boolean createIfMissing) {

@@ -90,10 +90,7 @@ abstract public class NAgentY extends NAgentX {
         public void enable() {
             believe(1);
         }
-        @Override
-        public void clear() {
-            believe(0);
-        }
+
 
         @Override
         public Stream<ITask> update(long now, int dur, NAR nar) {

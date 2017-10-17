@@ -1,6 +1,7 @@
 package nars.concept;
 
 import jcog.bag.Bag;
+import jcog.map.CompactArrayMap;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
@@ -21,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static nars.Op.*;
@@ -30,18 +32,16 @@ import static nars.concept.state.ConceptState.New;
 /**
  * concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks
  */
-public class BaseConcept extends ConcurrentHashMap implements Concept {
+public class BaseConcept implements Concept {
 
     @NotNull
     public final Term term;
-    @NotNull
+
     protected final BeliefTable beliefs;
-    @NotNull
     protected final BeliefTable goals;
-    @NotNull
     protected final QuestionTable quests;
-    @NotNull
     protected final QuestionTable questions;
+
     @NotNull
     public final Bag<Task, PriReference<Task>> taskLinks;
     @NotNull
@@ -49,6 +49,9 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
     @NotNull
     public transient ConceptState state = Deleted;
     private final Collection<Termed> templates;
+
+    protected final CompactArrayMap<String, Object> meta = new CompactArrayMap<>();
+
 
     public BaseConcept(@NotNull Term term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder conceptBuilder) {
         this(term,
@@ -68,7 +71,6 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
                        BeliefTable beliefs, BeliefTable goals,
                        QuestionTable questions, QuestionTable quests,
                        @NotNull Bag[] bags) {
-        super(0);
         assert (term.op().conceptualizable);
         this.term = term;
         this.termLinks = bags[0];
@@ -363,8 +365,8 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
         goals.clear();
         questions.clear();
         quests.clear();
+        meta.clear();
         state(ConceptState.Deleted);
-        clear();
     }
 
     @Override
@@ -376,6 +378,22 @@ public class BaseConcept extends ConcurrentHashMap implements Concept {
         if (includeQuests) s.add(quests.stream());
         return s.stream().flatMap(x -> x);
     }
+
+    @Override
+    public <X> X meta(String key, Function<String,Object> valueIfAbsent) {
+        return (X) meta.computeIfAbsent(key, valueIfAbsent);
+    }
+
+    @Override
+    public void meta(String key, Object value) {
+        meta.put(key, value);
+    }
+
+    @Override
+    public <X> X meta(String key) {
+        return (X) meta.get(key);
+    }
+
 }
 
 //    /**

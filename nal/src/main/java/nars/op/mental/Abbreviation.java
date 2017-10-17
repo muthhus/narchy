@@ -133,7 +133,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
                 Concept abbreviable = nar.concept(t);
                 if ((abbreviable != null) &&
                         !(abbreviable instanceof PermanentConcept) &&
-                                abbreviable.get(Abbreviation.class) == null) {
+                                abbreviable.meta("abbr") == null) {
 
                     each.accept(new PLink<>(t, b.priElseZero()));
                 }
@@ -201,7 +201,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
             final boolean[] succ = {false};
 
-            abbrConcept.computeIfAbsent(Abbreviation.class, (ac) -> {
+            abbrConcept.meta("abbr", (ac) -> {
 
                 Term abbreviatedTerm =abbreviated.term();
 

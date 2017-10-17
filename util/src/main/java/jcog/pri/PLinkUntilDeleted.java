@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PLinkUntilDeleted<X extends Deleteable> extends PLink<X> {
 
-    public PLinkUntilDeleted(@NotNull X id, float p) {
+    public PLinkUntilDeleted(X id, float p) {
         super(id, p);
     }
 

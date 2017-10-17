@@ -21,6 +21,7 @@
 package nars.concept;
 
 import jcog.bag.Bag;
+import jcog.map.MetaMap;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
@@ -34,11 +35,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public interface Concept extends Termed, ConcurrentMap, Comparable<Termed> {
+public interface Concept extends Termed, Comparable<Termed>, MetaMap {
 
 
     final static Concept[] EmptyArray = new Concept[0];
