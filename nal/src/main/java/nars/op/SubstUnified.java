@@ -9,7 +9,6 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.subst.SubUnify;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.*;

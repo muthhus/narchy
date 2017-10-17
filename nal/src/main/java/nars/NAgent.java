@@ -5,7 +5,6 @@ import jcog.event.On;
 import jcog.event.Ons;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
-import jcog.math.FloatHighPass;
 import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
@@ -36,7 +35,6 @@ import java.util.stream.Stream;
 import static jcog.Texts.n2;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * explicit management of sensor concepts and motor functions

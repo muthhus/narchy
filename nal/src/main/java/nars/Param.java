@@ -14,7 +14,6 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
-import nars.util.UtilityFunctions;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -347,11 +346,13 @@ public abstract class Param extends Services<Term,NAR> {
      * with a perceptual duration used as a time constant
      * dt >= 0
      */
-    public static float evi(float evi, float dur, long dt) {
+    public static float evi(float evi, long dt, long dur) {
 
         //return evi / (1 + ( dt / dur) ); //inverse linear
 
-        return evi / ( 1f + dt*dt / dur ); //inverse square
+        //use high precision math here
+        double ddt = (double)dt;
+        return (float) (evi / ( 1.0 + ddt*ddt / dur )); //inverse square
 
         //return evi / Util.sqr( 1f + dt / dur ); //inverse square suck
 

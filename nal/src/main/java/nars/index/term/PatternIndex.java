@@ -15,7 +15,6 @@ import nars.term.transform.VariableNormalization;
 import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 

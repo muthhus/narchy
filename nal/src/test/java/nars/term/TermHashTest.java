@@ -5,10 +5,7 @@ import nars.Op;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
-import static nars.$.$;
-import static nars.$.impl;
-import static nars.$.inh;
-import static nars.$.p;
+import static nars.$.*;
 import static nars.Op.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

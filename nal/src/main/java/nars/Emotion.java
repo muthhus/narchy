@@ -6,7 +6,6 @@ import com.netflix.servo.monitor.StepCounter;
 import jcog.meter.event.BufferedFloatGuage;
 import nars.concept.Concept;
 import nars.control.MetaGoal;
-import nars.task.ITask;
 import nars.term.Compound;
 import nars.util.ConcurrentMonitorRegistry;
 import org.apache.commons.lang3.mutable.MutableFloat;

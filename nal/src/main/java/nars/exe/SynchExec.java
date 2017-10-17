@@ -1,6 +1,5 @@
 package nars.exe;
 
-import jcog.event.On;
 import jcog.event.Ons;
 import nars.NAR;
 import nars.control.BatchActivate;

@@ -372,7 +372,7 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
             evict(evictPower);
 
             //TODO adjust cycle time in proportion to eviction power
-            setPeriodMS((int)Util.round( Util.lerp(1f - (evictPower*evictPower), (float)minPeriod, (float)maxPeriod),
+            setPeriodMS((int)Util.round( Util.lerp(1f - (evictPower*evictPower), (float)minPeriod, maxPeriod),
                     2 /* ms increments */) );
 
             return true;

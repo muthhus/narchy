@@ -77,7 +77,7 @@ abstract public class Loop implements Runnable {
     }
 
     public final Loop runFPS(float fps) {
-        setPeriodMS((int) (1000f / fps));
+        setPeriodMS(Math.round(1000f / fps));
         return this;
     }
 

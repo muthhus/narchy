@@ -11,7 +11,6 @@ import nars.concept.builder.ConceptBuilder;
 import nars.derive.AbstractPred;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicConst;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;

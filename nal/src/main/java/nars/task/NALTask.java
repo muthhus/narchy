@@ -1,6 +1,7 @@
 package nars.task;
 
 import jcog.Util;
+import jcog.map.CompactArrayMap;
 import jcog.pri.Pri;
 import nars.Param;
 import nars.Task;
@@ -10,13 +11,13 @@ import nars.term.Term;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
@@ -29,18 +30,16 @@ public class NALTask extends Pri implements Task {
     public final Term term;
     public final DiscreteTruth truth;
     public final byte punc;
+
     private final long creation, start, end;
 
     public final long[] stamp;
 
-    /**
-     * TODO final
-     */
     public short[] cause = ArrayUtils.EMPTY_SHORT_ARRAY;
 
     final int hash;
 
-    public Map meta;
+    public final Map<String,Object> meta = new CompactArrayMap();
 
 
     public NALTask(Term term, byte punc, @Nullable Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
@@ -49,32 +48,6 @@ public class NALTask extends Pri implements Task {
             if (truth == null)
                 throw new InvalidTaskException(term, "null truth");
         }
-
-
-//        //special case: simplify repeating conjunction of events
-//        if (term.op() == CONJ) {
-//            int dt = term.dt();
-//            if (dt !=DTERNAL && dt!=0) {
-//                Term s0 = term.sub(0);
-//                if (s0 instanceof Compound && s0.unneg() instanceof Compound && s0.equals(term.sub(1))) {
-//                    @Nullable Compound s01 = normalizedOrNull(s0, $.terms);
-//                    if (s01!=null) {
-//                        term = s01;
-//                        if (dt > 0) {
-//                            end = start + dt;
-//                        } else if (dt < 0) {
-//                            end = start - dt;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-//        if (Param.DEBUG) {
-//            term.recurseTerms(t -> {
-//                assert (!(t instanceof UnnormalizedVariable));
-//            });
-//        }
 
         Task.taskContentValid(term, punc, null, false);
 
@@ -211,22 +184,20 @@ public class NALTask extends Pri implements Task {
     public boolean delete() {
         if (super.delete()) {
             if (!Param.DEBUG)
-                this.meta = null; //.clear();
+                this.meta.clear();
             return true;
         }
         return false;
     }
 
-    @Override
-    @Deprecated
-    public @Nullable List log() {
-        if (meta != null) {
-            Map m = meta;
-            Object s = m.get(String.class);
-            if (s != null)
-                return (List) s;
+    public boolean delete(Task forwardTo) {
+        if (super.delete()) {
+            if (!Param.DEBUG)
+                this.meta.clear();
+            meta.put("@", forwardTo);
+            return true;
         }
-        return null;
+        return false;
     }
 
 
@@ -237,35 +208,19 @@ public class NALTask extends Pri implements Task {
         return appendTo(null).toString();
     }
 
-
     @Override
-    public Map meta() {
-        return meta;
+    public <X> X meta(String key, Function<String,Object> valueIfAbsent) {
+        return (X) meta.computeIfAbsent(key, valueIfAbsent);
     }
 
     @Override
-    public void meta(Object key, Object value) {
-
-
-        synchronized (this) {
-            if (meta == null) {
-                meta = UnifiedMap.newWithKeysValues(key, value); /* for compactness */
-            } else {
-                meta.put(key, value);
-            }
-        }
-
-
+    public void meta(String key, Object value) {
+        meta.put(key, value);
     }
 
     @Override
-    public <X> X meta(Object key) {
-        if (meta != null) {
-            //synchronized (this) {
-            return (X) meta.get(key);
-            //}
-        }
-        return null;
+    public <X> X meta(String key) {
+        return (X) meta.get(key);
     }
 
 //    @Nullable

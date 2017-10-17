@@ -7,7 +7,6 @@ import jcog.math.Interval;
 import nars.$;
 import nars.Op;
 import nars.Param;
-import nars.index.term.TermContext;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -24,7 +23,6 @@ import java.util.function.BiPredicate;
 
 import static com.google.common.collect.BoundType.OPEN;
 import static nars.Op.INT;
-import static nars.Op.Null;
 
 /**
  * 32-bit signed integer

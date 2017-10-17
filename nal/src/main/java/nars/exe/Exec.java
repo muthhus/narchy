@@ -1,5 +1,6 @@
 package nars.exe;
 
+import jcog.constraint.continuous.exceptions.InternalSolverError;
 import jcog.event.On;
 import jcog.exe.Can;
 import jcog.exe.Schedulearn;
@@ -15,7 +16,6 @@ import nars.control.Activate;
 import nars.control.Premise;
 import nars.task.ITask;
 import nars.task.NALTask;
-import jcog.constraint.continuous.exceptions.InternalSolverError;
 import nars.task.NativeTask;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;

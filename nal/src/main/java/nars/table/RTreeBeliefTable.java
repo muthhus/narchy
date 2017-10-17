@@ -341,9 +341,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         });
 
         //check for an override about partial activation of the input which would have been appended to its log during rtree add/merge procedure
-        Object ar = x.lastLogged();
+        Object ar = x.meta("partialActivation");
         if (ar instanceof BiConsumer) {
-            x.log().remove(ar);
+            x.meta("partialActivation", null);
             ((BiConsumer) ar).accept(n, c);
             boolean addOrRemInput = changes.removeKeyIfAbsent(x, true /*ignored*/);
             if (!addOrRemInput) {
@@ -412,7 +412,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         float inputStrength = inputRegion != null ? taskStrength.floatValueOf(inputRegion) : Float.POSITIVE_INFINITY;
 
 
-        FloatFunction<TaskRegion> rs = regionStrength(nar.time(), 1 + Math.round(tableDur()));
+        FloatFunction<TaskRegion> rs = regionStrength(nar.time(), 1L + Math.round(tableDur()));
         FloatFunction<Node<?, TaskRegion>> leafWeakness = (l) -> -rs.floatValueOf((TaskRegion) (l.region()));
 
         final int DELETE_VICTIMS = 3; //should be greater than 2 in case the merge victims are included
@@ -588,9 +588,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         return (TaskRegion r) -> {
 
             float maxConf = (float) r.coord(true, 2); //optimistic
-            float evi = w2c(Param.evi(w2c(maxConf), dur,
-                    Math.abs(when -
-                            (r.start() + r.end()) / 2L)
+            float evi = w2c(Param.evi(w2c(maxConf), Math.abs(when -
+                    (r.start() + r.end()) / 2L), dur
                     //Task.nearestBetween(r.start(), r.end(), when)))
             ));
 
@@ -757,7 +756,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 partialActivationSignal = (x,y)-> { /* nop */};
             }
 
-            i.log(partialActivationSignal);
+            i.meta("partialActivation", partialActivationSignal);
         }
 
     }

@@ -7,7 +7,6 @@ import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Iterator;

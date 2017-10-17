@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -116,7 +115,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     public void accept(NAR nar, Task task) {
 
         Term taskTerm = task.term();
-        if ((!(taskTerm instanceof Compound)) || taskTerm.vars() > 0 || task.meta(Abbreviation.class) != null)
+        if ((!(taskTerm instanceof Compound)) || taskTerm.vars() > 0)
             return;
 
         Prioritized b = task;

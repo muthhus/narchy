@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.VAR_QUERY;
-import static nars.time.Tense.DTERNAL;
 
 /**
  * I = input term type, T = transformable subterm type

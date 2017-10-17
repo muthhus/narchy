@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.term.Term;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
 

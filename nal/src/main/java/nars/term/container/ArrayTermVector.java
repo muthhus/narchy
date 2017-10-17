@@ -4,12 +4,9 @@ import jcog.list.ArrayIterator;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import static nars.Op.Null;
 
 /**
  * Holds a vector or tuple of terms.

@@ -2,7 +2,6 @@ package nars.nal;
 
 import nars.*;
 import nars.control.Derivation;
-import nars.control.Premise;
 import nars.derive.PrediTerm;
 import nars.derive.PrediTrie;
 import nars.derive.Taskify;
@@ -12,7 +11,6 @@ import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternIndex;
-import nars.task.ITask;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.test.TestNAR;
@@ -23,7 +21,9 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static nars.Op.QUEST;

@@ -135,7 +135,11 @@ public interface Prioritized extends Deleteable {
         //return priSafe(-1);
     }
 
-
+    @Override
+    default boolean isDeleted() {
+        float p = pri();
+        return p!=p; //fast NaN check
+    }
 
     @NotNull Appendable toBudgetStringExternal();
 

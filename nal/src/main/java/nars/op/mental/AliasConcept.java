@@ -1,7 +1,6 @@
 package nars.op.mental;
 
 import jcog.bag.Bag;
-import jcog.list.FasterList;
 import nars.NAR;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;

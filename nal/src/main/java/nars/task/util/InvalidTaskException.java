@@ -1,6 +1,5 @@
 package nars.task.util;
 
-import jcog.pri.Prioritized;
 import nars.Task;
 import nars.term.Termed;
 import nars.util.SoftException;

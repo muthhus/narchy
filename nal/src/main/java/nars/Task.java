@@ -3,6 +3,7 @@ package nars;
 import jcog.Texts;
 import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
+import jcog.list.FasterList;
 import jcog.math.Interval;
 import jcog.pri.PLink;
 import nars.concept.Concept;
@@ -28,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static java.util.Collections.singleton;
 import static nars.Op.*;
@@ -46,9 +48,9 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
     final Task[] EmptyArray = new Task[0];
     final long[] ETERNAL_ETERNAL = new long[]{Tense.ETERNAL, Tense.ETERNAL};
 
-    static boolean equal(@NotNull Task a, @NotNull Task b) {
+    static boolean equal(Task a, Task b) {
 
-        @NotNull long[] evidence = a.stamp();
+        long[] evidence = a.stamp();
 
         if ((!Arrays.equals(evidence, b.stamp())))
             return false;
@@ -67,7 +69,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         return a.term().equals(b.term());
     }
 
-    static void proof(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
+    static void proof(/*@NotNull*/Task task, int indent, /*@NotNull*/StringBuilder sb) {
         //TODO StringBuilder
 
         for (int i = 0; i < indent; i++)
@@ -97,7 +99,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                 new BytesHashProvider<>(IO::taskToBytes));
     }
 
-    static boolean taskContentValid(@NotNull Term t, byte punc, @Nullable NAR nar, boolean safe) {
+    static boolean taskContentValid(Term t, byte punc, @Nullable NAR nar, boolean safe) {
 
         if (t.op() == NEG)
             //must be applied before instantiating Task
@@ -146,7 +148,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
      * call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
      * these can all be tested prenormalization, because normalization will not affect the result
      */
-    static boolean validTaskCompound(@NotNull Term t, byte punc, boolean safe) {
+    static boolean validTaskCompound( Term t, byte punc, boolean safe) {
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
 
 //        if (t.varDep()==1) {
@@ -180,7 +182,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         return true;
     }
 
-    static boolean indepValid(@NotNull Term comp, @NotNull Term selected) {
+    static boolean indepValid(Term comp, Term selected) {
 
         List<byte[]> pp = comp.pathsTo(selected);
 
@@ -201,7 +203,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
                 if (validIndepVarSuperterm(o)) {
                     byte inside = (byte) (1 << p[i + 1]);
-                    m.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
+                    m.updateValue(t, inside, (previous) -> (byte) (previous | inside));
                 }
             }
         }
@@ -248,7 +250,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
 
     @Nullable
-    static NALTask clone(@NotNull Task x, @NotNull Term newContent) {
+    static NALTask clone(Task x,  Term newContent) {
 
         //TODO:
         //Task.tryTask()
@@ -269,18 +271,18 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                 x.start(), x.end(),
                 x.stamp());
         y.setPri(x);
-        y.meta = x.meta();
+        //y.meta.putAll(x.meta());
         return y;
     }
 
 //    @Nullable
-//    static boolean taskStatementValid(@NotNull Compound t, boolean safe) {
+//    static boolean taskStatementValid(/*@NotNull*/Compound t, boolean safe) {
 //        return taskStatementValid(t, (byte) 0, safe); //ignore the punctuation-specific conditions
 //    }
 
 
     @Nullable
-    static Task tryTask(@NotNull Term t, byte punc, Truth tr, BiFunction<Term, Truth, ? extends Task> res) {
+    static Task tryTask(Term t, byte punc, Truth tr, BiFunction<Term, Truth, ? extends Task> res) {
         ObjectBooleanPair<Term> x = tryContent(t, punc, true);
         if (x != null) {
             return res.apply(x.getOne(), tr != null ? tr.negIf(x.getTwo()) : null);
@@ -296,7 +298,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
      * necessitating an inversion of truth when constructing a Task with the input term
      */
     @Nullable
-    static ObjectBooleanPair<Term> tryContent(@NotNull Term t, byte punc, boolean safe) {
+    static ObjectBooleanPair<Term> tryContent(/*@NotNull*/Term t, byte punc, boolean safe) {
 
         Op o = t.op();
 
@@ -352,7 +354,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
      * @param dur  duration period across which evidence can decay before and after its defined start/stop time
      * @return value >= 0 indicating the evidence
      */
-    default float evi(long when, final int dur) {
+    default float evi(long when, final long dur) {
 
         Truth t = truth();
         long a = start();
@@ -386,7 +388,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
                     float ete = eternalizable();
                     float ecw = ete > 0 ? this.eviEternalized() * ete : 0;
                     float dcw = cw - ecw; //delta to eternalization
-                    cw = ecw + Param.evi(dcw, dur, dist); //decay
+                    cw = ecw + Param.evi(dcw, dist, dur); //decay
                 }
             }
 
@@ -473,7 +475,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
     }
 
     @Nullable
-    default Concept concept(@NotNull NAR n, boolean conceptualize) {
+    default Concept concept(/*@NotNull*/NAR n, boolean conceptualize) {
         Term t = term();
         return conceptualize ? n.conceptualize(t) : n.concept(t);
 //        if (!(c instanceof TaskConcept)) {
@@ -564,7 +566,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
      * to cancel any matched premise belief.
      */
     @Nullable
-    default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
+    default Task onAnswered(/*@NotNull*/Task answer, /*@NotNull*/NAR nar) {
         if (isInput()) {
 
             Concept concept = concept(nar, true);
@@ -759,17 +761,17 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         return term().dt();
     }
 
-    default float conf(long start, long end, int dur) {
+    default float conf(long start, long end, long dur) {
         float cw = evi(start, end, dur);
         return cw == cw ? w2c(cw) : Float.NaN;
     }
 
-    default float conf(long when, int dur) {
+    default float conf(long when, long dur) {
         return conf(when, when, dur);
     }
 
     @Nullable
-    default Truth truth(long targetStart, long targetEnd, int dur, float minConf) {
+    default Truth truth(long targetStart, long targetEnd, long dur, float minConf) {
         long t;
         if (targetStart == targetEnd) {
             t = targetStart;
@@ -779,7 +781,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         return truth(t, dur, minConf);
     }
 
-    default float evi(long targetStart, long targetEnd, final int dur) {
+    default float evi(long targetStart, long targetEnd, final long dur) {
         long t;
         if (targetStart == targetEnd)
             t = targetStart;
@@ -789,7 +791,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
     }
 
     @Nullable
-    default Truth truth(long when, int dur, float minConf) {
+    default Truth truth(long when, long dur, float minConf) {
         float eve = evi(when, dur);
         if (eve == eve && w2c(eve) >= minConf) {
 
@@ -842,35 +844,33 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
      */
     @NotNull
     default Task log(Object entry) {
-        if (Param.DEBUG_TASK_LOG)
-            getOrCreateLog().add(entry);
+        if (!Param.DEBUG_TASK_LOG)
+            return this;
+
+        log(true).add(entry);
         return this;
     }
 
-    Map meta();
+    /** Map.get */
+    <X> X meta(String key);
 
-    <X> X meta(Object key);
+    /** Map.put */
+    void meta(String key, Object value);
 
-    void meta(Object key, Object value);
+    /** Map.computeIfAbsent */
+    <X> X meta(String key, Function<String,Object> valueIfAbsent);
 
     @Nullable
-    default List log() {
-        return meta(String.class);
-    }
-
-    @NotNull
-    default List getOrCreateLog() {
-
-        List exist = log();
-        if (exist == null) {
-            meta(String.class, (exist = $.newArrayList(1)));
-        }
-        return exist;
+    default List log(boolean createIfMissing) {
+        if (createIfMissing)
+            return meta("!", (x) -> new FasterList(1));
+        else
+            return meta("!");
     }
 
     @Nullable
     default Object lastLogged() {
-        List log = log();
+        List log = log(false);
         return log == null || log.isEmpty() ? null : log.get(log.size() - 1);
     }
 
@@ -892,7 +892,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 //    }
 
     @NotNull
-    default StringBuilder proof(@NotNull StringBuilder temporary) {
+    default StringBuilder proof(/*@NotNull*/StringBuilder temporary) {
         temporary.setLength(0);
         proof(this, 0, temporary);
         return temporary;
@@ -1028,7 +1028,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
      * projected truth value
      */
     @Nullable
-    default Truth truth(long when, int dur) {
+    default Truth truth(long when, long dur) {
         float e = evi(when, dur);
         if (e <= Float.MIN_NORMAL)
             return null;

@@ -11,8 +11,6 @@ import nars.control.Causable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 
 /**
  * interface for controlled draining of a bag

@@ -1,7 +1,6 @@
 package nars.task.util;
 
 import jcog.tree.rtree.HyperRegion;
-import nars.task.NALTask;
 
 /**
  * only valid for comparison during rtree iteration

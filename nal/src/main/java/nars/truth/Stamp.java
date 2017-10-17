@@ -24,16 +24,13 @@ import jcog.Util;
 import jcog.io.BinTxt;
 import nars.Op;
 import nars.Param;
-import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.iterator.MutableLongIterator;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.impl.factory.primitive.LongSets;
-import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 import static nars.time.Tense.ETERNAL;
 

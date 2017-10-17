@@ -27,11 +27,7 @@ public class Pri implements Priority {
         setPri(p);
     }
 
-    @Override
-    public boolean isDeleted() {
-        float p = pri();
-        return p!=p; //fast NaN check
-    }
+
 
     @Nullable
     @Deprecated @Override

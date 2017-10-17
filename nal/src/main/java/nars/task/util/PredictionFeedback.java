@@ -1,6 +1,5 @@
 package nars.task.util;
 
-import jcog.Util;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -8,8 +7,6 @@ import nars.control.MetaGoal;
 import nars.table.BeliefTable;
 import nars.task.SignalTask;
 import org.jetbrains.annotations.Nullable;
-
-import static nars.time.Tense.ETERNAL;
 
 public class PredictionFeedback {
 

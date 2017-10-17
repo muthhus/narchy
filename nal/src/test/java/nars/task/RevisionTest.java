@@ -1,7 +1,6 @@
 package nars.task;
 
 import jcog.bag.Bag;
-import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.BaseConcept;
 import nars.concept.state.DefaultConceptState;
@@ -13,7 +12,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 

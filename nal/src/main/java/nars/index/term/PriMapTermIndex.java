@@ -15,7 +15,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.var.Variable;
 import nars.truth.Truth;
-import org.HdrHistogram.IntCountsHistogram;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -102,7 +101,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
 
                     int nv = bad.size();
                     if (nv > 0) {
-                        int kill = (int) Math.ceil(strength * nv);
+                        int kill = Math.round(strength * nv);
                         if (kill > 0) {
 
                             System.err.println("evicting " + kill + " victims (" + bad.size() + " remain;\ttotal concepts=" + size());

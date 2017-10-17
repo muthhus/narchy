@@ -2,7 +2,6 @@ package nars;
 
 import jcog.data.FloatParam;
 import jcog.exe.Loop;
-import nars.control.BatchActivate;
 import org.jetbrains.annotations.NotNull;
 
 /**

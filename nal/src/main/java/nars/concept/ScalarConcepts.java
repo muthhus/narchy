@@ -1,6 +1,5 @@
 package nars.concept;
 
-import com.google.common.collect.Streams;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.math.FloatSupplier;
