@@ -96,7 +96,9 @@ public class Premise extends UnaryTask {
         Concept taskConcept = task.concept(n, true);
         if (taskConcept == null) {
             if (Param.DEBUG) {
-                logger.warn("{} unconceptualizable", task); //WHY was task even created
+                //HACK disable this error print-out if the problem is just excess term volume
+                if (task.volume() < n.termVolumeMax.intValue() || Param.DEBUG_EXTRA)
+                    logger.warn("{} unconceptualizable", task); //WHY was task even created
                 //assert (false) : task + " could not be conceptualized"; //WHY was task even created
             }
             taskLink.delete();

@@ -1,5 +1,6 @@
 package nars.task;
 
+import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.Interval;
@@ -27,8 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static jcog.Util.lerp;
-import static nars.Op.CONJ;
-import static nars.Op.NEG;
+import static nars.Op.*;
 import static nars.time.Tense.*;
 import static nars.truth.TruthFunctions.c2w;
 
@@ -112,17 +112,20 @@ public class Revision {
 
 
     /*@NotNull*/
-    static Term intermpolate(/*@NotNull*/ Term a, /*@NotNull*/ Term b, float aProp, float curDepth, /*@NotNull*/ Random rng, boolean mergeOrChoose) {
+    static Term intermpolate(/*@NotNull*/ Term a, long dt, /*@NotNull*/ Term b, float aProp, float curDepth, /*@NotNull*/ Random rng, boolean mergeOrChoose) {
         if (a.equals(b)) {
             return a;
         }
 
         Op ao = a.op();
         Op bo = b.op();
+        if (ao!=bo)
+            return Null; //fail, why
+
         assert (ao == bo) : a + " and " + b + " have different op";
 
         if (ao==NEG) {
-            return intermpolate(a.unneg(), b.unneg(),
+            return intermpolate(a.unneg(), 0, b.unneg(),
                     aProp, curDepth, rng, mergeOrChoose).neg();
         }
 
@@ -132,7 +135,7 @@ public class Revision {
             if (ao.temporal) {
                 switch (ao) {
                     case CONJ:
-                        return dtMergeConj(a, b, aProp, curDepth / 2f, rng, mergeOrChoose);
+                        return dtMergeConj(a, dt, b, aProp, curDepth / 2f, rng, mergeOrChoose);
                     case IMPL:
                         return dtMergeImpl(a, b, aProp, curDepth / 2f, rng, mergeOrChoose);
                     default:
@@ -148,7 +151,7 @@ public class Revision {
                     Term ai = aa.sub(i);
                     Term bi = bb.sub(i);
                     if (!ai.equals(bi)) {
-                        Term y = intermpolate(ai, bi, aProp, curDepth / 2f, rng, mergeOrChoose);
+                        Term y = intermpolate(ai, 0, bi, aProp, curDepth / 2f, rng, mergeOrChoose);
                         if (!ai.equals(y)) {
                             change = true;
                             ai = y;
@@ -169,21 +172,37 @@ public class Revision {
 
     }
 
-    private static Term dtMergeConj(Term a, Term b, float aProp, float v, Random rng, boolean mergeOrChoose) {
-        Set<ObjectLongPair<Term>> ab = new TreeSet();
+    private static Term dtMergeConj(Term a, long dt, Term b, float aProp, float v, Random rng, boolean mergeOrChoose) {
+        Set<ObjectLongPair<Term>> ab = new HashSet();
         a.events(ab::add);
         int aSize = ab.size();
-        b.events(ab::add);
+        b.events(ab::add, dt);
         int bSize = ab.size() - aSize;
 
-        FasterList<ObjectLongPair<Term>> x = new FasterList(ab);
+        //it may not be valid to choose subsets of the events, in a case like where >1 occurrences of $ must remain parent
+
+        List<ObjectLongPair<Term>> x = new FasterList(ab);
         int max = Math.max(aSize, bSize);
         int all = x.size();
         int excess = all - max;
         if (excess > 0) {
+
+            x.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
+
             //decide on some items to remove
-            //for now just use the sublist
-            x.removeBelow(all-excess);
+            //must keep the endpoints unless a shift and adjustment are reported
+            //to the callee which decides this for the revised task
+
+            //for now just remove some inner tasks
+            if (all - excess < 2)
+                return null; //retain the endpoints
+            else if (all - excess == 2)
+                x = List.of(x.get(0), x.get(all-1)); //retain only the endpoints
+            else {
+                for (int i = 0; i < excess; i++) {
+                    x.remove(rng.nextInt(x.size() - 2) + 1);
+                }
+            }
         }
 
         return Op.conj(x);
@@ -235,8 +254,8 @@ public class Revision {
         if (a0.equals(b0) && a1.equals(b1)) {
             return a.dt(dt);
         } else {
-            Term na = intermpolate(a0, b0, aProp, depth, rng, mergeOrChoose);
-            Term nb = intermpolate(a1, b1, aProp, depth, rng, mergeOrChoose);
+            Term na = intermpolate(a0, 0, b0, aProp, depth, rng, mergeOrChoose);
+            Term nb = intermpolate(a1, 0, b1, aProp, depth, rng, mergeOrChoose);
             return a.op().the(dt,
                     na,
                     nb);
@@ -279,21 +298,28 @@ public class Revision {
     }
 
     public static Term intermpolate(/*@NotNull*/ Term a, /*@NotNull*/ Term b, float aProp, NAR nar) {
-        return intermpolate(a, b, aProp, 1, nar.random(), nar.dtMergeOrChoose.booleanValue());
+        return intermpolate(a, 0, b, aProp, nar);
+    }
+
+    /** a is left aligned, dt is any temporal shift between where the terms exist in the callee's context */
+    public static Term intermpolate(/*@NotNull*/ Term a, long dt, /*@NotNull*/ Term b, float aProp, NAR nar) {
+        return intermpolate(a, dt, b, aProp, 1, nar.random(), nar.dtMergeOrChoose.booleanValue());
     }
 
 
-    /**
-     * t is the target time of the new merged task
-     */
     @Nullable
     public static Task merge(/*@NotNull*/ Task a, /*@NotNull*/ Task b, long now, NAR nar) {
 
-
-        long as = a.start();
-        assert (as != ETERNAL);
-        long bs = b.start();
+        long as, bs;
+        if ((as = a.start()) > (bs=b.start())) {
+            //swap so that 'a' is left aligned
+            Task x = a;
+            a = b;
+            b = x;
+        }
         assert (bs != ETERNAL);
+        assert (as != ETERNAL);
+
 
 
         //            float ae = a.evi();
@@ -355,10 +381,10 @@ public class Revision {
 
         float maxEviAB = Math.max(a.evi(), b.evi());
         float evi = rawTruth.evi();
-        if (maxEviAB < evi) {
+        if (maxEviAB < evi + Pri.EPSILON) {
             //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
             //TODO weight the contributed overlap amount by the relative confidence provided by each task
-            float overlapDiscount = Stamp.overlapFraction(a.stamp(), b.stamp())/2f;
+            float overlapDiscount = Stamp.overlapFraction(a.stamp(), b.stamp())/2;
     //        factor *= overlapDiscount;
     //        if (factor < Prioritized.EPSILON) return null;
 
@@ -399,7 +425,7 @@ public class Revision {
         Term at = a.term();
         Term bt = b.term();
 
-        Term atConceptual = at.conceptual();
+        //Term atConceptual = at.conceptual();
         //if (Param.DEBUG) assert(bt.conceptual().equals(atConceptual)): at + " and " + bt + " may not belong in the same concept";
 
         for (int i = 0; i < Param.MAX_TERMPOLATE_RETRIES; i++) {
@@ -409,7 +435,11 @@ public class Revision {
                 i = Param.MAX_TERMPOLATE_RETRIES; //no need to retry
             } else {
                 try {
-                    t = intermpolate(at, bt, aProp, nar);
+                    long dt = bs - as;
+                    t = intermpolate(at, dt, bt, aProp, nar);
+                    if (t == null || !t.op().conceptualizable)
+                        continue;
+
                 } catch (Throwable ett) {
                     //TODO this probably means conjunction need to be merged by events
                     if (Param.DEBUG_EXTRA)

@@ -5,6 +5,7 @@ import nars.Param;
 import nars.Task;
 import nars.control.MetaGoal;
 import nars.table.BeliefTable;
+import nars.task.NALTask;
 import nars.task.SignalTask;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,11 +54,10 @@ public class PredictionFeedback {
             if (y instanceof SignalTask)
                 return; //ignore previous signaltask
 
-
-            //only tasks created before now
-            long leadTime = y.start() - y.creation();
-            if (leadTime < 0)
-                return;
+//            //only tasks created before now
+//            long leadTime = y.start() - y.creation();
+//            if (leadTime < 0)
+//                return;
 
 //            float yConf = y.conf(now, dur);
 //            if (yConf!=yConf)
@@ -85,12 +85,15 @@ public class PredictionFeedback {
                 //punish
                 v = (1f - coherence) * 2f * confFraction /* * (1/headstart) */ * strength;
 
+                if (deleteIfIncoherent) {
+                    //forward to the actual sensor reading
+                    ((NALTask)y).delete(x);
+                } else {
+                    y.setPri(0); //drain priority  TODO maybe transfer it to nearby tasks?
+                }
+
                 MetaGoal.learn(MetaGoal.Inaccurate, y.cause(), v, nar);
 
-                if (deleteIfIncoherent)
-                    y.delete();
-                else
-                    y.setPri(0); //drain priority  TODO maybe transfer it to nearby tasks?
             }
 
         });

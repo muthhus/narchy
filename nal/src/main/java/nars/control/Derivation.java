@@ -320,7 +320,7 @@ public class Derivation extends Unify {
             this.overlapDouble =
                     Util.or(
                         overlapSingle,
-                        Stamp.overlapFraction(taskStamp, beliefStamp),
+                        Stamp.overlapFraction(taskStamp, beliefStamp)/2,
                         Stamp.cyclicity(beliefStamp)
                     );
         } else {

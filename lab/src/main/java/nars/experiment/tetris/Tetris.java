@@ -116,8 +116,8 @@ public class Tetris extends NAgentX implements Bitmap2D {
         );
         //pixels.resolution(0.1f);
 
-        //actionsTriState();
-        actionsToggle();
+        actionsTriState();
+        //actionsToggle();
 
         state.reset();
 
@@ -176,6 +176,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     }
 
 
+
     void actionsToggle() throws Narsese.NarseseException {
         actionToggle($.p("left"), ()-> state.take_action(LEFT));
         actionToggle($.p("right"), ()-> state.take_action(RIGHT));
@@ -198,18 +199,21 @@ public class Tetris extends NAgentX implements Bitmap2D {
                     break;
             }
         });
-        actionTriState($("R"), (i) -> {
-            switch (i) {
-                case -1:
-                    state.take_action(CCW);
-                    break;
-                case 0:
-                    break;
-                case +1:
-                    state.take_action(CW);
-                    break;
-            }
-        });
+
+        actionToggle($.p("R"), ()-> state.take_action(CW));
+
+//        actionTriState($("R"), (i) -> {
+//            switch (i) {
+//                case -1:
+//                    state.take_action(CCW);
+//                    break;
+//                case 0:
+//                    break;
+//                case +1:
+//                    state.take_action(CW);
+//                    break;
+//            }
+//        });
 
 //        actions.add(new ActionConcept($("x(tetris)"), nar, (b, d) -> {
 //            //float alpha = nar.confidenceDefault(BELIEF);

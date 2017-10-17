@@ -365,13 +365,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     n.input(task);
                 }
             } else {
-                task.delete();
+                if (task.meta("@")==null)
+                    task.delete(); //dont delete it if forwarding, to save the pri
             }
         });
-
-
-
-
     }
 
     boolean ensureCapacity(Space<TaskRegion> treeRW, @Nullable Task inputRegion, ObjectBooleanHashMap<Task> changes, NAR nar) {
@@ -432,7 +429,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         //2.
         @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
         if (toMerge != null) {
-            if (compressMerge(tree, toMerge, taskStrength, inputStrength, lowestTaskConf, changes, nar)) {
+            if (compressMerge(tree, toMerge, taskStrength, inputStrength, weakestTask, changes, nar)) {
                 if (tree.size() <= cap) return true;
             }
         }
@@ -454,11 +451,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         return false; //?? could be a problem if it reaches here
     }
 
-    static final FloatFunction<TaskRegion> lowestTaskConf = (r) -> -((Task) r).conf();
+
 
     private static boolean tryDelete(Space<TaskRegion> treeRW, @Nullable TaskRegion x) {
         if (x != null && treeRW.remove(x)) {
-            x.task().delete();
+            //x.task().delete(); //dont delete this might remove any forward here
             return true;
         }
         return false;

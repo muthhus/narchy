@@ -225,7 +225,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int MAX_INPUT_ANSWERS = 8;
 
     /** max retries for termpolation to produce a valid task content result during revision */
-    public static final int MAX_TERMPOLATE_RETRIES = 2;
+    public static final int MAX_TERMPOLATE_RETRIES = 1;
 
 
 

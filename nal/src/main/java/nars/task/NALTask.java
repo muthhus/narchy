@@ -184,7 +184,7 @@ public class NALTask extends Pri implements Task {
     public boolean delete() {
         if (super.delete()) {
             if (!Param.DEBUG) {
-                assert(meta.get("@")==null); //TODO temporary
+                //assert(meta.get("@")==null); //TODO temporary
                 this.meta.clear();
             }
             return true;
@@ -193,13 +193,11 @@ public class NALTask extends Pri implements Task {
     }
 
     public boolean delete(Task forwardTo) {
-        if (super.delete()) {
-            if (!Param.DEBUG)
-                this.meta.clear();
-            meta.put("@", forwardTo);
-            return true;
-        }
-        return false;
+        super.delete();
+        if (!Param.DEBUG)
+            this.meta.clear();
+        meta.put("@", forwardTo);
+        return true;
     }
 
 

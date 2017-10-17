@@ -322,7 +322,14 @@ public interface Stamp {
      */
     static float overlapFraction(long[] a, long[] b) {
         //prefer to make a set of the shorter length input
-        if (a.length > b.length) {
+        int al = a.length;
+        int bl = b.length;
+
+        if (al == 1 && bl == 1) {
+            return (a[0] == b[0]) ? 1 : 0;
+        }
+
+        if (al > bl) {
             //swap
             long[] ab = a;
             a = b;
@@ -331,7 +338,7 @@ public interface Stamp {
 
         //TODO fast impl for simple cases where a.length=1
 
-        return overlapFraction(LongSets.immutable.of(a), a.length, b);
+        return overlapFraction(LongSets.immutable.of(a), al, b);
     }
 
 
@@ -352,7 +359,10 @@ public interface Stamp {
         if (isCyclic(b))
             bSize--;
 
-        return (((float) common) / Math.min(aSize, bSize));
+        int denom = (aSize + bSize - common); //denominator excludes one copy of common but includes one too
+        assert(denom!=0);
+
+        return ((float) common) / denom;
     }
 
     long creation();

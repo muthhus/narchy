@@ -315,17 +315,21 @@ public class PriMapTermIndex extends MaplikeTermIndex {
             score = score*2; //double any belief score, ie. for ==>
         }
 
+        // link value is divided by the complexity,
+        // representing increassed link 'maintenance cost'
+        // involved in terms with higher complexity
+        // that were ultimately necessary to
+        // form and supporting the beliefs and goals counted above,
+        // (they are not divided like this)
+        int complexity = c.complexity();
+
         Bag<Task, PriReference<Task>> ta = c.tasklinks();
-        score += ta.size() / (1f + ta.capacity());
+        score += (ta.size() / (1f + ta.capacity())) / complexity;
 
         Bag<Term, PriReference<Term>> te = c.termlinks();
-        score += te.size() / (1f + te.capacity());
+        score += (te.size() / (1f + te.capacity())) / complexity;
 
-        return score / c.complexity();
-
-//        return (((talCap + telCap) / 2f) + (beliefConf + goalConf) / 2f)
-//                /
-//                (1f + (c.complexity() + c.volume() / 2f));
+        return score;
     }
 
     protected void forget(PriReference<Termed> x, Concept c, float amount) {

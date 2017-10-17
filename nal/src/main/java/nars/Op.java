@@ -954,7 +954,6 @@ public enum Op {
         //group all parallel clusters
         ObjectLongPair<Term> e0 = events.get(0);
 
-        //Term head = events.get(0).getOne();
         long headAt = e0.getTwo();
         int groupStart = -1;
         for (int i = 1; i <= ee; i++) {

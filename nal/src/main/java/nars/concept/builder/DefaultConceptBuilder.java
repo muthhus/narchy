@@ -95,7 +95,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             float pre = value.pri();
                             if (pre!=pre) {
                                 //if the original tasklink has been deleted, estimate the new priority based on the average pri of the table
-                                pre = isEmpty() ? 0.5f : priAvg();
+                                //TODO better estimate
+                                pre = (isEmpty() ? 0.5f : priAvg());
+                            } else {
+                                pre *= x.priElseZero() / px.priElseZero(); //ratio of the task priorities
                             }
 
                             putAsync(new PLinkUntilDeleted<>(

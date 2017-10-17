@@ -225,13 +225,22 @@ public class StampTest {
         assertEquals(0f, Stamp.overlapFraction(a(1, 2), a(3, 4)), 0.01f);
     }
     @Test public void testOverlapFraction2() {
-        assertEquals(0.5f, Stamp.overlapFraction(a(1,2), a(2,3)), 0.01f);
-        assertEquals(0.5f, Stamp.overlapFraction(a(1,2, Long.MAX_VALUE), a(2,3, Long.MAX_VALUE)), 0.01f); //cyclic unaffected result
-        assertEquals(0.333f, Stamp.overlapFraction(a(1,2,3), a(3,4,5)), 0.01f);
+        assertEquals(1/3f, Stamp.overlapFraction(a(1,2), a(2,3)), 0.01f);
+        assertEquals(2/3f, Stamp.overlapFraction(a(1,2), a(1,2,3)), 0.01f);
 
-        //one is completely subsumed by another
-        assertEquals(1f, Stamp.overlapFraction(a(1,2), a(2)), 0.01f);
-        assertEquals(1f, Stamp.overlapFraction(a(1,2,3,4), a(2,3,4)), 0.01f);
+        //include one or both cyclics
+        assertEquals(1/3f, Stamp.overlapFraction(a(1,2), a(2,3, Long.MAX_VALUE)), 0.01f); //cyclic unaffected result
+        assertEquals(1/3f, Stamp.overlapFraction(a(1,2, Long.MAX_VALUE), a(2,3, Long.MAX_VALUE)), 0.01f); //cyclic unaffected result
+
+        //12345
+        //------
+        //123345
+        assertEquals(0.2f, Stamp.overlapFraction(a(1,2,3), a(3,4,5)), 0.01f);
+        assertEquals(1/3f, Stamp.overlapFraction(a(1,2,3,4), a(3,4,5)), 0.01f);
+
+        //one is completely subsumed in another
+        assertEquals(1/3f, Stamp.overlapFraction(a(1,2), a(2)), 0.01f);
+        assertEquals(0.6f, Stamp.overlapFraction(a(1,2,3,4), a(2,3,4)), 0.01f);
     }
 
 }
