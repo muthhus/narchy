@@ -195,7 +195,7 @@ abstract public class NAgentX extends NAgent {
         n.termVolumeMax.setValue(32);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.75f);
+        n.goalConfidence(0.85f);
 
 
         float priFactor = 0.1f;
