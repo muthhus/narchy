@@ -248,8 +248,8 @@ public class TermReductionsTest extends NarseseTest {
     public void testConjParallelConceptualShouldntBeXTERNAL() throws Narsese.NarseseException {
 
 
-        for (int dt : new int[] { XTERNAL, DTERNAL, 0 }) {
-            assertEquals("(&&,a,b,c)",
+        for (int dt : new int[] { /*XTERNAL,*/ DTERNAL, 0 }) {
+            assertEquals(dt + "", "(&&,a,b,c)",
                     CONJ.the(
                             dt,
                             $.$("a"),
@@ -355,12 +355,12 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testEmbeddedConjNormalizationN2() throws Narsese.NarseseException {
-        Compound alreadyNormalized = $("((a &&+1 b) &&+1 c)");
-        Compound needsNormalized = $("(a &&+1 (b &&+1 c))");
-        assertEquals(needsNormalized, alreadyNormalized);
-        assertEquals(needsNormalized.toString(), alreadyNormalized.toString());
-        assertEquals(needsNormalized.dt(), alreadyNormalized.dt());
-        assertEquals(needsNormalized.subterms(), alreadyNormalized.subterms());
+        Compound bad = $("(a &&+1 (b &&+1 c))");
+        Compound good =  $("((a &&+1 b) &&+1 c)");
+        assertEquals(good, bad);
+        assertEquals(good.toString(), bad.toString());
+        assertEquals(good.dt(), bad.dt());
+        assertEquals(good.subterms(), bad.subterms());
     }
 
     @Test
@@ -397,18 +397,20 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testEmbeddedConjNormalizationWithNeg1() throws Narsese.NarseseException {
         String d = "(((d) &&+3 (a)) &&+1 (b))"; //correct grouping
+
         String c = "((d) &&+3 ((a) &&+1 (b)))"; //incorrect grouping
-        String a = "(((a) &&+1 (b)) &&-3 (d))"; //incorrect order
-
-        Term aa = $(a);
         Term cc = $(c);
-        aa.printRecursive();
-        cc.printRecursive();
-
-        assertEquals(aa, cc);
-
-        assertEquals(d, aa.toString());
         assertEquals(d, cc.toString());
+
+        String a = "(((a) &&+1 (b)) &&-3 (d))"; //incorrect order
+        Term aa = $(a);
+        assertEquals(d, aa.toString());
+
+
+//        aa.printRecursive();
+//        cc.printRecursive();
+
+
 
         //correct subterm ordering by volume
         assertTrue(aa.sub(0).subs() > aa.sub(1).subs());
@@ -417,7 +419,20 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
+    public void testEmbeddedConjNormalizationB() throws Narsese.NarseseException {
+        assertEquals(
+                "(((--,noid(0,5)) &&+- noid(11,2)) &&+- (noid(11,2) &&+- noid(11,2)))",
+                $("((((--,noid(0,5)) &&+- noid(11,2)) &&+- noid(11,2)) &&+- noid(11,2))").toString()
+        );
+    }
+
+    @Test
     public void testEmbeddedConjNormalization2() throws Narsese.NarseseException {
+        assertEquals(
+                "((a &&+1 b) &&+3 (c &&+5 d))",
+                $("(a &&+1 (b &&+3 (c &&+5 d)))").toString()
+        );
+
         assertEquals(
                 "(((t2-->hold) &&+1 (t1-->at)) &&+3 ((t1-->[opened]) &&+5 open(t1)))",
                 $("(hold:t2 &&+1 (at:t1 &&+3 ([opened]:t1 &&+5 open(t1))))").toString()

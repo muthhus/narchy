@@ -97,17 +97,23 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
     @Override
+    public Term conceptual() {
+        return Compound.super.conceptual();
+    }
+
+
+    @Override
     @Nullable
     public final Term root() {
         return Compound.super.root();
     }
 
-    public @Nullable Term transform(@NotNull CompoundTransform t, Compound parent) {
+    public @Nullable Term transform(CompoundTransform t, Compound parent) {
         return transform(t);
     }
 
     @Override
-    public @Nullable Term transform(@NotNull CompoundTransform t) {
+    public @Nullable Term transform(CompoundTransform t) {
         return t.transform(this, op(), dt);
     }
 

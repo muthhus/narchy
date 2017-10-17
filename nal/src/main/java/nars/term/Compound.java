@@ -914,7 +914,7 @@ public interface Compound extends Term, IPair, TermContainer {
         if (op()==NEG)
             return unneg().conceptual();
 
-        Term term = root().unneg(); //just in case
+        Term term = root().unneg(); //unneg just in case
 
         if (!term.op().conceptualizable)
             return Null;

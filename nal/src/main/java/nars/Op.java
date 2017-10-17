@@ -203,7 +203,7 @@ public enum Op {
             if (dt == XTERNAL) {
                 //only sort (but dont deduplicate, allowing repeat)
                 Arrays.sort(u);
-                return compound(CONJ, XTERNAL, u);
+                //return compound(CONJ, XTERNAL, u);
             }
 
             if (dt == DTERNAL || dt == 0) {
@@ -225,35 +225,38 @@ public enum Op {
                 //ex: (x &&+ (y &&+ z))
                 //      becomes
                 //    ((x &&+ y) &&+ z)
-                //TODO may need to count # of events, not number of conjunctions.
-                boolean aConj = a.op() == CONJ;
-                int subEventsLeft = aConj ? conjSubEventCount(a) : 0;
-                boolean bConj = b.op() == CONJ;
-                int subEventsRight = bConj ? conjSubEventCount(b) : 0;
-                if (subEventsLeft > 0 || subEventsRight > 0) {
+                int subEventsLeft = eventCount(a);
+                assert (subEventsLeft > 0);
+                int subEventsRight = eventCount(b);
+                assert (subEventsRight > 0);
+                if (subEventsLeft > 1 || subEventsRight > 1) {
                     //rebalance and align
-                    boolean imbalanced = false;
-                    if (Math.abs(subEventsLeft - subEventsRight) > 1)
-                        imbalanced = true; //one side has 2 or more than the other
 
-                    if (imbalanced) {
-                        if (dt < 0) {
-                            dt = -dt;
-                            Term x = a;
-                            a = b;
-                            b = x;
+                    boolean heavyLeft;
+                    if ((heavyLeft = ((subEventsLeft - subEventsRight) > 1)) ||
+                            ((subEventsRight - subEventsLeft) > 0)) { // notice the difference in 0, 1. if the # of events is odd, left gets it
+
+                        if (dt == XTERNAL) {
+                            //temporally oblivious rebalancing (but should canonically sort each subterm once balanced)
+                            if (heavyLeft && a.dt() == XTERNAL) {
+                                Term aToB = a.sub(1);
+                                Term abx = CONJ.the(XTERNAL, a.sub(0), CONJ.the(XTERNAL, aToB, b));
+                                return abx;
+                            } else {
+                                //??
+                            }
                         }
-                        return conjMerge(a, 0, b,
-                                dt != 0 ? dt + a.dtRange() : //sequence
-                                        0 //parallel
-                        );
-
                     }
-//                    if (dt > 0 && (imbalanced /*|| (bConj && !concurrent(b.dt()))*/)) {
-//                        return nullIfNull(conjMerge(a, 0, b, dt + a.dtRange()));
-//                    } else if (dt < 0 && (imbalanced/* || (aConj && !concurrent(a.dt()))*/)) {
-//                        return nullIfNull(conjMerge(b, 0, a, -dt - b.dtRange()));
-//                    }
+
+                    if (dt < 0) { //&& (dt != XTERNAL)
+                        Term x = a;
+                        a = b;
+                        b = x;
+                        return conjMerge(a, 0, b, -dt + a.dtRange());
+                    } else {
+                        return conjMerge(a, 0, b, dt + a.dtRange());
+                    }
+
                 }
 
                 int order = a.compareTo(b);
@@ -274,14 +277,23 @@ public enum Op {
             }
         }
 
-        private int conjSubEventCount(Term a) {
-            //TODO make an int reducer method for Term
-            final int[] subevents = {0};
-            a.recurseTerms(sub -> {
-                if (sub.op() == CONJ)
-                    subevents[0] += sub.subs();
-            });
-            return subevents[0];
+        private int eventCount(Term a) {
+            if (a.op() == CONJ) {
+                //TODO make an int reducer method for Term
+                final int[] events = {0};
+                a.recurseTerms(sub -> {
+                    if (sub.op() == CONJ) {
+                        int dt = sub.dt();
+                        if (dt == 0 || dt == DTERNAL)
+                            events[0]++; //parallel as unified event
+                        else
+                            events[0] += sub.subs(); //sequence
+                    }
+                });
+                return events[0];
+            } else {
+                return 1;
+            }
         }
 
         /**
@@ -619,7 +631,8 @@ public enum Op {
     public static final int[] NALLevelEqualAndAbove = new int[8 + 1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
 
 
-    /** whether it is a special or atomic term that isnt conceptualizable.
+    /**
+     * whether it is a special or atomic term that isnt conceptualizable.
      * negation is an exception to this, being unconceptualizable itself
      * but it will have conceptualizable=true.
      */
@@ -881,7 +894,7 @@ public enum Op {
         }
 
         conceptualizable = !(var || virtual ||
-                str.equals("+") /* INT */ || str.equals("B") /* Bool */ );
+                str.equals("+") /* INT */ || str.equals("B") /* Bool */);
 
         goalable = conceptualizable && !str.equals("==>");
 
@@ -907,8 +920,8 @@ public enum Op {
 
     final static Comparator<ObjectLongPair<Term>> conjEventComparator = Comparator.comparingLong(ObjectLongPair<Term>::getTwo).thenComparing(ObjectLongPair::getOne);
 
-    @NotNull
-    static public Term conjMerge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
+    /*@NotNull*/
+    static public Term conjMerge(Term a, long aStart, Term b, long bStart) {
 
         TreeSet<ObjectLongPair<Term>> eventSet = new TreeSet(conjEventComparator);
 
@@ -1064,7 +1077,7 @@ public enum Op {
             //return CONJ.the(dt, left, right);
             if (left.compareTo(right) > 0) {
                 //larger on left
-                if (dt!=XTERNAL)
+                if (dt != XTERNAL)
                     dt = -dt;
                 Term t = right;
                 right = left;
@@ -1073,8 +1086,8 @@ public enum Op {
 
             int ldt = left.dt();
             int rdt = right.dt();
-            if (left.op() == CONJ && !concurrent(ldt) && ldt!=XTERNAL &&
-                    right.op() == CONJ && !concurrent(rdt) && rdt!=XTERNAL &&
+            if (left.op() == CONJ && !concurrent(ldt) && ldt != XTERNAL &&
+                    right.op() == CONJ && !concurrent(rdt) && rdt != XTERNAL &&
                     ((left.subs() > 1 + right.subs()) || (right.subs() > left.subs()))) {
                 //seq imbalance
                 return CONJ.the(dt, left, right); //send through again
