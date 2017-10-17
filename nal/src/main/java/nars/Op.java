@@ -200,73 +200,72 @@ public enum Op {
             }
 
 
-            if (dt == XTERNAL) {
-                //only sort (but dont deduplicate, allowing repeat)
-                Arrays.sort(u);
-                //return compound(CONJ, XTERNAL, u);
-            }
+
 
             if (dt == DTERNAL || dt == 0) {
 
-                Term f = junctionFlat(dt, u);
-                return implInConjReduction(f);
+                //eternal or commutive
+                return implInConjReduction( junctionFlat(dt, u) );
 
             } else {
-                //sequence or parallel
 
-
+                //sequence or xternal
                 if (n > 2)
                     return Null; //"invalid non-commutive conjunction arity!=2, arity=" + n;
 
-                Term a = u[0];
-                Term b = u[1];
+                if (dt == XTERNAL) {
+                    Arrays.sort(u); //pre-sort
+                }
 
+                //rebalance and align
                 //convention: left align all sequences
                 //ex: (x &&+ (y &&+ z))
                 //      becomes
                 //    ((x &&+ y) &&+ z)
+
+                Term a = u[0];
+                Term b = u[1];
                 int subEventsLeft = eventCount(a);
-                assert (subEventsLeft > 0);
                 int subEventsRight = eventCount(b);
-                assert (subEventsRight > 0);
-                if (subEventsLeft > 1 || subEventsRight > 1) {
-                    //rebalance and align
+
+                boolean heavyLeft = (subEventsLeft - subEventsRight) > 1;
+                boolean heavyRight = (subEventsRight - subEventsLeft) > 0; // notice the difference in 0, 1. if the # of events is odd, left gets it
 
 
-                    boolean heavyLeft = (subEventsLeft - subEventsRight) > 1;
-                    boolean heavyRight = (subEventsRight - subEventsLeft) > 0; // notice the difference in 0, 1. if the # of events is odd, left gets it
+                if (dt == XTERNAL) {
+                    //temporally oblivious rebalancing (but should canonically sort each subterm once balanced)
+                    if (heavyLeft && a.dt() == XTERNAL) {
+                        Term aToB = a.sub(1);
+                        return compound(CONJ, XTERNAL,
+                                Terms.sorted(CONJ.the(XTERNAL, b, aToB), a.sub(0)));
+                    }
+                    if (heavyRight && b.dt() == XTERNAL) {
+                        Term bToA = b.sub(1);
+                        return compound(CONJ, XTERNAL,
+                                Terms.sorted(CONJ.the(XTERNAL, a, bToA), b.sub(0)));
+                    }
 
+                    return compound(CONJ, XTERNAL, a, b); //a and b should already be sorted
+                } else {
 
-                    if (dt == XTERNAL) {
-                        //temporally oblivious rebalancing (but should canonically sort each subterm once balanced)
-                        if (heavyLeft && a.dt() == XTERNAL) {
-                            Term aToB = a.sub(1);
-                            return compound(CONJ, XTERNAL, a.sub(0), compound(CONJ, XTERNAL, aToB, b));
-                        }
-                        if (heavyRight && b.dt() == XTERNAL) {
-                            Term bToA = b.sub(0);
-                            return compound(CONJ, XTERNAL, compound(CONJ, XTERNAL, a, bToA), b.sub(1));
-                        }
-                    } else {
+                    if (heavyLeft || heavyRight || dt < 0) {
 
-                        if (heavyLeft || heavyRight || dt < 0) {
-
-                            if (dt < 0) { //&& (dt != XTERNAL)
-                                Term x = a;
-                                a = b;
-                                b = x;
-                                return conjMerge(a, 0, b, -dt + a.dtRange());
-                            } else {
+                        if (dt < 0) { //&& (dt != XTERNAL)
+                            Term x = a;
+                            a = b;
+                            b = x;
+                            return conjMerge(a, 0, b, -dt + a.dtRange());
+                        } else {
 //                                if (heavyRight) {
 //                                    return conjMerge(b, 0, a, dt + a.dtRange());
 //                                } else {
-                                    return conjMerge(a, 0, b, dt + a.dtRange());
+                            return conjMerge(a, 0, b, dt + a.dtRange());
 //                                }
-                            }
                         }
                     }
+                }
 
-                } else {
+                {
 
                     int order = a.compareTo(b);
                     if (order == 0) {
@@ -288,7 +287,6 @@ public enum Op {
         }
 
         private int eventCount(Term a) {
-            if (a.op() == CONJ) {
                 //TODO make an int reducer method for Term
                 final int[] events = {0};
                 a.recurseTerms(sub -> {
@@ -301,9 +299,7 @@ public enum Op {
                     }
                 });
                 return events[0];
-            } else {
-                return 1;
-            }
+
         }
 
         /**

@@ -242,7 +242,7 @@ public class TemporalTermTest {
                 nt.toString());
 
         //assertNotNull(n.conceptualize(nt, UnitBudget.One));
-        assertEquals("( &&+- ,do(that),(a),(b))", n.conceptualize(nt).toString());
+        assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt).toString());
 
         //assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt, UnitBudget.One).toString()); ????????
 
@@ -901,7 +901,7 @@ public class TemporalTermTest {
         assertConceptual("((--,(nario,zoom)) &&+- happy)", "((--,(nario,zoom)) && happy)");
         assertConceptual("((--,(nario,zoom)) &&+- happy)", "--((--,(nario,zoom)) && happy)");
         assertConceptual("((--,(nario,zoom)) &&+- happy)", "((--,(nario,zoom)) &&+- happy)");
-        assertConceptual("(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))", "(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))");
+        assertConceptual("(((--,(x,(--,x))) &&+- happy) &&+- (--,(nario,zoom)))", "(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))");
 
         String c = "((--,(nario,zoom)) &&+- (vx &&+- vy))";
         assertConceptual(
