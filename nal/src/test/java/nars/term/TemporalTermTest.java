@@ -903,7 +903,7 @@ public class TemporalTermTest {
         assertConceptual("((--,(nario,zoom)) &&+- happy)", "((--,(nario,zoom)) &&+- happy)");
         assertConceptual("(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))", "(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))");
 
-        String c = "(((--,(nario,zoom)) &&+- vx) &&+- vy)";
+        String c = "((--,(nario,zoom)) &&+- (vx &&+- vy))";
         assertConceptual(
                 //WRONG:"((--,(nario,zoom)) &&+- (vx &&+- vy))"
                 c, "((vx &&+97 vy) &&+156 (--,(nario,zoom)))");
@@ -913,7 +913,7 @@ public class TemporalTermTest {
     @Test
     public void testConjSeqConceptual2() throws Narsese.NarseseException {
         assertConceptual(
-                "(((--,(nario,zoom)) &&+- vx) &&+- vy)",
+                "((--,(nario,zoom)) &&+- (vx &&+- vy))",
                 "((vx &&+97 vy) &&-100 (--,(nario,zoom)))");
 
     }
@@ -923,16 +923,14 @@ public class TemporalTermTest {
 
         assertTrue($("((--,(vy &&+- happy)) &&+- (happy &&+- vy))") instanceof Compound);
         assertConceptual(
-                //"((--,(happy &&+- vy)) &&+- (happy &&+- vy))",
-                "(((--,(happy &&+- vy)) &&+- happy) &&+- vy)",
+                "((--,(happy &&+- vy)) &&+- (happy &&+- vy))",
                 "((--,(vy &&+84 happy))&&(happy&|vy))");
     }
 
     @Test
     public void testConceptual2b() throws Narsese.NarseseException {
         assertConceptual(
-                //"(((--,(happy &&+- vy)) &&+- (happy &&+- vy)) ==>+- ((--,(happy &&+- vy)) &&+- (--,vx)))",
-                "((((--,(happy &&+- vy)) &&+- happy) &&+- vy) ==>+- ((--,(happy &&+- vy)) &&+- (--,vx)))",
+                "(((--,(happy &&+- vy)) &&+- (happy &&+- vy)) ==>+- ((--,(happy &&+- vy)) &&+- (--,vx)))",
                 "(((--,(vy &&+84 happy))&&(happy&|vy)) ==>+84 ((--,vx) &&+21 (--,(happy &&+146 vy))))");
     }
 

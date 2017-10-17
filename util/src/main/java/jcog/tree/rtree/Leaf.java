@@ -130,14 +130,14 @@ public class Leaf<T> implements Node<T, T> {
 
     @Override
     public boolean contains(T t, Spatialization<T> model) {
+        if (size == 0 || (size > 1 && !region.contains(model.region(t))))
+            return false;
+
         T[] data = this.data;
         final int s = size;
         for (int i = 0; i < s; i++) {
             T d = data[i];
-            if (d == t) {
-                return true;
-            }
-            if (t.equals(d)) {
+            if (t == d || t.equals(d)) {
                 model.merge(d, t);
                 return true;
             }

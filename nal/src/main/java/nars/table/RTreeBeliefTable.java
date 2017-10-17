@@ -329,6 +329,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             ensureCapacity(treeRW, null, changes, n);
 
+            if (!changes.getIfAbsent(x, true))
+                return; //this can theoretically happen if a duplicate is inserted that the pre-compress just extracted. this catches it
+
+
             if (treeRW.add(x)) {
                 changes.put(x, true);
                 ensureCapacity(treeRW, x, changes, n);
@@ -726,10 +730,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         @Override
         protected void merge(TaskRegion existing, TaskRegion incoming) {
 
-            Task i = incoming.task();
-//                if (e == i)
-//                    return; //same instance
+            if (existing == incoming)
+                return; //same instance
 
+            Task i = incoming.task();
             float activation = i.priElseZero();
             if (activation < Prioritized.EPSILON)
                 return;

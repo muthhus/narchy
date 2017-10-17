@@ -200,12 +200,10 @@ public enum Op {
             }
 
 
-
-
             if (dt == DTERNAL || dt == 0) {
 
                 //eternal or commutive
-                return implInConjReduction( junctionFlat(dt, u) );
+                return implInConjReduction(junctionFlat(dt, u));
 
             } else {
 
@@ -225,32 +223,56 @@ public enum Op {
 
                 Term a = u[0];
                 Term b = u[1];
-                int eventsLeft = a.eventCount();
-                int eventsRight = b.eventCount();
-                assert(eventsLeft > 0);
-                assert(eventsRight > 0);
-
-                boolean heavyLeft = (eventsLeft - eventsRight) > 1;
-                boolean heavyRight = (eventsRight - eventsLeft) > 0; // notice the difference in 0, 1. if the # of events is odd, left gets it
+//                int eventsLeft = a.eventCount();
+//                int eventsRight = b.eventCount();
+//                assert(eventsLeft > 0);
+//                assert(eventsRight > 0);
+//                boolean heavyLeft = (eventsLeft - eventsRight) > 1;
+//                boolean heavyRight = (eventsRight - eventsLeft) > 0; // notice the difference in 0, 1. if the # of events is odd, left gets it
 
 
                 if (dt == XTERNAL) {
-                    //temporally oblivious rebalancing (but should canonically sort each subterm once balanced)
-                    if (heavyLeft && a.dt() == XTERNAL) {
-                        Term aToB = a.sub(1);
-                        return CONJ.the(XTERNAL,
-                                CONJ.the(XTERNAL, b, aToB), a.sub(0));
+
+                    int va = a.volume();
+                    int vb = b.volume();
+
+                    boolean heavyLeft, heavyRight;
+
+                    if (va > vb && a.op() == CONJ && a.dt() == XTERNAL && a.subs() == 2) {
+                        int va0 = a.sub(0).volume();
+                        int va1 = a.sub(1).volume();
+
+                        int vamin = Math.min(va0, va1);
+
+                        //if left remains heavier by donating its smallest
+                        if ((va - vamin) > (vb + vamin)) {
+                            int min = va0 <= va1 ? 0 : 1;
+                            Term aToB = a.sub(min);
+                            return CONJ.the(XTERNAL,
+                                    CONJ.the(XTERNAL, b, aToB), a.sub(1 - min));
+                        }
                     }
-                    if (heavyRight && b.dt() == XTERNAL) {
-                        Term bToA = b.sub(0);
-                        return CONJ.the(XTERNAL,
-                                CONJ.the(XTERNAL, a, bToA), b.sub(1));
-                    }
+
+                    //b volume should not be larger than a, it is guaranteed by commutive ordinality convention
+
+                    /*else if (vb > va && b.op() == CONJ && b.dt() == XTERNAL && b.subs() == 2) {
+                        int vb0 = b.sub(0).volume();
+                        int vb1 = b.sub(1).volume();
+
+                        if (vb - va > Math.min(vb0, vb1)) {
+                            int min = vb0 <= vb1 ? 0 : 1;
+                            Term bToA = b.sub(min);
+                            return CONJ.the(XTERNAL,
+                                    CONJ.the(XTERNAL, a, bToA), b.sub(1 - min));
+                        }
+                    }*/
+
 
                     return compound(CONJ, XTERNAL, a, b); //a and b should already be sorted
                 } else {
 
-                    if (heavyLeft || heavyRight || dt < 0) {
+
+                    {
 
                         if (dt < 0) { //&& (dt != XTERNAL)
                             Term x = a;
@@ -267,27 +289,26 @@ public enum Op {
                     }
                 }
 
-                {
-
-                    int order = a.compareTo(b);
-                    if (order == 0) {
-                        dt = Math.abs(dt);
-                    } else if (order > 0) {
-                        //ensure lexicographic ordering
-                        Term x = u[0];
-                        u[0] = u[1];
-                        u[1] = x; //swap
-                        dt = -dt;
-                    }
-                }
-
-                return implInConjReduction(
-                        compound(CONJ, dt, u)
-                );
+//                {
+//
+//                    int order = a.compareTo(b);
+//                    if (order == 0) {
+//                        dt = Math.abs(dt);
+//                    } else if (order > 0) {
+//                        //ensure lexicographic ordering
+//                        Term x = u[0];
+//                        u[0] = u[1];
+//                        u[1] = x; //swap
+//                        dt = -dt;
+//                    }
+//                }
+//
+//                return implInConjReduction(
+//                        compound(CONJ, dt, u)
+//                );
 
             }
         }
-
 
 
         /**
