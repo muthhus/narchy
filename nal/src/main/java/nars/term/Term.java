@@ -65,8 +65,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static nars.Op.NEG;
-import static nars.Op.Null;
+import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -82,7 +81,6 @@ public interface Term extends Termed, Comparable<Termed> {
     default Term term() {
         return this;
     }
-
 
 
     /*@NotNull*/
@@ -110,7 +108,8 @@ public interface Term extends Termed, Comparable<Termed> {
     @Override
     int structure();
 
-    @Override boolean contains(Term t);
+    @Override
+    boolean contains(Term t);
 
     default void append(ByteArrayDataOutput out) {
         Term.append(this, out);
@@ -448,8 +447,6 @@ public interface Term extends Termed, Comparable<Termed> {
 //    }
 
 
-
-
     default String structureString() {
         return String.format("%16s",
                 Integer.toBinaryString(structure()))
@@ -712,6 +709,20 @@ public interface Term extends Termed, Comparable<Termed> {
         return context.applyTermIfPossible(this);
     }
 
+
+    /** includes itself in the count unless it's a CONJ sequence in which case it becomes the sum of the subterms event counts*/
+    default int eventCount() {
+        if (op() == CONJ) {
+            int dt = this.dt();
+            if (dt!=0 && dt!=DTERNAL) {
+                 return intify((sum, x)->sum + x.eventCount(), 0);
+            }
+        }
+
+        return 1;
+    }
+
+
     /* collects any contained events */
     default void events(Consumer<ObjectLongPair<Term>> events) {
         events(events, 0);
@@ -818,7 +829,8 @@ public interface Term extends Termed, Comparable<Termed> {
         return Null;
     }
 
-    /** the skeleton of a term, without any temporal or other meta-assumptions
+    /**
+     * the skeleton of a term, without any temporal or other meta-assumptions
      */
     default Term root() {
         return this;
@@ -858,7 +870,7 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
     default Term neg() {
-        return NEG.the(DTERNAL,this); //the DTERNAL gets it directly to it
+        return NEG.the(DTERNAL, this); //the DTERNAL gets it directly to it
     }
 
     default Term negIf(boolean negate) {
@@ -867,7 +879,6 @@ public interface Term extends Termed, Comparable<Termed> {
 
     @Nullable
     Term temporalize(Retemporalize r);
-
 
 
 }

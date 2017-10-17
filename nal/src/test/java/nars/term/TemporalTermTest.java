@@ -897,20 +897,24 @@ public class TemporalTermTest {
     }
 
     @Test
-    public void testConceptual() throws Narsese.NarseseException {
+    public void testConjSeqConceptual1() throws Narsese.NarseseException {
         assertConceptual("((--,(nario,zoom)) &&+- happy)", "((--,(nario,zoom)) && happy)");
         assertConceptual("((--,(nario,zoom)) &&+- happy)", "--((--,(nario,zoom)) && happy)");
         assertConceptual("((--,(nario,zoom)) &&+- happy)", "((--,(nario,zoom)) &&+- happy)");
-        assertConceptual("(((--,(x,(--,x))) &&+- happy) &&+- (--,(nario,zoom)))", "(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))");
+        assertConceptual("(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))", "(((--,(nario,zoom)) &&+- happy) &&+- (--,(x,(--,x))))");
 
-        String c = "((--,(nario,zoom)) &&+- (vx &&+- vy))";
+        String c = "(((--,(nario,zoom)) &&+- vx) &&+- vy)";
         assertConceptual(
                 //WRONG:"((--,(nario,zoom)) &&+- (vx &&+- vy))"
                 c, "((vx &&+97 vy) &&+156 (--,(nario,zoom)))");
         assertConceptual(
                 c, "((vx &&+97 vy) &&+100 (--,(nario,zoom)))");
+    }
+    @Test
+    public void testConjSeqConceptual2() throws Narsese.NarseseException {
         assertConceptual(
-                "(((--,(nario,zoom)) &&+- vx) &&+- vy)", "((vx &&+97 vy) &&-100 (--,(nario,zoom)))");
+                "(((--,(nario,zoom)) &&+- vx) &&+- vy)",
+                "((vx &&+97 vy) &&-100 (--,(nario,zoom)))");
 
     }
 
@@ -918,13 +922,17 @@ public class TemporalTermTest {
     public void testConceptual2() throws Narsese.NarseseException {
 
         assertTrue($("((--,(vy &&+- happy)) &&+- (happy &&+- vy))") instanceof Compound);
-        assertConceptual("((--,(happy &&+- vy)) &&+- (happy &&+- vy))", "((--,(vy &&+84 happy))&&(happy&|vy))");
+        assertConceptual(
+                //"((--,(happy &&+- vy)) &&+- (happy &&+- vy))",
+                "(((--,(happy &&+- vy)) &&+- happy) &&+- vy)",
+                "((--,(vy &&+84 happy))&&(happy&|vy))");
     }
 
     @Test
     public void testConceptual2b() throws Narsese.NarseseException {
         assertConceptual(
-                "(((--,(happy &&+- vy)) &&+- (happy &&+- vy)) ==>+- ((--,(happy &&+- vy)) &&+- (--,vx)))",
+                //"(((--,(happy &&+- vy)) &&+- (happy &&+- vy)) ==>+- ((--,(happy &&+- vy)) &&+- (--,vx)))",
+                "((((--,(happy &&+- vy)) &&+- happy) &&+- vy) ==>+- ((--,(happy &&+- vy)) &&+- (--,vx)))",
                 "(((--,(vy &&+84 happy))&&(happy&|vy)) ==>+84 ((--,vx) &&+21 (--,(happy &&+146 vy))))");
     }
 

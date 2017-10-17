@@ -225,24 +225,26 @@ public enum Op {
 
                 Term a = u[0];
                 Term b = u[1];
-                int subEventsLeft = eventCount(a);
-                int subEventsRight = eventCount(b);
+                int eventsLeft = a.eventCount();
+                int eventsRight = b.eventCount();
+                assert(eventsLeft > 0);
+                assert(eventsRight > 0);
 
-                boolean heavyLeft = (subEventsLeft - subEventsRight) > 1;
-                boolean heavyRight = (subEventsRight - subEventsLeft) > 0; // notice the difference in 0, 1. if the # of events is odd, left gets it
+                boolean heavyLeft = (eventsLeft - eventsRight) > 1;
+                boolean heavyRight = (eventsRight - eventsLeft) > 0; // notice the difference in 0, 1. if the # of events is odd, left gets it
 
 
                 if (dt == XTERNAL) {
                     //temporally oblivious rebalancing (but should canonically sort each subterm once balanced)
                     if (heavyLeft && a.dt() == XTERNAL) {
                         Term aToB = a.sub(1);
-                        return compound(CONJ, XTERNAL,
-                                Terms.sorted(CONJ.the(XTERNAL, b, aToB), a.sub(0)));
+                        return CONJ.the(XTERNAL,
+                                CONJ.the(XTERNAL, b, aToB), a.sub(0));
                     }
                     if (heavyRight && b.dt() == XTERNAL) {
-                        Term bToA = b.sub(1);
-                        return compound(CONJ, XTERNAL,
-                                Terms.sorted(CONJ.the(XTERNAL, a, bToA), b.sub(0)));
+                        Term bToA = b.sub(0);
+                        return CONJ.the(XTERNAL,
+                                CONJ.the(XTERNAL, a, bToA), b.sub(1));
                     }
 
                     return compound(CONJ, XTERNAL, a, b); //a and b should already be sorted
@@ -286,21 +288,7 @@ public enum Op {
             }
         }
 
-        private int eventCount(Term a) {
-                //TODO make an int reducer method for Term
-                final int[] events = {0};
-                a.recurseTerms(sub -> {
-                    if (sub.op() == CONJ) {
-                        int dt = sub.dt();
-                        if (dt == 0 || dt == DTERNAL)
-                            events[0]++; //parallel as unified event
-                        else
-                            events[0] += sub.subs(); //sequence
-                    }
-                });
-                return events[0];
 
-        }
 
         /**
          * flattening conjunction builder, for (commutive) multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
