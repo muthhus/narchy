@@ -32,7 +32,7 @@ public abstract class AbstractTraining {
                 agent.predict(inter.actual);
             }
             else {
-                double[] actual_output = null;
+                double[] actual_output;
 
                 if (validation_mode)
                     actual_output = agent.predict(inter.actual);

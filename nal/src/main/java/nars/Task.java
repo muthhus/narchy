@@ -91,9 +91,9 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
         }
     }
 
-    public static StableBloomFilter<Task> newBloomFilter(int cap) {
+    public static StableBloomFilter<Task> newBloomFilter(int cap, Random rng) {
         return new StableBloomFilter<>(
-                cap, 1,
+                cap, 1, 0.0005f, rng,
                 new BytesHashProvider<>(IO::taskToBytes));
     }
 

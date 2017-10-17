@@ -415,7 +415,7 @@ public interface NAct {
             float confMin = n.confMin.floatValue();
             float confBase =
                     //confMin * 4;
-                    n.confDefault(GOAL);
+                    n.confDefault(GOAL)/3;
             float curiEvi = c2w(confBase);
 
             int ip = p ? 0 : 1;
@@ -429,9 +429,9 @@ public interface NAct {
             boolean curious;
             if (!p) {
 
+                float eviSum = e[0] + e[1];
                 float cur = curiosity().floatValue();
-                if (cur > 0 && rng.nextFloat() <= cur) {
-                    float curiConf = confBase;
+                if (eviSum < curiEvi && cur > 0 && rng.nextFloat() <= cur) {
                     x = (rng.nextFloat() - 0.5f) * 2f;
                     e[0] = e[1] = curiEvi/2;
                     curious = true;
@@ -444,7 +444,6 @@ public interface NAct {
 
                 float y = update.valueOf(x); //-1..+1
 
-                float eviSum = e[0] + e[1];
                 float conf = ((y == y) && (eviSum > Pri.EPSILON)) ?
                             w2c(eviSum) : 0;
 

@@ -1203,10 +1203,21 @@ public enum Util {
     public static int argmax(final double... vec) {
         int result = -1;
         double max = Double.NEGATIVE_INFINITY;
-
-        int l = vec.length;
-        for (int i = 0; i < l; i++) {
+        for (int i = 0, l = vec.length; i < l; i++) {
             final double v = vec[i];
+            if (v > max) {
+                max = v;
+                result = i;
+            }
+        }
+        return result;
+    }
+
+    public static int argmax(final float... vec) {
+        int result = -1;
+        float max = Float.NEGATIVE_INFINITY;
+        for (int i = 0, l = vec.length; i < l; i++) {
+            final float v = vec[i];
             if (v > max) {
                 max = v;
                 result = i;
@@ -1303,29 +1314,31 @@ public enum Util {
     public static boolean equals(@NotNull long[] a, long[] b, int firstN) {
         if (a == b) return true;
         for (int i = 0; i < firstN; i++) {
-            if (a[i]!=b[i])
+            if (a[i] != b[i])
                 return false;
         }
         return true;
     }
+
     public static boolean equals(@NotNull long[] a, long[] b) {
         if (a == b) return true;
         int l = a.length;
-        if (b.length!=l)
+        if (b.length != l)
             return false;
         for (int i = 0; i < l; i++) {
-            if (a[i]!=b[i])
+            if (a[i] != b[i])
                 return false;
         }
         return true;
     }
+
     public static boolean equals(@NotNull short[] a, short[] b) {
         if (a == b) return true;
         int l = a.length;
-        if (b.length!=l)
+        if (b.length != l)
             return false;
         for (int i = 0; i < l; i++) {
-            if (a[i]!=b[i])
+            if (a[i] != b[i])
                 return false;
         }
         return true;

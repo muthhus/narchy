@@ -1,6 +1,7 @@
 package il.technion.tinytable.bit;
 
 
+import org.eclipse.collections.api.list.primitive.LongList;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 
 import java.util.Collection;
@@ -8,7 +9,7 @@ import java.util.Collection;
 
 public class Chains {
 
-    public static boolean isFingerprint(long item) {
+    private static boolean isFingerprint(long item) {
         return ((item & 1L) == 1L);
     }
 
@@ -16,7 +17,7 @@ public class Chains {
         return item | 1L;
     }
 
-    public static int findFingerprint(long[] chain, long fingerprint) {
+    private static int findFingerprint(long[] chain, long fingerprint) {
         if (chain == null || chain.length < 1)
             return -1;
 
@@ -50,7 +51,7 @@ public class Chains {
     }
 
     //
-    public static LongArrayList set(long[] chain, long fingerprint, int itemSize, long newCounter) {
+    public static LongList set(long[] chain, long fingerprint, int itemSize, long newCounter) {
         int idx = findFingerprint(chain, fingerprint);
         if (idx < 0)
             throw new RuntimeException("cannot find fingerprint");

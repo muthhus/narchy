@@ -3,11 +3,13 @@ package il.technion.tinytable.bit;
 
 import java.io.Serializable;
 
-public class AuxilaryBitSet implements Serializable {
+import static il.technion.tinytable.bit.BitHelper.value;
 
-    public final long[] words;
+class AuxilaryBitSet implements Serializable {
 
-    public AuxilaryBitSet(final int l) {
+    private final long[] words;
+
+    AuxilaryBitSet(final int l) {
 
         this.words = new long[l];
     }
@@ -21,7 +23,7 @@ public class AuxilaryBitSet implements Serializable {
      * @param to    - to bit to change
      * @param value - new bits to write.
      */
-    public void setBits(final int from, final int to, final long value) {
+    void setBits(final int from, final int to, final long value) {
         int fromWordIdx = from >>> 6;
 
         fromWordIdx = fromWordIdx % this.words.length;
@@ -30,24 +32,25 @@ public class AuxilaryBitSet implements Serializable {
         int toBitIdx = to & 63;
         int fromBitIdx = from & 63;
         if (fromWordIdx == toWordIdx) {
-            this.words[fromWordIdx] = BitHelper.ReplaceBitsInWord(this.words[fromWordIdx], fromBitIdx, toBitIdx, value);
+            this.words[fromWordIdx] = BitHelper.replace(this.words[fromWordIdx], fromBitIdx, toBitIdx, value);
             // System.out.println(Long.toBinaryString(this.words[fromWordIdx]));
             return;
         }
         if (toBitIdx == 0) {
-            this.words[fromWordIdx] = BitHelper.ReplaceBitsInWord(this.words[fromWordIdx], fromBitIdx, 63, value, true);
+            this.words[fromWordIdx] = BitHelper.replace(this.words[fromWordIdx], fromBitIdx, 63, value, true);
             return;
         }
         final int part1length = 64 - fromBitIdx;
 
-        final long part1Value = value & BitHelper.generateMask(0, part1length);
+        final long part1Value = value & BitHelper.mask(0, part1length);
 
 //		 System.out.println("SetBits: Part 1 length is: " + part1length +
 //		 " Part1 value is: " + Long.toBinaryString(part1Value) + " Part 2 value " + part2Value  );
 
-        this.words[fromWordIdx] = BitHelper.ReplaceBitsInWord(this.words[fromWordIdx], fromBitIdx, 63, part1Value, true);
+        this.words[fromWordIdx] = BitHelper.replace(this.words[fromWordIdx], fromBitIdx, 63, part1Value, true);
+
         final long part2Value = (value >>> part1length);
-        this.words[toWordIdx] = BitHelper.ReplaceBitsInWord(this.words[toWordIdx], 0, toBitIdx, part2Value);
+        this.words[toWordIdx] = BitHelper.replace(this.words[toWordIdx], 0, toBitIdx, part2Value);
 
         // assert readValue1 == part1Value : "part1Value: " + part1Value +
         // " ValueRead: " + readValue1;
@@ -63,7 +66,7 @@ public class AuxilaryBitSet implements Serializable {
     }
 
 
-    public long replaceBits(final int from, final int to, long value) {
+    long replaceBits(final int from, final int to, long value) {
 
         int fromWordIdx = from >>> 6;
         fromWordIdx = fromWordIdx % this.words.length;
@@ -86,25 +89,25 @@ public class AuxilaryBitSet implements Serializable {
 
 
             //			fromWordIdx%=this.words.length;
-            long $ = BitHelper.getValueFromWord(this.words[fromWordIdx], fromBitIdx, 63, true);
-            this.words[fromWordIdx] = BitHelper.ReplaceBitsInWord(this.words[fromWordIdx], fromBitIdx, 63, value, true);
+            long $ = value(this.words[fromWordIdx], fromBitIdx, 63, true);
+            this.words[fromWordIdx] = BitHelper.replace(this.words[fromWordIdx], fromBitIdx, 63, value, true);
             return $;
 
         }
 
-        final long lowBits = BitHelper.getValueFromWord(this.words[fromWordIdx], fromBitIdx, 63, true);
+        final long lowBits = value(this.words[fromWordIdx], fromBitIdx, 63, true);
         // System.out.println("LowBits: " + lowBits);
-        long highBits = BitHelper.getValueFromWord(this.words[toWordIdx], 0, toBitIdx);
+        long highBits = BitHelper.value(this.words[toWordIdx], 0, toBitIdx);
         final int part1length = 64 - fromBitIdx;
 
-        final long part1Value = value & BitHelper.generateMask(0, part1length);
+        final long part1Value = value & BitHelper.mask(0, part1length);
 
 //		 System.out.println("SetBits: Part 1 length is: " + part1length +
 //		 " Part1 value is: " + Long.toBinaryString(part1Value) + " Part 2 value " + part2Value  );
 
-        this.words[fromWordIdx] = BitHelper.ReplaceBitsInWord(this.words[fromWordIdx], fromBitIdx, 63, part1Value, true);
+        this.words[fromWordIdx] = BitHelper.replace(this.words[fromWordIdx], fromBitIdx, 63, part1Value, true);
         final long part2Value = (value >>> part1length);
-        this.words[toWordIdx] = BitHelper.ReplaceBitsInWord(this.words[toWordIdx], 0, toBitIdx, part2Value);
+        this.words[toWordIdx] = BitHelper.replace(this.words[toWordIdx], 0, toBitIdx, part2Value);
 
 
         return lowBits | (highBits << (64 - fromBitIdx));
@@ -118,7 +121,7 @@ public class AuxilaryBitSet implements Serializable {
      * @return - a long whose to-from first bits are set according tot eh
      * bitArray.
      */
-    public long getBits(final int from, final int to) {
+    long getBits(final int from, final int to) {
 
         int fromWordIdx = from >>> 6;
         fromWordIdx = fromWordIdx % this.words.length;
@@ -139,12 +142,12 @@ public class AuxilaryBitSet implements Serializable {
         if (toBitIdx == 0) {
 //			return ((this.words[fromWordIdx] & ((-1l << (fromBitIdx)) ^ (-1l ))) >>> (fromBitIdx));
 
-            return BitHelper.getValueFromWord(this.words[fromWordIdx], fromBitIdx, 63, true);
+            return value(this.words[fromWordIdx], fromBitIdx, 63, true);
         }
 
-        final long lowBits = BitHelper.getValueFromWord(this.words[fromWordIdx], fromBitIdx, 63, true);
+        final long lowBits = value(this.words[fromWordIdx], fromBitIdx, 63, true);
         // System.out.println("LowBits: " + lowBits);
-        long highBits = BitHelper.getValueFromWord(this.words[toWordIdx], 0, toBitIdx);
+        long highBits = BitHelper.value(this.words[toWordIdx], 0, toBitIdx);
 
         return lowBits | (highBits << (64 - fromBitIdx));
     }
@@ -173,9 +176,9 @@ public class AuxilaryBitSet implements Serializable {
 //			return BitHelper.getValueFromWord(this.words[fromWordIdx], fromBitIdx, 63, true);
         }
 
-        final long lowBits = BitHelper.getValueFromWord(this.words[fromWordIdx], fromBitIdx, 63, true);
+        final long lowBits = value(this.words[fromWordIdx], fromBitIdx, 63, true);
         // System.out.println("LowBits: " + lowBits);
-        long highBits = BitHelper.getValueFromWord(this.words[toWordIdx], 0, toBitIdx);
+        long highBits = BitHelper.value(this.words[toWordIdx], 0, toBitIdx);
 
         return lowBits | (highBits << (64 - fromBitIdx));
     }

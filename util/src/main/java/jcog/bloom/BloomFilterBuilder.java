@@ -3,6 +3,8 @@ package jcog.bloom;
 import jcog.bloom.hash.DefaultHashProvider;
 import jcog.bloom.hash.HashProvider;
 
+import java.util.Random;
+
 /**
  * {@link BloomFilterBuilder}s are the entry point to builder different types of {@link LeakySet}s.
  *
@@ -72,24 +74,8 @@ public class BloomFilterBuilder<E> {
      * Build the instance.
      * @return Standard {@link LeakySet}.
      */
-    public LeakySet<E> buildFilter() {
-        return new StableBloomFilter<>(size, numberOfHashes, hashProvider);
+    public StableBloomFilter<E> buildFilter() {
+        return new StableBloomFilter<>(size, numberOfHashes,  unlearningRate, new Random(), hashProvider);
     }
-
-    /**
-     * Build the instance.
-     * @return {@link CountingLeakySet}.
-     */
-    public CountingLeakySet<E> buildCountingFilter() {
-        return new StableBloomFilter<>(size, numberOfHashes,  hashProvider);
-    }
-
-//    /**
-//     * Build the instance.
-//     * @return A stable {@link LeakySet}.
-//     */
-//    public CountingLeakySet<E> buildStableFilter() {
-//        return new StableBloomFilter<>(size, numberOfHashes, unlearningRate, hashProvider);
-//    }
 
 }

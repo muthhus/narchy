@@ -87,6 +87,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Nullable
     protected DynTruth truth(long start, long end, Term template, boolean evidence, NAR nar) {
+        if (template == null)
+            return null; //TODO
         return model.eval(template, beliefOrGoal, start, end, evidence, nar); //newDyn(evidence);
     }
 

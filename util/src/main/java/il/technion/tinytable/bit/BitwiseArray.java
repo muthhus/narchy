@@ -15,7 +15,7 @@ public class BitwiseArray extends AuxilaryBitSet {
      * @param itemSize
      * @param bucketcapacity
      */
-    public BitwiseArray(final int capacity, final int itemSize, int bucketcapacity) {
+    protected BitwiseArray(final int capacity, final int itemSize, int bucketcapacity) {
         super((capacity * itemSize) / 64 + 1);
         this.itemSize = itemSize;
         this.bucketCapacity = bucketcapacity;
@@ -53,18 +53,16 @@ public class BitwiseArray extends AuxilaryBitSet {
      * @param mod
      * @return
      */
-    protected long get(int bucketId, int idx, int customSize, int mod) {
-        int effectiveItemSize = customSize;
+    private long get(int bucketId, int idx, int customSize, int mod) {
         int bucketStart = this.start(bucketId);
         int start = bucketStart + idx * customSize;
-        return super.getBits(start, start + effectiveItemSize);
+        return super.getBits(start, start + customSize);
     }
 
     protected long replace(int bucketId, int idx, int customSize, long value) {
-        int effectiveItemSize = customSize;
         int bucketStart = this.start(bucketId);
         int start = bucketStart + idx * customSize;
-        int end = start + effectiveItemSize;
+        int end = start + customSize;
         long res = super.getBits(start, end);
         super.setBits(start, end, value);
         return res;
@@ -120,14 +118,12 @@ public class BitwiseArray extends AuxilaryBitSet {
             start += this.itemSize;
             end += this.itemSize;
         } while (value != 0L);
-        return;
     }
 
     protected void shrinkBucket(int bucketId, int idx, int customSize, long value) {
-        int effectiveItemSize = customSize;
         int bucketStart = start(bucketId);
         int start = bucketStart + idx * customSize;
-        int end = start + effectiveItemSize;
+        int end = start + customSize;
         super.setBits(start, end, 0);
 
         int bucketEnd = bucketStart + (this.size(bucketId) - 1) * this.itemSize;
@@ -151,7 +147,7 @@ public class BitwiseArray extends AuxilaryBitSet {
      * @param bucketID
      * @return
      */
-    public int size(int bucketID) {
+    protected int size(int bucketID) {
         return 0;
     }
 
@@ -161,7 +157,7 @@ public class BitwiseArray extends AuxilaryBitSet {
      * @param bucketID
      * @return
      */
-    public int start(int bucketId) {
+    protected int start(int bucketId) {
         return this.bucketBitSize * bucketId;
     }
 

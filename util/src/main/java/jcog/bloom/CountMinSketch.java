@@ -79,6 +79,8 @@ import java.nio.ByteBuffer;
  * <p/>
  * so even if there are multiple hash collisions, the returned value will be the best estimate
  * (upper bound) for the given key. The actual count can never be greater than this value.
+ *
+ * http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.146.2889&rep=rep1&type=pdf
  */
 public class CountMinSketch {
     // 1% estimation error with 1% probability (99% confidence) that the estimation breaks this limit
@@ -157,6 +159,20 @@ public class CountMinSketch {
 
     public void add(int val) {
         add(Ints.toByteArray(val));
+    }
+
+    public int countAndAdd(int val) {
+        byte[] b = Ints.toByteArray(val);
+        int c = count(b);
+        add(b);
+        return c;
+    }
+
+    public int countAndAdd(long val) {
+        byte[] b = Longs.toByteArray(val);
+        int c = count(b);
+        add(b);
+        return c;
     }
 
     public void add(long val) {

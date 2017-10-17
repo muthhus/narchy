@@ -117,10 +117,10 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
                         //$.p(id, $.the("happy")), //happy in this environment
                         $.inh($.the("happy"), id),
                 new FloatPolarNormalized(
-                        new FloatHighPass(
+                        //new FloatHighPass(
                                 () -> rewardCurrent
-                        )
-                ).relax(0.002f));
+                        //)
+                ).relax(0.01f));
 
         this.happyGoal = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), now,
                 ETERNAL, ETERNAL,
@@ -207,7 +207,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         //sendInfluxDB("localhost", 8089);
 
         return id + " rwrd=" + n2(rewardCurrent) +
-                " dex=" + /*n4*/(dexterity()) +
+                " dex=" + /*n4*/(dexterity(now, now)) +
                 //"\t" + Op.cache.summary() +
                 /*" var=" + n4(varPct(nar)) + */ "\t" + nar.terms.summary() + " " +
                 nar.emotion.summary();
@@ -269,7 +269,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
         Truth happynowT = nar.beliefTruth(happy, now);
         float happynow = happynowT != null ? (happynowT.freq() - 0.5f) * 2f : 0;
-        nar.emotion.happy(dexterity() * happynow /* /nar.confDefault(GOAL) */);
+        nar.emotion.happy(dexterity(now, now) * happynow /* /nar.confDefault(GOAL) */);
 
         if (trace)
             logger.info(summary());
@@ -542,29 +542,37 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
     }
 
 
+    public float dexterity() {
+        return dexterity(nar.time());
+    }
+
+    public float dexterity(long when) {
+        return dexterity(when, when);
+    }
+
     /**
      * average confidence of actions
      * see: http://www.dictionary.com/browse/dexterity?s=t
      */
-    public float dexterity() {
+    public float dexterity(long start, long end) {
         int n = actions.size();
         if (n == 0)
             return 0;
 
         final float[] m = {0};
-        int dur = nar.dur();
-        long now = nar.time();
         actions.keySet().forEach(a -> {
-            Truth g = nar.goalTruth(a, now - dur / 2, now + dur / 2);
+            Truth g = nar.goalTruth(a, start, end);
             float c;
             if (g != null) {
-                c = g.evi();
+                //c = g.evi();
+                c = g.conf();
             } else {
                 c = 0;
             }
             m[0] += c;
         });
-        return m[0] > 0 ? w2c(m[0] / n /* avg */) : 0;
+        //return m[0] > 0 ? w2c(m[0] / n /* avg */) : 0;
+        return m[0] > 0 ? m[0] / n /* avg */ : 0;
     }
 
 

@@ -128,7 +128,7 @@ public class reflect {
         public ReflectClonedTask(int cap, NAR n) {
             super(cap, n);
             this.n = n;
-            this.filter = Task.newBloomFilter(1024);
+            this.filter = Task.newBloomFilter(1024, n.random());
         }
 
         @Override
@@ -137,7 +137,7 @@ public class reflect {
                 Term tt = next.term();
                 if (tt.subs() > 1 && !tt.hasAny(VAR_QUERY)) {
                     if (tt.volume() <= n.termVolumeMax.intValue() * 0.75f)
-                        if (filter.addIfMissing(next, 0.01f))
+                        if (filter.addIfMissing(next))
                             return true;
                 }
             }
@@ -178,7 +178,7 @@ public class reflect {
         public ReflectSimilarToTaskTerm(int cap, NAR n) {
             super(cap, n);
             this.filter = new StableBloomFilter<>(
-                    1024, 1,
+                    1024, 1, 0.0005f, n.random(),
                     new BytesHashProvider<>(IO::termToBytes));
             this.n = n;
         }
@@ -190,7 +190,7 @@ public class reflect {
                 Term tt = next.term();
                 if (tt.subs() > 1 && !tt.hasAny(VAR_QUERY))
                     if (tt.volume() <= n.termVolumeMax.intValue() * VOL_RATIO_MAX)
-                        if (filter.addIfMissing(tt.term().conceptual(), 0.01f))
+                        if (filter.addIfMissing(tt.term().conceptual()))
                             return true;
 
             }

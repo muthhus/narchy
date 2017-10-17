@@ -3,9 +3,9 @@ package il.technion.tinytable.bit;
 
 
 public class BucketSizeExpert {
-	int maxSize;
-	int minSize;
-	int bucketCapacity; 
+	private final int maxSize;
+	private final int minSize;
+	private final int bucketCapacity;
 	public BucketSizeExpert(int bucketSize,int minSize,int maxSize)
 	{
 		 bucketCapacity = bucketSize/minSize;

@@ -12,11 +12,11 @@ public class TinySet extends BitwiseArray2 {
 
 	private final short[] A;
 	// first level index.
-	protected int nrItems;
+	private final int nrItems;
 	boolean bloomFilter;
-	long L[];
-	HashMakerWithIndexBit hashFunc;
-	BucketSizeExpert bucketMaster;
+	private final long[] L;
+	private final HashMakerWithIndexBit hashFunc;
+	private final BucketSizeExpert bucketMaster;
 	public TinySet(int itemsize, int bucketCapacity,int nrBuckets,int maxAdditionalBits)
 	{
 		super(bucketCapacity*nrBuckets, itemsize+1,bucketCapacity);
@@ -55,13 +55,13 @@ public class TinySet extends BitwiseArray2 {
 
 	private void removeItem(int bucketNumber, int chainNumber, long fingerPrint) {
 		int actualSize = bucketBitSize-A[bucketNumber]*this.itemSize;
-		int itemSize = this.getBucketItemSize(bucketNumber,actualSize);
-		int mod  = this.getBucketMod(bucketNumber, itemSize);
+		int itemSize = this.bucketItemSize(bucketNumber,actualSize);
+		int mod  = this.bucketMod(bucketNumber, itemSize);
 		int bucketStart = this.bucketBitSize*bucketNumber + this.A[bucketNumber]*this.itemSize;
-		int idx = getChainStart(bucketStart,bucketNumber,chainNumber,itemSize,mod);
+		int idx = chainStart(bucketStart,bucketNumber,chainNumber,itemSize,mod);
 		//fingers can be two sizes, instead of constantly adjusting create two sizes and check them. 
-		long sfingerPrint = BitHelper.adjustFingerPrint(itemSize, fingerPrint);
-		long lfingerPrint = BitHelper.adjustFingerPrint(itemSize+1, fingerPrint);
+		long sfingerPrint = BitHelper.fingerPrint(itemSize, fingerPrint);
+		long lfingerPrint = BitHelper.fingerPrint(itemSize+1, fingerPrint);
 
 
 		long otherFingerprint = this.Get(bucketNumber,idx,itemSize,mod);
@@ -84,7 +84,7 @@ public class TinySet extends BitwiseArray2 {
 		//		this.Put(bucketNumber, idx, BitHelper.markFingerPrintAsDeleted(otherFingerprint),itemSize,mod);
 
 	}
-	public boolean containItem(String item)
+	private boolean containItem(String item)
 	{
 
 		return this.containsItem(hashFunc.createHash(item));
@@ -98,11 +98,11 @@ public class TinySet extends BitwiseArray2 {
 
 	private int baseRank(int bucketNumber,int chainNumber)
 	{
-		long mask = ~((-1l)<<chainNumber);
+		long mask = ~((-1L)<<chainNumber);
 		return Long.bitCount(L[bucketNumber]&mask); 
 	}
 
-	private int getChainStart(int bucketStart,int bucketNumber,int chainNumber, int size, int mod)
+	private int chainStart(int bucketStart, int bucketNumber, int chainNumber, int size, int mod)
 	{
 		return this.findChain(bucketStart, bucketNumber, 0, size, mod,baseRank(bucketNumber,chainNumber));
 
@@ -128,15 +128,15 @@ public class TinySet extends BitwiseArray2 {
 	{
 		int bucketSize = this.bucketBitSize - this.A[item.bucketId]*this.itemSize;
 		// first, let's calculate the bucket size and mod, we do it now so we only do it once.
-		int size = this.getBucketItemSize(item.bucketId,bucketSize);
-		int mod = this.getBucketMod(item.bucketId, bucketSize);
-		int newSize = this.getNextItemSize(item.bucketId,bucketSize);
-		int newMod = this.getNextBucketMod(item.bucketId, bucketSize);
+		int size = this.bucketItemSize(item.bucketId,bucketSize);
+		int mod = this.bucketMod(item.bucketId, bucketSize);
+		int newSize = this.nextItemSize(item.bucketId,bucketSize);
+		int newMod = this.nextBucketMod(item.bucketId, bucketSize);
 		// second, lets calculate the next item bucket size and mod.
 		int bucketStart = this.bucketBitSize*item.bucketId + this.A[item.bucketId]*this.itemSize;
-		int idxToAdd = getChainStart(bucketStart,item.bucketId,item.chainId ,size,mod);
+		int idxToAdd = chainStart(bucketStart,item.bucketId,item.chainId ,size,mod);
 
-		if(!this.MarkChain(item.bucketId, item.chainId))
+		if(!this.markChain(item.bucketId, item.chainId))
 			item.fingerprint = FingerPrintAux.setLast(item.fingerprint);
 
 		//find the next free bucket.
@@ -144,12 +144,13 @@ public class TinySet extends BitwiseArray2 {
 //		// if we need to, we steal items from other buckets.
 //		makeRoomForStolenItems(item.bucketId,nextBucket);
 		// we may also need to make room for current buckets, and shrink the finger prints.
-		item.fingerprint = makeRoomForBucketItem(item.bucketId, item.fingerprint, idxToAdd,size,mod,newSize,newMod);
+		item.fingerprint = allocateBucketItem(item.bucketId, item.fingerprint, idxToAdd,size,mod,newSize,newMod);
 		//finally we put the item in the bucket, and perform a local bucket shifting as needed.
-		this.PutAndPush(item.bucketId, idxToAdd, item.fingerprint,newSize,newMod,item.chainId,false);
+		this.putpush(item.bucketId, idxToAdd, item.fingerprint,newSize,newMod,item.chainId,false);
 		//this.MarkChain(bucketNumber, chainNumber);
 	}
-	private long makeRoomForBucketItem(int bucketNumber, long fingerPrint, int idx, int oldItemSize, int oldMod,int newItemSize,int newMod) {
+
+	private long allocateBucketItem(int bucketNumber, long fingerPrint, int idx, int oldItemSize, int oldMod, int newItemSize, int newMod) {
 
 		//first we check if a downsize of the items is required.
 		if(oldItemSize!=newItemSize|| newMod!=oldMod)
@@ -163,13 +164,13 @@ public class TinySet extends BitwiseArray2 {
 		//we calculate the length of the new item size, and adjust the fingerprint to that size.
 		newItemSize = idx<newMod?newItemSize+1:newItemSize;
 
-		return BitHelper.adjustFingerPrint(newItemSize, fingerPrint);
+		return BitHelper.fingerPrint(newItemSize, fingerPrint);
 	}
 	private void resizeItems(int bucketId,int oldSize, int newSize,int oldMod, int newMod,boolean IncrementAnchor) {
 
 
 		//int modSize = newSize==this.maxAdditionalSize + this.itemSize? newSize: newSize+1;
-		int i=0;
+		int i;
 		int bucketStart = this.bucketBitSize*bucketId + this.A[bucketId]*this.itemSize;
 
 		for( i=0; i<this.Items[bucketId];i++)
@@ -177,7 +178,7 @@ public class TinySet extends BitwiseArray2 {
 			int nsize = newSize + i<newMod?1:0;
 			int psize = oldSize + i<oldMod?1:0;
 			if(nsize!=psize){
-				long oldFp = this.Replace(bucketStart,bucketId,i,oldSize,oldMod,0l);
+				long oldFp = this.Replace(bucketStart,bucketId,i,oldSize,oldMod, 0L);
 				this.Put(bucketStart,bucketId,i, oldFp,newSize,newMod);
 			}
 		}
@@ -190,38 +191,37 @@ public class TinySet extends BitwiseArray2 {
 
 
 	@Override
-    public void Put(int bucketId, int idx, final long value) {
-		int size = this.getBucketItemSize(bucketId,bucketBitSize-A[bucketId]*this.itemSize);
-		int mod = this.getBucketMod(bucketId,size);
+    protected void Put(int bucketId, int idx, final long value) {
+		int size = this.bucketItemSize(bucketId,bucketBitSize-A[bucketId]*this.itemSize);
+		int mod = this.bucketMod(bucketId,size);
 		this.Put(bucketId,idx, value,size,mod);
-		return;
-	}
+    }
 
 	@Override
-    public long Get(int bucketID, int idx) {
-		int size = this.getBucketItemSize(bucketID,bucketBitSize-A[bucketID]*this.itemSize);
-		int mod =getBucketMod(bucketID,bucketBitSize-A[bucketID]*this.itemSize);
+    protected long Get(int bucketID, int idx) {
+		int size = this.bucketItemSize(bucketID,bucketBitSize-A[bucketID]*this.itemSize);
+		int mod = bucketMod(bucketID,bucketBitSize-A[bucketID]*this.itemSize);
 		return this.Get(bucketID,idx, size,mod);
 	}
 
 
-	public int getBucketItemSize(int bucketNumber,int bucketSize)
+	private int bucketItemSize(int bucketNumber, int bucketSize)
 	{
 		//		int actualBucketSize = bucketBitSize-stolenItems*this.minSize;
 
 		return this.bucketMaster.getSize(Items[bucketNumber],bucketSize);
 	}
 
-	private int getNextItemSize(int bucketNumber,int bucketSize)
+	private int nextItemSize(int bucketNumber, int bucketSize)
 	{
 
 		return this.bucketMaster.getSize(Items[bucketNumber]+1,bucketSize);
 	}
-	private int getNextBucketMod(int bucketNumber,int actualBucketSize)
+	private int nextBucketMod(int bucketNumber, int actualBucketSize)
 	{
 		return this.bucketMaster.getMod(Items[bucketNumber]+1,actualBucketSize);
 	}
-	public int getBucketMod(int bucketNumber,int actualBucketSize)
+	private int bucketMod(int bucketNumber, int actualBucketSize)
 	{
 		return this.bucketMaster.getMod(Items[bucketNumber],actualBucketSize);
 
@@ -230,18 +230,18 @@ public class TinySet extends BitwiseArray2 {
 	private boolean containChain(int bucketNumber, int chainNumber)
 	{
 		//		long mask = ((1l)<<chainNumber);
-		return (L[bucketNumber]&((1l)<<chainNumber)) != 0;
+		return (L[bucketNumber]&((1L)<<chainNumber)) != 0;
 	}
 
-	private boolean MarkChain(int bucketNumber, int chainNumber)
+	private boolean markChain(int bucketNumber, int chainNumber)
 	{
-		long mask = ((1l)<<chainNumber);
+		long mask = ((1L)<<chainNumber);
 		boolean result = (L[bucketNumber]&mask) == mask;
 		L[bucketNumber]|=mask;
 		return result;
 	}
 
-	boolean containsItem(FingerPrintAux item)
+	private boolean containsItem(FingerPrintAux item)
 	{
 		int bucketSize = this.bucketBitSize - this.A[item.bucketId]*this.itemSize;
 
@@ -249,10 +249,10 @@ public class TinySet extends BitwiseArray2 {
 			return false;
 		int bucketStart = this.bucketBitSize*item.bucketId + this.A[item.bucketId]*this.itemSize;
 
-		int itemSize = this.getBucketItemSize(item.bucketId,bucketSize);
-		int mod  = this.getBucketMod(item.bucketId, bucketSize);
+		int itemSize = this.bucketItemSize(item.bucketId,bucketSize);
+		int mod  = this.bucketMod(item.bucketId, bucketSize);
 		//		int bucketStart = this.bucketBitSize*item.bucketId + this.A[item.bucketId]*this.itemSize;
-		int idx = getChainStart(bucketStart,item.bucketId,item.chainId,itemSize,mod);
+		int idx = chainStart(bucketStart,item.bucketId,item.chainId,itemSize,mod);
 		//fingers can be two sizes, instead of constantly adjusting create two sizes and check them.
 		long sfingerPrint = item.fingerprint&((1<<itemSize)-1);
 
@@ -266,9 +266,9 @@ public class TinySet extends BitwiseArray2 {
 		long fpTocomper = idx <mod ? lfingerPrint:sfingerPrint;
 
 		//GIL: adding back the bug.
-		while((fpTocomper^otherFingerprint)>1l)
+		while((fpTocomper^otherFingerprint)> 1L)
 		{
-			if((otherFingerprint&1l) ==1l)
+			if((otherFingerprint& 1L) == 1L)
 				return false;
 			idx++;
 			fpTocomper = idx <mod ? lfingerPrint:sfingerPrint;
@@ -297,7 +297,7 @@ public class TinySet extends BitwiseArray2 {
 	 * 				- bucket item size. (in order to decode bucket)
 	 * @param chainNumber
 	 */
-	protected void PutAndPush(int bucketId, int idx, final long value, int size, int mod, int chainNumber,boolean replaceDeleted) {
+	private void putpush(int bucketId, int idx, final long value, int size, int mod, int chainNumber, boolean replaceDeleted) {
 
 		int bucketStart = this.bucketBitSize*bucketId + this.A[bucketId]*this.itemSize;
 

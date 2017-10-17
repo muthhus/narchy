@@ -11,11 +11,11 @@ import static org.junit.Assert.assertFalse;
  */
 public class CountingLeakySetTest {
 
-    private CountingLeakySet<String> filter;
+    private StableBloomFilter<String> filter;
 
     @Before
     public void before() {
-        this.filter = BloomFilterBuilder.get().buildCountingFilter();
+        this.filter = BloomFilterBuilder.get().buildFilter();
     }
 
     @Test

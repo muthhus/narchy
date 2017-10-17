@@ -6,6 +6,7 @@ import jcog.Util;
 import jcog.exe.Loop;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.Cleaner;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -24,6 +25,7 @@ import static jcog.pri.PriMap.State.FREE;
  */
 public class PriMap<X, Y> extends AbstractMap<X, Y> {
 
+
     public enum Hold {
         STRONG, WEAK, SOFT
     }
@@ -41,10 +43,18 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
     abstract public static class TLink<X, Y> implements Supplier<Y> {
         public final X key;
         public final int hash;
+        //TODO support hash64 and larger
 
-        public TLink(X key) {
+        /** activity counter */
+        long action = 0;
+
+        long lastActive;
+
+
+        public TLink(X key, long now) {
             this.key = key;
             this.hash = key.hashCode();
+            this.lastActive = now;
         }
 
         @Override
@@ -57,13 +67,38 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
             return this == obj || (key == obj || key.equals(obj));
         }
 
+        public void updateAction(long boost, long now, float forgetRate) {
+
+            //TODO use atomics to avoid synch block
+            synchronized (key) {
+                long prevLastActive = this.lastActive;
+                long dt = now - prevLastActive;
+
+                long nextAction = this.action;
+                if (dt > 0) {
+                    nextAction = Math.max(0, Math.round(forgetRate * dt));
+                }
+
+                lastActive = now;
+                this.action = nextAction + boost;
+            }
+
+        }
+
+        @Override
+        public String toString() {
+            return key + "{" +
+                    ", action=" + action +
+                    ", lastActive=" + lastActive +
+                    '}';
+        }
     }
 
     public static class BasicTLink<X, Y> extends TLink<X, Y> {
         private Y value;
 
-        public BasicTLink(X key) {
-            super(key);
+        public BasicTLink(X key, long now) {
+            super(key, now);
         }
 
         public TLink<X, Y> setValue(Y newValue) {
@@ -77,6 +112,9 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
         }
     }
 
+    public final long now() {
+        return clock.getAsLong();
+    }
 
     TLink<X, Y> link(@Nullable TLink<X, Y> t, X k, Y v, Hold mode) {
 
@@ -89,19 +127,19 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
 
             case STRONG:
                 if (!(t instanceof BasicTLink))
-                    t = new BasicTLink(k);
+                    t = new BasicTLink(k, now());
                 ((BasicTLink) t).setValue(v);
                 break;
 
             case SOFT:
                 if (!(t instanceof ProxyTLink))
-                    t = new ProxyTLink(k);
+                    t = new ProxyTLink(k, now());
                 ((ProxyTLink) t).setValue(new MySoftReference(k, v, refq));
                 break;
 
             case WEAK:
                 if (!(t instanceof ProxyTLink))
-                    t = new ProxyTLink(k);
+                    t = new ProxyTLink(k, now());
                 ((ProxyTLink) t).setValue(new MyWeakReference(k, v, refq));
                 break;
 
@@ -115,8 +153,8 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
 
         private Supplier<Y> value = () -> null;
 
-        public ProxyTLink(X key) {
-            super(key);
+        public ProxyTLink(X key, long now) {
+            super(key, now);
         }
 
         public void setValue(Supplier<Y> value) {
@@ -150,25 +188,35 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
     final Map<X, TLink<X, Y>> map = new ConcurrentHashMap<>();
 
     private final LongSupplier clock;
+
+    private float forgetRate = 1;
+
     public final ReferenceQueue refq = new ReferenceQueue();
-    protected final Loop cleaner;
+    public final Loop cleaner;
 
     public PriMap() {
         this(System::currentTimeMillis);
     }
 
     public PriMap(LongSupplier clock) {
-        this.clock = clock;
 
+        this.clock = clock;
         this.cleaner = new Cleaner();
     }
 
     public Y get(Object x) {
-        TLink<X, Y> t = link(x);
-        return t != null ? t.get() : null;
+        TLink<X, Y> t = getLink(x);
+        if (t!=null) {
+            Y y = t.get();
+            if (y!=null) {
+                t.updateAction(1, now(), forgetRate);
+                return y;
+            }
+        }
+        return null;
     }
 
-    protected TLink<X, Y> link(Object x) {
+    protected TLink<X, Y> getLink(Object x) {
         return map.get(x);
     }
 
@@ -274,6 +322,14 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
         throw new TODO();
     }
 
+    public Iterator<TLink<X, Y>> linkIterator() {
+        return map.values().iterator();
+    }
+
+    public Iterator<Y> valueIterator() {
+        return Iterators.transform(linkIterator(), Supplier::get);
+    }
+
     private class MyEntrySet extends AbstractSet<Entry<X, Y>> {
 
         final Set<Entry<X, TLink<X, Y>>> e = map.entrySet();
@@ -294,8 +350,8 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
     /** TODO abstract this into a general purpose PriMap-independent resource watcher which triggers the various eviction options as well as controls other controllable parameters as plugins like AgentService */
     protected class Cleaner extends Loop {
 
-        final float alertThreshold = 0.75f;
         int minPeriod = 1, maxPeriod = 200;
+
 
         public Cleaner() {
             super();
@@ -312,13 +368,17 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
             }
 
             float evictPower = updateMemory(Util.memoryUsed());
+
             evict(evictPower);
 
             //TODO adjust cycle time in proportion to eviction power
-            setPeriodMS(Util.lerp(Util.round( 1f - evictPower, 0.2f), minPeriod, maxPeriod));
+            setPeriodMS((int)Util.round( Util.lerp(1f - (evictPower*evictPower), (float)minPeriod, (float)maxPeriod),
+                    2 /* ms increments */) );
 
             return true;
         }
+
+
 
 
     }
@@ -334,14 +394,12 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
     protected float updateMemory(float used) {
         if (used > 0.9f) {
             state = State.CRITICAL;
-            return used;
-        } else if (used > 0.5f) {
+        } else if (used > 0.25f) {
             state = State.ALERT;
-            return used;
         } else {
             state = State.FREE;
-            return 0;
         }
+        return Util.unitize(used*used*used);
     }
 
     public void evict(float strength) {

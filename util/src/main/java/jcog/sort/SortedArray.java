@@ -164,6 +164,8 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
 
     public final int add(final E element, FloatFunction<E> cmp) {
         float elementRank = cmp.floatValueOf(element);
+        if (elementRank!=elementRank)
+            return -1; //NaN cancels
 
         return add(element, elementRank, cmp);
     }

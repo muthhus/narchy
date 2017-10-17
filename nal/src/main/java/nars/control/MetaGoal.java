@@ -102,7 +102,7 @@ public enum MetaGoal {
             float prev = c.value();
             final float momentum =
 //                    0f;
-                    0.9f;
+                    0.98f;
 //                    0.99f * (1f - Util.unitize(
 //                            Math.abs(next) / (1 + Math.max(Math.abs(next), Math.abs(prev)))));
 

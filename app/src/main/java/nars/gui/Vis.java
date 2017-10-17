@@ -10,7 +10,6 @@ import nars.NAR;
 import nars.NAgent;
 import nars.concept.Concept;
 import nars.gui.graph.EdgeDirected;
-import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -98,14 +97,14 @@ public class Vis {
 //        }
 //    }
 
-    public static Surface budgetHistogram(Iterable<PriReference> bag, int bins) {
+    public static Surface bagHistogram(Iterable<PriReference> bag, int bins) {
         //new SpaceGraph().add(new Facial(
 
-        double[] d = new double[bins];
+        float[] d = new float[bins];
         return col(
                 Vis.pane("Concept Priority Distribution (0..1)",
                         new HistogramChart(
-                                () -> Bag.priHistogram(bag, d),
+                                () -> Bag.histogram(bag, d),
                                 new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))
                 )
 //                Vis.pane("Concept Volume",
@@ -355,7 +354,9 @@ public class Vis {
             plot2.add("Busy", nar.emotion.busyVol::getSum);
             plot3.add("Lern", nar.emotion::learningVol, 0f, 1f);
 
-            plot1.add("Dex", a::dexterity, 0f, 1f);
+            plot1.add("Dex+0", () -> a.dexterity(a.now), 0f, 1f);
+            plot1.add("Dex+1", () -> a.dexterity(a.now+1*a.nar.dur()), 0f, 1f);
+            plot1.add("Dex+2", () -> a.dexterity(a.now+2*a.nar.dur()), 0f, 1f);
 
             plot4.add("Hpy", () -> {
                 return a.happy.beliefs().freq(a.now, a.nar);

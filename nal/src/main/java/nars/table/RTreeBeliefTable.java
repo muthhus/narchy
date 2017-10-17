@@ -174,8 +174,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         if (start == ETERNAL) start = end = nar.time();
         assert (end >= start);
 
-        FloatFunction<Task> ts = (template != null && template.isTemporal()) ?
-                taskStrength(template, start, end) :
+        FloatFunction<Task> ts =
+                //(template != null && template.isTemporal()) ?
+                    //taskStrength(template, start, end) :
                 taskStrength(start, end);
 
         FloatFunction<TaskRegion> strongestTask =
@@ -380,11 +381,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         if (size <= cap)
             return true;
 
+        int dur = 1 + (int) ( tableDur());
+
         long now = nar.time();
         FloatFunction<Task> taskStrength =
                 new CachedFloatFunction(
                         //taskStrength(now-dur/2, now+dur/2, dur);
-                        taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, nar.dur())
+                        taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, dur)
                 );
 
         for (int e = 0; treeRW.size() > cap /*&& e < excess*/; e++) {

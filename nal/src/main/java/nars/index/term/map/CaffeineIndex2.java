@@ -254,7 +254,7 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
     @Override
     public @NotNull String summary() {
         //CacheStats s = cache.stats();
-        return (vectors.estimatedSize() + " TermVectors, ") + ' ' + super.summary() +
+        return (vectors.estimatedSize() + " TermVectors, ") + ' ' +
                 (Param.DEBUG ? (" " + vectors.stats()) : "");
         //(" + n2(s.hitRate()) + " hitrate, " +
         //s.requestCount() + " reqs)";

@@ -13,16 +13,16 @@ import java.util.function.Function;
 public class TinyTable extends BitwiseArray {
 
     /** used as an object pool for the rank indexing technique. In order to prevent dynamic memory allocation. */
-    public final byte[] offsets;
-    public final byte[] chain;
+    private final byte[] offsets;
+    private final byte[] chain;
 
     /** base index array. */
-    public final long[] I0;
+    final long[] I0;
     /** IStar array. */
-    public final long[] IStar;
+    final long[] IStar;
 
     /** anchor distance array. */
-    public final short[] A;
+    final short[] A;
 
     private static final int maxAdditionalSize = 0;
 
@@ -66,14 +66,14 @@ public class TinyTable extends BitwiseArray {
         return remove(toBytes.apply(x));
     }
 
-    public boolean remove(byte[] i) {
+    private boolean remove(byte[] i) {
         return remove(hash.hash(i));
     }
 
     public boolean contains(String item) {
         return this.contains(item.getBytes());
     }
-    public boolean contains(byte[] item) {
+    private boolean contains(byte[] item) {
         return this.contains(hash.hash(item));
     }
     public <X> boolean contains(X item, Function<X,byte[]> toBytes) {
@@ -85,7 +85,7 @@ public class TinyTable extends BitwiseArray {
         return this.contains(hash.hash(item));
     }
 
-    public long size(int bucketId, int chainId, long fingerprint) {
+    long size(int bucketId, int chainId, long fingerprint) {
 
         long[] chain = this.getChain(bucketId, chainId);
         return Chains.size(chain, fingerprint, this.itemSize - 1);
@@ -114,23 +114,22 @@ public class TinyTable extends BitwiseArray {
      * <p>
      * In order to support deletions, deleted items are first logically deleted, and are fully
      * deleted only upon addition.
-     *
-     * @param bucketNumber
+     *  @param bucketNumber
      * @param chainNumber
      * @param fingerPrint
      */
-    protected void add(FingerPrint fpAux) {
+    int add(FingerPrint fpAux) {
         int nextBucket = this.findFreeBucket(fpAux.bucketId);
         upscaleBuckets(fpAux.bucketId, nextBucket);
 
         int idxToAdd = RankIndexing.addItem(fpAux, I0, IStar, offsets, chain);
         // if we need to, we steal items from other buckets.
         this.putAndPush(fpAux.bucketId, idxToAdd, fpAux.fingerprint);
-        return;
+        return idxToAdd;
     }
 
 
-    protected boolean remove(FingerPrint fpaux) {
+    private boolean remove(FingerPrint fpaux) {
         int m = moveToEnd(fpaux);
         if (m < 0)
             return false;
@@ -182,11 +181,10 @@ public class TinyTable extends BitwiseArray {
             return -1;
             //throw new RuntimeException("Not found!");
 
-        int removedOffset = itemOffset;
         int lastOffset = chain[chainoffset];
         long lastItem = this.get(fpaux.bucketId, lastOffset);
 //		Assert.assertTrue(chain.containsitemOffset));
-        this.set(fpaux.bucketId, removedOffset, lastItem);
+        this.set(fpaux.bucketId, itemOffset, lastItem);
         this.set(fpaux.bucketId, lastOffset, 0L);
         return lastOffset;
 
@@ -194,7 +192,7 @@ public class TinyTable extends BitwiseArray {
     }
 
 
-    protected void removeItemFromIndex(FingerPrint fpaux) {
+    void removeItemFromIndex(FingerPrint fpaux) {
         int chainSize = RankIndexing.getChainAndUpdateOffsets(fpaux, I0, IStar, this.offsets, this.chain, fpaux.chainId) - 1;
         RankIndexing.RemoveItem(fpaux.chainId, I0, IStar, fpaux.bucketId, offsets, chain, chainSize);
     }
@@ -231,8 +229,8 @@ public class TinyTable extends BitwiseArray {
     }
 
 
-    public long[] getChain(int bucketId, int chainId) {
-        IntList chain = RankIndexing.getChain(chainId, I0[bucketId], IStar[bucketId]);
+    long[] getChain(int bucketId, int chainId) {
+        IntList chain = RankIndexing.getChain(chainId, I0[bucketId], IStar[bucketId], bucketCapacity);
         int s = chain.size();
         long[] result = new long[s];
         for (int i = 0; i < s; i++) {
@@ -257,7 +255,6 @@ public class TinyTable extends BitwiseArray {
                 lastBucket = A.length - 1;
             }
         }
-        return;
 
     }
 
@@ -277,15 +274,13 @@ public class TinyTable extends BitwiseArray {
      * @param size        - bucket item size. (in order to decode bucket)
      * @param chainNumber
      */
-    protected void putAndPush(int bucketId, int idx, final long value) {
+    private void putAndPush(int bucketId, int idx, final long value) {
         this.replaceMany(bucketId, idx, value, this.start(bucketId));
         //this.nrItems++;
-        return;
     }
 
-    protected void removeAndShrink(int bucketId) {
+    void removeAndShrink(int bucketId) {
         this.replaceBackwards(bucketId, this.start(bucketId));
-        return;
     }
 
 

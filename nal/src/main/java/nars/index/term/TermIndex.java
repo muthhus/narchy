@@ -88,7 +88,7 @@ public abstract class TermIndex implements TermContext {
         out.println();
     }
 
-    abstract public Stream<Termed> stream();
+    abstract public Stream<? extends Termed> stream();
 
     /**
      * default impl

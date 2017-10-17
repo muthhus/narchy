@@ -1,6 +1,6 @@
 package il.technion.tinytable.hash;
 
-public class MurmurHash {
+class MurmurHash {
 
     /**
      * Murmur hash 2.0.
@@ -30,7 +30,7 @@ public class MurmurHash {
          * @param seed   initial seed value
          * @return 32 bit hash of the given array
          */
-        public static int hash32(final byte[] data, final int length, final int seed) {
+        private static int hash32(final byte[] data, final int length, final int seed) {
             // 'm' and 'r' are mixing constants generated offline.
             // They're not really 'magic', they just happen to work well.
             final int m = 0x5bd1e995;
@@ -75,7 +75,7 @@ public class MurmurHash {
          * @param length length of the array to hash
          * @return 32 bit hash of the given array
          */
-        public static int hash32(final byte[] data, final int length) {
+        private static int hash32(final byte[] data, final int length) {
             return hash32(data, length, 0x9747b28c);
         }
 
@@ -85,7 +85,7 @@ public class MurmurHash {
          * @param text string to hash
          * @return 32 bit hash of the given string
          */
-        public static int hash32(final String text) {
+        private static int hash32(final String text) {
             final byte[] bytes = text.getBytes();
             return hash32(bytes, bytes.length);
         }
@@ -185,7 +185,7 @@ public class MurmurHash {
          * @param text string to hash
          * @return 64 bit hash of the given string
          */
-        public static long hash64(final String text) {
+        private static long hash64(final String text) {
             final byte[] bytes = text.getBytes();
             return hash64(bytes, bytes.length);
         }
@@ -206,7 +206,7 @@ public class MurmurHash {
 
 	public static long hash641(final byte[] data, final int length) {
 
-		long h = (Seed64 & 0xffffffffl) ^ (length * m);
+		long h = (Seed64 & 0xffffffffL) ^ (length * m);
 		final int length8 = length >>> 3;
 		for (int i = 0; i < length8; i++) {
 			final int i8 = i << 3;

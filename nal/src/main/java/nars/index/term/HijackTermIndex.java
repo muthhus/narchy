@@ -17,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static nars.truth.TruthFunctions.w2c;
 
@@ -231,6 +233,11 @@ public class HijackTermIndex extends MaplikeTermIndex {
         }
 
         conceptScores.recordValue(score);
+    }
+
+    @Override
+    public Stream<? extends Termed> stream() {
+        return table.stream().map(Supplier::get);
     }
 
     protected float score(Concept c) {

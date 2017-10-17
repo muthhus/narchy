@@ -14,10 +14,10 @@ import java.util.function.Supplier;
 public class HistogramChart extends Surface {
 
 
-    private final Supplier<double[]> data;
+    private final Supplier<float[]> data;
     private final Color3f dark, light;
 
-    public HistogramChart(Supplier<double[]> source, Color3f dark, Color3f light) {
+    public HistogramChart(Supplier<float[]> source, Color3f dark, Color3f light) {
 
         this.data = source;
         this.dark = dark;
@@ -27,7 +27,7 @@ public class HistogramChart extends Surface {
 
 //    public HistogramChart(NAR nar, FloatFunction<PLink<Concept>> meter, int bins, Color3f dark, Color3f light) {
 //
-//        double[] data = new double[bins];
+//        float[] data = new float[bins];
 //        this.data = () -> data;
 //        this.dark = dark;
 //        this.light = light;
@@ -39,8 +39,8 @@ public class HistogramChart extends Surface {
 //                data[b]++;
 //            });
 //
-//            double total = 0;
-//            for (double e : data) {
+//            float total = 0;
+//            for (float e : data) {
 //                total += e;
 //            }
 //            if (total > 0) {
@@ -56,11 +56,11 @@ public class HistogramChart extends Surface {
     @Override
     protected void paint(GL2 gl) {
 
-        double[] data = this.data.get();
+        float[] data = this.data.get();
 
         int N = data.length;
         float dx = 1f / N;
-        double max = data[Util.argmax(data)];
+        float max = data[Util.argmax(data)];
         if (max == 0)
             return; //empty
 

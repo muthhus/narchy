@@ -1,7 +1,6 @@
 package il.technion.tinytable.hash;
 
 
-import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 
 public class RankIndexing {
@@ -13,7 +12,7 @@ public class RankIndexing {
      * @param idx
      * @return
      */
-    public static int rank(long Istar, int idx) {
+    private static int rank(long Istar, int idx) {
         return Long.bitCount(Istar & ((1L << idx) - 1));
     }
 
@@ -34,8 +33,7 @@ public class RankIndexing {
             if (nextOffset == offset || nextOffset == 0)
                 break;
             offset = nextOffset;
-			int i = 0;
-			i++;
+
 
         }
         return baseOffset + offset;
@@ -63,7 +61,7 @@ public class RankIndexing {
      * @param offsets  - an array to write the result in
      * @param bucketId
      */
-    public static void getItemsPerLevelUpTo64New(long[] I0, long[] IStar, final byte[] offsets, int bucketId) {
+    private static void getItemsPerLevelUpTo64New(long[] I0, long[] IStar, final byte[] offsets, int bucketId) {
         offsets[0] = (byte) Long.bitCount(I0[bucketId]);
 
 
@@ -86,7 +84,7 @@ public class RankIndexing {
 
     }
 
-    public static int[] getItemsPerLevelUpTo64(long I0, long IStar) {
+    private static int[] getItemsPerLevel(long I0, long IStar) {
         int[] temp = new int[65];
         temp[0] = Long.bitCount(I0);
 
@@ -116,7 +114,7 @@ public class RankIndexing {
      * @param offset      - the offset of the bit in the index that tells us where the chain is
      * @return
      */
-    public static int getNextChainIndex(int chainNumber, long index, int offset) {
+    private static int getNextChainIndex(int chainNumber, long index, int offset) {
         long modified = index >> offset;
         long mask = 1L << chainNumber;
         return ((modified) & (mask)) != 0L ? Long.bitCount(modified & (mask - 1)) : -1;
@@ -251,11 +249,12 @@ public class RankIndexing {
      * @param chainNumber
      * @param I0
      * @param IStar
+     * @param is
      * @return
      */
-    public static IntList getChain(int chainNumber, long I0, long IStar) {
+    public static IntArrayList getChain(int chainNumber, long I0, long IStar, int is) {
         IntArrayList itemIdx = new IntArrayList(3);
-        int[] offsets = getItemsPerLevelUpTo64(I0, IStar);
+        int[] offsets = getItemsPerLevel(I0, IStar);
 
         int firstItem = getNextChainIndex(chainNumber, I0, 0);
 
@@ -264,7 +263,7 @@ public class RankIndexing {
 
         int offset = 0;
         int i = 0;
-        while (firstItem >= 0) {
+        while (firstItem >= 0 && i <= is) {
             firstItem = getNextChainIndex(firstItem, IStar, offset);
             if (firstItem < 0)
                 return itemIdx;
@@ -296,8 +295,8 @@ public class RankIndexing {
      * @param chain
      * @return
      */
-    public static int getChainWithoutUpdatingOffsets(FingerPrint fpaux,
-                                                     long[] I0, long[] IStar, byte[] offsets, byte[] chain) {
+    private static int getChainWithoutUpdatingOffsets(FingerPrint fpaux,
+                                                      long[] I0, long[] IStar, byte[] offsets, byte[] chain) {
 
         int nextItem = getNextChainIndex(fpaux.chainId, I0[fpaux.bucketId], 0);
         chain[0] = (byte) nextItem;
@@ -308,11 +307,14 @@ public class RankIndexing {
             nextItem = getNextChainIndex(nextItem, IStar[fpaux.bucketId], offset);
             if (nextItem < 0) {
                 chain[++i] = -1;
-                return i - 1;
+                break;
             }
+            if (i == chain.length-1)
+                break;
             offset += offsets[i];
             chain[++i] = (byte) (offset + nextItem);
         }
+        return i-1;
     }
 
 }

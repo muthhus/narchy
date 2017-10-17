@@ -4,8 +4,10 @@ package il.technion.tinytable;
 import il.technion.tinytable.bit.Chains;
 import il.technion.tinytable.hash.FingerPrint;
 import il.technion.tinytable.hash.RankIndexing;
+import org.eclipse.collections.api.PrimitiveIterable;
 import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.api.list.primitive.LongList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 
 import java.util.function.Function;
 
@@ -29,7 +31,7 @@ public class TinyCountingTable extends TinyTable {
         return get(item.getBytes());
     }
 
-    public long get(byte[] item) {
+    private long get(byte[] item) {
         return get(hash.hash(item));
     }
 
@@ -37,7 +39,7 @@ public class TinyCountingTable extends TinyTable {
         return get(toBytes.apply(x));
     }
 
-    public long get(FingerPrint fpaux) {
+    private long get(FingerPrint fpaux) {
         return this.size(fpaux.bucketId, fpaux.chainId, fpaux.fingerprint | 1L);
     }
 
@@ -51,7 +53,7 @@ public class TinyCountingTable extends TinyTable {
      */
     private void shrinkChain(int bucketId, int chainId) {
 		this.removeAndShrink(bucketId);
-		int bucket = 0;
+		int bucket;
         int il = this.I0.length;
         for (int i = bucketId + 1; i < bucketId + il; i++) {
             bucket = (i) % il;
@@ -80,11 +82,11 @@ public class TinyCountingTable extends TinyTable {
         set(toBytes.apply(item), value);
     }
 
-    public void set(byte[] item, long value) {
+    private void set(byte[] item, long value) {
         set(hash.hash(item), value);
     }
 
-    public void set(FingerPrint fpaux, long value) {
+    private void set(FingerPrint fpaux, long value) {
         fpaux.fingerprint |= 1L;
         if (!this.contains(fpaux)) {
             this.add(fpaux);
@@ -106,12 +108,13 @@ public class TinyCountingTable extends TinyTable {
      * @return
      */
     private IntList adjustChainToItems(int bucketId, int chainId,
-                                       LongList items) {
-        IntList chain = RankIndexing.getChain(chainId, I0[bucketId], IStar[bucketId]);
+                                       PrimitiveIterable items) {
+
+        IntArrayList chain = RankIndexing.getChain(chainId, I0[bucketId], IStar[bucketId], this.bucketCapacity);
         FingerPrint fpaux = new FingerPrint(bucketId, chainId, 1L);
         // if the chain is shorter than needed we add dummy items.
-        int is = items.size();
         int cs = chain.size();
+        int is = items.size();
         if (cs < is) {
             int diff = is - cs;
             while (diff > 0) {
@@ -130,7 +133,7 @@ public class TinyCountingTable extends TinyTable {
             }
 
         }
-        chain = RankIndexing.getChain(chainId, I0[bucketId], IStar[bucketId]);
+        chain = RankIndexing.getChain(chainId, I0[bucketId], IStar[bucketId], bucketCapacity);
         return chain;
     }
 
@@ -149,7 +152,7 @@ public class TinyCountingTable extends TinyTable {
 //		Assert.assertTrue(chainIndexes.size() == items.length);
 
         //then we put the items in the appropriate indices.
-        int is = items.size();
+        int is = Math.min(chainIndexes.size(), items.size());
         for (int i = 0; i < is; i++) {
             int itemOffset = chainIndexes.get(i);
             if (itemOffset < 0)

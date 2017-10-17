@@ -102,9 +102,9 @@ abstract public class Loop implements Runnable {
                     } catch (Throwable ignored) { }
                     logger.info("stop {}", this);
                 }
-            } else if (prevPeriodMS >= 0 && nextPeriodMS >= 0) {
+            } else if (prevPeriodMS >= 0) {
                 //change speed
-                logger.info("{} period={}ms", this, nextPeriodMS);
+                logger.debug("{} period={}ms", this, nextPeriodMS);
             }
             return true;
         }

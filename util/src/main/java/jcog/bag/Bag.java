@@ -87,7 +87,7 @@ public interface Bag<K, V> extends Table<K, V> {
      */
     @Override
     @Nullable
-    V remove(@NotNull K x);
+    V remove(/*@NotNull*/ K x);
 
 
     default V put(/*@NotNull */V x) {
@@ -117,12 +117,12 @@ public interface Bag<K, V> extends Table<K, V> {
 //        }
 
 
-    V put(@NotNull V b, @Nullable MutableFloat overflowing);
+    V put(/*@NotNull*/ V b, @Nullable MutableFloat overflowing);
 
 
     /* sample the bag, optionally removing each visited element as decided by the visitor's
      * returned value */
-    @NotNull Bag<K, V> sample(/*@NotNull */Bag.BagCursor<? super V> each);
+    /*@NotNull*/ Bag<K, V> sample(/*@NotNull */Bag.BagCursor<? super V> each);
 
 
     default List<V> copyToList(int n) {
@@ -498,7 +498,7 @@ public interface Bag<K, V> extends Table<K, V> {
 
 
     @NotNull
-    default double[] priHistogram(@NotNull double[] x) {
+    default float[] histogram(/*@NotNull*/ float[] x) {
         int bins = x.length;
         forEach(budget -> {
             float p = priElse(budget, 0);
@@ -506,7 +506,7 @@ public interface Bag<K, V> extends Table<K, V> {
             x[b]++;
         });
         double total = 0;
-        for (double e : x) {
+        for (float e : x) {
             total += e;
         }
         if (total > 0) {
@@ -534,7 +534,7 @@ public interface Bag<K, V> extends Table<K, V> {
 
 
     @NotNull
-    static double[] priHistogram(Iterable<? extends PriReference> pp, @NotNull double[] x) {
+    static float[] histogram(Iterable<? extends PriReference> pp, @NotNull float[] x) {
         int bins = x.length;
         final double[] total = {0};
 

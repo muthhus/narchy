@@ -3,8 +3,8 @@ package il.technion.tinytable.hash;
 public class HashMakerWithIndexBit {
 	
 //currently chain is bounded to be 64. 
-	HashMaker hash;
-	FingerPrintAux $;
+private final HashMaker hash;
+	private FingerPrintAux $;
 	public HashMakerWithIndexBit(int fingerprintsize,int bucketrange, int chainrange,int minsize)
 	{
 		hash = new HashMaker(fingerprintsize, bucketrange, chainrange, minsize);
@@ -24,7 +24,7 @@ public class HashMakerWithIndexBit {
 		return $;
 	}
 
-	public  FingerPrintAux createHash(final byte[] data) {
+	private FingerPrintAux createHash(final byte[] data) {
 
 		 $ = hash.createHash(data);
 		$.fingerprint<<=1;

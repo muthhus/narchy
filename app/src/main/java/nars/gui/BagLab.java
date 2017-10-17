@@ -39,7 +39,7 @@ public class BagLab  {
     private final List<FloatSlider> inputSliders;
     private final int uniques;
 
-    double[] selectionHistogram = new double[BINS];
+    float[] selectionHistogram = new float[BINS];
 
     public BagLab(Bag<Integer,PriReference<Integer>> bag) {
         super();
@@ -63,7 +63,7 @@ public class BagLab  {
                     Vis.pane("Bag Selection Distribution (0..1)", new HistogramChart(
                             ()->selectionHistogram, new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))),
                     Vis.pane("Bag Content Distribution (0..1)", new HistogramChart(
-                            ()->bag.priHistogram(new double[10]), new Color3f(0f, 0.25f, 0.5f), new Color3f(0.1f, 0.5f, 1f)))
+                            ()->bag.histogram(new float[10]), new Color3f(0f, 0.25f, 0.5f), new Color3f(0.1f, 0.5f, 1f)))
                 )
                 //,hijackVis((HijackBag)bag)
         );

@@ -21,7 +21,7 @@ public class FingerPrintAux
 	public static boolean Equals(long $1, long $2)
 	{
 //		$1 = $1^$2;
-		return (($1^$2)  <2l);
+		return (($1^$2)  < 2L);
 	}
 	// the item is last in chain iff it is marked by 1 on the LSB. 
 	public static boolean isLast(long fingerPrint)

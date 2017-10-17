@@ -5,12 +5,12 @@ package il.technion.tinytable.bit;
  */
 public class BitwiseArray2 extends AuxilaryBitSet {
 
-	protected int itemSize;
-	protected int capacity;
-	protected int bucketBitSize;
+	protected final int itemSize;
+	private final int capacity;
+	protected final int bucketBitSize;
 	public short Items[];
-	protected int maxitemSize;
-	public int BucketCapacity;
+	private final int maxitemSize;
+	private final int BucketCapacity;
 	protected int maxAdditionalSize = 15;
 
 	/**
@@ -20,7 +20,7 @@ public class BitwiseArray2 extends AuxilaryBitSet {
 	 * @param itemSize
 	 * @param bucketcapacity
 	 */
-	public BitwiseArray2(final int capacity, final int itemSize, int bucketcapacity) {
+	protected BitwiseArray2(final int capacity, final int itemSize, int bucketcapacity) {
 		super((capacity * itemSize)/64 + 1);
 		this.itemSize = itemSize;
 		this.capacity = capacity;
@@ -57,7 +57,7 @@ public class BitwiseArray2 extends AuxilaryBitSet {
 			return super.getBits(start, start + effectiveItemSize);
 	}
 
-	protected int getSizeFix(int idx, int customSize, int mod) {
+	private int getSizeFix(int idx, int customSize, int mod) {
 		int effectiveItemSize = customSize;
 		if(idx<mod)
 			effectiveItemSize = customSize+1;
@@ -67,7 +67,7 @@ public class BitwiseArray2 extends AuxilaryBitSet {
 		while(sum>0)
 		{
 			long fp = this.Get(bucketId*this.bucketBitSize, idx, customSize, mod);
-			sum -= fp&1l;
+			sum -= fp& 1L;
 			idx++;
 		}
 		return idx;
@@ -136,7 +136,6 @@ public class BitwiseArray2 extends AuxilaryBitSet {
 	protected void Put(int bucketId,int idx, final long value) {
 		int bucketStart = this.bucketBitSize*bucketId;
 		this.Put(bucketStart,bucketId,idx, value,this.itemSize,0);
-		return;
 	}
 
 

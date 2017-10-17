@@ -39,7 +39,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     protected float min, max;
     protected boolean mustSort;
 
-    protected ArrayBag(PriMerge mergeFunction, @NotNull Map<X, Y> map) {
+    protected ArrayBag(PriMerge mergeFunction, /*@NotNull*/ Map<X, Y> map) {
         this(0, mergeFunction, map);
     }
 
@@ -55,7 +55,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         }
     }
 
-    protected ArrayBag(@Deprecated int cap, PriMerge mergeFunction, @NotNull Map<X, Y> map) {
+    protected ArrayBag(@Deprecated int cap, PriMerge mergeFunction, /*@NotNull*/ Map<X, Y> map) {
         super(new SortedPLinks(), map);
         this.mergeFunction = mergeFunction;
         setCapacity(cap);
@@ -375,9 +375,9 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
      * at the top of the list. so for large amounts of samples
      * it will be helpful to call this in batches << the size of the bag.
      */
-    @NotNull
+    /*@NotNull*/
     @Override
-    public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each) {
+    public Bag<X, Y> sample(/*@NotNull*/ Bag.BagCursor<? super Y> each) {
 
         Random rng = random();
         final boolean direction =
@@ -440,7 +440,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     }
 
     //    @Override
-//    public final void putAsync(@NotNull Y b) {
+//    public final void putAsync(/*@NotNull*/ Y b) {
 //        toPut.accept(b);
 //    }
 
@@ -562,7 +562,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
     }
 
-    public boolean insert(@NotNull Y incoming, @Nullable List<Y>[] trash) {
+    public boolean insert(/*@NotNull*/ Y incoming, @Nullable List<Y>[] trash) {
         float p = pri(incoming);
         pressurize(p);
 
@@ -631,13 +631,13 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
 //    @Nullable
 //    @Override
-//    protected Y addItem(@NotNull Y i) {
+//    protected Y addItem(/*@NotNull*/ Y i) {
 //        throw new UnsupportedOperationException();
 //    }
 
 
     @Override
-    @NotNull
+    /*@NotNull*/
     public Bag<X, Y> commit(Consumer<Y> update) {
         commit(update, false);
         return this;
@@ -882,7 +882,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 //    }
 
 
-    @NotNull
+    /*@NotNull*/
     @Override
     public String toString() {
         return super.toString() + '{' + items.getClass().getSimpleName() + '}';
@@ -900,12 +900,12 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     }
 
 
-//    public final void popAll(@NotNull Consumer<PLink<V>> receiver) {
+//    public final void popAll(/*@NotNull*/ Consumer<PLink<V>> receiver) {
 //        forEach(receiver);
 //        clear();
 //    }
 
-//    public void pop(@NotNull Consumer<PLink<V>> receiver, int n) {
+//    public void pop(/*@NotNull*/ Consumer<PLink<V>> receiver, int n) {
 //        if (n == size()) {
 //            //special case where size <= inputPerCycle, the entire bag can be flushed in one operation
 //            popAll(receiver);
@@ -928,7 +928,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 //
 //
 //        @Override
-//        public float score(@NotNull X v) {
+//        public float score(/*@NotNull*/ X v) {
 //            return v.pri();
 //        }
 //    }

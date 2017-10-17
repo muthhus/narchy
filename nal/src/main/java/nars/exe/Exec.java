@@ -60,7 +60,7 @@ abstract public class Exec implements Executor, PriMerge {
             if (Param.DEBUG) {
                 throw e;
             } else {
-                logger.error("{} {}", x, (Param.DEBUG) ? e : e.getMessage());
+                logger.error("{} {}", x, e); //(Param.DEBUG) ? e : e.getMessage());
                 x.delete();
             }
         }

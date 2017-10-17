@@ -1,7 +1,9 @@
 package jcog.sort;
 
+import jcog.list.FasterList;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class TopN<E> extends SortedArray<E> implements Consumer<E> {
@@ -9,7 +11,7 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E> {
     private final FloatFunction<E> rank;
 
     E min = null;
-    float minSeen = Float.POSITIVE_INFINITY;
+    float admitThresh = Float.POSITIVE_INFINITY;
 
     public TopN(E[] target, FloatFunction<E> rank) {
         this.list = target;
@@ -21,23 +23,24 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E> {
 //     * untested
 //     */
     public TopN min(float min) {
-        this.minSeen = min;
+        this.admitThresh = min;
         return this;
     }
 
     @Override
     public void clear() {
-        this.minSeen = Float.POSITIVE_INFINITY;
+        this.admitThresh = Float.POSITIVE_INFINITY;
         super.clear();
     }
 
     @Override
     public int add(E element, float elementRank, FloatFunction<E> cmp) {
+        //TODO TEST THIS
         if (size == list.length) {
 //            assert (last() == min):
 //                    last() + "=last but min=" + min;
 
-            if (elementRank >= minSeen) {
+            if (elementRank >= admitThresh) {
                 reject(element);
                 return -1; //insufficient
             }
@@ -89,7 +92,8 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E> {
         E nextMin = last();
         if (min != nextMin) {
             this.min = nextMin;
-            minSeen = nextMin == null ? Float.POSITIVE_INFINITY : rank.floatValueOf(last());
+            admitThresh = ((size < capacity()) || nextMin == null) ? Float.POSITIVE_INFINITY :
+                    rank.floatValueOf(last());
         }
     }
 
@@ -98,14 +102,45 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E> {
         throw new UnsupportedOperationException();
     }
 
+    public List<E> drain(int count) {
+        count = Math.min(count, size);
+        List<E> x = new FasterList(count);
+        for (int i = 0; i < count; i++) {
+            x.add(pop());
+        }
+        return x;
+    }
+
     public E[] drain(E[] next) {
 
         E[] current = this.list;
 
         this.list = next;
-        this.minSeen = Float.POSITIVE_INFINITY;
+        this.admitThresh = Float.POSITIVE_INFINITY;
         this.size = 0;
 
         return current;
+    }
+
+    public float minAdmission() {
+        if (size == capacity())
+            return -admitThresh;
+        else
+            return Float.NEGATIVE_INFINITY;
+    }
+
+    public float maxValue() {
+        E f = first();
+        if (f!=null)
+            return rank.floatValueOf(f);
+        else
+            return Float.NaN;
+    }
+    public float minValue() {
+        E f = last();
+        if (f!=null)
+            return rank.floatValueOf(f);
+        else
+            return Float.NaN;
     }
 }
