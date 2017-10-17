@@ -1,6 +1,7 @@
 package nars.task;
 
 import jcog.Util;
+import jcog.list.FasterList;
 import jcog.math.Interval;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
@@ -17,18 +18,17 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static jcog.Util.lerp;
 import static nars.Op.CONJ;
+import static nars.Op.NEG;
 import static nars.time.Tense.*;
 import static nars.truth.TruthFunctions.c2w;
 
@@ -40,7 +40,7 @@ public class Revision {
     public static final Logger logger = LoggerFactory.getLogger(Revision.class);
 
     @Nullable
-    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b, float factor, float minEvi) {
+    public static Truth revise(/*@NotNull*/ Truthed a, /*@NotNull*/ Truthed b, float factor, float minEvi) {
         float w1 = a.evi() * factor;
         float w2 = b.evi() * factor;
         float w = (w1 + w2);
@@ -54,7 +54,7 @@ public class Revision {
     }
 
 //    @Nullable
-//    public static Truth revise(@NotNull Iterable<? extends Truthed> aa, float minConf) {
+//    public static Truth revise(/*@NotNull*/ Iterable<? extends Truthed> aa, float minConf) {
 //        float f = 0;
 //        float w = 0;
 //        for (Truthed x : aa) {
@@ -73,7 +73,7 @@ public class Revision {
 //                );
 //    }
 
-//    public static Truth merge(@NotNull Truth newTruth, @NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float minConf, float confMax) {
+//    public static Truth merge(/*@NotNull*/ Truth newTruth, /*@NotNull*/ Truthed a, float aFrequencyBalance, /*@NotNull*/ Truthed b, float minConf, float confMax) {
 //        float w1 = a.evi();
 //        float w2 = b.evi();
 //        float w = (w1 + w2) * evidenceFactor;
@@ -106,27 +106,38 @@ public class Revision {
 //    }
 
 
-    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b) {
+    public static Truth revise(/*@NotNull*/ Truthed a, /*@NotNull*/ Truthed b) {
         return revise(a, b, 1f, 0f);
     }
 
 
-    @NotNull
-    static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, float curDepth, @NotNull Random rng, boolean mergeOrChoose) {
+    /*@NotNull*/
+    static Term intermpolate(/*@NotNull*/ Term a, /*@NotNull*/ Term b, float aProp, float curDepth, /*@NotNull*/ Random rng, boolean mergeOrChoose) {
         if (a.equals(b)) {
             return a;
+        }
+
+        Op ao = a.op();
+        Op bo = b.op();
+        assert (ao == bo) : a + " and " + b + " have different op";
+
+        if (ao==NEG) {
+            return intermpolate(a.unneg(), b.unneg(),
+                    aProp, curDepth, rng, mergeOrChoose).neg();
         }
 
         int len = a.subs();
         if (len > 0) {
 
-            Op ao = a.op();
-            Op bo = b.op();
-            assert (ao == bo) : a + " and " + b + " have different op";
-
-
-            if (ao.temporal && len == 2) {
-                return dtMergeTemporal(a, b, aProp, curDepth / 2f, rng, mergeOrChoose);
+            if (ao.temporal) {
+                switch (ao) {
+                    case CONJ:
+                        return dtMergeConj(a, b, aProp, curDepth / 2f, rng, mergeOrChoose);
+                    case IMPL:
+                        return dtMergeImpl(a, b, aProp, curDepth / 2f, rng, mergeOrChoose);
+                    default:
+                        throw new RuntimeException();
+                }
             } else {
 
                 Term[] ab = new Term[len];
@@ -158,9 +169,29 @@ public class Revision {
 
     }
 
+    private static Term dtMergeConj(Term a, Term b, float aProp, float v, Random rng, boolean mergeOrChoose) {
+        Set<ObjectLongPair<Term>> ab = new TreeSet();
+        a.events(ab::add);
+        int aSize = ab.size();
+        b.events(ab::add);
+        int bSize = ab.size() - aSize;
 
-    @NotNull
-    private static Term dtMergeTemporal(@NotNull Term a, @NotNull Term b, float aProp, float depth, @NotNull Random rng, boolean mergeOrChoose) {
+        FasterList<ObjectLongPair<Term>> x = new FasterList(ab);
+        int max = Math.max(aSize, bSize);
+        int all = x.size();
+        int excess = all - max;
+        if (excess > 0) {
+            //decide on some items to remove
+            //for now just use the sublist
+            x.removeBelow(all-excess);
+        }
+
+        return Op.conj(x);
+    }
+
+
+    /*@NotNull*/
+    private static Term dtMergeImpl(/*@NotNull*/ Term a, /*@NotNull*/ Term b, float aProp, float depth, /*@NotNull*/ Random rng, boolean mergeOrChoose) {
 
         int adt = a.dt();
 
@@ -213,16 +244,16 @@ public class Revision {
 
     }
 
-//    private static boolean forwardSubterms(@NotNull Term a, int adt) {
+//    private static boolean forwardSubterms(/*@NotNull*/ Term a, int adt) {
 //        return a.op()!=CONJ || (adt >= 0) || (adt == DTERNAL);
 //    }
 
-    public static Term choose(Term a, Term b, float aBalance, @NotNull Random rng) {
+    public static Term choose(Term a, Term b, float aBalance, /*@NotNull*/ Random rng) {
         return (rng.nextFloat() < aBalance) ? a : b;
     }
 
-    @NotNull
-    public static Term[] choose(@NotNull Term[] a, Term[] b, float aBalance, @NotNull Random rng) {
+    /*@NotNull*/
+    public static Term[] choose(/*@NotNull*/ Term[] a, Term[] b, float aBalance, /*@NotNull*/ Random rng) {
         int l = a.length;
         Term[] x = new Term[l];
         for (int i = 0; i < l; i++) {
@@ -232,7 +263,7 @@ public class Revision {
     }
 
 
-    @NotNull
+    /*@NotNull*/
     public static Task chooseByConf(/*@NotNull*/ Task t, @Nullable Task b, /*@NotNull*/ Derivation p) {
 
         if ((b == null) || !b.isBeliefOrGoal())
@@ -248,12 +279,9 @@ public class Revision {
     }
 
     public static Term intermpolate(/*@NotNull*/ Term a, /*@NotNull*/ Term b, float aProp, NAR nar) {
-        return intermpolate(a, b, aProp, nar.random(), nar.dtMergeOrChoose.booleanValue());
+        return intermpolate(a, b, aProp, 1, nar.random(), nar.dtMergeOrChoose.booleanValue());
     }
 
-    public static Term intermpolate(/*@NotNull*/ Term a, /*@NotNull*/ Term b, float aProp, /*@NotNull*/ Random rng, boolean mergeOrChoose) {
-        return intermpolate(a, b, aProp, 1, rng, mergeOrChoose);
-    }
 
     /**
      * t is the target time of the new merged task
@@ -315,10 +343,10 @@ public class Revision {
         if (factor < Prioritized.EPSILON) return null;
 
         int dur = nar.dur();
-        float intermvalDistance = dtDiff(a.term(), b.term()) /
-                ((1 + Math.max(a.term().dtRange(), b.term().dtRange())) * dur);
-        factor *= (1f / (1f + intermvalDistance));
-        if (factor < Prioritized.EPSILON) return null;
+//        float intermvalDistance = dtDiff(a.term(), b.term()) /
+//                ((1 + Math.max(a.term().dtRange(), b.term().dtRange())) * dur);
+//        factor *= (1f / (1f + intermvalDistance));
+//        if (factor < Prioritized.EPSILON) return null;
 
         float confMin = nar.confMin.floatValue();
         Truth rawTruth = revise(a, b, factor, c2w(confMin));
@@ -330,7 +358,7 @@ public class Revision {
         if (maxEviAB < evi) {
             //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
             //TODO weight the contributed overlap amount by the relative confidence provided by each task
-            float overlapDiscount = 1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
+            float overlapDiscount = Stamp.overlapFraction(a.stamp(), b.stamp())/2f;
     //        factor *= overlapDiscount;
     //        if (factor < Prioritized.EPSILON) return null;
 
@@ -592,7 +620,7 @@ public class Revision {
 }
 
 //    /** get the task which occurrs nearest to the target time */
-//    @NotNull public static Task closestTo(@NotNull Task[] t, long when) {
+//    /*@NotNull*/ public static Task closestTo(/*@NotNull*/ Task[] t, long when) {
 //        Task best = t[0];
 //        long bestDiff = Math.abs(when - best.occurrence());
 //        for (int i = 1; i < t.length; i++) {
@@ -613,7 +641,7 @@ public class Revision {
 //    }
 
 //    @Nullable
-//    public static Truth revisionTemporalOLD(@NotNull Task ta, @NotNull Task tb, long target, float match, float confThreshold) {
+//    public static Truth revisionTemporalOLD(/*@NotNull*/ Task ta, /*@NotNull*/ Task tb, long target, float match, float confThreshold) {
 //        Truth a = ta.truth();
 //        Truth b = tb.truth();
 //
@@ -656,7 +684,7 @@ public class Revision {
 
 
 //    @Nullable
-//    public static Budget budgetRevision(@NotNull Truth revised, @NotNull Task newBelief, @NotNull Task oldBelief, @NotNull NAR nar) {
+//    public static Budget budgetRevision(/*@NotNull*/ Truth revised, /*@NotNull*/ Task newBelief, /*@NotNull*/ Task oldBelief, /*@NotNull*/ NAR nar) {
 //
 //        final Budget nBudget = newBelief.budget();
 //
@@ -714,8 +742,8 @@ public class Revision {
 //    /**
 //     * assumes the compounds are the same except for possible numeric metadata differences
 //     */
-//    public static @NotNull Compound intermpolate(@NotNull Termed<Compound> a, @NotNull Termed<Compound> b, float aConf, float bConf, @NotNull TermIndex index) {
-//        @NotNull Compound aterm = a.term();
+//    public static /*@NotNull*/ Compound intermpolate(/*@NotNull*/ Termed<Compound> a, /*@NotNull*/ Termed<Compound> b, float aConf, float bConf, /*@NotNull*/ TermIndex index) {
+//        /*@NotNull*/ Compound aterm = a.term();
 //        if (a.equals(b))
 //            return aterm;
 //
@@ -723,7 +751,7 @@ public class Revision {
 //        float bWeight = c2w(bConf);
 //        float aProp = aWeight / (aWeight + bWeight);
 //
-//        @NotNull Compound bterm = b.term();
+//        /*@NotNull*/ Compound bterm = b.term();
 //
 //        int dt = DTERNAL;
 //        int at = aterm.dt();
@@ -740,7 +768,7 @@ public class Revision {
 //    }
 
 //    @Nullable
-//    public static ProjectedTruth project(@NotNull Truth t, long target, long now, long occ, boolean eternalizeIfWeaklyTemporal) {
+//    public static ProjectedTruth project(/*@NotNull*/ Truth t, long target, long now, long occ, boolean eternalizeIfWeaklyTemporal) {
 //
 //        if (occ == target)
 //            return new ProjectedTruth(t, target);
@@ -770,11 +798,11 @@ public class Revision {
 //
 //        return new ProjectedTruth(t.freq(), nextConf, target);
 //    }
-//    private static void failIntermpolation(@NotNull Compound a, @NotNull Compound b) {
+//    private static void failIntermpolation(/*@NotNull*/ Compound a, /*@NotNull*/ Compound b) {
 //        throw new RuntimeException("interpolation failure: different or invalid internal structure and can not be compared:\n\t" + a + "\n\t" + b);
 //    }
 //
-//    private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, float depth, @Nullable Random rng) {
+//    private static int dtCompare(/*@NotNull*/ Compound a, /*@NotNull*/ Compound b, float aProp, float depth, @Nullable Random rng) {
 //        int newDT;
 //        int adt = a.dt();
 //        if (adt != b.dt()) {
@@ -807,7 +835,7 @@ public class Revision {
 //        return newDT;
 //    }
 
-//    static int choose(int x, int y, float xProp, @NotNull Random random) {
+//    static int choose(int x, int y, float xProp, /*@NotNull*/ Random random) {
 //        return random.nextFloat() < xProp ? x : y;
 //    }
 
@@ -829,7 +857,7 @@ public class Revision {
 //     * <p>
 //     * TODO threshold to stop early
 //     */
-//    public static FloatObjectPair<Compound> dtMerge(@NotNull Compound a, @NotNull Compound b, float aProp, Random rng) {
+//    public static FloatObjectPair<Compound> dtMerge(/*@NotNull*/ Compound a, /*@NotNull*/ Compound b, float aProp, Random rng) {
 //        if (a.equals(b)) {
 //            return PrimitiveTuples.pair(0f, a);
 //        }
@@ -877,8 +905,8 @@ public class Revision {
 //    /**
 //     * computes a value that indicates the amount of difference (>=0) in the internal 'dt' subterm structure of 2 temporal compounds
 //     */
-//    @NotNull
-//    public static float dtDifference(@Nullable Termed<Compound> a, @NotNull Termed<Compound> b) {
+//    /*@NotNull*/
+//    public static float dtDifference(@Nullable Termed<Compound> a, /*@NotNull*/ Termed<Compound> b) {
 //        if (a == null) return 0f;
 //
 //        MutableFloat f = new MutableFloat(0);
@@ -886,8 +914,8 @@ public class Revision {
 //        return f.floatValue();
 //    }
 
-//    @NotNull
-//    private static void dtDifference(@NotNull Term a, @NotNull Term b, float depth) {
+//    /*@NotNull*/
+//    private static void dtDifference(/*@NotNull*/ Term a, /*@NotNull*/ Term b, float depth) {
 //        if (a.op() == b.op()) {
 //            if (a.size() == 2 && b.size() == 2) {
 //

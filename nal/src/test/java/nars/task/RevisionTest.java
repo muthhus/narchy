@@ -358,15 +358,18 @@ public class RevisionTest {
 
     private Set<Term> permutations(Term a, Term b) {
 
+        NAR s = NARS.shell();
+        s.dtMergeOrChoose.setValue(false);
+
         assertTrue(a.conceptual().equals(b.conceptual()));
 
         @NotNull Set<Term> ut = ((Compound) a).recurseTermsToSet(ATOM);
 
         Set<Term> ss = new TreeSet();
-        Random rng = new XorShift128PlusRandom(1);
+
         int n = 8 * (a.volume() + b.volume());
         for (int i = 0; i < n; i++) {
-            Term ab = Revision.intermpolate(a, b, 0.5f, rng, false);
+            Term ab = Revision.intermpolate(a, b, 0.5f, s);
 
             assertTrue(ab.conceptual().equals(a.conceptual()));
 

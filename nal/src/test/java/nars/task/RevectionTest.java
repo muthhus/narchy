@@ -2,7 +2,9 @@ package nars.task;
 
 import com.google.common.collect.Lists;
 import nars.*;
+import nars.term.Term;
 import nars.test.analyze.BeliefAnalysis;
+import nars.time.Tense;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,6 +13,7 @@ import org.junit.Test;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static nars.Op.BELIEF;
 import static nars.task.RevisionTest.newNAR;
@@ -301,6 +304,78 @@ public class RevectionTest {
         assertEquals(12, b.wave().end());
 
 
+
+    }
+
+    @Test public void testSequenceIntermpolation1() throws Narsese.NarseseException {
+
+        //these terms appear entirely different but they in fact would
+        //resolve to the same concept and would appear side-by-side in the
+        //same temporal belief table.
+        //
+        //this exemplifies the entire point of my NAL7 redesign
+        //
+        //now this test will show how these different sequences can be merged
+        //to form a new sequence which may or may not resolve to the same concept due to the
+        //various ways the two sequences can overlap, creating repeats, inversions, etc
+        //with otional dt dithering to blend the perception of nearly simultaneous events
+        //to more generalizable parallel conjunctions
+        //          :)
+
+        NAR s = NARS.shell();
+        s.dtMergeOrChoose.setValue(false);
+
+        Term a = $.$("(((--,(dx-->noid)) &&+4 ((--,(by-->noid))&|(happy-->noid))) &&+11 (bx-->noid))");
+        Term b = $.$("(((bx-->noid) &&+7 (--,(dx-->noid))) &&+4 ((--,(by-->noid))&|(happy-->noid)))");
+        assertEquals(a.root(), b.root());
+        assertEquals(a.conceptual(), b.conceptual());
+
+        TreeSet<Term> outcomes = new TreeSet();
+
+        int misses = 0;
+        for (int i = 0; i < 10; i++) {
+            Term c = Revision.intermpolate(a, b, 0.5f, s);
+            if (c!=null) {
+                outcomes.add(c);
+            } else
+                misses++;
+        }
+
+        outcomes.forEach(System.out::println);
+        assertTrue(outcomes.size() > 0);
+    }
+
+    @Test public void testSequenceIntermpolationInBeliefTable() throws Narsese.NarseseException {
+
+        NAR s = NARS.tmp();
+
+        Term a = $.$("(((--,(dx-->noid)) &&+4 ((--,(by-->noid))&|(happy-->noid))) &&+11 (bx-->noid))");
+        Term b = $.$("(((bx-->noid) &&+7 (--,(dx-->noid))) &&+4 ((--,(by-->noid))&|(happy-->noid)))");
+        assertEquals(a.root(), b.root());
+        assertEquals(a.conceptual(), b.conceptual());
+
+        s.log();
+        StringBuilder out = new StringBuilder();
+        s.onTask(t -> {
+            out.append(t.toString()).append('\n');
+        });
+
+        Task at = s.believe(a, Tense.Present, 1f);
+        s.believe(b, Tense.Present);
+        s.concept(a).beliefs().setCapacity(1, 1);
+        s.input(at); //force belief table compression even though it's a duplicate
+
+
+        s.run(1);
+
+        /*
+        $.50 (((--,(dx-->noid)) &&+4 ((--,(by-->noid))&|(happy-->noid))) &&+11 (bx-->noid)). 0⋈15 %1.0;.90% {0: 1}
+        $.50 (((bx-->noid) &&+7 (--,(dx-->noid))) &&+4 ((--,(by-->noid))&|(happy-->noid))). 0⋈11 %1.0;.90% {0: 2}
+          >-- should not be activated: $.50 (((--,(dx-->noid)) &&+4 ((--,(by-->noid))&|(happy-->noid))) &&+11 (bx-->noid)). 0⋈15 %1.0;.90% {0: 1}
+        $.50 (((--,(dx-->noid)) &&+4 ((--,(by-->noid))&|(happy-->noid))) &&+7 ((--,(by-->noid))&|(happy-->noid))). 0⋈15 %1.0;.95% {0: 1;2}
+        $.26 ((--,(dx-->noid)) &&+4 ((--,(by-->noid))&|(happy-->noid))). 0⋈4 %1.0;.81% {1: 1;;}
+        $.31 ((--,(dx-->noid)) &&+15 (bx-->noid)). 0⋈15 %1.0;.81% {1: 1;;}
+         */
 
     }
 
