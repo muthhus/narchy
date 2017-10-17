@@ -232,42 +232,52 @@ public enum Op {
                 if (subEventsLeft > 1 || subEventsRight > 1) {
                     //rebalance and align
 
-                    boolean heavyLeft;
-                    if ((heavyLeft = ((subEventsLeft - subEventsRight) > 1)) ||
-                            ((subEventsRight - subEventsLeft) > 0)) { // notice the difference in 0, 1. if the # of events is odd, left gets it
 
-                        if (dt == XTERNAL) {
-                            //temporally oblivious rebalancing (but should canonically sort each subterm once balanced)
-                            if (heavyLeft && a.dt() == XTERNAL) {
-                                Term aToB = a.sub(1);
-                                Term abx = CONJ.the(XTERNAL, a.sub(0), CONJ.the(XTERNAL, aToB, b));
-                                return abx;
+                    boolean heavyLeft = (subEventsLeft - subEventsRight) > 1;
+                    boolean heavyRight = (subEventsRight - subEventsLeft) > 0; // notice the difference in 0, 1. if the # of events is odd, left gets it
+
+
+                    if (dt == XTERNAL) {
+                        //temporally oblivious rebalancing (but should canonically sort each subterm once balanced)
+                        if (heavyLeft && a.dt() == XTERNAL) {
+                            Term aToB = a.sub(1);
+                            return compound(CONJ, XTERNAL, a.sub(0), compound(CONJ, XTERNAL, aToB, b));
+                        }
+                        if (heavyRight && b.dt() == XTERNAL) {
+                            Term bToA = b.sub(0);
+                            return compound(CONJ, XTERNAL, compound(CONJ, XTERNAL, a, bToA), b.sub(1));
+                        }
+                    } else {
+
+                        if (heavyLeft || heavyRight || dt < 0) {
+
+                            if (dt < 0) { //&& (dt != XTERNAL)
+                                Term x = a;
+                                a = b;
+                                b = x;
+                                return conjMerge(a, 0, b, -dt + a.dtRange());
                             } else {
-                                //??
+//                                if (heavyRight) {
+//                                    return conjMerge(b, 0, a, dt + a.dtRange());
+//                                } else {
+                                    return conjMerge(a, 0, b, dt + a.dtRange());
+//                                }
                             }
                         }
                     }
 
-                    if (dt < 0) { //&& (dt != XTERNAL)
-                        Term x = a;
-                        a = b;
-                        b = x;
-                        return conjMerge(a, 0, b, -dt + a.dtRange());
-                    } else {
-                        return conjMerge(a, 0, b, dt + a.dtRange());
+                } else {
+
+                    int order = a.compareTo(b);
+                    if (order == 0) {
+                        dt = Math.abs(dt);
+                    } else if (order > 0) {
+                        //ensure lexicographic ordering
+                        Term x = u[0];
+                        u[0] = u[1];
+                        u[1] = x; //swap
+                        dt = -dt;
                     }
-
-                }
-
-                int order = a.compareTo(b);
-                if (order == 0) {
-                    dt = Math.abs(dt);
-                } else if (order > 0) {
-                    //ensure lexicographic ordering
-                    Term x = u[0];
-                    u[0] = u[1];
-                    u[1] = x; //swap
-                    dt = -dt;
                 }
 
                 return implInConjReduction(
