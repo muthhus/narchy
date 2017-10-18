@@ -5,6 +5,7 @@ import com.jogamp.nativewindow.util.Point;
 import com.jogamp.newt.event.MouseEvent;
 import jcog.Util;
 import spacegraph.input.Finger;
+import spacegraph.phys.util.AnimVector2f;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -22,8 +23,8 @@ public class ZoomOrtho extends Ortho {
     final static short MOVE_WINDOW_BUTTON = 2;
 
     private int[] panStart = null;
-    private int[] windowStart = null;
     private int[] windowTarget = new int[2];
+    private int[] windowStart = new int[2];
     private InsetsImmutable windowInsets;
 
 
@@ -61,19 +62,23 @@ public class ZoomOrtho extends Ortho {
     }
 
     public float cw() {
-        return (ZoomOrtho.this.window.getWidth() / ZoomOrtho.this.scale.x);
+        AnimVector2f s = (AnimVector2f) this.scale;
+        return (ZoomOrtho.this.window.getWidth() / s.targetX());
     }
 
     public float ch() {
-        return (ZoomOrtho.this.window.getHeight() / ZoomOrtho.this.scale.y);
+        AnimVector2f s = (AnimVector2f) this.scale;
+        return (ZoomOrtho.this.window.getHeight() / s.targetY());
     }
 
     public float cx() {
-        return (0.5f - pos.x) / scale.x;
+        AnimVector2f s = (AnimVector2f) this.scale;
+        return (0.5f - pos.x) / s.targetX();
     }
 
     public float cy() {
-        return (0.5f - pos.y) / scale.y;
+        AnimVector2f s = (AnimVector2f) this.scale;
+        return (0.5f - pos.y) / s.targetY();
     }
 
 
@@ -98,48 +103,52 @@ public class ZoomOrtho extends Ortho {
             int mx = Finger.pointer.getX();
             int my = Finger.pointer.getY();
             if (panStart == null) {
+
                 panStart = new int[2];
                 panStart[0] = mx;
                 panStart[1] = my;
 
+                if (bd[0] == MOVE_WINDOW_BUTTON) {
+                    //TODO compute this in the EDT on the first invocation
+                    //Point p = new Point();
 
-                Point p = new Point();
-                window.window.getLocationOnScreen(p);
-                windowStart = new int[2];
-                windowStart[0] = p.getX();
-                windowStart[1] = p.getY();
-
-                windowInsets = window.window.getInsets();
+                    windowStart[0] = window.windowX;
+                    windowStart[1] = window.windowY;
+                    windowInsets = window.window.getInsets();
+                }
 
             } else {
-                int dx = mx - panStart[0];
-                int dy = my - panStart[1];
+
                 if (bd[0] == PAN_BUTTON) {
-                    move(dx, +dy);
+                    int dx = mx - panStart[0];
+                    int dy = my - panStart[1];
+                    move(dx, -dy);
                     panStart[0] = mx;
                     panStart[1] = my;
+
                 } else if (bd[0] == MOVE_WINDOW_BUTTON) {
+
+                    //compute even if the window is in progress
 
                     windowTarget[0] = windowStart[0] + (mx - panStart[0]);
                     windowTarget[1] = windowStart[1] + (my - panStart[1]);
 
                     if (windowMoving.compareAndSet(false, true)) {
-                        window.window.getScreen().getDisplay().getEDTUtil().invoke(false, ()->{
-                            try {
-                                int fx = windowTarget[0];
-                                int fy = windowTarget[1];
-                                window.window.setTopLevelPosition(fx - windowInsets.getLeftWidth(), fy - windowInsets.getTopHeight());
-                            } finally {
-                                windowMoving.set(false);
-                            }
-                        });
+                        window.window.getScreen().getDisplay().getEDTUtil().invoke(false, this::moveWindow);
                     }
 
                 }
             }
         } else {
             panStart = null;
-            windowStart = null;
+        }
+    }
+
+    private void moveWindow() {
+        try {
+            window.window.setPosition(windowTarget[0] - windowInsets.getLeftWidth(), windowTarget[1] - windowInsets.getTopHeight());
+        } finally {
+            windowMoving.set(false);
         }
     }
 
@@ -151,10 +160,14 @@ public class ZoomOrtho extends Ortho {
         //when wheel rotated on negative (empty) space, adjust scale
         //if (mouse.touching == null) {
         //System.out.println(Arrays.toString(e.getRotation()) + " " + e.getRotationScale());
-        float zoomMult = Util.clamp(1f + -e.getRotation()[1] * zoomRate, 0.5f, 1.5f);
+        float dWheel = e.getRotation()[1];
 
-        float psx = scale.x;
-        float psy = scale.y;
+
+        float zoomMult = Util.clamp(1f + -dWheel * zoomRate, 0.5f, 1.5f);
+
+        AnimVector2f s = (AnimVector2f) this.scale;
+        float psx = s.targetX();
+        float psy = s.targetY();
         float sx = psx * zoomMult;
         float sy = psy * zoomMult;
         int wx = window.getWidth();
@@ -162,21 +175,21 @@ public class ZoomOrtho extends Ortho {
 
         if (sx / wx >= minZoom && sy / wy >= minZoom && sx / wx <= maxZoom && sy / wy <= maxZoom) {
 
-            float pcx = cx();
-            float pcy = cy();
-            float pcw = cw();
-            float pch = ch();
+//            float pcx = cx();
+//            float pcy = cy();
+//            float pcw = cw();
+//            float pch = ch();
 
-            float dx = (pcw * psx - pcw * sx) / 2;
-            float dy = (pch * psy - pch * sy) / 2;
+            //float dx = (pcw * psx - pcw * sx) / 2;
+            //float dy = (pch * psy - pch * sy) / 2;
             //System.out.println(pcx + " " + pcy + " : " + dx + " " + dy);
-            pos.add(dx, dy, 0);
-            scale.set(sx, sy);
+            //pos.add(dx, dy, 0);
+            this.scale.set(sx, sy);
 
-            float ncx = cx();
-            float ncy = cy();
-            float ncw = cw();
-            float nch = ch();
+//            float ncx = cx();
+//            float ncy = cy();
+//            float ncw = cw();
+//            float nch = ch();
 
             //pos.set()
             //TODO

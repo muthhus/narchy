@@ -1,6 +1,8 @@
 package spacegraph;
 
+import com.jogamp.nativewindow.util.Point;
 import com.jogamp.newt.event.WindowEvent;
+import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
 import jcog.list.FasterList;
 import jcog.map.MRUCache;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -39,6 +42,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     final List<Ortho> preAdd = new FasterList();
     final List<Consumer<SpaceGraph>> frameListeners = new FasterList();
+    public int windowX, windowY;
 
     @Override
     public void windowDestroyed(WindowEvent windowEvent) {
@@ -49,7 +53,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         frameListeners.clear();
         preAdd.clear();
     }
-
 
 
     /**
@@ -95,7 +98,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
         add(cc);
     }
-
 
 
     public void addFrameListener(Consumer<SpaceGraph> f) {
@@ -144,10 +146,11 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         y.activate();
         return (Y) y;
     }
+
     public @Nullable <Y extends Spatial<X>> Y get(X x) {
         //Spatial y = atoms.getIfPresent(x);
         Spatial y = atoms.get(x);
-        if (y!=null)
+        if (y != null)
             y.activate();
         return (Y) y;
     }
@@ -156,13 +159,13 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     public void remove(X x) {
         Spatial<X> y = atoms.remove(x);
-        if (y!=null) {
+        if (y != null) {
             remove(y);
         }
     }
 
     public void remove(Spatial<X> y) {
-            toRemove.add(y);
+        toRemove.add(y);
     }
 
 
@@ -186,7 +189,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     @Override
     public void init(GL2 gl) {
         super.init(gl);
-
+        updateWindowInfo();
 
         for (Ortho f : preAdd) {
             _add(f);
@@ -283,11 +286,50 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         return l;
     }
 
+//    @Override
+//    public void windowGainedFocus(WindowEvent windowEvent) {
+//        updateWindowInfo();
+//    }
+
+    @Override
+    public void windowResized(WindowEvent windowEvent) {
+        updateWindowInfo();
+    }
+
+    @Override
+    public void windowMoved(WindowEvent windowEvent) {
+        updateWindowInfo();
+    }
+
+    private AtomicBoolean gettingScreenPointer = new AtomicBoolean(false);
+
+    private void updateWindowInfo() {
+        GLWindow rww = window;
+        if (rww == null)
+            return;
+
+        if (gettingScreenPointer.compareAndSet(false, true)) {
+            if (!rww.isRealized() || !rww.isVisible()) {
+                windowX = windowY = -1;
+                return;
+            }
+            window.getScreen().getDisplay().getEDTUtil().invoke(false, () -> {
+                try {
+                    Point p = rww.getLocationOnScreen(new Point());
+                    windowX = p.getX();
+                    windowY = p.getY();
+                } finally {
+                    gettingScreenPointer.set(false);
+                }
+            });
+        }
+    }
+
     public static SpaceGraph window(Surface s, int w, int h) {
         SpaceGraph win = new SpaceGraphFlat(
-            new ZoomOrtho(s)
-                //.scale(Math.min(w,h))
-                .maximize()
+                new ZoomOrtho(s)
+                        //.scale(Math.min(w,h))
+                        .maximize()
         );
         if (w > 0 && h > 0) {
 
@@ -330,7 +372,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         camPos.set(x, y, z);
         return this;
     }
-
 
 
     //    public static class PickDragMouse extends SpaceMouse {

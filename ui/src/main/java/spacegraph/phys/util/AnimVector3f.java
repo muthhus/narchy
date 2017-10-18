@@ -55,11 +55,16 @@ public class AnimVector3f extends v3 implements Animated {
 
     public void interpLERP(float dt) {
         float rate = speed.floatValue() * dt;
-        super.set(
-                Util.lerp(rate, x, target.x),
-                Util.lerp(rate, y, target.y),
-                Util.lerp(rate, z, target.z)
-        );
+        if (rate >= 1) {
+            super.set(target.x, target.y, target.z );
+        } else {
+
+            super.set(
+                    Util.lerp(rate, x, target.x),
+                    Util.lerp(rate, y, target.y),
+                    Util.lerp(rate, z, target.z)
+            );
+        }
     }
 
     public void interpLinear(float dt) {
@@ -99,6 +104,6 @@ public class AnimVector3f extends v3 implements Animated {
     @Override
     public void add(float dx, float dy, float dz) {
         //super.add(dx, dy, dz);
-        target.add(dx, dy, dz);
+        target.add( dx,  dy,  dz);
     }
 }

@@ -153,5 +153,12 @@ public class v2 extends Tuple2f {
       return((float) (Math.acos( vDot )));
    }
 
-
+ /**
+   * Computes the dot product of the this vector and vector v1.
+   * @param v1 the other vector
+   */
+  public final float dot(v2 v1)
+    {
+      return (this.x*v1.x + this.y*v1.y);
+    }
 }

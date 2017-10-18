@@ -58,12 +58,20 @@ public class AnimVector2f extends v2 implements Animated {
         return running;
     }
 
+    public float targetX() {
+        return target.x;
+    }
+    public float targetY() {
+        return target.y;
+    }
+
     public void interpLERP(float dt) {
         float rate = Util.unitize(speed.floatValue() * dt);
         super.set(
                 Util.lerp(rate, x, target.x),
                 Util.lerp(rate, y, target.y)
         );
+        //System.out.println(target + "->" + dt + "->" + x + "," + y);
     }
 
 

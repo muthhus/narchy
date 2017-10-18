@@ -62,7 +62,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
 
         //TODO FPSAnimator
-        animate(w);
+        start(w);
 
         return w;
     }
@@ -71,22 +71,16 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     static final Logger logger = LoggerFactory.getLogger(JoglSpace.class);
 
-    private static void animate(GLWindow w) {
+    private static void start(GLWindow w) {
 
-        if (!windows.add(w))
-            return;
+        if (!windows.isEmpty()) {
+            if (!windows.add(w))
+                return;
+        } else {
+            a.start();
+            windows.add(w);
+        }
 
-//        synchronized (a) {
-//
-//            if (!a.isStarted()) {
-//                a.start();
-//                logger.info("START {}", a);
-//            } else if (a.isPaused()) {
-//                a.resume();
-//                logger.info("RESUME {}", a);
-//            }
-//
-//        }
         a.add(w);
 
         w.addWindowListener(new WindowAdapter() {
@@ -628,7 +622,6 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 //        sharedDrawable.display(); // triggers GLContext object creation and native realization.
 //        Draw.init(sharedDrawable.getGL().getGL2());
         a = new GameAnimatorControl(FPS_IDEAL);
-        a.start();
     }
 
 }

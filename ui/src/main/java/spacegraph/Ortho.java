@@ -1,8 +1,6 @@
 package spacegraph;
 
-import com.jogamp.nativewindow.util.Point;
 import com.jogamp.newt.event.*;
-import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
@@ -37,10 +35,21 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         this.surface = HUDSurface.set(content);
 
         this.finger = new Finger(this);
-        //this.scale = new AnimVector2f(6f);
-        //this.pos = new AnimVector3f(3f);
+        this.scale = new AnimVector2f(1, 1, 6f);
+        this.pos = new AnimVector3f(8f);
     }
 
+    public void start(SpaceGraph s) {
+        this.window = s;
+        s.addWindowListener(this);
+        s.addMouseListener(this);
+        s.addKeyListener(this);
+        s.dyn.addAnimation((Animated) scale);
+        s.dyn.addAnimation((Animated) pos);
+        surface.start(this);
+        surface.layout();
+        resized();
+    }
     @Override
     public SurfaceRoot root() {
         return this;
@@ -48,7 +57,7 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
 
     @Override
     public Ortho translate(float x, float y) {
-        pos.set(x, y);
+        pos.set(x, y, 0);
         return this;
     }
 
@@ -80,21 +89,12 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         return this;
     }
 
-    public void start(SpaceGraph s) {
-        this.window = s;
-        s.addWindowListener(this);
-        s.addMouseListener(this);
-        s.addKeyListener(this);
-//        s.dyn.addAnimation((Animated) scale);
-//        s.dyn.addAnimation((Animated) pos);
-        surface.start(this);
-        surface.layout();
-        resized();
-    }
 
 
     @Override
     protected void paint(GL2 gl) {
+        gl.glTranslatef(-0.5f, -0.5f, 0);
+        //gl.glTranslatef(-window.getWidth()/2, -window.getHeight()/2, 0);
         surface.render(gl);
     }
 
@@ -116,8 +116,10 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     private void resized() {
         //TODO resize preserving aspect, translation, etc
         if (maximize && window != null) {
-            scale(window.getWidth(), window.getHeight());
-            translate(0, 0);
+            int W = window.getWidth();
+            int H = window.getHeight();
+            scale(W, H);
+            translate(W/2, H/2);
         }
     }
 
@@ -232,11 +234,8 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
 
         if (e != null) {
             if (window != null) {
-                SpaceGraph rw = window;
-                GLWindow rww = rw.window;
-                if (rww != null) {
-                    Point p = rww.getLocationOnScreen(new Point());
-                    Finger.pointer.set(p.getX() + e.getX(), p.getY() + e.getY());
+                if (window.window!=null) {
+                    Finger.pointer.set(window.windowX + e.getX(), window.windowY + e.getY());
                 }
             }
             e.setConsumed(true);
@@ -246,8 +245,9 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
             off();
         } else {*/
         Surface s;
-        float lx = (sx - pos.x) / (scale.x);
-        float ly = (sy - pos.y) / (scale.y);
+        float lx = 0.5f + (sx - pos.x) / (scale.x);
+        float ly = 0.5f + (sy - pos.y) / (scale.y);
+        System.out.println(lx + " " + ly);
         //if (lx >= 0 && ly >= 0 && lx <= 1f && ly <= 1f) {
         if ((s = finger.on(sx, sy, lx, ly, buttonsDown)) != null) {
             return s;

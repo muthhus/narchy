@@ -41,7 +41,6 @@ import spacegraph.phys.BulletGlobals;
  */
 public abstract class Tuple2f implements java.io.Serializable, Cloneable {
 
-    static final long serialVersionUID = 9011180388985266884L;
 
     /**
      * The x coordinate.
@@ -75,14 +74,7 @@ public abstract class Tuple2f implements java.io.Serializable, Cloneable {
         this.x = t[0];
         this.y = t[1];
     }
-     /**
-   * Computes the dot product of the this vector and vector v1.
-   * @param v1 the other vector
-   */
-  public final float dot(v2 v1)
-    {
-      return (this.x*v1.x + this.y*v1.y);
-    }
+
 
 
     /**
