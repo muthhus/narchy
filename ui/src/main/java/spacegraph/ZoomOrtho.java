@@ -1,13 +1,20 @@
 package spacegraph;
 
 import com.jogamp.nativewindow.util.InsetsImmutable;
-import com.jogamp.nativewindow.util.Point;
 import com.jogamp.newt.event.MouseEvent;
+import com.jogamp.opengl.GL2;
 import jcog.Util;
 import spacegraph.input.Finger;
+import spacegraph.layout.Stacking;
+import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
+import spacegraph.render.Draw;
+import spacegraph.widget.Widget;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static spacegraph.Surface.Align.None;
 
 /**
  * Ortho with mouse zoom controls
@@ -23,13 +30,16 @@ public class ZoomOrtho extends Ortho {
     final static short MOVE_WINDOW_BUTTON = 2;
 
     private int[] panStart = null;
-    private int[] windowTarget = new int[2];
+    private int[] moveTarget = new int[2];
+    @Deprecated private int[] resizeTarget = new int[2];
     private int[] windowStart = new int[2];
     private InsetsImmutable windowInsets;
 
+    final HUD HUDSurface = new HUD();
 
-    public ZoomOrtho(Surface surface) {
-        super(surface);
+    public ZoomOrtho(Surface content) {
+        super();
+        setSurface(content);
 
 
 //        this.surface = new Stacking(this.surface, overlay);
@@ -54,11 +64,15 @@ public class ZoomOrtho extends Ortho {
     }
 
     @Override
+    public void setSurface(Surface content) {
+        this.surface = HUDSurface.set(content);
+    }
+
+    @Override
     public void start(SpaceGraph s) {
         super.start(s);
 
-        window.window.setUndecorated(true);
-        window.window.setResizable(false);
+        //window.window.setUndecorated(true);
     }
 
     public float cw() {
@@ -85,11 +99,31 @@ public class ZoomOrtho extends Ortho {
     @Override
     public void mouseMoved(MouseEvent e) {
         super.mouseMoved(e);
+    }
 
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        dragMode = null;
         panStart = null;
+        super.mouseReleased(e);
     }
 
     final AtomicBoolean windowMoving = new AtomicBoolean(false);
+
+    final int resizeBorder = 32; //pixels
+
+    enum WindowDragMode {
+        MOVE,
+        RESIZE_NW,
+        RESIZE_SW,
+        RESIZE_NE,
+        RESIZE_SE
+    }
+
+    final int windowMinWidth = resizeBorder * 3;
+    final int windowMinHeight = resizeBorder * 3;
+    WindowDragMode dragMode = null;
+
 
     @Override
     public void mouseDragged(MouseEvent e) {
@@ -115,43 +149,103 @@ public class ZoomOrtho extends Ortho {
                     windowStart[0] = window.windowX;
                     windowStart[1] = window.windowY;
                     windowInsets = window.window.getInsets();
+
+                    int windowWidth = window.getWidth();
+                    int windowHeight = window.getHeight();
+                    int ex = e.getX();
+                    int ey = windowHeight - e.getY();
+
+                    if ((ex < resizeBorder) && (ey < resizeBorder)) {
+                        dragMode = WindowDragMode.RESIZE_SW; //&& window.isResizable()
+                    } else if ((ex > windowWidth - resizeBorder) && (ey < resizeBorder)) {
+                        dragMode = WindowDragMode.RESIZE_SE;  //&& window.isResizable()
+                    } else {
+                        dragMode = WindowDragMode.MOVE;
+                    }
+                    //System.out.println("window drag mode: " + dragMode);
                 }
 
             } else {
 
-                if (bd[0] == PAN_BUTTON) {
-                    int dx = mx - panStart[0];
-                    int dy = my - panStart[1];
-                    move(dx, -dy);
-                    panStart[0] = mx;
-                    panStart[1] = my;
+                int dx = mx - panStart[0];
+                int dy = my - panStart[1];
+                if (dx == 0 && dy == 0) {
 
-                } else if (bd[0] == MOVE_WINDOW_BUTTON) {
+                } else {
+                    if (bd[0] == PAN_BUTTON) {
 
-                    //compute even if the window is in progress
+                        move(dx, -dy);
+                        panStart[0] = mx;
+                        panStart[1] = my;
 
-                    windowTarget[0] = windowStart[0] + (mx - panStart[0]);
-                    windowTarget[1] = windowStart[1] + (my - panStart[1]);
+                    } else if (bd[0] == MOVE_WINDOW_BUTTON) {
 
-                    if (windowMoving.compareAndSet(false, true)) {
-                        window.window.getScreen().getDisplay().getEDTUtil().invoke(false, this::moveWindow);
+                        //compute even if the window is in progress
+
+                        if (dragMode == WindowDragMode.MOVE) {
+
+
+                            if (windowMoving.compareAndSet(false, true)) {
+                            moveTarget[0] = windowStart[0] + dx;
+                            moveTarget[1] = windowStart[1] + dy;
+                        window.window.getScreen().getDisplay().getEDTUtil().invoke(true, this::moveWindow);
+                            }
+
+                        } else if (dragMode == WindowDragMode.RESIZE_SE) {
+
+                            int windowWidth = window.getWidth();
+                            int windowHeight = window.getHeight();
+
+                            windowStart[0] = window.windowX;
+                            windowStart[1] = window.windowY;
+
+                            moveTarget[0] = windowStart[0];
+                            moveTarget[1] = windowStart[1];
+
+                            resizeTarget[0] = Math.min(window.window.getScreen().getWidth(), Math.max(windowMinWidth, windowWidth + dx));
+                            resizeTarget[1] = Math.min(window.window.getScreen().getHeight(), Math.max(windowMinHeight, windowHeight + dy));
+
+                            if (windowMoving.compareAndSet(false, true)) {
+
+                                window.window.getScreen().getDisplay().getEDTUtil().invoke(true, ()->
+                                        resizeWindow(windowStart[0], windowStart[1], resizeTarget[0], resizeTarget[1]) );
+                                        //this::resizeWindow);
+                                if (panStart != null) {
+                                    panStart[0] = mx;
+                                    panStart[1] = my;
+                                }
+                            }
+
+                        }
+
                     }
-
                 }
             }
         } else {
             panStart = null;
+            dragMode = null;
         }
     }
 
     private void moveWindow() {
         try {
-            window.window.setPosition(windowTarget[0] - windowInsets.getLeftWidth(), windowTarget[1] - windowInsets.getTopHeight());
+            window.window.setPosition(moveTarget[0], moveTarget[1]);
         } finally {
             windowMoving.set(false);
         }
     }
 
+    private void resizeWindow(int x, int y, int w, int h) {
+        try {
+            //System.out.println(Arrays.toString(moveTarget) + " " + Arrays.toString(resizeTarget));
+            window.window.setSize(w, h);
+            window.window.setPosition(x, y);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        } finally {
+            windowMoving.set(false);
+        }
+    }
 
     @Override
     public void mouseWheelMoved(MouseEvent e) {
@@ -196,6 +290,101 @@ public class ZoomOrtho extends Ortho {
 
         }
         //}
+    }
+
+    private class HUD extends Stacking {
+
+        float smx, smy;
+
+        {
+            align = None;
+            aspect = 1f;
+        }
+
+        final Widget bottomRightMenu = new Widget() {
+
+            @Override
+            protected void paintComponent(GL2 gl) {
+
+            }
+        };
+
+
+        @Override
+        protected void paint(GL2 gl) {
+            super.paint(gl);
+
+            gl.glPushMatrix();
+            gl.glLoadIdentity();
+
+            int W = window.getWidth();
+            int H = window.getHeight();
+
+            gl.glColor4f(0.8f, 0.6f, 0f, 0.25f);
+
+            int borderThick = 8;
+            gl.glLineWidth(borderThick);
+            Draw.line(gl, 0, 0, W, 0);
+            Draw.line(gl, 0, 0, 0, H);
+            Draw.line(gl, W, 0, W, H);
+            Draw.line(gl, 0, H, W, H);
+
+
+            gl.glLineWidth(8f);
+
+            float ch = 175f; //TODO proportional to ortho height (pixels)
+            float cw = 175f; //TODO proportional to ortho width (pixels)
+
+            gl.glColor4f(0.5f, 0.5f, 0.5f, 0.25f);
+            Draw.rectStroke(gl, smx - cw / 2f, smy - ch / 2f, cw, ch);
+
+            gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
+            Draw.line(gl, smx, smy - ch, smx, smy + ch);
+            Draw.line(gl, smx - cw, smy, smx + cw, smy);
+            gl.glPopMatrix();
+
+        }
+
+        {
+//            set(
+//                    overlay
+//                    //bottomRightMenu.scale(64,64)
+//            );
+        }
+
+        {
+//            clipTouchBounds = false;
+        }
+
+        boolean canDragBR = false;
+
+        @Override
+        public Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
+
+            //System.out.println(hitPoint);
+            if (hitPoint != null) {
+                float hudMarginThick = 0.05f; //pixels
+
+                smx = finger.hitGlobal.x;
+                smy = finger.hitGlobal.y;
+
+                //boolean nearEdge = Math.abs(sx - )
+                canDragBR = (smx > 1f - hudMarginThick && smy > hudMarginThick);
+//                    if (canDragBR) {
+//                        System.out.println("draggable");
+//                    }
+            } else {
+                canDragBR = false;
+            }
+
+            Surface x = super.onTouch(finger, hitPoint, buttons);
+
+            if (x == this) {
+                return null; //pass-thru
+            } else
+                return x;
+        }
+
     }
 
 }

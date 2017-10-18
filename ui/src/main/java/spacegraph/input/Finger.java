@@ -26,7 +26,7 @@ public class Finger {
     public final static Point pointer = new Point();
 
     public final v2 hit = new v2(), hitGlobal = new v2();
-    public final v2[] hitOnDown = new v2[5];
+    public final v2[] hitOnDown = new v2[5], hitOnDownGlobal = new v2[5];
     public final boolean[] buttonDown = new boolean[5];
     public final boolean[] prevButtonDown = new boolean[5];
     private final Ortho root;
@@ -65,6 +65,7 @@ public class Finger {
             for (int j = 0, jj = hitOnDown.length; j < jj; j++) {
                 if (!prevButtonDown[j] && buttonDown[j]) {
                     hitOnDown[j] = new v2(hit);
+                    hitOnDownGlobal[j] = new v2(hitGlobal);
                 }
             }
 
@@ -97,7 +98,7 @@ public class Finger {
     }
 
     public boolean dragging(int button) {
-        return (hitOnDown[button] != null && hitOnDown[button].distanceSq(hit) >= DRAG_THRESHOLD * DRAG_THRESHOLD);
+        return (hitOnDownGlobal[button] != null && hitOnDownGlobal[button].distanceSq(hitGlobal) >= DRAG_THRESHOLD * DRAG_THRESHOLD);
     }
 
     private boolean on(@Nullable Widget touched) {
