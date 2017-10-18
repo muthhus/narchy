@@ -4,8 +4,9 @@ import com.jogamp.nativewindow.util.InsetsImmutable;
 import com.jogamp.nativewindow.util.Point;
 import com.jogamp.newt.event.MouseEvent;
 import jcog.Util;
-import org.apache.commons.math3.util.ArithmeticUtils;
 import spacegraph.input.Finger;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Ortho with mouse zoom controls
@@ -22,6 +23,7 @@ public class ZoomOrtho extends Ortho {
 
     private int[] panStart = null;
     private int[] windowStart = null;
+    private int[] windowTarget = new int[2];
     private InsetsImmutable windowInsets;
 
 
@@ -82,7 +84,7 @@ public class ZoomOrtho extends Ortho {
         panStart = null;
     }
 
-    boolean windowMoveWait = false;
+    final AtomicBoolean windowMoving = new AtomicBoolean(false);
 
     @Override
     public void mouseDragged(MouseEvent e) {
@@ -113,38 +115,26 @@ public class ZoomOrtho extends Ortho {
                 int dx = mx - panStart[0];
                 int dy = my - panStart[1];
                 if (bd[0] == PAN_BUTTON) {
-                    move(-dx, dy);
+                    move(dx, +dy);
                     panStart[0] = mx;
                     panStart[1] = my;
                 } else if (bd[0] == MOVE_WINDOW_BUTTON) {
 
-//                    if (!windowMoveWait) {
-//                        windowMoveWait = true;
-//                        window.window.getScreen().getDisplay().getEDTUtil().invoke(false, () -> {
-//                            Point p = new Point();
-//                            window.window.getLocationOnScreen(p);
-//                            int cx = p.getX();
-//                            int cy = p.getY();
+                    windowTarget[0] = windowStart[0] + (mx - panStart[0]);
+                    windowTarget[1] = windowStart[1] + (my - panStart[1]);
 
-                            //wait for EDT to update the window, dont spam it
-                            //if (windowNext[0] == cx && windowNext[1] == cy) {
-//                            int grid = 5;
-//                            int fx = (int)Util.round((windowStart[0] + (mx - panStart[0])), grid);
-//                            int fy = (int)Util.round((windowStart[1] - (my - panStart[1])), grid);
-                            int fx = windowStart[0] + (mx - panStart[0]);
-                            int fy = windowStart[1] + (my - panStart[1]);
+                    if (windowMoving.compareAndSet(false, true)) {
+                        window.window.getScreen().getDisplay().getEDTUtil().invoke(false, ()->{
+                            try {
+                                int fx = windowTarget[0];
+                                int fy = windowTarget[1];
+                                window.window.setTopLevelPosition(fx - windowInsets.getLeftWidth(), fy - windowInsets.getTopHeight());
+                            } finally {
+                                windowMoving.set(false);
+                            }
+                        });
+                    }
 
-
-                            //dont re-issue set position unless it has changed
-                            window.window.setTopLevelPosition(fx - windowInsets.getLeftWidth(), fy - windowInsets.getTopHeight());
-//                            window.window.getScreen().getDisplay().dispatchMessages();
-//                            window.window.getScreen().getDisplay().getEDTUtil().waitUntilIdle();
-
-                      //      }
-//
-//                            windowMoveWait = false;
-//                        });
-                    //}
                 }
             }
         } else {
