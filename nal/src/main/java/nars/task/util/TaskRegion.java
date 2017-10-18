@@ -3,6 +3,9 @@ package nars.task.util;
 import jcog.tree.rtree.HyperRegion;
 import nars.task.Tasked;
 
+import static nars.task.util.TaskRegion.nearestBetween;
+import static nars.time.Tense.ETERNAL;
+
 public interface TaskRegion extends HyperRegion, Tasked {
 
     /**
@@ -14,6 +17,37 @@ public interface TaskRegion extends HyperRegion, Tasked {
      */
     float CONF_SAMENESS_IMPORTANCE = 0.05f;
 
+    static long nearestBetween(long s, long e, long when) {
+        assert (when != ETERNAL);
+
+        if (s == ETERNAL) {
+            return when;
+        } else if (when < s || e == s) {
+            return s; //point or at or beyond the start
+        } else if (when > e) {
+            return e; //at or beyond the end
+        } else {
+            return when; //internal
+        }
+    }
+    static long furthestBetween(long s, long e, long when) {
+        assert (when != ETERNAL);
+
+        if (s == ETERNAL) {
+            return when;
+        } else if (when < s || e == s) {
+            return e; //point or at or beyond the start
+        } else if (when > e) {
+            return s; //at or beyond the end
+        } else {
+            //internal, choose most distant endpoint
+            if (Math.abs(when-s) > Math.abs(when-e))
+                return s;
+            else
+                return e;
+        }
+    }
+
     @Override
     boolean equals(Object obj);
 
@@ -23,6 +57,15 @@ public interface TaskRegion extends HyperRegion, Tasked {
     long start();
 
     long end();
+
+    default long mid() { return (start() + end())/2; }
+
+    default long nearestTimeTo(long when) {
+        return nearestBetween(start(), end(), when);
+    }
+    default long furthestTimeTo(long when) {
+        return furthestBetween(start(), end(), when);
+    }
 
     @Override
     default double cost() {

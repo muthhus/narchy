@@ -346,7 +346,7 @@ public abstract class Param extends Services<Term,NAR> {
      * with a perceptual duration used as a time constant
      * dt >= 0
      */
-    public static float evi(float evi, long dt, long dur) {
+    public static double evi(float evi, long dt, long dur) {
 
         //return evi / (1 + ( dt / dur) ); //inverse linear
 

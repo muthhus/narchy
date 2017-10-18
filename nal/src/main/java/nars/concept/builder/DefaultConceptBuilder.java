@@ -79,35 +79,38 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 new CurveBag<PriReference<Task>>(Param.tasklinkMerge, sharedMap, rng, 0) {
                     @Override
                     public void onRemove(PriReference<Task> value) {
-                        Task x = value.get();
-                        Task px = x;
-                        Task y = null;
+                        float p = ((PLinkUntilDeleted) value).priBeforeDeletion;
+                        if (p == p) {
+                            // this link was deleted due to the referent being deleted,
+                            // not because the link was deleted.
+                            // so see if a forwarding exists
 
-                        //TODO maybe a hard limit should be here for safety in case anyone wants to create loops of forwarding tasks
-                        do {
-                            y = x.meta("@");
-                            if (y != null)
-                                x = y;
-                        } while (y != null);
+                            Task x = value.get();
+                            Task px = x;
+                            Task y = null;
 
-                        if (x != px && !x.isDeleted()) {
+                            //TODO maybe a hard limit should be here for safety in case anyone wants to create loops of forwarding tasks
+                            do {
+                                y = x.meta("@");
+                                if (y != null)
+                                    x = y;
+                            } while (y != null);
 
-                            float pre = value.pri();
-                            if (pre!=pre) {
-                                //if the original tasklink has been deleted, estimate the new priority based on the average pri of the table
-                                //TODO better estimate
-                                pre = (isEmpty() ? 0.5f : priAvg());
-                            } else {
-                                pre *= x.priElseZero() / px.priElseZero(); //ratio of the task priorities
+                            if (x != px && !x.isDeleted()) {
+                                putAsync(new PLinkUntilDeleted<>(x, p));
                             }
-
-                            putAsync(new PLinkUntilDeleted<>(
-                                    x, pre));
-
                         }
+
                     }
                 };
-        return new Bag[]{termbag, taskbag};
+
+        return new Bag[]
+
+                {
+                        termbag, taskbag
+                }
+
+                ;
 //        } else {
 //            return new Bag[]{
 //                    new MyDefaultHijackBag(Param.termlinkMerge),

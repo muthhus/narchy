@@ -37,16 +37,16 @@ public class Line1DSimplest extends NAgent {
         super( n);
 
 
-        in = senseNumber($.the("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
+        in = senseNumber($.p("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
                 this.i
         );
-        senseNumber($.the("o"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
+        senseNumber($.p("o"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
                 this.o
         );
 
-        initDualToggle();
+        //initDualToggle();
         //initDualUnipolar();
-        //initBipolar();
+        initBipolar();
 
 //        in = senseNumber(
 //                //$.inh($.the("i"), id),

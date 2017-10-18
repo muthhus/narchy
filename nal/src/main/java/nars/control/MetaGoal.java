@@ -179,8 +179,9 @@ public enum MetaGoal {
         int numCauses = effects.length;
 
         float vPer =
-                //strength;
-                strength / numCauses; //divided equally
+                strength; //must be flat
+                //strength / numCauses; //divided equally <- WRONG
+
         if (Math.abs(vPer) < Prioritized.EPSILON) return; //no change
 
         for (int i = 0; i < numCauses; i++) {

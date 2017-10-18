@@ -415,7 +415,7 @@ public interface NAct {
             float confMin = n.confMin.floatValue();
             float confBase =
                     //confMin * 4;
-                    n.confDefault(GOAL)/3;
+                    n.confDefault(GOAL);
             float curiEvi = c2w(confBase);
 
             int ip = p ? 0 : 1;
@@ -444,28 +444,30 @@ public interface NAct {
 
                 float y = update.valueOf(x); //-1..+1
 
-                float conf = ((y == y) && (eviSum > Pri.EPSILON)) ?
-                            w2c(eviSum) : 0;
 
                 //w2c(Math.abs(y) * c2w(restConf));
                 PreciseTruth N, P;
 
-                if (conf >= confMin) {
+//                float conf = ((y == y) && (eviSum > Pri.EPSILON)) ?
+//                            w2c(eviSum) : 0;
+
+                if (y == y) {
                     float yf = (y / 2f)+0.5f; //0..+1
-                    P = $.t(yf, conf);
-                    N = $.t(1-yf, conf);
+                    float confFeedback = confBase;
+                    P = $.t(yf, confFeedback);
+                    N = $.t(1-yf, confFeedback);
                 } else {
 
                     P = N = null;
                 }
 
 
-                PreciseTruth pb = y > 0 ? P : N;
+                PreciseTruth pb = P;
                 PreciseTruth pg =
                         curious && y==y ? $.t(y >= 0 ? 1 : 0, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
                         //null;
                 CC[0].feedback(pb, pg, n);
-                PreciseTruth nb = y < 0 ? P : N;
+                PreciseTruth nb = N;
                 PreciseTruth ng =
                         curious && y==y  ? $.t(y >= 0 ? 0 : 1, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
                         //null;

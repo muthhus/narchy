@@ -636,14 +636,16 @@ public class Revision {
                 /** account for how much the merge stretches the truth beyond the range of the inputs */
                 long separation = u - s - tolerance;
                 if (separation > 0) {
-                    factor = 1f - (separation / ((float) u));
+                    int shortest = Math.min(al, bl);
+                    if (separation < shortest) {
+                        factor = 1f - separation / ((float) shortest);
+                    } else {
+                        factor = 0; //too separate
+                    }
 
-                    //                int shortest = Math.min(al, bl);
-                    //                if (separation < shortest) {
-                    //                    factor = 1f - separation / ((float) shortest);
-                    //                } else {
-                    //                    factor = 0; //too separate
-                    //                }
+
+                    //factor = 1f - (separation / ((float) u));
+
                 }
             }
 

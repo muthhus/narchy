@@ -29,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import static java.util.Collections.singleton;
 import static nars.Op.*;
@@ -224,27 +223,13 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
             return (a+b)/2; //midpoint
         }
 
-        long u = nearestBetween(a, b, x);
-        long v = nearestBetween(a, b, y);
+        long u = TaskRegion.nearestBetween(a, b, x);
+        long v = TaskRegion.nearestBetween(a, b, y);
         if (Math.min(Math.abs(u - a), Math.abs(u - b)) <
                 Math.min(Math.abs(v - a), Math.abs(v - b))) {
             return u;
         } else {
             return v;
-        }
-    }
-
-    static long nearestBetween(long s, long e, long when) {
-        assert (when != ETERNAL);
-
-        if (s == ETERNAL) {
-            return when;
-        } else if (when < s || e == s) {
-            return s; //point or at or beyond the start
-        } else if (when > e) {
-            return e; //at or beyond the end
-        } else {
-            return when; //internal
         }
     }
 
@@ -388,7 +373,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
                     float ete = eternalizable();
                     float ecw = ete > 0 ? this.eviEternalized() * ete : 0;
                     float dcw = cw - ecw; //delta to eternalization
-                    cw = ecw + Param.evi(dcw, dist, dur); //decay
+                    cw = (float) (ecw + Param.evi(dcw, dist, dur)); //decay
                 }
             }
 
@@ -596,7 +581,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
             if (a == b) return a;
             else return Math.abs(a-x) < Math.abs(b-x) ? a : b;
         } else if (a == b) {
-            return nearestBetween(x, y, a);
+            return TaskRegion.nearestBetween(x, y, a);
         } else /*if (x <= a && y >= b) {
             return (a + b) / 2; //midpoint of this within the range
         } else if ((x > a) && (y < b)) {
@@ -606,9 +591,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         }
     }
 
-    default long nearestTimeTo(long when) {
-        return nearestBetween(start(), end(), when);
-    }
+
 
     default @Nullable StringBuilder appendTo(@Nullable StringBuilder sb /**@Nullable*/) {
         return appendTo(sb, false);
@@ -807,7 +790,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         return null;
     }
 
-    default long mid() {
+    @Override default long mid() {
         long s = start();
         return (s != ETERNAL) ? ((s + end()) / 2L) : ETERNAL;
     }

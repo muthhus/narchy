@@ -55,13 +55,16 @@ public class CameraSensorView extends BitmapMatrixView implements BitmapMatrixVi
     public int update(int x, int y) {
 
 
-        long now = this.now;
+
+
+        long start = now - dur/2;
+        long end = now + dur/2;
 
         BaseConcept s = cam.matrix[x][y];
-        Truth b = s.beliefs().truth(now, now, nar);
+        Truth b = s.beliefs().truth(start, end, nar);
         float bf = b != null ? b.freq() : 0.5f;
 
-        Truth d = s.goals().truth(now, now, nar);
+        Truth d = s.goals().truth(start, end, nar);
         float R = bf*0.75f, G = bf*0.75f, B = bf*0.75f;
         if (d!=null) {
             float f = d.expectation();

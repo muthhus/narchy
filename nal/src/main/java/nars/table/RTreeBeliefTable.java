@@ -36,11 +36,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static nars.Op.CONJ;
 import static nars.table.TemporalBeliefTable.temporalTaskPriority;
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.w2c;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
@@ -408,11 +405,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         float inputStrength = inputRegion != null ? taskStrength.floatValueOf(inputRegion) : Float.POSITIVE_INFINITY;
 
-
-        FloatFunction<TaskRegion> rs = regionStrength(nar.time(), 1L + Math.round(tableDur()));
-        FloatFunction<Node<?, TaskRegion>> leafWeakness = (l) -> -rs.floatValueOf((TaskRegion) (l.region()));
-
-        final int DELETE_VICTIMS = 3; //should be greater than 2 in case the merge victims are included
+        FloatFunction<TaskRegion> leafRegionWeakness =
+                /*new CachedFloatFunction*/(regionWeakness(nar.time(), 1L + Math.round(tableDur())));
+        FloatFunction<Leaf<TaskRegion>> leafWeakness =
+                L -> leafRegionWeakness.floatValueOf((TaskRegion) L.region());
 
         Top<Leaf<TaskRegion>> mergeVictim = new Top(leafWeakness);
 
@@ -420,49 +416,57 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         int startSize = tree.size();
         if (startSize <= cap) return true; //compressed thanks to another thread
 
-        TopN<TaskRegion> deleteVictim = new TopDeleteVictims(DELETE_VICTIMS, weakestTask, inputStrength);
 
         //1.
-        findEvictable(tree, tree.root(), deleteVictim, mergeVictim);
+        findEvictable(tree, tree.root(), mergeVictim);
         if (tree.size() <= cap)
             return true; //done, due to a removal of deleted items while finding eviction candiates
 
         //2.
         @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
         if (toMerge != null) {
-            if (compressMerge(tree, toMerge, taskStrength, inputStrength, weakestTask, changes, nar)) {
+            if (mergeOrDelete(tree, toMerge, taskStrength, inputStrength, weakestTask, changes, nar)) {
                 if (tree.size() <= cap) return true;
             }
         }
 
-
-        if (deleteVictim.isEmpty())
-            return false; //input too weak
-
         //3.
-        for (TaskRegion d : deleteVictim.list) {
-            if (d != null) {
-                if (tryDelete(tree, d))
-                    if (tree.size() <= cap) return true;
-            } else {
-                break;
+        /*
+                    Object[] ld = l.data;
+
+            // remove any deleted tasks while scanning for victims
+            for (int i = 0; i < size; i++) {
+                TaskRegion t = (TaskRegion) ld[i];
+//                if (t.task().isDeleted()) {
+//                    //TODO this may disrupt the iteration being conducted, it may need to be deferred until after
+//                    //boolean deleted = tree.remove(t); //already has write lock so just use non-async methods
+//
+//                } else {
+                deleteVictims.accept(t);
+//                }
             }
-        }
+         */
+//        for (TaskRegion d : deleteVictim.list) {
+//            if (d != null) {
+//                if (tree.remove(d)) {
+//                    //TODO forward to a neighbor?
+//                    Task dt = d.task();
+//                    dt.delete();
+//                    changes.put(dt, false);
+//                    if (tree.size() <= cap)
+//                        return true;
+//                }
+//            } else {
+//                break;
+//            }
+//        }
 
         return false; //?? could be a problem if it reaches here
     }
 
 
 
-    private static boolean tryDelete(Space<TaskRegion> treeRW, @Nullable TaskRegion x) {
-        if (x != null && treeRW.remove(x)) {
-            x.task().delete();
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean compressMerge(Space<TaskRegion> treeRW, Leaf<TaskRegion> l, FloatFunction<Task> taskStrength, float inputStrength, FloatFunction<TaskRegion> weakestTasks, ObjectBooleanHashMap<Task> changes, NAR nar) {
+    private static boolean mergeOrDelete(Space<TaskRegion> treeRW, Leaf<TaskRegion> l, FloatFunction<Task> taskStrength, float inputStrength, FloatFunction<TaskRegion> weakestTasks, ObjectBooleanHashMap<Task> changes, NAR nar) {
         short s = l.size;
         assert (s > 0);
 
@@ -477,8 +481,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             b = l.get(1);
         }
 
-        if (a != null && b != null) {
-            Task at = a.task();
+        assert(a!=null);
+        Task at = a.task();
+        treeRW.remove(at);
+        changes.put(at, false);
+
+        if (b != null) {
             Task bt = b.task();
 
             Task c = Revision.merge(at, bt, nar.time(), nar);
@@ -496,11 +504,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
                 if (allowMerge) {
 
-                    treeRW.remove(at);
-                    treeRW.remove(bt);
-                    changes.put(at, false);
-                    changes.put(bt, false);
                     changes.put(c, true);
+
+                    treeRW.remove(bt);
+                    changes.put(bt, false);
 
                     ((NALTask)at).delete(c); //forward
                     ((NALTask)bt).delete(c); //forward
@@ -513,34 +520,22 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             }
         }
 
+        //merge impossible, delete a
+        if (b!=null)
+            ((NALTask)at).delete(b.task()); //forward
+        else
+            ((NALTask)at).delete();
+
         return false;
     }
 
 
-    static void findEvictable(Space<TaskRegion> tree, Node<TaskRegion, ?> next, Consumer<TaskRegion> deleteVictims, Top<Leaf<TaskRegion>> mergeVictims) {
+    static void findEvictable(Space<TaskRegion> tree, Node<TaskRegion, ?> next, Top<Leaf<TaskRegion>> mergeVictims) {
         if (next instanceof Leaf) {
 
             Leaf<TaskRegion> l = (Leaf) next;
 
-            int size = l.size;
-
-            if (size > 1)
-                mergeVictims.accept(l);
-
-            Object[] ld = l.data;
-
-            // remove any deleted tasks while scanning for victims
-            for (int i = 0; i < size; i++) {
-                TaskRegion t = (TaskRegion) ld[i];
-//                if (t.task().isDeleted()) {
-//                    //TODO this may disrupt the iteration being conducted, it may need to be deferred until after
-//                    //boolean deleted = tree.remove(t); //already has write lock so just use non-async methods
-//
-//                } else {
-                deleteVictims.accept(t);
-//                }
-            }
-
+            mergeVictims.accept(l);
 
         } else { //if (next instanceof Branch)
 
@@ -548,54 +543,31 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             int size = b.size();
             Node<TaskRegion, ?>[] ww = b.child;
             for (int i = 0; i < size; i++) {
-                findEvictable(tree, ww[i], deleteVictims, mergeVictims);
+                findEvictable(tree, ww[i], mergeVictims);
             }
 
-//        int w = b.size();
-//        if (w > 0) {
-//
-//            //recurse through a subest of the weakest regions, while also collecting victims
-//            //select the 2 weakest regions and recurse
-//            Top2<Node<TaskRegion, ?>> weakest = new Top2(
-//                    mergeVictims.rank
-//            );
-//
-//            for (int i = 0; i < w; i++) {
-//                Node bb = b.get(i);
-//                if (bb != null) {
-//                    weakest.add(bb);
-//                }
-//            }
-//
-//            if (weakest.a != null)
-//                compressNode(tree, weakest.a, deleteVictims, mergeVictims);
-//            if (weakest.b != null)
-//                compressNode(tree, weakest.b, deleteVictims, mergeVictims);
-//        }
-
         }
-//      else {
-//            throw new RuntimeException();
-//        }
+
     }
 
 
     /**
      * TODO use the same heuristics as task strength
      */
-    private static FloatFunction<TaskRegion> regionStrength(long when, long dur) {
+    private static FloatFunction<TaskRegion> regionWeakness(long when, long dur) {
 
         return (TaskRegion r) -> {
 
-            float maxConf = (float) r.coord(true, 2); //optimistic
-            float evi = w2c(Param.evi(w2c(maxConf), Math.abs(when -
-                    (r.start() + r.end()) / 2L), dur
-                    //Task.nearestBetween(r.start(), r.end(), when)))
-            ));
+            long regionTime =
+                    //r.mid();
+                    r.furthestTimeTo(when);
+            long timeDist = 1 + Math.abs(when - regionTime);
 
-            float span = (float) ((1 + r.range(0)) / dur);
+            float antiConf = 1f - (float) (r.coord(true, 2)+r.coord(false,2))/2f;
 
-            return evi * span;
+            //float span = (float)(1 + r.range(0)/dur); //span becomes less important the further away, more fair to short near-term tasks
+
+            return (float) (antiConf * timeDist);
         };
     }
 

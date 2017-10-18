@@ -14,7 +14,7 @@ public class PredictionFeedback {
     final BeliefTable table;
     static final boolean deleteAny = false; //
 
-    static final float REWARD_PUNISH_COHERENCE_THRESHOLD = 0.5f;
+    static final float REWARD_PUNISH_COHERENCE_THRESHOLD = 0.9f;
 
     public PredictionFeedback(BeliefTable table) {
         this.table = table;
@@ -24,10 +24,7 @@ public class PredictionFeedback {
         if (x == null)
             return;
 
-
-
         feedback(x, Param.DELETE_INACCURATE_PREDICTIONS /* TODO make this adjustable threshold */, nar);
-
     }
 
     /** TODO handle stretched tasks */
@@ -80,6 +77,8 @@ public class PredictionFeedback {
                 v = coherence * 2f * confFraction /* * headstart */ * strength;
 
                 MetaGoal.learn(MetaGoal.Accurate, y.cause(), v, nar);
+
+                ((NALTask)y).meta("@", x); //in case the task gets deleted, the link will point to the sensor value
 
             } else {
                 //punish
