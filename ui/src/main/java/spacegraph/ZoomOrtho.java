@@ -1,30 +1,33 @@
 package spacegraph;
 
+import com.jogamp.nativewindow.util.InsetsImmutable;
+import com.jogamp.nativewindow.util.Point;
 import com.jogamp.newt.event.MouseEvent;
-import com.jogamp.opengl.GL2;
-import spacegraph.layout.Stacking;
-import spacegraph.math.v2;
-
-import static spacegraph.math.v3.v;
+import jcog.Util;
+import org.apache.commons.math3.util.ArithmeticUtils;
+import spacegraph.input.Finger;
 
 /**
  * Ortho with mouse zoom controls
  */
 public class ZoomOrtho extends Ortho {
 
-    float zoomRate = 0.1f;
+    float zoomRate = 0.2f;
 
     final static float minZoom = 0.1f;
     final static float maxZoom = 10f;
 
     final static short PAN_BUTTON = 3;
+    final static short MOVE_WINDOW_BUTTON = 2;
 
-    v2 panStart;
+    private int[] panStart = null;
+    private int[] windowStart = null;
+    private InsetsImmutable windowInsets;
 
-    final Stacking overlay = new Stacking();
 
     public ZoomOrtho(Surface surface) {
         super(surface);
+
 
 //        this.surface = new Stacking(this.surface, overlay);
 //        overlay.children().add(new Widget() {
@@ -47,21 +50,29 @@ public class ZoomOrtho extends Ortho {
 //        });
     }
 
+    @Override
+    public void start(SpaceGraph s) {
+        super.start(s);
+
+        window.window.setUndecorated(true);
+        window.window.setResizable(false);
+    }
+
     public float cw() {
         return (ZoomOrtho.this.window.getWidth() / ZoomOrtho.this.scale.x);
     }
+
     public float ch() {
         return (ZoomOrtho.this.window.getHeight() / ZoomOrtho.this.scale.y);
     }
 
     public float cx() {
-        return (0.5f - pos.x)/scale.x;
+        return (0.5f - pos.x) / scale.x;
     }
 
     public float cy() {
-        return (0.5f - pos.y)/scale.y;
+        return (0.5f - pos.y) / scale.y;
     }
-
 
 
     @Override
@@ -71,25 +82,74 @@ public class ZoomOrtho extends Ortho {
         panStart = null;
     }
 
+    boolean windowMoveWait = false;
+
     @Override
     public void mouseDragged(MouseEvent e) {
         super.mouseDragged(e);
 
         short[] bd = e.getButtonsDown();
 
-        if (bd.length > 0 && bd[0] == PAN_BUTTON) {
-            int mx = e.getX();
-            int my = window.getHeight() - e.getY();
+        if (bd.length > 0 && (bd[0] == PAN_BUTTON) || (bd[0] == MOVE_WINDOW_BUTTON)) {
+            //int mx = e.getX();
+            //int my = window.getHeight() - e.getY();
+            int mx = Finger.pointer.getX();
+            int my = Finger.pointer.getY();
             if (panStart == null) {
-                panStart = v(mx, my);
+                panStart = new int[2];
+                panStart[0] = mx;
+                panStart[1] = my;
+
+
+                Point p = new Point();
+                window.window.getLocationOnScreen(p);
+                windowStart = new int[2];
+                windowStart[0] = p.getX();
+                windowStart[1] = p.getY();
+
+                windowInsets = window.window.getInsets();
+
             } else {
-                float dx = mx - panStart.x;
-                float dy = my - panStart.y;
-                move(dx, dy);
-                panStart.set(mx, my);
+                int dx = mx - panStart[0];
+                int dy = my - panStart[1];
+                if (bd[0] == PAN_BUTTON) {
+                    move(-dx, dy);
+                    panStart[0] = mx;
+                    panStart[1] = my;
+                } else if (bd[0] == MOVE_WINDOW_BUTTON) {
+
+//                    if (!windowMoveWait) {
+//                        windowMoveWait = true;
+//                        window.window.getScreen().getDisplay().getEDTUtil().invoke(false, () -> {
+//                            Point p = new Point();
+//                            window.window.getLocationOnScreen(p);
+//                            int cx = p.getX();
+//                            int cy = p.getY();
+
+                            //wait for EDT to update the window, dont spam it
+                            //if (windowNext[0] == cx && windowNext[1] == cy) {
+//                            int grid = 5;
+//                            int fx = (int)Util.round((windowStart[0] + (mx - panStart[0])), grid);
+//                            int fy = (int)Util.round((windowStart[1] - (my - panStart[1])), grid);
+                            int fx = windowStart[0] + (mx - panStart[0]);
+                            int fy = windowStart[1] + (my - panStart[1]);
+
+
+                            //dont re-issue set position unless it has changed
+                            window.window.setTopLevelPosition(fx - windowInsets.getLeftWidth(), fy - windowInsets.getTopHeight());
+//                            window.window.getScreen().getDisplay().dispatchMessages();
+//                            window.window.getScreen().getDisplay().getEDTUtil().waitUntilIdle();
+
+                      //      }
+//
+//                            windowMoveWait = false;
+//                        });
+                    //}
+                }
             }
         } else {
             panStart = null;
+            windowStart = null;
         }
     }
 
@@ -100,34 +160,38 @@ public class ZoomOrtho extends Ortho {
 
         //when wheel rotated on negative (empty) space, adjust scale
         //if (mouse.touching == null) {
-            //System.out.println(Arrays.toString(e.getRotation()) + " " + e.getRotationScale());
-            float zoomMult = 1f + -e.getRotation()[1] * zoomRate;
+        //System.out.println(Arrays.toString(e.getRotation()) + " " + e.getRotationScale());
+        float zoomMult = Util.clamp(1f + -e.getRotation()[1] * zoomRate, 0.5f, 1.5f);
 
-            float psx = scale.x;
-            float psy = scale.y;
-            float sx = psx * zoomMult;
-            float sy = psy * zoomMult;
-            int wx = window.getWidth();
-            int wy = window.getHeight();
+        float psx = scale.x;
+        float psy = scale.y;
+        float sx = psx * zoomMult;
+        float sy = psy * zoomMult;
+        int wx = window.getWidth();
+        int wy = window.getHeight();
 
-            if (sx/wx >= minZoom && sy/wy >= minZoom && sx/wx <= maxZoom && sy/wy <= maxZoom) {
+        if (sx / wx >= minZoom && sy / wy >= minZoom && sx / wx <= maxZoom && sy / wy <= maxZoom) {
 
-                float pcx = cx();
-                float pcy = cy();
-                float pcw = cw();
-                float pch = ch();
+            float pcx = cx();
+            float pcy = cy();
+            float pcw = cw();
+            float pch = ch();
 
-                scale.set(sx, sy);
+            float dx = (pcw * psx - pcw * sx) / 2;
+            float dy = (pch * psy - pch * sy) / 2;
+            //System.out.println(pcx + " " + pcy + " : " + dx + " " + dy);
+            pos.add(dx, dy, 0);
+            scale.set(sx, sy);
 
-                float ncx = cx();
-                float ncy = cy();
-                float ncw = cw();
-                float nch = ch();
+            float ncx = cx();
+            float ncy = cy();
+            float ncw = cw();
+            float nch = ch();
 
-                //pos.set()
-                //TODO
+            //pos.set()
+            //TODO
 
-            }
+        }
         //}
     }
 

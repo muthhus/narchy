@@ -39,15 +39,15 @@ abstract public class Surface {
         //TODO etc...
     }
 
-    public final v3 pos;
-    public final v2 scale;
+    public v3 pos;
+    public v2 scale;
 
     public Surface parent;
 
     /**
      * not used unless aspect ratio is set to non-NaN value
      */
-    Align align = Align.Center;
+    protected Align align = Align.Center;
 
     /**
      * height/width target aspect ratio; if aspect is NaN, no adjustment applied

@@ -126,7 +126,7 @@ abstract public class Widget extends Stacking {
         SpaceGraph s = SpaceGraph.window(
 
                 widgetDemo()
-                , 800, 600);
+                , 1200, 800);
 
 
         //SpaceGraph dd = SpaceGraph.window(new Cuboid(widgetDemo(), 16, 8f).color(0.5f, 0.5f, 0.5f, 0.25f), 1000, 1000);

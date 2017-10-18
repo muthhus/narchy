@@ -9,6 +9,9 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
 import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
+import spacegraph.phys.util.AnimVector2f;
+import spacegraph.phys.util.AnimVector3f;
+import spacegraph.phys.util.Animated;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
@@ -27,18 +30,15 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     private boolean maximize;
     public SpaceGraph window;
 
+    final HUD HUDSurface = new HUD();
+
     public Ortho(Surface content) {
 
-        HUDSurface.set(content);
-        this.surface = HUDSurface;
-
-
-        surface.align = None;
-        surface.aspect = 1f;
+        this.surface = HUDSurface.set(content);
 
         this.finger = new Finger(this);
-//        this.scale = new AnimVector2f(3f);
-//        this.pos = new AnimVector2f(3f);
+        //this.scale = new AnimVector2f(6f);
+        //this.pos = new AnimVector3f(3f);
     }
 
     @Override
@@ -84,10 +84,9 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         this.window = s;
         s.addWindowListener(this);
         s.addMouseListener(this);
-
         s.addKeyListener(this);
-//        s.dyn.addAnimation(scale);
-//        s.dyn.addAnimation(pos);
+//        s.dyn.addAnimation((Animated) scale);
+//        s.dyn.addAnimation((Animated) pos);
         surface.start(this);
         surface.layout();
         resized();
@@ -273,20 +272,15 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     }
 
 
-    final HUD HUDSurface = new HUD();
-
 
     private class HUD extends Stacking {
 
         float smx, smy;
 
-//        @Override
-//        protected void paint(GL2 gl) {
-//            gl.glPushMatrix();
-//            gl.glLoadIdentity();
-//            super.paint(gl);
-//            gl.glPopMatrix();
-//        }
+        {
+            align = None;
+            aspect = 1f;
+        }
 
         final Widget bottomRightMenu = new Widget() {
 

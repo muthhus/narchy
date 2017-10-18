@@ -43,8 +43,9 @@ public class Layout<S extends Surface> extends Surface {
 
     }
 
-    public final void set(S... s) {
+    public final Layout set(S... s) {
         set(Lists.newArrayList(s));
+        return this;
     }
 
     public Layout<S> set(List<S> next) {
