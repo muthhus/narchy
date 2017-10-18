@@ -47,7 +47,7 @@ public class Layout<S extends Surface> extends Surface {
         set(Lists.newArrayList(s));
     }
 
-    public Layout<S> set(@NotNull List<S> next) {
+    public Layout<S> set(List<S> next) {
         synchronized (scale) {
 
             if (!Objects.equals(this.children, next)) {
@@ -107,7 +107,6 @@ public class Layout<S extends Surface> extends Surface {
             for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
                 cc.get(i).onTouch(finger, null, null);
             }
-            return null;
         } else {
 
             for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
@@ -139,7 +138,7 @@ public class Layout<S extends Surface> extends Surface {
             }
         }
 
-        return this;
+        return null;
     }
 
     @Override

@@ -454,6 +454,12 @@ public enum Draw {
         line(gl, (float) x1, (float) y1, (float) x2, (float) y2);
     }
 
+    public static void line(GL2 gl, int x1, int y1, int x2, int y2) {
+        gl.glBegin(GL2.GL_LINES);
+        gl.glVertex2i(x1, y1);
+        gl.glVertex2i(x2, y2);
+        gl.glEnd();
+    }
     public static void line(GL2 gl, float x1, float y1, float x2, float y2) {
         gl.glBegin(GL2.GL_LINES);
         gl.glVertex2f(x1, y1);

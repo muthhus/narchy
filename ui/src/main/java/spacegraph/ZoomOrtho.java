@@ -24,7 +24,6 @@ public class ZoomOrtho extends Ortho {
     final Stacking overlay = new Stacking();
 
     public ZoomOrtho(Surface surface) {
-
         super(surface);
 
 //        this.surface = new Stacking(this.surface, overlay);
