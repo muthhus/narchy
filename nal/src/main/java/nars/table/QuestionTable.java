@@ -31,9 +31,9 @@ public interface QuestionTable extends TaskTable {
      * allows question to pass through it to the link activation phase, but
      * otherwise does not store it
      */
-    //@NotNull QuestionTable Unstored = new EmptyQuestionTable();
+    ///*@NotNull*/ QuestionTable Unstored = new EmptyQuestionTable();
 
-    @NotNull QuestionTable Empty = new NullQuestionTable();
+    /*@NotNull*/ QuestionTable Empty = new NullQuestionTable();
 
     class NullQuestionTable implements QuestionTable {
 
@@ -43,7 +43,7 @@ public interface QuestionTable extends TaskTable {
         }
 
         @Override
-        public void add(@NotNull Task t, BaseConcept c, NAR n) {
+        public void add(/*@NotNull*/ Task t, BaseConcept c, NAR n) {
 
         }
 
@@ -109,7 +109,7 @@ public interface QuestionTable extends TaskTable {
         }
 
         @Override
-        public void add(@NotNull Task t, BaseConcept c, NAR n) {
+        public void add(/*@NotNull*/ Task t, BaseConcept c, NAR n) {
             final float[] act = new float[1];
             Task u;
             synchronized (lock) {
@@ -191,7 +191,7 @@ public interface QuestionTable extends TaskTable {
 //        final static HijackQuestionTable common = new HijackQuestionTable(1024, 3);
 //
 //        @Override
-//        public void add(@NotNull Task t, BaseConcept c, NAR n) {
+//        public void add(/*@NotNull*/ Task t, BaseConcept c, NAR n) {
 //            Task e = common.get(t);
 //            float activation = t.priElseZero();
 //            if (e ==null) {

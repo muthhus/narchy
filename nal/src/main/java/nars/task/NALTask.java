@@ -39,7 +39,7 @@ public class NALTask extends Pri implements Task {
 
     final int hash;
 
-    public final Map<String,Object> meta = new CompactArrayMap();
+    public final CompactArrayMap<String,Object> meta = new CompactArrayMap();
 
 
     public NALTask(Term term, byte punc, @Nullable Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
@@ -183,9 +183,10 @@ public class NALTask extends Pri implements Task {
     @Override
     public boolean delete() {
         if (super.delete()) {
-            if (!Param.DEBUG) {
-                //assert(meta.get("@")==null); //TODO temporary
-                this.meta.clear();
+            if (Param.DEBUG) {
+                //dont clear meta if debugging
+            } else {
+                this.meta.clearExcept("@");
             }
             return true;
         }
@@ -194,9 +195,11 @@ public class NALTask extends Pri implements Task {
 
     public boolean delete(Task forwardTo) {
         super.delete();
-        if (!Param.DEBUG)
-            this.meta.clear();
-        meta.put("@", forwardTo);
+
+        if (Param.DEBUG)
+            meta.put("@", forwardTo);
+        else
+            meta.clearPut("@", forwardTo);
         return true;
     }
 

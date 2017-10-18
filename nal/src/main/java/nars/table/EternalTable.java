@@ -45,7 +45,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
         @Override
-        public @Nullable Task put(@NotNull Task incoming) {
+        public @Nullable Task put(/*@NotNull*/ Task incoming) {
             throw new UnsupportedOperationException();
         }
 
@@ -55,7 +55,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
         @Override
-        public @Nullable void add(@NotNull Task input, BaseConcept c, @NotNull NAR nar) {
+        public @Nullable void add(/*@NotNull*/ Task input, BaseConcept c, /*@NotNull*/ NAR nar) {
             //nothing
         }
 
@@ -70,7 +70,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         }
 
-        @NotNull
+        /*@NotNull*/
         @Override
         public Iterator<Task> iterator() {
             return Collections.emptyIterator();
@@ -168,7 +168,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
      * for ranking purposes
      */
     @Override
-    public final float floatValueOf(@NotNull Task w) {
+    public final float floatValueOf(/*@NotNull*/ Task w) {
         //return rankEternalByConfAndOriginality(w);
         return -w.conf();
     }
@@ -179,7 +179,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 //    }
 //
 //    @Override
-//    public final int compare(@NotNull Task o1, @NotNull Task o2) {
+//    public final int compare(/*@NotNull*/ Task o1, /*@NotNull*/ Task o2) {
 //        float f1 = rank(o2); //reversed
 //        float f2 = rank(o1);
 //        if (f1 < f2)
@@ -190,7 +190,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 //    }
 
     @Deprecated
-    static void removeTask(@NotNull Task t, @Nullable String reason) {
+    static void removeTask(/*@NotNull*/ Task t, @Nullable String reason) {
 //        if (reason!=null && Param.DEBUG && t instanceof MutableTask)
 //            ((MutableTask)t).log(reason);
         t.delete();
@@ -202,7 +202,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
      * non-null: revised task
      */
     @Nullable
-    private /*Revision*/Task tryRevision(@NotNull Task y /* input */,
+    private /*Revision*/Task tryRevision(/*@NotNull*/ Task y /* input */,
                                          @Nullable NAR nar) {
 
         Object[] list = this.list;
@@ -303,7 +303,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     }
 
     @Nullable
-    public Task put(@NotNull final Task incoming) {
+    public Task put(final Task incoming) {
         Task displaced = null;
 
         synchronized (this) {
@@ -331,7 +331,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
 
 //    @Override
-//    public void remove(@NotNull Task belief, List<Task> displ) {
+//    public void remove(/*@NotNull*/ Task belief, List<Task> displ) {
 //        synchronized(builder) {
 //            /* removed = */ remove(indexOf(belief, this));
 //        }
@@ -366,7 +366,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
     @Override
     @Nullable
-    public void add(@NotNull Task input, BaseConcept c, @NotNull NAR nar) {
+    public void add(/*@NotNull*/ Task input, BaseConcept c, /*@NotNull*/ NAR nar) {
 
         int cap = capacity();
         if (cap == 0) {
@@ -464,7 +464,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
      * try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      * returns true if it was inserted, false if not
      */
-    private boolean insert(@NotNull Task input) {
+    private boolean insert(/*@NotNull*/ Task input) {
 
         Truth before = this.truth;
 
@@ -482,7 +482,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         return true;
     }
 
-    private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, NAR nar) {
+    private void addEternalAxiom(/*@NotNull*/ Task input, /*@NotNull*/ EternalTable et, NAR nar) {
         //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
         //1. clear the corresponding table, set capacity to one, and insert this task
         et.forEachTask(t -> removeTask(t, "Overridden"));

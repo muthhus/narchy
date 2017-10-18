@@ -365,8 +365,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     n.input(task);
                 }
             } else {
-                if (task.meta("@")==null)
-                    task.delete(); //dont delete it if forwarding, to save the pri
+                task.delete();
             }
         });
     }
@@ -455,7 +454,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     private static boolean tryDelete(Space<TaskRegion> treeRW, @Nullable TaskRegion x) {
         if (x != null && treeRW.remove(x)) {
-            //x.task().delete(); //dont delete this might remove any forward here
+            x.task().delete();
             return true;
         }
         return false;

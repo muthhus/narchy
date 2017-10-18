@@ -31,10 +31,8 @@ public class ArrayIterator<E> implements Iterator<E>, Iterable<E> {
     @NotNull
     @Override
     public Iterator<E> iterator() {
-        synchronized (this) {
-            if (_index != 0)
-                throw new RuntimeException("iterator() method can only be called once");
-        }
+        if (_index != 0)
+            throw new RuntimeException("iterator() method can only be called once");
         return this;
     }
 }

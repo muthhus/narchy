@@ -3,112 +3,90 @@ package jcog.map;
 import jcog.TODO;
 import jcog.list.FasterList;
 
-import java.io.Serializable;
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.Arrays;
 import java.util.function.Function;
 
 /**
- * Optimised for very small data sets, allowing compact size and fast puts at
- * the expense of O(n) lookups. This implementation may store duplicate entries
- * for the same key. TODO: explain more.
- *
- * @author The Stajistics Project
+ * TODO dont extend FasterList because 'size' field isnt used. removals will involve CoW
  */
-public class CompactArrayMap<K, V> extends AbstractMap<K, V> implements Serializable {
+public class CompactArrayMap<K, V> extends FasterList {
 
-    protected FasterList entries;
+    final Object lock = new Object();
 
     public CompactArrayMap() {
         this(0);
     }
 
     public CompactArrayMap(int initialCapacity) {
-        if (initialCapacity == 0)
-            entries = null;
-        else
-            entries = new FasterList<>(initialCapacity);
-    }
-
-    public CompactArrayMap(Map<K, V> map) {
-        this(map.size());
-        putAll(map);
-    }
-
-    @Override
-    public int size() {
-        FasterList e = this.entries;
-        return e != null ? e.size() : 0;
+        super(initialCapacity);
     }
 
 
-
-    @Override
     public boolean containsValue(Object aValue) {
         throw new TODO();
     }
 
-    @Override
     public boolean containsKey(Object key) {
         return get(key) != null;
     }
 
-
-    @Override
     public V get(Object key) {
-        FasterList x = this.entries;
-        if (x != null) {
-            int s = x.size();
-            Object[] a = x.array();
+        Object[] a = items;
+        if (a!=null) {
+            int s = a.length;
             for (int i = 0; i < s; ) {
-                if (keyEquals(a[i], key))
-                    return (V) a[i + 1];
-                i += 2;
-            }
-        }
-        return null;
-    }
-
-
-    /**
-     * Note: contract broken! Always returns null.
-     */
-    @Override
-    public synchronized V put(K key, V value) {
-        FasterList x = entries;
-        if (x == null) {
-            x = new FasterList(1);
-            this.entries = x;
-        } else {
-            int s = x.size();
-            Object[] a = x.array();
-            for (int i = 0; i < s; ) {
-                if (keyEquals(a[i], key)) {
-                    a[i+1] = value;
-                    return null;
+                Object k = a[i];
+                if (k!=null) {
+                    if (keyEquals(k, key))
+                        return (V) a[i + 1];
                 }
                 i += 2;
             }
         }
-        x.add(key);
-        x.add(value);
         return null;
     }
 
-    @Override
+    public void put(K key, V value) {
+        synchronized (lock) {
+            Object[] a = items;
+            if (a == null) {
+                this.items = new Object[] { key, value };
+            } else {
+                int s = size;
+                for (int i = 0; i < s; ) {
+                    if (keyEquals(a[i], key)) {
+                        a[i + 1] = value; //directly modify
+                        return;
+                    }
+                    i += 2;
+                }
+                a = Arrays.copyOf(a, s+2);
+                a[s++] = key;
+                a[s] = value;
+                this.items = a;
+            }
+        }
+    }
+
     public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
         V e = get(key);
         if (e!=null)
             return e;
 
         V v = mappingFunction.apply(key);
-        put(key, v);
-        return v;
+        synchronized (lock) {
+            put(key, v);
+            return v;
+        }
     }
 
+
     @Override
-    public V remove(Object key) {
+    public boolean remove(Object object) {
+        throw new UnsupportedOperationException("use removeKey");
+    }
+
+    public V removeKey(Object key) {
         throw new TODO();
 //        int i = indexOf(key);
 //        if (i != -1) {
@@ -117,17 +95,32 @@ public class CompactArrayMap<K, V> extends AbstractMap<K, V> implements Serializ
 //        return null;
     }
 
+    /** override for alternate equality test */
     public boolean keyEquals(Object a, Object b) {
         return a.equals(b);
     }
 
     @Override
     public void clear() {
-        entries = null;
+        synchronized(lock) {
+            clearFast();
+        }
     }
 
-    @Override
-    public Set<Entry<K, V>> entrySet() {
-        throw new TODO();
+    public void clearExcept(K key) {
+        synchronized(lock) {
+            V exist = get(key);
+            clearFast();
+            if (exist!=null)
+                put(key, exist);
+        }
+    }
+
+    public void clearPut(K key, V value) {
+        synchronized(lock) {
+            clearFast();
+            if (value!=null)
+                put(key, value);
+        }
     }
 }
