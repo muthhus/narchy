@@ -7,14 +7,12 @@ import com.jogamp.opengl.GL2;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
-import spacegraph.layout.Layout;
 import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
 import static spacegraph.Surface.Align.None;
-import static spacegraph.math.v3.v;
 
 /**
  * orthographic widget adapter. something which goes on the "face" of a HUD ("head"s-up-display)
@@ -31,11 +29,9 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
 
     public Ortho(Surface content) {
 
-        this.surface =
-            new Stacking(
-                content,
-                HUDSurface
-            );
+        HUDSurface.set(content);
+        this.surface = HUDSurface;
+
 
         surface.align = None;
         surface.aspect = 1f;
@@ -219,13 +215,11 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
             float sx = e.getX();
             float sy = window.getHeight() - e.getY();
 
-            x = (sx - pos.x) / (scale.x);
-            y = (sy - pos.y) / (scale.y);
-            if (x >= 0 && y >= 0 && x <= 1f && y <= 1f) {
-                updateMouse(e, x, y, buttonsDown);
-                return true;
-            }
+            //if (!HUDSurface.updateMouseHUD(sx, sy, buttonsDown)) {
 
+            updateMouse(e, sx, sy, buttonsDown);
+            return true;
+            //}
 
         }
 
@@ -235,7 +229,7 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         return false;
     }
 
-    public Surface updateMouse(@Nullable MouseEvent e, float x, float y, short[] buttonsDown) {
+    public Surface updateMouse(@Nullable MouseEvent e, float sx, float sy, short[] buttonsDown) {
 
         if (e != null) {
             if (window != null) {
@@ -253,9 +247,13 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
             off();
         } else {*/
         Surface s;
-        if ((s = finger.on(v(x, y), buttonsDown)) != null) {
+        float lx = (sx - pos.x) / (scale.x);
+        float ly = (sy - pos.y) / (scale.y);
+        //if (lx >= 0 && ly >= 0 && lx <= 1f && ly <= 1f) {
+        if ((s = finger.on(sx, sy, lx, ly, buttonsDown)) != null) {
             return s;
         }
+        //}
 
         //}
 
@@ -278,98 +276,101 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     final HUD HUDSurface = new HUD();
 
 
-    private class HUD extends Layout {
+    private class HUD extends Stacking {
 
-        @Override
-        protected void paint(GL2 gl) {
-            gl.glPushMatrix();
-            gl.glLoadIdentity();
-            super.paint(gl);
-            gl.glPopMatrix();
-        }
+        float smx, smy;
 
-        Surface windowBorder = new Surface() {
-
-
-            @Override
-            protected void paint(GL2 gl) {
-                int W = window.getWidth();
-                int H = window.getHeight();
-
-
-                gl.glColor4f(0.8f, 0.0f, 0.8f, 0.75f);
-
-                int borderThick = 8;
-                gl.glLineWidth(borderThick);
-                Draw.line(gl, 0, 0, W, 0);
-                Draw.line(gl, 0, 0, 0, H);
-                Draw.line(gl, W, 0, W, H);
-                Draw.line(gl, 0, H, W, H);
-
-                gl.glLineWidth(0);
-
-//        gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
-//        gl.glLineWidth(4f);
-//
-//        float ch = 175f; //TODO proportional to ortho height (pixels)
-//        float cw = 175f; //TODO proportional to ortho width (pixels)
-//        Draw.rectStroke(gl, this.finger.-cw/2f, smy-ch/2f, cw, ch);
-//
-//        float hl = 1.25f; //cross hair length
-//        Draw.line(gl, smx, smy-ch*hl, smx, smy+ch*hl);
-//        Draw.line(gl, smx-cw*hl, smy, smx+cw*hl, smy);
-
-            }
-        };
+//        @Override
+//        protected void paint(GL2 gl) {
+//            gl.glPushMatrix();
+//            gl.glLoadIdentity();
+//            super.paint(gl);
+//            gl.glPopMatrix();
+//        }
 
         final Widget bottomRightMenu = new Widget() {
 
-            public boolean hover;
-
-            @Override
-            protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
-                hover = hitPoint!=null;
-                return true;
-            }
-
             @Override
             protected void paintComponent(GL2 gl) {
-                if (hover) {
-                    gl.glColor3f(1f, 0f, 0f);
-                } else {
-                    gl.glColor3f(0f, 1f, 0f);
-                }
-                Draw.rect(gl, 0, 0, 1, 1);
+
             }
         };
 
-        {
-            float borderPanelThick = 64;
-            set(
-                    windowBorder,
-                    bottomRightMenu
-                        .scale(borderPanelThick, borderPanelThick).align(Align.RightCenter)
-            );
+
+        @Override
+        protected void paint(GL2 gl) {
+            super.paint(gl);
+
+            gl.glPushMatrix();
+            gl.glLoadIdentity();
+
+            int W = window.getWidth();
+            int H = window.getHeight();
+
+            gl.glColor4f(0.8f, 0.6f, 0f, 0.25f);
+
+            int borderThick = 8;
+            gl.glLineWidth(borderThick);
+            Draw.line(gl, 0, 0, W, 0);
+            Draw.line(gl, 0, 0, 0, H);
+            Draw.line(gl, W, 0, W, H);
+            Draw.line(gl, 0, H, W, H);
+
+
+            gl.glLineWidth(8f);
+
+            float ch = 175f; //TODO proportional to ortho height (pixels)
+            float cw = 175f; //TODO proportional to ortho width (pixels)
+
+            gl.glColor4f(0.5f, 0.5f, 0.5f, 0.25f);
+            Draw.rectStroke(gl, smx - cw / 2f, smy - ch / 2f, cw, ch);
+
+            gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
+            Draw.line(gl, smx, smy - ch, smx, smy + ch);
+            Draw.line(gl, smx - cw, smy, smx + cw, smy);
+            gl.glPopMatrix();
+
         }
 
-//        @Override
-//        protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
-//            System.out.println(hitPoint);
-////           int W = window.getWidth();
-////            int H = window.getHeight();
-//
-//            float hudMarginThick = 0.1f; //pixels
-//
-//            float sx = hitPoint.x, sy = hitPoint.y;
-//            if (sx > 0.9f - hudMarginThick && sy > hudMarginThick) {
-//                return true;
-//            }
-//
-//            return false;
-//
-//        }
+        {
+//            set(
+//                    overlay
+//                    //bottomRightMenu.scale(64,64)
+//            );
+        }
 
+        {
+//            clipTouchBounds = false;
+        }
 
+        boolean canDragBR = false;
+
+        @Override
+        public Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
+
+            //System.out.println(hitPoint);
+            if (hitPoint != null) {
+                float hudMarginThick = 0.05f; //pixels
+
+                smx = finger.hitGlobal.x;
+                smy = finger.hitGlobal.y;
+
+                //boolean nearEdge = Math.abs(sx - )
+                canDragBR = (smx > 1f - hudMarginThick && smy > hudMarginThick);
+//                    if (canDragBR) {
+//                        System.out.println("draggable");
+//                    }
+            } else {
+                canDragBR = false;
+            }
+
+            Surface x = super.onTouch(finger, hitPoint, buttons);
+
+            if (x == this) {
+                return null; //pass-thru
+            } else
+                return x;
+        }
 
     }
 }

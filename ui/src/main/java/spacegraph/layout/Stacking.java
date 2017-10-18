@@ -9,6 +9,7 @@ public class Stacking extends Layout {
 
     public Stacking(Surface... children) {
         super(children);
+//        clipTouchBounds = false;
     }
 
 }

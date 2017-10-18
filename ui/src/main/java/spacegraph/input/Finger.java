@@ -25,8 +25,7 @@ public class Finger {
      */
     public final static Point pointer = new Point();
 
-
-    public final v2 hit = new v2();
+    public final v2 hit = new v2(), hitGlobal = new v2();
     public final v2[] hitOnDown = new v2[5];
     public final boolean[] buttonDown = new boolean[5];
     public final boolean[] prevButtonDown = new boolean[5];
@@ -50,8 +49,9 @@ public class Finger {
     }
 
 
-    public Surface on(v2 hit, short[] nextButtonDown) {
-        this.hit.set(hit);
+    public Surface on(float sx, float sy, float lx, float ly, short[] nextButtonDown) {
+        this.hit.set(lx, ly);
+        this.hitGlobal.set(sx, sy);
 
         arraycopy(this.buttonDown, 0, prevButtonDown, 0, buttonDown.length);
 

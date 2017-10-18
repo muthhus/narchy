@@ -95,7 +95,7 @@ public class Layout<S extends Surface> extends Surface {
     }
 
     @Override
-    public final Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
+    public Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
         Surface x = super.onTouch(finger, hitPoint, buttons);
         if (x != null)
             return x;
@@ -103,13 +103,15 @@ public class Layout<S extends Surface> extends Surface {
         //2. test children reaction
         List<S> cc = this.children;
 
+        // Draw forward, propagate touch events backwards
         if (hitPoint == null) {
-            for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
+            for (int i = cc.size()-1; i >=0; i--) {
                 cc.get(i).onTouch(finger, null, null);
             }
+            return null;
         } else {
 
-            for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
+            for (int i = cc.size()-1; i >=0; i--) {
                 Surface c = cc.get(i);
 
                 v2 sc = c.scale;
@@ -138,7 +140,7 @@ public class Layout<S extends Surface> extends Surface {
             }
         }
 
-        return null;
+        return this;
     }
 
     @Override

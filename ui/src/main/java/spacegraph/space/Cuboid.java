@@ -119,7 +119,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
 
                     //System.out.println(localPoint + " " + thick);
                     if (mouseFront != null)
-                        return mouseFront.on(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
+                        return mouseFront.on(Float.NaN, Float.NaN, localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f, buttons);
                     //return mouseFront.update(null, localPoint.x, localPoint.y, buttons);
                 }
             } else {
