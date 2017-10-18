@@ -36,7 +36,9 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static nars.Op.CONJ;
 import static nars.table.TemporalBeliefTable.temporalTaskPriority;
+import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -478,6 +480,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         if (a != null && b != null) {
             Task at = a.task();
             Task bt = b.task();
+
             Task c = Revision.merge(at, bt, nar.time(), nar);
             if (c != null) {
 

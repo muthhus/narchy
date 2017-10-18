@@ -57,7 +57,8 @@ public enum TermLinks {
             case VAR_DEP:
             case VAR_INDEP:
             case VAR_QUERY:
-              break; //OK
+                return; //NO
+                //break; //YES
             default:
                 if (!o.conceptualizable)
                     return;

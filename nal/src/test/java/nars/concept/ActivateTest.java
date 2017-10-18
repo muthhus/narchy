@@ -123,13 +123,13 @@ public class ActivateTest {
     public void testTemplates4() throws Narsese.NarseseException {
         //dont descend past layer 3:
         testTemplates("(open(John,portal:interdimensional) ==> #x)",
-                "[(John,(interdimensional-->portal)), (open(John,(interdimensional-->portal)) ==>+- #1), open(John,(interdimensional-->portal)), open, (interdimensional-->portal), John]");
+                "[(John,(interdimensional-->portal)), (open(John,(interdimensional-->portal)) ==>+- #1), open(John,(interdimensional-->portal)), open, #1]");
     }
 
     @Test
     public void testTemplates4b() throws Narsese.NarseseException {
         testTemplates("(open(John,portal(a(d),b,c)) ==> #x)",
-                "[portal(a(d),b,c), open(John,portal(a(d),b,c)), (John,portal(a(d),b,c)), (open(John,portal(a(d),b,c)) ==>+- #1), open, John]");
+                "[open(John,portal(a(d),b,c)), (John,portal(a(d),b,c)), (open(John,portal(a(d),b,c)) ==>+- #1), open, #1]");
     }
 
     @Test
@@ -148,6 +148,11 @@ public class ActivateTest {
     public void testTemplatesWithQueryVar() throws Narsese.NarseseException {
         testTemplates("(x --> ?1)",
                 "[(x-->?1), x]");
+    }
+    @Test
+    public void testTemplatesWithDepVar() throws Narsese.NarseseException {
+        testTemplates("(x --> #1)",
+                "[(x-->#1), x, #1]");
     }
 
     @Test

@@ -361,7 +361,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
                 Term notAction = action.neg();
 
-                ((FasterList) predictors).addAll(
+                ((FasterList) predictors).addingAll(
 
                         question($.impl($.conj(what, a.happy.term()), action)),
                         question($.impl($.conj(what, a.happy.term().neg()), action))

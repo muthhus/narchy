@@ -21,7 +21,7 @@ public interface Truthed  {
      * Note that values of 0.5 are not considered positive, being an unbiased
      * midpoint value
      *
-     * @return True if the frequence is less than 1/2
+     * @return True if the frequence is less than (but not equal to) 1/2
      */
     default boolean isNegative() {
         return freq() < 0.5f;
@@ -32,10 +32,10 @@ public interface Truthed  {
      * Note that values of 0.5 are not considered positive, being an unbiased
      * midpoint value
      *
-     * @return True if the frequence is greater than 1/2
+     * @return True if the frequence is greater than or equal to 1/2
      */
     default boolean isPositive() {
-        return freq() > 0.5f;
+        return freq() >= 0.5f;
     }
 
     /**

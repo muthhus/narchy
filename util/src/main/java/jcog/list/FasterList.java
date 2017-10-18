@@ -428,9 +428,10 @@ public class FasterList<X> extends FastList<X> {
         return size();
     }
 
-    public void addAll(X... x) {
+    public FasterList addingAll(X... x) {
         for (X y : x)
             add(y);
+        return this;
     }
 
     public final void setFast(int index, X t) {

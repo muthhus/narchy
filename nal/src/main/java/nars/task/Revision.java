@@ -1,6 +1,5 @@
 package nars.task;
 
-import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.Interval;
@@ -119,12 +118,12 @@ public class Revision {
 
         Op ao = a.op();
         Op bo = b.op();
-        if (ao!=bo)
+        if (ao != bo)
             return Null; //fail, why
 
         assert (ao == bo) : a + " and " + b + " have different op";
 
-        if (ao==NEG) {
+        if (ao == NEG) {
             return intermpolate(a.unneg(), 0, b.unneg(),
                     aProp, curDepth, rng, mergeOrChoose).neg();
         }
@@ -197,7 +196,7 @@ public class Revision {
             if (all - excess < 2)
                 return null; //retain the endpoints
             else if (all - excess == 2)
-                x = List.of(x.get(0), x.get(all-1)); //retain only the endpoints
+                x = new FasterList(2).addingAll(x.get(0), x.get(all - 1)); //retain only the endpoints
             else {
                 for (int i = 0; i < excess; i++) {
                     x.remove(rng.nextInt(x.size() - 2) + 1);
@@ -301,7 +300,9 @@ public class Revision {
         return intermpolate(a, 0, b, aProp, nar);
     }
 
-    /** a is left aligned, dt is any temporal shift between where the terms exist in the callee's context */
+    /**
+     * a is left aligned, dt is any temporal shift between where the terms exist in the callee's context
+     */
     public static Term intermpolate(/*@NotNull*/ Term a, long dt, /*@NotNull*/ Term b, float aProp, NAR nar) {
         return intermpolate(a, dt, b, aProp, 1, nar.random(), nar.dtMergeOrChoose.booleanValue());
     }
@@ -309,9 +310,14 @@ public class Revision {
 
     @Nullable
     public static Task merge(/*@NotNull*/ Task a, /*@NotNull*/ Task b, long now, NAR nar) {
+        if (a.op() == CONJ) {
+            //avoid intermpolation of 2 conjunctions with opposite polarities
+            if (!a.term().equals(b.term()) && (a.isPositive() ^ b.isPositive()) && (a.term().dtRange() != 0 || b.term().dtRange() != 0))
+                return null;
+        }
 
         long as, bs;
-        if ((as = a.start()) > (bs=b.start())) {
+        if ((as = a.start()) > (bs = b.start())) {
             //swap so that 'a' is left aligned
             Task x = a;
             a = b;
@@ -319,7 +325,6 @@ public class Revision {
         }
         assert (bs != ETERNAL);
         assert (as != ETERNAL);
-
 
 
         //            float ae = a.evi();
@@ -335,7 +340,6 @@ public class Revision {
 //                0.5f + 0.5f * (1f - Math.abs(a.freq() - b.freq()));
 //        factor *= freqDiscount;
 //        if (factor < Prioritized.EPSILON) return null;
-
 
 
 //            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
@@ -384,9 +388,9 @@ public class Revision {
         if (maxEviAB < evi + Pri.EPSILON) {
             //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
             //TODO weight the contributed overlap amount by the relative confidence provided by each task
-            float overlapDiscount = Stamp.overlapFraction(a.stamp(), b.stamp())/2;
-    //        factor *= overlapDiscount;
-    //        if (factor < Prioritized.EPSILON) return null;
+            float overlapDiscount = Stamp.overlapFraction(a.stamp(), b.stamp()) / 2;
+            //        factor *= overlapDiscount;
+            //        if (factor < Prioritized.EPSILON) return null;
 
             float eviDiscount = (evi - maxEviAB) * overlapDiscount;
             float newEvi = evi - eviDiscount;

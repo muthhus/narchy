@@ -1368,6 +1368,10 @@ public enum Util {
         }
     }
 
+    public static float max(float a, float b, float c) {
+        return Math.max(Math.max(a,b),c);
+    }
+
     public static enum RouletteControl {
         STOP, CONTINUE, WEIGHTS_CHANGED
     }
