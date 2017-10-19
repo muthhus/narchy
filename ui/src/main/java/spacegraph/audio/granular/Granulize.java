@@ -99,7 +99,7 @@ public class Granulize extends Granulator implements SoundProducer, SoundProduce
 
     @Override
 	public final void setAmplitude(float amplitude) {
-        this.amplitude.setValue(amplitude);
+        this.amplitude.set(amplitude);
     }
 
     @Override
@@ -155,7 +155,7 @@ public class Granulize extends Granulator implements SoundProducer, SoundProduce
 	public Granulize setStretchFactor(float stretchFactor) {
 //		playOffset = calculateCurrentBufferIndex();
 //		playTime = now;
-		this.stretchFactor.setValue(stretchFactor);
+		this.stretchFactor.set(stretchFactor);
         return this;
 	}
 

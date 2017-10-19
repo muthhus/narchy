@@ -6,6 +6,7 @@ import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
+import org.apache.commons.lang.StringUtils;
 import spacegraph.SpaceGraph;
 
 import javax.swing.*;

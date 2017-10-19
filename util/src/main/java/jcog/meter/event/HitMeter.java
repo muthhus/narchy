@@ -24,7 +24,7 @@ public class HitMeter extends FunctionMeter<Long> {
 
     @Override
     public String toString() {
-        return signalID(0) + '=' + hits.getValue();
+        return signalID(0) + '=' + hits.get();
     }
 
     public HitMeter(String id) {
@@ -32,21 +32,21 @@ public class HitMeter extends FunctionMeter<Long> {
     }    
     
     public HitMeter reset() {
-        hits.setValue(0);
+        hits.set(0);
         return this;
     }
 
     public long hit() {
         hits.add(1);
-        return hits.getValue();
+        return hits.get();
     }
 
     public long hit(int n) {
-        hits.add(n); return hits.getValue();
+        hits.add(n); return hits.get();
     }
     
     public long count() {
-        return hits.getValue();
+        return hits.get();
     }
     
     @Override

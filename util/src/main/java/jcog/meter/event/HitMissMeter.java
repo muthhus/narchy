@@ -47,8 +47,8 @@ public class HitMissMeter extends FunctionMeter<Double> {
     }    
     
     public HitMissMeter reset() {
-        hit.setValue(0);
-        miss.setValue(0);
+        hit.set(0);
+        miss.set(0);
         return this;
     }
 

@@ -17,7 +17,7 @@ public class AnimFloat extends MutableFloat implements Animated {
 
     public AnimFloat(float current, Dynamics w, float speed) {
         super(Float.NaN);
-        setValue(current);
+        set(current);
         target = current;
         this.speed = new MutableFloat(speed);
         w.addAnimation(this);
@@ -28,7 +28,7 @@ public class AnimFloat extends MutableFloat implements Animated {
     }
 
     public void invalidate() {
-        super.setValue(Float.NaN);
+        super.set(Float.NaN);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class AnimFloat extends MutableFloat implements Animated {
         float x = floatValue();
         if (x!=x) {
             //invalidated
-            super.setValue(target);
+            super.set(target);
         } else {
             //interpLinear(dt);
             interpLERP(dt);
@@ -49,15 +49,15 @@ public class AnimFloat extends MutableFloat implements Animated {
     public void interpLERP(float dt) {
         float rate = speed.floatValue() * dt;
         //System.out.println(target + " " + floatValue() + " " + rate);
-        super.setValue(
+        super.set(
                 Util.lerp(rate, floatValue(), target)
         );
     }
 
     @Override
-    public void setValue(float value) {
+    public void set(float value) {
         if (!Float.isFinite(floatValue()))
-            super.setValue(value);
+            super.set(value);
         target = value;
     }
 

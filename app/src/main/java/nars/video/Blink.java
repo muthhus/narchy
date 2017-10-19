@@ -22,7 +22,7 @@ public class Blink implements Bitmap2D {
 
     public Blink(Bitmap2D in, float rate) {
         this.in = in;
-        this.visibleProb.setValue(rate);
+        this.visibleProb.set(rate);
     }
 
     @Override

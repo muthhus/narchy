@@ -204,7 +204,7 @@ public class HaiQ extends Agent {
 
 
     public void setQ(float alpha, float gamma, float lambda) {
-        Alpha.setValue(alpha);
+        Alpha.set(alpha);
         Gamma = gamma;
         Lambda = lambda;
     }

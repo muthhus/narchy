@@ -45,7 +45,7 @@ public class PatrickTests extends AbstractNALTest {
          */
 
         TestNAR tt = test;
-        tt.nar.truthResolution.setValue(0.05f);
+        tt.nar.truthResolution.set(0.05f);
         tt.truthTolerance(0.2f);
 
         tt

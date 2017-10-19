@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nars;
+package jcog.util;
 
 import jdk.nashorn.api.scripting.URLReader;
-import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +50,7 @@ import static java.lang.String.format;
  */
 public class Grok implements Serializable {
 
-    public static void main(String[] args) throws IOException {
-
+    public static void main(String[] args) throws FileNotFoundException {
 
 
         Grok g = Grok.withThe("patterns", "linux-syslog");
@@ -65,6 +64,12 @@ public class Grok implements Serializable {
             String data = g.discover(line);
 
             System.out.println(data);
+
+
+//            Match x = g.capture(data, "PATH");
+//            if (!x.isNull())
+//                System.err.println(x);
+
         });
 
     }
@@ -78,7 +83,7 @@ public class Grok implements Serializable {
      * Map of the named regex of the originalGrokPattern
      * with id = namedregexid and value = namedregex.
      */
-    private Map<String, String> namedRegexCollection;
+    private final Map<String, String> namedRegexCollection;
     /**
      * Original {@code Grok} pattern (expl: %{IP}).
      */
@@ -87,19 +92,11 @@ public class Grok implements Serializable {
      * Pattern of the namedRegex.
      */
     private Pattern compiledNamedRegex;
-    /**
-     * {@code Grok} discovery.
-     */
-    private Discovery disco;
+
     /**
      * {@code Grok} patterns definition.
      */
-    private Map<String, String> grokPatternDefinition;
-
-    /**
-     * only use in grok discovery.
-     */
-    private String savedPattern;
+    private final Map<String, String> grokPatternDefinition;
 
 
     /**
@@ -110,28 +107,26 @@ public class Grok implements Serializable {
     /**
      * Create Empty {@code Grok}.
      */
-    public static final Grok EMPTY = new Grok();
+    static final Grok EMPTY = new Grok();
 
     /**
      * Create a new <i>empty</i>{@code Grok} object.
      */
-    public Grok() {
-        originalGrokPattern = StringUtils.EMPTY;
-        disco = null;
-        namedRegex = StringUtils.EMPTY;
+    Grok() {
+        this(new TreeMap<>());
+    }
+
+    String savedPattern;
+
+    private Grok(Map<String, String> patterns) {
+        originalGrokPattern = "";
+        namedRegex = "";
         compiledNamedRegex = null;
-        grokPatternDefinition = new TreeMap<String, String>();
-        namedRegexCollection = new TreeMap<String, String>();
-        savedPattern = StringUtils.EMPTY;
+        grokPatternDefinition = patterns;
+        namedRegexCollection = new TreeMap<>();
+        savedPattern = "";
     }
 
-    String getSaved_pattern() {
-        return savedPattern;
-    }
-
-    void setSaved_pattern(String savedpattern) {
-        this.savedPattern = savedpattern;
-    }
 
     /**
      * Create a {@code Grok} instance with the given patterns file and
@@ -148,12 +143,14 @@ public class Grok implements Serializable {
         g.addPatternFrom(grokPatternPath);
         return g;
     }
+
     public static Grok withReader(Reader reader)
-            throws RuntimeException, FileNotFoundException {
+            throws RuntimeException {
         Grok g = new Grok();
         g.addPatterns(reader);
         return g;
     }
+
     /**
      * Add custom pattern to grok in the runtime.
      *
@@ -161,11 +158,11 @@ public class Grok implements Serializable {
      * @param pattern : Regular expression Or {@code Grok} pattern
      * @throws RuntimeException runtime expt
      **/
-    public void addPattern(String name, String pattern) throws RuntimeException {
-        if (StringUtils.isBlank(name)) {
+    private void addPattern(String name, String pattern) throws RuntimeException {
+        if (isBlank(name)) {
             throw new RuntimeException("Invalid Pattern name");
         }
-        if (StringUtils.isBlank(pattern)) {
+        if (isBlank(pattern)) {
             throw new RuntimeException("Invalid Pattern");
         }
         grokPatternDefinition.put(name, pattern);
@@ -178,7 +175,7 @@ public class Grok implements Serializable {
      * @param cpy : Map to copy
      * @throws RuntimeException runtime expt
      **/
-    public void addPatterns(Map<String, String> cpy) throws RuntimeException {
+    void addPatterns(Map<String, String> cpy) throws RuntimeException {
         if (cpy == null) {
             throw new RuntimeException("Invalid Patterns");
         }
@@ -196,7 +193,7 @@ public class Grok implements Serializable {
      *
      * @return Patterns (name, regular expression)
      */
-    public Map<String, String> patterns() {
+    Map<String, String> patterns() {
         return grokPatternDefinition;
     }
 
@@ -206,7 +203,7 @@ public class Grok implements Serializable {
      *
      * @return named regex
      */
-    public String namedRegex() {
+    String namedRegex() {
         return namedRegex;
     }
 
@@ -216,24 +213,25 @@ public class Grok implements Serializable {
      * @param file : Path of the grok pattern
      * @throws RuntimeException runtime expt
      */
-    public Grok addPatternFrom(String file) throws RuntimeException, FileNotFoundException {
+    private Grok addPatternFrom(String file) throws RuntimeException, FileNotFoundException {
         return addPatterns(new FileReader(file));
     }
 
+    static final Pattern gp = Pattern.compile("^([A-z0-9_]+)\\s+(.*)$");
     /**
      * Add patterns to {@code Grok} from a Reader.
      *
      * @param r : Reader with {@code Grok} patterns
      * @throws RuntimeException runtime expt
      */
-    public Grok addPatterns(Reader r) throws RuntimeException {
+    private Grok addPatterns(Reader r) throws RuntimeException {
         BufferedReader br = new BufferedReader(r);
-        String line;
         // We dont want \n and commented line
-        Pattern pattern = Pattern.compile("^([A-z0-9_]+)\\s+(.*)$");
+
         try {
+            String line;
             while ((line = br.readLine()) != null) {
-                Matcher m = pattern.matcher(line);
+                Matcher m = gp.matcher(line);
                 if (m.matches()) {
                     this.addPattern(m.group(1), m.group(2));
                 }
@@ -257,18 +255,20 @@ public class Grok implements Serializable {
     }
 
     /**
-     * Match the given <tt>log</tt> with the named regex.
-     * And return the json representation of the matched element
+     * Match the given <tt>text</tt> with the named regex.
      *
      * @param text : log to match
-     * @return json representation og the log
-     */
-    public Match capture(String text, boolean flattened) {
+     * */
+    public Match capture(String text) {
         Match match = match(text);
-        match.captures(flattened);
+        match.captures(/*flattened*/);
         return match;
     }
-
+    public Match capture(String text, String pattern) {
+        Match match = match(text, pattern);
+        match.captures(/*flattened*/);
+        return match;
+    }
 
 
     /**
@@ -278,8 +278,8 @@ public class Grok implements Serializable {
      * @param text : Single line of log
      * @return Grok Match
      */
-    public Match match(String text) {
-        if (compiledNamedRegex == null || StringUtils.isBlank(text)) {
+    Match match(String text) {
+        if (compiledNamedRegex == null || isBlank(text)) {
             return Match.EMPTY;
         }
 
@@ -294,15 +294,62 @@ public class Grok implements Serializable {
         }
         return match;
     }
+   Match match(String text, String pattern) {
+        if (isBlank(text)) {
+            return Match.EMPTY;
+        }
 
+        Matcher m = Pattern.compile(compiled(patterns().get(pattern), false)).matcher(text);
+        Match match = new Match();
+        if (m.find()) {
+            match.setSubject(text);
+            match.setGrok(this);
+            match.setMatch(m);
+            match.setStart(m.start(0));
+            match.setEnd(m.end(0));
+        }
+        return match;
+    }
     /**
      * Compile the {@code Grok} pattern to named regex pattern.
      *
      * @param pattern : Grok pattern (ex: %{IP})
      * @throws RuntimeException runtime expt
      */
-    public void compile(String pattern) throws RuntimeException {
+    void compile(String pattern) throws RuntimeException {
         compile(pattern, false);
+    }
+
+    private static boolean isBlank(String str) {
+        int strLen;
+        if (str != null && (strLen = str.length()) != 0) {
+            for (int i = 0; i < strLen; ++i) {
+                if (!Character.isWhitespace(str.charAt(i))) {
+                    return false;
+                }
+            }
+
+            return true;
+        } else {
+            return true;
+        }
+    }
+
+    private static int countMatches(String str, String sub) {
+        if (!str.isEmpty()) {
+            int sl = sub.length();
+            if (sl > 0) {
+                int count = 0;
+
+
+                for (int idx = 0; (idx = str.indexOf(sub, idx)) != -1; idx += sl) {
+                    ++count;
+                }
+
+                return count;
+            }
+        }
+        return 0;
     }
 
     /**
@@ -312,13 +359,22 @@ public class Grok implements Serializable {
      * @param namedOnly : Whether to capture named expressions only or not (i.e. %{IP:ip} but not ${IP})
      * @throws RuntimeException runtime expt
      */
-    public void compile(String pattern, boolean namedOnly) throws RuntimeException {
+    private void compile(String pattern, boolean namedOnly) throws RuntimeException {
 
-        if (StringUtils.isBlank(pattern)) {
+        String namedRegex = compiled(pattern, namedOnly);
+
+        // Compile the regex
+        this.namedRegex = namedRegex;
+        compiledNamedRegex = Pattern.compile(namedRegex);
+    }
+
+    @NotNull
+    private String compiled(String pattern, boolean namedOnly) {
+        if (isBlank(pattern)) {
             throw new RuntimeException("{pattern} should not be empty or null");
         }
 
-        namedRegex = pattern;
+        String namedRegex = pattern;
         originalGrokPattern = pattern;
         int index = 0;
         /** flag for infinite recurtion */
@@ -336,33 +392,37 @@ public class Grok implements Serializable {
 
             Matcher m = GROK_PATTERN.matcher(namedRegex);
             // Match %{Foo:bar} -> pattern name and subname
-            // Match %{Foo=regex} -> add new regex definition 
+            // Match %{Foo=regex} -> add new regex definition
             if (m.find()) {
                 continueIteration = true;
                 Map<String, String> group = namedGroups(m, m.group());
-                if (group.get("definition") != null) {
+                String gdef = group.get("definition");
+                String gname = group.get("name");
+                String gpat = group.get("pattern");
+                if (gdef != null) {
                     try {
-                        addPattern(group.get("pattern"), group.get("definition"));
-                        group.put("name", group.get("name") + "=" + group.get("definition"));
+                        addPattern(gpat, gdef);
+                        group.put("name", gname + "=" + gdef);
                     } catch (RuntimeException e) {
                         throw new RuntimeException(e);
                     }
                 }
-                int count = StringUtils.countMatches(namedRegex, "%{" + group.get("name") + "}");
+                int count = countMatches(namedRegex, "%{" + gname + "}");
                 for (int i = 0; i < count; i++) {
-                    String definitionOfPattern = grokPatternDefinition.get(group.get("pattern"));
+                    String definitionOfPattern = grokPatternDefinition.get(gpat);
                     if (definitionOfPattern == null) {
                         throw new RuntimeException(format("No definition for key '%s' found, aborting",
-                                group.get("pattern")));
+                                gpat));
                     }
                     String replacement = String.format("(?<name%d>%s)", index, definitionOfPattern);
-                    if (namedOnly && group.get("subname") == null) {
+                    String gsub = group.get("subname");
+                    if (namedOnly && gsub == null) {
                         replacement = String.format("(?:%s)", definitionOfPattern);
                     }
                     namedRegexCollection.put("name" + index,
-                            (group.get("subname") != null ? group.get("subname") : group.get("name")));
+                            (gsub != null ? gsub : gname));
                     namedRegex =
-                            StringUtils.replace(namedRegex, "%{" + group.get("name") + "}", replacement, 1);
+                            replace(namedRegex, "%{" + gname + "}", replacement, 1);
                     // System.out.println(_expanded_pattern);
                     index++;
                 }
@@ -372,8 +432,45 @@ public class Grok implements Serializable {
         if (namedRegex.isEmpty()) {
             throw new RuntimeException("Pattern not fount");
         }
-        // Compile the regex
-        compiledNamedRegex = Pattern.compile(namedRegex);
+        return namedRegex;
+    }
+
+
+    private static String replace(String text, String searchString, String replacement) {
+        return replace(text, searchString, replacement, Integer.MAX_VALUE);
+    }
+
+    private static String replace(String text, String searchString, String replacement, int max) {
+        if (max > 0 && !text.isEmpty()) {
+            int replLength = searchString.length();
+            if (replLength > 0) {
+
+                int start = 0;
+                int end = text.indexOf(searchString, start);
+                if (end == -1) {
+                    return text;
+                } else {
+                    int increase = replacement.length() - replLength;
+                    increase = increase < 0 ? 0 : increase;
+                    increase *= max > 64 ? 64 : max;
+
+                    StringBuilder buf;
+                    for (buf = new StringBuilder(text.length() + increase); end != -1; end = text.indexOf(searchString, start)) {
+                        buf.append(text, start, end).append(replacement);
+                        start = end + replLength;
+                        --max;
+                        if (max == 0) {
+                            break;
+                        }
+                    }
+
+                    return buf.append(text, start, text.length()).toString();
+                }
+
+            }
+        }
+        return text;
+
     }
 
     /**
@@ -383,12 +480,8 @@ public class Grok implements Serializable {
      * @param input : Single line of log
      * @return the Grok pattern
      */
-    public String discover(String input) {
-
-        if (disco == null) {
-            disco = new Discovery(this);
-        }
-        return disco.discover(input);
+    String discover(String input) {
+        return new Discovery(this).discover(input);
     }
 
     /**
@@ -406,7 +499,7 @@ public class Grok implements Serializable {
      * @param id : named regex id
      * @return String of the named regex
      */
-    public String getNamedRegexCollectionById(String id) {
+    private String getNamedRegexCollectionById(String id) {
         return namedRegexCollection.get(id);
     }
 
@@ -419,7 +512,7 @@ public class Grok implements Serializable {
         return namedRegexCollection;
     }
 
-    public static Grok withThe(String... patternLibs) throws FileNotFoundException {
+    private static Grok withThe(String... patternLibs) {
         Grok g = new Grok();
         for (String s : patternLibs) {
             g.addPatterns(new URLReader(Grok.class.getClassLoader().getResource("patterns/" + s)));
@@ -427,22 +520,26 @@ public class Grok implements Serializable {
         return g;
     }
 
+
+    private final static Pattern complexity = Pattern.compile("\\Q" + "|" + "\\E");
+    private final static Pattern wordBoundary = Pattern.compile(".\\b.");
+
     /**
      * {@code Discovery} try to find the best pattern for the given string.
      *
      * @author anthonycorbacho
      * @since 0.0.2
      */
-    static class Discovery {
+    static class Discovery extends Grok {
 
-        private Grok grok;
+        private final Grok grok;
 
         /**
          * Create a new {@code Discovery} object.
          *
          * @param grok instance of grok
          */
-        public Discovery(Grok grok) {
+        Discovery(Grok grok) {
             this.grok = grok;
         }
 
@@ -454,25 +551,13 @@ public class Grok implements Serializable {
          */
         private Map<String, Grok> sort(Map<String, Grok> groks) {
 
-            List<Grok> groky = new ArrayList<Grok>(groks.values());
-            Map<String, Grok> mGrok = new LinkedHashMap<String, Grok>();
-            Collections.sort(groky, new Comparator<Grok>() {
-
-                public int compare(Grok g1, Grok g2) {
-                    return (this.complexity(g1.namedRegex()) < this.complexity(g2.namedRegex())) ? 1
-                            : 0;
-                }
-
-                private int complexity(String expandedPattern) {
-                    int score = 0;
-                    score += expandedPattern.split("\\Q" + "|" + "\\E", -1).length - 1;
-                    score += expandedPattern.length();
-                    return score;
-                }
-            });
+            Collection<Grok> n = groks.values();
+            List<Grok> groky = new ArrayList<>(n);
+            Map<String, Grok> mGrok = new LinkedHashMap(n.size());
+            groky.sort(MyGrokComparator);
 
             for (Grok g : groky) {
-                mGrok.put(g.getSaved_pattern(), g);
+                mGrok.put(g.savedPattern, g);
             }
             return mGrok;
 
@@ -485,11 +570,12 @@ public class Grok implements Serializable {
         private int complexity(String expandedPattern) {
             int score = 0;
 
-            score += expandedPattern.split("\\Q" + "|" + "\\E", -1).length - 1;
+            score += complexity.split(expandedPattern, -1).length - 1;
             score += expandedPattern.length();
 
             return score;
         }
+
 
         /**
          * Find a pattern from a log.
@@ -498,33 +584,30 @@ public class Grok implements Serializable {
          * @param patterns
          * @return Grok pattern %{Foo}...
          */
+        @Override
         public String discover(String text) {
             if (text == null) {
                 return "";
             }
 
-            Map<String, Grok> groks = new TreeMap<String, Grok>();
+            Map<String, Grok> groks = new TreeMap<>();
             Map<String, String> gPatterns = grok.patterns();
             // Boolean done = false;
             String texte = text;
 
             // Compile the pattern
-            Iterator<Map.Entry<String, String>> it = gPatterns.entrySet().iterator();
-            while (it.hasNext()) {
-                @SuppressWarnings("rawtypes")
-                Map.Entry pairs = (Map.Entry) it.next();
-                String key = pairs.getKey().toString();
+            for (Map.Entry<String, String> pairs : gPatterns.entrySet()) {
+                String key = pairs.getKey();
                 Grok g = new Grok();
 
                 // g.patterns.putAll( gPatterns );
                 try {
                     g.addPatterns(gPatterns);
-                    g.setSaved_pattern(key);
+                    g.savedPattern = key;
                     g.compile("%{" + key + "}");
                     groks.put(key, g);
                 } catch (RuntimeException e) {
                     // Add logger
-                    continue;
                 }
 
             }
@@ -534,10 +617,7 @@ public class Grok implements Serializable {
 
             // while (!done){
             // done = true;
-            Iterator<Map.Entry<String, Grok>> pit = patterns.entrySet().iterator();
-            while (pit.hasNext()) {
-                @SuppressWarnings("rawtypes")
-                Map.Entry pairs = (Map.Entry) pit.next();
+            for (Map.Entry<String, Grok> pairs : patterns.entrySet()) {
                 String key = pairs.getKey().toString();
                 Grok value = (Grok) pairs.getValue();
 
@@ -555,20 +635,19 @@ public class Grok implements Serializable {
                 String part = getPart(m, text);
 
                 // we skip boundary word
-                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(".\\b.");
-                Matcher ma = pattern.matcher(part);
+                Matcher ma = wordBoundary.matcher(part);
                 if (!ma.find()) {
                     continue;
                 }
 
                 // We skip the part that already include %{Foo}
-                java.util.regex.Pattern pattern2 = java.util.regex.Pattern.compile("%\\{[^}+]\\}");
+                Pattern pattern2 = Pattern.compile("%\\{[^}+]\\}");
                 Matcher ma2 = pattern2.matcher(part);
 
                 if (ma2.find()) {
                     continue;
                 }
-                texte = StringUtils.replace(texte, part, "%{" + key + "}");
+                texte = replace(texte, part, "%{" + key + "}");
             }
             // }
 
@@ -590,6 +669,22 @@ public class Grok implements Serializable {
 
             return text.substring(m.getStart(), m.getEnd());
         }
+
+        static final Comparator<Grok> MyGrokComparator = new Comparator<>() {
+
+            @Override
+            public int compare(Grok g1, Grok g2) {
+                return (this.complexity(g1.namedRegex()) < this.complexity(g2.namedRegex())) ? 1
+                        : 0;
+            }
+
+            private int complexity(String expandedPattern) {
+                int score = 0;
+                score += complexity.split(expandedPattern, -1).length - 1;
+                score += expandedPattern.length();
+                return score;
+            }
+        };
     }
 
     /**
@@ -599,8 +694,8 @@ public class Grok implements Serializable {
      */
     static class Converter {
 
-        public static Map<String, IConverter<?>> converters = new HashMap<String, IConverter<?>>();
-        public static Locale locale = Locale.ENGLISH;
+        static final Map<String, IConverter<?>> converters = new HashMap<>();
+        static final Locale locale = Locale.ENGLISH;
 
         static {
             converters.put("byte", new ByteConverter());
@@ -624,7 +719,7 @@ public class Grok implements Serializable {
             return converter;
         }
 
-        public static KeyValue convert(String key, Object value) {
+        static KeyValue convert(String key, Object value) {
             String[] spec = key.split(";|:", 3);
             try {
                 if (spec.length == 1) {
@@ -649,16 +744,16 @@ public class Grok implements Serializable {
 
     static class KeyValue {
 
-        private String key = null;
-        private Object value = null;
-        private String grokFailure = null;
+        private String key;
+        private Object value;
+        private String grokFailure;
 
-        public KeyValue(String key, Object value) {
+        KeyValue(String key, Object value) {
             this.key = key;
             this.value = value;
         }
 
-        public KeyValue(String key, Object value, String grokFailure) {
+        KeyValue(String key, Object value, String grokFailure) {
             this.key = key;
             this.value = value;
             this.grokFailure = grokFailure;
@@ -672,7 +767,7 @@ public class Grok implements Serializable {
             return this.grokFailure;
         }
 
-        public String getKey() {
+        String getKey() {
             return key;
         }
 
@@ -680,7 +775,7 @@ public class Grok implements Serializable {
             this.key = key;
         }
 
-        public Object getValue() {
+        Object getValue() {
             return value;
         }
 
@@ -693,19 +788,20 @@ public class Grok implements Serializable {
     //
 // Converters
 //
-    @FunctionalInterface  static interface IConverter<T> {
+    @FunctionalInterface
+    interface IConverter<T> {
 
         default T convert(String value, String informat) throws Exception {
             return null;
         }
 
-        public T convert(String value) throws Exception;
+        T convert(String value) throws Exception;
     }
 
 
     static class ByteConverter implements IConverter<Byte> {
         @Override
-        public Byte convert(String value) throws Exception {
+        public Byte convert(String value) {
             return Byte.parseByte(value);
         }
     }
@@ -713,7 +809,7 @@ public class Grok implements Serializable {
 
     static class BooleanConverter implements IConverter<Boolean> {
         @Override
-        public Boolean convert(String value) throws Exception {
+        public Boolean convert(String value) {
             return Boolean.parseBoolean(value);
         }
     }
@@ -721,7 +817,7 @@ public class Grok implements Serializable {
 
     static class ShortConverter implements IConverter<Short> {
         @Override
-        public Short convert(String value) throws Exception {
+        public Short convert(String value) {
             return Short.parseShort(value);
         }
     }
@@ -729,7 +825,7 @@ public class Grok implements Serializable {
 
     static class IntegerConverter implements IConverter<Integer> {
         @Override
-        public Integer convert(String value) throws Exception {
+        public Integer convert(String value) {
             return Integer.parseInt(value);
         }
     }
@@ -737,7 +833,7 @@ public class Grok implements Serializable {
 
     static class LongConverter implements IConverter<Long> {
         @Override
-        public Long convert(String value) throws Exception {
+        public Long convert(String value) {
             return Long.parseLong(value);
         }
     }
@@ -745,7 +841,7 @@ public class Grok implements Serializable {
 
     static class FloatConverter implements IConverter<Float> {
         @Override
-        public Float convert(String value) throws Exception {
+        public Float convert(String value) {
             return Float.parseFloat(value);
         }
     }
@@ -753,7 +849,7 @@ public class Grok implements Serializable {
 
     static class DoubleConverter implements IConverter<Double> {
         @Override
-        public Double convert(String value) throws Exception {
+        public Double convert(String value) {
             return Double.parseDouble(value);
         }
     }
@@ -761,7 +857,7 @@ public class Grok implements Serializable {
 
     static class StringConverter implements IConverter<String> {
         @Override
-        public String convert(String value) throws Exception {
+        public String convert(String value) {
             return value;
         }
     }
@@ -769,14 +865,14 @@ public class Grok implements Serializable {
 
     static class DateConverter implements IConverter<Date> {
         @Override
-        public Date convert(String value) throws Exception {
+        public Date convert(String value) throws java.text.ParseException {
             return DateFormat.getDateTimeInstance(DateFormat.SHORT,
                     DateFormat.SHORT,
                     Converter.locale).parse(value);
         }
 
         @Override
-        public Date convert(String value, String informat) throws Exception {
+        public Date convert(String value, String informat) throws java.text.ParseException {
             SimpleDateFormat formatter = new SimpleDateFormat(informat, Converter.locale);
             return formatter.parse(value);
         }
@@ -786,8 +882,8 @@ public class Grok implements Serializable {
     static class Match {
 
         private String subject; // texte
-        private Map<String, Object> capture;
-        private Garbage garbage;
+        private final Map<String, Object> capture;
+        private final Garbage garbage;
         private Grok grok;
         private Matcher match;
         private int start;
@@ -796,16 +892,16 @@ public class Grok implements Serializable {
         /**
          * For thread safety.
          */
-        private static ThreadLocal<Match> matchHolder = ThreadLocal.withInitial(Match::new);
+        private static final ThreadLocal<Match> matchHolder = ThreadLocal.withInitial(Match::new);
 
         /**
          * Create a new {@code Match} object.
          */
-        public Match() {
+        Match() {
             subject = "Nothing";
             grok = null;
             match = null;
-            capture = new TreeMap<String, Object>();
+            capture = new TreeMap<>();
             garbage = new Garbage();
             start = 0;
             end = 0;
@@ -814,9 +910,9 @@ public class Grok implements Serializable {
         /**
          * Create Empty grok matcher.
          */
-        public static final Match EMPTY = new Match();
+        static final Match EMPTY = new Match();
 
-        public void setGrok(Grok grok) {
+        void setGrok(Grok grok) {
             if (grok != null) {
                 this.grok = grok;
             }
@@ -826,23 +922,23 @@ public class Grok implements Serializable {
             return match;
         }
 
-        public void setMatch(Matcher match) {
+        void setMatch(Matcher match) {
             this.match = match;
         }
 
-        public int getStart() {
+        int getStart() {
             return start;
         }
 
-        public void setStart(int start) {
+        void setStart(int start) {
             this.start = start;
         }
 
-        public int getEnd() {
+        int getEnd() {
             return end;
         }
 
-        public void setEnd(int end) {
+        void setEnd(int end) {
             this.end = end;
         }
 
@@ -860,7 +956,7 @@ public class Grok implements Serializable {
          *
          * @param text : single line of log
          */
-        public void setSubject(String text) {
+        void setSubject(String text) {
             if (text == null) {
                 return;
             }
@@ -880,23 +976,9 @@ public class Grok implements Serializable {
         }
 
 
-        /**
-         * Match to the <tt>subject</tt> the <tt>regex</tt> and save the matched element into a map
-         * <p>
-         * Multiple values to the same key are flattened to one value: the sole non-null value will be captured.
-         * Should there be multiple non-null values a RuntimeException is being thrown.
-         * <p>
-         * This can be used in cases like: (foo (.*:message) bar|bar (.*:message) foo) where the regexp guarantees that only
-         * one value will be captured.
-         * <p>
-         * See also {@link #captures} which returns multiple values of the same key as list.
-         */
-        public void capturesFlattened() {
-            captures(true);
-        }
 
         @SuppressWarnings("unchecked")
-        private void captures(boolean flattened) {
+        private void captures(/*boolean flattened*/) {
             if (match == null) {
                 return;
             }
@@ -912,16 +994,17 @@ public class Grok implements Serializable {
             while (it.hasNext()) {
 
                 @SuppressWarnings("rawtypes")
-                Map.Entry pairs = (Map.Entry) it.next();
+                Map.Entry<String,String> pairs = it.next();
                 String key = null;
-                Object value = null;
-                if (this.grok.getNamedRegexCollectionById(pairs.getKey().toString()) == null) {
-                    key = pairs.getKey().toString();
-                } else if (!this.grok.getNamedRegexCollectionById(pairs.getKey().toString()).isEmpty()) {
-                    key = this.grok.getNamedRegexCollectionById(pairs.getKey().toString());
+                String nr = this.grok.getNamedRegexCollectionById(pairs.getKey());
+                if (nr == null) {
+                    key = pairs.getKey();
+                } else if (!nr.isEmpty()) {
+                    key = nr;
                 }
+                Object value = null;
                 if (pairs.getValue() != null) {
-                    value = pairs.getValue().toString();
+                    value = pairs.getValue();
 
 
                     if (automaticConversionEnabled) {
@@ -931,11 +1014,7 @@ public class Grok implements Serializable {
                         key = keyValue.getKey();
 
                         // resolve value
-                        if (keyValue.getValue() instanceof String) {
-                            value = cleanString((String) keyValue.getValue());
-                        } else {
-                            value = keyValue.getValue();
-                        }
+                        value = keyValue.getValue() instanceof String ? cleanString((String) keyValue.getValue()) : keyValue.getValue();
 
 //                        // set if grok failure
 //                        if (keyValue.hasGrokFailure()) {
@@ -944,10 +1023,10 @@ public class Grok implements Serializable {
                     }
                 }
 
-                if (capture.containsKey(key)) {
-                    Object currentValue = capture.get(key);
+                Object currentValue = capture.get(key);
+                if (currentValue!=null) {
 
-                    if (flattened) {
+                    /*if (flattened) {
                         if (currentValue == null && value != null) {
                             capture.put(key, value);
                         }
@@ -958,14 +1037,11 @@ public class Grok implements Serializable {
                                             currentValue,
                                             value));
                         }
-                    } else {
+                    } else*/ {
                         if (currentValue instanceof List) {
                             ((List<Object>) currentValue).add(value);
                         } else {
-                            List<Object> list = new ArrayList<Object>();
-                            list.add(currentValue);
-                            list.add(value);
-                            capture.put(key, list);
+                            capture.put(key, List.of(currentValue, value));
                         }
                     }
                 } else {
@@ -990,13 +1066,20 @@ public class Grok implements Serializable {
                 return value;
             }
             char[] tmp = value.toCharArray();
-            if (tmp.length == 1 && (tmp[0] == '"' || tmp[0] == '\'')) {
-                value = "";//empty string
-            } else if ((tmp[0] == '"' && tmp[value.length() - 1] == '"')
-                    || (tmp[0] == '\'' && tmp[value.length() - 1] == '\'')) {
-                value = value.substring(1, value.length() - 1);
+            char t0 = tmp[0];
+            if (tmp.length == 1 && (t0 == '"' || t0 == '\'')) {
+                return "";//empty string
+            } else {
+                int vlen = value.length();
+                char tl = tmp[vlen - 1];
+                if ((t0 == '"' && tl == '"')
+                        || (t0 == '\'' && tl == '\'')) {
+                    return value.substring(1, vlen - 1);
+                } else {
+                    return value;
+                }
             }
-            return value;
+
         }
 
 
@@ -1062,10 +1145,22 @@ public class Grok implements Serializable {
          *
          * @return boolean
          */
-        public Boolean isNull() {
+        boolean isNull() {
             return this.match == null;
         }
 
+        @Override
+        public String toString() {
+            return "Match{" +
+                    "subject='" + subject + '\'' +
+                    ", capture=" + capture +
+                    ", garbage=" + garbage +
+                    ", grok=" + grok +
+                    ", match=" + match +
+                    ", start=" + start +
+                    ", end=" + end +
+                    '}';
+        }
     }
 
     /**
@@ -1077,16 +1172,16 @@ public class Grok implements Serializable {
      */
     static class Garbage {
 
-        private List<String> toRemove;
-        private Map<String, Object> toRename;
+        private final List<String> toRemove;
+        private final Map<String, Object> toRename;
 
         /**
          * Create a new {@code Garbage} object.
          */
-        public Garbage() {
+        Garbage() {
 
-            toRemove = new ArrayList<String>();
-            toRename = new TreeMap<String, Object>();
+            toRemove = new ArrayList<>();
+            toRename = new TreeMap<>();
             /** this is a default value to remove */
             toRemove.add("UNWANTED");
         }
@@ -1143,7 +1238,7 @@ public class Grok implements Serializable {
          * @param map to clean
          * @return nb of deleted item
          */
-        public int remove(Map<String, Object> map) {
+        int remove(Map<String, Object> map) {
             int item = 0;
 
             if (map == null) {
@@ -1172,7 +1267,7 @@ public class Grok implements Serializable {
          * @param map elem to rename
          * @return nb of renamed items
          */
-        public int rename(Map<String, Object> map) {
+        int rename(Map<String, Object> map) {
             int item = 0;
 
             if (map == null) {
@@ -1199,7 +1294,7 @@ public class Grok implements Serializable {
     /**
      * Extract Grok patter like %{FOO} to FOO, Also Grok pattern with semantic.
      */
-    public static final java.util.regex.Pattern GROK_PATTERN = java.util.regex.Pattern.compile(
+    private static final java.util.regex.Pattern GROK_PATTERN = java.util.regex.Pattern.compile(
             "%\\{" +
                     "(?<name>" +
                     "(?<pattern>[A-z0-9]+)" +
@@ -1213,11 +1308,11 @@ public class Grok implements Serializable {
                     ")?" +
                     "\\}");
 
-    public static final java.util.regex.Pattern NAMED_REGEX = java.util.regex.Pattern
+    private static final java.util.regex.Pattern NAMED_REGEX = java.util.regex.Pattern
             .compile("\\(\\?<([a-zA-Z][a-zA-Z0-9]*)>");
 
     private static Set<String> getNameGroups(String regex) {
-        Set<String> namedGroups = new LinkedHashSet<String>();
+        Set<String> namedGroups = new LinkedHashSet<>();
         Matcher m = NAMED_REGEX.matcher(regex);
         while (m.find()) {
             namedGroups.add(m.group(1));
@@ -1225,11 +1320,11 @@ public class Grok implements Serializable {
         return namedGroups;
     }
 
-    public static Map<String, String> namedGroups(Matcher matcher,
-                                                  String namedRegex) {
+    private static Map<String, String> namedGroups(Matcher matcher,
+                                                   String namedRegex) {
         Set<String> groupNames = getNameGroups(matcher.pattern().pattern());
         Matcher localMatcher = matcher.pattern().matcher(namedRegex);
-        Map<String, String> namedGroups = new LinkedHashMap<String, String>();
+        Map<String, String> namedGroups = new LinkedHashMap<>();
         if (localMatcher.find()) {
             for (String groupName : groupNames) {
                 String groupValue = localMatcher.group(groupName);

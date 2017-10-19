@@ -14,7 +14,7 @@ public class SynchExec extends UniExec {
 
     public SynchExec(int capacity, int firePerCycle) {
         super(capacity);
-        activationsPerCycle.setValue(firePerCycle);
+        activationsPerCycle.set(firePerCycle);
     }
 
     private BatchActivate activate = null;

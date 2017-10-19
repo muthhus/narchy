@@ -86,7 +86,7 @@ public class ScalarConceptsTest {
 
         //run a few oscillations
         for (int i = 0; i < 5; i++) {
-            m.setValue(Math.sin(i / 2f));
+            m.set(Math.sin(i / 2f));
             n.cycle();
 
 
@@ -136,7 +136,7 @@ public class ScalarConceptsTest {
         for (float v : new float[] { 0f, 0.5f, 1f }) {
 
 
-            x.setValue(v);
+            x.set(v);
             xc.update(n.time(), n.dur(), n);
             n.run(1);
 

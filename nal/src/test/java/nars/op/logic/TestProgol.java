@@ -200,7 +200,7 @@ public class TestProgol {
                 "has_milk(cat).\n" +
                 "homeothermic(cat).\n");
         Param.DEBUG = true;
-        n.truthResolution.setValue(0.25f);
+        n.truthResolution.set(0.25f);
         n.stats(System.out);
         //n.log();
         n.run(100);

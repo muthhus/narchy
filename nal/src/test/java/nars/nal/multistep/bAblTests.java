@@ -44,7 +44,7 @@ public class bAblTests extends AbstractNALTest {
 
         TestNAR t = test;
 
-        t.nar.truthResolution.setValue(0.25f);
+        t.nar.truthResolution.set(0.25f);
         t.nar.termVolumeMax.setValue(28);
 
         //t.log();
@@ -70,7 +70,7 @@ public class bAblTests extends AbstractNALTest {
 
         TestNAR t = test;
         t.nar.termVolumeMax.setValue(40);
-        t.nar.truthResolution.setValue(0.25f);
+        t.nar.truthResolution.set(0.25f);
 
         t.input("$0.9 ((&&, start($1,$2), at( $1,$B,$C), at( $B,$2,$C2) ) ==> ( path( id,$C,id,$C2)   && chunk( $1,$2,$B) )).")
                 .input("$0.9 ((&&, start($1,$2), at( $1,$B,$C), at( $2,$B,$C2) ) ==> ( path( id,$C,neg,$C2)  && chunk( $1,$2,$B) )).")

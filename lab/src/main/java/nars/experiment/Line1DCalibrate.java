@@ -86,12 +86,12 @@ public class Line1DCalibrate {
             }
         });
 
-        a.speed.setValue(yResolution);
+        a.speed.set(yResolution);
 
 //            a.up.resolution.setValue(yResolution);
 //            a.down.resolution.setValue(yResolution);
         a.in.resolution(yResolution);
-        a.curiosity.setValue(
+        a.curiosity.set(
                 0.1f
                 //(2/yResolution)*tHz);
         );

@@ -39,7 +39,7 @@ public class FloatSlider extends BaseSlider {
     public FloatSlider(FloatParam f) {
         this(f.floatValue(), f.min, f.max);
         input = f;
-        on((s, v) -> f.setValue(v));
+        on((s, v) -> f.set(v));
     }
 
     public FloatSlider label(String label) {

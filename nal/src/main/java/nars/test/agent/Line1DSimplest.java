@@ -108,13 +108,13 @@ public class Line1DSimplest extends NAgent {
     private void initDualToggle() {
         actionToggle($.p("up"), (b) -> {
             if(b) {
-                o.setValue(Util.unitize(o.floatValue() + speed.floatValue()));
+                o.set(Util.unitize(o.floatValue() + speed.floatValue()));
                 System.out.println(o);
             }
         });
         actionToggle($.p("down"), (b) -> {
             if (b) {
-                o.setValue(Util.unitize(o.floatValue() - speed.floatValue()));
+                o.set(Util.unitize(o.floatValue() - speed.floatValue()));
                 System.out.println(o);
             }
         });
@@ -125,7 +125,7 @@ public class Line1DSimplest extends NAgent {
         float[] x = new float[2];
         onFrame(() -> {
             float d = x[0] - x[1];
-            this.o.setValue(Util.unitize(o.floatValue() + d * speed.floatValue()));
+            this.o.set(Util.unitize(o.floatValue() + d * speed.floatValue()));
         });
         actionUnipolar($.p("up"), d -> {
             //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
@@ -173,7 +173,7 @@ public class Line1DSimplest extends NAgent {
     public void initBipolar() {
         actionBipolar($.the("y"), v -> {
             if (v == v) {
-                o.setValue(
+                o.set(
                         Util.unitize(o.floatValue() + v * speed.floatValue())
                 );
 
@@ -227,6 +227,6 @@ public class Line1DSimplest extends NAgent {
     }
 
     public void target(float v) {
-        i.setValue(v);
+        i.set(v);
     }
 }

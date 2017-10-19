@@ -163,7 +163,7 @@ public class Line1D {
 
 
             n.time.dur(10);
-            exp.agent.curiosity.setValue(0.1f);
+            exp.agent.curiosity.set(0.1f);
             exp.agent.runDur(1);
 
             //n.truthResolution.setValue(0.25f);
@@ -248,7 +248,7 @@ public class Line1D {
 //            for (GoalActionConcept g : new GoalActionConcept[]{agent.up, agent.down})
 //                g.resolution(yResolution);
 
-            agent.curiosity.setValue(
+            agent.curiosity.set(
                     0.05f
                     //(2/yResolution)*tHz);
             );
@@ -422,7 +422,7 @@ public class Line1D {
                     } else {
                         if (a.curiosity.floatValue() > 0)
                             System.err.println("TRAINING FINISHED - DISABLING CURIOSITY");
-                        a.curiosity.setValue(0f); //disable curiosity
+                        a.curiosity.set(0f); //disable curiosity
                     }
                 } else {
 

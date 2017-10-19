@@ -307,7 +307,7 @@ public class Recog2D extends NAgentX {
         NAgentX.runRT((n) -> {
 
             Recog2D a = new Recog2D(n);
-            a.nar.truthResolution.setValue(0.07f);
+            a.nar.truthResolution.set(0.07f);
             a.nar.termVolumeMax.setValue(16);
             return a;
 

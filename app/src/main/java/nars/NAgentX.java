@@ -190,8 +190,8 @@ abstract public class NAgentX extends NAgent {
 
         n.setEmotion(new Emotivation(n));
 
-        n.confMin.setValue(0.01f);
-        n.truthResolution.setValue(0.01f);
+        n.confMin.set(0.01f);
+        n.truthResolution.set(0.01f);
         n.termVolumeMax.setValue(32);
 
         n.beliefConfidence(0.9f);

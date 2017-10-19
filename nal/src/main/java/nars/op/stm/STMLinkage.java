@@ -35,7 +35,7 @@ public final class STMLinkage extends TaskService {
         super(nar);
 
         this.allowNonInput = allowNonInput;
-        strength.setValue(1f / capacity);
+        strength.set(1f / capacity);
 
         stm = Util.blockingQueue(capacity + 1 /* extra slot for good measure */);
 //        for (int i = 0; i < capacity+1; i++)

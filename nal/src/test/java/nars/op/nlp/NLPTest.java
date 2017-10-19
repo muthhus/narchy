@@ -26,7 +26,7 @@ public class NLPTest {
         //n.DEFAULT_QUEST_PRIORITY = 0.1f;
 
         //n.quaMin.setValue(0.1f);
-        n.truthResolution.setValue(0.1f);
+        n.truthResolution.set(0.1f);
 
         n.onOpArgs("say", (args, nn) -> {
             System.err.println(Joiner.on(" ").join(args));

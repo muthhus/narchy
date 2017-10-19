@@ -779,7 +779,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
             NAR n = NARS.tmp();
             n.time.dur(4);
-            n.truthResolution.setValue(0.1f);
+            n.truthResolution.set(0.1f);
             //new Abbreviation(n, "z", 3, 8, 0.1f, 32);
 
             new Tetris(n, Tetris.tetris_width, Tetris.tetris_height, 1);

@@ -717,7 +717,7 @@ public class NAL6Test extends AbstractNALTest {
         //B (A ==> C) |- C :post (:t/deduction :order-for-all-same) :pre ((:substitute-if-unifies "$" A B) (:shift-occurrence-forward ==>))
 
 
-        test.nar.truthResolution.setValue(0.1f);
+        test.nar.truthResolution.set(0.1f);
         test
                 .believe("num(x)", 1.0f, 0.9f)
                 .believe("( num($1) ==> num(($1)) )", 1.0f, 0.9f)

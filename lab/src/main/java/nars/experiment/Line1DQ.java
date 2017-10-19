@@ -17,7 +17,7 @@ public class Line1DQ {
         n.time.dur(5);
 
         Line1DSimplest a = new Line1DSimplest(n);
-        a.curiosity.setValue(0.01f);
+        a.curiosity.set(0.01f);
 
         a.onFrame((z) -> {
             a.target(
