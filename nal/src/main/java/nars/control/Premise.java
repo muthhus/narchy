@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static nars.Op.BELIEF;
+import static nars.Op.VAR_QUERY;
 import static nars.concept.TermLinks.linkTask;
 import static nars.time.Tense.ETERNAL;
 
@@ -353,7 +354,7 @@ public class Premise extends UnaryTask {
      * sets a negative number in the ttl array, which is to be added to the callee's
      * ttl.  if zero, then no TTL was consumed
      */
-    private static UnifySubst unify(@NotNull Term q, @NotNull Term a, NAR nar, int[] ttl) {
+    private static UnifySubst unify(Term q, Term a, NAR nar, int[] ttl) {
 
         final int startTTL = ttl[0];
         ttl[0] = 0;
@@ -362,7 +363,7 @@ public class Premise extends UnaryTask {
             return null; //fast-fail: no chance
 
         final boolean[] result = {false};
-        UnifySubst u = new UnifySubst(null /* any var type */, nar, (aa) -> {
+        UnifySubst u = new UnifySubst(VAR_QUERY, nar, (aa) -> {
 
             result[0] = true;
             return false;
@@ -395,7 +396,7 @@ public class Premise extends UnaryTask {
 //            return null;
     }
 
-    public void merge(@NotNull Premise incoming) {
+    public void merge(Premise incoming) {
         //WARNING this isnt thread safe but collisions should be rare
 
         Collection<Concept> target = this.links;

@@ -682,7 +682,7 @@ public interface Compound extends Term, IPair, TermContainer {
         if (o == CONJ) {
             int dt = dt();
 
-            if (!(dt == 0 && level > 0) && dt != DTERNAL && dt != XTERNAL) {
+            if (dt != DTERNAL && dt != XTERNAL) {
 
 
                 TermContainer tt = subterms();
@@ -869,18 +869,6 @@ public interface Compound extends Term, IPair, TermContainer {
         return t.transform(this, op(), DTERNAL);
     }
 
-
-    @Override
-    @Nullable
-    default Term transform(int newDT, CompoundTransform t) {
-        return t.transform(this, op(), newDT);
-    }
-
-
-    @Nullable
-    default Term xternal() {
-        return temporalize(Retemporalize.retemporalizeAllToXTERNAL);
-    }
 
     @Override
     @Nullable

@@ -1209,16 +1209,19 @@ public enum Op {
 
 
     @NotNull
-    private static Term newDiff(/*@NotNull*/ Op op, @NotNull Term... t) {
+    private static Term newDiff(/*@NotNull*/ Op op, Term... t) {
 
         //corresponding set type for reduction:
         Op set = op == DIFFe ? SETe : SETi;
 
         switch (t.length) {
             case 1:
-                Term t0 = t[0];
-                return t0 instanceof Ellipsislike ?
-                        new UnitCompound1(op, t0) :
+                Term single = t[0];
+                if (single instanceof EllipsisMatch) {
+                    return newDiff(op, ((EllipsisMatch)single).theArray());
+                }
+                return single instanceof Ellipsislike ?
+                        new UnitCompound1(op, single) :
                         Null;
             case 2:
                 Term et0 = t[0], et1 = t[1];
@@ -1625,7 +1628,7 @@ public enum Op {
     }
 
     @NotNull
-    private static Term intersect(@NotNull Term[] t, /*@NotNull*/ Op intersection, /*@NotNull*/ Op setUnion, /*@NotNull*/ Op setIntersection) {
+    private static Term intersect(Term[] t, /*@NotNull*/ Op intersection, /*@NotNull*/ Op setUnion, /*@NotNull*/ Op setIntersection) {
 
         int trues = 0;
         for (Term x : t) {
@@ -1662,6 +1665,9 @@ public enum Op {
             case 1:
 
                 Term single = t[0];
+                if (single instanceof EllipsisMatch) {
+                    return intersect(((EllipsisMatch)single).theArray(), intersection, setUnion, setIntersection);
+                }
                 return single instanceof Ellipsislike ?
                         new UnitCompound1(intersection, single) :
                         single;
@@ -1683,7 +1689,7 @@ public enum Op {
 
     @NotNull
     @Deprecated
-    private static Term intersect2(@NotNull Term term1, @NotNull Term term2, /*@NotNull*/ Op intersection, /*@NotNull*/ Op setUnion, /*@NotNull*/ Op setIntersection) {
+    private static Term intersect2(Term term1, Term term2, /*@NotNull*/ Op intersection, /*@NotNull*/ Op setUnion, /*@NotNull*/ Op setIntersection) {
 
         if (term1.equals(term2))
             return term1;

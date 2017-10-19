@@ -144,7 +144,10 @@ public class Derivation extends Unify {
      * if using this, must set: nar, index, random, DerivationBudgeting
      */
     public Derivation(NAR nar) {
-        super(VAR_PATTERN, nar.random(), Param.UnificationStackMax, 0);
+        super(
+                null /* any var type */
+                //VAR_PATTERN
+                , nar.random(), Param.UnificationStackMax, 0);
 
         this.nar = nar;
 
@@ -318,6 +321,7 @@ public class Derivation extends Unify {
 
             long[] beliefStamp = belief.stamp();
             this.overlapDouble =
+                    //Math.min(1, Util.sum(
                     Util.or(
                     //Util.max(
                         overlapSingle,

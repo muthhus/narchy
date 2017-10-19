@@ -185,11 +185,6 @@ public interface Term extends Termed, Comparable<Termed> {
         return t.applyTermOrNull(this);
     }
 
-    @Nullable
-    default Term transform(int newDT, CompoundTransform t) {
-        assert (newDT == DTERNAL);
-        return t.applyTermOrNull(this);
-    }
 
     @Nullable
     default Term transform(/*@NotNull*/ ByteList path, int depth, Term replacement) {

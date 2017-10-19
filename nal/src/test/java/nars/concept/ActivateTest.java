@@ -116,20 +116,20 @@ public class ActivateTest {
     public void testTemplates3() throws Narsese.NarseseException {
         //layer 3:
         testTemplates("(open(John,door) ==> #x)",
-                "[(open(John,door) ==>+- #1), open, door, open(John,door), John, (John,door)]");
+                "[(open(John,door)==>#1), open, door, open(John,door), John, (John,door)]");
     }
 
     @Test
     public void testTemplates4() throws Narsese.NarseseException {
         //dont descend past layer 3:
         testTemplates("(open(John,portal:interdimensional) ==> #x)",
-                "[(John,(interdimensional-->portal)), (open(John,(interdimensional-->portal)) ==>+- #1), open(John,(interdimensional-->portal)), open, #1]");
+                "[(John,(interdimensional-->portal)), (open(John,(interdimensional-->portal))==>#1), open(John,(interdimensional-->portal)), open, #1]");
     }
 
     @Test
     public void testTemplates4b() throws Narsese.NarseseException {
         testTemplates("(open(John,portal(a(d),b,c)) ==> #x)",
-                "[open(John,portal(a(d),b,c)), (John,portal(a(d),b,c)), (open(John,portal(a(d),b,c)) ==>+- #1), open, #1]");
+                "[open(John,portal(a(d),b,c)), (John,portal(a(d),b,c)), (open(John,portal(a(d),b,c))==>#1), open, #1]");
     }
 
     @Test
@@ -164,7 +164,7 @@ public class ActivateTest {
     @Test
     public void testTemplateConj2() throws Narsese.NarseseException {
         testTemplates("(&&,<#x --> lock>,(<$y --> key> ==> open($y,#x)))",
-                "[(($1-->key) &&+- (#2-->lock)), ((($1-->key) &&+- (#2-->lock)) ==>+- open($1,#2)), (#2-->lock), ($1,#2), key, open($1,#2), open, ($1-->key), lock]");
+                "[(($1-->key) &&+- (#2-->lock)), ((($1-->key) &&+- (#2-->lock))==>open($1,#2)), (#2-->lock), ($1,#2), key, open($1,#2), open, ($1-->key), lock]");
 
     }
 
@@ -199,7 +199,7 @@ public class ActivateTest {
     @Test
     public void testTemplatesAreEternal() throws Narsese.NarseseException {
         testTemplates("((x ==>+1 y),(x ==>+2 y))",
-                "[((x ==>+- y),(x ==>+- y)), (x ==>+- y), x, y]");
+                "[((x==>y),(x==>y)), (x==>y), x, y]");
     }
 
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {

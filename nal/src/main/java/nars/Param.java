@@ -114,7 +114,7 @@ public abstract class Param extends Services<Term,NAR> {
     public final FloatParam deriverity = new FloatParam(1.0f, 0f, 1f);
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTLmax = new MutableInteger(256);
+    public final MutableInteger matchTTLmax = new MutableInteger(192);
     public final MutableInteger matchTTLmin = new MutableInteger(64);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
@@ -174,12 +174,14 @@ public abstract class Param extends Services<Term,NAR> {
     @Deprecated public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;
 
 
-    public static float derivePriority(Task t, @NotNull Derivation d) {
+    public static float derivationPriority(Task t, Derivation d) {
         //float p = 1f / (1f + ((float)t.complexity())/termVolumeMax.floatValue());
 
         float discount = 1f;
 
-        int dCompl = t.complexity();
+        int dCompl =
+                //t.complexity();
+                t.volume();
         int pCompl = d.parentComplexity;
         int penalty = 1;
         float relGrowth =

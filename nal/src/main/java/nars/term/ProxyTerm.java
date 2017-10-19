@@ -84,10 +84,6 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
         return ref.containsRecursively(t, inSubtermsOf);
     }
 
-    @Override
-    public @Nullable Term transform(int newDT, @NotNull CompoundTransform t) {
-        return ref.transform(newDT, t);
-    }
 
     @Override public boolean equals(Object o) {
         return this == o || ref.equals(o);

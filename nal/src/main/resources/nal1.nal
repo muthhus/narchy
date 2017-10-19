@@ -43,11 +43,14 @@
             //TODO write test case for this
 
     //variable elimination 4b:
-    //(X --> A), ((#W --> A)<->(#W --> C)),  neq(X,C), neq(X,#W) |- (X-->C), (Belief:Analogy, Goal:Strong)
-    (X --> A), ((Y --> A)<->(Y --> C)),  neq(X,C), neq(X,Y) |- (X-->C), (Belief:Analogy, Goal:Strong)
-        (X --> A), (--(Y --> A)<->(Y --> C)),  neq(X,C), neq(X,Y) |- (X-->C), (Belief:AnalogyN, Goal:StrongN)
-    (A --> X), ((A --> Y)<->(C --> Y)),  neq(X,C), neq(X,Y) |- (C-->X), (Belief:Analogy, Goal:Strong)
-        (A --> X), (--(A --> Y)<->(C --> Y)),  neq(X,C), neq(X,Y) |- (C-->X), (Belief:AnalogyN, Goal:StrongN)
+    (X --> A),        ((Y --> A)<->(Y --> C)),  neqRCom(X,C), neq(X,Y)      |- (X-->C), (Belief:Analogy, Goal:Strong)
+        (X --> A),  (--(Y --> A)<->(Y --> C)),  neqRCom(X,C), neq(X,Y)      |- (X-->C), (Belief:AnalogyN, Goal:StrongN)
+    //(X --> A),       ((#W --> A)<->(#W --> C)),  neqRCom(X,C), neq(X,#W)    |- (X-->C), (Belief:Analogy, Goal:Strong)
+    //    (X --> A), (--(#W --> A)<->(#W --> C)),  neqRCom(X,C), neq(X,#W)    |- (X-->C), (Belief:AnalogyN, Goal:StrongN)
+    (A --> X),        ((A --> Y)<->(C --> Y)),  neqRCom(X,C), neq(X,Y)      |- (C-->X), (Belief:Analogy, Goal:Strong)
+        (A --> X),  (--(A --> Y)<->(C --> Y)),  neqRCom(X,C), neq(X,Y)      |- (C-->X), (Belief:AnalogyN, Goal:StrongN)
+    //(A --> X),       ((A --> #W)<->(C --> #W)),  neqRCom(X,C), neq(X,#W)    |- (C-->X), (Belief:Analogy, Goal:Strong)
+    //    (A --> X), (--(A --> #W)<->(C --> #W)),  neqRCom(X,C), neq(X,#W)    |- (C-->X), (Belief:AnalogyN, Goal:StrongN)
 
 //// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
 

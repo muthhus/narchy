@@ -475,7 +475,7 @@ public class Temporalize implements ITemporalize {
                 Time xt = e.start(trail);
                 if (xt != null) {
                     int score = (xt.base != ETERNAL ? 1 : 0) + (xt.offset != DTERNAL ? 1 : 0);
-                    int bestScore = best == null ? 0 : ((best.base != ETERNAL ? 1 : 0) + (best.offset != DTERNAL ? 1 : 0));
+                    int bestScore = 0;
                     if (score > bestScore) {
                         best = xt;
                         bestEvent = e;
@@ -588,7 +588,7 @@ public class Temporalize implements ITemporalize {
 
                 /* test for the exact appearance of temporalized form present in constraints */
                 if (hasEte) { //quick test filter
-                    @NotNull Term xEte = x.dt(DTERNAL);
+                    Term xEte = x.dt(DTERNAL);
                     if (!(xEte instanceof Bool) && constraints.get(xEte) != null) {
                         Event ds = solve(xEte, trail);
                         if (ds != null) {

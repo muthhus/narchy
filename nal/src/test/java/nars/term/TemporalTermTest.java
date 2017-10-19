@@ -151,27 +151,27 @@ public class TemporalTermTest {
     public void testAtemporalization() throws Narsese.NarseseException {
         Term t = $.$("((x) ==>+10 (y))");
         Concept c = n.conceptualize(t);
-        assertEquals("((x) ==> (y))", c.toString());
+        assertEquals("((x)==>(y))", c.toString());
     }
 
     @Test
     public void testAtemporalization2() throws Narsese.NarseseException {
 
-        assertEquals("((--,y) &&+- y)", $.<Compound>$("(y &&+3 (--,y))").xternal().toString());
+        assertEquals("((--,y) &&+- y)", $.<Compound>$("(y &&+3 (--,y))").temporalize(Retemporalize.retemporalizeAllToXTERNAL).toString());
     }
 
     @Test
     public void testAtemporalization3() throws Narsese.NarseseException {
 
         assertEquals("(--,((x &&+- $1) ==>+- ((--,y) &&+- $1)))",
-                $.<Compound>$("(--,(($1&&x) ==>+1 ((--,y) &&+2 $1)))").xternal().toString());
+                $.<Compound>$("(--,(($1&&x) ==>+1 ((--,y) &&+2 $1)))").temporalize(Retemporalize.retemporalizeAllToXTERNAL).toString());
     }
 
     @Test
     public void testAtemporalization4() throws Narsese.NarseseException {
         //maintain temporal information that would otherwise be factored out if non-temporal
 
-        assertEquals("((x &&+- $1) ==>+- (y &&+- $1))",
+        assertEquals("((x &&+- $1)==>(y &&+- $1))",
                 $.$("(($1 && x) ==>+1 ($1 &&+1 y))").root().toString());
     }
 
@@ -182,7 +182,7 @@ public class TemporalTermTest {
             Term c = $(s);
             assertTrue(c instanceof Compound);
 
-            assertEquals("((x ==>+- y) &&+- y)",
+            assertEquals("((x==>y) &&+- y)",
                     c.root().toString());
         }
     }
@@ -191,7 +191,7 @@ public class TemporalTermTest {
     public void testAtemporalization6() throws Narsese.NarseseException {
         Compound x = $("((--,(($1&&x) ==>+1 ((--,y) &&+2 $1))) &&+3 (--,y))");
 
-        Term y = x.xternal();
+        Term y = x.temporalize(Retemporalize.retemporalizeAllToXTERNAL);
         assertEquals("((--,((x &&+- $1) ==>+- ((--,y) &&+- $1))) &&+- (--,y))", y.toString());
     }
 
@@ -254,7 +254,7 @@ public class TemporalTermTest {
         assertEquals("((do(that) &&+1 (a)) ==>+2 (b))", nn.toString());
 
 
-        assertEquals("((do(that) &&+- (a)) ==>+- (b))", n.conceptualize(nn).toString());
+        assertEquals("((do(that) &&+- (a))==>(b))", n.conceptualize(nn).toString());
 
         //assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt, UnitBudget.One).toString()); ??
 
@@ -528,15 +528,15 @@ public class TemporalTermTest {
 
         Term t = $("(x==>y)");
         Term x = t.root();
-        assertEquals(XTERNAL, x.dt());
-        assertEquals("(x ==> y)", x.toString());
+        assertEquals(DTERNAL, x.dt());
+        assertEquals("(x==>y)", x.toString());
 
         n.input("(x ==>+0 y).", "(x ==>+1 y).").run(2);
 
         BaseConcept xImplY = (BaseConcept) n.conceptualize(t);
         assertNotNull(xImplY);
 
-        assertEquals("(x ==> y)", xImplY.toString());
+        assertEquals("(x==>y)", xImplY.toString());
 
         assertEquals(3, xImplY.beliefs().size());
 
@@ -672,7 +672,7 @@ public class TemporalTermTest {
         assertEquals(
                 //"[(#1==>x), (#1==>y), ((--,(y==>#1))&&(--,(#1==>y))), ((x==>#1)&&(#1==>x)), (x<=>y), (x==>#1), (x==>y), (y==>#1), (y==>x), x, y]"
                 //"[((x)<=>(y)), ((x)==>(y)), ((y)<=>(x)), ((y)==>(x)), (x), (y), x, y]"
-                "[((x) ==>+- (y)), ((y) ==>+- (x)), (x), (y), x, y]"
+                "[((x)==>(y)), ((y)==>(x)), (x), (y), x, y]"
                 , d.toString());
     }
 
@@ -775,9 +775,9 @@ public class TemporalTermTest {
 //            return as.equals(bs);
 //        }
         Term f = $("(x ==> y)");
+        assertEquals("(x==>y)", f.root().toString());
         Term g = $("(y ==>+1 x)");
-        assertEquals("(x ==>+- y)", f.root().toString());
-        assertEquals("(y ==>+- x)", g.root().toString());
+        assertEquals("(y==>x)", g.root().toString());
     }
 
     @Ignore
@@ -799,8 +799,8 @@ public class TemporalTermTest {
 //            return as.equals(bs);
 //        }
 
-        assertEquals($.<Compound>$("(x && (y ==> z))").xternal(),
-                $.<Compound>$("(x &&+1 (y ==>+1 z))").xternal());
+        assertEquals($.<Compound>$("(x && (y ==> z))").temporalize(Retemporalize.retemporalizeAllToXTERNAL),
+                $.<Compound>$("(x &&+1 (y ==>+1 z))").temporalize(Retemporalize.retemporalizeAllToXTERNAL));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -811,8 +811,8 @@ public class TemporalTermTest {
         assertEquals("((x &&+1 z) ==>+1 w)",
                 $("(x &&+1 (z ==>+1 w))").toString());
 
-        assertEquals($.<Compound>$("((x &&+- z) ==>+- w)").xternal(),
-                $.<Compound>$("(x &&+1 (z ==>+1 w))").xternal());
+        assertEquals($.<Compound>$("((x &&+- z) ==>+- w)").temporalize(Retemporalize.retemporalizeAllToXTERNAL),
+                $.<Compound>$("(x &&+1 (z ==>+1 w))").temporalize(Retemporalize.retemporalizeAllToXTERNAL));
     }
 
 //    @Test
@@ -930,7 +930,7 @@ public class TemporalTermTest {
     @Test
     public void testConceptual2b() throws Narsese.NarseseException {
         assertConceptual(
-                "(((--,(happy &&+- vy)) &&+- (happy &&+- vy)) ==> ((--,(happy &&+- vy)) &&+- (--,vx)))",
+                "(((--,(happy &&+- vy)) &&+- (happy &&+- vy))==>((--,(happy &&+- vy)) &&+- (--,vx)))",
                 "(((--,(vy &&+84 happy))&&(happy&|vy)) ==>+84 ((--,vx) &&+21 (--,(happy &&+146 vy))))");
     }
 

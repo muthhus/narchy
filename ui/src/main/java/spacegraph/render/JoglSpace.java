@@ -34,6 +34,13 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     //protected static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_IDEAL, FPS_MIN, FPS_IDEAL);
     protected static final GameAnimatorControl a;
 
+    static {
+//        GLCapabilitiesImmutable cfg = newDefaultConfig();
+//        sharedDrawable = GLDrawableFactory.getFactory(cfg.getGLProfile()).createDummyAutoDrawable(null, true, cfg, null);
+//        sharedDrawable.display(); // triggers GLContext object creation and native realization.
+//        Draw.init(sharedDrawable.getGL().getGL2());
+        a = new GameAnimatorControl(FPS_IDEAL);
+    }
 
     public static final GLU glu = new GLU();
     public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
@@ -71,7 +78,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     static final Logger logger = LoggerFactory.getLogger(JoglSpace.class);
 
-    private static void start(GLWindow w) {
+    private static synchronized void start(GLWindow w) {
 
         if (!windows.isEmpty()) {
             if (!windows.add(w))
@@ -80,8 +87,6 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
             a.start();
             windows.add(w);
         }
-
-        a.add(w);
 
         w.addWindowListener(new WindowAdapter() {
 
@@ -101,6 +106,10 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 //                }
             }
         });
+
+        a.add(w);
+
+
     }
 
     @Override
@@ -111,7 +120,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
         gl.setSwapInterval(0); //disable vsync
 
-        //printHardware();
+        printHardware();
 
         Draw.init(gl);
 
@@ -616,12 +625,5 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 //
 //    }
 
-    static {
-//        GLCapabilitiesImmutable cfg = newDefaultConfig();
-//        sharedDrawable = GLDrawableFactory.getFactory(cfg.getGLProfile()).createDummyAutoDrawable(null, true, cfg, null);
-//        sharedDrawable.display(); // triggers GLContext object creation and native realization.
-//        Draw.init(sharedDrawable.getGL().getGL2());
-        a = new GameAnimatorControl(FPS_IDEAL);
-    }
 
 }

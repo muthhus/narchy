@@ -72,20 +72,20 @@ abstract public class Solve extends AbstractPred<Derivation> {
                 }
 
 
-//                float overlap;
-//                if (f.allowOverlap()) {
-//                    overlap = 0;
-//                } else {
-                float overlap = (single ? d.overlapSingle : d.overlapDouble);
-//                }
+                float overlap;
+                if (f.allowOverlap()) {
+                    overlap = 0;
+                } else {
+                    overlap = (single ? d.overlapSingle : d.overlapDouble);
+                }
 
                 if (overlap > 0) {
-                    float e = t.evi() * (1f-overlap);
-                    if (e < Pri.EPSILON) //yes Pri epsilon
-                        return false;
-
-                    t = t.withEvi(e);
-                    if (t.conf() < confMin)
+//                    float e = t.evi() * (1f-overlap);
+//                    if (e < Pri.EPSILON) //yes Pri epsilon
+//                        return false;
+//
+//                    t = t.withEvi(e);
+//                    if (t.conf() < confMin)
                         return false;
                 }
 

@@ -396,8 +396,8 @@ public enum Terms {
 
     @Nullable
     @Deprecated public static <T extends Term> T normalizedOrNull(@Nullable Term t) {
-        return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
-        //return (T) t.normalize();
+        //return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
+        return (T) t.normalize();
     }
 
     @Nullable

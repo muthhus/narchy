@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 /**
  * Holds results of an ellipsis match and
 */
-public class EllipsisMatch extends GenericCompound implements Ellipsislike {
+public class EllipsisMatch extends GenericCompound  {
 
     //    public static ArrayEllipsisMatch matchedSubterms(Compound Y, IntObjectPredicate<Term> filter) {
 //        Function<IntObjectPredicate,Term[]> arrayGen =

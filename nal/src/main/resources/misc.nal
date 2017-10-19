@@ -2,10 +2,10 @@
 
 //substitutionViaSimilarity
 
-    //TODO these need special predicates to safely decompose the conjunctions without losing temporal information
+
      R, (S<->P)  |- subIfUnifiesAny(P, S, R), (Belief:Analogy)
      R, (--S<->P)  |- subIfUnifiesAny(P, S, R), (Belief:AnalogyN)
-     (&&,X,A..+), (X<->Y)  |- ((&&,A..+) &&+- Y), (Belief:Analogy, Goal:Weak)
+     (&&,X,A..+), (X<->Y)  |- substitute((&&,X,A..+),X,Y), (Belief:Analogy, Goal:Weak)
      (X ==> Z), (X<->Y) |- (Y ==>+- Z), (Belief:Analogy)
      (Z ==> X), (X<->Y) |- (Z ==>+- Y), (Belief:Analogy)
      (Z ==> X), (--X<->Y) |- (Z ==>+- Y), (Belief:AnalogyN)

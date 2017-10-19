@@ -99,6 +99,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
                 return false;
             }
 
+
             if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
 
         } else {

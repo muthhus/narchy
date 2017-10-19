@@ -25,13 +25,12 @@ abstract public class DynamicTruthModel {
 
 
     @Nullable
-    public DynTruth eval(Term superterm, boolean beliefOrGoal, long start, long end, boolean stamp, NAR n) {
+    public DynTruth eval(@NotNull Term superterm, boolean beliefOrGoal, long start, long end, boolean stamp, NAR n) {
 
 
         int sdt = superterm.dt();
-        if (sdt == XTERNAL) {
-            throw new RuntimeException("XTERNAL should not happen here");
-        }
+        assert(sdt!=XTERNAL):"XTERNAL should not happen here";
+
 
         Term[] inputs = components(superterm);
         assert (inputs.length > 0) : this + " yielded no dynamic components for superterm " + superterm;
@@ -54,8 +53,6 @@ abstract public class DynamicTruthModel {
             Concept subConcept = n.concept(subterm);
             if (subConcept == null)
                 return null; //ok just missing
-            else if (!(subConcept instanceof BaseConcept))
-                throw new RuntimeException("dynamically evaluated term should have only believable subterms");
 
             int dt;
             if (superterm.op() == CONJ) {
@@ -90,15 +87,12 @@ abstract public class DynamicTruthModel {
                 //task
                 BeliefTable table = (BeliefTable) ((BaseConcept) subConcept).table(beliefOrGoal ? BELIEF : GOAL);
 
-                bt = table
-                        .match(subStart, subEnd, subterm, n);
+                bt = table.match(subStart, subEnd, subterm, n);
                 if (bt == null) {
                     return null;
                 }
 
                 nt = bt.truth(subStart, subEnd, dur, 0f); //project to target time if task isnt at it
-                if (nt == null)
-                    return null;
 
             } else {
                 //truth only
@@ -233,9 +227,10 @@ abstract public class DynamicTruthModel {
                 d.conf = c;
                 d.freq = t.freq();
             } else {
-                d.conf *= c;
-                if (d.conf < confMin)
+
+                if ((d.conf *= c) < confMin)
                     return false;
+
                 d.freq *= (1f - t.freq());
 
 //                if (t.conf() * tx.conf() < confMin) //early termination check
@@ -272,23 +267,4 @@ abstract public class DynamicTruthModel {
             return false;
         }
     }
-
-//    /**
-//     * N-ary intersection truth function of subterms
-//     */
-//    public static class DynamicIntersection extends DynamicTruthModel.Intersection {
-//        private final Term[] subterms;
-//
-//        public DynamicIntersection(Term term) {
-//            this.subterms = term.subterms().theArray();
-//            assert(subterms.length > 1);
-//        }
-//
-//        @NotNull
-//        @Override
-//        public Term[] components(Term superterm) {
-//            return subterms;
-//        }
-//    }
-
 }

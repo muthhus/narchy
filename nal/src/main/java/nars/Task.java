@@ -98,7 +98,10 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
                 new BytesHashProvider<>(IO::taskToBytes));
     }
 
-    static boolean taskContentValid(Term t, byte punc, @Nullable NAR nar, boolean safe) {
+    static boolean taskContentValid(@Nullable Term t, byte punc, @Nullable NAR nar, boolean safe) {
+
+        if (t == null)
+            return fail(t, "null content", safe);
 
         if (t.op() == NEG)
             //must be applied before instantiating Task
@@ -559,16 +562,13 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
             return (x + y) / 2; //use midpoint of the two if this task is eternal
 
         long b = this.end();
-        if (x == y) {
-            if (a == b) return a;
-            else return Math.abs(a-x) < Math.abs(b-x) ? a : b;
-        } else if (a == b) {
+        if (a == b) {
             return TaskRegion.nearestBetween(x, y, a);
-        } else /*if (x <= a && y >= b) {
-            return (a + b) / 2; //midpoint of this within the range
         } else if ((x > a) && (y < b)) {
             return (x + y) / 2; //midpoint of the contained range
-        } else*/ {
+        } else if (x <= a && y >= b) {
+            return (a + b) / 2; //midpoint of this within the range
+        } else {
             return nearestStartOrEnd(a, b, x, y); //overlap or no overlap
         }
     }

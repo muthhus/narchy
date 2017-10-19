@@ -11,7 +11,6 @@ import spacegraph.phys.util.AnimVector2f;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static spacegraph.Surface.Align.None;
@@ -207,7 +206,7 @@ public class ZoomOrtho extends Ortho {
 
                             if (windowMoving.compareAndSet(false, true)) {
 
-                                window.window.getScreen().getDisplay().getEDTUtil().invoke(true, ()->
+                                window.window.getScreen().getDisplay().getEDTUtil().invoke(false, ()->
                                         resizeWindow(windowStart[0], windowStart[1], resizeTarget[0], resizeTarget[1]) );
                                         //this::resizeWindow);
                                 if (panStart != null) {

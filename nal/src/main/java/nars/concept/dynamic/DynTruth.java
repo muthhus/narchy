@@ -43,9 +43,6 @@ public final class DynTruth implements Truthed {
 
     @Nullable
     public float budget() {
-        //RawBudget b = new RawBudget();
-        if (e == null)
-            return Float.NaN;
 
         int s = e.size();
         assert (s > 0);
@@ -80,11 +77,6 @@ public final class DynTruth implements Truthed {
     }
 
 
-    @Override
-    public String toString() {
-        return truth().toString();
-    }
-
     NALTask task(/*@NotNull*/ Term c, boolean beliefOrGoal, NAR nar) {
 
         Truth tr0 = truth();
@@ -101,24 +93,16 @@ public final class DynTruth implements Truthed {
             return null;
 
         float priority = budget();
-        if (priority != priority) //deleted
-            return null;
 
         long[] se = Task.range(e);
         long start = se[0];
         long end = se[1];
 
-        Retemporalize r = start == ETERNAL ? Retemporalize.retemporalizeXTERNALToDTERNAL : Retemporalize.retemporalizeXTERNALToZero;
-        if (null == (c = c.temporalize(r)))
-            return null;
-
-
         // then if the term is valid, see if it is valid for a task
-        if (!Task.taskContentValid(c, beliefOrGoal ? BELIEF : GOAL, nar, true))
+        if (!Task.taskContentValid(c.temporalize(
+                start == ETERNAL ? Retemporalize.retemporalizeXTERNALToDTERNAL : Retemporalize.retemporalizeXTERNALToZero),
+                beliefOrGoal ? BELIEF : GOAL, nar, true))
             return null;
-
-
-
 
         NALTask dyn = new NALTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 tr, nar.time(), start, end /*+ dur*/, evidence());

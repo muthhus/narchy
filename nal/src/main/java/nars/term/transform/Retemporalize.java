@@ -25,11 +25,11 @@ abstract public class Retemporalize implements CompoundTransform {
         @Override
         public Term transform(Compound x, Op op, int dt) {
             if (op == IMPL) {
-                if (dt!=DTERNAL) {
+                if (x.dt()!=DTERNAL) {
                     //special handling
                     Term subj = x.sub(0).root();
                     Term pred = x.sub(1).root();
-                    return IMPL.the((subj.equals(pred)) ? XTERNAL : DTERNAL, subj, pred);
+                    return IMPL.the((subj.unneg().equals(pred)) ? XTERNAL : DTERNAL, subj, pred);
                 } else {
                     return x; //unchanged
                 }

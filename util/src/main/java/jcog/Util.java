@@ -1730,6 +1730,10 @@ public enum Util {
         return a * b;
     }
 
+    public static float and(float a, float b, float c) {
+        return a * b  * c;
+    }
+
     public static float or(float a, float b, float c) {
         return 1.0f - ((1.0f - a) * (1.0f - b) * (1.0f - c));
     }

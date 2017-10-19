@@ -93,7 +93,7 @@ public class Taskify extends AbstractPred<Derivation> {
         }
 
 
-        float priority = Param.derivePriority(t, d)
+        float priority = Param.derivationPriority(t, d)
                 //* channel.amp()
         ;
 

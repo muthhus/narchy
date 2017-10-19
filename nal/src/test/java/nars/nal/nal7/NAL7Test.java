@@ -930,9 +930,9 @@ public class NAL7Test extends AbstractNALTest {
 
         test
                 .input("((&|,a,b,c) &&+1 z). :|:")
-                .mustBelieve(cycles, "(a &&+1 z)", 1f, 0.81f, 0, 1)
-                .mustBelieve(cycles, "(b &&+1 z)", 1f, 0.81f, 0, 1)
-                .mustBelieve(cycles, "(c &&+1 z)", 1f, 0.81f, 0, 1);
+                .mustBelieve(cycles, "(a &&+1 z)", 1f, 0.73f, 0, 1)
+                .mustBelieve(cycles, "(b &&+1 z)", 1f, 0.73f, 0, 1)
+                .mustBelieve(cycles, "(c &&+1 z)", 1f, 0.73f, 0, 1);
     }
 
 
@@ -1482,7 +1482,7 @@ public class NAL7Test extends AbstractNALTest {
     public void testDecomposeImplPred() {
 
         test
-                .believe("( (a,#1) ==>+0 ( ( (x,#1) &| y) &| z ) )", Tense.Present, 1f, 0.9f)
+                .believe("( (a,#1) =|> ( ( (x,#1) &| y) &| z ) )", Tense.Present, 1f, 0.9f)
                 .mustBelieve(cycles, "( (a,#1) =|> (x,#1) )", 1f, 0.73f, 0)
                 .mustBelieve(cycles, "( (a,#1) =|> y )", 1f, 0.73f, 0)
                 .mustBelieve(cycles, "( (a,#1) =|> z )", 1f, 0.73f, 0)

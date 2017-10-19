@@ -37,21 +37,15 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     @Nullable
     protected Task generate(Term template, long start, long end, NAR nar) {
 
-        template = template(template, start, end, nar);
-        if (template == null)
+        Term tt = template(template, start, end, nar);
+        if (tt == null)
             return null;
 
-        DynTruth yy = truth(start, end, template, true, nar);
+        DynTruth yy = truth(start, end, tt, true, nar);
         if (yy == null)
             return null;
 
-        //compute the optimistic temporal union of the component's occurrences
-        @Nullable FasterList<Task> ee = yy.e;
-        if (ee == null || ee.isEmpty())
-            return null;
-
-
-        return yy.task(template, beliefOrGoal, nar);
+        return yy.task(tt, beliefOrGoal, nar);
     }
 
     @Override
@@ -86,8 +80,6 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Nullable
     protected DynTruth truth(long start, long end, Term template, boolean evidence, NAR nar) {
-        if (template == null)
-            return null; //TODO
         return model.eval(template, beliefOrGoal, start, end, evidence, nar); //newDyn(evidence);
     }
 
@@ -124,8 +116,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             }
         }
 
-        return DTERNAL;
-        //return 0; //parallel
+        //return DTERNAL;
+        return 0; //parallel
     }
 
     @Override
