@@ -107,7 +107,7 @@ public final class DefaultConceptState extends ConceptState {
         }
     }
 
-    public static int lerp(@NotNull Concept c, @NotNull MutableInteger _min, @NotNull MutableInteger _max) {
+    public static int lerp(Concept c, MutableInteger _min, MutableInteger _max) {
 
         int min = _min.intValue();
         int max = _max.intValue();

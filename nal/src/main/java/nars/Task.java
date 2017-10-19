@@ -45,7 +45,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
 
     final Task[] EmptyArray = new Task[0];
-    final long[] ETERNAL_ETERNAL = new long[]{Tense.ETERNAL, Tense.ETERNAL};
+    final long[] ETERNAL_ETERNAL = {Tense.ETERNAL, Tense.ETERNAL};
 
     static boolean equal(Task a, Task b) {
 
@@ -165,7 +165,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
                 } else {
                     //TODO use a byte[] path thing to reduce duplicate work performed in indepValid findPaths
                     if (t.hasAny(Op.VAR_INDEP)) {
-                        UnifiedSet unique = new UnifiedSet(1); //likely only one var indep repeated twice
+                        Set unique = new UnifiedSet(1); //likely only one var indep repeated twice
                         if (!t.ANDrecurse(
                                 v -> (v.op() != VAR_INDEP) || !unique.add(v) || indepValid(t, v))) {
                             return fail(t, "unbalanced InDep variable pairing", safe);
@@ -313,24 +313,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         }
 
     }
-
-    @Override
-    long creation();
-
-    @Override
-    Term term();
-
-    /**
-     * occurrence starting time
-     */
-    @Override
-    long start();
-
-    /**
-     * occurrence ending time
-     */
-    @Override
-    long end();
 
     /**
      * amount of evidence measured at a given time with a given duration window
@@ -556,7 +538,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
             Concept concept = concept(nar, true);
             if (concept != null) {
-                AnswerBag answers = (AnswerBag) concept.meta("?", (x) ->
+                AnswerBag answers = concept.meta("?", (x) ->
                         new AnswerBag(nar, Param.MAX_INPUT_ANSWERS)
                 );
                 answers.commit().putAsync(new PLink<>(twin(this, answer),
@@ -1069,11 +1051,9 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         }
     }
 
-    static long[] range(@Nullable Iterable<Task> ie) {
+    static long[] range(Iterable<Task> ie) {
         long start = Long.MAX_VALUE, end = Long.MIN_VALUE;
-        Iterator<Task> ee = ie.iterator();
-        while (ee.hasNext()) {
-            Task x = ee.next();
+        for (Task x : ie) {
             long s = x.start();
             if (s == ETERNAL)
                 continue; //return Task.ETERNAL_ETERNAL;

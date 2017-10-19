@@ -117,9 +117,6 @@ public abstract class TermVector implements TermContainer {
         return complexity;
     }
 
-    @Override
-    public abstract int subs();
-
     @NotNull
     @Override
     public String toString() {

@@ -57,7 +57,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
         public Term key(PLink<Concept> x) {
             return x.get().term();
         }
-    };
+    }
 
     //final EntryBag active = new EntryBag(PriMerge.replace, activeActive);
     final EntryBag good = new EntryBag(PriMerge.max, activeGood);
@@ -165,7 +165,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
                 Set<Termed> neighbors = new HashSet<>();
 
                 Consumer<PriReference> victimCollector = (k) -> {
-                    Termed t = (Termed) ((PriReference) k).get();
+                    Termed t = (Termed) k.get();
                     if (t != null) {
                         neighbors.add(t);
                     }

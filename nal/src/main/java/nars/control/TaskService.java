@@ -14,9 +14,7 @@ abstract public class TaskService extends NARService implements BiConsumer<NAR, 
     @Override
     protected void start(NAR nar) {
         super.start(nar);
-        ons.add(nar.onTask((t) -> {
-            accept(nar, t);
-        }));
+        ons.add(nar.onTask((t) -> accept(nar, t)));
     }
 
     protected TaskService(@NotNull NAR nar) {

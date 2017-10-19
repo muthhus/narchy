@@ -318,7 +318,8 @@ public class Derivation extends Unify {
 
             long[] beliefStamp = belief.stamp();
             this.overlapDouble =
-                    Util.max(
+                    Util.or(
+                    //Util.max(
                         overlapSingle,
                         Stamp.overlapFraction(taskStamp, beliefStamp),
                         Stamp.cyclicity(beliefStamp)

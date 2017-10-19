@@ -23,18 +23,11 @@ public interface ProtoCompound extends TermContainer {
     /** subterms as an array for construction */
     @Override /*@NotNull*/ Term[] theArray();
 
-    /** number subterms */
-    @Override
-    int subs();
-
     @Override
     boolean equals(Object obj);
 
     @Override
     int hashCode();
-
-    @Override
-    Term sub(int i);
 
     /** since it has potentially any structure... */
     @Override default int structure() {

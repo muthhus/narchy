@@ -382,7 +382,7 @@ public enum TrieDeriver {
 //                    }
 //                }
 //                return true;
-        return t./*filter(x -> !(x instanceof Conclude)).*/map(x -> (PrediTerm<Derivation>) x);
+        return t./*filter(x -> !(x instanceof Conclude)).*/map(x -> x);
     }
 
 

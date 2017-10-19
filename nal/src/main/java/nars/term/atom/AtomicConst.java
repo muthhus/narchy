@@ -59,9 +59,6 @@ public abstract class AtomicConst implements Atomic {
     }
 
     @Override
-    abstract public String toString();
-
-    @Override
     public int complexity() {
         return 1;
     }

@@ -70,9 +70,6 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
     Truth truth(long start, long end, EternalTable eternal, NAR nar);
 
 
-    @Override
-    void clear();
-
     void setCapacity(int temporals);
 
     default Consumer<Task> stretch(SignalTask changed) {

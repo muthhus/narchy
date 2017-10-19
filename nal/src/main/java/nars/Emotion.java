@@ -134,7 +134,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
     public synchronized void cycle() {
 
 
-        _happy = (float) happy.getSum();
+        _happy = happy.getSum();
         happy.clear();
 
         busyVol.clear();
@@ -310,11 +310,11 @@ public class Emotion extends ConcurrentMonitorRegistry {
      */
     public void onInput(Task x, NAR nar) {
 
-            Task t = (Task) x;
+            Task t = x;
             if (t.isCommand())
                 return; //ignore
 
-            float cost = unitize(t.voluplexity()/((float)nar.termVolumeMax.floatValue()))
+            float cost = unitize(t.voluplexity()/ nar.termVolumeMax.floatValue())
                     * t.priElseZero()
             ;
 

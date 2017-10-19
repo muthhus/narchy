@@ -339,7 +339,7 @@ public enum $ {
     }
 
     public static <X> Term[] terms(@NotNull X[] map, @NotNull Function<X, Term> toTerm) {
-        return Stream.of(map).map(toTerm::apply).toArray(Term[]::new);
+        return Stream.of(map).map(toTerm).toArray(Term[]::new);
     }
 
     public static <X> Term seteMap(@NotNull Map<Term, ? extends X> map, @NotNull Function<X, Term> toTerm) {
@@ -839,15 +839,11 @@ public enum $ {
     }
 
     public static <X> PrediTerm<X> AND(PrediTerm<X> a, PrediTerm<X> b) {
-        return new LambdaPred<>($.conj(a, b), (X x) -> {
-            return a.test(x) && b.test(x);
-        });
+        return new LambdaPred<>($.conj(a, b), (X x) -> a.test(x) && b.test(x));
     }
 
     public static <X> PrediTerm<X> OR(PrediTerm<X> a, PrediTerm<X> b) {
-        return new LambdaPred<>($.disj(a, b), (X x) -> {
-            return a.test(x) || b.test(x);
-        });
+        return new LambdaPred<>($.disj(a, b), (X x) -> a.test(x) || b.test(x));
     }
 
     public static int intValue(Term intTerm) throws NumberFormatException {

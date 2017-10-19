@@ -49,7 +49,7 @@ abstract public class Causable extends NARService {
     protected void stop(NAR nar) {
 
         synchronized (nar.can) {
-            boolean removed = nar.can.remove(this);
+            boolean removed = nar.can.remove(can);
         }
 
         super.stop(nar);
@@ -79,7 +79,7 @@ abstract public class Causable extends NARService {
         }
         long end = System.nanoTime();
 
-        can.update(completed, value(), (double) (end - start) / 1.0E9);
+        can.update(completed, value(), (end - start) / 1.0E9);
 
         if (busy != null)
             busy.set(false);

@@ -35,7 +35,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     }
 
     @Nullable
-    protected NALTask generate(Term template, long start, long end, NAR nar) {
+    protected Task generate(Term template, long start, long end, NAR nar) {
 
         template = template(template, start, end, nar);
         if (template == null)

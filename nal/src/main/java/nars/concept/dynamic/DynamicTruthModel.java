@@ -251,7 +251,7 @@ abstract public class DynamicTruthModel {
         @NotNull
         private final Term[] components;
 
-        public Identity(@NotNull Compound proxy, @NotNull Compound base) {
+        public Identity(Compound proxy, Compound base) {
             this.components = new Term[]{base};
         }
 

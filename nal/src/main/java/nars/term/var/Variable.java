@@ -23,15 +23,6 @@ public interface Variable extends Atomic {
      */
     int id();
 
-    @Override
-    int hashCode();
-
-
-    @Override
-    boolean equals(Object o);
-
-
-
 
     @Override
     @Nullable

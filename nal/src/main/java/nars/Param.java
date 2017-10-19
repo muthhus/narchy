@@ -174,7 +174,7 @@ public abstract class Param extends Services<Term,NAR> {
     @Deprecated public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;
 
 
-    public float derivePriority(Task t, @NotNull Derivation d) {
+    public static float derivePriority(Task t, @NotNull Derivation d) {
         //float p = 1f / (1f + ((float)t.complexity())/termVolumeMax.floatValue());
 
         float discount = 1f;
@@ -351,7 +351,7 @@ public abstract class Param extends Services<Term,NAR> {
         //return evi / (1 + ( dt / dur) ); //inverse linear
 
         //use high precision math here
-        double ddt = (double)dt;
+        double ddt = dt;
         return (float) (evi / ( 1.0 + ddt*ddt / dur )); //inverse square
 
         //return evi / Util.sqr( 1f + dt / dur ); //inverse square suck

@@ -832,7 +832,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * registers an operator
      */
     public final void onOp(@NotNull String a, @NotNull BiConsumer<Task, NAR> exe) {
-        onOp(a, (BiFunction<Task, NAR, Task>) (task, nar) -> {
+        onOp(a, (task, nar) -> {
             exe.accept(task, nar);
             return null;
         });
@@ -1334,9 +1334,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public final On onCycle(@NotNull Runnable each) {
-        return onCycle((ignored) -> {
-            each.run();
-        });
+        return onCycle((ignored) -> each.run());
     }
 
     @NotNull
@@ -1427,17 +1425,17 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public @NotNull NAR inputBinary(@NotNull File input) throws IOException, FileNotFoundException {
+    public @NotNull NAR inputBinary(@NotNull File input) throws IOException {
         return inputBinary(new BufferedInputStream(new FileInputStream(input), 64 * 1024));
     }
 
     @NotNull
-    public NAR outputBinary(@NotNull File f, boolean append) throws IOException {
+    public NAR outputBinary(@NotNull File f, boolean append) throws IOException, FileNotFoundException {
         return outputBinary(f, append, t -> t);
     }
 
     @NotNull
-    public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException, FileNotFoundException {
+    public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException {
         FileOutputStream ff = new FileOutputStream(f, append);
         outputBinary(ff, each);
         ff.close();

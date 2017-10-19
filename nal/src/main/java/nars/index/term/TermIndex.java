@@ -172,7 +172,7 @@ public abstract class TermIndex implements TermContext {
 
     private final TermContext intern = new InterningContext();
 
-    private class InterningContext implements CompoundTransform , TermContext {
+    private class InterningContext implements CompoundTransform {
 
         @Override
         public Termed apply(Term x) {

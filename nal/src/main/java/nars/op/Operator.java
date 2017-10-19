@@ -167,9 +167,7 @@ public class Operator extends BaseConcept implements PermanentConcept {
             if (lastActivity == ETERNAL || (now - lastActivity > minPeriod * n.dur()) && rise.compareAndSet(ETERNAL, now)) {
 
 
-                n.runLater(() -> {
-                    invoke(x, n);
-                }); //async exec
+                n.runLater(() -> invoke(x, n)); //async exec
 
                 //invoke(x, n); //inline exec
             }

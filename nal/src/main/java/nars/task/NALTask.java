@@ -10,13 +10,12 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Term;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
+import nars.truth.Truthed;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 import static nars.Op.*;
@@ -42,7 +41,7 @@ public class NALTask extends Pri implements Task {
     public final CompactArrayMap<String,Object> meta = new CompactArrayMap();
 
 
-    public NALTask(Term term, byte punc, @Nullable Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
+    public NALTask(Term term, byte punc, @Nullable Truthed truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
 
         if ((punc == BELIEF) || (punc == GOAL)) {
             if (truth == null)
@@ -243,7 +242,7 @@ public class NALTask extends Pri implements Task {
 //    }
 
     public Task clone(Term x) {
-        NALTask t = new NALTask(x, punc, truth, creation, start(), end(), stamp);
+        Task t = new NALTask(x, punc, truth, creation, start(), end(), stamp);
         t.setPri(this);
         return t;
     }

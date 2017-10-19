@@ -9,7 +9,6 @@ import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.TermLinks;
 import nars.task.NALTask;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Iterator;

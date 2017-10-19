@@ -204,7 +204,7 @@ public final class BudgetFunctions  {
         float priSum = Math.min(maxPri, Pri.sum(src));
         float perSrc = priSum / src.length;
 
-        Pri u = new Pri(0f);
+        Priority u = new Pri(0f);
         for (Priority t : src) {
             u.take(t, perSrc, true, copyOrTransfer);
         }

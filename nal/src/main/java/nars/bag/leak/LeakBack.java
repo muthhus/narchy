@@ -22,7 +22,7 @@ abstract public class LeakBack extends TaskLeak {
         this.out = nar.newCauseChannel(this);
     }
 
-    public void feedback(Task x) {
+    public void feedback(ITask x) {
         out.input(x);
     }
     

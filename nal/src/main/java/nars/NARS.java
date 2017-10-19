@@ -163,9 +163,7 @@ public class NARS {
     }
 
     public NARS nal(int nal) {
-        after.add((x) -> {
-            x.nal(nal);
-        });
+        after.add((x) -> x.nal(nal));
         return this;
     }
 

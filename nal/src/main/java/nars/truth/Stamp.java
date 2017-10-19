@@ -130,7 +130,7 @@ public interface Stamp {
      * TODO refine */
     static float cyclicity(long[] s) {
 
-        return isCyclic(s) ? (float) (0.9f / Math.sqrt(s.length - 1)) : 0;
+        return isCyclic(s) ? (float) (0.95f / Math.sqrt(s.length-1)) : 0;
     }
 
     /*@NotNull*/

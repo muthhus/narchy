@@ -76,33 +76,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         @NotNull Bag<Term, PriReference<Term>> termbag =
                 new CurveBag<>(Param.termlinkMerge, sharedMap, rng, 0);
         @NotNull CurveBag<PriReference<Task>> taskbag =
-                new CurveBag<PriReference<Task>>(Param.tasklinkMerge, sharedMap, rng, 0) {
-                    @Override
-                    public void onRemove(PriReference<Task> value) {
-                        float p = ((PLinkUntilDeleted) value).priBeforeDeletion;
-                        if (p == p) {
-                            // this link was deleted due to the referent being deleted,
-                            // not because the link was deleted.
-                            // so see if a forwarding exists
-
-                            Task x = value.get();
-                            Task px = x;
-                            Task y = null;
-
-                            //TODO maybe a hard limit should be here for safety in case anyone wants to create loops of forwarding tasks
-                            do {
-                                y = x.meta("@");
-                                if (y != null)
-                                    x = y;
-                            } while (y != null);
-
-                            if (x != px && !x.isDeleted()) {
-                                putAsync(new PLinkUntilDeleted<>(x, p));
-                            }
-                        }
-
-                    }
-                };
+                new TaskLinkCurveBag(sharedMap, rng);
 
         return new Bag[]
 
@@ -444,6 +418,38 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public boolean concurrent() {
         return nar.exe.concurrent();
+    }
+
+    private static class TaskLinkCurveBag extends CurveBag<PriReference<Task>> {
+        public TaskLinkCurveBag(Map sharedMap, Random rng) {
+            super(Param.tasklinkMerge, sharedMap, rng, 0);
+        }
+
+        @Override
+        public void onRemove(PriReference<Task> value) {
+            float p = ((PLinkUntilDeleted) value).priBeforeDeletion;
+            if (p == p) {
+                // this link was deleted due to the referent being deleted,
+                // not because the link was deleted.
+                // so see if a forwarding exists
+
+                Task x = value.get();
+                Task px = x;
+                Task y = null;
+
+                //TODO maybe a hard limit should be here for safety in case anyone wants to create loops of forwarding tasks
+                do {
+                    y = x.meta("@");
+                    if (y != null)
+                        x = y;
+                } while (y != null);
+
+                if (x != px && !x.isDeleted()) {
+                    putAsync(new PLinkUntilDeleted<>(x, p));
+                }
+            }
+
+        }
     }
 
     private class MyDefaultHijackBag extends DefaultHijackBag {

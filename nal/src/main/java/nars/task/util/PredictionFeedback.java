@@ -78,7 +78,7 @@ public class PredictionFeedback {
 
                 MetaGoal.learn(MetaGoal.Accurate, y.cause(), v, nar);
 
-                ((NALTask)y).meta("@", x); //in case the task gets deleted, the link will point to the sensor value
+                y.meta("@", x); //in case the task gets deleted, the link will point to the sensor value
 
             } else {
                 //punish

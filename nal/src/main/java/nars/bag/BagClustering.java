@@ -82,7 +82,7 @@ public class BagClustering<X> {
 
     public void print(PrintStream out) {
         forEachCluster(c -> {
-            out.println(c.toString());
+            out.println(c);
             stream(c.id).forEach(i -> {
                 out.print("\t");
                 out.println(i);

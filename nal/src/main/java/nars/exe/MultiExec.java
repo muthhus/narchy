@@ -146,7 +146,7 @@ public class MultiExec extends Exec {
 
         public int work(int conc) {
             int s;
-            float qs = ((ConcurrentQueue) q).size();
+            float qs = q.size();
             if (qs > 0) {
                 s = (int) Math.ceil(qs / Math.max(1, (conc - 1)));
                 for (int i = 0; i < s; i++) {

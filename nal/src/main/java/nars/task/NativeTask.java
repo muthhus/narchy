@@ -45,10 +45,6 @@ public abstract class NativeTask implements ITask {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public @Nullable
-    abstract Iterable<? extends ITask> run(NAR n);
-
     /**
      * wraps a Runnable
      */
@@ -90,7 +86,7 @@ public abstract class NativeTask implements ITask {
 
         @Override
         public String toString() {
-            return "@" + when + ':' + then.toString();
+            return "@" + when + ':' + then;
         }
 
         @Override

@@ -202,12 +202,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 //    }
 
     /**
-     * empties the table, an unindexes them in the NAR
-     */
-    @Override
-    void clear();
-
-    /**
      * estimates the current truth value from the top task, projected to the specified 'when' time;
      * returns null if no evidence is available
      */
@@ -253,15 +247,12 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             if (aProj != null) {
 
                 final Task aa = answer;
-                Task a = Task.tryTask(answer.term(), answer.punc(), aProj, (content, truth) -> {
-                    return new NALTask(
-                            content,
-                            aa.punc(),
-                            truth, now, start, end,
-                            (question != null) ?
-                                    Stamp.zip(aa.stamp(), question.stamp(), 0.5f) : aa.stamp());
-
-                });
+                Task a = Task.tryTask(answer.term(), answer.punc(), aProj, (content, truth) -> new NALTask(
+                        content,
+                        aa.punc(),
+                        truth, now, start, end,
+                        (question != null) ?
+                                Stamp.zip(aa.stamp(), question.stamp(), 0.5f) : aa.stamp()));
                 if (a == null)
                     return null;
 

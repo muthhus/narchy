@@ -21,7 +21,7 @@ final public class TaskPunctuation extends AbstractPred<Derivation> {
 
     TaskPunctuation(byte p, String id) {
         super(id);
-        this.punc = (byte) p;
+        this.punc = p;
     }
 
 

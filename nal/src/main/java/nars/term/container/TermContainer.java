@@ -57,14 +57,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    /**
-     * gets subterm at index i
-     */
-    /*@NotNull*/
-    @Override
-    Term sub(int i);
-
-
     /*@NotNull*/
     default Compound compound(int i) {
         return ((Compound) sub(i));
@@ -151,7 +143,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     default /*@NotNull*/ Set<Term> toSet(Predicate<Term> ifTrue) {
         int s = subs();
         if (s > 0) {
-            UnifiedSet u = new UnifiedSet(s);
+            Set u = new UnifiedSet(s);
             for (int i = 0; i < s; i++) {
                 /*@NotNull*/ Term x = sub(i);
                 if (ifTrue.test(x))

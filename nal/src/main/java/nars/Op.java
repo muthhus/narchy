@@ -596,7 +596,7 @@ public enum Op {
      * bitvector of non-variable terms which can not be part of a goal term
      */
     public static final int NonGoalable = or(IMPL);
-    public static int varBits = Op.or(VAR_PATTERN, VAR_DEP, VAR_QUERY, VAR_INDEP);
+    public static final int varBits = Op.or(VAR_PATTERN, VAR_DEP, VAR_QUERY, VAR_INDEP);
 
 
     public final boolean allowsBool;

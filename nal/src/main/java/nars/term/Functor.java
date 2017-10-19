@@ -98,22 +98,19 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
 
     public static LambdaFunctor r0(@NotNull String termAtom, @NotNull Supplier<Runnable> ff) {
         Atom fName = fName(termAtom);
-        return f0(fName, ()-> {
+        return f0(fName, ()-> new AbstractPred<Object>($.inst( $.quote(Util.uuid64()), fName )) {
 
-            return new AbstractPred<Object>($.inst( $.quote(Util.uuid64()), fName )) {
-
-                @Override
-                public boolean test(Object o) {
-                    try {
-                        Runnable r = ff.get();
-                        r.run();
-                        return true;
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                        return false;
-                    }
+            @Override
+            public boolean test(Object o) {
+                try {
+                    Runnable r = ff.get();
+                    r.run();
+                    return true;
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    return false;
                 }
-            };
+            }
         });
     }
 

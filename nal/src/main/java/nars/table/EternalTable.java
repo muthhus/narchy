@@ -16,7 +16,6 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.BudgetFunctions;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -124,7 +123,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
     @Override
     public void forEachTask(Consumer<? super Task> x) {
-        super.forEach((y) -> {
+        forEach((y) -> {
             if (!y.isDeleted()) x.accept(y);
         });
     }
@@ -278,16 +277,15 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         Truth revisionTruth = conclusion;
         Task prevBelief = oldBelief;
-        Task x = Task.tryTask(t, y.punc(), conclusion, (term, truth) -> {
-            NALTask r = new NALTask(t,
+        Task x = Task.tryTask(t, y.punc(), conclusion, (term, truth) ->
+            new NALTask(t,
                     y.punc(),
                     revisionTruth,
                     nar.time() /* creation time */,
                     ETERNAL, ETERNAL,
                     Stamp.zip(prevBelief.stamp(), y.stamp(), 0.5f /* TODO proportionalize */)
-            );
-            return r;
-        });
+            )
+        );
         if (x!=null) {
             x.setPri(BudgetFunctions.fund(Math.max(prevBelief.priElseZero(), y.priElseZero()), false, prevBelief, y));
             ((NALTask)x).cause = Cause.zip(y, prevBelief);
@@ -341,11 +339,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
 
     @Override
-    public void clear() {
-        synchronized (this) {
-            forEachTask(Task::delete);
-            super.clear();
-        }
+    public synchronized void clear() {
+        forEachTask(Task::delete);
+        super.clear();
     }
 
     @Override

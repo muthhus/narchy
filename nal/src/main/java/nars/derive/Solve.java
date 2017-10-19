@@ -5,6 +5,7 @@ import jcog.pri.Pri;
 import nars.Param;
 import nars.control.Derivation;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
@@ -21,7 +22,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
     private final TruthOperator goal;
     private final boolean beliefProjected;
 
-    Solve(Compound id, TruthOperator belief, TruthOperator goal, boolean beliefProjected) {
+    Solve(Term id, TruthOperator belief, TruthOperator goal, boolean beliefProjected) {
         super(id);
         this.belief = belief;
         this.goal = goal;

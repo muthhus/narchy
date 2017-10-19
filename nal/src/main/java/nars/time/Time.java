@@ -43,12 +43,6 @@ public abstract class Time implements Clock, Serializable {
      */
     public abstract void clear();
 
-    /**
-     * returns the current time, as measured in units determined by this clock
-     */
-    @Override
-    public abstract long now();
-
 
     /** time elapsed since last cycle */
     public abstract long sinceLast();

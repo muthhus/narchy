@@ -79,7 +79,7 @@ public class LinkClustering extends DurService {
      * @param centroids
      * @param capacity
      */
-    public LinkClustering(@NotNull NAR nar, FloatFunction<Task> accept, int centroids, int capacity) {
+    public LinkClustering(@NotNull NAR nar, FloatFunction<Task> accept, int centroids, int capacity, int minConjSize, int maxConjSize) {
         super(nar);
 
         this.accept = accept;

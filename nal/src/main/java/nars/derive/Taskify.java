@@ -93,7 +93,7 @@ public class Taskify extends AbstractPred<Derivation> {
         }
 
 
-        float priority = nar.derivePriority(t, d)
+        float priority = Param.derivePriority(t, d)
                 //* channel.amp()
         ;
 
@@ -105,7 +105,7 @@ public class Taskify extends AbstractPred<Derivation> {
             t.log(rule);
 
         short[] cause = ArrayUtils.addAll(d.parentCause, channel.id);
-        ((DerivedTask)t).cause = cause;
+        t.cause = cause;
 
         if (d.derivations.merge(t, t, DUPLICATE_DERIVATION_MERGE) != t) {
             spam(d, Param.TTL_DERIVE_TASK_REPEAT);
@@ -117,7 +117,7 @@ public class Taskify extends AbstractPred<Derivation> {
     }
 
 
-    private boolean spam(@NotNull Derivation p, int cost) {
+    private static boolean spam(@NotNull Derivation p, int cost) {
         p.use(cost);
         return true; //just does
     }
