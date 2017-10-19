@@ -1,6 +1,6 @@
 package nars.op.java;
 
-import nars.Op;
+import jcog.Util;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.Nullable;
@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface Termizer {
 
+	Term TRUE = Atomic.the("true");
+	Term FALSE = Atomic.the("false");
 	Term VOID = Atomic.the("void");
 	Term EMPTY = Atomic.the("empty");
 	Term NULL = Atomic.the("null");
@@ -20,4 +22,7 @@ public interface Termizer {
 	@Nullable
 	Object object(Term t);
 
+	default Object[] object(Term[] t) {
+		return Util.map(this::object, new Object[t.length], t);
+	}
 }

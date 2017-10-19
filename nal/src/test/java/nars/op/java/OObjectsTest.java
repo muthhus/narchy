@@ -2,8 +2,10 @@ package nars.op.java;
 
 import nars.NAR;
 import nars.NARS;
-import org.jetbrains.annotations.NotNull;
+import nars.Narsese;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class OObjectsTest {
 
@@ -19,16 +21,32 @@ public class OObjectsTest {
         }
     }
 
-    @Test
-    public void testOObjects1() {
-        NAR n = NARS.tmp();
+    final NAR n = NARS.tmp();
 
+    final OObjects objs = new OObjects(n);
+
+    final SimpleClass x = objs.the("x", SimpleClass.class);
+
+    @Test public void testSelfInvocation() throws Narsese.NarseseException {
         n.log();
 
-        OObjects objs = new OObjects(n);
-        SimpleClass x = objs.the("x", SimpleClass.class);
-        System.out.println(x + " " + x.getClass());
+        StringBuilder sb = new StringBuilder();
+        n.onTask(sb::append);
 
+        n.input("SimpleClass(set,x,(1))! :|:");
+        n.run(1);
+        n.run(1);
+
+        n.input("SimpleClass(get,x,(),#y)! :|:");
+        n.run(1);
+        n.run(1);
+
+        assertEquals("",sb.toString());
+
+    }
+
+    @Test public void testExternalInvocation() {
+        n.log();
         n.run(1);
         {
             x.get();
@@ -38,6 +56,5 @@ public class OObjectsTest {
             x.set(1);
         }
         n.run(1);
-
     }
 }

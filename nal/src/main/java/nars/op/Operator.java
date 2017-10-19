@@ -114,17 +114,17 @@ public class Operator extends BaseConcept implements PermanentConcept {
         final BiConsumer<Task, NAR> exe;
 
         public AtomicExec(BiConsumer<Task, NAR> exe, float expThresh) {
-            this(exe, expThresh, 1);
+            this(exe, expThresh, 0);
         }
 
-        public AtomicExec(BiConsumer<Task, NAR> exe, float expThresh, float minPeriod /* dur's */) {
+        public AtomicExec(BiConsumer<Task, NAR> exe, float expThresh, float minRecoveryPeriod /* dur's */) {
             this.exe = exe;
-            this.minPeriod = minPeriod;
+            this.minPeriod = minRecoveryPeriod;
             this.expThresh = expThresh;
         }
 
         @Override
-        public @Nullable Task apply(@NotNull Task x, @NotNull NAR n) {
+        public @Nullable Task apply(Task x, NAR n) {
 
             long now = n.time();
             int dur = n.dur();

@@ -1,28 +1,46 @@
 package nars.op.java;
 
+import com.google.common.primitives.Primitives;
+import com.google.common.reflect.Invokable;
+import com.google.common.reflect.TypeToken;
+import javassist.tools.reflect.Reflection;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 import javassist.util.proxy.ProxyObject;
+import jcog.Util;
 import jcog.map.CustomConcurrentHashMap;
 import nars.$;
 import nars.NAR;
 import nars.Task;
+import nars.op.Operator;
+import nars.task.NALTask;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import nars.time.Tense;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.platform.commons.support.ReflectionSupport;
+import org.junit.platform.commons.util.ReflectionUtils;
 
+import javax.script.Invocable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 import static jcog.map.CustomConcurrentHashMap.*;
+import static nars.Op.ATOM;
+import static nars.Op.VAR_DEP;
 
 
 /**
@@ -49,7 +67,9 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
             "equals"
     );
 
-    static final Map<Class, ProxyFactory> proxyCache = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, IDENTITY, 64);
+    static final Map<Class, Class> proxyCache = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, IDENTITY, 64);
+    final static Map<Term, Method> methodCache = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, IDENTITY, 64); //cache: (class,method) -> Method
+    public static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 
     //final Map<Class, ClassOperator> classOps = Global.newHashMap();
     //final Map<Method, MethodOperator> methodOps = Global.newHashMap();
@@ -68,6 +88,7 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
     private final float metadataBeliefConf = 0.99f;
     private final float metadataPriority = 0.1f;
 
+    final static ThreadLocal<Task> invokingGoal = new ThreadLocal<>();
 
     public OObjects(NAR n) {
         nar = n;
@@ -84,8 +105,6 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
         return $.func((Atomic) $.the(c.getSimpleName()), args);
     }
 
-    //final AtomicBoolean lock = new AtomicBoolean(false);
-
     public static boolean isMethodVisible(Method m) {
         String n = m.getName();
         return !methodExclusions.contains(n) &&
@@ -97,16 +116,6 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
     }
 
 
-//    /** when a proxy wrapped instance method is called, this can
-//     *  parametrically intercept arguments and return value
-//     *  and input them to the NAL in narsese.
-//     */
-//    @Override
-//    public Object invoke(Object object, Method overridden, Method forwarder, Object[] args) throws Throwable {
-//        Object result = forwarder.invoke(object, args);
-//        return invoked( object, overridden, args, result);
-//    }
-
     @Override
     protected Term classInPackage(Term classs, Term packagge) {
         Term t = $.inst(classs, packagge);
@@ -116,21 +125,6 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
         return t;
     }
 
-//    @Override
-//    protected void onInstanceOfClass(Object o, Term oterm, Term clas) {
-//        /** only point to type if non-numeric? */
-//        //if (!Primitives.isWrapperType(instance.getClass()))
-//
-//        //nar.believe(Instance.make(oterm, clas));
-//    }
-
-//    protected void onInstanceOfClass(Term identifier, Term clas) {
-////        if (metadata) {
-////            nar.believe(metadataPriority, $.inst(identifier, clas),
-////                    Tense.ETERNAL,
-////                    metadataBeliefFreq, metadataBeliefConf);
-////        }
-//    }
 
     @Override
     protected void onInstanceChange(Term oterm, Term prevOterm) {
@@ -144,10 +138,9 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
     }
 
 
-    @Nullable Task externallyInvoked(@NotNull Object instance, @NotNull Method method, @NotNull Object[] args, Object result) {
+    @Nullable Task feedback(@NotNull Object instance, @NotNull Method method, @NotNull Object[] args, Object result) {
         if (methodExclusions.contains(method.getName()))
             return null;
-
 
         Term op = operation(method, getMethodInvocationTerms(method, instance, args, result));
 
@@ -166,8 +159,8 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
         boolean isVoid = method.getReturnType() == void.class;
 
         Term[] x = new Term[isVoid ? 3 : 4];
-        x[0] = $.the(method.getName());
         x[1] = term(instance);
+        x[0] = $.the(method.getName());
         x[2] = $.p(terms(args));
         if (!isVoid)
             x[3] = term(result);
@@ -179,41 +172,27 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
         //TODO use direct array creation, not Stream
         return Stream.of(args).map(this::term).toArray(Term[]::new);
     }
-//
-//    public NALProxyMethodHandler(NAR n /* options */) {
-//
-//    }
-    //    private final List<NALObjMethodHandler> methodHandlers = Global.newArrayList();
-//
-//    public NALObject() {
-//    }
-//
-//    public NALObject add(NALObjMethodHandler n) {
-//        methodHandlers.add(n);
-//        return this;
-//    }
-//
 
-//    @NotNull public <T> T theOrNull(String id, @NotNull Class<? extends T> instance, Object... args)  {
-//        try {
-//            return the(id, instance, args);
-//        } catch (Exception e) {
-//            return null;
-//        }
-//    }
+    private Term[] terms(TermContainer args) {
+        //TODO use direct array creation, not Stream
+        return Stream.of(args).map(this::term).toArray(Term[]::new);
+    }
 
     /**
      * creates a new instance to be managed by this
      */
     @NotNull
     public <T> T the(String id, Class<? extends T> instance, Object... args) {
-        ProxyFactory factory = proxyCache.computeIfAbsent(instance, (c) -> {
+        Class clazz = proxyCache.computeIfAbsent(instance, (c) -> {
             ProxyFactory p = new ProxyFactory();
             p.setSuperclass(c);
-            return p;
+
+            String opName = c.getSimpleName();
+            nar.onOp(opName, new Operator.AtomicExec(operator(c), 0.5f));
+
+            return p.createClass();
         });
 
-        Class clazz = factory.createClass();
 
         try {
             return the((Atom) $.the(id), (T) clazz.getConstructors()[0].newInstance(args));
@@ -223,56 +202,95 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
     }
 
 
-    @Nullable
-    public Object invokeVolition(Method method, Object instance, Object[] args) throws InvocationTargetException, IllegalAccessException {
-        return method.invoke(instance, args);
+    private BiConsumer<Task, NAR> operator(Class c) {
+        return (task, n) -> {
+            TermContainer args = Operator.args(task);
+            int a = args.subs();
+            if (!(a == 3 || (a == 4 && args.sub(3).op() == VAR_DEP))) {
+                //this is likely a goal from the NAR to itself about a desired result state
+                //used during reasoning
+                //anyway it is invalid for invocation (u
+                return;
+            }
+
+            Term method = args.sub(0);
+            if (method.op() != ATOM)
+                return;
+
+            Term instance = args.sub(1);
+            Object inst = instances.get(instance);
+            if (inst == null)
+                return;
+
+            Term methodArgs = args.sub(2);
+            int m = methodArgs.subs();
+            String methodName = method.toString();
+            MethodHandle mm;
+            Object[] orgs;
+            if (m == 0) {
+                mm = method(inst, c, methodName, ArrayUtils.EMPTY_CLASS_ARRAY);
+                if (mm == null)
+                    return;
+                orgs = ArrayUtils.EMPTY_OBJECT_ARRAY;
+            } else {
+                orgs = object(methodArgs.subterms().theArray());
+
+                Class[] types = Util.map(x -> Primitives.unwrap(x.getClass()),
+                        new Class[orgs.length], orgs);
+                mm = method(inst, c, methodName, types);
+                if (mm == null)
+                    return;
+            }
+
+            invokingGoal.set(task);
+            try {
+                mm.bindTo(inst).invokeWithArguments(orgs);
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            } finally {
+                invokingGoal.set(null);
+            }
+
+        };
+    }
+
+    final static Class[] RETURN_TYPES = {Object.class, void.class, int.class};
+
+    private MethodHandle method(Object inst, Class c, String methodName, Class<?>[] types) {
+        try {
+            Method m = ReflectionUtils.findMethod(c, methodName, types).orElse(null);
+            //Method m = ReflectionSupport.findMethod(c, methodName, types).orElse(null);
+            if (m == null)
+                return null;
+            m.trySetAccessible();
+            return MethodHandles.lookup().unreflect(m);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
-//    final class DelegateHandler<X> implements MethodHandler {
-//
-//        private final X obj;
-//
-//        public DelegateHandler(X n) {
-//            this.obj = n;
-//        }
-//
-//        @Override public final Object invoke(Object o, Method method, Method method1, Object[] objects) throws Throwable {
-//            final X obj = this.obj;
-//            Object result = method.invoke(obj, objects);
-//            return invoked( obj, method, objects, result);
-//        }
-//    }
-
-    final static ThreadLocal<Task> invokingGoal = new ThreadLocal<>();
 
     @Nullable
     @Override
-    public final Object invoke(@NotNull Object obj, @NotNull Method wrapped, @NotNull Method wrapper, @NotNull Object[] args) throws Throwable {
-
+    public final Object invoke(Object obj, Method wrapped, Method wrapper, Object[] args) throws Throwable {
 
         Object result = wrapper.invoke(obj, args);
 
         if (methodExclusions.contains(wrapped.getName()))
             return result; //pass-through
 
+        Task fb = feedback(obj, wrapped, args, result);
 
-        Task fb = invokingGoal.get();
-
-        if (fb == null) {
-            fb = externallyInvoked(obj, wrapped, args, result);
+        Task cause = invokingGoal.get();
+        if (cause != null) {
+            ((NALTask) fb).causeMerge(cause);
+            ((NALTask) fb).priMax(cause.priElseZero());
         }
 
-//            if (invokingGoal == null) {
-        //just execute it
-//                resultwrapper.invoke(obj, args);
-//            } else {
-//                MethodOperator.setCurrentTask(invokingGoal);
-//            }
-
-        if (fb!=null)
+        if (fb != null)
             nar.input(fb);
-
 
         return result;
     }

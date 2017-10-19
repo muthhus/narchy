@@ -5,6 +5,7 @@ import nars.$;
 import nars.Op;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.term.atom.Int;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.bimap.MutableBiMap;
 import org.eclipse.collections.impl.bimap.mutable.HashBiMap;
@@ -69,6 +70,8 @@ public class DefaultTermizer implements Termizer {
     @Override public Object object(Term t) {
 
         if (t == NULL) return null;
+        if (t instanceof Int)
+            return ((Int)t).id;
 
         Object x = instances.get(t);
         if (x == null)
@@ -91,7 +94,7 @@ public class DefaultTermizer implements Termizer {
             return $.quote(o);
 
         if (o instanceof Boolean)
-            return ((Boolean) o) ? Op.True : Op.False;
+            return ((Boolean) o) ? Termizer.TRUE : Termizer.FALSE ;
 
         if (o instanceof Character)
             return $.quote(String.valueOf(o));
@@ -130,10 +133,7 @@ public class DefaultTermizer implements Termizer {
         }
 
         if (o instanceof int[]) {
-            List<Term> arg = Arrays.stream((int[]) o)
-                    .mapToObj($::the).collect(Collectors.toList());
-            if (arg.isEmpty()) return EMPTY;
-            return $.p( arg );
+            return $.p( (int[])o );
         }
 
         //noinspection IfStatementWithTooManyBranches
@@ -307,7 +307,7 @@ public class DefaultTermizer implements Termizer {
     }
 
     /** generic instance term representation */
-    public static Term instanceTerm(@NotNull Object o) {
+    public static Term instanceTerm(Object o) {
         //return o.getClass().getName() + '@' + Integer.toHexString(o.hashCode());
         //return o.getClass() + "_" + System.identityHashCode(o)
 
@@ -379,6 +379,7 @@ public class DefaultTermizer implements Termizer {
         if (o == null) return NULL;
         if (o instanceof Term)
             return ((Term)o);
+
 
         Term oe;
         if (cacheableInstance(o)) {
