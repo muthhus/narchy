@@ -19,7 +19,7 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
-    float fwdSpeed = 2;
+    float fwdSpeed = 6;
     float rotSpeed = 0.05f;
 
     public static void main(String[] args) {
@@ -90,9 +90,9 @@ public class FZero extends NAgentX {
 //            }
 //        });
 
-        //senseNumberDifference($.inh(the("joy"), id), happy).resolution.setValue(0.02f);
-//        senseNumberDifference($.prop(the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.02f);
-//        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
+//        senseNumberDifference($.inh(the("joy"), id), happy).resolution.setValue(0.02f);
+        senseNumberDifference($.inh($.the("angVel"), id), () -> (float) fz.playerAngle).resolution(0.02f);
+        senseNumberDifference($.inh($.the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution(0.02f);
         @NotNull ScalarConcepts ang = senseNumber($.the("ang"), () ->
                         (float) (0.5f + 0.5f * MathUtils.normalizeAngle(fz.playerAngle, 0) / (Math.PI)),
                 5,

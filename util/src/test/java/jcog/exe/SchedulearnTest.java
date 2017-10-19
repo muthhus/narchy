@@ -18,9 +18,9 @@ public class SchedulearnTest {
 
         a.update(1, 0.5f, 1f);
         b.update(20, 5f, 2f);
-        c.update(20, 5f, 3f); //same as 'a' but bigger observed supply
+        c.update(20, 5f, 4f); //same as 'a' but bigger observed supply
 
-        float timeSlice = 10f;
+        float timeSlice =6f;
 
         Schedulearn s = new Schedulearn();
         s.solve(List.of(a, b, c), timeSlice);
@@ -37,7 +37,7 @@ public class SchedulearnTest {
         assertTrue(a.iterations() > a.supply());
 
         double te = Schedulearn.estimatedTimeTotal(List.of(a, b, c));
-        assertEquals(te, timeSlice, timeSlice/4f /* within 25% of the target */);
+        assertEquals(te, timeSlice, timeSlice/3f /* within a value near the target */);
 
     }
 }

@@ -151,7 +151,7 @@ public class TemporalTermTest {
     public void testAtemporalization() throws Narsese.NarseseException {
         Term t = $.$("((x) ==>+10 (y))");
         Concept c = n.conceptualize(t);
-        assertEquals("((x) ==>+- (y))", c.toString());
+        assertEquals("((x) ==> (y))", c.toString());
     }
 
     @Test
@@ -529,14 +529,14 @@ public class TemporalTermTest {
         Term t = $("(x==>y)");
         Term x = t.root();
         assertEquals(XTERNAL, x.dt());
-        assertEquals("(x ==>+- y)", x.toString());
+        assertEquals("(x ==> y)", x.toString());
 
         n.input("(x ==>+0 y).", "(x ==>+1 y).").run(2);
 
         BaseConcept xImplY = (BaseConcept) n.conceptualize(t);
         assertNotNull(xImplY);
 
-        assertEquals("(x ==>+- y)", xImplY.toString());
+        assertEquals("(x ==> y)", xImplY.toString());
 
         assertEquals(3, xImplY.beliefs().size());
 
@@ -930,7 +930,7 @@ public class TemporalTermTest {
     @Test
     public void testConceptual2b() throws Narsese.NarseseException {
         assertConceptual(
-                "(((--,(happy &&+- vy)) &&+- (happy &&+- vy)) ==>+- ((--,(happy &&+- vy)) &&+- (--,vx)))",
+                "(((--,(happy &&+- vy)) &&+- (happy &&+- vy)) ==> ((--,(happy &&+- vy)) &&+- (--,vx)))",
                 "(((--,(vy &&+84 happy))&&(happy&|vy)) ==>+84 ((--,vx) &&+21 (--,(happy &&+146 vy))))");
     }
 

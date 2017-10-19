@@ -10,16 +10,8 @@ import org.junit.Test;
 //@RunWith(Parameterized.class)
 public class NAL2Test extends AbstractNALTest {
 
-//    public NAL2Test(Supplier<NAR> b) {
-//        super(b);
-//    }
+    static final int cycles = 50;
 
-    static final int cycles = 200;
-
-//    @Parameterized.Parameters(name = "{0}")
-//    public static Iterable<Supplier<NAR>> configurations() {
-//        return AbstractNALTest.nars(2);
-//    }
 
     @Override protected NAR nar() { return NARS.tmp(3); }
 

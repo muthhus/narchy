@@ -50,7 +50,7 @@ public class Schedulearn {
             Arrays.fill(v, 0.5f);
         }
 
-        float base = 0.5f/canSize;
+        float base = 1/(canSize*canSize); //HEURISTIC
         for (int i = 0; i < canSize; i++) {
             v[i] = base + (v[i] - minValue) / range;
             totalValue += v[i];

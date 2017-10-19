@@ -217,12 +217,12 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
                 //GL_FASTEST);
 
         //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
-//        gl.glColorMaterial(GL_FRONT_AND_BACK,
-//                GL_AMBIENT_AND_DIFFUSE
-//                //GL_DIFFUSE
-//        );
-//        gl.glEnable(GL_COLOR_MATERIAL);
-//        gl.glEnable(GL_NORMALIZE);
+        gl.glColorMaterial(GL_FRONT_AND_BACK,
+                GL_AMBIENT_AND_DIFFUSE
+                //GL_DIFFUSE
+        );
+        gl.glEnable(GL_COLOR_MATERIAL);
+        //gl.glEnable(GL_NORMALIZE);
 
         //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, new float[] { 1, 1, 1, 1 }, 0);
         //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, new float[] { 0, 0, 0, 0 }, 0);

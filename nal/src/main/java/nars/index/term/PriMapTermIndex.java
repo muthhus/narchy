@@ -40,7 +40,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
 
     final int activeActive = 64;
     final int activeGood = 64;
-    final int activeBad = 64;
+    final int activeBad = 256;
 
     static class EntryBag extends ConcurrentArrayBag<Term,PLink<Concept>> {
 
@@ -95,7 +95,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
 
                 if (strength > 0) {
 
-                    if (strength > 0.99f) {
+                    if (strength > 0.9f) {
                         System.gc();
                     }
 

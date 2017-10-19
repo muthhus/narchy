@@ -152,7 +152,7 @@ public class ActivateTest {
     @Test
     public void testTemplatesWithDepVar() throws Narsese.NarseseException {
         testTemplates("(x --> #1)",
-                "[(x-->#1), x, #1]");
+                "[(x-->#1), x]");
     }
 
     @Test

@@ -111,8 +111,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 int s = size;
 
                 //TODO can be accelerated by batch remove operation
+                Task x = strongest();
                 while (c < s--) {
-                    removeLast().delete();
+                    ((NALTask)removeLast()).delete(x);
                 }
 
                 resize(c);
@@ -190,10 +191,10 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 //    }
 
     @Deprecated
-    static void removeTask(/*@NotNull*/ Task t, @Nullable String reason) {
+    void removeTask(/*@NotNull*/ Task t, @Nullable String reason) {
 //        if (reason!=null && Param.DEBUG && t instanceof MutableTask)
 //            ((MutableTask)t).log(reason);
-        t.delete();
+        ((NALTask)t).delete(strongest());
     }
 
     /**
@@ -294,8 +295,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             if (Param.DEBUG)
                 x.log("Insertion Revision");
 
-            ((NALTask)y).delete(x);
-            ((NALTask)prevBelief).delete(x);
+//            ((NALTask)y).meta("@",x);
+//            ((NALTask)prevBelief).meta("@",x);
 
         }
 

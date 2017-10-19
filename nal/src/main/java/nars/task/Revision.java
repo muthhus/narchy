@@ -388,7 +388,7 @@ public class Revision {
         if (maxEviAB < evi + Pri.EPSILON) {
             //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
             //TODO weight the contributed overlap amount by the relative confidence provided by each task
-            float overlapDiscount = Stamp.overlapFraction(a.stamp(), b.stamp()) / 2;
+            float overlapDiscount = Stamp.overlapFraction(a.stamp(), b.stamp());
             //        factor *= overlapDiscount;
             //        if (factor < Prioritized.EPSILON) return null;
 
@@ -401,8 +401,8 @@ public class Revision {
         }
 
 
-        Truth newTruth1 = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), confMin, 1);
-        if (newTruth1 == null)
+        Truth finalTruth = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), confMin, 1);
+        if (finalTruth == null)
             return null;
 
 
@@ -461,7 +461,7 @@ public class Revision {
                 assert (cc.isNormalized());
 
                 if (ccp.getTwo())
-                    newTruth1 = newTruth1.neg();
+                    finalTruth = finalTruth.neg();
                 break;
             }
         }
@@ -486,11 +486,17 @@ public class Revision {
 //        }
 
 
+        if (equivalent(a, finalTruth, start, end, cc, nar))
+            return a;
+        if (equivalent(b, finalTruth, start, end, cc, nar))
+            return b;
+
         NALTask t = new NALTask(cc, a.punc(),
-                newTruth1,
+                finalTruth,
                 now, start, end,
                 Stamp.zip(a.stamp(), b.stamp(), aProp) //get a stamp collecting all evidence from the table, since it all contributes to the result
         );
+
         t.setPri(Util.lerp(aProp, b.priElseZero(), a.priElseZero()));
 
         //t.setPri(a.priElseZero() + b.priElseZero());
@@ -500,6 +506,15 @@ public class Revision {
         if (Param.DEBUG)
             t.log("Revection Merge");
         return t;
+    }
+
+    public static boolean equivalent(Task input, Truth output, long start, long end, Term cc, NAR nar) {
+        Truth bt = input.truth();
+        if (input.conf() >= output.conf() && Util.equals(input.freq(),output.freq(), nar.truthResolution.asFloat())) {
+            if (cc.equals(input.term()) && start == input.start() && end == input.end())
+                return true;
+        }
+        return false;
     }
 
 

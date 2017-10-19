@@ -193,7 +193,7 @@ public class NALTask extends Pri implements Task {
         return false;
     }
 
-    public boolean delete(Task forwardTo) {
+    public boolean delete(@NotNull Task forwardTo) {
         if (super.delete()) {
             if (Param.DEBUG)
                 meta.put("@", forwardTo);

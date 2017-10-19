@@ -2,6 +2,7 @@ package nars.table;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
+import jcog.Util;
 import jcog.pri.Prioritized;
 import jcog.sort.TopN;
 import jcog.tree.rtree.*;
@@ -207,10 +208,20 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                         return b;
                 }
 
+                if (Util.equals(a.freq(), b.freq(), nar.truthResolution.asFloat())) {
+                    return a; //has higher relevance
+                }
 
                 //otherwise interpolate
                 Task c = Revision.merge(a, b, start, nar);
+
+
                 if (c != null) {
+
+                    if (c.equals(a))
+                        return a;
+                    if (c.equals(b))
+                        return b;
 
                     int dur = nar.dur();
                     if (c.evi(start, end, dur) > a.evi(start, end, dur))
@@ -490,7 +501,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             Task bt = b.task();
 
             Task c = Revision.merge(at, bt, nar.time(), nar);
-            if (c != null) {
+            if (c != null && !c.equals(a) && !c.equals(b)) {
 
                 boolean allowMerge;
 
@@ -504,13 +515,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
                 if (allowMerge) {
 
-                    changes.put(c, true);
-
                     treeRW.remove(bt);
                     changes.put(bt, false);
 
                     ((NALTask)at).delete(c); //forward
                     ((NALTask)bt).delete(c); //forward
+
+                    changes.put(c, true); //but dont add it now, because it may be for another concept
 
                     return true;
                 } else {
@@ -526,7 +537,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         else
             ((NALTask)at).delete();
 
-        return false;
+        return true;
     }
 
 

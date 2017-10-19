@@ -451,9 +451,12 @@ public interface NAct {
 //                float conf = ((y == y) && (eviSum > Pri.EPSILON)) ?
 //                            w2c(eviSum) : 0;
 
+                boolean weak = eviSum < Pri.EPSILON || w2c(eviSum) < confMin;
+
                 if (y == y) {
                     float yf = (y / 2f)+0.5f; //0..+1
-                    float confFeedback = confBase;
+
+                    float confFeedback = Math.max(confMin, weak ? 0 : w2c(eviSum / 2f));
                     P = $.t(yf, confFeedback);
                     N = $.t(1-yf, confFeedback);
                 } else {
@@ -464,12 +467,12 @@ public interface NAct {
 
                 PreciseTruth pb = P;
                 PreciseTruth pg =
-                        curious && y==y ? $.t(y >= 0 ? 1 : 0, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
+                        y==y && (curious || weak) ? $.t(y >= 0 ? 1 : 0, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
                         //null;
                 CC[0].feedback(pb, pg, n);
                 PreciseTruth nb = N;
                 PreciseTruth ng =
-                        curious && y==y  ? $.t(y >= 0 ? 0 : 1, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
+                        y==y && (curious || weak)  ? $.t(y >= 0 ? 0 : 1, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
                         //null;
                 CC[1].feedback(nb, ng, n);
 
