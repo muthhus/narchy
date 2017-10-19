@@ -14,7 +14,6 @@ import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -63,9 +62,12 @@ public class Operator extends BaseConcept implements PermanentConcept {
     }
 
     public static Task error(Task x, Throwable error, long when) {
-        StringWriter ss = new StringWriter();
-        ExceptionUtils.printRootCauseStackTrace(error, new PrintWriter(ss));
-        return Operator.command("error", when, $.quote(x.toString()), $.quote(ss.toString()));
+        //StringWriter ss = new StringWriter();
+        //ExceptionUtils.printRootCauseStackTrace(error, new PrintWriter(ss));
+        return Operator.command("error", when, $.quote(x.toString()),
+                //$.quote(ss.toString())
+                $.quote(error.getMessage())
+        );
     }
 
 

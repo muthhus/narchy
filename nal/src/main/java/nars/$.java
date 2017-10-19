@@ -163,10 +163,6 @@ public enum $ {
         return INH.the($.p(arg), opTerm);
     }
 
-    @NotNull
-    public static Term func(@NotNull Atomic opTerm, @NotNull Collection<Term> arg) {
-        return INH.the($.p(arg), opTerm);
-    }
 
 
     @NotNull

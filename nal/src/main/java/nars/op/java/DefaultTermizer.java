@@ -2,6 +2,7 @@ package nars.op.java;
 
 import com.google.common.collect.ImmutableSet;
 import nars.$;
+import nars.Op;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
@@ -55,8 +56,8 @@ public class DefaultTermizer implements Termizer {
 
     public DefaultTermizer() {
         map(NULL, null);
-        map(TRUE, true);
-        map(FALSE, false);
+        map(Op.True, true);
+        map(Op.False, false);
     }
 
     public void map(Term x, Object y) {
@@ -90,7 +91,7 @@ public class DefaultTermizer implements Termizer {
             return $.quote(o);
 
         if (o instanceof Boolean)
-            return ((Boolean) o) ? TRUE : FALSE;
+            return ((Boolean) o) ? Op.True : Op.False;
 
         if (o instanceof Character)
             return $.quote(String.valueOf(o));
@@ -325,7 +326,7 @@ public class DefaultTermizer implements Termizer {
     }
 
     @Nullable
-    protected Term termClassInPackage(Term classs, @Deprecated Term packagge) {
+    protected Term classInPackage(Term classs, @Deprecated Term packagge) {
         //TODO ??
         return null;
     }

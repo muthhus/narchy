@@ -14,12 +14,12 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static jcog.Util.unitize;
 import static nars.Op.*;
@@ -48,7 +48,7 @@ public abstract class Param extends Services<Term,NAR> {
      * true: dt values will be interpolated
      * false: dt values will be chosen by weighted random decision
      * */
-    public final MutableBoolean dtMergeOrChoose = new MutableBoolean(false);
+    public final AtomicBoolean dtMergeOrChoose = new AtomicBoolean(false);
 
     /** how many INT terms are canonically interned/cached. [0..n) */
     public final static int MAX_CACHED_INTS = 64;

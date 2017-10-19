@@ -304,7 +304,7 @@ public class Revision {
      * a is left aligned, dt is any temporal shift between where the terms exist in the callee's context
      */
     public static Term intermpolate(/*@NotNull*/ Term a, long dt, /*@NotNull*/ Term b, float aProp, NAR nar) {
-        return intermpolate(a, dt, b, aProp, 1, nar.random(), nar.dtMergeOrChoose.booleanValue());
+        return intermpolate(a, dt, b, aProp, 1, nar.random(), nar.dtMergeOrChoose.get());
     }
 
 

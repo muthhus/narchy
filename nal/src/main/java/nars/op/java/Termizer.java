@@ -1,5 +1,6 @@
 package nars.op.java;
 
+import nars.Op;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.Nullable;
@@ -9,15 +10,13 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface Termizer {
 
-	Atomic TRUE = Atomic.the("true");
-	@Nullable
-	Term FALSE = TRUE.neg();
-    Atomic VOID = Atomic.the("void");
-	Atomic EMPTY = Atomic.the("empty");
-	Atomic NULL = Atomic.the("null");
+	Term VOID = Atomic.the("void");
+	Term EMPTY = Atomic.the("empty");
+	Term NULL = Atomic.the("null");
 
 	@Nullable
 	Term term(Object o);
+
 	@Nullable
 	Object object(Term t);
 

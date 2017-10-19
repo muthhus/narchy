@@ -363,7 +363,7 @@ public class RevisionTest {
     private Set<Term> permutations(Term a, Term b) {
 
         NAR s = NARS.shell();
-        s.dtMergeOrChoose.setValue(false);
+        s.dtMergeOrChoose.set(false);
 
         assertTrue(a.conceptual().equals(b.conceptual()));
 

@@ -323,7 +323,7 @@ public class RevectionTest {
         //          :)
 
         NAR s = NARS.shell();
-        s.dtMergeOrChoose.setValue(false);
+        s.dtMergeOrChoose.set(false);
 
         Term a = $.$("(((--,(dx-->noid)) &&+4 ((--,(by-->noid))&|(happy-->noid))) &&+11 (bx-->noid))");
         Term b = $.$("(((bx-->noid) &&+7 (--,(dx-->noid))) &&+4 ((--,(by-->noid))&|(happy-->noid)))");
