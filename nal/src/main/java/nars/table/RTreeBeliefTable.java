@@ -175,8 +175,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         assert (end >= start);
 
         FloatFunction<Task> ts =
-                //(template != null && template.isTemporal()) ?
-                    //taskStrength(template, start, end) :
+                (template != null && template.isTemporal()) ?
+                    taskStrength(template, start, end) :
                 taskStrength(start, end);
 
         FloatFunction<TaskRegion> strongestTask =

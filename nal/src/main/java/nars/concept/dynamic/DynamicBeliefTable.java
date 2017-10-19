@@ -50,7 +50,12 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public Truth truth(long start, long end, NAR nar) {
-        DynTruth d = truth(start, end, template(term, start, end, nar), false, nar);
+        Term t = template(term, start, end, nar);
+        if (t == null)
+            return null;
+
+
+        DynTruth d = truth(start, end, t, false, nar);
         return Truth.maxConf(d != null ? d.truth() : null,
                 super.truth(start, end, nar) /* includes only non-dynamic beliefs */);
     }
@@ -61,20 +66,38 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             int newDT = matchDT(template, start, end);
             template = template.dt(newDT);
         }
-        @Nullable Term t2 = template.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
-        if (t2 == null) {
-            //for some reason, retemporalizing to DTERNAL failed (ex: conj collision)
-            //so as a backup plan, use dt=+/-1
-            int dur = nar.dur();
-            Random rng = nar.random();
-            t2 = template.temporalize(new Retemporalize.RetemporalizeFromToFunc(XTERNAL,
-                    () -> rng.nextBoolean() ? +dur : -dur));
+
+        //still XTERNAL ? try using start..end as a dt
+        if (template.dt() == XTERNAL) {
+            template = template.dt((int) (end-start));
         }
-//        if (t2!=null && t2.dt()==XTERNAL) {
-//            return template(t2, start, end ,nar);//temporary
-//            //throw new RuntimeException("wtf xternal");
+
+        template = template.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
+        if (template == null)
+            return null;
+
+        if (!template.conceptual().equals(term))
+            return null; //doesnt correspond to this concept anyway
+
+        return template;
+
+//        if (t2 == null) {
+//
+//
+//
+//            //for some reason, retemporalizing to DTERNAL failed (ex: conj collision)
+//            //so as a backup plan, use dt=+/-1
+//            int dur = nar.dur();
+//            Random rng = nar.random();
+//            t2 = template.temporalize(new Retemporalize.RetemporalizeFromToFunc(XTERNAL,
+//                    () -> rng.nextBoolean() ? +dur : -dur));
 //        }
-        return t2;
+////        if (t2!=null && t2.dt()==XTERNAL) {
+////            return template(t2, start, end ,nar);//temporary
+////            //throw new RuntimeException("wtf xternal");
+////        }
+//
+//        return t2;
     }
 
 

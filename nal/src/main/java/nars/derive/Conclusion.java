@@ -103,10 +103,12 @@ public final class Conclusion extends AbstractPred<Derivation> {
             if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
 
         } else {
-            c2 = c1.temporalize(Retemporalize.retemporalizeAllToDTERNAL);
-            if (c2 == null)
-                return false;
+            c2 = c1;
         }
+
+        c2 = c2.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
+        if (c2 == null)
+            return false;
 
         c2 = c2.normalize();
         if (c2 == null)

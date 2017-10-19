@@ -32,8 +32,6 @@ UIFiles
 jmh-result.text
 .gradle/
 gradle/
-gradlew
-gradlew.bat
 
 nal/tree.xml
 nal/vis.xml
