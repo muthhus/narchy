@@ -36,7 +36,7 @@ public class MIDI {
 
     public MIDI() throws LineUnavailableException {
         NAR nar = NARS.threadSafe();
-        nar.termVolumeMax.setValue(16);
+        nar.termVolumeMax.set(16);
 
         Param.DEBUG = true;
         nar.onTask(t -> {

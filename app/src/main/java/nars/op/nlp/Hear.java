@@ -9,7 +9,7 @@ import nars.concept.Concept;
 import nars.op.Operator;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -152,7 +152,7 @@ public class Hear extends Loop {
                 enWiki.setMaxLag(-1);
 
                 String html = enWiki.getRenderedText(page);
-                html = StringEscapeUtils.unescapeHtml4(html);
+                html = StringEscapeUtils.unescapeHtml(html);
                 String strippedText = html.replaceAll("(?s)<[^>]*>(\\s*<[^>]*>)*", " ").toLowerCase();
 
                 //System.out.println(strippedText);

@@ -84,7 +84,6 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
-        assert (this != t);
         return inSubtermsOf.test(this) && subterms().containsRecursively(t, inSubtermsOf);
     }
 

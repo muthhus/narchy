@@ -113,6 +113,13 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
+    @SinglePremise
+    Identity() {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return TruthOperator.identity(T, minConf);
+        }
+    },
 
 //    @AllowOverlap @SinglePremise
 //    StructuralStrongNeg() {

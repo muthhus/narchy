@@ -36,7 +36,6 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
     private static final Pattern ruleImpl = Pattern.compile("\\|\\-");
 
-//    private final boolean permuteBackwards, permuteForwards;
     private final NAR nar;
 
     @NotNull

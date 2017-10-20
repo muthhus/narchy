@@ -63,11 +63,10 @@ public final class Conclude {
 
     public static void match(final PremiseRule rule, List<PrediTerm<Derivation>> pre, List<PrediTerm<Derivation>> post, @NotNull SortedSet<MatchConstraint> constraints, PatternIndex index, NAR nar) {
 
+        PrediTerm<Derivation> conc = the(rule, index, nar);
+
         final Term taskPattern = rule.getTask();
         final Term beliefPattern = rule.getBelief();
-
-
-        PrediTerm<Derivation> conc = the(rule, index, nar);
 
         boolean taskIsPatVar = taskPattern.op() == Op.VAR_PATTERN;
         boolean belIsPatVar = beliefPattern.op() == Op.VAR_PATTERN;
@@ -79,13 +78,6 @@ public final class Conclude {
 
         if (!taskIsPatVar)
             pre.addAll(SubTermStructure.get(0, taskPattern.structure()));
-
-//        if (belief!=null && task instanceof Compound && !task.isCommutative()) {
-//            int beliefInTask = ((Compound)task).indexOf(belief);
-//            if (beliefInTask!=-1) {
-//                System.out.println(belief + " in " + task);
-//            }
-//        }
 
         if (!belIsPatVar)
             pre.addAll(SubTermStructure.get(1, beliefPattern.structure()));
@@ -107,15 +99,15 @@ public final class Conclude {
 
         if (taskPattern.equals(beliefPattern)) {
             post.add(new UnifyTerm.UnifySubtermThenConclude(0, taskPattern, conc));
-        } else if (taskFirst(taskPattern, beliefPattern)) {
+        } else { // else if (taskFirst(taskPattern, beliefPattern)) {
             //task first
             post.add(new UnifyTerm.UnifySubterm(0, taskPattern));
             post.add(new UnifyTerm.UnifySubtermThenConclude(1, beliefPattern, conc));
-        } else {
+        } /*else {
             //belief first
             post.add(new UnifyTerm.UnifySubterm(1, beliefPattern));
             post.add(new UnifyTerm.UnifySubtermThenConclude(0, taskPattern, conc));
-        }
+        }*/
 
         //Term beliefPattern = pattern.term(1);
 
@@ -138,7 +130,7 @@ public final class Conclude {
 
     }
 
-    private static boolean taskFirst(@NotNull Term task, @NotNull Term belief) {
+    private static boolean taskFirst(Term task, Term belief) {
 
 
         Ellipsis taskEllipsis = Ellipsis.firstEllipsisRecursive(task);

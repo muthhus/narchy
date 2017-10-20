@@ -47,7 +47,7 @@ public class NARBenchmark {
 
         n = NARS.tmp();
         n.nal(Integer.parseInt(nalLevel));
-        n.termVolumeMax.setValue(Integer.parseInt(termVolumeMax));
+        n.termVolumeMax.set(Integer.parseInt(termVolumeMax));
 
         //n.inputActivation.setValue(0.5f);
         //n.derivedActivation.setValue(0.5f);

@@ -274,7 +274,7 @@ public class IRCNLP extends IRC {
 
         n.truthResolution.set(0.2f);
 
-        n.termVolumeMax.setValue(24);
+        n.termVolumeMax.set(24);
 
         /*@NotNull Default n = new Default(new Default.DefaultTermIndex(4096),
             new RealTime.DS(true),

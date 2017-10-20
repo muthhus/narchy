@@ -133,6 +133,12 @@ public class ActivateTest {
     }
 
     @Test
+    public void testFunction() throws Narsese.NarseseException {
+        testTemplates("f(x)",
+                "[f(x), f, x, (x)]");
+    }
+
+    @Test
     public void testTemplatesWithInt2() throws Narsese.NarseseException {
         testTemplates("num((0))",
                 "[(0), ((0)), num((0)), num]");

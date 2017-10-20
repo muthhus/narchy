@@ -12,7 +12,7 @@ public final class OpInConstraint extends MatchConstraint {
     private final int ops;
 
     public OpInConstraint(Term target, /*@NotNull*/ Op... accepted) {
-        super("opIn", target, $.the(Op.or(accepted)));
+        super(target, "opIn", $.the(Op.or(accepted)));
         ops = Op.or(accepted);
     }
 

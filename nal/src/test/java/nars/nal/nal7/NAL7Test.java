@@ -23,54 +23,8 @@ import static org.junit.Assert.assertEquals;
  */
 public class NAL7Test extends AbstractNALTest {
 
-    public int cycles = 550;
+    public int cycles = 350;
 
-    @Test
-    public void inductionDiffEventsAtom() {
-        testInduction("before", "after", 10);
-    }
-
-    @Test
-    public void inductionDiffEventsCompound() {
-        testInduction("x:before", "x:after", 10);
-    }
-
-    @Test
-    public void inductionDiffEventsNegPos() {
-        testInduction("--x:before", "x:after", 10);
-    }
-
-    @Test
-    public void inductionSameEvents() {
-        testInduction("x", "x", 10);
-    }
-
-    @Test
-    public void inductionSameEventsNeg() {
-        testInduction("--x", "--x", 10);
-    }
-
-    @Test
-    public void inductionSameEventsInvertPosNeg() {
-        testInduction("x", "--x", 10);
-    }
-
-    @Test
-    public void inductionSameEventsInvertNegPos() {
-        testInduction("--x", "x", 10);
-    }
-
-    void testInduction(String a, String b, int dt) {
-        int cycles = dt * 2;
-        test
-                .log()
-                .input(a + ". :|:")
-                .inputAt(dt, b + ". :|:")
-                .mustBelieve(cycles, "(" + a + " ==>+" + dt + " " + b + ")", 1.00f, 0.45f /*abductionConf*/, 0)
-                .mustBelieve(cycles, "(" + b + " ==>-" + dt + " " + a + ")", 1.00f, 0.45f /*inductionConf*/, dt)
-                .mustBelieve(cycles, "(" + a + " &&+" + dt + " " + b + ")", 1.00f, 0.81f /*intersectionConf*/, 0, dt)
-        ;
-    }
 
     @Test
     public void induction_on_events_neg2() {

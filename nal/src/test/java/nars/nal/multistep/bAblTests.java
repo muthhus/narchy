@@ -45,7 +45,7 @@ public class bAblTests extends AbstractNALTest {
         TestNAR t = test;
 
         t.nar.truthResolution.set(0.25f);
-        t.nar.termVolumeMax.setValue(28);
+        t.nar.termVolumeMax.set(28);
 
         //t.log();
         t.believe("((pick(#Person,$Object) &&+0 inside(#Person,$Place)) ==>+0 inside($Object,$Place))")
@@ -69,7 +69,7 @@ public class bAblTests extends AbstractNALTest {
         //(19) Path Finding
 
         TestNAR t = test;
-        t.nar.termVolumeMax.setValue(40);
+        t.nar.termVolumeMax.set(40);
         t.nar.truthResolution.set(0.25f);
 
         t.input("$0.9 ((&&, start($1,$2), at( $1,$B,$C), at( $B,$2,$C2) ) ==> ( path( id,$C,id,$C2)   && chunk( $1,$2,$B) )).")

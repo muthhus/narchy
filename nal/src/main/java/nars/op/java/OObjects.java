@@ -161,7 +161,7 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
         Term[] x = new Term[isVoid ? 3 : 4];
         x[1] = term(instance);
         x[0] = $.the(method.getName());
-        x[2] = $.p(terms(args));
+        x[2] = args.length != 1 ? $.p(terms(args)) : term(args[0]) /* unwrapped singleton */;
         if (!isVoid)
             x[3] = term(result);
 
@@ -228,7 +228,7 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
             MethodHandle mm;
             Object[] orgs;
             if (m == 0) {
-                mm = method(inst, c, methodName, ArrayUtils.EMPTY_CLASS_ARRAY);
+                mm = method(c, methodName, ArrayUtils.EMPTY_CLASS_ARRAY);
                 if (mm == null)
                     return;
                 orgs = ArrayUtils.EMPTY_OBJECT_ARRAY;
@@ -237,7 +237,7 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
 
                 Class[] types = Util.map(x -> Primitives.unwrap(x.getClass()),
                         new Class[orgs.length], orgs);
-                mm = method(inst, c, methodName, types);
+                mm = method(c, methodName, types);
                 if (mm == null)
                     return;
             }
@@ -254,12 +254,9 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
         };
     }
 
-    final static Class[] RETURN_TYPES = {Object.class, void.class, int.class};
-
-    private MethodHandle method(Object inst, Class c, String methodName, Class<?>[] types) {
+    private MethodHandle method(Class c, String methodName, Class<?>[] types) {
         try {
             Method m = ReflectionUtils.findMethod(c, methodName, types).orElse(null);
-            //Method m = ReflectionSupport.findMethod(c, methodName, types).orElse(null);
             if (m == null)
                 return null;
             m.trySetAccessible();
@@ -287,10 +284,11 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
         if (cause != null) {
             ((NALTask) fb).causeMerge(cause);
             ((NALTask) fb).priMax(cause.priElseZero());
+        } else {
+            fb.priMax(nar.priDefault(fb.punc()));
         }
 
-        if (fb != null)
-            nar.input(fb);
+        nar.input(fb);
 
         return result;
     }

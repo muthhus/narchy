@@ -13,6 +13,7 @@ import nars.task.Revision;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.Subst;
+import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -159,14 +160,13 @@ public class TemporalizeDerived extends Temporalize {
 
             //HACK HACK HACK special case: a repeat in temporal induction
             Op po = pattern.op();
-            Term tt = task.term();
-            if (po.temporal && !task.isEternal() && !belief.isEternal() && belief.term().equals(tt)) {
-                if (((po == CONJ || po == IMPL) && pattern.subs() == 2)) {
-                    Term p0 = pattern.sub(0);
-                    if (p0.unneg().equals(tt) && p0.unneg().equals(pattern.sub(1).unneg())) {
+            Term tt = task.term().unneg();
+            if (po.temporal && !task.isEternal() && !belief.isEternal() && belief.term().unneg().equals(tt)) {
+                if (/*((po == CONJ || po == IMPL) && */pattern.subs() == 2) {
+                    Term p0 = pattern.sub(0).unneg();
+                    if (p0.equals(tt) && p0.equals(pattern.sub(1).unneg())) {
                         occ[0] = task.start();
 
-                        int dt = (int) (belief.start() - task.end());
 
                         //HACK HACK HACK
                         Term beliefTruth = c.rule.POST[0].beliefTruth;
@@ -179,8 +179,11 @@ public class TemporalizeDerived extends Temporalize {
                                 reverse = true;
                         }
 
+                        int dt;
                         if (reverse) {
-                            dt = -dt;
+                            dt = (int) (task.start() - belief.end());
+                        } else {
+                            dt = (int) (belief.start() - task.end());
                         }
 
                         return pattern.dt(dt);
@@ -249,7 +252,7 @@ public class TemporalizeDerived extends Temporalize {
         }
 
 
-        return e.term;
+        return e.term.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
     }
 
 }

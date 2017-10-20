@@ -17,10 +17,9 @@ import org.jetbrains.annotations.NotNull;
  */
 abstract public class UnifyTerm extends AbstractPred<Derivation> {
 
-    @NotNull
     public final Term pattern;
 
-    UnifyTerm(@NotNull Term id, @NotNull Term pattern) {
+    UnifyTerm(Term id, Term pattern) {
         super(id);
         this.pattern = pattern;
     }

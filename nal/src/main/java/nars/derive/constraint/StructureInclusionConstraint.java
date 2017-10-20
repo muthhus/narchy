@@ -10,7 +10,7 @@ public final class StructureInclusionConstraint extends MatchConstraint {
     private final int structure;
 
     public StructureInclusionConstraint(Term target, int opVector) {
-        super("StructIncl", target, $.the(opVector));
+        super(target, "StructIncl", $.the(opVector));
         this.structure = opVector;
     }
 

@@ -63,7 +63,7 @@ public class TestProloglike {
         //Param.DEBUG = true;
         NAR n = NARS.tmp();
 
-        n.termVolumeMax.setValue(1024);
+        n.termVolumeMax.set(1024);
         n.log();
         n.inputNarsese(
                 TestProloglike.class.getResource("einsteinsRiddle.nal")

@@ -1185,6 +1185,13 @@ public enum Util {
         return y;
     }
 
+    public static int sum(int... x) {
+        int y = 0;
+        for (int f : x)
+            y += f;
+        return y;
+    }
+
     public static float sum(float... x) {
         float y = 0;
         for (float f : x)

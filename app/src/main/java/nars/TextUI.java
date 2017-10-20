@@ -482,7 +482,7 @@ public class TextUI {
             public BagListBox(int capacity, boolean autoupdate) {
 
                 this.autoupdate = autoupdate;
-                visible.setValue(capacity);
+                visible.set(capacity);
 
                 bag = new PLinkArrayBag(capacity * 2, PriMerge.replace, new ConcurrentHashMap());
                 onCycle = newGUIUpdate(this::update);

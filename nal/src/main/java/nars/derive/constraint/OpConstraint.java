@@ -13,7 +13,7 @@ public final class OpConstraint extends MatchConstraint {
     private final Op op;
 
     public OpConstraint(Term target, /*@NotNull*/ Op o) {
-        super("op", target, $.quote(o.toString()));
+        super(target, "op", $.quote(o.toString()));
         op = o;
     }
 

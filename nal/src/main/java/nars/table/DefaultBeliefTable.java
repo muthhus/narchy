@@ -133,7 +133,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     @Override
-    public void add(@NotNull Task input, @NotNull BaseConcept concept, @NotNull NAR nar) {
+    public void add(Task input, BaseConcept concept, NAR nar) {
         (input.isEternal() ? eternal : temporal).add(input, concept, nar);
     }
 

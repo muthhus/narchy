@@ -3,7 +3,7 @@ package spacegraph.widget.meta;
 import jcog.Services;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
-import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;

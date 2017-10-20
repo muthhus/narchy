@@ -29,7 +29,7 @@ import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.ugens.*;
 import org.HdrHistogram.DoubleHistogram;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
@@ -186,13 +186,13 @@ abstract public class NAgentX extends NAgent {
 
         n.defaultWants();
 
-        n.dtMergeOrChoose.setValue(true);
+        n.dtMergeOrChoose.set(true);
 
         n.setEmotion(new Emotivation(n));
 
         n.confMin.set(0.01f);
         n.truthResolution.set(0.01f);
-        n.termVolumeMax.setValue(32);
+        n.termVolumeMax.set(32);
 
         n.beliefConfidence(0.9f);
         n.goalConfidence(0.85f);

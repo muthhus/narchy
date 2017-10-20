@@ -570,7 +570,8 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test;
         tester.believe("((test($a,is,cat) && sentence($a,is,$b)) ==> ($a --> $b))");
         tester.believe("test(tim,is,cat)");
-        tester.mustBelieve(cycles, "(sentence(tim,is,$1) ==> (tim --> $1))", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
+        tester.mustBelieve(cycles, "(sentence(tim,is,$1) ==> (tim --> $1))",
+                1.00f, 0.73f); //en("there is a lock which is opened by key1");
 
     }
 

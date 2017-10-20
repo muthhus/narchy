@@ -143,7 +143,7 @@ public class QuestionTest {
             NAR d = new NARS().get();
             d.random().setSeed(seed);
             d.nal(4);
-            d.termVolumeMax.setValue(16);
+            d.termVolumeMax.set(16);
             d.truthResolution.set(0.1f);
             return d;
         };

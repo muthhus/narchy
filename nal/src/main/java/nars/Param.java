@@ -14,6 +14,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
+import nars.util.UtilityFunctions;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,16 +29,22 @@ import static nars.control.MetaGoal.*;
 /**
  * NAR Parameters
  */
-public abstract class Param extends Services<Term,NAR> {
+public abstract class Param extends Services<Term, NAR> {
 
 
-    /** must be big enough to support as many layers of compound terms as exist in an eval */
+    /**
+     * must be big enough to support as many layers of compound terms as exist in an eval
+     */
     public static final int MAX_EVAL_RECURSION = 32;
 
-    /** rate that integers in integer-containing termlink compounds will be dynamically mutated on activation */
+    /**
+     * rate that integers in integer-containing termlink compounds will be dynamically mutated on activation
+     */
     public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.25f;
 
-    /** TODO if a task is deleted by this, the system should replace it with a question about the state sometime in the future */
+    /**
+     * TODO if a task is deleted by this, the system should replace it with a question about the state sometime in the future
+     */
     public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
 
     public static final float LINK_FORGET_TEMPERATURE = PriForget.FORGET_TEMPERATURE_DEFAULT;
@@ -47,10 +54,12 @@ public abstract class Param extends Services<Term,NAR> {
      * controls interpolation policy:
      * true: dt values will be interpolated
      * false: dt values will be chosen by weighted random decision
-     * */
+     */
     public final AtomicBoolean dtMergeOrChoose = new AtomicBoolean(false);
 
-    /** how many INT terms are canonically interned/cached. [0..n) */
+    /**
+     * how many INT terms are canonically interned/cached. [0..n)
+     */
     public final static int MAX_CACHED_INTS = 64;
 
 
@@ -77,75 +86,100 @@ public abstract class Param extends Services<Term,NAR> {
 
     public static final PriMerge tasklinkMerge =
             PriMerge.max;
-            //PriMerge.plus; //not safe to plus without enough headroom
+    //PriMerge.plus; //not safe to plus without enough headroom
 
-   /** budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links) */
+    /**
+     * budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links)
+     */
     public static final FloatFloatToFloatFunction termTaskLinkToPremise =
-            //Util::or;
-            Util::and;
-            //UtilityFunctions::aveGeo;
-            //UtilityFunctions::aveAri;
-            //Math::min;
-            //Math::max;
+            Util::or;
+    //Util::and;
+    //UtilityFunctions::aveGeo;
+    //UtilityFunctions::aveAri;
+    //Math::min;
+    //Math::max;
 
     public static final PriMerge premiseMerge = PriMerge.max;
 
 
-    /** max budget for derivations from the task and optional belief budget */
-    public static final FloatFloatToFloatFunction TaskBeliefDerivationMax =
-            Util::or;
-            //Util::and;
-            //UtilityFunctions::aveAri;
+    /**
+     * max budget for derivations from the task and optional belief budget
+     */
+    public static final FloatFloatToFloatFunction TaskBeliefDerivation =
             //Math::max;
+            //Util::or;
+            //Util::and;
+            UtilityFunctions::aveAri;
+
 
     public static final PriMerge taskMerge = PriMerge.max;
 
 
-
-
-    /** maximum time (in durations) that a signal task can latch its last value before it becomes unknown */
+    /**
+     * maximum time (in durations) that a signal task can latch its last value before it becomes unknown
+     */
     public final static int SIGNAL_LATCH_TIME_MAX =
-                    //0;
-                    //Integer.MAX_VALUE;
-                    8;
-                    //8;
+            //0;
+            //Integer.MAX_VALUE;
+            8;
+    //8;
 
-    /** derivation severity - how completely confidence is reduced in derivation (default: 1.0) */
+    /**
+     * derivation severity - how completely confidence is reduced in derivation (default: 1.0)
+     */
     public final FloatParam deriverity = new FloatParam(1.0f, 0f, 1f);
 
-    /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTLmax = new MutableInteger(192);
+    /**
+     * 'time to live', unification steps until unification is stopped
+     */
+    public final MutableInteger matchTTLmax = new MutableInteger(256);
     public final MutableInteger matchTTLmin = new MutableInteger(64);
 
-    /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
+    /**
+     * how much percent of a premise's allocated TTL can be used in the belief matching phase.
+     */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.25f;
 
     public static final int TTL_PREMISE_MIN =
             Param.TTL_UNIFY * 2 +
-            Param.TTL_DERIVE_TASK_SUCCESS;
+                    Param.TTL_DERIVE_TASK_SUCCESS;
 
-    /** cost of attempting a unification */
+    /**
+     * cost of attempting a unification
+     */
     public static final int TTL_UNIFY = 1;
 
-    /** cost of executing a termute permutation */
+    /**
+     * cost of executing a termute permutation
+     */
     public static final int TTL_MUTATE = 1;
 
-    /** cost of a successful task derivation */
+    /**
+     * cost of a successful task derivation
+     */
     public static final int TTL_DERIVE_TASK_SUCCESS = 4;
 
-    /** cost of a repeat (of another within the premise's batch) task derivation */
+    /**
+     * cost of a repeat (of another within the premise's batch) task derivation
+     */
     public static final int TTL_DERIVE_TASK_REPEAT = 2;
 
-    /** cost of a task derived, but too similar to one of its parents */
+    /**
+     * cost of a task derived, but too similar to one of its parents
+     */
     public static final int TTL_DERIVE_TASK_SAME = 2;
 
-    /** cost of a failed/aborted task derivation */
+    /**
+     * cost of a failed/aborted task derivation
+     */
     public static final int TTL_DERIVE_TASK_FAIL = 2;
 
-    /** number between 0 and 1 controlling the proportion of activation going
+    /**
+     * number between 0 and 1 controlling the proportion of activation going
      * forward (compound to subterms) vs. reverse (subterms to parent compound).
      * when calculated, the total activation will sum to 1.0.
-     * so 0.5 is equal amounts for both. */
+     * so 0.5 is equal amounts for both.
+     */
     public static final float TERMLINK_BALANCE = 0.5f;
 
 
@@ -164,14 +198,18 @@ public abstract class Param extends Services<Term,NAR> {
         Action.want(w, 0.1f);
     }
 
-    /** how many durations above which to dither dt relations to dt=0 (parallel)
-     *  set to zero to disable dithering.  typically the value will be 0..1.0.
+    /**
+     * how many durations above which to dither dt relations to dt=0 (parallel)
+     * set to zero to disable dithering.  typically the value will be 0..1.0.
      */
     public final MutableFloat dtDither = new MutableFloat(0.5f);
 
 
-    /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
-    @Deprecated public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;
+    /**
+     * abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds
+     */
+    @Deprecated
+    public static int DT_ABS_LIMIT = Integer.MAX_VALUE / 256;
 
 
     public static float derivationPriority(Task t, Derivation d) {
@@ -180,17 +218,16 @@ public abstract class Param extends Services<Term,NAR> {
         float discount = 1f;
 
         int dCompl =
-                //t.complexity();
-                t.volume();
+                t.complexity();
+        //t.volume();
         int pCompl = d.parentComplexity;
-        int penalty = 1;
         float relGrowth =
-                unitize(((float)dCompl) / (penalty + dCompl + pCompl)); //1 - (proportion of its complexity / (its complexity + parent complexity) )
+                unitize(((float) pCompl) / (pCompl + dCompl));
 
-        discount *= 1f - (relGrowth);
+        discount *= (relGrowth);
 
         Truth tr = t.truth();
-        if (/* belief or goal */ tr!=null) {
+        if (/* belief or goal */ tr != null) {
 
             //prefer confidence, relative to the premise which formed it
             float parentConf = d.single ? d.premiseConfSingle : d.premiseConfDouble;
@@ -211,11 +248,10 @@ public abstract class Param extends Services<Term,NAR> {
     }
 
 
-
-
-
-    /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
-     * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
+    /**
+     * absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
+     * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this
+     */
     public static final int COMPOUND_VOLUME_MAX = 127;
 
     /**
@@ -223,12 +259,15 @@ public abstract class Param extends Services<Term,NAR> {
      */
     public static final int COMPOUND_SUBTERMS_MAX = 127;
 
-    /** how many answers to record per input question task (in its concept's answer bag) */
+    /**
+     * how many answers to record per input question task (in its concept's answer bag)
+     */
     public static final int MAX_INPUT_ANSWERS = 8;
 
-    /** max retries for termpolation to produce a valid task content result during revision */
+    /**
+     * max retries for termpolation to produce a valid task content result during revision
+     */
     public static final int MAX_TERMPOLATE_RETRIES = 1;
-
 
 
 //    /** determines if an input goal or command operation task executes */
@@ -249,7 +288,7 @@ public abstract class Param extends Services<Term,NAR> {
      * if this is exceeded it may indicate a recursively
      * malformed term due to a serious inference bug
      */
-    public final MutableInteger termVolumeMax = new MutableInteger(COMPOUND_VOLUME_MAX );
+    public final MutableInteger termVolumeMax = new MutableInteger(COMPOUND_VOLUME_MAX);
 
     //public static final boolean ARITHMETIC_INDUCTION = false;
 
@@ -264,7 +303,6 @@ public abstract class Param extends Services<Term,NAR> {
     static Atom randomSelf() {
         return (Atom) $.quote("I_" + Util.uuid64());
     }
-
 
 
     /**
@@ -285,8 +323,6 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int UnificationVariableCapInitial = 8;
 
 
-
-
     //public static final boolean DEBUG_BAG_MASS = false;
     //public static boolean DEBUG_TRACE_EVENTS = false; //shows all emitted events
     //public static boolean DEBUG_DERIVATION_STACKTRACES; //includes stack trace in task's derivation rule string
@@ -295,20 +331,18 @@ public abstract class Param extends Services<Term,NAR> {
     public static final boolean DEBUG_TASK_LOG = true; //false disables task history completely
 
 
-
-
-
     private float defaultGoalConf, defaultBeliefConf;
 
 
-    /** internal granularity which truth components are rounded to */
+    /**
+     * internal granularity which truth components are rounded to
+     */
     public static final float TRUTH_EPSILON = 0.01f;
 
     /**
      * how precise unit test results must match expected values to pass
      */
     public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
-
 
 
 //    /** EXPERIMENTAL  decreasing priority of sibling tasks on temporal task insertion */
@@ -318,11 +352,8 @@ public abstract class Param extends Services<Term,NAR> {
 //    public static final boolean ACTION_CONCEPT_LINK_TRUTH = false;
 
 
-
 //    /** derivation confidence (by evidence) multiplier.  normal=1.0, <1.0= under-confident, >1.0=over-confident */
 //    @NotNull public final FloatParam derivedEvidenceGain = new FloatParam(1f, 0f, 4f);
-
-
 
 
     @NotNull
@@ -340,7 +371,7 @@ public abstract class Param extends Services<Term,NAR> {
      * terms to their subterms
      * 0 momentum means an activation is fired completely and suddenly
      * 1 momentum means it retains all activation
-     * */
+     */
     public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
 
     /**
@@ -354,7 +385,7 @@ public abstract class Param extends Services<Term,NAR> {
 
         //use high precision math here
         double ddt = dt;
-        return (float) (evi / ( 1.0 + ddt*ddt / dur )); //inverse square
+        return (float) (evi / (1.0 + ddt * ddt / dur)); //inverse square
 
         //return evi / Util.sqr( 1f + dt / dur ); //inverse square suck
 
@@ -384,11 +415,11 @@ public abstract class Param extends Services<Term,NAR> {
 
         TruthPolation t =
                 new TruthPolation.TruthPolationBasic(start, end, dur);
-                //new TruthPolation.TruthPolationConf(start, end, dur);
-                //new TruthPolation.TruthPolationGreedy(start, end, dur);
-                //..SoftMax..
-                //new TruthPolation.TruthPolationRoulette(start, end, dur, ThreadLocalRandom.current());
-                //new TruthPolationWithVariance(when, dur);
+        //new TruthPolation.TruthPolationConf(start, end, dur);
+        //new TruthPolation.TruthPolationGreedy(start, end, dur);
+        //..SoftMax..
+        //new TruthPolation.TruthPolationRoulette(start, end, dur, ThreadLocalRandom.current());
+        //new TruthPolationWithVariance(when, dur);
 
         // Contribution of each task's truth
         // use forEach instance of the iterator(), since HijackBag forEach should be cheaper
@@ -431,7 +462,6 @@ public abstract class Param extends Services<Term,NAR> {
     public float DEFAULT_QUESTION_PRIORITY = 0.5f;
 
 
-
     /**
      * Default priority of input judgment
      */
@@ -441,7 +471,6 @@ public abstract class Param extends Services<Term,NAR> {
      * Default priority of input question
      */
     public float DEFAULT_QUEST_PRIORITY = 0.5f;
-
 
 
     public float priDefault(byte punctuation) {
@@ -461,7 +490,31 @@ public abstract class Param extends Services<Term,NAR> {
             case COMMAND:
                 return 0;
         }
-        throw new RuntimeException("Unknown sentence type: " + punctuation);
+        throw new RuntimeException("Unknown punctuation: " + punctuation);
+    }
+
+    public void priDefault(byte punctuation, float pri) {
+        switch (punctuation) {
+            case BELIEF:
+                DEFAULT_BELIEF_PRIORITY = pri;
+                break;
+
+            case QUEST:
+                DEFAULT_QUEST_PRIORITY = pri;
+                break;
+
+            case QUESTION:
+                DEFAULT_QUESTION_PRIORITY = pri;
+                break;
+
+            case GOAL:
+                DEFAULT_GOAL_PRIORITY = pri;
+                break;
+
+            default:
+                throw new RuntimeException("Unknown punctuation: " + punctuation);
+
+        }
     }
 
 
@@ -487,7 +540,6 @@ public abstract class Param extends Services<Term,NAR> {
 
 
     abstract public int nal();
-
 
 
 }

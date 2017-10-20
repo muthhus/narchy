@@ -3,18 +3,14 @@
 //substitutionViaSimilarity
 
 
-     R, (S<->P)  |- subIfUnifiesAny(P, S, R), (Belief:Analogy)
-     R, (--S<->P)  |- subIfUnifiesAny(P, S, R), (Belief:AnalogyN)
+     R, (S<->P)  |- subIfUnifiesAny(P, S, R), (Belief:Analogy, Goal:Weak)
+     R, (--S<->P)  |- subIfUnifiesAny(P, S, R), (Belief:AnalogyN, Goal:WeakN)
      (&&,X,A..+), (X<->Y)  |- substitute((&&,X,A..+),X,Y), (Belief:Analogy, Goal:Weak)
+     (A..+), (X<->Y)  |- substitute((A..+),X,Y), (Belief:Analogy, Goal:Weak)
      (X ==> Z), (X<->Y) |- (Y ==>+- Z), (Belief:Analogy)
      (Z ==> X), (X<->Y) |- (Z ==>+- Y), (Belief:Analogy)
      (Z ==> X), (--X<->Y) |- (Z ==>+- Y), (Belief:AnalogyN)
 
-//desire spreading by similarity
-//     S, (S<->P)    |- P, (Goal:Weak)
-//     S, (--S<->P)  |- P, (Goal:WeakN)
-     R, (S<->P)    |- subIfUnifiesAny(P, S, R), (Goal:Weak)
-     R, (--S<->P)  |- subIfUnifiesAny(P, S, R), (Goal:WeakN)
 
 
 

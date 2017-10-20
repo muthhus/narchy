@@ -55,9 +55,13 @@ public interface Stamp {
 
         int aLen = a.length, bLen = b.length;
 
-        //if (isCyclic(a)) aLen--; //cyclic flag is not propagated
-        //if (isCyclic(b)) bLen--; //cyclic flag is not propagated
-        if (isCyclic(a) && isCyclic(b)) bLen--; //only inherit one cyclic
+        {
+            if (isCyclic(a)) aLen--; //cyclic flag is not propagated through double derivation
+            if (isCyclic(b)) bLen--; //cyclic flag is not propagated through double derivation
+        }
+        {
+            //if (isCyclic(a) && isCyclic(b)) bLen--; //only inherit one cyclic
+        }
 
         int baseLength = Math.min(aLen + bLen, maxLen);
 

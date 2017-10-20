@@ -1,6 +1,6 @@
 package spacegraph.widget.button;
 
-import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import spacegraph.widget.Label;
 

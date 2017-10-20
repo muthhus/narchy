@@ -403,11 +403,11 @@ public abstract class Unify extends Versioning implements Subst {
 
         @Nullable
         @Override
-        public Versioned<Term> set(@NotNull Term next) {
+        public Versioned<Term> set(/*@NotNull*/ Term next) {
             return valid(next) ? super.set(next) : null;
         }
 
-        private boolean valid(@NotNull Term x) {
+        private boolean valid(/*@NotNull*/ Term x) {
             if (constraints != null) {
                 int s = constraints.size();
                 for (int i = 0; i < s; i++) {

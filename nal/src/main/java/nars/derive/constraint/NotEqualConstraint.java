@@ -11,7 +11,7 @@ public final class NotEqualConstraint extends MatchConstraint {
     private final Term other;
 
     public NotEqualConstraint(Term target, Term other) {
-        super("neq", target, other);
+        super(target, "neq", other);
         this.other = other;
     }
 

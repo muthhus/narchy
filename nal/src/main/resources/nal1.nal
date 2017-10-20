@@ -66,6 +66,8 @@
 
 //Inheritance to Similarity
     (S <-> P), (S --> P), task("?") |- (S <-> P),   (Belief:BeliefStructuralAbduction, Punctuation:Belief)
+    (X <-> Y), X, task("?") |- Y,   (Punctuation: Question)
+    (X <-> Y), X, task("@") |- Y,   (Punctuation: Quest)
 
 //Similarity to Inheritance
     (S --> P), (S <-> P), task("?") |- (S --> P),   (Belief:BeliefStructuralDeduction, Punctuation:Belief)

@@ -15,7 +15,7 @@ public final class OpExclusionConstraint extends MatchConstraint {
 //    }
 
     public OpExclusionConstraint(Term target, int opVector) {
-        super("opExcl", target, $.the(opVector));
+        super(target, "opExcl", $.the(opVector));
         this.op = opVector;
     }
 

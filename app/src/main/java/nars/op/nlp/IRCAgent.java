@@ -217,7 +217,7 @@ public class IRCAgent extends IRC {
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
-        n.termVolumeMax.setValue(20);
+        n.termVolumeMax.set(20);
 
 
 //        Control c = n.getControl();

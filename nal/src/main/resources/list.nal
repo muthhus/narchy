@@ -1,2 +1,6 @@
-P, X, task("*"), task(containsBelief) |- ((P, indices(P,X))-->X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    //ex:  (a,x,b,x)  x   |-   (((a,x,b,x), {1, 3}) --> x)
+
+//(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ((P,indicesOf(P,X))-->(C,X)), (Belief:Identity, Goal:Identity)
+//(C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ((C,X)-->(P,indicesOf(P,X))), (Belief:Identity, Goal:Identity)
+    //((P,X)-->(C,indicesOf(P,X)))
+
+(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (indicesOf(P,X)-->C), (Belief:Identity, Goal:Identity)

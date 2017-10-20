@@ -191,7 +191,8 @@ public class Derivation extends Unify {
                 nar.get(Atomic.the("conjEvent")),
                 nar.get(Atomic.the("conjDropIfEarliest")),
                 nar.get(Atomic.the("ifConjCommNoDepVars")),
-                nar.get(Atomic.the("without"))
+                nar.get(Atomic.the("without")),
+                nar.get(Atomic.the("indicesOf"))
         );
 
 
@@ -284,7 +285,11 @@ public class Derivation extends Unify {
 //            bt = bt.normalize(ttv); //shift variables up to be unique compared to taskTerm's
 //        }
         this.beliefTerm = bt;
-        this.parentComplexity = Math.max(taskTerm.complexity(), bt.complexity());
+        this.parentComplexity =
+                //Util.sum(
+                Math.max(
+                    taskTerm.complexity(), bt.complexity()
+                );
 
 
         switch (this.taskPunct = task.punc()) {
@@ -351,7 +356,7 @@ public class Derivation extends Unify {
 
         this.premisePri =
                 //p.priElseZero(); //use the premise pri directly
-                belief == null ? task.priElseZero() : Param.TaskBeliefDerivationMax.apply(task.priElseZero(), belief.priElseZero());
+                belief == null ? task.priElseZero() : Param.TaskBeliefDerivation.apply(task.priElseZero(), belief.priElseZero());
 
         float parentValue = nar.evaluate(parentCause); /* value of the parent cause as a multiplier */
         this.premisePri *= parentValue;

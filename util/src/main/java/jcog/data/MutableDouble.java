@@ -76,7 +76,7 @@ public class MutableDouble extends Number implements Comparable, Mutable {
    * @return the value as a Double
    */
   @Override
-  public Object getValue() {
+  public Object get() {
     return value;
   }
 
@@ -101,7 +101,7 @@ public class MutableDouble extends Number implements Comparable, Mutable {
    *           if the type is not a {@link Number}
    */
   @Override
-  public void setValue(Object value) {
+  public void set(Object value) {
     setValue(((Number) value).doubleValue());
   }
 
@@ -393,7 +393,7 @@ interface Mutable {
    * 
    * @return the stored value
    */
-  Object getValue();
+  Object get();
 
   /**
    * Sets the value of this mutable.
@@ -405,7 +405,7 @@ interface Mutable {
    * @throws ClassCastException
    *           if the type is invalid
    */
-  void setValue(Object value);
+  void set(Object value);
 
 }
 

@@ -19,6 +19,8 @@ import static jcog.Util.sum;
  */
 public interface Prioritized extends Deleteable {
 
+
+
     /**
      * a value in range 0..1.0 inclusive.
      * if the value is NaN, then it means this has been deleted
@@ -44,7 +46,11 @@ public interface Prioritized extends Deleteable {
     /**
      * default minimum difference necessary to indicate a significant modification in budget float number components
      */
-    float EPSILON = 0.0001f;
+    float EPSILON =             0.002f;
+
+    /** epsilon necessary to cause a visible disturbance */
+    float EPSILON_VISIBLE =     0.010f;
+
 
 //    /**
 //     * decending order (highest first)

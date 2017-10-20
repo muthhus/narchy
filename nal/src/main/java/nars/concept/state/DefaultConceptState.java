@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.data.MutableInteger;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
+import nars.concept.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.IntToIntFunction;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,8 @@ import static jcog.Util.clamp;
  */
 public final class DefaultConceptState extends ConceptState {
 
+    private static final int SENSOR_CONCEPT_BELIEFS = 64;
+    
     /** fall-off rate for belief table capacity */
     float beliefComplexityCapacity = 10;
 
@@ -84,16 +87,20 @@ public final class DefaultConceptState extends ConceptState {
     @Override
     public int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
         int max, min;
-        if (beliefOrGoal) {
-            max = eternalOrTemporal ? beliefsMaxEte : beliefsMaxTemp;
-            min = eternalOrTemporal ? beliefsMinEte : beliefsMinTemp;
+        if (compoundConcept instanceof SensorConcept) {
+            return SENSOR_CONCEPT_BELIEFS;
         } else {
-            max = eternalOrTemporal ? goalsMaxEte : goalsMaxTemp;
-            min = eternalOrTemporal ? goalsMinEte : goalsMinTemp;
+            if (beliefOrGoal) {
+                max = eternalOrTemporal ? beliefsMaxEte : beliefsMaxTemp;
+                min = eternalOrTemporal ? beliefsMinEte : beliefsMinTemp;
+            } else {
+                max = eternalOrTemporal ? goalsMaxEte : goalsMaxTemp;
+                min = eternalOrTemporal ? goalsMinEte : goalsMinTemp;
+            }
+            return Util.lerp(Util.unitize((-1 + compoundConcept.complexity())/32f), max, min);
+            //return (int) Math.ceil(max * Math.min(1f, (1f / (compoundConcept.volume()/ beliefComplexityCapacity))));
         }
 
-        return Util.lerp(Util.unitize((-1 + compoundConcept.complexity())/32f), max, min);
-        //return (int) Math.ceil(max * Math.min(1f, (1f / (compoundConcept.volume()/ beliefComplexityCapacity))));
     }
 
     @Override

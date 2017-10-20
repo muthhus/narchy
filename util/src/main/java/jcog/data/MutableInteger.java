@@ -67,12 +67,12 @@ public class MutableInteger extends Number implements Comparable, Mutable {
    * @return the value as a Double
    */
   @Override
-  public Object getValue() {
+  public Object get() {
     return (double) value;
   }
 
   @Override
-  public void setValue(Object value) {
+  public void set(Object value) {
       if (value instanceof Number)
           set((Number)value);
       else

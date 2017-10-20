@@ -62,7 +62,7 @@ public class Repl {
                 .appName("NARchy")
                 .build();
 
-        nar.logBudgetMin(new PrintStream(reader.getTerminal().output()), 0.1f);
+        nar.logPriMin(new PrintStream(reader.getTerminal().output()), 0.1f);
 
         reader.setOpt(LineReader.Option.AUTO_FRESH_LINE);
         reader.setOpt(LineReader.Option.AUTO_LIST);

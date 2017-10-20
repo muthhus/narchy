@@ -113,7 +113,7 @@ public class PremiseRule extends GenericCompound {
     /**
      * compiles the conditions which are necessary to activate this rule
      */
-    public Pair<Set<Term>, PrediTerm<Derivation>> build(@NotNull PostCondition post) {
+    public Pair<Set<Term>, PrediTerm<Derivation>> build(PostCondition post) {
 
         byte puncOverride = post.puncOverride;
 
@@ -247,7 +247,7 @@ public class PremiseRule extends GenericCompound {
 
 
     @NotNull
-    public final PremiseRule setup(@NotNull PatternIndex index, NAR nar) /* throws PremiseRuleException */ {
+    public final PremiseRule setup(PatternIndex index, NAR nar) /* throws PremiseRuleException */ {
 
         compile(index);
 
@@ -333,7 +333,7 @@ public class PremiseRule extends GenericCompound {
                     break;
 
                 case "notSet":
-                    opIsNot(taskPattern, beliefPattern, pres, constraints, X, Op.SetBits);
+                    termIsNot(pres, taskPattern, beliefPattern, constraints, X, Op.SetBits);
                     break;
 
                 case "set":
@@ -343,17 +343,17 @@ public class PremiseRule extends GenericCompound {
                     break;
 
                 case "setext": //TODO rename: opSETe
-                    isOp(pres, taskPattern, beliefPattern, constraints, X, Op.SETe);
+                    termIs(pres, taskPattern, beliefPattern, constraints, X, Op.SETe);
                     break;
 
                 case "setint": //TODO rename: opSETi
-                    isOp(pres, taskPattern, beliefPattern, constraints, X, Op.SETi);
+                    termIs(pres, taskPattern, beliefPattern, constraints, X, Op.SETi);
                     break;
                 case "opSECTe":
-                    isOp(pres, taskPattern, beliefPattern, constraints, X, Op.SECTe);
+                    termIs(pres, taskPattern, beliefPattern, constraints, X, Op.SECTe);
                     break;
                 case "opSECTi":
-                    isOp(pres, taskPattern, beliefPattern, constraints, X, Op.SECTi);
+                    termIs(pres, taskPattern, beliefPattern, constraints, X, Op.SECTi);
                     break;
 
 //
@@ -362,14 +362,27 @@ public class PremiseRule extends GenericCompound {
 //                    break;
 
                 case "notImpl":
-                    opIsNot(taskPattern, beliefPattern, pres, constraints, X, Op.IMPL.bit);
+                    termIsNot(pres, taskPattern, beliefPattern, constraints, X, Op.IMPL.bit);
+                    break;
+
+                 case "subOf":
+                    //X subOf Y : X is subterm of Y
+                    constraints.add(new SubOfConstraint(X, Y, false));
+                    constraints.add(new SubOfConstraint(Y, X, true));
+                    break;
+
+                 case "is":
+                    //TODO make var arg version of this
+                    Op o = Op.the($.unquote(Y));
+                    assert (o != null);
+                    termIs(pres, taskPattern, beliefPattern, constraints, X, o);
                     break;
 
                 case "has":
                     //TODO make var arg version of this
-                    Op o = Op.the($.unquote(Y));
-                    assert (o != null);
-                    termHas(taskPattern, beliefPattern, pres, constraints, X, o.bit);
+                    Op oh = Op.the($.unquote(Y));
+                    assert (oh != null);
+                    termHas(taskPattern, beliefPattern, pres, constraints, X, oh);
                     break;
 
                 case "time":
@@ -486,6 +499,10 @@ public class PremiseRule extends GenericCompound {
                     switch (XString) {
                         case "containsBelief":
                             pres.add(TaskPolarity.taskContainsBelief);
+                            break;
+
+                        case "containsBeliefRecursively":
+                            pres.add(TaskPolarity.taskContainsBeliefRecursively);
                             break;
 
                         case "negative":
@@ -631,19 +648,29 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
-    private static void isOp(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, SortedSet<MatchConstraint> constraints, Term x, Op v) {
-        if (taskPattern.equals(x) || beliefPattern.equals(x))
-            pres.add(new TaskBeliefHas(v.bit, taskPattern.equals(x), beliefPattern.equals(x)));
+    private static void termIs(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, SortedSet<MatchConstraint> constraints, Term x, Op v) {
         constraints.add(new OpConstraint(x, v));
+
+
+        includesOp(pres, taskPattern, beliefPattern, x, v);
+    }
+
+    private static void includesOp(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, Term x, Op o) {
+        boolean inTask = taskPattern.containsRecursively(x);
+        boolean inBelief = beliefPattern.containsRecursively(x);
+        if (inTask || inBelief)
+            pres.add(new TaskBeliefHas(o.bit, inTask, inBelief));
     }
 
 
-    private static void opIsNot(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
+    private static void termIsNot(@NotNull Set<PrediTerm> pres, Term task, Term belief, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
         constraints.add(new OpExclusionConstraint(t, structure));
     }
 
-    private static void termHas(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
-        constraints.add(new StructureInclusionConstraint(t, structure));
+    private static void termHas(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, Op o) {
+        constraints.add(new StructureInclusionConstraint(x, o.bit));
+
+        includesOp(pres, task, belief, x, o);
     }
 
     private static void termHasNot(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {

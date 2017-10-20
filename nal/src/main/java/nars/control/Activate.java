@@ -52,7 +52,7 @@ public class Activate extends UnaryTask<Concept> {
             buildTemplates(nar);
 
         float cost = TermLinks.linkTemplates(id, templates, priElseZero(), nar.momentum.floatValue(), nar);
-        if (cost > Pri.EPSILON)
+        if (cost >= Pri.EPSILON)
             priSub(cost);
 
         return hypothesize(nar);

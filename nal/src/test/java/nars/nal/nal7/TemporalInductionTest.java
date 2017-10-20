@@ -3,8 +3,10 @@ package nars.nal.nal7;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
+import nars.Param;
 import nars.concept.BaseConcept;
 import nars.table.BeliefTable;
+import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -16,6 +18,56 @@ import static org.junit.Assert.*;
  * Created by me on 6/8/15.
  */
 public class TemporalInductionTest {
+
+    @Test
+    public void inductionDiffEventsAtom() {
+        testInduction("before", "after", 10);
+    }
+
+    @Test
+    public void inductionDiffEventsCompound() {
+        testInduction("x:before", "x:after", 10);
+    }
+
+    @Test
+    public void inductionDiffEventsNegPos() {
+        Param.DEBUG = true;
+        testInduction("--x:before", "x:after", 4);
+    }
+
+    @Test
+    public void inductionSameEvents() {
+        testInduction("x", "x", 10);
+    }
+
+    @Test
+    public void inductionSameEventsNeg() {
+        testInduction("--x", "--x", 10);
+    }
+
+    @Test
+    public void inductionSameEventsInvertPosNeg() {
+        testInduction("x", "--x", 10);
+    }
+
+    @Test
+    public void inductionSameEventsInvertNegPos() {
+        testInduction("--x", "x", 10);
+    }
+
+    static void testInduction(String a, String b, int dt) {
+        int cycles = dt * 16;
+        new TestNAR(NARS.tmp())
+                .log()
+                .input(a + ". :|:")
+                .inputAt(dt, b + ". :|:")
+                .mustBelieve(cycles, "(" + a + " ==>+" + dt + " " + b + ")", 1.00f, 0.45f /*abductionConf*/, 0)
+                .mustBelieve(cycles, "(" + b + " ==>-" + dt + " " + a + ")", 1.00f, 0.45f /*inductionConf*/, dt)
+                .mustBelieve(cycles, "(" + a + " &&+" + dt + " " + b + ")", 1.00f, 0.81f /*intersectionConf*/, 0, dt)
+                .run(cycles, true)
+        ;
+    }
+
 
     @Test
     public void testTemporalInduction() throws Narsese.NarseseException {
@@ -65,13 +117,13 @@ public class TemporalInductionTest {
 
         //most current relevant overall:
         assertEquals(
-                "(b-->a). 5 %0.0;.85%"
+                "(b-->a). 5 %0.0;.90%"
                 , n.belief(c.term(), 5).toStringWithoutBudget());
 
 
         //least relevant
         assertEquals(
-                "(b-->a). 0 %1.0;.85%"
+                "(b-->a). 0 %1.0;.90%"
                 , n.belief(c.term(), 0).toStringWithoutBudget());
 
     }

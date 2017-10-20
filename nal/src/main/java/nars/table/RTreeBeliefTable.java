@@ -176,8 +176,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         FloatFunction<Task> ts =
                 (template != null && template.isTemporal()) ?
-                    taskStrength(template, start, end) :
-                taskStrength(start, end);
+                        taskStrength(template, start, end) :
+                        taskStrength(start, end);
 
         FloatFunction<TaskRegion> strongestTask =
                 new CachedFloatFunction<>(t -> +ts.floatValueOf((Task) t));
@@ -349,16 +349,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             }
         });
 
-        //check for an override about partial activation of the input which would have been appended to its log during rtree add/merge procedure
-        Object ar = x.meta("partialActivation");
-        if (ar instanceof BiConsumer) {
-            x.meta("partialActivation", null);
-            ((BiConsumer) ar).accept(n, c);
-            boolean addOrRemInput = changes.removeKeyIfAbsent(x, true /*ignored*/);
-            if (!addOrRemInput) {
-                x.delete(); //delete which would have occurred in the block below anyway
-            }
-        }
 
         changes.forEachKeyValue((task, addOrRemove) -> {
             if (addOrRemove) {
@@ -374,10 +364,17 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     //it's a new merge
                     n.input(task);
                 }
-            } else {
-                task.delete();
+            } else {      //check for an override about partial activation of the input which would have been appended to its log during rtree add/merge procedure
+                assert (task.isDeleted());
             }
         });
+
+        Object ar = x.meta("partialActivation");
+        if (ar instanceof BiConsumer) {
+            assert (x.isDeleted());
+            x.meta("partialActivation", null);
+            ((BiConsumer) ar).accept(n, c);
+        }
     }
 
     boolean ensureCapacity(Space<TaskRegion> treeRW, @Nullable Task inputRegion, ObjectBooleanHashMap<Task> changes, NAR nar) {
@@ -386,7 +383,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         if (size <= cap)
             return true;
 
-        int dur = 1 + (int) ( tableDur());
+        int dur = 1 + (int) (tableDur());
 
         long now = nar.time();
         FloatFunction<Task> taskStrength =
@@ -476,7 +473,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
 
-
     private static boolean mergeOrDelete(Space<TaskRegion> treeRW, Leaf<TaskRegion> l, FloatFunction<Task> taskStrength, float inputStrength, FloatFunction<TaskRegion> weakestTasks, ObjectBooleanHashMap<Task> changes, NAR nar) {
         short s = l.size;
         assert (s > 0);
@@ -492,7 +488,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             b = l.get(1);
         }
 
-        assert(a!=null);
+        assert (a != null);
         Task at = a.task();
         treeRW.remove(at);
         changes.put(at, false);
@@ -518,8 +514,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     treeRW.remove(bt);
                     changes.put(bt, false);
 
-                    ((NALTask)at).delete(c); //forward
-                    ((NALTask)bt).delete(c); //forward
+                    ((NALTask) at).delete(c); //forward
+                    ((NALTask) bt).delete(c); //forward
 
                     changes.put(c, true); //but dont add it now, because it may be for another concept
 
@@ -532,10 +528,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
 
         //merge impossible, delete a
-        if (b!=null)
-            ((NALTask)at).delete(b.task()); //forward
+        if (b != null)
+            ((NALTask) at).delete(b.task()); //forward
         else
-            ((NALTask)at).delete();
+            ((NALTask) at).delete();
 
         return true;
     }
@@ -574,7 +570,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     r.furthestTimeTo(when);
             long timeDist = 1 + Math.abs(when - regionTime);
 
-            float antiConf = 1f - (float) (r.coord(true, 2)+r.coord(false,2))/2f;
+            float antiConf = 1f - (float) (r.coord(true, 2) + r.coord(false, 2)) / 2f;
 
             //float span = (float)(1 + r.range(0)/dur); //span becomes less important the further away, more fair to short near-term tasks
 
@@ -719,27 +715,28 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 return; //same instance
 
             Task i = incoming.task();
+
             float activation = i.priElseZero();
+
+            i.delete();
+
             if (activation < Prioritized.EPSILON)
                 return;
 
+            //partial activate
             Task e = existing.task();
             float before = e.priElseZero();
             ((NALTask) e).causeMerge(i);
             float after = e.priMax(activation);
             float activationApplied = (after - before);
 
+            if (activationApplied < Prioritized.EPSILON)
+                return;
 
-            BiConsumer<NAR, Concept> partialActivationSignal;
-            if (activationApplied >= Prioritized.EPSILON) {
-                partialActivationSignal = ((BiConsumer<NAR, Concept>) (nar, c) -> {
-                    TermLinks.linkTask(e, activationApplied, nar, c);
-                }); //store here so callee can activate outside of the lock
-            } else {
-                partialActivationSignal = (x,y)-> { /* nop */};
-            }
+            i.meta("partialActivation", ((BiConsumer<NAR, Concept>) (nar, c) -> {
+                TermLinks.linkTask(e, activationApplied, nar, c);
+            }));
 
-            i.meta("partialActivation", partialActivationSignal);
         }
 
     }

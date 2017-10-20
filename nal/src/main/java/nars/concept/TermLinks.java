@@ -4,6 +4,7 @@ import jcog.list.FasterList;
 import jcog.pri.PLink;
 import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import nars.*;
 import nars.control.Activate;
 import nars.control.BatchActivate;
@@ -54,20 +55,18 @@ public enum TermLinks {
 
         Op o = b.op();
         switch (o) {
-            case VAR_DEP:
-            case VAR_INDEP:
             case VAR_QUERY:
                 return; //NO
-                //break; //YES
-            default:
-                if (!o.conceptualizable)
-                    return;
+            case VAR_DEP:
+            case VAR_INDEP:
+                break; //YES
+
         }
 
         if (!tc.add(b))
             return; //already added
 
-        if (--layersRemain <= 0) // || !b.op().conceptualizable || b.isAny(VAR_QUERY.bit | VAR_PATTERN.bit))
+        if ((--layersRemain <= 0) || !b.op().conceptualizable)
             return;
 
         int bs = b.subs();
@@ -102,7 +101,7 @@ public enum TermLinks {
                 return 2;
 
             case INH:
-                return 3;
+                return 4;
 
             case IMPL:
                 if (host.hasAny(Op.CONJ))
@@ -131,7 +130,9 @@ public enum TermLinks {
 
         n.input(new Activate(cc, activationApplied));
 
-        n.eventTask.emit(t);
+        if (activationApplied >= Prioritized.EPSILON_VISIBLE) {
+            n.eventTask.emit(t);
+        }
     }
 
     public static void linkTemplate(Concept src, Termed target, float priForward, float priReverse, BatchActivate a, NAR nar, MutableFloat refund) {

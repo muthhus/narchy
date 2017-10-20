@@ -98,7 +98,7 @@ public class DeductiveMeshTest {
 
         NAR n = new NARS().get();
         //n.nal(5);
-        n.logBudgetMin(System.out, 0.1f);
+        n.logPriMin(System.out, 0.1f);
 
 
 //        n.onCycle(x -> {

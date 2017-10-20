@@ -51,6 +51,45 @@ public class Builtin {
                     return y;
             }),
 
+            /** similar to C/Java "indexOf" but returns a set of all numeric indices where the 2nd argument occurrs as a subterm of the first
+             *  if not present, returns Null
+             * */
+            Functor.f2("numIndicesOf", (x,y) -> {
+                int s = x.subs();
+                if (s > 0) {
+                    TreeSet<Term> indices = null; //lazy alloc
+                    for (int i = 0; i < s; i++) {
+                        if (x.sub(i).equals(y)) {
+                            if (indices == null) indices = new TreeSet();
+                            indices.add(Int.the(i));
+                        }
+                    }
+                    if (indices == null)
+                        return Null;
+                    else {
+                        return $.sete(indices);
+                    }
+                }
+                return Null;
+            }),
+            Functor.f2("indicesOf", (x,y) -> {
+                int s = x.subs();
+                if (s > 0) {
+                    TreeSet<Term> indices = null; //lazy alloc
+                    for (int i = 0; i < s; i++) {
+                        if (x.sub(i).equals(y)) {
+                            if (indices == null) indices = new TreeSet();
+                            indices.add($.p(y, Int.the(i)));
+                        }
+                    }
+                    if (indices == null)
+                        return Null;
+                    else {
+                        return $.sete(indices);
+                    }
+                }
+                return Null;
+            }),
             //Functor.f0("date", () -> quote(new Date().toString())),
 
             Functor.f1Const("reflect", reflect::reflect),

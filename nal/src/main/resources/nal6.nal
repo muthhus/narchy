@@ -10,6 +10,12 @@
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
+    //strong unification
+    (Y ==> X), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:Deduction)
+    (--Y ==> X), Z, task(".")   |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:DeductionPN)
+    (X ==> Y), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:AbductionPB)
+    //(--X ==> Y), Z, task(".")   |- (--,subIfUnifiesAny(X,Y,Z)), (Belief:AbductionN)
+
     //If after S M happens, and after M P happens, so P happens after S
     (M ==> P), (S ==> M) |- (S ==>+- P), (Belief:Deduction)
         (S ==> M), (M ==> P) |- (S ==>+- P), (Belief:Deduction)
@@ -98,24 +104,8 @@
 
 //conditional abduction
 
-    ((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:AbductionPB)
-    ((&&,M,A..+) ==> X), ((&&,A..+) ==> Y), task(".") |- subIfUnifiesAny(M,X,Y,"$"), (Belief:AbductionPB)
-    //(M ==> C), C, task(".") |- M, (Belief:Abduction)
-    //(M ==> X), Y, task(".") |- subIfUnifiesAny(M,X,Y,"$"), (Belief:Abduction)
-
-        //has(A,"$"),
-    //B, ((--,%A) ==> C), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursiveN, Goal:InductionRecursiveN)
-    //    B, (A ==> C), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursivePN, Goal:InductionRecursivePN)
-    //    B, ((--,%A) ==> C), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursiveNN, Goal:InductionRecursiveNN)
-
-    //B, (C ==> A), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
-    //B, ((--,%C) ==> A), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:AbductionN, Goal:DeductionN)
-        //B, (C ==> A), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionPN, Goal:DeductionPN)
-        //B, ((--,%C) ==> A), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionNN, Goal:DeductionNN)
-
-
-
-
+    ((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny((M ==>+- C),X,Y), (Belief:AbductionPB)
+    ((&&,M,A..+) ==> X), ((&&,A..+) ==> Y), task(".") |- subIfUnifiesAny((M ==>+- C),X,Y,"$"), (Belief:AbductionPB)
 
     //answering
     Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Z), Y, Z, "$", strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
@@ -124,11 +114,6 @@
     Z, (--X==>Y), task("?") |- subIfUnifiesAny((--Z ==>+- Y), X, Z, "$", strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
         //Z, (X==>Y), task("?") |- subIfUnifiesAny(X, Y, Z, strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
 
-    //strong unification
-    //(Y==>X),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Deduction)
-    //((--,%Y)==>X),Z,task(".") |- subIfUnifiesAny(X,Y,Z), (Belief:DeductionPN)
-    //(X==>Y),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Abduction)
-    //((--,%X)==>Y),Z,task(".") |- (--,subIfUnifiesAny(X,Y,Z)), (Belief:AbductionPN)
 
     //B, (C && A), task("!"), time(urgent) |- subIfUnifiesAny(C,A,B), (Goal:Strong)
     //B, (C && (--,%A)), task("!"), time(urgent) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)

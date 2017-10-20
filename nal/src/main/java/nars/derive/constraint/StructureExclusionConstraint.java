@@ -11,7 +11,7 @@ public final class StructureExclusionConstraint extends MatchConstraint {
     private final int structure;
 
     public StructureExclusionConstraint(Term target, int opVector) {
-        super("StructExcl", target, $.the(opVector));
+        super(target, "StructExcl", $.the(opVector));
         this.structure = opVector;
     }
 

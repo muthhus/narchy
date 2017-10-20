@@ -56,7 +56,7 @@ abstract public class TaskBeliefOccurrence extends AbstractPred<Derivation> {
             if (b == null)
                 return false;
             Task t = m.task;
-            return (!t.isEternal() && !b.isEternal()) && (t.start() >= b.end());
+            return (!t.isEternal() && !b.isEternal()) && (t.start() >= b.start());
         }
     };
 
