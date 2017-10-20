@@ -92,8 +92,10 @@ public class Signal {
 
 
             if (current == next) {
-                current.priMax(pri.asFloat());
-                current.grow(now);
+                if (current!=null) {
+                    current.priMax(pri.asFloat());
+                    current.grow(now);
+                }
                 return null;  //dont re-input the task, just stretch it where it is in the temporal belief table
             } else {
                 if (current!=null) {

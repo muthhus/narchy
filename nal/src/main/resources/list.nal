@@ -2,6 +2,7 @@
 (P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ({indicesOf(P,X)}-->C), (Belief:Identity, Goal:Identity)
 (C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (C-->{indicesOf(P,X)}), (Belief:Identity, Goal:Identity)
 
+
 //GOAL ANALOGIES
 //1. IMPL=based
 (P-->C), (A ==> (Q-->C)), neq(Q,P), task("!") |- (A ==>+- (P-->C)), (Punctuation:Question)
@@ -12,8 +13,11 @@
         (P-->C), ((Q-->C) ==> A), neq(Q,P), task("!") |- substDiff(A, Q, P), (Punctuation:Quest)
 
 //2. CONJ-based
-(P-->C), (A && (Q-->C)), neq(Q,P), task("!") |- (substDiff(A,Q,P) &&+- (P-->C)), (Punctuation:Question)
-    (P-->C), (A && (Q-->C)), neq(Q,P), task("!") |- substDiff(A,Q,P), (Punctuation:Quest)
+(P-->C), (A && (Q-->C)), neq(Q,P), task("!") |- (substDiff(A,Q,P) &&+- (P-->C)), (Punctuation:Quest)
+    (P-->C), (A && --(Q-->C)), neq(Q,P), task("!") |- (substDiff(A,Q,P) &&+- --(P-->C)), (Punctuation:Quest)
+(C-->P), (A && (C-->Q)), neq(Q,P), task("!") |- (substDiff(A,Q,P) &&+- (C-->P)), (Punctuation:Quest)
+    (C-->P), (A && --(C-->Q)), neq(Q,P), task("!") |- (substDiff(A,Q,P) &&+- --(C-->P)), (Punctuation:Quest)
+
 
 //(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (indicesOf(P,X)-->P), (Belief:Identity, Goal:Identity)
 //(C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (P-->indicesOf(P,X)), (Belief:Identity, Goal:Identity)

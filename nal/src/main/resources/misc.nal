@@ -1,12 +1,9 @@
 
-
 //substitutionViaSimilarity
-
-
      R, (S<->P)  |- subIfUnifiesAny(P, S, R), (Belief:Analogy, Goal:Weak)
      R, (--S<->P)  |- subIfUnifiesAny(P, S, R), (Belief:AnalogyN, Goal:WeakN)
-     (&&,X,A..+), (X<->Y)  |- substitute((&&,X,A..+),X,Y), (Belief:Analogy, Goal:Weak)
-     (A..+), (X<->Y)  |- substitute((A..+),X,Y), (Belief:Analogy, Goal:Weak)
+     Z, (X<->Y)  |- substitute(Z,X,Y,"strict"), (Belief:Analogy, Goal:Weak)
+     Z, (--X<->Y)  |- substitute(Z,X,Y,"strict"), (Belief:AnalogyN, Goal:WeakN)
      (X ==> Z), (X<->Y) |- (Y ==>+- Z), (Belief:Analogy)
      (Z ==> X), (X<->Y) |- (Z ==>+- Y), (Belief:Analogy)
      (Z ==> X), (--X<->Y) |- (Z ==>+- Y), (Belief:AnalogyN)

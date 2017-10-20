@@ -6,6 +6,10 @@ import nars.NARS;
 import nars.Param;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.Op.BELIEF;
+import static nars.Op.QUEST;
+import static nars.Op.QUESTION;
+
 public class ThermostatTest {
 
     static final float speed = 0.02f;
@@ -32,31 +36,48 @@ public class ThermostatTest {
 
         n = NARS.tmp();
 
+        n.priDefault(BELIEF, 0.2f);
+        n.priDefault(QUESTION, 0.1f);
+        n.priDefault(QUEST, 0.1f);
+
         n.log();
 
         OObjects objs = new OObjects(n);
 
         this.x = objs.the("x", MutableInteger.class, 0);
 
-        x.set(0);
-        n.run(1);
-        x.intValue();
-        n.run(1);
+        for (int i = 0; i < 10; i++) {
+            x.set(0);
+            n.run(1);
+            x.intValue();
+            n.run(1);
 
-        x.set(1);
-        n.run(1);
-        x.intValue();
-        n.run(1);
+            n.run(10);
+
+            x.set(1);
+            n.run(1);
+            x.intValue();
+            n.run(1);
+
+            n.run(10);
+        }
 
         x.set(0);
         n.run(1);
 
         n.time.dur(10);
-        n.truthResolution.set(0.1f);
+        n.truthResolution.set(0.05f);
+        n.termVolumeMax.set(28);
 
-        while (x.intValue()!=1) {
-            n.input("x(intValue, (), 1)! :|:");
-            n.run(10);
+
+        while (x.intValue()!=1 /*&& n.time() < 1000*/) {
+            if (n.time() % 100 == 0) {
+                n.clear();
+                n.input("$1.0 x(intValue, (), 1)! :|:");
+                n.input("$1.0 (0<->1)?");
+            }
+            n.run(1);
+
         }
 
 

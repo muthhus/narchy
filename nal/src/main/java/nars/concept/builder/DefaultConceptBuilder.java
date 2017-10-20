@@ -132,7 +132,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                                     ////                                            Int.unroll(subj).forEachRemaining(dsi -> lx.add(INH.the(dsi, pred)));
                                     //                                } else {
                                     Term x = INH.the(csi, pred);
-                                    assert (!(x instanceof Bool) && !(x instanceof Variable));
+                                    assert (!(x instanceof Bool) && !(x instanceof Variable)): "(" + csi + " --> " + pred + ") produced invalid term as part of " + t;
                                     lx.add(x);
                                     //                                }
                                 }

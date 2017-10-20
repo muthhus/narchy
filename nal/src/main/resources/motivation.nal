@@ -2,7 +2,7 @@
     X, X, task("!") |-          (?1 ==>+- X), (Punctuation:Question)
     X, X, task("!") |-          (X ==>+- ?1), (Punctuation:Question)
     X, X, task("!") |-        (--X ==>+- ?1), (Punctuation:Question)
-    X, Y, task("!") |-          ((Y &&+- ?1) ==>+- X), (Punctuation:Question)
+    //X, Y, task("!") |-          ((Y &&+- ?1) ==>+- X), (Punctuation:Question)
 
 ////    X, X, task("!") |-           (?1 && X), (Punctuation:Question)
 //    X, X, task("!") |-           (?1 &&+- X), (Punctuation:Question)

@@ -47,7 +47,7 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
         /** activity counter */
         long action = 0;
 
-        long lastActive;
+        public long lastActive;
 
 
         public TLink(X key, long now) {

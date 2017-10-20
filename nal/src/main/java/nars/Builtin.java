@@ -91,6 +91,7 @@ public class Builtin {
                         return Null;
                     else {
                         return $.sete(indices);
+                        //return $.secte(indices);
                     }
                 }
                 return Null;
@@ -109,7 +110,13 @@ public class Builtin {
                     if (indices == null)
                         return Null;
                     else {
-                        return $.secte(indices);
+                        switch (indices.size()) {
+                            case 0: return Null; //shouldnt happen
+                            case 1: return indices.first();
+                            default:
+                                //return $.secte(indices);
+                                return $.sete(indices);
+                        }
                     }
                 }
                 return Null;

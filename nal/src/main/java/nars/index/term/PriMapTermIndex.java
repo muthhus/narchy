@@ -74,14 +74,14 @@ public class PriMapTermIndex extends MaplikeTermIndex {
 //                System.out.println(y.key + " " + c);
 //            }
 
-            @Override
-            protected TLink<Term, Concept> getLink(Object x) {
-                TLink<Term, Concept> y = super.getLink(x);
-                if (y!=null) {
-                    update(y);
-                }
-                return y;
-            }
+//            @Override
+//            protected TLink<Term, Concept> getLink(Object x) {
+//                TLink<Term, Concept> y = super.getLink(x);
+//                if (y!=null) {
+//                    update(y);
+//                }
+//                return y;
+//            }
 
 
             @Override
@@ -130,9 +130,9 @@ public class PriMapTermIndex extends MaplikeTermIndex {
             /**
              * items per ms
              */
-            int probeRate = 1;
+            float probeRate = 0.5f;
 
-            private void probeEvict(float evictPower, int itemsPerMS) {
+            private void probeEvict(float evictPower, float itemsPerMS) {
                 if (concepts == null) return;
                 if (probe == null)
                     probe = Iterables.cycle(concepts::linkIterator).iterator();
@@ -153,6 +153,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
 
             @Override
             protected void onRemove(Term term, Concept termed) {
+                assert(!(termed instanceof PermanentConcept));
                 //System.err.println("remove: " + term);
                 PriMapTermIndex.this.onRemove(termed);
             }
