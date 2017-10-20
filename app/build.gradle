@@ -28,6 +28,7 @@ shadowJar {
     exclude 'com/sun/jna/aix*'
     exclude 'Conversant*.png'
 
+    mainClassName = 'nars.TextUI'
 
 //   baseName = 'nars_app'
 //   classifier = null

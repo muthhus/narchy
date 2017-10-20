@@ -64,10 +64,11 @@ public class Builtin {
                             m.put(f, t);
                         }
                     }
-                    assert(m.size() > 0);
-                    Term y = target.replace(m);
-                    if (!y.equals(target))
-                        return y;
+                    if (!m.isEmpty()) { //can be empty in 'dt' cases
+                        Term y = target.replace(m);
+                        if (!y.equals(target))
+                            return y;
+                    }
                 }
                 return Null;
             }),

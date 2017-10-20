@@ -173,7 +173,7 @@ public class NARS {
     }
 
     public static NARS realtime() {
-        return realtime(1);
+        return realtime(2);
     }
 
     /**

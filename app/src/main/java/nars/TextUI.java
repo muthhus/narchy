@@ -96,7 +96,7 @@ public class TextUI {
 
         nar.time.dur(100); //100 x centisecond = 1 sec
 
-        nar.startFPS(100f);
+        nar.startFPS(10f);
 
         new TextUI(nar, 1024);
 

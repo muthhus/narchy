@@ -110,7 +110,7 @@ public class MultiExec extends Exec {
 
         public int think(int conc) {
             int p;
-            if ((p = premiseRemaining = can.share(1f / conc)) > 0) {
+            if ((p = premiseRemaining = Math.max(1,can.share(1f / conc))) > 0) {
                 premiseDone = 0;
 
                 int loops = 0;
