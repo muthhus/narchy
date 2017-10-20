@@ -192,7 +192,8 @@ public class Derivation extends Unify {
                 nar.get(Atomic.the("conjDropIfEarliest")),
                 nar.get(Atomic.the("ifConjCommNoDepVars")),
                 nar.get(Atomic.the("without")),
-                nar.get(Atomic.the("indicesOf"))
+                nar.get(Atomic.the("indicesOf")),
+                nar.get(Atomic.the("substDiff"))
         );
 
 

@@ -15,10 +15,7 @@ import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
 
@@ -49,6 +46,30 @@ public class Builtin {
                     return x; //no variables introduced, fall-through
                 else
                     return y;
+            }),
+
+            /** applies the changes in structurally similar terms "from" and "to" to the target term */
+            Functor.f3((Atom)$.the("substDiff"), (target, from, to) -> {
+                if (from.equals(to))
+                    return Null; //only interested in when there is a difference to apply
+
+                int n;
+                if (from.op() == to.op() && (n = from.subs()) == to.subs()) {
+                    //likely they have the same structure
+                    Map<Term,Term> m = new HashMap();
+                    for (int i = 0; i < n; i++) {
+                        Term f = from.sub(i);
+                        Term t = to.sub(i);
+                        if (!f.equals(t)) {
+                            m.put(f, t);
+                        }
+                    }
+                    assert(m.size() > 0);
+                    Term y = target.replace(m);
+                    if (!y.equals(target))
+                        return y;
+                }
+                return Null;
             }),
 
             /** similar to C/Java "indexOf" but returns a set of all numeric indices where the 2nd argument occurrs as a subterm of the first

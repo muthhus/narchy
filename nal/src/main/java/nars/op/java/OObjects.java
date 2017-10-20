@@ -1,9 +1,6 @@
 package nars.op.java;
 
 import com.google.common.primitives.Primitives;
-import com.google.common.reflect.Invokable;
-import com.google.common.reflect.TypeToken;
-import javassist.tools.reflect.Reflection;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 import javassist.util.proxy.ProxyObject;
@@ -15,32 +12,28 @@ import nars.Task;
 import nars.op.Operator;
 import nars.task.NALTask;
 import nars.task.TaskBuilder;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.time.Tense;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.platform.commons.support.ReflectionSupport;
+import org.junit.platform.commons.util.Preconditions;
 import org.junit.platform.commons.util.ReflectionUtils;
 
-import javax.script.Invocable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static jcog.map.CustomConcurrentHashMap.*;
 import static nars.Op.ATOM;
+import static nars.Op.PROD;
 import static nars.Op.VAR_DEP;
+import static org.junit.platform.commons.util.ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP;
 
 
 /**
@@ -49,11 +42,7 @@ import static nars.Op.VAR_DEP;
  * stored, input to one or more reasoners, etc..
  * <p>
  * <p>
- * TODO -
- *  use guava proxies and remove javassist dependency
- *  reflect the available methods first, add them as individual operators
- *      and intercept those correctly. this will avoid dispatch lookup
- *      on each invocation
+ * TODO option to include stack traces in conjunction with invocation
  */
 public class OObjects extends DefaultTermizer implements Termizer, MethodHandler {
 
@@ -98,34 +87,13 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
         nar = n;
     }
 
-    static Term operation(Method overridden, Term[] args) {
-        //dereference class to origin, not using a wrapped class
-        Class c = overridden.getDeclaringClass();
-
-        //HACK
-        if (c.getName().contains("_$$_")) ////javassist wrapper class
-            c = c.getSuperclass();
-
-        return $.func((Atomic) $.the(c.getSimpleName()), args);
-    }
-
-    public static boolean isMethodVisible(Method m) {
-        String n = m.getName();
-        return !methodExclusions.contains(n) &&
-
-                //javassist wrapper method HACK todo use something more specific this could trigger a false positive
-                !n.contains("_d")
-
-                && (m.getDeclaringClass() != Object.class);
-    }
-
 
     @Override
     protected Term classInPackage(Term classs, Term packagge) {
         Term t = $.inst(classs, packagge);
-        nar.believe(metadataPriority, t,
-                Tense.ETERNAL,
-                metadataBeliefFreq, metadataBeliefConf);
+//        nar.believe(metadataPriority, t,
+//                Tense.ETERNAL,
+//                metadataBeliefFreq, metadataBeliefConf);
         return t;
     }
 
@@ -134,20 +102,23 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
     protected void onInstanceChange(Term oterm, Term prevOterm) {
 
         Term s = $.sim(oterm, prevOterm);
-        if (s instanceof Compound)
-            nar.believe(metadataPriority, s,
-                    Tense.ETERNAL,
-                    metadataBeliefFreq, metadataBeliefConf);
+//        if (s instanceof Compound)
+//            nar.believe(metadataPriority, s,
+//                    Tense.ETERNAL,
+//                    metadataBeliefFreq, metadataBeliefConf);
 
     }
 
 
-    @Nullable Task feedback(Object instance, Method method, Object[] args, Object result) {
+    @Nullable Task feedback(Object instance, Method method, Object[] args, boolean explicit, Object result) {
         if (methodExclusions.contains(method.getName()))
             return null;
 
-        Term classmethod = $.the(instance.getClass().getSimpleName() + "_" +  method.getName());
-        Term op = operation(method, getMethodInvocationTerms(method, instance, args, result));
+        Atom in = (Atom) instances.inverse().get(instance);
+
+        Term[] targs = opTerms(method, instance, args, result);
+
+        Term op = $.func(in, targs);
 
         TaskBuilder g = $.belief(op,
                 invocationGoalFreq, invocationGoalConf).
@@ -157,14 +128,14 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
     }
 
     @NotNull
-    private Term[] getMethodInvocationTerms(@NotNull Method method, Object instance, Object[] args, Object result) {
+    private Term[] opTerms(Method method, Object instance, Object[] args, Object result) {
 
         //TODO handle static methods
 
         boolean isVoid = method.getReturnType() == void.class;
 
-        Term[] x = new Term[isVoid ? 3 : 4];
-        x[0] = term(instance);
+        Term[] x = new Term[isVoid ? 2 : 3];
+        x[0] = $.the(method.getName());
         x[1] = args.length != 1 ? $.p(terms(args)) : term(args[0]) /* unwrapped singleton */;
         if (!isVoid)
             x[2] = term(result);
@@ -187,64 +158,95 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
      */
     @NotNull
     public <T> T the(String id, Class<? extends T> instance, Object... args) {
+
+        Atom o = (Atom) $.the(id);
+
         Class clazz = proxyCache.computeIfAbsent(instance, (c) -> {
             ProxyFactory p = new ProxyFactory();
             p.setSuperclass(c);
 
-            String opName = c.getSimpleName();
 
-            nar.onOp(opName, new Operator.AtomicExec(operator(null /* TODO */), 0.5f));
+            nar.onOp(id, new Operator.AtomicExec(operator(c), 0.5f));
 
             return p.createClass();
         });
 
 
         try {
-            return the((Atom) $.the(id), (T) clazz.getConstructors()[0].newInstance(args));
+            return the(o, (T) clazz.getConstructors()[0].newInstance(args));
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }
 
 
-    private BiConsumer<Task, NAR> operator(MethodHandle mm) {
+    private BiConsumer<Task, NAR> operator(Class c) {
         return (task, n) -> {
-            TermContainer args = Operator.args(task);
+
+            Term taskTerm = task.term();
+            TermContainer args = Operator.args(taskTerm);
             int a = args.subs();
-            if (!(a == 3 || (a == 4 && args.sub(3).op() == VAR_DEP))) {
+            if (!(a == 2 || (a == 3 && args.sub(2).op() == VAR_DEP))) {
                 //this is likely a goal from the NAR to itself about a desired result state
                 //used during reasoning
                 //anyway it is invalid for invocation (u
                 return;
             }
 
+
+
             Term method = args.sub(0);
             if (method.op() != ATOM)
                 return;
 
-            Term instance = args.sub(1);
-            Object inst = instances.get(instance);
-            if (inst == null)
+            Term methodArgs = args.sub(1);
+
+            boolean maWrapped = methodArgs.op() == PROD;
+
+            int aa = maWrapped ? methodArgs.subs() : 1;
+
+            Object[] orgs;
+            Class[] types;
+            if (aa == 0) {
+                orgs = ArrayUtils.EMPTY_OBJECT_ARRAY;
+                types = ArrayUtils.EMPTY_CLASS_ARRAY;
+            } else {
+                orgs = object(maWrapped ? methodArgs.subterms().theArray() : new Term[] { methodArgs });
+                types = Util.map(x -> Primitives.unwrap(x.getClass()),
+                        new Class[orgs.length], orgs);
+            }
+
+            MethodHandle mm;
+            try {
+
+                Method x = findMethod(c, method.toString(), types);
+
+                if (x == null) {
+                    x = findMethod(Object.class, method.toString(), types);
+                }
+
+                if (x == null)
+                    return;
+
+                x.trySetAccessible();
+
+                mm = MethodHandles.lookup().unreflect(x);
+
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            if (mm == null)
                 return;
 
-            Term methodArgs = args.sub(2);
-            int m = methodArgs.subs();
-            Object[] orgs;
-            if (m == 0) {
-                orgs = ArrayUtils.EMPTY_OBJECT_ARRAY;
-            } else {
-                orgs = object(methodArgs.subterms().theArray());
-//
-//                Class[] types = Util.map(x -> Primitives.unwrap(x.getClass()),
-//                        new Class[orgs.length], orgs);
-//                mm = method(c, methodName, types);
-//                if (mm == null)
-//                    return;
-            }
+
 
             invokingGoal.set(task);
             try {
-
+                Atom ins = Operator.func(taskTerm);
+                Object inst = instances.get(ins);
+                assert(inst!=null);
                 mm.bindTo(inst).invokeWithArguments(orgs);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
@@ -255,20 +257,72 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
         };
     }
 
-    private MethodHandle method(Class c, String methodName, Class<?>[] types) {
-        try {
-            Method m = ReflectionUtils.findMethod(c, methodName, types).orElse(null);
-            if (m == null)
-                return null;
-            m.trySetAccessible();
-            return MethodHandles.lookup().unreflect(m);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
 
+	private static Method findMethod(Class<?> clazz, Predicate<Method> predicate) {
+		Preconditions.notNull(clazz, "Class must not be null");
+		Preconditions.notNull(predicate, "Predicate must not be null");
+
+		for (Class<?> current = clazz; current != null; current = current.getSuperclass()) {
+			// Search for match in current type
+			Method[] methods = current.isInterface() ? current.getMethods() : current.getDeclaredMethods();
+			for (Method method : methods) {
+				if (predicate.test(method)) {
+					return method;
+				}
+			}
+
+			// Search for match in interfaces implemented by current type
+			for (Class<?> ifc : current.getInterfaces()) {
+				Method m = findMethod(ifc, predicate);
+				if (m!=null)
+				    return m;
+			}
+		}
+
+		return null;
+	}
+/**
+	 * Determine if the supplied candidate method (typically a method higher in
+	 * the type hierarchy) has a signature that is compatible with a method that
+	 * has the supplied name and parameter types, taking method sub-signatures
+	 * and generics into account.
+	 */
+	private static boolean hasCompatibleSignature(Method candidate, String methodName, Class<?>[] parameterTypes) {
+		if (!methodName.equals(candidate.getName())) {
+			return false;
+		}
+		if (parameterTypes.length != candidate.getParameterCount()) {
+			return false;
+		}
+		// trivial case: parameter types exactly match
+		if (Arrays.equals(parameterTypes, candidate.getParameterTypes())) {
+			return true;
+		}
+		// param count is equal, but types do not match exactly: check for method sub-signatures
+		// https://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html#jls-8.4.2
+		for (int i = 0; i < parameterTypes.length; i++) {
+			Class<?> lowerType = parameterTypes[i];
+			Class<?> upperType = candidate.getParameterTypes()[i];
+			if (!upperType.isAssignableFrom(lowerType)) {
+				return false;
+			}
+		}
+		// lower is sub-signature of upper: check for generics in upper method
+		if (isGeneric(candidate)) {
+			return true;
+		}
+		return false;
+	}
+
+	static boolean isGeneric(Method method) {
+		return isGeneric(method.getGenericReturnType())
+				|| Arrays.stream(method.getGenericParameterTypes()).anyMatch(OObjects::isGeneric);
+	}
+
+	private static boolean isGeneric(Type type) {
+		return type instanceof TypeVariable || type instanceof GenericArrayType;
+	}
 
     @Nullable
     @Override
@@ -276,20 +330,22 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
 
         Object result = wrapper.invoke(obj, args);
 
-        if (methodExclusions.contains(wrapped.getName()))
-            return result; //pass-through
-
-        Task fb = feedback(obj, wrapped, args, result);
-
         Task cause = invokingGoal.get();
-        if (cause != null) {
-            ((NALTask) fb).causeMerge(cause);
-            ((NALTask) fb).priMax(cause.priElseZero());
-        } else {
-            fb.priMax(nar.priDefault(fb.punc()));
-        }
 
-        nar.input(fb);
+        boolean explicit = cause != null;
+
+        Task fb = feedback(obj, wrapped, args, explicit, result);
+        if (fb!=null) {
+
+            if (explicit) {
+                ((NALTask) fb).causeMerge(cause);
+                ((NALTask) fb).priMax(cause.priElseZero());
+            } else {
+                fb.priMax(nar.priDefault(fb.punc()));
+            }
+
+            nar.input(fb);
+        }
 
         return result;
     }
@@ -320,30 +376,20 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
         return wrappedInstance;
     }
 
-//
-//    /** shared log entry marker instance to prevent duplicate execution
-//     * if a wrapper has already been
-//     * invoked and the return value already determined */
-//    public final static class JavaInvoked {
-//        public final static JavaInvoked the = new JavaInvoked();
-//
-//        protected JavaInvoked() {         }
-//
-//        @NotNull
-//        @Override
-//        public String toString() {
-//            return "Java Invoked";
-//        }
-//    }
 
 
-//    @Override
-//    public Term term(Object o) {
-//        Term i = instances.get(o);
-//        if (i!=null)
-//            return i;
-//        return super.term(o);
-//    }
 
 
+
+    	/**
+	 * @see org.junit.platform.commons.support.ReflectionSupport#findMethod(Class, String, Class...)
+	 */
+	public static Method findMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+		Preconditions.notNull(clazz, "Class must not be null");
+		Preconditions.notBlank(methodName, "Method name must not be null or blank");
+		Preconditions.notNull(parameterTypes, "Parameter types array must not be null");
+		Preconditions.containsNoNullElements(parameterTypes, "Individual parameter types must not be null");
+
+		return findMethod(clazz, method -> hasCompatibleSignature(method, methodName, parameterTypes));
+	}
 }

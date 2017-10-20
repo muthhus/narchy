@@ -37,16 +37,32 @@ public class OObjectsTest {
         StringBuilder sb = new StringBuilder();
         n.onTask(sb::append);
 
-        n.input("SimpleClass(set,x,(1))! :|:");
+        n.input("x(set,(1))! :|:");
         n.run(1);
         n.run(1);
 
-        n.input("SimpleClass(get,x,(),#y)! :|:");
+        n.input("x(get,(),#y)! :|:");
         n.run(1);
         n.run(1);
 
         assertEquals("$.50 SimpleClass(set,x,(1))! 0 %1.0;.90%$.50 SimpleClass(set,x,(1)). 1 %1.0;.90%$.50 SimpleClass(get,x,(),#1)! 2 %1.0;.90%$.50 SimpleClass(get,x,(),1). 3 %1.0;.90%", sb.toString());
 
+    }
+   @Test
+    public void testObjectMethods() throws Narsese.NarseseException {
+        final NAR n = NARS.tmp();
+
+        n.log();
+        final OObjects objs = new OObjects(n);
+
+        final SimpleClass x = objs.the("x", SimpleClass.class);
+        StringBuilder sb = new StringBuilder();
+        n.onTask(sb::append);
+
+        //n.input("x(getClass,(),#y)! :|:");
+        n.input("x(hashCode,())! :|:");
+        n.run(1);
+        n.run(1);
     }
 
     @Test
@@ -85,16 +101,17 @@ public class OObjectsTest {
 
 
         n.priDefault(BELIEF, 0.5f);
-        n.truthResolution.set(0.05f);
-        //n.logPriMin(System.out, 0.02f);
+        n.truthResolution.set(0.1f);
         n.time.dur(10);
+        n.termVolumeMax.set(20);
 
-        n.onTask(xx -> {
-           if (xx instanceof DerivedTask) {
-               //if (xx.isGoal())
-                System.out.println(xx);
-           }
-        });
+        n.logPriMin(System.out, 0.02f);
+//        n.onTask(xx -> {
+//           if (xx instanceof DerivedTask) {
+//               if (xx.isGoal())
+//                System.out.println(xx);
+//           }
+//        });
 
         int N = 2;
 
@@ -104,7 +121,8 @@ public class OObjectsTest {
         while (x.v != 2) {
 
             if (loops++ < trainingRounds) {
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 2; i++) {
+
 
                     x.set(i % N);
 
@@ -115,15 +133,21 @@ public class OObjectsTest {
                     n.run(1);
                 }
 
-                n.clear();
+
+
+                n.input("$0.5 (0<->2)?");
+                n.input("$0.5 (1<->2)?");
+                n.input("$1.0 x(get,(),2)! :|:");
+
+                n.run(50);
             }
 
-            n.input("$1.0 SimpleClass(get,x,(),2)! :|:");
+            //n.input("$1.0 x(set,2)! :|:");
 //            n.input("$1.0 SimpleClass(get,x,(),2)! :|:");
 //            n.input("$1.0 SimpleClass(get,x,(),_)! :|:");
 //        n.input("$1.0 --SimpleClass(get,x,(),0)! :|:");
 //        n.input("$1.0 --SimpleClass(get,x,(),1)! :|:");
-            n.run(500);
+            n.run(50);
         }
 //        n.input("$0.5 (0<->1)?");
 //        n.input("$0.5 (1<->2)?");

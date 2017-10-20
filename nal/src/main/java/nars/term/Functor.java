@@ -1,6 +1,7 @@
 package nars.term;
 
 import jcog.Util;
+import jcog.util.TriFunction;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -155,6 +156,11 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
     /** two argument functor (convenience method) */
     public static LambdaFunctor f2(@NotNull String termAtom, @NotNull BiFunction<Term, Term, Term> ff) {
         return f2(fName(termAtom), ff);
+    }
+
+    /** two argument functor (convenience method) */
+    public static LambdaFunctor f3(@NotNull Atom termAtom, @NotNull TriFunction<Term, Term, Term, Term> ff) {
+        return f(termAtom, 3, (tt)-> ff.apply(tt.sub(0), tt.sub(1), tt.sub(2)));
     }
 
     /** two argument non-variable integer functor (convenience method) */

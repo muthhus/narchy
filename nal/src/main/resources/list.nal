@@ -1,6 +1,12 @@
 (P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ({indicesOf(P,X)}-->C), (Belief:Identity, Goal:Identity)
 (C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (C-->{indicesOf(P,X)}), (Belief:Identity, Goal:Identity)
 
+(P-->C), (A ==> (Q-->C)), neq(Q,P), task("!") |- (A ==>+- (P-->C)), (Punctuation:Question)
+    (P-->C), (A ==> (Q-->C)), neq(Q,P), task("!") |- (substDiff(A, Q, P) ==>+- (P-->C)), (Punctuation:Question)
+        (P-->C), (A ==> (Q-->C)), neq(Q,P), task("!") |- substDiff(A, Q, P), (Punctuation:Quest)
+(P-->C), ((Q-->C) ==> A), neq(Q,P), task("!") |- ((P-->C) ==>+- A), (Punctuation:Question)
+    (P-->C), ((Q-->C) ==> A), neq(Q,P), task("!") |- ((P-->C) ==>+- substDiff(A, Q, P)), (Punctuation:Question)
+        (P-->C), ((Q-->C) ==> A), neq(Q,P), task("!") |- substDiff(A, Q, P), (Punctuation:Quest)
 
 //(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (indicesOf(P,X)-->P), (Belief:Identity, Goal:Identity)
 //(C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (P-->indicesOf(P,X)), (Belief:Identity, Goal:Identity)

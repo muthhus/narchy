@@ -268,7 +268,7 @@ public class DefaultTermizer implements Termizer {
         return x;
     }
 
-    public static Term classTerm(@NotNull Class c) {
+    public static Term classTerm(Class c) {
         //return Atom.the(Utf8.toUtf8(name));
 
         return Atomic.the(c.getSimpleName());
@@ -339,16 +339,8 @@ public class DefaultTermizer implements Termizer {
         //        String cname = o.getClass().toString().substring(6) /* "class " */;
 //        int slice = cname.length();
 //
-        Runnable[] post = new Runnable[1];
 
-
-        Term result = obj2termCached(o, post);
-
-        if (result!=null)
-            if (post[0]!=null)
-                post[0].run();
-
-        return result;
+        return obj2termCached(o);
 
 
         //TODO decide to use toString or System object id
@@ -374,11 +366,14 @@ public class DefaultTermizer implements Termizer {
     }
 
     @Nullable
-    public Term obj2termCached(@Nullable Object o, Runnable[] post) {
+    public Term obj2termCached(@Nullable Object o) {
 
         if (o == null) return NULL;
         if (o instanceof Term)
             return ((Term)o);
+        if (o instanceof Integer) {
+            return Int.the((Integer)o);
+        }
 
 
         Term oe;
@@ -387,9 +382,7 @@ public class DefaultTermizer implements Termizer {
             MutableBiMap<Object, Term> iii = instances.inverse();
             oe = iii.get(o); //computeifAbsent crashes because it can go recursive
             if (oe == null) {
-
-
-                oe = iii.computeIfAbsent(o, this::obj2term);
+                oe = iii.put(o, obj2term(o));
             }
         } else {
             oe = obj2term(o);

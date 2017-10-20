@@ -56,9 +56,12 @@ public class Operator extends BaseConcept implements PermanentConcept {
     /**
      * returns the arguments of an operation (task or term)
      */
-    public static @Nullable TermContainer args(@NotNull Termed operation) {
+    public static @Nullable TermContainer args(Termed operation) {
         assert (operation.op() == INH && operation.subIs(1, ATOM));
         return operation.sub(0).subterms();
+    }
+    public static @Nullable Atom func(Termed operation) {
+        return (Atom) operation.sub(1);
     }
 
     public static Task error(Task x, Throwable error, long when) {

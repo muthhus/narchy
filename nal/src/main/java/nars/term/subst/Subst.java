@@ -36,7 +36,7 @@ public interface Subst extends CompoundTransform {
 
     @Override
     default @Nullable Termed apply(Term x) {
-        if (x instanceof Bool || x instanceof Intlike)//assert (!(x instanceof Bool));
+        if (x instanceof Bool)//assert (!(x instanceof Bool));
             return x;
 
         Term y = xy(x);
