@@ -64,10 +64,11 @@ public class TemporalizeDerived extends Temporalize {
 
         long taskStart = task.start();
         long taskEnd = task.end();
-//        if (taskStart == ETERNAL && task.isGoal() && belief!=null && !belief.isEternal()) {
-//            //pretend this is a temporal goal task at the present time, since present time does occur within the eternal task
-//            taskStart = taskEnd = d.time;
-//        }
+
+        if (taskStart == ETERNAL && task.isGoal() && belief!=null && !belief.isEternal()) {
+            //apply this as a temporal goal task at the present time, since present time does occur within the eternal task
+            taskStart = taskEnd = d.time;
+        }
 
         knowDerivedAbsolute(d,
                 polarizedTaskTerm(task),

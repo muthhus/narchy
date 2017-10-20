@@ -1,14 +1,13 @@
 package nars.op.java;
 
 import com.google.common.collect.ImmutableSet;
+import jcog.map.CustomConcurrentHashMap;
 import nars.$;
 import nars.Op;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.atom.Int;
 import nars.term.var.Variable;
-import org.eclipse.collections.api.bimap.MutableBiMap;
-import org.eclipse.collections.impl.bimap.mutable.HashBiMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +17,8 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static jcog.map.CustomConcurrentHashMap.*;
 
 
 /**
@@ -34,7 +35,8 @@ public class DefaultTermizer implements Termizer {
     final Map<Class, Term> classes = new HashMap();
 
 
-    final HashBiMap<Term,Object> instances = new HashBiMap();
+    final static Map<Term, Object> termToObj = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, IDENTITY, 64); //cache: (class,method) -> Method
+    final static Map<Object, Term> objToTerm = new CustomConcurrentHashMap(SOFT, IDENTITY, STRONG, EQUALS, 64); //cache: (class,method) -> Method
 
     /*final HashMap<Term, Object> instances = new HashMap();
     final HashMap<Object, Term> objects = new HashMap();*/
@@ -56,13 +58,28 @@ public class DefaultTermizer implements Termizer {
     );
 
     public DefaultTermizer() {
-        map(NULL, null);
-        map(Op.True, true);
-        map(Op.False, false);
+        put(Op.True, true);
+        put(Op.False, false);
     }
 
-    public void map(Term x, Object y) {
-        instances.put(x, y);
+    public void put(@NotNull Term x, @NotNull Object y) {
+        assert(x!=y);
+        synchronized (termToObj) {
+            termToObj.put(x, y);
+            objToTerm.put(y, x);
+        }
+    }
+    public void remove(Term x) {
+        synchronized (termToObj) {
+            Object y = termToObj.remove(x);
+            objToTerm.remove(y);
+        }
+    }
+    public void remove(Object x) {
+        synchronized (termToObj) {
+            Term y = objToTerm.remove(x);
+            termToObj.remove(y);
+        }
     }
 
     /** dereference a term to an object (but do not un-termize) */
@@ -73,7 +90,7 @@ public class DefaultTermizer implements Termizer {
         if (t instanceof Int)
             return ((Int)t).id;
 
-        Object x = instances.get(t);
+        Object x = termToObj.get(t);;
         if (x == null)
             return t; /** return the term intance itself */
 
@@ -378,11 +395,9 @@ public class DefaultTermizer implements Termizer {
 
         Term oe;
         if (cacheableInstance(o)) {
-
-            MutableBiMap<Object, Term> iii = instances.inverse();
-            oe = iii.get(o); //computeifAbsent crashes because it can go recursive
+            oe = objToTerm.get(o);
             if (oe == null) {
-                oe = iii.put(o, obj2term(o));
+                oe = objToTerm.put(o, obj2term(o));
             }
         } else {
             oe = obj2term(o);

@@ -1,6 +1,5 @@
 package nars.experiment.mario;
 
-import com.google.common.collect.Iterables;
 import jcog.Util;
 import jcog.data.FloatParam;
 import nars.$;
@@ -170,7 +169,7 @@ public class NARio extends NAgentX {
     }
 
     public void initBipolar() {
-        Iterables.concat(actionBipolar($.inh($.the("x"), id), (x) -> {
+        actionBipolar($.inh($.the("x"), id), (x) -> {
             float thresh = 0.2f;
             float thresh2 = 0.9f;
             if (x <= -thresh) {
@@ -195,7 +194,7 @@ public class NARio extends NAgentX {
                 return 0.5f;
                 //return Float.NaN;
             }
-        }),
+        });
         actionBipolar($.inh($.the("y"), id), (y) -> {
             float thresh = 0.2f;
             if (y <= -thresh) {
@@ -215,7 +214,7 @@ public class NARio extends NAgentX {
                 return 0.5f;
                 //return Float.NaN;
             }
-        }));/*.forEach(g -> {
+        });/*.forEach(g -> {
             g.resolution(0.1f);
         });*/
     }

@@ -6,12 +6,10 @@ import nars.NAct;
 import nars.Task;
 import nars.control.CauseChannel;
 import nars.task.ITask;
-import nars.task.Revision;
 import nars.task.util.PredictionFeedback;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -80,19 +78,22 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
         Truth goal = this.goals().truth(pStart, pEnd, nar);
 
-            //HACK EXPERIMENT combine belief and goal
-            Truth belief = this.beliefs().truth(pStart, pEnd, nar);
-            if (belief!=null) {
-
-                float hope = belief.eviEternalized();
-
-                if (goal == null) {
-                    goal = belief.withEvi(hope); //what one images will happen maybe is what one wants
-                } else {
-                    goal = Revision.revise(goal, belief.withEvi(hope), Math.abs(belief.freq()-goal.freq()), 0 );
-                }
-
-            }
+//            //HACK EXPERIMENT combine belief and goal
+//            int shift =
+//                    0;
+//                    //+dur/2;
+//            Truth belief = this.beliefs().truth(pStart+shift, pEnd+shift, nar);
+//            if (belief!=null) {
+//
+//                float hope = belief.eviEternalized();
+//
+//                if (goal == null) {
+//                    goal = belief.withEvi(hope); //what one images will happen maybe is what one wants
+//                } else {
+//                    goal = Revision.revise(goal, belief.withEvi(hope), Math.abs(belief.freq()-goal.freq()), 0 );
+//                }
+//
+//            }
 
         this.motor.accept(this, goal);
 
@@ -109,11 +110,11 @@ public class GoalActionAsyncConcept extends ActionConcept {
         Task fg;
         Task fb;
         long goalTime =
-                //now;
-                now-dur/2;
+                now;
+                //now-dur/2;
         long beliefTime =
                 //now;
-                now;//+dur/2;
+                now+dur/2;
 
         in.input(
             fg = feedGoal.set(term, g, stamper, goalTime, dur, nar),

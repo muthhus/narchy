@@ -1,19 +1,16 @@
 package nars.concept.dynamic;
 
-import jcog.list.FasterList;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
-import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.transform.Retemporalize;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.DTERNAL;

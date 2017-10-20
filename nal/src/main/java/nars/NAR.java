@@ -391,7 +391,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return goal($(goalTermString), tense, freq, conf);
     }
 
-    public Task goal(@NotNull Term goal, @NotNull Tense tense, float freq)  {
+    public Task goal(@NotNull Term goal, @NotNull Tense tense, float freq) {
         return goal(goal, tense, freq, confDefault(GOAL));
     }
 
@@ -838,13 +838,17 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         });
     }
 
+    public final Operator onOp(@NotNull String a, @NotNull BiFunction<Task, NAR, Task> exe) {
+        return onOp((Atom) $.the(a), exe);
+    }
+
     /**
      * registers an operator
      */
-    public final Operator onOp(@NotNull String a, @NotNull BiFunction<Task, NAR, Task> exe) {
+    public final Operator onOp(@NotNull Atom a, @NotNull BiFunction<Task, NAR, Task> exe) {
 
         Operator op;
-        terms.set(op = new Operator((Atom) Atomic.the(a), exe, this));
+        terms.set(op = new Operator(a, exe, this));
         return op;
 
 //        {
@@ -1642,7 +1646,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     public final FasterList<Cause> causes = new FasterList(256);
 
-    /** optional actions whose potential invocation is heuristically controlled */
+    /**
+     * optional actions whose potential invocation is heuristically controlled
+     */
     public final FasterList<Can> can = new FasterList(8);
 
 
@@ -1651,7 +1657,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * default deriver
      */
-    @Deprecated public Derivation derivation() {
+    @Deprecated
+    public Derivation derivation() {
         return derivation(deriver);
     }
 
@@ -1684,7 +1691,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * +Infinity -> amp=2
      */
     public float evaluate(short[] effect) {
-        return Math.max(Pri.EPSILON,  1f + Util.tanhFast( MetaGoal.privaluate(causes, effect) ));
+        return Math.max(Pri.EPSILON, 1f + Util.tanhFast(MetaGoal.privaluate(causes, effect)));
     }
 
 //    /**

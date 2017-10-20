@@ -5,7 +5,6 @@ import nars.control.Derivation;
 import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.truth.Truth;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * task truth is postiive

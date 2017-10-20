@@ -50,8 +50,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.jogamp.opengl.GL.*;
-import static com.jogamp.opengl.GL2ES1.GL_TEXTURE_ENV;
-import static com.jogamp.opengl.GL2ES1.GL_TEXTURE_ENV_MODE;
 import static jcog.Util.unitize;
 import static spacegraph.math.v3.v;
 import static spacegraph.render.JoglSpace.glsrt;

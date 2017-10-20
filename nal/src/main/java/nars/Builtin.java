@@ -66,7 +66,7 @@ public class Builtin {
                     }
                     if (!m.isEmpty()) { //can be empty in 'dt' cases
                         Term y = target.replace(m);
-                        if (!y.equals(target))
+                        if (y!=null && !y.equals(target))
                             return y;
                     }
                 }

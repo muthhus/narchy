@@ -16,8 +16,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.jogamp.opengl.GL.GL_BGRA;
 import static com.jogamp.opengl.GL.GL_RGB;
 import static com.jogamp.opengl.GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV;
-import static com.jogamp.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
-import static java.lang.System.arraycopy;
 
 public class TextureSurface extends Surface {
 

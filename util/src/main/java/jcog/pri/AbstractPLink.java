@@ -1,7 +1,5 @@
 package jcog.pri;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Objects;
 import java.util.function.Supplier;
 

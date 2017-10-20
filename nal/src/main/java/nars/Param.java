@@ -92,12 +92,12 @@ public abstract class Param extends Services<Term, NAR> {
      * budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links)
      */
     public static final FloatFloatToFloatFunction termTaskLinkToPremise =
-    //        Util::or;
-    //Util::and;
-    //UtilityFunctions::aveGeo;
-    UtilityFunctions::aveAri;
-    //Math::min;
-    //Math::max;
+            Util::or;
+            //Util::and;
+            //UtilityFunctions::aveGeo;
+            //UtilityFunctions::aveAri;
+            //Math::min;
+            //Math::max;
 
     public static final PriMerge premiseMerge = PriMerge.max;
 
@@ -132,7 +132,7 @@ public abstract class Param extends Services<Term, NAR> {
     /**
      * 'time to live', unification steps until unification is stopped
      */
-    public final MutableInteger matchTTLmax = new MutableInteger(512);
+    public final MutableInteger matchTTLmax = new MutableInteger(192);
     public final MutableInteger matchTTLmin = new MutableInteger(32);
 
     /**

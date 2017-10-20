@@ -28,9 +28,14 @@
     (A --> C), (B --> C), neq(A,B),setext(A),setext(B) |- (union(A,B) --> C), (Belief:Intersection)
     (A --> C), (B --> C), neq(A,B),setext(A),setext(B) |- (differ(A,B) --> C), (Belief:Difference)
 
-    (A --> C), (B --> C), neq(A,B),setint(A),setint(B) |- (union(A,B) --> C), (Belief:Union)
+    (A --> C), (B --> C), neq(A,B),setint(A),setint(B) |- (union(A,B) --> C), (Belief:Union, Goal:Union)
     (A --> C), (B --> C), neq(A,B),setint(A),setint(B) |- (intersect(A,B) --> C), (Belief:Intersection)
     (A --> C), (B --> C), neq(A,B),setint(A),setint(B) |- (differ(A,B) --> C), (Belief:Difference)
+
+//Set Goals
+    (A --> C), (B --> C), task("!"), neq(A,B),setext(A),setext(B) |- (intersect(A,B) --> C), (Goal:Strong)
+    (A --> C), (B --> C), task("!"), neq(A,B),setext(A),setext(B) |- (union(A,B) --> C), (Goal:Weak)
+
 
 //Set Decomposition
 
@@ -39,13 +44,5 @@
 
 //Set Un-recurser
     ({ (V-->K), A..* }-->M), M |- ({V} --> (M,K)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-
-//Set Questions
-
-    ([A] <-> [B]), (A <-> B), task("?") |- ([A] <-> [B]), (Belief:BeliefIdentity, Punctuation:Belief)
-    ({A} <-> {B}), (A <-> B), task("?") |- ({A} <-> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
-
-    ([A] --> [B]), (A <-> B), task("?") |- ([A] --> [B]), (Belief:BeliefIdentity, Punctuation:Belief)
-    ({A} --> {B}), (A <-> B), task("?") |- ({A} --> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
 
 

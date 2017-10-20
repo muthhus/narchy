@@ -90,25 +90,17 @@ public class Signal {
 
             }
 
-            if (current != null && !current.isDeleted()) {
 
-                LongObjectProcedure<SignalTask> stretch = current.stretch;
-                if (stretch!=null) {
-                    stretch.value(now, current);
+            if (current == next) {
+                current.priMax(pri.asFloat());
+                current.grow(now);
+                return null;  //dont re-input the task, just stretch it where it is in the temporal belief table
+            } else {
+                if (current!=null) {
+                    current.end(now);
                 }
-
+                return this.last = next; //new or null input; stretch will be assigned on first insert to the belief table (if this happens)
             }
-
-            if (current != next) {
-                if (current!=null)
-                    current.stretch = SignalTask.Frozen;
-                this.last = next;
-            }
-
-            if (next == null || next.stretch != null)
-                return null; //dont re-input the task, just stretch it where it is in the temporal belief table
-            else
-                return next; //new input; stretch will be assigned on first insert to the belief table (if this happens)
 
         } finally {
             busy.set(false);

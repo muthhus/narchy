@@ -6,7 +6,6 @@ import nars.experiment.tetris.impl.TetrisState;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
 
-import static nars.$.$;
 import static nars.experiment.tetris.impl.TetrisState.*;
 
 /**
@@ -187,7 +186,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     void actionsTriState() throws Narsese.NarseseException {
 
 
-        actionTriState($("X"), (i) -> {
+        actionTriState($.the("X"), (i) -> {
             switch (i) {
                 case -1:
                     state.take_action(LEFT);
@@ -200,7 +199,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
             }
         });
 
-        actionToggle($.p("R"), ()-> state.take_action(CW));
+        actionToggle($.the("R"), ()-> state.take_action(CW));
 
 //        actionTriState($("R"), (i) -> {
 //            switch (i) {
@@ -521,7 +520,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
             try {
                 //n.truthResolution.setValue(0.05f);
                 a = new Tetris(n, Tetris.tetris_width, Tetris.tetris_height);
-            a.nar.log();
+
                 //a.durations.setValue(2f);
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();

@@ -3,7 +3,6 @@ package jcog.map;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /** from: https://dzone.com/articles/letting-garbage-collector-do-c */

@@ -1,6 +1,5 @@
 package nars.gui.graph;
 
-import jcog.map.MRUCache;
 import jcog.memoize.LinkedMRUMemoize;
 import jcog.memoize.Memoize;
 import jcog.pri.PriReference;
@@ -11,7 +10,6 @@ import nars.gui.NARSpace;
 import nars.term.Termed;
 import org.eclipse.collections.api.tuple.Pair;
 
-import java.util.Map;
 import java.util.function.Function;
 
 

@@ -15,8 +15,8 @@
  */
 package jcog.constraint.discrete.search;
 
-import jcog.constraint.discrete.trail.TrailedInt;
 import jcog.constraint.discrete.IntVar;
+import jcog.constraint.discrete.trail.TrailedInt;
 import org.eclipse.collections.api.block.function.primitive.BooleanFunction;
 
 import java.util.List;

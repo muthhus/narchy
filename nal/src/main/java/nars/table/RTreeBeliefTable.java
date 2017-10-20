@@ -79,7 +79,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
                 boolean removed = treeRW.remove(task);
 
-                task.setEnd(newEnd);
+                task.slidingEnd = newEnd;
 
                 boolean added = treeRW.add(task);
 

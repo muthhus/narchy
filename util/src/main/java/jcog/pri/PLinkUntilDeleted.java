@@ -1,7 +1,5 @@
 package jcog.pri;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * A BLink that references and depends on another Budgeted item (ex: Task).
  * Adds an additional condition that deletes the link if the referenced

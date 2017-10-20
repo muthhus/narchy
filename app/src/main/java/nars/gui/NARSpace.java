@@ -1,9 +1,7 @@
 package nars.gui;
 
 import jcog.event.On;
-import jcog.list.FasterList;
 import nars.gui.graph.EdgeDirected;
-import nars.gui.graph.TermWidget;
 import nars.term.Term;
 import nars.term.Termed;
 import spacegraph.AbstractSpace;

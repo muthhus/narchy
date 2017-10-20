@@ -37,7 +37,6 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.MapSubst;
 import nars.term.subst.MapSubst1;
-import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.Retemporalize;
@@ -705,12 +704,14 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
 
-    /** includes itself in the count unless it's a CONJ sequence in which case it becomes the sum of the subterms event counts*/
+    /**
+     * includes itself in the count unless it's a CONJ sequence in which case it becomes the sum of the subterms event counts
+     */
     default int eventCount() {
         if (op() == CONJ) {
             int dt = this.dt();
-            if (dt!=0 && dt!=DTERNAL) {
-                 return intify((sum, x)->sum + x.eventCount(), 0);
+            if (dt != 0 && dt != DTERNAL) {
+                return intify((sum, x) -> sum + x.eventCount(), 0);
             }
         }
 
@@ -845,19 +846,12 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
 
-    default Term replace(/*@NotNull*/ Map<Term, Term> m) {
-
-        Subst s;
-
-        if (m.size() == 1) {
-            Map.Entry<Term, Term> e = m.entrySet().iterator().next();
-            s = new MapSubst1(e.getKey(), e.getValue());
-        } else
-            s = new MapSubst(m);
-
-        //return s.transform(this);
-        return transform(s);
-
+    @Nullable default Term replace(/*@NotNull*/ Map<Term, Term> m) {
+        return transform((m.size() == 1) ?
+            new MapSubst1(m.entrySet().iterator().next())
+                :
+            new MapSubst(m)
+        );
     }
 
     default Term replace(Term from, Term to) {

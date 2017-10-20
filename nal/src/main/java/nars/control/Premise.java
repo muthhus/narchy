@@ -22,7 +22,6 @@ import nars.term.subst.Unify;
 import nars.term.subst.UnifySubst;
 import nars.term.transform.Retemporalize;
 import org.eclipse.collections.impl.tuple.Tuples;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

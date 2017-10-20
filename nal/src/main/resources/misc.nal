@@ -14,42 +14,6 @@
 
 
 
-//If S can stand for P, P can to a certain low degree also represent the class S
-//If after S usually P happens, then it might be a good guess that usually before P happens, S happens.
-
-    (P ==> S), (S ==> P),    task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief)
-    (--P ==> S), (S ==> P),  task("?") |- (--P ==>+- --S), (Belief:ConversionPN, Punctuation:Belief)
-    (P ==> S), (--S ==> P),  task("?") |- (P ==>+- --S), (Belief:Conversion, Punctuation:Belief)
-    //(P ==> S), (S ==> P),        task("?") |- ((--,%P) ==>+- S), (Belief:ConversionPN, Punctuation:Belief)
-    //(P ==> S), ((--,%S) ==> P),  task("?") |- (--,((--,%P) ==>+- S)), (Belief:ConversionPN, Punctuation:Belief)
-
-//and the backward inference driven forward inference:
-
-
-//experimental:
-    ([A] <-> {B}), (A <-> B), task("?") |- ([A] <-> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
-    ({A} <-> [B]), (A <-> B), task("?") |- ({A} <-> [B]), (Belief:BeliefIdentity, Punctuation:Belief)
-    ([A] --> {B}), (A <-> B), task("?") |- ([A] --> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
-    ({A} --> [B]), (A <-> B), task("?") |- ({A} --> [B]), (Belief:BeliefIdentity, Punctuation:Belief)
-
-
-//NAL3:
-
-//TODO these may produce invalid beliefs if the input contains a query variable, this can be filtered before the rule is processed:
-
-
-
-//disjunction
-   (&&,--B,A..+), B, task("?") |- (--,((&&,A..+) &&+- --B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-////composition on both sides of a statement  TODO - quests handling of these
-    //((A..+) --> Z), (X --> Y), task("?") |- ((A..+) --> substitute((A..+),X,Y,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-        //contains(A..+,X),
-    //(Z --> (A..+)), (X --> Y), task("?") |- (substitute((A..+),X,Y,strict) --> (A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-    //((A..+) <-> Z), (X <-> Y), task("?") |- ((A..+) <-> substitute((A..+),X,Y,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-        //this one needs reviewed, it might need to be subIfUnified, and other problems
-
 
 //WASTEPAPER ===
 

@@ -127,10 +127,10 @@
     ((&&,M,A..+) ==> X), ((&&,A..+) ==> Y), task(".") |- subIfUnifiesAny((M ==>+- C),X,Y,"$"), (Belief:AbductionPB)
 
     //answering
-    Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Z), Y, Z, "$", strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    //Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Z), Y, Z, "$", strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
         //Z, (X==>Y), task("?") |- subIfUnifiesAny(Y, X, Z, strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    Z, (X==>Y), task("?") |- subIfUnifiesAny((Z ==>+- Y), X, Z, "$", strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
-    Z, (--X==>Y), task("?") |- subIfUnifiesAny((--Z ==>+- Y), X, Z, "$", strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
+    //Z, (X==>Y), task("?") |- subIfUnifiesAny((Z ==>+- Y), X, Z, "$", strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
+    //Z, (--X==>Y), task("?") |- subIfUnifiesAny((--Z ==>+- Y), X, Z, "$", strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
         //Z, (X==>Y), task("?") |- subIfUnifiesAny(X, Y, Z, strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
 
 

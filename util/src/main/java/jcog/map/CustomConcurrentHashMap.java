@@ -268,10 +268,8 @@ public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * and using {@link System#identityHashCode} for hashing
      */
     public static final Equivalence<Object> IDENTITY =
-            new EquivalenceUsingHashAndIdentity();
-
-    public static final Equivalence<Object> SYSTEM_IDENTITY =
             new EquivalenceUsingIdentity();
+
     /**
      * An Equivalence object performing {@link Object#equals} based comparisons
      * and using {@link Object#hashCode} hashing

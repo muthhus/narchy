@@ -23,7 +23,6 @@ package jcog.tree.rtree;
 import jcog.Util;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.function.Consumer;

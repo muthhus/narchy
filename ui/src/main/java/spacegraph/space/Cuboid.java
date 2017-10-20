@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SimpleSpatial;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
-import spacegraph.math.v2;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.ClosestRay;

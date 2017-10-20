@@ -2,7 +2,6 @@ package spacegraph.render;
 
 import com.jogamp.common.os.Platform;
 import com.jogamp.nativewindow.WindowClosingProtocol;
-import com.jogamp.newt.NewtFactory;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;

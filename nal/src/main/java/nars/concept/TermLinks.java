@@ -56,10 +56,10 @@ public enum TermLinks {
         Op o = b.op();
         switch (o) {
             case VAR_QUERY:
-                return; //NO
             case VAR_DEP:
             case VAR_INDEP:
-                break; //YES
+                return; //NO
+                //break; //YES
 
         }
 
@@ -95,19 +95,19 @@ public enum TermLinks {
                 return 2;
 
             case CONJ:
-                return 2;
-
-            case SIM:
-                return 2;
-
-            case INH:
                 return 3;
 
+            case SIM:
+                return 3;
+
+            case INH:
+                return 4;
+
             case IMPL:
-                if (host.hasAny(Op.CONJ))
+//                if (host.hasAny(Op.CONJ))
                     return 4;
-                else
-                    return 3;
+//                else
+//                    return 3;
 
             default:
                 throw new UnsupportedOperationException("unhandled operator type: " + host.op());

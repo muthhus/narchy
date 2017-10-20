@@ -4,12 +4,11 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.Param;
-import nars.task.DerivedTask;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static nars.Op.BELIEF;
-import static org.junit.Assert.assertEquals;
+import static nars.Op.*;
+import static org.junit.Assert.assertTrue;
 
 public class OObjectsTest {
 
@@ -45,9 +44,11 @@ public class OObjectsTest {
         n.run(1);
         n.run(1);
 
-        assertEquals("$.50 SimpleClass(set,x,(1))! 0 %1.0;.90%$.50 SimpleClass(set,x,(1)). 1 %1.0;.90%$.50 SimpleClass(get,x,(),#1)! 2 %1.0;.90%$.50 SimpleClass(get,x,(),1). 3 %1.0;.90%", sb.toString());
-
+        String s = sb.toString();
+        assertTrue(s.contains("x(set,1). 1 %1.0;.90%"));
+        assertTrue(s.contains("x(get,(),1). 3 %1.0;.90%"));
     }
+
    @Test
     public void testObjectMethods() throws Narsese.NarseseException {
         final NAR n = NARS.tmp();
@@ -83,7 +84,9 @@ public class OObjectsTest {
             x.set(1);
         }
         n.run(1);
-        assertEquals("$.50 SimpleClass(get,x,(),0). 1 %1.0;.90%$.50 SimpleClass(set,x,(1)). 2 %1.0;.90%$.09 (((get,x,(),0)-->$1) ==>+1 ((set,x,(1))-->$1)). 1 %1.0;.45%$.09 (SimpleClass(get,x,(),0) ==>+1 SimpleClass(set,x,(1))). 1 %1.0;.45%$.17 (((get,x,(),0)-->#1) &&+1 ((set,x,(1))-->#1)). 1⋈2 %1.0;.81%$.09 (SimpleClass(set,x,(1)) ==>-1 SimpleClass(get,x,(),0)). 2 %1.0;.45%", sb.toString());
+        String s = sb.toString();
+        assertTrue(s.contains("$.50 x(get,(),0). 1 %1.0;.90%"));
+        assertTrue(s.contains("$.50 x(set,1). 2 %1.0;.90%"));
     }
 
     @Ignore
@@ -100,10 +103,12 @@ public class OObjectsTest {
         final SimpleClass x = objs.the("x", SimpleClass.class);
 
 
-        n.priDefault(BELIEF, 0.5f);
+        n.priDefault(BELIEF, 0.05f);
+        n.priDefault(QUESTION, 0.05f);
+        n.priDefault(QUEST, 0.05f);
         n.truthResolution.set(0.1f);
         n.time.dur(10);
-        n.termVolumeMax.set(20);
+        n.termVolumeMax.set(30);
 
         n.logPriMin(System.out, 0.02f);
 //        n.onTask(xx -> {
@@ -135,9 +140,9 @@ public class OObjectsTest {
 
 
 
-                n.input("$0.5 (0<->2)?");
-                n.input("$0.5 (1<->2)?");
-                n.input("$1.0 x(get,(),2)! :|:");
+//                n.input("$0.5 (0<->2)?");
+//                n.input("$0.5 (1<->2)?");
+                n.input("$1.0 x(get,(),2)!");
 
                 n.run(50);
             }
@@ -149,6 +154,11 @@ public class OObjectsTest {
 //        n.input("$1.0 --SimpleClass(get,x,(),1)! :|:");
             n.run(50);
         }
+
+//        while (x.v!=3) {
+//
+//        }
+
 //        n.input("$0.5 (0<->1)?");
 //        n.input("$0.5 (1<->2)?");
 //        n.input("$0.5 (2<->3)?");

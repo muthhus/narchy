@@ -1,6 +1,5 @@
 package nars.exe;
 
-import com.conversantmedia.util.concurrent.ConcurrentQueue;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.exe.AffinityExecutor;

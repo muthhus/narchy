@@ -3,7 +3,6 @@ package jcog.tree.rtree;
 import jcog.tree.rtree.split.AxialSplitLeaf;
 import jcog.tree.rtree.split.LinearSplitLeaf;
 import jcog.tree.rtree.split.QuadraticSplitLeaf;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 

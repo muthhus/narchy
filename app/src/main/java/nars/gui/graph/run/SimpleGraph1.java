@@ -16,7 +16,6 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.widget.Label;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

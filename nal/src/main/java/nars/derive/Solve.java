@@ -1,7 +1,6 @@
 package nars.derive;
 
 import jcog.Util;
-import jcog.pri.Pri;
 import nars.Param;
 import nars.control.Derivation;
 import nars.term.Compound;
@@ -80,13 +79,18 @@ abstract public class Solve extends AbstractPred<Derivation> {
                 }
 
                 if (overlap > 0) {
+                    return false;
+
 //                    float e = t.evi() * (1f-overlap);
 //                    if (e < Pri.EPSILON) //yes Pri epsilon
 //                        return false;
 //
 //                    t = t.withEvi(e);
 //                    if (t.conf() < confMin)
-                        return false;
+//                        return false;
+
+//                    if (d.random.nextFloat() <= overlap)
+//                        return false;
                 }
 
                 break;

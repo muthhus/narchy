@@ -5,6 +5,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+
 /**
  * 1-pair substitution
  */
@@ -12,6 +14,10 @@ public class MapSubst1 implements Subst {
 
     private final Term from;
     private final Term to;
+
+    public MapSubst1(Map.Entry<Term,Term> e) {
+        this(e.getKey(), e.getValue());
+    }
 
     /**
      * creates a substitution of one variable; more efficient than supplying a Map

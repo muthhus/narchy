@@ -6,7 +6,6 @@ import jcog.Util;
 import jcog.exe.Loop;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.Cleaner;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;

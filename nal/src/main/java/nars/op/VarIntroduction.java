@@ -1,7 +1,6 @@
 package nars.op;
 
 import jcog.list.FasterList;
-import nars.$;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;

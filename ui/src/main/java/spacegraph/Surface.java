@@ -7,8 +7,6 @@ import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
 
-import java.util.List;
-
 /**
  * planar subspace.
  * (fractal) 2D Surface embedded relative to a parent 2D surface or 3D space

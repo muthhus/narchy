@@ -2,7 +2,6 @@ package nars;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.list.ArrayIterator;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
 import jcog.pri.Pri;
@@ -12,7 +11,6 @@ import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
 import nars.task.ITask;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
@@ -437,7 +435,7 @@ public interface NAct {
                 float cur = curiosity().floatValue();
                 if (eviSum < curiEvi && cur > 0 && rng.nextFloat() <= cur) {
                     x = (rng.nextFloat() - 0.5f) * 2f;
-                    e[0] = e[1] = curiEvi/2;
+                    e[0] = e[1] = curiEvi;
                     curious = true;
                 } else {
                     curious = false;
@@ -473,19 +471,21 @@ public interface NAct {
 
                 PreciseTruth pb = P;
                 PreciseTruth pg =
-                        y==y && (curious) ? $.t(y >= 0 ? yf :  1-yf,
-                                    //Util.lerp(Math.abs(y), confMin, confBase)
-                                    confBase
-                                    ) : null; //only feedback artificial goal if input goal was null
-                        //null;
+                        y==y && (curious) ? P :
+                                //$.t(y >= 0 ? yf :  1-yf,
+//                                    //Util.lerp(Math.abs(y), confMin, confBase)
+//                                    confBase
+//                                    ) : null; //only feedback artificial goal if input goal was null
+                        null;
                 CC[0].feedback(pb, pg, n);
                 PreciseTruth nb = N;
                 PreciseTruth ng =
-                        y==y && (curious) ? $.t(y >= 0 ? 1-yf : yf,
-                                    //Util.lerp(Math.abs(y), confMin, confBase)
-                                    confBase
-                                    ) : null; //only feedback artificial goal if input goal was null
-                        //null;
+                        y==y && (curious) ? N :
+//                                $.t(y >= 0 ? 1-yf : yf,
+//                                    //Util.lerp(Math.abs(y), confMin, confBase)
+//                                    confBase
+//                                    ) : null; //only feedback artificial goal if input goal was null
+                        null;
                 CC[1].feedback(nb, ng, n);
 
 

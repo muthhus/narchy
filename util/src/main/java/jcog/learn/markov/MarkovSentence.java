@@ -5,7 +5,6 @@ import jcog.io.Twokenize;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Adds functionality to the MarkovChain class which

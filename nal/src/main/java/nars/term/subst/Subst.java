@@ -3,7 +3,6 @@ package nars.term.subst;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Bool;
-import nars.term.atom.Intlike;
 import nars.term.transform.CompoundTransform;
 import org.jetbrains.annotations.Nullable;
 

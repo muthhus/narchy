@@ -15,9 +15,9 @@
  */
 package jcog.constraint.discrete.constraint;
 
-import jcog.constraint.discrete.trail.TrailedInt;
 import jcog.constraint.discrete.IntVar;
 import jcog.constraint.discrete.propagation.Propagator;
+import jcog.constraint.discrete.trail.TrailedInt;
 
 public class AllDifferent extends Propagator {
 

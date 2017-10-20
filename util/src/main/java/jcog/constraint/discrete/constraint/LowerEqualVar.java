@@ -15,8 +15,8 @@
  */
 package jcog.constraint.discrete.constraint;
 
-import jcog.constraint.discrete.propagation.Propagator;
 import jcog.constraint.discrete.IntVar;
+import jcog.constraint.discrete.propagation.Propagator;
 
 public class LowerEqualVar extends Propagator {
 

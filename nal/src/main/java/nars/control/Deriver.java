@@ -68,20 +68,26 @@ public class Deriver extends AbstractPred<Derivation> {
                 //TODO move temporal induction to a separate file
                 //fallthru
             case 6:
-            case 5:
-                files.add("induction.nal");  //TODO nal6 only needs general induction, not the temporal parts
                 files.add("nal6.nal");
+                files.add("nal6.guess.nal");
+
+                files.add("induction.nal");  //TODO nal6 only needs general induction, not the temporal parts
+
                 files.add("misc.nal"); //TODO split this up
                 files.add("list.nal");  //experimental
                 //fallthru
+            case 5:
             case 4:
             case 3:
             case 2:
                 files.add("nal3.nal");
+                //files.add("nal3.guess.nal");
                 files.add("nal2.nal");
+                files.add("nal2.guess.nal");
                 //fallthru
             case 1:
                 files.add("nal1.nal");
+                files.add("nal1.guess.nal");
                 break;
             default:
                 throw new UnsupportedOperationException();

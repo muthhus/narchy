@@ -553,7 +553,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
         Task forward = meta("@");
         long s,e;
-        if (forward == null || (forward.conf(s = start(), e = end()) < answer.conf(s, e))) {
+        if (forward == null || (forward!=answer && forward.conf(s = start(), e = end()) < answer.conf(s, e))) {
             meta("@", answer); //forward to the top answer if this ever gets deleted
         }
 

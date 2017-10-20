@@ -3,7 +3,6 @@ package spacegraph.layout;
 import com.google.common.collect.Lists;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
-import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
