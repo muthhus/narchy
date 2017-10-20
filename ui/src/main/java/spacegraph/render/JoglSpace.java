@@ -2,6 +2,7 @@ package spacegraph.render;
 
 import com.jogamp.common.os.Platform;
 import com.jogamp.nativewindow.WindowClosingProtocol;
+import com.jogamp.newt.NewtFactory;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
@@ -62,6 +63,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public static GLWindow window(GLCapabilitiesImmutable config, JoglSpace j) {
 
 
+
         GLWindow w = GLWindow.create(config);
         w.addGLEventListener(j);
         w.addWindowListener(j);
@@ -118,7 +120,11 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
         this.gl = drawable.getGL().getGL2();
 
-        gl.setSwapInterval(0); //disable vsync
+        if (gl.getGLProfile().isHardwareRasterizer()) {
+            gl.setSwapInterval(4); //reduce CPU strain
+        } else {
+            gl.setSwapInterval(0); //0=disable vsync
+        }
 
         printHardware();
 
@@ -148,8 +154,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         GLCapabilities config = new GLCapabilities(
 
                 //GLProfile.getMinimum(true)
-                //GLProfile.getDefault()
-                GLProfile.getMaximum(true)
+                GLProfile.getDefault()
+                //GLProfile.getMaximum(true)
 
 
         );

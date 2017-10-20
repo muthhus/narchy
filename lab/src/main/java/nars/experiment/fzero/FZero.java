@@ -312,7 +312,7 @@ public class FZero extends NAgentX {
         //System.out.println("head=" + fz.playerAngle%(2*3.14f) + " pow=" + fz.power + " vel=" + fz.vehicleMetrics[0][6] + " deltaDist=" + deltaDistance);
 
 
-        float ambientSadness = 0.25f;
+        float ambientSadness = 0f;
 
         return Util.clamp(
                 //-0.5f /* bias */ +

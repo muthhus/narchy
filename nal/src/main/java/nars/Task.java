@@ -150,7 +150,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
      * call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
      * these can all be tested prenormalization, because normalization will not affect the result
      */
-    static boolean validTaskCompound( Term t, byte punc, boolean safe) {
+    static boolean validTaskCompound(Term t, byte punc, boolean safe) {
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
 
 //        if (t.varDep()==1) {
@@ -223,7 +223,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
     static long nearestStartOrEnd(long a, long b, long x, long y) {
         if (a == x && b == y) {
-            return (a+b)/2; //midpoint
+            return (a + b) / 2; //midpoint
         }
 
         long u = TaskRegion.nearestBetween(a, b, x);
@@ -238,7 +238,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
 
     @Nullable
-    static NALTask clone(Task x,  Term newContent) {
+    static NALTask clone(Task x, Term newContent) {
 
         //TODO:
         //Task.tryTask()
@@ -349,7 +349,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
                 long touched =
                         nearestTimeTo(when);
-                        //(a + z) / 2; //midpoint: to be fair to other more precisely endured tasks
+                //(a + z) / 2; //midpoint: to be fair to other more precisely endured tasks
 
                 long dist = Math.abs(when - touched);
                 if (dist > 0) {
@@ -546,8 +546,15 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
                 );
                 answers.commit().putAsync(new PLink<>(twin(this, answer),
                         (this.priElseZero()) * (answer.conf())));
+
             }
 
+        }
+
+        Task forward = meta("@");
+        long s,e;
+        if (forward == null || (forward.conf(s = start(), e = end()) < answer.conf(s, e))) {
+            meta("@", answer); //forward to the top answer if this ever gets deleted
         }
 
         return answer;
@@ -572,7 +579,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
             return nearestStartOrEnd(a, b, x, y); //overlap or no overlap
         }
     }
-
 
 
     default @Nullable StringBuilder appendTo(@Nullable StringBuilder sb /**@Nullable*/) {
@@ -772,7 +778,8 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         return null;
     }
 
-    @Override default long mid() {
+    @Override
+    default long mid() {
         long s = start();
         return (s != ETERNAL) ? ((s + end()) / 2L) : ETERNAL;
     }
@@ -906,7 +913,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
         Term x = term();
 
-                //invoke possible Operation
+        //invoke possible Operation
         boolean cmd = isCommand();
 
         if (cmd || (isGoal() && !isEternal())) {
@@ -932,7 +939,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
                 //otherwise: allow processing goal
             }
         }
-
 
 
         Term y = x.eval(n.terms.intern());

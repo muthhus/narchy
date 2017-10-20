@@ -16,6 +16,8 @@
  */
 package org.apache.commons.lang3.mutable;
 
+import jcog.math.FloatSupplier;
+
 /**
  * A mutable <code>float</code> wrapper.
  * <p>
@@ -24,7 +26,7 @@ package org.apache.commons.lang3.mutable;
  * @see Float
  * @since 2.1
  */
-public class MutableFloat extends Number  {
+public class MutableFloat extends Number implements FloatSupplier {
 
     /**
      * Required for serialization support.
@@ -394,4 +396,8 @@ public class MutableFloat extends Number  {
         return String.valueOf(value);
     }
 
+    @Override
+    public float asFloat() {
+        return value;
+    }
 }

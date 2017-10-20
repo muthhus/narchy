@@ -201,7 +201,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
         //gl.glEnable(GL_POINT_SMOOTH);
         gl.glEnable(GL_LINE_SMOOTH);
         //gl.glEnable(GL_POLYGON_SMOOTH); //[Polygon smooth] is not a recommended method for anti-aliasing. Use Multisampling instead.
-        gl.glEnable(GL2.GL_MULTISAMPLE);
+//        gl.glEnable(GL2.GL_MULTISAMPLE);
 
         gl.glShadeModel(GL_SMOOTH);
 
@@ -222,7 +222,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
                 //GL_DIFFUSE
         );
         gl.glEnable(GL_COLOR_MATERIAL);
-        //gl.glEnable(GL_NORMALIZE);
+        gl.glEnable(GL_NORMALIZE);
 
         //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, new float[] { 1, 1, 1, 1 }, 0);
         //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, new float[] { 0, 0, 0, 0 }, 0);
@@ -230,7 +230,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
         gl.glEnable(GL_DEPTH_TEST);
         gl.glDepthFunc(GL_LEQUAL);
 
-        //gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
+        gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
 
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0f); // Black Background
         gl.glClearDepth(1f); // Depth Buffer Setup

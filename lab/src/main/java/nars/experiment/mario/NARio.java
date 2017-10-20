@@ -1,8 +1,12 @@
 package nars.experiment.mario;
 
+import com.google.common.collect.Iterables;
 import jcog.Util;
 import jcog.data.FloatParam;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.NAgentX;
+import nars.Narsese;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
@@ -166,23 +170,21 @@ public class NARio extends NAgentX {
     }
 
     public void initBipolar() {
-        actionBipolar($.inh($.the("x"), id), (x) -> {
-            float thresh = 0.25f;
+        Iterables.concat(actionBipolar($.inh($.the("x"), id), (x) -> {
+            float thresh = 0.2f;
             float thresh2 = 0.9f;
             if (x <= -thresh) {
                 mario.scene.key(Mario.KEY_LEFT, true);
                 mario.scene.key(Mario.KEY_RIGHT, false);
                 mario.scene.key(Mario.KEY_SPEED, x <= -thresh2);
-                //return -1f;
-                //return -1;
-                return x;
+                return -1;
+                //return x;
             } else if (x >= +thresh) {
                 mario.scene.key(Mario.KEY_RIGHT, true);
                 mario.scene.key(Mario.KEY_LEFT, false);
                 mario.scene.key(Mario.KEY_SPEED, x >= +thresh2);
-                //return +1f;
-                //return +1;
-                return x;
+                return +1;
+                //return x;
             } else {
                 mario.scene.key(Mario.KEY_LEFT, false);
                 mario.scene.key(Mario.KEY_RIGHT, false);
@@ -190,28 +192,32 @@ public class NARio extends NAgentX {
                 //return 0f;
                 //return x;
                 //return 0;
-                return 0;
+                return 0.5f;
+                //return Float.NaN;
             }
-        });
+        }),
         actionBipolar($.inh($.the("y"), id), (y) -> {
-            float thresh = 0.25f;
+            float thresh = 0.2f;
             if (y <= -thresh) {
                 mario.scene.key(Mario.KEY_DOWN, true);
                 mario.scene.key(Mario.KEY_JUMP, false);
-                //return -1f;
-                return y;
+                return -1f;
+                //return y;
             } else if (y >= +thresh) {
                 mario.scene.key(Mario.KEY_JUMP, true);
                 mario.scene.key(Mario.KEY_DOWN, false);
-                //return +1f;
-                return y;
+                return +1f;
+                //return y;
             } else {
                 mario.scene.key(Mario.KEY_JUMP, false);
                 mario.scene.key(Mario.KEY_DOWN, false);
                 //return 0f;
-                return 0;
+                return 0.5f;
+                //return Float.NaN;
             }
-        });
+        }));/*.forEach(g -> {
+            g.resolution(0.1f);
+        });*/
     }
 
     int lastCoins;

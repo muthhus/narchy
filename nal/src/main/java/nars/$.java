@@ -204,12 +204,12 @@ public enum $ {
     }
 
     @NotNull
-    public static Term p(@NotNull String... t) {
+    public static Term p(String... t) {
         return $.p((Term[]) $.the(t));
     }
 
     @NotNull
-    public static Term p(@NotNull int... t) {
+    public static Term p(int... t) {
         return $.p((Term[]) $.the(t));
     }
 

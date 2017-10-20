@@ -50,6 +50,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.jogamp.opengl.GL.*;
+import static com.jogamp.opengl.GL2ES1.GL_TEXTURE_ENV;
+import static com.jogamp.opengl.GL2ES1.GL_TEXTURE_ENV_MODE;
 import static jcog.Util.unitize;
 import static spacegraph.math.v3.v;
 import static spacegraph.render.JoglSpace.glsrt;
@@ -540,13 +542,16 @@ public enum Draw {
         tt.bind(gl);
 
 
+        //gl.glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+        gl.glColor3f(1.0f, 1.0f, 1.0f);
+
         //sharp pixels on magnification
         gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
         gl.glBegin(GL2.GL_QUADS);
 
-        gl.glNormal3f(0, 0, 1);
+//        gl.glNormal3f(0, 0, 1);
         gl.glTexCoord2f(0.0f, 1.0f);
         gl.glVertex3f(x1, y1, z);
         gl.glTexCoord2f(1.0f, 1.0f);
@@ -562,10 +567,7 @@ public enum Draw {
 
     }
 
-    /**
-     * thickness of font to avoid z-fighting
-     */
-    final static float zStep = 0.05f;
+
 
 //    @Deprecated
 //    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {

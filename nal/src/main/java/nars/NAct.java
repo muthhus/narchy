@@ -2,6 +2,7 @@ package nars;
 
 import jcog.Util;
 import jcog.data.FloatParam;
+import jcog.list.ArrayIterator;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
 import jcog.pri.Pri;
@@ -11,6 +12,7 @@ import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
 import nars.task.ITask;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
@@ -393,10 +395,12 @@ public interface NAct {
 
         Term pt =
                 //$.inh( $.the("\"+\""), s);
-                $.p(s, ZeroProduct);
+                //$.p(s, ZeroProduct);
+                $.p(s,$.the("\"+\""));
         Term nt =
                 //$.inh($.the("\"-\""), s);
-                $.p(ZeroProduct, s);
+                //$.p(ZeroProduct, s);
+                $.p(s,$.the("\"-\""));
 
         final float f[] = new float[2];
         final float e[] = new float[2];
@@ -453,26 +457,34 @@ public interface NAct {
 
                 boolean weak = eviSum < Pri.EPSILON || w2c(eviSum) < confMin;
 
-                if (y == y) {
-                    float yf = (y / 2f)+0.5f; //0..+1
+                float confFeedback =
+                        //Math.max(confMin, weak ? 0 : w2c(eviSum ));
+                        confBase;
 
-                    float confFeedback = Math.max(confMin, weak ? 0 : w2c(eviSum / 2f));
+                float yf = (y / 2f)+0.5f; //0..+1
+                if (y == y) {
+
                     P = $.t(yf, confFeedback);
                     N = $.t(1-yf, confFeedback);
                 } else {
-
                     P = N = null;
                 }
 
 
                 PreciseTruth pb = P;
                 PreciseTruth pg =
-                        y==y && (curious || weak) ? $.t(y >= 0 ? 1 : 0, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
+                        y==y && (curious) ? $.t(y >= 0 ? yf :  1-yf,
+                                    //Util.lerp(Math.abs(y), confMin, confBase)
+                                    confBase
+                                    ) : null; //only feedback artificial goal if input goal was null
                         //null;
                 CC[0].feedback(pb, pg, n);
                 PreciseTruth nb = N;
                 PreciseTruth ng =
-                        y==y && (curious || weak)  ? $.t(y >= 0 ? 0 : 1, Util.lerp(Math.abs(y), confMin, confBase)) : null; //only feedback artificial goal if input goal was null
+                        y==y && (curious) ? $.t(y >= 0 ? 1-yf : yf,
+                                    //Util.lerp(Math.abs(y), confMin, confBase)
+                                    confBase
+                                    ) : null; //only feedback artificial goal if input goal was null
                         //null;
                 CC[1].feedback(nb, ng, n);
 
@@ -485,6 +497,7 @@ public interface NAct {
         addAction(p);
         addAction(n);
 
+        //return new ArrayIterator<>(p,n);
     }
 
     default void actionBipolarExpectationNormalized(@NotNull Term s, @NotNull FloatToFloatFunction update) {

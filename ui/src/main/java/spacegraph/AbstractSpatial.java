@@ -1,6 +1,7 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
+import jogamp.opengl.GLContextImpl;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.constraint.TypedConstraint;

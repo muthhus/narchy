@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.data.MutableInteger;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.concept.SensorConcept;
 import org.eclipse.collections.api.block.function.primitive.IntToIntFunction;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,9 +14,10 @@ import static jcog.Util.clamp;
  */
 public final class DefaultConceptState extends ConceptState {
 
-    private static final int SENSOR_CONCEPT_BELIEFS = 64;
-    
-    /** fall-off rate for belief table capacity */
+
+    /**
+     * fall-off rate for belief table capacity
+     */
     float beliefComplexityCapacity = 10;
 
     public int beliefsMaxEte;
@@ -35,11 +35,13 @@ public final class DefaultConceptState extends ConceptState {
     public int goalsMaxTemp;
     public int goalsMinTemp;
 
-    /** minimum of 3 beliefs per belief table. for eternal, this allows revision between two goals to produce a third  */
+    /**
+     * minimum of 3 beliefs per belief table. for eternal, this allows revision between two goals to produce a third
+     */
     public DefaultConceptState(String id, int beliefsCapTotal, int goalsCapTotal, int questionsMax) {
-        this(   id,
-                new MutableInteger(clamp(beliefsCapTotal/4, 2, 6)), //belief ete ~1/4
-                new MutableInteger(clamp(beliefsCapTotal/4, 2, 6)),   //goal ete  ~1/4
+        this(id,
+                new MutableInteger(clamp(beliefsCapTotal / 4, 2, 6)), //belief ete ~1/4
+                new MutableInteger(clamp(beliefsCapTotal / 4, 2, 6)),   //goal ete  ~1/4
                 new MutableInteger(Math.max(3, beliefsCapTotal)), //belief temp
                 new MutableInteger(Math.max(3, goalsCapTotal)), //goal temp
                 new MutableInteger(questionsMax),
@@ -50,7 +52,7 @@ public final class DefaultConceptState extends ConceptState {
                     int maxVol = 32;
                     int maxLinks = 32;
                     int minLinks = 8;
-                    int l = Math.max(minLinks, (int)Math.round(maxLinks/(Math.pow(2, (vol-1)/(Math.sqrt(maxVol)) ))));
+                    int l = Math.max(minLinks, (int) Math.round(maxLinks / (Math.pow(2, (vol - 1) / (Math.sqrt(maxVol))))));
                     //System.out.println(l + " <- " + vol);
                     return l;
                 },
@@ -59,7 +61,7 @@ public final class DefaultConceptState extends ConceptState {
                     int maxVol = 32;
                     int maxLinks = 24;
                     int minLinks = 4;
-                    int l = Math.max(minLinks, (int)Math.round(maxLinks/(Math.pow(2, (vol-1)/(Math.sqrt(maxVol)) ))));
+                    int l = Math.max(minLinks, (int) Math.round(maxLinks / (Math.pow(2, (vol - 1) / (Math.sqrt(maxVol))))));
                     return l;
                 }
         );
@@ -87,20 +89,16 @@ public final class DefaultConceptState extends ConceptState {
     @Override
     public int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
         int max, min;
-        if (compoundConcept instanceof SensorConcept) {
-            return SENSOR_CONCEPT_BELIEFS;
-        } else {
-            if (beliefOrGoal) {
-                max = eternalOrTemporal ? beliefsMaxEte : beliefsMaxTemp;
-                min = eternalOrTemporal ? beliefsMinEte : beliefsMinTemp;
-            } else {
-                max = eternalOrTemporal ? goalsMaxEte : goalsMaxTemp;
-                min = eternalOrTemporal ? goalsMinEte : goalsMinTemp;
-            }
-            return Util.lerp(Util.unitize((-1 + compoundConcept.complexity())/32f), max, min);
-            //return (int) Math.ceil(max * Math.min(1f, (1f / (compoundConcept.volume()/ beliefComplexityCapacity))));
-        }
 
+        if (beliefOrGoal) {
+            max = eternalOrTemporal ? beliefsMaxEte : beliefsMaxTemp;
+            min = eternalOrTemporal ? beliefsMinEte : beliefsMinTemp;
+        } else {
+            max = eternalOrTemporal ? goalsMaxEte : goalsMaxTemp;
+            min = eternalOrTemporal ? goalsMinEte : goalsMinTemp;
+        }
+        return Util.lerp(Util.unitize((-1 + compoundConcept.complexity()) / 32f), max, min);
+        //return (int) Math.ceil(max * Math.min(1f, (1f / (compoundConcept.volume()/ beliefComplexityCapacity))));
     }
 
     @Override
@@ -120,7 +118,7 @@ public final class DefaultConceptState extends ConceptState {
         int max = _max.intValue();
 
         float v = c.complexity();
-        float complexityFactor = ((v-1) / 32); //(nar.compoundVolumeMax.intValue()/2f); //HEURISTIC
+        float complexityFactor = ((v - 1) / 32); //(nar.compoundVolumeMax.intValue()/2f); //HEURISTIC
         complexityFactor = Util.sqr(Util.unitize(complexityFactor)); //clip at +1
 
         return Util.lerp(complexityFactor, max, min); //at least enough for its templates

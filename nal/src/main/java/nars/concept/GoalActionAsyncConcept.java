@@ -1,14 +1,17 @@
 package nars.concept;
 
+import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.NAct;
 import nars.Task;
 import nars.control.CauseChannel;
 import nars.task.ITask;
+import nars.task.Revision;
 import nars.task.util.PredictionFeedback;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,10 +51,13 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
         this.in = n.newCauseChannel(term());
 
-        this.feedBelief = new Signal(BELIEF, resolution).pri(() -> n.priDefault(BELIEF));
+        //for dynamic change
+        final FloatSupplier myResolution = () -> this.resolution.asFloat();
+
+        this.feedBelief = new Signal(BELIEF, myResolution).pri(() -> n.priDefault(BELIEF));
         //((SensorBeliefTable) beliefs).sensor = feedback;
 
-        this.feedGoal = new Signal(GOAL, resolution).pri(() -> n.priDefault(GOAL));
+        this.feedGoal = new Signal(GOAL, myResolution).pri(() -> n.priDefault(GOAL));
 
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create
@@ -66,13 +72,27 @@ public class GoalActionAsyncConcept extends ActionConcept {
     public Stream<ITask> update(long now, int dur, NAR nar) {
 
         long pStart =
-                //now;
-                now - dur/2;
+                now;
+                //now - dur/2;
         long pEnd =
-                //now;
-                now + dur/2;
+                now;
+                //now + dur/2;
 
         Truth goal = this.goals().truth(pStart, pEnd, nar);
+
+            //HACK EXPERIMENT combine belief and goal
+            Truth belief = this.beliefs().truth(pStart, pEnd, nar);
+            if (belief!=null) {
+
+                float hope = belief.eviEternalized();
+
+                if (goal == null) {
+                    goal = belief.withEvi(hope); //what one images will happen maybe is what one wants
+                } else {
+                    goal = Revision.revise(goal, belief.withEvi(hope), Math.abs(belief.freq()-goal.freq()), 0 );
+                }
+
+            }
 
         this.motor.accept(this, goal);
 
@@ -102,6 +122,11 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
         beliefFeedback.accept(feedBelief.get() /* in case stretched */, nar);
     }
+
+    //not working yet:
+//    public void resolution(float v) {
+//        this.resolution = new MutableFloat(v);
+//    }
 
 
     //    Truth[] linkTruth(long when, long now, float minConf) {
