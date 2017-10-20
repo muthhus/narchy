@@ -92,10 +92,10 @@ public abstract class Param extends Services<Term, NAR> {
      * budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links)
      */
     public static final FloatFloatToFloatFunction termTaskLinkToPremise =
-            Util::or;
+    //        Util::or;
     //Util::and;
     //UtilityFunctions::aveGeo;
-    //UtilityFunctions::aveAri;
+    UtilityFunctions::aveAri;
     //Math::min;
     //Math::max;
 
@@ -132,8 +132,8 @@ public abstract class Param extends Services<Term, NAR> {
     /**
      * 'time to live', unification steps until unification is stopped
      */
-    public final MutableInteger matchTTLmax = new MutableInteger(256);
-    public final MutableInteger matchTTLmin = new MutableInteger(64);
+    public final MutableInteger matchTTLmax = new MutableInteger(512);
+    public final MutableInteger matchTTLmin = new MutableInteger(32);
 
     /**
      * how much percent of a premise's allocated TTL can be used in the belief matching phase.

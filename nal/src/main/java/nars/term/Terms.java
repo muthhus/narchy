@@ -558,47 +558,22 @@ public enum Terms {
         return uniques;
     }
 
-    public static Term[] sorted(Collection<Term> s) {
-        if (s instanceof SortedSet)
-            return sorted((Set) s);
-        else {
-            return sorted(s.toArray(new Term[s.size()]));
-        }
-    }
-
     /**
      * a Set is already duplicate free, so just sort it
      */
-    public static Term[] sorted(Set<Term> s) {
+    public static Term[] sorted(Collection<Term> s) {
 
-        //1. deduplicated
         Term[] x = s.toArray(new Term[s.size()]);
-
-//        //filter any True, False, or Null's - return as an innocuous one element poison-pill array
-//        for (Term t : x) {
-//            if (t instanceof SpecialAtom)
-//                return new Term[] { t };
-//        }
 
         //2. sorted
         if ((x.length >= 2) && (!(s instanceof SortedSet)))
-            Arrays.sort(x);
-
-        return x;
-    }
-
-    @Nullable
-    public static Term subj(@NotNull Termed statement) {
-        return statement.term().sub(0);
-    }
-
-    @Nullable
-    public static Term pred(@NotNull Termed statement) {
-        return statement.term().sub(1);
+            return sorted(x);
+        else
+            return x;
     }
 
     @NotNull
-    public static Term[] neg(@NotNull Term... modified) {
+    public static Term[] neg(Term... modified) {
         int l = modified.length;
         Term[] u = new Term[l];
         for (int i = 0; i < l; i++) {
@@ -614,7 +589,9 @@ public enum Terms {
      *
      * @param dt will be either 0 or DTERNAL (commutive relation)
      */
-    public static boolean flatten(/*@NotNull*/ Op op, @NotNull Term[] u, int dt, ObjectByteHashMap<Term> s) {
+    public static boolean flatten(/*@NotNull*/ Op op, Term[] u, int dt, ObjectByteHashMap<Term> s) {
+
+        assert(u.length>1);
 
         //sort by volume, decreasing first. necessary for proper subsumption of events into sibling sequence compounds that may contain them
         //may also provide some performance benefit for accelerated early termination in case of invalid construction attempts (ex: co-negation)
@@ -640,8 +617,7 @@ public enum Terms {
     }
 
     public static boolean flattenMatchDT(int candidate, int target) {
-        if (candidate == target) return true;
-        return target == 0 && candidate == DTERNAL;
+        return (candidate == target) ? true : ((target == 0) && (candidate == DTERNAL));
     }
 
     public static boolean flatten(/*@NotNull*/ Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
@@ -709,8 +685,8 @@ public enum Terms {
     }
 
     @NotNull
-    public static Term intersect(/*@NotNull*/ Op o, @NotNull TermContainer a, @NotNull TermContainer b) {
-        if (a.equals(b) && a instanceof Term)
+    public static Term intersect(/*@NotNull*/ Op o, TermContainer a, TermContainer b) {
+        if (a instanceof Term && a.equals(b))
             return (Term) a;
 
         Term[] c = TermContainer.intersect(a, b);
@@ -718,7 +694,7 @@ public enum Terms {
     }
 
     @NotNull
-    public static Term union(/*@NotNull*/ Op o, @NotNull TermContainer a, @NotNull TermContainer b) {
+    public static Term union(/*@NotNull*/ Op o, TermContainer a, TermContainer b) {
         boolean bothTerms = a instanceof Term && b instanceof Term;
         if (bothTerms && a.equals(b))
             return (Term) a;
@@ -739,17 +715,7 @@ public enum Terms {
         return o.the(DTERNAL, t);
     }
 
-    public static boolean reflex(@NotNull Term sub0, @NotNull Term sub1) {
-        sub0 = sub0.unneg();
-        sub1 = sub1.unneg();
-        return sub0.equals(sub1) ||
-                sub0.containsRecursively(sub1) ||
-                sub1.containsRecursively(sub0);
-    }
 
-    interface SubtermScorer {
-        int score(Compound superterm, Term subterm);
-    }
 
 }
 

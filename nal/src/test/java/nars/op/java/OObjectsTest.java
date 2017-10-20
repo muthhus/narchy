@@ -86,33 +86,37 @@ public class OObjectsTest {
 
         n.priDefault(BELIEF, 0.5f);
         n.truthResolution.set(0.05f);
-        n.logPriMin(System.out, 0.02f);
+        //n.logPriMin(System.out, 0.02f);
         n.time.dur(10);
 
-//        n.onTask(xx -> {
-//           if (xx instanceof DerivedTask && xx.isGoal()) {
-//               System.out.println(xx);
-//           }
-//        });
+        n.onTask(xx -> {
+           if (xx instanceof DerivedTask) {
+               //if (xx.isGoal())
+                System.out.println(xx);
+           }
+        });
 
         int N = 2;
 
         n.clear();
 
+        int loops = 0, trainingRounds = 4;
         while (x.v != 2) {
 
-            for (int i = 0; i < 4; i++) {
+            if (loops++ < trainingRounds) {
+                for (int i = 0; i < 10; i++) {
 
-                x.set(i % N);
+                    x.set(i % N);
 
-                n.run(1);
+                    n.run(1);
 
-                x.get();
+                    x.get();
 
-                n.run(10);
+                    n.run(1);
+                }
+
+                n.clear();
             }
-
-            n.clear();
 
             n.input("$1.0 SimpleClass(get,x,(),2)! :|:");
 //            n.input("$1.0 SimpleClass(get,x,(),2)! :|:");

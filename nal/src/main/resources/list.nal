@@ -1,6 +1,13 @@
+(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ({indicesOf(P,X)}-->C), (Belief:Identity, Goal:Identity)
+(C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (C-->{indicesOf(P,X)}), (Belief:Identity, Goal:Identity)
 
-//(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ((P,indicesOf(P,X))-->(C,X)), (Belief:Identity, Goal:Identity)
-//(C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ((C,X)-->(P,indicesOf(P,X))), (Belief:Identity, Goal:Identity)
-    //((P,X)-->(C,indicesOf(P,X)))
 
-(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (indicesOf(P,X)-->C), (Belief:Identity, Goal:Identity)
+//(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (indicesOf(P,X)-->P), (Belief:Identity, Goal:Identity)
+//(C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (P-->indicesOf(P,X)), (Belief:Identity, Goal:Identity)
+
+//(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively)     |- ({(X,indicesOf(P,X))}-->C), (Belief:Identity, Goal:Identity)
+//    //(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (P-->(X,indicesOf(P,X))), (Belief:Identity, Goal:Identity)
+//(C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively)     |- (C-->[(X,indicesOf(P,X))]), (Belief:Identity, Goal:Identity)
+//    //(C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (P-->(X,indicesOf(P,X))), (Belief:Identity, Goal:Identity)
+
+

@@ -15,14 +15,24 @@
 //                (A --> C)
 
     (A --> B), (B --> C), neqRCom(A,C)      |- (A --> C), (Belief:Deduction, Goal:Strong)
-    (A --> B), (A --> C), neqRCom(B,C)      |- (C --> B), (Belief:Abduction, Goal:Weak)
-    (A --> C), (B --> C), neqRCom(A,B)      |- (A --> B), (Belief:Induction, Goal:Weak)
-    (A --> B), (B --> C), neqRCom(A,C)      |- (C --> A), (Belief:Exemplification, Goal:Weak)
+        (A --> B), (B --> C), task("?"), neqRCom(A,B)  |- (A --> C), (Punctuation:Question)
+            (A --> B), (B --> C), task("@"), neqRCom(A,B)  |- (A --> C), (Punctuation:Quest)
+        (A --> B), (B --> C), task("?"), neqRCom(A,B)  |- (C --> A), (Punctuation:Question)
+            (A --> B), (B --> C), task("@"), neqRCom(A,B)  |- (C --> A), (Punctuation:Quest)
 
-    (A --> C), (B --> C), task("?"), neqRCom(A,B)  |- (A --> B), (Punctuation:Question)
-        (A --> C), (B --> C), task("@"), neqRCom(A,B)  |- (A --> B), (Punctuation:Quest)
-    (A --> C), (B --> C), task("?"), neqRCom(A,B)  |- (B --> A), (Punctuation:Question)
-        (A --> C), (B --> C), task("@"), neqRCom(A,B)  |- (B --> A), (Punctuation:Quest)
+    (A --> B), (A --> C), neqRCom(B,C)      |- (C --> B), (Belief:Abduction, Goal:Weak)
+        (A --> B), (A --> C), task("?"), neqRCom(A,B)  |- (C --> B), (Punctuation:Question)
+            (A --> B), (A --> C), task("@"), neqRCom(A,B)  |- (C --> B), (Punctuation:Quest)
+        (A --> B), (A --> C), task("?"), neqRCom(A,B)  |- (B --> C), (Punctuation:Question)
+            (A --> B), (A --> C), task("@"), neqRCom(A,B)  |- (B --> C), (Punctuation:Quest)
+
+    (A --> C), (B --> C), neqRCom(A,B)      |- (A --> B), (Belief:Induction, Goal:Weak)
+        (A --> C), (B --> C), task("?"), neqRCom(A,B)  |- (A --> B), (Punctuation:Question)
+            (A --> C), (B --> C), task("@"), neqRCom(A,B)  |- (A --> B), (Punctuation:Quest)
+        (A --> C), (B --> C), task("?"), neqRCom(A,B)  |- (B --> A), (Punctuation:Question)
+            (A --> C), (B --> C), task("@"), neqRCom(A,B)  |- (B --> A), (Punctuation:Quest)
+
+    (A --> B), (B --> C), neqRCom(A,C)      |- (C --> A), (Belief:Exemplification, Goal:Weak)
 
 
 

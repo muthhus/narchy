@@ -49,7 +49,11 @@ import static nars.Op.VAR_DEP;
  * stored, input to one or more reasoners, etc..
  * <p>
  * <p>
- * TODO option to include stack traces in conjunction with invocation
+ * TODO -
+ *  use guava proxies and remove javassist dependency
+ *  reflect the available methods first, add them as individual operators
+ *      and intercept those correctly. this will avoid dispatch lookup
+ *      on each invocation
  */
 public class OObjects extends DefaultTermizer implements Termizer, MethodHandler {
 
@@ -138,10 +142,11 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
     }
 
 
-    @Nullable Task feedback(@NotNull Object instance, @NotNull Method method, @NotNull Object[] args, Object result) {
+    @Nullable Task feedback(Object instance, Method method, Object[] args, Object result) {
         if (methodExclusions.contains(method.getName()))
             return null;
 
+        Term classmethod = $.the(instance.getClass().getSimpleName() + "_" +  method.getName());
         Term op = operation(method, getMethodInvocationTerms(method, instance, args, result));
 
         TaskBuilder g = $.belief(op,
@@ -159,11 +164,10 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
         boolean isVoid = method.getReturnType() == void.class;
 
         Term[] x = new Term[isVoid ? 3 : 4];
-        x[1] = term(instance);
-        x[0] = $.the(method.getName());
-        x[2] = args.length != 1 ? $.p(terms(args)) : term(args[0]) /* unwrapped singleton */;
+        x[0] = term(instance);
+        x[1] = args.length != 1 ? $.p(terms(args)) : term(args[0]) /* unwrapped singleton */;
         if (!isVoid)
-            x[3] = term(result);
+            x[2] = term(result);
 
         return x;
     }
@@ -188,7 +192,8 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
             p.setSuperclass(c);
 
             String opName = c.getSimpleName();
-            nar.onOp(opName, new Operator.AtomicExec(operator(c), 0.5f));
+
+            nar.onOp(opName, new Operator.AtomicExec(operator(null /* TODO */), 0.5f));
 
             return p.createClass();
         });
@@ -202,7 +207,7 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
     }
 
 
-    private BiConsumer<Task, NAR> operator(Class c) {
+    private BiConsumer<Task, NAR> operator(MethodHandle mm) {
         return (task, n) -> {
             TermContainer args = Operator.args(task);
             int a = args.subs();
@@ -224,26 +229,22 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
 
             Term methodArgs = args.sub(2);
             int m = methodArgs.subs();
-            String methodName = method.toString();
-            MethodHandle mm;
             Object[] orgs;
             if (m == 0) {
-                mm = method(c, methodName, ArrayUtils.EMPTY_CLASS_ARRAY);
-                if (mm == null)
-                    return;
                 orgs = ArrayUtils.EMPTY_OBJECT_ARRAY;
             } else {
                 orgs = object(methodArgs.subterms().theArray());
-
-                Class[] types = Util.map(x -> Primitives.unwrap(x.getClass()),
-                        new Class[orgs.length], orgs);
-                mm = method(c, methodName, types);
-                if (mm == null)
-                    return;
+//
+//                Class[] types = Util.map(x -> Primitives.unwrap(x.getClass()),
+//                        new Class[orgs.length], orgs);
+//                mm = method(c, methodName, types);
+//                if (mm == null)
+//                    return;
             }
 
             invokingGoal.set(task);
             try {
+
                 mm.bindTo(inst).invokeWithArguments(orgs);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();

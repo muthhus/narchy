@@ -99,15 +99,15 @@ public final class Conclude {
 
         if (taskPattern.equals(beliefPattern)) {
             post.add(new UnifyTerm.UnifySubtermThenConclude(0, taskPattern, conc));
-        } else { // else if (taskFirst(taskPattern, beliefPattern)) {
+        } if (taskFirst(taskPattern, beliefPattern)) {
             //task first
             post.add(new UnifyTerm.UnifySubterm(0, taskPattern));
             post.add(new UnifyTerm.UnifySubtermThenConclude(1, beliefPattern, conc));
-        } /*else {
+        } else {
             //belief first
             post.add(new UnifyTerm.UnifySubterm(1, beliefPattern));
             post.add(new UnifyTerm.UnifySubtermThenConclude(0, taskPattern, conc));
-        }*/
+        }
 
         //Term beliefPattern = pattern.term(1);
 

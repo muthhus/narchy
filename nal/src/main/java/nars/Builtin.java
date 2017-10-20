@@ -55,6 +55,7 @@ public class Builtin {
              *  if not present, returns Null
              * */
             Functor.f2("numIndicesOf", (x,y) -> {
+            //Functor.f2("indicesOf", (x,y) -> {
                 int s = x.subs();
                 if (s > 0) {
                     TreeSet<Term> indices = null; //lazy alloc
@@ -72,6 +73,7 @@ public class Builtin {
                 }
                 return Null;
             }),
+            //Functor.f2("keyValues", (x,y) -> {
             Functor.f2("indicesOf", (x,y) -> {
                 int s = x.subs();
                 if (s > 0) {
@@ -85,11 +87,24 @@ public class Builtin {
                     if (indices == null)
                         return Null;
                     else {
-                        return $.sete(indices);
+                        return $.secte(indices);
                     }
                 }
                 return Null;
             }),
+
+            Functor.f2("varMask", (x,y) -> {
+                int s = x.subs();
+                if (s > 0) {
+                    Term[] t = new Term[s];
+                    for (int i = 0; i < s; i++) {
+                        t[i] = x.sub(i).equals(y) ? y : $.varDep("z" + i); //unnormalized vars
+                    }
+                    return $.p(t);
+                }
+                return Null;
+            }),
+
             //Functor.f0("date", () -> quote(new Date().toString())),
 
             Functor.f1Const("reflect", reflect::reflect),
