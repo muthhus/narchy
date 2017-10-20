@@ -9,6 +9,7 @@ import jcog.list.FasterList;
 import jcog.pri.mix.control.MixContRL;
 import nars.control.Cause;
 import nars.control.Derivation;
+import nars.control.DurService;
 import nars.control.MetaGoal;
 import nars.derive.PrediTerm;
 import nars.exe.MultiExec;
@@ -463,7 +464,7 @@ abstract public class NAgentX extends NAgent {
     private static Surface metaGoalChart(NAgent a) {
 
         return new TreeChart<Cause>() {
-            final Ons on;
+            final DurService on;
 
             final FasterList<ItemVis<Cause>> cache = new FasterList();
 
@@ -525,7 +526,7 @@ abstract public class NAgentX extends NAgent {
             @Override
             public void stop() {
                 super.stop();
-                on.off();
+                on.stop();
             }
         };
     }
@@ -543,7 +544,7 @@ abstract public class NAgentX extends NAgent {
                 s, Math.max(1, (int)Math.ceil(Math.sqrt(s))),
                 Draw::colorBipolar) {
 
-            final Ons on;
+            final DurService on;
 
             {
                 on = a.onFrame((Runnable) this::update);
@@ -552,7 +553,7 @@ abstract public class NAgentX extends NAgent {
             @Override
             public void stop() {
                 super.stop();
-                on.off();
+                on.stop();
             }
         };
 

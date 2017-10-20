@@ -13,7 +13,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 /**
  * Created by me on 10/20/16.
  */
-abstract public class Loop implements Runnable {
+abstract public class Loop {
 
     protected static final Logger logger = getLogger(Loop.class);
 
@@ -90,7 +90,7 @@ abstract public class Loop implements Runnable {
         int prevPeriodMS;
         if ((prevPeriodMS = periodMS.getAndSet(nextPeriodMS)) != nextPeriodMS) {
             if (prevPeriodMS < 0 && nextPeriodMS >= 0) {
-                Thread myNewThread = new Thread(this);
+                Thread myNewThread = new Thread(this::run);
                 if (thread.compareAndSet(null, myNewThread)) {
                     myNewThread.start();
                 }
@@ -127,8 +127,7 @@ abstract public class Loop implements Runnable {
     /**
      * dont call this directly
      */
-    @Override
-    public final void run() {
+    protected final void run() {
         assert(thread.get() == Thread.currentThread());
 
         onStart();

@@ -16,7 +16,7 @@ public class DynamicConceptSpace extends TermSpace {
 
     final Bagregate<Activate> bag;
 
-    private final Flip<List> next = new Flip(()->new FasterList<>());
+    private final Flip<List> next = new Flip(FasterList::new);
     final float bagUpdateRate = 0.25f;
     private final int maxNodes;
     private DurService on;

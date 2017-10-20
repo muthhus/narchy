@@ -208,7 +208,7 @@ public class IRCAgent extends IRC {
 
         //Param.DEBUG = true;
 
-        @NotNull NAR n = NARchy.all(); //NARS.realtime().get();
+        @NotNull NAR n = NARchy.ui(); //NARS.realtime().get();
                 //newRealtimeNAR(1024, 25, 2);
 
 

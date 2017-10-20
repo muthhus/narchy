@@ -109,11 +109,11 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                 /* TODO */ 64, 7, 15);
 
 
-        cs.show(800, 800, false);
+        cs.show(800, 800, true);
 
         SpaceGraph.window(
                 col(
-                        reflect(cs),
+                        //reflect(cs),
 //                        reflect(cs.vis),
                         //Vis.reflect(fd),
                         reflect(n.exe)

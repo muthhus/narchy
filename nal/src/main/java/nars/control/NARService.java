@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class NARService extends Services.AbstractService<NAR> implements Termed {
 
 
-    public Ons ons;
+    protected Ons ons;
 
     protected NARService(NAR nar) {
         nar.on(this);

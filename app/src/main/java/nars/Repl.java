@@ -80,10 +80,8 @@ public class Repl {
                 if (line == null)
                     break;
 
-            } catch (UserInterruptException e) {
+            } catch (UserInterruptException | EndOfFileException e) {
                 // Ignore
-                break;
-            } catch (EndOfFileException e) {
                 break;
             }
 
@@ -121,7 +119,7 @@ public class Repl {
         //Default e = new Default();
         //new InterNAR2(e, 15000);
 
-        NAR d = NARchy.all();
+        NAR d = NARchy.ui();
 
         //InterNAR2 ii = new InterNAR2(d, 15001);
         //ii.connect("tcp://localhost:15000");

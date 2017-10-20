@@ -402,31 +402,31 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
     }
 
 
-    /**
-     * Returns true if the L-infinite distance between this tuple
-     * and tuple t1 is less than or equal to the epsilon parameter,
-     * otherwise returns false.  The L-infinite
-     * distance is equal to MAX[abs(x1-x2), abs(y1-y2), abs(z1-z2)].
-     *
-     * @param t1      the tuple to be compared to this tuple
-     * @param epsilon the threshold value
-     * @return true or false
-     */
-    public boolean epsilonEquals(Tuple3f t1, float epsilon) {
-
-        float diff = x - t1.x;
-        if (Float.isNaN(diff)) return false;
-        if ((diff < 0 ? -diff : diff) > epsilon) return false;
-
-        diff = y - t1.y;
-        if (Float.isNaN(diff)) return false;
-        if ((diff < 0 ? -diff : diff) > epsilon) return false;
-
-        diff = z - t1.z;
-        if (Float.isNaN(diff)) return false;
-        return (diff < 0 ? -diff : diff) <= epsilon;
-
-    }
+//    /**
+//     * Returns true if the L-infinite distance between this tuple
+//     * and tuple t1 is less than or equal to the epsilon parameter,
+//     * otherwise returns false.  The L-infinite
+//     * distance is equal to MAX[abs(x1-x2), abs(y1-y2), abs(z1-z2)].
+//     *
+//     * @param t1      the tuple to be compared to this tuple
+//     * @param epsilon the threshold value
+//     * @return true or false
+//     */
+//    public boolean epsilonEquals(Tuple3f t1, float epsilon) {
+//
+//        float diff = x - t1.x;
+//        if (Float.isNaN(diff)) return false;
+//        if ((diff < 0 ? -diff : diff) > epsilon) return false;
+//
+//        diff = y - t1.y;
+//        if (Float.isNaN(diff)) return false;
+//        if ((diff < 0 ? -diff : diff) > epsilon) return false;
+//
+//        diff = z - t1.z;
+//        if (Float.isNaN(diff)) return false;
+//        return (diff < 0 ? -diff : diff) <= epsilon;
+//
+//    }
 
 
     /**

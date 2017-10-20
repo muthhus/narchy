@@ -1,11 +1,13 @@
 package nars.video;
 
 import jcog.Util;
-import jcog.event.Ons;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.BaseConcept;
+import nars.control.DurService;
 import nars.truth.Truth;
+import org.jetbrains.annotations.Nullable;
+import spacegraph.Surface;
 import spacegraph.render.Draw;
 import spacegraph.widget.meter.BitmapMatrixView;
 
@@ -15,11 +17,11 @@ import java.util.function.Consumer;
  * displays a CameraSensor pixel data as perceived through its concepts (belief/goal state)
  * monochrome
  */
-public class CameraSensorView extends BitmapMatrixView implements BitmapMatrixView.ViewFunction2D, Consumer<NAgent> {
+public class CameraSensorView extends BitmapMatrixView implements BitmapMatrixView.ViewFunction2D {
 
     private final Sensor2D cam;
     private final NAR nar;
-    private Ons on;
+    private DurService on;
     private float maxConceptPriority;
     private long now;
     int dur;
@@ -28,22 +30,26 @@ public class CameraSensorView extends BitmapMatrixView implements BitmapMatrixVi
         super(cam.width, cam.height);
         this.cam = cam;
         this.nar = a.nar;
-        this.dur = nar.dur();
-        on = a.onFrame(this);
+        this.dur = a.nar.dur();
     }
 
+    @Override
+    public void start(@Nullable Surface parent) {
+        super.start(parent);
+        on = DurService.build(nar, this::accept);
+    }
 
     @Override
     public synchronized void stop() {
-        if (on!=null) { on.off(); this.on = null; }
+        if (on!=null) { on.stop(); this.on = null; }
         super.stop();
     }
 
 
-    @Override
-    public void accept(NAgent nn) {
-        now = nar.time();
-        dur = nar.dur();
+
+    public void accept(NAR nn) {
+        now = nn.time();
+        dur = nn.dur();
         maxConceptPriority = 1;
         update();
 //            nar instanceof Default ?

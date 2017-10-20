@@ -1,10 +1,12 @@
 package nars;
 
 import com.google.common.base.Joiner;
+import nars.exe.SynchExec;
 import nars.op.Operator;
 import nars.op.nlp.Hear;
 import nars.op.stm.ConjClustering;
 import nars.term.container.TermContainer;
+import nars.time.RealTime;
 import nars.time.Tense;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.audio.MaryTTSpeech;
@@ -14,18 +16,19 @@ import static nars.Op.GOAL;
 
 public class NARchy extends NARS {
 
-    public static NAR all() {
-        NAR nar = NARS
-                .realtime()
+    public static NAR ui() {
+        NAR nar = new DefaultNAR(8, true)
+                .exe(new SynchExec(64, 1))
+                .time(new RealTime.CS().durFPS(10f))
                 //.memory("/tmp/nal")
                 .then(Hear::wiki)
                 .get();
 
 
-        ConjClustering conjClusterB = new ConjClustering(nar, 4, BELIEF, true, 16, 64);
+        ConjClustering conjClusterB = new ConjClustering(nar, 3, BELIEF, true, 16, 64);
         ConjClustering conjClusterG = new ConjClustering(nar, 2, GOAL, true, 16, 64);
 
-        installSpeech(nar);
+        //installSpeech(nar);
 
         return nar;
     }

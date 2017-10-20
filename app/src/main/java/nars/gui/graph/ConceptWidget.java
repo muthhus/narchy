@@ -170,10 +170,7 @@ public class ConceptWidget extends TermWidget implements Consumer<PriReference<?
 
     @Override
     public void renderAbsolute(GL2 gl) {
-        edges.forEach(f -> {
-            if (f.a > 0)
-                render(gl, f);
-        });
+        render(gl, this, edges);
     }
 
     //    @Override

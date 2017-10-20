@@ -9,7 +9,6 @@ import nars.derive.PrediTerm;
 import nars.derive.PrediTrie;
 import nars.derive.rule.PremiseRuleSet;
 import nars.exe.Exec;
-import nars.exe.MultiExec;
 import nars.exe.SynchExec;
 import nars.index.term.PatternIndex;
 import nars.index.term.TermIndex;
@@ -144,14 +143,14 @@ public class NARS {
      * @param nal adjustable NAL level. level >= 7 include STM (short-term-memory) Linkage plugin
      */
     public static NAR tmp(int nal) {
-        return new Default(nal, false).get();
+        return new DefaultNAR(nal, false).get();
     }
 
     /**
      * single-thread, limited to NAL6 so it should be more compact than .tmp()
      */
     public static NAR tmpEternal() {
-        return new Default(6, false).get();
+        return new DefaultNAR(6, false).get();
     }
 
     /**
@@ -159,7 +158,7 @@ public class NARS {
      * unbounded soft reference index
      */
     public static NAR threadSafe() {
-        return new Default(8, true).get();
+        return new DefaultNAR(8, true).get();
     }
 
     public NARS nal(int nal) {
@@ -172,21 +171,10 @@ public class NARS {
         return this;
     }
 
-    public static NARS realtime() {
-        return realtime(2);
-    }
 
-    /**
-     * default: thread-safe, with centisecond (0.01) precision realtime clock
-     */
-    public static NARS realtime(int threads) {
-        return new Default(8, true)
-                .exe(new MultiExec(threads))
-                .time(new RealTime.CS());
-    }
 
     public static NARS realtime(float durFPS) {
-        return new Default(8, true).time(new RealTime.CS().durFPS(durFPS));
+        return new DefaultNAR(8, true).time(new RealTime.CS().durFPS(durFPS));
     }
 
     /**
@@ -237,11 +225,11 @@ public class NARS {
      * generic defaults
      */
     @Deprecated
-    public static class Default extends NARS {
+    public static class DefaultNAR extends NARS {
 
         final int nal;
 
-        public Default(int nal, boolean threadSafe) {
+        public DefaultNAR(int nal, boolean threadSafe) {
 
             this.nal = nal;
             this.deriver = nars.control.Deriver.getDefault(nal);

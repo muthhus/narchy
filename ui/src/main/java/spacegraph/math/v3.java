@@ -260,9 +260,7 @@ public class v3 extends Tuple3f {
         scale(thenScale);
     }
 
-    public boolean isZero(float epsilon) {
-        return epsilonEquals(v(), epsilon);
-    }
+
 
     public void randomize(Random r, float scale) {
         set(r.nextFloat() * scale, r.nextFloat() * scale, r.nextFloat() * scale);

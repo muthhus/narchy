@@ -22,10 +22,12 @@ import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.event.On;
+import jcog.event.Ons;
 import jcog.pri.PLink;
 import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
 import nars.control.Activate;
+import nars.control.DurService;
 import nars.control.NARService;
 import nars.op.Operator;
 import nars.op.nlp.Hear;
@@ -65,10 +67,16 @@ public class TextUI {
         return vt;
     }
 
-    public TextUI(NAR n, int port) throws IOException {
+    public TextUI(NAR n, Terminal t, float fps) throws IOException {
+        this.nar = n;
+        TextGUI session = new TextGUI(n, t, fps);
+        sessions.add(session);
+    }
+
+    public TextUI(NAR n, int telnetPort) throws IOException {
         this(n);
-        TelnetTerminalServer server = new TelnetTerminalServer(port, Charset.forName("utf-8"));
-        logger.info("telnet listen on port={}", port);
+        TelnetTerminalServer server = new TelnetTerminalServer(telnetPort, Charset.forName("utf-8"));
+        logger.info("telnet listen on port={}", telnetPort);
         while (true) {
             TelnetTerminal conn = server.acceptConnection();
             if (conn != null) {
@@ -78,28 +86,6 @@ public class TextUI {
                 sessions.add(session);
             }
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-
-        NAR nar = NARchy.all();
-
-//        try {
-//            //new NoteFS("/tmp/nal", nar);
-//
-//            InterNAR i = new InterNAR(nar, 8, 0);
-//            i.recv.preAmp(0.1f);
-//            i.runFPS(2);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-        nar.time.dur(100); //100 x centisecond = 1 sec
-
-        nar.startFPS(10f);
-
-        new TextUI(nar, 1024);
-
     }
 
 
@@ -359,11 +345,12 @@ public class TextUI {
         }
 
 
-        On newGUIUpdate(/* TODO AtomicBoolean busy, */Runnable r) {
-            return nar.eventCycle.on(
-                    System::currentTimeMillis,
-                    () -> Math.round(1000f / guiUpdateFPS.asFloat()),
-                    (n) -> r.run());
+        DurService newGUIUpdate(/* TODO AtomicBoolean busy, */Runnable r) {
+            return DurService.build(nar, r);
+//            return nar.eventCycle.on(
+//                    System::currentTimeMillis,
+//                    () -> Math.round(1000f / guiUpdateFPS.asFloat()),
+//                    (n) -> r.run());
         }
 
         private class TaskListRenderer extends AbstractListBox.ListItemRenderer {
@@ -384,7 +371,7 @@ public class TextUI {
                     graphics.applyThemeStyle(themeDefinition.getSelected());
                 } else {
                     //graphics.applyThemeStyle(themeDefinition.getNormal());
-                    int c = (int) (t.priElseZero() * 200 + 55);
+                    int c = (int) (t.priElseZero() * 175 + 75);
                     int r, g, b;
                     if (t.isBelief()) {
                         r = g = b = c / 2;
@@ -403,7 +390,7 @@ public class TextUI {
                     );
                 }
 
-                String label = t.toString().toString();
+                String label = t.toString();
                 //getLabel(listBox, index, item);
                 int cols = graphics.getSize().getColumns() - 1;
                 label = TerminalTextUtils.fitString(label, cols);
@@ -418,7 +405,7 @@ public class TextUI {
 
         private class EmotionDashboard extends Panel {
             private final TextBox stats;
-            private final On on;
+            private final DurService on;
             private final AtomicBoolean busy = new AtomicBoolean(false);
 
             public EmotionDashboard() {
@@ -440,7 +427,7 @@ public class TextUI {
             public synchronized void onRemoved(Container container) {
                 super.onRemoved(container);
                 removeAllComponents();
-                on.off();
+                on.stop();
             }
 
             private final StringBuilder sb = new StringBuilder(1024);
@@ -471,7 +458,7 @@ public class TextUI {
             protected final AtomicBoolean changed = new AtomicBoolean(false);
             protected final MutableInteger visible = new MutableInteger();
 
-            protected final On onCycle;
+            protected final DurService update;
             float priInfluenceRate = 1f;
             private boolean autoupdate = true;
 
@@ -485,7 +472,7 @@ public class TextUI {
                 visible.set(capacity);
 
                 bag = new PLinkArrayBag(capacity * 2, PriMerge.replace, new ConcurrentHashMap());
-                onCycle = newGUIUpdate(this::update);
+                update = newGUIUpdate(this::update);
 
             }
 
@@ -523,7 +510,7 @@ public class TextUI {
             public synchronized void onRemoved(Container container) {
                 super.onRemoved(container);
                 clearItems();
-                onCycle.off();
+                update.stop();
             }
 
             final List<X> next = $.newArrayList();

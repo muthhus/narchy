@@ -30,11 +30,13 @@ public class ZoomOrtho extends Ortho {
 
     private int[] panStart = null;
     private int[] moveTarget = new int[2];
-    @Deprecated private int[] resizeTarget = new int[2];
+    @Deprecated
+    private int[] resizeTarget = new int[2];
     private int[] windowStart = new int[2];
     private InsetsImmutable windowInsets;
 
     final HUD HUDSurface = new HUD();
+    private int pmx, pmy;
 
     public ZoomOrtho(Surface content) {
         super();
@@ -97,7 +99,22 @@ public class ZoomOrtho extends Ortho {
 
     @Override
     public void mouseMoved(MouseEvent e) {
+
         super.mouseMoved(e);
+
+
+        int windowWidth = window.getWidth();
+        int windowHeight = window.getHeight();
+        pmx = e.getX();
+        pmy = windowHeight - e.getY();
+
+        if ((pmx < resizeBorder) && (pmy < resizeBorder)) {
+            potentialDragMode = WindowDragMode.RESIZE_SW; //&& window.isResizable()
+        } else if ((pmx > windowWidth - resizeBorder) && (pmy < resizeBorder)) {
+            potentialDragMode = WindowDragMode.RESIZE_SE;  //&& window.isResizable()
+        } else {
+            potentialDragMode = WindowDragMode.MOVE;
+        }
     }
 
     @Override
@@ -109,7 +126,7 @@ public class ZoomOrtho extends Ortho {
 
     final AtomicBoolean windowMoving = new AtomicBoolean(false);
 
-    final int resizeBorder = 32; //pixels
+    final int resizeBorder = 48; //pixels
 
     enum WindowDragMode {
         MOVE,
@@ -121,7 +138,7 @@ public class ZoomOrtho extends Ortho {
 
     final int windowMinWidth = resizeBorder * 3;
     final int windowMinHeight = resizeBorder * 3;
-    WindowDragMode dragMode = null;
+    WindowDragMode dragMode = null, potentialDragMode = null;
 
 
     @Override
@@ -149,18 +166,8 @@ public class ZoomOrtho extends Ortho {
                     windowStart[1] = window.windowY;
                     windowInsets = window.window.getInsets();
 
-                    int windowWidth = window.getWidth();
-                    int windowHeight = window.getHeight();
-                    int ex = e.getX();
-                    int ey = windowHeight - e.getY();
+                    dragMode = potentialDragMode;
 
-                    if ((ex < resizeBorder) && (ey < resizeBorder)) {
-                        dragMode = WindowDragMode.RESIZE_SW; //&& window.isResizable()
-                    } else if ((ex > windowWidth - resizeBorder) && (ey < resizeBorder)) {
-                        dragMode = WindowDragMode.RESIZE_SE;  //&& window.isResizable()
-                    } else {
-                        dragMode = WindowDragMode.MOVE;
-                    }
                     //System.out.println("window drag mode: " + dragMode);
                 }
 
@@ -185,9 +192,9 @@ public class ZoomOrtho extends Ortho {
 
 
                             if (windowMoving.compareAndSet(false, true)) {
-                            moveTarget[0] = windowStart[0] + dx;
-                            moveTarget[1] = windowStart[1] + dy;
-                        window.window.getScreen().getDisplay().getEDTUtil().invoke(true, this::moveWindow);
+                                moveTarget[0] = windowStart[0] + dx;
+                                moveTarget[1] = windowStart[1] + dy;
+                                window.window.getScreen().getDisplay().getEDTUtil().invoke(true, this::moveWindow);
                             }
 
                         } else if (dragMode == WindowDragMode.RESIZE_SE) {
@@ -206,9 +213,9 @@ public class ZoomOrtho extends Ortho {
 
                             if (windowMoving.compareAndSet(false, true)) {
 
-                                window.window.getScreen().getDisplay().getEDTUtil().invoke(false, ()->
-                                        resizeWindow(windowStart[0], windowStart[1], resizeTarget[0], resizeTarget[1]) );
-                                        //this::resizeWindow);
+                                window.window.getScreen().getDisplay().getEDTUtil().invoke(false, () ->
+                                        resizeWindow(windowStart[0], windowStart[1], resizeTarget[0], resizeTarget[1]));
+                                //this::resizeWindow);
                                 if (panStart != null) {
                                     panStart[0] = mx;
                                     panStart[1] = my;
@@ -224,6 +231,12 @@ public class ZoomOrtho extends Ortho {
             panStart = null;
             dragMode = null;
         }
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        super.mouseExited(e);
+        potentialDragMode = null;
     }
 
     private void moveWindow() {
@@ -295,6 +308,7 @@ public class ZoomOrtho extends Ortho {
 
         float smx, smy;
 
+
         {
             align = None;
             aspect = 1f;
@@ -328,6 +342,19 @@ public class ZoomOrtho extends Ortho {
             Draw.line(gl, W, 0, W, H);
             Draw.line(gl, 0, H, W, H);
 
+            WindowDragMode p;
+            if ((p = potentialDragMode)!=null) {
+                switch (p) {
+                    case RESIZE_SE:
+                        gl.glColor4f(1f, 0.8f, 0f, 0.5f);
+                        Draw.quad2d(gl, pmx, pmy, W, resizeBorder, W, 0, W-resizeBorder, 0);
+                        break;
+                    case RESIZE_SW:
+                        gl.glColor4f(1f, 0.8f, 0f, 0.5f);
+                        Draw.quad2d(gl, pmx, pmy, 0, resizeBorder, 0, 0, resizeBorder, 0);
+                        break;
+                }
+            }
 
             gl.glLineWidth(8f);
 

@@ -8,6 +8,7 @@ import jcog.math.FloatSupplier;
 import nars.concept.ScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
+import nars.control.DurService;
 import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -201,7 +202,7 @@ public interface NSense {
         return fs;
     }
 
-    Ons onFrame(Consumer r);
+    DurService onFrame(Consumer r);
 
     @NotNull
     default ScalarConcepts senseNumber(Term id, FloatSupplier v, int precision, ScalarConcepts.ScalarEncoder model)  {

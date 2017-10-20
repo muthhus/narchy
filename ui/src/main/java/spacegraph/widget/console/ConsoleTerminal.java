@@ -40,9 +40,10 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
         this(new DefaultVirtualTerminal(new TerminalSize(cols, rows)));
     }
 
+
     public ConsoleTerminal(VirtualTerminal t) {
-        resize(t.getTerminalSize().getColumns(), t.getTerminalSize().getRows());
         this.term = t;
+        resize(t.getTerminalSize().getColumns(), t.getTerminalSize().getRows());
     }
 
     private void render() {
@@ -94,6 +95,9 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     @Override
     public void start(@Nullable Surface parent) {
 
+
+        super.start(parent);
+
         term.addVirtualTerminalListener(listener = new VirtualTerminalListener() {
 
 
@@ -118,11 +122,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
             }
         });
 
-        super.start(parent);
-
         term.addInput(KeyStroke.fromString("<pageup>")); //HACK trigger redraw
-
-
     }
 
     @Override
@@ -217,7 +217,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
                     break;
 
                 default:
-                    System.err.println("character not handled: " + e);
+                    //System.err.println("character not handled: " + e);
                     return false;
             }
 

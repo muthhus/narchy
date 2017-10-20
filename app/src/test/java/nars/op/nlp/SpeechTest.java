@@ -34,7 +34,7 @@ public class SpeechTest {
 
     @Test
     public void testHearGoal() throws Narsese.NarseseException {
-        NAR n = NARchy.all();
+        NAR n = NARchy.ui();
         n.termVolumeMax.set(16);
         n.truthResolution.set(0.1f);
         n.confMin.set(0.1f);

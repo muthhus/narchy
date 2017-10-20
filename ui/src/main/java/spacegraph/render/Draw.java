@@ -169,6 +169,7 @@ public enum Draw {
             switch (shape.getShapeType()) {
                 case BOX_SHAPE_PROXYTYPE:
                     SimpleBoxShape boxShape = (SimpleBoxShape) shape;
+                    v3 a = v();
                     boxShape.getHalfExtentsWithoutMargin(a);
                     //Vector3f halfExtent = stack.vectors.get();
                     gl.glScalef(2f * a.x, 2f * a.y, 2f * a.z);
@@ -466,7 +467,22 @@ public enum Draw {
         gl.glVertex2f(x2, y2);
         gl.glEnd();
     }
+    public static void tri2d(GL2 gl, int x1, int y1, int x2, int y2, int x3, int y3) {
+        gl.glBegin(GL2.GL_TRIANGLES);
+        gl.glVertex2i(x1, y1);
+        gl.glVertex2i(x2, y2);
+        gl.glVertex2i(x3, y3);
+        gl.glEnd();
+    }
 
+    public static void quad2d(GL2 gl, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glVertex2i(x1, y1);
+        gl.glVertex2i(x2, y2);
+        gl.glVertex2i(x3, y3);
+        gl.glVertex2i(x4, y4);
+        gl.glEnd();
+    }
     public static void line(GL2 gl, v3 a, v3 b) {
         gl.glBegin(GL2.GL_LINES);
         gl.glVertex3f(a.x, a.y, a.z);
@@ -604,12 +620,12 @@ public enum Draw {
 //    static final Matrix3f tmpM3 = new Matrix3f();
     static final AxisAngle4f tmpA = new AxisAngle4f();
 
-    static public void renderHalfTriEdge(GL2 gl, SimpleSpatial src, EDraw<?> e, float width, float twist) {
+    static public void renderHalfTriEdge(GL2 gl, SimpleSpatial src, EDraw<?> e, float width, float twist, Quat4f tmpQ) {
 
 
         Transform st = src.transform;
 
-        final Quat4f tmpQ = st.getRotation(new Quat4f());
+        tmpQ = st.getRotation(tmpQ);
 
         if (twist != 0)
             tmpQ.setAngle(0, 1, 0, twist);
@@ -619,8 +635,7 @@ public enum Draw {
 
         //ww.normalize();
 
-        SimpleSpatial tgt = e.id;
-        Transform tt = tgt.transform;
+        Transform tt = ((SimpleSpatial) e.id).transform;
 
         float sx = st.x;
         float tx = tt.x;
@@ -633,12 +648,11 @@ public enum Draw {
         float dz = tz - sz;
         v3 vv = new v3(dx, dy, dz).cross(ww).normalized(width);
 
-        gl.glPushMatrix();
 
         gl.glBegin(GL2.GL_TRIANGLES);
 
         gl.glColor4f(e.r, e.g, e.b, e.a);
-        gl.glNormal3f(ww.x, ww.y, ww.z);
+        //gl.glNormal3f(ww.x, ww.y, ww.z);
 
         gl.glVertex3f(sx + vv.x, sy + vv.y, sz + vv.z); //right base
         gl.glVertex3f( //right base
@@ -650,7 +664,6 @@ public enum Draw {
 
         gl.glEnd();
 
-        gl.glPopMatrix();
 
     }
 

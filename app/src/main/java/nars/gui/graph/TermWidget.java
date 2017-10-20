@@ -3,11 +3,14 @@ package nars.gui.graph;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.pri.Deleteable;
+import jcog.pri.Pri;
 import nars.concept.Concept;
 import nars.gui.TermIcon;
 import nars.term.Term;
 import nars.term.Termed;
+import spacegraph.SimpleSpatial;
 import spacegraph.Surface;
+import spacegraph.math.Quat4f;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.collision.ClosestRay;
@@ -19,7 +22,6 @@ import spacegraph.space.EDraw;
 public class TermWidget extends Cuboid<Termed> {
 
 
-
     //caches a reference to the current concept
     public Concept concept;
     public float pri;
@@ -28,7 +30,7 @@ public class TermWidget extends Cuboid<Termed> {
     public TermWidget(Termed x, float w, float h) {
         super(x, w, h);
 
-       setFront(
+        setFront(
 //            /*col(
                 //new Label(x.toString())
 //                row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(nar, x))
@@ -38,6 +40,7 @@ public class TermWidget extends Cuboid<Termed> {
         );
 
     }
+
     public void commit(ConceptWidget.TermVis vis, TermSpace space) {
 
         this.space = space;
@@ -58,7 +61,7 @@ public class TermWidget extends Cuboid<Termed> {
         }
 
         if (buttons.length > 0 && buttons[0] == 1) {
-            if (concept!=null)
+            if (concept != null)
                 concept.print();
         }
 
@@ -66,17 +69,22 @@ public class TermWidget extends Cuboid<Termed> {
     }
 
 
-    public void render( GL2 gl,  EDraw e) {
+    public static void render(GL2 gl, SimpleSpatial src, Iterable<? extends EDraw> ee) {
 
+        Quat4f tmpQ = new Quat4f();
+        ee.forEach(e -> {
+            if (e.a < Pri.EPSILON)
+                return;
 
-        float width = e.width;
-        float thresh = 0.1f;
-        if (width <= thresh) {
-            gl.glColor4f(e.r, e.g, e.b, e.a * (width / thresh) /* fade opacity */);
-            Draw.renderLineEdge(gl, this, e, width);
-        } else {
-            Draw.renderHalfTriEdge(gl, this, e, width / 9f, e.r * 2f /* hack */);
-        }
+            float width = e.width;
+            float thresh = 0.1f;
+            if (width <= thresh) {
+                gl.glColor4f(e.r, e.g, e.b, e.a * (width / thresh) /* fade opacity */);
+                Draw.renderLineEdge(gl, src, e, width);
+            } else {
+                Draw.renderHalfTriEdge(gl, src, e, width / 9f, e.r * 2f /* hack */, tmpQ);
+            }
+        });
     }
 
     public static class TermEdge extends EDraw<TermWidget> implements Termed, Deleteable {
@@ -85,7 +93,7 @@ public class TermWidget extends Cuboid<Termed> {
 
         private final int hash;
 
-        public TermEdge( TermWidget target) {
+        public TermEdge(TermWidget target) {
             super(target);
             this.hash = target.key.hashCode();
         }
@@ -136,7 +144,7 @@ public class TermWidget extends Cuboid<Termed> {
 
                 final float MaxEdgeWidth = 4;
 
-                this.width = minLineWidth + Util.sqr( 1 + pri * MaxEdgeWidth  );
+                this.width = minLineWidth + Util.sqr(1 + pri * MaxEdgeWidth);
 
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
 //                float qEst = ff.qua();
@@ -144,10 +152,9 @@ public class TermWidget extends Cuboid<Termed> {
 //                    qEst = 0f;
 
 
-
                 this.r = 0.05f + 0.9f * (tasklinkPri / edgeSum);
                 this.g = 0.05f + 0.9f * (termlinkPri / edgeSum);
-                this.b = 0.5f * (1f - (r + g)/2f);
+                this.b = 0.5f * (1f - (r + g) / 2f);
 
 
                 this.a = 0.05f + 0.9f * Util.and(this.r * tasklinkBoost, this.g * termlinkBoost);
