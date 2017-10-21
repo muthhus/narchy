@@ -9,19 +9,14 @@ import nars.control.Activate;
 import nars.gui.graph.DynamicConceptSpace;
 import nars.task.ITask;
 import nars.task.NALTask;
-import nars.term.Termed;
+import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.SpaceGraph;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static nars.gui.Vis.reflect;
-import static spacegraph.layout.Grid.col;
 
 public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
-    final AtomicBoolean atomsEnabled = new AtomicBoolean(true);
+
 
     public SimpleConceptGraph1(NAR nar, int visibleNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         this(nar, ()->nar.exe.stream().
@@ -33,13 +28,13 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         super(nar, concepts, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
     }
 
-    @Override
-    protected boolean include(Termed x) {
-        return true;
-        //return atomsEnabled.get() || !(x.term() instanceof Atomic);
-//                return term instanceof Compound &&
-//                        term.complexity()==3 && term.toString().endsWith("-->x)");
-    }
+//    @Override
+//    protected boolean include(Termed x) {
+//        return true;
+//        //return atomsEnabled.get() || !(x.term() instanceof Atomic);
+////                return term instanceof Compound &&
+////                        term.complexity()==3 && term.toString().endsWith("-->x)");
+//    }
 
 //    public static class TaskTreeChart extends NARChart<ITask> {
 //
@@ -106,35 +101,11 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        );
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                /* TODO */ 64, 7, 15);
-
+                /* TODO */ 64, 3, 8);
 
         cs.show(800, 800, true);
 
-        SpaceGraph.window(
-                col(
-                        //reflect(cs),
-//                        reflect(cs.vis),
-                        //Vis.reflect(fd),
-                        reflect(n.exe)
-                        //new CheckBox("Atoms", atomsEnabled),
-                        //reflect( new CycleView(n) ),
-//                        new PushButton("+", () -> {
-//                            try {
-//                                n.input("x:h! :|:");
-//                            } catch (Narsese.NarseseException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }),
-//                        new PushButton("-", () -> {
-//                            try {
-//                                n.input("--x:h! :|:");
-//                            } catch (Narsese.NarseseException e) {
-//                                e.printStackTrace();
-//                            }
-//                        })
-                ),
-                400, 400);
+
 
         //n.log();
         //n.loop(2f);
@@ -158,7 +129,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //                ,"(d-->e).","(e-->a)."
 
                 "{a,b}.", "{b,c}.","{c,d}."
-                ,"{d,e}.","{e,a}."
+                ,"{d,e}.","{e,a}.", "(a,b,c,b)! :|:"
 
                 //,"(a &&+1 b). :|:"
 
@@ -203,15 +174,15 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                 .classify("ConceptFire", x -> x instanceof Activate)
                 ;
         n.onCycle((nn)->{
-            n.exe.forEach(exeTasks::accept);
+            n.exe.forEach(exeTasks);
             csv.out(
                     nn.time(),
 
-                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(0)).getSum(),
+                    ((StatisticalSummary) exeTasks.cond.get(0)).getSum(),
 
-                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(1)).getSum(),
+                    ((StatisticalSummary) exeTasks.cond.get(1)).getSum(),
 
-                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(2)).getSum(),
+                    ((StatisticalSummary) exeTasks.cond.get(2)).getSum(),
 
                     nn.emotion.busyVol.getSum()
             );

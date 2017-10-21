@@ -2,11 +2,11 @@ package jcog.bloom.quantitative;
 
 import jcog.bloom.BloomFilterBuilder;
 import jcog.bloom.LeakySet;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by jeff on 16/05/16.
@@ -49,7 +49,7 @@ public class FalsePositiveRateTest {
     private static List<String> randomStrings(String prefix, int count) {
         List<String> strings = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            String value = prefix + RandomStringUtils.randomAlphanumeric(7);
+            String value = prefix + UUID.randomUUID();
             strings.add(value);
         }
         return strings;

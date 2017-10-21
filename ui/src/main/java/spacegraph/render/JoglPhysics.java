@@ -194,27 +194,28 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
 
         window.addKeyListener(this);
 
-
-
-
         //gl.glEnable(GL_POINT_SPRITE);
         //gl.glEnable(GL_POINT_SMOOTH);
         gl.glEnable(GL_LINE_SMOOTH);
         //gl.glEnable(GL_POLYGON_SMOOTH); //[Polygon smooth] is not a recommended method for anti-aliasing. Use Multisampling instead.
 //        gl.glEnable(GL2.GL_MULTISAMPLE);
 
-        gl.glShadeModel(GL_SMOOTH);
+//        gl.glShadeModel(
+//            GL_SMOOTH
+//            //GL_FLAT
+//        );
+
 
 
         gl.glHint(GL_POLYGON_SMOOTH_HINT,
-                GL_NICEST);
-                //GL_FASTEST);
+                //GL_NICEST);
+                GL_FASTEST);
         gl.glHint(GL_LINE_SMOOTH_HINT,
-                GL_NICEST);
-                //GL_FASTEST);
+                //GL_NICEST);
+                GL_FASTEST);
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT,
-                GL_NICEST);
-                //GL_FASTEST);
+                //GL_NICEST);
+                GL_FASTEST);
 
         //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
         gl.glColorMaterial(GL_FRONT_AND_BACK,
@@ -222,7 +223,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
                 //GL_DIFFUSE
         );
         gl.glEnable(GL_COLOR_MATERIAL);
-        gl.glEnable(GL_NORMALIZE);
+        //gl.glEnable(GL_NORMALIZE);
 
         //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, new float[] { 1, 1, 1, 1 }, 0);
         //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, new float[] { 0, 0, 0, 0 }, 0);
@@ -230,7 +231,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
         gl.glEnable(GL_DEPTH_TEST);
         gl.glDepthFunc(GL_LEQUAL);
 
-        gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
+//        gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
 
         gl.glClearColor(0.0f, 0.0f, 0.0f, 0f); // Black Background
         gl.glClearDepth(1f); // Depth Buffer Setup
@@ -246,8 +247,8 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
         gl.glBlendEquation(GL_FUNC_ADD);
 
 
-        //gl.glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
-        //gl.glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
+        gl.glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+        gl.glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 
         //loadGLTexture(gl);
 

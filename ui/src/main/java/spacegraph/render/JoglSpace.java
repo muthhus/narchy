@@ -125,7 +125,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
             gl.setSwapInterval(0); //0=disable vsync
         }
 
-        printHardware();
+        //printHardware();
 
         Draw.init(gl);
 

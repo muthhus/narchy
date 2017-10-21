@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.function.Consumer;
 
 import static jcog.pri.op.PriMerge.plus;
 import static spacegraph.layout.Grid.col;
@@ -69,7 +70,7 @@ public class BagLab  {
         );
     }
 
-    private Surface hijackVis(HijackBag bag) {
+    private static Surface hijackVis(HijackBag bag) {
         int c = bag.capacity();
         int w = (int) Math.ceil(Math.sqrt(1 + c));
         int h = c / w;
@@ -87,7 +88,7 @@ public class BagLab  {
                     }
                 }
                 Draw.colorBipolar(gl, p);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
 
             }
             return 0;
@@ -150,10 +151,8 @@ public class BagLab  {
         for (int i = 0; i < (int)sampleBatches ; i++) {
             sampled.clear();
 
-            bag.sample(batchSize, (v) -> {
-                //System.out.println(h + " " + v);
-                sampled.add(v);
-            });
+            //System.out.println(h + " " + v);
+            bag.sample(batchSize, (Consumer<PriReference<Integer>>) sampled::add);
 
             //BLink<Integer> sample = bag.sample();
             for (PriReference<Integer> sample : sampled) {

@@ -49,6 +49,9 @@ public abstract class Param extends Services<Term, NAR> {
 
     public static final float LINK_FORGET_TEMPERATURE = PriForget.FORGET_TEMPERATURE_DEFAULT;
 
+    /** hard limit to prevent infinite looping */
+    public static final int MAX_TASK_FORWARD_HOPS = 8;
+
 
     /**
      * controls interpolation policy:

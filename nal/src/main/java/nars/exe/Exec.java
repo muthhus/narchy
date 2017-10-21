@@ -106,7 +106,7 @@ abstract public class Exec implements Executor, PriMerge {
         return concurrency() > 1;
     }
 
-    protected void ignore(@NotNull Task t) {
+    protected void ignore( Task t) {
         t.delete();
         nar.emotion.taskIgnored.increment();
     }

@@ -24,6 +24,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.OutputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by me on 11/14/16.
@@ -43,16 +44,17 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 
     public ConsoleTerminal(VirtualTerminal t) {
         this.term = t;
-        resize(t.getTerminalSize().getColumns(), t.getTerminalSize().getRows());
     }
 
-    private void render() {
-        needFullRedraw = true;
 
-        if (needFullRedraw) {
-            updateBackBuffer();
-            this.needFullRedraw = false;
-            texture.update(backbuffer);
+    private void render() {
+        needFullRedraw.set(true);
+        while (needFullRedraw.compareAndSet(true, false)) {
+            if (updateBackBuffer()) {
+                texture.update(backbuffer);
+                needFullRedraw.set(false);
+                break;
+            }
         }
     }
 
@@ -94,9 +96,9 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 
     @Override
     public void start(@Nullable Surface parent) {
-
-
         super.start(parent);
+
+        resize(term.getTerminalSize().getColumns(), term.getTerminalSize().getRows());
 
         term.addVirtualTerminalListener(listener = new VirtualTerminalListener() {
 
@@ -122,7 +124,8 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
             }
         });
 
-        term.addInput(KeyStroke.fromString("<pageup>")); //HACK trigger redraw
+        //term.addInput(KeyStroke.fromString("<pageup>")); //HACK trigger redraw
+
     }
 
     @Override
@@ -141,6 +144,10 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     public void paint(GL2 gl) {
 
         texture.paint(gl);
+
+        if (needFullRedraw.get()) {
+            render();
+        }
     }
 
     @Override
@@ -164,7 +171,6 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
         return term.getCharacter(col, row);
     }
 
-
     @Override
     public boolean onKey(KeyEvent e, boolean pressed) {
 
@@ -173,18 +179,18 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 
         int cc = e.getKeyCode();
         if (pressed && cc == 13) {
-            term.addInput(new KeyStroke(KeyType.Enter, e.isControlDown(), e.isAltDown()));
+            term.addInput(new KeyStroke(KeyType.Enter, e.isControlDown(), e.isAltDown(), e.isShiftDown()));
         } else if (pressed && cc == 8) {
-            term.addInput(new KeyStroke(KeyType.Backspace, e.isControlDown(), e.isAltDown()));
+            term.addInput(new KeyStroke(KeyType.Backspace, e.isControlDown(), e.isAltDown(), e.isShiftDown()));
         } else if (pressed && cc == 27) {
-            term.addInput(new KeyStroke(KeyType.Escape, e.isControlDown(), e.isAltDown()));
+            term.addInput(new KeyStroke(KeyType.Escape, e.isControlDown(), e.isAltDown(), e.isShiftDown()));
         } else if (e.isPrintableKey() && !e.isActionKey() && !e.isModifierKey()) {
             char c = e.getKeyChar();
-            if (!TerminalTextUtils.isControlCharacter(c) && !pressed /* release */) {
+            if (!TerminalTextUtils.isControlCharacter(c) && pressed /* release */) {
                 //eterm.gui.getActiveWindow().handleInput(
                 term.addInput(
                         //eterm.gui.handleInput(
-                        new KeyStroke(c, e.isControlDown(), e.isAltDown())
+                        new KeyStroke(c, e.isControlDown(), e.isAltDown(), e.isShiftDown())
                 );
 
             } else {
@@ -199,6 +205,10 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
                     break;
                 case KeyEvent.VK_ENTER:
                     c = KeyType.Enter;
+                    break;
+
+                case KeyEvent.VK_INSERT:
+                    c = KeyType.Insert;
                     break;
                 case KeyEvent.VK_DELETE:
                     c = KeyType.Delete;
@@ -240,7 +250,6 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     }
 
 
-
     private static final ImmutableCharSet TYPED_KEYS_TO_IGNORE = CharSets.immutable.of('\n', '\t', '\r', '\b', '\u001b', '\u007f');
 
     private boolean cursorIsVisible;
@@ -249,7 +258,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 
     private final boolean blinkOn;
 
-    private boolean needFullRedraw;
+    private final AtomicBoolean needFullRedraw = new AtomicBoolean(true);
     private TerminalPosition lastDrawnCursorPosition;
 
     private final int lastComponentWidth;
@@ -266,6 +275,8 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     boolean antialias = true;
     boolean quality = false;
 
+    private Graphics2D backbufferGraphics;
+
     {
 
 
@@ -276,10 +287,9 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
         this.lastComponentWidth = 0;
         this.backbuffer = null;
         this.blinkOn = true;
-        this.needFullRedraw = false;
-
 
         setFontSize(24);
+
 
     }
 
@@ -364,7 +374,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 //        this.notifyAll();
 //    }
 
-    private synchronized void updateBackBuffer() {
+    private boolean updateBackBuffer() {
         final int fontWidth = this.getFontWidth();
         final int fontHeight = this.getFontHeight();
         final TerminalPosition cursorPosition = term.getCursorBufferPosition();
@@ -372,15 +382,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
         int firstVisibleRowIndex = 0 / fontHeight;
         int lastVisibleRowIndex = (this.getHeight()) / fontHeight;
         this.ensureGraphicBufferHasRightSize();
-        final Graphics2D backbufferGraphics = this.backbuffer.createGraphics();
 
-        backbufferGraphics.setFont(font);
-        if (antialias) { //if (this.isTextAntiAliased()) {
-            backbufferGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        }
-        if (quality) {
-            backbufferGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        }
 
 //            final AtomicBoolean foundBlinkingCharacters = new AtomicBoolean(this.deviceConfiguration.isCursorBlinking());
 //        this.buildDirtyCellsLookupTable(firstVisibleRowIndex, lastVisibleRowIndex);
@@ -394,6 +396,9 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
         int characterWidth = fontWidth * 1; //(TerminalTextUtils.isCharCJK(textCharacter.getCharacter()) ? 2 : 1);
 
         term.forEachLine(firstVisibleRowIndex, lastVisibleRowIndex, (row, bufferLine) -> {
+
+            if (needFullRedraw.get())
+                return;
 
             for (int column = 0; column < cols; ++column) {
                 TextCharacter textCharacter = bufferLine.getCharacterAt(column);
@@ -410,25 +415,35 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
             }
 
         });
-        backbufferGraphics.dispose();
+        if (needFullRedraw.get())
+            return false;
 
         this.lastDrawnCursorPosition = cursorPosition;
-
-        this.needFullRedraw = false;
+        return true;
     }
 
 
     private void ensureGraphicBufferHasRightSize() {
 
-        if (this.backbuffer == null || this.backbuffer.getWidth() != this.getWidth() || this.backbuffer.getHeight() != this.getHeight()) {
-            BufferedImage newBackbuffer = new BufferedImage(getWidth(), getHeight(), 1);
-            Graphics2D graphics = newBackbuffer.createGraphics();
-            graphics.fillRect(0, 0, newBackbuffer.getWidth(), newBackbuffer.getHeight());
-            graphics.drawImage(this.backbuffer, 0, 0, (ImageObserver) null);
-            graphics.dispose();
-            this.backbuffer = newBackbuffer;
-            //this.copybuffer = new BufferedImage(backbuffer.getWidth(), backbuffer.getHeight(), 1);
+        if (this.backbuffer != null && this.backbuffer.getWidth() == this.getWidth() && this.backbuffer.getHeight() == this.getHeight()) {
+            return;
         }
+
+        BufferedImage newBackbuffer = new BufferedImage(getWidth(), getHeight(), 1);
+        Graphics2D backbufferGraphics = newBackbuffer.createGraphics();
+        backbufferGraphics.fillRect(0, 0, newBackbuffer.getWidth(), newBackbuffer.getHeight());
+        backbufferGraphics.drawImage(this.backbuffer, 0, 0, (ImageObserver) null);
+
+        backbufferGraphics.setFont(font);
+        if (antialias) { //if (this.isTextAntiAliased()) {
+            backbufferGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        }
+        if (quality) {
+            backbufferGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        }
+
+        this.backbufferGraphics = backbufferGraphics;
+        this.backbuffer = newBackbuffer;
 
     }
 
@@ -442,10 +457,10 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 
         //FontMetrics fontMetrics = g.getFontMetrics();
         //g.drawString(Character.toString(character.getCharacter()), x, y + fontHeight - fontMetrics.getDescent() + 1);
-        final int descent = 4;
+        final int descent = 6;
         char c = character.getCharacter();
-        if (c!=' ')
-            g.drawChars(new char[] {c}, 0, 1, x, y + fontHeight + 1 - descent);
+        if (c != ' ')
+            g.drawChars(new char[]{c}, 0, 1, x, y + fontHeight + 1 - descent);
 
 
         int lineStartY;
@@ -472,12 +487,11 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 //        if (this.deviceConfiguration.getCursorStyle() == CursorStyle.UNDER_BAR) {
 //            g.fillRect(x, y + fontHeight - 3, characterWidth, 2);
 //        } else if (this.deviceConfiguration.getCursorStyle() == CursorStyle.VERTICAL_BAR) {
-            g.fillRect(x, y + 1, 2, fontHeight - 2);
+            g.fillRect(x, y + 1, characterWidth, fontHeight - 2);
 //        }
         }
 
     }
-
 
 
 //        public synchronized void enterPrivateMode() {
@@ -497,16 +511,16 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 //            this.clearBackBuffer();
 //        }
 
-    private void clearBackBuffer() {
-        if (this.backbuffer != null) {
-            Graphics2D graphics = this.backbuffer.createGraphics();
-            Color backgroundColor = Color.BLACK; //this.colorConfiguration.toAWTColor(ANSI.DEFAULT, false, false);
-            graphics.setColor(backgroundColor);
-            graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
-            graphics.dispose();
-        }
-
-    }
+//    private void clearBackBuffer() {
+//        if (this.backbuffer != null) {
+//            Graphics2D graphics = this.backbuffer.createGraphics();
+//            Color backgroundColor = Color.BLACK; //this.colorConfiguration.toAWTColor(ANSI.DEFAULT, false, false);
+//            graphics.setColor(backgroundColor);
+//            graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
+//            graphics.dispose();
+//        }
+//
+//    }
 
 //    public synchronized void setCursorPosition(int x, int y) {
 //        this.setCursorPosition(new TerminalPosition(x, y));
@@ -527,10 +541,10 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 //        public TerminalPosition getCursorPosition() {
 //            return term.getCursorPosition();
 //        }
-
-    public void setCursorVisible(boolean visible) {
-        this.cursorIsVisible = visible;
-    }
+//
+//    public void setCursorVisible(boolean visible) {
+//        this.cursorIsVisible = visible;
+//    }
 
 //        public synchronized void putCharacter(char c) {
 //            term.putCharacter(c);

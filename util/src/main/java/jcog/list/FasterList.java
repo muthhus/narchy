@@ -520,4 +520,9 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
+    public X added(X x) {
+        add(x);
+        return x;
+    }
+
 }

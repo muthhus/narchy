@@ -9,27 +9,18 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.Concept;
-import nars.gui.graph.EdgeDirected;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
-import spacegraph.AbstractSpace;
-import spacegraph.Ortho;
-import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.layout.Flatten;
-import spacegraph.layout.ForceDirected;
+import spacegraph.audio.AudioSource;
+import spacegraph.audio.WaveCapture;
 import spacegraph.layout.Grid;
 import spacegraph.layout.Stacking;
 import spacegraph.math.Color3f;
-import spacegraph.render.SpaceGraph2D;
-import spacegraph.space.CrosshairSurface;
 import spacegraph.widget.Label;
 import spacegraph.widget.LabeledPane;
-import spacegraph.widget.button.CheckBox;
-import spacegraph.widget.button.PushButton;
 import spacegraph.widget.console.ConsoleTerminal;
-import spacegraph.widget.console.TerminalUI;
+import spacegraph.widget.console.TextEdit;
 import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meter.Plot2D;
 import spacegraph.widget.slider.FloatSlider;
@@ -40,7 +31,6 @@ import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
-import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.row;
 
@@ -50,8 +40,8 @@ import static spacegraph.layout.Grid.row;
 public class Vis {
 
 
-    public static ConsoleTerminal newInputEditor() {
-        return new ConsoleTerminal(new TerminalUI(20, 5));
+    public static ConsoleTerminal inputEditor() {
+        return new ConsoleTerminal(new TextEdit(40, 8));
     }
 
     public static Grid beliefCharts(int window, NAR nar, Object... x) {
@@ -148,7 +138,7 @@ public class Vis {
         Grid grid = new Grid();
         List<Plot2D> plots = $.newArrayList();
         for (Termed t : concepts) {
-            final Truth[] bb = new Truth[] { $.t(0.5f, 0.5f) };
+            final Truth[] bb = {$.t(0.5f, 0.5f)};
             Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/) {
 
                 @Override
@@ -157,14 +147,11 @@ public class Vis {
 
                     bb[0] = a.nar.beliefTruth(concept, a.nar.time());
                     float b;
-                    if (bb[0] == null)
-                        b = 0f;
-                    else
-                         b = 2f * (bb[0].freq()) -1f;
+                    b = bb[0] == null ? 0f : 2f * (bb[0].freq()) - 1f;
 
-                    backgroundColor[0] = b < 0 ? -b/4f : 0;
+                    backgroundColor[0] = b < 0 ? -b / 4f : 0;
                     backgroundColor[1] = 0;
-                    backgroundColor[2] = b >= 0 ? b/4f : 0;
+                    backgroundColor[2] = b >= 0 ? b / 4f : 0;
                     backgroundColor[3] = 0.9f;
 
                     super.paint(gl);
@@ -174,11 +161,11 @@ public class Vis {
 //            p.add("P", () -> a.nar.pri(t, Float.NaN), 0f, 1f);
 //            p.add("G", () -> a.nar.concept(t).goalFreq(nar.time(), nar.dur()), 0f, 1f);
             p.add("B", () -> {
-                return bb[0] !=null ? bb[0].freq() : Float.NaN;
+                return bb[0] != null ? bb[0].freq() : Float.NaN;
             }, 0f, 1f);
             p.add("G", () -> {
                 Truth b = a.nar.goalTruth(t, a.nar.time());
-                return b!=null ? b.freq() : Float.NaN;
+                return b != null ? b.freq() : Float.NaN;
             }, 0f, 1f);
 
             grid.children.add(p);
@@ -253,42 +240,42 @@ public class Vis {
 //        );
 //    }
 
-    public static SpaceGraph<Term> conceptsWindow(AbstractSpace nn) {
-        Surface controls = col(new PushButton("x"), row(new FloatSlider("z", 0, 0, 4)), new CheckBox("?"))
-                .hide();
-
-
-        ForceDirected fd;
-        SpaceGraph<Term> s = new SpaceGraph2D<>()
-//                .add(
-//                        new Ortho(
-////                                new FloatSlider("~", 0, 0, 1f).on((slider, v) -> {
+//    public static SpaceGraph<Term> conceptsWindow(AbstractSpace nn) {
+//        Surface controls = col(new PushButton("x"), row(new FloatSlider("z", 0, 0, 4)), new CheckBox("?"))
+//                .hide();
+//
+//
+//        ForceDirected fd;
+//        SpaceGraph<Term> s = new SpaceGraph2D<>()
+////                .add(
+////                        new Ortho(
+//////                                new FloatSlider("~", 0, 0, 1f).on((slider, v) -> {
+//////
+//////                                }).scale(100, 100).pos(0f, 0f)
 ////
-////                                }).scale(100, 100).pos(0f, 0f)
+////                                new ConsoleTerminal(new ConsoleSurface.EditTerminal(40,20))
+////
+//////                                new CheckBox("").on((cb, v) -> {
+//////                                    if (!v)
+//////                                        controls.hide();
+//////                                    else
+//////                                        controls.scale(200,200f).pos(300f,300f);
+//////                                }).scale(100, 100).pos(0f, 0f)
+////
+////                        ).scale(500,500))
+//                .add(new Ortho(controls))
+//                .add(nn.with(
+//                        new Flatten()
+//                        //new Spiral()
+//                        //new FastOrganicLayout()
+//                )).with(fd = new EdgeDirected());
 //
-//                                new ConsoleTerminal(new ConsoleSurface.EditTerminal(40,20))
+//        s.add(new Ortho(new CrosshairSurface(s)));
 //
-////                                new CheckBox("").on((cb, v) -> {
-////                                    if (!v)
-////                                        controls.hide();
-////                                    else
-////                                        controls.scale(200,200f).pos(300f,300f);
-////                                }).scale(100, 100).pos(0f, 0f)
+//        window(new ReflectionSurface(fd), 500, 500);
 //
-//                        ).scale(500,500))
-                .add(new Ortho(controls))
-                .add(nn.with(
-                        new Flatten()
-                        //new Spiral()
-                        //new FastOrganicLayout()
-                )).with(fd = new EdgeDirected());
-
-        s.add(new Ortho(new CrosshairSurface(s)));
-
-        window(new ReflectionSurface(fd), 500, 500);
-
-        return s;
-    }
+//        return s;
+//    }
 
 //    public static ConsoleSurface logConsole(NAR nar, int cols, int rows, FloatParam priMin) {
 //        ConsoleSurface term = new ConsoleTerminal(cols, rows);
@@ -324,8 +311,21 @@ public class Vis {
 //        return term;
 //    }
 
-    public static ReflectionSurface reflect(Object c) {
-        return new ReflectionSurface(c);
+    public static <X> ReflectionSurface<X> reflect(X c) {
+        return new ReflectionSurface<>(c);
+    }
+
+    public static Surface audioCapture() {
+        AudioSource audio = new AudioSource(3, 20);
+        WaveCapture au = new WaveCapture(
+                audio,
+                //new SineSource(128),
+                20);
+
+        return row(
+                au.newMonitorPane(),
+                new FloatSlider(audio.gain)
+        );
     }
 
     public static class EmotionPlot extends Grid implements Consumer<NAR> {
@@ -355,8 +355,8 @@ public class Vis {
             plot3.add("Lern", nar.emotion::learningVol, 0f, 1f);
 
             plot1.add("Dex+0", () -> a.dexterity(a.now), 0f, 1f);
-            plot1.add("Dex+1", () -> a.dexterity(a.now+1*a.nar.dur()), 0f, 1f);
-            plot1.add("Dex+2", () -> a.dexterity(a.now+2*a.nar.dur()), 0f, 1f);
+            plot1.add("Dex+1", () -> a.dexterity(a.now + 1 * a.nar.dur()), 0f, 1f);
+            plot1.add("Dex+2", () -> a.dexterity(a.now + 2 * a.nar.dur()), 0f, 1f);
 
             plot4.add("Hpy", () -> {
                 return a.happy.beliefs().freq(a.now, a.nar);

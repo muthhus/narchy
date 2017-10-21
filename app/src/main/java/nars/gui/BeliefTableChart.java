@@ -11,6 +11,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
+import nars.truth.Truthed;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 import spacegraph.widget.Label;
@@ -129,10 +130,9 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
             if (cc != null) {
                 cp = 1f; /*nar.pri(cc);*/
 
-                long nowStart = now - dur / 2;
-                long nowEnd = now + dur / 2;
-
                 beliefs.set(cc.beliefs(), now, dur, nar, minT, maxT);
+                long nowEnd = now + dur / 2;
+                long nowStart = now - dur / 2;
                 beliefs.current = nar.beliefTruth(cc, nowStart, nowEnd);
                 goals.set(cc.goals(), now, dur, nar, minT, maxT);
                 goals.current = nar.goalTruth(cc, nowStart, nowEnd);
@@ -282,7 +282,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 //            new Color(0.2f + 0.4f * c, 1f, 0.2f, 0.39f + 0.6f * c)
 //    );
 
-    public void drawCrossHair(GL2 gl, float x, float gew, Truth truth, double theta) {
+    public static void drawCrossHair(GL2 gl, float x, float gew, Truthed truth, double theta) {
         gl.glLineWidth(CROSSHAIR_THICK);
 
         float conf = truth.conf();
@@ -361,7 +361,6 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         wave.forEach((freq, conf, s, e) -> {
 
             boolean eternal = (s != s);
-            float pw = baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
 
             //normalize to range
             //conf = (conf - confMinMax[0]) / (confMinMax[1] - confMinMax[0]);
@@ -383,7 +382,6 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
             //r.renderTask(gl, qua, conf, pw, ph, xStart, xEnd, freq);
 
-            float alpha = 0.1f + (conf) * 0.4f;
             float r, g, b;
             if (beliefOrGoal) {
                 r = 0.1f + 0.9f*conf;
@@ -397,10 +395,12 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
 
             float mid = (end + start) / 2f;
+            float pw = baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
             float W = Math.max((end - start), pw);
-            float x = mid - W / 2;
-            float y = freq - ph/2;
+            float alpha = 0.1f + (conf) * 0.4f;
             gl.glColor4f(r, g, b, alpha); //, 0.7f + 0.2f * q);
+            float y = freq - ph / 2;
+            float x = mid - W / 2;
             Draw.rect(gl,
                     x, y,
                     W, ph);
@@ -409,7 +409,8 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         });
     }
 
-    private void renderWaveLine(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
+    /** TODO use double not float for precision that may be lost */
+    private static void renderWaveLine(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
 
         gl.glLineWidth(3.0f);
         gl.glBegin(GL2.GL_LINE_STRIP);

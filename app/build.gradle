@@ -13,7 +13,7 @@ dependencies {
 
 
 
-mainClassName = 'nars.TextUI'
+mainClassName = 'nars.UI'
 
 shadowJar {
 
@@ -28,7 +28,7 @@ shadowJar {
     exclude 'com/sun/jna/aix*'
     exclude 'Conversant*.png'
 
-    mainClassName = 'nars.TextUI'
+    mainClassName = 'nars.UI'
 
 //   baseName = 'nars_app'
 //   classifier = null

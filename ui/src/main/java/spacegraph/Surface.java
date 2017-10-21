@@ -208,7 +208,6 @@ abstract public class Surface {
     /**
      * returns true if the event has been absorbed, false if it should continue propagating
      */
-    @Deprecated
     public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
         return false;
     }

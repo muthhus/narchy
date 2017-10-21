@@ -9,6 +9,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static jcog.bloom.LongBitsetBloomFilter.DEFAULT_FPP;
+
 /**
  * pair of BloomFilter which, when one or both are
  * consulted, can answer 'yes' 'no' or 'maybe' for a given input and a
@@ -25,13 +27,18 @@ import java.util.function.Predicate;
  */
 public class YesNoMaybe<X> extends Flip<Twin<LongBitsetBloomFilter>> {
 
-    public final AtomicLong hit = new AtomicLong();
+    public final AtomicLong hitYes = new AtomicLong();
+    public final AtomicLong hitNo = new AtomicLong();
     public final AtomicLong miss = new AtomicLong();
 
     final AtomicInteger count = new AtomicInteger();
     private final Function<X, byte[]> byter;
     private final int capacity;
     private final Predicate<X> test;
+
+    public YesNoMaybe(Predicate<X> test, Function<X, byte[]> byter, int capacity) {
+        this(test, byter, capacity, DEFAULT_FPP);
+    }
 
     public YesNoMaybe(Predicate<X> test, Function<X, byte[]> byter, int capacity, float falsePosRate) {
         super(() ->
@@ -66,7 +73,7 @@ public class YesNoMaybe<X> extends Flip<Twin<LongBitsetBloomFilter>> {
         boolean definiteYes = !ny.test(b);
         boolean definiteNo = !nn.test(b);
         if (definiteYes ^ definiteNo) {
-            hit.incrementAndGet();
+            (definiteYes ? hitYes : hitNo).incrementAndGet();
             return definiteYes;
         }
 
@@ -92,11 +99,14 @@ public class YesNoMaybe<X> extends Flip<Twin<LongBitsetBloomFilter>> {
     }
 
     public float hitRate(boolean clear) {
-        int total = miss.intValue() + hit.intValue();
+        int miss = this.miss.intValue();
+        int yes = hitYes.intValue();
+        int no = hitNo.intValue();
+        float total = miss + yes + no;
         if (total == 0) return 0;
         else if (clear) {
-            miss.set(0); hit.set(0);
+            this.miss.set(0); hitYes.set(0); hitNo.set(0);
         }
-        return hit.floatValue() / total;
+        return (no + yes) / total;
     }
 }

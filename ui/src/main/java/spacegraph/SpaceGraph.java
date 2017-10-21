@@ -140,14 +140,14 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-    public @NotNull <Y extends Spatial<X>> Y getOrAdd(X x, Function<X, Y> materializer) {
+    public <Y extends Spatial<X>> Y getOrAdd(X x, Function<X, Y> materializer) {
         //Spatial y = atoms.get(x, materializer);
         Spatial y = atoms.computeIfAbsent(x, materializer);
         y.activate();
         return (Y) y;
     }
 
-    public @Nullable <Y extends Spatial<X>> Y get(X x) {
+    public <Y extends Spatial<X>> Y get(X x) {
         //Spatial y = atoms.getIfPresent(x);
         Spatial y = atoms.get(x);
         if (y != null)
@@ -189,7 +189,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     @Override
     public void init(GL2 gl) {
         super.init(gl);
-        updateWindowInfo();
 
         for (Ortho f : preAdd) {
             _add(f);
@@ -198,6 +197,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
         initInput();
+        updateWindowInfo();
 
     }
 
@@ -307,12 +307,12 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         GLWindow rww = window;
         if (rww == null)
             return;
+        if (!rww.isRealized() || !rww.isVisible() || !rww.isNativeValid()) {
+            return;
+        }
 
         if (gettingScreenPointer.compareAndSet(false, true)) {
-            if (!rww.isRealized() || !rww.isVisible()) {
-                windowX = windowY = -1;
-                return;
-            }
+
             window.getScreen().getDisplay().getEDTUtil().invoke(false, () -> {
                 try {
                     Point p = rww.getLocationOnScreen(new Point());

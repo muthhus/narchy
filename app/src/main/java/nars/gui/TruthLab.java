@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import nars.*;
 import nars.concept.BaseConcept;
+import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -13,7 +14,9 @@ import spacegraph.Surface;
 import spacegraph.layout.Grid;
 import spacegraph.render.Draw;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.IntFunction;
 
 import static java.util.stream.Collectors.toList;
 import static nars.$.$;
@@ -51,11 +54,6 @@ public class TruthLab extends Grid {
         update(n);
     }
 
-    @Override
-    public void layout() {
-        super.layout();
-    }
-
     protected void update(NAR n) {
 
         this.end = Math.max(this.end, n.time());
@@ -78,7 +76,7 @@ public class TruthLab extends Grid {
         final float[] data;
         final int samples;
 
-        public TruthTimeline(long start, long end, int samplePeriod, IntToObjectFunction<Truth> eval) {
+        public TruthTimeline(long start, long end, int samplePeriod, IntFunction<Truth> eval) {
             this.data = new float[(int) Math.ceil(((double) (end - start)) / samplePeriod) * 3];
 
             int i = 0;
@@ -89,18 +87,12 @@ public class TruthLab extends Grid {
 
                 Truth t = eval.apply(Math.round(occ));
                 float f;
-                if (t != null)
-                    f = t.freq();
-                else
-                    f = 0.5f;
+                f = t != null ? t.freq() : 0.5f;
 
                 data[i++] = f;
 
                 float c;
-                if (t != null)
-                    c = t.conf();
-                else
-                    c = -1;
+                c = t != null ? t.conf() : -1;
 
                 data[i++] = c;
 
@@ -165,7 +157,7 @@ public class TruthLab extends Grid {
                 if (truthOrProjectedTaskTruth) {
                     return b.truth(w, w, nar);
                 } else {
-                    Task x = b.answer((long) w, w, null, nar);
+                    Task x = b.answer(w, w, null, nar);
                     return x != null ? x.truth(w, dur, Param.TRUTH_EPSILON) : null;
 
                 }
@@ -188,11 +180,11 @@ public class TruthLab extends Grid {
         }
 
 
-        public List<Surface> update(NAR n, long start, long end, int samplePeriod) {
+        public Collection<Surface> update(NAR n, long start, long end, int samplePeriod) {
 
             List<Surface> cc = $.newArrayList();
 
-            BaseConcept c = (BaseConcept) n.concept(term);
+            Concept c = (BaseConcept) n.concept(term);
             if (c == null) {
 
             } else {

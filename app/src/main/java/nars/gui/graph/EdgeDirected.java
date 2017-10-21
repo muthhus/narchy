@@ -1,5 +1,6 @@
 package nars.gui.graph;
 
+import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.layout.ForceDirected;
 import spacegraph.phys.Collidable;
@@ -20,12 +21,12 @@ public class EdgeDirected extends ForceDirected {
             Spatial A = ((Spatial) c.data());
 
             //TODO abstract the Edges as a feature to optionally add to a TermWidget, not just for ConceptWidgets
-            if (A instanceof ConceptWidget) {
-                ((ConceptWidget) A).edges.forEach(e -> {
+            if (A instanceof TermWidget) {
+                ((TermWidget<?>) A).edges().forEach(e -> {
 
                     float attraction = e.attraction;
                     if (attraction > 0) {
-                        TermWidget B = e.id;
+                        SimpleSpatial B = e.id;
 
                         if ((B.body != null)) {
 

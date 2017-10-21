@@ -10,6 +10,8 @@ import spacegraph.Surface;
 import spacegraph.layout.Grid;
 import spacegraph.widget.console.ConsoleTerminal;
 
+import java.io.IOException;
+
 public class ConceptView extends Grid {
 
     private final Termed term;
@@ -46,7 +48,11 @@ public class ConceptView extends Grid {
 
         } else {
             io.term.clearScreen();
-            io.append(term + " unconceptualized");
+            try {
+                io.append(String.valueOf(term)).append(" unconceptualized");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

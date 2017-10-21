@@ -23,8 +23,8 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     boolean center = true;
 
-    public final FloatParam repel = new FloatParam(3f, 0, 4f);
-    public final FloatParam attraction = new FloatParam(0.5f, 0, 1f);
+    public final FloatParam repel = new FloatParam(3f, 0, 9f);
+    public final FloatParam attraction = new FloatParam(0.1f, 0, 3f);
 
 
 
@@ -132,9 +132,9 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             return;
 
         len -= idealDist;
-//        if (len < 0) {
-//            return;
-//        }
+        if (len < 0) {
+            return;
+        }
 //        if (len < BulletGlobals.FLT_EPSILON)
 //            return;
 

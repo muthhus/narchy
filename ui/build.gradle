@@ -7,17 +7,16 @@ repositories {
 dependencies {
     compile project(':util')
 
-    compile group: 'jline', name: 'jline', version: '3.0.0.M1'
     compile group: 'com.googlecode.lanterna', name: 'lanterna', version: '3.0.0'
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.54'
 
-    compile group: 'com.github.drapostolos', name: 'type-parser', version: '0.6.0'
+
 
     compile group: 'org.semanticweb.yars', name: 'nxparser-parsers', version: '2.3.3'
 
-    compile(group: 'org.xeustechnologies', name: 'jcl-core', version: '2.8') {
-        exclude(module: 'objenesis')
-    }
+//    compile(group: 'org.xeustechnologies', name: 'jcl-core', version: '2.8') {
+//        exclude(module: 'objenesis')
+//    }
 
     //compile group: 'org.joml', name: 'joml', version: '1.9.4'
 
@@ -31,7 +30,10 @@ dependencies {
 
 //    compile group: 'org.boofcv', name: 'sfm', version: '0.26'
 //    compile group: 'org.boofcv', name: 'geo', version: '0.26'
-    compile group: 'org.boofcv', name: 'io', version: '0.26'
+    compile(group: 'org.boofcv', name: 'io', version: '0.26') {
+        exclude(module: 'snakeyaml')
+        exclude(module: 'xstream')
+    }
 //    compile group: 'org.boofcv', name: 'ip', version: '0.26'
     compile(group: 'org.boofcv', name: 'WebcamCapture', version: '0.26') {
         exclude(module: 'visualize')

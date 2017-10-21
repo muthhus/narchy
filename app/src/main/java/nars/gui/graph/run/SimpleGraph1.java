@@ -3,150 +3,106 @@ package nars.gui.graph.run;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
-import jcog.pri.PLink;
 import nars.$;
-import nars.NARS;
-import nars.concept.Concept;
-import nars.gui.graph.ConceptWidget;
+import nars.Narsese;
 import nars.gui.graph.TermSpace;
 import nars.gui.graph.TermWidget;
-import nars.term.Termed;
-import org.jetbrains.annotations.NotNull;
+import nars.term.Term;
 import spacegraph.SpaceGraph;
-import spacegraph.Surface;
-import spacegraph.widget.Label;
+import spacegraph.render.Draw;
+import spacegraph.space.EDraw;
 
 import java.util.List;
 
 /**
  * display a directed graph by wrapping its elements in NAR concepts (HACK)
  */
-public class SimpleGraph1 extends TermSpace {
+public class SimpleGraph1 extends TermSpace<Term> {
 
-    ConceptWidget touched;
-    final Surface status = new Label("ready");
+//    final Surface status = new Label("ready");
 
-    public SimpleGraph1(int maxEdges) {
-        super(NARS.shell(), maxEdges, maxEdges);
+    final TermWidget.TermVis<TermWidget<Term>> vis = w -> {
 
+        w.scale(5, 5, 5);
 
-//        nodeBuilder = (x) ->
-//            new ConceptWidget(x) {
-//                @Override
-//                public Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons, JoglPhysics space) {
-//                    if (touched!=this) {
-//                        ((Label)status).set(concept.toString());
-//                        ((Label)status).color.a(0.8f);
-//                    }
-//                    touched = this;
-//
-//                    return super.onTouch(body, hitPoint, buttons, space);
-//                }
-//            };
+        Draw.colorHash(w.id, w.shapeColor);
 
-//        vis = new ConceptWidget.ConceptVis() {
-//            final float minSize = 3f;
-//            final float maxSize = 24;
-//
-//            @Override
-//            public void apply(ConceptWidget cw, Term tt) {
-//                float p = cw.pri;
-//
-//                float nodeScale = (float) (minSize + Math.sqrt(p) * maxSize);
-//                float l = nodeScale * 2;
-//                float w = nodeScale;
-//                float h = 1;
-//                cw.scale(l, w, h);
-//
-//
-//                float density = 0.25f;
-//                if (cw.body != null) {
-//                    cw.body.setMass(l * w * h * density);
-//                    cw.body.setDamping(0.9f, 0.9f);
-//                }
-//                Concept c = cw.concept;
-//                if (c != null) {
-//                    Draw.colorHash(c.hashCode(), cw.shapeColor, 0.75f, 0.35f, 0.9f);
-//                }
-//            }
-//        };
+        w.edges().forEach(x -> {
+            x.r = 1;
+            x.g = 0.5f;
+            x.b = 0;
+            x.a = 1;
+            x.width = 10;
+            x.setPri(0.5f);
+            x.attraction = 1;
+            x.attractionDist = 1;
+        });
+    };
 
+    public SimpleGraph1() {
+        super();
+    }
 
-        //nar.startFPS(1f);
+    static class DefaultTermWidget extends TermWidget<Term> {
+
+        public final List<EDraw<?>> edges = $.newArrayList();
+
+        public DefaultTermWidget(Term x) {
+            super(x);
+        }
+
+        @Override
+        public Iterable<EDraw<?>> edges() {
+            return edges;
+        }
     }
 
 
-    protected SimpleGraph1 commit(Graph g) {
-        List<TermWidget> n2 = $.newArrayList(g.nodes().size());
+    protected SimpleGraph1 commit(Graph<Term> g) {
+        List<TermWidget<Term>> n2 = $.newArrayList(g.nodes().size());
 
         g.nodes().forEach(x -> {
             //HACK todo use proxyterms in a cache
-            Concept c = nar.conceptualize(nodeTerm(x));
             //c.termlinks().clear();
-            g.successors(x).forEach( y -> c.termlinks().put(new PLink(nodeTerm(y),  1f) ));
-            n2.add(conceptWidget(new PLink(c, 1f)));
+
+            DefaultTermWidget w = space.getOrAdd(x, DefaultTermWidget::new);
+
+            g.successors(x).forEach((Term y) -> w.edges.add(new EDraw(space.getOrAdd(y, DefaultTermWidget::new))));
+
+            n2.add(w);
         });
 
         this.active = n2;
-
 
 
         return this;
     }
 
 
-//   protected <N,E> SimpleGraph1 commit(ValueGraph<N,E> g, FloatFunction<E> pri) {
-//        List<Activate> n2 = $.newArrayList(g.nodes().size());
-//
-//
-//        g.nodes().forEach(x -> {
-//            //HACK todo use proxyterms in a cache
-//            Concept c = nar.conceptualize(nodeTerm(x));
-//            Bag<Term, PriReference<Term>> tl = c.termlinks();
-//            //tl.clear();
-//            g.successors(x).forEach( y -> {
-//                tl.put(new PLink(nodeTerm(y),  pri.floatValueOf(
-//                    g.edgeValue(x, y)
-//                )));
-//            } );
-//            tl.commit();
-//            n2.add(new Activate(c, 1f));
-//        });
-//
-//        this.next = n2;
-//        return this;
-//    }
-//
-    @NotNull
-    private Termed nodeTerm(Object x) {
-        return $.quote(System.identityHashCode(x) + " " + x);
-    }
-
     @Override
     protected void render() {
-        //super.render();
-//        active = next;
+        active.forEach(n -> n.commit(vis, this));
     }
 
     @Override
-    protected List<TermWidget> get() {
-//        if (next!=null) {
-//            nodes = next;
-//            next = null;
-//        }
-//        nodes.forEach(c -> displayNext.add(nodeGetOrCreate(c)));
-        //displayNext.addAll(next);
+    protected List<TermWidget<Term>> get() {
         throw new UnsupportedOperationException("shouldnt get called because render is overridden");
     }
 
     public static void main(String[] args) {
 
         MutableGraph g = GraphBuilder.directed().build();
-        g.putEdge("x", "y");
-        g.putEdge("y", "z");
-        g.putEdge("y", "w");
+        g.putEdge($.the("x"), $.the("y"));
+        g.putEdge($.the("y"), $.the("z"));
+        g.putEdge($.the("y"), $.the("w"));
 
-        SimpleGraph1 cs = new SimpleGraph1(10) {
+
+//        NAR n = NARS.tmp();
+//        n.input("a:b.","b:c.");
+//        n.run(10);
+//        AdjGraph<Term, Float> g = TermGraph.termlink(n);
+
+        SimpleGraph1 cs = new SimpleGraph1() {
             @Override
             public void start(SpaceGraph space) {
                 super.start(space);

@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  */
 public abstract class Spatial<X> implements Active {
 
-    public final X key;
+    public final X id;
     public final int hash;
     public boolean preactive;
 
@@ -37,14 +37,14 @@ public abstract class Spatial<X> implements Active {
     }
 
     protected Spatial(X k) {
-        this.key = k!=null ? k : (X) this;
+        this.id = k!=null ? k : (X) this;
         this.hash = k!=null ? k.hashCode() : super.hashCode();
     }
 
     @Override
     public String toString() {
 
-        return key + "<" +
+        return id + "<" +
                 //(body!=null ? body.shape() : "shapeless")  +
                 ">";
     }
@@ -55,7 +55,7 @@ public abstract class Spatial<X> implements Active {
     @Override
     public final boolean equals(Object obj) {
 
-        return this == obj || key.equals(((Spatial) obj).key);
+        return this == obj || id.equals(((Spatial) obj).id);
     }
 
     @Override

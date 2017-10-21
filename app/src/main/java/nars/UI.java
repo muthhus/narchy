@@ -1,18 +1,16 @@
 package nars;
 
-import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import jcog.Util;
 import nars.gui.Vis;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import spacegraph.SpaceGraph;
-import spacegraph.widget.console.ConsoleTerminal;
+import spacegraph.Surface;
 
 import java.io.IOException;
 
 import static spacegraph.SpaceGraph.window;
+import static spacegraph.layout.Grid.grid;
 
 /**
  * main UI entry point
@@ -38,31 +36,48 @@ public class UI {
 
         nar.startFPS(5f);
 
-        try {
-            //1. try to open a Spacegraph openGL window
-            logger.info("Starting Spacegraph UI");
-            SpaceGraph.window(
-                window(Vis.reflect(nar), 700, 600)
+
+        nar.runLater(()-> {
+            window(
+                    Vis.reflect(nar), 700, 600
             );
-            ConsoleTerminal ct = new ConsoleTerminal(
-                    new TextUI(nar).session(8f)
-            );
-            SpaceGraph.window(
-                    ct,800, 600);
 
-            Util.pause(50); ct.term.addInput(KeyStroke.fromString("<pageup>")); //HACK trigger redraw
+            window(OmniBox.get(nar), 600, 200);
 
-        } catch (Throwable t) {
-            //2. if that fails:
-            logger.info("Fallback to Terminal UI");
-            DefaultTerminalFactory tf = new DefaultTerminalFactory();
-            Terminal tt = tf.createTerminal();
-            new TextUI(nar, tt, 8f);
-        }
+            try {
+
+                //1. try to open a Spacegraph openGL window
+                logger.info("Starting Spacegraph UI");
+
+                //            window(new ConsoleTerminal(new TextUI(nar).session(8f)) {
+                //                {
+                //                    Util.pause(50); term.addInput(KeyStroke.fromString("<pageup>")); //HACK trigger redraw
+                //                }
+                //            }, 800, 600);
 
 
+            } catch (Throwable t) {
+                //2. if that fails:
+                logger.info("Fallback to Terminal UI");
+                DefaultTerminalFactory tf = new DefaultTerminalFactory();
+                try {
+                    Terminal tt = tf.createTerminal();
+                    new TextUI(nar, tt, 8f);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
 
     }
 
+    static class OmniBox {
+
+        static Surface get(NAR n) {
+            return grid(Vis.inputEditor()
+                    /*Vis.audioCapture()*/);
+        }
+    }
 
 }

@@ -59,7 +59,7 @@ public class Signal {
             return last;
 
         try {
-            SignalTask current = this.last;
+            SignalTask last = this.last;
             @Nullable PreciseTruth tt = nextTruth != null ? nextTruth.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f) : null;
 
 
@@ -70,10 +70,10 @@ public class Signal {
             } else {
 
 
-                if (current == null ||
-                        current.isDeleted() ||
-                        (!current.truth.equals(tt, nar.truthResolution.floatValue()) ||
-                                (Param.SIGNAL_LATCH_TIME_MAX != Integer.MAX_VALUE && now - current.start() >= dur * Param.SIGNAL_LATCH_TIME_MAX)
+                if (last == null ||
+                        last.isDeleted() ||
+                        (!last.truth.equals(tt, nar.truthResolution.floatValue()) ||
+                                (Param.SIGNAL_LATCH_TIME_MAX != Integer.MAX_VALUE && now - last.start() >= dur * Param.SIGNAL_LATCH_TIME_MAX)
                         )) {
 
                     //TODO move the task construction out of this critical update section?
@@ -83,7 +83,7 @@ public class Signal {
 
                 } else {
 
-                    next = current; //nothing, keep as-is
+                    next = last; //nothing, keep as-is
 
                 }
 
@@ -91,15 +91,16 @@ public class Signal {
             }
 
 
-            if (current == next) {
-                if (current!=null) {
-                    current.priMax(pri.asFloat());
-                    current.grow(now);
+            if (last == next) {
+                if (last!=null) {
+                    last.priMax(pri.asFloat());
+                    last.grow(now);
                 }
                 return null;  //dont re-input the task, just stretch it where it is in the temporal belief table
             } else {
-                if (current!=null) {
-                    current.end(now);
+                if (last!=null) {
+                    last.priMax(pri.asFloat());
+                    last.end(now);
                 }
                 return this.last = next; //new or null input; stretch will be assigned on first insert to the belief table (if this happens)
             }

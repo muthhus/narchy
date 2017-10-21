@@ -12,6 +12,7 @@ import nars.control.Cause;
 import nars.control.Premise;
 import nars.derive.Conclude;
 import nars.task.ITask;
+import nars.task.NativeTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,11 @@ public class MultiExec extends Exec {
         }
 
         nar.can.add(deriver);
+    }
+
+    @Override
+    public void execute(Runnable r) {
+        add(new NativeTask.RunTask(r));
     }
 
     class Sub extends UniExec implements Runnable {

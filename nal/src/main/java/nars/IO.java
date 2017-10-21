@@ -74,7 +74,7 @@ public class IO {
 
 
     @NotNull
-    public static NALTask readTask(@NotNull DataInput in) throws IOException {
+    public static NALTask readTask(DataInput in) throws IOException {
 
 
         Term preterm = readTerm(in);
@@ -102,7 +102,7 @@ public class IO {
     }
 
     @NotNull
-    public static long[] readEvidence(@NotNull DataInput in) throws IOException {
+    public static long[] readEvidence(DataInput in) throws IOException {
         int eviLength = in.readByte();
         long[] evi = new long[eviLength];
         for (int i = 0; i < eviLength; i++) {
@@ -112,7 +112,7 @@ public class IO {
     }
 
     @NotNull
-    public static Truth readTruth(@NotNull DataInput in) throws IOException {
+    public static Truth readTruth(DataInput in) throws IOException {
         return DiscreteTruth.intToTruth(in.readInt());
     }
 
@@ -120,7 +120,7 @@ public class IO {
     /**
      * with Term first
      */
-    public static void writeTask(@NotNull DataOutput out, @NotNull Task t) throws IOException {
+    public static void writeTask(DataOutput out, Task t) throws IOException {
 
         Term tt = t.term();
 
@@ -150,7 +150,7 @@ public class IO {
     /**
      * with Term last
      */
-    public static void writeTask2(@NotNull DataOutput out, @NotNull Task t) throws IOException {
+    public static void writeTask2(DataOutput out, Task t) throws IOException {
 
         byte p = t.punc();
         out.writeByte(p);
@@ -172,7 +172,7 @@ public class IO {
         IO.writeUTF8WithPreLen(t.term().toString(), out);
     }
 
-    //    public static void writeStringUTF(@NotNull DataOutput out, String s) throws IOException {
+    //    public static void writeStringUTF(DataOutput out, String s) throws IOException {
 //
 //        //byte[] bb = s.getBytes(Charset.defaultCharset());
 //        byte[] bb = s.getBytes(Charset.defaultCharset()); //Hack.bytes(s);
@@ -180,34 +180,34 @@ public class IO {
 //        out.write(bb);
 //    }
 
-    public static void writePriority(@NotNull DataOutput out, @NotNull Prioritized t) throws IOException {
+    public static void writePriority(DataOutput out, Prioritized t) throws IOException {
         out.writeFloat(t.priElseZero());
     }
 
-    public static void writeBudget(@NotNull DataOutput out, @NotNull Prioritized t) throws IOException {
+    public static void writeBudget(DataOutput out, Prioritized t) throws IOException {
         writePriority(out, t);
     }
 
-    public static void writeEvidence(@NotNull DataOutput out, @NotNull long[] evi) throws IOException {
+    public static void writeEvidence(DataOutput out, long[] evi) throws IOException {
         int evil = evi.length;
         out.writeByte(evil);
         for (int i = 0; i < evil; i++)
             out.writeLong(evi[i]);
     }
 
-    public static void writeTruth(@NotNull DataOutput out, @NotNull Truthed t) throws IOException {
+    public static void writeTruth(DataOutput out, Truthed t) throws IOException {
         Truth tt = t.truth();
         out.writeInt(DiscreteTruth.truthToInt(tt.freq(), tt.conf()));
     }
 
 
     @NotNull
-    public static Atomic readVariable(@NotNull DataInput in, /*@NotNull*/ Op o) throws IOException {
+    public static Atomic readVariable(DataInput in, /*@NotNull*/ Op o) throws IOException {
         return $.v(o, in.readInt());
     }
 
     @NotNull
-    public static Atomic readAtomic(@NotNull DataInput in, /*@NotNull*/ Op o) throws IOException {
+    public static Atomic readAtomic(DataInput in, /*@NotNull*/ Op o) throws IOException {
 
         switch (o) {
 
@@ -243,7 +243,7 @@ public class IO {
      * called by readTerm after determining the op type
      */
     @NotNull
-    public static Term readTerm(@NotNull DataInput in) throws IOException, UnsupportedEncodingException {
+    public static Term readTerm(DataInput in) throws IOException, UnsupportedEncodingException {
 
         byte ob = in.readByte();
         if (ob == SPECIAL_OP)
@@ -258,7 +258,7 @@ public class IO {
             return readCompound(in, o);
     }
 
-    @NotNull public static Term readSpecialTerm(@NotNull DataInput in) throws IOException {
+    public static Term readSpecialTerm(DataInput in) throws IOException {
         try {
             return Narsese.term(in.readUTF(), false);
         } catch (Narsese.NarseseException e) {
@@ -266,13 +266,13 @@ public class IO {
         }
     }
 
-//    public static void writeTerm(@NotNull Stream<? extends Term> term, @NotNull DataOutput out) throws IOException {
+//    public static void writeTerm(Stream<? extends Term> term, DataOutput out) throws IOException {
 //        DynBytes d = new DynBytes(64 * 1024); //HACK make configurable size
 //        term.forEach(x -> x.append((ByteArrayDataOutput) d));
 //        d.appendTo(out);
 //    }
 
-    public static void writeTermContainer(@NotNull ByteArrayDataOutput out, @NotNull TermContainer c) {
+    public static void writeTermContainer(ByteArrayDataOutput out, TermContainer c) {
         int siz = c.subs();
 
         out.writeByte(siz);
@@ -281,7 +281,7 @@ public class IO {
             c.sub(i).append(out);
     }
 
-//    public static void writeTermContainer(@NotNull DataOutput out, @NotNull Term... subterms) throws IOException {
+//    public static void writeTermContainer(DataOutput out, Term... subterms) throws IOException {
 //        out.writeByte(subterms.length);
 //        for (Term x : subterms) {
 //            writeTerm(out, x);
@@ -289,18 +289,18 @@ public class IO {
 //    }
 
 
-    public static void writeCompoundSuffix(@NotNull DataOutput out, int dt, Op o) throws IOException {
+    public static void writeCompoundSuffix(DataOutput out, int dt, Op o) throws IOException {
         if (o.temporal)
             out.writeInt(dt);
     }
 
-    public static boolean isSpecial(@NotNull Term term) {
+    public static boolean isSpecial(Term term) {
         return term instanceof UnnormalizedVariable;
     }
 
 
     @NotNull
-    public static Term[] readTermContainer(@NotNull DataInput in) throws IOException {
+    public static Term[] readTermContainer(DataInput in) throws IOException {
         int siz = in.readByte();
 
         assert (siz < Param.COMPOUND_SUBTERMS_MAX);
@@ -320,7 +320,7 @@ public class IO {
      * TODO make a version which reads directlyinto TermIndex
      */
     @NotNull
-    static Term readCompound(@NotNull DataInput in, /*@NotNull*/ Op o) throws IOException {
+    static Term readCompound(DataInput in, /*@NotNull*/ Op o) throws IOException {
 
         Term[] v = readTermContainer(in);
 
@@ -342,7 +342,7 @@ public class IO {
         return y;
     }
 
-    public static byte[] asBytes(@NotNull Task t) {
+    public static byte[] asBytes(Task t) {
         try {
             ByteArrayOutputStream bs = new ByteArrayOutputStream();
             IO.writeTask(new DataOutputStream(bs), t);
@@ -352,7 +352,7 @@ public class IO {
         }
     }
 
-    public static byte[] termToBytes(@NotNull Term t) {
+    public static byte[] termToBytes(Term t) {
         //bb = ArrayPool.bytes().
         DynBytes d = new DynBytes(t.volume() * 16 /* estimate */);
         //ByteArrayOutputStream bs = new ByteArrayOutputStream();
@@ -399,11 +399,11 @@ public class IO {
     }
 
     @Nullable
-    public static byte[] taskToBytes(@NotNull Task x) {
+    public static byte[] taskToBytes(Task x) {
         return taskToBytes(x, TermFirst);
     }
 
-    public static byte[] taskToBytes(@NotNull Task x, @NotNull TaskSerialization mode) {
+    public static byte[] taskToBytes(Task x, TaskSerialization mode) {
         try {
             DynBytes dos = new DynBytes(x.volume() * 16);
             switch (mode) {
@@ -425,7 +425,7 @@ public class IO {
      * WARNING
      */
     @Nullable
-    public static Task taskFromBytes(@NotNull byte[] b) {
+    public static Task taskFromBytes(byte[] b) {
         try {
             return IO.readTask(input(b));
         } catch (IOException e) {
@@ -438,7 +438,7 @@ public class IO {
      * WARNING
      */
     @Nullable
-    public static Term termFromBytes(@NotNull byte[] b) {
+    public static Term termFromBytes(byte[] b) {
         try {
             return IO.readTerm(input(b));
         } catch (IOException e) {
@@ -448,21 +448,21 @@ public class IO {
         }
     }
 
-    public static ByteArrayDataInput input(@NotNull byte[] b) {
+    public static ByteArrayDataInput input(byte[] b) {
 
         //return ByteStreams.newDataInput(b);
         return ByteStreams.newDataInput(b);
         //return new DataInputStream(new ByteArrayInputStream(b));
     }
 
-    public static DataInputStream input(@NotNull byte[] b, int offset) {
+    public static DataInputStream input(byte[] b, int offset) {
         return new DataInputStream(new ByteArrayInputStream(b, offset, b.length - offset));
     }
 
 
     public interface Printer {
 
-        static void compoundAppend(@NotNull Compound c, @NotNull Appendable p) throws IOException {
+        static void compoundAppend(Compound c, Appendable p) throws IOException {
 
             p.append(Op.COMPOUND_TERM_OPENER);
 
@@ -478,7 +478,7 @@ public class IO {
 
         }
 
-        static void compoundAppend(String o, @NotNull TermContainer c, @NotNull Function<Term, Term> filter, @NotNull Appendable p) throws IOException {
+        static void compoundAppend(String o, TermContainer c, Function<Term, Term> filter, Appendable p) throws IOException {
 
             p.append(Op.COMPOUND_TERM_OPENER);
 
@@ -494,7 +494,7 @@ public class IO {
         }
 
 
-        static void appendArgs(@NotNull TermContainer c, @NotNull Appendable p) throws IOException {
+        static void appendArgs(TermContainer c, Appendable p) throws IOException {
             int nterms = c.subs();
 
             boolean bb = nterms > 1;
@@ -506,7 +506,7 @@ public class IO {
             }
         }
 
-        static void appendArgs(@NotNull TermContainer c, @NotNull Function<Term, Term> filter, @NotNull Appendable p) throws IOException {
+        static void appendArgs(TermContainer c, Function<Term, Term> filter, Appendable p) throws IOException {
             int nterms = c.subs();
 
             boolean bb = nterms > 1;
@@ -518,11 +518,11 @@ public class IO {
             }
         }
 
-        static void appendCloser(@NotNull Appendable p) throws IOException {
+        static void appendCloser(Appendable p) throws IOException {
             p.append(Op.COMPOUND_TERM_CLOSER);
         }
 
-        static void append(@NotNull Compound c, @NotNull Appendable p) throws IOException {
+        static void append(Compound c, Appendable p) throws IOException {
             final Op op = c.op();
 
             switch (op) {
@@ -568,7 +568,7 @@ public class IO {
             }
         }
 
-//        static void inheritAppend(@NotNull Compound c, @NotNull Appendable p) throws IOException {
+//        static void inheritAppend(Compound c, Appendable p) throws IOException {
 //            Term a = Statement.subj(c);
 //            Term b = Statement.pred(c);
 //
@@ -578,7 +578,7 @@ public class IO {
 //            a.append(p);
 //            p.append(Symbols.COMPOUND_TERM_CLOSER);
 //        }
-//        static void similarAppend(@NotNull Compound c, @NotNull Appendable p) throws IOException {
+//        static void similarAppend(Compound c, Appendable p) throws IOException {
 //            Term a = Statement.subj(c);
 //            Term b = Statement.pred(c);
 //
@@ -589,9 +589,9 @@ public class IO {
 //            p.append(Symbols.COMPOUND_TERM_CLOSER);
 //        }
 
-        static void statementAppend(@NotNull Compound c, @NotNull Appendable p, /*@NotNull*/ Op op) throws IOException {
+        static void statementAppend(Compound c, Appendable p, /*@NotNull*/ Op op) throws IOException {
 
-            @NotNull TermContainer cs = c.subterms();
+            TermContainer cs = c.subterms();
             Term a = cs.sub(0);
             Term b = cs.sub(1);
 
@@ -619,7 +619,7 @@ public class IO {
         }
 
 
-        static void productAppend(@NotNull TermContainer product, @NotNull Appendable p) throws IOException {
+        static void productAppend(TermContainer product, Appendable p) throws IOException {
 
             int s = product.subs();
             p.append(Op.COMPOUND_TERM_OPENER);
@@ -633,7 +633,7 @@ public class IO {
         }
 
 
-        static void setAppend(@NotNull Compound set, @NotNull Appendable p) throws IOException {
+        static void setAppend(Compound set, Appendable p) throws IOException {
 
             int len = set.subs();
 
@@ -656,7 +656,7 @@ public class IO {
             p.append(closer);
         }
 
-        static void operationAppend(@NotNull Compound argsProduct, @NotNull Atomic operator, @NotNull Appendable p) throws IOException {
+        static void operationAppend(Compound argsProduct, Atomic operator, Appendable p) throws IOException {
 
             //Term predTerm = operator.identifier(); //getOperatorTerm();
             //        if ((predTerm.volume() != 1) || (predTerm.hasVar())) {
@@ -692,7 +692,7 @@ public class IO {
 
 
         @NotNull
-        static StringBuilder stringify(@NotNull Compound c) {
+        static StringBuilder stringify(Compound c) {
             StringBuilder sb = new StringBuilder(/* conservative estimate */ c.volume() * 2);
             try {
                 c.append(sb);
@@ -788,7 +788,7 @@ public class IO {
 //     * @return The number of bytes written out.
 //     * @throws IOException if an I/O error occurs.
 //     */
-//    public static void writeUTFWithoutLength(@NotNull DataOutput out, @NotNull String str) throws IOException {
+//    public static void writeUTFWithoutLength(DataOutput out, String str) throws IOException {
 //
 //
 //        //int c, count = 0;
@@ -957,12 +957,12 @@ public class IO {
 //
 //                @NotNull
 //                @Override
-//                public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
+//                public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
 //                    return readTask(in, index);
 //                }
 //
 //                @Override
-//                public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+//                public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
 //                    writeTask(out, (Task) toWrite);
 //                }
 //            }, true);
@@ -987,12 +987,12 @@ public class IO {
 ////
 ////            @Nullable
 ////            @Override
-////            public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
+////            public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
 ////                return readTermContainer(in, index);
 ////            }
 ////
 ////            @Override
-////            public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+////            public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
 ////                writeTermContainer(out, (TermContainer) toWrite);
 ////            }
 ////        };
@@ -1006,12 +1006,12 @@ public class IO {
 //
 //            @Nullable
 //            @Override
-//            public Object instantiate(Class objectClass, @NotNull FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
+//            public Object instantiate(Class objectClass, FSTObjectInput in, FSTClazzInfo serializationInfo, FSTClazzInfo.FSTFieldInfo referencee, int streamPosition) throws IOException {
 //                return readTerm(in, index);
 //            }
 //
 //            @Override
-//            public void writeObject(@NotNull FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
+//            public void writeObject(FSTObjectOutput out, Object toWrite, FSTClazzInfo clzInfo, FSTClazzInfo.FSTFieldInfo referencedBy, int streamPosition) throws IOException {
 //                writeTerm(out, (Term) toWrite);
 //            }
 //        };

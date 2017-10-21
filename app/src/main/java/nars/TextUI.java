@@ -22,7 +22,6 @@ import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.event.On;
-import jcog.event.Ons;
 import jcog.pri.PLink;
 import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
@@ -187,11 +186,11 @@ public class TextUI {
                     white, darkblue,
                     TextColor.ANSI.BLACK
             );
-
-
             st.setWindowPostRenderer(null);
 
             tui.setTheme(st);
+
+
 
             final BasicWindow window = new BasicWindow();
             window.setHints(List.of(Window.Hint.FULL_SCREEN, NO_POST_RENDERING));

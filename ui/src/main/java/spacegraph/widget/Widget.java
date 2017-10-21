@@ -14,7 +14,7 @@ import spacegraph.render.Draw;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
 import spacegraph.widget.console.ConsoleTerminal;
-import spacegraph.widget.console.TerminalUI;
+import spacegraph.widget.console.TextEdit;
 import spacegraph.widget.slider.BaseSlider;
 import spacegraph.widget.slider.XYSlider;
 
@@ -171,7 +171,7 @@ abstract public class Widget extends Stacking {
     private static class DummyConsole extends ConsoleTerminal implements Runnable {
 
         public DummyConsole() {
-            super(new TerminalUI(15,15));
+            super(new TextEdit(15,15));
             new Thread(this).start();
         }
 

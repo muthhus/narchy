@@ -121,6 +121,8 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
             //if (t!=null) t.delete();
             return null; //pass-through for map removal
         }
+        if (mode == null)
+            mode = mode(k, v);
 
         switch (mode) {
 
@@ -241,22 +243,22 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
 
     @Override
     public Y compute(X x, BiFunction<? super X, ? super Y, ? extends Y> remap) {
-        TLink<X, Y> r = map.compute(x, (xx, prev) -> link(prev, xx, remap.apply(xx, prev != null ? prev.get(): null) , mode(x)));
+        TLink<X, Y> r = map.compute(x, (xx, prev) -> link(prev, xx, remap.apply(xx, prev != null ? prev.get(): null), null));
         return r != null ? r.get() : null;
     }
 
     /** selects the default mode for an entry */
-    protected Hold mode(X x) {
+    protected Hold mode(X x, Y v) {
         return defaultMode;
     }
 
     @Override
     public Y merge(X x, Y value, BiFunction<? super Y, ? super Y, ? extends Y> remap) {
-        TLink<X, Y> r = map.compute(x, (xx, prev) -> link(prev, xx, remap.apply(prev != null ? prev.get() : null, value), mode(x)));
+        TLink<X, Y> r = map.compute(x, (xx, prev) -> link(prev, xx, remap.apply(prev != null ? prev.get() : null, value), null));
         return r != null ? r.get() : null;
     }
 
-    public Y put(X x, Hold mode, Y y) {
+    public Y put(X x, @Nullable Hold mode, Y y) {
         final Object[] previous = {null};
         TLink<X, Y> cur = map.compute(x, (xx, prev) -> {
             if (prev!=null)
@@ -279,7 +281,7 @@ public class PriMap<X, Y> extends AbstractMap<X, Y> {
 
     @Override
     public Y put(X x, Y y) {
-        return put(x, mode(x), y);
+        return put(x, null, y);
     }
 
     @Override

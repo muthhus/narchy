@@ -62,7 +62,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
         super.delete(dyn);
 
-        synchronized(key) {
+        synchronized(id) {
             if (body != null) {
                 body.destroy(dyn);
                 body = null;
@@ -202,7 +202,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     //TODO make abstract
     protected CollisionShape newShape() {
-        return new SimpleBoxShape(v3.v(1,1,1));
+        return new SimpleBoxShape(v3.v(0.5f,0.5f,0.5f));
         //return new BoxShape(v3.v(1, 1, 1));
     }
 
@@ -218,7 +218,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
 
         //b.setDamping(0.95f, 0.95f);
-        b.setFriction(0.9f);
+        //b.setFriction(0.9f);
 
 
         return b;

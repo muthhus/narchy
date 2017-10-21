@@ -11,8 +11,6 @@ import spacegraph.Surface;
 import spacegraph.render.Draw;
 import spacegraph.widget.meter.BitmapMatrixView;
 
-import java.util.function.Consumer;
-
 /**
  * displays a CameraSensor pixel data as perceived through its concepts (belief/goal state)
  * monochrome

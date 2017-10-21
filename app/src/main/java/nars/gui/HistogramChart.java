@@ -59,7 +59,6 @@ public class HistogramChart extends Surface {
         float[] data = this.data.get();
 
         int N = data.length;
-        float dx = 1f / N;
         float max = data[Util.argmax(data)];
         if (max == 0)
             return; //empty
@@ -73,9 +72,10 @@ public class HistogramChart extends Surface {
         float gb = light.y;
         float bb = light.z;
 
+        float dx = 1f / N;
         for (int i = 0; i < N; i++) {
 
-            float v = (float) (data[i] / max);
+            float v = data[i] / max;
 
             gl.glColor3f(Util.lerp(v, ra, rb), Util.lerp(v, ga, gb), Util.lerp(v, ba, bb));
 

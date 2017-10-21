@@ -41,7 +41,7 @@ import java.util.function.Function;
  * https://code.google.com/p/smhasher/wiki/MurmurHash2Flaw
  */
 public class LongBitsetBloomFilter {
-    private static final double DEFAULT_FPP = 0.05;
+    public static final float DEFAULT_FPP = 0.05f;
     private MetalBitSet bitSet;
     private final int m;
     private final int k;

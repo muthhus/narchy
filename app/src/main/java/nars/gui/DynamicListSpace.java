@@ -3,7 +3,6 @@ package nars.gui;
 import jcog.event.On;
 import nars.gui.graph.EdgeDirected;
 import nars.term.Term;
-import nars.term.Termed;
 import spacegraph.AbstractSpace;
 import spacegraph.Active;
 import spacegraph.SpaceGraph;
@@ -14,12 +13,16 @@ import spacegraph.space.ListSpace;
 
 import java.util.List;
 
+import static nars.gui.Vis.reflect;
+import static spacegraph.SpaceGraph.window;
+import static spacegraph.layout.Grid.grid;
+
 
 /**
- * thread-safe visualization of capacity-bound NAR data buffers
- * TODO extract to superclass: BufferedListSpace
+ * thread-safe visualization of a set of spatials, and
+ * calls to their per-frame rendering animation
  */
-public abstract class NARSpace<X extends Termed, Y extends Spatial<X>> extends ListSpace<X, Y> implements Animated {
+public abstract class DynamicListSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> implements Animated {
 
 
     //private final TriConsumer<NAR, SpaceGraph<Term>, List<Spatial<X>>> collect;
@@ -37,7 +40,7 @@ public abstract class NARSpace<X extends Termed, Y extends Spatial<X>> extends L
 
 
 
-    public NARSpace() {
+    public DynamicListSpace() {
         super();
 
 //        nar.onCycle(x -> {
@@ -113,7 +116,7 @@ public abstract class NARSpace<X extends Termed, Y extends Spatial<X>> extends L
 
     /** displays in a window with default force-directed options */
     public SpaceGraph<Term> show(int w, int h, boolean flat) {
-        AbstractSpace ss = flat ? with(new Flatten()) : this;
+
 
 //                        new SpaceTransform<Term>() {
 //                            @Override
@@ -137,19 +140,26 @@ public abstract class NARSpace<X extends Termed, Y extends Spatial<X>> extends L
                 //new Spiral()
 //                        //new FastOrganicLayout()
 
+
+
+
+        AbstractSpace ss = flat ? with(new Flatten()) : this;
         SpaceGraph<Term> s = new SpaceGraph<>(ss);
 
         EdgeDirected fd = new EdgeDirected();
         s.dyn.addBroadConstraint(fd);
 
-        s.camPos(0, 0, 90);
 
         //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
 
+        window(
+                grid(reflect(fd)
+                        //, reflect(((DynamicConceptSpace)this).vis)
+                ),
+                        400, 400);
 
         //Vis.conceptsWindow2D
         s
-                //.add(new ZoomOrtho(logConsole(n, 120, 40, new FloatParam(0.25f)).opacity(0.5f)))
                 //.ortho(logConsole( n, 90, 40, new FloatParam(0f)).opacity(0.25f))
                 .camPos(0, 0, 90)
                 .show(w, h);

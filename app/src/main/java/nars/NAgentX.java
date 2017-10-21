@@ -3,7 +3,6 @@ package nars;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.event.Ons;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.pri.mix.control.MixContRL;

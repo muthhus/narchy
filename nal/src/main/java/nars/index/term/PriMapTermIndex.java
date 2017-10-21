@@ -2,10 +2,12 @@ package nars.index.term;
 
 import com.google.common.collect.Iterables;
 import jcog.bag.Bag;
+import jcog.bloom.YesNoMaybe;
 import jcog.pri.PLink;
 import jcog.pri.PriMap;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
+import nars.IO;
 import nars.Task;
 import nars.bag.ConcurrentArrayBag;
 import nars.concept.Concept;
@@ -26,6 +28,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static jcog.Texts.n2;
+import static jcog.pri.PriMap.Hold.SOFT;
+import static jcog.pri.PriMap.Hold.STRONG;
 
 public class PriMapTermIndex extends MaplikeTermIndex {
 
@@ -38,11 +42,11 @@ public class PriMapTermIndex extends MaplikeTermIndex {
      * how many items to visit during update
      */
 
-    final int activeActive = 64;
-    final int activeGood = 64;
-    final int activeBad = 256;
+    final int activeActive = 32;
+    final int activeGood = 32;
+    final int activeBad = 32;
 
-    static class EntryBag extends ConcurrentArrayBag<Term,PLink<Concept>> {
+    static class EntryBag extends ConcurrentArrayBag<Term, PLink<Concept>> {
 
         public EntryBag(PriMerge mergeFunction, int cap) {
             super(mergeFunction, cap);
@@ -95,7 +99,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
 
                 if (strength > 0) {
 
-                    if (strength > 0.9f) {
+                    if (strength > 0.95f) {
                         System.gc();
                     }
 
@@ -105,7 +109,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
                         if (kill > 0) {
 
                             System.err.println("evicting " + kill + " victims (" + bad.size() + " remain;\ttotal concepts=" + size());
-                            bad.pop(kill, (t)->{
+                            bad.pop(kill, (t) -> {
                                 Concept x = t.get();
                                 if (x != null)
                                     removeGenocidally(x);
@@ -130,7 +134,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
             /**
              * items per ms
              */
-            float probeRate = 0.5f;
+            float probeRate = 1f;
 
             private void probeEvict(float evictPower, float itemsPerMS) {
                 if (concepts == null) return;
@@ -140,20 +144,25 @@ public class PriMapTermIndex extends MaplikeTermIndex {
                 int num = Math.round(concepts.cleaner.periodMS.get() * itemsPerMS * evictPower);
                 for (int i = 0; probe.hasNext() && i < num; i++) {
                     TLink<Term, Concept> next = probe.next();
-                    update(next);
+                    Concept c = next.get();
+                    if (c != null)
+                        update(c);
                 }
 
             }
 
 
-//            @Override
-//            protected Hold mode(Term term) {
-//                return term.volume() > 19 ? SOFT : STRONG;
-//            }
+            @Override
+            protected Hold mode(Term term, Concept v) {
+                if (v instanceof PermanentConcept)
+                    return STRONG;
+                else
+                    return SOFT;
+            }
 
             @Override
             protected void onRemove(Term term, Concept termed) {
-                assert(!(termed instanceof PermanentConcept));
+                assert (!(termed instanceof PermanentConcept));
                 //System.err.println("remove: " + term);
                 PriMapTermIndex.this.onRemove(termed);
             }
@@ -220,15 +229,15 @@ public class PriMapTermIndex extends MaplikeTermIndex {
 
         if (createIfMissing) {
             //HACK when switching to Term,Concept use 'conceptBuilder' itself not this adapter
-            return concepts.compute(x, (term, u) -> (Concept) conceptBuilder.apply(term,u));
+            return concepts.compute(x, (term, u) -> (Concept) conceptBuilder.apply(term, u));
         } else {
             return concepts.get(x);
         }
     }
 
 
-
-    @Deprecated public static final BiFunction<? super Termed, ? super Termed, ? extends Concept> setOrReplaceNonPermanent = (prev, next) -> {
+    @Deprecated
+    public static final BiFunction<? super Termed, ? super Termed, ? extends Concept> setOrReplaceNonPermanent = (prev, next) -> {
         if (prev instanceof PermanentConcept && !(next instanceof PermanentConcept))
             return (Concept) prev;
         return (Concept) next;
@@ -236,7 +245,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
 
     @Override
     public void set(@NotNull Term src, @NotNull Termed target) {
-        concepts.merge(src, (Concept)target, setOrReplaceNonPermanent);
+        concepts.merge(src, (Concept) target, setOrReplaceNonPermanent);
     }
 
     @Override
@@ -257,23 +266,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
         return true;
     }
 
-
-//    static final ToDoubleFunction<Task> taskScore =
-//            //t -> t.evi(now, dur);
-//            Truthed::conf;
-
-    private void update(PriMap.TLink<Term, Concept> t) {
-
-        Concept c = t.get();
-        if (c == null)
-            return;
-
-        update(c);
-
-    }
-
-    protected void update(Concept c) {
-
+    final YesNoMaybe<Concept> seenRecently = new YesNoMaybe<>((c) -> {
         float value = value(c);
 
         if (!good.isFull() || good.priMin() < value) {
@@ -281,15 +274,24 @@ public class PriMapTermIndex extends MaplikeTermIndex {
         } else {
 
             if (victimizable(c)) {
-                float antivalue = 1f / (1 + Math.max(0.05f,value)*2);
+                float antivalue = 1f / (1 + Math.max(0.05f, value) * 2);
                 if (!bad.isFull() || bad.priMin() < antivalue) {
                     bad.putAsync(new PLink(c, antivalue));
                 }
             }
         }
+        return true;
+    }, c -> IO.termToBytes(c.term()), 1024, 0.01f);
+
+//    static final ToDoubleFunction<Task> taskScore =
+//            //t -> t.evi(now, dur);
+//            Truthed::conf;
+
+    protected void update(Concept c) {
+        seenRecently.test(c);
     }
 
-    protected float value(Concept c) {
+    private float value(Concept c) {
 
         //float maxAdmit = -victims.minAdmission();
 
@@ -313,7 +315,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
             if (gt != null)
                 score += gt.conf();
         } else {
-            score = score*2; //double any belief score, ie. for ==>
+            score = score * 2; //double any belief score, ie. for ==>
         }
 
         // link value is divided by the complexity,

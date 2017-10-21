@@ -6,11 +6,13 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SimpleSpatial;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
+import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.SimpleBoxShape;
+import spacegraph.phys.shape.SphereShape;
 import spacegraph.render.Draw;
 import spacegraph.render.JoglPhysics;
 
@@ -81,21 +83,21 @@ public class Cuboid<X> extends SimpleSpatial<X> {
 
         if (body != null) {
 
-//            //rotate to match camera's orientation (billboarding)
-//            Object d = body.data();
-//            if (d instanceof SimpleSpatial) {
-//                SimpleSpatial sd = (SimpleSpatial)d;
-//                //Quat4f target = Quat4f.angle(-space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0);
-//                Quat4f target = new Quat4f();
-//                // TODO somehow use the object's local transformation ? sd.transform().getRotation(...);
-//                target.setAngle( -space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0.01f);
-//
-//                target.normalize();
-//
-//                //System.out.print("rotating: " + sd.transform().getRotation(new Quat4f()));
-//                sd.rotate(target, 0.2f, new Quat4f());
-//                //System.out.println("  : " + sd.transform().getRotation(new Quat4f()));
-//            }
+            //rotate to match camera's orientation (billboarding)
+            Object d = body.data();
+            if (d instanceof SimpleSpatial) {
+                SimpleSpatial sd = (SimpleSpatial)d;
+                //Quat4f target = Quat4f.angle(-space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0);
+                Quat4f target = new Quat4f();
+                // TODO somehow use the object's local transformation ? sd.transform().getRotation(...);
+                target.setAngle( -space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0.01f);
+
+                target.normalize();
+
+                //System.out.print("rotating: " + sd.transform().getRotation(new Quat4f()));
+                sd.rotate(target, 0.2f, new Quat4f());
+                //System.out.println("  : " + sd.transform().getRotation(new Quat4f()));
+            }
 //
             Surface s0 = super.onTouch(body, r, buttons, space);
             if (s0 != null)
@@ -107,7 +109,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
             Transform it = Transform.t(transform()).inverse();
             v3 localPoint = it.transform(v(r.hitPointWorld));
 
-            if (body != null) {
+            if (body != null && body.shape() instanceof SimpleBoxShape) {
                 SimpleBoxShape shape = (SimpleBoxShape) body.shape();
                 float frontZ = shape.z() / 2;
                 float zTolerance = frontZ / 4f;
@@ -123,7 +125,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
                 }
             } else {
 
-                if (mouseFront.off()) {
+                if (mouseFront != null && mouseFront.off()) {
 
                 }
             }
@@ -148,7 +150,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
             //float pp = 1f - (p / 2f);
             //float pp = 1f;
 
-            gl.glTranslatef(-0.5f, -0.5f, 0.5f + zOffset);
+            gl.glTranslatef(-0.5f, -0.5f, 0.5f + (shape instanceof SphereShape ? 10 : 0)+zOffset);
             //gl.glScalef(pp, pp, 1f);
 
             //Transform t = transform();

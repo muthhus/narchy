@@ -438,11 +438,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 Task y = null;
 
                 //TODO maybe a hard limit should be here for safety in case anyone wants to create loops of forwarding tasks
+                int hopsRemain = Param.MAX_TASK_FORWARD_HOPS;
                 do {
                     y = x.meta("@");
                     if (y != null)
                         x = y;
-                } while (y != null);
+                } while (y != null && --hopsRemain > 0);
 
                 if (x != px && !x.isDeleted()) {
                     putAsync(new PLinkUntilDeleted<>(x, p));

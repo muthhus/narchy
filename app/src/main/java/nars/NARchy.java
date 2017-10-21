@@ -18,44 +18,51 @@ public class NARchy extends NARS {
 
     public static NAR ui() {
         NAR nar = new DefaultNAR(8, true)
-                .exe(new SynchExec(64, 1))
+                .exe(new SynchExec(64, 1) {
+                    @Override
+                    public boolean concurrent() {
+                        return true;
+                    }
+                })
                 .time(new RealTime.CS().durFPS(10f))
                 //.memory("/tmp/nal")
-                .then(Hear::wiki)
                 .get();
 
 
         ConjClustering conjClusterB = new ConjClustering(nar, 3, BELIEF, true, 16, 64);
         ConjClustering conjClusterG = new ConjClustering(nar, 2, GOAL, true, 16, 64);
 
-        //installSpeech(nar);
+        Hear.wiki(nar);
+        installSpeech(nar);
 
         return nar;
     }
 
     public static void installSpeech(NAR nar) {
-        MaryTTSpeech.speak(""); //forces load of TTS so it will be ready ASAP and not load on the first use
-        nar.onOp("speak", new Operator.AtomicExec((t, n) -> {
-            @Nullable TermContainer args = Operator.args(t);
-            if (args.AND(x -> !x.op().var)) {
-                String text = Joiner.on(", ").join(args);
-                if (text.isEmpty())
-                    return;
-                if (text.charAt(0)!='"')
-                    text = "\"" + text + '"';
+        nar.runLater(()-> {
+            MaryTTSpeech.speak(""); //forces load of TTS so it will be ready ASAP and not load on the first use
+            nar.onOp("speak", new Operator.AtomicExec((t, n) -> {
+                @Nullable TermContainer args = Operator.args(t);
+                if (args.AND(x -> !x.op().var)) {
+                    String text = Joiner.on(", ").join(args);
+                    if (text.isEmpty())
+                        return;
+                    if (text.charAt(0) != '"')
+                        text = "\"" + text + '"';
 
-                n.believe($.func("speak", args.theArray()), Tense.Present);
+                    n.believe($.func("speak", args.theArray()), Tense.Present);
 
-                MaryTTSpeech.speak(text);
-            }
-        }, 0.51f));
+                    MaryTTSpeech.speak(text);
+                }
+            }, 0.51f));
 
-        try {
-            nar.believe($.$("(hear:$1 ==> speak:$1)"), Tense.Eternal);
-            nar.believe($.$("(speak:$1 ==> hear:$1)"), Tense.Eternal);
-            nar.goal($.$("(hear:#1 &| speak:#1)"), Tense.Eternal, 1f);
-        } catch (Narsese.NarseseException e) {
-            e.printStackTrace();
-        }
+//            try {
+//                nar.believe($.$("(hear:$1 ==> speak:$1)"), Tense.Eternal);
+//                nar.believe($.$("(speak:$1 ==> hear:$1)"), Tense.Eternal);
+//                nar.goal($.$("(hear:#1 &| speak:#1)"), Tense.Eternal, 1f);
+//            } catch (Narsese.NarseseException e) {
+//                e.printStackTrace();
+//            }
+        });
     }
 }

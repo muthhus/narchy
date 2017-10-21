@@ -9,7 +9,7 @@ public class ArrayIterator<E> implements Iterator<E>, Iterable<E> {
     private final E[] _array;
     int _index;
 
-    public ArrayIterator(E... array) {
+    public ArrayIterator(E[] array) {
         _array = array;
     }
 

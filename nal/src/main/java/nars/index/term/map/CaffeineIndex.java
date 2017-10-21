@@ -101,7 +101,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 //    }
 
     @Override
-    public void remove(@NotNull Term x) {
+    public void remove(Term x) {
         concepts.invalidate(x);
     }
 
@@ -118,7 +118,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     }
 
     @Override
-    public void forEach(@NotNull Consumer<? super Termed> c) {
+    public void forEach( Consumer<? super Termed> c) {
         concepts.asMap().values().forEach(c::accept);
     }
 
@@ -174,7 +174,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     }
 
     /** this will be called from within a worker task */
-    @Override public final void onRemoval(Term key, Termed value, @NotNull RemovalCause cause) {
+    @Override public final void onRemoval(Term key, Termed value,RemovalCause cause) {
 
         if (value!=null)
             onRemove(value);
@@ -182,7 +182,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
 
     @Override
-    public final void execute(@NotNull Runnable command) {
+    public final void execute(Runnable command) {
         if (nar!=null)
             nar.exe.execute(command);
         else
