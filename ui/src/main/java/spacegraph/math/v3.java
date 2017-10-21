@@ -273,4 +273,8 @@ public class v3 extends Tuple3f {
         return this;
     }
 
+    public float maxComponent() {
+        return Util.max(x,y,z);
+    }
+
 }

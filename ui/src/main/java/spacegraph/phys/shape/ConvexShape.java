@@ -26,6 +26,8 @@ package spacegraph.phys.shape;
 import spacegraph.math.v3;
 import spacegraph.phys.math.Transform;
 
+import static spacegraph.math.v3.v;
+
 /**
  * ConvexShape is an abstract shape class. It describes general convex shapes
  * using the {@link #localGetSupportingVertex localGetSupportingVertex} interface
@@ -48,17 +50,6 @@ public abstract class ConvexShape extends CollisionShape {
 	
 	public abstract void getAabbSlow(Transform t, v3 aabbMin, v3 aabbMax);
 
-	@Override
-	public abstract void setLocalScaling(v3 scaling);
-
-	@Override
-	public abstract v3 getLocalScaling(v3 out);
-
-	@Override
-	public abstract CollisionShape setMargin(float margin);
-
-	@Override
-	public abstract float getMargin();
 
 	public abstract int getNumPreferredPenetrationDirections();
 

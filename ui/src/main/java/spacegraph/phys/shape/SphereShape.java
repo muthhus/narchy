@@ -33,19 +33,37 @@ import spacegraph.phys.math.Transform;
  * @author jezek2
  */
 public class SphereShape extends ConvexInternalShape {
-	
+
+	public SphereShape() {
+		this(0.5f);
+	}
+
+	/** scale x unit sphere */
 	public SphereShape(float radius) {
 		setRadius(radius);
 	}
 
 	public void setRadius(float radius) {
+		radius = Math.abs(radius);
 		implicitShapeDimensions.x = radius;
 		collisionMargin = radius;
 	}
 
 	@Override
+	public void setLocalScaling(float x, float y, float z) {
+		super.setLocalScaling(x, y, z);
+		collisionMargin = x;
+	}
+
+	@Override
+	public void setLocalScaling(v3 scaling) {
+		setLocalScaling(scaling.x, scaling.y, scaling.z);
+	}
+
+	@Override
 	public float getBoundingRadius() {
-		return implicitShapeDimensions.x;
+		//return implicitShapeDimensions.x;
+		return getRadius();
 	}
 
 	@Override

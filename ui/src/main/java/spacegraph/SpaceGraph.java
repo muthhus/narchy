@@ -140,7 +140,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-    public <Y extends Spatial<X>> Y getOrAdd(X x, Function<X, Y> materializer) {
+    public <Y extends Spatial<X>> Y getOrAdd(X x, Function<X,Y> materializer) {
         //Spatial y = atoms.get(x, materializer);
         Spatial y = atoms.computeIfAbsent(x, materializer);
         y.activate();
@@ -230,6 +230,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     protected void update() {
 
         toRemove.forEach(x -> x.delete(dyn));
+        toRemove.clear();
 
         this.inputs.forEach(this::update);
 

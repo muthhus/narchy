@@ -18,14 +18,14 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
 
 
-    public SimpleConceptGraph1(NAR nar, int visibleNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+    public SimpleConceptGraph1(NAR nar, int visibleNodes, int maxEdgesPerNodeMax) {
         this(nar, ()->nar.exe.stream().
                         map(x -> x instanceof Activate ? (Activate)x : null).filter(Objects::nonNull).iterator(),
-                visibleNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
+                visibleNodes, maxEdgesPerNodeMax);
     }
 
-    public SimpleConceptGraph1(NAR nar, @NotNull Iterable<Activate> concepts, int maxNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
-        super(nar, concepts, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
+    public SimpleConceptGraph1(NAR nar, @NotNull Iterable<Activate> concepts, int maxNodes, int maxEdgesPerNodeMax) {
+        super(nar, concepts, maxNodes, maxEdgesPerNodeMax);
     }
 
 //    @Override
@@ -54,10 +54,6 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        Param.DEBUG = true;
         //Param.TRACE = true;
         NAR n = NARS.threadSafe();
-        n.DEFAULT_BELIEF_PRIORITY = 0.1f;
-        n.DEFAULT_QUESTION_PRIORITY = 0.1f;
-        n.DEFAULT_GOAL_PRIORITY= 0.1f;
-        n.DEFAULT_QUEST_PRIORITY = 0.1f;
         float fps = 16f;
 
         //csvPriority(n, "/tmp/x.csv");
@@ -101,9 +97,9 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        );
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                /* TODO */ 64, 3, 8);
+                /* TODO */ 64, 5);
 
-        cs.show(800, 800, true);
+        cs.show(800, 800, false);
 
 
 

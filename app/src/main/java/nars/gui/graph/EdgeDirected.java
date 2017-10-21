@@ -26,7 +26,7 @@ public class EdgeDirected extends ForceDirected {
 
                     float attraction = e.attraction;
                     if (attraction > 0) {
-                        SimpleSpatial B = e.id;
+                        SimpleSpatial B = e.tgt();
 
                         if ((B.body != null)) {
 

@@ -165,8 +165,8 @@ public class Cuboid<X> extends SimpleSpatial<X> {
     }
 
     @Override
-    public void renderAbsolute(GL2 gl) {
-        super.renderAbsolute(gl);
+    public void renderAbsolute(GL2 gl, long timeMS) {
+        super.renderAbsolute(gl, timeMS);
 
         //display pick location (debugging)
         if (mousePick != null) {

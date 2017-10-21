@@ -1,6 +1,7 @@
 package nars.gui;
 
 import jcog.event.On;
+import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;
 import nars.term.Term;
 import spacegraph.AbstractSpace;
@@ -77,7 +78,7 @@ public abstract class DynamicListSpace<X, Y extends Spatial<X>> extends ListSpac
 
 
     @Override
-    public void start(SpaceGraph space) {
+    public void start(SpaceGraph<X> space) {
         this.space = space;
         space.dyn.addAnimation(this);
         //on = nar.onCycle(nn -> updateIfNotBusy(this::update));
@@ -105,10 +106,6 @@ public abstract class DynamicListSpace<X, Y extends Spatial<X>> extends ListSpac
         });
     }
 
-    /** override to filter items */
-    protected boolean include(X x) {
-        return true;
-    }
 
     abstract protected List<Y> get();
 
@@ -154,7 +151,7 @@ public abstract class DynamicListSpace<X, Y extends Spatial<X>> extends ListSpac
 
         window(
                 grid(reflect(fd)
-                        //, reflect(((DynamicConceptSpace)this).vis)
+                    , reflect(((DynamicConceptSpace)this).vis)
                 ),
                         400, 400);
 

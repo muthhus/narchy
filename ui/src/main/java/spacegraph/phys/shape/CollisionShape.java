@@ -28,6 +28,8 @@ import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.broad.BroadphaseNativeType;
 import spacegraph.phys.math.Transform;
 
+import static spacegraph.math.v3.v;
+
 /**
  * CollisionShape class provides an interface for collision shapes that can be
  * shared among {@link Collidable}s.
@@ -164,6 +166,10 @@ public abstract class CollisionShape {
 
 	public Object getUserPointer() {
 		return userPointer;
+	}
+
+	public void setLocalScaling(float x, float y, float z){
+		setLocalScaling(v(Math.abs(x), Math.abs(y), Math.abs(z)));
 	}
 
 }

@@ -23,7 +23,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     boolean center = true;
 
-    public final FloatParam repel = new FloatParam(3f, 0, 9f);
+    public final FloatParam repel = new FloatParam(8f, 0, 16f);
     public final FloatParam attraction = new FloatParam(0.1f, 0, 3f);
 
 
@@ -58,7 +58,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         float r = 400;
         boundsMin = v(-r, -r, -r);
         boundsMax = v(+r, +r, +r);
-        maxRepelDist = r*0.75f;
+        maxRepelDist = r*2;
     }
 
 
@@ -127,7 +127,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         v3 delta = v();
         delta.sub(yp.transform(), xp.transform());
 
-        float len = delta.normalize();
+        float len = delta.lengthSquared();
         if (!Float.isFinite(len))
             return;
 
@@ -141,8 +141,9 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
         //v3 delta2 = v(delta);
 
+        delta.normalize();
         //delta.scale((speed / (1 + /&xp.mass() /* + yp.mass()*/) ) * len );
-        delta.scale( /* (float)(len) *  */ speed );
+        delta.scale( /*(float)(len) * */  speed );
         ((Dynamic) x).velAdd(delta);
         //delta2.scale(-(speed * (yp.mass() /* + yp.mass()*/) ) * len  );
         delta.scale(-1 );

@@ -48,12 +48,6 @@ public class BoxShape extends SimpleBoxShape {
 	}
 
 	@Override
-    public void size(float x, float y, float z) {
-		setMargin(0f); //is margin helpful?
-		super.size(x, y, z);
-	}
-
-	@Override
     public v3 getHalfExtentsWithMargin(v3 out) {
 		v3 halfExtents = getHalfExtentsWithoutMargin(out);
 

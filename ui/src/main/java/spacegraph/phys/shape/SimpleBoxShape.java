@@ -23,6 +23,7 @@
 
 package spacegraph.phys.shape;
 
+import jcog.Util;
 import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
@@ -43,41 +44,57 @@ public class SimpleBoxShape extends PolyhedralConvexShape {
 
 	private float radius;
 
-	public SimpleBoxShape(v3 boxHalfExtents) {
-		this(boxHalfExtents.x*2f, boxHalfExtents.y*2f, boxHalfExtents.z*2f);
+
+	public SimpleBoxShape() {
+		this(1, 1, 1);
 	}
 
 	public SimpleBoxShape(float w, float h, float d) {
 		super();
 
+		implicitShapeDimensions.set(w/2, h/2, d/2);
+
 		setMargin(0f);
 
 		//VectorUtil.mul(implicitShapeDimensions, boxHalfExtents, localScaling);
-		size(w,h,d); //localscaling is by default 1,1,1 anyway
+		updateRadius();
 
 		/*float m = getMargin();
 
 		implicitShapeDimensions.add(-m, -m, -m);*/
 	}
 
+	public void setSize(float w, float h, float d) {
+		implicitShapeDimensions.set(w/2, h/2, d/2);
+		updateRadius();
+	}
+
+
 	@Override
 	public float getBoundingRadius() {
 		return radius;
 	}
 
-	public void size(float x, float y, float z) {
-		implicitShapeDimensions.set(x/2f, y/2f, z/2f);
-		updateRadius();
+	@Override
+	public void setLocalScaling(float x, float y, float z) {
+		throw new UnsupportedOperationException();
+//		localScaling.set(Math.abs(x), Math.abs(y), Math.abs(z));
+//		updateRadius();
 	}
 
 	@Override
 	public void setLocalScaling(v3 scaling) {
-		super.setLocalScaling(scaling);
-		updateRadius();
+		throw new UnsupportedOperationException();
+//		super.setLocalScaling(scaling);
+//		updateRadius();
 	}
 
 	private void updateRadius() {
-		radius = 0.5f * implicitShapeDimensions.length() * localScaling.length();
+		radius = Util.max(
+						implicitShapeDimensions.x,// * localScaling.x,
+						implicitShapeDimensions.y,// * localScaling.y,
+						implicitShapeDimensions.z// * localScaling.z
+				);
 	}
 
 	public v3 getHalfExtentsWithMargin(v3 out) {
@@ -104,7 +121,7 @@ public class SimpleBoxShape extends PolyhedralConvexShape {
 
 	@Override
 	public v3 localGetSupportingVertex(v3 vec, v3 out) {
-		v3 halfExtents = getHalfExtentsWithoutMargin(out);
+		v3 halfExtents = implicitShapeDimensions; //getHalfExtentsWithoutMargin(out);
 		
 //		float margin = getMargin();
 //		halfExtents.x += margin;
@@ -193,7 +210,7 @@ public class SimpleBoxShape extends PolyhedralConvexShape {
 
 	@Override
 	public void getAabb(Transform t, v3 aabbMin, v3 aabbMax) {
-		AabbUtil2.transformAabb(getHalfExtentsWithoutMargin(), getMargin(), t, aabbMin, aabbMax);
+		AabbUtil2.transformAabb(implicitShapeDimensions, 0, t, aabbMin, aabbMax);
 	}
 
 	public final v3 getHalfExtentsWithoutMargin() {
@@ -203,23 +220,23 @@ public class SimpleBoxShape extends PolyhedralConvexShape {
 	@Override
 	public void calculateLocalInertia(float mass, v3 inertia) {
 
-		v3 halfExtents = getHalfExtentsWithMargin(new v3());
+		v3 halfExtents = implicitShapeDimensions; //getHalfExtentsWithMargin(new v3());
 
-		float lx = 2f * halfExtents.x;
-		float ly = 2f * halfExtents.y;
-		float lz = 2f * halfExtents.z;
+		float lx2 = Util.sqr(2f * halfExtents.x);
+		float ly2 = Util.sqr(2f * halfExtents.y);
+		float lz2 = Util.sqr(2f * halfExtents.z);
 
 		inertia.set(
-				mass / 12f * (ly * ly + lz * lz),
-				mass / 12f * (lx * lx + lz * lz),
-				mass / 12f * (lx * lx + ly * ly));
+				mass / 12f * (ly2 + lz2),
+				mass / 12f * (lx2 + lz2),
+				mass / 12f * (lx2 + ly2));
 	}
 
 	@Override
 	public void getPlane(v3 planeNormal, v3 planeSupport, int i) {
 		// this plane might not be aligned...
 		Vector4f plane = new Vector4f();
-		v3 tmp = new v3();
+		v3 tmp = new v3(implicitShapeDimensions);
 		getPlaneEquation(plane, i, tmp);
 		planeNormal.set(plane.x, plane.y, plane.z);
 
@@ -244,7 +261,7 @@ public class SimpleBoxShape extends PolyhedralConvexShape {
 
 	@Override
 	public void getVertex(int i, v3 vtx) {
-		v3 halfExtents = getHalfExtentsWithoutMargin(); //getHalfExtentsWithoutMargin(new v3());
+		v3 halfExtents = implicitShapeDimensions; //getHalfExtentsWithoutMargin(); //getHalfExtentsWithoutMargin(new v3());
 
 		float hx = halfExtents.x;
 		float hy = halfExtents.y;

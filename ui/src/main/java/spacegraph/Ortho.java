@@ -77,10 +77,9 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     @Override
     public void zoom(float x, float y, float sx, float sy) {
 
+        //System.out.println(x + "," + y + " " + sx + "x" + sy + ".." + scale);
         v2 gs = scale;
-        float tx = x * gs.x;
-        float ty = y * gs.y;
-        translate(-tx, -ty);
+        translate(-(x - 1) * scale.x/2,  -(y - 1)*scale.y/2);
 
         //scale()
     }

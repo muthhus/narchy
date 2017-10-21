@@ -342,8 +342,10 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
         clear();
         updateCamera();
 
+        long timeMS = clock.getTimeMilliseconds();
+
         gl.glEnable(GL2.GL_DEPTH_TEST);
-        forEachSpatial(this::render);
+        forEachSpatial(s -> render(s,timeMS));
     }
 
 
@@ -798,11 +800,11 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
     }
 
 
-    public final void render(Spatial<?> s) {
+    public final void render(Spatial<?> s, long timeMS) {
 
         GL2 gl = this.gl;
 
-        s.renderAbsolute(gl);
+        s.renderAbsolute(gl, timeMS);
 
         s.forEachBody(body -> {
 

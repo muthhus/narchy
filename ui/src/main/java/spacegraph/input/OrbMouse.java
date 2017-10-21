@@ -33,11 +33,11 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
     float gOldPickingDist;
 
     protected TypedConstraint pickConstraint;
-//    protected Dynamic directDrag;
+    //    protected Dynamic directDrag;
     public Dynamic pickedBody; // for deactivation state
     public Spatial pickedSpatial;
     public Collidable picked;
-    public  v3 hitPoint;
+    public v3 hitPoint;
     protected final VoronoiSimplexSolver simplexSolver = new VoronoiSimplexSolver();
     public ClosestRay pickRay;
 
@@ -69,8 +69,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 
                     //TODO compute new azi and ele that match the current viewing angle values by backcomputing the vector delta
 
-
-                    space.camera(co.getWorldOrigin(), co.shape().getBoundingRadius());
+                    space.camera(co.getWorldOrigin(), co.shape().getBoundingRadius()*2.5f);
 
                 }
                 return true;
@@ -153,31 +152,31 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
     private ClosestRay mouseGrabOn() {
         // add a point to point constraint for picking
 
-        if (pickConstraint == null && pickedBody!=null ) {
+        if (pickConstraint == null && pickedBody != null) {
             pickedBody.setActivationState(Collidable.DISABLE_DEACTIVATION);
 
             Dynamic body = pickedBody;
-                v3 pickPos = new v3(rayCallback.hitPointWorld);
+            v3 pickPos = new v3(rayCallback.hitPointWorld);
 
-                Transform tmpTrans = body.worldTransform;
-                tmpTrans.inverse();
-                v3 localPivot = new v3(pickPos);
-                tmpTrans.transform(localPivot);
+            Transform tmpTrans = body.worldTransform;
+            tmpTrans.inverse();
+            v3 localPivot = new v3(pickPos);
+            tmpTrans.transform(localPivot);
 
-                Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
-                p2p.impulseClamp = 3f;
+            Point2PointConstraint p2p = new Point2PointConstraint(body, localPivot);
+            p2p.impulseClamp = 3f;
 
-                // save mouse position for dragging
-                gOldPickingPos.set(rayCallback.rayToWorld);
-                v3 eyePos = new v3(space.camPos);
-                v3 tmp = new v3();
-                tmp.sub(pickPos, eyePos);
-                gOldPickingDist = tmp.length();
-                // very weak constraint for picking
-                p2p.tau = 0.1f;
+            // save mouse position for dragging
+            gOldPickingPos.set(rayCallback.rayToWorld);
+            v3 eyePos = new v3(space.camPos);
+            v3 tmp = new v3();
+            tmp.sub(pickPos, eyePos);
+            gOldPickingDist = tmp.length();
+            // very weak constraint for picking
+            p2p.tau = 0.1f;
 
-                space.dyn.addConstraint(p2p);
-                pickConstraint = p2p;
+            space.dyn.addConstraint(p2p);
+            pickConstraint = p2p;
 
 //                body.setActivationState(Collidable.DISABLE_DEACTIVATION);
 //                v3 pickPos = v(rayCallback.hitPointWorld);
@@ -243,28 +242,36 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
             Arrays.toString(buttons) + " at " + mouseTouch.hitPointWorld
         );*/
 
-        picked = cray!=null ? cray.collidable : null;
+        Spatial prevPick = pickedSpatial;
+        Spatial pickedSpatial = null;
+
+        picked = cray != null ? cray.collidable : null;
         if (picked != null) {
             Object t = picked.data();
             if (t instanceof Spatial) {
                 pickedSpatial = ((Spatial) t);
                 if (pickedSpatial.onTouch(picked, cray, buttons, space) != null) {
-                    //absorbed
+                    //absorbed surface
+
                     clearDrag();
-                    return true;
+
+                } else {
+                    //maybe find next closest?
                 }
-            } else {
-                pickedSpatial = null;
+
+
             }
-        } else {
-//            if (pickedSpatial!=null) {
-//                if (pickedSpatial.onTouch(picked, cray, buttons)!=null) {
-//                    clearDrag();
-//                    return true;
-//                }
-//            }
-            pickedSpatial = null;
         }
+
+//        } else {
+////            if (pickedSpatial!=null) {
+////                if (pickedSpatial.onTouch(picked, cray, buttons)!=null) {
+////                    clearDrag();
+////                    return true;
+////                }
+////            }
+//            pickedSpatial = null;
+//        }
 
         //}
 
@@ -301,21 +308,20 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 //            } else
 
 
-
-                    v3 newRayTo = new v3(mousePick(px, py).rayToWorld); //HACK dont involve a complete ClosestRay
-                    v3 eyePos = new v3(space.camPos);
-                    v3 dir = new v3();
-                    dir.sub(newRayTo, eyePos);
-                    dir.normalize();
-                    dir.scale(gOldPickingDist);
-
-                    v3 newPos = new v3();
-                    newPos.add(eyePos, dir);
-
-                // move the constraint pivot
-                Point2PointConstraint p2p = (Point2PointConstraint) pickConstraint;
-                p2p.setPivotB(newPos);
-                return true;
+//            v3 newRayTo = new v3(mousePick(px, py).rayToWorld); //HACK dont involve a complete ClosestRay
+//            v3 eyePos = new v3(space.camPos);
+//            v3 dir = new v3();
+//            dir.sub(newRayTo, eyePos);
+//            dir.normalize();
+//            dir.scale(gOldPickingDist);
+//
+//            v3 newPos = new v3();
+//            newPos.add(eyePos, dir);
+//
+//            // move the constraint pivot
+//            Point2PointConstraint p2p = (Point2PointConstraint) pickConstraint;
+//            p2p.setPivotB(newPos);
+//            return true;
 
 
         } else {
@@ -383,9 +389,17 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 //
         }
 
+        if (prevPick != pickedSpatial) {
+            if (prevPick != null) {
+                prevPick.onUntouch(space);
+            }
+            this.pickedSpatial = pickedSpatial;
+        }
+
         return false;
 
     }
+
     @Nullable
     public ClosestRay mousePick(int x, int y) {
 //        float top = 1f;
@@ -421,8 +435,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
 
         if (aspect < 1f) {
             hor.scale(1f / aspect);
-        }
-        else {
+        } else {
             vertical.scale(aspect);
         }
 
@@ -471,7 +484,7 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
         float x = (2.0f * px) / ww - 1.0f;
         float y = 1.0f - (2.0f * py) / hh;
         float z = 1.0f;
-        Vector4f ray_eye = new Vector4f( x*2f, y*2f, -1.0f, 1.0f );
+        Vector4f ray_eye = new Vector4f(x * 2f, y * 2f, -1.0f, 1.0f);
 
         //https://capnramses.github.io/opengl/raycasting.html
 
@@ -490,7 +503,6 @@ public class OrbMouse extends SpaceMouse implements KeyListener {
         v3 ray_wor = v(ray_eye.x, ray_eye.y, ray_eye.z);
         ray_wor.normalize();
         ray_wor.scale(1000f);
-
 
 
         //if (mouseDragDX == 0) { //if not already dragging somewhere "outside"

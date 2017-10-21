@@ -169,8 +169,7 @@ public enum Draw {
             switch (shape.getShapeType()) {
                 case BOX_SHAPE_PROXYTYPE:
                     SimpleBoxShape boxShape = (SimpleBoxShape) shape;
-                    v3 a = v();
-                    boxShape.getHalfExtentsWithoutMargin(a);
+                    v3 a = boxShape.implicitShapeDimensions;
                     //Vector3f halfExtent = stack.vectors.get();
                     gl.glScalef(2f * a.x, 2f * a.y, 2f * a.z);
                     //glsrt.drawCube(gl, 1f);
@@ -635,7 +634,8 @@ public enum Draw {
 
         //ww.normalize();
 
-        Transform tt = ((SimpleSpatial) e.id).transform;
+
+        Transform tt = e.tgt().transform;
 
         float sx = st.x;
         float tx = tt.x;
@@ -656,13 +656,12 @@ public enum Draw {
 
         gl.glVertex3f(sx + vv.x, sy + vv.y, sz + vv.z); //right base
 
-        gl.glColor4f(e.r, e.g, e.b, e.a);
         gl.glVertex3f( //right base
                 sx + -vv.x, sy + -vv.y, sz + -vv.z //full triangle
                 //sx, sy, sz  //half triangle
         );
 
-        gl.glColor4f(e.r/2f, e.g/2f, e.b/2f, e.a);
+        gl.glColor4f(e.r/2f, e.g/2f, e.b/2f, e.a*2/3);
         gl.glVertex3f(tx, ty, tz); //tip
 
         gl.glEnd();
@@ -670,12 +669,12 @@ public enum Draw {
 
     }
 
-    public static void renderLineEdge(GL2 gl, SimpleSpatial src, EDraw<?> e, float width) {
+    public static void renderLineEdge(GL2 gl, SimpleSpatial src, SimpleSpatial tgt, float width) {
         gl.glLineWidth(width);
         gl.glBegin(GL.GL_LINES);
         v3 s = src.transform();
         gl.glVertex3f(s.x, s.y, s.z);
-        v3 t = e.id.transform();
+        v3 t = tgt.transform();
         gl.glVertex3f(t.x, t.y, t.z);
         gl.glEnd();
     }

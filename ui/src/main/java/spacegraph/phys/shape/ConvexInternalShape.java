@@ -37,7 +37,7 @@ import spacegraph.phys.math.VectorUtil;
 public abstract class ConvexInternalShape extends ConvexShape {
 
 	// local scaling. collisionMargin is not scaled !
-	protected final v3 localScaling = new v3(1f, 1f, 1f);
+	public final v3 localScaling = new v3(1f, 1f, 1f);
 	public final v3 implicitShapeDimensions = new v3();
 	protected float collisionMargin = BulletGlobals.CONVEX_DISTANCE_MARGIN;
 
@@ -97,7 +97,12 @@ public abstract class ConvexInternalShape extends ConvexShape {
 	public void setLocalScaling(v3 scaling) {
 		localScaling.absolute(scaling);
 	}
-	
+
+	@Override
+	public void setLocalScaling(float x, float y, float z) {
+		localScaling.set(Math.abs(x), Math.abs(y), Math.abs(z));
+	}
+
 	@Override
 	public v3 getLocalScaling(v3 out) {
 		out.set(localScaling);

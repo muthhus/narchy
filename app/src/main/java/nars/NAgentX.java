@@ -664,7 +664,7 @@ abstract public class NAgentX extends NAgent {
                     new WindowButton("concept graph", () -> {
                         SpaceGraph s = new SpaceGraph<>(
                                 new SimpleConceptGraph1(nar,
-                                        64, 12, 12)
+                                        64, 12)
                         );
                         EdgeDirected fd = new EdgeDirected();
                         s.dyn.addBroadConstraint(fd);

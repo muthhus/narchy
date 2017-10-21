@@ -27,7 +27,7 @@ public abstract class AbstractSpatial<X> extends Spatial<X> {
     }
 
     @Override
-    public void renderAbsolute(GL2 gl) {
+    public void renderAbsolute(GL2 gl, long timeMS) {
         //blank
     }
 

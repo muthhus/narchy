@@ -4,8 +4,7 @@ import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import nars.$;
-import nars.Narsese;
-import nars.gui.graph.TermSpace;
+import nars.gui.DynamicListSpace;
 import nars.gui.graph.TermWidget;
 import nars.term.Term;
 import spacegraph.SpaceGraph;
@@ -17,7 +16,7 @@ import java.util.List;
 /**
  * display a directed graph by wrapping its elements in NAR concepts (HACK)
  */
-public class SimpleGraph1 extends TermSpace<Term> {
+public class SimpleGraph1 extends DynamicListSpace<Term,TermWidget<Term>> {
 
 //    final Surface status = new Label("ready");
 
@@ -45,14 +44,14 @@ public class SimpleGraph1 extends TermSpace<Term> {
 
     static class DefaultTermWidget extends TermWidget<Term> {
 
-        public final List<EDraw<?>> edges = $.newArrayList();
+        public final List<EDraw<TermWidget<Term>>> edges = $.newArrayList();
 
         public DefaultTermWidget(Term x) {
             super(x);
         }
 
         @Override
-        public Iterable<EDraw<?>> edges() {
+        public Iterable<EDraw<TermWidget<Term>>> edges() {
             return edges;
         }
     }
@@ -65,11 +64,13 @@ public class SimpleGraph1 extends TermSpace<Term> {
             //HACK todo use proxyterms in a cache
             //c.termlinks().clear();
 
-            DefaultTermWidget w = space.getOrAdd(x, DefaultTermWidget::new);
+            DefaultTermWidget src = space.getOrAdd(x, DefaultTermWidget::new);
 
-            g.successors(x).forEach((Term y) -> w.edges.add(new EDraw(space.getOrAdd(y, DefaultTermWidget::new))));
+            g.successors(x).forEach((Term y) ->
+                    src.edges.add(new EDraw<>(
+                            src, space.getOrAdd(y, DefaultTermWidget::new), 0.5f)));
 
-            n2.add(w);
+            n2.add(src);
         });
 
         this.active = n2;

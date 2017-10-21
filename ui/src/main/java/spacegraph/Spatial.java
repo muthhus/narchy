@@ -8,6 +8,7 @@ import spacegraph.phys.Dynamics;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.render.JoglPhysics;
+import spacegraph.render.JoglSpace;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -113,7 +114,7 @@ public abstract class Spatial<X> implements Active {
 
     @Nullable abstract public List<TypedConstraint> constraints();
 
-    public abstract void renderAbsolute(GL2 gl);
+    public abstract void renderAbsolute(GL2 gl, long timeMS);
 
     public abstract void renderRelative(GL2 gl, Collidable body);
 
@@ -136,4 +137,7 @@ public abstract class Spatial<X> implements Active {
 
     abstract public float radius();
 
+    public void onUntouch(JoglSpace space) {
+
+    }
 }
