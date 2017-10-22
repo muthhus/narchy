@@ -68,8 +68,7 @@ public class Grid extends Layout {
 //    }
 
     @Override
-    public void layout() {
-        super.layout();
+    public void doLayout() {
 
         assert(parent!=null);
 
@@ -124,6 +123,8 @@ public class Grid extends Layout {
             //vertical
             layoutGrid(1, n, margin);
         }
+
+        super.doLayout();
 
     }
 

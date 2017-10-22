@@ -6,6 +6,7 @@ import jcog.Texts;
 import jcog.tree.rtree.rect.RectFloat2D;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
+import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
 
 import java.io.PrintStream;
@@ -36,6 +37,10 @@ abstract public class Surface  {
                 ", bounds=" + bounds +
                 "scale=" + scale +
                 '}';
+    }
+
+    public void pos(RectFloat2D r) {
+        bounds = r;
     }
 
     public enum Align {
@@ -106,16 +111,22 @@ abstract public class Surface  {
 
     /** null parent means it is the root surface */
     public void start(@Nullable Surface parent) {
-        this.parent = parent;
+        synchronized(this) {
+            this.parent = parent;
+        }
+    }
+
+    public void stop() {
+        synchronized(this) {
+            parent = null;
+        }
     }
 
     public void layout() {
         //nothing by default
     }
 
-    public void stop() {
-        parent = null;
-    }
+
 
     public float w() {
         return bounds.max.x - bounds.min.x;

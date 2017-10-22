@@ -31,32 +31,40 @@ public class VSplit<X extends Surface, Y extends Surface> extends Layout {
     }
 
     @Override
-    public void layout() {
+    public void doLayout() {
 
         float margin = 0.0f;
         //float content = 1f - margin;
         float x = margin / 2f;
 
-        Surface top = top();
 
         float X = x();
         float Y = y();
         float h = h();
         float w = w();
+        float Ysplit = Y + split * h;
 
-        if (top != null) {
-            top.pos(X,  Y, X+w, split* h);
+        Surface top = top();
+        if (top!=null) {
+            top.pos(X, Ysplit, X+w, Y+h);
         }
 
         Surface bottom = bottom();
-        if (bottom!=null) {
-            bottom.pos(X,  Y+split * h, X+w, h);
+        if (top != null) {
+            bottom.pos(X,  Y, X+w, Ysplit);
         }
 
+        super.doLayout();
     }
 
-    public final void top(X s) { children.set(0, s); }
-    public final void bottom(Y s) { children.set(1, s); }
+    public final void top(X s) {
+        s.start(this);
+        children.set(0, s);
+    }
+    public final void bottom(Y s) {
+        s.start(this);
+        children.set(1, s);
+    }
 
     public final X top() {
         return (X) children.get(0);

@@ -18,9 +18,9 @@ import static com.jogamp.opengl.GL.GL_BGRA;
 import static com.jogamp.opengl.GL.GL_RGB;
 import static com.jogamp.opengl.GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV;
 
-public class TextureSurface extends Surface {
+public class Tex {
 
-    Texture texture;
+    com.jogamp.opengl.util.texture.Texture texture;
 
     public boolean mipmap;
 
@@ -34,13 +34,7 @@ public class TextureSurface extends Surface {
     private IntBuffer buffer;
     private Object src;
 
-    public TextureSurface() {
-
-    }
-
-
-    @Override
-    public void paint(GL2 gl) {
+    public void paint(GL2 gl, RectFloat2D bounds) {
 
 
         if (profile == null)
@@ -60,7 +54,7 @@ public class TextureSurface extends Surface {
         }
 
         if (texture != null) {
-            Draw.rectTex(gl, texture, 0, 0, 1, 1, 0);
+            Draw.rectTex(gl, texture, bounds.min.x, bounds.min.y, bounds.w(), bounds.h(), 0);
         }
 
     }
@@ -94,4 +88,15 @@ public class TextureSurface extends Surface {
 
     }
 
+    public Surface view() {
+        return new TexSurface();
+    }
+
+    private class TexSurface extends Surface {
+
+        @Override
+        protected void paint(GL2 gl) {
+            Tex.this.paint(gl, bounds);
+        }
+    }
 }

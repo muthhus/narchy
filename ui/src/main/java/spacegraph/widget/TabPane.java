@@ -33,11 +33,10 @@ public class TabPane extends VSplit {
         final List<Surface> togglesShown = new FasterList();
         builder.forEach((k, v) -> {
             CheckBox c = (CheckBox) new CheckBox(k).on((cb, a) -> {
-                List<Surface> ts = header.children;
                 if (a) {
-                    ts.remove( cb );
+                    header.children.remove( cb );
                 } else {
-                    ts.add( cb );
+                    header.children.add( cb );
                 }
                 update(); //TODO safer asynch
             });

@@ -272,35 +272,13 @@ public class ZoomOrtho extends Ortho {
 
         AnimVector2f s = (AnimVector2f) this.scale;
         float psx = s.targetX();
-        float psy = s.targetY();
+        float psy = psx;
         float sx = psx * zoomMult;
-        float sy = psy * zoomMult;
-        int wx = W;
-        int wy = H;
 
-        if (sx >= minZoom && sy >= minZoom && sx <= maxZoom && sy <= maxZoom) {
+        sx = Math.max(sx, minZoom);
+        sx = Math.min(sx, maxZoom);
+        scale.set(sx,sx);
 
-//            float pcx = cx();
-//            float pcy = cy();
-//            float pcw = cw();
-//            float pch = ch();
-
-            //float dx = (pcw * psx - pcw * sx) / 2;
-            //float dy = (pch * psy - pch * sy) / 2;
-            //System.out.println(pcx + " " + pcy + " : " + dx + " " + dy);
-            //pos.add(dx, dy, 0);
-            this.scale.set(sx, sy);
-
-//            float ncx = cx();
-//            float ncy = cy();
-//            float ncw = cw();
-//            float nch = ch();
-
-            //pos.set()
-            //TODO
-
-        }
-        //}
     }
 
     private class HUD extends Stacking {

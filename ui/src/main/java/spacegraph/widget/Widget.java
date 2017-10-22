@@ -10,6 +10,7 @@ import spacegraph.Surface;
 import spacegraph.input.Finger;
 import spacegraph.layout.Layout;
 import spacegraph.layout.Stacking;
+import spacegraph.layout.VSplit;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
 import spacegraph.widget.button.CheckBox;
@@ -155,21 +156,21 @@ abstract public class Widget extends Stacking {
     }
 
     public static Layout widgetDemo() {
-        return grid(
-                new BaseSlider(.25f  /* pause */),
-                grid(),
-                col(new CheckBox("ABC"), new CheckBox("XYZ")),
-                grid(new ScaleDebugLabel(), new ScaleDebugLabel(),
-                        row(new PushButton("x"), new PushButton("xyz")),
-                        col(new ScaleDebugLabel(), new PushButton("sdjfjsdfk"))
-                ),
-                new PushButton("clickMe()", (p) -> {
-                    p.setLabel(Texts.n2(Math.random()));
-                }),
-
-                new XYSlider(),
-                new DummyConsole()
-        );
+        return
+                grid(
+                        row(new PushButton("row1"), new PushButton("row2"), new PushButton("row3")),
+                        col(new PushButton("col1"), new PushButton("col2"), new PushButton("col3")),
+                        new VSplit(new PushButton("vsplit top"), new PushButton("vsplit bottom")),
+                        new VSplit(new PushButton("grid within"), grid(
+                            new BaseSlider(.25f  /* pause */),
+                            col(new CheckBox("ABC"), new CheckBox("XYZ"))
+                        ), 0.8f),
+                        new PushButton("clickMe()", (p) -> {
+                          p.setLabel(Texts.n2(Math.random()));
+                        }),
+                        new XYSlider(),
+                        new DummyConsole()
+                );
     }
 
     private static class DummyConsole extends ConsoleTerminal implements Runnable {

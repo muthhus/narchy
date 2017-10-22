@@ -100,16 +100,15 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         throw new UnsupportedOperationException();
     }
 
+    float zoomMargin = 0.1f;
+
     @Override
-    public void zoom(float x, float y, float sx, float sy) {
+    public synchronized void zoom(float x, float y, float sx, float sy) {
 
-        //System.out.println(x + "," + y + " " + sx + "x" + sy + ".." + scale);
-        //v2 gs = scale;
-        //move(-(x - 1) * scale.x/2,  -(y - 1)*scale.y/2);
         cam.set(x, y);
-        //scale.set(sx/ w(), sy/ h());
+        float s = Math.max(sx,sy) * (1 + zoomMargin);
+        scale.set(W/s, H/s);
 
-        //scale()
     }
 
     @Override
@@ -295,7 +294,7 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
             surface.pos(0, 0, W, H);
 
             scale.set(1, 1);
-            cam.set(0, 0);
+            cam.set(W/2, H/2);
 
             layout();
         } else {

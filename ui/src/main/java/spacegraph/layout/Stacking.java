@@ -13,9 +13,9 @@ public class Stacking extends Layout {
     }
 
     @Override
-    public void layout() {
-        children.forEach((c) ->
-            c.pos(0, 0, w(), h()));
-        super.layout();
+    public void doLayout() {
+        children.forEach((c) -> c.pos(bounds));
+        super.doLayout();
     }
+
 }

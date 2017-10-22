@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.widget.meter.BitmapMatrixView;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -223,13 +224,13 @@ public class WebCam {
 
     public Surface surface() {
 
-        TextureSurface ts = new TextureSurface();
+        Tex ts = new Tex();
 
         eventChange.on(x -> {
             ts.update(iimage);
         });
 
-        return ts;
+        return ts.view();
     }
 
 

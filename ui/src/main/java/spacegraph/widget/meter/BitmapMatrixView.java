@@ -1,9 +1,11 @@
 package spacegraph.widget.meter;
 
+import com.jogamp.opengl.GL2;
 import jcog.math.FloatSupplier;
 import jcog.tensor.ArrayTensor;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
-import spacegraph.video.TextureSurface;
+import spacegraph.Surface;
+import spacegraph.video.Tex;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -16,8 +18,7 @@ import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 /**
  * Created by me on 7/29/16.
  */
-public class BitmapMatrixView extends TextureSurface {
-
+public class BitmapMatrixView extends Surface {
 
     private final int w;
     private final int h;
@@ -25,6 +26,12 @@ public class BitmapMatrixView extends TextureSurface {
     private BufferedImage buf;
     private int[] rasInt;
     private WritableRaster raster;
+    private final Tex tex;
+
+    @Override
+    protected void paint(GL2 gl) {
+        tex.paint(gl, bounds);
+    }
 
 //
 //    public static ViewFunction2D arrayRenderer(float[][] ww) {
@@ -86,6 +93,7 @@ public class BitmapMatrixView extends TextureSurface {
         this.w = w;
         this.h = h;
         this.view = view != null ? view : ((ViewFunction2D) this);
+        this.tex = new Tex();
     }
 
 //    public static final ViewFunction1D bipolar1 = (x, gl) -> {
@@ -185,7 +193,7 @@ public class BitmapMatrixView extends TextureSurface {
             }
         }
 
-        update(buf);
+        tex.update(buf);
     }
 
 

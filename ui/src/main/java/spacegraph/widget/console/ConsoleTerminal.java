@@ -16,8 +16,7 @@ import org.eclipse.collections.api.set.primitive.ImmutableCharSet;
 import org.eclipse.collections.impl.factory.primitive.CharSets;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
-import spacegraph.render.Draw;
-import spacegraph.video.TextureSurface;
+import spacegraph.video.Tex;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
@@ -32,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 
-    final TextureSurface texture = new TextureSurface();
+    final Tex tex = new Tex();
 
     public final VirtualTerminal term;
     private final int[] cursorPos = new int[2];
@@ -44,7 +43,9 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
 
 
     public ConsoleTerminal(VirtualTerminal t) {
+
         this.term = t;
+        resize(term.getTerminalSize().getColumns(), term.getTerminalSize().getRows());
     }
 
 
@@ -52,7 +53,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
         needFullRedraw.set(true);
         while (needFullRedraw.compareAndSet(true, false)) {
             if (updateBackBuffer()) {
-                texture.update(backbuffer);
+                tex.update(backbuffer);
                 needFullRedraw.set(false);
                 break;
             }
@@ -99,8 +100,6 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     public void start(@Nullable Surface parent) {
         super.start(parent);
 
-        resize(term.getTerminalSize().getColumns(), term.getTerminalSize().getRows());
-
         term.addVirtualTerminalListener(listener = new VirtualTerminalListener() {
 
 
@@ -144,7 +143,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     @Override
     public void paintComponent(GL2 gl) {
 
-        Draw.bounds(gl, this, texture::paint);
+        tex.paint(gl, bounds);
         
         if (needFullRedraw.get()) {
             render();
