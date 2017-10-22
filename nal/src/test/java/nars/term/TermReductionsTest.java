@@ -1103,6 +1103,11 @@ public class TermReductionsTest extends NarseseTest {
         );
 
     }
+    @Test public void testInvalidCircularImpl() throws Narsese.NarseseException {
+        assertNotEquals(Null, $("(x(intValue,(),1) ==>+10 ((--,x(intValue,(),0)) &| x(intValue,(),1)))"));
+        assertEquals(Null, $("(x(intValue,(),1) =|> ((--,x(intValue,(),0)) &| x(intValue,(),1)))"));
+        assertEquals(Null, $("(x(intValue,(),1) ==> ((--,x(intValue,(),0)) &| x(intValue,(),1)))"));
+    }
 
     @Test
     public void testImplInImplDTernal() throws Narsese.NarseseException {

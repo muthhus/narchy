@@ -51,7 +51,7 @@ public class TetrisVisualizer extends Surface {
         if (newWindow) {
             SpaceGraph s = new SpaceGraph();
             s.show(t.getWidth() * blockSize, t.getHeight() * blockSize);
-            s.add(new Ortho(this).maximize());
+            s.add(new Ortho(this));
         }
 
         tetris = t;

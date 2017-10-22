@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -154,7 +155,7 @@ public class Temporalize implements ITemporalize {
     }
 
     private RelativeEvent relative(Term term, Term relativeTo, int start, int end) {
-        assert (!term.equals(relativeTo));
+        //assert (!term.equals(relativeTo));
         assert ((start == DTERNAL) == (end == DTERNAL));
         return new RelativeEvent(this, term, relativeTo, start, end);
     }
@@ -243,6 +244,8 @@ public class Temporalize implements ITemporalize {
                 Term implSubj = implComponents.sub(0);
                 Term implPred = implComponents.sub(1);
 
+                /*if (!implSubj.equals(implPred))*/
+            {
                 if (implDT == DTERNAL) {
                     //do not infer any specific temporal relation between the subterms
                     //just inherit from the parent directly
@@ -252,27 +255,29 @@ public class Temporalize implements ITemporalize {
                     know(implPred, relative(implPred, implSubj, DTERNAL));
 
                 } else {
+                    int predFromSubj = implDT + implSubj.dtRange();
+
+                    //crosslink
+                    know(implSubj, relative(implSubj, implPred, -predFromSubj));
                     if (!implSubj.equals(implPred)) {
-                        int predFromSubj = implDT + implSubj.dtRange();
-
-                        //crosslink
-                        know(implSubj, relative(implSubj, implPred, -predFromSubj));
                         know(implPred, relative(implPred, implSubj, predFromSubj));
+                    }
 
+                    if (implSubj.hasAny(CONJ)) {
 
-                        if (implSubj.hasAny(CONJ)) {
+                        implSubj.events(oe -> {
+                            Term ss = oe.getOne();
+                            if (!ss.equals(implPred)) {
+                                int t = -predFromSubj + ((int) oe.getTwo());
+                                know(ss, relative(ss, implPred, t));
+                                know(implPred, relative(implPred, ss, -t));
+                            } else {
+                                //TODO repeat case
+                            }
+                        });
+                    }
 
-                            implSubj.events(oe -> {
-                                Term ss = oe.getOne();
-                                if (!ss.equals(implPred)) {
-                                    int t = -predFromSubj + ((int) oe.getTwo());
-                                    know(ss, relative(ss, implPred, t));
-                                    know(implPred, relative(implPred, ss, -t));
-                                } else {
-                                    //TODO repeat case
-                                }
-                            });
-                        }
+                    if (!implSubj.equals(implPred)) {
                         if (implPred.hasAny(CONJ)) {
                             implPred.events(oe -> {
                                 Term pp = oe.getOne();
@@ -285,14 +290,16 @@ public class Temporalize implements ITemporalize {
                                 }
                             });
                         }
-                    } else {
-                        //TODO repeat case
                     }
 
-                }
+                }/* else{
+                        //TODO repeat case
+                    }*/
+
+            }
 
 
-                break;
+            break;
 
 
             case NEG:
@@ -327,10 +334,10 @@ public class Temporalize implements ITemporalize {
                             ObjectLongPair<Term> jj = ee.get(j);
                             Term b = jj.getOne();
 
+                            //chain to previous term
+                            int bt = (int) jj.getTwo();
+                            know(a, relative(a, b, at - bt));
                             if (!a.equals(b)) {
-                                //chain to previous term
-                                int bt = (int) jj.getTwo();
-                                know(a, relative(a, b, at - bt));
                                 know(b, relative(b, a, bt - at));
                             }
                         }
@@ -426,6 +433,10 @@ public class Temporalize implements ITemporalize {
 
     @Override
     public Event solve(final Term x, Map<Term, Time> trail) {
+        return solve(x, trail, (t) -> true);
+    }
+
+    public Event solve(final Term x, Map<Term, Time> trail, Predicate<Time> select) {
         assert (!(x instanceof Bool));
         //System.out.println("solve " + target + "\t" + trail);
 
@@ -474,14 +485,19 @@ public class Temporalize implements ITemporalize {
 
                 Time xt = e.start(trail);
                 if (xt != null) {
-                    int score = (xt.base != ETERNAL ? 1 : 0) + (xt.offset != DTERNAL ? 1 : 0);
-                    int bestScore = 0;
-                    if (score > bestScore) {
+                    if (select.test(xt)) {
                         best = xt;
                         bestEvent = e;
-                        if (score >= 1)
-                            break; //found the best possible
+                        break;
                     }
+//                    int score = (xt.base != ETERNAL ? 1 : 0) + (xt.offset != DTERNAL ? 1 : 0);
+//                    int bestScore = 0;
+//                    if (score > bestScore) {
+//                        best = xt;
+//                        bestEvent = e;
+//                        if (score >= 1)
+//                            break; //found the best possible
+//                    }
                 }
 
             }
@@ -799,14 +815,14 @@ public class Temporalize implements ITemporalize {
         }*/
 
         Time early = ata < bta ? at : bt;
-        Time late = ata < bta ? bt : at;
+        //Time late = ata < bta ? bt : at;
 
         int cDur;
         if (Math.abs(ata - bta) < dur) {
             //dither
             cDur = (int) Math.abs(ata - bta);
             bta = ata;
-            late = early;
+            //late = early;
         } else {
             cDur = -1;
         }
@@ -909,22 +925,20 @@ public class Temporalize implements ITemporalize {
     }
 
 
-    public void knowAmbient(@NotNull Term t) {
+    public void knowAmbient(Term t) {
         know(new AmbientEvent(t), 0, t.dtRange());
     }
 
-    private final static class AmbientEvent extends AbsoluteEvent {
-        public AmbientEvent(@NotNull Term t) {
+    final static class AmbientEvent extends AbsoluteEvent {
+        public AmbientEvent(Term t) {
             super(t, Tense.ETERNAL, Tense.ETERNAL);
         }
 
-        @NotNull
         @Override
         public Time start(@Nullable Map<Term, Time> ignored) {
             return AMBIENT_EVENT;
         }
 
-        @NotNull
         @Override
         public Time end(Map<Term, Time> ignored) {
             return AMBIENT_EVENT;

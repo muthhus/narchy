@@ -4,8 +4,10 @@ import nars.term.Term;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.SortedSet;
 
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 
 public class RelativeEvent extends Event {
@@ -14,6 +16,7 @@ public class RelativeEvent extends Event {
     public final int end;
     protected final ITemporalize t;
     final boolean inverts;
+    private final boolean self;
 
 
     protected RelativeEvent(ITemporalize t, Term term, Term relativeTo, int start, int end) {
@@ -26,6 +29,7 @@ public class RelativeEvent extends Event {
         this.rel = relativeTo;
         this.start = start;
         this.end = end;
+        this.self = term.equals(relativeTo.term());
         this.inverts = term.unneg().equals(relativeTo.unneg());
     }
 
@@ -45,6 +49,24 @@ public class RelativeEvent extends Event {
     @Override
     @Nullable
     public Time start(Map<Term, Time> trail) {
+
+
+        if (self && start!=DTERNAL) {
+            //terminate here but apply the relative offset indicated to any matching absolute term constraint
+            SortedSet<Event> m = ((Temporalize) t).constraints.get(term);
+            if (m!=null) {
+                for (Event e : m) {
+                    if (e instanceof AbsoluteEvent) {
+                        long ae = ((AbsoluteEvent) e).start;
+                        if (ae == ETERNAL)
+                            return null; //cant do anything
+                        return Time.the(this.start + ae, 0);
+                    }
+                }
+            }
+            return null;
+        }
+
         return resolve(this.start, trail);
     }
 
@@ -56,6 +78,7 @@ public class RelativeEvent extends Event {
 
     @Nullable
     private Time resolve(int offset, Map<Term, Time> trail) {
+
 
         Event e = t.solve(rel, trail);
         if (e != null) {
@@ -76,6 +99,10 @@ public class RelativeEvent extends Event {
         } else {
             return term + "@" + ITemporalize.timeStr(start) + "->" + rel;
         }
+    }
+
+    public boolean self() {
+        return self;
     }
 
     public boolean inverts() {

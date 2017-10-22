@@ -227,23 +227,21 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         float x, y;
 
 
-        if (e != null && !e.isConsumed()) {
+        if (e != null) {
 
             //screen coordinates
             float sx = e.getX();
-            float sy = window.getHeight() - e.getY();
+            float sy = H - e.getY();
 
-            wmx = +cam.x + (sx/W) * scale.x;
-            wmy = +cam.y + (sy/H) * scale.y;
-
+            wmx = +cam.x + (-0.5f*W + sx)/scale.x;
+            wmy = +cam.y + (-0.5f*H + sy)/scale.x;
 
             updateMouse(e, sx, sy, buttonsDown);
             return true;
 
         } else {
 
-            x = y = Float.NaN;
-            updateMouse(null, x, y, null);
+            updateMouse(null, wmx, wmy, null);
 
             return false;
         }
@@ -280,10 +278,10 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
 
 
         float sx = scale.x;
-        float sy = scale.y;
-        //gl.glTranslatef(W / 2, H / 2, 0);
-        gl.glScalef(sx, sy, 1);
-        gl.glTranslatef(-cam.x/sx, -cam.y/sy, 0);
+        //float sy = scale.y;
+        gl.glTranslatef(W / 2, H / 2, 0);
+        gl.glScalef(sx, sx, 1);
+        gl.glTranslatef(-cam.x, -cam.y, 0);
         //gl.glTranslatef((sx) * -cam.x, sy * -cam.y, 0);
 
         surface.render(gl);
@@ -291,13 +289,11 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
 
     private void resized() {
         if (window != null) {
-            //TODO resize preserving aspect, translation, etc
             W = window.getWidth();
             H = window.getHeight();
             //pos(0, 0, );
             surface.pos(0, 0, W, H);
 
-            //int S = Math.min(W, H);
             scale.set(1, 1);
             cam.set(0, 0);
 

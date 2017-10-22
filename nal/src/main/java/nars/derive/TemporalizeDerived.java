@@ -14,12 +14,13 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.Subst;
 import nars.term.transform.Retemporalize;
-import org.jetbrains.annotations.NotNull;
+import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static nars.Op.CONJ;
 import static nars.Op.IMPL;
@@ -50,6 +51,8 @@ public class TemporalizeDerived extends Temporalize {
 
     protected static final boolean knowTransformed = true;
 
+    final HashMap trail = new LinkedHashMap();
+
     /**
      * constraints specific for specific double premise derivations
      */
@@ -65,10 +68,10 @@ public class TemporalizeDerived extends Temporalize {
         long taskStart = task.start();
         long taskEnd = task.end();
 
-        if (taskStart == ETERNAL && task.isGoal() && belief!=null && !belief.isEternal()) {
-            //apply this as a temporal goal task at the present time, since present time does occur within the eternal task
-            taskStart = taskEnd = d.time;
-        }
+//        if (taskStart == ETERNAL && task.isGoal() && belief!=null && !belief.isEternal()) {
+//            //apply this as a temporal goal task at the present time, since present time does occur within the eternal task
+//            taskStart = taskEnd = d.time;
+//        }
 
         knowDerivedAbsolute(d,
                 polarizedTaskTerm(task),
@@ -91,9 +94,11 @@ public class TemporalizeDerived extends Temporalize {
 
             long beliefStart = belief.start();
             long beliefEnd = belief.end();
-//            if (belief.op().temporal && taskStart!=ETERNAL) {
-//                beliefStart = beliefEnd = ETERNAL; //pretend as if belief is eternal, allowing task to override the result determination
-//            }
+
+            if (belief.op().temporal && taskStart != ETERNAL) {
+                beliefStart = beliefEnd = ETERNAL; //pretend as if belief is eternal, allowing task to override the result determination
+            }
+
             knowDerivedAbsolute(d,
                     polarizedTaskTerm(belief),
                     beliefStart, beliefEnd); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
@@ -108,15 +113,16 @@ public class TemporalizeDerived extends Temporalize {
      * negate if negated, for precision in discriminating positive/negative
      */
     static Term polarizedTaskTerm(Task t) {
-        return t.term().negIf(t.truth() != null && t.truth().isNegative());
+        Truth tt = t.truth();
+        return t.term().negIf(tt != null && tt.isNegative());
     }
 
     void knowDerivedAmbient(TermContext d, Term x) {
         knowAmbient(x);
         if (knowTransformed) {
             Term y = //x.transform(d);
-                x.eval(d);
-            if (y != null && !y.equals(x) && !(y instanceof Bool))
+                    x.eval(d);
+            if (!y.equals(x) && y.op().conceptualizable)
                 knowAmbient(y);
         }
     }
@@ -132,7 +138,7 @@ public class TemporalizeDerived extends Temporalize {
 
         if (knowTransformed) {
             Term y = //x.transform(d);
-                x.eval(d);
+                    x.eval(d);
             if (y != null && !y.equals(x) && !(y instanceof Bool)) {
                 knowAbsolute(y, start, end);
             }
@@ -147,21 +153,30 @@ public class TemporalizeDerived extends Temporalize {
             $.$safe("InductionPN"), $.$safe("InductionNN"));
 
     @Nullable
-    public Term solve(Conclusion c, @NotNull Derivation d, Term pattern) {
+    public Term solve(Conclusion c, Derivation d, Term pattern) {
 
         long[] occ = d.concOcc;
 
         Task belief;
+        Term tt = task.term();
         if (d.single) {
             belief = null;
             constraints = sng;
+
+            if (!tt.isTemporal()) {
+                //simple case
+                d.concOcc[0] = task.start();
+                d.concOcc[1] = task.end();
+                return pattern;
+            }
+
         } else {
             belief = this.belief;
             constraints = dbl;
 
             //HACK HACK HACK special case: a repeat in temporal induction
             Op po = pattern.op();
-            Term tt = task.term().unneg();
+
             if (po.temporal && !task.isEternal() && !belief.isEternal() && belief.term().unneg().equals(tt)) {
                 if (/*((po == CONJ || po == IMPL) && */pattern.subs() == 2) {
                     Term p0 = pattern.sub(0).unneg();
@@ -192,12 +207,29 @@ public class TemporalizeDerived extends Temporalize {
                 }
             }
 
+
         }
 
-        Map<Term, Time> trail = new HashMap<>();
+        Map<Term, Time> trail = this.trail;
+        this.trail.clear();
+
         Event e;
         try {
-            e = solve(pattern, trail);
+
+            Predicate<Time> filter;
+            if (task.term().equals(pattern)) {
+                filter = (t) -> {
+                    return t.abs() != task.start(); //find an event which differs from the that time
+                };
+            } else if (belief!=null && belief.term().equals(pattern)) {
+                filter = (t) -> {
+                    return t.abs() != belief.start(); //find an event which differs from the that time
+                };
+            } else {
+                filter = t -> true;
+            }
+
+            e = solve(pattern, trail, filter);
             if (e == null) {
                 return null;
             }
@@ -244,14 +276,25 @@ public class TemporalizeDerived extends Temporalize {
 
             } else if (te) {
                 //TODO maybe this should be 'now'
-                occ[0] = belief.start();
-                occ[1] = belief.end();
+                //occ[0] = belief.start();
+                //occ[1] = belief.end();
+                occ[0] = occ[1] = d.time;
             } else /*if (be)*/ {
                 occ[0] = occ[1] = task.start(); //TODO any duration?
             }
 
         }
 
+        if (occ[0]!=ETERNAL && occ[1] < occ[0]) {
+            if (occ[1] == ETERNAL) {
+                occ[1] = occ[0];
+            } else {
+                //HACK swap for order
+                long t = occ[0];
+                occ[0] = occ[1];
+                occ[1] = t;
+            }
+        }
 
         return e.term.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
     }

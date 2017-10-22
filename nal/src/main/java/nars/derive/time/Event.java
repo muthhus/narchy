@@ -72,30 +72,11 @@ public abstract class Event implements Comparable<Event> {
                 if (THAT.inverts() && !THIS.inverts())
                     return -1;
 
-                Term x = THIS.rel.term();
-                Term y = THAT.rel.term();
 
-                if (x.equals(y)) {
-                    int c1 = Integer.compare(THIS.start, THAT.start);
-                    if (c1 != 0)
-                        return c1;
-                    return Integer.compare(THIS.end, THAT.end);
-                } else {
+                return compareTermStartEnd(
+                        THIS.rel.term(), THIS.start, THIS.end,
+                        THAT.rel.term(), THAT.start, THAT.end);
 
-//                    float xs = t.score(x);
-//                    float ys = t.score(y);
-//                    if (xs != ys) {
-//                        return Float.compare(ys, xs);
-//                    } else {
-                    //prefer larger complexity (variables arent helpful)
-                    int xv = x.complexity();
-                    int yv = y.complexity();
-                    if (xv == yv)
-                        return x.compareTo(y);
-                    else
-                        return Integer.compare(yv, xv);
-                    //         }
-                }
 
             } else if (this instanceof AbsoluteEvent) {
                 AbsoluteEvent THIS = (AbsoluteEvent) this;
@@ -104,14 +85,12 @@ public abstract class Event implements Comparable<Event> {
                 long sThat = THAT.start;
 
                 //eternal should be ranked lower
-                if (sThis == ETERNAL) return +1;
-                if (sThat == ETERNAL) return -1;
+                if (sThis == ETERNAL && sThat != ETERNAL) return +1;
+                if (sThat == ETERNAL && sThis != ETERNAL) return -1;
 
-                int cs = Long.compare(sThis, sThat);
-
-                if (cs != 0)
-                    return cs;
-                return Long.compare(THIS.end, THAT.end);
+                return compareTermStartEnd(
+                        THIS.term, THIS.start, THIS.end,
+                        THAT.term, THAT.start, THAT.end);
 
             }
 
@@ -134,6 +113,31 @@ public abstract class Event implements Comparable<Event> {
         }
 
         return +1;
+    }
+
+    static int compareTermStartEnd(Term x, long xstart, long xend, Term y, long ystart, long yend) {
+
+        if (x.equals(y)) {
+            int c1 = Long.compare(xstart, ystart);
+            if (c1 != 0)
+                return c1;
+            return Long.compare(xend, yend);
+        } else {
+
+//                    float xs = t.score(x);
+//                    float ys = t.score(y);
+//                    if (xs != ys) {
+//                        return Float.compare(ys, xs);
+//                    } else {
+            //prefer larger complexity (variables arent helpful)
+            int xv = x.complexity();
+            int yv = y.complexity();
+            if (xv == yv)
+                return x.compareTo(y);
+            else
+                return Integer.compare(yv, xv);
+            //         }
+        }
     }
 
     public static String str(Term term, long start, long end) {

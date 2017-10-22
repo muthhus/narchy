@@ -353,7 +353,10 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
                 long dist = Math.abs(when - touched);
                 if (dist > 0) {
-                    assert (dur > 0);
+                    if (dur <= 0) {
+                        System.err.println("dur=0");
+                    }
+                    assert (dur > 0): "dur=0";
 
                     float ete = eternalizable();
                     float ecw = ete > 0 ? this.eviEternalized() * ete : 0;

@@ -54,7 +54,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        Param.DEBUG = true;
         //Param.TRACE = true;
         NAR n = NARS.threadSafe();
-        float fps = 16f;
+        float fps = 2f;
 
         //csvPriority(n, "/tmp/x.csv");
 
@@ -121,11 +121,11 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         //n.run(600);
         n.log();
         n.input(
-//                "(a-->b).", "(b-->c).","(c-->d)."
-//                ,"(d-->e).","(e-->a)."
+                "(a-->b).", "(b-->c).","(c-->d)."
+                ,"(d-->e).","(e-->a)."
 
-                "{a,b}.", "{b,c}.","{c,d}."
-                ,"{d,e}.","{e,a}.", "(a,b,c,b)! :|:"
+//                "{a,b}.", "{b,c}.","{c,d}."
+//                ,"{d,e}.","{e,a}.", "(a,b,c,b)! :|:"
 
                 //,"(a &&+1 b). :|:"
 

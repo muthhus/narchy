@@ -1,24 +1,24 @@
 package jcog.tree.rtree;
 
-/*
- * #%L
- * Conversant RTree
- * ~~
- * Conversantmedia.com © 2016, Conversant, Inc. Conversant® is a trademark of Conversant, Inc.
- * ~~
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
+        /*
+         * #%L
+         * Conversant RTree
+         * ~~
+         * Conversantmedia.com © 2016, Conversant, Inc. Conversant® is a trademark of Conversant, Inc.
+         * ~~
+         * Licensed under the Apache License, Version 2.0 (the "License");
+         * you may not use this file except in compliance with the License.
+         * You may obtain a copy of the License at
+         *
+         *      http://www.apache.org/licenses/LICENSE-2.0
+         *
+         * Unless required by applicable law or agreed to in writing, software
+         * distributed under the License is distributed on an "AS IS" BASIS,
+         * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+         * See the License for the specific language governing permissions and
+         * limitations under the License.
+         * #L%
+         */
 
 
 import java.util.function.Function;
@@ -101,7 +101,7 @@ public interface HyperRegion<X> {
 
 
     default double center(int d) {
-        return (coord(true, d) + coord(false, d))/2.0;
+        return (coord(true, d) + coord(false, d)) / 2.0;
     }
 
     /**
@@ -116,7 +116,12 @@ public interface HyperRegion<X> {
 
     default double rangeIfFinite(int dim, double elseValue) {
         double r = range(dim);
-        return !Double.isFinite(r) ? elseValue : r;
+        if (!Double.isFinite(r)) {
+            return elseValue;
+        } else {
+            assert (r >= 0);
+            return r;
+        }
     }
 
 
@@ -152,7 +157,6 @@ public interface HyperRegion<X> {
                 return false;
         return true;
     }
-
 
 
     /**
@@ -200,7 +204,6 @@ public interface HyperRegion<X> {
                 coord(maxOrMin, dim) - X.coord(XmaxOrMin, dim)
         );
     }
-
 
 
 //    @JsonIgnore  default double getRangeMin() {

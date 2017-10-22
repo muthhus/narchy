@@ -591,8 +591,10 @@ public class Revision {
 
                 for (Term[] xy : ab.values()) {
                     if (xy[0] != null && xy[1] != null) {
-                        if (!xy[0].equals(xy[1]))
-                            d += dtDiff(xy[0], xy[1], depth + 1);
+                        if (!xy[0].equals(xy[1])) {
+                            if (!((!xy[0].equals(a) && !xy[1].equals(b)) || (!xy[1].equals(a) && !xy[0].equals(b)))) //for prevneting an infinite recursion here that i dont understand yet
+                                d += dtDiff(xy[0], xy[1], depth + 1);
+                        }
                     } //else ?
                 }
             }

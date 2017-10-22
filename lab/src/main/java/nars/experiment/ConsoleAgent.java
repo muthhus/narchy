@@ -73,7 +73,7 @@ public abstract class ConsoleAgent extends NAgentX {
         W = new TestConsole(
                 nar.self(),
                 true,
-                R.w(), R.h()).write('a', 'b', ' ');
+                R.W(), R.H()).write('a', 'b', ' ');
 
         //SpaceGraph.window(new VSplit(Rlabel, R, 0.1f), 800, 600);
         //SpaceGraph.window(new VSplit(label("context"), Rlabel, 0.1f), 800, 600);
@@ -240,6 +240,11 @@ public abstract class ConsoleAgent extends NAgentX {
             return c;
         }
 
+        @Override
+        protected void paintComponent(GL2 gl) {
+
+        }
+
 
         //final TextCharacter space = new TextCharacter(' ');
 
@@ -361,11 +366,11 @@ public abstract class ConsoleAgent extends NAgentX {
 
         }
 
-        public int h() {
+        public int H() {
             return chars[0].length;
         }
 
-        public int w() {
+        public int W() {
             return cols();
         }
 

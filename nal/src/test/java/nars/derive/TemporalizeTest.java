@@ -25,6 +25,21 @@ public class TemporalizeTest {
     final NAR n = NARS.shell();
 
     @Test
+    public void testAmbientEquivalence() {
+        Temporalize t = new Temporalize();
+        t.knowAmbient($.the("x"));
+        t.knowAmbient($.the("x"));
+        assertEquals(1, t.constraints.get($.the("x")).size());
+    }
+    @Test
+    public void testAmbientInequivalence() {
+        Temporalize t = new Temporalize();
+        t.knowAmbient($.the("(x ==>+1 y)"));
+        t.knowAmbient($.the("(x ==>+2 y)"));
+        assertEquals(2, t.constraints.get($.the("(x==>y)")).size());
+    }
+
+    @Test
     public void testAbsoluteRanking() {
         Temporalize t = new Temporalize();
 

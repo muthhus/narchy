@@ -109,6 +109,10 @@ public class Operator extends BaseConcept implements PermanentConcept {
          */
         final AtomicLong rise = new AtomicLong(ETERNAL);
 
+        /** how many durations before the current time in which a goal remains active in the present */
+        final static int pastDurs = 1;
+        final static int presentDurs = 1;
+
         long lastActivity = ETERNAL;
         public static final Logger logger = LoggerFactory.getLogger(AtomicExec.class);
 
@@ -129,14 +133,17 @@ public class Operator extends BaseConcept implements PermanentConcept {
 
             long now = n.time();
             int dur = n.dur();
-            int cycleRadiusToWatch = dur;
-            if (!x.isBefore(now)) {
+            if (!x.isBefore(now - pastDurs * dur)) {
                 long xs = x.start();
-                if (xs ==now) {
+                if (xs <= now + presentDurs*dur) {
                     return tryInvoke(x, n);
                 } else {
+                    //schedule for future execution
                     n.at(xs, ()->tryInvoke(x, n));
                 }
+            } else {
+                //too early
+                System.err.println(x + " too early");
             }
 
             return x;

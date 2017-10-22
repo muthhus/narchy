@@ -14,13 +14,10 @@ import spacegraph.render.JoglPhysics;
 import spacegraph.render.JoglSpace;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
-import spacegraph.widget.button.PushButton;
-import spacegraph.widget.slider.FloatSlider;
+import spacegraph.widget.Label;
 
 import java.util.List;
 import java.util.function.Consumer;
-
-import static spacegraph.layout.Grid.row;
 
 abstract public class TermWidget<T extends Termed> extends Cuboid<T> {
 
@@ -31,8 +28,8 @@ abstract public class TermWidget<T extends Termed> extends Cuboid<T> {
 
         setFront(
             //col(
-                //new Label(x.toString())
-                row(new FloatSlider( 0, 0, 4 ), new PushButton("x"))
+                new Label(x.toString())
+                //row(new FloatSlider( 0, 0, 4 ), new PushButton("x"))
                         //, new BeliefTableChart(nar, x))
                     //new CheckBox("?")
             //)

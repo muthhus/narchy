@@ -181,64 +181,64 @@ public class Try extends AbstractPred<Derivation> {
 
     private static final boolean KEY = true;
     private static final boolean VAL = false;
-
-    /**
-     * set
-     */
-    private static void s2(short[] s, int i, boolean firstOrSecond, short newValue) {
-        s[i * 2 + (firstOrSecond ? 0 : 1)] = newValue;
-    }
-
-    private static void bingoSortPairwise(short[] A, int[] range) {
-        /*
-        https://en.wikipedia.org/wiki/Selection_sort
-        In the bingo sort variant, items are ordered by repeatedly
-        looking through the remaining items to find the greatest
-        value and moving all items with that value to their final location.
-        [2] Like counting sort, this is an efficient variant if
-        there are many duplicate values.
-        Indeed, selection sort does one pass through
-        the remaining items for each item moved.
-        Bingo sort does one pass for each value (not item):
-        after an initial pass to find the biggest value,
-        the next passes can move every item with that value to
-        its final location while finding the next value
-*/
-//{ This procedure sorts in ascending order. }
-        int max = (A.length - 1) / 2;
-
-    /* The first iteration is written to look very similar to the subsequent ones, but
-      without swaps. */
-        short vm = g2(A, max, VAL); //   nextValue := A[max];
-        for (int i = max - 1; i >= 0; i--) { //    for i := max - 1 downto 0 do
-            short vi;
-            if ((vi = g2(A, i, VAL)) > vm) //        if A[i] > nextValue then
-                vm = vi;
-        }
-        range[1] = vm;
-        while (max >= 0 && g2(A, max, VAL) == vm) max--;
-        while (max >= 0) { //    while max > 0 do begin
-            float value = vm;
-            vm = g2(A, max, VAL);
-            for (int i = max - 1; i >= 0; i--) {  //for i:=max - 1 downto 0 do
-                short vi = g2(A, i, VAL);
-                if (vi == value) {
-                    //swap(A[i], A[max]);
-                    short ki = g2(A, i, KEY);
-                    short km = g2(A, max, KEY);
-                    s2(A, i, KEY, km);
-                    s2(A, i, VAL, vm);
-                    s2(A, max, KEY, ki);
-                    s2(A, max, VAL, vi);
-                    max--;
-                } else if (vi > vm)
-                    vm = vi;
-            }
-            while (max >= 0 && g2(A, max, VAL) == vm)
-                max--;
-        }
-        range[0] = g2(A, 0, VAL);
-
-    }
+//
+//    /**
+//     * set
+//     */
+//    private static void s2(short[] s, int i, boolean firstOrSecond, short newValue) {
+//        s[i * 2 + (firstOrSecond ? 0 : 1)] = newValue;
+//    }
+//
+//    private static void bingoSortPairwise(short[] A, int[] range) {
+//        /*
+//        https://en.wikipedia.org/wiki/Selection_sort
+//        In the bingo sort variant, items are ordered by repeatedly
+//        looking through the remaining items to find the greatest
+//        value and moving all items with that value to their final location.
+//        [2] Like counting sort, this is an efficient variant if
+//        there are many duplicate values.
+//        Indeed, selection sort does one pass through
+//        the remaining items for each item moved.
+//        Bingo sort does one pass for each value (not item):
+//        after an initial pass to find the biggest value,
+//        the next passes can move every item with that value to
+//        its final location while finding the next value
+//*/
+////{ This procedure sorts in ascending order. }
+//        int max = (A.length - 1) / 2;
+//
+//    /* The first iteration is written to look very similar to the subsequent ones, but
+//      without swaps. */
+//        short vm = g2(A, max, VAL); //   nextValue := A[max];
+//        for (int i = max - 1; i >= 0; i--) { //    for i := max - 1 downto 0 do
+//            short vi;
+//            if ((vi = g2(A, i, VAL)) > vm) //        if A[i] > nextValue then
+//                vm = vi;
+//        }
+//        range[1] = vm;
+//        while (max >= 0 && g2(A, max, VAL) == vm) max--;
+//        while (max >= 0) { //    while max > 0 do begin
+//            float value = vm;
+//            vm = g2(A, max, VAL);
+//            for (int i = max - 1; i >= 0; i--) {  //for i:=max - 1 downto 0 do
+//                short vi = g2(A, i, VAL);
+//                if (vi == value) {
+//                    //swap(A[i], A[max]);
+//                    short ki = g2(A, i, KEY);
+//                    short km = g2(A, max, KEY);
+//                    s2(A, i, KEY, km);
+//                    s2(A, i, VAL, vm);
+//                    s2(A, max, KEY, ki);
+//                    s2(A, max, VAL, vi);
+//                    max--;
+//                } else if (vi > vm)
+//                    vm = vi;
+//            }
+//            while (max >= 0 && g2(A, max, VAL) == vm)
+//                max--;
+//        }
+//        range[0] = g2(A, 0, VAL);
+//
+//    }
 }
 

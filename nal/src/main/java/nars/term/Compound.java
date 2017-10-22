@@ -761,10 +761,9 @@ public interface Compound extends Term, IPair, TermContainer {
         for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
             Term xi = xy[i];
             Term yi = xi.evalSafe(context, remain);
-            /*if (yi == null) {
+            if (yi == null) {
                 return Null;
-            } else */
-            if (xi != yi && (!xi.equals(yi) || yi.getClass() != xi.getClass())) {
+            } else if (xi != yi && (!xi.equals(yi) || yi.getClass() != xi.getClass())) {
                 if (!changed) {
                     xy = toArray(); //begin clone copy
                     changed = true;

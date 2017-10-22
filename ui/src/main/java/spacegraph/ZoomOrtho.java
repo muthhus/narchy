@@ -84,15 +84,6 @@ public class ZoomOrtho extends Ortho {
         //window.window.setUndecorated(true);
     }
 
-    public float cw() {
-        AnimVector2f s = (AnimVector2f) this.scale;
-        return (ZoomOrtho.this.window.getWidth() / s.targetX());
-    }
-
-    public float ch() {
-        AnimVector2f s = (AnimVector2f) this.scale;
-        return (ZoomOrtho.this.window.getHeight() / s.targetY());
-    }
 
 //    public float cx() {
 //        AnimVector2f s = (AnimVector2f) this.scale;

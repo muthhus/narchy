@@ -179,7 +179,10 @@ public class Plot2D extends Surface {
 
     @Override
     protected void paint(GL2 gl) {
+        Draw.bounds(gl, 0, 0, w(), h(), this::paintUnit);
+    }
 
+    protected void paintUnit(GL2 gl) {
 
         List<Series> series = this.series;
 

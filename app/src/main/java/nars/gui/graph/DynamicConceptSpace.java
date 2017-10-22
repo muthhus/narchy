@@ -171,10 +171,6 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
             });
 
             edges.commit(ee -> {
-//                e.update(termlinkOpac, tasklinkOpac);
-//                e.decay(0.95f);
-//                e.priMult(0.95f);
-
                 ConceptWidget src = ee.src;
                 if (ee.tgt.active()) {
                     src.currentEdges.write().computeIfAbsent(ee.tgt.id, (t) ->

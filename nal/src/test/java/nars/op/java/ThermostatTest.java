@@ -46,6 +46,8 @@ public class ThermostatTest {
 
         this.x = objs.the("x", MutableInteger.class, 0);
 
+        n.time.dur(4);
+
         for (int i = 0; i < 10; i++) {
             x.set(0);
             n.run(1);
@@ -65,7 +67,7 @@ public class ThermostatTest {
         x.set(0);
         n.run(1);
 
-        n.time.dur(10);
+
         n.truthResolution.set(0.05f);
         n.termVolumeMax.set(28);
 
