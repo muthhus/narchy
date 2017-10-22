@@ -17,37 +17,24 @@ import java.util.function.Consumer;
 /**
  * Created by me on 7/20/16.
  */
-public class Layout extends Surface {
+abstract public class Layout extends Surface {
 
     final AtomicBoolean mustLayout = new AtomicBoolean(true);
 
-    public final CopyOnWriteArrayList<Surface> children = new Children();
-
     protected boolean clipTouchBounds = true;
-
-    public Layout(Surface... children) {
-        super();
-        set(children);
-    }
-
-    public Layout(List<Surface> children) {
-        set(children);
-    }
 
 
     public final void layout() {
         mustLayout.set(true);
     }
 
-    public void doLayout() {
-        children.forEach(Surface::layout);
-    }
+    abstract protected void doLayout();
 
     @Override
     public void print(PrintStream out, int indent) {
         super.print(out, indent);
 
-        children.forEach(c -> {
+        forEach(c -> {
             out.print(Texts.repeat("  ", indent + 1));
             c.print(out, indent + 1);
         });
@@ -61,42 +48,7 @@ public class Layout extends Surface {
             doLayout();
         }
 
-        List<? extends Surface> cc = children;
-        for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
-            cc.get(i).render(gl);
-        }
-
-    }
-
-
-    public final Layout set(Surface... next) {
-        if (!equals(this.children, next)) {
-            synchronized (mustLayout) {
-                children.clear();
-                for (Surface c : next) {
-                    if (c != null)
-                        children.add(c);
-                }
-            }
-        }
-        return this;
-    }
-
-    public Layout set(List<Surface> next) {
-        if (!equals(this.children, next)) {
-            synchronized (mustLayout) {
-                children.clear();
-                children.addAll(next);
-            }
-        }
-        return this;
-    }
-
-
-    @Override
-    public void stop() {
-        children.clear();
-        super.stop();
+        forEach(c -> c.render(gl));
     }
 
 
@@ -107,24 +59,22 @@ public class Layout extends Surface {
             return x;
 
         //2. test children reaction
-        List<Surface> cc = this.children;
+
 
         // Draw forward, propagate touch events backwards
         if (hitPoint == null) {
-            for (int i = cc.size() - 1; i >= 0; i--) {
-                cc.get(i).onTouch(finger, null, null);
-            }
+            forEach(c -> c.onTouch(finger, null, null));
             return null;
         } else {
 
-            for (int i = cc.size() - 1; i >= 0; i--) {
-                Surface c = cc.get(i);
-
+            //HACK
+            final Surface[] found = {null};
+            forEach(c -> {
                 //TODO factor in the scale if different from 1
                 float csx = c.w();
                 float csy = c.h();
                 if (/*csx != csx || */csx <= 0 || /*csy != csy ||*/ csy <= 0)
-                    continue;
+                    return;
 
                 //project to child's space
                 v2 relativeHit = new v2(finger.hit);
@@ -138,11 +88,16 @@ public class Layout extends Surface {
                     //subHit.add(c.translateLocal.x*csx, c.translateLocal.y*csy);
 
                     Surface s = c.onTouch(finger, relativeHit, buttons);
-
-                    if (s != null)
-                        return s; //FIFO
+                    if (s != null) {
+                        if (found[0]==null || found[0].bounds.cost() < s.bounds.cost())
+                            found[0] = s; //FIFO
+                    }
                 }
-            }
+
+            });
+
+            if ((found[0])!=null)
+                return found[0];
         }
 
         return this;
@@ -151,11 +106,7 @@ public class Layout extends Surface {
     @Override
     public boolean onKey(KeyEvent e, boolean pressed) {
         if (!super.onKey(e, pressed)) {
-
-            for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
-                if (children.get(i).onKey(e, pressed))
-                    return true;
-            }
+            forEach(c -> c.onKey(e, pressed));
         }
         return false;
     }
@@ -163,19 +114,12 @@ public class Layout extends Surface {
     @Override
     public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
         if (!super.onKey(hitPoint, charCode, pressed)) {
-
-            List<Surface> cc = this.children;
-            for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
-                if (cc.get(i).onKey(hitPoint, charCode, pressed))
-                    return true;
-            }
+            forEach(c -> onKey(hitPoint, charCode, pressed));
         }
         return false;
     }
 
-    public void forEach(Consumer<Surface> o) {
-        children.forEach(o);
-    }
+    abstract public void forEach(Consumer<Surface> o);
 
     /**
      * identity compare
@@ -203,97 +147,4 @@ public class Layout extends Surface {
         return true;
     }
 
-    private class Children extends CopyOnWriteArrayList<Surface> {
-        @Override
-        public boolean add(Surface surface) {
-            synchronized (mustLayout) {
-                if (!super.add(surface)) {
-                    return false;
-                }
-                if (surface != null) {
-                    surface.start(Layout.this);
-                    layout();
-                }
-            }
-            return true;
-        }
-
-        @Override
-        public Surface set(int index, Surface neww) {
-            Surface old;
-            synchronized (mustLayout) {
-                while (size() <= index) {
-                    add(null);
-                }
-                old = super.set(index, neww);
-                if (old == neww)
-                    return neww;
-                else {
-                    if (old != null) {
-                        old.stop();
-                    }
-                    if (neww != null) {
-                        neww.start(Layout.this);
-                    }
-                }
-            }
-            layout();
-            return old;
-        }
-
-        @Override
-        public boolean addAll(Collection<? extends Surface> c) {
-            synchronized (mustLayout) {
-                for (Surface s : c)
-                    add(s);
-            }
-            layout();
-            return true;
-        }
-
-        @Override
-        public Surface remove(int index) {
-            Surface x;
-            synchronized (mustLayout) {
-                x = super.remove(index);
-                if (x == null)
-                    return null;
-                x.stop();
-            }
-            layout();
-            return x;
-        }
-
-        @Override
-        public boolean remove(Object o) {
-            synchronized (mustLayout) {
-                if (!super.remove(o))
-                    return false;
-                ((Surface) o).stop();
-            }
-            layout();
-            return true;
-        }
-
-
-        @Override
-        public void add(int index, Surface element) {
-            synchronized (mustLayout) {
-                super.add(index, element);
-                element.start(Layout.this);
-            }
-            layout();
-        }
-
-        @Override
-        public void clear() {
-            synchronized (mustLayout) {
-                this.removeIf(x -> {
-                    x.stop();
-                    return true;
-                });
-            }
-            layout();
-        }
-    }
 }

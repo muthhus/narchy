@@ -44,7 +44,7 @@ public class Label extends Surface {
         this.value = newValue;
 
         int len = newValue.length();
-        this.aspect = 1.6f / (len);
+//        this.aspect = 1.6f / (len);
         this.fontScale = 1f / len;
     }
 

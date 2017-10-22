@@ -36,6 +36,7 @@ import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.AspectAlign;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
@@ -688,8 +689,8 @@ abstract public class NAgentX extends NAgent {
 
                     a instanceof NAgentX ?
                             new WindowButton("vision", () -> grid(((NAgentX) a).cam.stream().map(cs ->
-                                    new CameraSensorView(cs, a).align(Surface.Align.Center, cs.width, cs.height))
-                                    .toArray(Surface[]::new))
+                                    new AspectAlign(new CameraSensorView(cs, a), Surface.Align.Center, cs.width, cs.height))
+                                .toArray(Surface[]::new))
                             ) : grid()
 
 //                    grid(

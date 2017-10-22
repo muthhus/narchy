@@ -287,8 +287,6 @@ public class ZoomOrtho extends Ortho {
         final CurveBag<PLink> notifications = new CurveBag(PriMerge.plus, new ConcurrentHashMap(), new XorShift128PlusRandom(1));
 
         {
-            align = None;
-            aspect = 1f;
             notifications.setCapacity(8);
             notifications.putAsync(new PLink("ready", 0.5f));
         }

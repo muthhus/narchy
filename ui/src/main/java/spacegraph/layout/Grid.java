@@ -17,7 +17,7 @@ import static jcog.Util.lerp;
     aspect ratio=+inf: col (x)
                  else: grid( %x, %(ratio * x) )
  */
-public class Grid extends Layout {
+public class Grid extends MutableLayout {
 
 
     public static final float HORIZONTAL = 0f;
@@ -107,9 +107,9 @@ public class Grid extends Layout {
             assert(y*x >= s);
 
             if (y==1) {
-                a = Float.POSITIVE_INFINITY; //column
-            } else if (x == 1) {
                 a = 0; //row
+            } else if (x == 1) {
+                a = Float.POSITIVE_INFINITY; //column
             } else {
                 layoutGrid(x, y, margin);
                 return;

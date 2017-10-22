@@ -5,7 +5,7 @@ import spacegraph.Surface;
 /**
  * Splits a surface into a top and bottom vertical column
  */
-public class VSplit<X extends Surface, Y extends Surface> extends Layout {
+public class VSplit<X extends Surface, Y extends Surface> extends MutableLayout {
 
     public float split; //0.5f = middle, 0.0 = all top, 1.0 = all bottom
 

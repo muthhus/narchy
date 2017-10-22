@@ -6,27 +6,33 @@ import jcog.Texts;
 import jcog.tree.rtree.rect.RectFloat2D;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
-import spacegraph.layout.Stacking;
+import spacegraph.layout.Layout;
 import spacegraph.math.v2;
 
 import java.io.PrintStream;
+import java.util.function.Consumer;
+
+import static spacegraph.Surface.Align.Center;
 
 /**
  * planar subspace.
  * (fractal) 2D Surface embedded relative to a parent 2D surface or 3D space
  */
-abstract public class Surface  {
+abstract public class Surface {
 
 
     public float x() {
         return bounds.min.x;
     }
+
     public float y() {
         return bounds.min.y;
     }
+
     public float cx() {
         return 0.5f * (bounds.min.x + bounds.max.x);
     }
+
     public float cy() {
         return 0.5f * (bounds.min.y + bounds.max.y);
     }
@@ -67,22 +73,13 @@ abstract public class Surface  {
     }
 
 
-    /** scale can remain the unit 1 vector, normally */
-    public v2 scale = new v2(1,1); //v2.ONE;
+    /**
+     * scale can remain the unit 1 vector, normally
+     */
+    public v2 scale = new v2(1, 1); //v2.ONE;
     public RectFloat2D bounds;
     public Surface parent;
 
-
-
-    /**
-     * not used unless aspect ratio is set to non-NaN value
-     */
-    protected Align align = Align.Center;
-
-    /**
-     * height/width target aspect ratio; if aspect is NaN, no adjustment applied
-     */
-    protected float aspect = Float.NaN;
 
     public Surface() {
         bounds = RectFloat2D.Unit;
@@ -95,29 +92,18 @@ abstract public class Surface  {
         return parent.root();
     }
 
-    public Surface align(Align align) {
-        this.align = align;
-        return this;
-    }
 
-    public Surface align(Align align, float aspect) {
-        this.aspect = aspect;
-        return align(align);
-    }
-
-    public Surface align(Align align, float width, float height) {
-        return align(align, height / width);
-    }
-
-    /** null parent means it is the root surface */
+    /**
+     * null parent means it is the root surface
+     */
     public void start(@Nullable Surface parent) {
-        synchronized(this) {
+        synchronized (this) {
             this.parent = parent;
         }
     }
 
     public void stop() {
-        synchronized(this) {
+        synchronized (this) {
             parent = null;
         }
     }
@@ -127,10 +113,10 @@ abstract public class Surface  {
     }
 
 
-
     public float w() {
         return bounds.max.x - bounds.min.x;
     }
+
     public float h() {
         return bounds.max.y - bounds.min.y;
     }
@@ -154,7 +140,8 @@ abstract public class Surface  {
     /**
      * may be overridden to trap events on this surface (returning true), otherwise they pass through to any children
      */
-    @Deprecated protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
+    @Deprecated
+    protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
         return false;
     }
 
@@ -176,53 +163,9 @@ abstract public class Surface  {
         float sx = scale.x;
         if (sx != sx)
             return; //NaN = invisible
-//
-//        v2 scale = this.scale;
-//
-//        float sx, sy;
-//
-//        float aspect = this.aspect;
-//        if (aspect==aspect /* not NaN */) {
-//
-//            if (scale.y/scale.x > aspect) {
-//                //wider, shrink y
-//                sx = scale.x;
-//                sy = scale.y * aspect;
-//            } else {
-//                //taller, shrink x
-//                sx = scale.x / aspect;
-//                sy = scale.y;
-//            }
-//
-//
-//        } else {
-//            //consume entire area, regardless of aspect
-//            sx = scale.x;
-//            sy = scale.y;
-//        }
-//
-//
-//        switch (align) {
-//
-//            //TODO others
-//
-//            case Center:
-//                //HACK TODO figure this out
-//                tx += (1f - (sx/scale.x))/2f;
-//                ty += (1f - (sy/scale.y))/2f;
-//                break;
-//
-//            case None:
-//            default:
-//                break;
-//
-//        }
 
-//        RectFloat2D b = bounds;
-//        float tx = b.min.x, ty = b.min.y;
-        float sy = scale.y;
 
-        gl.glPushMatrix();
+//        gl.glPushMatrix();
 
 //        if (tx!=0 || ty!=0)
 //            gl.glTranslatef(tx, ty,  0);
@@ -230,17 +173,14 @@ abstract public class Surface  {
 //        if (sx!=1 || sy!=1)
 //            gl.glScalef(sx, sy, 1f);
 
-        //gl.glNormal3f(0,0,1);
-
         paint(gl);
 
-        gl.glPopMatrix();
+//        gl.glPopMatrix();
     }
 
 
-
     public static boolean leftButton(short[] buttons) {
-        return buttons!=null && buttons.length == 1 && buttons[0] == 1;
+        return buttons != null && buttons.length == 1 && buttons[0] == 1;
     }
 
 

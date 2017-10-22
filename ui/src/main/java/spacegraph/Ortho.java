@@ -100,7 +100,7 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         throw new UnsupportedOperationException();
     }
 
-    float zoomMargin = 0.1f;
+    float zoomMargin = 0.25f;
 
     @Override
     public synchronized void zoom(float x, float y, float sx, float sy) {

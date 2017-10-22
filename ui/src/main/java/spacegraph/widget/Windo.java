@@ -3,7 +3,7 @@ package spacegraph.widget;
 import com.jogamp.opengl.GL2;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.layout.Layout;
+import spacegraph.layout.MutableLayout;
 import spacegraph.layout.VSplit;
 import spacegraph.math.v2;
 import spacegraph.widget.button.PushButton;
@@ -65,7 +65,7 @@ public class Windo extends Widget {
 //    }
 
     /** anchor region for Windo's to populate */
-    public static class Desktop extends Layout {
+    public static class Desktop extends MutableLayout {
 
         public Desktop(Windo... initial) {
 
