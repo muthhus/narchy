@@ -38,15 +38,19 @@ public class VSplit<X extends Surface, Y extends Surface> extends Layout {
         float x = margin / 2f;
 
         Surface top = top();
+
+        float X = x();
+        float Y = y();
         float h = h();
         float w = w();
+
         if (top != null) {
-            top.pos(0,  0, w, split* h);
+            top.pos(X,  Y, X+w, split* h);
         }
 
         Surface bottom = bottom();
         if (bottom!=null) {
-            top.pos(0,  split * h, w, h);
+            bottom.pos(X,  Y+split * h, X+w, h);
         }
 
     }

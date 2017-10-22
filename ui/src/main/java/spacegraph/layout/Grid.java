@@ -92,7 +92,7 @@ public class Grid extends Layout {
             float actualAspect = h()/ w();
 
             int x;
-            int s = Math.round((float)Math.sqrt(n));
+            int s = (int) Math.floor((float)Math.sqrt(n));
             if (actualAspect/a > 1f) {
                 x = Math.round(lerp((actualAspect)/n, s, 1f));
             } else if (actualAspect/a < 1f) {
@@ -144,6 +144,8 @@ public class Grid extends Layout {
 
         float py = ((ny-1) * dy) + hm;
 
+        float X = x();
+        float Y = y();
         float W = w();
         float H = h();
 
@@ -158,7 +160,7 @@ public class Grid extends Layout {
 
                 float x1 = px * W;
                 float y1 = py * H;
-                c.pos(x1, y1, x1+dxc*W, y1+dyc*H);
+                c.pos(X+x1, Y+y1, X+x1+dxc*W, Y+y1+dyc*H);
                 c.layout();
 
                 px += dx;

@@ -53,7 +53,7 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     @Override
     public void layout() {
         surface.layout();
-        surface.print(System.out, 0);
+        //surface.print(System.out, 0);
     }
 
     @Override
@@ -281,7 +281,7 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         //float sy = scale.y;
         gl.glTranslatef(W / 2, H / 2, 0);
         gl.glScalef(sx, sx, 1);
-        gl.glTranslatef(-cam.x, -cam.y, 0);
+        gl.glTranslatef(-cam.x, -cam.y , 0);
         //gl.glTranslatef((sx) * -cam.x, sy * -cam.y, 0);
 
         surface.render(gl);

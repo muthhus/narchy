@@ -162,10 +162,9 @@ abstract public class Surface  {
 
     public final void render(GL2 gl) {
 
-//        v2 s = this.scale;
-//        float scaleX = s.x;
-//        if (scaleX != scaleX || scaleX <= 0)
-//            return; //invisible
+        float sx = scale.x;
+        if (sx != sx)
+            return; //NaN = invisible
 //
 //        v2 scale = this.scale;
 //
@@ -210,7 +209,7 @@ abstract public class Surface  {
 
 //        RectFloat2D b = bounds;
 //        float tx = b.min.x, ty = b.min.y;
-        float sx = scale.x, sy = scale.y;
+        float sy = scale.y;
 
         gl.glPushMatrix();
 
