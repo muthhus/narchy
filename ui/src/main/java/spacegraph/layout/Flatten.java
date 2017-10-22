@@ -1,5 +1,6 @@
 package spacegraph.layout;
 
+import com.jogamp.opengl.math.Quaternion;
 import spacegraph.*;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
@@ -14,8 +15,8 @@ import static spacegraph.math.v3.v;
  */
 public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
 
-    private final Quat4f up = Quat4f.angle(0,0,1,0);
-    private final Quat4f tmp = new Quat4f();
+    private final Quaternion up = new Quaternion().setFromAngleNormalAxis(0, new float[] { 0,0,1});
+
 
     private final float zTolerance = 0.05f;
 
@@ -47,7 +48,7 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
             if (Math.abs(tz) > zTolerance) {
                 b.impulse(v( 0, 0, -tz*zSpeed*b.mass()));
             }
-            s.rotate(up, rotateRate, tmp);
+            s.rotate(up, rotateRate, new Quaternion());
 
 
             //dampening: keep upright and eliminate z-component of linear velocity

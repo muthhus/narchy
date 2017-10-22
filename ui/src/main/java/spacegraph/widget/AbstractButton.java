@@ -1,6 +1,7 @@
 package spacegraph.widget;
 
 import com.jogamp.opengl.GL2;
+import jcog.tree.rtree.rect.RectFloat2D;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
 import spacegraph.render.Draw;
@@ -13,21 +14,37 @@ public abstract class AbstractButton extends Widget {
     private boolean pressed;
     private final boolean enabled = true;
 
+    public static void text(GL2 gl, Label text, float x, float y, float w, float h) {
+        gl.glPushMatrix();
+        gl.glTranslatef(x , y , 0);
+        gl.glScalef(w, h, 1);
+        text.paint(gl);
+        gl.glPopMatrix();
+    }
+
+
     @Override
     protected void paintComponent(GL2 gl) {
-        paintBack(gl);
-        paintContent(gl);
+        RectFloat2D b = bounds;
+        paintComponent(gl, b.min.x, b.min.y, b.max.x - b.min.x, b.max.y - b.min.y);
     }
 
-    protected void paintContent(GL2 gl) {
-
+    private void paintComponent(GL2 gl, float x, float y, float w, float h) {
+        paintBack(gl, x, y, w, h);
+        paintContent(gl, x, y, w, h);
     }
 
-    public void paintBack(GL2 gl) {
+    /**
+     * TODO make abstract
+     */
+    protected void paintContent(GL2 gl, float x, float y, float w, float h) {
+    }
+
+    public void paintBack(GL2 gl, float x, float y, float w, float h) {
         float p = pushed / 2f;
         float dim = 1f - (pushed /* + if disabled, dim further */) * 3f;
         gl.glColor3f(0.25f * dim, 0.25f * dim, 0.25f * dim);
-        Draw.rect(gl, p, p, 1 - 2 * p, 1 - 2 * p);
+        Draw.rect(gl, x + p, y + p, w - 2 * p, h - 2 * p);
     }
 
     @Override

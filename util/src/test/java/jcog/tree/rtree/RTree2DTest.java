@@ -409,9 +409,9 @@ public class RTree2DTest {
      * @return tree
      */
     public static RTree<RectDouble2D> createRect2DTree(int minM, int maxM, Spatialization.DefaultSplits splitType) {
-        return new RTree<>(new RectDouble2D.Builder(), minM, maxM, splitType);
+        return new RTree<>((r->r), minM, maxM, splitType);
     }
     public static RTree<RectFloatND> createRectNDTree(int minM, int maxM, Spatialization.DefaultSplits splitType) {
-        return new RTree<>(new RectFloatND.Builder(), minM, maxM, splitType);
+        return new RTree<>((r->r), minM, maxM, splitType);
     }
 }

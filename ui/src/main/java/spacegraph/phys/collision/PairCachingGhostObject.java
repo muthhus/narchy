@@ -41,7 +41,7 @@ public class PairCachingGhostObject extends GhostObject {
 	 */
 	@Override
 	public void addOverlappingObjectInternal(Broadphasing otherProxy, Broadphasing thisProxy) {
-		Broadphasing actualThisProxy = thisProxy != null? thisProxy : broadphase();
+        Broadphasing actualThisProxy = thisProxy != null? thisProxy : broadphase;
 		assert(actualThisProxy != null);
 
 		Collidable otherObject = otherProxy.data;
@@ -58,7 +58,7 @@ public class PairCachingGhostObject extends GhostObject {
 	@Override
 	public void removeOverlappingObjectInternal(Broadphasing otherProxy, Intersecter intersecter, Broadphasing thisProxy1) {
 		Collidable otherObject = otherProxy.data;
-		Broadphasing actualThisProxy = thisProxy1 != null? thisProxy1 : broadphase();
+        Broadphasing actualThisProxy = thisProxy1 != null? thisProxy1 : broadphase;
 		assert(actualThisProxy != null);
 
 		assert (otherObject != null);

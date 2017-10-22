@@ -6,8 +6,8 @@ import java.util.function.Supplier;
 /** atomic switching double buffer */
 public class Flip<X> extends AtomicBoolean {
 
-    private final X a;
-    private final X b;
+    private X a;
+    private X b;
 
     public Flip(Supplier<X> builder) {
         this.a = builder.get();
@@ -16,6 +16,15 @@ public class Flip<X> extends AtomicBoolean {
 
     public X write() {
         return !get() ? a : b;
+    }
+
+    public Flip write(X next) {
+        if (!get()) this.a = next; else  this.b = next;
+        return this;
+    }
+
+    public void writeCommit(X next) {
+        write(next).commit();
     }
 
     public X commit() {

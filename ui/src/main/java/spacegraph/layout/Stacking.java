@@ -12,4 +12,10 @@ public class Stacking extends Layout {
 //        clipTouchBounds = false;
     }
 
+    @Override
+    public void layout() {
+        children.forEach((c) ->
+            c.pos(0, 0, w(), h()));
+        super.layout();
+    }
 }

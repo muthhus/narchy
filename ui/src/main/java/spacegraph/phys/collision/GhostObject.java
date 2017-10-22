@@ -113,7 +113,7 @@ public class GhostObject extends Collidable {
             Collidable collidable = overlappingObjects.get(i);
 
 			// only perform raycast if filterMask matches
-			if (resultCallback.needsCollision(collidable.broadphase())) {
+            if (resultCallback.needsCollision(collidable.broadphase)) {
 				//RigidcollisionObject* collisionObject = ctrl->GetRigidcollisionObject();
 				v3 collisionObjectAabbMin = new v3();
 				v3 collisionObjectAabbMax = new v3();
@@ -150,7 +150,7 @@ public class GhostObject extends Collidable {
             Collidable collidable = overlappingObjects.get(i);
 
 			// only perform raycast if filterMask matches
-			if (resultCallback.needsCollision(collidable.broadphase())) {
+            if (resultCallback.needsCollision(collidable.broadphase)) {
 				Collisions.rayTestSingle(rayFromTrans, rayToTrans,
                         collidable,
 				                             collidable.shape(),

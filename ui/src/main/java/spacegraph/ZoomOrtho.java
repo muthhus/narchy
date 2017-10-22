@@ -4,6 +4,11 @@ import com.jogamp.nativewindow.util.InsetsImmutable;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
+import jcog.bag.impl.CurveBag;
+import jcog.pri.PLink;
+import jcog.pri.op.PriMerge;
+import jcog.random.XorShift128PlusRandom;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
 import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
@@ -11,6 +16,8 @@ import spacegraph.phys.util.AnimVector2f;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
+import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static spacegraph.Surface.Align.None;
@@ -22,7 +29,8 @@ public class ZoomOrtho extends Ortho {
 
     float zoomRate = 0.2f;
 
-    final static float minZoom = 0.1f;
+
+    final static float minZoom = 0.05f;
     final static float maxZoom = 10f;
 
     final static short PAN_BUTTON = 3;
@@ -86,15 +94,15 @@ public class ZoomOrtho extends Ortho {
         return (ZoomOrtho.this.window.getHeight() / s.targetY());
     }
 
-    public float cx() {
-        AnimVector2f s = (AnimVector2f) this.scale;
-        return (0.5f - pos.x) / s.targetX();
-    }
-
-    public float cy() {
-        AnimVector2f s = (AnimVector2f) this.scale;
-        return (0.5f - pos.y) / s.targetY();
-    }
+//    public float cx() {
+//        AnimVector2f s = (AnimVector2f) this.scale;
+//        return (0.5f - pos.x) / s.targetX();
+//    }
+//
+//    public float cy() {
+//        AnimVector2f s = (AnimVector2f) this.scale;
+//        return (0.5f - pos.y) / s.targetY();
+//    }
 
 
     @Override
@@ -180,7 +188,7 @@ public class ZoomOrtho extends Ortho {
                 } else {
                     if (bd[0] == PAN_BUTTON) {
 
-                        move(dx, -dy);
+                        cam.add(dx/scale.x, -dy/scale.y);
                         panStart[0] = mx;
                         panStart[1] = my;
 
@@ -276,10 +284,10 @@ public class ZoomOrtho extends Ortho {
         float psy = s.targetY();
         float sx = psx * zoomMult;
         float sy = psy * zoomMult;
-        int wx = window.getWidth();
-        int wy = window.getHeight();
+        int wx = W;
+        int wy = H;
 
-        if (sx / wx >= minZoom && sy / wy >= minZoom && sx / wx <= maxZoom && sy / wy <= maxZoom) {
+        if (sx >= minZoom && sy >= minZoom && sx <= maxZoom && sy <= maxZoom) {
 
 //            float pcx = cx();
 //            float pcy = cy();
@@ -307,11 +315,30 @@ public class ZoomOrtho extends Ortho {
     private class HUD extends Stacking {
 
         float smx, smy;
-
+        final CurveBag<PLink> notifications = new CurveBag(PriMerge.plus, new ConcurrentHashMap(), new XorShift128PlusRandom(1));
 
         {
             align = None;
             aspect = 1f;
+            notifications.setCapacity(8);
+            notifications.putAsync(new PLink("ready", 0.5f));
+        }
+
+
+        @Override
+        public void start(@Nullable Surface parent) {
+            super.start(parent);
+            root().onLog(t -> {
+
+                String m;
+                if (t instanceof Object[])
+                    m = Arrays.toString((Object[]) t);
+                else
+                    m = t.toString();
+
+                notifications.putAsync(new PLink(m, 1f));
+                notifications.commit();
+            });
         }
 
         final Widget bottomRightMenu = new Widget() {
@@ -325,6 +352,17 @@ public class ZoomOrtho extends Ortho {
 
         @Override
         protected void paint(GL2 gl) {
+            {
+                //world coordinates alignment and scaling indicator
+                gl.glLineWidth(2);
+                gl.glColor3f(0.5f, 0.5f, 0.5f);
+                float cx = wmx;
+                float cy = wmy;
+                Draw.rectStroke(gl, cx + -100, cy + -100, 200, 200);
+                Draw.rectStroke(gl, cx + -200, cy + -200, 400, 400);
+                Draw.rectStroke(gl, cx + -300, cy + -300, 600, 600);
+            }
+
             super.paint(gl);
 
             gl.glPushMatrix();
@@ -343,11 +381,11 @@ public class ZoomOrtho extends Ortho {
             Draw.line(gl, 0, H, W, H);
 
             WindowDragMode p;
-            if ((p = potentialDragMode)!=null) {
+            if ((p = potentialDragMode) != null) {
                 switch (p) {
                     case RESIZE_SE:
                         gl.glColor4f(1f, 0.8f, 0f, 0.5f);
-                        Draw.quad2d(gl, pmx, pmy, W, resizeBorder, W, 0, W-resizeBorder, 0);
+                        Draw.quad2d(gl, pmx, pmy, W, resizeBorder, W, 0, W - resizeBorder, 0);
                         break;
                     case RESIZE_SW:
                         gl.glColor4f(1f, 0.8f, 0f, 0.5f);
@@ -367,8 +405,24 @@ public class ZoomOrtho extends Ortho {
             gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
             Draw.line(gl, smx, smy - ch, smx, smy + ch);
             Draw.line(gl, smx - cw, smy, smx + cw, smy);
+
+
+            gl.glLineWidth(2);
+            gl.glColor3f(0.8f, 0.5f, 0);
+            Draw.text(gl, str(notifications.top().get()), 32, smx + cw, smy + ch, 0);
+            gl.glColor3f(0.4f, 0f, 0.8f);
+            Draw.text(gl, wmx + "," + wmy, 32, smx - cw, smy - ch, 0);
+
             gl.glPopMatrix();
 
+
+        }
+
+        String str(@Nullable Object x) {
+            if (x instanceof Object[])
+                return Arrays.toString((Object[]) x);
+            else
+                return x.toString();
         }
 
         {
@@ -387,8 +441,13 @@ public class ZoomOrtho extends Ortho {
         @Override
         public Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
 
+
             //System.out.println(hitPoint);
             if (hitPoint != null) {
+
+                float lmx = finger.hit.x; //hitPoint.x;
+                float lmy = finger.hit.y; //hitPoint.y;
+
                 float hudMarginThick = 0.05f; //pixels
 
                 smx = finger.hitGlobal.x;

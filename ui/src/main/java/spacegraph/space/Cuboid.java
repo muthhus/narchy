@@ -1,12 +1,13 @@
 package spacegraph.space;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.math.Quaternion;
 import jcog.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SimpleSpatial;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
-import spacegraph.math.Quat4f;
+import spacegraph.math.AxisAngle4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.ClosestRay;
@@ -88,15 +89,26 @@ public class Cuboid<X> extends SimpleSpatial<X> {
             if (d instanceof SimpleSpatial) {
                 SimpleSpatial sd = (SimpleSpatial)d;
                 //Quat4f target = Quat4f.angle(-space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0);
-                Quat4f target = new Quat4f();
-                // TODO somehow use the object's local transformation ? sd.transform().getRotation(...);
-                target.setAngle( -space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0.01f);
+                //Quat4f target = new Quat4f();
 
-                target.normalize();
+                //sd.rotate( -space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0, 0.2f);
 
-                //System.out.print("rotating: " + sd.transform().getRotation(new Quat4f()));
-                sd.rotate(target, 0.2f, new Quat4f());
-                //System.out.println("  : " + sd.transform().getRotation(new Quat4f()));
+//                com.jogamp.common.util.SyncedRingbuffer
+//                Transform bt = body.worldTransform;
+//                // TODO somehow use the object's local transformation ? sd.transform().getRotation(...);
+//                target.setAngle(
+//                        space.camFwd.x-bt.x,
+//                        space.camFwd.y - bt.y,
+//                        space.camFwd.z -bt.z,
+//                        (float) Math.PI
+//                );
+//
+//                target.normalize();
+//
+
+
+//                sd.rotate(target, 0.2f); //new Quat4f());
+//                //System.out.println("  : " + sd.transform().getRotation(new Quat4f()));
             }
 //
             Surface s0 = super.onTouch(body, r, buttons, space);

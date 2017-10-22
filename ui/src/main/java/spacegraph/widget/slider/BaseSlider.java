@@ -43,7 +43,11 @@ public class BaseSlider extends Widget {
 
     @Override
     protected void paintComponent(GL2 gl) {
+        gl.glPushMatrix();
+        gl.glTranslatef(x(), y(), 0);
+        gl.glScalef(w(), h(), 1);
         draw.value(this.p, gl);
+        gl.glPopMatrix();
     }
 
 

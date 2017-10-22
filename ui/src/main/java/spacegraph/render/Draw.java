@@ -35,6 +35,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SimpleSpatial;
+import spacegraph.Surface;
 import spacegraph.math.AxisAngle4f;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
@@ -48,6 +49,7 @@ import spacegraph.space.EDraw;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.jogamp.opengl.GL.*;
 import static jcog.Util.unitize;
@@ -652,7 +654,8 @@ public enum Draw {
         gl.glBegin(GL2.GL_TRIANGLES);
 
         gl.glColor4f(e.r, e.g, e.b, e.a);
-        gl.glNormal3f(0,0,1);
+        //gl.glNormal3f(0,0,1);
+        gl.glNormal3f(ww.x,ww.y,ww.z);
 
         gl.glVertex3f(sx + vv.x, sy + vv.y, sz + vv.z); //right base
 
@@ -824,6 +827,21 @@ public enum Draw {
 
     public static void colorGrays(GL2 gl, float x) {
         gl.glColor3f(x, x, x);
+    }
+
+
+    public static void bounds(GL2 gl, Surface s, Consumer<GL2> c) {
+        float x = s.x();
+        float y = s.y();
+        bounds(gl, x, y, s.w(), s.h(), c);
+    }
+
+    public static void bounds(GL2 gl, float x1, float y1, float w, float h, Consumer<GL2> c) {
+        gl.glPushMatrix();
+        gl.glTranslatef(x1 , y1 , 0);
+        gl.glScalef(w, h, 1);
+        c.accept(gl);
+        gl.glPopMatrix();
     }
 
 

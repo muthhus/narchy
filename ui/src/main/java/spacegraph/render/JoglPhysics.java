@@ -342,7 +342,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
         clear();
         updateCamera();
 
-        long timeMS = clock.getTimeMilliseconds();
+        long timeMS = System.currentTimeMillis();
 
         gl.glEnable(GL2.GL_DEPTH_TEST);
         forEachSpatial(s -> render(s,timeMS));

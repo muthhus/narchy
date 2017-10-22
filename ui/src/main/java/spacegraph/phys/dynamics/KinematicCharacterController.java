@@ -21,7 +21,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package spacegraph.phys.dynamics.character;
+package spacegraph.phys.dynamics;
 
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
@@ -447,8 +447,8 @@ public class KinematicCharacterController extends ActionInterface {
 		v3 up = new v3();
 		up.scale(-1f, upAxisDirection[upAxis]);
 		KinematicClosestNotMeConvexResultCallback callback = new KinematicClosestNotMeConvexResultCallback(ghostObject, up, 0.7071f);
-        callback.collisionFilterGroup = ghostObject.broadphase().collisionFilterGroup;
-        callback.collisionFilterMask = ghostObject.broadphase().collisionFilterMask;
+        callback.collisionFilterGroup = ghostObject.broadphase.collisionFilterGroup;
+        callback.collisionFilterMask = ghostObject.broadphase.collisionFilterMask;
 
 		if (useGhostObjectSweepTest) {
 			ghostObject.convexSweepTest(convexShape, start, end, callback, world.getDispatchInfo().allowedCcdPenetration);
@@ -543,8 +543,8 @@ public class KinematicCharacterController extends ActionInterface {
 
 			KinematicClosestNotMeConvexResultCallback callback = new KinematicClosestNotMeConvexResultCallback(ghostObject, sweepDirNegative, -1.0f);
 
-            callback.collisionFilterGroup = ghostObject.broadphase().collisionFilterGroup;
-            callback.collisionFilterMask = ghostObject.broadphase().collisionFilterMask;
+            callback.collisionFilterGroup = ghostObject.broadphase.collisionFilterGroup;
+            callback.collisionFilterMask = ghostObject.broadphase.collisionFilterMask;
 
 			float margin = convexShape.getMargin();
 			convexShape.setMargin(margin + addedMargin);
@@ -630,8 +630,8 @@ public class KinematicCharacterController extends ActionInterface {
 		end.set(targetPosition);
 
 		KinematicClosestNotMeConvexResultCallback callback = new KinematicClosestNotMeConvexResultCallback(ghostObject, upAxisDirection[upAxis], maxSlopeCosine);
-        callback.collisionFilterGroup = ghostObject.broadphase().collisionFilterGroup;
-        callback.collisionFilterMask = ghostObject.broadphase().collisionFilterMask;
+        callback.collisionFilterGroup = ghostObject.broadphase.collisionFilterGroup;
+        callback.collisionFilterMask = ghostObject.broadphase.collisionFilterMask;
 
 		if (useGhostObjectSweepTest) {
 			ghostObject.convexSweepTest(convexShape, start, end, callback, collisions.getDispatchInfo().allowedCcdPenetration);

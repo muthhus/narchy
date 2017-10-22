@@ -181,7 +181,7 @@ public class Dynamic<X> extends Collidable<X> {
 		forceActivationState(Collidable.DISABLE_SIMULATION);
 		data = null;
 
-		Broadphasing bp = broadphase();
+        Broadphasing bp = broadphase;
 		if (bp != null) {
 			//
 			// only clear the cached algorithms

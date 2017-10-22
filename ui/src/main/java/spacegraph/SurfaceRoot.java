@@ -1,12 +1,14 @@
 package spacegraph;
 
+import jcog.event.On;
+
+import java.util.function.Consumer;
+
 public interface SurfaceRoot {
 
     default SurfaceRoot root() {
         return this;
     }
-
-    Ortho translate(float x, float y);
 
     Ortho move(float x, float y);
 
@@ -16,4 +18,6 @@ public interface SurfaceRoot {
 
     void zoom(float x, float y, float sx, float sy);
 
+    /** receives notifications, logs, etc */
+    On onLog(Consumer o);
 }

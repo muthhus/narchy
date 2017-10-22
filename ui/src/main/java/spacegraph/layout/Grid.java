@@ -2,6 +2,7 @@ package spacegraph.layout;
 
 import com.google.common.collect.Iterables;
 import jcog.Util;
+import jcog.list.FasterList;
 import spacegraph.Surface;
 
 import java.util.Collection;
@@ -16,7 +17,7 @@ import static jcog.Util.lerp;
     aspect ratio=+inf: col (x)
                  else: grid( %x, %(ratio * x) )
  */
-public class Grid<S extends Surface> extends Layout<S> {
+public class Grid extends Layout {
 
 
     public static final float HORIZONTAL = 0f;
@@ -26,30 +27,25 @@ public class Grid<S extends Surface> extends Layout<S> {
     float margin = 0.05f;
     float gridAspect = Float.NaN;
 
-    public Grid(S... children) {
+    public Grid(Surface... children) {
         this(SQUARE, children);
     }
 
-    public Grid(List<S> children) {
+    public Grid(List<Surface> children) {
         this(SQUARE, children);
     }
 
-    public Grid(float aspect, S... children) {
+    public Grid(float aspect, Surface... children) {
         super();
         this.gridAspect = (aspect);
         set(children);
     }
 
-    public Grid(float aspect, List<S> children) {
+    public Grid(float aspect, List<Surface> children) {
         super();
         this.gridAspect = (aspect);
         set(children);
     }
-
-
-    /** previous scale */
-    float lw, lh;
-
 
     public boolean isGrid() {
         float a = gridAspect;
@@ -75,6 +71,8 @@ public class Grid<S extends Surface> extends Layout<S> {
     public void layout() {
         super.layout();
 
+        assert(parent!=null);
+
         int n = children.size();
         if (n == 0)
             return;
@@ -84,8 +82,6 @@ public class Grid<S extends Surface> extends Layout<S> {
 //            a = 0; //use linear layout for small n
 
 
-        float aa = a;
-
         if (a!=0 && Float.isFinite(a)) {
 
             //determine the ideal rows and columns of the grid to match the visible aspect ratio
@@ -93,13 +89,13 @@ public class Grid<S extends Surface> extends Layout<S> {
 
             //TODO use the 'a' value to adjust the x/y balance, currently it is not
 
-            float actualAspect = lh/lw;
+            float actualAspect = h()/ w();
 
             int x;
-            int s = (int)Math.sqrt(n);
-            if (actualAspect > 1f) {
+            int s = Math.round((float)Math.sqrt(n));
+            if (actualAspect/a > 1f) {
                 x = Math.round(lerp((actualAspect)/n, s, 1f));
-            } else if (actualAspect < 1f) {
+            } else if (actualAspect/a < 1f) {
                 //TODO fix
                 x = Math.round(lerp(1f-(1f/actualAspect)/n, n, (float)s));
             } else {
@@ -109,18 +105,19 @@ public class Grid<S extends Surface> extends Layout<S> {
             x = Math.max(1, x);
             int y = (int)Math.max(1, Math.ceil((float)n / x));
 
+            assert(y*x >= s);
+
             if (y==1) {
-                aa = Float.POSITIVE_INFINITY; //column
+                a = Float.POSITIVE_INFINITY; //column
             } else if (x == 1) {
-                aa = 0; //row
+                a = 0; //row
             } else {
                 layoutGrid(x, y, margin);
                 return;
             }
         }
 
-
-        if (aa == 0) {
+        if (a == 0) {
             //horizontal
             layoutGrid(n, 1, margin);
         } else /*if (!Float.isFinite(aa))*/ {
@@ -147,6 +144,9 @@ public class Grid<S extends Surface> extends Layout<S> {
 
         float py = ((ny-1) * dy) + hm;
 
+        float W = w();
+        float H = h();
+
         for (int y = 0; y < ny; y++) {
 
             float px = hm;//margin / 2f;
@@ -156,8 +156,9 @@ public class Grid<S extends Surface> extends Layout<S> {
 
                 Surface c = children.get(i);
 
-                c.pos(px, py);
-                c.scale(dxc, dyc);
+                float x1 = px * W;
+                float y1 = py * H;
+                c.pos(x1, y1, x1+dxc*W, y1+dyc*H);
                 c.layout();
 
                 px += dx;
@@ -177,7 +178,7 @@ public class Grid<S extends Surface> extends Layout<S> {
     }
 
     public static Grid grid(Surface... content) {
-        return new Grid(content);
+        return new Grid(new FasterList<>(content));
     }
     public static <S> Grid grid(Collection<S> c, Function<S,Surface> builder) {
         Surface ss [] = new Surface[c.size()];
@@ -206,7 +207,8 @@ public class Grid<S extends Surface> extends Layout<S> {
         return new Grid(VERTICAL, content);
     }
     public static Grid grid(int num, IntFunction<Surface> build) {
-        return new Grid(Util.map(0, num, build, Surface[]::new));
+        Surface[] x = Util.map(0, num, build, Surface[]::new);
+        return new Grid(new FasterList(x));
     }
 
 }

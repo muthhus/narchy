@@ -110,7 +110,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
     public SpaceGraph ortho(Surface ortho) {
-        return add(new Ortho(ortho).maximize());
+        return add(new Ortho(ortho));
     }
 
     public SpaceGraph add(Ortho c) {
@@ -329,8 +329,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     public static SpaceGraph window(Surface s, int w, int h) {
         SpaceGraph win = new SpaceGraphFlat(
                 new ZoomOrtho(s)
-                        //.scale(Math.min(w,h))
-                        .maximize()
         );
         if (w > 0 && h > 0) {
 

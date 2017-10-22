@@ -107,7 +107,7 @@ public abstract class Collisions<X> {
         // check that the object isn't already added
         //assert (!collisionObjects.contains(collisionObject));
 
-        Broadphasing currentBroadphase = c.broadphase();
+        Broadphasing currentBroadphase = c.broadphase;
         if (currentBroadphase == null) {
 
             v3 minAabb = new v3();
@@ -189,7 +189,7 @@ public abstract class Collisions<X> {
         // moving objects should be moderately sized, probably something wrong if not
         tmp.sub(maxAabb, minAabb); // TODO: optimize
         if (colObj.isStaticObject() || (tmp.lengthSquared() < maxAABBLength)) {
-            Broadphasing broadphase = colObj.broadphase();
+            Broadphasing broadphase = colObj.broadphase;
             if (broadphase == null)
                 throw new RuntimeException();
             bp.setAabb(broadphase, minAabb, maxAabb, intersecter);
@@ -510,7 +510,7 @@ public abstract class Collisions<X> {
             //return array[index];
             if (collidable != null) {
 
-                Broadphasing broadphaseHandle = collidable.broadphase();
+                Broadphasing broadphaseHandle = collidable.broadphase;
 
                 // only perform raycast if filterMask matches
                 if (broadphaseHandle != null && resultCallback.needsCollision(broadphaseHandle)) {
@@ -562,12 +562,16 @@ public abstract class Collisions<X> {
         v3 linVel = new v3();
         v3 angVel = new v3();
         TransformUtil.calculateVelocity(convexFromTrans, convexToTrans, 1f, linVel, angVel);
-        Transform R = new Transform();
-        R.setIdentity();
-        R.setRotation(convexFromTrans.getRotation(new Quat4f()));
-        castShape.calculateTemporalAabb(R, linVel, angVel, 1f, castShapeAabbMin, castShapeAabbMax);
 
-        Transform tmpTrans = new Transform();
+
+        {
+            Transform R = new Transform();
+            R.setIdentity();
+            R.setRotation(convexFromTrans.getRotation(new Quat4f()));
+            castShape.calculateTemporalAabb(R, linVel, angVel, 1f, castShapeAabbMin, castShapeAabbMax);
+        }
+
+        //Transform R = new Transform();
         v3 collisionObjectAabbMin = new v3();
         v3 collisionObjectAabbMax = new v3();
         float[] hitLambda = new float[1];
@@ -575,21 +579,29 @@ public abstract class Collisions<X> {
         // go over all objects, and if the ray intersects their aabb + cast shape aabb,
         // do a ray-shape query using convexCaster (CCD)
 
-        for (Collidable collidable : collidables()) {
+        v3 hitNormal = new v3();
+
+        List<Collidable> collidables = collidables();
+        for (int i = 0, collidablesSize = collidables.size(); i < collidablesSize; i++) {
+            Collidable collidable = collidables.get(i);
 
             // only perform raycast if filterMask matches
-            if (resultCallback.needsCollision(collidable.broadphase())) {
+            if (resultCallback.needsCollision(collidable.broadphase)) {
                 //RigidcollisionObject* collisionObject = ctrl->GetRigidcollisionObject();
-                collidable.getWorldTransform(tmpTrans);
-                collidable.shape().getAabb(tmpTrans, collisionObjectAabbMin, collisionObjectAabbMax);
+                Transform S = collidable.worldTransform;
+                CollisionShape shape = collidable.shape();
+
+                shape.getAabb(S, collisionObjectAabbMin, collisionObjectAabbMax);
                 AabbUtil2.aabbExpand(collisionObjectAabbMin, collisionObjectAabbMax, castShapeAabbMin, castShapeAabbMax);
+
                 hitLambda[0] = 1f; // could use resultCallback.closestHitFraction, but needs testing
-                v3 hitNormal = new v3();
+                hitNormal.zero(); //may not be necessary
+
                 if (AabbUtil2.rayAabb(convexFromWorld, convexToWorld, collisionObjectAabbMin, collisionObjectAabbMax, hitLambda, hitNormal)) {
                     objectQuerySingle(castShape, convexFromTrans, convexToTrans,
                             collidable,
-                            collidable.shape(),
-                            tmpTrans,
+                            shape,
+                            S,
                             resultCallback,
                             dispatchInfo.allowedCcdPenetration);
                 }

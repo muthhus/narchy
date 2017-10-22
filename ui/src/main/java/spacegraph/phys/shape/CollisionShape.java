@@ -86,8 +86,7 @@ public abstract class CollisionShape {
 		float temporalAabbMinz = temporalAabbMin.z;
 
 		// add linear motion
-		v3 linMotion = new v3(linvel);
-		linMotion.scale(timeStep);
+		v3 linMotion = new v3(linvel, timeStep);
 
 		//todo: simd would have a vector max/min operation, instead of per-element access
 		if (linMotion.x > 0f) {

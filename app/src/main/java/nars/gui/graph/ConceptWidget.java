@@ -5,6 +5,7 @@ import jcog.bag.Bag;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import jcog.util.Flip;
@@ -26,8 +27,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
 import static jcog.Util.sqr;
-import static nars.gui.graph.ConceptWidget.ConceptVis2.TASKLINK;
-import static nars.gui.graph.ConceptWidget.ConceptVis2.TERMLINK;
+import static nars.gui.graph.DynamicConceptSpace.ConceptVis2.TASKLINK;
+import static nars.gui.graph.DynamicConceptSpace.ConceptVis2.TERMLINK;
 import static spacegraph.math.v3.v;
 
 
@@ -35,7 +36,6 @@ public class ConceptWidget extends TermWidget<Concept> {
 
     public float pri;
 
-    private DynamicConceptSpace space;
     public final Flip<Map<Concept, ConceptEdge>> currentEdges = new Flip(LinkedHashMap::new);
 
     public ConceptWidget(Concept x) {
@@ -87,11 +87,6 @@ public class ConceptWidget extends TermWidget<Concept> {
 
     //final RecycledSummaryStatistics edgeStats = new RecycledSummaryStatistics();
 
-    @Override
-    public void commit(TermVis termVis, DynamicListSpace space) {
-        this.space = (DynamicConceptSpace) space;
-        termVis.accept(this);
-    }
 
 
     //    @Override
@@ -122,7 +117,11 @@ public class ConceptWidget extends TermWidget<Concept> {
 
 
         @Override
-        public void accept(ConceptWidget cw) {
+        public void accept(List<ConceptWidget> pending) {
+            pending.forEach(this::each);
+        }
+
+        public void each(ConceptWidget cw) {
             float p = cw.pri;
             p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
 
@@ -176,225 +175,17 @@ public class ConceptWidget extends TermWidget<Concept> {
         }
     }
 
-    public static class ConceptVis2 implements TermVis<ConceptWidget>, BiConsumer<ConceptWidget, PriReference<? extends Termed>> {
-
-        static final int TASKLINK = 0;
-        static final int TERMLINK = 1;
-
-
-        public Bag<EdgeComponent, EdgeComponent> edges;
-
-        int maxEdges;
-        public final FloatParam minSize = new FloatParam(1f, 0.1f, 5f);
-        public final FloatParam maxSizeMult = new FloatParam(2f, 1f, 5f);
-        public final AtomicBoolean showLabel = new AtomicBoolean(true);
-        public final FloatParam termlinkOpacity = new FloatParam(1f, 0f, 1f);
-        public final FloatParam tasklinkOpacity = new FloatParam(1f, 0f, 1f);
-        public final FloatParam lineWidthMax = new FloatParam(1f, 0f, 4f);
-        public final FloatParam lineWidthMin = new FloatParam(0.1f, 0f, 4f);
-        public final FloatParam separation = new FloatParam(1f, 0f, 6f);
-        public final FloatParam lineAlphaMin = new FloatParam(0.1f, 0f, 1f);
-        public final FloatParam lineAlphaMax = new FloatParam(0.8f, 0f, 1f);
-
-        public ConceptVis2(int maxEdges) {
-            super();
-            this.maxEdges = maxEdges;
-
-            this.edges =
-                    //new PLinkHijackBag(0, 2);
-                    new PLinkArrayBag<>(maxEdges,
-                            //PriMerge.max,
-                            //PriMerge.replace,
-                            PriMerge.plus,
-                            //new UnifiedMap()
-                            //new LinkedHashMap()
-                            new LinkedHashMap() //maybe: edgeBagSharedMap
-                    );
-        }
-
-        @Override
-        public void update(List<ConceptWidget> pending) {
-
-            //float priSum = edges.priSum();
-
-            pending.forEach(c -> {
-                c.currentEdges.write().clear();
-            });
-
-            edges.commit(ee -> {
-//                e.update(termlinkOpac, tasklinkOpac);
-//                e.decay(0.95f);
-//                e.priMult(0.95f);
-
-                ConceptWidget src = ee.src;
-                if (ee.tgt.active()) {
-                    ConceptEdge ce = src.currentEdges.write().computeIfAbsent(ee.tgt.id, (t) ->
-                            new ConceptEdge(src, ee.tgt, 0)
-                    );
-                    ce.merge(ee);
-                }
-
-            });
-            float termlinkOpac = termlinkOpacity.floatValue();
-            float tasklinkOpac = tasklinkOpacity.floatValue();
-            float separation = this.separation.floatValue();
-            float minLineWidth = this.lineWidthMin.floatValue();
-            float MaxEdgeWidth = this.lineWidthMax.floatValue();
-            float _lineAlphaMax = this.lineAlphaMax.floatValue();
-            float _lineAlphaMin = this.lineAlphaMin.floatValue();
-            float lineAlphaMin = Math.min(_lineAlphaMin, _lineAlphaMax);
-            float lineAlphaMax = Math.max(lineAlphaMin, _lineAlphaMax);
-            pending.forEach(c -> {
-                float srcRad = c.radius();
-                c.currentEdges.write().values().forEach(e -> {
-                    //e.update(termlinkOpac, tasklinkOpac)
-
-                    float edgeSum = (e.termlinkPri + e.tasklinkPri);
-
-                    if (edgeSum >= 0) {
-
-
-                        float p = e.priElseZero();
-                        e.width = minLineWidth + 0.5f * sqr(1 + p * MaxEdgeWidth);
-
-                        float taskish = e.tasklinkPri / edgeSum* termlinkOpac;
-                        e.r = 0.05f + 0.65f * sqr(taskish);
-                        float termish = e.termlinkPri / edgeSum* tasklinkOpac;
-                        e.b = 0.05f + 0.65f * sqr(termish);
-                        e.g = 0.1f * (1f - (e.r + e.g) / 1.5f);
-
-                        e.a = Util.lerp(p * Math.max( taskish , termish  ), lineAlphaMin, lineAlphaMax);
-
-                        //0.05f + 0.9f * Util.and(this.r * tasklinkBoost, this.g * termlinkBoost);
-
-                        e.attraction = 0.5f * e.width / 2f;// + priSum * 0.75f;// * 0.5f + 0.5f;
-                        float totalRad = srcRad + e.tgt().radius();
-                        e.attractionDist =
-                                //4f;
-                                (totalRad * separation) + totalRad; //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
-                    } else {
-                        e.a = -1;
-                        e.attraction = 0;
-                    }
-                });
-                c.currentEdges.commit();
-            });
-
-
-        }
-
-        @Override
-        public void accept(ConceptWidget src, PriReference<? extends Termed> link) {
-            float pri = link.priElseNeg1();
-            if (pri < 0)
-                return;
-
-            Termed ttt = link.get();
-            if (ttt == null)
-                return;
-
-            Term tt = ttt.term();
-            if (!tt.equals(src.id.term())) {
-                Concept cc = src.space.nar.concept(tt);
-                if (cc != null) {
-                    ConceptWidget tgt = src.space.space.get(cc);
-                    if (tgt != null && tgt.active()) {
-                        //                Concept c = space.nar.concept(tt);
-                        //                if (c != null) {
-
-                        int type;
-                        if (!!(ttt instanceof Task)) {
-                            type = TASKLINK;
-                        } else {
-                            type = TERMLINK;
-                        }
-
-                        edges.putAsync(new EdgeComponent(link, src, tgt, type, pri));
-                        //new PLinkUntilDeleted(ate, pri)
-                        //new PLink(ate, pri)
-
-                        //                }
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void accept(ConceptWidget cw) {
-            float p = cw.pri;
-
-
-            //long now = space.now();
-//            float b = conceptWidget.concept.beliefs().eviSum(now);
-//            float g = conceptWidget.concept.goals().eviSum(now);
-//            float q = conceptWidget.concept.questions().priSum();
-
-            //sqrt because the area will be the sqr of this dimension
-            float ep = 1 + p;
-            float minSize = this.minSize.floatValue();
-            float nodeScale = minSize + (ep * ep) * maxSizeMult.floatValue();
-            //1f + 2f * p;
-
-            boolean atomic = (cw.id.op().atomic);
-            if (atomic)
-                nodeScale /= 2f;
-
-            if (cw.shape instanceof SphereShape) {
-                float r = nodeScale;
-                cw.scale(r, r, r);
-            } else {
-                float l = nodeScale * 1.618f;
-                float w = nodeScale;
-                float h = 1; //nodeScale / (1.618f * 2);
-                cw.scale(l, w, h);
-            }
-
-
-            if (cw.body != null) {
-                float density = 5.5f;
-                cw.body.setMass(nodeScale * nodeScale * nodeScale /* approx */ * density);
-                cw.body.setDamping(0.99f, 0.9f);
-
-            }
-
-//            Draw.hsb(
-//                    (tt.op().ordinal() / 16f),
-//                    0.5f + 0.5f / tt.volume(),
-//                    0.3f + 0.2f * p,
-//                    0.9f, conceptWidget.shapeColor);
-
-            if (!showLabel.get())
-                cw.front.hide();
-            else
-                cw.front.scale(1f, 1f);
-
-//            Concept c = cw.id;
-//            if (c != null) {
-////                Truth belief = c.belief(space.now, space.dur);
-////                if (belief == null) belief = zero;
-////                Truth goal = c.goal(space.now, space.dur);
-////                if (goal == null) goal = zero;
-////
-////                float angle = 45 + belief.freq() * 180f + (goal.freq() - 0.5f) * 90f;
-//                //angle / 360f
-            Draw.colorHash(cw.id, cw.shapeColor);// * or(belief.conf(), goal.conf()), 0.9f, cw.shapeColor);
-
-            cw.currentEdges.write().clear();
-            cw.id.tasklinks().forEach(x -> this.accept(cw, x));
-            cw.id.termlinks().forEach(x -> this.accept(cw, x));
-
-
-        }
-    }
 
     public static class ConceptEdge extends EDraw<ConceptWidget> {
 
         float termlinkPri, tasklinkPri;
+        boolean inactive;
+        final static float priTHRESH = Pri.EPSILON_VISIBLE;
 
         public ConceptEdge(ConceptWidget src, ConceptWidget target, float pri) {
             super(src, target, pri);
+            inactive = false;
         }
-
 
         protected void decay(float rate) {
             //termlinkPri = tasklinkPri = 0;
@@ -426,6 +217,9 @@ public class ConceptWidget extends TermWidget<Concept> {
 
         public void merge(EdgeComponent e) {
             float p = e.priElseZero();
+            if (p <= priTHRESH)
+                return;
+
             switch (e.type) {
                 case TERMLINK:
                     this.termlinkPri += p;
@@ -435,6 +229,7 @@ public class ConceptWidget extends TermWidget<Concept> {
                     break;
             }
             priMax(p);
+            inactive = false;
         }
 
     }

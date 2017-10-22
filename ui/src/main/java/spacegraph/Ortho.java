@@ -2,13 +2,19 @@ package spacegraph;
 
 import com.jogamp.newt.event.*;
 import com.jogamp.opengl.GL2;
+import jcog.event.ListTopic;
+import jcog.event.On;
+import jcog.event.Topic;
+import jcog.tree.rtree.rect.RectFloat2D;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
-import spacegraph.math.v2;
+import spacegraph.math.v3;
 import spacegraph.phys.util.AnimVector2f;
 import spacegraph.phys.util.AnimVector3f;
 import spacegraph.phys.util.Animated;
+
+import java.util.function.Consumer;
 
 /**
  * orthographic widget adapter. something which goes on the "face" of a HUD ("head"s-up-display)
@@ -19,20 +25,48 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
 
     final Finger finger;
 
-    public Surface surface;
-    private boolean maximize;
-    public SpaceGraph window;
+    //temporary: world mouse coord
+    protected float wmy, wmx;
 
+    /**
+     * window width/height in pixels
+     */
+    int W, H;
+
+    public Surface surface;
+    public SpaceGraph window;
+    protected final v3 cam;
+
+    final Topic logs = new ListTopic();
 
     public Ortho() {
         this.finger = new Finger(this);
         this.scale = new AnimVector2f(1, 1, 6f);
-        this.pos = new AnimVector3f(8f);
+        this.cam = new AnimVector3f(8f);
     }
 
     public Ortho(Surface content) {
         this();
         setSurface(content);
+    }
+
+    @Override
+    public void layout() {
+        surface.layout();
+        surface.print(System.out, 0);
+    }
+
+    @Override
+    public On onLog(Consumer o) {
+        return logs.on(o);
+    }
+
+    public void log(Object... o) {
+        logs.emit(o);
+    }
+
+    public void log(Object o) {
+        logs.emit(o);
     }
 
     public void setSurface(Surface content) {
@@ -42,14 +76,13 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
 
     public void start(SpaceGraph s) {
         this.window = s;
+        resized();
         s.addWindowListener(this);
         s.addMouseListener(this);
         s.addKeyListener(this);
         s.dyn.addAnimation((Animated) scale);
-        s.dyn.addAnimation((Animated) pos);
+        s.dyn.addAnimation((Animated) cam);
         surface.start(this);
-        surface.layout();
-        resized();
     }
 
     @Override
@@ -58,53 +91,41 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     }
 
     @Override
-    public Ortho translate(float x, float y) {
-        pos.set(x, y, 0);
-        return this;
-    }
-
-    @Override
     public Ortho move(float x, float y) {
-        pos.add(x, y, 0);
-        return this;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Ortho scale(float s) {
-        return scale(s, s);
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void zoom(float x, float y, float sx, float sy) {
 
         //System.out.println(x + "," + y + " " + sx + "x" + sy + ".." + scale);
-        v2 gs = scale;
-        translate(-(x - 1) * scale.x/2,  -(y - 1)*scale.y/2);
+        //v2 gs = scale;
+        //move(-(x - 1) * scale.x/2,  -(y - 1)*scale.y/2);
+        cam.set(x, y);
+        //scale.set(sx/ w(), sy/ h());
 
         //scale()
     }
 
     @Override
     public Ortho scale(float sx, float sy) {
-        scale.set(sx, sy);
-        return this;
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
-    protected void paint(GL2 gl) {
-        gl.glTranslatef(-0.5f, -0.5f, 0);
-        surface.render(gl);
+    public float w() {
+        return W;
     }
 
-
-    /**
-     * expand to window
-     */
-    public Ortho maximize() {
-        maximize = true;
-        resized();
-        return this;
+    @Override
+    public float h() {
+        return H;
     }
 
     @Override
@@ -112,14 +133,10 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
         resized();
     }
 
-    private void resized() {
-        //TODO resize preserving aspect, translation, etc
-        if (maximize && window != null) {
-            int W = window.getWidth();
-            int H = window.getHeight();
-            scale(W, H);
-            translate(W / 2, H / 2);
-        }
+
+    @Override
+    public Surface pos(float x1, float y1, float x2, float y2) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -209,17 +226,19 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     private boolean updateMouse(MouseEvent e, short[] buttonsDown) {
         float x, y;
 
+
         if (e != null && !e.isConsumed()) {
 
             //screen coordinates
             float sx = e.getX();
             float sy = window.getHeight() - e.getY();
 
-            //if (!HUDSurface.updateMouseHUD(sx, sy, buttonsDown)) {
+            wmx = +cam.x + (sx/W) * scale.x;
+            wmy = +cam.y + (sy/H) * scale.y;
+
 
             updateMouse(e, sx, sy, buttonsDown);
             return true;
-            //}
 
         } else {
 
@@ -245,14 +264,46 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
             off();
         } else {*/
         Surface s;
-        float lx = 0.5f + (sx - pos.x) / (scale.x);
-        float ly = 0.5f + (sy - pos.y) / (scale.y);
+
         //System.out.println(lx + " " + ly);
         //if (lx >= 0 && ly >= 0 && lx <= 1f && ly <= 1f) {
-        if ((s = finger.on(sx, sy, lx, ly, buttonsDown)) != null) {
+        if ((s = finger.on(sx, sy, wmx, wmy, buttonsDown)) != null) {
+            log("on", s);
             return s;
         } else {
             return null;
+        }
+    }
+
+    @Override
+    protected void paint(GL2 gl) {
+
+
+        float sx = scale.x;
+        float sy = scale.y;
+        //gl.glTranslatef(W / 2, H / 2, 0);
+        gl.glScalef(sx, sy, 1);
+        gl.glTranslatef(-cam.x/sx, -cam.y/sy, 0);
+        //gl.glTranslatef((sx) * -cam.x, sy * -cam.y, 0);
+
+        surface.render(gl);
+    }
+
+    private void resized() {
+        if (window != null) {
+            //TODO resize preserving aspect, translation, etc
+            W = window.getWidth();
+            H = window.getHeight();
+            //pos(0, 0, );
+            surface.pos(0, 0, W, H);
+
+            //int S = Math.min(W, H);
+            scale.set(1, 1);
+            cam.set(0, 0);
+
+            layout();
+        } else {
+            W = H = 1;
         }
     }
 
@@ -268,5 +319,11 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
 
     }
 
+    static final float zoomDilation = 1.05f;
 
+    public float getTargetHeight(RectFloat2D rect) {
+        float r = rect.mag() / 2.0f * zoomDilation;
+        double focus = Math.toRadians(45 /* degrees */);
+        return r * (float) (Math.sin(Math.PI / 2.0 - focus / 2.0) / Math.sin(focus / 2.0));
+    }
 }

@@ -2,17 +2,41 @@ package spacegraph;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
+import jcog.Texts;
+import jcog.tree.rtree.rect.RectFloat2D;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
-import spacegraph.math.v3;
+
+import java.io.PrintStream;
 
 /**
  * planar subspace.
  * (fractal) 2D Surface embedded relative to a parent 2D surface or 3D space
  */
-abstract public class Surface {
+abstract public class Surface  {
 
+
+    public float x() {
+        return bounds.min.x;
+    }
+    public float y() {
+        return bounds.min.y;
+    }
+    public float cx() {
+        return 0.5f * (bounds.min.x + bounds.max.x);
+    }
+    public float cy() {
+        return 0.5f * (bounds.min.y + bounds.max.y);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + "{" +
+                ", bounds=" + bounds +
+                "scale=" + scale +
+                '}';
+    }
 
     public enum Align {
 
@@ -37,10 +61,13 @@ abstract public class Surface {
         //TODO etc...
     }
 
-    public v3 pos;
-    public v2 scale;
 
+    /** scale can remain the unit 1 vector, normally */
+    public v2 scale = new v2(1,1); //v2.ONE;
+    public RectFloat2D bounds;
     public Surface parent;
+
+
 
     /**
      * not used unless aspect ratio is set to non-NaN value
@@ -53,8 +80,7 @@ abstract public class Surface {
     protected float aspect = Float.NaN;
 
     public Surface() {
-        pos = new v3();
-        scale = new v2(1f, 1f);
+        bounds = RectFloat2D.Unit;
     }
 
     public SurfaceRoot root() {
@@ -91,6 +117,13 @@ abstract public class Surface {
         parent = null;
     }
 
+    public float w() {
+        return bounds.max.x - bounds.min.x;
+    }
+    public float h() {
+        return bounds.max.y - bounds.min.y;
+    }
+
     /**
      * returns non-null if the event has been absorbed by a speciifc sub-surface
      * or null if nothing absorbed the gesture
@@ -118,64 +151,74 @@ abstract public class Surface {
     abstract protected void paint(GL2 gl);
 
     public Surface move(float dx, float dy) {
-        pos.add(dx, dy,0);
+        bounds = bounds.move(dx, dy);
         return this;
+    }
+
+    public void print(PrintStream out, int indent) {
+        out.print(Texts.repeat("  ", indent));
+        out.println(this.toString());
     }
 
     public final void render(GL2 gl) {
 
+//        v2 s = this.scale;
+//        float scaleX = s.x;
+//        if (scaleX != scaleX || scaleX <= 0)
+//            return; //invisible
+//
+//        v2 scale = this.scale;
+//
+//        float sx, sy;
+//
+//        float aspect = this.aspect;
+//        if (aspect==aspect /* not NaN */) {
+//
+//            if (scale.y/scale.x > aspect) {
+//                //wider, shrink y
+//                sx = scale.x;
+//                sy = scale.y * aspect;
+//            } else {
+//                //taller, shrink x
+//                sx = scale.x / aspect;
+//                sy = scale.y;
+//            }
+//
+//
+//        } else {
+//            //consume entire area, regardless of aspect
+//            sx = scale.x;
+//            sy = scale.y;
+//        }
+//
+//
+//        switch (align) {
+//
+//            //TODO others
+//
+//            case Center:
+//                //HACK TODO figure this out
+//                tx += (1f - (sx/scale.x))/2f;
+//                ty += (1f - (sy/scale.y))/2f;
+//                break;
+//
+//            case None:
+//            default:
+//                break;
+//
+//        }
 
-        v2 s = this.scale;
-        float scaleX = s.x;
-        if (scaleX != scaleX || scaleX <= 0)
-            return; //invisible
-
-        v2 scale = this.scale;
-
-        float sx, sy;
-
-        float aspect = this.aspect;
-        if (aspect==aspect /* not NaN */) {
-
-            if (scale.y/scale.x > aspect) {
-                //wider, shrink y
-                sx = scale.x;
-                sy = scale.y * aspect;
-            } else {
-                //taller, shrink x
-                sx = scale.x / aspect;
-                sy = scale.y;
-            }
-
-
-        } else {
-            //consume entire area, regardless of aspect
-            sx = scale.x;
-            sy = scale.y;
-        }
-
-        float tx = pos.x, ty = pos.y;
-        switch (align) {
-
-            //TODO others
-
-            case Center:
-                //HACK TODO figure this out
-                tx += (1f - (sx/scale.x))/2f;
-                ty += (1f - (sy/scale.y))/2f;
-                break;
-
-            case None:
-            default:
-                break;
-
-        }
-
+//        RectFloat2D b = bounds;
+//        float tx = b.min.x, ty = b.min.y;
+        float sx = scale.x, sy = scale.y;
 
         gl.glPushMatrix();
 
-        gl.glTranslatef(tx, ty, pos.z);
-        gl.glScalef(sx, sy, 1f);
+//        if (tx!=0 || ty!=0)
+//            gl.glTranslatef(tx, ty,  0);
+
+//        if (sx!=1 || sy!=1)
+//            gl.glScalef(sx, sy, 1f);
 
         //gl.glNormal3f(0,0,1);
 
@@ -196,8 +239,8 @@ abstract public class Surface {
         return this;
     }
 
-    public Surface pos(float x, float y) {
-        pos.set(x, y);
+    public Surface pos(float x1, float y1, float x2, float y2) {
+        bounds = new RectFloat2D(x1, y1, x2, y2);
         return this;
     }
 

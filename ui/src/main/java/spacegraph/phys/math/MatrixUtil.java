@@ -196,16 +196,16 @@ public class MatrixUtil {
 		//ArrayPool<float[]> floatArrays = ArrayPool.get(float.class);
 		
 		float trace = mat.m00 + mat.m11 + mat.m22;
-		float[] temp = new float[4]; //floatArrays.getFixed(4);
+		//float[] temp = new float[4]; //floatArrays.getFixed(4);
 
 		if (trace > 0f) {
 			float s = (float) Math.sqrt(trace + 1f);
-			temp[3] = (s * 0.5f);
+			dest.w = (s * 0.5f);
 			s = 0.5f / s;
 
-			temp[0] = ((mat.m21 - mat.m12) * s);
-			temp[1] = ((mat.m02 - mat.m20) * s);
-			temp[2] = ((mat.m10 - mat.m01) * s);
+			dest.x = ((mat.m21 - mat.m12) * s);
+			dest.y = ((mat.m02 - mat.m20) * s);
+			dest.z = ((mat.m10 - mat.m01) * s);
 		}
 		else {
 			int i = mat.m00 < mat.m11 ? (mat.m11 < mat.m22 ? 2 : 1) : (mat.m00 < mat.m22 ? 2 : 0);
@@ -213,14 +213,14 @@ public class MatrixUtil {
 			int k = (i + 2) % 3;
 
 			float s = (float) Math.sqrt(mat.get(i, i) - mat.get(j, j) - mat.get(k, k) + 1f);
-			temp[i] = s * 0.5f;
+			dest.set(i, s * 0.5f);
 			s = 0.5f / s;
 
-			temp[3] = (mat.get(k, j) - mat.get(j, k)) * s;
-			temp[j] = (mat.get(j, i) + mat.get(i, j)) * s;
-			temp[k] = (mat.get(k, i) + mat.get(i, k)) * s;
+			dest.w = (mat.get(k, j) - mat.get(j, k)) * s;
+			dest.set(j, (mat.get(j, i) + mat.get(i, j)) * s);
+			dest.set(k, (mat.get(k, i) + mat.get(i, k)) * s);
 		}
-		dest.set(temp);
+		//dest.set(temp);
 		
 		//floatArrays.release(temp);
 	}

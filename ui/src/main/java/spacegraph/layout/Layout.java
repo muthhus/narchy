@@ -1,12 +1,14 @@
 package spacegraph.layout;
 
-import com.google.common.collect.Lists;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
+import jcog.Texts;
+import jcog.list.FasterList;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
 
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -14,22 +16,38 @@ import java.util.function.Consumer;
 /**
  * Created by me on 7/20/16.
  */
-public class Layout<S extends Surface> extends Surface {
+public class Layout extends Surface {
 
-    public List<S> children;
+    public List<Surface> children;
 
     protected boolean clipTouchBounds = true;
 
-    public Layout(S... children) {
-        this(Lists.newArrayList(children));
-    }
-
-    public Layout(List<S> children) {
+    public Layout(Surface... children) {
+        super();
         set(children);
     }
 
-    public List<S> children() {
+    public Layout(List<Surface> children) {
+        set(children);
+    }
+
+    public List<Surface> children() {
         return children;
+    }
+
+    @Override
+    public void layout() {
+        children.forEach(Surface::layout);
+    }
+
+    @Override
+    public void print(PrintStream out, int indent) {
+        super.print(out, indent);
+
+        children.forEach(c -> {
+            out.print(Texts.repeat("  ", indent+1));
+            c.print(out, indent + 1);
+        });
     }
 
     @Override
@@ -42,17 +60,17 @@ public class Layout<S extends Surface> extends Surface {
 
     }
 
-    public final Layout set(S... s) {
-        set(Lists.newArrayList(s));
+    public final Layout set(Surface... s) {
+        set(new FasterList(s));
         return this;
     }
 
-    public Layout<S> set(List<S> next) {
+    public Layout set(List<Surface> next) {
         synchronized (scale) {
 
             if (!Objects.equals(this.children, next)) {
 
-                List<S> existing = this.children;
+                List<Surface> existing = this.children;
                 if (existing != null) {
                     for (Surface x : existing)
                         if (!next.contains(x)) {
@@ -70,7 +88,8 @@ public class Layout<S extends Surface> extends Surface {
                     }
                 }
 
-                layout();
+                if (parent!=null)
+                    layout();
             }
         }
         return this;
@@ -95,13 +114,18 @@ public class Layout<S extends Surface> extends Surface {
     }
 
     @Override
+    public Surface scale(float x, float y) {
+        return super.scale(x, y);
+    }
+
+    @Override
     public Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
         Surface x = super.onTouch(finger, hitPoint, buttons);
         if (x != null)
             return x;
 
         //2. test children reaction
-        List<S> cc = this.children;
+        List<Surface> cc = this.children;
 
         // Draw forward, propagate touch events backwards
         if (hitPoint == null) {
@@ -114,25 +138,24 @@ public class Layout<S extends Surface> extends Surface {
             for (int i = cc.size()-1; i >=0; i--) {
                 Surface c = cc.get(i);
 
-                v2 sc = c.scale;
-                float csx = sc.x;
-                float csy = sc.y;
+                //TODO factor in the scale if different from 1
+                float csx = c.w();
+                float csy = c.h();
                 if (/*csx != csx || */csx <= 0 || /*csy != csy ||*/ csy <= 0)
                     continue;
 
                 //project to child's space
-                v2 subHit = new v2(hitPoint);
-                subHit.sub(c.pos.x, c.pos.y);
-
-                subHit.scale(1f / csx, 1f / csy);
+                v2 relativeHit = new v2(finger.hit);
+                relativeHit.sub(c.x(), c.y());
+                relativeHit.scale(1f / csx, 1f / csy);
 
                 //subHit.sub(tx, ty);
 
-                float hx = subHit.x, hy = subHit.y;
+                float hx = relativeHit.x, hy = relativeHit.y;
                 if (!clipTouchBounds || (hx >= 0f && hx <= 1f && hy >= 0 && hy <= 1f)) {
                     //subHit.add(c.translateLocal.x*csx, c.translateLocal.y*csy);
 
-                    Surface s = c.onTouch(finger, subHit, buttons);
+                    Surface s = c.onTouch(finger, relativeHit, buttons);
 
                     if (s != null)
                         return s; //FIFO
@@ -159,7 +182,7 @@ public class Layout<S extends Surface> extends Surface {
     public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
         if (!super.onKey(hitPoint, charCode, pressed)) {
 
-            List<S> cc = this.children;
+            List<Surface> cc = this.children;
             for (int i = 0, childrenSize = cc.size(); i < childrenSize; i++) {
                 if (cc.get(i).onKey(hitPoint, charCode, pressed))
                     return true;
@@ -168,7 +191,7 @@ public class Layout<S extends Surface> extends Surface {
         return false;
     }
 
-    public void forEach(Consumer<S> o) {
+    public void forEach(Consumer<Surface> o) {
         children.forEach(o);
     }
 

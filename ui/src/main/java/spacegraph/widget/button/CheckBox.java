@@ -1,7 +1,9 @@
 package spacegraph.widget.button;
 
+import com.jogamp.opengl.GL2;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
+import spacegraph.render.Draw;
 import spacegraph.widget.Label;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,13 +18,13 @@ public class CheckBox extends ToggleButton {
 
     public CheckBox(String text) {
         this.text = text;
-        set(label = new Label(""));
+        label = new Label("");
         set(false);
     }
 
     public CheckBox(String text, BooleanProcedure b) {
         this(text);
-        on((a,e)->b.value(e));
+        on((a, e) -> b.value(e));
     }
 
     public CheckBox(String text, ToggleAction on) {
@@ -33,12 +35,18 @@ public class CheckBox extends ToggleButton {
     public CheckBox(String text, AtomicBoolean b) {
         this(text);
         set(b.get());
-        on((button,value)->b.set(value));
+        on((button, value) -> b.set(value));
     }
+
     public CheckBox(String text, MutableBoolean b) {
         this(text);
         set(b.booleanValue());
-        on((button,value)->b.setValue(value));
+        on((button, value) -> b.setValue(value));
+    }
+
+    @Override
+    protected void paintContent(GL2 gl, float x, float y, float w, float h) {
+        Draw.bounds(gl, x, y, w, h, label::paint);
     }
 
     @Override

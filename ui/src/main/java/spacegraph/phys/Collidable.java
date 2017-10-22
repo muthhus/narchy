@@ -57,7 +57,10 @@ public class Collidable<X> {
 	//without destroying the continuous interpolated motion (which uses this interpolation velocities)
 	protected final v3 interpolationLinearVelocity = new v3();
 	protected final v3 interpolationAngularVelocity = new v3();
-	protected Broadphasing broadphaseHandle;
+
+	/** broadphase handle */
+	public Broadphasing broadphase;
+
 	protected CollisionShape collisionShape;
 
 	public short mask, group;
@@ -226,14 +229,10 @@ public class Collidable<X> {
 		this.worldTransform.set(worldTransform);
 	}
 
-	public final Broadphasing broadphase() {
-		return broadphaseHandle;
-	}
-
 	public void broadphase(@Nullable Broadphasing broadphaseHandle) {
-		if ((broadphaseHandle!=null && this.broadphaseHandle!=null) || (broadphaseHandle==null && this.broadphaseHandle==null))
+		if ((broadphaseHandle!=null && this.broadphase !=null) || (broadphaseHandle==null && this.broadphase ==null))
 			throw new RuntimeException();
-		this.broadphaseHandle = broadphaseHandle;
+		this.broadphase = broadphaseHandle;
 	}
 
 	public final Transform getInterpolationWorldTransform(Transform out) {

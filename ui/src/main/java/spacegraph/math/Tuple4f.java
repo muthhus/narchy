@@ -119,12 +119,11 @@ public abstract class Tuple4f implements java.io.Serializable, Cloneable {
   /**
    * Constructs and initializes a Tuple4f to (0,0,0,0).
    */
-  protected Tuple4f()
-  {
-    this.x = 0.0f;
-    this.y = 0.0f;
-    this.z = 0.0f;
-    this.w = 0.0f;
+  protected Tuple4f()   {
+//    this.x = 0.0f;
+//    this.y = 0.0f;
+//    this.z = 0.0f;
+//    this.w = 0.0f;
   }
 
 

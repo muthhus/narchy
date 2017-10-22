@@ -78,6 +78,9 @@ public class v3 extends Tuple3f {
     public v3(v3 v1) {
         super(v1);
     }
+    public v3(v3 v1, float scale) {
+        set(v1.x * scale, v1.y * scale, v1.z * scale);
+    }
 
 
     /**

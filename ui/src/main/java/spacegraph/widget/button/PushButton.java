@@ -1,5 +1,6 @@
 package spacegraph.widget.button;
 
+import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.widget.AbstractButton;
 import spacegraph.widget.Label;
@@ -11,7 +12,7 @@ import java.util.function.Consumer;
  */
 public class PushButton extends AbstractButton {
 
-    private final Label text;
+    private final Label label;
 
     @Nullable private Consumer<PushButton> onClick;
 
@@ -21,7 +22,7 @@ public class PushButton extends AbstractButton {
 
     public PushButton(String s) {
         super();
-        set(text = new Label(s));
+        label = new Label(s);
     }
 
     public PushButton(Consumer<PushButton> onClick) {
@@ -42,8 +43,13 @@ public class PushButton extends AbstractButton {
         this.onClick = onClick;
     }
 
-    public void setText(String s) {
-        this.text.set(s);
+    public void setLabel(String s) {
+        this.label.set(s);
+    }
+
+    @Override
+    protected void paintContent(GL2 gl, float x, float y, float w, float h) {
+        text(gl, label, x, y, w, h);
     }
 
 

@@ -20,7 +20,7 @@ public class SimpleGraph1 extends DynamicListSpace<Term,TermWidget<Term>> {
 
 //    final Surface status = new Label("ready");
 
-    final TermWidget.TermVis<TermWidget<Term>> vis = w -> {
+    final TermWidget.BasicTermVis<TermWidget<Term>> vis = w -> {
 
         w.scale(5, 5, 5);
 
@@ -82,7 +82,7 @@ public class SimpleGraph1 extends DynamicListSpace<Term,TermWidget<Term>> {
 
     @Override
     protected void render() {
-        active.forEach(n -> n.commit(vis, this));
+        vis.accept(active);
     }
 
     @Override

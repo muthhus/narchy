@@ -1,5 +1,6 @@
 package spacegraph.widget;
 
+import com.jcraft.jsch.JSchException;
 import com.jogamp.opengl.GL2;
 import jcog.Texts;
 import jcog.Util;
@@ -17,6 +18,8 @@ import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.console.TextEdit;
 import spacegraph.widget.slider.BaseSlider;
 import spacegraph.widget.slider.XYSlider;
+
+import java.io.IOException;
 
 import static spacegraph.layout.Grid.*;
 
@@ -82,6 +85,7 @@ abstract public class Widget extends Stacking {
 
     }
 
+
     abstract protected void paintComponent(GL2 gl);
 
 
@@ -115,13 +119,13 @@ abstract public class Widget extends Stacking {
     protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
         if (finger!=null && finger.clickReleased(2)) { //released right button
 
-            root().zoom(pos.x, pos.y, scale.x, scale.y);
+            root().zoom(cx(), cy(), w(), h());
 
         }
         return super.onTouching(finger, hitPoint, buttons);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, JSchException {
 
         SpaceGraph s = SpaceGraph.window(
 
@@ -160,7 +164,7 @@ abstract public class Widget extends Stacking {
                         col(new ScaleDebugLabel(), new PushButton("sdjfjsdfk"))
                 ),
                 new PushButton("clickMe()", (p) -> {
-                    p.setText(Texts.n2(Math.random()));
+                    p.setLabel(Texts.n2(Math.random()));
                 }),
 
                 new XYSlider(),

@@ -31,6 +31,8 @@
 
 package spacegraph.math;
 
+import jcog.Util;
+
 /**
  * A 4 element unit quaternion represented by single precision floating
  * point x,y,z,w coordinates.  The quaternion is always normalized.
@@ -40,9 +42,9 @@ public class Quat4f extends Tuple4f {
     // Combatible with 1.1
     static final long serialVersionUID = 2675933778405442383L;
 
-    final static double EPS = 0.000001;
-    final static double EPS2 = 1.0e-30;
-    final static double PIO2 = 1.57079632679;
+    final static float EPS = 0.000001f;
+    final static float EPS2 = Float.MIN_NORMAL;
+    final static float PIO2 = 1.57079632679f;
 
     /**
      * Constructs and initializes a Quat4f from the specified xyzw coordinates.
@@ -110,18 +112,18 @@ public class Quat4f extends Tuple4f {
     }
 
 
-    /**
-     * Constructs and initializes a Quat4f from the specified Tuple4d.
-     *
-     * @param t1 the Tuple4d containing the initialization x y z w data
-     */
-    public Quat4f(Tuple4d t1) {
-        double mag = 1.0 / Math.sqrt(t1.x * t1.x + t1.y * t1.y + t1.z * t1.z + t1.w * t1.w);
-        x = (float) (t1.x * mag);
-        y = (float) (t1.y * mag);
-        z = (float) (t1.z * mag);
-        w = (float) (t1.w * mag);
-    }
+//    /**
+//     * Constructs and initializes a Quat4f from the specified Tuple4d.
+//     *
+//     * @param t1 the Tuple4d containing the initialization x y z w data
+//     */
+//    public Quat4f(Tuple4d t1) {
+//        double mag = 1.0 / Math.sqrt(t1.x * t1.x + t1.y * t1.y + t1.z * t1.z + t1.w * t1.w);
+//        x = (float) (t1.x * mag);
+//        y = (float) (t1.y * mag);
+//        z = (float) (t1.z * mag);
+//        w = (float) (t1.w * mag);
+//    }
 
 
     /**
@@ -365,60 +367,60 @@ public class Quat4f extends Tuple4f {
     }
 
 
-    /**
-     * Sets the value of this quaternion to the rotational component of
-     * the passed matrix.
-     *
-     * @param m1 the Matrix4d
-     */
-    public final void set(Matrix4d m1) {
-        double ww = 0.25 * (m1.m00 + m1.m11 + m1.m22 + m1.m33);
-
-        if (ww >= 0) {
-            if (ww >= EPS2) {
-                this.w = (float) Math.sqrt(ww);
-                ww = 0.25 / this.w;
-                this.x = (float) ((m1.m21 - m1.m12) * ww);
-                this.y = (float) ((m1.m02 - m1.m20) * ww);
-                this.z = (float) ((m1.m10 - m1.m01) * ww);
-                return;
-            }
-        } else {
-            this.w = 0;
-            this.x = 0;
-            this.y = 0;
-            this.z = 1;
-            return;
-        }
-
-        this.w = 0;
-        ww = -0.5 * (m1.m11 + m1.m22);
-        if (ww >= 0) {
-            if (ww >= EPS2) {
-                this.x = (float) Math.sqrt(ww);
-                ww = 0.5 / this.x;
-                this.y = (float) (m1.m10 * ww);
-                this.z = (float) (m1.m20 * ww);
-                return;
-            }
-        } else {
-            this.x = 0;
-            this.y = 0;
-            this.z = 1;
-            return;
-        }
-
-        this.x = 0;
-        ww = 0.5 * (1.0 - m1.m22);
-        if (ww >= EPS2) {
-            this.y = (float) Math.sqrt(ww);
-            this.z = (float) (m1.m21 / (2.0 * (double) (this.y)));
-            return;
-        }
-
-        this.y = 0;
-        this.z = 1;
-    }
+//    /**
+//     * Sets the value of this quaternion to the rotational component of
+//     * the passed matrix.
+//     *
+//     * @param m1 the Matrix4d
+//     */
+//    public final void set(Matrix4d m1) {
+//        double ww = 0.25 * (m1.m00 + m1.m11 + m1.m22 + m1.m33);
+//
+//        if (ww >= 0) {
+//            if (ww >= EPS2) {
+//                this.w = (float) Math.sqrt(ww);
+//                ww = 0.25 / this.w;
+//                this.x = (float) ((m1.m21 - m1.m12) * ww);
+//                this.y = (float) ((m1.m02 - m1.m20) * ww);
+//                this.z = (float) ((m1.m10 - m1.m01) * ww);
+//                return;
+//            }
+//        } else {
+//            this.w = 0;
+//            this.x = 0;
+//            this.y = 0;
+//            this.z = 1;
+//            return;
+//        }
+//
+//        this.w = 0;
+//        ww = -0.5 * (m1.m11 + m1.m22);
+//        if (ww >= 0) {
+//            if (ww >= EPS2) {
+//                this.x = (float) Math.sqrt(ww);
+//                ww = 0.5 / this.x;
+//                this.y = (float) (m1.m10 * ww);
+//                this.z = (float) (m1.m20 * ww);
+//                return;
+//            }
+//        } else {
+//            this.x = 0;
+//            this.y = 0;
+//            this.z = 1;
+//            return;
+//        }
+//
+//        this.x = 0;
+//        ww = 0.5 * (1.0 - m1.m22);
+//        if (ww >= EPS2) {
+//            this.y = (float) Math.sqrt(ww);
+//            this.z = (float) (m1.m21 / (2.0 * (double) (this.y)));
+//            return;
+//        }
+//
+//        this.y = 0;
+//        this.z = 1;
+//    }
 
 
     /**
@@ -477,60 +479,60 @@ public class Quat4f extends Tuple4f {
     }
 
 
-    /**
-     * Sets the value of this quaternion to the rotational component of
-     * the passed matrix.
-     *
-     * @param m1 the Matrix3d
-     */
-    public final void set(Matrix3d m1) {
-        double ww = 0.25 * (m1.m00 + m1.m11 + m1.m22 + 1.0f);
-
-        if (ww >= 0) {
-            if (ww >= EPS2) {
-                this.w = (float) Math.sqrt(ww);
-                ww = 0.25 / this.w;
-                this.x = (float) ((m1.m21 - m1.m12) * ww);
-                this.y = (float) ((m1.m02 - m1.m20) * ww);
-                this.z = (float) ((m1.m10 - m1.m01) * ww);
-                return;
-            }
-        } else {
-            this.w = 0;
-            this.x = 0;
-            this.y = 0;
-            this.z = 1;
-            return;
-        }
-
-        this.w = 0;
-        ww = -0.5 * (m1.m11 + m1.m22);
-        if (ww >= 0) {
-            if (ww >= EPS2) {
-                this.x = (float) Math.sqrt(ww);
-                ww = 0.5 / this.x;
-                this.y = (float) (m1.m10 * ww);
-                this.z = (float) (m1.m20 * ww);
-                return;
-            }
-        } else {
-            this.x = 0;
-            this.y = 0;
-            this.z = 1;
-            return;
-        }
-
-        this.x = 0;
-        ww = 0.5 * (1.0 - m1.m22);
-        if (ww >= EPS2) {
-            this.y = (float) Math.sqrt(ww);
-            this.z = (float) (m1.m21 / (2.0 * (double) (this.y)));
-            return;
-        }
-
-        this.y = 0;
-        this.z = 1;
-    }
+//    /**
+//     * Sets the value of this quaternion to the rotational component of
+//     * the passed matrix.
+//     *
+//     * @param m1 the Matrix3d
+//     */
+//    public final void set(Matrix3d m1) {
+//        float ww = 0.25f * (m1.m00 + m1.m11 + m1.m22 + 1.0f);
+//
+//        if (ww >= 0) {
+//            if (ww >= EPS2) {
+//                this.w = (float) Math.sqrt(ww);
+//                ww = 0.25f / this.w;
+//                this.x = (float) ((m1.m21 - m1.m12) * ww);
+//                this.y = (float) ((m1.m02 - m1.m20) * ww);
+//                this.z = (float) ((m1.m10 - m1.m01) * ww);
+//                return;
+//            }
+//        } else {
+//            this.w = 0;
+//            this.x = 0;
+//            this.y = 0;
+//            this.z = 1;
+//            return;
+//        }
+//
+//        this.w = 0;
+//        ww = -0.5 * (m1.m11 + m1.m22);
+//        if (ww >= 0) {
+//            if (ww >= EPS2) {
+//                this.x = (float) Math.sqrt(ww);
+//                ww = 0.5 / this.x;
+//                this.y = (float) (m1.m10 * ww);
+//                this.z = (float) (m1.m20 * ww);
+//                return;
+//            }
+//        } else {
+//            this.x = 0;
+//            this.y = 0;
+//            this.z = 1;
+//            return;
+//        }
+//
+//        this.x = 0;
+//        ww = 0.5 * (1.0 - m1.m22);
+//        if (ww >= EPS2) {
+//            this.y = (float) Math.sqrt(ww);
+//            this.z = (float) (m1.m21 / (2.0 * (double) (this.y)));
+//            return;
+//        }
+//
+//        this.y = 0;
+//        this.z = 1;
+//    }
 
 
     /**
@@ -552,50 +554,29 @@ public class Quat4f extends Tuple4f {
 
     public void setAngle(float ax, float ay, float az, float angle) {
         float amag;
-        amag = (float) Math.sqrt(ax * ax + ay * ay + az * az);
-        if (amag < EPS) {
-            w = 0.0f;
-            this.x = 0.0f;
-            this.y = 0.0f;
-            this.z = 0.0f;
+        amag = (ax * ax + ay * ay + az * az);
+        if (amag < EPS*EPS) {
+            this.x = this.y = this.z = this.w = 0.0f;
         } else {
-            amag = 1.0f / amag;
-            float mag = (float) Math.sin(angle / 2.0);
-            w = (float) Math.cos(angle / 2.0);
-            this.x = ax * amag * mag;
-            this.y = ay * amag * mag;
-            this.z = az * amag * mag;
+            if (Util.equals(angle, 0, EPS)) {
+                this.w = 1; this.x = this.y = this.z = 0;
+            } else {
+                amag = (float) (1.0f / Math.sqrt(amag));
+
+                double ha = angle / 2.0;
+                float mag = (float) Math.sin(ha) * amag;
+                w = (float) Math.cos(ha);
+                if (mag < EPS * EPS) {
+                    this.x = this.y = this.z = 0;
+                } else {
+                    this.x = ax * mag;
+                    this.y = ay * mag;
+                    this.z = az * mag;
+                }
+            }
         }
     }
 
-
-    /**
-     * Sets the value of this quaternion to the equivalent rotation
-     * of the AxisAngle argument.
-     *
-     * @param a the AxisAngle to be emulated
-     */
-    public final void set(AxisAngle4d a) {
-        float amag;
-        // Quat = cos(theta/2) + sin(theta/2)(roation_axis)
-
-        amag = (float) (1.0 / Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z));
-
-        if (amag < EPS) {
-            w = 0.0f;
-            x = 0.0f;
-            y = 0.0f;
-            z = 0.0f;
-        } else {
-            amag = 1.0f / amag;
-            float mag = (float) Math.sin(a.angle / 2.0);
-            w = (float) Math.cos(a.angle / 2.0);
-            x = (float) a.x * amag * mag;
-            y = (float) a.y * amag * mag;
-            z = (float) a.z * amag * mag;
-        }
-
-    }
 
 
     /**
@@ -614,55 +595,9 @@ public class Quat4f extends Tuple4f {
         // Fixed function to negate the first quaternion in the case that the
         // dot product of q1 and this is negative. Second case was not needed.
 
-        double s1, s2, om, sinom;
+        float s1, s2, om, sinom;
 
-        double dot = x * q1.x + y * q1.y + z * q1.z + w * q1.w;
-
-        if (dot < 0) {
-            // negate quaternion
-            q1.x = -q1.x;
-            q1.y = -q1.y;
-            q1.z = -q1.z;
-            q1.w = -q1.w;
-            dot = -dot;
-        }
-
-        if ((1.0 - dot) > EPS) {
-            om = Math.acos(dot);
-            sinom = Math.sin(om);
-            s1 = Math.sin((1.0 - alpha) * om) / sinom;
-            s2 = Math.sin(alpha * om) / sinom;
-        } else {
-            s1 = 1.0 - alpha;
-            s2 = alpha;
-        }
-
-        w = (float) (s1 * w + s2 * q1.w);
-        x = (float) (s1 * x + s2 * q1.x);
-        y = (float) (s1 * y + s2 * q1.y);
-        z = (float) (s1 * z + s2 * q1.z);
-    }
-
-
-    /**
-     * Performs a great circle interpolation between quaternion q1
-     * and quaternion q2 and places the result into this quaternion.
-     *
-     * @param q1    the first quaternion
-     * @param q2    the second quaternion
-     * @param alpha the alpha interpolation parameter
-     */
-    public final void interpolate(Quat4f q1, Quat4f q2, float alpha) {
-        // From "Advanced Animation and Rendering Techniques"
-        // by Watt and Watt pg. 364, function as implemented appeared to be
-        // incorrect.  Fails to choose the same quaternion for the double
-        // covering. Resulting in change of direction for rotations.
-        // Fixed function to negate the first quaternion in the case that the
-        // dot product of q1 and this is negative. Second case was not needed.
-
-        double s1, s2, om, sinom;
-
-        double dot = q2.x * q1.x + q2.y * q1.y + q2.z * q1.z + q2.w * q1.w;
+        float dot = x * q1.x + y * q1.y + z * q1.z + w * q1.w;
 
         if (dot < 0) {
             // negate quaternion
@@ -674,19 +609,65 @@ public class Quat4f extends Tuple4f {
         }
 
         if ((1.0 - dot) > EPS) {
-            om = Math.acos(dot);
-            sinom = Math.sin(om);
-            s1 = Math.sin((1.0 - alpha) * om) / sinom;
-            s2 = Math.sin(alpha * om) / sinom;
+            om = (float) Math.acos(dot);
+            sinom = (float) Math.sin(om);
+            s1 = (float) (Math.sin((1.0 - alpha) * om) / sinom);
+            s2 = (float) (Math.sin(alpha * om) / sinom);
         } else {
-            s1 = 1.0 - alpha;
+            s1 = 1.0f - alpha;
             s2 = alpha;
         }
-        w = (float) (s1 * q1.w + s2 * q2.w);
-        x = (float) (s1 * q1.x + s2 * q2.x);
-        y = (float) (s1 * q1.y + s2 * q2.y);
-        z = (float) (s1 * q1.z + s2 * q2.z);
+
+        w = (s1 * w + s2 * q1.w);
+        x = (s1 * x + s2 * q1.x);
+        y = (s1 * y + s2 * q1.y);
+        z = (s1 * z + s2 * q1.z);
     }
+
+
+//    /**
+//     * Performs a great circle interpolation between quaternion q1
+//     * and quaternion q2 and places the result into this quaternion.
+//     *
+//     * @param q1    the first quaternion
+//     * @param q2    the second quaternion
+//     * @param alpha the alpha interpolation parameter
+//     */
+//    public final void interpolate(Quat4f q1, Quat4f q2, float alpha) {
+//        // From "Advanced Animation and Rendering Techniques"
+//        // by Watt and Watt pg. 364, function as implemented appeared to be
+//        // incorrect.  Fails to choose the same quaternion for the double
+//        // covering. Resulting in change of direction for rotations.
+//        // Fixed function to negate the first quaternion in the case that the
+//        // dot product of q1 and this is negative. Second case was not needed.
+//
+//        double s1, s2, om, sinom;
+//
+//        double dot = q2.x * q1.x + q2.y * q1.y + q2.z * q1.z + q2.w * q1.w;
+//
+//        if (dot < 0) {
+//            // negate quaternion
+//            q1.x = -q1.x;
+//            q1.y = -q1.y;
+//            q1.z = -q1.z;
+//            q1.w = -q1.w;
+//            dot = -dot;
+//        }
+//
+//        if ((1.0 - dot) > EPS) {
+//            om = Math.acos(dot);
+//            sinom = Math.sin(om);
+//            s1 = Math.sin((1.0 - alpha) * om) / sinom;
+//            s2 = Math.sin(alpha * om) / sinom;
+//        } else {
+//            s1 = 1.0 - alpha;
+//            s2 = alpha;
+//        }
+//        w = (float) (s1 * q1.w + s2 * q2.w);
+//        x = (float) (s1 * q1.x + s2 * q2.x);
+//        y = (float) (s1 * q1.y + s2 * q2.y);
+//        z = (float) (s1 * q1.z + s2 * q2.z);
+//    }
 
     public static Quat4f angle(float ax, float ay, float az, float angle) {
         Quat4f q = new Quat4f();
@@ -728,6 +709,16 @@ public class Quat4f extends Tuple4f {
 
     }
 
+    public void set(int i, float v) {
+        switch (i) {
+            case 0: this.x = v; break;
+            case 1: this.y = v; break;
+            case 2: this.z = v; break;
+            case 3: this.w = v; break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
 }
 
 

@@ -240,6 +240,10 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
     }
 
 
+    public final void add(float dx, float dy) {
+        add(dx, dy, 0);
+    }
+
     public void add(float dx, float dy, float dz) {
         set(this.x + dx, this.y + dy, this.z + dz);
     }

@@ -1,6 +1,7 @@
 package spacegraph;
 
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.math.Quaternion;
 import jcog.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.Quat4f;
@@ -11,14 +12,11 @@ import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.CollisionShape;
-import spacegraph.phys.shape.ConvexInternalShape;
 import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.phys.shape.SphereShape;
 
 import java.util.List;
 import java.util.function.Consumer;
-
-import static spacegraph.math.v3.v;
 
 /** simplified implementation which manages one body and N constraints. useful for simple objects */
 public class SimpleSpatial<X> extends AbstractSpatial<X> {
@@ -32,7 +30,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     /** physics motion state */
     //public final Motion motion = new Motion();
     //private final String label;
-    protected CollisionShape shape;
+    public CollisionShape shape;
 
     /** prevents physics movement */
     public boolean motionLock;
@@ -143,29 +141,41 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         return this;
     }
 
-    /** interpolates rotation to the specified axis vector and rotation angle around it */
-    public void rotate(float nx, float ny, float nz, float angle, float speed) {
-        if (motionLock)
-            return;
+//    /** interpolates rotation to the specified axis vector and rotation angle around it */
+//    public void rotate(float nx, float ny, float nz, float angle, float speed) {
+//        if (motionLock)
+//            return;
+//
+//        Quat4f tmp = new Quat4f();
+//
+//
+//        Quat4f target = new Quat4f();
+//        target.setAngle(nx,ny,nz,angle);
+//
+//        rotate(target, speed, tmp);
+//    }
 
-        Quat4f tmp = new Quat4f();
 
-        Quat4f target = new Quat4f();
-        target.setAngle(nx,ny,nz,angle);
-
-        rotate(target, speed, tmp);
+    public void rotate(Quaternion target, float speed) {
+        if (motionLock) return;
+        rotate(target, speed, new Quaternion());
     }
 
-
-    public void rotate(Quat4f target, float speed, Quat4f tmp) {
+    public void rotate(Quaternion target, float speed, Quaternion tmp) {
         if (motionLock)
             return;
 
-        Quat4f current = transform().getRotation(tmp);
-        current.interpolate(target, speed);
-        transform().setRotation(current);
+        Quaternion current = transform.getRotation(tmp);
+        current.setSlerp(current, target, speed);
+        transform.setRotation(current);
 
         reactivate();
+    }
+
+    public void rotate(float tx, float ty, float tz, float angle, float speed) {
+        Quaternion q = transform.getRotation(new Quaternion());
+        q.rotateByAngleNormalAxis(angle, tx, ty, tz);
+        rotate(q, speed);
     }
 
 

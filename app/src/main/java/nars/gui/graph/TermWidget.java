@@ -1,9 +1,6 @@
 package nars.gui.graph;
 
 import com.jogamp.opengl.GL2;
-import jcog.pri.Pri;
-import nars.gui.DynamicListSpace;
-import nars.gui.TermIcon;
 import nars.term.Termed;
 import spacegraph.SimpleSpatial;
 import spacegraph.Surface;
@@ -17,9 +14,13 @@ import spacegraph.render.JoglPhysics;
 import spacegraph.render.JoglSpace;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
+import spacegraph.widget.button.PushButton;
+import spacegraph.widget.slider.FloatSlider;
 
 import java.util.List;
 import java.util.function.Consumer;
+
+import static spacegraph.layout.Grid.row;
 
 abstract public class TermWidget<T extends Termed> extends Cuboid<T> {
 
@@ -29,12 +30,13 @@ abstract public class TermWidget<T extends Termed> extends Cuboid<T> {
         super(x, 1, 1);
 
         setFront(
-//            /*col(
+            //col(
                 //new Label(x.toString())
-//                row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(nar, x))
-//                    //new CheckBox("?")
-//            )*/
-                new TermIcon(x)
+                row(new FloatSlider( 0, 0, 4 ), new PushButton("x"))
+                        //, new BeliefTableChart(nar, x))
+                    //new CheckBox("?")
+            //)
+                //new TermIcon(x)
         );
 
     }
@@ -46,9 +48,6 @@ abstract public class TermWidget<T extends Termed> extends Cuboid<T> {
 
     abstract public Iterable<? extends EDraw<?>> edges();
 
-    public void commit(TermWidget.TermVis vis, DynamicListSpace<T, TermWidget<T>> space) {
-        vis.accept(this);
-    }
 
     @Override
     public void onUntouch(JoglSpace space) {
@@ -75,13 +74,13 @@ abstract public class TermWidget<T extends Termed> extends Cuboid<T> {
 
         Quat4f tmpQ = new Quat4f();
         ee.forEach(e -> {
-            if (e.a < Pri.EPSILON)
-                return;
-
             float width = e.width;
             float thresh = 0.1f;
             if (width <= thresh) {
-                gl.glColor4f(e.r, e.g, e.b, e.a * (width / thresh) /* fade opacity */);
+                float aa = e.a * (width / thresh);
+                if (aa < 1/256f)
+                    return;
+                gl.glColor4f(e.r, e.g, e.b, aa /* fade opacity */);
                 Draw.renderLineEdge(gl, src, e.tgt(), width);
             } else {
                 Draw.renderHalfTriEdge(gl, src, e, width, twist, tmpQ);
@@ -91,7 +90,10 @@ abstract public class TermWidget<T extends Termed> extends Cuboid<T> {
 
     @Override
     public void renderAbsolute(GL2 gl, long timeMS) {
-        render(gl, this, timeMS / 100f, edges());
+        render(gl, this,
+                //(float)Math.PI * 2 * (timeMS % 4000) / 4000f,
+                0,
+                edges());
 
         if (touched) {
             gl.glPushMatrix();
@@ -103,15 +105,18 @@ abstract public class TermWidget<T extends Termed> extends Cuboid<T> {
         }
     }
 
-    public interface TermVis<X extends TermWidget> extends Consumer<X> {
+    public interface TermVis<X extends TermWidget> extends Consumer<List<X>> {
 
-        /**
-         * called after all nodes have been sent through
-         * @param pending
-         */
-        default public void update(List<ConceptWidget> pending) {
-
-        }
     }
+
+    /** for simple element-wise functions */
+    public interface BasicTermVis<X extends TermWidget> extends Consumer<List<X>> {
+        default void accept(List<X> l) {
+            l.forEach(this::each);
+        }
+
+        void each(X e);
+    }
+
 
 }

@@ -40,6 +40,7 @@ public class v2 extends Tuple2f {
 
     // Combatible with 1.1
     static final long serialVersionUID = -2168194326883512320L;
+    public static v2 ONE = new v2RO(1,1);
 
     /**
      * Constructs and initializes a Vector2f from the specified xy coordinates.
@@ -113,30 +114,30 @@ public class v2 extends Tuple2f {
 
 
 
-    /**
-     * Sets the value of this vector to the normalization of vector v1.
-     * @param v1 the un-normalized vector
-     */  
-    public final void normalize(v2 v1)
-    {
+//    /**
+//     * Sets the value of this vector to the normalization of vector v1.
+//     * @param v1 the un-normalized vector
+//     */
+//    public final void normalize(v2 v1)
+//    {
+//
+//        float norm = (float) (1.0 / Math.sqrt(v1.x * v1.x + v1.y * v1.y));
+//        this.x = v1.x*norm;
+//        this.y = v1.y*norm;
+//    }
 
-        float norm = (float) (1.0 / Math.sqrt(v1.x * v1.x + v1.y * v1.y));
-        this.x = v1.x*norm;
-        this.y = v1.y*norm;
-    }
-
-    /**
-     * Normalizes this vector in place.
-     */  
-    public final v2 normalize()
-    {
-
-        float norm = (float)
-                (1.0 / Math.sqrt(this.x * this.x + this.y * this.y));
-        this.x *= norm;
-        this.y *= norm;
-        return this;
-    }
+//    /**
+//     * Normalizes this vector in place.
+//     */
+//    public final v2 normalize()
+//    {
+//
+//        float norm = (float)
+//                (1.0 / Math.sqrt(this.x * this.x + this.y * this.y));
+//        this.x *= norm;
+//        this.y *= norm;
+//        return this;
+//    }
 
 
   /**
@@ -147,7 +148,7 @@ public class v2 extends Tuple2f {
     */
    public final float angle(v2 v1)
    {
-      double vDot = this.dot(v1) / ( this.length()*v1.length() );
+      double vDot = this.dot(v1) / ( this.lengthSquared() );
       if( vDot < -1.0) vDot = -1.0;
       if( vDot >  1.0) vDot =  1.0;
       return((float) (Math.acos( vDot )));
@@ -161,4 +162,17 @@ public class v2 extends Tuple2f {
     {
       return (this.x*v1.x + this.y*v1.y);
     }
+
+    /** read-only v2 */
+    public static class v2RO extends v2 {
+        public v2RO(float x, float y) {
+            super(x, y);
+        }
+
+        @Override
+        public void set(float x, float y) {
+            throw new RuntimeException("cant modify");
+        }
+    }
+
 }

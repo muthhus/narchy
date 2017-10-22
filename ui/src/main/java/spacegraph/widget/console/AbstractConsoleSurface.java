@@ -2,11 +2,11 @@ package spacegraph.widget.console;
 
 import com.googlecode.lanterna.TextCharacter;
 import com.jogamp.opengl.GL2;
-import spacegraph.Surface;
+import spacegraph.widget.Widget;
 
 import java.awt.*;
 
-public abstract class AbstractConsoleSurface extends Surface implements Appendable {
+public abstract class AbstractConsoleSurface extends Widget implements Appendable {
     protected Color bg;
     protected int rows, cols;
 
@@ -39,8 +39,6 @@ public abstract class AbstractConsoleSurface extends Surface implements Appendab
         //align(Align.Center, cols/1.5f, rows);
     }
 
-    @Override
-    public abstract void paint(GL2 gl);
 
     /** x,y aka col,row */
     public abstract int[] getCursorPos();

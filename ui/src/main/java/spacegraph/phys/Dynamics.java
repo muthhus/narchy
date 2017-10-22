@@ -678,7 +678,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
                                     tmpSphere.setRadius(body.getCcdSweptSphereRadius()); //btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
 
-                                    Broadphasing bph = body.broadphase();
+                                    Broadphasing bph = body.broadphase;
                                     sweepResults.collisionFilterGroup = bph.collisionFilterGroup;
                                     sweepResults.collisionFilterMask = bph.collisionFilterMask;
 
@@ -1135,7 +1135,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
             if (intersecter.needsResponse(me, otherObj)) {
                 // don't do CCD when there are already contact points (touching contact/penetration)
                 OArrayList<PersistentManifold> manifoldArray = new OArrayList<>();
-                BroadphasePair collisionPair = pairCache.findPair(me.broadphase(), proxy0);
+                BroadphasePair collisionPair = pairCache.findPair(me.broadphase, proxy0);
                 if (collisionPair != null) {
                     if (collisionPair.algorithm != null) {
                         //manifoldArray.resize(0);

@@ -32,8 +32,8 @@ public class NARchy extends NARS {
         ConjClustering conjClusterB = new ConjClustering(nar, 3, BELIEF, true, 16, 64);
         ConjClustering conjClusterG = new ConjClustering(nar, 2, GOAL, true, 16, 64);
 
-        Hear.wiki(nar);
-        installSpeech(nar);
+        //Hear.wiki(nar);
+        //installSpeech(nar);
 
         return nar;
     }

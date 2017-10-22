@@ -52,7 +52,7 @@ public class BulletStack {
 	
 	// others:
 	//public final Vector4StackList vectors4 = new Vector4StackList();
-	public final QuatStackList quats = new QuatStackList();
+//	public final QuatStackList quats = new QuatStackList();
 
 	//public final ArrayPool<float[]> floatArrays = new ArrayPool<>(float.class);
 	

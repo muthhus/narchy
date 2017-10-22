@@ -16,6 +16,7 @@ import org.eclipse.collections.api.set.primitive.ImmutableCharSet;
 import org.eclipse.collections.impl.factory.primitive.CharSets;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
+import spacegraph.render.Draw;
 import spacegraph.video.TextureSurface;
 
 import java.awt.*;
@@ -141,10 +142,10 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     }
 
     @Override
-    public void paint(GL2 gl) {
+    public void paintComponent(GL2 gl) {
 
-        texture.paint(gl);
-
+        Draw.bounds(gl, this, texture::paint);
+        
         if (needFullRedraw.get()) {
             render();
         }

@@ -23,7 +23,7 @@ import static spacegraph.layout.Grid.grid;
  * thread-safe visualization of a set of spatials, and
  * calls to their per-frame rendering animation
  */
-public abstract class DynamicListSpace<X, Y extends Spatial<X>> extends ListSpace<X, Y> implements Animated {
+public abstract class DynamicListSpace<X,Y extends Spatial<X>> extends ListSpace<X,Y> implements Animated {
 
 
     //private final TriConsumer<NAR, SpaceGraph<Term>, List<Spatial<X>>> collect;
@@ -89,11 +89,11 @@ public abstract class DynamicListSpace<X, Y extends Spatial<X>> extends ListSpac
     /** swap buffers */
     protected void render() {
 
-        List<Y> prev = this.active;
+        List<? extends Spatial<X>> prev = this.active;
 
         prev.forEach(Active::deactivate);
 
-        List<Y> next = get();
+        List next = get();
 
         //System.out.println(space.dyn.summary() + " " +  prev.size() + " prev " + next.size() + " next");
 
@@ -107,7 +107,7 @@ public abstract class DynamicListSpace<X, Y extends Spatial<X>> extends ListSpac
     }
 
 
-    abstract protected List<Y> get();
+    abstract protected List<? extends Spatial<X>> get();
 
 
 
