@@ -208,8 +208,7 @@ public enum Op {
             } else {
 
                 //sequence or xternal
-                if (n > 2)
-                    return Null; //"invalid non-commutive conjunction arity!=2, arity=" + n;
+                assert(n==2): "invalid non-commutive conjunction arity!=2, arity=" + n;
 
                 if (dt == XTERNAL) {
                     Arrays.sort(u); //pre-sort
@@ -435,7 +434,7 @@ public enum Op {
          * measurements.
          *
          */
-        private @NotNull SortedSet<Term> junctionGroupNonDTSubterms(@NotNull ObjectByteMap<Term> s) {
+        private SortedSet<Term> junctionGroupNonDTSubterms(ObjectByteMap<Term> s) {
 
             TreeSet<Term> outer = new TreeSet<>();
 
@@ -1189,23 +1188,6 @@ public enum Op {
 
     }
 
-//    protected static Term conjMergeLeftAlign(List<ObjectLongPair<Term>> events, int from, int to) {
-//        //Left aligned method:
-//        Term head = e0.getOne();
-//        long headAt = e0.getTwo();
-//        for (int i = 1; i < ee; i++) {
-//
-//            ObjectLongPair<Term> ei = events.get(i);
-//            Term next = ei.getOne();
-//            long nextAt = ei.getTwo();
-//
-//            int dt = (int) (nextAt - headAt);
-//            head = CONJ.the(dt, head, next);
-//
-//            headAt = nextAt;
-//        }
-//        return head;
-//    }
 
 
     @NotNull
@@ -1572,24 +1554,25 @@ public enum Op {
 
         }
 
-        if (op.commutative) {
-
-//            //normalize co-negation
-//            boolean sn = subject.op() == NEG;
-//            boolean pn = predicate.op() == NEG;
+        //already sorted here if commutive
+//        if (op.commutative) {
 //
-            if (/*(sn == pn) && */(subject.compareTo(predicate) > 0)) {
-                Term x = predicate;
-                predicate = subject;
-                subject = x;
-                if (dt != XTERNAL && !dtConcurrent)
-                    dt = -dt;
-            }
-
-            //assert (subject.compareTo(predicate) <= 0);
-            //System.out.println( "\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
-
-        }
+////            //normalize co-negation
+////            boolean sn = subject.op() == NEG;
+////            boolean pn = predicate.op() == NEG;
+////
+//            if (/*(sn == pn) && */(subject.compareTo(predicate) > 0)) {
+//                Term x = predicate;
+//                predicate = subject;
+//                subject = x;
+//                if (dt != XTERNAL && !dtConcurrent)
+//                    dt = -dt;
+//            }
+//
+//            //assert (subject.compareTo(predicate) <= 0);
+//            //System.out.println( "\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
+//
+//        }
 
 
         return compound(op, dt, subject, predicate).negIf(!polarity);
@@ -1611,7 +1594,7 @@ public enum Op {
         }
     }
 
-    private static boolean containEachOther(@NotNull Term x, @NotNull Term y, Predicate<Term> delim) {
+    private static boolean containEachOther(Term x, Term y, Predicate<Term> delim) {
         int xv = x.volume();
         int yv = y.volume();
         if (xv == yv)
@@ -1742,7 +1725,7 @@ public enum Op {
         return !c.hasAny(Op.NonGoalable);// && c.op().goalable;
     }
 
-    public static TermContainer subterms(@NotNull Collection<? extends Term> t) {
+    public static TermContainer subterms(Collection<? extends Term> t) {
         return subterms(t.toArray(new Term[t.size()]));
     }
 

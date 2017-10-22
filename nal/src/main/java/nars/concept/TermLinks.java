@@ -83,15 +83,20 @@ public enum TermLinks {
     static int layers(Term host) {
         switch (host.op()) {
 
+
             case SETe:
             case SETi:
+                return 1;
+
+            case PROD:
+                return 2;
 
             case DIFFe:
             case DIFFi:
             case SECTi:
             case SECTe:
 
-            case PROD:
+
                 return 2;
 
             case CONJ:

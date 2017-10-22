@@ -121,12 +121,12 @@ public class Revision {
         if (ao != bo)
             return Null; //fail, why
 
-        assert (ao == bo) : a + " and " + b + " have different op";
-
-        if (ao == NEG) {
-            return intermpolate(a.unneg(), 0, b.unneg(),
-                    aProp, curDepth, rng, mergeOrChoose).neg();
-        }
+//        assert (ao == bo) : a + " and " + b + " have different op";
+//
+//        if (ao == NEG) {
+//            return intermpolate(a.unneg(), 0, b.unneg(),
+//                    aProp, curDepth, rng, mergeOrChoose).neg();
+//        }
 
         int len = a.subs();
         if (len > 0) {

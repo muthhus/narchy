@@ -130,7 +130,7 @@ abstract public class Exec implements Executor, PriMerge {
         if (existing instanceof Activate) {
             return Param.activateMerge.merge(existing, incoming);
         } else if (existing instanceof Premise) {
-            ((Premise)existing).merge((Premise)incoming);
+//            ((Premise)existing).merge((Premise)incoming);
             return Param.premiseMerge.merge(existing, incoming);
         }else {
             if (existing instanceof NALTask) {

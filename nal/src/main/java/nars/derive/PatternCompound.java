@@ -19,6 +19,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static nars.Op.*;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 abstract public class PatternCompound extends GenericCompoundDT {
 
@@ -86,13 +88,13 @@ abstract public class PatternCompound extends GenericCompoundDT {
             //ty.volume() >= minVolumeNecessary
                 ) {
 
-            if (op.temporal) {
-                int sdur = subst.dur;
-                if (sdur >= 0) {
-                    if (!Compound.matchTemporalDT(this, y, sdur))
-                        return false;
-                }
-            }
+//            if (op.temporal) {
+//                int sdur = subst.dur;
+//                if (sdur >= 0) {
+//                    if (!Compound.matchTemporalDT(this, y, sdur))
+//                        return false;
+//                }
+//            }
 
             TermContainer xsubs = subterms();
             TermContainer ysubs = y.subterms();
@@ -111,7 +113,15 @@ abstract public class PatternCompound extends GenericCompoundDT {
         return false;
 
     }
-
+//    //TODO generalize
+//    static boolean matchTemporalDT(Term aa, Term bb, int dur) {
+//        int a = aa.dt();
+//        if (a == XTERNAL || a == DTERNAL) return true;
+//        int b = bb.dt();
+//        if (a == b || b == XTERNAL || b == DTERNAL) return true;
+//
+//        return Math.abs(a - b) <= dur;
+//    }
     abstract protected static class PatternCompoundWithEllipsis extends PatternCompound {
 
         @NotNull

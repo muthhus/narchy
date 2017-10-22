@@ -555,47 +555,47 @@ public class Temporalize implements ITemporalize {
                 return new AmbientEvent(x); //last resort, use the input as-is
             } else {
                 TermContainer tt = x.subterms();
-
+//
                 int tts = tt.subs();
                 assert (tts > 1);
 
 
-                boolean has0 = false;
-                boolean hasEte = false;
-                for (Term y : constraints.keySet()) {
-                    if (y.op() == x.op()) {
-                        switch (y.dt()) {
-                            case 0:
-                                has0 = true;
-                                break;
-                            case DTERNAL:
-                                hasEte = true;
-                                break;
-                        }
-                    }
-                }
+//                boolean has0 = false;
+//                boolean hasEte = false;
+//                for (Term y : constraints.keySet()) {
+//                    if (y.op() == x.op()) {
+//                        switch (y.dt()) {
+//                            case 0:
+//                                has0 = true;
+//                                break;
+//                            case DTERNAL:
+//                                hasEte = true;
+//                                break;
+//                        }
+//                    }
+//                }
 
-                //test for 0 first because it's more specific
-                /* test for the exact appearance of temporalized form present in constraints */
-                if (has0) { //quick test filter
-                    @NotNull Term xPar = x.dt(0);
-                    if (!(xPar instanceof Bool) && constraints.get(xPar) != null) {
-                        Event ds = solve(xPar, trail);
-                        if (ds != null)
-                            return relative(xPar, ds, 0);
-                    }
-                }
-
-                /* test for the exact appearance of temporalized form present in constraints */
-                if (hasEte) { //quick test filter
-                    Term xEte = x.dt(DTERNAL);
-                    if (!(xEte instanceof Bool) && constraints.get(xEte) != null) {
-                        Event ds = solve(xEte, trail);
-                        if (ds != null) {
-                            return relative(xEte, ds, DTERNAL);
-                        }
-                    }
-                }
+//                //test for 0 first because it's more specific
+//                /* test for the exact appearance of temporalized form present in constraints */
+//                if (has0) { //quick test filter
+//                    @NotNull Term xPar = x.dt(0);
+//                    if (!(xPar instanceof Bool) && constraints.get(xPar) != null) {
+//                        Event ds = solve(xPar, trail);
+//                        if (ds != null)
+//                            return relative(xPar, ds, 0);
+//                    }
+//                }
+//
+//                /* test for the exact appearance of temporalized form present in constraints */
+//                if (hasEte) { //quick test filter
+//                    Term xEte = x.dt(DTERNAL);
+//                    if (!(xEte instanceof Bool) && constraints.get(xEte) != null) {
+//                        Event ds = solve(xEte, trail);
+//                        if (ds != null) {
+//                            return relative(xEte, ds, DTERNAL);
+//                        }
+//                    }
+//                }
 
 
 //                //HACK try this trick: fully anonymous match

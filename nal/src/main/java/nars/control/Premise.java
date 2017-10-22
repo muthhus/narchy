@@ -254,21 +254,21 @@ public class Premise extends UnaryTask {
                     focusEnd = focus + dur;
                 }
 
-                boolean tryMatch = true;
-//                if (beliefIsTask && task.punc() == BELIEF && task.during(when)) {
-//                    if (Math.abs(when - now) > 0 /*= dur*/) {
-//                        //try projecting to now (maybe also a future time) because it will be a different time
-//                        when = now;
-//                    } else {
-//                        //leave belief blank. it already matches itself
-//                        tryMatch = false;
-//                    }
-//                }
-                if (tryMatch) {
+//                boolean tryMatch = true;
+////                if (beliefIsTask && task.punc() == BELIEF && task.during(when)) {
+////                    if (Math.abs(when - now) > 0 /*= dur*/) {
+////                        //try projecting to now (maybe also a future time) because it will be a different time
+////                        when = now;
+////                    } else {
+////                        //leave belief blank. it already matches itself
+////                        tryMatch = false;
+////                    }
+////                }
+//                if (tryMatch) {
                     match = beliefConcept.beliefs().match(focusStart, focusEnd, beliefTerm, n);
-                } else {
-                    match = null;
-                }
+//                } else {
+//                    match = null;
+//                }
             }
 
             if (match != null && match.isBelief()) {
@@ -285,9 +285,6 @@ public class Premise extends UnaryTask {
             }
         }
 
-
-        if (beliefTerm instanceof Bool)
-            return null;
 
         Collection<DerivedTask> dd = d.run(this, task, belief, beliefTerm, ttlMax);
         if (dd != null) {
@@ -395,30 +392,30 @@ public class Premise extends UnaryTask {
 //            return null;
     }
 
-    public void merge(Premise incoming) {
-        //WARNING this isnt thread safe but collisions should be rare
-
-        Collection<Concept> target = this.links;
-        Collection<Concept> add = incoming.links;
-
-        if (target == add || add == null)
-            return; //same or no change
-
-        if (target == null || target.isEmpty()) {
-            this.links = add;
-            return; //just replace it
-        }
-
-        if (!(target instanceof Set)) {
-            Set<Concept> merge =
-                    new HashSet(target.size() + add.size());
-                    //Collections.newSetFromMap(new ConcurrentHashMap<>(target.size() + add.size()));
-            merge.addAll(target);
-            merge.addAll(add);
-            this.links = merge;
-        } else {
-            target.addAll(add);
-        }
-    }
+//    public void merge(Premise incoming) {
+//        //WARNING this isnt thread safe but collisions should be rare
+//
+//        Collection<Concept> target = this.links;
+//        Collection<Concept> add = incoming.links;
+//
+//        if (target == add || add == null)
+//            return; //same or no change
+//
+//        if (target == null || target.isEmpty()) {
+//            this.links = add;
+//            return; //just replace it
+//        }
+//
+//        if (!(target instanceof Set)) {
+//            Set<Concept> merge =
+//                    new HashSet(target.size() + add.size());
+//                    //Collections.newSetFromMap(new ConcurrentHashMap<>(target.size() + add.size()));
+//            merge.addAll(target);
+//            merge.addAll(add);
+//            this.links = merge;
+//        } else {
+//            target.addAll(add);
+//        }
+//    }
 
 }

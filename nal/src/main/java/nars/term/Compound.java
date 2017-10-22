@@ -88,7 +88,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    /*@NotNull*/
+        /*@NotNull*/
     TermContainer subterms();
 
     @Override
@@ -158,7 +158,8 @@ public interface Compound extends Term, IPair, TermContainer {
             if (dt == XTERNAL) //unknown
                 return DTERNAL;
 
-            /*@NotNull*/ TermContainer yy = subterms();
+            /*@NotNull*/
+            TermContainer yy = subterms();
 
             if (op == IMPL) {
                 //only two options
@@ -257,7 +258,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    /*@NotNull*/
+            /*@NotNull*/
     default ByteList structureKey(ByteArrayList appendTo) {
         appendTo.add(op().id);
         appendTo.add((byte) subs());
@@ -326,15 +327,6 @@ public interface Compound extends Term, IPair, TermContainer {
 
     }
 
-    //TODO generalize
-    static boolean matchTemporalDT(Term aa, Term bb, int dur) {
-        int a = aa.dt();
-        if (a == XTERNAL || a == DTERNAL) return true;
-        int b = bb.dt();
-        if (a == b || b == XTERNAL || b == DTERNAL) return true;
-
-        return Math.abs(a - b) <= dur;
-    }
 
     @Override
     default Term term() {
@@ -570,15 +562,19 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
             Op o = op();
-            if (!o.temporal) {
-                return this;
-                //assert (o.temporal);
-            }
+            assert (o.temporal);
+//            if (!o.temporal) {
+//                return this;
+//                //assert (o.temporal);
+//            }
 
             Compound b = this instanceof GenericCompoundDT ?
                     ((GenericCompoundDT) this).ref : this;
+            if (nextDT == DTERNAL)
+                return b;
 
-            /*@NotNull*/ TermContainer subs = subterms();
+            /*@NotNull*/
+            TermContainer subs = subterms();
             if ((nextDT != XTERNAL && !concurrent(nextDT)) && subs.subs() > 2)
                 return Null; //tried to temporalize what can only be commutive
 
@@ -587,7 +583,7 @@ public interface Compound extends Term, IPair, TermContainer {
             }
 
             Term[] ss = subs.theArray();
-            if (o.commutative && ss[0].compareTo(ss[1]) > 0) {
+            if (o.commutative) {
                 //must re-arrange the order to lexicographic, and invert dt
                 return o.the(nextDT != DTERNAL ? -nextDT : DTERNAL, ss[1], ss[0]);
             } else {
@@ -765,9 +761,10 @@ public interface Compound extends Term, IPair, TermContainer {
         for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
             Term xi = xy[i];
             Term yi = xi.evalSafe(context, remain);
-            if (yi == null) {
+            /*if (yi == null) {
                 return Null;
-            } else if (xi != yi && (!xi.equals(yi) || yi.getClass() != xi.getClass())) {
+            } else */
+            if (xi != yi && (!xi.equals(yi) || yi.getClass() != xi.getClass())) {
                 if (!changed) {
                     xy = toArray(); //begin clone copy
                     changed = true;
@@ -788,14 +785,14 @@ public interface Compound extends Term, IPair, TermContainer {
             for (int i = 0; i < xy.length; i++) {
                 Term x = xy[i];
                 if (x instanceof EllipsisMatch) {
-                    Term[] xx = ((EllipsisMatch)x).theArray();
+                    Term[] xx = ((EllipsisMatch) x).theArray();
                     for (Term xxx : xx)
                         z[k++] = xxx;
                 } else {
                     z[k++] = x;
                 }
             }
-            assert(k==z.length);
+            assert (k == z.length);
             changed = true;
             xy = z;
         }
@@ -842,18 +839,13 @@ public interface Compound extends Term, IPair, TermContainer {
         int totalVars = vars + pVars;
 
         Term y;
-        if (totalVars > 0) {
-            y = transform(
-                    ((vars == 1) && (pVars == 0) && varOffset == 0) ?
-                            VariableNormalization.singleVariableNormalization //special case for efficiency
-                            :
-                            new VariableNormalization(totalVars /* estimate */, varOffset)
-            );
-
-
-        } else {
-            y = this;
-        }
+        assert (totalVars > 0);
+        y = transform(
+                ((vars == 1) && (pVars == 0) && varOffset == 0) ?
+                        VariableNormalization.singleVariableNormalization //special case for efficiency
+                        :
+                        new VariableNormalization(totalVars /* estimate */, varOffset)
+        );
 
         if (varOffset == 0 && y != null && y instanceof Compound)
             ((Compound) y).setNormalized();
@@ -889,16 +881,18 @@ public interface Compound extends Term, IPair, TermContainer {
 //        }
     }
 
-    /*@NotNull*/ @Override default Term root() {
+    /*@NotNull*/
+    @Override
+    default Term root() {
         Term term = temporalize(Retemporalize.retemporalizeConceptual);
         return term == null ? Null : term;
     }
 
     @Override
-    /*@NotNull*/
+            /*@NotNull*/
     default Term conceptual() {
 
-        if (op()==NEG)
+        if (op() == NEG)
             return unneg().conceptual();
 
         Term term = root().unneg(); //unneg just in case
@@ -910,7 +904,6 @@ public interface Compound extends Term, IPair, TermContainer {
 
         return term != null ? term : Null;
     }
-
 
 
     //    public int countOccurrences(final Term t) {

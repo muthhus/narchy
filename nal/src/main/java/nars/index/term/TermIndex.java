@@ -194,12 +194,12 @@ public abstract class TermIndex implements TermContext {
 //                    CompoundTransform.super.applyTermIfPossible(x) : x;
 //        }
 
-        @Override
-        public Term intern(Term x) {
-            if (x instanceof Compound)
-                return x.transform(this);
-            if (x.op().conceptualizable) return TermIndex.this.applyTermIfPossible(x);
-            else return x;
-        }
+//        @Override
+//        public Term intern(Term x) {
+//            if (x instanceof Compound)
+//                return x.transform(this);
+//            if (x.op().conceptualizable) return TermIndex.this.applyTermIfPossible(x);
+//            else return x;
+//        }
     }
 }
