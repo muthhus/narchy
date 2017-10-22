@@ -57,7 +57,7 @@ public class TetrisVisualizer extends Surface {
         tetris = t;
         this.blockSize = blockSize;
 
-        aspect = t.height / ((float)t.width);
+//        aspect = t.height / ((float)t.width);
 
         blocks = new TetrisBlocksComponent(this);
 

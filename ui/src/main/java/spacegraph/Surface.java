@@ -49,6 +49,10 @@ abstract public class Surface {
         bounds = r;
     }
 
+    public AspectAlign align(Align align, float aspectRatio) {
+        return new AspectAlign(this, align, aspectRatio);
+    }
+
     public enum Align {
 
 

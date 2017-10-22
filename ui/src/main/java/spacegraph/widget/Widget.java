@@ -158,20 +158,20 @@ abstract public class Widget extends Stacking {
 
     public static Layout widgetDemo() {
         return
-                grid(
-                        row(new PushButton("row1"), new PushButton("row2"), new PushButton("row3")),
-                        col(new PushButton("col1"), new PushButton("col2"), new PushButton("col3")),
-                        new VSplit(new PushButton("vsplit top"), new PushButton("vsplit bottom")),
-                        new VSplit(new PushButton("grid within"), grid(
-                            new BaseSlider(.25f  /* pause */),
-                            col(new CheckBox("ABC"), new CheckBox("XYZ"))
-                        ), 0.8f),
-                        new PushButton("clickMe()", (p) -> {
-                          p.setLabel(Texts.n2(Math.random()));
-                        }),
-                        new XYSlider(),
-                        new AspectAlign(new DummyConsole())
-                );
+            grid(
+                    row(new PushButton("row1"), new PushButton("row2"), new PushButton("row3")),
+                    col(new PushButton("col1"), new PushButton("col2"), new PushButton("col3")),
+                    new VSplit(new PushButton("vsplit top"), new PushButton("vsplit bottom")),
+                    new VSplit(new PushButton("grid within"), grid(
+                        new BaseSlider(.25f  /* pause */),
+                        col(new CheckBox("ABC"), new CheckBox("XYZ"))
+                    ), 0.8f),
+                    new PushButton("clickMe()", (p) -> {
+                      p.setLabel(Texts.n2(Math.random()));
+                    }),
+                    new XYSlider(),
+                    new DummyConsole().align(Align.Center, 1f)
+            );
     }
 
     private static class DummyConsole extends ConsoleTerminal implements Runnable {
