@@ -6,17 +6,17 @@ import nars.NARS;
 import nars.Narsese;
 import nars.Param;
 import nars.test.analyze.EventCount;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NALLevelTest {
 
 
 
-    @Ignore
+    @Disabled
     @Test
     public void testLevel1vs8() throws Narsese.NarseseException {
         Param.DEBUG = true;
@@ -42,8 +42,8 @@ public class NALLevelTest {
         n8.run(5);
 
 
-        assertEquals("NAL1 should NOT process", 0, n1Count.numTaskProcesses());
-        assertTrue("NAL8 will process", n8Count.numTaskProcesses() >= 1);
+        assertEquals(0, n1Count.numTaskProcesses(), "NAL1 should NOT process");
+        assertTrue(n8Count.numTaskProcesses() >= 1, "NAL8 will process");
 
 
 

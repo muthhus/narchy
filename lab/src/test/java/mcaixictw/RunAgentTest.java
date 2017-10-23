@@ -2,7 +2,7 @@ package mcaixictw;
 
 import mcaixictw.worldmodels.WorldModelSettings;
 import mcaixictw.worldmodels.Worldmodel;
-import org.junit.*;
+import org.junit.jupiter.api.*;
 
 import java.util.logging.Logger;
 
@@ -11,15 +11,15 @@ abstract public class RunAgentTest {
 	private static Logger log = Logger.getLogger(RunAgentTest.class
 			.getName());
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpBeforeClass() throws Exception {
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void tearDownAfterClass() throws Exception {
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		// set up the biased coin environment. The coin lands on one side with a
@@ -47,7 +47,7 @@ abstract public class RunAgentTest {
 	private ControllerSettings controllerSettings = new ControllerSettings();
 	private UCTSettings uctSettings = new UCTSettings();
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 
 	}

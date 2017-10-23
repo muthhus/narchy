@@ -8,14 +8,14 @@ import nars.index.term.map.MapTermIndex;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TermIndexTest {
@@ -73,7 +73,8 @@ public class TermIndexTest {
 //        );
 //        //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
 //    }
-    @Ignore @Test public void testTermSharing5c() throws Narsese.NarseseException {
+    @Disabled
+    @Test public void testTermSharing5c() throws Narsese.NarseseException {
         testIndex(
                 new MapTermIndex(new HashMap(1024))
         );
@@ -181,7 +182,7 @@ public class TermIndexTest {
         }
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testRuleTermsAddedToMemoryTermIndex() {
         //this.activeTasks = activeTasks;

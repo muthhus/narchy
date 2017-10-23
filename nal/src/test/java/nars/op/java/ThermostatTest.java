@@ -4,11 +4,8 @@ import jcog.data.MutableInteger;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
-import org.jetbrains.annotations.NotNull;
 
-import static nars.Op.BELIEF;
-import static nars.Op.QUEST;
-import static nars.Op.QUESTION;
+import static nars.Op.*;
 
 public class ThermostatTest {
 

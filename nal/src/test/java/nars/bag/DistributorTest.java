@@ -2,12 +2,12 @@ package nars.bag;
 
 import jcog.math.Distributor;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 /**
  * @author me

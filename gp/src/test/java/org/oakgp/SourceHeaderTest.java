@@ -15,8 +15,8 @@
  */
 package org.oakgp;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,14 +30,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests that the contents of every Java source file starts with the license header.
  */
 public class SourceHeaderTest {
-    @Ignore
+    @Disabled
     @Test
     public void testSourceHeaders() throws IOException {
         List<Path> javaSourceFiles = getJavaSourceFiles();
@@ -61,7 +61,7 @@ public class SourceHeaderTest {
     private void assertSourceHeader(Path p) throws IOException {
         List<String> lines = Files.readAllLines(p, Charset.defaultCharset());
         String failureMessage = "No source header found for " + p.toFile();
-        assertTrue(failureMessage, lines.size() > 15);
+        assertTrue(lines.size() > 15, failureMessage);
         assertEquals(failureMessage, "/*", lines.get(0));
         assertEquals(failureMessage, " * Licensed under the Apache License, Version 2.0 (the \"License\");", lines.get(3));
         assertEquals(failureMessage, " * you may not use this file except in compliance with the License.", lines.get(4));

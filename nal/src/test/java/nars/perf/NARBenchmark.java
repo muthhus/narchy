@@ -7,7 +7,7 @@ import nars.NARS;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.test.DeductiveMeshTest;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
 
@@ -17,7 +17,7 @@ import static nars.perf.JmhBenchmark.perf;
 
 @State(Scope.Thread)
 @AuxCounters(AuxCounters.Type.EVENTS)
-@Ignore
+@Disabled
 public class NARBenchmark {
 
     @Param({"6"})

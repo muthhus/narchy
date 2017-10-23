@@ -1,7 +1,7 @@
 package nars.term;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 public class ProxyTermTest {
 
-    @Ignore
+    @Disabled
     @Test
     public void testEveryTermMethodProxied() {
 

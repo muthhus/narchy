@@ -22,10 +22,12 @@ package jcog.tree.rtree;
 
 import jcog.tree.rtree.rect.RectDouble2D;
 import jcog.tree.rtree.util.Stats;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by jcovert on 6/12/15.
@@ -54,10 +56,10 @@ public class QuadraticSplitLeafTest {
         rTree.add(new RectDouble2D(8, 8, 9, 9));
 
         Stats stats = rTree.stats();
-        Assert.assertTrue("Unexpected max depth after basic split", stats.getMaxDepth() == 1);
-        Assert.assertTrue("Unexpected number of branches after basic split", stats.getBranchCount() == 1);
-        Assert.assertTrue("Unexpected number of leaves after basic split", stats.getLeafCount() == 2);
-        Assert.assertTrue("Unexpected number of entries per leaf after basic split", stats.getEntriesPerLeaf() == 4.5);
+        assertTrue(stats.getMaxDepth() == 1, "Unexpected max depth after basic split");
+        assertTrue(stats.getBranchCount() == 1, "Unexpected number of branches after basic split");
+        assertTrue(stats.getLeafCount() == 2, "Unexpected number of leaves after basic split");
+        assertTrue(stats.getEntriesPerLeaf() == 4.5, "Unexpected number of entries per leaf after basic split");
     }
 
     @Test
@@ -79,19 +81,19 @@ public class QuadraticSplitLeafTest {
                 childCount++;
             }
         }
-        Assert.assertEquals("Expected different number of children after split", 2, childCount);
+        assertEquals(2, childCount, "Expected different number of children after split");
 
         Node<RectDouble2D, Object> child1 = children[0];
         RectDouble2D child1Mbr = (RectDouble2D) child1.region();
         RectDouble2D expectedChild1Mbr = new RectDouble2D(0, 0, 4, 4);
-        Assert.assertEquals("Child 1 size incorrect after split", 4, child1.size());
-        Assert.assertEquals("Child 1 mbr incorrect after split", expectedChild1Mbr, child1Mbr);
+        assertEquals(4, child1.size(), "Child 1 size incorrect after split");
+        assertEquals(expectedChild1Mbr, child1Mbr, "Child 1 mbr incorrect after split");
 
         Node<RectDouble2D, Object> child2 = children[1];
         RectDouble2D child2Mbr = (RectDouble2D) child2.region();
         RectDouble2D expectedChild2Mbr = new RectDouble2D(4, 0, 5, 1);
-        Assert.assertEquals("Child 2 size incorrect after split", 1, child2.size());
-        Assert.assertEquals("Child 2 mbr incorrect after split", expectedChild2Mbr, child2Mbr);
+        assertEquals(1, child2.size(), "Child 2 size incorrect after split");
+        assertEquals(expectedChild2Mbr, child2Mbr, "Child 2 mbr incorrect after split");
     }
 
     /**
@@ -127,7 +129,7 @@ public class QuadraticSplitLeafTest {
         final int expectedEntryCount = 17;
 
         final Stats stats = rTree.stats();
-        Assert.assertEquals("Unexpected number of entries in " + TYPE + " split tree: " + stats.getEntryCount() + " entries - expected: " + expectedEntryCount + " actual: " + stats.getEntryCount(), expectedEntryCount, stats.getEntryCount());
+        assertEquals(expectedEntryCount, stats.getEntryCount(), "Unexpected number of entries in " + TYPE + " split tree: " + stats.getEntryCount() + " entries - expected: " + expectedEntryCount + " actual: " + stats.getEntryCount());
     }
 
     /**
@@ -146,8 +148,8 @@ public class QuadraticSplitLeafTest {
         }
 
         final Stats stats = rTree.stats();
-        Assert.assertTrue("Unexpected number of entries in " + TYPE + " split tree: " + stats.getEntryCount() + " entries - expected: " + entryCount + " actual: " + stats.getEntryCount(),
-                Math.abs(entryCount - stats.getEntryCount()) < 20 /* in case of duplicates */);
+        assertTrue(Math.abs(entryCount - stats.getEntryCount()) < 20,
+                "Unexpected number of entries in " + TYPE + " split tree: " + stats.getEntryCount() + " entries - expected: " + entryCount + " actual: " + stats.getEntryCount() /* in case of duplicates */);
         stats.print(System.out);
     }
 

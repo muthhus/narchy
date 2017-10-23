@@ -19,20 +19,19 @@ package com.metamx.collections.spatial;
 import com.metamx.collections.bitmap.BitmapFactory;
 import com.metamx.collections.bitmap.RoaringBitmapFactory;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
-import junit.framework.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  */
 public class RTreeTest {
     private RTree R;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         BitmapFactory rbf = new RoaringBitmapFactory();
         R = new RTree(2, new LinearGutmanSplitStrategy(0, 50, rbf), rbf);
@@ -43,22 +42,22 @@ public class RTreeTest {
 //    public void testInsertNoSplit() {
 //        float[] elem = new float[]{5, 5};
 //        tree.insert(elem, 1);
-//        Assert.assertTrue(Arrays.equals(elem, tree.getRoot().getMinCoordinates()));
-//        Assert.assertTrue(Arrays.equals(elem, tree.getRoot().getMaxCoordinates()));
+//        assertTrue(Arrays.equals(elem, tree.getRoot().getMinCoordinates()));
+//        assertTrue(Arrays.equals(elem, tree.getRoot().getMaxCoordinates()));
 //
 //        tree.insert(new float[]{6, 7}, 2);
 //        tree.insert(new float[]{1, 3}, 3);
 //        tree.insert(new float[]{10, 4}, 4);
 //        tree.insert(new float[]{8, 2}, 5);
 //
-//        Assert.assertEquals(tree.getRoot().getChildren().size(), 5);
+//        assertEquals(tree.getRoot().getChildren().size(), 5);
 //
 //        float[] expectedMin = new float[]{1, 2};
 //        float[] expectedMax = new float[]{10, 7};
 //
-//        Assert.assertTrue(Arrays.equals(expectedMin, tree.getRoot().getMinCoordinates()));
-//        Assert.assertTrue(Arrays.equals(expectedMax, tree.getRoot().getMaxCoordinates()));
-//        Assert.assertEquals(tree.getRoot().getArea(), 45.0d);
+//        assertTrue(Arrays.equals(expectedMin, tree.getRoot().getMinCoordinates()));
+//        assertTrue(Arrays.equals(expectedMax, tree.getRoot().getMaxCoordinates()));
+//        assertEquals(tree.getRoot().getArea(), 45.0d);
 //    }
 //
 //    @Test
@@ -67,7 +66,7 @@ public class RTreeTest {
 //        tree.insert(new float[]{1, 1}, 1);
 //        tree.insert(new float[]{1, 1}, 1);
 //
-//        Assert.assertEquals(tree.getRoot().getChildren().size(), 3);
+//        assertEquals(tree.getRoot().getChildren().size(), 3);
 //    }
 
     @Test
@@ -76,7 +75,7 @@ public class RTreeTest {
         R.insert(new float[]{1, 1}, 1);
         R.insert(new float[]{1, 1}, 1);
 
-        Assert.assertEquals(R.root().children.size(), 3);
+        assertEquals(R.root().children.size(), 3);
     }
     @Test
     public void testRemoval() {
@@ -84,7 +83,7 @@ public class RTreeTest {
         R.insert(new float[]{3, 2}, 2);
         R.insert(new float[]{1, 3}, 3);
 
-        Assert.assertEquals(3, R.root().children.size());
+        assertEquals(3, R.root().children.size());
 
         RTreeUtils.print(R);
 
@@ -92,7 +91,7 @@ public class RTreeTest {
 
         RTreeUtils.print(R);
 
-        Assert.assertEquals(2, R.root().children.size());
+        assertEquals(2, R.root().children.size());
         assertFalse(R.root().contains(new float[]{1, 3}));
 
         assertEquals(2, R.root().max[1], 0.01f); //y coord = 2, not 3 (which was just removed)
@@ -106,7 +105,7 @@ public class RTreeTest {
 //            tree.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, i);
 //        }
 //
-//        Assert.assertTrue(tree.getRoot().getChildren().size() > 1);
+//        assertTrue(tree.getRoot().getChildren().size() > 1);
 //    }
 
     @Test
@@ -116,7 +115,7 @@ public class RTreeTest {
             R.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, i);
         }
 
-        Assert.assertTrue(R.root().children.size() > 1);
+        assertTrue(R.root().children.size() > 1);
     }
 
 

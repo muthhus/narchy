@@ -5,7 +5,7 @@ import nars.Task;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * test an invididual premise

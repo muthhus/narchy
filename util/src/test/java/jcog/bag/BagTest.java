@@ -19,8 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static jcog.Texts.n4;
-import static org.junit.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author me
@@ -65,7 +64,7 @@ public class BagTest {
 //    public static void testScalePutHalfs(float expect, Bag<String,PLink<String>> a, float... scales) {
 //        for (float s : scales) {
 //            a.put(new RawPLink("x", 0.5f), s, null);
-//            Assert.assertNotNull(a.get("x"));
+//            assertNotNull(a.get("x"));
 //        }
 //        a.commit(null);
 //
@@ -199,8 +198,9 @@ public class BagTest {
             for (int highs : ff.length > 4 ? new int[] { ff.length-1, ff.length-2} : new int[] { ff.length-1 }  ) {
                 final float MIN_RATIO = 2f; //should be higher
                 float maxMinRatio = ff[highs] / ff[lows];
-                assertTrue(maxMinRatio + " ratio between max and min",
-                        maxMinRatio > MIN_RATIO
+                assertTrue(
+                        maxMinRatio > MIN_RATIO,
+                        maxMinRatio + " ratio between max and min"
                 );
             }
         }
@@ -246,8 +246,8 @@ public class BagTest {
 //
 //        System.out.println(ratioUniform + " " + ratioFlat);
 //
-//        Assert.assertTrue(ratioUniform > 7f); //should be ideally ~10
-//        Assert.assertTrue(ratioFlat < 7f); //should be ideally ~1
+//        assertTrue(ratioUniform > 7f); //should be ideally ~10
+//        assertTrue(ratioFlat < 7f); //should be ideally ~1
 //
 //    }
 
@@ -312,7 +312,7 @@ public class BagTest {
             if (inserted==null) {
                 bag.print();
                 bag.put(p);
-                fail();
+                fail("");
             }
         }
         bag.commit(null);

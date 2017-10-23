@@ -21,10 +21,12 @@ import com.metamx.collections.bitmap.RoaringBitmapFactory;
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.Point;
 import com.metamx.collections.spatial.RTree;
-import junit.framework.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -48,10 +50,10 @@ public class LinearGutmanSplitStrategyTest {
             node.enclose();
 
             Node[] groups = strategy.split(node);
-            Assert.assertEquals(groups[0].min[0], 1.0f);
-            Assert.assertEquals(groups[0].min[1], 4.0f);
-            Assert.assertEquals(groups[1].min[0], 9.0f);
-            Assert.assertEquals(groups[1].min[1], 8.0f);
+            assertEquals(groups[0].min[0], 1.0f);
+            assertEquals(groups[0].min[1], 4.0f);
+            assertEquals(groups[1].min[0], 9.0f);
+            assertEquals(groups[1].min[1], 8.0f);
         }
     }
 
@@ -69,10 +71,10 @@ public class LinearGutmanSplitStrategyTest {
         node.enclose();
 
         Node[] groups = strategy.split(node);
-        Assert.assertEquals(groups[0].min[0], 1.0f);
-        Assert.assertEquals(groups[0].min[1], 4.0f);
-        Assert.assertEquals(groups[1].min[0], 9.0f);
-        Assert.assertEquals(groups[1].min[1], 8.0f);
+        assertEquals(groups[0].min[0], 1.0f);
+        assertEquals(groups[0].min[1], 4.0f);
+        assertEquals(groups[1].min[0], 9.0f);
+        assertEquals(groups[1].min[1], 8.0f);
     }
 
 
@@ -85,7 +87,7 @@ public class LinearGutmanSplitStrategyTest {
             tree.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, i);
         }
 
-        Assert.assertTrue(getNumPoints(tree.root()) >= tree.size());
+        assertTrue(getNumPoints(tree.root()) >= tree.size());
     }
 
     @Test
@@ -97,7 +99,7 @@ public class LinearGutmanSplitStrategyTest {
             tree.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, i);
         }
 
-        Assert.assertTrue(getNumPoints(tree.root()) >= tree.size());
+        assertTrue(getNumPoints(tree.root()) >= tree.size());
     }
 
     private int getNumPoints(Node node) {

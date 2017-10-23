@@ -20,7 +20,7 @@
 //import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 //import org.jetbrains.annotations.NotNull;
 //import org.jetbrains.annotations.Nullable;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.util.ArrayList;
 //import java.util.List;
@@ -28,8 +28,8 @@
 //import java.util.function.Supplier;
 //
 //import static nars.$.conj;
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertTrue;
+//import static org.junit.jupiter.api.Assertions.*;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 ///**
 // * Created by me on 5/6/16.

@@ -6,11 +6,11 @@ import nars.term.var.CommonVariable;
 import nars.term.var.UnnormalizedVariable;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -61,7 +61,7 @@ public class CommonVariableTest {
         );
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void CommonVariableOfCommonVariable() {
         //different lengths
@@ -76,7 +76,7 @@ public class CommonVariableTest {
         assertEquals(c12, c12_reverse);
         assertEquals(0, c12.compareTo(c12_reverse));
         assertEquals(0, c12_reverse.compareTo(c12));
-        Assert.assertTrue(c12 != c12_reverse);
+        assertTrue(c12 != c12_reverse);
 
         Variable c123 = CommonVariable.common((AbstractVariable)c12, (AbstractVariable)p3.normalize(3));
         assertEquals("%770%3 class nars.term.var.UnnormalizedVariable", (c123 + " " + c123.getClass()));

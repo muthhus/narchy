@@ -8,7 +8,6 @@ import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.truth.Truth;
-import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;

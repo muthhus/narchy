@@ -6,22 +6,22 @@ import nars.Param;
 import nars.term.Term;
 import nars.test.TestNAR;
 import nars.time.Tense;
-import nars.util.AbstractNALTest;
+import nars.util.NALTest;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static nars.$.$;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by me on 1/9/16.
  */
-public class NAL7Test extends AbstractNALTest {
+public class NAL7Test extends NALTest {
 
     public int cycles = 350;
 
@@ -210,7 +210,8 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
-    @Ignore @Test
+    @Disabled
+    @Test
     public void justPlainWrongTiming() {
         /*
         WRONG
@@ -907,7 +908,7 @@ public class NAL7Test extends AbstractNALTest {
 //                .mustNotOutput(cycles,"(y)",BELIEF,0,ETERNAL);
 //    }
 
-    @Ignore
+    @Disabled
     @Test
     public void testDecomposeConjunctionQuestion() {
 
@@ -919,7 +920,7 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testDecomposeConjunctionQuest() {
 
@@ -1443,7 +1444,7 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testImplInductionAndConjReduction() {
         /*

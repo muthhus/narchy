@@ -15,7 +15,7 @@
  */
 package org.oakgp.function.math;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Assignments;
 import org.oakgp.Type;
 import org.oakgp.function.Function;
@@ -28,8 +28,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.oakgp.TestUtils.readNode;
 import static org.oakgp.Type.integerType;
 import static org.oakgp.function.math.ArithmeticExpressionSimplifier.assertEvaluateToSameResult;

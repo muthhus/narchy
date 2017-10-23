@@ -16,13 +16,13 @@
 package org.oakgp.util;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Ignore
+@Disabled
 public class CacheMapTest {
 //    @Test
 //    public void testSynchronized() {

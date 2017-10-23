@@ -183,7 +183,7 @@ public class TinyTable extends BitwiseArray {
 
         int lastOffset = chain[chainoffset];
         long lastItem = this.get(fpaux.bucketId, lastOffset);
-//		Assert.assertTrue(chain.containsitemOffset));
+//		assertTrue(chain.containsitemOffset));
         this.set(fpaux.bucketId, itemOffset, lastItem);
         this.set(fpaux.bucketId, lastOffset, 0L);
         return lastOffset;

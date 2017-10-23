@@ -15,7 +15,7 @@
  */
 package org.oakgp.examples.hanoi;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TowersOfHanoiSystemTest {
     @Test

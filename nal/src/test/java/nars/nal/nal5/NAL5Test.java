@@ -1,20 +1,20 @@
 package nars.nal.nal5;
 
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
 //@RunWith(Parameterized.class)
-public class NAL5Test extends AbstractNALTest {
+public class NAL5Test extends NALTest {
 
     final int cycles = 550;
 
-    @Before
+    @BeforeEach
     public void nal() {
         test.nar.nal(5);
     }
@@ -311,7 +311,7 @@ public class NAL5Test extends AbstractNALTest {
 
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void negation2() throws nars.Narsese.NarseseException {
 
@@ -577,7 +577,7 @@ public class NAL5Test extends AbstractNALTest {
         ;
     }
 
-    @Ignore @Test //???
+    @Disabled @Test //???
     public void testAbductionNegNegImplicationPred() {
 
         test
@@ -588,7 +588,7 @@ public class NAL5Test extends AbstractNALTest {
         ;
     }
 
-    @Ignore @Test //???
+    @Disabled @Test //???
     public void testAbductionPosNegImplicationPred() {
 
         test

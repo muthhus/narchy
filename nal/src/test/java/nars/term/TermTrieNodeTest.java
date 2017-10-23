@@ -2,12 +2,12 @@
 //
 //import nars.NAR;
 //import nars.nar.Default;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //import Trie;
 //import TrieMatch;
 //import Tries;
 //
-//import static org.junit.Assert.assertEquals;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 //
 //
@@ -66,7 +66,7 @@
 ////        //trie.print(System.out);
 ////    }
 //
-////    @Test @Ignore
+////    @Test @Disabled
 ////    public void testInsertionAndRemoval() {
 ////        // Insert a bunch of key/value pairs.
 ////        TermTrieNode<Concept> trieMap = new TermTrieNode();

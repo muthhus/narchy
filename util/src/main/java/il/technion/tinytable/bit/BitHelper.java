@@ -10,7 +10,7 @@ public class BitHelper {
 
     public static long fingerPrint(int size, long fingerPrint) {
         //long mask = ((1<<size)-1);
-        //Assert.assertTrue(mask == BitHelper.generateMask(0, size, false));
+        //assertTrue(mask == BitHelper.generateMask(0, size, false));
         return fingerPrint & ((1 << size) - 1);
     }
 

@@ -26,8 +26,6 @@ package spacegraph.phys.shape;
 import spacegraph.math.v3;
 import spacegraph.phys.math.Transform;
 
-import static spacegraph.math.v3.v;
-
 /**
  * ConvexShape is an abstract shape class. It describes general convex shapes
  * using the {@link #localGetSupportingVertex localGetSupportingVertex} interface

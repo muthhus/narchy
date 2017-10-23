@@ -5,19 +5,20 @@ import nars.NARS;
 import nars.Narsese;
 import nars.term.Term;
 import nars.test.TestNAR;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class MatchConstraintTest {
 
     final static int CYCLES = 64;
 
-    @Test public void testNeqComRecursiveConstraint() throws Narsese.NarseseException {
+    @Test
+    public void testNeqComRecursiveConstraint() throws Narsese.NarseseException {
         NoCommonSubtermConstraint c = new NoCommonSubtermConstraint($.varQuery(1), $.varQuery(2), true);
         assertFalse(
                 c.invalid($.$("X"), (Term)$.$("Y"))

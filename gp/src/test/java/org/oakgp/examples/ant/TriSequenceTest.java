@@ -15,13 +15,13 @@
  */
 package org.oakgp.examples.ant;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Arguments;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.Node;
 import org.oakgp.node.VariableNode;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.examples.ant.AntMovement.*;
 import static org.oakgp.examples.ant.BiSequence.BISEQUENCE;
 import static org.oakgp.examples.ant.TriSequence.TRISEQUENCE;

@@ -2,25 +2,27 @@ package alice.tuprolog;
 
 import alice.tuprolog.event.OutputEvent;
 import alice.tuprolog.event.OutputListener;
-import junit.framework.TestCase;
-import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
  * @author George S. Cowan
  *
  */
-@Ignore
-public class TestVarIsEqual extends TestCase {
+@Disabled
+public class TestVarIsEqual {
 
   Prolog core;
   String yes = "yes.\n";
   private final SysoutListener sysoutListener = new SysoutListener();
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     core = new Prolog();
     core.addOutputListener(sysoutListener);
   }
@@ -37,6 +39,7 @@ public class TestVarIsEqual extends TestCase {
     }
   }
 
+  @Test
   public void testDifferntVarsCompareEqual() throws MalformedGoalException, InvalidTheoryException {
     // theory is modified code from PTTP
     String theory = "test :- body_for_head_literal_instrumented(d(X,Y),(not_d(X,U);d(X,Y)),Bod).    "
@@ -111,8 +114,8 @@ public class TestVarIsEqual extends TestCase {
     core.setTheory(new Theory(theory));
 
     Solution info = core.solve("test. ");
-    Assert.assertTrue("Test should complete normally: " + info,
-            info.isSuccess());
+    assertTrue(info.isSuccess(),
+            "Test should complete normally: " + info);
     String expected = ""
       + "\n" +    "body_for_head_literal input Head: d(X_e1,Y_e1)"
       + "\n" +    "                             Wff: ';'(not_d(X_e1,U_e1),d(X_e1,Y_e1))"
@@ -131,7 +134,7 @@ public class TestVarIsEqual extends TestCase {
       + "\n" +    ""
     ;
 
-  Assert.assertEquals("Var == should not succeed.", expected, sysoutListener.getAllOutput());
+  assertEquals("Var == should not succeed.", expected, sysoutListener.getAllOutput());
   }
 
 }

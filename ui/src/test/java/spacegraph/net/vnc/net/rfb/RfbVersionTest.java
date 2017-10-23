@@ -13,10 +13,10 @@
 // *******************************************************************************/
 //package spacegraph.net.vnc.net.rfb;
 //
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //import spacegraph.net.vnc.rfb.codec.ProtocolVersion;
 //
-//import static org.junit.Assert.*;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 //public class RfbVersionTest {
 //

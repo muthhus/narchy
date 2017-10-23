@@ -4,8 +4,8 @@ import com.google.common.base.Joiner;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by me on 2/18/17.
@@ -18,7 +18,7 @@ public class NLPTest {
 //
 //    }
 
-    @Test @Ignore
+    @Test @Disabled
     public void testNLP0() throws Narsese.NarseseException {
         //Param.DEBUG = true;
 

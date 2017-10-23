@@ -4,14 +4,14 @@
 //import jcog.Util;
 //import jcog.net.js.JsUDPServer;
 //import org.eclipse.collections.impl.factory.Maps;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.net.DatagramPacket;
 //import java.net.SocketException;
 //import java.net.UnknownHostException;
 //import java.util.Arrays;
 //
-//import static junit.framework.TestCase.assertTrue;
+//
 //
 //
 //public class JsServerTest {

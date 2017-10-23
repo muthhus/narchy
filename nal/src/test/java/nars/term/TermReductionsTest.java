@@ -7,8 +7,8 @@ import nars.term.atom.Atomic;
 import nars.term.atom.Int;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.$.*;
 import static nars.$.conj;
@@ -17,7 +17,7 @@ import static nars.term.TermTest.assertValid;
 import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static nars.time.Tense.DTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 12/10/15.
@@ -194,7 +194,7 @@ public class TermReductionsTest extends NarseseTest {
     /**
      * needs reviewed could be totally wrong
      */
-    @Ignore
+    @Disabled
     @Test
     public void testImplicationNegatedPredicateImplicated() throws Narsese.NarseseException {
 
@@ -338,7 +338,7 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals(pp, disj(pp, pp));
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testRepeatConjunctionTaskSimplification() throws Narsese.NarseseException {
         //the repeats in the conjunction term can be replaced with a single event with equivalent start/stop time
@@ -556,7 +556,7 @@ public class TermReductionsTest extends NarseseTest {
                 seti($("a"), $("b"), $("c")),
                 seti($("d"), $("b")));
         assertEquals(Op.SETi, d.op());
-        assertEquals(d.toString(), 2, d.subs());
+        assertEquals(2, d.subs());
         assertEquals("[a,c]", d.toString());
     }
 
@@ -568,7 +568,7 @@ public class TermReductionsTest extends NarseseTest {
         Term b = sete($("d"), $("b"));
         Term d = diffe(a, b);
         assertEquals(Op.SETe, d.op());
-        assertEquals(d.toString(), 2, d.subs());
+        assertEquals(2, d.subs());
         assertEquals("{a,c}", d.toString());
 
     }
@@ -636,7 +636,7 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals("(&|,a,b,c)", $("( a &&+0 (b &&+0 c) )").toString());
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testTemporalNTermEquivalenceParallel() throws Narsese.NarseseException {
         //+0 is the only case in which temporal && can have arity>2
@@ -789,7 +789,7 @@ public class TermReductionsTest extends NarseseTest {
                 $("(--(p) || --(q))").toString());
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testDemorgan2() throws Narsese.NarseseException {
 
@@ -937,7 +937,7 @@ public class TermReductionsTest extends NarseseTest {
                 /*"((a) &&+1 (a))",*/ //<-- conjunction case is special, see repeating conjunction simplification test
         }) {
             Term t = $(x);
-            assertTrue(x + " :: " + t, t instanceof Compound);
+            assertTrue(t instanceof Compound, x + " :: " + t);
             assertTrue(t.dt() != DTERNAL);
 
             Task y = task(t, Op.BELIEF, t(1f, 0.9f)).apply(n);

@@ -5,10 +5,10 @@ import jcog.learn.ql.DQN;
 import jcog.learn.ql.HaiQ;
 import jcog.learn.ql.HaiQAgent;
 import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AgentTest {
 
@@ -20,7 +20,8 @@ public class AgentTest {
         testAgent( new HaiQAgent(1, 2) );
     }
 
-    @Ignore @Test public void testDPGAgent() {
+    @Disabled
+    @Test public void testDPGAgent() {
         testAgent( new DPG(1, 2) ); //broken it seems
     }
 

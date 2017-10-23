@@ -15,11 +15,11 @@
  */
 package org.oakgp.function;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Arguments;
 import org.oakgp.Assignments;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ImpureFunctionTest {
     @Test

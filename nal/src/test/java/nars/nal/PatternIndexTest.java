@@ -7,7 +7,7 @@
 //import nars.nal.meta.PatternCompound;
 //import nars.term.Compound;
 //import nars.term.Term;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //import org.zhz.dfargx.MatchedText;
 //import org.zhz.dfargx.RegexSearcher;
 //

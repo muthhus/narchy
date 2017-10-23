@@ -497,7 +497,7 @@
 ////        File pyFile = new File("/tmp/x.py");
 ////        String ret = (String) PyCaller.call(pyFile, "hi", (Object)new String[]{"all", "my", "friend", "!"});
 ////        System.out.println(ret);
-////        //Assert.assertEquals("hello, all my friend ! ",ret);
+////        //assertEquals("hello, all my friend ! ",ret);
 ////    }
 //
 //

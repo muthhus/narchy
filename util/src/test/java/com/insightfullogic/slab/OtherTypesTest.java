@@ -1,10 +1,10 @@
 package com.insightfullogic.slab;
 
-import org.junit.AfterClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OtherTypesTest {
 	
@@ -46,7 +46,7 @@ public class OtherTypesTest {
 		assertEquals('c', value.getChar());
 	}
 	
-	@AfterClass
+	@AfterEach
 	public static void free() {
 		value.close();
 	}

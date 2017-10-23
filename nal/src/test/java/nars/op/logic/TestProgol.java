@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.Param;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * http://www.doc.ic.ac.uk/~shm/progol_anim_example_in.html

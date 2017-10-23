@@ -5,13 +5,13 @@ import nars.NARS;
 import nars.Narsese;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.function.Function;
 
 import static nars.$.$;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 10/14/16.

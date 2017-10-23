@@ -1,21 +1,20 @@
 package jcog.bloom;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- *   Copyright 2014 Prasanth Jayachandran
- *
+ * Copyright 2014 Prasanth Jayachandran
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -121,21 +120,24 @@ public class CountMinSketchTest {
         assertEquals(actualFreq[60] + actualFreq2[60], cms3.count(60), 0.01);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testIncompatibleMerge() {
-        CountMinSketch cms = new CountMinSketch(1024, 10);
-        cms.add("Hello".getBytes());
-        cms.add("Hello".getBytes());
-        cms.add("Hello".getBytes());
-        cms.add("Hello".getBytes());
-        CountMinSketch cms2 = new CountMinSketch(1024, 11);
-        cms2.add("Hello");
-        cms2.add("Hello");
-        cms2.add("Hello");
-        cms2.add("Hello");
+        assertThrows(RuntimeException.class, () -> {
+            CountMinSketch cms = new CountMinSketch(1024, 10);
+            cms.add("Hello".getBytes());
+            cms.add("Hello".getBytes());
+            cms.add("Hello".getBytes());
+            cms.add("Hello".getBytes());
+            CountMinSketch cms2 = new CountMinSketch(1024, 11);
+            cms2.add("Hello");
+            cms2.add("Hello");
+            cms2.add("Hello");
+            cms2.add("Hello");
 
-        // should throw exception
-        cms.merge(cms2);
+            // should throw exception
+            cms.merge(cms2);
+
+        });
     }
 
     @Test
@@ -190,7 +192,8 @@ public class CountMinSketchTest {
         assertEquals(2, cms4.count(Integer.MIN_VALUE), 0.01);
     }
 
-    @Test public void testCountMinRoar1() {
+    @Test
+    public void testCountMinRoar1() {
         CountMinRoar c = new CountMinRoar();
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < i; j++)

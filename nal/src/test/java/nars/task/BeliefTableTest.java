@@ -10,17 +10,14 @@ import nars.test.analyze.BeliefAnalysis;
 import nars.time.Tense;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static junit.framework.TestCase.assertNotNull;
 import static nars.Op.BELIEF;
 import static nars.task.RevisionTest.x;
 import static nars.time.Tense.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 7/5/15.
@@ -111,10 +108,10 @@ public class BeliefTableTest {
             long w = timing[i];
             Truth truth = table.truth(w, n);
             float fExpected = freqPattern[i];
-            assertEquals("exact truth @" + w + " == " + fExpected, fExpected, truth.freq(), 0.01f);
+            assertEquals(fExpected, truth.freq(), 0.01f, "exact truth @" + w + " == " + fExpected);
 
             Task match = table.match(w, null, n);
-            assertEquals("exact belief @" + w + " == " + fExpected, fExpected, match.freq(), 0.01f);
+            assertEquals(fExpected, match.freq(), 0.01f, "exact belief @" + w + " == " + fExpected);
         }
 
         //measure midpoint interpolation
@@ -220,10 +217,10 @@ public class BeliefTableTest {
 
     static void assertDuration(NAR n, String c, long start, long end) throws Narsese.NarseseException {
         BaseConcept cc = (BaseConcept) n.conceptualize(c);
-        Assert.assertNotNull(c + " unconceptualized", cc);
+        assertNotNull(cc,c + " unconceptualized");
 
         List<Task> tt = Lists.newArrayList(cc.beliefs());
-        assertTrue(c + " not believed", cc.beliefs() instanceof DynamicBeliefTable || tt.size() > 0);
+        assertTrue(cc.beliefs() instanceof DynamicBeliefTable || tt.size() > 0, c + " not believed");
 
         if (tt.size() > 0) {
             Task t = tt.get(0);

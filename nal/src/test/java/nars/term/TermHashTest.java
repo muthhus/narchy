@@ -3,12 +3,12 @@ package nars.term;
 import nars.Narsese;
 import nars.Op;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static nars.$.*;
 import static nars.Op.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * test term hash and structure bits

@@ -15,10 +15,10 @@
  */
 package org.oakgp.rank;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.node.Node;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.oakgp.TestUtils.*;
 

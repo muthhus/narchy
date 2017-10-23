@@ -1,14 +1,14 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
 import com.google.common.collect.Lists;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.function.Function;
 
 import static org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel.FALSE_LABEL;
 import static org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel.TRUE_LABEL;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DecisionTreeGetLabelTest {
 
@@ -18,7 +18,7 @@ public class DecisionTreeGetLabelTest {
     public void testGetLabelOnEmptyList() {
         DecisionTree tree = new DecisionTree();
         List<Function<Object,Object>> data = Lists.newArrayList();
-        Assert.assertNull(DecisionTree.label(it, data, 0.9f));
+        assertNull(DecisionTree.label(it, data, 0.9f));
     }
 
     @Test
@@ -26,7 +26,7 @@ public class DecisionTreeGetLabelTest {
         DecisionTree tree = new DecisionTree();
         List<Function<Object,Object>> data = Lists.newArrayList();
         data.add(new TestValue(TRUE_LABEL));
-        Assert.assertEquals("true", DecisionTree.label(it, data,0.9f).toString());
+        assertEquals("true", DecisionTree.label(it, data,0.9f).toString());
     }
 
     @Test
@@ -35,7 +35,7 @@ public class DecisionTreeGetLabelTest {
         List<Function<Object,Object>> data = Lists.newArrayList();
         data.add(new TestValue(TRUE_LABEL));
         data.add(new TestValue(FALSE_LABEL));
-        Assert.assertNull(DecisionTree.label(it, data,0.9f));
+        assertNull(DecisionTree.label(it, data,0.9f));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class DecisionTreeGetLabelTest {
         for (int i = 0; i < 5; i++) {
             data.add(new TestValue(FALSE_LABEL));
         }
-        Assert.assertEquals("true", DecisionTree.label(it, data,0.9f).toString());
+        assertEquals("true", DecisionTree.label(it, data,0.9f).toString());
     }
 
     @Test
@@ -56,11 +56,11 @@ public class DecisionTreeGetLabelTest {
         DecisionTree tree = new DecisionTree();
 
         List<Function<Object,Object>> homogenous = buildSample(96, 4);
-        Assert.assertNotNull(DecisionTree.label(it, homogenous, 0.9f));
+        assertNotNull(DecisionTree.label(it, homogenous, 0.9f));
 
 
         List<Function<Object,Object>> nonhomogenous = buildSample(50, 50);
-        Assert.assertNull(DecisionTree.label(it, nonhomogenous, 0.9f));
+        assertNull(DecisionTree.label(it, nonhomogenous, 0.9f));
     }
 
     static List<Function<Object,Object>> buildSample(int a, int b) {

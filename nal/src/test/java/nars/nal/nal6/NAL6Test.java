@@ -1,20 +1,20 @@
 package nars.nal.nal6;
 
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
-public class NAL6Test extends AbstractNALTest {
+public class NAL6Test extends NALTest {
 
 
     final int cycles = 1500;
 
-    @Before
+    @BeforeEach
     public void nal() {
         test.nar.nal(6);
     }
@@ -327,7 +327,7 @@ public class NAL6Test extends AbstractNALTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void variable_introduction3() {
 
         TestNAR tester = test;
@@ -501,7 +501,7 @@ public class NAL6Test extends AbstractNALTest {
 
 
     @Test
-    @Ignore public void abduction_with_variable_elimination() {
+    @Disabled public void abduction_with_variable_elimination() {
 
         test
                 .believe("(open($1,lock1) ==> ($1 --> key))", 1.00f, 0.90f) //en("whatever opens lock1 is a key");
@@ -513,7 +513,7 @@ public class NAL6Test extends AbstractNALTest {
 
     @Test
     /** TODO verify */
-    @Ignore public void abduction_with_variable_elimination_negated() {
+    @Disabled public void abduction_with_variable_elimination_negated() {
 
         test
 

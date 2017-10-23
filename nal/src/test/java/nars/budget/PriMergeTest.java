@@ -6,9 +6,10 @@ import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import nars.$;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  * Created by me on 2/2/16.

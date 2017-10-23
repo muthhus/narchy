@@ -8,9 +8,7 @@ import spacegraph.input.Finger;
 import spacegraph.math.v2;
 
 import java.io.PrintStream;
-import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 

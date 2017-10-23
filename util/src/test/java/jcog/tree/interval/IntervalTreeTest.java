@@ -2,11 +2,11 @@ package jcog.tree.interval;
 
 import jcog.math.Interval;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 9/4/15.

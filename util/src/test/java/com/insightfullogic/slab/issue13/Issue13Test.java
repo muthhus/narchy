@@ -1,7 +1,7 @@
 package com.insightfullogic.slab.issue13;
 
 import com.insightfullogic.slab.Allocator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class Issue13Test {
 

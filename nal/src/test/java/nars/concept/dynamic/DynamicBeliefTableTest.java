@@ -10,11 +10,11 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Int;
 import nars.truth.Truth;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static nars.$.$;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 10/27/16.
@@ -60,7 +60,7 @@ public class DynamicBeliefTableTest {
 
             Concept xIntNegY = n.conceptualize($("((x|--y)-->a)"));
             assertTrue(xIntNegY instanceof DynamicConcept);
-            assertEquals(now + " " + xIntNegY,$.t(0f, 0.81f), n.beliefTruth(xIntNegY, now));
+            assertEquals($.t(0f, 0.81f), n.beliefTruth(xIntNegY, now), now + " " + xIntNegY);
             assertEquals($.t(1f, 0.81f), n.beliefTruth(n.conceptualize($("((x|--z)-->a)")), now));
         }
     }
@@ -113,7 +113,7 @@ public class DynamicBeliefTableTest {
         BaseConcept cc = ((BaseConcept) n.conceptualize($("(&&, a:x, a:y, a:z)")));
         Truth now = n.beliefTruth(cc, n.time());
         assertNotNull(now);
-        assertTrue(now + " truth at " + n.time(), $.t(1f, 0.73f).equals(now, 0.1f));
+        assertTrue($.t(1f, 0.73f).equals(now, 0.1f), now + " truth at " + n.time());
         //the truth values were provided despite the belief tables being empty:
         assertTrue(cc.beliefs().isEmpty());
 
@@ -153,7 +153,7 @@ public class DynamicBeliefTableTest {
 
         DynTruth xt = xtable.truth(0, 0, template, true, n);
         assertNotNull(xt);
-        assertTrue(xt.truth().toString(), $.t(1f, 0.81f).equals(xt.truth(), 0.1f));
+        assertTrue($.t(1f, 0.81f).equals(xt.truth(), 0.1f), xt.truth().toString());
 
         assertEquals(0.74f, xtable.generate($("((x) &&+6 (y))"), 0, 0, n).conf(), 0.05f);
         assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0, 0, n).conf(), 0.05f); //best match to the input

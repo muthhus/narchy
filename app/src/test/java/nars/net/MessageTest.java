@@ -5,12 +5,12 @@
 //import nars.Task;
 //import nars.nar.Terminal;
 //import nars.net.gnutella.message.QueryMessage;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.io.IOException;
 //
-//import static junit.framework.TestCase.assertTrue;
-//import static org.junit.Assert.assertEquals;
+//
+//import static org.junit.jupiter.api.Assertions.*;
 //
 ///**
 // * Created by me on 7/10/16.

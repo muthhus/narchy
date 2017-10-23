@@ -15,7 +15,7 @@
  */
 package org.oakgp.node.walk;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.Node;
@@ -24,8 +24,8 @@ import org.oakgp.node.VariableNode;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.oakgp.TestUtils.*;
 import static org.oakgp.function.math.IntegerUtils.the;
 import static org.oakgp.node.NodeType.*;

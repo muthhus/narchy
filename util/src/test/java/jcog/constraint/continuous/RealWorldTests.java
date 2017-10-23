@@ -3,13 +3,13 @@ package jcog.constraint.continuous;
 import jcog.constraint.continuous.exceptions.DuplicateConstraintException;
 import jcog.constraint.continuous.exceptions.NonlinearExpressionException;
 import jcog.constraint.continuous.exceptions.UnsatisfiableConstraintException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by alex on 20/11/2014.

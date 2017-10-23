@@ -1,7 +1,7 @@
 package jcog.learn.deep;
 
 import jcog.Util;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 

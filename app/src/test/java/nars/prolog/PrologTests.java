@@ -5,11 +5,11 @@
 //import nars.Param;
 //import nars.nar.Default;
 //import nars.op.Operator;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.util.List;
 //
-//import static org.junit.Assert.assertEquals;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 ///**
 // * Created by me on 3/3/16.

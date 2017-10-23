@@ -54,7 +54,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        Param.DEBUG = true;
         //Param.TRACE = true;
         NAR n = NARS.threadSafe();
-        float fps = 2f;
+        float fps = 16f;
 
         //csvPriority(n, "/tmp/x.csv");
 

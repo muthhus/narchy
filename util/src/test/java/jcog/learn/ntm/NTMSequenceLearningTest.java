@@ -3,9 +3,9 @@ package jcog.learn.ntm;
 import jcog.learn.ntm.run.SequenceGenerator;
 import jcog.learn.ntm.run.SequenceLearner;
 import jcog.learn.ntm.run.TrainingSequence;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by me on 2/17/17.

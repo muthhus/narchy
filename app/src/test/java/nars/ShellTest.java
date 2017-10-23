@@ -2,7 +2,7 @@
 //
 //import nars.nar.Default;
 //import nars.op.shell;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 ///**
 // * Created by me on 2/24/16.

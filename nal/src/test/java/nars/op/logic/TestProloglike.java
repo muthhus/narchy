@@ -4,8 +4,8 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.Param;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * Created by me on 4/17/17.
  */
-@Ignore
+@Disabled
 public class TestProloglike {
 
 //    static {

@@ -6,9 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.SortedSet;
 
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.XTERNAL;
+import static nars.time.Tense.*;
 
 public class RelativeEvent extends Event {
     public final Term rel;

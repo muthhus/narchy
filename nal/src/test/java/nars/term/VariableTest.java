@@ -2,10 +2,10 @@ package nars.term;
 
 import nars.*;
 import nars.term.atom.Atomic;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static nars.$.$;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 8/28/15.

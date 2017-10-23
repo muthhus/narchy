@@ -15,14 +15,14 @@
  */
 package org.oakgp.terminate;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.oakgp.rank.RankedCandidates;
 
 import java.util.function.Predicate;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.oakgp.TestUtils.singletonRankedCandidates;
 
@@ -34,7 +34,7 @@ public class CompositeTerminatorTest {
     private Predicate<RankedCandidates> t3;
 
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void setup() {
         t1 = mock(Predicate.class);
         t2 = mock(Predicate.class);

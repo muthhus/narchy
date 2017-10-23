@@ -1,7 +1,6 @@
 package spacegraph.widget.console;
 
 import com.googlecode.lanterna.TextCharacter;
-import com.jogamp.opengl.GL2;
 import spacegraph.widget.Widget;
 
 import java.awt.*;

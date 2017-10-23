@@ -4,15 +4,15 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.util.NLPGen;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by me on 7/9/16.
  */
-@Ignore
+@Disabled
 public class NLPGenTest {
 
     final NLPGen g = new NLPGen();

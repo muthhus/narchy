@@ -6,7 +6,7 @@
 //import nars.test.TestNAR;
 //import nars.util.signal.RuleTest;
 //import org.junit.Ignore;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //import org.junit.runner.RunWith;
 //import org.junit.runners.Parameterized;
 //
@@ -22,7 +22,7 @@
 // //     <base --> (/,reaction,acid,_)> //en("A base is something that has a reaction with an acid.");
 //
 // */
-//@Ignore @RunWith(Parameterized.class)
+//@Disabled @RunWith(Parameterized.class)
 //public class NAL4Test extends AbstractNALTest {
 //
 //

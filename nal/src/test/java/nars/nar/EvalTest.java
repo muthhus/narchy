@@ -3,11 +3,11 @@
 //import nars.$;
 //import nars.NAR;
 //import nars.task.Task;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertNotNull;
-//import static org.junit.Assert.assertTrue;
+//import static org.junit.jupiter.api.Assertions.*;
+//import static org.junit.jupiter.api.Assertions.*;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 ///**
 // * Clojure integration test

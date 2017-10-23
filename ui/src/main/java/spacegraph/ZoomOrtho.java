@@ -20,8 +20,6 @@ import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static spacegraph.Surface.Align.None;
-
 /**
  * Ortho with mouse zoom controls
  */

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.intelligentjava.machinelearning.decisiontree.data.SimpleValue;
 import org.intelligentjava.machinelearning.decisiontree.feature.P;
 import org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.function.Function;
@@ -15,7 +15,7 @@ import static java.util.stream.Collectors.toList;
 import static org.intelligentjava.machinelearning.decisiontree.data.SimpleValue.classification;
 import static org.intelligentjava.machinelearning.decisiontree.data.SimpleValue.data;
 import static org.intelligentjava.machinelearning.decisiontree.feature.PredicateFeature.feature;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DecisionTreeTrainingTest {
 

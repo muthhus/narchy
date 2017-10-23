@@ -15,15 +15,15 @@
  */
 package org.oakgp.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.node.Node;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oakgp.TestUtils.*;
 import static org.oakgp.util.NodeComparator.NODE_COMPARATOR;
 

@@ -3,22 +3,20 @@ package mcaixictw;
 import mcaixictw.worldmodels.ContextTree;
 import mcaixictw.worldmodels.WorldModelSettings;
 import mcaixictw.worldmodels.Worldmodel;
-import org.junit.*;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.*;
 
 
 public class ContextTreeTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpBeforeClass() throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownAfterClass() throws Exception {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         WorldModelSettings settings = new WorldModelSettings();
@@ -35,7 +33,7 @@ public class ContextTreeTest {
     double eps = 1E-8; // tolerance
     Worldmodel ct;
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
     }
 
@@ -48,7 +46,7 @@ public class ContextTreeTest {
         double p_1 = model.predict(new BooleanArrayList(true));
         double p_0 = model.predict(new BooleanArrayList(false));
         System.out.println("p_1: " + p_1 + " p_0: " + p_0);
-        assertTrue(Math.abs(1.0 - (p_1 + p_0)) < eps);
+        Assertions.assertTrue(Math.abs(1.0 - (p_1 + p_0)) < eps);
     }
 
     @Test
@@ -94,43 +92,43 @@ public class ContextTreeTest {
         System.out.println(ct);
 
         // root
-        assertTrue(equals(Math.exp(ct.getRoot().getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getRoot().getLogProbWeighted()),
                 7.0 / 2048.0));
 
         // first level
         context = new BooleanArrayList();
         context.add(true);
-        assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
                 1.0 / 16.0));
 
         context = new BooleanArrayList();
         context.add(false);
-        assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
                 9.0 / 128.0));
 
         // second level
         context = new BooleanArrayList();
         context.add(true);
         context.add(true);
-        assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
                 1.0 / 2.0));
 
         context = new BooleanArrayList();
         context.add(true);
         context.add(false);
-        assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
                 1.0 / 8.0));
 
         context = new BooleanArrayList();
         context.add(false);
         context.add(true);
-        assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
                 5.0 / 16.0));
 
         context = new BooleanArrayList();
         context.add(false);
         context.add(false);
-        assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
                 3.0 / 8.0));
 
         // third level
@@ -138,35 +136,35 @@ public class ContextTreeTest {
         context.add(true);
         context.add(true);
         context.add(false);
-        assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
                 1.0 / 2.0));
 
         context = new BooleanArrayList();
         context.add(true);
         context.add(false);
         context.add(false);
-        assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
                 1.0 / 8.0));
 
         context = new BooleanArrayList();
         context.add(false);
         context.add(true);
         context.add(true);
-        assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
                 1.0 / 2.0));
 
         context = new BooleanArrayList();
         context.add(false);
         context.add(true);
         context.add(false);
-        assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
                 1.0 / 2.0));
 
         context = new BooleanArrayList();
         context.add(false);
         context.add(false);
         context.add(true);
-        assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
+        Assertions.assertTrue(equals(Math.exp(ct.getNode(context).getLogProbWeighted()),
                 3.0 / 8.0));
 
     }
@@ -245,7 +243,7 @@ public class ContextTreeTest {
         }
 
         double p2 = ct.predict(list);
-        assertTrue(p2 > p1);
+        Assertions.assertTrue(p2 > p1);
     }
 
     @Test
@@ -336,7 +334,7 @@ public class ContextTreeTest {
 
         System.out.println(r);
 
-        assertTrue(r != null);
+        Assertions.assertTrue(r != null);
     }
 
     @Test
@@ -360,7 +358,7 @@ public class ContextTreeTest {
 
         double p3 = ct.predict(list);
 
-        assertTrue(p1 - p3 < eps);
+        Assertions.assertTrue(p1 - p3 < eps);
     }
 
     @Test
@@ -380,7 +378,7 @@ public class ContextTreeTest {
         ct.update(list);
         ct.revert(3);
 
-        assertTrue(p1 - ct.predict(listTrue) < eps);
+        Assertions.assertTrue(p1 - ct.predict(listTrue) < eps);
     }
 
     @Test
@@ -399,12 +397,12 @@ public class ContextTreeTest {
 
         ct.updateHistory(list);
 
-        assertTrue(ct.historySize() == s1 + list.size());
+        Assertions.assertTrue(ct.historySize() == s1 + list.size());
 
         ct.revertHistory(s1);
 
-        assertTrue(ct.historySize() == s1);
-        assertTrue(ct.predict(listTrue) - p1 < eps);
+        Assertions.assertTrue(ct.historySize() == s1);
+        Assertions.assertTrue(ct.predict(listTrue) - p1 < eps);
     }
 
     @Test
@@ -428,8 +426,8 @@ public class ContextTreeTest {
         ct.update(list);
         ct.revert(list.size());
 
-        assertTrue(ct.predict(listTrue) - pTrue < eps);
-        assertTrue(ct.predict(listFalse) - pFalse < eps);
+        Assertions.assertTrue(ct.predict(listTrue) - pTrue < eps);
+        Assertions.assertTrue(ct.predict(listFalse) - pFalse < eps);
     }
 
     @Test
@@ -444,7 +442,7 @@ public class ContextTreeTest {
         double p = ct.predict(list);
         ct.updateHistory(list);
         ct.revertHistory(s1);
-        assertTrue(p - ct.predict(list) < eps);
+        Assertions.assertTrue(p - ct.predict(list) < eps);
     }
 
     @Test
@@ -456,7 +454,7 @@ public class ContextTreeTest {
 
         ct.genRandomSymbols(10);
 
-        assertTrue(ct.predict(list) - p1 < eps);
+        Assertions.assertTrue(ct.predict(list) - p1 < eps);
     }
 
     @Test
@@ -467,7 +465,7 @@ public class ContextTreeTest {
         int numSymbols = 11;
         ct.genRandomSymbolsAndUpdate(numSymbols);
 
-        assertTrue(ct.historySize() == s1 + numSymbols);
+        Assertions.assertTrue(ct.historySize() == s1 + numSymbols);
 
     }
 
@@ -481,7 +479,7 @@ public class ContextTreeTest {
 
         for (int i = 0; i < 100; i++) {
             // test whether it always returns the same probability.
-            assertTrue(ct.predict(list) - p < eps);
+            Assertions.assertTrue(ct.predict(list) - p < eps);
         }
 
         double pTrue = ct.predict(list);
@@ -489,7 +487,7 @@ public class ContextTreeTest {
         list.add(false);
         double pFalse = ct.predict(list);
 
-        assertTrue(pTrue + pFalse - 1.0 < eps);
+        Assertions.assertTrue(pTrue + pFalse - 1.0 < eps);
     }
 
     @Test
@@ -515,7 +513,7 @@ public class ContextTreeTest {
             ct.revert(1);
         }
 
-        assertTrue(ct.predict(list) - p1 < eps);
+        Assertions.assertTrue(ct.predict(list) - p1 < eps);
     }
 
     @Test
@@ -530,11 +528,11 @@ public class ContextTreeTest {
 
         ct.update(updateList);
 
-        assertTrue(!ct.nthHistorySymbol(0));
-        assertTrue(!ct.nthHistorySymbol(1));
-        assertTrue(ct.nthHistorySymbol(2));
-        assertTrue(!ct.nthHistorySymbol(3));
-        assertTrue(!ct.nthHistorySymbol(4));
+        Assertions.assertTrue(!ct.nthHistorySymbol(0));
+        Assertions.assertTrue(!ct.nthHistorySymbol(1));
+        Assertions.assertTrue(ct.nthHistorySymbol(2));
+        Assertions.assertTrue(!ct.nthHistorySymbol(3));
+        Assertions.assertTrue(!ct.nthHistorySymbol(4));
 
     }
 

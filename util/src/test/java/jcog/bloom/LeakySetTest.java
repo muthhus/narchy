@@ -1,9 +1,9 @@
 package jcog.bloom;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by jeff on 14/05/16.
@@ -12,7 +12,7 @@ public class LeakySetTest {
 
     private LeakySet<String> filter;
 
-    @Before
+    @BeforeEach
     public void before() {
         this.filter = BloomFilterBuilder.get().buildFilter();
     }

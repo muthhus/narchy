@@ -15,7 +15,7 @@
  */
 package org.oakgp.rank.fitness;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.node.Node;
 import org.oakgp.rank.GenerationRanker;
 import org.oakgp.rank.RankedCandidates;

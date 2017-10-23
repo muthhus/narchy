@@ -4,11 +4,11 @@ package nars.nal.nal2;
 import nars.NAR;
 import nars.NARS;
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.Test;
 
 //@RunWith(Parameterized.class)
-public class NAL2Test extends AbstractNALTest {
+public class NAL2Test extends NALTest {
 
     static final int cycles = 50;
 

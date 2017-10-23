@@ -7,15 +7,15 @@ import nars.task.NALTask;
 import nars.term.Term;
 import nars.test.TestNAR;
 import nars.time.Tense;
-import nars.util.AbstractNALTest;
-import org.junit.Ignore;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class NAL8Test extends AbstractNALTest {
+public class NAL8Test extends NALTest {
 
     public static final int cycles = 230;
 
@@ -198,7 +198,7 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(x)", GOAL, 0);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testGoalConjunctionDecomposeViaStrongTruth() {
 
@@ -209,7 +209,7 @@ public class NAL8Test extends AbstractNALTest {
         ;
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testGoalConjunctionDecomposeViaStrongTruthNeg() {
 
@@ -510,7 +510,7 @@ public class NAL8Test extends AbstractNALTest {
 //                .mustNotOutput(cycles, "(((in)|(left))-->^cam)", GOAL, 0, ETERNAL);
 //    }
 
-    @Ignore
+    @Disabled
     @Test
     public void testInheritanceDecompositionTemporalGoal() {
         //(((in)|(left))-->^cam)!
@@ -567,7 +567,7 @@ public class NAL8Test extends AbstractNALTest {
 //        ;
 //    }
 
-    @Ignore
+    @Disabled
     @Test
     public void questConjunction() {
 
@@ -769,7 +769,7 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
-    @Ignore
+    @Disabled
     @Test
     public void questImplDt() {
 

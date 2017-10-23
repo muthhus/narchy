@@ -3,13 +3,13 @@ package nars.budget;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by me on 10/28/16.
  */
-@Ignore
+@Disabled
 public class TaskBudgetingTest {
 
     /** taskbudgeting - structural deduction test

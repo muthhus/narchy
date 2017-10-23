@@ -15,7 +15,7 @@
  */
 package org.oakgp.primitive;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.function.Function;
 import org.oakgp.function.Signature;
 import org.oakgp.function.choice.If;
@@ -30,7 +30,7 @@ import org.oakgp.function.math.IntegerUtils;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.assertUnmodifiable;
 import static org.oakgp.Type.*;
 

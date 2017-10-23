@@ -7,7 +7,7 @@
 //import nars.term.Term;
 //import EventCount;
 //import org.junit.Ignore;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.io.PrintWriter;
 //import java.io.StringWriter;
@@ -19,7 +19,7 @@
 //import java.util.concurrent.atomic.AtomicInteger;
 //
 //import static org.apache.commons.lang3.StringUtils.countMatches;
-//import static org.junit.Assert.*;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 //
 //public class NALObjectsTest  {
@@ -260,7 +260,7 @@
 //    }
 //
 //    //TODO
-//    @Ignore
+//    @Disabled
 //    @Test public void testOverloadedMethods() throws Exception {
 //        NAR n = new Default();
 //

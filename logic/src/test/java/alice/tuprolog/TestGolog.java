@@ -1,15 +1,15 @@
 package alice.tuprolog;
 
 import com.google.common.io.Resources;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
 public class TestGolog {
     
-    @Ignore
+    @Disabled
     @Test
     public void golog1() throws Exception {
 

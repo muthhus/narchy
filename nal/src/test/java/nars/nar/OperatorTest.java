@@ -5,16 +5,16 @@ import nars.op.Operator;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.time.Tense;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.Op.COMMAND;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
-@Ignore
+@Disabled
 public class OperatorTest {
 
     public static Term[] args(Task t) {
@@ -244,7 +244,7 @@ public class OperatorTest {
 ////
 ////    }
 //
-////    @Ignore @Test public void testCompoundOperator() {
+////    @Disabled @Test public void testCompoundOperator() {
 ////
 ////        AtomicBoolean executed = new AtomicBoolean(false);
 ////
@@ -328,7 +328,7 @@ public class OperatorTest {
 ////        assertEquals(1, count.get()); //should only be triggered once, by the matching term
 ////    }
 //
-////    @Ignore
+////    @Disabled
 ////    @Test public void testPatternAnswererInNAR() {
 ////        NAR n = new Default(100,1,1,1);
 ////

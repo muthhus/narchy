@@ -15,14 +15,14 @@
  */
 package org.oakgp.evolve.mutate;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.generate.TreeGenerator;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.Node;
 import org.oakgp.select.DummyNodeSelector;
 import org.oakgp.util.Random;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.oakgp.TestUtils.*;

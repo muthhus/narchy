@@ -15,18 +15,18 @@
  */
 package org.oakgp.function;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FunctionsTest {
     /**
      * Confirms that each implementation of {@code Function} has exactly one corresponding {@code AbstractFunctionTest} instance.
      */
-    @Ignore
+    @Disabled
     @Test
     public void test() throws Exception {
         List<Class<?>> functionClasses = SubClassFinder.find(Function.class, "src/main/java");
@@ -34,9 +34,9 @@ public class FunctionsTest {
         for (Class<?> functionTest : functionTestClasses) {
             AbstractFunctionTest t = (AbstractFunctionTest) functionTest.newInstance();
             Class<?> functionClass = t.getFunction().getClass();
-            assertTrue("Tested more than once: " + functionClass, functionClasses.contains(functionClass));
+            assertTrue(functionClasses.contains(functionClass), "Tested more than once: " + functionClass);
             functionClasses.remove(functionClass);
         }
-        assertTrue("Not tested " + functionClasses.toString(), functionClasses.isEmpty());
+        assertTrue(functionClasses.isEmpty(), "Not tested " + functionClasses.toString());
     }
 }

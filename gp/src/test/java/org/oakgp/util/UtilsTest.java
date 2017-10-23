@@ -15,7 +15,7 @@
  */
 package org.oakgp.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Type;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.Node;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.*;
 import static org.oakgp.Type.*;
 import static org.oakgp.util.DummyRandom.GetIntExpectation.nextInt;

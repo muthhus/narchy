@@ -15,7 +15,7 @@
  */
 package org.oakgp.function.math;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Arguments;
 import org.oakgp.Assignments;
 import org.oakgp.node.FunctionNode;
@@ -23,7 +23,7 @@ import org.oakgp.node.Node;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.*;
 
 public class ArithmeticExpressionSimplifierTest {
@@ -163,7 +163,7 @@ public class ArithmeticExpressionSimplifierTest {
         Node b = readNode("(+ 9 12)");
         try {
             ArithmeticExpressionSimplifier.assertEvaluateToSameResult(a, b);
-            fail();
+            fail("");
         } catch (IllegalArgumentException e) {
             assertEquals("(* 7 (- 1 2)) = -7 (+ 9 12) = 21", e.getMessage());
         }

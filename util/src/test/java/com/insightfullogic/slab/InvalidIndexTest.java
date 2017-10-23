@@ -1,19 +1,26 @@
 package com.insightfullogic.slab;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class InvalidIndexTest {
 
-	@Test(expected=InvalidSizeException.class)
-	public void countIsNaturalNumber() {
-		Allocator.of(GameEvent.class).allocate(0);
-	}
+    @Test
+    public void countIsNaturalNumber() {
 
-	@Test(expected=InvalidSizeException.class)
-	public void cantResizeBelowIndex() {
-		GameEvent event = Allocator.of(GameEvent.class).allocate(5);
-		event.move(4);
-		event.resize(1);
-	}
+        assertThrows(InvalidSizeException.class, () ->
+                Allocator.of(GameEvent.class).allocate(0)
+        );
+    }
+
+    @Test
+    public void cantResizeBelowIndex() {
+        assertThrows(InvalidSizeException.class, () -> {
+            GameEvent event = Allocator.of(GameEvent.class).allocate(5);
+            event.move(4);
+            event.resize(1);
+        });
+    }
 
 }

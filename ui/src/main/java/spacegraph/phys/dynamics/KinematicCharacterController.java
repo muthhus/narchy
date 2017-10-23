@@ -32,7 +32,6 @@ import spacegraph.phys.collision.PairCachingGhostObject;
 import spacegraph.phys.collision.broad.BroadphasePair;
 import spacegraph.phys.collision.narrow.ManifoldPoint;
 import spacegraph.phys.collision.narrow.PersistentManifold;
-import spacegraph.phys.dynamics.ActionInterface;
 import spacegraph.phys.math.IDebugDraw;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.ConvexShape;

@@ -8,13 +8,13 @@ package jcog;
 import jcog.meter.FunctionMeter;
 import jcog.meter.TemporalMetrics;
 import jcog.meter.func.BasicStatistics;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.PrintStream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  *
@@ -39,7 +39,7 @@ public class MetricsTest {
         tm.add(timeDoubler);
         
         assertEquals(0, tm.numRows());
-        assertEquals("signal columns: time and 'x'", 2, tm.getSignals().size()); 
+        assertEquals(2, tm.getSignals().size(),"signal columns: time and 'x'");
         
         tm.update(1.0);
         
@@ -82,7 +82,7 @@ public class MetricsTest {
 //
 //    }
     
-    @Ignore
+    @Disabled
     @Test public void testSummaryStatistics() {
 
         TemporalMetrics<Double> tm = new TemporalMetrics<>(10);

@@ -9,7 +9,7 @@
 //import nars.term.atom.Atom;
 //import org.jetbrains.annotations.NotNull;
 //import org.jetbrains.annotations.Nullable;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.util.Map;
 //import java.util.concurrent.ConcurrentHashMap;

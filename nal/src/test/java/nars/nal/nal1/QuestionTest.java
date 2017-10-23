@@ -6,8 +6,8 @@ import nars.term.Term;
 import nars.test.DeductiveMeshTest;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.DoubleSummaryStatistics;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,8 +15,8 @@ import java.util.function.BiFunction;
 import java.util.function.IntFunction;
 
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by me on 5/24/16.
@@ -194,7 +194,7 @@ public class QuestionTest {
     }
 
 
-    @Test @Ignore
+    @Test @Disabled
     public void testMathBackchain() throws Narsese.NarseseException {
         NAR n = new NARS().get();
         n.log();
@@ -227,14 +227,14 @@ public class QuestionTest {
 
     }
 
-    @Ignore @Test
+    @Disabled @Test
     public void testDeriveQuestionOrdinary() throws Narsese.NarseseException {
         new TestNAR(new NARS().get()) //requires NAL3 single premise
                 .ask("((S | P) --> M)")
                 .believe("(S --> M)")
                 .mustQuestion(512, "(P --> M)").test();
     }
-    @Ignore @Test
+    @Disabled @Test
     public void testDeriveQuestOrdinary() throws Narsese.NarseseException {
         //this.activeTasks = activeTasks;
         new TestNAR(new NARS().get()) //requires NAL3 single premise

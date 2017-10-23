@@ -2,8 +2,9 @@ package il.technion.tinytable;
 
 import il.technion.tinytable.hash.FingerPrint;
 import il.technion.tinytable.hash.RankIndexing;
-import junit.framework.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RankIndexingTechnqiueUnitTest {
 
@@ -20,17 +21,17 @@ public class RankIndexingTechnqiueUnitTest {
 
         RankIndexing.addItem(fpaux, I0, IStar, offsets, chain);
 
-        Assert.assertTrue(RankIndexing.chainExist(I0[0], 4));
+        assertTrue(RankIndexing.chainExist(I0[0], 4));
 
         fpaux = new FingerPrint(fpaux.bucketId, 5 /* chain */, fpaux.fingerprint);
         RankIndexing.addItem(fpaux, I0, IStar, offsets, chain);
-        Assert.assertTrue(RankIndexing.chainExist(I0[0], fpaux.chainId));
+        assertTrue(RankIndexing.chainExist(I0[0], fpaux.chainId));
         RankIndexing.getChainAndUpdateOffsets(fpaux, I0, IStar, offsets, chain);
-        Assert.assertTrue(chain[0] == 1);
+        assertTrue(chain[0] == 1);
 
         fpaux = new FingerPrint(fpaux.bucketId, 4 /* chain */, fpaux.fingerprint);
         RankIndexing.getChainAndUpdateOffsets(fpaux, I0, IStar, offsets, chain);
-        Assert.assertTrue(chain[0] == 0);
+        assertTrue(chain[0] == 0);
     }
 
     @Test
@@ -45,17 +46,17 @@ public class RankIndexingTechnqiueUnitTest {
         //add an item!
         RankIndexing.addItem(fpaux, I0, IStar, offsets, chain);
         // check that item chain exists
-        Assert.assertTrue(RankIndexing.chainExist(I0[0], 4));
+        assertTrue(RankIndexing.chainExist(I0[0], 4));
         // get the chain
         int chainSize = RankIndexing.getChainAndUpdateOffsets(fpaux, I0, IStar, offsets, chain);
         // assert that it is of size 1.
-        Assert.assertTrue(chainSize == 1);
+        assertTrue(chainSize == 1);
         // remove the item - update the chain size.
         RankIndexing.RemoveItem(4, I0, IStar, 0, offsets, chain, chainSize - 1);
         // verify that the chain does not exist anymore.
         chainSize = RankIndexing.getChainAndUpdateOffsets(fpaux, I0, IStar, offsets, chain);
-        Assert.assertTrue(chainSize == 0);
-        Assert.assertTrue(chain[0] == -1);
+        assertTrue(chainSize == 0);
+        assertTrue(chain[0] == -1);
 
 
     }

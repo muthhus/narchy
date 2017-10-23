@@ -8,7 +8,7 @@
 //import nars.term.Compound;
 //import nars.term.Term;
 //import org.jetbrains.annotations.NotNull;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.util.Arrays;
 //import java.util.HashMap;

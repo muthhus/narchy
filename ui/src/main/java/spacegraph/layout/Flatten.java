@@ -2,7 +2,6 @@ package spacegraph.layout;
 
 import com.jogamp.opengl.math.Quaternion;
 import spacegraph.*;
-import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Dynamic;
 

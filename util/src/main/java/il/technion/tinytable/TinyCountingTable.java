@@ -149,7 +149,7 @@ public class TinyCountingTable extends TinyTable {
         IntList chainIndexes = adjustChainToItems(bucketId, chainId, items);
         // at this point we are sure that they are the same size.
 //		System.out.println(Items[bucketId]);
-//		Assert.assertTrue(chainIndexes.size() == items.length);
+//		assertTrue(chainIndexes.size() == items.length);
 
         //then we put the items in the appropriate indices.
         int is = Math.min(chainIndexes.size(), items.size());

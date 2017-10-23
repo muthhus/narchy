@@ -60,7 +60,7 @@
 //
 //            //assertEquals(items.size(), f.size());
 //
-//            //Assert.assertEquals(preadjustCount, postadjustCount);
+//            //assertEquals(preadjustCount, postadjustCount);
 //
 //            float min = f.getPriorityMin();
 //            float max = f.getPriorityMax();
@@ -71,7 +71,7 @@
 //
 //            /*if (requireOrder) {
 //
-//                //Assert.assertTrue(max >= min);
+//                //assertTrue(max >= min);
 //            }*/
 //
 //
@@ -82,11 +82,11 @@
 //                CharSequence t = f.sample().get();
 //
 //                if (t == null) {
-//                    //Assert.assertTrue(sizeAfter == 0);
-//                    //Assert.assertEquals(sizeAfter, sizeBefore);
+//                    //assertTrue(sizeAfter == 0);
+//                    //assertEquals(sizeAfter, sizeBefore);
 //                    continue;
 //                }
-//                //Assert.assertEquals(sizeAfter, sizeBefore-1);
+//                //assertEquals(sizeAfter, sizeBefore-1);
 //
 //                int sizeAfter = f.size();
 //
@@ -94,15 +94,15 @@
 //
 //                //String expected = (min + " > "+ p + " > " + max);
 //                /*if (requireOrder) {
-//                    //Assert.assertTrue(expected, p >= min);
-//                    //Assert.assertTrue(expected, p <= max);
+//                    //assertTrue(expected, p >= min);
+//                    //assertTrue(expected, p <= max);
 //                    throw new RuntimeException("out of order2");
 //                }*/
 //
 //                nRemoved[0] = removal(nRemoved[0], p, count);
 //            }
 //
-//            //Assert.assertEquals(postadjustCount-nRemoved, f.size());
+//            //assertEquals(postadjustCount-nRemoved, f.size());
 //
 //            //nametable and itemtable consistent size
 //            //assertEquals(items.size(), f.size());

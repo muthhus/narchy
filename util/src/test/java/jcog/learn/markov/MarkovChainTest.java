@@ -1,14 +1,14 @@
 package jcog.learn.markov;
 
 import com.google.common.base.Joiner;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MarkovChainTest {
     @Test
@@ -67,7 +67,7 @@ public class MarkovChainTest {
             System.out.println(s + "\t" + (end - start) + " ms");
         }
 
-        assertTrue("unique sentences", sentences.size() > (ii / 5));
+        assertTrue(sentences.size() > (ii / 5), "unique sentences");
 
     }
 

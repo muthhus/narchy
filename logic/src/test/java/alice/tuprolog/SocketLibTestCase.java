@@ -1,26 +1,21 @@
 package alice.tuprolog;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Eleonora Cau
  *
  */
 
-@Ignore
+@Disabled
 public class SocketLibTestCase {
 	
 	final Prolog engine = new Prolog("alice.tuprolog.lib.SocketLibrary", "alice.tuprolog.lib.ThreadLibrary");
 	String theory;
-	
-	
 
-	@Test 
-	public void test_server_write() throws InvalidTheoryException, MalformedGoalException, NoSolutionException, UnknownVarException{
+	@Test public void test_server_write() throws InvalidTheoryException, MalformedGoalException, NoSolutionException, UnknownVarException{
 		//THIS FAILS INTERMITTENTLY PROBABLY DUE TO A MISSING DELAY THAT ALLOWS THE SERVER TO BE READY BEFORE A CLIENT CONNECTS
 		String theory =
 		"server(Y) :- thread_create(ID1, Y).\n"+
@@ -41,7 +36,7 @@ public class SocketLibTestCase {
 		engine.setTheory(new Theory(theory));
 		
 		Solution result = engine.solve("server(doServer(SS)), client(doClient(CS,Msg)).");
-		assertTrue(result.isSuccess());
+		Assertions.assertTrue(result.isSuccess());
 
 		/*Var clientSock = (Var) result.getTerm("CS");	
 		System.out.println("[SocketLibTest] Client Socket: "+ clientSock);
@@ -50,12 +45,11 @@ public class SocketLibTestCase {
 		System.out.println("[SocketLibTest] Server Socket: "+ serverSock);*/
 		
 		Struct msg = (Struct) result.getTerm("Msg");	
-		assertEquals(Term.createTerm("'msg inviato dal server'"), msg);
+		Assertions.assertEquals(Term.createTerm("'msg inviato dal server'"), msg);
 	
 	}
 	
-	@Test 
-	public void test_client_write() throws InvalidTheoryException, MalformedGoalException, NoSolutionException, UnknownVarException{
+	@Test public void test_client_write() throws InvalidTheoryException, MalformedGoalException, NoSolutionException, UnknownVarException{
 		String theory = 
 		"server(ID1):- thread_create(ID1, doServer(SS, Msg)). \n"+
 		"doServer(S, Msg) :- tcp_socket_server_open('127.0.0.1:4446', S, []), " +
@@ -73,7 +67,7 @@ public class SocketLibTestCase {
 		engine.setTheory(new Theory(theory));
 		
 		Solution result = engine.solve("server(ID1), client(doClient(CS)), read(ID1,doServer(SS,Msg)).");
-		assertTrue(result.isSuccess());
+		Assertions.assertTrue(result.isSuccess());
 		
 		/*Var clientSock = (Var) result.getTerm("CS");	
 		System.out.println("[SocketLibTest] Client Socket: "+ clientSock);
@@ -82,7 +76,7 @@ public class SocketLibTestCase {
 		System.out.println("[SocketLibTest] Server Socket: "+ serverSock);*/
 		
 		Struct msg = (Struct) result.getTerm("Msg");	
-		assertEquals(Term.createTerm("'msg inviato dal client'"), msg);
+		Assertions.assertEquals(Term.createTerm("'msg inviato dal client'"), msg);
 	}
 }
 

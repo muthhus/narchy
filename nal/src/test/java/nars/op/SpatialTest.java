@@ -9,7 +9,7 @@
 //import nars.term.Term;
 //import nars.term.atom.Atom;
 //import nars.term.obj.IntTerm;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import static nars.Op.COMMAND;
 //import static nars.Op.GOAL;

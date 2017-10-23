@@ -7,9 +7,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.List;
 import nars.core.NARRun;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit Test Reasoning, using input and output files from nars-dist/Examples ;

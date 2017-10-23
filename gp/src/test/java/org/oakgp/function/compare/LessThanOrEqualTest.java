@@ -15,14 +15,14 @@
  */
 package org.oakgp.function.compare;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.function.AbstractFunctionTest;
 import org.oakgp.function.Function;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.oakgp.Type.integerType;
 import static org.oakgp.Type.stringType;
 

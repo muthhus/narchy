@@ -1,9 +1,9 @@
 package nars.nal.nal8;
 
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
-import org.junit.Ignore;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
@@ -11,8 +11,8 @@ import static nars.time.Tense.ETERNAL;
 /**
  * Additional experimental tests,
  */
-@Ignore
-public class NAL8TestExt extends AbstractNALTest {
+@Disabled
+public class NAL8TestExt extends NALTest {
 
         final int cycles = 96; //150 worked for most of the initial NAL8 tests converted
 

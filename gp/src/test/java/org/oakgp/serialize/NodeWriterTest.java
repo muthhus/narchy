@@ -15,7 +15,7 @@
  */
 package org.oakgp.serialize;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Arguments;
 import org.oakgp.function.classify.IsPositive;
 import org.oakgp.function.hof.Filter;
@@ -24,7 +24,7 @@ import org.oakgp.node.ConstantNode;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.Node;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oakgp.TestUtils.*;
 import static org.oakgp.Type.*;
 import static org.oakgp.util.Void.VOID_CONSTANT;

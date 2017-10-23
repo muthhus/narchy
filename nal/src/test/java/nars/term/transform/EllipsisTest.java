@@ -21,8 +21,8 @@ import nars.term.subst.Unify;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -32,7 +32,7 @@ import static nars.$.$;
 import static nars.Op.*;
 import static nars.derive.match.Ellipsis.firstEllipsis;
 import static nars.time.Tense.DTERNAL;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 12/12/15.
@@ -131,7 +131,7 @@ public class EllipsisTest {
                             if (s.varPattern()==0)
                                 selectedFixed.add(s);
 
-                            assertEquals(s + " should be all subbed by " + this.xy, 0, s.varPattern());
+                            assertEquals( 0, s.varPattern(), s + " should be all subbed by " + this.xy);
                         }
 
                     }
@@ -220,7 +220,7 @@ public class EllipsisTest {
             Set<Term> selectedFixed = super.test(arity, repeats);
 
             /** should have iterated all */
-            assertEquals(selectedFixed.toString(), p.isCommutative() ? 1 : arity, selectedFixed.size());
+            assertEquals(p.isCommutative() ? 1 : arity, selectedFixed.size(), selectedFixed.toString());
             return selectedFixed;
         }
 
@@ -232,7 +232,7 @@ public class EllipsisTest {
         @Override public void testFurther(Set<Term> selectedFixed, @NotNull Unify f, @NotNull Set<Term> varArgTerms) {
             assertEquals(2, f.xy.size());
             Term fixedTermValue = f.xy(fixedTerm);
-            assertNotNull(f.toString(), fixedTermValue);
+            assertNotNull(fixedTermValue, f.toString());
             assertTrue(fixedTermValue instanceof Atomic);
             assertFalse(varArgTerms.contains(fixedTermValue));
         }
@@ -284,7 +284,7 @@ public class EllipsisTest {
         public @NotNull Term getResult() throws Narsese.NarseseException {
             String s = prefix + "Z, " + ellipsisTerm + suffix;
             Compound c = $(s);
-            assertNotNull(s + " produced null compound", c);
+            assertNotNull(c, s + " produced null compound");
             return c;
         }
 
@@ -335,13 +335,13 @@ public class EllipsisTest {
     @NotNull
     public static String[] p(String a, String b) { return new String[] { a, b}; }
 
-    @Ignore
+    @Disabled
     @Test public void testVarArg0() throws Narsese.NarseseException {
         //String rule = "(%S --> %M), ((|, %S, %A..+ ) --> %M) |- ((|, %A, ..) --> %M), (Belief:DecomposePositiveNegativeNegative)";
         String rule = "(%S ==> %M), ((&&,%S,%A..+) ==> %M) |- ((&&,%A..+) ==> %M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame, SequenceIntervals:FromBelief)";
 
         Compound _x = $.$('<' + rule + '>');
-        assertTrue(_x.toString(), _x instanceof PremiseRule);
+        assertTrue(_x instanceof PremiseRule, _x.toString());
         PremiseRule x = (PremiseRule)_x;
         //System.out.println(x);
         x = x.normalize(new PatternIndex());
@@ -497,14 +497,14 @@ public class EllipsisTest {
             if (o.statement) continue;
 
             if (o!=DIFFe && o!=DIFFi) {
-                assertEquals(o + " with normal term", a, o.the(DTERNAL, a));
+                assertEquals(a, o.the(DTERNAL, a), o + " with normal term");
             } else {
                 assertEquals(Null, o.the(DTERNAL, a));
             }
 
-            assertEquals(o + " with ellipsis not reduced",
-                    o.statement ? VAR_PATTERN : o,
-                    o.the(DTERNAL, b).op());
+            assertEquals(o.statement ? VAR_PATTERN : o,
+                    o.the(DTERNAL, b).op(),
+                    o + " with ellipsis not reduced");
         }
     }
 

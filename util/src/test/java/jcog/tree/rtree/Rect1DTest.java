@@ -3,10 +3,10 @@ package jcog.tree.rtree;
 import jcog.tree.rtree.rect.RectDouble1D;
 import jcog.tree.rtree.util.Stats;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by me on 12/2/16.
@@ -19,7 +19,7 @@ public class Rect1DTest {
 
         HyperPoint centroid = rect.center();
         double x = centroid.coord(0);
-        Assert.assertTrue("Bad X-coord of centroid - expected " + 2.0 + " but was " + x, x == 2.0d);
+        assertTrue(x == 2.0d, "Bad X-coord of centroid - expected " + 2.0 + " but was " + x);
 
     }
 
@@ -62,12 +62,12 @@ public class Rect1DTest {
 //            }
 //
 //            final int expectedCount = 9;
-//            Assert.assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
-//            Assert.assertEquals("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
+//            assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
+//            assertEquals("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
 //
 //            // If the order of nodes in the tree changes, this test may fail while returning the correct results.
 //            for (int i = 0; i < resultCount; i++) {
-//                Assert.assertTrue("Unexpected result found", results[i].min.x == i + 2 && results[i].min.y == i + 2 && results[i].max.x == i + 5 && results[i].max.y == i + 5);
+//                assertTrue("Unexpected result found", results[i].min.x == i + 2 && results[i].min.y == i + 2 && results[i].max.x == i + 5 && results[i].max.y == i + 5);
 //            }
 
     }

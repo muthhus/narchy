@@ -5,7 +5,6 @@ import com.jogamp.opengl.GL2;
 import jcog.Texts;
 import jcog.Util;
 import org.jetbrains.annotations.Nullable;
-import spacegraph.AspectAlign;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;

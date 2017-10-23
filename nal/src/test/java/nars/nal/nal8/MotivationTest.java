@@ -7,13 +7,13 @@
 //import nars.util.signal.FloatConcept;
 //import nars.util.signal.MotorConcept;
 //import org.jetbrains.annotations.NotNull;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.util.concurrent.atomic.AtomicInteger;
 //import java.util.function.Predicate;
 //
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertTrue;
+//import static org.junit.jupiter.api.Assertions.*;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 //
 //public class MotivationTest {
@@ -156,7 +156,7 @@
 ////import nars.nar.Default;
 ////import nars.task.Task;
 ////import org.jetbrains.annotations.NotNull;
-////import org.junit.Test;
+////import org.junit.jupiter.api.Test;
 ////
 /////**
 //// * Created by me on 1/30/16.

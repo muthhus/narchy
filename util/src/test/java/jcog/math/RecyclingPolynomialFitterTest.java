@@ -1,9 +1,9 @@
 package jcog.math;
 
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RecyclingPolynomialFitterTest {
 

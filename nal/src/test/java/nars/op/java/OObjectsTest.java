@@ -4,11 +4,11 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.Param;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.*;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OObjectsTest {
 
@@ -89,7 +89,7 @@ public class OObjectsTest {
         assertTrue(s.contains("$.50 x(set,1). 2 %1.0;.90%"));
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void learnMethodGoal() throws Narsese.NarseseException {
 //         StringBuilder sb = new StringBuilder();

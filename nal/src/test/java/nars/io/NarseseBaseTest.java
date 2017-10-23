@@ -9,9 +9,9 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class NarseseBaseTest extends NarseseTest {
 
@@ -226,7 +226,7 @@ public class NarseseBaseTest extends NarseseTest {
     public void testOperationNoArgs() throws Narsese.NarseseException {
         Term t = term("op()");
         assertNotNull(t);
-        assertEquals(t.toString(), Op.INH, t.op());
+        assertEquals(Op.INH, t.op(), t.toString());
         //assertEquals(0, Operator.opArgs((Compound)t).size());
 
         taskParses("op()!");
@@ -297,7 +297,7 @@ public class NarseseBaseTest extends NarseseTest {
         Term abcd = term("((a,b) --> (c,d))");
         Term ABCD = term("<(*,a,b) --> (*,c,d)>");
         assertEquals(Op.INH, x.op());
-        assertEquals(abcd + " != " + ABCD, abcd, ABCD);
+        assertEquals(abcd, ABCD, abcd + " != " + ABCD);
     }
 
     @NotNull

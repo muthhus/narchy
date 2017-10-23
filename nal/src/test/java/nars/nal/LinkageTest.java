@@ -12,19 +12,19 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.var.Variable;
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
+import nars.util.NALTest;
 import nars.util.graph.TermGraph;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 //don't touch this file - patham9
 
-public class LinkageTest extends AbstractNALTest {
+public class LinkageTest extends NALTest {
 
     int runCycles = 10;
 
@@ -49,10 +49,10 @@ public class LinkageTest extends AbstractNALTest {
         tester.run(runCycles, false);
 
         Concept ret = tester.nar.conceptualize(premise1);
-        assertTrue(ret + " termlinks contains " + premise2, isPassed2(premise2, ret));
+        assertTrue(isPassed2(premise2, ret), ret + " termlinks contains " + premise2);
 
         Concept ret2 = tester.nar.conceptualize(premise2);
-        assertTrue(ret2 + " termlinks contains " + premise1, isPassed2(premise1, ret2));
+        assertTrue(isPassed2(premise1, ret2), ret2 + " termlinks contains " + premise1);
 
 
 //        if(passed && passed2) { //dummy to pass the test:
@@ -95,12 +95,12 @@ public class LinkageTest extends AbstractNALTest {
         //nar.log();
 
         Termed premise1 = $.$(spremise1);
-        assertEquals("reparsed", $.$(spremise1), premise1);
+        assertEquals($.$(spremise1), premise1, "reparsed");
         assertNotNull(premise1);
         assertEquals($.$(spremise1), premise1);
 
         Termed premise2 = $.$(spremise2);
-        assertEquals("reparsed", $.$(spremise2), premise2);
+        assertEquals($.$(spremise2), premise2,"reparsed");
         assertNotNull(premise2);
         assertEquals($.$(spremise2), premise2);
 
@@ -127,17 +127,17 @@ public class LinkageTest extends AbstractNALTest {
 
 
         boolean p12 = linksIndirectly(p1, p2, nar);
-        assertTrue(premise1 + " no link to " + premise2, p12);
+        assertTrue(p12, premise1 + " no link to " + premise2);
 
         boolean p21 = linksIndirectly(p2, p1, nar);
-        assertTrue(premise1 + " no link to " + p2, p21);
+        assertTrue(p21, premise1 + " no link to " + p2);
 
 
         //System.err.println(premise1 + " not linked with " + premise2);
 
         int numNodes = g.nodeCount();
         assertTrue(numNodes > 0);
-        assertTrue(g.toString(), g.edgeCount()>0);
+        assertTrue(g.edgeCount()>0, g.toString());
 
 //        for (Term x : g.nodes()) {
 //            assertEquals(x + " not reachable by all other nodes", numNodes, Graphs.reachableNodes(g.asGraph(), x).size());
@@ -374,19 +374,19 @@ public class LinkageTest extends AbstractNALTest {
     }
 
     @Test
-    @Ignore /* requires inheritance to have termlink templates to level 2, but this doesnt seem critical otherwise */
+    @Disabled /* requires inheritance to have termlink templates to level 2, but this doesnt seem critical otherwise */
     public void Indirect_Linkage_Layer2_Basic_WithVar2() throws Exception {
         ProperlyLinkedIndirectlyTest("<a --> <b --> <#1 --> x>>>", BELIEF, "<k --> x>");
     }
 
     @Test
-    @Ignore /* requires inheritance to have termlink templates to level 2, but this doesnt seem critical otherwise */
+    @Disabled /* requires inheritance to have termlink templates to level 2, but this doesnt seem critical otherwise */
     public void Indirect_Linkage_Layer2_Basic_WithVar2_Goal() throws Exception {
         ProperlyLinkedIndirectlyTest("<a --> <b --> <#1 --> x>>>", GOAL, "<k --> x>");
     }
 
     @Test
-    @Ignore /* requires inheritance to have termlink templates to level 2, but this doesnt seem critical otherwise */
+    @Disabled /* requires inheritance to have termlink templates to level 2, but this doesnt seem critical otherwise */
     public void Indirect_Linkage_Layer2_Basic_WithVar2_Question() throws Exception {
         ProperlyLinkedIndirectlyTest("<a --> <b --> <#1 --> x>>>", QUESTION, "<k --> x>");
     }
@@ -399,7 +399,7 @@ public class LinkageTest extends AbstractNALTest {
         tester.nar.run(10);
         Concept ret = tester.nar.conceptualize(s);
 
-        assertNotNull("Failed to create a concept for " + s, ret);
+        assertNotNull(ret,"Failed to create a concept for " + s);
     }
 
     @Test

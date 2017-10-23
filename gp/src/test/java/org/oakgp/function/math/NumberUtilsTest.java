@@ -15,12 +15,12 @@
  */
 package org.oakgp.function.math;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.function.choice.If;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.Node;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.*;
 import static org.oakgp.Type.integerType;
 

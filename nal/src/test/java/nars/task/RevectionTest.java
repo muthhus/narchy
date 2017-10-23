@@ -8,7 +8,7 @@ import nars.time.Tense;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.List;
@@ -19,8 +19,8 @@ import static nars.Op.BELIEF;
 import static nars.task.RevisionTest.newNAR;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by me on 5/8/16.
@@ -184,7 +184,7 @@ public class RevectionTest {
 
         }
 
-        assertTrue("all beliefs covered", 3 <= tops.size());
+        assertTrue(3 <= tops.size(), "all beliefs covered");
 
         b.print();
 

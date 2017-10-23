@@ -23,7 +23,7 @@ import org.oakgp.node.Node;
 import org.oakgp.node.VariableNode;
 import org.oakgp.util.NodeSimplifier;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oakgp.Type.nullableType;
 import static org.oakgp.Type.stringType;
 

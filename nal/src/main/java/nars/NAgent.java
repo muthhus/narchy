@@ -2,7 +2,6 @@ package nars;
 
 import jcog.data.FloatParam;
 import jcog.event.On;
-import jcog.event.Ons;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.math.FloatPolarNormalized;

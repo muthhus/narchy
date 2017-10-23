@@ -5,9 +5,9 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
-import org.junit.Ignore;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.$.$;
 
@@ -15,7 +15,7 @@ import static nars.$.$;
  * see Natural_Language_Processing2.md
  */
 //@RunWith(Parameterized.class)
-public class PatrickTests extends AbstractNALTest {
+public class PatrickTests extends NALTest {
 
 //    public PatrickTests(Supplier<NAR> b) {
 //        super(b);
@@ -153,7 +153,7 @@ public class PatrickTests extends AbstractNALTest {
 
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testConditioningWithoutAnticipation() throws Narsese.NarseseException {
         /*
@@ -213,7 +213,7 @@ public class PatrickTests extends AbstractNALTest {
 
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testPixelImage() throws Narsese.NarseseException {
 

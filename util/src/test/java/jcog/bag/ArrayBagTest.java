@@ -9,7 +9,7 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,7 +19,7 @@ import java.util.function.DoubleSupplier;
 import static jcog.bag.BagTest.testBagSamplingDistribution;
 import static jcog.bag.BagTest.testBasicInsertionRemoval;
 import static jcog.pri.op.PriMerge.plus;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ArrayBagTest {
 
@@ -50,7 +50,7 @@ public class ArrayBagTest {
 
         PriReference<String> agx = a.get("x");
         Pri expect = new Pri(0.2f);
-        assertTrue(agx + "==?==" + expect, Util.equals(expect.priElseNeg1(), agx.priElseNeg1(), 0.01f));
+        assertTrue(Util.equals(expect.priElseNeg1(), agx.priElseNeg1(), 0.01f), agx + "==?==" + expect);
 
     }
 

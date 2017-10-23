@@ -3,9 +3,9 @@ package nars.budget;
 import jcog.Util;
 import jcog.io.SparkLine;
 import nars.util.UtilityFunctions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *

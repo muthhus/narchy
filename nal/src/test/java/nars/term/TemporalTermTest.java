@@ -6,18 +6,16 @@ import nars.concept.Concept;
 import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
 import java.util.TreeSet;
 
-import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TemporalTermTest {
@@ -440,7 +438,7 @@ public class TemporalTermTest {
             assertEquals("(x " + op + "+- y)", f0.root().toString());
 
             Concept f = n.conceptualize(f0);
-            assertTrue(e + "==" + f, e == f);
+            assertTrue(e == f, e + "==" + f);
 
             //repeat
             Concept g = n.conceptualize($("(x " + op + "+- x)"));
@@ -695,7 +693,7 @@ public class TemporalTermTest {
     public void testInvalidConjunction() throws Narsese.NarseseException {
 
         Compound x = $("(&&,(#1-->I),(#1-->{i141}),(#2-->{i141}))");
-        Assert.assertNotNull(x);
+        assertNotNull(x);
         assertEquals(Op.Null, x.dt(-1));
         assertEquals(Op.Null, x.dt(+1));
         assertNotEquals(Op.Null, x.dt(0));
@@ -707,8 +705,8 @@ public class TemporalTermTest {
     public void testWeirdParse() throws Narsese.NarseseException {
         assertEquals("(&&,a,b,c,-59)", $("( &&-59 ,a, b, c)").toString());
 
-//        Assert.assertNotNull(x.dt(0));
-//        Assert.assertNotNull(x.dt(0).dt(DTERNAL));
+//        assertNotNull(x.dt(0));
+//        assertNotNull(x.dt(0).dt(DTERNAL));
 //        assertEquals(x, x.dt(0).dt(DTERNAL));
 //
 //        try {
@@ -780,7 +778,7 @@ public class TemporalTermTest {
         assertEquals("(y==>x)", g.root().toString());
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testEqualsAnonymous3() throws Narsese.NarseseException {
         //        if (as == bs) {

@@ -3,10 +3,10 @@ package nars.derive;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
+@Disabled
 public class BasicRulesTest {
 
     @Test

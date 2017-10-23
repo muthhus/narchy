@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.Param;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MathTest {
 

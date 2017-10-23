@@ -278,9 +278,12 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
 //            float q = conceptWidget.concept.questions().priSum();
 
             //sqrt because the area will be the sqr of this dimension
+
+            float volume = 1f / (1f + cw.id.complexity());
+            float density = 5f * volume;
             float ep = 1 + p;
             float minSize = this.minSize.floatValue();
-            float nodeScale = minSize + (ep * ep) * maxSizeMult.floatValue();
+            float nodeScale = minSize + (ep * ep) * maxSizeMult.floatValue() * volume /* ^1/3? */;
             //1f + 2f * p;
 
             boolean atomic = (cw.id.op().atomic);
@@ -299,7 +302,6 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
 
 
             if (cw.body != null) {
-                float density = 5.5f;
                 cw.body.setMass(nodeScale * nodeScale * nodeScale /* approx */ * density);
                 cw.body.setDamping(0.99f, 0.9f);
 

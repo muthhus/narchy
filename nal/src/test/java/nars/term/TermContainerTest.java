@@ -7,11 +7,11 @@ import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector1;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.$.$;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 3/1/16.
@@ -41,7 +41,7 @@ public class TermContainerTest {
 
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testCommonSubterms() throws Narsese.NarseseException {
         assertTrue(commonSubtermOrContainment($("x"), $("x")));
@@ -52,7 +52,7 @@ public class TermContainerTest {
         assertTrue(TermContainer.commonSubterms($("(x,y)"), $("(x,y,z)"), false));
     }
 
-    @Ignore @Test
+    @Disabled @Test
     public void testCommonSubtermsRecursion() throws Narsese.NarseseException {
         assertTrue(TermContainer.commonSubterms($("(x,y)"), $("{a,x}"), false));
         assertFalse(TermContainer.commonSubterms($("(x,y)"), $("{a,b}"), false));

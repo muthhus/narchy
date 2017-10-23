@@ -6,21 +6,20 @@ package edu.virginia.cs.skiptree.test;
  */
 
 import edu.virginia.cs.skiptree.ConcurrentSkipTreeSet;
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import java.io.*;
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ConcurrentSkipTreeSetTest extends JSR166TestCase {
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run (suite());
-    }
-    public static Test suite() {
-        return new TestSuite(ConcurrentSkipTreeSetTest.class);
-    }
+//    public static void main(String[] args) {
+//        junit.textui.TestRunner.run (suite());
+//    }
+//    public static Test suite() {
+//        return new TestSuite(ConcurrentSkipTreeSetTest.class);
+//    }
 
     static class MyReverseComparator implements Comparator {
         @Override

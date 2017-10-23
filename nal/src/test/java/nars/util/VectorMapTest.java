@@ -6,7 +6,7 @@ import nars.NARS;
 import nars.util.data.UniformVector;
 import nars.util.data.VectorMap;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author me

@@ -3,13 +3,13 @@ package nars.io;
 import jcog.Util;
 import nars.*;
 import nars.time.Tense;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
 import static nars.$.$;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by me on 7/8/16.
@@ -79,7 +79,7 @@ public class InterNARTest {
 
         } catch (Exception e) {
             e.printStackTrace();
-            assertTrue(e.toString(), false);
+            assertTrue(false, e.toString());
         }
     }
 

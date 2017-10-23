@@ -2,16 +2,16 @@ package alice.tuprolog;
 
 import alice.tuprolog.event.OutputEvent;
 import alice.tuprolog.event.OutputListener;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 // Based on the work of Sara Sabioni
-@Ignore
+@Disabled
 public class ISOIOLibraryTestCase {
 
 	static Prolog engine;
@@ -21,7 +21,7 @@ public class ISOIOLibraryTestCase {
 	static String readPath;
 	static String binPath;
 
-	@BeforeClass
+	@BeforeAll
 	public static void initTest()
 	{
 		try
@@ -50,8 +50,7 @@ public class ISOIOLibraryTestCase {
 		}
 	}
 
-	@Test
-	public void test_open() throws MalformedGoalException, InvalidTheoryException 
+	@Test public void test_open() throws MalformedGoalException, InvalidTheoryException
 	{
 		// Apertura di un file esistente
 		info = engine.solve("open('" + writePath +"','write',X,[alias('editor'), type(text)]).");
@@ -80,8 +79,7 @@ public class ISOIOLibraryTestCase {
 		assertFalse(info.isSuccess());
 	}
 
-	@Test
-	public void test_2() throws InvalidTheoryException, MalformedGoalException, IOException
+	@Test public void test_2() throws InvalidTheoryException, MalformedGoalException, IOException
 	{
 		String dataToWrite = "B";
 		String theory = "test2:-" +
@@ -94,8 +92,7 @@ public class ISOIOLibraryTestCase {
 		assertEquals("", dataToWrite, getStringDataWritten(writePath));
 	}
 
-	@Test
-	public void test_3() throws InvalidTheoryException, MalformedGoalException, IOException
+	@Test public void test_3() throws InvalidTheoryException, MalformedGoalException, IOException
 	{
 		String dataToWrite1 = "term.";
 		String dataToWrite2 = "ciao.";
@@ -113,8 +110,7 @@ public class ISOIOLibraryTestCase {
 		assertEquals("", dataToWrite2, getStringDataWritten(readPath));
 	}
 
-	@Test
-	public void test_4() throws InvalidTheoryException, MalformedGoalException, IOException
+	@Test public void test_4() throws InvalidTheoryException, MalformedGoalException, IOException
 	{
 		String dataToWrite = "term.";
 		String theory = "test4:-" +
@@ -128,8 +124,7 @@ public class ISOIOLibraryTestCase {
 		assertEquals("", dataToWrite, getStringDataWritten(writePath));
 	}
 
-	@Test
-	public void test_5() throws InvalidTheoryException, MalformedGoalException, IOException
+	@Test public void test_5() throws InvalidTheoryException, MalformedGoalException, IOException
 	{
 		final String dataToRead = "ciao";
 		// Per beccare l'output
@@ -150,8 +145,7 @@ public class ISOIOLibraryTestCase {
 		engine.removeOutputListener(listener);
 	}
 
-	@Test
-	public void test_6() throws InvalidTheoryException, MalformedGoalException, IOException
+	@Test public void test_6() throws InvalidTheoryException, MalformedGoalException, IOException
 	{
 		final String[] dataToRead = { "c", "\n", "iao" };
 		// Per beccare l'output
@@ -185,8 +179,7 @@ public class ISOIOLibraryTestCase {
 		engine.removeOutputListener(listener);
 	}
 
-	@Test
-	public void test_7() throws InvalidTheoryException, MalformedGoalException, IOException
+	@Test public void test_7() throws InvalidTheoryException, MalformedGoalException, IOException
 	{
 		final String dataToRead = "c";
 		// Per beccare l'output
@@ -203,8 +196,7 @@ public class ISOIOLibraryTestCase {
 		engine.removeOutputListener(listener);
 	}
 	
-	@Test
-	public void test_8() throws InvalidTheoryException, MalformedGoalException, IOException
+	@Test public void test_8() throws InvalidTheoryException, MalformedGoalException, IOException
 	{
 		final int dataToRead = 51;
 		// Per beccare l'output
@@ -225,8 +217,7 @@ public class ISOIOLibraryTestCase {
 		engine.removeOutputListener(listener);
 	}
 
-	@Test
-	public void test_9() throws InvalidTheoryException, MalformedGoalException, IOException
+	@Test public void test_9() throws InvalidTheoryException, MalformedGoalException, IOException
 	{
 		int dataToWrite = 51;
 
@@ -241,8 +232,7 @@ public class ISOIOLibraryTestCase {
 		assertEquals(dataToWrite, getByteDataWritten(binPath));
 	}
 
-	@Test
-	public void test_10() throws InvalidTheoryException, MalformedGoalException, IOException
+	@Test public void test_10() throws InvalidTheoryException, MalformedGoalException, IOException
 	{
 		final int[] dataToRead = { 99, 105, 105 }; // 'c', 'i', 'i'
 
@@ -255,7 +245,7 @@ public class ISOIOLibraryTestCase {
 			@Override
 			public void onOutput(OutputEvent e) 
 			{
-				assertEquals("", dataToRead[count]+"", e.getMsg());
+				assertEquals(dataToRead[count]+"", e.getMsg(), "");
 				count++;
 			}
 		};

@@ -4,7 +4,7 @@
 //import nars.concept.Concept;
 //import nars.nar.Default;
 //import nars.rl.example.MarkovObservationsGraph;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 ///**
 // * Created by me on 5/11/15.

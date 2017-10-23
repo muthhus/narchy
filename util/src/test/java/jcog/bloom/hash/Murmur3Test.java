@@ -1,9 +1,9 @@
 package jcog.bloom.hash;
 
 import jcog.bloom.Murmur3Hash;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by jeff on 16/05/16.

@@ -15,7 +15,7 @@
  */
 package org.oakgp.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Evolution;
 import org.oakgp.evolve.GenerationEvolver;
 import org.oakgp.node.Node;
@@ -26,7 +26,7 @@ import org.oakgp.rank.RankedCandidates;
 import java.util.Collection;
 import java.util.function.Predicate;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 
 public class RunnerTest {

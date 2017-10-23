@@ -10,7 +10,7 @@ import nars.test.analyze.BeliefAnalysis;
 import nars.time.Tense;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -18,8 +18,8 @@ import java.util.TreeSet;
 import static nars.Op.ATOM;
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by me on 3/18/16.
@@ -95,11 +95,11 @@ public class RevisionTest {
         //b.print(beliefOrGoal);
 
         b.table(beliefOrGoal).print();
-        assertEquals("reivsed", 3, b.size(beliefOrGoal));
+        assertEquals( 3, b.size(beliefOrGoal));
 
         n.run(delay1);
 
-        assertEquals("no additional revisions", 3, b.size(beliefOrGoal));
+        assertEquals(3, b.size(beliefOrGoal), "no additional revisions");
 
 
     }

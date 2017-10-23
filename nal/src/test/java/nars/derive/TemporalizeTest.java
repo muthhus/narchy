@@ -10,15 +10,15 @@ import nars.derive.time.*;
 import nars.index.term.TermContext;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
 import static nars.$.$;
 import static nars.$.the;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TemporalizeTest {
 
@@ -245,7 +245,7 @@ public class TemporalizeTest {
     /**
      * tests temporalization of pure events which overlap, or are separated by a distance below a proximal threshold (see Param.java)
      */
-    @Ignore
+    @Disabled
     @Test
     public void testStatementEventsNearlyOverlappingTemporal() throws Narsese.NarseseException {
 //              .input(new NALTask($.$("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
@@ -820,8 +820,8 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 
                 String xy = a + "\t" + r;
 
-                assertTrue(xy, r.start(null).abs() >= 1);
-                assertTrue(xy, r.end(null).abs() <= 16);
+                assertTrue(r.start(null).abs() >= 1, xy);
+                assertTrue(r.end(null).abs() <= 16, xy);
 
 
                 result.add(xy);
@@ -878,7 +878,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 //        assertEquals("(c ==>-4 (a &&+1 b))@5", s.toString());
 //    }
 
-    @Ignore
+    @Disabled
     @Test
     public void testPreconImplConjPreConflict() throws Narsese.NarseseException {
 
@@ -957,7 +957,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 
             FasterList<ObjectLongPair<Term>> ye = y.events();
             if (ye.getFirst().getOne().equals(first) && ye.getLast().getOne().equals(last)) {
-                assertEquals(y + " has different dt span", xdt, ydt);
+                assertEquals(xdt, ydt, y + " has different dt span");
             }
 
             ye.sort(Comparator.comparingLong(ObjectLongPair::getTwo));

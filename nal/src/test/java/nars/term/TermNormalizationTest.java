@@ -4,10 +4,10 @@ import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static nars.$.$;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 3/19/15.
@@ -21,7 +21,7 @@ public class TermNormalizationTest {
             Term a = x.sub((byte)0, (byte)0);
             Term b = x.sub((byte)1, (byte)0);
             assertNotEquals(a, x.sub((byte)0, (byte)1));
-            assertEquals(x + " subterms (0,0)==(1,0)", a, b);
+            assertEquals(a, b, x + " subterms (0,0)==(1,0)");
             assertTrue(a == b);
         }
     }

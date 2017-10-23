@@ -1,7 +1,6 @@
 package nars;
 
 import jcog.Util;
-import jcog.event.Ons;
 import jcog.math.FloatFirstOrderDifference;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.FloatSupplier;

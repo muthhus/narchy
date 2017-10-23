@@ -15,13 +15,13 @@
  */
 package org.oakgp.function.compare;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Type;
 import org.oakgp.function.Function;
 import org.oakgp.function.Signature;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.oakgp.Type.booleanType;
 
 public class ComparisonOperatorTest {

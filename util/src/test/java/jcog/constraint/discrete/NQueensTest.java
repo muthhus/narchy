@@ -17,9 +17,9 @@ package jcog.constraint.discrete;
 
 import jcog.constraint.discrete.modeling.Constraints;
 import jcog.constraint.discrete.modeling.Views;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NQueensTest {
   

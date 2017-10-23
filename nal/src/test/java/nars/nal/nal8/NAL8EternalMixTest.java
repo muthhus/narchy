@@ -2,9 +2,9 @@ package nars.nal.nal8;
 
 import nars.test.TestNAR;
 import nars.time.Tense;
-import nars.util.AbstractNALTest;
-import org.junit.Ignore;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
@@ -13,7 +13,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * NAL8 tests specifically involving one or more eternal input tasks
  */
-public class NAL8EternalMixTest extends AbstractNALTest {
+public class NAL8EternalMixTest extends NALTest {
 
     final int cycles = 450;
 
@@ -345,7 +345,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
                 .mustNotOutput(cycles, "at(SELF,t003)", BELIEF, 0, 1f, 0, 1f, ETERNAL);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void condition_belief_deduction_2_dternal() {
 
@@ -564,7 +564,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
     }
 
 
-    @Ignore
+    @Disabled
     @Test
     public void disjunctionBackwardsQuestionTemporal() {
 

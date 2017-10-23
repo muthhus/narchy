@@ -7,9 +7,9 @@ import nars.index.term.PatternIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 7/7/15.
@@ -50,7 +50,7 @@ public class PremiseRuleTest {
 
         //NAR p = new NAR(new Default());
 
-        assertNotNull("metaparser can is a superset of narsese", Narsese.term("<A --> b>"));
+        assertNotNull(Narsese.term("<A --> b>"), "metaparser can is a superset of narsese");
 
         //
 

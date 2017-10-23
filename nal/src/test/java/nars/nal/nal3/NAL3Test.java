@@ -4,14 +4,14 @@ package nars.nal.nal3;
 import nars.$;
 import nars.Narsese;
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
-import org.junit.Before;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class NAL3Test extends AbstractNALTest {
+public class NAL3Test extends NALTest {
 
     public static final int cycles = 1500;
 
@@ -21,7 +21,7 @@ public class NAL3Test extends AbstractNALTest {
 //    public static Iterable configurations() {
 //        return AbstractNALTest.nars(3);
 //    }
-    @Before
+    @BeforeEach
     public void nal() { test.nar.nal(3); }
 
 

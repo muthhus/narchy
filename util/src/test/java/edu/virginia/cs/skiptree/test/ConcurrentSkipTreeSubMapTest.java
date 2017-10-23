@@ -7,22 +7,21 @@ package edu.virginia.cs.skiptree.test;
  */
 
 import edu.virginia.cs.skiptree.ConcurrentSkipTreeMap;
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentNavigableMap;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ConcurrentSkipTreeSubMapTest extends JSR166TestCase {
-    public static void main(String[] args) {
-        junit.textui.TestRunner.run (suite());
-    }
-    public static Test suite() {
-        return new TestSuite(ConcurrentSkipTreeSubMapTest.class);
-    }
+//    public static void main(String[] args) {
+//        junit.textui.TestRunner.run (suite());
+//    }
+//    public static Test suite() {
+//        return new TestSuite(ConcurrentSkipTreeSubMapTest.class);
+//    }
 
     /**
      * Create a map from Integers 1-5 to Strings "A"-"E".
@@ -238,7 +237,6 @@ public class ConcurrentSkipTreeSubMapTest extends JSR166TestCase {
 
     /**
      * entrySet contains all pairs
-     */
     public void testEntrySet() {
         ConcurrentNavigableMap map = map5();
         Set s = map.entrySet();

@@ -1,25 +1,23 @@
 package mcaixictw;
 
-import org.junit.*;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.*;
 
 
 public class UtilTest {
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpBeforeClass() throws Exception {
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void tearDownAfterClass() throws Exception {
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 	}
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 	}
 
@@ -29,7 +27,7 @@ public class UtilTest {
 		for (int i = 0; i < 1000; i++) {
 			int range = 1 + (int) Math.round(Math.random() * 7);
 			int r = Util.randRange(range);
-			assertTrue(r < range && r >= 0);
+			Assertions.assertTrue(r < range && r >= 0);
 		}
 	}
 
@@ -40,16 +38,16 @@ public class UtilTest {
 		list.add(true);
 		list.add(false);
 		list.add(true);
-		assertTrue(Util.decode(list) == 13);
+		Assertions.assertTrue(Util.decode(list) == 13);
 	}
 
 	@Test
 	public final void testEncode() {
 		BooleanArrayList list = Util.encode(13, 4);
-		assertTrue(list.get(0) == true);
-		assertTrue(list.get(1) == true);
-		assertTrue(list.get(2) == false);
-		assertTrue(list.get(3) == true);
+		Assertions.assertTrue(list.get(0) == true);
+		Assertions.assertTrue(list.get(1) == true);
+		Assertions.assertTrue(list.get(2) == false);
+		Assertions.assertTrue(list.get(3) == true);
 	}
 
 }

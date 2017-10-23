@@ -1,7 +1,6 @@
 package jcog.tree.rtree.rect;
 
 import jcog.Util;
-import jcog.pri.Pri;
 import jcog.tree.rtree.HyperRegion;
 import jcog.tree.rtree.RTree;
 import jcog.tree.rtree.point.Float2D;

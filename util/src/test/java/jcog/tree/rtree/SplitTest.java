@@ -2,9 +2,9 @@ package jcog.tree.rtree;
 
 import jcog.tree.rtree.rect.RectDouble2D;
 import jcog.tree.rtree.util.Stats;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SplitTest {
 
@@ -29,7 +29,7 @@ public class SplitTest {
                         boolean added = rTree.add(r);
                         if (!added) {
                             rTree.add(r); //for debugging: try again and see what happened
-                            fail();
+                            fail("");
                         }
                         assertTrue(added);
                         assertEquals(++i, rTree.size());
@@ -38,9 +38,9 @@ public class SplitTest {
                         boolean tryAddingAgainToTestForNonMutation = rTree.add(r);
                         if (tryAddingAgainToTestForNonMutation) {
                             rTree.add(r); //for debugging: try again and see what happened
-                            fail();
+                            fail("");
                         }
-                        assertFalse(i + "==?" + rTree.size() , tryAddingAgainToTestForNonMutation); //reinsertion of existing element will not affect size and will return false here
+                        assertFalse(tryAddingAgainToTestForNonMutation, i + "==?" + rTree.size()); //reinsertion of existing element will not affect size and will return false here
                         assertEquals(i, rTree.size()); //reinsertion should cause no change in size
                         //assertEquals(i, rTree.stats().getEntryCount());
                     }

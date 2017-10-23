@@ -1160,6 +1160,7 @@ public enum Draw {
         switch (a) {
             case Left:
                 //nothing
+                x += scaleX/2f; //half letter towrads the right
                 break;
             case Right:
                 x -= totalWidth; //TODO check this

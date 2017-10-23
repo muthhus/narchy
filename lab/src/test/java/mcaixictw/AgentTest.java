@@ -2,22 +2,19 @@ package mcaixictw;
 
 import mcaixictw.worldmodels.WorldModelSettings;
 import mcaixictw.worldmodels.Worldmodel;
-import org.junit.*;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.*;
 
 abstract public class AgentTest {
 
-	@BeforeClass
+	@BeforeAll
 	public static void setUpBeforeClass() throws Exception {
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void tearDownAfterClass() throws Exception {
 	}
 
-	@Before
+	@BeforeEach
 	public void setUp() throws Exception {
 
 		// 5, 5, false, 3, 8, 3
@@ -38,7 +35,7 @@ abstract public class AgentTest {
 	int rewBits = 3;
 	WorldModelSettings modelSettings;
 
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 	}
 
@@ -53,31 +50,31 @@ abstract public class AgentTest {
 		result.addAll(Util.encode(reward, rewBits));
 
 		// 10100101101
-		assertTrue(result.get(0) == true);
-		assertTrue(result.get(1) == false);
-		assertTrue(result.get(2) == true);
-		assertTrue(result.get(3) == false);
-		assertTrue(result.get(4) == false);
-		assertTrue(result.get(5) == true);
-		assertTrue(result.get(6) == false);
-		assertTrue(result.get(7) == true);
-		assertTrue(result.get(8) == true);
-		assertTrue(result.get(9) == false);
-		assertTrue(result.get(10) == false);
+		Assertions.assertTrue(result.get(0) == true);
+		Assertions.assertTrue(result.get(1) == false);
+		Assertions.assertTrue(result.get(2) == true);
+		Assertions.assertTrue(result.get(3) == false);
+		Assertions.assertTrue(result.get(4) == false);
+		Assertions.assertTrue(result.get(5) == true);
+		Assertions.assertTrue(result.get(6) == false);
+		Assertions.assertTrue(result.get(7) == true);
+		Assertions.assertTrue(result.get(8) == true);
+		Assertions.assertTrue(result.get(9) == false);
+		Assertions.assertTrue(result.get(10) == false);
 
 		result = agent.encodePercept(observation, reward);
 		// 10100101101
-		assertTrue(result.get(0));
-		assertFalse(result.get(1));
-		assertTrue(result.get(2) == true);
-		assertTrue(result.get(3) == false);
-		assertTrue(result.get(4) == false);
-		assertTrue(result.get(5) == true);
-		assertTrue(result.get(6) == false);
-		assertTrue(result.get(7) == true);
-		assertTrue(result.get(8) == true);
-		assertTrue(result.get(9) == false);
-		assertTrue(result.get(10) == false);
+		Assertions.assertTrue(result.get(0));
+		Assertions.assertFalse(result.get(1));
+		Assertions.assertTrue(result.get(2) == true);
+		Assertions.assertTrue(result.get(3) == false);
+		Assertions.assertTrue(result.get(4) == false);
+		Assertions.assertTrue(result.get(5) == true);
+		Assertions.assertTrue(result.get(6) == false);
+		Assertions.assertTrue(result.get(7) == true);
+		Assertions.assertTrue(result.get(8) == true);
+		Assertions.assertTrue(result.get(9) == false);
+		Assertions.assertTrue(result.get(10) == false);
 	}
 
 	@Test
@@ -96,10 +93,10 @@ abstract public class AgentTest {
 		int perception = (obs << rewBits) | rew;
 		agent.modelUpdate(obs, rew);
 		int lastPercept = agent.getLastPercept();
-		assertTrue(perception == lastPercept);
+		Assertions.assertTrue(perception == lastPercept);
 		agent.genRandomActionAndUpdate();
 		lastPercept = agent.getLastPercept();
-		assertTrue(perception == lastPercept);
+		Assertions.assertTrue(perception == lastPercept);
 	}
 
 	@Test
@@ -108,9 +105,9 @@ abstract public class AgentTest {
 		agent.modelUpdate(0);
 		agent.genPerceptAndUpdate();
 		int a = agent.genRandomActionAndUpdate();
-		assertTrue(a == agent.getLastAction());
+		Assertions.assertTrue(a == agent.getLastAction());
 		agent.genPerceptAndUpdate();
-		assertTrue(a == agent.getLastAction());
+		Assertions.assertTrue(a == agent.getLastAction());
 	}
 
 	@Test
@@ -131,7 +128,7 @@ abstract public class AgentTest {
 
 		// System.out.println("p: " + p + " p2: " + p2 + " p2-p: " + (p2 - p));
 
-		assertTrue(Math.abs(p2 - p) < eps);
+		Assertions.assertTrue(Math.abs(p2 - p) < eps);
 	}
 
 	@Test
@@ -147,6 +144,6 @@ abstract public class AgentTest {
 			agent.genRandomActionAndUpdate();
 		}
 		agent.historyRevert(mu);
-		assertTrue(agent.perceptProbability(obs, rew) - p < eps);
+		Assertions.assertTrue(agent.perceptProbability(obs, rew) - p < eps);
 	}
 }

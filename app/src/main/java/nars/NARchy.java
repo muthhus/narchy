@@ -3,7 +3,6 @@ package nars;
 import com.google.common.base.Joiner;
 import nars.exe.SynchExec;
 import nars.op.Operator;
-import nars.op.nlp.Hear;
 import nars.op.stm.ConjClustering;
 import nars.term.container.TermContainer;
 import nars.time.RealTime;

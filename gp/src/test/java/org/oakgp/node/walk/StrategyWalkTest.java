@@ -15,13 +15,13 @@
  */
 package org.oakgp.node.walk;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.function.Function;
 import org.oakgp.node.*;
 
 import java.util.function.Predicate;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.*;
 import static org.oakgp.function.math.IntegerUtils.the;
 import static org.oakgp.util.Utils.TRUE_NODE;

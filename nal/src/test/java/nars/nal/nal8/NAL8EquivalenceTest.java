@@ -1,16 +1,16 @@
 package nars.nal.nal8;
 
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
-import org.junit.Ignore;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static nars.time.Tense.ETERNAL;
 
-@Ignore
-public class NAL8EquivalenceTest extends AbstractNALTest {
+@Disabled
+public class NAL8EquivalenceTest extends NALTest {
 
     static final int cycles = NAL8Test.cycles;
 

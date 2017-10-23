@@ -3,11 +3,11 @@ package nars.derive;
 import nars.Narsese;
 import nars.index.term.PatternIndex;
 import nars.term.Compound;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static nars.$.$;
 import static nars.time.Tense.XTERNAL;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PatternCompoundTest {
 

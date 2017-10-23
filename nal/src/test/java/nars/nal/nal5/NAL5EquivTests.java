@@ -1,19 +1,20 @@
 package nars.nal.nal5;
 
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
 /** original nal5 tests involving the equivalence operator */
-@Ignore public class NAL5EquivTests extends AbstractNALTest {
+@Disabled
+public class NAL5EquivTests extends NALTest {
     final int cycles = 50;
 
-    @Before
+    @BeforeEach
     public void nal() {
         test.nar.nal(5);
     }

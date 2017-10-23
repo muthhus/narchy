@@ -6,12 +6,12 @@ import nars.time.Tense;
 import nars.truth.DiscreteTruth;
 import nars.truth.Stamp;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
 import static nars.Op.BELIEF;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 11/3/15.
@@ -25,9 +25,9 @@ public class TaskTest {
 
         assertTrue(Narsese.parse().task(s, n).start() == Tense.ETERNAL);
 
-        assertTrue("default is eternal", Narsese.parse().task(s, n).isEternal());
+        assertTrue(Narsese.parse().task(s, n).isEternal(), "default is eternal");
 
-        assertTrue("tense=eternal is eternal", Narsese.parse().task(s, n).start() == Tense.ETERNAL);
+        assertTrue(Narsese.parse().task(s, n).start() == Tense.ETERNAL, "tense=eternal is eternal");
 
         //assertTrue("present is non-eternal", !Tense.isEternal(((Task)n.task(s)).present(n).start()));
 
@@ -164,8 +164,8 @@ public class TaskTest {
         d.eventTask.on(t -> {
 
             if (t instanceof DerivedTask && ((DerivedTask)t).getParentBelief()!=null && !Stamp.isCyclic(t.stamp()))
-                assertArrayEquals("all double-premise derived terms have this evidence: "
-                        + t + ": " + Arrays.toString(ev) + "!=" + Arrays.toString(t.stamp()), ev, t.stamp());
+                assertArrayEquals(ev, t.stamp(), "all double-premise derived terms have this evidence: "
+                        + t + ": " + Arrays.toString(ev) + "!=" + Arrays.toString(t.stamp()));
 
             System.out.println(t.proof());
 

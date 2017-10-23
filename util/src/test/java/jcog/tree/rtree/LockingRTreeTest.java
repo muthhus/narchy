@@ -20,8 +20,8 @@ package jcog.tree.rtree;//package spacegraph.index;
 // * #L%
 // */
 //
-//import org.junit.Assert;
-//import org.junit.Test;
+//import static org.junit.jupiter.api.Assertions.*;
+//import org.junit.jupiter.api.Test;
 //
 //import java.util.concurrent.TimeUnit;
 //import java.util.concurrent.locks.*;
@@ -171,33 +171,33 @@ package jcog.tree.rtree;//package spacegraph.index;
 //
 //                @Override
 //                public void lock() {
-//                    Assert.assertFalse("Attempting to acquire read lock while write locked", isLocked);
+//                    assertFalse("Attempting to acquire read lock while write locked", isLocked);
 //                    readers++;
 //                }
 //
 //                @Override
 //                public void lockInterruptibly() throws InterruptedException {
-//                    Assert.assertFalse("Attempting to acquire read lock while write locked", isLocked);
+//                    assertFalse("Attempting to acquire read lock while write locked", isLocked);
 //                    readers++;
 //                }
 //
 //                @Override
 //                public boolean tryLock() {
-//                    Assert.assertFalse("Attempting to acquire read lock while write locked", isLocked);
+//                    assertFalse("Attempting to acquire read lock while write locked", isLocked);
 //                    readers++;
 //                    return true;
 //                }
 //
 //                @Override
 //                public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
-//                    Assert.assertFalse("Attempting to acquire read lock while write locked", isLocked);
+//                    assertFalse("Attempting to acquire read lock while write locked", isLocked);
 //                    readers++;
 //                    return true;
 //                }
 //
 //                @Override
 //                public void unlock() {
-//                    Assert.assertNotEquals("Attempting to unlock read lock without any readers", readers, 0);
+//                    assertNotEquals("Attempting to unlock read lock without any readers", readers, 0);
 //                    readers--;
 //                }
 //
@@ -215,34 +215,34 @@ package jcog.tree.rtree;//package spacegraph.index;
 //                @Override
 //                public void lock() {
 //                    isLocked = true;
-//                    Assert.assertEquals("Attempting to acquire write lock while readers are reading", readers, 0);
+//                    assertEquals("Attempting to acquire write lock while readers are reading", readers, 0);
 //                }
 //
 //                @Override
 //                public void lockInterruptibly() throws InterruptedException {
 //                    isLocked = true;
-//                    Assert.assertEquals("Attempting to acquire write lock while readers are reading", readers, 0);
+//                    assertEquals("Attempting to acquire write lock while readers are reading", readers, 0);
 //                }
 //
 //                @Override
 //                public boolean tryLock() {
 //                    isLocked = true;
-//                    Assert.assertEquals("Attempting to acquire write lock while readers are reading", readers, 0);
+//                    assertEquals("Attempting to acquire write lock while readers are reading", readers, 0);
 //                    return true;
 //                }
 //
 //                @Override
 //                public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
 //                    isLocked = true;
-//                    Assert.assertEquals("Attempting to acquire write lock while readers are reading", readers, 0);
+//                    assertEquals("Attempting to acquire write lock while readers are reading", readers, 0);
 //                    return true;
 //                }
 //
 //                @Override
 //                public void unlock() {
-//                    Assert.assertTrue("Attempting to unlock write lock without any writers", isLocked);
+//                    assertTrue("Attempting to unlock write lock without any writers", isLocked);
 //                    isLocked = false;
-//                    Assert.assertEquals("Attempting to unlock write lock while readers are reading", readers, 0);
+//                    assertEquals("Attempting to unlock write lock while readers are reading", readers, 0);
 //                }
 //
 //                @Override
@@ -262,27 +262,27 @@ package jcog.tree.rtree;//package spacegraph.index;
 //
 //        @Override
 //        public int search(HyperRect rect, Object[] t) {
-//            Assert.assertNotEquals("Read lock should have reader while search in progress", lock.readers, 0);
-//            Assert.assertFalse("Attempting to read while writers are writing", lock.isLocked);
+//            assertNotEquals("Read lock should have reader while search in progress", lock.readers, 0);
+//            assertFalse("Attempting to read while writers are writing", lock.isLocked);
 //            return 0;
 //        }
 //
 //        @Override
 //        public void add(Object o) {
-//            Assert.assertEquals("Read lock should have no readers while write in progress", lock.readers, 0);
-//            Assert.assertTrue("Attempting to write without write lock", lock.isLocked);
+//            assertEquals("Read lock should have no readers while write in progress", lock.readers, 0);
+//            assertTrue("Attempting to write without write lock", lock.isLocked);
 //        }
 //
 //        @Override
 //        public void remove(Object o) {
-//            Assert.assertEquals("Read lock should have no readers while write in progress", lock.readers, 0);
-//            Assert.assertTrue("Attempting to write without write lock", lock.isLocked);
+//            assertEquals("Read lock should have no readers while write in progress", lock.readers, 0);
+//            assertTrue("Attempting to write without write lock", lock.isLocked);
 //        }
 //
 //        @Override
 //        public void update(Object told, Object tnew) {
-//            Assert.assertEquals("Read lock should have no readers while write in progress", lock.readers, 0);
-//            Assert.assertTrue("Attempting to write without write lock", lock.isLocked);
+//            assertEquals("Read lock should have no readers while write in progress", lock.readers, 0);
+//            assertTrue("Attempting to write without write lock", lock.isLocked);
 //        }
 //
 //        @Override

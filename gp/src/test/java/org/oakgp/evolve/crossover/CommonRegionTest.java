@@ -15,10 +15,10 @@
  */
 package org.oakgp.evolve.crossover;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.node.Node;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oakgp.TestUtils.assertNodeEquals;
 import static org.oakgp.TestUtils.readNode;
 

@@ -20,8 +20,8 @@ import java.util.function.LongPredicate;
 import static java.lang.Float.NaN;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 /**
@@ -120,7 +120,7 @@ public class TestNAR {
 
 
         if (requireConditions)
-            assertTrue("no conditions tested", !succeedsIfAll.isEmpty() || !failsIfAny.isEmpty());
+            assertTrue(!succeedsIfAll.isEmpty() || !failsIfAny.isEmpty(), "no conditions tested");
 
 
         //TODO cache requires & logger, it wont change often

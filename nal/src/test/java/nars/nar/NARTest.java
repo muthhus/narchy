@@ -7,13 +7,13 @@ import nars.NARS;
 import nars.Narsese;
 import nars.concept.Concept;
 import nars.term.Termed;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 8/7/15.
@@ -44,7 +44,7 @@ public class NARTest {
 //
 //    }
 
-    @Test @Ignore
+    @Test @Disabled
     public void testMemoryTransplant() throws Narsese.NarseseException {
 
         //this.activeTasks = activeTasks;

@@ -1,13 +1,13 @@
 package jcog.math;
 
 import jcog.random.XorShift128PlusRandom;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
 import static com.google.common.math.IntMath.factorial;
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * from http://stackoverflow.com/questions/2920315/permutation-of-array

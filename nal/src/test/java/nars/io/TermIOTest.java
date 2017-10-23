@@ -8,7 +8,7 @@ import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,7 +19,7 @@ import java.util.Set;
 
 import static java.lang.System.out;
 import static nars.$.$;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Term serialization
@@ -183,7 +183,7 @@ public class TermIOTest {
         Set<String> bb = new HashSet();
         b.tasks().forEach(t -> bb.add(t.toStringWithoutBudget()));
 
-        assertEquals("difference: " + Sets.symmetricDifference(ab, bb), ab, bb);
+        assertEquals(ab, bb, "difference: " + Sets.symmetricDifference(ab, bb));
 
 //        //measure with budgets but allow only a certain one budget difference, due to rounding issues
 //        Set<String> abB = new HashSet();

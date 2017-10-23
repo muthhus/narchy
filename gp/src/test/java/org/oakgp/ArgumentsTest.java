@@ -15,13 +15,13 @@
  */
 package org.oakgp;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.node.Node;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.createVariable;
 import static org.oakgp.TestUtils.integerConstant;
 
@@ -139,7 +139,7 @@ public class ArgumentsTest {
     private void assertArrayIndexOutOfBoundsException(Arguments arguments, int index) {
         try {
             arguments.arg(index);
-            fail();
+            fail("");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }

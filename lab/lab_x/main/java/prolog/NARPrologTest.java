@@ -3,10 +3,10 @@
 //import nars.NAR;
 //import nars.io.TextOutput;
 //import nars.model.impl.Default;
-//import org.junit.Before;
-//import org.junit.Test;
+//import org.junit.jupiter.api.BeforeEach;
+//import org.junit.jupiter.api.Test;
 //
-//import static org.junit.Assert.assertTrue;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 ///**
 // * Created by me on 2/19/15.

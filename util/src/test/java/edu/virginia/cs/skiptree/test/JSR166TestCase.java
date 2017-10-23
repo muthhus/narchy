@@ -6,17 +6,17 @@ package edu.virginia.cs.skiptree.test;
  * http://creativecommons.org/licenses/publicdomain
  * Other contributors include Andrew Wright, Jeffrey Hayes,
  * Pat Fisher, Mike Judd.
- */
+*/
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.security.*;
 import java.util.PropertyPermission;
 import java.util.concurrent.*;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Base class for JSR166 Junit TCK tests.  Defines some constants,
@@ -91,42 +91,42 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  *
  * </ul>
  */
-public class JSR166TestCase extends TestCase {
+public class JSR166TestCase  {
     private static final boolean useSecurityManager =
         Boolean.getBoolean("jsr166.useSecurityManager");
 
-    /**
-     * Runs all JSR166 unit tests using junit.textui.TestRunner
-     */
-    public static void main(String[] args) {
-        if (useSecurityManager) {
-            System.err.println("Setting a permissive security manager");
-            Policy.setPolicy(permissivePolicy());
-            System.setSecurityManager(new SecurityManager());
-        }
-        int iters = 1;
-        if (args.length > 0)
-            iters = Integer.parseInt(args[0]);
-        Test s = suite();
-        for (int i = 0; i < iters; ++i) {
-            junit.textui.TestRunner.run(s);
-            System.gc();
-            System.runFinalization();
-        }
-        System.exit(0);
-    }
+//    /**
+//     * Runs all JSR166 unit tests using junit.textui.TestRunner
+//     */
+//    public static void main(String[] args) {
+//        if (useSecurityManager) {
+//            System.err.println("Setting a permissive security manager");
+//            Policy.setPolicy(permissivePolicy());
+//            System.setSecurityManager(new SecurityManager());
+//        }
+//        int iters = 1;
+//        if (args.length > 0)
+//            iters = Integer.parseInt(args[0]);
+//        Test s = suite();
+//        for (int i = 0; i < iters; ++i) {
+//            junit.textui.TestRunner.run(s);
+//            System.gc();
+//            System.runFinalization();
+//        }
+//        System.exit(0);
+//    }
 
-    /**
-     * Collects all JSR166 unit tests as one suite
-     */
-    public static Test suite() {
-        TestSuite suite = new TestSuite("JSR166 Unit Tests");
-        suite.addTest(new TestSuite(ConcurrentSkipTreeMapTest.class));
-        suite.addTest(new TestSuite(ConcurrentSkipTreeSubMapTest.class));
-        suite.addTest(new TestSuite(ConcurrentSkipTreeSetTest.class));
-        suite.addTest(new TestSuite(ConcurrentSkipTreeSubSetTest.class));        
-        return suite;
-    }
+//    /**
+//     * Collects all JSR166 unit tests as one suite
+//     */
+//    public static Test suite() {
+//        TestSuite suite = new TestSuite("JSR166 Unit Tests");
+//        suite.addTest(new TestSuite(ConcurrentSkipTreeMapTest.class));
+//        suite.addTest(new TestSuite(ConcurrentSkipTreeSubMapTest.class));
+//        suite.addTest(new TestSuite(ConcurrentSkipTreeSetTest.class));
+//        suite.addTest(new TestSuite(ConcurrentSkipTreeSubSetTest.class));
+//        return suite;
+//    }
 
 
     public static long SHORT_DELAY_MS;
@@ -162,7 +162,8 @@ public class JSR166TestCase extends TestCase {
     /**
      * Initializes test to indicate that no thread assertions have failed
      */
-    @Override
+
+    @BeforeEach
     public void setUp() {
         setDelays();
         threadFailed = false;
@@ -171,7 +172,7 @@ public class JSR166TestCase extends TestCase {
     /**
      * Triggers test case failure if any thread assertions have failed
      */
-    @Override
+    @AfterEach
     public void tearDown() {
         assertFalse(threadFailed);
     }

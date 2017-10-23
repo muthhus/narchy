@@ -25,7 +25,7 @@ import br.ufpr.gres.core.premutation.PremutationClassInfo;
 import br.ufpr.gres.core.visitors.methods.MutatingClassVisitor;
 import br.ufpr.gres.core.visitors.methods.empty.NullVisitor;
 import br.ufpr.gres.example.Cal;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 
 import java.util.ArrayList;

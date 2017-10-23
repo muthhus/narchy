@@ -21,10 +21,10 @@ package jcog.tree.rtree;
  */
 
 import jcog.tree.rtree.rect.RectDouble2D;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by jcovert on 6/12/15.
@@ -46,25 +46,25 @@ public class BranchTest {
             while (i < 8) {
                 rTree.add(rects[i++]);
             }
-            assertEquals("[" + type + "] Expected 0 branches at this time", 0, rTree.stats().getBranchCount());
+            assertEquals(0, rTree.stats().getBranchCount(), "[" + type + "] Expected 0 branches at this time");
 
             // leaf was full, first split
             rTree.add(rects[i++]);
-            assertEquals("[" + type + "] Expected 1 branch at this time", 1, rTree.stats().getBranchCount());
+            assertEquals(1, rTree.stats().getBranchCount(), "[" + type + "] Expected 1 branch at this time");
 
             // cause another split, extra branches get optimized out
             while (i < 10) {
                 rTree.add(rects[i++]);
                 assertEquals(i, rTree.size());
             }
-            assertEquals("[" + type + "] Expected 1 branch at this time:\n" + rTree.stats(), 1, rTree.stats().getBranchCount());
+            assertEquals(1, rTree.stats().getBranchCount(), "[" + type + "] Expected 1 branch at this time:\n" + rTree.stats());
 
             // cause enough additional splits to force new branch creation
             while (i < 80) {
                 rTree.add(rects[i++]);
                 assertEquals(i, rTree.size());
             }
-            assertTrue("[" + type + "] Expected branches at this time", 3 <= rTree.stats().getBranchCount());
+            assertTrue(3 <= rTree.stats().getBranchCount(), "[" + type + "] Expected branches at this time");
         }
     }
 }

@@ -6,10 +6,10 @@ import nars.Param;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static nars.Param.TRUTH_EPSILON;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TruthTest {
@@ -88,7 +88,7 @@ public class TruthTest {
         if (t == null)
             return;
         Truth u = DiscreteTruth.intToTruth(t.hashCode());
-        assertNotNull(t +  " unhased to null via hashCode " + t.hashCode(), u);
+        assertNotNull( u, t +  " unhased to null via hashCode " + t.hashCode());
         assertEquals(t, u);
     }
 

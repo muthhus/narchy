@@ -1,7 +1,7 @@
 package org.zhz.dfargx;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.zhz.dfargx.automata.DFA;
 import org.zhz.dfargx.automata.NFA;
 import org.zhz.dfargx.node.Node;
@@ -130,7 +130,7 @@ public class RegexTest {
         System.out.println("Java pattern Cost " + matchesPerMS(num, pre)*1E6f + " matches per ms");
         System.out.println(jpResult);
         System.out.println();
-        Assert.assertTrue(dfaResult == jpResult);
+        Assertions.assertTrue(dfaResult == jpResult);
     }
 
     private float matchesPerMS(float num, long pre) {

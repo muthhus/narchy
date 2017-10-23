@@ -15,11 +15,11 @@
  */
 package org.oakgp.function.math;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BigIntegerUtilsTest {
     private static final NumberUtils<BigInteger> UTILS = BigIntegerUtils.the;

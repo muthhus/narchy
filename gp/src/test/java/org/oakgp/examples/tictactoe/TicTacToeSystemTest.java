@@ -15,7 +15,7 @@
  */
 package org.oakgp.examples.tictactoe;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Assignments;
 import org.oakgp.Evolution;
 import org.oakgp.Type;

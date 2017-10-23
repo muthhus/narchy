@@ -3,7 +3,6 @@ package jcog.tree.rtree.point;
 import jcog.tree.rtree.HyperPoint;
 import jcog.tree.rtree.HyperRegion;
 import jcog.tree.rtree.rect.RectFloat2D;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 

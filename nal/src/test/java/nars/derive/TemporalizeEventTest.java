@@ -2,19 +2,19 @@ package nars.derive;
 
 import nars.Narsese;
 import nars.derive.time.Temporalize;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.$.$;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /** tests the 'eventization' of various terms
  * these tests are basically correct. they just need their expected
- * outputs updated with what it currently prints out.  so it is set to @Ignore for now
+ * outputs updated with what it currently prints out.  so it is set to @Disabled for now
  * because if these didnt work, there would be massive failure in TemporalizeTest.java
  * */
-@Ignore
+@Disabled
 public class TemporalizeEventTest {
     @Test
     public void testEventize1a() throws Narsese.NarseseException {

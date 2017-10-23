@@ -25,13 +25,13 @@ import jcog.tree.rtree.rect.RectDouble2D;
 import jcog.tree.rtree.rect.RectFloatND;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by jcairns on 4/30/15.
@@ -51,7 +51,7 @@ public class RTree2DTest {
         final Double2D[] result = new Double2D[10];
 
         final int n = pTree.containedToArray(rect, result);
-        Assert.assertEquals(7, n);
+        assertEquals(7, n);
 
         for(int i=0; i<n; i++) {
             assertTrue(result[i].x >= 2);
@@ -88,14 +88,14 @@ public class RTree2DTest {
             }
 
             final int expectedCount = 9;
-            //Assert.assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
-            Assert.assertEquals("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
+            //assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
+            assertEquals(expectedCount, resultCount, "[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount);
 
             Collections.sort(results);
 
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             for (int i = 0; i < resultCount; i++) {
-                assertTrue("Unexpected result found", results.get(i).min.x == i + 2 && results.get(i).min.y == i + 2 && results.get(i).max.x == i + 5 && results.get(i).max.y == i + 5);
+                assertTrue(results.get(i).min.x == i + 2 && results.get(i).min.y == i + 2 && results.get(i).max.x == i + 5 && results.get(i).max.y == i + 5, "Unexpected result found");
             }
         }
     }
@@ -128,10 +128,10 @@ public class RTree2DTest {
             }
 
             final int expectedCount = entryCount;
-            assertTrue("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount,
-                    Math.abs(expectedCount - foundCount) < 10 /* in case of duplicates */);
-            assertTrue("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount,
-                    Math.abs(expectedCount - resultCount) < 10 /* in case of duplicates */);
+            assertTrue(Math.abs(expectedCount - foundCount) < 10,
+                    "[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount /* in case of duplicates */);
+            assertTrue(Math.abs(expectedCount - resultCount) < 10,
+                    "[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount /* in case of duplicates */);
 
         }
     }
@@ -140,7 +140,7 @@ public class RTree2DTest {
      * Collect stats making the structure of trees of each split type
      * more visible.
      */
-    @Ignore
+    @Disabled
     // This test ignored because output needs to be manually evaluated.
     public void treeStructureStatsTest() {
 
@@ -166,7 +166,7 @@ public class RTree2DTest {
      *  - Evals for QUADRATIC tree increases with size of the search bounding box.
      *  - QUADRATIC seems to be ideal for small search bounding boxes.
      */
-    @Ignore
+    @Disabled
     // This test ignored because output needs to be manually evaluated.
     public void treeSearchStatsTest() {
 
@@ -206,11 +206,11 @@ public class RTree2DTest {
         }
         RectDouble2D[] searchResults = new RectDouble2D[10];
         for(int i = 0; i < rects.length; i++) {
-            assertTrue("Found hyperRect that should have been removed on search " + i, rTree.containedToArray(rects[i], searchResults) == 0);
+            assertTrue(rTree.containedToArray(rects[i], searchResults) == 0, "Found hyperRect that should have been removed on search " + i);
         }
 
         rTree.add(new RectDouble2D(0,0,5,5));
-        assertTrue("Found hyperRect that should have been removed on search ", rTree.size() != 0);
+        assertTrue(rTree.size() != 0, "Found hyperRect that should have been removed on search ");
     }
 
     @Test
@@ -219,14 +219,14 @@ public class RTree2DTest {
 
         RectDouble2D rect = new RectDouble2D(0,0,2,2);
         rTree.add(rect);
-        assertTrue("Did not add HyperRect to Tree", rTree.size() > 0);
+        assertTrue(rTree.size() > 0, "Did not add HyperRect to Tree");
         assertTrue( rTree.remove(rect) );
-        assertTrue("Did not remove HyperRect from Tree", rTree.size() == 0);
+        assertTrue(rTree.size() == 0, "Did not remove HyperRect from Tree");
         rTree.add(rect);
-        assertTrue("Tree nulled out and could not add HyperRect back in", rTree.size() > 0);
+        assertTrue(rTree.size() > 0, "Tree nulled out and could not add HyperRect back in");
     }
 
-    @Ignore
+    @Disabled
     // This test ignored because output needs to be manually evaluated.
     public void treeRemoveAndRebalanceTest() {
         final RTree<RectDouble2D> rTree = createRect2DTree(Spatialization.DefaultSplits.QUADRATIC);
@@ -273,7 +273,7 @@ public class RTree2DTest {
         rTree.replace(oldRect, newRect);
         RectDouble2D[] results = new RectDouble2D[2];
         int num = rTree.containedToArray(newRect, results);
-        assertTrue("Did not find the updated HyperRect", num == 1);
+        assertTrue(num == 1, "Did not find the updated HyperRect");
         String st = results[0].toString();
         System.out.print(st);
     }

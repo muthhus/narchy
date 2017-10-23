@@ -1,14 +1,14 @@
 package nars.nal.nal1;
 
 import nars.test.DeductiveChainTest;
-import nars.util.AbstractNALTest;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.Test;
 
 import static nars.test.DeductiveChainTest.*;
 
 //import static nars.util.meter.experiment.DeductiveChainTest.inh;
 
-public class NAL1MultistepTest extends AbstractNALTest {
+public class NAL1MultistepTest extends NALTest {
 
 
     @Test public void multistepInh2() {

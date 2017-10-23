@@ -15,13 +15,13 @@
  */
 package org.oakgp.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.node.Node;
 
 import java.util.Arrays;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.readNode;
 
 public class NodeSetTest {

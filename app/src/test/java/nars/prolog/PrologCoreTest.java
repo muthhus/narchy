@@ -5,12 +5,12 @@
 //import nars.Narsese;
 //import nars.nar.Default;
 //import nars.op.PrologCore;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.io.IOException;
 //
-//import static org.junit.Assert.assertFalse;
-//import static org.junit.Assert.assertTrue;
+//import static org.junit.jupiter.api.Assertions.*;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 ///**
 // * Created by me on 3/3/16.

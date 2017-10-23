@@ -15,12 +15,12 @@
  */
 package org.oakgp.node;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.TestUtils;
 import org.oakgp.function.math.IntegerUtils;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NodeTypeTest {
     private static final ConstantNode CONSTANT_NODE = TestUtils.integerConstant(7);

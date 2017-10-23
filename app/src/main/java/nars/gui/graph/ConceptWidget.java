@@ -1,32 +1,21 @@
 package nars.gui.graph;
 
 import jcog.Util;
-import jcog.bag.Bag;
-import jcog.bag.impl.PLinkArrayBag;
-import jcog.data.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;
-import jcog.pri.op.PriMerge;
 import jcog.util.Flip;
-import nars.Task;
 import nars.concept.Concept;
-import nars.gui.DynamicListSpace;
-import nars.term.Term;
 import nars.term.Termed;
 import spacegraph.SpaceGraph;
 import spacegraph.phys.Dynamic;
-import spacegraph.phys.shape.SphereShape;
 import spacegraph.render.Draw;
 import spacegraph.space.EDraw;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
 
-import static jcog.Util.sqr;
 import static nars.gui.graph.DynamicConceptSpace.ConceptVis2.TASKLINK;
 import static nars.gui.graph.DynamicConceptSpace.ConceptVis2.TERMLINK;
 import static spacegraph.math.v3.v;

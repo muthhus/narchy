@@ -15,12 +15,12 @@
  */
 package org.oakgp.node.walk;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.walk.DepthWalk.DepthWalkStrategy;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.oakgp.TestUtils.*;
 
 public class DepthWalkTest {

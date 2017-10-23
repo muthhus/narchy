@@ -2,7 +2,7 @@ package jcog;
 
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.math3.stat.Frequency;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

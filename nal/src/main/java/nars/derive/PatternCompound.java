@@ -6,7 +6,6 @@ import nars.derive.match.EllipsisMatch;
 import nars.derive.mutate.Choose1;
 import nars.derive.mutate.Choose2;
 import nars.op.mental.AliasConcept;
-import nars.term.Compound;
 import nars.term.GenericCompoundDT;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
@@ -19,8 +18,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static nars.Op.*;
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.XTERNAL;
 
 abstract public class PatternCompound extends GenericCompoundDT {
 

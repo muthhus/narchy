@@ -1,14 +1,14 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
 import com.google.common.collect.Lists;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.function.Function;
 
 import static org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel.FALSE_LABEL;
 import static org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel.TRUE_LABEL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DecisionTreeGetMajorityLabelTest {
     
@@ -17,7 +17,7 @@ public class DecisionTreeGetMajorityLabelTest {
 //    public void testGetLabelOnEmptyList() {
 //        DecisionTree tree = new DecisionTree();
 //        List<DataSample> data = Lists.newArrayList();
-//        Assert.assertNull(tree.getMajorityLabel(data));
+//        assertNull(tree.getMajorityLabel(data));
 //    }
     
     @Test
@@ -29,7 +29,7 @@ public class DecisionTreeGetMajorityLabelTest {
         data.add(new TestValue(TRUE_LABEL));
         data.add(new TestValue(FALSE_LABEL));
         data.add(new TestValue(FALSE_LABEL));
-        Assert.assertEquals("false", DecisionTree.majority(null, data).toString());
+        assertEquals("false", DecisionTree.majority(null, data).toString());
     }
 
     @Test
@@ -40,6 +40,6 @@ public class DecisionTreeGetMajorityLabelTest {
         data.add(new TestValue(FALSE_LABEL));
         data.add(new TestValue(TRUE_LABEL));
         data.add(new TestValue(FALSE_LABEL));
-        Assert.assertEquals("false", DecisionTree.majority(null, data).toString());
+        assertEquals("false", DecisionTree.majority(null, data).toString());
     }
 }

@@ -15,7 +15,7 @@
  */
 package org.oakgp.evolve.crossover;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.evolve.GeneticOperator;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.Node;
@@ -26,8 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.oakgp.TestUtils.assertNodeEquals;
 import static org.oakgp.TestUtils.readFunctionNode;
 import static org.oakgp.util.DummyRandom.GetIntExpectation.nextInt;

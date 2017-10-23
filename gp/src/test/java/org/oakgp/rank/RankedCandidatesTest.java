@@ -15,14 +15,14 @@
  */
 package org.oakgp.rank;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.mockNode;
 
 public class RankedCandidatesTest {
@@ -58,7 +58,7 @@ public class RankedCandidatesTest {
         assertSame(element5, itr.next());
         try {
             itr.next();
-            fail();
+            fail("");
         } catch (NoSuchElementException e) {
             // expected
         }
@@ -82,10 +82,12 @@ public class RankedCandidatesTest {
         assertFalse(itr.hasNext());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void testRemove() {
-        Iterator<RankedCandidate> itr = rankedCandidates.iterator();
-        itr.remove();
+        assertThrows(UnsupportedOperationException.class, () -> {
+            Iterator<RankedCandidate> itr = rankedCandidates.iterator();
+            itr.remove();
+        });
     }
 
     @Test
@@ -138,7 +140,7 @@ public class RankedCandidatesTest {
     private void assertArrayIndexOutOfBoundsException(RankedCandidates candidates, int index) {
         try {
             candidates.get(index);
-            fail();
+            fail("");
         } catch (ArrayIndexOutOfBoundsException e) {
             // expected
         }

@@ -7,7 +7,7 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 import java.util.TreeSet;
@@ -15,7 +15,7 @@ import java.util.TreeSet;
 import static jcog.bag.BagTest.*;
 import static jcog.pri.op.PriMerge.max;
 import static jcog.pri.op.PriMerge.plus;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * TODO test packing efficiency (lack of sparsity)
@@ -130,12 +130,12 @@ public class HijackBagTest {
 
                 @Override
                 public void onRemove(@NotNull Object value) {
-                    fail();
+                    fail("");
                 }
 
                 @Override
                 public void onReject(@NotNull Object value) {
-                    fail();
+                    fail("");
                 }
 
                 @Override

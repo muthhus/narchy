@@ -1,6 +1,6 @@
 package nars.perf;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 /**
  * Created by me on 12/11/15.
  */
-@Ignore
+@Disabled
 public enum JmhBenchmark {
 	;
 

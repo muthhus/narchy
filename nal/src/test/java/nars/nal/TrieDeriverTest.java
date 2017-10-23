@@ -18,8 +18,8 @@ import net.byteseek.utils.collections.IdentityHashSet;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static nars.Op.QUEST;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 12/12/15.
@@ -204,7 +204,7 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
 
     private final List<TestNAR> tests = $.newArrayList();
 
-    @After
+    @AfterEach
     public void runTests() {
         tests.forEach(TestNAR::test);
     }

@@ -3,7 +3,7 @@
 //import nars.concept.DefaultConceptBuilder;
 //import nars.term.Terms;
 //import nars.util.data.random.XorShift128PlusRandom;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 ///**
 // * Created by me on 3/13/16.

@@ -15,13 +15,13 @@
  */
 package org.oakgp.primitive;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.node.ConstantNode;
 
 import java.util.List;
 
 import static java.lang.Boolean.TRUE;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.*;
 import static org.oakgp.Type.*;
 

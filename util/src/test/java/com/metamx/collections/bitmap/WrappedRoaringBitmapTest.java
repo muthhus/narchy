@@ -16,36 +16,56 @@
 
 package com.metamx.collections.bitmap;
 
-import junit.framework.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
-@RunWith(Parameterized.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+
 public class WrappedRoaringBitmapTest {
     private final RoaringBitmapFactory factory;
 
-    public WrappedRoaringBitmapTest(RoaringBitmapFactory factory) {
+    WrappedRoaringBitmapTest(RoaringBitmapFactory factory) {
         this.factory = factory;
     }
 
-    @Parameterized.Parameters
-    public static List<RoaringBitmapFactory[]> factoryClasses() {
-        return Arrays.asList(
-                Arrays.asList(
-                        new RoaringBitmapFactory(false)
-                ).toArray(new RoaringBitmapFactory[1]),
-                Arrays.asList(
-                        new RoaringBitmapFactory(true)
-                ).toArray(new RoaringBitmapFactory[1])
-        );
+    @TestFactory
+    public static Stream<DynamicTest> factoryClasses() {
+
+        return List.of(
+
+                new RoaringBitmapFactory(false),
+                new RoaringBitmapFactory(true)
+
+        ).stream().map(factory ->
+                List.of(
+
+                        DynamicTest.dynamicTest(factory.toString() + "_serialize", () -> {
+                            WrappedRoaringBitmap set = createWrappedRoaringBitmap(factory);
+
+                            byte[] buffer = new byte[set.getSizeInBytes()];
+                            ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
+                            set.serialize(byteBuffer);
+                            byteBuffer.flip();
+                            ImmutableBitmap immutableBitmap = new RoaringBitmapFactory().mapImmutableBitmap(byteBuffer);
+                            assertEquals(5, immutableBitmap.size());
+                        }),
+
+                        DynamicTest.dynamicTest(factory.toString() + "_toByteArray", () -> {
+                            WrappedRoaringBitmap set = createWrappedRoaringBitmap(factory);
+                            ImmutableBitmap immutableBitmap = new RoaringBitmapFactory().mapImmutableBitmap(ByteBuffer.wrap(set.toBytes()));
+                            assertEquals(5, immutableBitmap.size());
+                        })
+
+                )).flatMap(Collection::stream);
     }
 
-    private WrappedRoaringBitmap createWrappedRoaringBitmap() {
+    private static WrappedRoaringBitmap createWrappedRoaringBitmap(RoaringBitmapFactory factory) {
         WrappedRoaringBitmap set = (WrappedRoaringBitmap) factory.makeEmptyMutableBitmap();
         set.add(1);
         set.add(3);
@@ -55,23 +75,5 @@ public class WrappedRoaringBitmapTest {
         return set;
     }
 
-    @Test
-    public void testSerialize() {
-        WrappedRoaringBitmap set = createWrappedRoaringBitmap();
-
-        byte[] buffer = new byte[set.getSizeInBytes()];
-        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
-        set.serialize(byteBuffer);
-        byteBuffer.flip();
-        ImmutableBitmap immutableBitmap = new RoaringBitmapFactory().mapImmutableBitmap(byteBuffer);
-        Assert.assertEquals(5, immutableBitmap.size());
-    }
-
-    @Test
-    public void testToByteArray() {
-        WrappedRoaringBitmap set = createWrappedRoaringBitmap();
-        ImmutableBitmap immutableBitmap = new RoaringBitmapFactory().mapImmutableBitmap(ByteBuffer.wrap(set.toBytes()));
-        Assert.assertEquals(5, immutableBitmap.size());
-    }
 
 }

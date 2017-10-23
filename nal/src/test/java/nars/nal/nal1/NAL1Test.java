@@ -4,10 +4,10 @@ import nars.NAR;
 import nars.NARS;
 import nars.Param;
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.Test;
 
-public class NAL1Test extends AbstractNALTest {
+public class NAL1Test extends NALTest {
 
     final int CYCLES = 275;
     static {

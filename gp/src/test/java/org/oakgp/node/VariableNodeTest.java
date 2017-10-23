@@ -15,11 +15,11 @@
  */
 package org.oakgp.node;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Assignments;
 import org.oakgp.Type;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.createVariable;
 import static org.oakgp.TestUtils.integerConstant;
 import static org.oakgp.Type.integerType;

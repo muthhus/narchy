@@ -1,11 +1,11 @@
 package com.insightfullogic.slab.implementation;
 
 import com.insightfullogic.slab.SlabOptions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static com.insightfullogic.slab.implementation.MemoryCalculation.calculateAddress;
 import static com.insightfullogic.slab.implementation.MemoryCalculation.calculateAllocation;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MemoryCalculationTest {
     

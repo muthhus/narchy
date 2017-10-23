@@ -1,19 +1,19 @@
 package nars.nal.nal4;
 
-import nars.util.AbstractNALTest;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
-public class NAL4NewTest extends AbstractNALTest {
+public class NAL4NewTest extends NALTest {
 
 
     public static final int CYCLES = 450;
 
-    @Before
+    @BeforeEach
     public void nal() { test.nar.nal(4); }
 
 
@@ -57,7 +57,7 @@ public class NAL4NewTest extends AbstractNALTest {
 
 
     @Test
-    @Ignore
+    @Disabled
     public void testNeqComRecursiveConstraint() {
 
         /*

@@ -5,8 +5,8 @@ import nars.*;
 import nars.term.Term;
 import nars.test.TestNAR;
 import nars.time.Tense;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -14,12 +14,12 @@ import java.util.Iterator;
 import static nars.$.$;
 import static nars.term.atom.Int.range;
 import static nars.term.atom.Int.the;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class IntTest {
 
-    @Ignore
+    @Disabled
     @Test
     public void testVariableIntroduction() throws Narsese.NarseseException {
         NAR n = NARS.shell();
@@ -130,7 +130,7 @@ public class IntTest {
 ///**
 // * Created by me on 8/5/16.
 // */
-//@Ignore
+//@Disabled
 //public class ArithmeticInductionTest {
 //
 //    @Test

@@ -12,9 +12,9 @@ public class Label extends Surface {
 
     private String value = "(null)";
 
-    public float fontScale = 1f;
+    public float fontScaleX = 1f, fontScaleY = 1f;
     public final Color4f color = new Color4f(1f,1f,1f,1f);
-    public float lineWidth = 3f;
+    public float lineWidth = 5f;
 
     public Label() {
         this("");
@@ -32,7 +32,7 @@ public class Label extends Surface {
         color.apply(gl);
         gl.glLineWidth(lineWidth);
         //float dz = 0.1f;
-        Draw.text(gl, value(), fontScale, 1, 0f, 0f, 0, Draw.TextAlignment.Left);
+        Draw.text(gl, value(), fontScaleX, fontScaleY, 0, 0.5f-fontScaleY/2f, 0, Draw.TextAlignment.Left);
 
     }
 
@@ -44,8 +44,19 @@ public class Label extends Surface {
         this.value = newValue;
 
         int len = newValue.length();
-//        this.aspect = 1.6f / (len);
-        this.fontScale = 1f / len;
+        float ratio = 1.5f;
+        float fontScaleX = 1f / len;
+        float fontScaleY = ratio * fontScaleX;
+        if (fontScaleX > fontScaleY) {
+            //wider than tall, limit by width
+//            fontScaleY =
+        } else {
+            //taller than wide, limit by height
+            fontScaleY = 1f;
+            fontScaleX = 1f / (ratio*len);
+        }
+        this.fontScaleX = fontScaleX;
+        this.fontScaleY = fontScaleY;
     }
 
     public String value() {
@@ -56,4 +67,6 @@ public class Label extends Surface {
     public String toString() {
         return "Label[" + value + ']';
     }
+
+
 }

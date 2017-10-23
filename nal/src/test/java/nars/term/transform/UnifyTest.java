@@ -10,13 +10,13 @@ import nars.term.subst.Unify;
 import nars.test.TestNAR;
 import nars.util.signal.RuleTest;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class UnifyTest {
@@ -118,7 +118,7 @@ public class UnifyTest {
 
                     } else {
                         //HACK there should be incomplete assignments even though this says it matched
-                        assertTrue("why matched?: " + xy, (n1) > (xy.size())); //|| (n2) <= (yx.size()));
+                        assertTrue((n1) > (xy.size()), "why matched?: " + xy); //|| (n2) <= (yx.size()));
                         //assertFalse("match found but should not have", true);
                     }
 
@@ -226,7 +226,7 @@ public class UnifyTest {
                 true);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void pattern_trySubs_Var_2_product_and_common_depvar_bidirectional() {
         Unify sub = test(Op.VAR_DEP,
@@ -454,7 +454,7 @@ public class UnifyTest {
                 true);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void pattern_trySubs_set3_1_b() {
         test(Op.VAR_PATTERN,
@@ -471,7 +471,7 @@ public class UnifyTest {
                 true);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void pattern_trySubs_set3_1_b_commutative_inside_statement() {
         test(Op.VAR_PATTERN,
@@ -480,7 +480,7 @@ public class UnifyTest {
                 true);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void pattern_trySubs_set3_1_statement_of_specific_commutatives() {
         test(Op.VAR_PATTERN,
@@ -497,7 +497,7 @@ public class UnifyTest {
                 true);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void pattern_trySubs_set3_1_c() {
         test(Op.VAR_PATTERN,
@@ -748,7 +748,7 @@ public class UnifyTest {
                 "{{a, b, c, d}, {z, b, c, d}}", true);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void ellipsisLinearInner() {
 
@@ -843,7 +843,7 @@ public class UnifyTest {
 //    }
 //
 //
-//    @Ignore
+//    @Disabled
 //    @Test
 //    public void testImageRelationAfterEllipsis() {
 //        test(Op.VAR_PATTERN,
@@ -854,7 +854,7 @@ public class UnifyTest {
 //                "<A --> (/, B, C, _, D)>", false);
 //    }
 //
-//    @Ignore
+//    @Disabled
 //    @Test
 //    public void testInnerEllipsis() {
 //        test(Op.VAR_PATTERN,
@@ -911,7 +911,7 @@ public class UnifyTest {
     /**
      * this case is unrealistic as far as appearing in rules but it would be nice to get working
      */
-    @Ignore
+    @Disabled
     @Test
     public void ellipsisCommutiveRepeat() {
         test(Op.VAR_PATTERN,

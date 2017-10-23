@@ -25,19 +25,17 @@ import nars.term.container.ArrayTermVector;
 import nars.term.container.TermVector;
 import nars.term.container.TermVector1;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.TreeSet;
 import java.util.function.Supplier;
 
 import static java.lang.Long.toBinaryString;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.Op.*;
 import static nars.task.RevisionTest.x;
 import static nars.time.Tense.DTERNAL;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author me
@@ -48,6 +46,7 @@ public class TermTest {
 
 
     protected void assertEquivalentTerm(@NotNull String term1String, @NotNull String term2String) {
+
         try {
 
 
@@ -59,7 +58,7 @@ public class TermTest {
             assertEquivalentTerm(term1.term(), term2.term());
 
         } catch (Exception e) {
-            assertFalse(e.toString(), true);
+            fail(e.toString());
         }
     }
 
@@ -148,11 +147,11 @@ public class TermTest {
         assertEquals(2, Terms.sorted(a, b, b).length);
         assertEquals(1, Terms.sorted(a, a).length);
         assertEquals(1, Terms.sorted(a).length);
-        assertEquals("correct natural ordering", a, Terms.sorted(a, b)[0]);
-        assertEquals("correct natural ordering", a, Terms.sorted(a, b, c)[0]);
-        assertEquals("correct natural ordering", b, Terms.sorted(a, b, c)[1]);
-        assertEquals("correct natural ordering", c, Terms.sorted(a, b, c)[2]);
-        assertEquals("correct natural ordering", b, Terms.sorted(a, a, b, b, c, c)[1]);
+        assertEquals(a, Terms.sorted(a, b)[0], "correct natural ordering");
+        assertEquals(a, Terms.sorted(a, b, c)[0], "correct natural ordering");
+        assertEquals(b, Terms.sorted(a, b, c)[1], "correct natural ordering");
+        assertEquals(c, Terms.sorted(a, b, c)[2], "correct natural ordering");
+        assertEquals(b, Terms.sorted(a, a, b, b, c, c)[1], "correct natural ordering");
 
     }
 
@@ -204,8 +203,8 @@ public class TermTest {
         int t2c1 = term2.compareTo(term1);
 
         assertTrue(!t1e2);
-        assertTrue("term1 and term2 inequal, so t1.compareTo(t2) should not = 0", t1c2 != 0);
-        assertTrue("term1 and term2 inequal, so t2.compareTo(t1) should not = 0", t2c1 != 0);
+        assertTrue(t1c2 != 0, "term1 and term2 inequal, so t1.compareTo(t2) should not = 0");
+        assertTrue(t2c1 != 0, "term1 and term2 inequal, so t2.compareTo(t1) should not = 0");
 
         /*
         System.out.println("t1 equals t2 " + t1e2);
@@ -216,8 +215,8 @@ public class TermTest {
         TreeSet<Term> set = new TreeSet<>();
         boolean added1 = set.add(term1);
         boolean added2 = set.add(term2);
-        assertTrue("term 1 added to set", added1);
-        assertTrue("term 2 added to set", added2);
+        assertTrue(added1, "term 1 added to set");
+        assertTrue(added2, "term 2 added to set");
 
         assertTrue(set.size() == 2);
 
@@ -282,7 +281,7 @@ public class TermTest {
 
         try {
             Task x = n.inputAndGet(t + '.');
-            assertFalse(t + " is invalid compound term", true);
+            assertFalse(true, t + " is invalid compound term");
         } catch (Throwable tt) {
             assertTrue(true);
         }
@@ -428,7 +427,7 @@ public class TermTest {
 
         if (conceptualize) {
             Concept n2a = n2.conceptualize(a);
-            assertNotNull(a + " should conceptualize", n2a);
+            assertNotNull( n2a, a + " should conceptualize");
             assertNotNull(b);
             assertEquals(n2a.toString(), b.toString());
             assertEquals(n2a.hashCode(), b.hashCode());
@@ -535,8 +534,8 @@ public class TermTest {
         Term tb = $(b);
 
         assertNotEquals(ta, tb);
-        assertNotEquals(ta + " vs. " + tb,
-                ta.hashCode(), tb.hashCode());
+        assertNotEquals(ta.hashCode(),
+                tb.hashCode(), ta + " vs. " + tb);
 
 
     }
@@ -554,7 +553,7 @@ public class TermTest {
     @Test public void testHashDistribution() {
         int ah = new TermVector1($.the("x")).hashCode(); //one letter apart
         int bh = new TermVector1($.the("y")).hashCode();
-        assertTrue(ah + " vs " + bh,  Math.abs(ah-bh) > 1 );
+        assertTrue(Math.abs(ah-bh) > 1, ah + " vs " + bh);
     }
 
     @Test
@@ -607,7 +606,7 @@ public class TermTest {
         return a;
     }
 
-//    @Ignore
+//    @Disabled
 //    @Test
 //    public void testSubtermsVector() {
 //
@@ -652,7 +651,7 @@ public class TermTest {
             NAR t = NARS.shell();
             t.believe(x);
 
-            assertTrue(x + " should not have been allowed as a task content", false);
+            assertTrue(false, x + " should not have been allowed as a task content");
 
 
         } catch (Exception e) {
@@ -872,7 +871,7 @@ public class TermTest {
         try {
             Term recv = o.get();
             if (recv!=Null) //False also signals invalid reduction
-                assertTrue(recv + " was not null", false);
+                assertTrue(false, recv + " was not null");
         } catch (InvalidTermException e) {
             //correct if happens here
         }

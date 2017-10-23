@@ -1,6 +1,6 @@
 package nars;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by me on 5/2/16.

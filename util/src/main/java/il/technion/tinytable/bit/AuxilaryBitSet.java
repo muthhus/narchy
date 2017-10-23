@@ -58,9 +58,9 @@ class AuxilaryBitSet implements Serializable {
 //		final long readValue2 = BitHelper.getValueFromWord(this.words[toWordIdx], 0, toBitIdx, false);
 //		
 //		
-//		Assert.assertTrue(readValue1==part1Value);
+//		assertTrue(readValue1==part1Value);
 //
-//		Assert.assertTrue(readValue2==part2Value);
+//		assertTrue(readValue2==part2Value);
 
 
     }

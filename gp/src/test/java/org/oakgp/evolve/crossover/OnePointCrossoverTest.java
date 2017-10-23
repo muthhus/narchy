@@ -15,7 +15,7 @@
  */
 package org.oakgp.evolve.crossover;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.evolve.GeneticOperator;
 import org.oakgp.node.Node;
 import org.oakgp.select.DummyNodeSelector;

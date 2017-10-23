@@ -10,10 +10,10 @@
 //import nars.term.Compound;
 //import nars.term.Term;
 //import nars.term.var.AbstractVariable;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import static nars.Op.Imdex;
-//import static org.junit.Assert.*;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 ///**
 // * Created by me on 3/23/16.

@@ -3,14 +3,13 @@ package nars.task;
 import nars.truth.Stamp;
 import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static junit.framework.TestCase.assertTrue;
 import static nars.truth.Stamp.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *
@@ -52,7 +51,8 @@ public class StampTest {
         );
     }
 
-    @Ignore @Test public void testStampZipReverse() {
+    @Disabled
+    @Test public void testStampZipReverse() {
 
         long[] a = {1, 2};
         long[] b = {3, 4};
@@ -126,7 +126,7 @@ public class StampTest {
         );
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testStampReversePreservesOldestEvidence() {
         assertArrayEquals(

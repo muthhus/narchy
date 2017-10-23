@@ -12,9 +12,9 @@
 //import nars.nal.Task;
 //import nars.nal.term.Term;
 //import nars.model.impl.Default;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
-//import static org.junit.Assert.assertTrue;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 ///**
 // *

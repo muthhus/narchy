@@ -26,8 +26,6 @@ import jcog.tree.rtree.RTree;
 import jcog.tree.rtree.point.Double2D;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Function;
-
 /**
  * Created by jcovert on 6/15/15.
  */

@@ -2,13 +2,13 @@ package jcog.net;
 
 import jcog.net.attn.HashMapTagSet;
 import jcog.net.attn.TagDigest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
  * Created by me on 5/2/17.

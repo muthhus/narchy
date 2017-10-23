@@ -21,9 +21,9 @@
 //import com.carrotsearch.junitbenchmarks.Clock;
 //import com.google.common.collect.Lists;
 //import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
-//import org.junit.Assert;
+//import static org.junit.jupiter.api.Assertions.*;
 //import org.junit.Rule;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //import org.junit.rules.TestRule;
 //import org.roaringbitmap.buffer.BufferFastAggregation;
 //import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
@@ -78,7 +78,7 @@
 //    final ByteArrayOutputStream out = new ByteArrayOutputStream();
 //    r.serialize(new DataOutputStream(out));
 //    final byte[] bytes = out.toByteArray();
-//    Assert.assertEquals(buf.remaining(), bytes.length);
+//    assertEquals(buf.remaining(), bytes.length);
 //    buf.put(bytes);
 //    buf.rewind();
 //    return new ImmutableRoaringBitmap(buf.asReadOnlyBuffer());
@@ -128,62 +128,62 @@
 //  public void timeConciseUnion() throws Exception
 //  {
 //    ImmutableConciseSet union = ImmutableConciseSet.union(concise);
-//    Assert.assertEquals(unionCount, union.size());
+//    assertEquals(unionCount, union.size());
 //  }
 //
 //  @Test @BenchmarkOptions(warmupRounds = 1, benchmarkRounds = 2)
 //  public void timeOffheapConciseUnion() throws Exception
 //  {
 //    ImmutableConciseSet union = ImmutableConciseSet.union(offheapConcise);
-//    Assert.assertEquals(unionCount, union.size());
+//    assertEquals(unionCount, union.size());
 //  }
 //
 //  @Test @BenchmarkOptions(warmupRounds = 1, benchmarkRounds = 2)
 //  public void timeGenericConciseUnion() throws Exception
 //  {
 //    ImmutableBitmap union = conciseFactory.union(Lists.newArrayList(genericConcise));
-//    Assert.assertEquals(unionCount, union.size());
+//    assertEquals(unionCount, union.size());
 //  }
 //
 //  @Test @BenchmarkOptions(warmupRounds = 1, benchmarkRounds = 5)
 //  public void timeGenericConciseIntersection() throws Exception
 //  {
 //    ImmutableBitmap intersection = conciseFactory.intersection(Lists.newArrayList(genericConcise));
-//    Assert.assertTrue(intersection.size() >= minIntersection);
+//    assertTrue(intersection.size() >= minIntersection);
 //  }
 //
 //  @Test
 //  public void timeRoaringUnion() throws Exception
 //  {
 //    ImmutableRoaringBitmap union = BufferFastAggregation.horizontal_or(Lists.newArrayList(roaring).iterator());
-//    Assert.assertEquals(unionCount, union.getCardinality());
+//    assertEquals(unionCount, union.getCardinality());
 //  }
 //
 //  @Test
 //  public void timeImmutableRoaringUnion() throws Exception
 //  {
 //    ImmutableRoaringBitmap union = BufferFastAggregation.horizontal_or(Lists.newArrayList(immutableRoaring).iterator());
-//    Assert.assertEquals(unionCount, union.getCardinality());
+//    assertEquals(unionCount, union.getCardinality());
 //  }
 //
 //  @Test
 //  public void timeOffheapRoaringUnion() throws Exception
 //  {
 //    ImmutableRoaringBitmap union = BufferFastAggregation.horizontal_or(Lists.newArrayList(offheapRoaring).iterator());
-//    Assert.assertEquals(unionCount, union.getCardinality());
+//    assertEquals(unionCount, union.getCardinality());
 //  }
 //
 //  @Test
 //  public void timeGenericRoaringUnion() throws Exception
 //  {
 //    ImmutableBitmap union = roaringFactory.union(Lists.newArrayList(genericRoaring));
-//    Assert.assertEquals(unionCount, union.size());
+//    assertEquals(unionCount, union.size());
 //  }
 //
 //  @Test
 //  public void timeGenericRoaringIntersection() throws Exception
 //  {
 //    ImmutableBitmap intersection = roaringFactory.intersection(Lists.newArrayList(genericRoaring));
-//    Assert.assertTrue(intersection.size() >= minIntersection);
+//    assertTrue(intersection.size() >= minIntersection);
 //  }
 //}

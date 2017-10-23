@@ -8,11 +8,11 @@ import nars.concept.BaseConcept;
 import nars.table.BeliefTable;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 6/8/15.

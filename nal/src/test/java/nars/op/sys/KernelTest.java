@@ -5,12 +5,12 @@
 //import nars.nar.Default;
 //import org.apache.commons.math3.stat.Frequency;
 //import org.junit.Ignore;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 ///**
 // * experimental , not complete
 // */
-//@Ignore
+//@Disabled
 //public class KernelTest {
 //
 //

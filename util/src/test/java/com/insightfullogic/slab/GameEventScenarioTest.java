@@ -1,9 +1,8 @@
 package com.insightfullogic.slab;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GameEventScenarioTest {
 
@@ -76,16 +75,18 @@ public class GameEventScenarioTest {
 		}
 	}
 
-	@Test(expected = ArrayIndexOutOfBoundsException.class)
+	@Test
 	public void boundsCheckingCatches() {
-		ConcreteCursor.boundsChecking = true;
-		Allocator<GameEvent> eventAllocator = Allocator.of(GameEvent.class);
-		GameEvent event = eventAllocator.allocate(1);
-		try {
-			event.move(2);
-		} finally {
-			event.close();
-		}
+		assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
+			ConcreteCursor.boundsChecking = true;
+			Allocator<GameEvent> eventAllocator = Allocator.of(GameEvent.class);
+			GameEvent event = eventAllocator.allocate(1);
+			try {
+				event.move(2);
+			} finally {
+				event.close();
+			}
+		});
 	}
 
 }

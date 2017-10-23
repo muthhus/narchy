@@ -3,7 +3,7 @@ package nars.nal.nal6;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by me on 11/6/15.

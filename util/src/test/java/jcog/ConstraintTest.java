@@ -16,7 +16,7 @@
 //import org.jacop.core.IntVar;
 //import org.jacop.core.Store;
 //import org.jacop.search.*;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.util.Arrays;
 //import java.util.Map;

@@ -8,10 +8,11 @@ import nars.rl.horde.demons.Demon;
 import nars.rl.horde.functions.HordeUpdatable;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SuppressWarnings("serial")
@@ -87,19 +88,19 @@ public class HordeSchedulerTest {
     }
 
     public void checkDemon(FakeDemon d, final RealVector x_t, final Integer a_t, final RealVector x_tp1) {
-        Assert.assertEquals(d.x_t, x_t);
-        Assert.assertEquals(d.a_t, a_t);
-        Assert.assertEquals(d.x_tp1, x_tp1);
+        assertEquals(d.x_t, x_t);
+        assertEquals(d.a_t, a_t);
+        assertEquals(d.x_tp1, x_tp1);
     }
 
     public void checkFunction(FakeFunction[] fs, final RealVector x_t, final Integer a_t, RealVector o_tp1,
                               final RealVector x_tp1, boolean state) {
         for (FakeFunction f : fs) {
-            Assert.assertEquals(f.o_tp1, o_tp1);
-            Assert.assertEquals(f.x_t, x_t);
-            Assert.assertEquals(f.a_t, a_t);
-            Assert.assertEquals(f.x_tp1, x_tp1);
-            Assert.assertEquals(f.demonState, state);
+            assertEquals(f.o_tp1, o_tp1);
+            assertEquals(f.x_t, x_t);
+            assertEquals(f.a_t, a_t);
+            assertEquals(f.x_tp1, x_tp1);
+            assertEquals(f.demonState, state);
         }
     }
 }

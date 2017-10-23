@@ -1,10 +1,11 @@
 package jcog.bloom;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Created by me on 8/6/15.
@@ -13,29 +14,32 @@ public class LongBitsetBloomFilterTest {
     private static final int COUNT = 100;
     Random rand = new Random(123);
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void testBloomIllegalArg1() {
-        LongBitsetBloomFilter bf = new LongBitsetBloomFilter(0, 0);
+        assertThrows(AssertionError.class, ()-> {
+
+            LongBitsetBloomFilter bf = new LongBitsetBloomFilter(0, 0);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void testBloomIllegalArg2() {
-        LongBitsetBloomFilter bf = new LongBitsetBloomFilter(0, 0.1);
+        assertThrows(AssertionError.class, ()->{LongBitsetBloomFilter bf = new LongBitsetBloomFilter(0, 0.1);});
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void testBloomIllegalArg3() {
-        LongBitsetBloomFilter bf = new LongBitsetBloomFilter(1, 0.0);
+        assertThrows(AssertionError.class, ()->{LongBitsetBloomFilter bf = new LongBitsetBloomFilter(1, 0.0);});
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void testBloomIllegalArg4() {
-        LongBitsetBloomFilter bf = new LongBitsetBloomFilter(1, 1.0);
+        assertThrows(AssertionError.class, ()->{LongBitsetBloomFilter bf = new LongBitsetBloomFilter(1, 1.0);});
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void testBloomIllegalArg5() {
-        LongBitsetBloomFilter bf = new LongBitsetBloomFilter(-1, -1);
+        assertThrows(AssertionError.class, ()->{LongBitsetBloomFilter bf = new LongBitsetBloomFilter(-1, -1);});
     }
 
 

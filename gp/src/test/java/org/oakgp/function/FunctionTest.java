@@ -15,12 +15,12 @@
  */
 package org.oakgp.function;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Arguments;
 import org.oakgp.Assignments;
 import org.oakgp.Type;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FunctionTest {
     @Test

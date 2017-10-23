@@ -1,17 +1,17 @@
 package alice.tuprolog;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static alice.tuprolog.TestGolog.theory;
-import static org.junit.Assert.assertEquals;
 
 public class TestEinsteinRiddle {
     
-    @Ignore
+    @Disabled
     @Test
     public void einsteinsRiddle() throws InterruptedException, IOException, URISyntaxException, InvalidTheoryException {
 
@@ -25,7 +25,7 @@ public class TestEinsteinRiddle {
                 if (finished[0])
                     return;
 
-                assertEquals("yes.\nX / german", o.toString());
+                Assertions.assertEquals("yes.\nX / german", o.toString());
                 finished[0] = true;
             });
     }

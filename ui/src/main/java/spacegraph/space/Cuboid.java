@@ -1,13 +1,11 @@
 package spacegraph.space;
 
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.math.Quaternion;
 import jcog.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SimpleSpatial;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
-import spacegraph.math.AxisAngle4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.ClosestRay;

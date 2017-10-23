@@ -8,8 +8,9 @@ import nars.rl.horde.functions.RewardFunction;
 import nars.rl.horde.functions.TD;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class HordeTest {
@@ -65,7 +66,7 @@ public class HordeTest {
         PredictionDemon predictionDemon = new PredictionDemon(RewardFunction01, td);
         PredictionDemonVerifier verifier = new PredictionDemonVerifier(td.gamma(), predictionDemon);
         runExperiment(predictionDemon, verifier);
-        Assert.assertEquals(RewardFunction01.reward(), predictionDemon.prediction(), 1.0);
+        assertEquals(RewardFunction01.reward(), predictionDemon.prediction(), 1.0);
     }
 
     private void runExperiment(PredictionDemon predictionDemon, PredictionDemonVerifier verifier) {
@@ -84,7 +85,7 @@ public class HordeTest {
             demonVerifier.update(false);
             x_t = x_tp1;
             time++;
-            Assert.assertTrue(time < maxStep);
+            assertTrue(time < maxStep);
         }
     }
 
@@ -95,7 +96,7 @@ public class HordeTest {
         PredictionDemon predictionDemon = new PredictionDemon(RewardFunction01, td);
         PredictionDemonVerifier verifier = new PredictionDemonVerifier(td.gamma(), predictionDemon);
         runExperiment(predictionDemon, verifier);
-        Assert.assertEquals(RewardFunction01.reward() / (1 - gamma), predictionDemon.prediction(), 1.0);
+        assertEquals(RewardFunction01.reward() / (1 - gamma), predictionDemon.prediction(), 1.0);
     }
 
     @Test

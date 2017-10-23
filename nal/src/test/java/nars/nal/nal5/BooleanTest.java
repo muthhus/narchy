@@ -5,11 +5,11 @@ import nars.concept.Concept;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * NAL5 Boolean / Boolean Satisfiability / Boolean Conditionality
@@ -105,14 +105,14 @@ public class BooleanTest {
             }
             boolean thisone = ((ex == i) && (ey == j));
             if (thisone && b == null)
-                assertTrue("unrecognized true case", false);
+                assertTrue(false, "unrecognized true case");
 
 
             if (thisone && b.isNegative() && b.conf() > confThresh)
-                assertTrue("wrong true case:\n" + t.proof(), false);
+                assertTrue(false, "wrong true case:\n" + t.proof());
 
             if (!thisone && b != null && b.isPositive() && b.conf() > confThresh)
-                assertTrue("wrong false case:\n" + t.proof(), false);
+                assertTrue(false, "wrong false case:\n" + t.proof());
 
         }
 

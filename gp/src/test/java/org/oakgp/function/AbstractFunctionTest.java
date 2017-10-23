@@ -15,7 +15,7 @@
  */
 package org.oakgp.function;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Arguments;
 import org.oakgp.Assignments;
 import org.oakgp.Type;
@@ -31,7 +31,7 @@ import java.io.UncheckedIOException;
 import java.util.Observable;
 import java.util.Observer;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.node.NodeType.isFunction;
 import static org.oakgp.util.Utils.createIntegerTypeArray;
 

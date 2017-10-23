@@ -70,7 +70,7 @@ public class TinySet extends BitwiseArray2 {
 
 		while(!(FingerPrintAux.Equals(fpTocomper,otherFingerprint))) 
 		{
-			//			Assert.assertTrue(!FingerPrintAux.Equals(otherFingerprint,0l));
+			//			assertTrue(!FingerPrintAux.Equals(otherFingerprint,0l));
 			if(FingerPrintAux.isLast(otherFingerprint))
 			{
 				System.err.println("Item not found!");

@@ -13,13 +13,13 @@ import nars.concept.ScalarConcepts;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.StreamSupport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by me on 7/2/16.
@@ -42,7 +42,7 @@ public class ScalarConceptsTest {
 //        );
 //    }
 
-    @Ignore
+    @Disabled
     @Test
     public void testRewardConceptsFuzzification3() {
         NAR n = NARS.shell();

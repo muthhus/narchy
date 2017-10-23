@@ -10,12 +10,12 @@
 //import nars.term.Termed;
 //import nars.term.atom.Atom;
 //import nars.term.compound.Compound;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.util.Arrays;
 //
 //import static nars.$.$;
-//import static org.junit.Assert.*;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 //
 ///** various tests of the Sequence and Parallel term types */

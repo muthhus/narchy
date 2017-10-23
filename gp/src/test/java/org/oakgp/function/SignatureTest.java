@@ -15,12 +15,12 @@
  */
 package org.oakgp.function;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Type;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.assertUnmodifiable;
 import static org.oakgp.Type.booleanType;
 import static org.oakgp.Type.integerType;
@@ -41,12 +41,9 @@ public class SignatureTest {
     }
 
     private void assertArrayIndexOutOfBoundsException(Signature signature, int index) {
-        try {
+        assertThrows(ArrayIndexOutOfBoundsException.class, ()->{
             signature.argType(index);
-            fail();
-        } catch (ArrayIndexOutOfBoundsException e) {
-            // expected
-        }
+        });
     }
 
     @Test

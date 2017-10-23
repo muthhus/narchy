@@ -3,15 +3,14 @@ package nars.rdfowl;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
-import static junit.framework.TestCase.assertTrue;
+
 
 /**
  * Created by me on 9/13/16.
@@ -28,7 +27,7 @@ public class NQuadsRDFTest {
         assertTrue(n.terms.size() > 2);
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testSchema1() throws Exception {
         final NAR n = NARS.tmp();
@@ -67,7 +66,7 @@ public class NQuadsRDFTest {
 //        });
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testSchema2() throws Exception {
 

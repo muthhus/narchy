@@ -4,11 +4,11 @@
 //import nars.nar.Default;
 //import org.codehaus.commons.compiler.CompileException;
 //import org.codehaus.janino.ExpressionEvaluator;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.lang.reflect.InvocationTargetException;
 //
-//import static org.junit.Assert.assertEquals;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 //
 //public class javaTest  {

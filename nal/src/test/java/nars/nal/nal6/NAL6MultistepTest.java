@@ -7,10 +7,10 @@ import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.time.Tense;
 import nars.truth.Truth;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Created by me on 10/29/16.

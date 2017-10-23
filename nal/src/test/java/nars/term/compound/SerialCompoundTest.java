@@ -2,11 +2,11 @@ package nars.term.compound;
 
 import nars.Narsese;
 import nars.term.Compound;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static nars.$.$;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by me on 2/19/17.

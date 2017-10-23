@@ -15,7 +15,7 @@
  */
 package org.oakgp.examples.ant;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ArtificialAntSystemTest {
     @Test

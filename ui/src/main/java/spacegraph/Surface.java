@@ -6,13 +6,9 @@ import jcog.Texts;
 import jcog.tree.rtree.rect.RectFloat2D;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
-import spacegraph.layout.Layout;
 import spacegraph.math.v2;
 
 import java.io.PrintStream;
-import java.util.function.Consumer;
-
-import static spacegraph.Surface.Align.Center;
 
 /**
  * planar subspace.

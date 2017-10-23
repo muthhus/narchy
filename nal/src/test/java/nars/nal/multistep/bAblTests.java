@@ -1,15 +1,15 @@
 package nars.nal.multistep;
 
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.BELIEF;
 
 /**
  * see bAbl.nal
  */
-public class bAblTests extends AbstractNALTest {
+public class bAblTests extends NALTest {
 
 
 

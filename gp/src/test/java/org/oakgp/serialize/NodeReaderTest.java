@@ -15,7 +15,7 @@
  */
 package org.oakgp.serialize;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Arguments;
 import org.oakgp.function.Function;
 import org.oakgp.function.classify.IsPositive;
@@ -30,7 +30,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.*;
 import static org.oakgp.Type.*;
 import static org.oakgp.util.Void.VOID;
@@ -51,7 +51,7 @@ public class NodeReaderTest {
             assertTrue(nr.isEndOfStream());
             try {
                 nr.readNode();
-                fail();
+                fail("");
             } catch (IllegalStateException e) {
                 // expected
             }
@@ -237,7 +237,7 @@ public class NodeReaderTest {
         String input = "TEST";
         try (NodeReader r = new NodeReader(input, new Function[0], new ConstantNode[0], VariableSet.createVariableSet())) {
             r.readNode();
-            fail();
+            fail("");
         } catch (IllegalArgumentException e) {
             // expected
             assertEquals("Could not find version of function: TEST in: []", e.getMessage());
@@ -334,7 +334,7 @@ public class NodeReaderTest {
     private void assertReadException(String input, String expectedMessage) {
         try {
             readNode(input);
-            fail();
+            fail("");
         } catch (RuntimeException e) {
             assertEquals(expectedMessage, e.getMessage());
         }

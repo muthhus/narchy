@@ -42,7 +42,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.oakgp.Type.*;
@@ -67,7 +67,7 @@ public class TestUtils {
         assertEquals("java.util.Collections$UnmodifiableRandomAccessList", list.getClass().getName());
         try {
             list.add(new Object());
-            fail();
+            fail("");
         } catch (UnsupportedOperationException e) {
             // expected
         }

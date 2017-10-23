@@ -8,21 +8,21 @@
 //import nars.term.var.Variable;
 //import nars.time.Tense;
 //import org.junit.Ignore;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 //import java.util.ArrayList;
 //import java.util.List;
 //
 //import static jcog.io.SparkLine.renderFloats;
-//import static org.junit.Assert.assertEquals;
-//import static org.junit.Assert.assertTrue;
+//import static org.junit.jupiter.api.Assertions.*;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 ///**
 // * Created by me on 3/4/17.
 // */
 //public class Line1DSimplestTest {
 //
-//    @Ignore @Test
+//    @Disabled @Test
 //    public void testScripted() throws Narsese.NarseseException {
 //
 //        Param.DEBUG = true;
@@ -192,7 +192,7 @@
 //
 //
 //    /** tests with an explicit rule provided that will help it succeed */
-//    @Ignore
+//    @Disabled
 //    @Test public void testSimpleCheat() throws Narsese.NarseseException {
 //
 //

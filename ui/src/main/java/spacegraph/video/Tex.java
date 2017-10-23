@@ -2,7 +2,6 @@ package spacegraph.video;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
 import jcog.tree.rtree.rect.RectFloat2D;

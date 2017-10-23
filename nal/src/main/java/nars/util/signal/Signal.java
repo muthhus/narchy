@@ -8,7 +8,6 @@ import nars.task.SignalTask;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
-import org.eclipse.collections.api.block.procedure.primitive.LongObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

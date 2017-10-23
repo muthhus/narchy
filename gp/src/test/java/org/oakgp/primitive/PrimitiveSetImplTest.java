@@ -15,7 +15,7 @@
  */
 package org.oakgp.primitive;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.Type;
 import org.oakgp.function.Function;
 import org.oakgp.function.choice.If;
@@ -26,7 +26,7 @@ import org.oakgp.node.VariableNode;
 import org.oakgp.util.DummyRandom;
 import org.oakgp.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.oakgp.TestUtils.*;

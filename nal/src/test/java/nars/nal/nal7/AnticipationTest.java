@@ -5,12 +5,12 @@
 //import nars.op.mental.Anticipate;
 //import nars.test.TestNAR;
 //import org.junit.Ignore;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
 ///**
 // * Created by me on 1/21/16.
 // */
-//@Ignore
+//@Disabled
 //public class AnticipationTest {
 //
 //    @Test

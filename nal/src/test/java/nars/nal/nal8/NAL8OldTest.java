@@ -5,13 +5,13 @@
 //import nars.nal.AbstractNALTest;
 //import nars.test.TestNAR;
 //import org.junit.Ignore;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //import org.junit.runner.RunWith;
 //import org.junit.runners.Parameterized;
 //
 //import java.util.function.Supplier;
 //
-//@Ignore
+//@Disabled
 //@RunWith(Parameterized.class)
 //public class NAL8OldTest extends AbstractNALTest {
 //

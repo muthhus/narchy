@@ -2,14 +2,14 @@ package nars.nal.nal4;
 
 import nars.Narsese;
 import nars.test.TestNAR;
-import nars.util.AbstractNALTest;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import nars.util.NALTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-public class NAL4MultistepTest extends AbstractNALTest {
+public class NAL4MultistepTest extends NALTest {
 
-    @Before
+    @BeforeEach
     public void nal() { test.nar.nal(4); }
 
 
@@ -62,7 +62,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
     }
 
-    @Test @Ignore
+    @Test @Disabled
     public void nal4_everyday_reasoning_easier() throws Narsese.NarseseException {
         int time = 2550;
 

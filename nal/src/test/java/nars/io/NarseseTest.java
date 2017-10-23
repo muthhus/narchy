@@ -11,17 +11,17 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 import static nars.$.$;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
-@Ignore
+@Disabled
 public class NarseseTest {
 
 
@@ -39,7 +39,7 @@ public class NarseseTest {
                 if (e instanceof Bool) {
                     assertTrue(true);
                 } else {
-                    assertTrue(s + " should not be parseable but got: " + e, false); //must throw exception
+                    assertTrue(false, s + " should not be parseable but got: " + e); //must throw exception
                 }
             } catch (Narsese.NarseseException | InvalidTermException e) {
                 assertTrue(true);
@@ -49,7 +49,7 @@ public class NarseseTest {
 
 
     protected void testProductABC(@NotNull Compound p) {
-        assertEquals(p + " should have 3 sub-terms", 3, p.subs());
+        assertEquals(3, p.subs(), p + " should have 3 sub-terms");
         assertEquals("a", p.sub(0).toString());
         assertEquals("b", p.sub(1).toString());
         assertEquals("c", p.sub(2).toString());
@@ -159,7 +159,7 @@ public class NarseseTest {
             } catch (InvalidTaskException good) {
                 assertTrue(true); //what should happen
             } catch (Exception e) {
-                assertTrue(e.toString(), false); //something else happend
+                assertTrue(false, e.toString()); //something else happend
             }
 
         }

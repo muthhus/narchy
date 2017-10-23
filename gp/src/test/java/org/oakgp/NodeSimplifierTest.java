@@ -15,16 +15,16 @@
  */
 package org.oakgp;
 
-import org.junit.ComparisonFailure;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.function.Function;
 import org.oakgp.function.Signature;
 import org.oakgp.node.ConstantNode;
 import org.oakgp.node.FunctionNode;
 import org.oakgp.node.Node;
 import org.oakgp.util.NodeSimplifier;
+import org.opentest4j.AssertionFailedError;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.oakgp.TestUtils.*;
 
 public class NodeSimplifierTest {
@@ -201,12 +201,14 @@ public class NodeSimplifierTest {
     @Test
     public void testSanityCheckDoesFail() {
         // check that the "when/expect" pattern used in these tests does actually fail when the results are not as expected
-        try {
+//        try {
+        assertThrows(AssertionFailedError.class, ()->{
             when("(+ v0 v1)").expect("(+ v1 v0)");
-            fail();
-        } catch (ComparisonFailure e) {
-            assertEquals("9 vs. 9 expected:<(+ v[1 v0])> but was:<(+ v[0 v1])>", e.getMessage());
-        }
+            fail("");
+        });
+//        } catch (ComparisonFailure e) {
+//            assertEquals("9 vs. 9 expected:<(+ v[1 v0])> but was:<(+ v[0 v1])>", e.getMessage());
+//        }
     }
 
     @Test
@@ -279,7 +281,7 @@ public class NodeSimplifierTest {
             String simplifiedVersionString = writeNode(simplifiedVersion);
             for (Object[] assignedValue : assignedValues) {
                 Assignments assignments = new Assignments(assignedValue);
-                assertEquals(simplifiedVersionString, evaluate(inputNode, assignments), evaluate(simplifiedVersion, assignments));
+                assertEquals(evaluate(inputNode, assignments), evaluate(simplifiedVersion, assignments), simplifiedVersionString);
             }
 
             // test actual simplified version matches expected

@@ -7,16 +7,14 @@ import jcog.tree.rtree.rect.RectDouble2D;
 import jcog.tree.rtree.rect.RectFloatND;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntFunction;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 12/21/16.
@@ -39,10 +37,10 @@ public class RTreeNDTest {
         assertEquals(7, n);
 
         for (int i = 0; i < n; i++) {
-            Assert.assertTrue(result[i].coord(0) >= 2);
-            Assert.assertTrue(result[i].coord(0) <= 8);
-            Assert.assertTrue(result[i].coord(1) >= 2);
-            Assert.assertTrue(result[i].coord(1) <= 8);
+            assertTrue(result[i].coord(0) >= 2);
+            assertTrue(result[i].coord(0) <= 8);
+            assertTrue(result[i].coord(1) >= 2);
+            assertTrue(result[i].coord(1) <= 8);
         }
     }
 
@@ -76,21 +74,22 @@ public class RTreeNDTest {
             }
 
             final int expectedCount = 9;
-            //Assert.assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
+            //assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
 
-            assertEquals("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
+            assertEquals(expectedCount, resultCount, "[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount);
 
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             Collections.sort(results);
             for (int i = 0; i < resultCount; i++) {
-                assertTrue("Unexpected result found", results.get(i).min.coord(0) == i + 2 && results.get(i).min.coord(1) == i + 2 && results.get(i).max.coord(0) == i + 5 && results.get(i).max.coord(1) == i + 5);
+                assertTrue(results.get(i).min.coord(0) == i + 2 && results.get(i).min.coord(1) == i + 2 && results.get(i).max.coord(0) == i + 5 && results.get(i).max.coord(1) == i + 5, "Unexpected result found");
             }
 
             System.out.println("\t" + rTree.stats());
         }
     }
 
-    @Ignore @Test
+    @Disabled
+    @Test
     public void testSearchAllWithOneDimensionRandomlyInfinite() {
         System.out.println("\n\nINfinites");
         final int entryCount = 400;
@@ -140,12 +139,12 @@ public class RTreeNDTest {
                 }
 
                 final int expectedCount = rects.length;
-                //Assert.assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
-                Assert.assertTrue("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount,
-                        Math.abs(expectedCount - foundCount) < 10 /* in case of duplicates */);
+                //assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
+                assertTrue(Math.abs(expectedCount - foundCount) < 10,
+                        "[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount /* in case of duplicates */);
 
-                Assert.assertTrue("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount,
-                        Math.abs(expectedCount - resultCount) < 10 /* in case of duplicates */);
+                assertTrue(Math.abs(expectedCount - resultCount) < 10,
+                        "[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount /* in case of duplicates */);
 
                 Set<RectFloatND> output = new HashSet();
                 Collections.addAll(output, results);
@@ -190,17 +189,17 @@ public class RTreeNDTest {
             }
 
             final int expectedCount = 3;
-            assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
-            assertEquals("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
+            assertEquals(expectedCount, foundCount, "[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount);
+            assertEquals(expectedCount, resultCount, "[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount);
 
             Arrays.sort(results);
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             for (int i = 0; i < resultCount; i++) {
-                Assert.assertTrue("Unexpected result found:" + results[i],
-                Util.equals(results[i].min.x, (double) (i + 5), RTree.EPSILON) &&
-                        Util.equals(results[i].min.y, (double) (i + 5), RTree.EPSILON) &&
-                        Util.equals(results[i].max.x, (double) (i + 8), RTree.EPSILON) &&
-                        Util.equals(results[i].max.y, (double) (i + 8), RTree.EPSILON));
+                assertTrue(Util.equals(results[i].min.x, (double) (i + 5), RTree.EPSILON) &&
+                                Util.equals(results[i].min.y, (double) (i + 5), RTree.EPSILON) &&
+                                Util.equals(results[i].max.x, (double) (i + 8), RTree.EPSILON) &&
+                                Util.equals(results[i].max.y, (double) (i + 8), RTree.EPSILON),
+                        "Unexpected result found:" + results[i]);
             }
         }
     }
@@ -229,18 +228,19 @@ public class RTreeNDTest {
             final int resultCount = results.size();
 
 
-            assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
-            assertEquals("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
+            assertEquals(expectedCount, resultCount, "[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + resultCount);
+            assertEquals(
+                    expectedCount, resultCount, "[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount);
 
             Collections.sort(results);
 
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             for (int i = 0; i < resultCount; i++) {
-                Assert.assertTrue("Unexpected result found",
-                Util.equals(results.get(i).min.x, (double) (i + 2), RTree.EPSILON) &&
-                        Util.equals(results.get(i).min.y, (double) (i + 2), RTree.EPSILON) &&
-                        Util.equals(results.get(i).max.x, (double) (i + 5), RTree.EPSILON) &&
-                        Util.equals(results.get(i).max.y, (double) (i + 5), RTree.EPSILON));
+                assertTrue(Util.equals(results.get(i).min.x, (double) (i + 2), RTree.EPSILON) &&
+                                Util.equals(results.get(i).min.y, (double) (i + 2), RTree.EPSILON) &&
+                                Util.equals(results.get(i).max.x, (double) (i + 5), RTree.EPSILON) &&
+                                Util.equals(results.get(i).max.y, (double) (i + 5), RTree.EPSILON),
+                        "Unexpected result found");
             }
         }
     }
@@ -304,8 +304,8 @@ public class RTreeNDTest {
             assertEquals(entryCount, visitCount.get());
 
             final int expectedCount = entryCount;
-            assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
-            assertEquals("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
+            assertEquals(expectedCount, foundCount, "[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount);
+            assertEquals(expectedCount, resultCount, "[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount);
         }
     }
 
@@ -313,7 +313,7 @@ public class RTreeNDTest {
      * Collect stats making the structure of trees of each split type
      * more visible.
      */
-    @Ignore
+    @Disabled
     // This test ignored because output needs to be manually evaluated.
     public void treeStructureStatsTest() {
 
@@ -339,7 +339,7 @@ public class RTreeNDTest {
      * - Evals for QUADRATIC tree increases with size of the search bounding box.
      * - QUADRATIC seems to be ideal for small search bounding boxes.
      */
-    @Ignore
+    @Disabled
     // This test ignored because output needs to be manually evaluated.
     public void treeSearchStatsTest() {
 
@@ -384,10 +384,9 @@ public class RTreeNDTest {
         assertEquals(rTree.size(), rects.length);
 
         for (int i = 0; i < rects.length; i++) {
-            Assert.assertFalse(rTree.containedAsSet(rects[i]).isEmpty());
+            assertFalse(rTree.containedAsSet(rects[i]).isEmpty());
         }
     }
-
 
 
     @Test
@@ -407,16 +406,16 @@ public class RTreeNDTest {
 
         assertEquals(1, rTree.size());
 
-        Assert.assertFalse("Missing hyperRect that should  be found " + rects[0], rTree.containedAsSet(rects[0]).isEmpty());
+        assertFalse(rTree.containedAsSet(rects[0]).isEmpty(), "Missing hyperRect that should  be found " + rects[0]);
 
         for (int i = 1; i < rects.length; i++) {
-            Assert.assertTrue("Found hyperRect that should have been removed on search " + rects[i], rTree.containedAsSet(rects[i]).isEmpty());
+            assertTrue(rTree.containedAsSet(rects[i]).isEmpty(), "Found hyperRect that should have been removed on search " + rects[i]);
         }
 
         final RectDouble2D hr = new RectDouble2D(0, 0, 5, 5);
         rTree.add(hr);
-        Assert.assertFalse(rTree.containedAsSet(hr).isEmpty());
-        Assert.assertTrue("Found hyperRect that should have been removed on search", rTree.size() != 0);
+        assertFalse(rTree.containedAsSet(hr).isEmpty());
+        assertTrue(rTree.size() != 0, "Found hyperRect that should have been removed on search");
     }
 
     @Test
@@ -461,7 +460,7 @@ public class RTreeNDTest {
         assertEquals(0, rTree.size());
 
         for (int i = 0; i < rect.length; i++) {
-            Assert.assertTrue("Found hyperRect that should have been removed " + rect[i], rTree.containedAsSet(rect[i]).isEmpty());
+            assertTrue(rTree.containedAsSet(rect[i]).isEmpty(), "Found hyperRect that should have been removed " + rect[i]);
         }
     }
 
@@ -486,10 +485,10 @@ public class RTreeNDTest {
         assertEquals(0, rTree.size());
 
         for (int i = 0; i < N; i++) {
-            Assert.assertTrue("#" + i + " of " + rect.length + ": Found hyperRect that should have been removed" + rect[i], rTree.containedAsSet(rect[i]).isEmpty());
+            assertTrue(rTree.containedAsSet(rect[i]).isEmpty(), "#" + i + " of " + rect.length + ": Found hyperRect that should have been removed" + rect[i]);
         }
 
-        Assert.assertFalse("Found hyperRect that should have been removed on search ", rTree.size() > 0);
+        assertFalse(rTree.size() > 0, "Found hyperRect that should have been removed on search ");
     }
 
     @Test
@@ -498,14 +497,14 @@ public class RTreeNDTest {
 
         RectDouble2D rect = new RectDouble2D(0, 0, 2, 2);
         rTree.add(rect);
-        Assert.assertTrue("Did not add HyperRect to Tree", rTree.size() > 0);
+        assertTrue(rTree.size() > 0, "Did not add HyperRect to Tree");
         rTree.remove(rect);
-        Assert.assertTrue("Did not remove HyperRect from Tree", rTree.size() == 0);
+        assertTrue(rTree.size() == 0, "Did not remove HyperRect from Tree");
         rTree.add(rect);
-        Assert.assertTrue("Tree nulled out and could not add HyperRect back in", rTree.size() > 0);
+        assertTrue(rTree.size() > 0, "Tree nulled out and could not add HyperRect back in");
     }
 
-    @Ignore
+    @Disabled
     // This test ignored because output needs to be manually evaluated.
     public void treeRemoveAndRebalanceTest() {
         final RTree<RectDouble2D> rTree = createRectDouble2DTree(Spatialization.DefaultSplits.QUADRATIC);
@@ -569,7 +568,7 @@ public class RTreeNDTest {
         rTree.replace(oldRect, newRect);
         RectDouble2D[] results = new RectDouble2D[2];
         final int num = rTree.containedToArray(newRect, results);
-        Assert.assertTrue("Did not find the updated HyperRect", num == 1);
+        assertTrue(num == 1, "Did not find the updated HyperRect");
         System.out.print(results[0]);
     }
 
@@ -578,11 +577,12 @@ public class RTreeNDTest {
     }
 
     static RTree<RectDouble2D> createRectDouble2DTree(int minM, int maxM, Spatialization.DefaultSplits splitType) {
-        return new RTree<>(new RectDouble2D.Builder(), minM, maxM, splitType);
+        return new RTree<>((x -> x), minM, maxM, splitType);
     }
 
     @Test
-    @Ignore public void testAddsubtreeWithSideTree() {
+    @Disabled
+    public void testAddsubtreeWithSideTree() {
         final RTree<RectDouble2D> rTree = createRectDouble2DTree(3, 6, Spatialization.DefaultSplits.QUADRATIC);
 
         final RectDouble2D search;

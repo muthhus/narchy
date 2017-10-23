@@ -6,10 +6,10 @@
 //import nars.NAR;
 //import nars.concept.Concept;
 //import nars.nar.Default;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
-//import static junit.framework.TestCase.assertNotNull;
-//import static junit.framework.TestCase.assertTrue;
+//
+//
 //
 ///**
 // * Created by me on 5/7/15.

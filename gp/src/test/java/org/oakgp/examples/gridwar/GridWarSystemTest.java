@@ -15,7 +15,7 @@
  */
 package org.oakgp.examples.gridwar;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GridWarSystemTest {
     @Test

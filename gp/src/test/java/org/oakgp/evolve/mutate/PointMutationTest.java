@@ -15,7 +15,7 @@
  */
 package org.oakgp.evolve.mutate;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.oakgp.evolve.GeneticOperator;
 import org.oakgp.function.Function;
 import org.oakgp.function.classify.IsZero;
@@ -28,8 +28,8 @@ import org.oakgp.select.DummyNodeSelector;
 import org.oakgp.util.DummyRandom;
 import org.oakgp.util.DummyValuesMap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.oakgp.TestUtils.integerConstant;
 import static org.oakgp.util.DummyRandom.GetIntExpectation.nextInt;
 

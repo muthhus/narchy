@@ -3,7 +3,7 @@ package nars.concept;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 public class TermLinkTest {

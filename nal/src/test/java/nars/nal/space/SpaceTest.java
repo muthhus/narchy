@@ -8,9 +8,9 @@
 //import nars.term.container.TermContainer;
 //import nars.term.container.TermVector;
 //import org.jetbrains.annotations.NotNull;
-//import org.junit.Test;
+//import org.junit.jupiter.api.Test;
 //
-//import static org.junit.Assert.*;
+//import static org.junit.jupiter.api.Assertions.*;
 //
 ///**
 // * Created by me on 1/7/16.

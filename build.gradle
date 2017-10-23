@@ -6,6 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+        classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.0'
     }
 }
 
@@ -15,8 +16,8 @@ plugins {
 }
 
 buildScan {
-  licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-  licenseAgree = 'yes'
+    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
+    licenseAgree = 'yes'
 }
 
 allprojects {
@@ -26,10 +27,10 @@ allprojects {
     version = '1.0'
 }
 
-
 subprojects {
     apply plugin: 'java'
     apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'com.kncept.junit5.reporter'
 
     sourceCompatibility = 1.9
     targetCompatibility = 1.9
@@ -53,5 +54,17 @@ subprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }
 
+    junitHtmlReport {
+        //https://github.com/kncept/junit-reporter
+        // If true, then instead of producing multiple reports per test folder (test run),
+        // aggregate them all together into the test-reports root directory.
+        //
+        // Also use this if all your test results end up directly in the test-results directory
+        aggregated = true
 
+        //RAG status css overrides
+        cssRed = 'red'
+        cssAmber = 'orange'
+        cssGreen = 'green'
+    }
 }
