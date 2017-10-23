@@ -122,27 +122,27 @@ public class TemporalTermTest {
     public void testEventsWithRepeatParallel() throws Narsese.NarseseException {
 
         assertEquals("[a:0, b:0]",
-                $("(a&|b)").events().toString());
+                $("(a&|b)").eventList().toString());
 
         assertEquals(
                 "[(a&|b):0, (b&|c):5]",
                 //"[a:0, b:0, (a&|b):0, b:5, c:5, (b&|c):5]",
-                $("((a&|b) &&+5 (b&|c))").events().toString());
+                $("((a&|b) &&+5 (b&|c))").eventList().toString());
 
     }
 
     @Test
     public void testEventsWithXTERNAL() throws Narsese.NarseseException {
         //cant decompose
-        assertEquals("[(x &&+- y):0]", $("(x &&+- y)").events().toString());
-        assertEquals("[(x &&+- y):0, z:1]", $("((x &&+- y) &&+1 z)").events().toString());
+        assertEquals("[0:(x &&+- y)]", $("(x &&+- y)").eventList().toString());
+        assertEquals("[0:(x &&+- y), 1:z]", $("((x &&+- y) &&+1 z)").eventList().toString());
     }
 
     @Test
     public void testEventsWithDTERNAL() throws Narsese.NarseseException {
         //cant decompose
-        assertEquals("[(x&&y):0]", $("(x && y)").events().toString());
-        assertEquals("[(x&&y):0, z:1]", $("((x && y) &&+1 z)").events().toString());
+        assertEquals("[0:(x&&y)]", $("(x && y)").eventList().toString());
+        assertEquals("[0:(x&&y), 1:z]", $("((x && y) &&+1 z)").eventList().toString());
     }
 
     @Test
@@ -229,8 +229,8 @@ public class TemporalTermTest {
     @Test
     public void testParseOperationInFunctionalForm2() throws Narsese.NarseseException {
         assertEquals(
-                //"(do(that) &&+0 ((a)&&(b)))",
-                "(&|,do(that),(a),(b))",
+                "(((a)&&(b))&|do(that))",
+                //"(&|,do(that),(a),(b))",
                 $.$("(do(that) &&+0 ((a)&&(b)))").toString());
 
         Termed nt = $.$("(((that)-->do) &&+0 ((a)&&(b)))");

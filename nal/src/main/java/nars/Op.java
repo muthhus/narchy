@@ -15,13 +15,16 @@ import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.var.UnnormalizedVariable;
 import nars.time.Tense;
+import org.eclipse.collections.api.block.predicate.primitive.LongObjectPredicate;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.map.primitive.ObjectByteMap;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
+import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
-import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
@@ -35,6 +38,7 @@ import java.util.function.Predicate;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.term.Terms.flatten;
+import static nars.term.Terms.sorted;
 import static nars.time.Tense.*;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
@@ -199,16 +203,63 @@ public enum Op {
                 }
             }
 
+            if ((dt == 0 || dt == DTERNAL) && u.length == 2) {
+                if (conegated(u[0], u[1]))
+                    return False;
+            }
 
-            if (dt == DTERNAL || dt == 0) {
+            Term ci;
+            if (dt == 0) {
+                ci = u[0];
+                for (int i = 1; i < u.length; i++) {
 
-                //eternal or commutive
-                return implInConjReduction(junctionFlat(dt, u));
+                    //HACK cut to prevent infinite recursion due to impl conj reduction
+                    if (u[0].op() == IMPL && u[0].containsRecursively(u[1].unneg())) {
+                        Term ui = u[0];
+                        int id = ui.dt();
+
+                        {
+                            Term uis = ui.sub(0);
+                            if (uis.equals(u[1]))
+                                continue; //already absorbed into the subject
+                            if (uis.op() == CONJ) {
+                                LongObjectHashMap<Term> uism = uis.eventMap(0);
+                                Term uismNOW = uism.get(0);
+                                if (uismNOW.equals(u[1]))
+                                    return True;
+                                if (uismNOW.unneg().equals(u[1]))
+                                    return Null; //co-negation
+                            }
+                        }
+
+                        if (id == DTERNAL || id == 0) { //simultaneous with now
+                            Term uip = ui.sub(1);
+                            if (uip.equals(u[1]))
+                                return True;
+                            if (uip.op() == CONJ) {
+                                LongObjectHashMap<Term> uipm = uip.eventMap(0);
+                                Term uipmNOW = uipm.get(0);
+                                if (uipmNOW.equals(u[1]))
+                                    return True;
+                                if (uipmNOW.unneg().equals(u[1]))
+                                    return Null; //co-negation
+                            }
+                        }
+                    }
+
+                    ci = conjMerge(ci, 0, u[i], 0);
+                    if (ci instanceof Bool)
+                        return ci;
+                }
+
+            } else if (dt == DTERNAL) {
+
+                ci = junctionFlat(dt, u);
 
             } else {
 
                 //sequence or xternal
-                assert(n==2): "invalid non-commutive conjunction arity!=2, arity=" + n;
+                assert (n == 2) : "invalid non-commutive conjunction arity!=2, arity=" + n;
 
                 if (dt == XTERNAL) {
                     Arrays.sort(u); //pre-sort
@@ -277,36 +328,20 @@ public enum Op {
                             Term x = a;
                             a = b;
                             b = x;
-                            return conjMerge(a, 0, b, -dt + a.dtRange());
+                            ci = conjMerge(a, 0, b, -dt + a.dtRange());
                         } else {
 //                                if (heavyRight) {
 //                                    return conjMerge(b, 0, a, dt + a.dtRange());
 //                                } else {
-                            return conjMerge(a, 0, b, dt + a.dtRange());
+                            ci = conjMerge(a, 0, b, dt + a.dtRange());
 //                                }
                         }
                     }
                 }
 
-//                {
-//
-//                    int order = a.compareTo(b);
-//                    if (order == 0) {
-//                        dt = Math.abs(dt);
-//                    } else if (order > 0) {
-//                        //ensure lexicographic ordering
-//                        Term x = u[0];
-//                        u[0] = u[1];
-//                        u[1] = x; //swap
-//                        dt = -dt;
-//                    }
-//                }
-//
-//                return implInConjReduction(
-//                        compound(CONJ, dt, u)
-//                );
-
             }
+
+            return implInConjReduction(ci);
         }
 
 
@@ -314,8 +349,8 @@ public enum Op {
          * flattening conjunction builder, for (commutive) multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
          * see: https://en.wikipedia.org/wiki/Boolean_algebra#Monotone_laws
          */
-        @NotNull
-        private Term junctionFlat(int dt, @NotNull final Term... u) {
+        /*@NotNull*/
+        private Term junctionFlat(int dt, final Term[] u) {
 
             //TODO if there are no negations in u then an accelerated construction is possible
 
@@ -323,17 +358,13 @@ public enum Op {
 
 
             //simple accelerated case:
-            if (u.length == 2) {
-                if ((u[0].op() == NEG && u[0].unneg().equals(u[1])) ||
-                        (u[1].op() == NEG && u[1].unneg().equals(u[0])))
-                    return False; //co-neg
+            if (u.length == 2 && !u[0].hasAny(CONJ) && !u[1].hasAny(CONJ)) { //if it's simple
 
-                //it will already have been sorted and de-duplicated upon arriving here
-                // if (u[0].equals(u[1])) return u[0];
-                // u = Terms.sorted(u)
+                //already checked in callee
+                //if (u[0].unneg().equals(u[1].unneg()))
+                //    return False; //co-neg
 
-                if (!u[0].hasAny(CONJ) && !u[1].hasAny(CONJ)) //if it's simple
-                    return compound(CONJ, dt, u);
+                return compound(CONJ, dt, u);
             }
 
 
@@ -369,7 +400,7 @@ public enum Op {
                             if (!disjSubs.isEmpty()) {
                                 if (csa == null)
                                     csa = $.newArrayList(1);
-                                csa.add(CONJ.the(disj.dt(), Terms.sorted(disjSubs)).neg());
+                                csa.add(CONJ.the(disj.dt(), sorted(disjSubs)).neg());
                             }
                         }
                     }
@@ -380,7 +411,7 @@ public enum Op {
                 if (cs.size() == 1)
                     return cs.first();
 
-                Term[] scs = Terms.sorted(cs);
+                Term[] scs = sorted(cs);
                 return !Arrays.equals(scs, u) ?
                         CONJ.the(dt, scs) : //changed, recurse
                         compound(CONJ, dt, scs);
@@ -548,6 +579,16 @@ public enum Op {
      */
     //SUBTERMS("...", 1, OpType.Other)
     ;
+
+    private static boolean conegated(Term a, Term b) {
+        Term ua = a.unneg();
+        if (ua != a && ua.equals(b)) return true; //co-negation
+        Term ub = b.unneg();
+        if (ub != b && ub.equals(a)) return true; //co-negation
+
+        return false;
+    }
+
     @NotNull
     public static final Compound ZeroProduct = new GenericCompound(Op.PROD, TermContainer.NoSubterms);
 
@@ -932,97 +973,143 @@ public enum Op {
         return (dt == DTERNAL) || (dt == 0);
     }
 
-    final static Comparator<ObjectLongPair<Term>> conjEventComparator = Comparator.comparingLong(ObjectLongPair<Term>::getTwo).thenComparing(ObjectLongPair::getOne);
 
     /*@NotNull*/
     static public Term conjMerge(Term a, long aStart, Term b, long bStart) {
 
-        TreeSet<ObjectLongPair<Term>> eventSet = new TreeSet(conjEventComparator);
+        if (a.eventCount() == 1 && b.eventCount() == 1) {
+            int dt = (int) (bStart - aStart);
 
-        a.events(eventSet::add, aStart);
-        b.events(eventSet::add, bStart);
-
-        int ee = eventSet.size();
-        assert (ee > 0);
-        if (ee == 1) {
-            return eventSet.first().getOne();
+            return conjSeqFinal(dt, a, b);
         }
 
-        List<ObjectLongPair<Term>> events = new FasterList<>(eventSet);
+        LongObjectHashMap<Collection<Term>> eventSets = new LongObjectHashMap();
 
-        //group all parallel clusters
-        ObjectLongPair<Term> e0 = events.get(0);
+        LongObjectPredicate<Term> insert = (long w, Term xb) -> {
+            Collection<Term> ab = eventSets.updateValue(w,
+                    () -> {
+                        TreeSet<Term> x = new TreeSet();
+                        x.add(xb);
+                        return x;
+                    },
+                    (Collection<Term> xa) -> {
+                        if (xa.add(xb)) {
+                            Op o = xb.op();
+                            if (o == NEG) { if (xa.contains(xb.unneg())) return null; }
+                            else { if (xa.contains(xb.neg())) return null; }
+                        }
+                        return xa;
+                    });
+            return ab != null;
+        };
 
-        long headAt = e0.getTwo();
-        int groupStart = -1;
-        for (int i = 1; i <= ee; i++) {
-            long nextAt = (i != ee) ? events.get(i).getTwo() : ETERNAL;
-            if (nextAt == headAt) {
-                if (groupStart == -1) groupStart = i - 1;
-            } else {
-                if (groupStart != -1) {
-                    int groupEnd = i;
-                    Term[] p = new Term[groupEnd - groupStart];
-                    assert (p.length > 1);
-                    long when = events.get(groupStart).getTwo();
-                    for (int k = 0, j = groupStart; j < groupEnd; j++) {
-                        p[k++] = events.get(groupStart).getOne();
-                        events.remove(groupStart);
-                        i--;
-                        ee--;
-                    }
-                    Term replacement = p.length > 1 ? CONJ.the(0, p) : p[0];
-                    if (events.isEmpty()) {
-                        //got them all here
-                        return replacement;
-                    }
-                    events.add(i, PrimitiveTuples.pair(replacement, when));
-                    i++;
-                    ee++;
-                    groupStart = -1; //reset
-                }
+        if (!a.eventsWhile(insert, aStart))
+            return False;
+        if (!b.eventsWhile(insert, bStart))
+            return False;
+
+        LongObjectHashMap<Term> eventSet = new LongObjectHashMap<>();
+        Term[] cut = { null };
+        if (!eventSets.keyValuesView().allSatisfy((ws) -> {
+            Term[] sps = sorted(ws.getTwo());
+            assert(sps.length > 0);
+            Term pp;
+            if (sps.length == 1)
+                pp = sps[0];
+            else {
+                pp = compound(CONJ, 0, sps); //direct
             }
-            headAt = nextAt;
+            if (pp instanceof Bool) {
+                cut[0] = pp;
+                return false;
+            }
+            eventSet.put(ws.getOne(), pp);
+            return true;
+        })) {
+            return cut[0];
         }
 
+//        int ee = eventSet.size();
+//        assert (ee > 0);
+//        if (ee == 1) {
+//            return eventSet.values().iterator().next().get;
+//        }
+
+        List<LongObjectPair<Term>> events = new FasterList<>(eventSet.size());
+        eventSet.forEachKeyValue((w, t) -> events.add(PrimitiveTuples.pair(w, t)));
         return conj(events);
+
+//        //group all parallel clusters
+//        LongObjectPair<Term> e0 = events.get(0);
+//
+//        long headAt = e0.getOne();
+//        int groupStart = -1;
+//        for (int i = 1; i <= ee; i++) {
+//            long nextAt = (i != ee) ? events.get(i).getOne() : ETERNAL;
+//            if (nextAt == headAt) {
+//                if (groupStart == -1) groupStart = i - 1;
+//            } else {
+//                if (groupStart != -1) {
+//                    int groupEnd = i;
+//                    Term[] p = new Term[groupEnd - groupStart];
+//                    assert (p.length > 1);
+//                    long when = events.get(groupStart).getOne();
+//                    for (int k = 0, j = groupStart; j < groupEnd; j++) {
+//                        p[k++] = events.get(groupStart).getTwo();
+//                        events.remove(groupStart);
+//                        i--;
+//                        ee--;
+//                    }
+//                    Term replacement = p.length > 1 ? CONJ.the(0, p) : p[0];
+//                    if (events.isEmpty()) {
+//                        //got them all here
+//                        return replacement;
+//                    }
+//                    events.add(i, PrimitiveTuples.pair(when, replacement));
+//                    i++;
+//                    ee++;
+//                    groupStart = -1; //reset
+//                }
+//            }
+//            headAt = nextAt;
+//        }
+
     }
+
 
     /**
      * constructs a correctly merged conjunction from a list of events
      */
     @NotNull
-    public static Term conj(List<ObjectLongPair<Term>> events) {
+    public static Term conj(List<LongObjectPair<Term>> events) {
 
-        if (events.size() > 1) {
-            events.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
-            ListIterator<ObjectLongPair<Term>> ii = events.listIterator();
+        int ee = events.size();
+        if (ee > 1) {
+            Collections.sort(events);
+            ListIterator<LongObjectPair<Term>> ii = events.listIterator();
             long prevtime = ETERNAL;
             while (ii.hasNext()) {
-                ObjectLongPair<Term> x = ii.next();
-                long now = x.getTwo();
+                LongObjectPair<Term> x = ii.next();
+                long now = x.getOne();
                 if (prevtime != ETERNAL && prevtime == now) {
                     ii.remove();
-                    ObjectLongPair<Term> y = ii.previous();
-                    Term xyt = CONJ.the(0, x.getOne(), y.getOne());
+                    ee--;
+                    LongObjectPair<Term> y = ii.previous();
+                    Term xyt = CONJ.the(0, x.getTwo(), y.getTwo());
                     if (xyt == Null) return Null;
                     if (xyt == False) return False;
-                    ObjectLongPair<Term> xy = pair(xyt, now);
+                    LongObjectPair<Term> xy = pair(now, xyt);
                     ii.set(xy);
                     ii.next();
                 }
                 prevtime = now;
             }
         }
-
-        int ee = events.size();
-
-
         switch (ee) {
             case 0:
                 return True;
             case 1:
-                return events.get(0).getOne();
+                return events.get(0).getTwo();
             default:
                 return conjSeq(events);
         }
@@ -1032,23 +1119,23 @@ public enum Op {
      * constructs a correctly merged conjunction from a list of events, in the sublist specified by from..to (inclusive)
      * all of the events should have distinct times before calling here.
      */
-    private static Term conjSeq(List<ObjectLongPair<Term>> events) {
+    private static Term conjSeq(List<LongObjectPair<Term>> events) {
 
         int ee = events.size();
 
 
-        ObjectLongPair<Term> first = events.get(0);
+        LongObjectPair<Term> first = events.get(0);
         switch (ee) {
             case 0:
                 throw new NullPointerException("should not be called with empty events list");
             case 1:
-                return first.getOne();
+                return first.getTwo();
             case 2:
-                Term left = first.getOne();
-                ObjectLongPair<Term> second = events.get(1);
-                Term right = second.getOne();
-                return conjNonCommFinal(
-                        (int) (second.getTwo() - first.getTwo()),
+                Term left = first.getTwo();
+                LongObjectPair<Term> second = events.get(1);
+                Term right = second.getTwo();
+                return conjSeqFinal(
+                        (int) (second.getOne() - first.getOne()),
                         left, right);
         }
 
@@ -1063,15 +1150,15 @@ public enum Op {
         if (right == Null) return Null;
         if (right == False) return False; //early fail shortcut
 
-        int dt = (int) (events.get(center + 1).getTwo() - first.getTwo() - left.dtRange());
+        int dt = (int) (events.get(center + 1).getOne() - first.getOne() - left.dtRange());
 
-        return conjNonCommFinal(dt, left, right);
+        return conjSeqFinal(dt, left, right);
     }
 
     /**
      * HACK
      */
-    private static Term conjNonCommFinal(int dt, Term left, Term right) {
+    private static Term conjSeqFinal(int dt, Term left, Term right) {
         if (left == False) return False;
         if (left == Null) return Null;
 
@@ -1081,33 +1168,37 @@ public enum Op {
         if (left == True) return right;
         if (right == True) return left;
 
-
         if (dt == 0 || dt == DTERNAL) {
-            return CONJ.the(dt, left, right); //send through again
-        } else {
+            if (left.equals(right)) return left;
+            if (conegated(left, right)) return False;
 
-            //System.out.println(left + " " + right + " " + left.compareTo(right));
-            //return CONJ.the(dt, left, right);
-            if (left.compareTo(right) > 0) {
-                //larger on left
-                if (dt != XTERNAL)
-                    dt = -dt;
-                Term t = right;
-                right = left;
-                left = t;
-            }
-
-            int ldt = left.dt();
-            int rdt = right.dt();
-            if (left.op() == CONJ && !concurrent(ldt) && ldt != XTERNAL &&
-                    right.op() == CONJ && !concurrent(rdt) && rdt != XTERNAL &&
-                    ((left.subs() > 1 + right.subs()) || (right.subs() > left.subs()))) {
-                //seq imbalance
-                return CONJ.the(dt, left, right); //send through again
-            }
-
-            return implInConjReduction(compound(compound(CONJ, left, right), dt));
+            //return CONJ.the(dt, left, right); //send through again
         }
+
+
+        //System.out.println(left + " " + right + " " + left.compareTo(right));
+        //return CONJ.the(dt, left, right);
+        if (left.compareTo(right) > 0) {
+            //larger on left
+            if (dt != XTERNAL)
+                dt = -dt;
+            Term t = right;
+            right = left;
+            left = t;
+        }
+
+        int ldt = left.dt();
+        int rdt = right.dt();
+        if (left.op() == CONJ && !concurrent(ldt) && ldt != XTERNAL &&
+                right.op() == CONJ && !concurrent(rdt) && rdt != XTERNAL &&
+                ((left.subs() > 1 + right.subs()) || (right.subs() > left.subs()))) {
+            //seq imbalance
+            return CONJ.the(dt, left, right); //send through again
+        }
+
+
+        return compound(CONJ, dt, left, right);
+
     }
 
     /**
@@ -1115,9 +1206,12 @@ public enum Op {
      */
     static private Term implInConjReduction(final Term conj /* possibly a conjunction */) {
 
-        Op xo = conj.op();
-        if (xo != CONJ || !conj.hasAny(IMPL))
+
+        if (!conj.hasAny(IMPL))
             return conj; //fall-through
+
+        assert (conj.op() == CONJ);
+
         int conjDT = conj.dt();
 
         if (/*dt==DTERNAL || */conjDT == XTERNAL)
@@ -1155,11 +1249,11 @@ public enum Op {
             @NotNull TreeSet<Term> ss = cs.toSortedSet();
             assert (ss.remove(implication)) : "must have removed something";
 
-            Term[] css = Terms.sorted(ss);
+            Term[] css = sorted(ss);
             if (conj.dt() == conjDT && cs.equalTerms(css))
                 return conj; //prevent recursive loop
             else
-                other = xo.the(conjDT, css /* assumes commutive since > 2 */);
+                other = CONJ.the(conjDT, css /* assumes commutive since > 2 */);
         }
 
 
@@ -1171,7 +1265,7 @@ public enum Op {
                 CONJ.the(conjDT, other, implication.sub(0) /* impl precond */);
 
         if (conjInner instanceof Bool)
-            return Null;
+            return conjInner;
 
         @NotNull Term implPost = implication.sub(1); /* impl postcondition */
 
@@ -1189,7 +1283,6 @@ public enum Op {
     }
 
 
-
     @NotNull
     private static Term newDiff(/*@NotNull*/ Op op, Term... t) {
 
@@ -1200,7 +1293,7 @@ public enum Op {
             case 1:
                 Term single = t[0];
                 if (single instanceof EllipsisMatch) {
-                    return newDiff(op, ((EllipsisMatch)single).theArray());
+                    return newDiff(op, ((EllipsisMatch) single).theArray());
                 }
                 return single instanceof Ellipsislike ?
                         new UnitCompound1(op, single) :
@@ -1385,8 +1478,10 @@ public enum Op {
 
 
                 if (dtConcurrent) {
-                    if (subject.unneg().equals(predicate))
+                    if (subject.unneg().equals(predicate)) {
+                        if (subject.op() == NEG) polarity = !polarity; //invert if the subj is neg
                         return polarity ? True : /*False*/Null;
+                    }
                 } //else: allow repeat
 
                 boolean subjConj = subject.op() == CONJ;
@@ -1442,7 +1537,7 @@ public enum Op {
                                         subject = sss.iterator().next();
                                         break;
                                     default:
-                                        subject = CONJ.the(/*DTERNAL?*/csub.dt(), Terms.sorted(sss));
+                                        subject = CONJ.the(/*DTERNAL?*/csub.dt(), sorted(sss));
                                         break;
                                 }
                             }
@@ -1462,7 +1557,7 @@ public enum Op {
                                         predicate = ppp.iterator().next();
                                         break;
                                     default:
-                                        predicate = CONJ.the(cpred.dt(), Terms.sorted(ppp));
+                                        predicate = CONJ.the(cpred.dt(), sorted(ppp));
                                         break;
                                 }
                             }
@@ -1479,17 +1574,17 @@ public enum Op {
                         int pre = subject.dtRange();
                         int edt = pre + (dt != DTERNAL ? dt : 0);
 
-                        Set<ObjectLongPair<Term>> se = new HashSet();
-                        subject.events(se::add);
+                        Set<LongObjectPair<Term>> se = subject.eventSet(0);
 
-                        FasterList<ObjectLongPair<Term>> pe = predicate.events(edt);
+                        MutableSet<LongObjectPair<Term>> pe = predicate.eventSet(edt);
+
                         if (pe.removeIf(se::contains)) {
                             if (pe.isEmpty()) {
                                 return Null;
                             } else {
                                 //duplicates were removed, reconstruct new predicate
-                                int ndt = (int) pe.minBy(ObjectLongPair::getTwo).getTwo() - pre;
-                                return IMPL.the(ndt, subject, Op.conj(pe)).negIf(!polarity);
+                                int ndt = (int) pe.minBy(LongObjectPair::getOne).getOne() - pre;
+                                return IMPL.the(ndt, subject, Op.conj(pe.toList())).negIf(!polarity);
                             }
                         }
 
@@ -1648,7 +1743,7 @@ public enum Op {
 
                 Term single = t[0];
                 if (single instanceof EllipsisMatch) {
-                    return intersect(((EllipsisMatch)single).theArray(), intersection, setUnion, setIntersection);
+                    return intersect(((EllipsisMatch) single).theArray(), intersection, setUnion, setIntersection);
                 }
                 return single instanceof Ellipsislike ?
                         new UnitCompound1(intersection, single) :
@@ -1807,12 +1902,12 @@ public enum Op {
 
     public final Term the(int dt, /*@NotNull*/ Collection<Term> sub) {
         int s = sub.size();
-        return _the(dt, commute(dt, s) ? Terms.sorted(sub) : sub.toArray(new Term[s]));
+        return _the(dt, commute(dt, s) ? sorted(sub) : sub.toArray(new Term[s]));
     }
 
     /*@NotNull*/
     public final Term the(int dt, Term... u) {
-        return _the(dt, commute(dt, u.length) ? Terms.sorted(u) : u);
+        return _the(dt, commute(dt, u.length) ? sorted(u) : u);
     }
 
     /*@NotNull*/ Term _the(int dt, Term[] u) {

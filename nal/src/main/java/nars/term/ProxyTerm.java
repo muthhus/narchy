@@ -7,7 +7,7 @@ import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.Retemporalize;
 import org.eclipse.collections.api.list.primitive.ByteList;
-import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
+import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -217,12 +217,6 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     public Term evalSafe(TermContext context, int remain) {
         return ref.evalSafe(context, remain);
     }
-
-    @Override
-    public void events(Consumer<ObjectLongPair<Term>> events, long dt, int level) {
-        ref.events(events, dt, level);
-    }
-
 
     @Override
     public Term dt(int dt) {

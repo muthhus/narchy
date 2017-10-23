@@ -1,10 +1,13 @@
 package nars.term;
 
+import jcog.list.FasterList;
 import nars.*;
 import nars.io.NarseseTest;
 import nars.task.util.InvalidTaskException;
 import nars.term.atom.Atomic;
 import nars.term.atom.Int;
+import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Disabled;
@@ -17,7 +20,6 @@ import static nars.term.TermTest.assertValid;
 import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
-import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -276,10 +278,10 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals(
                 "(a &&+16 ((--,a)&|b))",
                 Op.conj(
-                        $.newArrayList(
-                                pair($.$("a"), 298L),
-                                pair($.$("b"), 314L),
-                                pair($.$("(--,a)"), 314L))
+                        new FasterList<LongObjectPair<Term>>(new LongObjectPair[]{
+                                PrimitiveTuples.pair(298L, $.$("a") ),
+                                PrimitiveTuples.pair(314L, $.$("b")),
+                                PrimitiveTuples.pair(314L, $.$("(--,a)"))})
                 ).toString()
         );
     }
@@ -351,6 +353,8 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testConjParallelWithSeq() throws Narsese.NarseseException {
         assertEquals("(a &&+5 b)", $("((a &&+5 b)&|a)").toString());
+
+        assertEquals(False, $("((--a &&+5 b)&|a)"));
     }
 
     @Test
@@ -609,7 +613,7 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testTemporalConjunctionReduction2() throws Narsese.NarseseException {
-        assertEquals("((b &&+1 c)&|a)", $("(a &&+0 (b &&+1 c))").toString());
+        assertEquals("((a&|b) &&+1 c)", $("(a &&+0 (b &&+1 c))").toString());
     }
 
     @Test
@@ -912,22 +916,62 @@ public class TermReductionsTest extends NarseseTest {
                 $("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))==>((--,(($1,xyz)-->$2))&&(x:y)))").toString());
     }
 
+    @Test public void testConjNearIdentity() throws Narsese.NarseseException {
+        assertEquals(
+                True,
+                $("( (a&&b) ==> (a&|b) )") //differ in dt=0 and dt=DTERNAL
+        );
+
+        assertEquals(
+             //"(a&|b)",
+            "(&|,(a&&b),a,b)",
+             $("( (a&&b) &| (a&|b) )").toString() //differ in dt=0 and dt=DTERNAL
+         );
+
+        assertEquals(
+             $("((X,x)&|#1)"),
+             $("( ((X,x)&&#1) &| ((X,x)&|#1) )") //differ in dt=0 and dt=DTERNAL
+         );
+
+        assertEquals(
+             $("(--,((X,x)&|#1)"),
+             $("( (--,((X,x)&&#1)) &| (--,((X,x)&|#1)) )") //differ in dt=0 and dt=DTERNAL
+         );
+    }
+
     @Test
     public void testDternalizeRepeatConjImpl() throws Narsese.NarseseException {
         assertEquals("a",
                 $("(a &&+1 a)").dt(DTERNAL).toString());
+        assertEquals(False,
+                $("(a &&+1 --a)").dt(DTERNAL));
+
         assertEquals("a",
                 $("(a &&+1 a)").dt(0).toString());
+        assertEquals(False,
+                $("(a &&+1 --a)").dt(0));
+
         assertEquals("(a &&+- a)",
                 $("(a &&+1 a)").dt(XTERNAL).toString());
+        assertEquals("((--,a) &&+- a)",
+                $("(a &&+1 --a)").dt(XTERNAL).toString());
+
 
         assertEquals(True,
                 $("(a ==>+1 a)").dt(DTERNAL));
+        assertEquals(Null,
+                $("(--a ==>+1 a)").dt(DTERNAL));
+
         assertEquals(True,
                 $("(a ==>+1 a)").dt(0));
+        assertEquals(Null,
+                $("(--a ==>+1 a)").dt(0));
+
+
         assertEquals("(a ==>+- a)",
                 $("(a ==>+1 a)").dt(XTERNAL).toString());
-
+        assertEquals("((--,a) ==>+- a)",
+                $("(--a ==>+1 a)").dt(XTERNAL).toString());
     }
 
     @Test
@@ -938,9 +982,10 @@ public class TermReductionsTest extends NarseseTest {
                 $("((tetris(isRowClear,7,true)==>tetris(7,14))&&tetris(7,14))"));
         assertEquals(Null,
                 $("((tetris(isRowClear,7,true)=|>tetris(7,14))&&tetris(7,14))"));
-        assertEquals(Null,
+
+        assertEquals(True,
                 $("((tetris(isRowClear,7,true)==>tetris(7,14))&|tetris(7,14))"));
-        assertEquals(Null,
+        assertEquals(True,
                 $("((tetris(isRowClear,7,true)=|>tetris(7,14))&|tetris(7,14))"));
 
         assertEquals(Null,
@@ -1080,10 +1125,7 @@ public class TermReductionsTest extends NarseseTest {
 
         assertEquals("((ball_right) &&+270 (--,(ball_left)))", c1.toString());
         assertEquals(
-                "(((ball_right) &&+270 (--,(ball_left)))&|(ball_left))", //ball_right subsumed by the sequence
-
-                //HACK: this narsese parser isnt implemented yet:
-                //$("( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right)))")
+                "(((ball_left)&|(ball_right)) &&+270 (--,(ball_left)))", //ball_right subsumed by the sequence
 
                 parallel($("(ball_left)"), $("(ball_right)"), c1)
                         .toString());

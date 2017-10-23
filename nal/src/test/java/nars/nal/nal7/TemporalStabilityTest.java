@@ -64,17 +64,15 @@ abstract public class TemporalStabilityTest {
     }
 
     private boolean refersToOOBEvents(Task t) {
-        return t.term().events().stream().anyMatch(x -> {
-            long s = t.start();
-            if (s == ETERNAL)
-                return false;
+        long s = t.start();
+        if (s == ETERNAL)
+            return false;
+        return t.term().eventsWhile((r, xt)->{
 
-            Term xt = x.getOne();
-
-            if (!validOccurrence(s + x.getTwo()))
+            if (!validOccurrence(s + r))
                 return true;
             if (xt.op() == CONJ) {
-               if (!validOccurrence(s + x.getTwo() + xt.dtRange()))
+               if (!validOccurrence(s + r + xt.dtRange()))
                    return true;
             }
 
@@ -84,7 +82,7 @@ abstract public class TemporalStabilityTest {
 //                    return true;
 //            }
             return false;
-        });
+        }, 0);
     }
 
     private void run(int cycles, NAR n) {

@@ -1,7 +1,6 @@
 package nars;
 
 import jcog.Texts;
-import jcog.list.FasterList;
 import nars.concept.Concept;
 import nars.op.DepIndepVarIntroduction;
 import nars.op.Operator;
@@ -13,7 +12,9 @@ import nars.term.atom.Atom;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
+import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
+import org.eclipse.collections.impl.list.mutable.FastList;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -308,14 +309,12 @@ public class Builtin {
             } else {
                 //recursive event-based decomposition and recomposition
 
-
-                List<ObjectLongPair<Term>> ee = $.newArrayList(2);
-                t.events(ee::add, 0);
-
+                List<LongObjectPair<Term>> ee = t.eventList();
                 int toRemove = nar.random().nextInt(ee.size());
                 ee.remove(toRemove);
 
                 r = Op.conj(ee);
+
             }
 
 //            if (r instanceof Variable /*&& r.op()!=VAR_DEP*/)
@@ -350,10 +349,10 @@ public class Builtin {
             if (conj.op() != CONJ || conj.subtermTimeSafe(event) != 0)
                 return Null;
             if (conj.dt() != DTERNAL) {
-                FasterList<ObjectLongPair<Term>> events = conj.events();
-                assert (events.get(0).getTwo() == 0);
-                ObjectLongPair<Term> first = events.get(0);
-                Term firstTerm = first.getOne();
+                FastList<LongObjectPair<Term>> events = conj.eventList();
+                assert (events.get(0).getOne() == 0);
+                LongObjectPair<Term> first = events.get(0);
+                Term firstTerm = first.getTwo();
 //
 //                boolean neg;
                 if (!firstTerm.equals(event)) {

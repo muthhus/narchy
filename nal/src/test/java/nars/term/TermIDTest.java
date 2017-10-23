@@ -124,12 +124,11 @@ public class TermIDTest {
         return i.term();
     }
 
-    public void areEqualAndIfNotWhy(@NotNull String a, @NotNull String b) {
-        assertEquals(charComparison(a, b), a, b);
+    static void areEqualAndIfNotWhy(@NotNull String a, @NotNull String b) {
+        assertEquals(a, b, charComparison(a, b));
     }
 
-    @NotNull
-    public static String charComparison(@NotNull String a, @NotNull String b) {
+    static String charComparison(String a, String b) {
         return Arrays.toString(a.toCharArray()) + " != " + Arrays.toString(b.toCharArray());
     }
 

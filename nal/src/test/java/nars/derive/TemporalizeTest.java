@@ -9,7 +9,9 @@ import nars.Narsese;
 import nars.derive.time.*;
 import nars.index.term.TermContext;
 import nars.term.Term;
+import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -943,10 +945,9 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         Term x = $(xs);
         int xdt = x.dtRange();
 
-        FasterList<ObjectLongPair<Term>> xe = x.events();
-        xe.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
-        Term first = xe.getFirst().getOne();
-        Term last = xe.getLast().getOne();
+        FastList<LongObjectPair<Term>> xe = x.eventList();
+        Term first = xe.getFirst().getTwo();
+        Term last = xe.getLast().getTwo();
 
         for (int i = 0; i < 10 * xe.size(); i++) {
 
@@ -956,18 +957,15 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
             assertNotEquals(xe, y);
             assertTrue(ydt <= xdt);
 
-            FasterList<ObjectLongPair<Term>> ye = y.events();
-            if (ye.getFirst().getOne().equals(first) && ye.getLast().getOne().equals(last)) {
+            FastList<LongObjectPair<Term>> ye = y.eventList();
+            if (ye.getFirst().getTwo().equals(first) && ye.getLast().getTwo().equals(last)) {
                 assertEquals(xdt, ydt, y + " has different dt span");
             }
 
-            ye.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
-
-
             //same relative timing
             for (int j = 1; j < ye.size(); j++) {
-                Term y1 = ye.get(j - 1).getOne();
-                Term y2 = ye.get(j).getOne();
+                Term y1 = ye.get(j - 1).getTwo();
+                Term y2 = ye.get(j).getTwo();
                 assertEquals(
                         y.subTime(y2) - y.subTime(y1),
                         x.subTime(y2) - x.subTime(y1)

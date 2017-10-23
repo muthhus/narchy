@@ -264,30 +264,30 @@ public class Temporalize implements ITemporalize {
 
                     if (implSubj.hasAny(CONJ)) {
 
-                        implSubj.events(oe -> {
-                            Term ss = oe.getOne();
+                        implSubj.eventsWhile((w,ss) -> {
                             if (!ss.equals(implPred)) {
-                                int t = -predFromSubj + ((int) oe.getTwo());
+                                int t = (int)(-predFromSubj + w);
                                 know(ss, relative(ss, implPred, t));
                                 know(implPred, relative(implPred, ss, -t));
                             } else {
                                 //TODO repeat case
                             }
-                        });
+                            return true;
+                        },0);
                     }
 
                     if (!implSubj.equals(implPred)) {
                         if (implPred.hasAny(CONJ)) {
-                            implPred.events(oe -> {
-                                Term pp = oe.getOne();
+                            implPred.eventsWhile((w, pp)-> {
                                 if (!pp.equals(implSubj)) {
-                                    int t = predFromSubj + ((int) oe.getTwo());
+                                    int t = (int) (predFromSubj + w);
                                     know(pp, relative(pp, implSubj, t));
                                     know(implSubj, relative(implSubj, pp, -t));
                                 } else {
                                     //TODO repeat case
                                 }
-                            });
+                                return true;
+                            }, implDT);
                         }
                     }
 
@@ -327,13 +327,10 @@ public class Temporalize implements ITemporalize {
                         pt = at;
                     }
 
-                    FasterList<ObjectLongPair<Term>> ee = x.events();
-                    int numEvents = ee.size();
-
-                    if (numEvents <= 1) {
-                        return;
-                    }
-
+//                    FasterList<ObjectLongPair<Term>> ee = x.eventList();
+//                    int numEvents = ee.size();
+//                    if (numEvents <= 1)
+//                        return;
 //                    //matrix n^2/2
 //                    for (int i = 0, eeSize = ee.size(); i < eeSize; i++) {
 //                        ObjectLongPair<Term> ii = ee.get(i);

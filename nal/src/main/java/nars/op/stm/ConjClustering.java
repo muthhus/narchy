@@ -15,6 +15,7 @@ import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.util.BudgetFunctions;
+import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.Nullable;
@@ -181,7 +182,7 @@ public class ConjClustering extends Causable {
 
             Task[] uu = vv.values().toArray(new Task[vs]);
 
-            List<ObjectLongPair<Term>> pp = $.newArrayList(uu.length);
+            List<LongObjectPair<Term>> pp = $.newArrayList(uu.length);
             float freq = 1f;
             float conf = 1f;
             float priMax = Float.NEGATIVE_INFINITY;
@@ -210,7 +211,7 @@ public class ConjClustering extends Causable {
                     freq *= tf;
                 }
 
-                pp.add(pair(tt, x.start()));
+                pp.add(pair(x.start(), tt));
             }
 
             //TODO discount based on evidential overlap? needs N-way overlapFraction function
@@ -235,7 +236,6 @@ public class ConjClustering extends Causable {
                     m.cause = Cause.zip(uu);
 
                     float maxPri = priMax;
-                        //priMax / uuLen; //HACK
 
                     m.setPri(BudgetFunctions.fund(maxPri, true, uu));
                     in.input(m);

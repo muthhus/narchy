@@ -577,7 +577,7 @@ public enum Terms {
 
         u = u.clone(); //dont modify input, it will confuse callee's
 
-        Arrays.sort(u, volumeComparator);
+        //Arrays.sort(u, volumeComparator);
 
         for (Term x : u) {
             if (!flatten(op, dt, x, s))
@@ -603,10 +603,11 @@ public enum Terms {
         if (x instanceof Bool) {
 
             if (x == True)
-                return true; //silently ignore
+                return true;
 
             if (x == False)
-                return s.getIfAbsentPut(True, (byte) -1) == (byte) +1; //attempt to mark a False, for the chance it may become inverted and disappear rather than aborting any further construction here
+                return false;
+                //return s.getIfAbsentPut(True, (byte) -1) == (byte) +1; //attempt to mark a False, for the chance it may become inverted and disappear rather than aborting any further construction here
 
             return false; //x must be Null
         }

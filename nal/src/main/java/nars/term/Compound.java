@@ -34,8 +34,8 @@ import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.Retemporalize;
 import nars.term.transform.VariableNormalization;
+import org.eclipse.collections.api.block.predicate.primitive.LongObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
-import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.Nullable;
@@ -570,29 +570,33 @@ public interface Compound extends Term, IPair, TermContainer {
 
             Compound base = this instanceof GenericCompoundDT ?
                     ((GenericCompoundDT) this).ref : this;
-            if (nextDT == DTERNAL && !sub(0).equals(sub(1)))
-                return base; //re-use base only if the terms are inequal
 
-            /*@NotNull*/
-            TermContainer subs = subterms();
-            if ((nextDT != XTERNAL && !concurrent(nextDT)) && subs.subs() > 2)
-                return Null; //tried to temporalize what can only be commutive
 
             if (nextDT == XTERNAL) {
                 return Op.compound(base, XTERNAL);
-            }
+            } else {
+                TermContainer subs = subterms();
+                int ns = subs.subs();
+                if (nextDT == DTERNAL && ns == 2 && !subs.sub(0).unneg().equals(subs.sub(1).unneg()))
+                    return base; //re-use base only if the terms are inequal
 
-            Term[] ss = subs.theArray();
-            if (o.commutative) {
+                /*@NotNull*/
+                if (!concurrent(nextDT) && ns > 2)
+                    return Null; //tried to temporalize what can only be commutive
 
-                if (ss.length == 2) {
-                    //must re-arrange the order to lexicographic, and invert dt
-                    return o.the(nextDT != DTERNAL ? -nextDT : DTERNAL, ss[1], ss[0]);
+
+                Term[] ss = subs.theArray();
+                if (o.commutative) {
+
+                    if (ss.length == 2) {
+                        //must re-arrange the order to lexicographic, and invert dt
+                        return o.the(nextDT != DTERNAL ? -nextDT : DTERNAL, ss[1], ss[0]);
+                    } else {
+                        return o.the(nextDT, ss);
+                    }
                 } else {
                     return o.the(nextDT, ss);
                 }
-            } else {
-                return o.the(nextDT, ss);
             }
 
 
@@ -675,9 +679,10 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
 
+
     /* collects any contained events within a conjunction*/
     @Override
-    default void events(Consumer<ObjectLongPair<Term>> events, long offset, int level) {
+    default boolean eventsWhile(LongObjectPredicate<Term> events, long offset, int level) {
         Op o = op();
         if (o == CONJ) {
             int dt = dt();
@@ -694,24 +699,26 @@ public interface Compound extends Term, IPair, TermContainer {
                 if (!reverse) {
                     for (int i = 0; i < s; i++) {
                         Term st = tt.sub(i);
-                        st.events(events, t, level + 1); //recurse
+                        if (!st.eventsWhile(events, t, level + 1)) //recurse
+                            return false;
                         t += dt + st.dtRange();
                     }
                 } else {
                     for (int i = s - 1; i >= 0; i--) {
                         Term st = tt.sub(i);
-                        st.events(events, t, level + 1); //recurse
+                        if (!st.eventsWhile(events, t, level + 1)) //recurse
+                            return false;
                         t += -dt + st.dtRange();
                     }
                 }
 
                 //if (dt!=0 || level==0) //allow dt==0 case to proceed below and add the (&| event as well as its components (which are precisely known)
-                return;
+                return true;
             }
 
         }
 
-        events.accept(PrimitiveTuples.pair(this, offset));
+        return events.accept(offset, this);
     }
 
 

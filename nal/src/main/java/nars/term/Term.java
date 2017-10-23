@@ -22,7 +22,6 @@ package nars.term;
 
 
 import com.google.common.io.ByteArrayDataOutput;
-import jcog.list.FasterList;
 import nars.$;
 import nars.IO;
 import nars.Op;
@@ -43,12 +42,16 @@ import nars.term.transform.Retemporalize;
 import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.block.predicate.primitive.LongObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.list.primitive.ImmutableByteList;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
+import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
@@ -705,7 +708,7 @@ public interface Term extends Termed, Comparable<Termed> {
     default int eventCount() {
         if (op() == CONJ) {
             int dt = this.dt();
-            if (dt != 0 && dt != DTERNAL) {
+            if (dt != DTERNAL) {
                 return intify((sum, x) -> sum + x.eventCount(), 0);
             }
         }
@@ -715,29 +718,53 @@ public interface Term extends Termed, Comparable<Termed> {
 
 
     /* collects any contained events */
-    default void events(Consumer<ObjectLongPair<Term>> events) {
-        events(events, 0);
+    default void events(Consumer<LongObjectPair<Term>> events) {
+        eventsWhile((w, t)-> {
+            events.accept(PrimitiveTuples.pair(w, t));
+            return true; //continue
+        }, 0);
     }
 
-    default FasterList<ObjectLongPair<Term>> events(int offset) {
-        FasterList<ObjectLongPair<Term>> events = new FasterList<>();
-        events(events::add, offset);
+    default MutableSet<LongObjectPair<Term>> eventSet(long offset) {
+        MutableSet<LongObjectPair<Term>> events = new UnifiedSet<>();
+        eventsWhile((w, t)-> {
+            events.add(PrimitiveTuples.pair(w, t));
+            return true; //continue
+        }, offset);
+        return events;
+    }
+    default LongObjectHashMap<Term> eventMap(long offset) {
+        LongObjectHashMap<Term> events = new LongObjectHashMap();
+        eventsWhile((w, t)-> {
+            Term existed = events.put(w, t);
+            if (existed!=null) {
+                events.put(w, CONJ.the(0, existed, t));
+            }
+            return true;
+        }, offset);
         return events;
     }
 
-    default FasterList<ObjectLongPair<Term>> events() {
-        return events(0);
+    /** event list, sorted by time */
+    default FastList<LongObjectPair<Term>> eventList() {
+        return eventList(0);
     }
 
-    default void events(Consumer<ObjectLongPair<Term>> events, long dt) {
-        events(events, dt, 0);
+   /** event list, sorted by time */
+    default FastList<LongObjectPair<Term>> eventList(int offset) {
+        MutableSet<LongObjectPair<Term>> s = eventSet(offset);
+        return (FastList)s.toSortedList();
+    }
+
+    default boolean eventsWhile(LongObjectPredicate<Term> whileEachEvent, long dt) {
+        return eventsWhile(whileEachEvent, dt, 0);
     }
 
     /**
      * dont call directly
      */
-    default void events(Consumer<ObjectLongPair<Term>> events, long dt, int level) {
-        events.accept(PrimitiveTuples.pair(this, dt));
+    default boolean eventsWhile(LongObjectPredicate<Term> whileEachEvent, long dt, int level) {
+        return whileEachEvent.accept(dt, this);
     }
 
     default void printRecursive() {

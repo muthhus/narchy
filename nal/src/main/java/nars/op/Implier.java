@@ -3,7 +3,6 @@ package nars.op;
 import com.google.common.collect.Iterables;
 import jcog.data.FloatParam;
 import jcog.data.graph.AdjGraph;
-import jcog.list.FasterList;
 import jcog.pri.Prioritized;
 import nars.$;
 import nars.NAR;
@@ -22,7 +21,9 @@ import nars.truth.TruthAccumulator;
 import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
 import nars.util.graph.TermGraph;
+import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -254,17 +255,18 @@ public class Implier extends DurService {
         if (!tt.op().conceptualizable)
             return;
 
-        //recursively divide the desire among the conjunction events, emulating (not necessarily exactly) StructuralDeduction's
+        //recursively divide the desire among the conjunction events occurring NOW,
+        // emulating (not necessarily exactly) StructuralDeduction's
         if (tt.op() == CONJ) {
-            FasterList<ObjectLongPair<Term>> e = tt.events();
+            FastList<LongObjectPair<Term>> e = tt.eventList();
             if (e.size() > 1) {
                 float eSub = g.evi() / e.size();
                 float cSub = w2c(eSub);
                 if (cSub >= nar.confMin.floatValue()) {
                     Truth gSub = $.t(g.freq(), cSub);
-                    for (ObjectLongPair<Term> ee : e) {
-                        Term one = ee.getOne();
-                        if (one.op().conceptualizable)
+                    for (LongObjectPair<Term> ee : e) {
+                        Term one = ee.getTwo();
+                        if (ee.getOne() == 0  && (one.op().conceptualizable))
                             goal(goals, one, gSub);
                     }
                 }

@@ -17,8 +17,10 @@ import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
+import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -113,9 +115,6 @@ public class Revision {
 
     /*@NotNull*/
     static Term intermpolate(/*@NotNull*/ Term a, long dt, /*@NotNull*/ Term b, float aProp, float curDepth, /*@NotNull*/ Random rng, boolean mergeOrChoose) {
-        if (a.equals(b)) {
-            return a;
-        }
 
         Op ao = a.op();
         Op bo = b.op();
@@ -133,6 +132,10 @@ public class Revision {
         if (len > 0) {
 
             if (ao.temporal) {
+                if (a.equals(b) && (dt == 0 || dt == DTERNAL)) {
+                    return a;
+                }
+
                 switch (ao) {
                     case CONJ:
                         return dtMergeConj(a, dt, b, aProp, curDepth / 2f, rng, mergeOrChoose);
@@ -142,6 +145,9 @@ public class Revision {
                         throw new RuntimeException();
                 }
             } else {
+                if (a.equals(b)) {
+                    return a;
+                }
 
                 Term[] ab = new Term[len];
                 boolean change = false;
@@ -173,21 +179,15 @@ public class Revision {
     }
 
     private static Term dtMergeConj(Term a, long dt, Term b, float aProp, float v, Random rng, boolean mergeOrChoose) {
-        Set<ObjectLongPair<Term>> ab = new HashSet();
-        a.events(ab::add);
-        int aSize = ab.size();
-        b.events(ab::add, dt);
-        int bSize = ab.size() - aSize;
+        FastList<LongObjectPair<Term>> ab = Op.conjMerge(a, 0, b, dt).eventList();
 
         //it may not be valid to choose subsets of the events, in a case like where >1 occurrences of $ must remain parent
 
-        List<ObjectLongPair<Term>> x = new FasterList(ab);
-        int max = Math.max(aSize, bSize);
+        FastList<LongObjectPair<Term>> x = new FasterList(ab);
+        int max = 1+x.size()/2; //HALF
         int all = x.size();
         int excess = all - max;
         if (excess > 0) {
-
-            x.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
 
             //decide on some items to remove
             //must keep the endpoints unless a shift and adjustment are reported
@@ -566,8 +566,8 @@ public class Revision {
 
                     final float[] xd = {0};
                     ObjectLongHashMap<Term> ab = new ObjectLongHashMap(len);
-                    a.events((tw) -> ab.put(tw.getOne().root(), tw.getTwo()));
-                    b.events((tw) -> ab.addToValue(tw.getOne().root(), -tw.getTwo()));
+                    a.events((tw) -> ab.put(tw.getTwo().root(), tw.getOne()));
+                    b.events((tw) -> ab.addToValue(tw.getTwo().root(), -tw.getOne()));
 
                     ab.forEachValue(x -> xd[0] += Math.abs(x));
                     d += xd[0];
@@ -577,13 +577,13 @@ public class Revision {
 
                 //TODO this collapses duplicates. ignore for now
                 a.events((tw) -> {
-                    Term tww = tw.getOne();
+                    Term tww = tw.getTwo();
                     if (tww.isTemporal())
                         ab.put(tww.root(), new Term[]{tww, null});
                 });
 
                 b.events((tw) -> {
-                    Term tww = tw.getOne();
+                    Term tww = tw.getTwo();
                     if (tww.isTemporal()) {
                         Term[] x = ab.computeIfAbsent(tww.root(), (nn) -> new Term[2]);
                         x[1] = tww;
