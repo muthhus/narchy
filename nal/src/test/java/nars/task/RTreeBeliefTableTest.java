@@ -56,6 +56,11 @@ public class RTreeBeliefTableTest {
 
         //try capacity limit
         Task e = add(r, x, 0.3f, 0.9f, 3, 4, n);
+
+        System.out.println("\nat capacity?");
+        r.print(System.out);
+        r.forEachTask(System.out::println);
+
         assertEquals(4, r.size()); //capacity limit unaffected
 
         System.out.println("after capacity compress inserting " + e.toString(true));

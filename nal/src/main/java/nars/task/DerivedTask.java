@@ -15,7 +15,7 @@ public class DerivedTask extends NALTask {
 
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Term tc, byte punct, @Nullable Truth truth, long now, long start, long end, long[] evi) {
+    public DerivedTask(Term tc, byte punct, @Nullable Truth truth, long now, long start, long end, long[] evi) {
         super(tc, punct, truth, now, start, end,
                 evi);
 

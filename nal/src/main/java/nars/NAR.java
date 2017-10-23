@@ -260,12 +260,15 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         this.time = time;
         time.clear();
 
+        self = new AtomicReference<>(null);
+        setSelf(Param.randomSelf());
+
+        newCauseChannel("input"); //generic non-self source of input
+
         this.deriver = deriver.apply(this);
 
         this.nal = 8;
 
-        self = new AtomicReference<>(null);
-        setSelf(Param.randomSelf());
 
         for (int i = 0; i < valueSummary.length; i++)
             valueSummary[i] = new RecycledSummaryStatistics();
@@ -609,9 +612,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final void input(ITask x) {
         if (x == null) return;
 
-        if (x instanceof Task) {
-            emotion.onInput((Task) x, this);
-        }
         exe.add(x);
     }
 

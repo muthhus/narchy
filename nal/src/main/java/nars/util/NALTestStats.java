@@ -1,33 +1,33 @@
 package nars.util;
 
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import nars.control.MetaGoal;
+import org.junit.jupiter.api.extension.*;
 
-public class NALTestStats implements BeforeTestExecutionCallback,
-        AfterTestExecutionCallback, AfterAllCallback {
+public class NALTestStats implements AfterEachCallback, AfterAllCallback {
 
 //    private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace
 //            .create("nars", NALTestStats.class.getSimpleName());
 
-    {
-        System.out.println("NALTESTSTAT");
-    }
+    final MetaGoal.Report metagoals = new MetaGoal.Report();
 
-    @Override
-    public void afterTestExecution(ExtensionContext context) throws Exception {
-        System.out.println(context);
 
-    }
 
-    @Override
-    public void beforeTestExecution(ExtensionContext context) throws Exception {
-
-    }
 
     @Override
     public void afterAll(ExtensionContext context) throws Exception {
 
+        metagoals.print(System.out);
+
+    }
+
+    @Override
+    public void afterEach(ExtensionContext context) throws Exception {
+         NALTest n = ((NALTest)context.getTestInstance().get());
+
+        context.publishReportEntry(context.getUniqueId() + " NAR stats",
+                n.nar.stats().toString());
+
+        if (n.metagoals!=null)
+            metagoals.add(n.metagoals);
     }
 }

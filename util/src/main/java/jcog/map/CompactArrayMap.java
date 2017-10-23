@@ -11,7 +11,7 @@ import java.util.function.Function;
  */
 public class CompactArrayMap<K, V> extends FasterList {
 
-    final Object lock = new Object();
+    //final Object lock = new Object();
 
     public CompactArrayMap() {
         this(0);
@@ -47,7 +47,7 @@ public class CompactArrayMap<K, V> extends FasterList {
     }
 
     public void put(K key, V value) {
-        synchronized (lock) {
+        synchronized (this) {
             Object[] a = items;
             if (a == null) {
                 this.items = new Object[] { key, value };
@@ -74,7 +74,7 @@ public class CompactArrayMap<K, V> extends FasterList {
             return e;
 
         V v = mappingFunction.apply(key);
-        synchronized (lock) {
+        synchronized (this) {
             put(key, v);
             return v;
         }
@@ -102,13 +102,13 @@ public class CompactArrayMap<K, V> extends FasterList {
 
     @Override
     public void clear() {
-        synchronized(lock) {
+        synchronized(this) {
             clearFast();
         }
     }
 
     public void clearExcept(K key) {
-        synchronized(lock) {
+        synchronized(this) {
             V exist = get(key);
             clearFast();
             if (exist!=null)
@@ -117,7 +117,7 @@ public class CompactArrayMap<K, V> extends FasterList {
     }
 
     public void clearPut(K key, V value) {
-        synchronized(lock) {
+        synchronized(this) {
             clearFast();
             if (value!=null)
                 put(key, value);

@@ -93,7 +93,7 @@ public abstract class TermIndex implements TermContext {
     /**
      * default impl
      */
-    public void forEach(@NotNull Consumer<? super Termed> c) {
+    public void forEach(Consumer<? super Termed> c) {
         stream().forEach(c);
     }
 
@@ -102,7 +102,7 @@ public abstract class TermIndex implements TermContext {
      * term should be conceptualizable prior to calling this
      */
     @Nullable
-    public final Concept concept(@NotNull Termed x, boolean createIfMissing) {
+    public final Concept concept(Termed x, boolean createIfMissing) {
 
         Term xt;
         if (x instanceof Concept) {

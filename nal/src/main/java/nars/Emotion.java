@@ -307,18 +307,20 @@ public class Emotion extends ConcurrentMonitorRegistry {
 
     /**
      * sensory prefilter
+     * @param x is a non-command task
      */
     public void onInput(Task x, NAR nar) {
 
-            Task t = x;
-            if (t.isCommand())
-                return; //ignore
+        Task t = x;
+        float pri = t.priElseZero();
+        float vol = t.voluplexity();
 
-            float cost = unitize(t.voluplexity()/ nar.termVolumeMax.floatValue())
-                    * t.priElseZero()
-            ;
+        float cost = unitize(vol / nar.termVolumeMax.floatValue());
+                //* pri;
 
-            MetaGoal.learn(MetaGoal.Perceive, t.cause(), cost, nar);
+        MetaGoal.learn(MetaGoal.Perceive, t.cause(), cost, nar);
+
+        busy(pri, (int) Math.ceil(vol ));
 
 
     }
@@ -340,7 +342,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
         float ansConf = answer.conf();
 
         answer.take(question,
-            ansConf * (1 - qOrig), false,false);
+                ansConf * (1 - qOrig), false, false);
 
         //reward answer for answering the question
         float str = ansConf *

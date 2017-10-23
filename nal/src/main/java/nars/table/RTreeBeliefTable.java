@@ -13,7 +13,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
-import nars.concept.Concept;
 import nars.concept.TermLinks;
 import nars.task.NALTask;
 import nars.task.Revision;
@@ -31,7 +30,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -352,29 +350,23 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         changes.forEachKeyValue((task, addOrRemove) -> {
             if (addOrRemove) {
-                if (task == x) {
-                    float pri = x.pri();
-
-                    if (pri == pri) {
-                        TermLinks.linkTask(x, pri, n, c);
-                    }
-                    //otherwise somehow it was added then immediately removed during compression, ie. rejected
-
-                } else {
-                    //it's a new merge
-                    n.input(task);
+                //full activation
+                float pri = x.pri();
+                if (pri == pri) {
+                    TermLinks.linkTask(x, pri, n, c);
                 }
+
             } else {      //check for an override about partial activation of the input which would have been appended to its log during rtree add/merge procedure
-                //assert (task.isDeleted());
+                assert (task.isDeleted());
             }
         });
 
-        Object ar = x.meta("partialActivation");
-        if (ar instanceof BiConsumer) {
+        Float partialActivation = x.meta("partialActivation");
+        if (partialActivation != null) {
             assert (x.isDeleted());
-            x.meta("partialActivation", null);
-            ((BiConsumer) ar).accept(n, c);
+            TermLinks.linkTask(x, partialActivation, n, c);
         }
+
     }
 
     boolean ensureCapacity(Space<TaskRegion> treeRW, @Nullable Task inputRegion, ObjectBooleanHashMap<Task> changes, NAR nar) {
@@ -421,8 +413,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         Top<Leaf<TaskRegion>> mergeVictim = new Top(leafWeakness);
 
         //0.
-        int startSize = tree.size();
-        if (startSize <= cap) return true; //compressed thanks to another thread
+        //int startSize = tree.size();
+        //if (startSize <= cap) return true; //compressed thanks to another thread
 
 
         //1.
@@ -518,7 +510,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     ((NALTask) bt).delete(c); //forward
 
                     changes.put(c, true); //but dont add it now, because it may be for another concept
-
+                    treeRW.add(c);
                     return true;
                 } else {
                     //merge result is not strong enough
@@ -733,9 +725,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             if (activationApplied < Prioritized.EPSILON)
                 return;
 
-            i.meta("partialActivation", ((BiConsumer<NAR, Concept>) (nar, c) -> {
-                TermLinks.linkTask(e, activationApplied, nar, c);
-            }));
+            i.meta("partialActivation", activationApplied);
 
         }
 

@@ -1,5 +1,6 @@
 package nars.control;
 
+import com.google.common.collect.TreeBasedTable;
 import jcog.Util;
 import jcog.math.RecycledSummaryStatistics;
 import nars.Task;
@@ -7,7 +8,11 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.ShortIterable;
 import org.eclipse.collections.api.block.predicate.primitive.ShortPredicate;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 import static nars.Param.CAUSE_CAPACITY;
 
@@ -23,7 +28,7 @@ import static nars.Param.CAUSE_CAPACITY;
  * positive and negative decay rates.  the value is clamped to a range
  * (ex: 0..+1) so it doesn't explode.
  */
-public class Cause {
+public class Cause implements Comparable<Cause> {
 
     /** current scalar utility estimate for this cause's support of the current MetaGoal's.
      *  may be positive or negative, and is in relation to other cause's values
@@ -79,6 +84,20 @@ public class Cause {
         return name + "[" + id + "]=" + super.toString();
     }
 
+    @Override
+    public int hashCode() {
+        return Short.hashCode(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj || id == ((Cause)obj).id;
+    }
+
+    @Override
+    public int compareTo(Cause o) {
+        return Short.compare(id, o.id);
+    }
 
     public static short[] zip(@Nullable Task... e) {
         short[] a = e[0].cause();
@@ -206,6 +225,10 @@ public class Cause {
             valueSummary[i].accept(p.current);
         }
     }
+
+
+
+
 
     static class AwesomeShortArrayList extends ShortArrayList {
 

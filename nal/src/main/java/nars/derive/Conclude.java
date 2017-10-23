@@ -28,7 +28,7 @@ public final class Conclude {
     private static final Term VAR_INTRO = $.the("varIntro");
 
 
-    static public PrediTerm<Derivation> the(@NotNull PremiseRule rule, PatternIndex index, NAR nar) {
+    static public PrediTerm<Derivation> the(PremiseRule rule, PatternIndex index, NAR nar) {
 
         Term pattern = rule.conclusion().sub(0);
 
@@ -48,7 +48,7 @@ public final class Conclude {
 
         Term id = $.func("derive", pattern);
 
-        Taskify taskify = new Taskify(rule, nar.newCause(RuleCause::new));
+        Taskify taskify = new Taskify( nar.newCause((s)->new RuleCause(rule, s)));
 
         Term concID = $.func("derive", /*$.the(cid), */pattern/* prod args */);
         return AndCondition.the(
@@ -168,8 +168,18 @@ public final class Conclude {
      * holds the deriver id also that it can be applied at the end of a derivation.
      */
     public static class RuleCause extends Cause {
-        public RuleCause(short id) {
+        public final PremiseRule rule;
+        public final String ruleString;
+
+        public RuleCause(PremiseRule rule, short id) {
             super(id);
+            this.rule = rule;
+            this.ruleString = rule.toString();
+        }
+
+        @Override
+        public String toString() {
+            return $.p(rule, $.the(id)).toString();
         }
     }
 

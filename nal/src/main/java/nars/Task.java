@@ -979,10 +979,11 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
     default void process(NAR n) {
 
+        n.emotion.onInput(this, n);
+
         Concept c = concept(n, true);
         if (c != null) {
 
-            n.emotion.busy(priElseZero(), this.volume());
 
             c.process(this, n);
         }

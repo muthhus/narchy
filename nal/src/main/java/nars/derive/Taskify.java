@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.control.Derivation;
-import nars.derive.rule.PremiseRule;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
 import nars.task.NALTask;
@@ -37,12 +36,10 @@ public class Taskify extends AbstractPred<Derivation> {
      * from the recipient.
      */
     public final Conclude.RuleCause channel;
-    private final String rule;
 
-    protected Taskify(/*@NotNull*/ PremiseRule rule, Conclude.RuleCause channel) {
+    protected Taskify(Conclude.RuleCause channel) {
         super($.func("taskify", $.the(channel.id)));
         this.channel = channel;
-        this.rule = rule.toString(); //only store toString of the rule to avoid remaining attached to the RuleSet
     }
 
     @Override
@@ -102,7 +99,7 @@ public class Taskify extends AbstractPred<Derivation> {
         t.setPri(priority);
 
         if (Param.DEBUG)
-            t.log(rule);
+            t.log(channel.ruleString);
 
         short[] cause = ArrayUtils.addAll(d.parentCause, channel.id);
         t.cause = cause;
@@ -137,7 +134,7 @@ public class Taskify extends AbstractPred<Derivation> {
                                     parent.evi() >= derived.evi())
                             ) {
                         if (Param.DEBUG_SIMILAR_DERIVATIONS)
-                            logger.warn("similar derivation to parent:\n\t{} {}\n\t{}", derived, parent, rule);
+                            logger.warn("similar derivation to parent:\n\t{} {}\n\t{}", derived, parent, channel.ruleString);
 
 
                         if (parent instanceof DerivedTask) {

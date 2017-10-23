@@ -3,6 +3,7 @@ package nars.rdfowl;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedOutputStream;
@@ -10,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**

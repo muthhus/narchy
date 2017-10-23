@@ -283,12 +283,12 @@ public class BaseConcept implements Concept {
      * Called exactly once on each task.
      */
     @Override
-    public void process(@NotNull Task t, @NotNull NAR n) {
+    public void process(Task t, @NotNull NAR n) {
         table(t.punc()).add(t, this, n);
     }
 
     @Override
-    public void value(@NotNull Task t, float activation, NAR n) {
+    public void value(Task t, float activation, NAR n) {
 
         byte punc = t.punc();
         if (punc == BELIEF || punc == GOAL) {

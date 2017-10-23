@@ -1,5 +1,6 @@
 package nars.control;
 
+import com.google.common.collect.TreeBasedTable;
 import jcog.Util;
 import jcog.learn.deep.RBM;
 import jcog.learn.ql.HaiQAgent;
@@ -10,11 +11,18 @@ import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.NAgent;
+import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
+import org.eclipse.collections.api.tuple.primitive.ObjectDoublePair;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Random;
+
+import static jcog.Texts.n4;
 
 /**
  * high-level reasoner control parameters
@@ -178,20 +186,21 @@ public enum MetaGoal {
 
         int numCauses = effects.length;
 
-        float vPer =
-                strength; //must be flat
-                //strength / numCauses; //divided equally <- WRONG
 
-        if (Math.abs(vPer) < Prioritized.EPSILON) return; //no change
+        if (Math.abs(strength) < Prioritized.EPSILON) return; //no change
 
         for (int i = 0; i < numCauses; i++) {
             short c = effects[i];
             Cause cc = causes.get(c);
-            if (cc == null)
-                continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
-            /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
+//            if (cc == null)
+//                continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
 
-            //float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
+            assert (cc != null) : "cause " + c + " missing";
+
+            //trace decay curve
+            //linear triangle increasing to inc, warning this does not integrate to 100% here
+            float vPer = (((float) (i + 1)) / numCauses) * strength;
+
             cc.learn(p, vPer);
 
         }
@@ -368,6 +377,59 @@ public enum MetaGoal {
 
         return b.get(n);
 
+    }
+
+    public static class Report extends ObjectDoubleHashMap<ObjectBytePair<Cause>> {
+
+        public TreeBasedTable<Cause,MetaGoal,Double> table() {
+            TreeBasedTable<Cause, MetaGoal, Double> tt = TreeBasedTable.create();
+            MetaGoal[] mv = MetaGoal.values();
+            synchronized(this) {
+                forEachKeyValue((k, v) -> {
+                    Cause c = k.getOne();
+                    MetaGoal m = mv[k.getTwo()];
+                    tt.put(c, m, v);
+                });
+            }
+            return tt;
+        }
+
+        public Report add(Report r) {
+            synchronized(this) {
+                r.forEachKeyValue(this::addToValue);
+            }
+            return this;
+        }
+
+        public Report add(Iterable<Cause> cc) {
+
+            cc.forEach(c -> {
+
+                int i = 0;
+                for (Traffic t : c.goalValue) {
+                    MetaGoal m = MetaGoal.values()[i];
+                    double tt = t.total;
+                    if (tt != 0) {
+                        synchronized(this) {
+                            addToValue(PrimitiveTuples.pair(c, (byte) i), tt);
+                        }
+                    }
+                    i++;
+                }
+
+            });
+            return this;
+        }
+
+        public void print(PrintStream out) {
+            synchronized (this) {
+                keyValuesView().toSortedListBy(x -> -x.getTwo()).forEach(x ->
+                  out.println(
+                      n4(x.getTwo()) + "\t" + MetaGoal.values()[x.getOne().getTwo()] + "\t" + x.getOne().getOne()
+                  )
+               );
+            }
+        }
     }
 
 }

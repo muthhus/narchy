@@ -34,7 +34,10 @@ public class NALTask extends Pri implements Task {
 
     public final long[] stamp;
 
-    public short[] cause = ArrayUtils.EMPTY_SHORT_ARRAY;
+    /** cause zero is reserved for unknown causes, as a catch-all */
+    public static final short[] UnknownCause = new short[] { 0 };
+
+    public short[] cause = UnknownCause;
 
     final int hash;
 
