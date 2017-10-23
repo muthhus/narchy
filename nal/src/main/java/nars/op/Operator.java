@@ -8,6 +8,7 @@ import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.task.NALTask;
+import nars.task.NativeTask;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import static nars.Op.ATOM;
 import static nars.Op.INH;
@@ -58,6 +60,7 @@ public class Operator extends BaseConcept implements PermanentConcept {
         assert (operation.op() == INH && operation.subIs(1, ATOM));
         return operation.sub(0).subterms();
     }
+
     public static @Nullable Atom func(Termed operation) {
         return (Atom) operation.sub(1);
     }
@@ -96,97 +99,4 @@ public class Operator extends BaseConcept implements PermanentConcept {
 //        nar.input( Operator.log(nar, x) );
 //    }
 
-    /**
-     * debounced and atomically/asynchronously executable operation
-     */
-    public static class AtomicExec implements BiFunction<Task, NAR, Task> {
-
-        private final float minPeriod;
-        private final float expThresh;
-
-        /**
-         * time of the current rising edge, or ETERNAL if not activated
-         */
-        final AtomicLong rise = new AtomicLong(ETERNAL);
-
-        /** how many durations before the current time in which a goal remains active in the present */
-        final static int pastDurs = 1;
-        final static int presentDurs = 1;
-
-        long lastActivity = ETERNAL;
-        public static final Logger logger = LoggerFactory.getLogger(AtomicExec.class);
-
-        final BiConsumer<Task, NAR> exe;
-
-        public AtomicExec(BiConsumer<Task, NAR> exe, float expThresh) {
-            this(exe, expThresh, 0);
-        }
-
-        public AtomicExec(BiConsumer<Task, NAR> exe, float expThresh, float minRecoveryPeriod /* dur's */) {
-            this.exe = exe;
-            this.minPeriod = minRecoveryPeriod;
-            this.expThresh = expThresh;
-        }
-
-        @Override
-        public @Nullable Task apply(Task x, NAR n) {
-
-            long now = n.time();
-            int dur = n.dur();
-            if (!x.isBefore(now - pastDurs * dur)) {
-                long xs = x.start();
-                if (xs <= now + presentDurs*dur) {
-                    return tryInvoke(x, n);
-                } else {
-                    //schedule for future execution
-                    n.at(xs, ()->tryInvoke(x, n));
-                }
-            } else {
-                //too early
-                System.err.println(x + " too early");
-            }
-
-            return x;
-        }
-
-        /**
-         * executed async
-         */
-        protected void invoke(Task x, NAR n) {
-            try {
-                @Nullable Concept cc = x.concept(n, true);
-                if (cc != null) {
-                    long now = n.time();
-                    Truth desire = cc.goals().truth(now, n);
-                    if (desire != null && desire.expectation() >= expThresh) {
-                        exe.accept(x, n);
-                    }
-                }
-            } catch (Throwable t) {
-                logger.info("{} {}", this, t);
-            } finally {
-                //end invocation
-                lastActivity = n.time();
-                rise.set(ETERNAL);
-            }
-        }
-
-        public @Nullable Task tryInvoke(Task x, NAR n) {
-
-            long now = n.time();
-            if (lastActivity == ETERNAL || (now - lastActivity > minPeriod * n.dur()) && rise.compareAndSet(ETERNAL, now)) {
-
-
-                n.runLater(() -> invoke(x, n)); //async exec
-
-                //invoke(x, n); //inline exec
-            }
-            return null;
-        }
-
-        public boolean isInvoked() {
-            return rise.get() != ETERNAL;
-        }
-
-    }
 }

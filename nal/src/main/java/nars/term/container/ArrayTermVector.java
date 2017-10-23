@@ -46,7 +46,7 @@ public class ArrayTermVector extends TermVector {
             if (s != y.length)
                 return false;
 
-            boolean srcXorY = System.identityHashCode(x) < System.identityHashCode(y);
+            //boolean srcXorY = System.identityHashCode(x) < System.identityHashCode(y);
             for (int i = 0; i < s; i++) {
                 Term xx = x[i];
                 Term yy = y[i];
@@ -55,16 +55,17 @@ public class ArrayTermVector extends TermVector {
                 } else if (!xx.equals(yy)) {
                     return false;
                 } else {
-                    //share since subterm is equal
-                    if (srcXorY)
-                        y[i] = xx;
-                    else
-                        x[i] = yy;
+//                    //share since subterm is equal
+//                    if (srcXorY)
+//                        y[i] = xx;
+//                    else
+//                        x[i] = yy;
 
                 }
             }
 
             //share since array is equal
+            boolean srcXorY = System.identityHashCode(x) < System.identityHashCode(y);
             if (srcXorY)
                 that.terms = x;
             else

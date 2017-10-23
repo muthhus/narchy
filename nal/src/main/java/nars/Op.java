@@ -1207,14 +1207,12 @@ public enum Op {
     static private Term implInConjReduction(final Term conj /* possibly a conjunction */) {
 
 
-        if (!conj.hasAny(IMPL))
+        if (!conj.hasAny(IMPL) || conj.op()!=CONJ)
             return conj; //fall-through
-
-        assert (conj.op() == CONJ);
 
         int conjDT = conj.dt();
 
-        if (/*dt==DTERNAL || */conjDT == XTERNAL)
+        if (conjDT == XTERNAL)
             return conj;
 
 
@@ -1246,7 +1244,7 @@ public enum Op {
         } else {
             //more than 2; group them as one term
             TermContainer cs = conj.subterms();
-            @NotNull TreeSet<Term> ss = cs.toSortedSet();
+            TreeSet<Term> ss = cs.toSortedSet();
             assert (ss.remove(implication)) : "must have removed something";
 
             Term[] css = sorted(ss);
@@ -1257,7 +1255,7 @@ public enum Op {
         }
 
 
-        if (whichImpl == 0 && conjDT != DTERNAL && conjDT != XTERNAL) {
+        if (whichImpl == 0 && conjDT != DTERNAL) {
             conjDT = -conjDT; //reverse dt if impl is from the 0th subterm
         }
 
@@ -1267,7 +1265,7 @@ public enum Op {
         if (conjInner instanceof Bool)
             return conjInner;
 
-        @NotNull Term implPost = implication.sub(1); /* impl postcondition */
+        Term implPost = implication.sub(1); /* impl postcondition */
 
         int preInInner = conjInner.subtermTimeSafe(implication.sub(0));
         if (preInInner == DTERNAL)
@@ -1283,7 +1281,6 @@ public enum Op {
     }
 
 
-    @NotNull
     private static Term newDiff(/*@NotNull*/ Op op, Term... t) {
 
         //corresponding set type for reduction:

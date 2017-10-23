@@ -1,7 +1,7 @@
 package nars.nar;
 
 import nars.*;
-import nars.op.Operator;
+import nars.op.AtomicExec;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.time.Tense;
@@ -55,7 +55,7 @@ public class OperatorTest {
 //            }
 //        });
         final int[] count = {0};
-        n.onOp("x", new Operator.AtomicExec((x, nar) -> {
+        n.onOp("x", new AtomicExec((x, nar) -> {
             System.err.println("INVOKE " + x);
             count[0]++;
         }, 0.66f, 2));
@@ -73,7 +73,7 @@ public class OperatorTest {
     public void testChoose() throws Narsese.NarseseException {
         NAR n = NARS.tmp();
         n.time.dur(10);
-        n.onOp("x", new Operator.AtomicExec((x, nar) -> {
+        n.onOp("x", new AtomicExec((x, nar) -> {
             Term[] args = args(x);
             if (args.length > 0) {
                 Term r;
@@ -101,7 +101,7 @@ public class OperatorTest {
     @Test
     public void testGoal2() throws Narsese.NarseseException {
         NAR n = NARS.tmp();
-        n.onOp("x", new Operator.AtomicExec((t, nar) -> {
+        n.onOp("x", new AtomicExec((t, nar) -> {
             Term x = t.term();
             Term[] args = args(t);
             Term y = $.func("args", args);

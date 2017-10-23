@@ -69,7 +69,7 @@ public abstract class NativeTask implements ITask {
 
     }
 
-    public static final class SchedTask extends NativeTask implements Comparable<SchedTask> {
+    public static class SchedTask extends NativeTask implements Comparable<SchedTask>, Consumer<NAR> {
 
         public final long when;
         public final Object then;
@@ -90,6 +90,11 @@ public abstract class NativeTask implements ITask {
         }
 
         @Override
+        public final void accept(NAR nar) {
+            run(nar);
+        }
+
+        @Override
         public final @Nullable Iterable<? extends ITask> run(NAR n) {
             if (then instanceof Consumer)
                 ((Consumer) then).accept(n);
@@ -100,18 +105,21 @@ public abstract class NativeTask implements ITask {
         }
 
         @Override
-        public int compareTo(@NotNull NativeTask.SchedTask b) {
-            if (this == b)
-                return 0;
+        public int compareTo(NativeTask.SchedTask b) {
+            if (this == b) return 0;
 
             int t = Longs.compare(when, b.when);
             if (t != 0) {
                 return t;
             }
 
+            if (this.equals(b))
+                return 0;
+
             Object aa = then;
             Object bb = b.then;
             if (aa == bb) return 0;
+
             //as a last resort, compare their system ID
             return Integer.compare(System.identityHashCode(aa), System.identityHashCode(bb)); //maintains uniqueness in case they occupy the same time
         }

@@ -8,10 +8,10 @@ import javassist.util.proxy.ProxyObject;
 import jcog.Util;
 import jcog.map.CustomConcurrentHashMap;
 import nars.*;
+import nars.op.AtomicExec;
 import nars.op.Operator;
 import nars.task.LatchingSignalTask;
 import nars.task.NALTask;
-import nars.task.SignalTask;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
@@ -139,7 +139,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
             super(id);
             this.object = object;
 
-            nar.onOp(this, new Operator.AtomicExec(operator(object.getClass()), 0.5f));
+            nar.onOp(this, new MethodExec(object));
         }
 
         @NotNull
@@ -229,8 +229,26 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
             return nextValue;
         }
+
+
     }
 
+    private class MethodExec extends AtomicExec {
+        public MethodExec(Object object) {
+            super(operator(object.getClass()), 0.5f);
+        }
+
+        @Override
+        protected boolean exePrefilter(Task x) {
+            TermContainer args = validArgs(Operator.args(x));
+            if (args == null)
+                return false;
+            if (null == validMethod(args.sub(0)))
+                return false;
+            //TODO other prefilter conditions
+            return true;
+        }
+    }
 
     private Term[] terms(Object[] args) {
         //TODO use direct array creation, not Stream
@@ -275,18 +293,12 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
         return (task, n) -> {
 
             Term taskTerm = task.term();
-            TermContainer args = Operator.args(taskTerm);
-            int a = args.subs();
-            if (!(a == 2 || (a == 3 && args.sub(2).op() == VAR_DEP))) {
-                //this is likely a goal from the NAR to itself about a desired result state
-                //used during reasoning
-                //anyway it is invalid for invocation (u
+            TermContainer args = validArgs(Operator.args(taskTerm));
+            if (args == null)
                 return;
-            }
 
-
-            Term method = args.sub(0);
-            if (method.op() != ATOM)
+            Term method = validMethod(args.sub(0));
+            if (method == null)
                 return;
 
             Term methodArgs = args.sub(1);
@@ -343,6 +355,28 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
             }
 
         };
+    }
+
+    private TermContainer validArgs(TermContainer args) {
+        int a = args.subs();
+        if (!(a == 2 || (a == 3 && args.sub(2).op() == VAR_DEP))) {
+            //this is likely a goal from the NAR to itself about a desired result state
+            //used during reasoning
+            //anyway it is invalid for invocation (u
+            return null;
+        }
+        return args;
+    }
+
+    private Term validMethod(Term method) {
+        if (method.op() != ATOM)
+            return null;
+        if (methodExclusions.contains(method.toString()))
+            return null;
+
+        //TODO check a cached list of the reflected methods of the target class
+
+        return method;
     }
 
     private Class[] typesOf(Object[] orgs) {

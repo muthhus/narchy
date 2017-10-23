@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.function.Consumer;
 
 /**
  * Time state
@@ -68,6 +69,9 @@ public abstract class Time implements Clock, Serializable {
 
 
     public void at(long whenOrAfter, Runnable then) {
+        at(new SchedTask(whenOrAfter, then));
+    }
+    public void at(long whenOrAfter, Consumer<NAR> then) {
         at(new SchedTask(whenOrAfter, then));
     }
 

@@ -1144,6 +1144,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final void runLater(@NotNull Runnable t) {
         time.at(time(), t);
     }
+    public final void runLater(@NotNull Consumer<NAR> t) {
+        time.at(time(), t);
+    }
 
 
     @NotNull
