@@ -54,7 +54,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
         @Override
-        public @Nullable void add(/*@NotNull*/ Task input, BaseConcept c, /*@NotNull*/ NAR nar) {
+        public void add(/*@NotNull*/ Task input, BaseConcept c, /*@NotNull*/ NAR nar) {
             //nothing
         }
 
@@ -362,7 +362,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     }
 
     @Override
-    @Nullable
     public void add(/*@NotNull*/ Task input, BaseConcept c, /*@NotNull*/ NAR nar) {
 
         int cap = capacity();

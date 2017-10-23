@@ -59,8 +59,7 @@ public final class TaskBeliefOp extends AbstractPred<Derivation> {
                     return false;
             }
             if (belief) {
-                if (!(derivation.belief != null && derivation.termSub1op == CONJ.id && isSequence(derivation.belief.term().dt())))
-                    return false;
+                return derivation.belief != null && derivation.termSub1op == CONJ.id && isSequence(derivation.belief.term().dt());
             }
             return true;
         }
@@ -87,8 +86,7 @@ public final class TaskBeliefOp extends AbstractPred<Derivation> {
                     return false;
             }
             if (belief) {
-                if (!(derivation.belief != null && derivation.termSub1op == CONJ.id && !isSequence(derivation.belief.term().dt())))
-                    return false;
+                return derivation.belief != null && derivation.termSub1op == CONJ.id && !isSequence(derivation.belief.term().dt());
             }
             return true;
         }

@@ -245,7 +245,6 @@ public class Temporalize implements ITemporalize {
                 Term implPred = implComponents.sub(1);
 
                 /*if (!implSubj.equals(implPred))*/
-            {
                 if (implDT == DTERNAL) {
                     //do not infer any specific temporal relation between the subterms
                     //just inherit from the parent directly
@@ -296,10 +295,8 @@ public class Temporalize implements ITemporalize {
                         //TODO repeat case
                     }*/
 
-            }
 
-
-            break;
+                break;
 
 
             case NEG:
@@ -310,10 +307,25 @@ public class Temporalize implements ITemporalize {
                 int tdt = x.dt();
                 if (tdt == DTERNAL) {
                     x.subterms().forEach(sub -> {
-                        know(sub, relative(sub, x, 0)); //link to super-conj
+                        know(sub, relative(sub, x, DTERNAL)); //link to super-conj
                     });
                 } else if (tdt != XTERNAL) {
                     //add the known timing of the conj's events
+
+                    //the raw events HACK this should be handled by some use of .events() will add flags later for including the compounds not just the fully decomposed events
+                    Term pa = null; int pt = 0;
+                    for (int i = 0, s = x.subs(); i < s; i++) {
+                        Term a = x.sub(i); //conj subevent
+
+                        int at = x.subTime(a);
+                        know(a, relative(a, x, at)); //link to its position in the super-conj
+                        if (i > 0) {
+                            know(a, relative(a, pa, at-pt)); //chain to previous
+                            know(a, relative(pa, a, pt-at)); //chain to previous //is this one necessary?
+                        }
+                        pa = a;
+                        pt = at;
+                    }
 
                     FasterList<ObjectLongPair<Term>> ee = x.events();
                     int numEvents = ee.size();
@@ -322,26 +334,26 @@ public class Temporalize implements ITemporalize {
                         return;
                     }
 
-                    //matrix n^2/2
-                    for (int i = 0, eeSize = ee.size(); i < eeSize; i++) {
-                        ObjectLongPair<Term> ii = ee.get(i);
-                        Term a = ii.getOne(); //conj subevent
-
-                        int at = (int) ii.getTwo();
-                        know(a, relative(a, x, at)); //link to super-conj
-
-                        for (int j = i + 1; j < eeSize; j++) {
-                            ObjectLongPair<Term> jj = ee.get(j);
-                            Term b = jj.getOne();
-
-                            //chain to previous term
-                            int bt = (int) jj.getTwo();
-                            know(a, relative(a, b, at - bt));
-                            if (!a.equals(b)) {
-                                know(b, relative(b, a, bt - at));
-                            }
-                        }
-                    }
+//                    //matrix n^2/2
+//                    for (int i = 0, eeSize = ee.size(); i < eeSize; i++) {
+//                        ObjectLongPair<Term> ii = ee.get(i);
+//                        Term a = ii.getOne(); //conj subevent
+//
+//                        int at = (int) ii.getTwo();
+//                        know(a, relative(a, x, at)); //link to its position in the super-conj
+//
+//                        for (int j = i + 1; j < eeSize; j++) {
+//                            ObjectLongPair<Term> jj = ee.get(j);
+//                            Term b = jj.getOne();
+//
+//                            //chain to previous term
+//                            int bt = (int) jj.getTwo();
+//                            know(a, relative(a, b, at - bt));
+//                            if (!a.equals(b)) {
+//                                know(b, relative(b, a, bt - at));
+//                            }
+//                        }
+//                    }
 
 //                    TermContainer ss = term.subterms();
 //                    int sss = ss.size();
@@ -546,11 +558,11 @@ public class Temporalize implements ITemporalize {
             else
                 return null;
         } else if (o.temporal) {
-            int xSize = x.subs();
             if (x.dt() != XTERNAL) {
                 //TODO verify that the provided subterm timing is correct.
                 // if so, return the input as-is
                 // if not, return null
+                int xSize = x.subs();
                 if (x.op() == CONJ && xSize == 2) {
                     Term a = x.sub(0);
                     Event ae = solve(a, trail);
@@ -817,14 +829,13 @@ public class Temporalize implements ITemporalize {
         Time early = ata < bta ? at : bt;
         //Time late = ata < bta ? bt : at;
 
-        int cDur;
         if (Math.abs(ata - bta) < dur) {
             //dither
-            cDur = (int) Math.abs(ata - bta);
+            //cDur = (int) Math.abs(ata - bta);
             bta = ata;
             //late = early;
         } else {
-            cDur = -1;
+            //cDur = -1;
         }
 
         Term newTerm = Op.conjMerge(a, ata, b, bta);
@@ -834,7 +845,7 @@ public class Temporalize implements ITemporalize {
 //            return null;
 
 
-        return new TimeEvent(newTerm, early, cDur == -1 ? newTerm.dtRange() : cDur);
+        return new TimeEvent(newTerm, early, newTerm.dtRange());
     }
 
     private static Event solveStatement(Term target, Map<Term, Time> trail, Event ra, Event rb) {

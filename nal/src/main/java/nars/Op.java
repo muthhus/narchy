@@ -48,7 +48,7 @@ public enum Op {
 
     NEG("--", 1, Args.One) {
         @Override
-        public Term _the(int dt, Term... u) {
+        public Term _the(int dt, Term[] u) {
             assert (u.length == 1); //assert (dt == DTERNAL || dt == XTERNAL);
 
             Term x = u[0];
@@ -127,7 +127,7 @@ public enum Op {
      */
     CONJ("&&", true, 5, Args.GTETwo) {
         @Override
-        public Term _the(int dt, Term... u) {
+        public Term _the(int dt, Term[] u) {
 
             final int n = u.length;
             switch (n) {
@@ -526,7 +526,7 @@ public enum Op {
     @Deprecated
     DISJ("||", true, 5, Args.GTETwo) {
         @Override
-        @NotNull Term _the(int dt, Term... u) {
+        @NotNull Term _the(int dt, Term[] u) {
             assert (dt == DTERNAL);
             if (u.length == 1 && u[0].op() != VAR_PATTERN)
                 return u[0];

@@ -394,29 +394,8 @@ public enum Terms {
             return null;
     }
 
-    @Nullable
-    @Deprecated public static <T extends Term> T normalizedOrNull(@Nullable Term t) {
-        //return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
-        return (T) t.normalize();
-    }
-
-    @Nullable
-    public static Term normalizedOrNull(@Nullable Term t, Retemporalize r) {
-        Term tt = t.temporalize(r);
-        return tt!=null ? tt.normalize() : null;
-    }
 
 
-    /**
-     * detects a negated conjunction of negated subterms:
-     * (--, (&&, --A, --B, .., --Z) )
-     */
-    public static boolean isDisjunction(@NotNull Compound c) {
-        if (c.dt() == DTERNAL && c.op() == NEG && c.subIs(0, CONJ)) {
-            return allNegated(c.sub(0).subterms());
-        }
-        return false;
-    }
 
 
     public static boolean allNegated(@NotNull TermContainer subterms) {

@@ -33,7 +33,6 @@ public class DeductiveChainTest  {
     @Nullable
     public static final IndexedStatementBuilder impl = (int x, int y) ->
             $.impl(a(x), a(y));
-    @Nullable
 //    public static final IndexedStatementBuilder equiv = (int x, int y) ->
 //            $.equi(a(x), a(y));
 

@@ -199,6 +199,21 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
     @Override
+    public int subs() {
+        return ref.subs();
+    }
+
+    @Override
+    public int volume() {
+        return ref.volume();
+    }
+
+    @Override
+    public int complexity() {
+        return ref.complexity();
+    }
+
+    @Override
     public void setNormalized() {
         ref.setNormalized();
     }

@@ -33,7 +33,6 @@ import java.util.function.BiFunction;
 import static java.util.Collections.singleton;
 import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
-import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 import static org.eclipse.collections.impl.tuple.Tuples.twin;
@@ -304,7 +303,8 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
             return null;
         }
 
-        if ((t = normalizedOrNull(t)) == null) {
+        //return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
+        if ((t = t.normalize()) == null) {
             if (!safe) Task.fail(t, "not normalizable", false);
             return null;
         }

@@ -19,7 +19,6 @@ import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 
 import static nars.Op.NEG;
-import static nars.term.Terms.normalizedOrNull;
 
 public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Tasked> {
 
@@ -100,8 +99,9 @@ public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Ta
         this.confMax = Math.min(1.0f, confMax);
         this.confMin = Math.max(0.0f, confMin);
         this.punc = punc;
+        //return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
         Term term =
-                normalizedOrNull(Narsese.term(sentenceTerm, true).term());
+                Narsese.term(sentenceTerm, true).term().normalize();
 
         if (term.op()==NEG) {
             term = term.unneg();

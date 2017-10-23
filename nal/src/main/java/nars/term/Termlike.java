@@ -356,9 +356,11 @@ public interface Termlike {
                 return varDep();
             case VAR_INDEP:
                 return varIndep();
+            default:
+                throw new UnsupportedOperationException();
         }
 
-        throw new UnsupportedOperationException();
+
     }
 
 

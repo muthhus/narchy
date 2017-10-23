@@ -76,7 +76,7 @@ public interface Compound extends Term, IPair, TermContainer {
      * whether any subterms (recursively) have
      * non-DTernal temporal relation
      */
-    default boolean isTemporal() {
+    @Override default boolean isTemporal() {
         return (dt() != DTERNAL && op().temporal)
                 ||
                 (subterms().isTemporal());

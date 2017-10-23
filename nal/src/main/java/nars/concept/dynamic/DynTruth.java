@@ -41,7 +41,6 @@ public final class DynTruth implements Truthed {
         this.truth = truth;
     }
 
-    @Nullable
     public float budget() {
 
         int s = e.size();

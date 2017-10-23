@@ -370,7 +370,7 @@ public class TemporalizeTest {
         System.out.println(h);
         assertNotNull(solution);
         //assertEquals("((#1-->swimmer)&&(#1-->$2))@ETE", solution.toString());
-        assertEquals("((#1-->swimmer)&&(#1-->$2))@:->(swan-->$2)", solution.toString());
+        assertEquals("((#1-->swimmer)&&(#1-->$2))@ETE", solution.toString());
         assertEquals(ETERNAL, solution.start(h).abs());
     }
 
@@ -625,7 +625,8 @@ public class TemporalizeTest {
             t.knowAbsolute($("((c &&+5 d) ==>-15 (a &&+5 b))"), invariant);
             Map<Term, Time> h = new HashMap();
             Event s = t.solve($("(c &&+- d)"), h);
-            assertEquals("(c &&+5 d)", invariant + ":", s.term.toString());
+
+            assertEquals("(c &&+5 d)", s.term.toString());
             assertEquals(11, s.start(h).abs()); //@[11..16]
         }
     }
@@ -762,12 +763,12 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
             HashMap h = new HashMap();
             Event st = t.solve(Aneg, h);
             assertEquals("(--,a)", st.term.toString());
-            assertEquals((x.subtermTime(Aneg) + start), st.start(h).abs());
+            assertEquals((x.subTime(Aneg) + start), st.start(h).abs());
         }
         HashMap h = new HashMap();
         Event st = t.solve(A, h);
         assertEquals("a", st.term.toString());
-        assertEquals((x.subtermTime(A) + start), st.start(h).abs());
+        assertEquals((x.subTime(A) + start), st.start(h).abs());
 
 
         //System.out.println(a);
@@ -968,8 +969,8 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
                 Term y1 = ye.get(j - 1).getOne();
                 Term y2 = ye.get(j).getOne();
                 assertEquals(
-                        y.subtermTime(y2) - y.subtermTime(y1),
-                        x.subtermTime(y2) - x.subtermTime(y1)
+                        y.subTime(y2) - y.subTime(y1),
+                        x.subTime(y2) - x.subTime(y1)
                 );
             }
 

@@ -128,21 +128,20 @@ public class Taskify extends AbstractPred<Derivation> {
         if (FILTER_SIMILAR_DERIVATIONS) {
             //test for same punc, term, start/end, freq, but different conf
             if (parent.term().equals(derived.term()) && parent.punc() == derived.punc() && parent.start() == derived.start() && parent.end() == derived.end()) {
-                /*if (Arrays.equals(derived.stamp(), parent.stamp()))*/ {
-                    if (parent.isQuestOrQuestion() ||
-                            (Util.equals(parent.freq(), derived.freq(), truthResolution) &&
-                                    parent.evi() >= derived.evi())
-                            ) {
-                        if (Param.DEBUG_SIMILAR_DERIVATIONS)
-                            logger.warn("similar derivation to parent:\n\t{} {}\n\t{}", derived, parent, channel.ruleString);
+                /*if (Arrays.equals(derived.stamp(), parent.stamp()))*/
+                if (parent.isQuestOrQuestion() ||
+                        (Util.equals(parent.freq(), derived.freq(), truthResolution) &&
+                                parent.evi() >= derived.evi())
+                        ) {
+                    if (Param.DEBUG_SIMILAR_DERIVATIONS)
+                        logger.warn("similar derivation to parent:\n\t{} {}\n\t{}", derived, parent, channel.ruleString);
 
 
-                        if (parent instanceof DerivedTask) {
-                            parent.priMax(derived.priElseZero());
-                            ((NALTask) parent).causeMerge(derived); //merge cause
-                        }
-                        return true;
+                    if (parent instanceof DerivedTask) {
+                        parent.priMax(derived.priElseZero());
+                        ((NALTask) parent).causeMerge(derived); //merge cause
                     }
+                    return true;
                 }
             }
         }

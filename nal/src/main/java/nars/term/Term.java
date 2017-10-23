@@ -220,8 +220,6 @@ public interface Term extends Termed, Comparable<Termed> {
         return csrc.op().the(csrc.dt(), target);
     }
 
-
-    @Nullable
     default <X> boolean pathsTo(/*@NotNull*/ Function<Term, X> subterm, /*@NotNull*/ BiPredicate<ByteList, X> receiver) {
         X ss = subterm.apply(this);
         if (ss != null) {
@@ -258,7 +256,6 @@ public interface Term extends Termed, Comparable<Termed> {
         return null;
     }
 
-    @Nullable
     static <X> boolean pathsTo(/*@NotNull*/ ByteArrayList p, TermContainer superTerm, /*@NotNull*/ Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
 
 
@@ -460,7 +457,7 @@ public interface Term extends Termed, Comparable<Termed> {
      *
      * @param x subterm which must be present
      */
-    default int subtermTime(/*@NotNull*/ Term x) {
+    default int subTime(/*@NotNull*/ Term x) {
         int d = subtermTimeSafe(x);
         if (d != DTERNAL)
             return d;
@@ -524,11 +521,9 @@ public interface Term extends Termed, Comparable<Termed> {
                     return s;
                 }
 
-//            default:
-//                return 0;
+            default:
+                return 0;
         }
-
-        return 0;
 
     }
 

@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import alice.tuprolog.lib.IOLibrary;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,8 @@ public class IOLibraryTestCase {
 		assertEquals(0, primitives.get(PrimitiveInfo.FUNCTOR).size());
 	}
 	
-	@Test public void testTab1() throws MalformedGoalException {
+	@Test
+	public void testTab1() throws MalformedGoalException {
 		Prolog engine = new Prolog();
 		TestOutputListener l = new TestOutputListener();
 		engine.addOutputListener(l);

@@ -1,6 +1,7 @@
 package nars.concept;
 
 import jcog.bag.Bag;
+import jcog.list.FasterList;
 import jcog.map.CompactArrayMap;
 import jcog.pri.PriReference;
 import nars.NAR;
@@ -18,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -370,7 +370,7 @@ public class BaseConcept implements Concept {
 
     @Override
     public Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests) {
-        List<Stream<Task>> s = new LinkedList<>();
+        List<Stream<Task>> s = new FasterList<>();
         if (includeBeliefs) s.add(beliefs.stream());
         if (includeGoals) s.add(goals.stream());
         if (includeQuestions) s.add(questions.stream());

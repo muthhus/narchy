@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static nars.Op.*;
-import static nars.term.Terms.normalizedOrNull;
 import static nars.term.atom.Atomic.the;
 import static nars.time.Tense.ETERNAL;
 
@@ -177,7 +176,8 @@ public class Inperience extends LeakBack {
         if (c == null || !c.op().conceptualizable)
             return 0;
 
-        Term r = normalizedOrNull(c);
+        //return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
+        Term r = c.normalize();
         if (r == null)
             return 0;
 

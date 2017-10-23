@@ -129,7 +129,6 @@ public interface NAct {
      * selects one of 2 states until it shifts to the other one. suitable for representing
      * push-buttons like keyboard keys. by default with no desire the state is off.   the off procedure will not be called immediately.
      */
-    @Nullable
     default void actionTriState(@NotNull Term s, @NotNull IntConsumer i) {
         actionTriState(s, (v) -> {
             i.accept(v);
@@ -141,7 +140,6 @@ public interface NAct {
      * tri-state implemented as delta version memory of last state.
      * initial state is neutral.
      */
-    @Nullable
     default void actionTriState(@NotNull Term cc, @NotNull IntPredicate i) {
         //final int[] state = {0};
         //new GoalActionConcept(cc, this, (b, d) -> {

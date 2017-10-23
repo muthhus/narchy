@@ -28,7 +28,6 @@ public final class PrediTrie {
     final FasterList<ValueFork> postChoices = new FasterList();
 
     public PrediTrie(PremiseRuleSet r) {
-        super();
 
         pre = new TermTrie<>();
 
@@ -150,7 +149,7 @@ public final class PrediTrie {
             bb.removeIf(p -> {
                 if (p instanceof AndCondition) {
                     AndCondition ac = (AndCondition) p;
-                    if (ac.OR(x -> {
+                    return ac.OR(x -> {
                         if (x instanceof AbstractPatternOp.PatternOp) {
                             AbstractPatternOp.PatternOp so = (AbstractPatternOp.PatternOp) x;
                             if (so.taskOrBelief == subterm) {
@@ -162,8 +161,7 @@ public final class PrediTrie {
                             }
                         }
                         return false;
-                    }))
-                        return true;
+                    });
 
                 }
                 return false;

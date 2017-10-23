@@ -152,7 +152,7 @@ public class TruthWave {
                     nar.truth(c, punc, mid, mid) //point
                     //nar.truth(c, punc, t, u) //range
             );
-            t += dt;
+            t = (long)(t+dt);
         }
         this.current = null;
         this.size = j;

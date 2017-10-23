@@ -76,7 +76,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return subs() <= i ? ifOutOfBounds : sub(i);
     }
 
-    @Nullable
     default boolean subEquals(int i, /*@NotNull*/ Term x) {
         return subs() > i && sub(i).equals(x);
     }

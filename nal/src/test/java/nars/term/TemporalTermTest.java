@@ -559,45 +559,45 @@ public class TemporalTermTest {
     public void testSubtermTimeRecursive() throws Narsese.NarseseException {
         Compound c = $("(hold:t2 &&+1 (at:t1 &&+3 ([opened]:t1 &&+5 open(t1))))");
         assertEquals("(((t2-->hold) &&+1 (t1-->at)) &&+3 ((t1-->[opened]) &&+5 open(t1)))", c.toString());
-        assertEquals(0, c.subtermTime($("hold:t2")));
-        assertEquals(1, c.subtermTime($("at:t1")));
-        assertEquals(4, c.subtermTime($("[opened]:t1")));
-        assertEquals(9, c.subtermTime($("open(t1)")));
+        assertEquals(0, c.subTime($("hold:t2")));
+        assertEquals(1, c.subTime($("at:t1")));
+        assertEquals(4, c.subTime($("[opened]:t1")));
+        assertEquals(9, c.subTime($("open(t1)")));
         assertEquals(9, c.dtRange());
     }
 
     @Test
     public void testSubtermNonCommutivePosNeg() throws Narsese.NarseseException {
         Term x = $("((d-->c) ==>-3 (a-->b))");
-        assertEquals(0, x.subtermTime($("(d-->c)")));
-        assertEquals(-3, x.subtermTime($("(a-->b)")));
+        assertEquals(0, x.subTime($("(d-->c)")));
+        assertEquals(-3, x.subTime($("(a-->b)")));
         assertEquals(DTERNAL, x.subtermTimeSafe($("a"))); //a is not an event within x
     }
 
     @Test
     public void subtermTimeWithConjInImpl() throws Narsese.NarseseException {
         @NotNull Term t = $("((b &&+5 c) ==>-10 (a &&+5 d))");
-        assertEquals(0, t.subtermTime($("(b &&+5 c)")));
-        assertEquals(-5, t.subtermTime($("(a &&+5 d)")));
-        assertEquals(-5, t.subtermTime($("a")));
-        assertEquals(0, t.subtermTime($("b")));
-        assertEquals(5, t.subtermTime($("c")));
+        assertEquals(0, t.subTime($("(b &&+5 c)")));
+        assertEquals(-5, t.subTime($("(a &&+5 d)")));
+        assertEquals(-5, t.subTime($("a")));
+        assertEquals(0, t.subTime($("b")));
+        assertEquals(5, t.subTime($("c")));
         assertEquals(DTERNAL, t.subtermTimeSafe($("x")));
     }
 
     @Test
     public void testSubtermTimeRecursiveWithNegativeCommutive() throws Narsese.NarseseException {
         Compound b = $("(a &&+5 b)");
-        assertEquals(0, b.subtermTime(A));
-        assertEquals(5, b.subtermTime(B));
+        assertEquals(0, b.subTime(A));
+        assertEquals(5, b.subTime(B));
 
         Compound c = $("(a &&-5 b)");
-        assertEquals(5, c.subtermTime(A));
-        assertEquals(0, c.subtermTime(B));
+        assertEquals(5, c.subTime(A));
+        assertEquals(0, c.subTime(B));
 
         Compound d = $("(b &&-5 a)");
-        assertEquals(0, d.subtermTime(A));
-        assertEquals(5, d.subtermTime(B));
+        assertEquals(0, d.subTime(A));
+        assertEquals(5, d.subTime(B));
 
 //        Compound e = $("(a <=>+1 b)");
 //        assertEquals(0, e.subtermTime(A));
@@ -618,24 +618,24 @@ public class TemporalTermTest {
         String g0 = "(((x) &&+1 (y)) &&+1 (z))";
         Compound g = $(g0);
         assertEquals(g0, g.toString());
-        assertEquals(0, g.subtermTime($("(x)")));
-        assertEquals(1, g.subtermTime($("(y)")));
-        assertEquals(2, g.subtermTime($("(z)")));
+        assertEquals(0, g.subTime($("(x)")));
+        assertEquals(1, g.subTime($("(y)")));
+        assertEquals(2, g.subTime($("(z)")));
 
         Compound h = $("((z) &&+1 ((x) &&+1 (y)))");
-        assertEquals(0, h.subtermTime($("(z)")));
-        assertEquals(1, h.subtermTime($("(x)")));
-        assertEquals(2, h.subtermTime($("(y)")));
+        assertEquals(0, h.subTime($("(z)")));
+        assertEquals(1, h.subTime($("(x)")));
+        assertEquals(2, h.subTime($("(y)")));
 
         Compound i = $("((y) &&+1 ((z) &&+1 (x)))");
-        assertEquals(0, i.subtermTime($("(y)")));
-        assertEquals(1, i.subtermTime($("(z)")));
-        assertEquals(2, i.subtermTime($("(x)")));
+        assertEquals(0, i.subTime($("(y)")));
+        assertEquals(1, i.subTime($("(z)")));
+        assertEquals(2, i.subTime($("(x)")));
 
         Compound j = $("((x) &&+1 ((z) &&+1 (y)))");
-        assertEquals(0, j.subtermTime($("(x)")));
-        assertEquals(1, j.subtermTime($("(z)")));
-        assertEquals(2, j.subtermTime($("(y)")));
+        assertEquals(0, j.subTime($("(x)")));
+        assertEquals(1, j.subTime($("(z)")));
+        assertEquals(2, j.subTime($("(y)")));
     }
 
     @Test

@@ -30,8 +30,7 @@ import java.nio.file.Paths;
 import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;
-import static nars.Op.ATOM;
-import static nars.Op.INH;
+import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -539,10 +538,18 @@ public class IO {
                 //case SIMILAR: similarAppend(c, p, pretty); return;
 
                 case NEG:
-                    //special case disjunction: (--,(&&,.....))
-                    if (Terms.isDisjunction(c)) {
-                        compoundAppend(Op.DISJ.toString(), c.sub(0).subterms(), Term::neg, p);
-                        return;
+                    /**
+                     * detects a negated conjunction of negated subterms:
+                     * (--, (&&, --A, --B, .., --Z) )
+                     */
+
+                    if (c.dt() == DTERNAL && c.op() == NEG) {
+                        Term x = c.sub(0);
+                        if (x.op() == CONJ) {
+                            if (Terms.allNegated(x.subterms())) {
+                                compoundAppend(Op.DISJ.toString(), x.subterms(), Term::neg, p);
+                            }
+                        }
                     }
             }
 
