@@ -110,15 +110,11 @@ public class StampTest {
 
     @Test
     public void testStampToSetArray() {
-        assertTrue(toSetArray(new long[] { 1, 2, 3 }).length == 3);
-        assertTrue(toSetArray(new long[] { 1, 1, 3 }).length == 2);
-        assertTrue(toSetArray(new long[] { 1 }).length == 1);
-        assertTrue(toSetArray(new long[] {  }).length == 0);
-        assertTrue(
-                Arrays.hashCode(toSetArray(new long[] { 3,2,1 }))
-                ==
-                Arrays.hashCode(toSetArray(new long[] { 2,3,1 }))
-        );
+        assertEquals(3, toSetArray(new long[]{1, 2, 3}).length);
+        assertEquals(2, toSetArray(new long[]{1, 1, 3}).length);
+        assertEquals(1, toSetArray(new long[]{1}).length);
+        assertEquals(0, toSetArray(new long[]{}).length);
+        assertEquals(Arrays.hashCode(toSetArray(new long[]{3, 2, 1})), Arrays.hashCode(toSetArray(new long[]{2, 3, 1})));
         assertTrue(
                 Arrays.hashCode(toSetArray(new long[] { 1,2,3 }))
                 !=

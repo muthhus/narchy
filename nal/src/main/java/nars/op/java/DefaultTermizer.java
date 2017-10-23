@@ -35,8 +35,8 @@ public class DefaultTermizer implements Termizer {
     final Map<Class, Term> classes = new HashMap();
 
 
-    final static Map<Term, Object> termToObj = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, IDENTITY, 64); //cache: (class,method) -> Method
-    final static Map<Object, Term> objToTerm = new CustomConcurrentHashMap(SOFT, IDENTITY, STRONG, EQUALS, 64); //cache: (class,method) -> Method
+    final Map<Term, Object> termToObj = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, IDENTITY, 64); //cache: (class,method) -> Method
+    final Map<Object, Term> objToTerm = new CustomConcurrentHashMap(SOFT, IDENTITY, STRONG, EQUALS, 64); //cache: (class,method) -> Method
 
     /*final HashMap<Term, Object> instances = new HashMap();
     final HashMap<Object, Term> objects = new HashMap();*/
@@ -90,7 +90,7 @@ public class DefaultTermizer implements Termizer {
         if (t instanceof Int)
             return ((Int)t).id;
 
-        Object x = termToObj.get(t);;
+        Object x = termToObj.get(t);
         if (x == null)
             return t; /** return the term intance itself */
 
@@ -335,11 +335,12 @@ public class DefaultTermizer implements Termizer {
 
         //instances.put(oterm, o); //reverse
 
-        return $.p(
-                    termPackage(o.getClass().getPackage()),
-                    termClassInPackage(o.getClass()),
-                    $.the(System.identityHashCode(o), 36)
-                );
+//        return $.p(
+//                    termPackage(o.getClass().getPackage()),
+//                    termClassInPackage(o.getClass()),
+//                    $.the(System.identityHashCode(o), 36)
+//                );
+        return $.the(System.identityHashCode(o), 36);
     }
 
     @Nullable
@@ -352,6 +353,10 @@ public class DefaultTermizer implements Termizer {
     @Nullable
     public Term term(@Nullable Object o) {
         if (o == null) return NULL;
+        if (o instanceof Boolean) {
+            if (((Boolean) o)) return TRUE;
+            else return FALSE;
+        }
 
         //        String cname = o.getClass().toString().substring(6) /* "class " */;
 //        int slice = cname.length();
@@ -397,7 +402,11 @@ public class DefaultTermizer implements Termizer {
         if (cacheableInstance(o)) {
             oe = objToTerm.get(o);
             if (oe == null) {
-                oe = objToTerm.put(o, obj2term(o));
+                Term ob = obj2term(o);
+                if (ob!=null)
+                    oe = objToTerm.put(o, ob);
+                else
+                    return $.varDep("unknown_" + System.identityHashCode(o));
             }
         } else {
             oe = obj2term(o);

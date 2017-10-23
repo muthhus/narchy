@@ -28,11 +28,11 @@ public abstract class Performance {
 	private long totalMemory;
 	protected final DecimalFormat df = new DecimalFormat("#.###");
 
-	public Performance(String name, int repeats, int warmups) {
+	protected Performance(String name, int repeats, int warmups) {
 		this(name, repeats, warmups, true);
 	}
 
-	public Performance(String name, int repeats, int warmups, boolean gc) {
+	protected Performance(String name, int repeats, int warmups, boolean gc) {
 		this.repeats = repeats;
 		this.name = name;
 

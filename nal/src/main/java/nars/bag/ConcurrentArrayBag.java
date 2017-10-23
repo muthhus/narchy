@@ -15,11 +15,11 @@ abstract public class ConcurrentArrayBag<K,X extends Priority> extends ArrayBag<
     private final QueueLock<X> toPut;
 
 
-    public ConcurrentArrayBag(@NotNull PriMerge mergeFunction, int cap) {
+    protected ConcurrentArrayBag(PriMerge mergeFunction, int cap) {
         this(mergeFunction, new ConcurrentHashMap<>(cap), cap);
     }
 
-    public ConcurrentArrayBag(@NotNull PriMerge mergeFunction, @NotNull Map<K, X> map, int cap) {
+    protected ConcurrentArrayBag(PriMerge mergeFunction, @NotNull Map<K, X> map, int cap) {
         super(mergeFunction, map);
         setCapacity(cap);
 

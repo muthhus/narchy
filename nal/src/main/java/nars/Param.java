@@ -192,7 +192,7 @@ public abstract class Param extends Services<Term, NAR> {
         float[] w = this.want;
 
         //follows the pos/neg guidelines described in the comment of each MetaGoal
-        Perceive.want(w, -0.05f);
+        Perceive.want(w, -0.01f);
         Believe.want(w, 0.1f);
         Desire.want(w, 0.1f);
         Accurate.want(w, 0.1f);

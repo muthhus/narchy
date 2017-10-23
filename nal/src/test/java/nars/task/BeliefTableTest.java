@@ -220,9 +220,9 @@ public class BeliefTableTest {
         assertNotNull(cc,c + " unconceptualized");
 
         List<Task> tt = Lists.newArrayList(cc.beliefs());
-        assertTrue(cc.beliefs() instanceof DynamicBeliefTable || tt.size() > 0, c + " not believed");
+        assertTrue(cc.beliefs() instanceof DynamicBeliefTable || !tt.isEmpty(), c + " not believed");
 
-        if (tt.size() > 0) {
+        if (!tt.isEmpty()) {
             Task t = tt.get(0);
             //System.out.println(sim.proof());
             //System.out.println(sim.start() + ".." + /*sim.occurrence() + ".."*/ + sim.end());
@@ -299,10 +299,7 @@ public class BeliefTableTest {
     public void testDTDiff() {
 
         //+- matches anything
-        assertTrue(
-    dtDiff("(x ==>+5 y)", "(x ==>+- y)") ==
-            dtDiff("(x ==>+5 y)", "(x ==>+5 y)")
-        );
+        assertEquals(dtDiff("(x ==>+5 y)", "(x ==>+- y)"), dtDiff("(x ==>+5 y)", "(x ==>+5 y)"), 0.0);
 
         assertTrue(
     dtDiff("(x ==>+5 y)", "(x ==>+2 y)") >

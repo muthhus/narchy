@@ -85,7 +85,7 @@ public interface QuestionTable extends TaskTable {
     }
 
     /** unsorted, MRU policy */
-    static class DefaultQuestionTable extends MRUCache<Task, Task> implements QuestionTable {
+    class DefaultQuestionTable extends MRUCache<Task, Task> implements QuestionTable {
 
         final Object lock = new Object();
 

@@ -9,8 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -76,7 +75,7 @@ public class CommonVariableTest {
         assertEquals(c12, c12_reverse);
         assertEquals(0, c12.compareTo(c12_reverse));
         assertEquals(0, c12_reverse.compareTo(c12));
-        assertTrue(c12 != c12_reverse);
+        assertNotSame(c12, c12_reverse);
 
         Variable c123 = CommonVariable.common((AbstractVariable)c12, (AbstractVariable)p3.normalize(3));
         assertEquals("%770%3 class nars.term.var.UnnormalizedVariable", (c123 + " " + c123.getClass()));

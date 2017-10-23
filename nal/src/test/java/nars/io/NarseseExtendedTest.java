@@ -81,7 +81,7 @@ public class NarseseExtendedTest extends NarseseTest {
     @Test
     public void testColonReverseInheritance() throws Narsese.NarseseException {
         Compound t = term("namespace:named");
-        assertEquals(t.op(), Op.INH);
+        assertEquals(Op.INH, t.op());
         assertEquals("named", t.sub(0).toString());
         assertEquals("namespace", t.sub(1).toString());
 
@@ -115,7 +115,7 @@ public class NarseseExtendedTest extends NarseseTest {
 
             eqTask(shorter, expected);
         } catch (Narsese.NarseseException e) {
-            assertTrue(false);
+            fail(e);
         }
     }
 
@@ -175,8 +175,8 @@ public class NarseseExtendedTest extends NarseseTest {
 
             Term tt = t.term();
             assertEquals(Op.INH, tt.op());
-            assertTrue("(negated-->a)".equals(tt.toString()));
-            assertTrue(t.punc() == Op.GOAL);
+            assertEquals("(negated-->a)", tt.toString());
+            assertEquals(t.punc(), Op.GOAL);
         }
     }
 
@@ -212,9 +212,9 @@ public class NarseseExtendedTest extends NarseseTest {
         );
 
         Compound nab = term("--(a & b)");
-        assertTrue(nab.op() == Op.NEG);
+        assertSame(nab.op(), Op.NEG);
 
-        assertTrue(nab.sub(0).op() == Op.SECTe);
+        assertSame(nab.sub(0).op(), Op.SECTe);
 
 //        try {
 //            task("(-- negated illegal_extra_term)!");

@@ -213,7 +213,7 @@ static PrediTerm<Derivation> the(PremiseRuleSet r) {
         return test(tlMax, false, rules);
     }
 
-    public TestNAR test(int tlMax, boolean debug, String... rules) throws Narsese.NarseseException {
+    public TestNAR test(int tlMax, boolean debug, String... rules) {
         NAR n = new NARS().deriver((NAR nar) -> {
             PrediTerm<Derivation> d = testCompile(debug, rules);
             TrieDeriver.print(d);

@@ -14,14 +14,14 @@ public class NALTestStats implements AfterEachCallback, AfterAllCallback {
 
 
     @Override
-    public void afterAll(ExtensionContext context) throws Exception {
+    public void afterAll(ExtensionContext context) {
 
         metagoals.print(System.out);
 
     }
 
     @Override
-    public void afterEach(ExtensionContext context) throws Exception {
+    public void afterEach(ExtensionContext context) {
          NALTest n = ((NALTest)context.getTestInstance().get());
 
         context.publishReportEntry(context.getUniqueId() + " NAR stats",

@@ -16,7 +16,7 @@ abstract public class LeakBack extends TaskLeak {
 
     private final CauseChannel<ITask> out;
 
-    public LeakBack(int capacity, NAR nar) {
+    protected LeakBack(int capacity, NAR nar) {
         super(capacity, INITIAL_RATE, nar);
         this.out = nar.newCauseChannel(this);
     }

@@ -197,7 +197,7 @@ public class Inperience extends LeakBack {
         );
         y.causeMerge(x);
 
-        feedback((Task) (y.log("Inperience").pri(x.priElseZero() * priFactor)));
+        feedback(y.log("Inperience").pri(x.priElseZero() * priFactor));
 
         return 1;
     }

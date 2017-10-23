@@ -43,7 +43,6 @@ public class Implier extends DurService {
 
     private final TermGraph.ImplGraph tg;
     private final Iterable<Term> seeds;
-    private final NAR nar;
     private final CauseChannel<ITask> in;
 
     float min = Prioritized.EPSILON; //even though it's for truth
@@ -88,7 +87,6 @@ public class Implier extends DurService {
 
         assert (relativeTargetDurs.length > 0);
 
-        this.nar = n;
         this.relativeTargetDurs = relativeTargetDurs;
         this.seeds = seeds;
         this.in = n.newCauseChannel(this);

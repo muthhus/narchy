@@ -138,9 +138,9 @@ public class NARTest {
         String statement1 = "<a --> b>.";
 
         Termed a = $.$("a");
-        assertTrue(a != null);
+        assertNotNull(a);
         Termed a1 = $.$("a");
-        assertTrue(a.equals(a1));
+        assertEquals(a, a1);
 
         n.input(statement1);
         n.run(4);
@@ -158,7 +158,7 @@ public class NARTest {
         assertNotNull(a2);
 
         Concept ca = n.concept(a2, true);
-        assertTrue(ca != null);
+        assertNotNull(ca);
 
 
     }

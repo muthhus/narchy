@@ -59,7 +59,7 @@ public class TestProloglike {
     }
 
     @Test
-    public void testRiddle1() throws IOException, Narsese.NarseseException {
+    public void testRiddle1() throws Exception {
         //Param.DEBUG = true;
         NAR n = NARS.tmp();
 
@@ -74,7 +74,7 @@ public class TestProloglike {
     }
 
     @Test
-    public void testMetagol() throws IOException, Narsese.NarseseException {
+    public void testMetagol() throws Exception {
         NAR n = NARS.tmp();
 
         //n.termVolumeMax.setValue(1024);

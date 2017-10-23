@@ -13,7 +13,6 @@ public class PtrManTests {
     @Test
     public void testOps1() throws Narsese.NarseseException {
 
-        ;
         NAR n = NARS.tmp();
         n.input("opProximity2(OPmov(0,5),OPsub(0,5)).",
                 "opProximity2(OPmov(1,5),OPsub(1,4)).",

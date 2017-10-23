@@ -1,15 +1,13 @@
 package nars.op.java;
 
+import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 import javassist.util.proxy.ProxyObject;
 import jcog.Util;
 import jcog.map.CustomConcurrentHashMap;
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.op.Operator;
 import nars.task.LatchingSignalTask;
 import nars.task.NALTask;
@@ -47,10 +45,10 @@ import static nars.Op.*;
  * <p>
  * TODO option to include stack traces in conjunction with invocation
  */
-public class OObjects extends DefaultTermizer implements Termizer, MethodHandler {
+public class OObjects extends DefaultTermizer implements MethodHandler {
 
     @NotNull
-    public static final Set<String> methodExclusions = Set.of(
+    public final Set<String> methodExclusions = Sets.newConcurrentHashSet(Set.of(
             "hashCode",
             "notify",
             "notifyAll",
@@ -61,7 +59,7 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
             "setHandler",
             "toString",
             "equals"
-    );
+    ));
 
     static final Map<Class, Class> proxyCache = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, IDENTITY, 64);
     final static Map<Term, Method> methodCache = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, IDENTITY, 64); //cache: (class,method) -> Method
@@ -154,9 +152,19 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
 
             Term[] x = new Term[isVoid ? 2 : 3];
             x[0] = $.the(method.getName());
-            x[1] = args.length != 1 ? $.p(terms(args)) : OObjects.this.term(args[0]) /* unwrapped singleton */;
-            if (!isVoid)
+            switch (args.length) {
+                case 0:
+                    x[1] = Op.ZeroProduct; break;
+                case 1:
+                    x[1] = OObjects.this.term(args[0]); break; /* unwrapped singleton */
+                default:
+                    x[1] = $.p(terms(args)); break;
+            }
+            assert(x[1]!=null): "could not termize: " + Arrays.toString(args);
+            if (!isVoid) {
                 x[2] = OObjects.this.term(result);
+                assert(x[2]!=null): "could not termize: " + result;
+            }
 
             return x;
         }
@@ -177,7 +185,9 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
                 return nextValue;
             }
 
-            ValueSignalTask next = new ValueSignalTask($.func(id, opTerms(method, args, nextValue)),
+            Term f = $.func(id, opTerms(method, args, nextValue)).normalize();
+
+            ValueSignalTask next = new ValueSignalTask(f,
                     BELIEF, $.t(invocationBeliefFreq,nar.confDefault(BELIEF)),
                     now, now, nar.time.nextStamp(), nextValue);
 
@@ -185,8 +195,8 @@ public class OObjects extends DefaultTermizer implements Termizer, MethodHandler
                 next.log("Invocation" /* via VM */);
 
             if (explicit) {
-                ((NALTask) next).causeMerge(cause);
-                ((NALTask) next).priMax(cause.priElseZero());
+                next.causeMerge(cause);
+                next.priMax(cause.priElseZero());
                 cause.pri(0); //drain
                 cause.meta("@", next);
             } else {

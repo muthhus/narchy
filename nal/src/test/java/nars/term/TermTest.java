@@ -76,7 +76,7 @@ public class TermTest {
 
     @Test public void testInstantiateBoolsFromEquivString() {
         for (Term b : new Term[] { True, False, Null })
-            assertTrue(b == $.the(b.toString()));
+            assertSame(b, $.the(b.toString()));
     }
 
     @Test
@@ -189,9 +189,9 @@ public class TermTest {
 
         assertEquals(term1a.toString(), term1.toString());
         assertTrue(term1.complexity() > 1);
-        assertTrue(term1.complexity() == term2.complexity());
+        assertEquals(term1.complexity(), term2.complexity());
 
-        assertTrue(term1.op() == INH);
+        assertSame(term1.op(), INH);
 
 
         //System.out.println("t1: " + term1 + ", complexity=" + term1.getComplexity());
@@ -218,7 +218,7 @@ public class TermTest {
         assertTrue(added1, "term 1 added to set");
         assertTrue(added2, "term 2 added to set");
 
-        assertTrue(set.size() == 2);
+        assertEquals(2, set.size());
 
     }
 
@@ -229,14 +229,14 @@ public class TermTest {
         Term term1 = $.$(term1String).term();
         Term term2 = $.$(term1String).term();
 
-        assertTrue(term1.equals(term2));
-        assertTrue(term1.hashCode() == term2.hashCode());
+        assertEquals(term1, term2);
+        assertEquals(term1.hashCode(), term2.hashCode());
 
         Compound cterm1 = ((Compound) term1);
         Compound cterm2 = ((Compound) term2);
 
         //test subterms
-        assertTrue(cterm1.sub(0).equals(cterm2.sub(0))); //'a'
+        assertEquals(cterm1.sub(0), cterm2.sub(0)); //'a'
 
     }
 
@@ -281,7 +281,7 @@ public class TermTest {
 
         try {
             Task x = n.inputAndGet(t + '.');
-            assertFalse(true, t + " is invalid compound term");
+            fail(t + " is invalid compound term");
         } catch (Throwable tt) {
             assertTrue(true);
         }
@@ -295,7 +295,7 @@ public class TermTest {
 
         } catch (Throwable ex) {
             ex.printStackTrace();
-            assertTrue(false);
+            fail(ex);
         }
 
 
@@ -318,21 +318,16 @@ public class TermTest {
     }
 
     @Test
-    public void testParseOperationInFunctionalForm() {
+    public void testParseOperationInFunctionalForm() throws Narsese.NarseseException {
 
 //        assertFalse(Op.isOperation(n.term("(a,b)")));
 //        assertFalse(Op.isOperation(n.term("^wonder")));
 
-        try {
             Term x = $.$("wonder(a,b)").term();
             assertEquals(INH, x.op());
             assertTrue(isOperation(x));
             assertEquals("wonder(a,b)", x.toString());
 
-        } catch (Narsese.NarseseException ex) {
-            ex.printStackTrace();
-            assertTrue(false);
-        }
 
 
     }
@@ -376,7 +371,7 @@ public class TermTest {
 //    }
 
     @Test public void testPatternVar() throws Narsese.NarseseException {
-        assertTrue($("%x").op() == Op.VAR_PATTERN);
+        assertSame($("%x").op(), Op.VAR_PATTERN);
     }
 
     @Test
@@ -392,14 +387,14 @@ public class TermTest {
         try {
             testTermEquality(s, false);
         } catch (Narsese.NarseseException e) {
-            assertTrue(false);
+            fail(e);
         }
     }
     protected void testTermEquality(@NotNull String s)  {
         try {
             testTermEquality(s, true);
         } catch (Narsese.NarseseException e) {
-            assertTrue(false);
+            fail(e);
         }
     }
 
@@ -415,7 +410,7 @@ public class TermTest {
         //assertTrue(a != b);
 
         if (a instanceof Compound) {
-            assertEquals(((Compound)a).subterms(), ((Compound)b).subterms());
+            assertEquals(a.subterms(), b.subterms());
         }
         assertEquals(a.hashCode(), b.hashCode());
         assertEquals(a.toString(), b.toString());
@@ -651,7 +646,7 @@ public class TermTest {
             NAR t = NARS.shell();
             t.believe(x);
 
-            assertTrue(false, x + " should not have been allowed as a task content");
+            fail(x + " should not have been allowed as a task content");
 
 
         } catch (Exception e) {
@@ -853,7 +848,7 @@ public class TermTest {
 
     @Test public void testEmptyProductEquality() throws Narsese.NarseseException {
         assertEquals( $("()"),$("()") );
-        assertEquals( $("()"), ZeroProduct);
+        assertEquals(ZeroProduct, $("()"));
     }
 
 
@@ -871,7 +866,7 @@ public class TermTest {
         try {
             Term recv = o.get();
             if (recv!=Null) //False also signals invalid reduction
-                assertTrue(false, recv + " was not null");
+                fail(recv + " was not null");
         } catch (InvalidTermException e) {
             //correct if happens here
         }

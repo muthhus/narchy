@@ -93,15 +93,15 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
     //final private ConceptFire fireHappy;
 
 
-    public NAgent(@NotNull NAR nar) {
+    protected NAgent(@NotNull NAR nar) {
         this("", nar);
     }
 
-    public NAgent(@NotNull String id, @NotNull NAR nar) {
+    protected NAgent(@NotNull String id, @NotNull NAR nar) {
         this(id.isEmpty() ? null : Atomic.the(id), nar);
     }
 
-    public NAgent(@Nullable Term id, @NotNull NAR nar) {
+    protected NAgent(@Nullable Term id, @NotNull NAR nar) {
         super(nar);
 
         this.nar = nar;

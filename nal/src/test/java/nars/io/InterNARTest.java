@@ -10,6 +10,7 @@ import java.util.function.BiConsumer;
 
 import static nars.$.$;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Created by me on 7/8/16.
@@ -79,7 +80,7 @@ public class InterNARTest {
 
         } catch (Exception e) {
             e.printStackTrace();
-            assertTrue(false, e.toString());
+            fail(e.toString());
         }
     }
 
@@ -98,7 +99,7 @@ public class InterNARTest {
             try {
                 b.believe("(X --> y)");
             } catch (Narsese.NarseseException e) {
-                assertTrue(false);
+                fail(e);
             }
 
 
@@ -134,7 +135,7 @@ public class InterNARTest {
                 b.believe("(a --> b)");
                 b.believe("(c --> d)");
             } catch (Narsese.NarseseException e) {
-                assertTrue(false);
+                fail(e);
             }
 
             b.onTask(tt -> {

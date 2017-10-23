@@ -625,7 +625,7 @@ public class TemporalizeTest {
             t.knowAbsolute($("((c &&+5 d) ==>-15 (a &&+5 b))"), invariant);
             Map<Term, Time> h = new HashMap();
             Event s = t.solve($("(c &&+- d)"), h);
-            assertEquals(invariant + ":", "(c &&+5 d)", s.term.toString());
+            assertEquals("(c &&+5 d)", invariant + ":", s.term.toString());
             assertEquals(11, s.start(h).abs()); //@[11..16]
         }
     }

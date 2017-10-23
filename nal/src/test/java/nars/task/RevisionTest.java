@@ -18,8 +18,7 @@ import java.util.TreeSet;
 import static nars.Op.ATOM;
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 3/18/16.
@@ -337,7 +336,7 @@ public class RevisionTest {
         Compound b = $.$("(a &&+1 b)");
         try {
             Set<Term> p = permutations(a, b);
-            assertTrue(false);
+            fail("");
         } catch (Error  e) {
             assertTrue(true);
         }
@@ -365,7 +364,7 @@ public class RevisionTest {
         NAR s = NARS.shell();
         s.dtMergeOrChoose.set(false);
 
-        assertTrue(a.conceptual().equals(b.conceptual()));
+        assertEquals(a.conceptual(), b.conceptual());
 
         @NotNull Set<Term> ut = ((Compound) a).recurseTermsToSet(ATOM);
 

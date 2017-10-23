@@ -101,8 +101,8 @@ public class TemporalTermTest {
         assertEquals(XTERNAL, ax.sub(1).dt());
         assertFalse(ax.equals(a));
 
-        assertTrue(b.root().equals(a.root()));
-        assertTrue(a.root().equals(b.root()));
+        assertEquals(b.root(), a.root());
+        assertEquals(a.root(), b.root());
         assertEquals(
                 Op.True,
                 $("((x,((--,R) &&+6 (--,happy)))-->(x,((--,R)&&(--,happy))))")
@@ -112,7 +112,7 @@ public class TemporalTermTest {
     public void assertInvalidTask(@NotNull String ss) {
         try {
             Narsese.parse().task(ss, n);
-            assertTrue(false);
+            fail("");
         } catch (Exception e) {
             assertTrue(true);
         }
@@ -210,14 +210,14 @@ public class TemporalTermTest {
         @Nullable Concept nc = c.concept(n, true);
         assertNotNull(nc);
 
-        assertTrue(na == nc);
+        assertSame(na, nc);
 
-        assertTrue(na.sub(0) == nc.sub(0));
+        assertSame(na.sub(0), nc.sub(0));
 
 //        System.out.println(b.concept(n));
 //        System.out.println(c.concept(n));
 
-        assertTrue(b.concept(n, true).sub(0).equals(c.concept(n, true).sub(0)));
+        assertEquals(b.concept(n, true).sub(0), c.concept(n, true).sub(0));
 
     }
 
@@ -368,7 +368,7 @@ public class TemporalTermTest {
         try {
             t = $.$(input);
         } catch (Narsese.NarseseException e) {
-            assertTrue(false);
+            fail(e);
         }
         if (expected == null)
             expected = input;
@@ -401,7 +401,7 @@ public class TemporalTermTest {
         BaseConcept a = (BaseConcept) n.conceptualize("(((SELF,#1)-->at) && goto(#1)).");
         Concept a0 = n.conceptualize("(goto(#1) && ((SELF,#1)-->at)).");
         assertNotNull(a);
-        assertTrue(a == a0);
+        assertSame(a, a0);
 
 
         a.beliefs().print();
@@ -417,28 +417,28 @@ public class TemporalTermTest {
             Concept a = n.conceptualize($("(x " + op + "   y)"));
             Concept b = n.conceptualize($("(x " + op + "+1 y)"));
 
-            assertTrue(a == b);
+            assertSame(a, b);
 
             Concept c = n.conceptualize($("(x " + op + "+2 y)"));
 
-            assertTrue(b == c);
+            assertSame(b, c);
 
             Concept d = n.conceptualize($("(x " + op + "-1 y)"));
 
-            assertTrue(c == d);
+            assertSame(c, d);
 
             Term e0 = $("(x " + op + "+- y)");
             assertEquals("(x " + op + "+- y)", e0.toString());
             Concept e = n.conceptualize(e0);
 
-            assertTrue(d == e);
+            assertSame(d, e);
 
             Term f0 = $("(y " + op + "+- x)");
             assertEquals("(x " + op + "+- y)", f0.toString());
             assertEquals("(x " + op + "+- y)", f0.root().toString());
 
             Concept f = n.conceptualize(f0);
-            assertTrue(e == f, e + "==" + f);
+            assertSame(e, f, e + "==" + f);
 
             //repeat
             Concept g = n.conceptualize($("(x " + op + "+- x)"));

@@ -25,8 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class NarseseTest {
 
 
-
-
     @NotNull <T extends Term> T term(@NotNull String s) throws Narsese.NarseseException {
         //TODO n.term(s) when the parser is replaced
         return (T) Narsese.term(s);
@@ -34,12 +32,13 @@ public class NarseseTest {
 
     public void assertInvalidTerms(@NotNull String... inputs) {
         for (String s : inputs) {
+            //assertThrows(Narsese.NarseseException.class)
             try {
                 Term e = term(s);
                 if (e instanceof Bool) {
                     assertTrue(true);
                 } else {
-                    assertTrue(false, s + " should not be parseable but got: " + e); //must throw exception
+                    fail(s + " should not be parseable but got: " + e); //must throw exception
                 }
             } catch (Narsese.NarseseException | InvalidTermException e) {
                 assertTrue(true);
@@ -99,10 +98,9 @@ public class NarseseTest {
 //    }
 
 
-
-        protected void taskParses(@NotNull String s) throws Narsese.NarseseException {
-            Task t = task(s);
-            assertNotNull(t);
+    protected void taskParses(@NotNull String s) throws Narsese.NarseseException {
+        Task t = task(s);
+        assertNotNull(t);
 //        Task u = oldParser.parseTaskOld(s, true);
 //        assertNotNull(u);
 //
@@ -110,100 +108,97 @@ public class NarseseTest {
 //        assertEquals("(truth) " + t.getTruth() + " != " + u.getTruth(), u.getTruth(), t.getTruth());
 //        //assertEquals("(creationTime) " + u.getCreationTime() + " != " + t.getCreationTime(), u.getCreationTime(), t.getCreationTime());
 //        assertEquals("(occurrencetime) " + u.getOccurrenceTime() + " != " + t.getOccurrenceTime(), u.getOccurrenceTime(), t.getOccurrenceTime());
-            //TODO budget:
-            //TODO punctuation:
+        //TODO budget:
+        //TODO punctuation:
+    }
+
+    @NotNull
+    List<Task> tasks(@NotNull String s) throws Narsese.NarseseException {
+        //TODO n.task(s) when the parser is replaced
+        //return p.parseTask(s, true);
+        List<Task> l = $.newArrayList(1);
+        Narsese.tasks(s, l, NARS.shell());
+        return l;
+    }
+
+
+    Task task(@NotNull String s) throws Narsese.NarseseException {
+        List<Task> l = tasks(s);
+        if (l.size() != 1)
+            throw new RuntimeException("Expected 1 task, got: " + l);
+        return l.get(0);
+    }
+
+    void testTruth(String t, float freq, float conf) throws Narsese.NarseseException {
+        String s = "a:b. " + t;
+
+        Truth truth = task(s).truth();
+        assertEquals(freq, truth.freq(), 0.001);
+        assertEquals(conf, truth.conf(), 0.001);
+    }
+
+    public void assertInvalidTasks(@NotNull String... inputs) {
+        for (String s : inputs) {
+            assertThrows(Exception.class, () -> {
+                Task e = this.task(s);
+            });
+        }
+    }
+
+
+    public void assertInvalidTasks(Supplier<Task> s) {
+
+        try {
+            s.get();
+            fail("");
+        } catch (InvalidTaskException good) {
+            assertTrue(true); //what should happen
+        } catch (Exception e) {
+            fail(e.toString()); //something else happend
         }
 
-        @NotNull
-        List<Task> tasks(@NotNull String s) throws Narsese.NarseseException {
-            //TODO n.task(s) when the parser is replaced
-            //return p.parseTask(s, true);
-            List<Task> l = $.newArrayList(1);
-            Narsese.tasks(s, l, NARS.shell());
-            return l;
-        }
+    }
 
 
-        Task task(@NotNull String s) throws Narsese.NarseseException {
-            List<Task> l = tasks(s);
-            if (l.size() != 1)
-                throw new RuntimeException("Expected 1 task, got: " + l);
-            return l.get(0);
-        }
+    @Test
+    public void testMultiline() throws Narsese.NarseseException {
+        String a = "<a --> b>.";
+        assertEquals(1, tasks(a).size());
 
-        void testTruth(String t, float freq, float conf) throws Narsese.NarseseException {
-            String s = "a:b. " + t;
+        String b = "<a --> b>. <b --> c>.";
+        assertEquals(2, tasks(b).size());
 
-            Truth truth = task(s).truth();
-            assertEquals(freq, truth.freq(), 0.001);
-            assertEquals(conf, truth.conf(), 0.001);
-        }
+        String c = "<a --> b>. \n <b --> c>.";
+        assertEquals(2, tasks(c).size());
 
-        public void assertInvalidTasks(@NotNull String... inputs) {
-            for (String s : inputs) {
-                try {
-                    Task e = this.task(s);
-                    assertTrue(false);
-                } catch (Exception e) {
-                    assertTrue(true);
-                }
-            }
-        }
+        String s = "<a --> b>.\n" +
+                "<b --> c>.\n" +
 
+                "<multi\n" +
+                " --> \n" +
+                "line>. :|:\n" +
 
-        public void assertInvalidTasks(Supplier<Task> s) {
+                "<multi \n" +
+                " --> \n" +
+                "line>.\n" +
 
-            try {
-                s.get();
-                assertTrue(false);
-            } catch (InvalidTaskException good) {
-                assertTrue(true); //what should happen
-            } catch (Exception e) {
-                assertTrue(false, e.toString()); //something else happend
-            }
+                "<x --> b>!\n" +
+                "<y --> w>.  <z --> x>.\n";
 
-        }
+        List<Task> t = tasks(s);
+        assertEquals(7, t.size());
 
+    }
 
-        @Test
-        public void testMultiline() throws Narsese.NarseseException {
-            String a = "<a --> b>.";
-            assertEquals(1, tasks(a).size());
+    @Test
+    public void testMultilineQuotes() throws Narsese.NarseseException {
 
-            String b = "<a --> b>. <b --> c>.";
-            assertEquals(2, tasks(b).size());
-
-            String c = "<a --> b>. \n <b --> c>.";
-            assertEquals(2, tasks(c).size());
-
-            String s = "<a --> b>.\n" +
-                    "<b --> c>.\n" +
-
-                    "<multi\n" +
-                    " --> \n" +
-                    "line>. :|:\n" +
-
-                    "<multi \n" +
-                    " --> \n" +
-                    "line>.\n" +
-
-                    "<x --> b>!\n" +
-                    "<y --> w>.  <z --> x>.\n";
-
-            List<Task> t = tasks(s);
-            assertEquals(7, t.size());
-
-        }
-
-        @Test
-        public void testMultilineQuotes() throws Narsese.NarseseException {
-
-            String a = "js(\"\"\"\n" + "1\n" + "\"\"\")";
-            System.out.println(a + " " + $(a));
-            assertEquals(a, $(a).toString());
-            List<Task> l = tasks(a + "!");
-            assertEquals(1, l.size());
-        }
+        String a = "js(\"\"\"\n" + "1\n" + "\"\"\")";
+        System.out.println(a + " " + $(a));
+        assertEquals(a, $(a).toString());
+        List<Task> l = tasks(a + "!");
+        assertEquals(1, l.size());
+    }
 
 //    @Test
 //    public void testLineComment() {
@@ -236,8 +231,6 @@ public class NarseseTest {
 //        assertEquals("^" + $.the(echo.class.getSimpleName()),
 //                Operator.operator(op).toString());
 //    }
-
-
 
 
     @Test

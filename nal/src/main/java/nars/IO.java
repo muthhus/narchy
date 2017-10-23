@@ -243,7 +243,7 @@ public class IO {
      * called by readTerm after determining the op type
      */
     @NotNull
-    public static Term readTerm(DataInput in) throws IOException, UnsupportedEncodingException {
+    public static Term readTerm(DataInput in) throws IOException {
 
         byte ob = in.readByte();
         if (ob == SPECIAL_OP)

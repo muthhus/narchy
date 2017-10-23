@@ -121,5 +121,5 @@ abstract public class TemporalStabilityTest {
     /**
      * inputs the tasks for a test
      */
-    abstract public void input(NAR n) throws Narsese.NarseseException;
+    abstract public void input(NAR n);
 }

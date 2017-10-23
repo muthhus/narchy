@@ -31,7 +31,6 @@ public class LinkClustering extends DurService {
 
     public final BagClustering<Task> bag;
 
-    private final NAR nar;
     private final FloatFunction<Task> accept;
 
     float confMin;
@@ -83,7 +82,6 @@ public class LinkClustering extends DurService {
         super(nar);
 
         this.accept = accept;
-        this.nar = nar;
         this.minConjSize = minConjSize;
         this.maxConjSize = maxConjSize;
 

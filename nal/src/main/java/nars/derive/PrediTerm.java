@@ -17,7 +17,7 @@ public interface PrediTerm<X> extends Term, Predicate<X> {
 
 
 
-    static final Comparator<PrediTerm> sortByCost = (a, b) -> {
+    Comparator<PrediTerm> sortByCost = (a, b) -> {
         if (a.equals(b)) return 0;
         float ac = a.cost();
         float bc = b.cost();
@@ -26,7 +26,7 @@ public interface PrediTerm<X> extends Term, Predicate<X> {
         else return a.compareTo(b);
     };
 
-    public static Comparator<PrediTerm<?>> sort(ToIntFunction<PrediTerm<?>> count) {
+    static Comparator<PrediTerm<?>> sort(ToIntFunction<PrediTerm<?>> count) {
         return (a, b) -> {
 
             if (a.equals(b)) return 0;

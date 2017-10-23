@@ -65,32 +65,22 @@ public class TermContainerTest {
     public void testUnionReusesInstance() throws Narsese.NarseseException {
         Compound container = $("{a,b}");
         Compound contained = $("{a}");
-        assertTrue(
-            Terms.union(container.op(), container, contained) == container
-        );
-        assertTrue(
-            Terms.union(contained.op(), contained, container) == container  //reverse
-        );
-        assertTrue(
-            Terms.union(container.op(), container, container) == container  //equal
-        );
+        assertSame(Terms.union(container.op(), container, contained), container);
+        assertSame(Terms.union(contained.op(), contained, container), container);
+        assertSame(Terms.union(container.op(), container, container), container);
     }
 
     @Test
     public void testDifferReusesInstance() throws Narsese.NarseseException {
         Compound x = $("{x}");
         Compound y = $("{y}");
-        assertTrue(
-                Op.difference(x.op(), x, y) == x
-        );
+        assertSame(Op.difference(x.op(), x, y), x);
     }
     @Test
     public void testIntersectReusesInstance() throws Narsese.NarseseException {
         Compound x = $("{x,y}");
         Compound y = $("{x,y}");
-        assertTrue(
-                Terms.intersect(x.op(), x, y) == x
-        );
+        assertSame(Terms.intersect(x.op(), x, y), x);
     }
 
     @Test

@@ -85,16 +85,6 @@ public abstract class TermVector implements TermContainer {
 
 
     @Override
-    public void forEach(Consumer<? super Term> action) {
-        forEach(action, 0, subs());
-    }
-
-//    @NotNull
-//    @Override public final Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
-//        return Terms.filter(terms(), filter);
-//    }
-
-    @Override
     public final int structure() {
         return structure;
     }

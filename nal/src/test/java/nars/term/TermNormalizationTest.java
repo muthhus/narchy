@@ -22,7 +22,7 @@ public class TermNormalizationTest {
             Term b = x.sub((byte)1, (byte)0);
             assertNotEquals(a, x.sub((byte)0, (byte)1));
             assertEquals(a, b, x + " subterms (0,0)==(1,0)");
-            assertTrue(a == b);
+            assertSame(a, b);
         }
     }
 

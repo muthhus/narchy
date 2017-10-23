@@ -161,16 +161,14 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
     protected void draw(Termed tt, Concept cc, GL2 gl, long minT, long maxT) {
 
 
-
-
         TruthWave beliefs = this.beliefs;
         //if (!beliefs.isEmpty()) {
-            renderTable(cc, minT, maxT, now, gl, beliefs, true);
+        renderTable(cc, minT, maxT, now, gl, beliefs, true);
         //}
 
         TruthWave goals = this.goals;
         //if (!goals.isEmpty()) {
-            renderTable(cc, minT, maxT, now, gl, goals, false);
+        renderTable(cc, minT, maxT, now, gl, goals, false);
         //}
 
         if (showTaskLinks) {
@@ -203,7 +201,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
     }
 
     @Override
-    protected void paintComponent(GL2 gl) {
+    protected void paintComponent(GL2 ggl) {
 
         /*if (!redraw.compareAndSet(true, false)) {
             return;
@@ -215,61 +213,65 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         //clear
         //clear(1f /*0.5f*/);
 
-
-        long minT, maxT;
-
-        if (range != null) {
-            minT = range[0];
-            maxT = range[1];
-        } else {
-
-            //compute bounds from combined min/max of beliefs and goals so they align correctly
-            minT = Long.MAX_VALUE;
-            maxT = Long.MIN_VALUE;
+        Draw.bounds(ggl, this, (gl) -> {
 
 
-            TruthWave b = this.beliefs;
-            if (!b.isEmpty()) {
-                long start = b.start();
-                if (start != ETERNAL) {
-                    minT = Math.min(start, minT);
-                    maxT = Math.max(b.end(), maxT);
+            long minT, maxT;
+
+            if (range != null) {
+                minT = range[0];
+                maxT = range[1];
+            } else {
+
+                //compute bounds from combined min/max of beliefs and goals so they align correctly
+                minT = Long.MAX_VALUE;
+                maxT = Long.MIN_VALUE;
+
+
+                TruthWave b = this.beliefs;
+                if (!b.isEmpty()) {
+                    long start = b.start();
+                    if (start != ETERNAL) {
+                        minT = Math.min(start, minT);
+                        maxT = Math.max(b.end(), maxT);
+                    }
                 }
-            }
-            TruthWave g = this.goals;
-            if (!g.isEmpty()) {
+                TruthWave g = this.goals;
+                if (!g.isEmpty()) {
 
-                long start = g.start();
-                if (start != ETERNAL) {
-                    minT = Math.min(start, minT);
-                    maxT = Math.max(g.end(), maxT);
+                    long start = g.start();
+                    if (start != ETERNAL) {
+                        minT = Math.min(start, minT);
+                        maxT = Math.max(g.end(), maxT);
+                    }
+
+
                 }
 
-
+                long[] newRange = rangeControl.apply(now, new long[]{minT, maxT});
+                minT = newRange[0];
+                maxT = newRange[1];
             }
 
-            long[] newRange = rangeControl.apply(now, new long[]{minT, maxT});
-            minT = newRange[0];
-            maxT = newRange[1];
-        }
 
+            gl.glColor3f(0, 0, 0); //background
+            Draw.rect(gl, 0, 0, 1, 1);
 
-        gl.glColor3f(0, 0, 0); //background
-        Draw.rect(gl, 0, 0, 1, 1);
+            gl.glLineWidth(1f);
+            gl.glColor3f(0.5f, 0.5f, 0.5f); //border
+            Draw.rectStroke(gl, 0, 0, 1, 1);
 
-        gl.glLineWidth(1f);
-        gl.glColor3f(0.5f, 0.5f, 0.5f); //border
-        Draw.rectStroke(gl, 0, 0, 1, 1);
+            String currentTermString = termString;
+            if (cc != null) {
+                draw(term, cc, gl, minT, maxT);
+                termString = cc.toString();
+            } else {
+                termString = term.toString();
+            }
+            label.set(termString);
+        });
 
-        String currentTermString = termString;
-        if (cc != null) {
-            draw(term, cc, gl, minT, maxT);
-            termString = cc.toString();
-        } else {
-            termString = term.toString();
-        }
-        label.set(termString);
-//        gl.glColor4f(0.75f, 0.75f, 0.75f, 0.8f + 0.2f * cp);
+        //        gl.glColor4f(0.75f, 0.75f, 0.75f, 0.8f + 0.2f * cp);
 //        gl.glLineWidth(1);
 //        Draw.text(gl, termString, (1f/termString.length()) * (0.5f + 0.25f * cp), 1 / 2f, 1 / 2f, 0);
     }
@@ -366,31 +368,30 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
             //conf = (conf - confMinMax[0]) / (confMinMax[1] - confMinMax[0]);
 
             /** smudge a low confidence task across more of the frequency range */
-            final float ph = Util.lerp(conf,0.2f, /* down to */ baseTaskSize/64f );
+            final float ph = Util.lerp(conf, 0.2f, /* down to */ baseTaskSize / 64f);
 
             float start, end;
             if (showEternal && eternal) {
                 start = end = nowX;
             } else if (((e <= maxT) && (e >= minT)) || ((s >= minT) && (s <= maxT))) {
-                start = xTime(minT, maxT, (long)s);
-                end = xTime(minT, maxT, (long)e);
+                start = xTime(minT, maxT, (long) s);
+                end = xTime(minT, maxT, (long) e);
             } else {
                 return;
             }
-
 
 
             //r.renderTask(gl, qua, conf, pw, ph, xStart, xEnd, freq);
 
             float r, g, b;
             if (beliefOrGoal) {
-                r = 0.1f + 0.9f*conf;
-                g = 0.4f*conf;
+                r = 0.1f + 0.9f * conf;
+                g = 0.4f * conf;
                 b = 0;
             } else {
                 r = 0;
-                g = 0.1f + 0.9f*conf;
-                b = 0.4f*conf;
+                g = 0.1f + 0.9f * conf;
+                b = 0.4f * conf;
             }
 
 
@@ -409,7 +410,9 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         });
     }
 
-    /** TODO use double not float for precision that may be lost */
+    /**
+     * TODO use double not float for precision that may be lost
+     */
     private static void renderWaveLine(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
 
         gl.glLineWidth(3.0f);
@@ -425,15 +428,15 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
             if (eternal) {
                 x = nowX; //???
             } else if ((start >= minT) && (start <= maxT)) {
-                x = xTime(minT, maxT, (long)start);
+                x = xTime(minT, maxT, (long) start);
             } else {
                 return;
             }
 
             float a =
                     0.1f + 0.9f * conf;
-                    //0.5f + conf * 0.3f;
-                    //0.45f + 0.5f * conf;
+            //0.5f + conf * 0.3f;
+            //0.45f + 0.5f * conf;
             if (beliefOrGoal) {
                 gl.glColor4f(0.5f, 0.25f, 0f, a);
             } else {
@@ -451,7 +454,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
                 //x = nowX; //??
                 return;
             } else if ((end >= minT) && (end <= maxT)) {
-                x = xTime(minT, maxT, (long)end);
+                x = xTime(minT, maxT, (long) end);
             }
 
             gl.glVertex2f(x, freq);
@@ -488,10 +491,9 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
     }
 
 
-
     private static float xTime(long minT, long maxT, long o) {
         if (minT == maxT) return 0.5f;
-        return (Math.min(maxT, Math.max(minT,o)) - minT) / ((float)(maxT - minT));
+        return (Math.min(maxT, Math.max(minT, o)) - minT) / ((float) (maxT - minT));
     }
 
 

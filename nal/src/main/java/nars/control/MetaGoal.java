@@ -12,7 +12,6 @@ import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.NAgent;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
-import org.eclipse.collections.api.tuple.primitive.ObjectDoublePair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectDoubleHashMap;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.slf4j.Logger;

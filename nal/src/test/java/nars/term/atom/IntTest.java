@@ -97,7 +97,7 @@ public class IntTest {
         return Arrays.toString(Iterators.toArray(unroll, Term.class));
     }
 
-    @Test public void testRecursiveUnroll() throws Narsese.NarseseException {
+    @Test public void testRecursiveUnroll() {
         assertEquals("",
                 unroll(
                     //$("(0..1,c,0,(2,b,1..2,(0..1,a,0)))")

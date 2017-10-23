@@ -5,8 +5,6 @@ import nars.NARS;
 import nars.test.DeductiveMeshTest;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
-
 public class MetaGoalTest {
 
     @Test

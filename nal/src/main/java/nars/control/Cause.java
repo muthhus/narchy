@@ -1,6 +1,5 @@
 package nars.control;
 
-import com.google.common.collect.TreeBasedTable;
 import jcog.Util;
 import jcog.math.RecycledSummaryStatistics;
 import nars.Task;
@@ -8,11 +7,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.ShortIterable;
 import org.eclipse.collections.api.block.predicate.primitive.ShortPredicate;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 import static nars.Param.CAUSE_CAPACITY;
 

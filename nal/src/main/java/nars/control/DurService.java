@@ -24,11 +24,11 @@ abstract public class DurService extends NARService implements Runnable {
     final AtomicBoolean busy = new AtomicBoolean(false);
 
 
-    public DurService(NAR n, float durs) {
+    protected DurService(NAR n, float durs) {
         this(n, new MutableFloat(durs));
     }
 
-    public DurService(NAR n, MutableFloat durations) {
+    protected DurService(NAR n, MutableFloat durations) {
         super(n);
         this.durations = durations;
         this.now = n.time()-1;
@@ -51,7 +51,7 @@ abstract public class DurService extends NARService implements Runnable {
         };
     }
 
-    public DurService(@NotNull NAR nar) {
+    protected DurService(@NotNull NAR nar) {
         this(nar, new MutableFloat(1f));
     }
 

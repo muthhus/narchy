@@ -41,7 +41,7 @@ import java.util.stream.Stream;
 public interface Concept extends Termed, Comparable<Termed>, MetaMap {
 
 
-    final static Concept[] EmptyArray = new Concept[0];
+    Concept[] EmptyArray = new Concept[0];
 
     /*@NotNull*/ Bag<Task,PriReference<Task>> tasklinks();
 

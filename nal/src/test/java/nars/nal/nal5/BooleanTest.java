@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * NAL5 Boolean / Boolean Satisfiability / Boolean Conditionality
@@ -105,14 +106,14 @@ public class BooleanTest {
             }
             boolean thisone = ((ex == i) && (ey == j));
             if (thisone && b == null)
-                assertTrue(false, "unrecognized true case");
+                fail("unrecognized true case");
 
 
             if (thisone && b.isNegative() && b.conf() > confThresh)
-                assertTrue(false, "wrong true case:\n" + t.proof());
+                fail("wrong true case:\n" + t.proof());
 
             if (!thisone && b != null && b.isPositive() && b.conf() > confThresh)
-                assertTrue(false, "wrong false case:\n" + t.proof());
+                fail("wrong false case:\n" + t.proof());
 
         }
 

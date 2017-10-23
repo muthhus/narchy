@@ -708,10 +708,11 @@ public class NAL8Test extends NALTest {
     public void implDecomposeGoalAfterPosNeg() {
 
         test
-                .inputAt(3, "(--(a) ==>+3 (b)). :|:")
-                .inputAt(13, "(b)! :|:")
-                .mustGoal(cycles, "(a)", 0f, 0.45f, 10)
-                .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL || t == 13);
+                .truthTolerance(0.15f)
+                .inputAt(3, "(--(a) ==>+2 (b)). :|:")
+                .inputAt(5, "(b)! :|:")
+                .mustGoal(cycles, "(a)", 0f, 0.45f, 3)
+                .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL || t == 5);
     }
 
     @Test

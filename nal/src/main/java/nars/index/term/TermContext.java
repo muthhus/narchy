@@ -12,7 +12,7 @@ import java.util.function.Function;
 public interface TermContext extends Function<Term,Termed> {
 
     /** if the result is null, return the input */
-    default public Termed applyIfPossible(/*@NotNull*/ Term x) {
+    default Termed applyIfPossible(/*@NotNull*/ Term x) {
         Termed y = apply(x);
         if (y != null)
             return y;
@@ -21,7 +21,7 @@ public interface TermContext extends Function<Term,Termed> {
     }
 
     /** elides superfluous .term() call */
-    default public Term applyTermIfPossible(/*@NotNull*/ Term x) {
+    default Term applyTermIfPossible(/*@NotNull*/ Term x) {
         Termed y = apply(x);
         if (y != null)
             return y.term();
@@ -31,7 +31,7 @@ public interface TermContext extends Function<Term,Termed> {
 
    /** elides superfluous .term() call */
     @Nullable
-    default public Term applyTermOrNull(/*@NotNull*/ Term x) {
+    default Term applyTermOrNull(/*@NotNull*/ Term x) {
         Termed y = apply(x);
         if (y != null)
             return y.term();

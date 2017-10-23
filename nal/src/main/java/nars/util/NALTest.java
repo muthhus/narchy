@@ -7,9 +7,7 @@ import nars.control.MetaGoal;
 import nars.test.TestNAR;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.ExtensionContext;
 
 
 @ExtendWith(NALTestStats.class)

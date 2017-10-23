@@ -6,6 +6,7 @@ import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * test an invididual premise
@@ -54,7 +55,7 @@ public interface RuleTest {
                     minConf, maxConf);
 		} catch (Narsese.NarseseException e) {
 			e.printStackTrace();
-			assertTrue(false);
+            fail(e);
 		}
 
 	}

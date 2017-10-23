@@ -11,7 +11,6 @@ import nars.term.Term;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +34,7 @@ public class NALTask extends Pri implements Task {
     public final long[] stamp;
 
     /** cause zero is reserved for unknown causes, as a catch-all */
-    public static final short[] UnknownCause = new short[] { 0 };
+    public static final short[] UnknownCause = { 0 };
 
     public short[] cause = UnknownCause;
 

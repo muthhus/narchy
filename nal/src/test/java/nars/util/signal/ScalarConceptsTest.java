@@ -90,7 +90,7 @@ public class ScalarConceptsTest {
             n.cycle();
 
 
-            double freqSum = StreamSupport.stream(f.sensors.spliterator(), false)
+            double freqSum = f.sensors.stream()
                     .peek(x -> n.input(x.update(n.time(), n.dur(), n)))
                     .map(x -> n.beliefTruth(x, n.time()))
                     .mapToDouble(x -> x != null ? x.freq() : 0f).sum();

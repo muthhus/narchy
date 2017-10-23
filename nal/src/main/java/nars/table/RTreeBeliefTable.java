@@ -355,9 +355,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 if (pri == pri) {
                     TermLinks.linkTask(x, pri, n, c);
                 }
-
-            } else {      //check for an override about partial activation of the input which would have been appended to its log during rtree add/merge procedure
-                assert (task.isDeleted());
             }
         });
 

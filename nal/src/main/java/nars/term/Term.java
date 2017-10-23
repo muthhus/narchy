@@ -170,7 +170,7 @@ public interface Term extends Termed, Comparable<Termed> {
         //if (!containsRecursively(subterm)) return null;
         return
                 this instanceof Compound && !impossibleSubTerm(subterm) ?
-                        pathTo(new ByteArrayList(0), ((Compound) this).subterms(), subterm) : null;
+                        pathTo(new ByteArrayList(0), this.subterms(), subterm) : null;
     }
 
 
@@ -229,7 +229,7 @@ public interface Term extends Termed, Comparable<Termed> {
                 return false;
         }
         if (this instanceof Compound) {
-            return pathsTo(new ByteArrayList(0), ((Compound) this).subterms(), subterm, receiver);
+            return pathsTo(new ByteArrayList(0), this.subterms(), subterm, receiver);
         } else {
             return true;
         }
@@ -246,7 +246,7 @@ public interface Term extends Termed, Comparable<Termed> {
                 return p.toArray();
             }
             if (s instanceof Compound && !s.impossibleSubTerm(target)) {
-                byte[] pt = pathTo(p, ((Compound) s).subterms(), target);
+                byte[] pt = pathTo(p, s.subterms(), target);
                 if (pt != null) {
                     p.add((byte) i);
                     return pt;
@@ -276,7 +276,7 @@ public interface Term extends Termed, Comparable<Termed> {
                     return false;
             }
             if (s instanceof Compound) {
-                if (!pathsTo(p, ((Compound) s).subterms(), subterm, receiver))
+                if (!pathsTo(p, s.subterms(), subterm, receiver))
                     return false;
             }
             p.removeAtIndex(ppp);
@@ -587,7 +587,7 @@ public interface Term extends Termed, Comparable<Termed> {
         return pathsTo(subterm, 0);
     }
 
-    final static List<byte[]> ListOfEmptyByteArray = List.of(ArrayUtils.EMPTY_BYTE_ARRAY);
+    List<byte[]> ListOfEmptyByteArray = List.of(ArrayUtils.EMPTY_BYTE_ARRAY);
 
     /*@NotNull*/
     default List<byte[]> pathsTo(Term subterm, int minLengthOfPathToReturn) {

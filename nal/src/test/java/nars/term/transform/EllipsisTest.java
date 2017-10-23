@@ -169,7 +169,7 @@ public class EllipsisTest {
         protected final Compound p;
         public final String ellipsisTerm;
 
-        public CommutiveEllipsisTest(String ellipsisTerm, String prefix, String suffix) throws Narsese.NarseseException {
+        protected CommutiveEllipsisTest(String ellipsisTerm, String prefix, String suffix) throws Narsese.NarseseException {
             this.prefix = prefix;
             this.suffix = suffix;
             this.ellipsisTerm = ellipsisTerm;

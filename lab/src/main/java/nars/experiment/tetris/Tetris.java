@@ -3,6 +3,7 @@ package nars.experiment.tetris;
 import jcog.data.FloatParam;
 import nars.*;
 import nars.experiment.tetris.impl.TetrisState;
+import nars.op.java.OObjects;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
 
@@ -22,7 +23,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
     static boolean easy;
 
-    private final TetrisState state;
+    private TetrisState state;
 
     //private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
@@ -76,11 +77,11 @@ public class Tetris extends NAgentX implements Bitmap2D {
                 }
             }
 
-            @Override
-            protected void die() {
-                //nar.time.tick(afterlife);
-                super.die();
-            }
+//            @Override
+//            protected void die() {
+//                //nar.time.tick(afterlife);
+//                super.die();
+//            }
         };
 
 //        view.children().add(new TetrisVisualizer(state, 2, false) {
@@ -115,6 +116,8 @@ public class Tetris extends NAgentX implements Bitmap2D {
         );
         //pixels.resolution(0.1f);
 
+
+        actionsReflect();
         actionsTriState();
         //actionsToggle();
 
@@ -174,6 +177,13 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        view.layout();
     }
 
+    private void actionsReflect() {
+
+        OObjects oo = new OObjects(nar);
+        oo.methodExclusions.add("toVector");
+        state = oo.the("tetris", TetrisState.class, tetris_width, tetris_height, 2);
+
+    }
 
 
     void actionsToggle() throws Narsese.NarseseException {
@@ -520,6 +530,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
             try {
                 //n.truthResolution.setValue(0.05f);
                 a = new Tetris(n, Tetris.tetris_width, Tetris.tetris_height);
+                a.nar.log();
 
                 //a.durations.setValue(2f);
             } catch (Narsese.NarseseException e) {

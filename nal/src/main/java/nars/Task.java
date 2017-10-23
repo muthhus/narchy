@@ -44,8 +44,8 @@ import static org.eclipse.collections.impl.tuple.Tuples.twin;
 public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.map.MetaMap {
 
 
-    final Task[] EmptyArray = new Task[0];
-    final long[] ETERNAL_ETERNAL = {Tense.ETERNAL, Tense.ETERNAL};
+    Task[] EmptyArray = new Task[0];
+    long[] ETERNAL_ETERNAL = {Tense.ETERNAL, Tense.ETERNAL};
 
     static boolean equal(Task a, Task b) {
 
@@ -92,7 +92,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         }
     }
 
-    public static StableBloomFilter<Task> newBloomFilter(int cap, Random rng) {
+    static StableBloomFilter<Task> newBloomFilter(int cap, Random rng) {
         return new StableBloomFilter<>(
                 cap, 1, 0.0005f, rng,
                 new BytesHashProvider<>(IO::taskToBytes));

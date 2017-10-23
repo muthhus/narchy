@@ -134,9 +134,9 @@ public class VariableTest {
 
     private static Compound raw(String a) {
         try {
-            return (Compound) (Term) Narsese.term(a, false);
+            return (Compound) Narsese.term(a, false);
         } catch (Narsese.NarseseException e) {
-            assertTrue(false);
+            fail(e);
             return null;
         }
    }

@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Created by me on 6/3/15.
@@ -101,7 +102,7 @@ public class TermIDTest {
                     expectedCompactOutput,
                     expectedLength);
         } catch (Narsese.NarseseException e) {
-            assertTrue(false);
+            fail(e);
             return null;
         }
     }

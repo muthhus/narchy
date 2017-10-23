@@ -195,30 +195,30 @@ public class TermIOTest {
     }
 
     @Test
-    public void testByteMappingAtom() throws IOException, Narsese.NarseseException {
+    public void testByteMappingAtom() throws Exception {
         assertEquals("(0,0)=. ", map("x"));
     }
 
 
     @Test
-    public void testByteMappingInh() throws IOException, Narsese.NarseseException {
+    public void testByteMappingInh() throws Exception {
         assertEquals("(0,0)=--> (1,2)=. (1,6)=. ", map("a:b"));
     }
 
     @Test
-    public void testByteMappingCompoundDT() throws IOException, Narsese.NarseseException {
+    public void testByteMappingCompoundDT() throws Exception {
         assertEquals("(0,0)===> (1,2)=. (1,6)=. ",
                 map("(a ==>+1 b)"));
     }
 
     @Test
-    public void testByteMappingCompoundDTExt() throws IOException, Narsese.NarseseException {
+    public void testByteMappingCompoundDTExt() throws Exception {
         assertEquals("(0,0)=--> (1,2)===> (2,4)=. (2,8)=. (1,16)=. ",
                 map("((a ==>+1 b) --> c)"));
     }
 
     @Test
-    public void testByteMappingCompound() throws IOException, Narsese.NarseseException {
+    public void testByteMappingCompound() throws Exception {
         assertEquals("(0,0)===> (1,2)=--> (2,4)=* (3,6)=. (3,10)=. (2,16)=. (1,20)=. ",
                 map("(a(b,\"c\") ==>+1 d)"));
     }

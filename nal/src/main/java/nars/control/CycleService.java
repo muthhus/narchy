@@ -9,7 +9,7 @@ abstract public class CycleService extends NARService implements Consumer<NAR> {
 
     protected final AtomicBoolean busy = new AtomicBoolean(false);
 
-    public CycleService(NAR nar) {
+    protected CycleService(NAR nar) {
         super(nar);
     }
 

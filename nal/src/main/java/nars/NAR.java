@@ -1434,7 +1434,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR outputBinary(@NotNull File f, boolean append) throws IOException, FileNotFoundException {
+    public NAR outputBinary(@NotNull File f, boolean append) throws IOException {
         return outputBinary(f, append, t -> t);
     }
 

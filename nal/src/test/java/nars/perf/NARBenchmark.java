@@ -20,10 +20,10 @@ import static nars.perf.JmhBenchmark.perf;
 @Disabled
 public class NARBenchmark {
 
-    @Param({"6"})
+    @Param("6")
     String nalLevel;
 
-    @Param({"8000"})
+    @Param("8000")
     String cycles;
 
     @Param({"heap", "hijack", "caffeine"})
@@ -68,7 +68,7 @@ public class NARBenchmark {
 //    }
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
+    @BenchmarkMode(Mode.AverageTime)
     public void deductiveMeshTest1() {
         new DeductiveMeshTest(n, 8, 8);
         n.run(Integer.parseInt(cycles));

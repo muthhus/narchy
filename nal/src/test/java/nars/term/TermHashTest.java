@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static nars.$.*;
 import static nars.Op.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * test term hash and structure bits
@@ -24,10 +23,10 @@ public class TermHashTest {
 
         assertFalse(inh(p("a"), $("b"))
                 .isAny(or(SIM, Op.PROD)));
-        assertFalse(inh(p("a"), $("b"))
-                .op() == Op.PROD);
+        assertNotSame(inh(p("a"), $("b"))
+                .op(), Op.PROD);
 
-        assertTrue(inh("a", "b").op() == INH);
+        assertSame(inh("a", "b").op(), INH);
         assertTrue(inh("a", "b").hasAny(INH));
         assertTrue(inh("a", "b").hasAny(Op.ATOM));
         assertFalse(inh("a", "b").hasAny(SIM));

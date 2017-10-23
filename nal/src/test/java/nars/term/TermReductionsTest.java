@@ -248,7 +248,7 @@ public class TermReductionsTest extends NarseseTest {
 
 
         for (int dt : new int[] { /*XTERNAL,*/ DTERNAL, 0 }) {
-            assertEquals(dt + "", "(&&,a,b,c)",
+            assertEquals("(&&,a,b,c)", dt + "",
                     CONJ.the(
                             dt,
                             $.$("a"),
@@ -326,7 +326,7 @@ public class TermReductionsTest extends NarseseTest {
          */
 
     @Test
-    public void testIntersectionRange() throws Narsese.NarseseException {
+    public void testIntersectionRange() {
         assertEquals("(8|4..5)", Op.SECTi.the(Int.the(4), Int.the(8), Int.range(4, 5)).toString());
         assertEquals("(8&4..5)", Op.SECTe.the(Int.the(4), Int.the(8), Int.range(4, 5)).toString());
         //TODO for Set's
@@ -717,13 +717,13 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testImplicationConjCommonSubterms2() throws Narsese.NarseseException {
+    public void testImplicationConjCommonSubterms2() {
         assertInvalidTerms("(a ==> (&&, a, b, c))");
     }
 
     @Test
     public void testConegatedConjunctionTerms0() throws Narsese.NarseseException {
-        assertEquals(false, true && false);
+        assertFalse(true && false);
         assertEquals(False, $("(#1 && (--,#1))"));
         assertEquals(False, $("(#1 &| (--,#1))"));
         assertEquals(False, parallel(varDep(1), varDep(1).neg()));
@@ -731,8 +731,8 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals(False, $("(&&, #1, (--,#1), (x))"));
         assertEquals("(x)", $("(&&, --(#1 && (--,#1)), (x))").toString());
 
-        assertTrue($("((x) &&+1 --(x))").op() == CONJ);
-        assertTrue($("(#1 &&+1 (--,#1))").op() == CONJ);
+        assertSame($("((x) &&+1 --(x))").op(), CONJ);
+        assertSame($("(#1 &&+1 (--,#1))").op(), CONJ);
 
 
     }
@@ -743,7 +743,7 @@ public class TermReductionsTest extends NarseseTest {
         NAR t = NARS.shell();
         try {
             t.inputAndGet("at($1,$2,$3)");
-            assertTrue(false);
+            fail("");
         } catch (Narsese.NarseseException | InvalidTaskException e) {
             assertTrue(true);
         }

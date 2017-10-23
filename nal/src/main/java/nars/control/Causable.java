@@ -28,7 +28,7 @@ abstract public class Causable extends NARService {
 
     private final AtomicBoolean busy;
 
-    public Causable(NAR nar) {
+    protected Causable(NAR nar) {
         super(nar);
         busy = singleton() ? new AtomicBoolean(false) : null;
 

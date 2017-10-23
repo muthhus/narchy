@@ -19,8 +19,7 @@ import static nars.Op.BELIEF;
 import static nars.task.RevisionTest.newNAR;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by me on 5/8/16.
@@ -246,7 +245,7 @@ public class RevectionTest {
         try {
             b = new BeliefAnalysis(n, "<a-->b>");
         } catch (Narsese.NarseseException e) {
-            assertTrue(false);
+            fail(e);
         }
         for (int i = 0; i < repeats; i++) {
             b.believe(0.5f, freq, inConf, at);
@@ -342,7 +341,7 @@ public class RevectionTest {
         }
 
         outcomes.forEach(System.out::println);
-        assertTrue(outcomes.size() > 0);
+        assertTrue(!outcomes.isEmpty());
     }
 
     @Test public void testSequenceIntermpolationInBeliefTable() throws Narsese.NarseseException {

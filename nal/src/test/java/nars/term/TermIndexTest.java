@@ -125,7 +125,7 @@ public class TermIndexTest {
         Termed t1 = $.$(s); //create by parsing
         Termed t2 = $.$(s); //create by parsing again
         assertEquals(t1, t2);
-        assertTrue(t1 != t2);
+        assertNotSame(t1, t2);
     }
 
     private static void testShared(@NotNull TermIndex i, @NotNull String s) throws Narsese.NarseseException {
@@ -173,12 +173,12 @@ public class TermIndexTest {
             System.err.println("share failed: " + t1 + ' ' + t1.getClass() + ' ' + t2 + ' ' + t2.getClass());
 
         assertEquals(t1, t2);
-        assertTrue(t1 == t2);
+        assertSame(t1, t2);
 
         if (t1 instanceof Compound) {
             //test all subterms are shared
             for (int i = 0; i < t1.term().subs(); i++)
-                testShared(((Compound) t1).sub(i), ((Compound) t2).sub(i));
+                testShared(t1.sub(i), t2.sub(i));
         }
     }
 
