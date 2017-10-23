@@ -16,6 +16,7 @@ import static nars.Op.*;
 import static nars.term.TermTest.assertValid;
 import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -247,8 +248,8 @@ public class TermReductionsTest extends NarseseTest {
     public void testConjParallelConceptualShouldntBeXTERNAL() throws Narsese.NarseseException {
 
 
-        for (int dt : new int[] { /*XTERNAL,*/ DTERNAL, 0 }) {
-            assertEquals("(&&,a,b,c)", dt + "",
+        for (int dt : new int[]{ /*XTERNAL,*/ DTERNAL, 0}) {
+            assertEquals("(&&,a,b,c)",
                     CONJ.the(
                             dt,
                             $.$("a"),
@@ -355,7 +356,7 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testEmbeddedConjNormalizationN2() throws Narsese.NarseseException {
         Compound bad = $("(a &&+1 (b &&+1 c))");
-        Compound good =  $("((a &&+1 b) &&+1 c)");
+        Compound good = $("((a &&+1 b) &&+1 c)");
         assertEquals(good, bad);
         assertEquals(good.toString(), bad.toString());
         assertEquals(good.dt(), bad.dt());
@@ -408,7 +409,6 @@ public class TermReductionsTest extends NarseseTest {
 
 //        aa.printRecursive();
 //        cc.printRecursive();
-
 
 
         //correct subterm ordering by volume
@@ -910,8 +910,44 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals(
                 "((--,isIn($1,xyz))==>((y-->x)))", //involves an additional negation factoring out to top level
                 $("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))==>((--,(($1,xyz)-->$2))&&(x:y)))").toString());
+    }
 
+    @Test
+    public void testDternalizeRepeatConjImpl() throws Narsese.NarseseException {
+        assertEquals("a",
+                $("(a &&+1 a)").dt(DTERNAL).toString());
+        assertEquals("a",
+                $("(a &&+1 a)").dt(0).toString());
+        assertEquals("(a &&+- a)",
+                $("(a &&+1 a)").dt(XTERNAL).toString());
 
+        assertEquals(True,
+                $("(a ==>+1 a)").dt(DTERNAL));
+        assertEquals(True,
+                $("(a ==>+1 a)").dt(0));
+        assertEquals("(a ==>+- a)",
+                $("(a ==>+1 a)").dt(XTERNAL).toString());
+
+    }
+
+    @Test
+    public void testImplCommonSubterms2() throws Narsese.NarseseException {
+        assertEquals(Null,
+                $("((tetris(isRowClear,7,true)&&tetris(7,14))==>tetris(7,14))"));
+        assertEquals(Null,
+                $("((tetris(isRowClear,7,true)==>tetris(7,14))&&tetris(7,14))"));
+        assertEquals(Null,
+                $("((tetris(isRowClear,7,true)=|>tetris(7,14))&&tetris(7,14))"));
+        assertEquals(Null,
+                $("((tetris(isRowClear,7,true)==>tetris(7,14))&|tetris(7,14))"));
+        assertEquals(Null,
+                $("((tetris(isRowClear,7,true)=|>tetris(7,14))&|tetris(7,14))"));
+
+        assertEquals(Null,
+                $("((tetris(isRowClear,7,true)&&tetris(7,14))=|>tetris(7,14))"));
+
+        assertEquals("((tetris(isRowClear,7,true)&&tetris(7,14)) ==>+10 tetris(7,14))",
+                $("((tetris(isRowClear,7,true)&&tetris(7,14)) ==>+10 tetris(7,14))").toString());
     }
 
     @Test
@@ -1103,7 +1139,9 @@ public class TermReductionsTest extends NarseseTest {
         );
 
     }
-    @Test public void testInvalidCircularImpl() throws Narsese.NarseseException {
+
+    @Test
+    public void testInvalidCircularImpl() throws Narsese.NarseseException {
         assertNotEquals(Null, $("(x(intValue,(),1) ==>+10 ((--,x(intValue,(),0)) &| x(intValue,(),1)))"));
         assertEquals(Null, $("(x(intValue,(),1) =|> ((--,x(intValue,(),0)) &| x(intValue,(),1)))"));
         assertEquals(Null, $("(x(intValue,(),1) ==> ((--,x(intValue,(),0)) &| x(intValue,(),1)))"));

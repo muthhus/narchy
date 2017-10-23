@@ -114,13 +114,13 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
     static class ValueSignalTask extends LatchingSignalTask {
 
-            final Object value;
+        final Object value;
 
-            public ValueSignalTask(Term t, byte punct, Truth truth, long start, long end, long stamp, Object value) {
-                super(t, punct, truth, start, end, stamp);
-                this.value = value; //weakref?
-            }
+        public ValueSignalTask(Term t, byte punct, Truth truth, long start, long end, long stamp, Object value) {
+            super(t, punct, truth, start, end, stamp);
+            this.value = value; //weakref?
         }
+    }
 
     class Instance extends Atom {
 
@@ -128,7 +128,6 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
          * reference to the actual object
          */
         public final Object object;
-
 
 
         /**
@@ -154,16 +153,19 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
             x[0] = $.the(method.getName());
             switch (args.length) {
                 case 0:
-                    x[1] = Op.ZeroProduct; break;
+                    x[1] = Op.ZeroProduct;
+                    break;
                 case 1:
-                    x[1] = OObjects.this.term(args[0]); break; /* unwrapped singleton */
+                    x[1] = OObjects.this.term(args[0]);
+                    break; /* unwrapped singleton */
                 default:
-                    x[1] = $.p(terms(args)); break;
+                    x[1] = $.p(terms(args));
+                    break;
             }
-            assert(x[1]!=null): "could not termize: " + Arrays.toString(args);
+            assert (x[1] != null) : "could not termize: " + Arrays.toString(args);
             if (!isVoid) {
                 x[2] = OObjects.this.term(result);
-                assert(x[2]!=null): "could not termize: " + result;
+                assert (x[2] != null) : "could not termize: " + result;
             }
 
             return x;
@@ -173,54 +175,57 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
             Task cause = invokingGoal.get();
             boolean explicit = cause != null;
 
-            float pri = nar.priDefault(BELIEF);
             long now = nar.time();
+            float pri = nar.priDefault(BELIEF);
 
+            //this essentially synchronizes on each (method,resultValue) tuple
+            // so it can form a coherent, synchronzed sequence of value change events
+            value.compute(method, (m, p1) -> {
 
-            ValueSignalTask p1 = value.get(method);
-            if (p1!=null && Objects.equals(p1.value, nextValue)) {
-                //just continue the existing task
-                p1.priMax(pri); //rebudget
-                p1.grow(now);
-                return nextValue;
-            }
+                if (p1 != null && Objects.equals(p1.value, nextValue)) {
+                    //just continue the existing task
 
-            Term f = $.func(id, opTerms(method, args, nextValue)).normalize();
+                    p1.priMax(pri); //rebudget
+                    p1.grow(now);
+                    return p1; //keep
+                }
 
-            ValueSignalTask next = new ValueSignalTask(f,
-                    BELIEF, $.t(invocationBeliefFreq,nar.confDefault(BELIEF)),
-                    now, now, nar.time.nextStamp(), nextValue);
+                Term f = $.func(id, opTerms(method, args, nextValue)).normalize();
 
-            if (Param.DEBUG)
-                next.log("Invocation" /* via VM */);
+                ValueSignalTask next = new ValueSignalTask(f,
+                        BELIEF, $.t(invocationBeliefFreq, nar.confDefault(BELIEF)),
+                        now, now, nar.time.nextStamp(), nextValue);
 
-            if (explicit) {
-                next.causeMerge(cause);
-                next.priMax(cause.priElseZero());
-                cause.pri(0); //drain
-                cause.meta("@", next);
-            } else {
-                next.priMax(pri);
-            }
-
-
-            SignalTask prev = value.put(method, next);
-
-            if (prev!=null) {
-                prev.end(now); //dont need to re-input prev, this takes care of it
-                next.priMax(pri);
-
-                NALTask prevEnd = new NALTask(prev.term(),
-                        BELIEF, $.t(1f - invocationBeliefFreq, nar.confDefault(BELIEF)),
-                        now, now, now, nar.time.nextInputStamp());
-                prevEnd.priMax(pri);
                 if (Param.DEBUG)
-                    prevEnd.log("Invoked");
+                    next.log("Invocation" /* via VM */);
 
-                nar.input(prevEnd);
-            }
+                if (explicit) {
+                    next.causeMerge(cause);
+                    next.priMax(cause.priElseZero());
+                    cause.pri(0); //drain
+                    cause.meta("@", next);
+                } else {
+                    next.priMax(pri);
+                }
 
-            nar.input(next);
+
+                if (p1 != null) {
+                    p1.end(now); //dont need to re-input prev, this takes care of it
+                    next.priMax(pri);
+
+                    NALTask prevEnd = new NALTask(p1.term(),
+                            BELIEF, $.t(1f - invocationBeliefFreq, nar.confDefault(BELIEF)),
+                            now, now, now, nar.time.nextInputStamp());
+                    prevEnd.priMax(pri);
+                    if (Param.DEBUG)
+                        prevEnd.log("Invoked");
+
+                    nar.input(prevEnd);
+                }
+
+                nar.input(next);
+                return next;
+            });
 
             return nextValue;
         }

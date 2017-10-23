@@ -548,6 +548,7 @@ public class IO {
                         if (x.op() == CONJ) {
                             if (Terms.allNegated(x.subterms())) {
                                 compoundAppend(Op.DISJ.toString(), x.subterms(), Term::neg, p);
+                                return;
                             }
                         }
                     }

@@ -568,10 +568,10 @@ public interface Compound extends Term, IPair, TermContainer {
 //                //assert (o.temporal);
 //            }
 
-            Compound b = this instanceof GenericCompoundDT ?
+            Compound base = this instanceof GenericCompoundDT ?
                     ((GenericCompoundDT) this).ref : this;
-            if (nextDT == DTERNAL)
-                return b;
+            if (nextDT == DTERNAL && !sub(0).equals(sub(1)))
+                return base; //re-use base only if the terms are inequal
 
             /*@NotNull*/
             TermContainer subs = subterms();
@@ -579,13 +579,18 @@ public interface Compound extends Term, IPair, TermContainer {
                 return Null; //tried to temporalize what can only be commutive
 
             if (nextDT == XTERNAL) {
-                return Op.compound(b, XTERNAL);
+                return Op.compound(base, XTERNAL);
             }
 
             Term[] ss = subs.theArray();
             if (o.commutative) {
-                //must re-arrange the order to lexicographic, and invert dt
-                return o.the(nextDT != DTERNAL ? -nextDT : DTERNAL, ss[1], ss[0]);
+
+                if (ss.length == 2) {
+                    //must re-arrange the order to lexicographic, and invert dt
+                    return o.the(nextDT != DTERNAL ? -nextDT : DTERNAL, ss[1], ss[0]);
+                } else {
+                    return o.the(nextDT, ss);
+                }
             } else {
                 return o.the(nextDT, ss);
             }

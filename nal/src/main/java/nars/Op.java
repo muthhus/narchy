@@ -1507,14 +1507,13 @@ public enum Op {
                 // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
                 if (predicate.op() == IMPL) {
                     Term cpr = predicate;
-                    int cprDT = cpr.dt();
+                    int abDT = cpr.dt();
                     //if (cprDT != XTERNAL) {
                     Term a = cpr.sub(0);
 
-                    subject = CONJ.the(dt, subject, a);
+                    subject = CONJ.the(dt /*caDT */, subject, a);
                     predicate = cpr.sub(1);
-                    boolean negate = !polarity;
-                    return IMPL.the(cprDT, subject, predicate).negIf(negate);
+                    return IMPL.the(abDT, subject, predicate).negIf(!polarity);
                     //}
                 }
 
