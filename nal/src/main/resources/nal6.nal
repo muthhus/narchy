@@ -13,7 +13,7 @@
     //strong unification
     (Y ==> X), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:Deduction)
     (--Y ==> X), Z, task(".")   |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:DeductionPN)
-    (X ==> Y), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:AbductionPB)
+    (X ==> Y), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$","strict"), (Belief:AbductionPB)
     //(--X ==> Y), Z, task(".")   |- (--,subIfUnifiesAny(X,Y,Z)), (Belief:AbductionN)
 
     //If after S M happens, and after M P happens, so P happens after S

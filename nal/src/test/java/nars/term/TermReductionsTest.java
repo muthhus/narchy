@@ -176,7 +176,7 @@ public class TermReductionsTest extends NarseseTest {
     public void testPointlessImplicationSubtermRepeat() throws Narsese.NarseseException {
         assertEquals("((a &&+5 x) ==>+5 c)", $("((a &&+5 x)=|>(x &&+5 c))").toString());
 
-        assertEquals(Null, $("((a &&+5 x)=|>x)"));
+        assertEquals(True, $("((a &&+5 x)=|>x)"));
 
         assertEquals("((a &&+5 $1) ==>+5 c)", $("((a &&+5 $1)=|>($1 &&+5 c))").toString());
 
@@ -187,7 +187,8 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testPointlessImplicationSubtermRepeat2() throws Narsese.NarseseException {
         //unaffected because of eternality
-        assertEquals("((a &&+5 x)=|>(&&,x,y,z))", $("((a &&+5 x)=|>(&&,x,y,z))").toString());
+        //assertEquals("((a &&+5 x)=|>(&&,x,y,z))", $("((a &&+5 x)=|>(&&,x,y,z))").toString());
+        assertEquals("((a &&+5 x)=|>(y&&z))", $("((a &&+5 x)=|>(&&,x,y,z))").toString());
 
         //affected because of temporality
         assertEquals("((a &&+5 x)=|>(y&|z))", $("((a &&+5 x)=|>((x&|y)&|z)))").toString());
@@ -279,7 +280,7 @@ public class TermReductionsTest extends NarseseTest {
                 "(a &&+16 ((--,a)&|b))",
                 Op.conj(
                         new FasterList<LongObjectPair<Term>>(new LongObjectPair[]{
-                                PrimitiveTuples.pair(298L, $.$("a") ),
+                                PrimitiveTuples.pair(298L, $.$("a")),
                                 PrimitiveTuples.pair(314L, $.$("b")),
                                 PrimitiveTuples.pair(314L, $.$("(--,a)"))})
                 ).toString()
@@ -711,23 +712,19 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testImplicationConjCommonSubterms() throws Narsese.NarseseException {
-        assertEquals("((b&&c)==>d)",
+        assertEquals("((&&,a,b,c)==>d)",
                 $("((&&, a, b, c) ==> (&&, a, d))").toString());
-        assertEquals("(d==>(b&&c))",
+        assertEquals("((a&&d)==>(b&&c))",
                 $("((&&, a, d) ==> (&&, a, b, c))").toString());
         assertInvalidTerms("((&&, a, b, c) ==> (&&, a, b))");
-        assertEquals("c", $("((&&, a, b) ==> (&&, a, b, c))").toString());
-        assertInvalidTerms("((&&, a, b, c) ==> a)");
-    }
+        assertEquals("((a&&b)==>c)", $("((&&, a, b) ==> (&&, a, b, c))").toString());
+        assertEquals(True, $("((&&, a, b, c) ==> a)"));
 
-    @Test
-    public void testImplicationConjCommonSubterms2() {
-        assertInvalidTerms("(a ==> (&&, a, b, c))");
+        assertEquals("(a==>(b&&c))", $("(a ==> (&&, a, b, c))").toString());
     }
 
     @Test
     public void testConegatedConjunctionTerms0() throws Narsese.NarseseException {
-        assertFalse(true && false);
         assertEquals(False, $("(#1 && (--,#1))"));
         assertEquals(False, $("(#1 &| (--,#1))"));
         assertEquals(False, parallel(varDep(1), varDep(1).neg()));
@@ -912,31 +909,32 @@ public class TermReductionsTest extends NarseseTest {
     public void testImplCommonSubterms() throws Narsese.NarseseException {
         //factor out the common sub-term
         assertEquals(
-                "((--,isIn($1,xyz))==>((y-->x)))", //involves an additional negation factoring out to top level
+                "(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))==>((y-->x)))", //involves an additional negation factoring out to top level
                 $("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))==>((--,(($1,xyz)-->$2))&&(x:y)))").toString());
     }
 
-    @Test public void testConjNearIdentity() throws Narsese.NarseseException {
+    @Test
+    public void testConjNearIdentity() throws Narsese.NarseseException {
         assertEquals(
                 True,
                 $("( (a&&b) ==> (a&|b) )") //differ in dt=0 and dt=DTERNAL
         );
 
         assertEquals(
-             //"(a&|b)",
-            "(&|,(a&&b),a,b)",
-             $("( (a&&b) &| (a&|b) )").toString() //differ in dt=0 and dt=DTERNAL
-         );
+                //"(a&|b)",
+                "(&|,(a&&b),a,b)",
+                $("( (a&&b) &| (a&|b) )").toString() //differ in dt=0 and dt=DTERNAL
+        );
 
         assertEquals(
-             $("((X,x)&|#1)"),
-             $("( ((X,x)&&#1) &| ((X,x)&|#1) )") //differ in dt=0 and dt=DTERNAL
-         );
+                $("((X,x)&|#1)"),
+                $("( ((X,x)&&#1) &| ((X,x)&|#1) )") //differ in dt=0 and dt=DTERNAL
+        );
 
         assertEquals(
-             $("(--,((X,x)&|#1)"),
-             $("( (--,((X,x)&&#1)) &| (--,((X,x)&|#1)) )") //differ in dt=0 and dt=DTERNAL
-         );
+                $("(--,((X,x)&|#1)"),
+                $("( (--,((X,x)&&#1)) &| (--,((X,x)&|#1)) )") //differ in dt=0 and dt=DTERNAL
+        );
     }
 
     @Test
@@ -976,11 +974,11 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testImplCommonSubterms2() throws Narsese.NarseseException {
-        assertEquals(Null,
+        assertEquals(True,
                 $("((tetris(isRowClear,7,true)&&tetris(7,14))==>tetris(7,14))"));
-        assertEquals(Null,
+        assertEquals(True,
                 $("((tetris(isRowClear,7,true)==>tetris(7,14))&&tetris(7,14))"));
-        assertEquals(Null,
+        assertEquals(True,
                 $("((tetris(isRowClear,7,true)=|>tetris(7,14))&&tetris(7,14))"));
 
         assertEquals(True,
@@ -988,11 +986,26 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals(True,
                 $("((tetris(isRowClear,7,true)=|>tetris(7,14))&|tetris(7,14))"));
 
-        assertEquals(Null,
+        assertEquals(True,
                 $("((tetris(isRowClear,7,true)&&tetris(7,14))=|>tetris(7,14))"));
 
         assertEquals("((tetris(isRowClear,7,true)&&tetris(7,14)) ==>+10 tetris(7,14))",
                 $("((tetris(isRowClear,7,true)&&tetris(7,14)) ==>+10 tetris(7,14))").toString());
+    }
+
+    @Test
+    public void testImplCommonSubterms3() throws Narsese.NarseseException {
+
+        assertEquals(
+                True,
+                $("((x(intValue,(),0)&&x(set,0))==>x(intValue,(),0))"));
+        assertEquals(
+                "x(set,0)",
+                $("((x(intValue,(),0)==>x(intValue,(),0)) && x(set,0))").toString());
+        assertEquals(
+                True,
+                $("((x(set,0)==>x(intValue,(),0)) && x(intValue,(),0))"));
+
     }
 
     @Test
@@ -1134,16 +1147,19 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testReducibleImplFactored() throws Narsese.NarseseException {
-        assertEquals("(x=|>z)",
+        assertEquals("((x&|y)=|>z)",
                 $("((y &| x) =|> (y &| z))").toString()
         );
-        assertEquals("(x==>z)",
+        assertEquals("((x&|y)==>z)",
                 $("((y &| x) ==> (y &| z))").toString()
         );
-        assertEquals("(x==>z)",
+    }
+    @Test
+    public void testReducibleImplFactored2() throws Narsese.NarseseException {
+        assertEquals("((x&&y)==>z)",
                 $("((y && x) ==> (y && z))").toString()
         );
-        assertEquals("((a&&x)==>z)",
+        assertEquals("((&&,a,x,y)==>z)",
                 $("((&&, x, y, a) ==> (y && z))").toString()
         );
         assertEquals("((y &&+1 x)=|>(z &&+1 y))", //not reducible
@@ -1158,25 +1174,44 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testReducibleImpl() throws Narsese.NarseseException {
 
-        assertInvalidTerms("(--x ==> (--y && --x))");
+        assertEquals("(--,((--,x)==>y))", $("(--x ==> (--y && --x))").toString());
 
-        assertEquals(Null,//"(x=|>y)",
-                $("(x ==>+0 (y &| x))")//.toString()
+        assertEquals("(x=|>y)",
+                $("(x ==>+0 (y &| x))").toString()
         );
-        assertEquals(Null,//"(y=|>x)",
+        assertEquals(True,
                 $("((y &| x) =|> x)")//.toString()
         );
-        assertEquals(Null,//"(--,((--,$1)=|>#2))",
-                $("((--,$1)=|>((--,$1)&|(--,#2)))")//.toString()
+        assertEquals("(--,((--,$1)=|>#2))",
+                $("((--,$1)=|>((--,$1)&|(--,#2)))").toString()
         );
+    }
+    @Test
+    public void testReducibleImplConjCoNeg() throws Narsese.NarseseException {
+        for (String i : new String[] { "==>", "=|>"}) {
+            for (String c : new String[]{"&&", "&|"}) {
+                assertEquals(Null,
+                        $("(x " + i + " (y " + c + " --x))")
+                );
+                assertEquals(Null,
+                        $("(--x " + i + " (y " + c + " x))")
+                );
+                assertEquals(Null,
+                        $("((y " + c + " --x) " + i + " x)")
+                );
+                assertEquals(False,  //this case reduces to negative of the outer term, so it becomes True
+                        $("((y " + c + " x) " + i + " --x)")
+                );
+            }
+        }
     }
 
     @Test
     public void testReducibleImplParallelNeg() throws Narsese.NarseseException {
-        assertEquals(Null,//"((--,x)=|>(--,y))",
-                $("(--x ==>+0 (--y &| --x))")//.toString()
+        assertEquals("(--,((--,x)=|>y))",
+                $("(--x =|> (--y &| --x))").toString()
         );
-        assertEquals(Null,//"((--,y)=|>(--,x))",
+        assertEquals(Null,
                 $("((--y &| --x) =|> --x)")//.toString()
         );
 
@@ -1185,8 +1220,10 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testInvalidCircularImpl() throws Narsese.NarseseException {
         assertNotEquals(Null, $("(x(intValue,(),1) ==>+10 ((--,x(intValue,(),0)) &| x(intValue,(),1)))"));
-        assertEquals(Null, $("(x(intValue,(),1) =|> ((--,x(intValue,(),0)) &| x(intValue,(),1)))"));
-        assertEquals(Null, $("(x(intValue,(),1) ==> ((--,x(intValue,(),0)) &| x(intValue,(),1)))"));
+        assertEquals("(--,(x(intValue,(),1)=|>x(intValue,(),0)))",
+                $("(x(intValue,(),1) =|> ((--,x(intValue,(),0)) &| x(intValue,(),1)))").toString());
+        assertEquals("(--,(x(intValue,(),1)==>x(intValue,(),0)))",
+                $("(x(intValue,(),1) ==> ((--,x(intValue,(),0)) &| x(intValue,(),1)))").toString());
     }
 
     @Test

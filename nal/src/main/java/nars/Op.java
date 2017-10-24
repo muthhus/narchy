@@ -26,6 +26,7 @@ import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
@@ -203,51 +204,56 @@ public enum Op {
                 }
             }
 
-            if ((dt == 0 || dt == DTERNAL) && u.length == 2) {
+            if (u.length == 2 && (dt == 0 || dt == DTERNAL)) {
                 if (conegated(u[0], u[1]))
                     return False;
             }
 
+
             Term ci;
             if (dt == 0) {
-                ci = u[0];
-                for (int i = 1; i < u.length; i++) {
+                ci = null;
+                for (int i = 0; i < u.length; i++) {
 
-                    //HACK cut to prevent infinite recursion due to impl conj reduction
-                    if (u[0].op() == IMPL && u[0].containsRecursively(u[1].unneg())) {
-                        Term ui = u[0];
-                        int id = ui.dt();
-
-                        {
-                            Term uis = ui.sub(0);
-                            if (uis.equals(u[1]))
-                                continue; //already absorbed into the subject
-                            if (uis.op() == CONJ) {
-                                LongObjectHashMap<Term> uism = uis.eventMap(0);
-                                Term uismNOW = uism.get(0);
-                                if (uismNOW.equals(u[1]))
-                                    return True;
-                                if (uismNOW.unneg().equals(u[1]))
-                                    return Null; //co-negation
-                            }
-                        }
-
-                        if (id == DTERNAL || id == 0) { //simultaneous with now
-                            Term uip = ui.sub(1);
-                            if (uip.equals(u[1]))
-                                return True;
-                            if (uip.op() == CONJ) {
-                                LongObjectHashMap<Term> uipm = uip.eventMap(0);
-                                Term uipmNOW = uipm.get(0);
-                                if (uipmNOW.equals(u[1]))
-                                    return True;
-                                if (uipmNOW.unneg().equals(u[1]))
-                                    return Null; //co-negation
-                            }
-                        }
+                    //PROMOTE DTERNAL to ZERO
+                    if (u[i].op() == CONJ && u[i].dt() == DTERNAL) {
+                        u[i] = u[i].dt(0);
                     }
+                    //HACK cut to prevent infinite recursion due to impl conj reduction
+//                    if (u[0].op() == IMPL && u[0].containsRecursively(u[1].unneg())) {
+//                        Term ui = u[0];
+//                        int id = ui.dt();
+//
+//                        {
+//                            Term uis = ui.sub(0);
+//                            if (uis.equals(u[1]))
+//                                continue; //already absorbed into the subject
+//                            if (uis.op() == CONJ) {
+//                                LongObjectHashMap<Term> uism = uis.eventMap(0);
+//                                Term uismNOW = uism.get(0);
+//                                if (uismNOW.equals(u[1]))
+//                                    return True;
+//                                if (uismNOW.unneg().equals(u[1]))
+//                                    return Null; //co-negation
+//                            }
+//                        }
+//
+//                        if (id == DTERNAL || id == 0) { //simultaneous with now
+//                            Term uip = ui.sub(1);
+//                            if (uip.equals(u[1]))
+//                                return True;
+//                            if (uip.op() == CONJ) {
+//                                LongObjectHashMap<Term> uipm = uip.eventMap(0);
+//                                Term uipmNOW = uipm.get(0);
+//                                if (uipmNOW.equals(u[1]))
+//                                    return True;
+//                                if (uipmNOW.unneg().equals(u[1]))
+//                                    return Null; //co-negation
+//                            }
+//                        }
+//                    }
 
-                    ci = conjMerge(ci, 0, u[i], 0);
+                    ci = i > 0 ? conjMerge(ci, 0, u[i], 0) : u[0];
                     if (ci instanceof Bool)
                         return ci;
                 }
@@ -259,17 +265,17 @@ public enum Op {
             } else {
 
                 //sequence or xternal
-                assert (n == 2) : "invalid non-commutive conjunction arity!=2, arity=" + n;
-
-                if (dt == XTERNAL) {
-                    Arrays.sort(u); //pre-sort
-                }
+                //assert (n == 2) : "invalid non-commutive conjunction arity!=2, arity=" + n;
 
                 //rebalance and align
                 //convention: left align all sequences
                 //ex: (x &&+ (y &&+ z))
                 //      becomes
                 //    ((x &&+ y) &&+ z)
+
+                if (dt == XTERNAL) {
+                    Arrays.sort(u); //pre-sort but should have been sorted already
+                }
 
                 Term a = u[0];
                 Term b = u[1];
@@ -282,43 +288,45 @@ public enum Op {
 
 
                 if (dt == XTERNAL) {
+                    if (n == 2) {
 
-                    int va = a.volume();
-                    int vb = b.volume();
+                        int va = a.volume();
+                        int vb = b.volume();
 
-                    boolean heavyLeft, heavyRight;
+                        boolean heavyLeft, heavyRight;
 
-                    if (va > vb && a.op() == CONJ && a.dt() == XTERNAL && a.subs() == 2) {
-                        int va0 = a.sub(0).volume();
-                        int va1 = a.sub(1).volume();
+                        if (va > vb && a.op() == CONJ && a.dt() == XTERNAL && a.subs() == 2) {
+                            int va0 = a.sub(0).volume();
+                            int va1 = a.sub(1).volume();
 
-                        int vamin = Math.min(va0, va1);
+                            int vamin = Math.min(va0, va1);
 
-                        //if left remains heavier by donating its smallest
-                        if ((va - vamin) > (vb + vamin)) {
-                            int min = va0 <= va1 ? 0 : 1;
-                            Term aToB = a.sub(min);
-                            return CONJ.the(XTERNAL,
-                                    CONJ.the(XTERNAL, b, aToB), a.sub(1 - min));
+                            //if left remains heavier by donating its smallest
+                            if ((va - vamin) > (vb + vamin)) {
+                                int min = va0 <= va1 ? 0 : 1;
+                                Term aToB = a.sub(min);
+                                return CONJ.the(XTERNAL,
+                                        CONJ.the(XTERNAL, b, aToB), a.sub(1 - min));
+                            }
                         }
+
+                        //b volume should not be larger than a, it is guaranteed by commutive ordinality convention
+
+                        /*else if (vb > va && b.op() == CONJ && b.dt() == XTERNAL && b.subs() == 2) {
+                            int vb0 = b.sub(0).volume();
+                            int vb1 = b.sub(1).volume();
+
+                            if (vb - va > Math.min(vb0, vb1)) {
+                                int min = vb0 <= vb1 ? 0 : 1;
+                                Term bToA = b.sub(min);
+                                return CONJ.the(XTERNAL,
+                                        CONJ.the(XTERNAL, a, bToA), b.sub(1 - min));
+                            }
+                        }*/
+
+
                     }
-
-                    //b volume should not be larger than a, it is guaranteed by commutive ordinality convention
-
-                    /*else if (vb > va && b.op() == CONJ && b.dt() == XTERNAL && b.subs() == 2) {
-                        int vb0 = b.sub(0).volume();
-                        int vb1 = b.sub(1).volume();
-
-                        if (vb - va > Math.min(vb0, vb1)) {
-                            int min = vb0 <= vb1 ? 0 : 1;
-                            Term bToA = b.sub(min);
-                            return CONJ.the(XTERNAL,
-                                    CONJ.the(XTERNAL, a, bToA), b.sub(1 - min));
-                        }
-                    }*/
-
-
-                    return compound(CONJ, XTERNAL, a, b); //a and b should already be sorted
+                    return compound(CONJ, XTERNAL, u);
                 } else {
 
 
@@ -364,7 +372,7 @@ public enum Op {
                 //if (u[0].unneg().equals(u[1].unneg()))
                 //    return False; //co-neg
 
-                return compound(CONJ, dt, u);
+                return Op.implInConjReduction(compound(CONJ, dt, u));
             }
 
 
@@ -412,9 +420,23 @@ public enum Op {
                     return cs.first();
 
                 Term[] scs = sorted(cs);
-                return !Arrays.equals(scs, u) ?
+
+                //promote DTERNAL to ZERO if any components are ZERO
+                boolean dtChange = false;
+                if (dt == DTERNAL) {
+                    for (Term x : scs) {
+                        if (x.op() == CONJ && x.dt() == 0) {
+                            dt = 0;
+                            dtChange = true;
+                            break;
+                        }
+                    }
+                }
+
+
+                return (dtChange || !Arrays.equals(scs, u)) ?
                         CONJ.the(dt, scs) : //changed, recurse
-                        compound(CONJ, dt, scs);
+                        Op.implInConjReduction(compound(CONJ, dt, scs));
             }
 
             return Null;
@@ -995,8 +1017,11 @@ public enum Op {
                     (Collection<Term> xa) -> {
                         if (xa.add(xb)) {
                             Op o = xb.op();
-                            if (o == NEG) { if (xa.contains(xb.unneg())) return null; }
-                            else { if (xa.contains(xb.neg())) return null; }
+                            if (o == NEG) {
+                                if (xa.contains(xb.unneg())) return null;
+                            } else {
+                                if (xa.contains(xb.neg())) return null;
+                            }
                         }
                         return xa;
                     });
@@ -1009,10 +1034,10 @@ public enum Op {
             return False;
 
         LongObjectHashMap<Term> eventSet = new LongObjectHashMap<>();
-        Term[] cut = { null };
+        Term[] cut = {null};
         if (!eventSets.keyValuesView().allSatisfy((ws) -> {
             Term[] sps = sorted(ws.getTwo());
-            assert(sps.length > 0);
+            assert (sps.length > 0);
             Term pp;
             if (sps.length == 1)
                 pp = sps[0];
@@ -1207,7 +1232,7 @@ public enum Op {
     static private Term implInConjReduction(final Term conj /* possibly a conjunction */) {
 
 
-        if (!conj.hasAny(IMPL) || conj.op()!=CONJ)
+        if (!conj.hasAny(IMPL) || conj.op() != CONJ)
             return conj; //fall-through
 
         int conjDT = conj.dt();
@@ -1429,9 +1454,6 @@ public enum Op {
         if (subject == Null || predicate == Null)
             return Null;
 
-
-        boolean polarity = true;
-
         boolean dtConcurrent = concurrent(dt);
         switch (op) {
 
@@ -1450,143 +1472,186 @@ public enum Op {
             case IMPL:
 
                 //special case for implications: reduce to --predicate if the subject is False
-                if (isTrueOrFalse(subject /* antecedent */)) {
-                    if (dtConcurrent) {
-                        boolean negate = polarity ? (subject == False) : (subject != False);
-                        return predicate.negIf(negate);
-                    } else {
-                        return Null; //no temporal basis
-                    }
-                }
-                if (predicate instanceof Bool)
+
+                //if (dtConcurrent) { //no temporal basis
+                if (subject == True)
+                    return predicate;
+                else if (subject == False)
+                    return predicate.neg();
+                else if (predicate instanceof Bool)
                     return Null;
 
                 if (subject.hasAny(InvalidImplicationSubj))
                     return Null; //throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
-//                if (predicate.hasAny(InvalidImplicationPred))
-//                    return Null; //throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
-
 
                 if (predicate.op() == NEG) {
                     //negated predicate gets unwrapped to outside
-                    predicate = predicate.unneg();
-                    polarity = !polarity;
+                    return IMPL.the(dt, subject, predicate.unneg()).neg();
+                }
+
+                if (dtConcurrent) {
+                    if (subject.equals(predicate))
+                        return True;
                 }
 
 
-                if (dtConcurrent) {
-                    if (subject.unneg().equals(predicate)) {
-                        if (subject.op() == NEG) polarity = !polarity; //invert if the subj is neg
-                        return polarity ? True : /*False*/Null;
-                    }
-                } //else: allow repeat
-
-                boolean subjConj = subject.op() == CONJ;
-                boolean predConj = predicate.op() == CONJ;
 
                 //factor out any common subterms iff concurrent
-                if (dtConcurrent) {
+//                if (dtConcurrent) {
+//
+//                    //factor common events from subj/pred in concurrent impl
+//
+//                    boolean subjConj = subject.op() == CONJ;
+//                    boolean predConj = predicate.op() == CONJ;
+//                    boolean subjConjComm = subjConj && concurrent(subject.dt());
+//                    boolean predConjComm = predConj && concurrent(predicate.dt());
+//
+//                    if (subjConjComm) {
+//                        TermContainer subjs = subject.subterms();
+//                        if (subjs.contains(predicate)) {
+//                            //if (X and Y) then (X), yes obviously
+//                            return True;
+//                        }
+//                        if (subjs.contains(predicate.neg())) {
+//                            //if (--X and Y) then (X), no: contradiction
+//                            return Null;
+//                        }
+//                    } else if (predConjComm) {
+//                        TermContainer preds = predicate.subterms();
+//                        if (preds.contains(subject)) {
+//                            ////if X then (X and Y), no not necessarily
+//                            return Null;
+//                        }
+//                        if (preds.contains(subject.neg())) {
+//                            ////if X then (--X and Y), no: contradiction
+//                            return Null;
+//                        }
+//                    }
+//
+////                    if (subjConjComm && predConjComm) {
+////                        final Term csub = subject;
+////                        TermContainer subjs = csub.subterms();
+////                        final Term cpred = predicate;
+////                        TermContainer preds = cpred.subterms();
+////
+////                        Term[] common = TermContainer.intersect(subjs, preds);
+////                        if (common != null) {
+////
+////                            Set<Term> sss = subjs.toSortedSet();
+////                            boolean modifiedS = false;
+////                            for (Term cc : common)
+////                                modifiedS |= sss.remove(cc);
+////
+////                            if (modifiedS) {
+////                                int s0 = sss.size();
+////                                switch (s0) {
+////                                    case 0:
+////                                        subject = True;
+////                                        break;
+////                                    case 1:
+////                                        subject = sss.iterator().next();
+////                                        break;
+////                                    default:
+////                                        subject = CONJ.the(/*DTERNAL?*/csub.dt(), sss);
+////                                        break;
+////                                }
+////                            }
+////
+////                            @NotNull SortedSet<Term> ppp = preds.toSortedSet();
+////                            boolean modifiedP = false;
+////                            for (Term cc : common)
+////                                modifiedP |= ppp.remove(cc);
+////
+////                            if (modifiedP) {
+////                                int s0 = ppp.size();
+////                                switch (s0) {
+////                                    case 0:
+////                                        predicate = True;
+////                                        break;
+////                                    case 1:
+////                                        predicate = ppp.iterator().next();
+////                                        break;
+////                                    default:
+////                                        predicate = CONJ.the(cpred.dt(), sorted(ppp));
+////                                        break;
+////                                }
+////                            }
+////
+////
+////                            return IMPL.the(dt, subject, predicate).negIf(!polarity);
+////                        }
+////
+////                    }
+//
+//
+//                }
 
-                    //factor common events from subj/pred in concurrent impl
 
-                    boolean subjComm = concurrent(subject.dt());
-                    boolean predComm = concurrent(predicate.dt());
+                // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
+                if (predicate.op() == IMPL) {
+                    int abDT = predicate.dt();
+                    //if (cprDT != XTERNAL) {
+                    Term a = predicate.sub(0);
 
-                    if (subjConj && !predConj && subjComm) {
-                        TermContainer subjs = subject.subterms();
-                        int i = subjs.indexOf(predicate);
-                        if (i != -1) {
-                            //probably need to drop from both but for now the safest thing is just to return Null
-                            //subject = conjDrop(subject, i);
+                    subject = CONJ.the(dt /*caDT */, subject, a);
+                    predicate = predicate.sub(1);
+                    return IMPL.the(abDT, subject, predicate);
+                    //}
+                }
+
+                //filter duplicate events
+
+                if (dt != XTERNAL && subject.dt() != XTERNAL && predicate.dt() != XTERNAL) {
+
+                    MutableSet<LongObjectPair<Term>> se = new UnifiedSet();
+                    subject.eventsWhile((w,t)->{
+                        se.add(PrimitiveTuples.pair(w, t));
+                        return true;
+                    }, 0, true, true, 0);
+
+                    MutableSet<LongObjectPair<Term>> pe = new UnifiedSet();
+
+                    int pre = subject.dtRange();
+                    int edt = pre + (dt != DTERNAL ? dt : 0);
+
+                    final boolean[] peChange = {false};
+                    boolean contradiction = !predicate.eventsWhile((w, t) -> {
+                        LongObjectPair<Term> x = PrimitiveTuples.pair(w, t);
+                        if (se.contains(x)) {
+                            //dont repeat it in the predicate
+                            peChange[0] = true;
+                        } else if (se.contains(pair(w, t.neg()))) {
+                            return false; //contradiction
+                        } else {
+                            pe.add(x);
+                        }
+                        return true;
+                    }, edt, true, true, 0);
+
+                    if (contradiction)
+                        return Null;
+
+                    if (peChange[0]) {
+                        //change occurred
+
+                        if (pe.isEmpty()) {
+                            return True; //<- TODO
+                        } /*else if (se.isEmpty()) {
                             return Null;
+                        } */ else {
+                            //duplicates were removed, reconstruct new predicate
+                            int ndt = dt != DTERNAL ? (int) pe.minBy(LongObjectPair::getOne).getOne() - pre : dt;
+                            return IMPL.the(ndt,
+                                    subject,
+                                    /*subject.dt()!=DTERNAL ? Op.conj(se.toList()) :
+                                        CONJ.the(DTERNAL, (Collection)se.collect(x->x.getTwo())),*/
+                                    predicate.dt()!=DTERNAL ? Op.conj(pe.toList()) :
+                                        CONJ.the(DTERNAL, (Collection)pe.collect(LongObjectPair::getTwo))
+                            );
                         }
-                    } else if (!subjConj && predConj && predComm) {
-                        TermContainer preds = predicate.subterms();
-                        int i = preds.indexOf(subject);
-                        if (i != -1) {
-                            //probably need to drop from both but for now the safest thing is just to return Null
-                            //predicate = conjDrop(predicate, i);
-                            return Null;
-                        }
-
-                    }
-                    if ((subjConj && predConj) && subjComm && predComm) {
-                        final Term csub = subject;
-                        TermContainer subjs = csub.subterms();
-                        final Term cpred = predicate;
-                        TermContainer preds = cpred.subterms();
-
-                        Term[] common = TermContainer.intersect(subjs, preds);
-                        if (common != null) {
-
-                            @NotNull Set<Term> sss = subjs.toSortedSet();
-                            boolean modifiedS = false;
-                            for (Term cc : common)
-                                modifiedS |= sss.remove(cc);
-
-                            if (modifiedS) {
-                                int s0 = sss.size();
-                                switch (s0) {
-                                    case 0:
-                                        subject = True;
-                                        break;
-                                    case 1:
-                                        subject = sss.iterator().next();
-                                        break;
-                                    default:
-                                        subject = CONJ.the(/*DTERNAL?*/csub.dt(), sorted(sss));
-                                        break;
-                                }
-                            }
-
-                            @NotNull SortedSet<Term> ppp = preds.toSortedSet();
-                            boolean modifiedP = false;
-                            for (Term cc : common)
-                                modifiedP |= ppp.remove(cc);
-
-                            if (modifiedP) {
-                                int s0 = ppp.size();
-                                switch (s0) {
-                                    case 0:
-                                        predicate = True;
-                                        break;
-                                    case 1:
-                                        predicate = ppp.iterator().next();
-                                        break;
-                                    default:
-                                        predicate = CONJ.the(cpred.dt(), sorted(ppp));
-                                        break;
-                                }
-                            }
-
-
-                            return IMPL.the(dt, subject, predicate).negIf(!polarity);
-                        }
-
-                    }
-
-
-                    if (subjConj && predConj) {
-                        //filter duplicate events
-                        int pre = subject.dtRange();
-                        int edt = pre + (dt != DTERNAL ? dt : 0);
-
-                        Set<LongObjectPair<Term>> se = subject.eventSet(0);
-
-                        MutableSet<LongObjectPair<Term>> pe = predicate.eventSet(edt);
-
-                        if (pe.removeIf(se::contains)) {
-                            if (pe.isEmpty()) {
-                                return Null;
-                            } else {
-                                //duplicates were removed, reconstruct new predicate
-                                int ndt = (int) pe.minBy(LongObjectPair::getOne).getOne() - pre;
-                                return IMPL.the(ndt, subject, Op.conj(pe.toList())).negIf(!polarity);
-                            }
-                        }
-
                     }
                 }
+
 
 //            if (op == INH || op == SIM || dt == 0 || dt == DTERNAL) {
 //                if ((subject instanceof Compound && subject.varPattern() == 0 && subject.containsRecursively(predicate)) ||
@@ -1594,20 +1659,6 @@ public enum Op {
 //                    return False; //self-reference
 //                }
 //            }
-
-
-                // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
-                if (predicate.op() == IMPL) {
-                    Term cpr = predicate;
-                    int abDT = cpr.dt();
-                    //if (cprDT != XTERNAL) {
-                    Term a = cpr.sub(0);
-
-                    subject = CONJ.the(dt /*caDT */, subject, a);
-                    predicate = cpr.sub(1);
-                    return IMPL.the(abDT, subject, predicate).negIf(!polarity);
-                    //}
-                }
 
 
                 break;
@@ -1666,7 +1717,7 @@ public enum Op {
 //        }
 
 
-        return compound(op, dt, subject, predicate).negIf(!polarity);
+        return compound(op, dt, subject, predicate);
     }
 
     private static Term conjDrop(@NotNull Term conj, int i) {

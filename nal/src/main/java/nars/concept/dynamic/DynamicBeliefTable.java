@@ -65,13 +65,14 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         }
 
         //still XTERNAL ? try using start..end as a dt
-        if (template.dt() == XTERNAL) {
+        if (template.dt() == XTERNAL && template.subs()==2) {
             template = template.dt((int) (end-start));
         }
 
-        template = template.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
+        template = template.temporalize(Retemporalize.retemporalizeXTERNALToZero);
         if (template == null)
             return null;
+
 
         if (!template.conceptual().equals(term))
             return null; //doesnt correspond to this concept anyway

@@ -299,7 +299,7 @@ public class BeliefTableTest {
     public void testDTDiff() {
 
         //+- matches anything
-        assertEquals(dtDiff("(x ==>+5 y)", "(x ==>+- y)"), dtDiff("(x ==>+5 y)", "(x ==>+5 y)"), 0.0);
+        assertEquals(dtDiff("(x ==>+5 y)", "(x ==>+- y)"), dtDiff("(x ==>+5 y)", "(x ==>+5 y)"));
 
         assertTrue(
     dtDiff("(x ==>+5 y)", "(x ==>+2 y)") >

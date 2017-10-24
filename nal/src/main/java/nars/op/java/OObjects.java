@@ -260,11 +260,41 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
         return Stream.of(args).map(this::term).toArray(Term[]::new);
     }
 
+
+    /**
+     * wraps a provided instance in an intercepting proxy class
+     */
+    public <T> T the(String id, T instance) {
+
+        ProxyFactory f = new ProxyFactory();
+        f.setSuperclass(instance.getClass());
+        try {
+            register(id, instance);
+            return (T) f.create(ArrayUtils.EMPTY_CLASS_ARRAY, ArrayUtils.EMPTY_OBJECT_ARRAY,
+                    (self, thisMethod, proceed, args) ->
+                            invoked(instance, thisMethod, args, thisMethod.invoke(instance, args))
+            );
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+
+//        T newInstance = (T)Proxy.newProxyInstance(instance.getClass().getClassLoader(),
+//                new Class[] { instance.getClass() }, new AbstractInvocationHandler() {
+//            @Override
+//            protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
+//                Object result = method.invoke(proxy, args);
+//                invoked(proxy, method, args, result);
+//                return result;
+//            }
+//        });
+
+    }
+
     /**
      * creates a new instance to be managed by this
      */
     @NotNull
-    public <T> T the(String id, Class<? extends T> instance, Object... args) {
+    public <T> T a(String id, Class<? extends T> instance, Object... args) {
 
         Class clazz = proxyCache.computeIfAbsent(instance, (c) -> {
             ProxyFactory p = new ProxyFactory();
@@ -275,17 +305,22 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
         try {
 
-            T wrappedInstance = (T) clazz.getDeclaredConstructor(typesOf(args)).newInstance(args);
+            T newInstance = (T) clazz.getDeclaredConstructor(typesOf(args)).newInstance(args);
+            ((ProxyObject) newInstance).setHandler(this);
 
-            ((ProxyObject) wrappedInstance).setHandler(this);
+            return register(id, newInstance);
 
-            Instance ii = new Instance(id, wrappedInstance);
-            put(ii, wrappedInstance);
-
-            return wrappedInstance;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private <T> T register(String id, T wrappedInstance) {
+
+        Instance ii = new Instance(id, wrappedInstance);
+        put(ii, wrappedInstance);
+
+        return wrappedInstance;
     }
 
 
@@ -322,9 +357,9 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
                 Method x = findMethod(c, method.toString(), types);
 
-                if (x == null) {
-                    x = findMethod(Object.class, method.toString(), types);
-                }
+//                if (x == null) {
+//                    x = findMethod(Object.class, method.toString(), types);
+//                }
 
                 if (x == null)
                     return;
@@ -458,10 +493,14 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
     @Nullable
     @Override
-    public final Object invoke(Object obj, Method wrapped, Method wrapper, Object[] args) throws Throwable {
+    public final Object invoke(Object obj, Method wrapper, Method wrapped, Object[] args) throws Throwable {
 
-        Object result = wrapper.invoke(obj, args);
+        Object result = wrapped.invoke(obj, args);
 
+        return invoked(obj, wrapper, args, result);
+    }
+
+    @Nullable Object invoked(Object obj, Method wrapped, Object[] args, Object result) {
         if (methodExclusions.contains(wrapped.getName()))
             return result;
 

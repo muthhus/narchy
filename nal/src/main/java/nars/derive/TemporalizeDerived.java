@@ -296,7 +296,7 @@ public class TemporalizeDerived extends Temporalize {
             }
         }
 
-        return e.term.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
+        return e.term;
     }
 
 }

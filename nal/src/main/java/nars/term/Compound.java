@@ -577,8 +577,8 @@ public interface Compound extends Term, IPair, TermContainer {
             } else {
                 TermContainer subs = subterms();
                 int ns = subs.subs();
-                if (nextDT == DTERNAL && ns == 2 && !subs.sub(0).unneg().equals(subs.sub(1).unneg()))
-                    return base; //re-use base only if the terms are inequal
+//                if (nextDT == DTERNAL && ns == 2 && !subs.sub(0).unneg().equals(subs.sub(1).unneg()))
+//                    return base; //re-use base only if the terms are inequal
 
                 /*@NotNull*/
                 if (!concurrent(nextDT) && ns > 2)
@@ -682,13 +682,15 @@ public interface Compound extends Term, IPair, TermContainer {
 
     /* collects any contained events within a conjunction*/
     @Override
-    default boolean eventsWhile(LongObjectPredicate<Term> events, long offset, int level) {
+    default boolean eventsWhile(LongObjectPredicate<Term> events, long offset, boolean decomposeConjParallel, boolean decomposeConjDTernal, int level) {
         Op o = op();
         if (o == CONJ) {
             int dt = dt();
 
-            if (dt != DTERNAL && dt != XTERNAL) {
+            if ((decomposeConjDTernal || dt != DTERNAL) && (decomposeConjParallel || dt != 0) && dt != XTERNAL) {
 
+                if (dt == DTERNAL)
+                    dt = 0;
 
                 TermContainer tt = subterms();
                 int s = tt.subs();
@@ -699,14 +701,14 @@ public interface Compound extends Term, IPair, TermContainer {
                 if (!reverse) {
                     for (int i = 0; i < s; i++) {
                         Term st = tt.sub(i);
-                        if (!st.eventsWhile(events, t, level + 1)) //recurse
+                        if (!st.eventsWhile(events, t, decomposeConjParallel, decomposeConjDTernal,level + 1)) //recurse
                             return false;
                         t += dt + st.dtRange();
                     }
                 } else {
                     for (int i = s - 1; i >= 0; i--) {
                         Term st = tt.sub(i);
-                        if (!st.eventsWhile(events, t, level + 1)) //recurse
+                        if (!st.eventsWhile(events, t, decomposeConjParallel, decomposeConjDTernal, level + 1)) //recurse
                             return false;
                         t += -dt + st.dtRange();
                     }

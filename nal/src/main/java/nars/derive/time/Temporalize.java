@@ -231,7 +231,7 @@ public class Temporalize implements ITemporalize {
         switch (x.op()) {
             case IMPL:
                 Term impl = x;
-                int implDT = x.dt();
+                final int implDT = x.dt();
 
                 if (implDT == XTERNAL) {
 
@@ -280,14 +280,14 @@ public class Temporalize implements ITemporalize {
                         if (implPred.hasAny(CONJ)) {
                             implPred.eventsWhile((w, pp)-> {
                                 if (!pp.equals(implSubj)) {
-                                    int t = (int) (predFromSubj + w);
+                                    int t = (int)  w;
                                     know(pp, relative(pp, implSubj, t));
                                     know(implSubj, relative(implSubj, pp, -t));
                                 } else {
                                     //TODO repeat case
                                 }
                                 return true;
-                            }, implDT);
+                            }, implDT+implSubj.dtRange());
                         }
                     }
 

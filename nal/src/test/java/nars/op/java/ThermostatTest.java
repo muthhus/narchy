@@ -41,7 +41,9 @@ public class ThermostatTest {
 
         OObjects objs = new OObjects(n);
 
-        this.x = objs.the("x", MutableInteger.class, 0);
+        this.x =
+                //objs.the("x", MutableInteger.class, 0);
+                objs.the("x", new MyMutableInteger());
 
         n.time.dur(4);
 
@@ -71,9 +73,9 @@ public class ThermostatTest {
 
         while (x.intValue()!=1 /*&& n.time() < 1000*/) {
             if (n.time() % 100 == 0) {
-                n.clear();
-                n.input("$1.0 x(intValue, (), 1)! :|:");
-                n.input("$1.0 (0<->1)?");
+                n.input("$1.0 x(intValue, (), 1)! :|: %1.00;0.90%");
+                n.input("$1.0 x(intValue, (), 0)! :|: %0.00;0.90%");
+                n.input("$1.0 x(set, 1)@ :|:");
             }
             n.run(1);
 
@@ -86,6 +88,15 @@ public class ThermostatTest {
 
     public static void main(String[] args) throws Exception {
         new ThermostatTest();
+    }
+
+    public static class MyMutableInteger extends MutableInteger {
+
+
+        @Override
+        public void set(int value) {
+            super.set(value);
+        }
     }
 
 //    public void train() {

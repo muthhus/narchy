@@ -944,7 +944,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         }
 
 
-        Term y = x; //x.eval(n.terms.intern());
+        Term y = x.eval(n.terms.intern());
 
         if (y == null)
             return null;

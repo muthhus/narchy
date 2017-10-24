@@ -32,7 +32,7 @@ public class OObjectsTest {
 
         final OObjects objs = new OObjects(n);
 
-        final SimpleClass x = objs.the("x", SimpleClass.class);
+        final SimpleClass x = objs.a("x", SimpleClass.class);
         StringBuilder sb = new StringBuilder();
         n.onTask(sb::append);
 
@@ -56,7 +56,7 @@ public class OObjectsTest {
         n.log();
         final OObjects objs = new OObjects(n);
 
-        final SimpleClass x = objs.the("x", SimpleClass.class);
+        final SimpleClass x = objs.a("x", SimpleClass.class);
         StringBuilder sb = new StringBuilder();
         n.onTask(sb::append);
 
@@ -72,7 +72,7 @@ public class OObjectsTest {
 
         final OObjects objs = new OObjects(n);
 
-        final SimpleClass x = objs.the("x", SimpleClass.class);
+        final SimpleClass x = objs.a("x", SimpleClass.class);
         StringBuilder sb = new StringBuilder();
         n.onTask(sb::append);
         n.run(1);
@@ -100,7 +100,7 @@ public class OObjectsTest {
 
         final OObjects objs = new OObjects(n);
 
-        final SimpleClass x = objs.the("x", SimpleClass.class);
+        final SimpleClass x = objs.a("x", SimpleClass.class);
 
 
         n.priDefault(BELIEF, 0.05f);

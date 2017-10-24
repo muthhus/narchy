@@ -77,8 +77,8 @@ public class Builtin {
             /** similar to C/Java "indexOf" but returns a set of all numeric indices where the 2nd argument occurrs as a subterm of the first
              *  if not present, returns Null
              * */
-            Functor.f2("numIndicesOf", (x,y) -> {
-            //Functor.f2("indicesOf", (x,y) -> {
+            //Functor.f2("numIndicesOf", (x,y) -> {
+            Functor.f2("indicesOf", (x,y) -> {
                 int s = x.subs();
                 if (s > 0) {
                     TreeSet<Term> indices = null; //lazy alloc
@@ -97,8 +97,8 @@ public class Builtin {
                 }
                 return Null;
             }),
-            //Functor.f2("keyValues", (x,y) -> {
-            Functor.f2("indicesOf", (x,y) -> {
+            Functor.f2("keyValues", (x,y) -> {
+            //Functor.f2("indicesOf", (x,y) -> {
                 int s = x.subs();
                 if (s > 0) {
                     TreeSet<Term> indices = null; //lazy alloc

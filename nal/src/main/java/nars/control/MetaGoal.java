@@ -194,7 +194,10 @@ public enum MetaGoal {
 //            if (cc == null)
 //                continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
 
-            assert (cc != null) : "cause " + c + " missing";
+            if (cc == null) {
+                logger.warn("cause {} missing", i);
+                continue;
+            }
 
             //trace decay curve
             //linear triangle increasing to inc, warning this does not integrate to 100% here

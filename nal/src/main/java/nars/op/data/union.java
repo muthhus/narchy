@@ -21,7 +21,7 @@ public class union extends Functor.BinaryFunctor {
     }
 
     @Nullable
-    @Override public Term apply(@NotNull Term a, @NotNull Term b) {
+    @Override public Term apply(Term a, Term b) {
 
         return Terms.union(a.op(), a.subterms(), b.subterms() );
     }

@@ -18,6 +18,7 @@ abstract public class Retemporalize implements CompoundTransform {
     public static final Retemporalize retemporalizeAllToXTERNAL = new RetemporalizeAll(XTERNAL);
     public static final Retemporalize retemporalizeXTERNALToDTERNAL = new RetemporalizeFromTo(XTERNAL, DTERNAL);
     public static final Retemporalize retemporalizeXTERNALToZero = new RetemporalizeFromTo(XTERNAL, 0);
+    public static final Retemporalize retemporalizeDTERNALToZero = new RetemporalizeFromTo(DTERNAL, 0);
 
     public static final Retemporalize retemporalizeConceptual = new Retemporalize() {
 

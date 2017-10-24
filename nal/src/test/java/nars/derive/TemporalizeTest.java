@@ -34,11 +34,11 @@ public class TemporalizeTest {
         assertEquals(1, t.constraints.get($.the("x")).size());
     }
     @Test
-    public void testAmbientInequivalence() {
+    public void testAmbientInequivalence() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
-        t.knowAmbient($.the("(x ==>+1 y)"));
-        t.knowAmbient($.the("(x ==>+2 y)"));
-        assertEquals(2, t.constraints.get($.the("(x==>y)")).size());
+        t.knowAmbient($.$("(x ==>+1 y)"));
+        t.knowAmbient($.$("(x ==>+2 y)"));
+        assertEquals(2, t.constraints.get($.$("(x==>y)")).size());
     }
 
     @Test

@@ -52,6 +52,18 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
+    /** keeps the same input frequency but reduces confidence */
+    @SinglePremise StructuralReduction() {
+        @Override
+        public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
+            if (T != null) {
+                float c = T.conf() * BeliefFunction.defaultConfidence(m);
+                if (c > minConf)
+                    return $.t(T.freq(), T.conf() * defaultConfidence(m));
+            }
+            return null;
+        }
+    },
 //    /** similar to structural deduction but preserves the frequency of the task */
 //   @SinglePremise @AllowOverlap StructuralDecompose() {
 //        @Override

@@ -58,8 +58,10 @@ public class DefaultTermizer implements Termizer {
     );
 
     public DefaultTermizer() {
-        put(Op.True, true);
-        put(Op.False, false);
+        termToObj.put(Op.True, true);
+        termToObj.put(Op.False, false);
+        objToTerm.put(true, TRUE);
+        objToTerm.put(false, FALSE);
     }
 
     public void put(@NotNull Term x, @NotNull Object y) {

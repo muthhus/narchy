@@ -10,6 +10,8 @@ import nars.term.transform.Retemporalize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -103,16 +105,20 @@ public final class Conclusion extends AbstractPred<Derivation> {
             if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
 
         } else {
-            c2 = c1.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
+            c2 = c1;
+        }
+
+
+        if (d.taskPunct==BELIEF || d.taskPunct==GOAL) {
+            //only should eliminate XTERNAL from beliefs and goals.  ok if it's in questions/quests since it's the only way to express indefinite temporal repetition
+            c2 = c2.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
             if (c2 == null)
                 return false;
         }
 
-
         c2 = c2.normalize();
         if (c2 == null)
             return false;
-
 
         d.derivedTerm.set(c2);
         return true;
