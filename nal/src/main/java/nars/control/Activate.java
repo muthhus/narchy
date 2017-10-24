@@ -42,7 +42,7 @@ public class Activate extends PLink<Concept> implements Termed {
         assert (c.isNormalized()) : c + " not normalized";
     }
 
-    public Iterable<Premise> hypothesize(NAR nar, int premisesMax) {
+    public Iterable<Premise> hypothesize(NAR nar, BatchActivation ba, int premisesMax) {
 
         nar.emotion.conceptFires.increment();
 
@@ -51,7 +51,7 @@ public class Activate extends PLink<Concept> implements Termed {
             this.templateConcepts = TermLinks.templateConcepts(templates);
         }
 
-        float cost = TermLinks.linkTemplates(id, templates, priElseZero(), nar.momentum.floatValue(), nar);
+        float cost = TermLinks.linkTemplates(id, templates, priElseZero(), nar.momentum.floatValue(), nar, ba);
         if (cost >= Pri.EPSILON)
             priSub(cost);
 

@@ -268,8 +268,6 @@ public class Derivation extends Unify {
         termutes.clear();
         preToPost.clear();
         //assert(termutes.isEmpty() && preToPost.isEmpty());
-
-        this.derivations.clear();
         this.forEachMatch = null;
         this.temporalize = null;
         this.concTruth = null;

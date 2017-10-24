@@ -6,9 +6,10 @@ import jcog.data.FloatParam;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.pri.mix.control.MixContRL;
-import nars.control.*;
-import nars.derive.PrediTerm;
-import nars.exe.SynchExec;
+import nars.control.Cause;
+import nars.control.DurService;
+import nars.control.MetaGoal;
+import nars.exe.UniExec;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
@@ -169,7 +170,7 @@ abstract public class NAgentX extends NAgent {
 //                (x) -> true);
 
         NAR n = new NARS()
-                .exe(new SynchExec(64) {
+                .exe(new UniExec(64) {
                     @Override
                     public boolean concurrent() {
                         return true;

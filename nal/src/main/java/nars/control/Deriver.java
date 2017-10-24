@@ -62,20 +62,25 @@ public class Deriver extends CycleService {
     protected void run(NAR nar) {
         Derivation d = nar.derivation.get().cycle(nar,deriver);
 
+        int matchTTL = Param.TTL_PREMISE_MIN * 3;
+        int ttlMin = nar.matchTTLmin.intValue();
+        int ttlMax = nar.matchTTLmax.intValue();
+
+        BatchActivation activator = BatchActivation.get();
+
         nar.exe.fire(conceptsPerCycle, a -> {
 
-            Iterable<Premise> h = a.hypothesize(nar, premises(a));
+            Iterable<Premise> h = a.hypothesize(nar, activator, premises(a));
             if (h == null)
                 return;
 
             h.forEach(p -> {
 
-                int matchTTL = Param.TTL_PREMISE_MIN * 3;
-
                 if (p.match(d, matchTTL) != null) {
 
-                    int deriveTTL = Util.lerp(Util.unitize(p.task.priElseZero() / nar.priDefault(p.task.punc())),
-                            nar.matchTTLmin.intValue(), nar.matchTTLmax.intValue());
+                    int deriveTTL = Util.lerp(Util.unitize(
+                            p.task.priElseZero() / nar.priDefault(p.task.punc())),
+                            ttlMin, ttlMax);
 
                     d.derive(deriveTTL);
                 }
@@ -85,6 +90,7 @@ public class Deriver extends CycleService {
         });
 
         d.commit(nar);
+        activator.commit(nar);
     }
 
 

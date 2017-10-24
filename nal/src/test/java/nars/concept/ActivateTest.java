@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.control.Activate;
+import nars.control.BatchActivation;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
@@ -47,7 +48,8 @@ public class ActivateTest {
 
         Term A = $.the("a");
 
-        cf.hypothesize(nar, 500).forEach(p -> {
+        BatchActivation ba = BatchActivation.get();
+        cf.hypothesize(nar, ba,500).forEach(p -> {
             //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
             if (p.termLink instanceof Atom || !A.equals(p.termLink.sub(0)))
                 return; //ignore
@@ -56,6 +58,7 @@ public class ActivateTest {
             premiseHits.addOccurrences(p.toString(), 1);
             termlinkHits.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
         });
+        ba.commit(nar);
 
 
         System.out.println("termlinks pri (after):\n");

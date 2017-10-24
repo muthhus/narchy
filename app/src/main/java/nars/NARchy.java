@@ -1,7 +1,7 @@
 package nars;
 
 import com.google.common.base.Joiner;
-import nars.exe.SynchExec;
+import nars.exe.UniExec;
 import nars.op.AtomicExec;
 import nars.op.Operator;
 import nars.op.stm.ConjClustering;
@@ -18,7 +18,7 @@ public class NARchy extends NARS {
 
     public static NAR ui() {
         NAR nar = new DefaultNAR(8, true)
-                .exe(new SynchExec(64) {
+                .exe(new UniExec(64) {
                     @Override
                     public boolean concurrent() {
                         return true;

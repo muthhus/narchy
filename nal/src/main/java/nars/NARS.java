@@ -5,9 +5,8 @@ import jcog.random.XorShift128PlusRandom;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
 import nars.control.Deriver;
-import nars.derive.rule.PremiseRuleSet;
 import nars.exe.Exec;
-import nars.exe.SynchExec;
+import nars.exe.UniExec;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.index.term.map.MapTermIndex;
@@ -116,11 +115,11 @@ public class NARS {
 
         index = () ->
                 //new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
-                new MapTermIndex(new LinkedHashMap(128));
+                new MapTermIndex(new LinkedHashMap(128, 0.9f));
 
         time = new CycleTime();
 
-        exe = () -> new SynchExec(24);
+        exe = () -> new UniExec(24);
 
         rng = () -> new XorShift128PlusRandom(1);
 

@@ -256,7 +256,7 @@ public enum TermLinks {
     }
 
     /** send some activation, returns the cost */
-    public static float linkTemplates(Concept src, List<Termed> templates, float totalBudget, float momentum, NAR nar) {
+    public static float linkTemplates(Concept src, List<Termed> templates, float totalBudget, float momentum, NAR nar, BatchActivation ba) {
 
         int n = templates.size();
         if (n == 0)
@@ -271,7 +271,6 @@ public enum TermLinks {
             return 0;
 
         MutableFloat refund = new MutableFloat(0);
-        BatchActivation ba = BatchActivation.get();
 
         int nextTarget = nar.random().nextInt(n);
         Term srcTerm = src.term();

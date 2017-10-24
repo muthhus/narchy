@@ -13,7 +13,6 @@ import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
-import jcog.util.IterableThreadLocal;
 import nars.Narsese.NarseseException;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
@@ -970,11 +969,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         time.cycle(this);
 
-        exe.should(can);
+        MetaGoal.update(causes, want, valueSummary);
+
+        exe.cycle(can);
 
         eventCycle.emit(this); //synchronous only
-
-        MetaGoal.update(causes, want, valueSummary);
 
         emotion.cycle();
     }

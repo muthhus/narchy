@@ -116,10 +116,9 @@ abstract public class Exec implements Executor {
     final Schedulearn sched = new Schedulearn();
 
     /** allocates what can be done */
-    public void should(List<Can> can) {
+    public void cycle(List<Can> can) {
 
         double defaultCycleTime = 1.0; //sec
-
 
         NARLoop loop = nar.loop;
 

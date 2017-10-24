@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 /**
  * unified executor
  * concurrent, thread-safe. one central concept bag
+ *
  */
 public class UniExec extends Exec {
 
@@ -65,6 +66,7 @@ public class UniExec extends Exec {
 
         super.start(nar);
     }
+
 
     @Override
     public synchronized void stop() {

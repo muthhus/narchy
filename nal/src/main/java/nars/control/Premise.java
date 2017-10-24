@@ -212,11 +212,9 @@ public class Premise extends PLink<Pair<Task,Term>> {
 
         if (beliefConcept != null && !beliefTerm.hasVarQuery()) { //doesnt make sense to look for a belief in a term with query var, it will have none
 
-            boolean beliefIsTask = beliefConcept.equals(taskConcept);
-
             Task match;
 
-            if (task.isQuestOrQuestion() && (beliefIsTask || beliefConceptCanAnswerTaskConcept)) {
+            if (task.isQuestOrQuestion() && (beliefConceptCanAnswerTaskConcept || beliefConcept.equals(taskConcept))) {
                 final BeliefTable answerTable =
                         (task.isGoal() || task.isQuest()) ?
                                 beliefConcept.goals() :
