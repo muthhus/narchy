@@ -213,7 +213,22 @@ public class NAL6Test extends NALTest {
 
 
     @Test
+    public void variable_elimination6_easier() {
+    //        $.21 (((Tweety-->chirping)&&(Tweety-->eatsWorms))==>(Tweety-->bird)). %1.0;.81%
+        //  ((%1,((%3&&%1073742338..+)==>%4),task(".")),(subIfUnifiesAny(((&&,%1073742338..+) ==>+- %4),%3,%1,"$"),((DeductionPB-->Belief))))
+        TestNAR tester = test;
+        tester.log();
+        tester.believe("((&&, flyer:$x, chirping:$x, eatsWorms:$x) ==> bird:$x)"); //en("If something can fly, chirp, and eats worms, then it is a bird.");
+        tester.believe("flyer:Tweety"); //en("Tweety can fly.");
+        tester.mustBelieve(cycles*2,
+                "((chirping:Tweety && eatsWorms:Tweety) ==> bird:Tweety)",
+                1.0f, 0.81f); //en("If Tweety can chirp and eats worms, then it is a bird.");
+
+    }
+    @Test
     public void variable_elimination6() {
+
+        ////  ((%1,((%3&&%1073742338..+)==>%4),task(".")),(subIfUnifiesAny(((&&,%1073742338..+) ==>+- %4),%3,%1,"$"),((DeductionPB-->Belief))))
 
         TestNAR tester = test;
         tester.believe("((&&, flyer:$x, [chirping]:$x, food($x, worms)) ==> bird:$x)"); //en("If something can fly, chirp, and eats worms, then it is a bird.");

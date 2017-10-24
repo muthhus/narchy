@@ -15,6 +15,7 @@ import nars.term.transform.Retemporalize;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static nars.Op.IMPL;
 import static nars.time.Tense.XTERNAL;
@@ -26,22 +27,25 @@ public enum TermGraph {
         AdjGraph<Term, Float> g = new AdjGraph<>(true);
         return termlink(nar, g);
     }
+    public static AdjGraph<Term, Float> termlink(NAR nar, AdjGraph<Term, Float> g) {
+        return termlink(nar, nar.conceptActive(), g);
+    }
 
-    private static AdjGraph<Term, Float> termlink(NAR nar, AdjGraph<Term, Float> g) {
-
-        nar.conceptActive().forEach(cf -> {
-            Concept c = cf.get();
-            Term s = c.term();
-            g.addNode(s);
-            c.termlinks().forEach(tl -> {
-                Term t = tl.get();
-                if (t.equals(s))
-                    return; //no self loop
-                g.addNode(t);
-                float p = tl.pri();
-                if (p == p)
-                    g.setEdge(s, t, p);
-            });
+    public static AdjGraph<Term, Float> termlink(NAR n, Stream<? extends Termed> it, AdjGraph<Term, Float> g) {
+        it.forEach(st -> {
+            Term s = st.term();
+            if (!g.addIfNew(s)) {
+                Concept c = n.concept(s);
+                c.termlinks().forEach(tl -> {
+                    Term t = tl.get();
+                    if (t.equals(s))
+                        return; //no self loop
+                    g.addNode(t);
+                    float p = tl.pri();
+                    if (p == p)
+                        g.setEdge(s, t, p);
+                });
+            }
         });
         return g;
     }

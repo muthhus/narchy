@@ -1339,9 +1339,9 @@ public enum Op {
 
     }
 
-    @NotNull
-    public static Term difference(/*@NotNull*/ Op o, @NotNull Term a, @NotNull Term b) {
-        assert (!o.temporal) : "this impl currently assumes any constructed term will have dt=DTERNAL";
+    /*@NotNull*/
+    public static Term difference(/*@NotNull*/ Op o, Term a, Term b) {
+        //assert (!o.temporal) : "this impl currently assumes any constructed term will have dt=DTERNAL";
 
         if (a.equals(b))
             return Null; //empty set

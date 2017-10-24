@@ -170,6 +170,7 @@ public class NAL5Test extends NALTest {
     @Test
     public void anonymous_analogy1_pos3() {
         TestNAR tester = test;
+        tester.log();
         tester.believe("(&&, x, y, z)");
         tester.believe("x", 0.80f, 0.9f);
         tester.mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.43f);
@@ -392,12 +393,23 @@ public class NAL5Test extends NALTest {
         //((&&,M,A_1..n) ==> C), ((&&,A_1..n) ==> C) |- M, (Truth:Abduction, Order:ForAllSame)
 
         TestNAR tester = test;
+        tester.log();
         tester.believe("([flying]:robin ==> bird:robin)"); //.en("If robin can fly then robin is a bird.");
         tester.believe("((swimmer:robin && [flying]:robin) ==> bird:robin)"); //.en("If robin both swims and flys then robin is a bird.");
         tester.mustBelieve(cycles * 4, "swimmer:robin", 1.00f, 0.45f /*0.4f*/); //.en("I guess robin swims.");
 
     }
+    @Test
+    public void conditional_abduction_viaMultiConditionalSyllogismEasier() {
+        //((&&,M,A_1..n) ==> C), ((&&,A_1..n) ==> C) |- M, (Truth:Abduction, Order:ForAllSame)
 
+        TestNAR tester = test;
+        tester.log();
+        tester.believe("(flyingrobin ==> birdrobin)"); //.en("If robin can fly then robin is a bird.");
+        tester.believe("((swimmerrobin && flyingrobin) ==> birdrobin)"); //.en("If robin both swims and flys then robin is a bird.");
+        tester.mustBelieve(cycles * 4, "swimmerrobin", 1.00f, 0.45f /*0.4f*/); //.en("I guess robin swims.");
+
+    }
 
     @Test
     public void conditional_abduction2_viaMultiConditionalSyllogism() {
@@ -431,6 +443,8 @@ public class NAL5Test extends NALTest {
         tester.mustBelieve(cycles * 2, "<<ro --> b> ==> <ro --> [w]>>", 1.00f, 0.42f);
         tester.mustBelieve(cycles * 2, "<<ro --> [w]> ==> <ro --> b>>", 0.90f, 0.45f);
     }
+
+
 
     @Test
     public void conditional_abduction3_semigeneric3() {
@@ -476,6 +490,16 @@ public class NAL5Test extends NALTest {
         tester.mustBelieve(cycles, "<(&&,<robin --> [chirping]>,<robin --> [withBeak]>) ==> <robin --> bird>>", 1.00f, 0.42f); //.en("I guess that if robin chirps and robin has a beak, then robin is a bird.");
 
     }
+    @Test
+    public void conditional_induction0() {
+        ////((&&,M,A..+) ==> C), ((&&,B,A..+)==>C)   |- (B ==>+- M), (Belief:Induction)
+
+        TestNAR tester = test;
+        tester.believe("((&&,x1,x2,a) ==> c)");
+        tester.believe("((&&,y1,y2,a) ==> c)");
+        tester.mustBelieve(cycles, "((x1&&x2) ==> (y1&&y2))", 1.00f, 0.45f);
+    }
+
 
     /* will be moved to NAL multistep test file!!
     //this is a multistep example, I will add a special test file for those with Default configuration

@@ -22,7 +22,7 @@ public class differ extends Functor.BinaryFunctor {
     }
 
     @Override
-    public Term apply(@NotNull Term a, @NotNull Term b) {
+    public Term apply(Term a, Term b) {
 
         Term y = Op.difference(a.op(), a, b);
 //        if (y.equals(a))

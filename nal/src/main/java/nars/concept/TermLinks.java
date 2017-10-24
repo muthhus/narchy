@@ -1,10 +1,8 @@
 package nars.concept;
 
+import jcog.bag.Bag;
 import jcog.list.FasterList;
-import jcog.pri.PLink;
-import jcog.pri.PLinkUntilDeleted;
-import jcog.pri.Pri;
-import jcog.pri.Prioritized;
+import jcog.pri.*;
 import nars.*;
 import nars.control.Activate;
 import nars.control.BatchActivate;
@@ -86,7 +84,7 @@ public enum TermLinks {
 
             case SETe:
             case SETi:
-                return 1;
+                return 2;
 
             case PROD:
                 return 2;
@@ -140,20 +138,20 @@ public enum TermLinks {
         }
     }
 
-    public static void linkTemplate(Concept src, Termed target, float priForward, float priReverse, BatchActivate a, NAR nar, MutableFloat refund) {
+    public static void linkTemplate(Term srcTerm, Bag srcTermLinks, Termed target, float priForward, float priReverse, BatchActivate a, NAR nar, MutableFloat refund) {
 
         float priSum = priForward + priReverse;
         if (target instanceof Concept) {
             Concept c = (Concept) target;
             c.termlinks().put(
-                    new PLink(src.term(), priReverse), refund
+                    new PLink(srcTerm, priReverse), refund
             );
             a.put(c, priSum);
         } else {
             refund.add(priReverse);
         }
 
-        src.termlinks().put(
+        srcTermLinks.put(
                 new PLink(target.term(), priForward), refund
         );
 
@@ -277,12 +275,14 @@ public enum TermLinks {
         BatchActivate ba = BatchActivate.get();
 
         int nextTarget = nar.random().nextInt(n);
+        Term srcTerm = src.term();
+        Bag<Term, PriReference<Term>> srcTermLinks = src.termlinks();
         for (int i = 0; i < toFire; i++) {
 
             Termed t = templates.get(nextTarget++);
             if (nextTarget == n) nextTarget = 0; //wrap around
 
-            linkTemplate(src, t, budgetedToEach/2f, budgetedToEach/2f, ba, nar, refund);
+            linkTemplate(srcTerm, srcTermLinks, t, budgetedToEach/2f, budgetedToEach/2f, ba, nar, refund);
         }
 
         float r = refund.floatValue();

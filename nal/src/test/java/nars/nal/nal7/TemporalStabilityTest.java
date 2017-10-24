@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.Task;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.CONJ;

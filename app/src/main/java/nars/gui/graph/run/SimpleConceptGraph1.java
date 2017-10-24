@@ -54,7 +54,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        Param.DEBUG = true;
         //Param.TRACE = true;
         NAR n = NARS.threadSafe();
-        float fps = 16f;
+        float fps = 64f;
 
         //csvPriority(n, "/tmp/x.csv");
 
@@ -120,9 +120,17 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         //n.run(600);
         n.log();
-        n.input(
-                "(a-->b).", "(b-->c).","(c-->d)."
-                ,"(d-->e).","(e-->a)."
+        //n.input(
+                //"(a-->b).", "(b-->c).","(c-->d).","(d-->e).","(e-->a)."
+
+        n.run(1).input("x(set,3)!  :|:");
+        n.run(1).input("x(set,3).  :|:");
+        n.run(1).input("x(get,#x)! :|:");
+        n.run(1).input("x(get,3).  :|:");
+        n.run(1).input("$1.0 x(get,4)!");
+
+
+
 
 //                "{a,b}.", "{b,c}.","{c,d}."
 //                ,"{d,e}.","{e,a}.", "(a,b,c,b)! :|:"
@@ -130,7 +138,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                 //,"(a &&+1 b). :|:"
 
                 //"$.50 at(SELF,{t001}). :|: %1.0;.90%", "$.70 (at(SELF,{t001}) &&+5 open({t001}))! %1.0;.90%" // //goal_ded_2
-        );
+
 
 
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));

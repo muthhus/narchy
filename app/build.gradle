@@ -3,12 +3,9 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 dependencies {
-    //compile project(':nal')
     compile project(':nal')
-
     compile project(':ui')
-
-//  testCompile project(':nal')
+    compile project(':logic')
 }
 
 

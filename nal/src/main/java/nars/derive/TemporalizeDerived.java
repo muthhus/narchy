@@ -1,5 +1,6 @@
 package nars.derive;
 
+import jcog.math.Interval;
 import nars.$;
 import nars.Op;
 import nars.Task;
@@ -13,7 +14,6 @@ import nars.task.Revision;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.Subst;
-import nars.term.transform.Retemporalize;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -269,10 +269,17 @@ public class TemporalizeDerived extends Temporalize {
             long ts = task.start();
             long k;
             if (!te && (belief != null && !belief.isEternal())) {
-                Revision.TaskTimeJoint joint = new Revision.TaskTimeJoint(ts, task.end(), belief.start(), belief.end(), d.nar);
-                occ[0] = joint.unionStart;
-                occ[1] = joint.unionEnd;
-                d.concConfFactor *= joint.factor;
+
+                Interval ii = Interval.intersect(ts, task.end(), belief.start(), belief.end());
+                if (ii == null)
+                    return null;
+                occ[0] = ii.a;
+                occ[1] = ii.b;
+
+//                Revision.TaskTimeJoint joint = new Revision.TaskTimeJoint(ts, task.end(), belief.start(), belief.end(), d.nar);
+//                occ[0] = joint.unionStart;
+//                occ[1] = joint.unionEnd;
+//                d.concConfFactor *= joint.factor;
 
             } else if (te) {
                 //TODO maybe this should be 'now'

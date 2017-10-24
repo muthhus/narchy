@@ -50,6 +50,15 @@ public class AdjGraph<V, E> implements Graph<V, E>, java.io.Serializable {
         return antinodes.get(i).v;
     }
 
+    public boolean addIfNew(V s) {
+        if (this.nodes.getIfAbsent(s, -1)==-1) {
+            addNode(s);
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Contains sets of node indexes. If "nodes" is not null, indices are
      * defined by "nodes", otherwise they correspond to 0,1,...

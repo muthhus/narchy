@@ -39,13 +39,8 @@ public class PrologRepl extends Automaton implements OutputListener, SpyListener
 
         /***/
         stdin = new BufferedReader(new InputStreamReader(System.in));
-        prolog.addQueryListener(new QueryListener() {
-            @Override
-            public void accept(QueryEvent e) {
-                System.out.println(e);
-            }
-        });
-        prolog.addExceptionListener((e)->System.err.println(e));
+        prolog.addQueryListener(System.out::println);
+        prolog.addExceptionListener(System.err::println);
         prolog.addOutputListener(this);
         prolog.addSpyListener(this);
         /*Castagna 06/2011*/   

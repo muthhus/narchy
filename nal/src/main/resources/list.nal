@@ -1,19 +1,23 @@
 //INDICES TRANSFORMATION
 //(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ({indicesOf(P,X)}-->C), (Belief:Identity, Goal:Identity)
 //(C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- (C-->{indicesOf(P,X)}), (Belief:Identity, Goal:Identity)
-(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ((C,indicesOf(P,X))-->X), (Belief:StructuralReduction, Goal:Identity)
+(P-->C), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ((C-->X)-->indicesOf(P,X)), (Belief:StructuralReduction)
+        //, Goal:StructuralReduction
     (P-->C), X, is(P,"*"), subOf(X,P), task("?") |- ((C,indicesOf(P,X))-->X), (Punctuation:Question)
     (P-->C), X, is(P,"*"), subOf(X,P), task("@") |- ((C,indicesOf(P,X))-->X), (Punctuation:Quest)
-(C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ((indicesOf(P,X),C)-->X), (Belief:StructuralReduction, Goal:Identity)
+(C-->P), X, is(P,"*"), subOf(X,P), task(containsBeliefRecursively) |- ((X-->C)-->indicesOf(P,X)), (Belief:StructuralReduction)
+        //, Goal:StructuralReduction)
 
 
 //GOAL ANALOGIES
 //1. IMPL=based
 (P-->C), (A ==> (Q-->C)), neq(Q,P), task("!") |- (A ==>+- (P-->C)), (Punctuation:Question)
-    (P-->C), (A ==> (Q-->C)), neq(Q,P), task("!") |- (substDiff(A, Q, P) ==>+- (P-->C)), (Punctuation:Question)
+  (C-->P), (A ==> (C-->Q)), neq(Q,P), task("!") |- (A ==>+- (C-->P)), (Punctuation:Question)
+     (P-->C), (A ==> (Q-->C)), neq(Q,P), task("!") |- (substDiff(A, Q, P) ==>+- (P-->C)), (Punctuation:Question)
         (P-->C), (A ==> (Q-->C)), neq(Q,P), task("!") |- substDiff(A, Q, P), (Punctuation:Quest)
 (P-->C), ((Q-->C) ==> A), neq(Q,P), task("!") |- ((P-->C) ==>+- A), (Punctuation:Question)
-    (P-->C), ((Q-->C) ==> A), neq(Q,P), task("!") |- ((P-->C) ==>+- substDiff(A, Q, P)), (Punctuation:Question)
+  (C-->P), ((C-->Q) ==> A), neq(Q,P), task("!") |- ((C-->P) ==>+- A), (Punctuation:Question)
+     (P-->C), ((Q-->C) ==> A), neq(Q,P), task("!") |- ((P-->C) ==>+- substDiff(A, Q, P)), (Punctuation:Question)
         (P-->C), ((Q-->C) ==> A), neq(Q,P), task("!") |- substDiff(A, Q, P), (Punctuation:Quest)
 
 //2. CONJ-based

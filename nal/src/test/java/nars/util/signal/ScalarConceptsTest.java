@@ -16,8 +16,6 @@ import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.util.stream.StreamSupport;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

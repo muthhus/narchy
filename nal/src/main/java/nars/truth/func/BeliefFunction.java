@@ -53,7 +53,7 @@ public enum BeliefFunction implements TruthOperator {
     },
 
     /** keeps the same input frequency but reduces confidence */
-    @SinglePremise StructuralReduction() {
+    @AllowOverlap @SinglePremise StructuralReduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
             if (T != null) {

@@ -5,7 +5,6 @@ import nars.Task;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**

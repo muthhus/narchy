@@ -135,8 +135,8 @@ public abstract class Param extends Services<Term, NAR> {
     /**
      * 'time to live', unification steps until unification is stopped
      */
-    public final MutableInteger matchTTLmax = new MutableInteger(192);
-    public final MutableInteger matchTTLmin = new MutableInteger(32);
+    public final MutableInteger matchTTLmax = new MutableInteger(256);
+    public final MutableInteger matchTTLmin = new MutableInteger(64);
 
     /**
      * how much percent of a premise's allocated TTL can be used in the belief matching phase.
@@ -226,6 +226,7 @@ public abstract class Param extends Services<Term, NAR> {
         int pCompl = d.parentComplexity;
         float relGrowth =
                 unitize(((float) pCompl) / (pCompl + dCompl));
+
 
         discount *= (relGrowth);
 

@@ -44,7 +44,7 @@ public class Premise extends UnaryTask {
 
     static final Logger logger = LoggerFactory.getLogger(Premise.class);
 
-    public final Task taskLink;
+    public final Task task;
     public final Term termLink;
 
     @Nullable
@@ -52,7 +52,7 @@ public class Premise extends UnaryTask {
 
     public Premise(Task tasklink, Term termlink, float pri, Collection<Concept> links) {
         super(Tuples.pair(tasklink, termlink), pri);
-        this.taskLink = tasklink;
+        this.task = tasklink;
         this.termLink = termlink;
         this.links = links;
     }
@@ -83,10 +83,14 @@ public class Premise extends UnaryTask {
 
         //nar.emotion.count("Premise_run");
 
-        Task taskLink = this.taskLink;
-        final Task task = taskLink;
-        if (task == null || task.isDeleted())
-            return null;
+        Task task = this.task;
+        if (task == null || task.isDeleted()) {
+            Task fwd = task.meta("@");
+            if (fwd!=null)
+                task = fwd; //TODO multihop dereference like what happens in tasklink bag
+            else
+                return null;
+        }
 
 
 
@@ -99,7 +103,6 @@ public class Premise extends UnaryTask {
                     logger.warn("{} unconceptualizable", task); //WHY was task even created
                 //assert (false) : task + " could not be conceptualized"; //WHY was task even created
             }
-            taskLink.delete();
             task.delete();
             delete();
             return null;
@@ -111,7 +114,7 @@ public class Premise extends UnaryTask {
         if (l != null) {
             links = null;
 
-            linkTask(this.taskLink, l,
+            linkTask(task, l,
                     1f
                     /*decayed*/);
         }
@@ -238,7 +241,7 @@ public class Premise extends UnaryTask {
                     @Nullable Task answered = task.onAnswered(match, n);
                     if (answered != null) {
 
-                        n.emotion.onAnswer(taskLink, answered);
+                        n.emotion.onAnswer(task, answered);
 
                     }
                 }
@@ -357,7 +360,7 @@ public class Premise extends UnaryTask {
             return null; //fast-fail: no chance
 
         final boolean[] result = {false};
-        UnifySubst u = new UnifySubst(VAR_QUERY, nar, (aa) -> {
+        UnifySubst u = new UnifySubst(null, nar, (aa) -> {
 
             result[0] = true;
             return false;

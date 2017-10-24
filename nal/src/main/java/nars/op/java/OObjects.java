@@ -142,8 +142,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
             nar.onOp(this, new MethodExec(object));
         }
 
-        @NotNull
-        private Term[] opTerms(Method method, Object[] args, Object result) {
+        private Term opTerm(Method method, Object[] args, Object result) {
 
             //TODO handle static methods
 
@@ -168,7 +167,9 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                 assert (x[2] != null) : "could not termize: " + result;
             }
 
-            return x;
+            Term y = $.func(id, x);
+
+            return y;
         }
 
         public Object update(Object obj, Method method, Object[] args, Object nextValue) {
@@ -190,7 +191,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                     return p1; //keep
                 }
 
-                Term f = $.func(id, opTerms(method, args, nextValue)).normalize();
+                Term f = opTerm(method, args, nextValue).normalize();
 
                 ValueSignalTask next = new ValueSignalTask(f,
                         BELIEF, $.t(invocationBeliefFreq, nar.confDefault(BELIEF)),

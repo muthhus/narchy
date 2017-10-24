@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 /**
  * concept firing, activation, etc
  */
-public class Activate extends UnaryTask<Concept> {
+public class Activate extends UnaryTask<Concept> implements Termed {
 
     /**
      * per batch, on empty
@@ -189,5 +189,10 @@ public class Activate extends UnaryTask<Concept> {
     @Override
     public boolean persist() {
         return true;
+    }
+
+    @Override
+    public Term term() {
+        return id.term();
     }
 }

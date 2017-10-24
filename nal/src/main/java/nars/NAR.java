@@ -1597,9 +1597,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return answer(c, BELIEF, start, end);
     }
 
-    public Task belief(Term c, long when) {
+    public final Task belief(Term c, long when) {
         return belief(c, when, when);
     }
+    public final Task belief(Term c) {
+        return belief(c, time());
+    }
+
 
     /**
      * strongest matching goal for the target time
@@ -1622,7 +1626,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         if (!(concept instanceof BaseConcept))
             return null;
 
-        //return ((BeliefTable) ((BaseConcept) concept).table(punc)).match(when,  c, false, this);
         return ((BeliefTable) ((BaseConcept) concept).table(punc)).answer(start, end, c, this);
     }
 

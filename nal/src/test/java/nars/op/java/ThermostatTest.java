@@ -4,6 +4,7 @@ import jcog.data.MutableInteger;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
+import nars.control.MetaGoal;
 
 import static nars.Op.*;
 
@@ -37,7 +38,6 @@ public class ThermostatTest {
         n.priDefault(QUESTION, 0.1f);
         n.priDefault(QUEST, 0.1f);
 
-        n.log();
 
         OObjects objs = new OObjects(n);
 
@@ -46,16 +46,17 @@ public class ThermostatTest {
                 objs.the("x", new MyMutableInteger());
 
         n.time.dur(4);
+        MetaGoal.Desire.want(n.want, 0.5f);
 
-        for (int i = 0; i < 10; i++) {
-            x.set(0);
+        for (int i = 0; i < 3; i++) {
+            x.set(3);
             n.run(1);
             x.intValue();
             n.run(1);
 
             n.run(10);
 
-            x.set(1);
+            x.set(4);
             n.run(1);
             x.intValue();
             n.run(1);
@@ -63,23 +64,32 @@ public class ThermostatTest {
             n.run(10);
         }
 
-        x.set(0);
+        x.set(3);
         n.run(1);
 
 
-        n.truthResolution.set(0.05f);
-        n.termVolumeMax.set(28);
+
+        //n.log();
+        n.onTask(x -> {
+            if (x.isGoal() && !x.isInput())
+                System.out.println(x.proof());
+        });
+
+        //n.truthResolution.set(0.1f);
+        n.termVolumeMax.set(24);
 
 
-        while (x.intValue()!=1 /*&& n.time() < 1000*/) {
-            if (n.time() % 100 == 0) {
-                n.input("$1.0 x(intValue, (), 1)! :|: %1.00;0.90%");
-                n.input("$1.0 x(intValue, (), 0)! :|: %0.00;0.90%");
-                n.input("$1.0 x(set, 1)@ :|:");
+        while (x.intValue()!=1 && n.time() < 7000) {
+            if (n.time() % 400 == 0) {
+                n.input("$1.0 x(intValue, (), 3)! :|: %1.00;0.90%");
+                n.input("$1.0 x(intValue, (), 4)! :|: %0.00;0.90%");
+                //n.input("$1.0 (set:?1 <-> intValue:?2)?");
+                //n.input("$1.0 x(set, 1)@ :|:");
             }
             n.run(1);
-
         }
+
+        new MetaGoal.Report().add(n.causes).print(System.out);
 
 
 

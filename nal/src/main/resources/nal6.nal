@@ -13,7 +13,7 @@
     //strong unification
     (Y ==> X), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:Deduction)
     (--Y ==> X), Z, task(".")   |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:DeductionPN)
-    (X ==> Y), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$","strict"), (Belief:AbductionPB)
+    (X ==> Y), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:AbductionPB)
     //(--X ==> Y), Z, task(".")   |- (--,subIfUnifiesAny(X,Y,Z)), (Belief:AbductionN)
 
     //If after S M happens, and after M P happens, so P happens after S
@@ -83,27 +83,27 @@
 
     (M ==> P), (M ==> S), neq(P,S) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
         (M ==> P), (M ==> S), neq(P,S) |- (M ==>+- (P &&+- --S)), (Belief:IntersectionPN)
-    (P ==> M), (S ==> M), neq(P,S) |- (M ==>+- --(--P &&+- --S)), (Belief:Union)
+    (M ==> P), (M ==> S), neq(P,S) |- (M ==>+- --(--P &&+- --S)), (Belief:Union)
 
 
 //// implication-based decomposition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
 
-    (S ==> M), ((&&,S,A..+) ==> M) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositive)
+    (S ==> M), (C ==> M), is(C,"&&") |- (without(C,S) ==>+- M), (Belief:DecomposeNegativePositivePositive)
         //(S ==> M), ((&&,(--,%S),A..+) ==> M) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositiveN)
         //(S ==> M), ((||,S,A..+) ==> M) |- ((||,A..+) ==>+- M), (Belief:DecomposePositiveNegativeNegative)
 
-    (M ==> S), (M ==> (&&,S,A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegative)
+    (M ==> S), (M ==> C), is(C,"&&") |- (M ==>+- without(C,S)), (Belief:DecomposePositiveNegativeNegative)
         //(M ==> S), (M ==> (&&,(--,%S),A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
         //(M ==> S), (M ==> (||,S,A..+)) |- (M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
-    (M ==> C), (M ==> C) |- (M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
+    (M ==> C), (M ==> C), is(C,"&&") |- (M ==>+- dropAnyEvent(C)), (Belief:StructuralReduction)
           //(M ==> C), D, belief("&&") |- (M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D)), (Belief:StructuralDeduction)
         //(--M ==> C), C, belief("&&") |- (--M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
           //(--M ==> C), D, belief("&&") |- (--M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D, strict)), (Belief:StructuralDeduction)
         //(M ==> (&&,(--,%S),A..+)), M |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
-    (C ==> M), (C ==> M) |- (dropAnyEvent(C) ==>+- M), (Belief:StructuralDeduction)
+    (C ==> M), (C ==> M), is(C,"&&") |- (dropAnyEvent(C) ==>+- M), (Belief:StructuralReduction)
           //(C ==> M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D) ==>+- M), (Belief:StructuralDeduction)
         //(C ==> --M), C, belief("&&") |- (dropAnyEvent(C) ==>+- --M), (Belief:StructuralDeduction)
           //(C ==> --M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D, strict) ==>+- --M), (Belief:StructuralDeduction)
@@ -121,10 +121,8 @@
 
     B, (C ==> A), notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:AbductionPB, Goal:DeciInduction)
 
-//conditional abduction
 
-    ((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny((M ==>+- C),X,Y), (Belief:AbductionPB)
-    ((&&,M,A..+) ==> X), ((&&,A..+) ==> Y), task(".") |- subIfUnifiesAny((M ==>+- C),X,Y,"$"), (Belief:AbductionPB)
+    Z, (C==>Y), task("?") |- subIfUnifiesAny(C,Y,Z), (Punctuation:Question)
 
     //answering
     //Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Z), Y, Z, "$", strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
@@ -144,11 +142,40 @@
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B), task(".") |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,"$"), (Belief:DeductionPB)
-    Y, ((&&,--X,A..+) ==> B), task(".") |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,"$"), (Belief:DeductionPBN)
 
-    Y, (B ==> (&&,X,A..+)), task(".") |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,"$"), (Belief:DeductionPB)
-    Y, (B ==> (&&,--X,A..+)), task(".") |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,"$"), (Belief:DeductionPBN)
+//conditional deduction/abduction
+//   original:   ((&&,M,A_1..n) ==> C), M, not_implication_or_equivalence(M) |- ((&&,A_1..n) ==> C), (Truth:Deduction, Order:ForAllSame)
+//   original:   ((&&,M,A_1..n) ==> C), (A ==> M) |- ((&&,A,A_1..n) ==> C), (Truth:Deduction, Order:ForAllSame)
+//   original:   ((&&,M,A_1..n) ==> C), ((&&,A_1..n) ==> C) |- M, (Truth:Abduction, Order:ForAllSame)
+//   original:   ((&&,A,A_1..n) ==> C), (A ==> M) |- ((&&,M,A_1..n) ==> C), (Truth:Abduction, Order:ForAllSame)
+//   original:   ((&&,A_1..n) =\> C), M, not_implication_or_equivalence(M) |- ((&&,M,A_1..n) =\> C), (Truth:Induction)
+//   original:   ((&&,M,A_1..n) ==> C), ((&&,A,A_1..n) ==> C) |- (A ==> M), (Truth:Induction, Order:ForAllSame)
+
+    (X ==> C), M,  is(X,"&&"), subOf(M,X) |- (without(X,M) ==>+- C), (Belief:Deduction)
+        //((&&,M,A..+) ==> C), M,                  |- ((&&,A..+) ==>+- C), (Belief:Deduction)
+    (X ==> C), (B==>M), is(X,"&&"), subOf(M,X), neq(B,M) |- ((without(X,M) &&+- B) ==>+- C), (Belief:Deduction)
+        //((&&,M,A..+) ==> C), (B ==> M), neq(B,M) |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
+
+    (X ==> C), (Y==>C), is(X,"&&"), is(Y,"&&"), neq(X,Y)   |- differ(Y,X), (Belief:AbductionPB)
+        //((&&,M,A..+) ==> C), ((&&,A..+) ==> C)   |- M, (Belief:AbductionPB)
+
+    (X ==> C), (B==>M), is(X,"&&"), subOf(B,X), neq(B,M) |- ((without(X,B) &&+- M) ==>+- C), (Belief:AbductionPB)
+        //((&&,B,A..+) ==> C), (B ==> M), neq(B,M) |- ((&&,M,A..+) ==>+- C), (Belief:AbductionPB)
+
+    (X ==> C), M, is(X,"&&") |- ((X &&+- M) ==>+- C), (Belief:Induction)
+        //((&&,A..+) ==> C), M,                    |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
+    (X ==> C), (Y ==> C), is(X,"&&"),is(Y,"&&"), neq(X,Y) |- (differ(Y,X) ==>+- differ(X,Y)), (Belief:Induction)
+        //((&&,M,A..+) ==> C), ((&&,B,A..+)==>C)   |- (B ==>+- M), (Belief:Induction)
+
+    //((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny((M ==>+- C),X,Y), (Belief:AbductionPB)
+    //((&&,M,A..+) ==> X), ((&&,A..+) ==> Y), task(".") |- subIfUnifiesAny((M ==>+- C),X,Y,"$"), (Belief:AbductionPB)
+
+    //Y, (B ==> (&&,X,A..+)), task(".") |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y), (Belief:DeductionPB)
+    //Y, (B ==> (&&,--X,A..+)), task(".") |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y), (Belief:DeductionPBN)
+
+    //Y, ((&&,X,A..+) ==> B), task(".") |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:DeductionPB)
+    //Y, ((&&,--X,A..+) ==> B), task(".") |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:DeductionPBN)
+
 
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
@@ -161,9 +188,6 @@
 
 
 
-        //TODO modify ellipsis to allow these two rules to be expressed as one:
-        // ((&&,M,A..+) ==> C), (A..+ ==> C) |- M, (Belief:Abduction)
-        //  which will match A..+ to a Conjunction
 
 
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
@@ -244,9 +268,9 @@
 
     //structural decompose any component of a conjunction.
     //for belief: any conj
-    C, C, task("&&") |- dropAnyEvent(C), (Belief:StructuralDeduction)
+    C, C, task("&&") |- dropAnyEvent(C), (Belief:StructuralReduction)
     //for goal: eternal and paral (goal seq must be decomposed sequentially
-    C, C, task("&&|") |- dropAnyEvent(C), (Goal:StructuralDeduction)
+    C, C, task("&&|") |- dropAnyEvent(C), (Goal:StructuralReduction)
 
 
     //(&&,A_1..n), A_i |- A_i, (Truth:StructuralDeduction, Desire:Strong)
@@ -257,8 +281,8 @@
 
 //Anonymous Analogy (NAL5)
     //originally this only unified depvar (dep var elimination)
-     (&&,X,A..+), Y    |- subIfUnifiesAny((&&,A..+),X,Y,"#",strict), (Belief:AnonymousAnalogy)
-     (&&,--X,A..+), Y  |- subIfUnifiesAny((&&,A..+),X,Y,"#",strict), (Belief:AnonymousAnalogyPN)
+     (&&,X,A..+), Y    |- subIfUnifiesAny((&&,A..+),X,Y,"#"), (Belief:AnonymousAnalogy)
+     (&&,--X,A..+), Y  |- subIfUnifiesAny((&&,A..+),X,Y,"#"), (Belief:AnonymousAnalogyPN)
 
 
      //((&&,X,A..+) && Z), Z |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)

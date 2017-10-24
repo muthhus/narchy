@@ -54,16 +54,11 @@ public enum GoalFunction implements TruthOperator {
     DeciInduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return BeliefFunction.AbductionPB.apply(B, T, m, minConf); //swap B and T to compute Induction from the Abduction formula
-
-//            if (B.isNegative()) {
-//                Truth x = induction(T, B.neg(), minConf);
-//                //Truth x = desireInd(T, B.neg(), minConf);
-//                return x != null ? x.neg() : null;
-//            } else  {
-//                return induction(T, B, minConf);
-//                //return desireInd(T, B, minConf);
-//            }
+            if (B.isNegative()) {
+                return abduction(B.neg(), T.neg(), minConf);
+            } else {
+                return abduction(B, T, minConf);
+            }
         }
     },
 
@@ -95,6 +90,14 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
+
+    @AllowOverlap @SinglePremise
+    StructuralReduction() {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return BeliefFunction.StructuralReduction.apply(T, B, m, minConf);
+        }
+    },
 
     @SinglePremise
     @AllowOverlap

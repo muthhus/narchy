@@ -33,7 +33,7 @@ public enum SparkLine {
 		}
 		return accumulator.toString();
 	}
-	public static String renderFloats(Collection<Float> values) {
+	public static String renderFloats(Collection<Float> values, int scaleDivisor) {
 		float max = Collections.max(values), min = Collections.min(values);
 		float scale = (max - min) / 7.0f;
 		StringBuilder accumulator = new StringBuilder();

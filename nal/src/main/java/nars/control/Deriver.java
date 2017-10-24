@@ -75,7 +75,7 @@ public class Deriver extends AbstractPred<Derivation> {
                 files.add("induction.nal");  //TODO nal6 only needs general induction, not the temporal parts
 
                 files.add("misc.nal"); //TODO split this up
-                files.add("list.nal");  //experimental
+                //files.add("list.nal");  //experimental
                 //fallthru
             case 5:
             case 4:

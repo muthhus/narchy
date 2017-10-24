@@ -58,7 +58,8 @@ public final class BuiltIn extends Library {
 		 return new String[][] { { "!", "cut", "predicate" },
 				 { "=", "unify", "predicate" },
 				 { "\\=", "deunify", "predicate" },
-				 { ",", "comma", "predicate" }, { "op", "$op", "predicate" },
+				 { ",", "comma", "predicate" },
+				 { "op", "$op", "predicate" },
 				 { "solve", "initialization", "directive" },
 				 { "consult", "include", "directive" },
 				 { "load_library", "$load_library", "directive" } };
