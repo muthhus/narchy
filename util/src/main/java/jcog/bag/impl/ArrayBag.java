@@ -734,6 +734,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     @Override
     public void forEach(Consumer<? super Y> action) {
 
+        int s = size();
         Object[] x = items.array();
         for (Object a : (x)) {
             if (a != null) {
@@ -743,6 +744,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                     action.accept(b);
                 }
             }
+            if (s-- <= 0)
+                break;
         }
 
     }

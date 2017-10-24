@@ -23,11 +23,11 @@
 //// inheritance decomposition ////////////////////////////////////////////////////////////////////////////////////
 //if (S --> M) is the case, and ((|,S,A..+) --> M) is not the case, then ((|,A..+) --> M) is not the case, hence Belief:DecomposePositiveNegativeNegative
 
-     (X --> M), ((|,X,A..+) --> M) |- ((|,A..+) --> M), (Belief:DecomposePositiveNegativeNegative, Goal:DecomposePositiveNegativeNegative)
-     (X --> M), ((&,X,A..+) --> M) |- ((&,A..+) --> M), (Belief:DecomposeNegativePositivePositive, Goal:DecomposeNegativePositivePositive)
+     (X --> M), (S --> M), is(S,"|"), subOf(X,S) |- (without(S,X) --> M), (Belief:DecomposePositiveNegativeNegative, Goal:DecomposePositiveNegativeNegative)
+     (X --> M), (S --> M), is(S,"&"), subOf(X,S) |- (without(S,X) --> M), (Belief:DecomposeNegativePositivePositive, Goal:DecomposeNegativePositivePositive)
 
-     (M --> X), (M --> (&,X,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative, Goal:DecomposePositiveNegativeNegative)
-     (M --> X), (M --> (|,X,A..+)) |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive, Goal:DecomposeNegativePositivePositive)
+     (M --> X), (M --> S), is(S,"&"), subOf(X,S) |- (M --> without(S,X)), (Belief:DecomposePositiveNegativeNegative, Goal:DecomposePositiveNegativeNegative)
+     (M --> X), (M --> S), is(S,"|"), subOf(X,S) |- (M --> without(S,X)), (Belief:DecomposeNegativePositivePositive, Goal:DecomposeNegativePositivePositive)
 
      (S --> M), ((S ~ P) --> M) |- (P --> M), (Belief:DecomposePositiveNegativePositive, Goal:DecomposePositiveNegativePositive)
      (S --> M), ((P ~ S) --> M) |- (P --> M), (Belief:DecomposeNegativeNegativeNegative, Goal:DecomposeNegativeNegativeNegative)
@@ -41,11 +41,11 @@
 
 //NAL3 single premise decompose
 
-    ((|,X,A..+) --> M), X |- ((|,A..+) --> M), (Belief:StructuralDeduction)
-    (M --> (&,X,A..+)), X |- (M --> (&,A..+)), (Belief:StructuralDeduction)
+    (S --> M), X, is(S,"|"), subOf(X,S) |- (without(S,X) --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (M --> S), X, is(S,"&"), subOf(X,S) |- (M --> without(S,X)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-    ((B ~ G) --> S), G, neqRCom(B,S) |- (B --> S), (Belief:StructuralDeduction)
-    (S --> (B - G)), G, neqRCom(B,S) |- (S --> B), (Belief:StructuralDeduction)
+    ((B ~ G) --> S), G, neqRCom(B,S) |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (S --> (B - G)), G, neqRCom(B,S) |- (S --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 
 //experiment

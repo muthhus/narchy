@@ -115,7 +115,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
 //    public final IterableThreadLocal<Derivation> derivation =
 //            new IterableThreadLocal<>(() -> new Derivation(this));
-    public static final ThreadLocal<Derivation> derivation =
+    public final ThreadLocal<Derivation> derivation =
             ThreadLocal.withInitial(Derivation::new);
 
     private final AtomicReference<Term> self;

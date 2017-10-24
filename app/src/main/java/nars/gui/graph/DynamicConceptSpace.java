@@ -25,6 +25,8 @@ import spacegraph.render.Draw;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.StampedLock;
 import java.util.function.BiConsumer;
 
 import static jcog.Util.sqr;
@@ -38,6 +40,8 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
     final float bagUpdateRate = 0.25f;
     private final int maxNodes;
     private DurService on;
+
+    final StampedLock rw = new StampedLock();
 
 
     public TermWidget.TermVis vis;
@@ -79,14 +83,21 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
 //    }
 
 
-    final AtomicBoolean ready = new AtomicBoolean(false);
+
+
+    final AtomicBoolean updates = new AtomicBoolean(false);
 
     @Override
     public void start(SpaceGraph<Concept> space) {
         super.start(space);
         on = DurService.build(nar, () -> {
-            if (concepts.update()) {
-                ready.set(true);
+            long s = rw.writeLock();
+            try {
+                if (concepts.update()) {
+                    updates.set(true);
+                }
+            } finally {
+                rw.unlock(s);
             }
         });
     }
@@ -99,22 +110,35 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
     }
 
 
+
     @Override
     protected List<ConceptWidget> get() {
 
-        if (ready.compareAndSet(true, false)) {
-            List<ConceptWidget> l = next.write();
+
+
+        if (updates.get()) {
+
+            List<ConceptWidget> l;
+            l = next.write();
             l.clear();
-            concepts.forEach((clink) -> {
-                ConceptWidget cw = space.getOrAdd(clink.get().id, ConceptWidget::new);
-                if (cw != null) {
+            updates.set(false); //acquired this set
 
-                    cw.pri = clink.priElseZero();
-                    l.add(cw);
+            long s = rw.tryReadLock();
+            try {
+                concepts.forEach((clink) -> {
+                    ConceptWidget cw = space.getOrAdd(clink.get().id, ConceptWidget::new);
+                    if (cw != null) {
 
-                }
-                //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
-            });
+                        cw.pri = clink.priElseZero();
+                        l.add(cw);
+
+                    }
+                    //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
+                });
+            } finally {
+                rw.unlock(s);
+            }
+
             vis.accept(l);
             next.commit();
         }

@@ -64,12 +64,12 @@ public class ArrayTermVector extends TermVector {
                 }
             }
 
-            //share since array is equal
-            boolean srcXorY = System.identityHashCode(x) < System.identityHashCode(y);
-            if (srcXorY)
-                that.terms = x;
-            else
-                this.terms = y;
+//            //share since array is equal
+//            boolean srcXorY = System.identityHashCode(x) < System.identityHashCode(y);
+//            if (srcXorY)
+//                that.terms = x;
+//            else
+//                this.terms = y;
 
             return true;
 
