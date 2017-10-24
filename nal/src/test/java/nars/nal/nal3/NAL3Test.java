@@ -5,6 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
+import nars.control.Deriver;
 import nars.test.TestNAR;
 import nars.util.NALTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,7 @@ public class NAL3Test extends NALTest {
     @Override
     protected NAR nar() {
         return new NARS().nal(3).
-                deriver(nars.control.Deriver.getDefault(3,
+                deriverAdd(Deriver.deriver(3,
                 "nal3.guess.nal" //additional rules
         )).get();
     }

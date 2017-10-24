@@ -91,7 +91,7 @@ abstract public class TaskMatch  implements Consumer<Task>, Predicate<Task> {
     @Override
     public void accept(@NotNull Task _x) {
 
-        Task x = nar.post(_x);
+        Task x = _x;
 
         test(x);
 

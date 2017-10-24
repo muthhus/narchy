@@ -367,7 +367,7 @@ public class IO {
         FileOutputStream os = new FileOutputStream(f.toFile());
         PrintStream ps = new PrintStream(os);
         nar.tasks().forEach(t -> {
-            Task tt = nar.post(t);
+            Task tt = t;
             try {
                 tt.appendTSV(ps);
             } catch (IOException e) {
@@ -382,7 +382,7 @@ public class IO {
         FileOutputStream os = new FileOutputStream(f.toFile());
         PrintStream ps = new PrintStream(os);
         nar.tasks().forEach(t -> {
-            Task tt = nar.post(t);
+            Task tt = t;
             try {
                 tt.appendTo(ps);
                 ps.append('\n');

@@ -4,13 +4,10 @@ import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
-import nars.control.Derivation;
-import nars.derive.PrediTerm;
-import nars.derive.PrediTrie;
+import nars.control.Deriver;
 import nars.derive.rule.PremiseRuleSet;
 import nars.exe.Exec;
 import nars.exe.SynchExec;
-import nars.index.term.PatternIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.index.term.map.MapTermIndex;
@@ -36,8 +33,9 @@ import java.util.function.Supplier;
 public class NARS {
 
     public NAR get() {
-        NAR n = new NAR(index.get(), exe.get(), time, rng.get(), concepts.get(), deriver);
+        NAR n = new NAR(index.get(), exe.get(), time, rng.get(), concepts.get());
         init(n);
+        derivers.forEach(d -> d.apply(n));
         after.forEach(x -> x.accept(n));
         n.time.synch(n);
         return n;
@@ -60,7 +58,7 @@ public class NARS {
 
     protected Supplier<ConceptBuilder> concepts;
 
-    protected Function<NAR, PrediTerm<Derivation>> deriver;
+    protected List<Function<NAR, Deriver>> derivers;
 
     /**
      * applied in sequence as final step before returning the NAR
@@ -88,24 +86,28 @@ public class NARS {
         return this;
     }
 
-    public NARS deriver(String... rules) {
-
-        deriver = (n) -> (PrediTrie.the(
-                new PremiseRuleSet(
-                        new PatternIndex(), n, rules
-                )));
-
+    /** adds a deriver with the standard rules for the given NAL level */
+    public NARS deriverAdd(int nal) {
+        derivers.add(
+            Deriver.deriver( nal )
+        );
         return this;
     }
 
-    public NARS deriver(Function<NAR, PrediTerm<Derivation>> dBuilder) {
-        this.deriver = dBuilder;
+    /** adds a deriver with the provided rulesets */
+    public NARS deriverAdd(String... rules) {
+        deriverAdd(
+            Deriver.deriver( 0, rules )
+        );
         return this;
     }
 
-    public NARS deriver(PrediTerm<Derivation> d) {
-        return deriver((nar) -> d);
+
+    public NARS deriverAdd(Function<NAR,Deriver> dBuilder) {
+        this.derivers.add(dBuilder);
+        return this;
     }
+
 
     /**
      * defaults
@@ -118,13 +120,13 @@ public class NARS {
 
         time = new CycleTime();
 
-        exe = () -> new SynchExec(32, 16);
+        exe = () -> new SynchExec(32);
 
         rng = () -> new XorShift128PlusRandom(1);
 
         concepts = DefaultConceptBuilder::new;
 
-        deriver = nars.control.Deriver.getDefault(8);
+        derivers = new FasterList();
     }
 
     /**
@@ -232,8 +234,11 @@ public class NARS {
         public DefaultNAR(int nal, boolean threadSafe) {
 
             this.nal = nal;
-            this.deriver = nars.control.Deriver.getDefault(nal);
 
+            deriverAdd(nal);
+
+            if (nal > 0)
+                deriverAdd(Deriver.deriver(nal));
 
             if (threadSafe)
                 index = () -> new CaffeineIndex(64 * 1024 );

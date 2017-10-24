@@ -46,17 +46,17 @@ public class ActivateTest {
         Activate cf = new Activate(c, 1f);
 
         Term A = $.the("a");
-        for (int i = 0; i < 500; i++) {
-            cf.run(nar).forEach(p -> {
-                //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
-                if (p.termLink instanceof Atom || !A.equals(p.termLink.sub(0)))
-                    return; //ignore
-                String tls = p.termLink.toString();
 
-                premiseHits.addOccurrences(p.toString(), 1);
-                termlinkHits.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
-            });
-        }
+        cf.hypothesize(nar, 500).forEach(p -> {
+            //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
+            if (p.termLink instanceof Atom || !A.equals(p.termLink.sub(0)))
+                return; //ignore
+            String tls = p.termLink.toString();
+
+            premiseHits.addOccurrences(p.toString(), 1);
+            termlinkHits.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
+        });
+
 
         System.out.println("termlinks pri (after):\n");
         c.termlinks().print();
@@ -94,7 +94,7 @@ public class ActivateTest {
         n.run(15);
 
 
-        n.forEachConceptActive(System.out::println);
+        n.conceptsActive().forEach(System.out::println);
     }
 
     @Test
@@ -155,6 +155,7 @@ public class ActivateTest {
         testTemplates("(x --> ?1)",
                 "[(x-->?1), x]");
     }
+
     @Test
     public void testTemplatesWithDepVar() throws Narsese.NarseseException {
         testTemplates("(x --> #1)",

@@ -5,6 +5,7 @@
 package nars.control;
 
 import jcog.Util;
+import jcog.pri.PLink;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -12,15 +13,13 @@ import nars.concept.Concept;
 import nars.derive.time.Event;
 import nars.derive.time.Temporalize;
 import nars.table.BeliefTable;
-import nars.task.DerivedTask;
-import nars.task.ITask;
-import nars.task.UnaryTask;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.Unify;
 import nars.term.subst.UnifySubst;
 import nars.term.transform.Retemporalize;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -29,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 
 import static nars.Op.BELIEF;
-import static nars.Op.VAR_QUERY;
 import static nars.concept.TermLinks.linkTask;
 import static nars.time.Tense.ETERNAL;
 
@@ -40,7 +38,7 @@ import static nars.time.Tense.ETERNAL;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public class Premise extends UnaryTask {
+public class Premise extends PLink<Pair<Task,Term>> {
 
     static final Logger logger = LoggerFactory.getLogger(Premise.class);
 
@@ -57,6 +55,14 @@ public class Premise extends UnaryTask {
         this.links = links;
     }
 
+    @Override
+    public boolean delete() {
+        if (super.delete()) {
+            links = null;
+            return true;
+        }
+        return false;
+    }
 
     /**
      * resolve the most relevant belief of a given term/concept
@@ -73,26 +79,24 @@ public class Premise extends UnaryTask {
      * <p>
      * returns ttl used, -1 if failed before starting
      */
-    @Override
-    public @Nullable Iterable<? extends ITask> run(NAR n) {
+    @Nullable public Derivation match(Derivation d, int matchTTL) {
 
-
-
+        NAR n = d.nar;
         n.emotion.conceptFirePremises.increment();
-
 
         //nar.emotion.count("Premise_run");
 
-        Task task = this.task;
+        final Task task = this.task;
         if (task == null || task.isDeleted()) {
-            Task fwd = task.meta("@");
-            if (fwd!=null)
-                task = fwd; //TODO multihop dereference like what happens in tasklink bag
-            else
-                return null;
+//            Task fwd = task.meta("@");
+//            if (fwd!=null)
+//                task = fwd; //TODO multihop dereference like what happens in tasklink bag
+//            else {
+//                delete();
+//                return;
+//            }
+            return null;
         }
-
-
 
 
         Concept taskConcept = task.concept(n, true);
@@ -104,7 +108,6 @@ public class Premise extends UnaryTask {
                 //assert (false) : task + " could not be conceptualized"; //WHY was task even created
             }
             task.delete();
-            delete();
             return null;
         }
 
@@ -121,8 +124,6 @@ public class Premise extends UnaryTask {
 
         //float taskPri = task.priElseZero();
 
-
-        Derivation d = n.derivation();
         int dur = d.dur;
         long now = d.time;
 
@@ -186,25 +187,19 @@ public class Premise extends UnaryTask {
 
 
         boolean beliefConceptCanAnswerTaskConcept = false;
-        int ttlMax = Util.lerp(Util.unitize(task.priElseZero()/n.priDefault(task.punc())),
-                n.matchTTLmin.intValue(), n.matchTTLmax.intValue());
 
         if (!taskTerm.equals(beliefTerm)) {
             boolean beliefHasVars = beliefTerm.vars() > 0;
             if (taskTerm.vars() > 0 || beliefHasVars) {
-                int[] matchTTL = {Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION)};
                 Unify u = unify(taskTerm, beliefTerm, n, matchTTL);
                 if (u != null) {
                     if (beliefHasVars) {
                         beliefTerm = beliefTerm.transform(u);
                         if (beliefTerm == null || beliefTerm instanceof Bool)
                             return null;
-
                     }
                     beliefConceptCanAnswerTaskConcept = true;
                 }
-                assert (matchTTL[0] <= 0);
-                ttlMax += matchTTL[0]; //changed if consumed in match (this value will be negative
             }
         }
 
@@ -287,21 +282,8 @@ public class Premise extends UnaryTask {
         }
 
 
-        Collection<DerivedTask> dd = d.run(this, task, belief, beliefTerm, ttlMax);
-        if (dd != null) {
-            int dds = dd.size();
-            n.emotion.taskDerived.increment(dds);
-            return dd;
-        } else {
-            return null;
-        }
-
-
-//        long ds = d.transformsCache.estimatedSize();
-//        if (ds >0)
-//            System.out.println(ds + " " + d.transformsCache.stats());
-
-
+        d.set(this, belief, beliefTerm);
+        return d;
     }
 
 
@@ -351,10 +333,8 @@ public class Premise extends UnaryTask {
      * sets a negative number in the ttl array, which is to be added to the callee's
      * ttl.  if zero, then no TTL was consumed
      */
-    private static UnifySubst unify(Term q, Term a, NAR nar, int[] ttl) {
+    private static UnifySubst unify(Term q, Term a, NAR nar, int ttl) {
 
-        final int startTTL = ttl[0];
-        ttl[0] = 0;
 
         if (q.op() != a.op() /*|| q.size() != a.size()*/)
             return null; //fast-fail: no chance
@@ -377,15 +357,12 @@ public class Premise extends UnaryTask {
 //
 //            return true; //keep trying
 
-        }, startTTL);
+        }, ttl);
         u.unify(q, a, true);
 
-        ttl[0] = -(startTTL - u.ttl); //how much consumed
+        //ttl[0] = -(startTTL - u.ttl); //how much consumed
 
-        if (result[0])
-            return u;
-        else
-            return null;
+        return result[0] ? u : null;
 
 //        if (Terms.equal(q, a, false, true /* no need to unneg, task content is already non-negated */))
 //            return q;

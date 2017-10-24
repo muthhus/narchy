@@ -407,6 +407,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
                 if (x != null) {
                     Y y = (Y) x;
+
                     BagSample next = each.next(y);
                     if (next.remove)
                         remove(key(y));
@@ -644,8 +645,10 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
     private void commit(@Nullable Consumer<Y> update, boolean checkCapacity) {
 
-        if (update == null && !checkCapacity)
+        if (update == null && !checkCapacity) {
+            ensureSorted();
             return;
+        }
 
         @Nullable List<Y> trash = null;
         synchronized (items) {

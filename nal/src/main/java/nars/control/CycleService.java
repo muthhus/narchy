@@ -1,11 +1,15 @@
 package nars.control;
 
 import nars.NAR;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 abstract public class CycleService extends NARService implements Consumer<NAR> {
+
+    static final Logger logger = LoggerFactory.getLogger(CycleService.class);
 
     protected final AtomicBoolean busy = new AtomicBoolean(false);
 
@@ -23,6 +27,8 @@ abstract public class CycleService extends NARService implements Consumer<NAR> {
         if (busy.compareAndSet(false, true)) {
             try {
                 run(nar);
+            } catch (Exception e) {
+                logger.error("{} {}", this, e);
             } finally {
                 busy.set(false);
             }

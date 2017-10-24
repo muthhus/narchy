@@ -1,108 +1,121 @@
 package nars.control;
 
+import jcog.Util;
 import nars.NAR;
+import nars.NARS;
 import nars.Op;
 import nars.Param;
 import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.derive.PrediTrie;
+import nars.derive.TrieDeriver;
 import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternIndex;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.io.PrintStream;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
-public class Deriver extends AbstractPred<Derivation> {
+public class Deriver extends CycleService {
 
 
-    private final PrediTerm<Derivation> exe;
+    public final PrediTerm<Derivation> deriver;
+    private final NAR nar;
 
-    public Deriver(PrediTerm<Derivation> o) {
-        super(o);
-        this.exe = o;
+    private float minPremisesPerConcept = 1;
+    private float maxPremisesPerConcept = 4;
+
+    int conceptsPerCycle = 2;
+
+    protected Deriver(NAR nar, String... rulesets) {
+        this(PrediTrie.the(
+                new PremiseRuleSet(
+                        new PatternIndex(), nar, rulesets
+                )), nar);
     }
+
+    protected Deriver(PrediTerm<Derivation> deriver, NAR nar) {
+        super(nar);
+        this.deriver = deriver;
+        this.nar = nar;
+    }
+
+    public static Function<NAR, Deriver> deriver(Function<NAR, PremiseRuleSet> rules) {
+        return (nar) ->
+                new Deriver(PrediTrie.the(rules.apply(nar),
+                        Param.TRACE ? DebugDerivationPredicate::new : null
+                ), nar);
+    }
+
+    public static Function<NAR, Deriver> deriver(int nal, String... additional) {
+        assert (nal > 0 || additional.length > 0);
+
+        return deriver(nar ->
+                PremiseRuleSet.rules(nar, new PatternIndex(),
+                        Derivers.defaultRules(nal, additional)
+                ));
+    }
+
 
     @Override
-    public final boolean test(Derivation derivation) {
-        return exe.test(derivation);
+    protected void run(NAR nar) {
+        Derivation d = nar.derivation.get().cycle(nar,deriver);
+
+        nar.exe.fire(conceptsPerCycle, a -> {
+
+            Iterable<Premise> h = a.hypothesize(nar, premises(a));
+            if (h == null)
+                return;
+
+            h.forEach(p -> {
+
+                int matchTTL = Param.TTL_PREMISE_MIN * 3;
+
+                if (p.match(d, matchTTL) != null) {
+
+                    int deriveTTL = Util.lerp(Util.unitize(p.task.priElseZero() / nar.priDefault(p.task.punc())),
+                            nar.matchTTLmin.intValue(), nar.matchTTLmax.intValue());
+
+                    d.derive(deriveTTL);
+                }
+
+            });
+
+        });
+
+        d.commit(nar);
     }
 
-    private static final Function<NAR, PrediTerm<Derivation>> NullDeriver = (n) -> new AbstractPred<Derivation>(Op.Null) {
+
+    private int premises(Activate a) {
+        return Math.round(Util.lerp(a.priElseZero(), minPremisesPerConcept, maxPremisesPerConcept));
+    }
+
+
+    public static final Function<NAR, PrediTerm<Derivation>> NullDeriver = (n) -> new AbstractPred<Derivation>(Op.Null) {
         @Override
         public boolean test(Derivation derivation) {
             return true;
         }
     };
 
-    public static Function<NAR, PrediTerm<Derivation>> getDefault(int nal, String... additional) {
-        if (nal == 0)
-            return NullDeriver;
 
-        return (nar) -> {
-            Function<PrediTerm<Derivation>, PrediTerm<Derivation>> xf;
-            if (Param.TRACE)
-                xf = DebugDerivationPredicate::new;
-            else
-                xf = null;
-
-            Set<String> files = defaultRules(nal, additional);
-
-            final PatternIndex p = new PatternIndex();
-
-            @NotNull PremiseRuleSet r = PremiseRuleSet.rules(nar, p, files.toArray(new String[files.size()]) );
-
-            return new Deriver(PrediTrie.the(r, xf));
-        };
+    public static Stream<Deriver> derivers(NAR n) {
+        return n.services().filter(Deriver.class::isInstance).map(Deriver.class::cast);
     }
 
-
-    public static Set<String> defaultRules(int level, String... otherFiles) {
-        Set<String> files = new TreeSet();
-        switch (level) {
-            case 8:
-                //files.add("motivation.nal");
-            case 7:
-                //TODO move temporal induction to a separate file
-                //fallthru
-            case 6:
-                files.add("nal6.nal");
-                files.add("nal6.guess.nal");
-
-                files.add("induction.nal");  //TODO nal6 only needs general induction, not the temporal parts
-
-                files.add("misc.nal"); //TODO split this up
-                //files.add("list.nal");  //experimental
-                //fallthru
-            case 5:
-            case 4:
-            case 3:
-            case 2:
-                files.add("nal3.nal");
-                //files.add("nal3.guess.nal");
-                files.add("nal2.nal");
-                files.add("nal2.guess.nal");
-                //fallthru
-            case 1:
-                files.add("nal1.nal");
-                files.add("nal1.guess.nal");
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
-
-        Collections.addAll(files, otherFiles);
-
-        return files;
+    public static void print(NAR n, PrintStream p) {
+        derivers(n).forEach(d -> {
+            p.println(d.toString());
+            TrieDeriver.print(d.deriver, p);
+            p.println();
+        });
     }
-
 }
 
 
-    //    /**
+//    /**
 //     * for now it seems there is a leak so its better if each NAR gets its own copy. adds some overhead but we'll fix this later
 //     * not working yet probably due to unsupported ellipsis IO codec. will fix soon
 //     */

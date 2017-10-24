@@ -192,14 +192,14 @@ public class Builtin {
             nar.on(t);
         }
 
-        nar.on(Functor.f("service", (TermContainer c) ->
-                $.sete(
-                        nar.services.entrySet().stream().map(
-                                (e) ->
-                                        $.p(e.getKey(), $.the(e.getValue().state())))
-                                .toArray(Term[]::new)
-                )
-        ));
+//        nar.on(Functor.f("service", (TermContainer c) ->
+//                $.sete(
+//                        nar.services().map(
+//                                (e) ->
+//                                        $.p(e, $.the(e.getValue().state())))
+//                                .toArray(Term[]::new)
+//                )
+//        ));
 
         /** subterm, but specifically inside an ellipsis. otherwise pass through */
         nar.on(Functor.f("esubterm", (TermContainer c) -> {
@@ -425,7 +425,7 @@ public class Builtin {
             int MAX_RESULT_LENGTH = 10;
             List<Term> rows = $.newArrayList(MAX_RESULT_LENGTH);
             //TODO use Exe stream() methods
-            nar.forEachConceptActive(bc -> {
+            nar.conceptsActive().forEach(bc -> {
                 if (rows.size() < MAX_RESULT_LENGTH && (query == null || bc.toString().toLowerCase().contains(query))) {
                     rows.add($.p(
                             bc.get().term(),

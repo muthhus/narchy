@@ -2,181 +2,87 @@ package nars.exe;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.ConcurrentCurveBag;
+import jcog.pri.op.PriMerge;
 import nars.NAR;
+import nars.concept.Concept;
 import nars.control.Activate;
 import nars.task.ITask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
-
-import static jcog.bag.Bag.BagSample.*;
 
 /**
  * unified executor
- * probabalistic continuation kernel
+ * concurrent, thread-safe. one central concept bag
  */
 public class UniExec extends Exec {
 
-    public final int CAPACITY;
+    private final int CAPACITY;
 
-//    public static class ITask extends PLinkUntilDeleted<ITask> {
-//
-//        public ITask(@NotNull ITask id, float p) {
-//            super(id, p);
-//        }
-//    }
-
-    protected Bag<ITask, ITask> plan;
-
-    protected int workRemaining;
-
+    protected Bag<Activate, Activate> active;
 
     public UniExec(int capacity) {
+
         CAPACITY = capacity;
     }
 
     @Override
     protected synchronized void clear() {
-        if (plan!=null)
-            plan.clear();
+        if (active !=null)
+            active.clear();
+    }
+
+    @Override
+    public void activate(Concept c, float activationApplied) {
+        active.putAsync(new Activate(c, activationApplied));
     }
 
     @Override
     public void add(ITask t) {
-        if (t instanceof Activate) {
-            plan.putAsync(t);
-        } else {
-            execute(t);
-        }
+        execute(t);
     }
 
-
-    protected void run(int i) {
-        workRemaining = i;
-        plan.commit().sample(this::exeSample);
-    }
-
-
-    public static final Logger logger = LoggerFactory.getLogger(UniExec.class);
-
-    public Bag.BagSample exeSample(ITask x) {
-        Iterable<? extends ITask> next = null;
-
-        try {
-            next = x.run(nar);
-        } catch (Exception e) {
-            logger.error("{} {}", x, e);
-        }
-
-
-        if (next != null) {
-            next.forEach(this::add);
-        }
-
-        boolean persist = x.persist();
-
-        if (done(x))
-            return persist ? Stop : RemoveAndStop;
-        else
-            return persist ? Next : Remove;
-    }
-
-    protected boolean done(ITask x) {
-        //realtime: System.currentTimeMillis() > nextCycle
-
-        //iterative:
-        return --workRemaining <= 0;
+    @Override
+    public void fire(int n, Consumer<Activate> each) {
+        active.sample(n, each);
     }
 
     @Override
     public synchronized void start(NAR nar) {
 
-        plan =
+        active =
                 //new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), CAPACITY) {
-                new ConcurrentCurveBag<ITask>(this, new ConcurrentHashMap(), nar.random(), CAPACITY) {
+                new ConcurrentCurveBag<>(PriMerge.plus, new ConcurrentHashMap<>(), nar.random(), CAPACITY) {
 
                     @Override
-                    public ITask key(ITask value) {
+                    public Activate key(Activate value) {
                         return value;
                     }
 
                     //
                 };
-//            new ConcurrentCurveBag(this,
-//                new ConcurrentHashMapUnsafe<>(1024), nar.random(), 1024);
-        //new PriorityHijackBag<>(CAPACITY,2) {
-//
-//                    @Override
-//                    public void setCapacity(int _newCapacity) {
-//                        super.setCapacity(_newCapacity);
-//                        resize(capacity());
-//                    }
-//          @Override
-//                    protected boolean replace(float incoming, float existing) {
-//                        return hijackGreedy(incoming, existing);
-//                    }
-//                                        @Override
-//                    protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, MutableFloat overflowing) {
-//                        float overflow = UniExec.this.merge(existing, incoming); //modify existing
-//                        if (overflow > 0) {
-//                            //pressurize(-overflow);
-//                            if (overflowing != null) overflowing.add(overflow);
-//                        }
-//                        return existing;
-//                    }
-//                                     @Override
-//                    public Consumer<ITask> forget(float rate) {
-//                        return null;
-////                        return new PriForget(rate) {
-////                            @Override
-////                            public void accept(@NotNull Priority b) {
-////                                if (b instanceof Activate || b instanceof )
-////                                super.accept(b);
-////                            }
-////                        };
-//                    }
 
         super.start(nar);
     }
 
-
-    public float pri(ITask key) {
-        return key.pri();
-
-//        float i = key.pri();
-//        if (i!=i) return Float.NaN;
-//
-//        if (key instanceof Activate) {
-//            return Util.lerp(i, 0f, 0.25f);
-//        } else if (key instanceof Premise) {
-//            return Util.lerp(i, 0.25f, 0.5f);
-//        } else {
-//            return Util.lerp(i, 0.5f, 1f);
-//        }
-    }
-
     @Override
     public synchronized void stop() {
-        if (plan != null) {
-            plan.clear();
-            plan = null;
+        if (active != null) {
+            active.clear();
+            active = null;
         }
     }
-
 
     @Override
     public int concurrency() {
         return 1;
     }
 
-
     @Override
-    public Stream<ITask> stream() {
-        return plan.stream(); //.filter(Objects::nonNull);
+    public Stream<Activate> active() {
+        return active.stream(); //.filter(Objects::nonNull);
     }
-
 
 //    final int WINDOW_SIZE = 32;
 //    final int WINDOW_RATIO = 8;

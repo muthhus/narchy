@@ -3,6 +3,7 @@ package nars.control;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
+import jcog.pri.PLink;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.NAR;
@@ -10,29 +11,28 @@ import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
 import nars.concept.TermLinks;
-import nars.task.UnaryTask;
 import nars.term.Term;
 import nars.term.Termed;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 
 /**
  * concept firing, activation, etc
  */
-public class Activate extends UnaryTask<Concept> implements Termed {
+public class Activate extends PLink<Concept> implements Termed {
 
-    /**
-     * per batch, on empty
-     */
-    static final int TASKLINKS_SAMPLED = 2;
-    /**
-     * per batch, on empty
-     */
-    static final int TERMLINKS_SAMPLED = 2;
+//    /**
+//     * per batch, on empty
+//     */
+//    static final int TASKLINKS_SAMPLED = 2;
+//    /**
+//     * per batch, on empty
+//     */
+//    static final int TERMLINKS_SAMPLED = 2;
 
-    Deque<Premise> pending;
 
     private List<Termed> templates;
     private Concept[] templateConcepts;
@@ -42,90 +42,80 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         assert (c.isNormalized()) : c + " not normalized";
     }
 
-
-    @Override
-    public Iterable<Premise> run(NAR nar) {
+    public Iterable<Premise> hypothesize(NAR nar, int premisesMax) {
 
         nar.emotion.conceptFires.increment();
 
-        if (templates == null)
-            buildTemplates(nar);
+        if (templates == null) {
+            this.templates = TermLinks.templates(id, nar);
+            this.templateConcepts = TermLinks.templateConcepts(templates);
+        }
 
         float cost = TermLinks.linkTemplates(id, templates, priElseZero(), nar.momentum.floatValue(), nar);
         if (cost >= Pri.EPSILON)
             priSub(cost);
 
-        return hypothesize(nar);
-    }
+        List<Premise> next = new FasterList(premisesMax);
 
-    void buildTemplates(NAR nar) {
-        this.templates = TermLinks.templates(id, nar);
-        this.templateConcepts = TermLinks.templateConcepts(templates);
-    }
+        final Bag<Term, PriReference<Term>> termlinks = id.termlinks();
 
+        termlinks.commit(termlinks.forget(Param.LINK_FORGET_TEMPERATURE));
+        int ntermlinks = termlinks.size();
+        if (ntermlinks == 0)
+            return null;
 
-    @Nullable
-    Iterable<Premise> hypothesize(NAR nar) {
+        //TODO add a termlink vs. tasklink balance parameter
+        int TERMLINKS_SAMPLED = (int) Math.ceil((float)Math.sqrt(premisesMax));
 
-        if (pending == null)
-            pending = new ArrayDeque(TASKLINKS_SAMPLED * TERMLINKS_SAMPLED); //may need to be concurrent
-
-        if (pending.isEmpty()) {
-
-            final Bag<Term, PriReference<Term>> termlinks = id.termlinks();
-
-            termlinks.commit(termlinks.forget(Param.LINK_FORGET_TEMPERATURE));
-            int ntermlinks = termlinks.size();
-            if (ntermlinks == 0)
-                return null;
+        int tlSampled = Math.min(ntermlinks, TERMLINKS_SAMPLED);
+        FasterList<PriReference<Term>> terml = new FasterList(tlSampled);
+        termlinks.sample(tlSampled, ((Consumer<PriReference>) terml::add));
+        int termlSize = terml.size();
+        if (termlSize <= 0) return null;
 
 
-            int tlSampled = Math.min(ntermlinks, TERMLINKS_SAMPLED);
-            FasterList<PriReference<Term>> terml = new FasterList(tlSampled);
-            termlinks.sample(tlSampled, ((Consumer<PriReference>) terml::add));
-            int termlSize = terml.size();
-            if (termlSize <= 0) return null;
+        final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
+        tasklinks.commit(tasklinks.forget(Param.LINK_FORGET_TEMPERATURE));
+        int ntasklinks = tasklinks.size();
+        if (ntasklinks == 0) return null;
 
+        int TASKLINKS_SAMPLED = (int) Math.ceil(((float)premisesMax) / termlSize);
 
-            final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
-            tasklinks.commit(tasklinks.forget(Param.LINK_FORGET_TEMPERATURE));
-            int ntasklinks = tasklinks.size();
-            if (ntasklinks == 0) return null;
+        final int[] remaining = {premisesMax};
 
-            Random rng = nar.random();
-            tasklinks.sample(Math.min(ntasklinks, TASKLINKS_SAMPLED), (tasklink) -> {
+        Random rng = nar.random();
+        tasklinks.sample(Math.min(ntasklinks, TASKLINKS_SAMPLED), (tasklink) -> {
 
-                final Task task = tasklink.get();
-                if (task == null)
-                    return;
+            final Task task = tasklink.get();
+            if (task == null)
+                return;
 
-                float tPri = task.priElseZero();
-                for (int j = 0; j < termlSize; j++) {
-                    PriReference<Term> termlink = terml.get(j);
+            float tPri = task.priElseZero();
+            for (int j = 0; j < termlSize && remaining[0]-- > 0; j++) {
+                PriReference<Term> termlink = terml.get(j);
 
-                    final Term term = termlink.get();
-                    if (term != null) {
+                final Term term = termlink.get();
+                if (term != null) {
 
-                        float pri = Param.termTaskLinkToPremise.apply(tPri, termlink.priElseZero());
+                    float pri1 = Param.termTaskLinkToPremise.apply(tPri, termlink.priElseZero());
 
-                        Premise p = new Premise(task, term, pri,
-                                //targetConcepts
-                                randomTaskLinked(rng)
-                        );
+                    Premise p = new Premise(task, term, pri1,
 
-                        pending.add(p);
-                    }
+                            //targets:
+                            randomTemplates(rng, TERMLINKS_SAMPLED /* heuristic */)
+
+                    );
+
+                    next.add(p);
                 }
-            });
+            }
+        });
 
-            if (pending.isEmpty())
-                return null;
-        }
-
-        return Collections.singleton(pending.removeFirst());
+        return next;
     }
 
-    private Collection<Concept> randomTaskLinked(Random rng) {
+
+    private Collection<Concept> randomTemplates(Random rng, int count) {
 
 //            {
 //                //this allows the tasklink, if activated to be inserted to termlinks of this concept
@@ -135,12 +125,12 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //                        nar.concept(t.get())
 //                ).filter(Objects::nonNull).collect(toList());
 //            }
-            {
-                //Util.selectRoulette(templateConcepts.length, )
+        {
+            //Util.selectRoulette(templateConcepts.length, )
 
-            }
+        }
 
-        return Util.select(TERMLINKS_SAMPLED, rng, this.templateConcepts);
+        return Util.select(count, rng, this.templateConcepts);
     }
 
 
@@ -185,11 +175,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //        return ttl;
 //    }
 
-
-    @Override
-    public boolean persist() {
-        return true;
-    }
 
     @Override
     public Term term() {

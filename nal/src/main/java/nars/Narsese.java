@@ -127,7 +127,6 @@ public class Narsese extends BaseParser<Object> {
 //            new CapacityLinkedHashMap<Pair<Op, List>, Term>(512));
 
 
-    @NotNull
     public static Narsese parse() {
         return parsers.get();
     }

@@ -665,7 +665,7 @@ public class TemporalTermTest {
         n.run(5);
 
         TreeSet d = new TreeSet(Comparator.comparing(Object::toString));
-        n.forEachConceptActive(x -> d.add(x.get()));
+        n.conceptsActive().forEach(x -> d.add(x.get()));
 
         //2 unique impl concepts created
         assertEquals(

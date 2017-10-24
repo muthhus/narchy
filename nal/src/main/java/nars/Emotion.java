@@ -37,7 +37,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
     public final Counter conceptFirePremises = new BasicCounter(id("concept fire premises"));
 
     public final Counter taskDerived = new BasicCounter(id("task derived"));
-    public final Counter taskIgnored = new BasicCounter(id("task ignored"));
+    //public final Counter taskIgnored = new BasicCounter(id("task ignored"));
 
 
 //    /**

@@ -87,6 +87,8 @@ abstract public class DurService extends NARService implements Runnable {
                 }
 
                 nar.at(this.now + durCycles, this);
+            } catch (Exception e) {
+                logger.error("{} {}", this, e);
             } finally {
                 busy.set(false);
             }

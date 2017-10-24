@@ -19,7 +19,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
 
     public SimpleConceptGraph1(NAR nar, int visibleNodes, int maxEdgesPerNodeMax) {
-        this(nar, ()->nar.exe.stream().
+        this(nar, ()->nar.exe.active().
                         map(x -> x instanceof Activate ? (Activate)x : null).filter(Objects::nonNull).iterator(),
                 visibleNodes, maxEdgesPerNodeMax);
     }

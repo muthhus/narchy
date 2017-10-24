@@ -45,7 +45,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
 
     @NotNull
-    public static PremiseRuleSet rules(NAR nar, PatternIndex p, String... filename) {
+    public static PremiseRuleSet rules(NAR nar, PatternIndex p, Collection<String> filename) {
 
         PremiseRuleSet rs = new PremiseRuleSet(parsedRules(filename), p, nar);
 
@@ -57,8 +57,8 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
         return rs;
     }
 
-    public static Stream<Pair<PremiseRule, String>> parsedRules(String... name) {
-        return Stream.of(name)./*parallel().*/flatMap(n -> {
+    public static Stream<Pair<PremiseRule, String>> parsedRules(Collection<String> name) {
+        return name.stream()./*parallel().*/flatMap(n -> {
 
                     InputStream nn = null;
                     try {
@@ -92,7 +92,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     final int[] errors = {0};
 
 
-    public PremiseRuleSet(@NotNull Stream<Pair<PremiseRule, String>> parsed, @NotNull PatternIndex patterns, NAR nar) {
+    public PremiseRuleSet(Stream<Pair<PremiseRule, String>> parsed, PatternIndex patterns, NAR nar) {
         this.nar = nar;
         this.patterns = patterns;
 

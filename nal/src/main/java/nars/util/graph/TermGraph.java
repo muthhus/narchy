@@ -28,7 +28,7 @@ public enum TermGraph {
         return termlink(nar, g);
     }
     public static AdjGraph<Term, Float> termlink(NAR nar, AdjGraph<Term, Float> g) {
-        return termlink(nar, nar.conceptActive(), g);
+        return termlink(nar, nar.conceptsActive(), g);
     }
 
     public static AdjGraph<Term, Float> termlink(NAR n, Stream<? extends Termed> it, AdjGraph<Term, Float> g) {

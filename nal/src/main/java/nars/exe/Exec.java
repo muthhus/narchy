@@ -4,24 +4,18 @@ import jcog.constraint.continuous.exceptions.InternalSolverError;
 import jcog.event.On;
 import jcog.exe.Can;
 import jcog.exe.Schedulearn;
-import jcog.list.FasterList;
-import jcog.pri.Prioritized;
-import jcog.pri.Priority;
-import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.NARLoop;
 import nars.Param;
-import nars.Task;
+import nars.concept.Concept;
 import nars.control.Activate;
-import nars.control.Premise;
 import nars.task.ITask;
-import nars.task.NALTask;
 import nars.task.NativeTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
-import java.util.Objects;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
@@ -34,7 +28,7 @@ import static jcog.Util.sqr;
  * manages low level task scheduling and execution
  *
  */
-abstract public class Exec implements Executor, PriMerge {
+abstract public class Exec implements Executor {
 
     private static final Logger logger = LoggerFactory.getLogger(Exec.class);
 
@@ -67,11 +61,13 @@ abstract public class Exec implements Executor, PriMerge {
 
     }
 
+    abstract public void fire(int n, Consumer<Activate> each);
+
     /** an estimate or exact number of parallel processes this runs */
     abstract public int concurrency();
 
 
-    abstract public Stream<ITask> stream();
+    abstract public Stream<Activate> active();
 
     public synchronized void start(NAR nar) {
         this.nar = nar;
@@ -87,15 +83,7 @@ abstract public class Exec implements Executor, PriMerge {
         }
     }
 
-    protected synchronized void clear() {
-
-    }
-
-  /** visits any pending tasks */
-    @Deprecated public final void forEach(Consumer<ITask> each) {
-        stream().filter(Objects::nonNull).forEach(each);
-    }
-
+    abstract void clear();
 
     /** true if this executioner executes procedures concurrently.
      * in subclasses, if this is true but concurrency()==1, it will use
@@ -105,40 +93,20 @@ abstract public class Exec implements Executor, PriMerge {
         return concurrency() > 1;
     }
 
-    protected void ignore( Task t) {
-        t.delete();
-        nar.emotion.taskIgnored.increment();
-    }
 
     @Override
-    public void execute(Runnable r) {
+    public void execute(Runnable async) {
         if (concurrent()) {
-            ForkJoinPool.commonPool().execute(r);
+            ForkJoinPool.commonPool().execute(async);
         } else {
-            r.run();
+            async.run();
         }
     }
-
 
     public void print(PrintStream out) {
         out.println(this);
     }
 
-    @Override
-    public float merge(Priority existing, Prioritized incoming) {
-        if (existing instanceof Activate) {
-            return Param.activateMerge.merge(existing, incoming);
-        } else if (existing instanceof Premise) {
-//            ((Premise)existing).merge((Premise)incoming);
-            return Param.premiseMerge.merge(existing, incoming);
-        }else {
-            if (existing instanceof NALTask) {
-                ((NALTask)existing).causeMerge((Task) incoming);
-            }
-            return Param.taskMerge.merge(existing, incoming);
-        }
-
-    }
 
     public float load() {
         return 0;
@@ -147,7 +115,8 @@ abstract public class Exec implements Executor, PriMerge {
 
     final Schedulearn sched = new Schedulearn();
 
-    public void cause(FasterList<Can> can) {
+    /** allocates what can be done */
+    public void should(List<Can> can) {
 
         double defaultCycleTime = 1.0; //sec
 
@@ -160,7 +129,6 @@ abstract public class Exec implements Executor, PriMerge {
 
         float throttle = loop.throttle.floatValue();
         double dutyCycleTime = nextCycleTime * throttle * (1f - sqr(nar.exe.load()));
-        double sleepTime = nextCycleTime * (1f - throttle);
 
         if (dutyCycleTime > 0) {
             try {
@@ -175,6 +143,7 @@ abstract public class Exec implements Executor, PriMerge {
         final double MIN_SLEEP_TIME = 0.001f; //1 ms
         final int sleepGranularity = 2;
         int divisor = sleepGranularity * concurrency();
+        double sleepTime = nextCycleTime * (1f - throttle);
         double sleepEach = sleepTime / divisor;
         if (sleepEach >= MIN_SLEEP_TIME) {
             int msToSleep = (int)Math.ceil(sleepTime*1000);
@@ -183,5 +152,7 @@ abstract public class Exec implements Executor, PriMerge {
 
     }
 
+
+    abstract public void activate(Concept c, float activationApplied);
 
 }

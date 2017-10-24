@@ -20,7 +20,6 @@ import nars.concept.Concept;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
 import nars.control.*;
-import nars.derive.PrediTerm;
 import nars.exe.Exec;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
@@ -91,54 +90,115 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     static final Set<String> logEvents = Sets.newHashSet("eventTask");
     static final String VERSION = "NARchy v?.?";
 
-    @NotNull
     public final Exec exe;
-    @NotNull
-    protected final Random random;
-
     public final transient Topic<NAR> eventClear = new ListTopic<>();
-
     public final transient Topic<NAR> eventCycle = new ListTopic<>();
-
-    /**
-     * a task has been processed or re-processed (priority changed)
-     */
     public final transient Topic<Task> eventTask = new ListTopic<>();
+
+    public final Emotion emotion;
+    public final Time time;
+
+    public final TermIndex terms;
+    public final NARLoop loop = new NARLoop(this);
+    /**
+     * table of values influencing reasoner heuristics
+     */
+    public final FasterList<Cause> causes = new FasterList(256);
+    /**
+     * optional actions whose potential invocation is heuristically controlled
+     */
+    public final FasterList<Can> can = new FasterList(8);
+    protected final Random random;
 
     /**
      * scoped to this NAR so it can be reset by it
      */
-    final IterableThreadLocal<Derivation> derivation =
-            new IterableThreadLocal<>(() -> new Derivation(this));
-    //ThreadLocal.withInitial(()->new Derivation(this));
+//    public final IterableThreadLocal<Derivation> derivation =
+//            new IterableThreadLocal<>(() -> new Derivation(this));
+    public static final ThreadLocal<Derivation> derivation =
+            ThreadLocal.withInitial(Derivation::new);
 
-
-    @NotNull
-    public Emotion emotion;
-
-    @NotNull
-    public final Time time;
-
-    @NotNull
-    public final TermIndex terms;
-
-
-    @NotNull
     private final AtomicReference<Term> self;
 
 
+
+    private final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[want.length + 1 /* for global norm */];
     /**
      * maximum NAL level currently supported by this memory, for restricting it to activity below NAL8
      */
     int nal;
 
-    public final NARLoop loop = new NARLoop(this);
+    public NAR(@NotNull TermIndex terms, @NotNull Exec exe, @NotNull Time time, @NotNull Random rng, @NotNull ConceptBuilder conceptBuilder) {
+        super(exe);
 
-    private final PrediTerm<Derivation> deriver;
+        this.random = rng;
 
+        this.terms = terms;
 
-    //private final PrediTerm<Derivation> deriver;
+        this.exe = exe;
 
+        this.time = time;
+        time.clear();
+
+        self = new AtomicReference<>(null);
+        setSelf(Param.randomSelf());
+
+        newCauseChannel("input"); //generic non-self source of input
+
+        this.nal = 8;
+
+        for (int i = 0; i < valueSummary.length; i++)
+            valueSummary[i] = new RecycledSummaryStatistics();
+
+        this.emotion = new Emotion(this);
+
+        if (terms.nar == null) { //dont reinitialize if already initialized, for sharing
+            terms.start(this);
+            Builtin.load(this);
+        }
+
+        exe.start(this);
+    }
+
+    static void outputEvent(Appendable out, String previou, String chan, Object v) throws IOException {
+        //indent each cycle
+        if (!"eventCycle".equals(chan)) {
+            out.append("  ");
+        }
+
+        if (!chan.equals(previou)) {
+            out
+                    //.append(ANSI.COLOR_CONFIG)
+                    .append(chan)
+                    //.append(ANSI.COLOR_RESET )
+                    .append(": ");
+            //previou = chan;
+        } else {
+            //indent
+            for (int i = 0; i < chan.length() + 2; i++)
+                out.append(' ');
+        }
+
+        if (v instanceof Object[]) {
+            v = Arrays.toString((Object[]) v);
+        } else if (v instanceof Task) {
+            Task tv = ((Task) v);
+            v = ansi()
+                    //.a(tv.originality() >= 0.33f ?
+                    .a(tv.pri() >= 0.25f ?
+                            Ansi.Attribute.INTENSITY_BOLD :
+                            Ansi.Attribute.INTENSITY_FAINT)
+                    .a(tv.pri() > 0.75f ? Ansi.Attribute.NEGATIVE_ON : Ansi.Attribute.NEGATIVE_OFF)
+                    .fg(Prioritized.budgetSummaryColor(tv))
+                    .a(
+                            tv.toString(true)
+                    )
+                    .reset()
+                    .toString();
+        }
+
+        out.append(v.toString()).append('\n');
+    }
 
     /**
      * creates a snapshot statistics object
@@ -166,17 +226,15 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 //        LongSummaryStatistics tasklinksCap = new LongSummaryStatistics();
 
 
-        forEachConcept(c -> {
+        concepts().filter(x -> !(x instanceof Functor)).forEach(c -> {
 
-            if ((c instanceof Functor))
-                return;
 
             //complexity.addValue(c.complexity());
             volume.recordValue(c.volume());
             rootOp.addValue(c.op());
             clazz.addValue(c.getClass().toString());
 
-            @Nullable ConceptState p = c.state();
+            ConceptState p = c.state();
             policy.addValue(p != null ? p.toString() : "null");
 
             //termlinksCap.accept(c.termlinks().capacity());
@@ -247,55 +305,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return x;
     }
 
-
-    public NAR(@NotNull TermIndex terms, @NotNull Exec exe, @NotNull Time time, @NotNull Random rng, @NotNull ConceptBuilder conceptBuilder, Function<NAR, PrediTerm<Derivation>> deriver) {
-        super(exe);
-
-        this.random = rng;
-
-        this.terms = terms;
-
-        this.exe = exe;
-
-        this.time = time;
-        time.clear();
-
-        self = new AtomicReference<>(null);
-        setSelf(Param.randomSelf());
-
-        newCauseChannel("input"); //generic non-self source of input
-
-        this.deriver = deriver.apply(this);
-
-        this.nal = 8;
-
-
-        for (int i = 0; i < valueSummary.length; i++)
-            valueSummary[i] = new RecycledSummaryStatistics();
-
-        this.emotion = new Emotion(this);
-
-        if (terms.nar == null) { //dont reinitialize if already initialized, for sharing
-            terms.start(this);
-            Builtin.load(this);
-        }
-
-        exe.start(this);
-    }
-
-
-    public void setEmotion(Emotion emotion) {
-        synchronized (self) { //lol
-            this.emotion = emotion;
-        }
-    }
-
     /**
      * Reset the system with an empty memory and reset clock.  Event handlers
      * will remain attached but enabled plugins will have been deactivated and
      * reactivated, a signal for them to empty their state (if necessary).
      */
-    @NotNull
     public void reset() {
 
         synchronized (exe) {
@@ -330,35 +344,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     }
 
-
-    public void setSelf(String self) {
+    public final void setSelf(String self) {
         setSelf(Atomic.the(self));
-    }
-
-    public void setSelf(Term self) {
-        this.self.set(self);
-    }
-
-    @NotNull
-    public Task inputAndGet(@NotNull String taskText) throws Narsese.NarseseException {
-        return inputAndGet(Narsese.parse().task(taskText, this));
-    }
-
-
-    @NotNull
-    public List<Task> input(@NotNull String text) throws NarseseException, InvalidTaskException {
-        List<Task> l = Narsese.parse().tasks(text, this);
-        input(l);
-        return l;
-    }
-
-
-    /**
-     * gets a concept if it exists, or returns null if it does not
-     */
-    @Nullable
-    public final Concept conceptualize(@NotNull String conceptTerm) throws NarseseException {
-        return conceptualize($.$(conceptTerm));
     }
 
 //    /** parses a term, returning it, or throws an exception (but will not return null) */
@@ -369,10 +356,33 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 //        return t;
 //    }
 
+    public final void setSelf(Term self) {
+        this.self.set(self);
+    }
+
+    @NotNull
+    public Task inputAndGet(@NotNull String taskText) throws Narsese.NarseseException {
+        return inputAndGet(Narsese.parse().task(taskText, this));
+    }
+
+    @NotNull
+    public List<Task> input(@NotNull String text) throws NarseseException, InvalidTaskException {
+        List<Task> l = Narsese.parse().tasks(text, this);
+        input(l);
+        return l;
+    }
+
+    /**
+     * gets a concept if it exists, or returns null if it does not
+     */
+    @Nullable
+    public final Concept conceptualize(@NotNull String conceptTerm) throws NarseseException {
+        return conceptualize($.$(conceptTerm));
+    }
+
     /**
      * ask question
      */
-    @NotNull
     public void question(@NotNull String termString) throws NarseseException {
         //TODO remove '?' if it is attached at end
         question($.$(termString));
@@ -414,7 +424,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public Task believe(@NotNull Term term, @NotNull long when, float freq, float conf) {
+    public Task believe(@NotNull Term term, long when, float freq, float conf) {
         return believe(priDefault(BELIEF), term, when, freq, conf);
     }
 
@@ -522,7 +532,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return input(pri, term, BELIEF, occurrenceTime, freq, conf);
     }
 
-
     @Nullable
     public Task goal(float pri, @NotNull Term goal, long when, float freq, float conf) throws InvalidTaskException {
         return input(pri, goal, GOAL, when, when, freq, conf);
@@ -539,7 +548,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @Nullable
-    public Task input(float pri, @NotNull Term term, byte punc, long start, long end, float freq, float conf) throws InvalidTaskException {
+    public Task input(float pri, Term term, byte punc, long start, long end, float freq, float conf) throws InvalidTaskException {
 
 
         ObjectBooleanPair<Term> b = Task.tryContent(term, punc, false);
@@ -563,56 +572,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     public Task que(@NotNull Term term, byte questionOrQuest) {
         return que(term, questionOrQuest, ETERNAL);
-    }
-
-    /**
-     * ¿qué?  que-stion or que-st
-     */
-    public Task que(@NotNull Term term, byte punc, long when) {
-
-
-        //TODO use input method like believe uses which avoids creation of redundant Budget instance
-        assert ((punc == QUESTION) || (punc == QUEST)); //throw new RuntimeException("invalid punctuation");
-
-        return inputAndGet(
-                new NALTask(term.unneg(), punc, null,
-                        time(), when, when,
-                        new long[]{time.nextStamp()}
-                ).budget(this)
-        );
-    }
-
-    /**
-     * logs tasks and other budgeted items with a summary exceeding a threshold
-     */
-    @NotNull
-    public NAR logPriMin(@NotNull Appendable out, float priThresh) {
-        return log(out, v -> {
-            Prioritized b = null;
-            if (v instanceof Prioritized) {
-                b = ((Prioritized) v);
-            } else if (v instanceof Twin) {
-                if (((Pair) v).getOne() instanceof Prioritized) {
-                    b = (Prioritized) ((Pair) v).getOne();
-                }
-            }
-            return b != null && b.pri() > priThresh;
-        });
-    }
-
-    /**
-     * main task entry point
-     */
-    @Override
-    public final void input(@NotNull ITask... t) {
-        for (ITask x : t)
-            input(x);
-    }
-
-    public final void input(ITask x) {
-        if (x == null) return;
-
-        exe.add(x);
     }
 
 
@@ -702,26 +661,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 //        return t;
 //    }
 
-    @NotNull
-    public Term pre(@NotNull Term t) {
-        return t;
-    }
 
-    /**
-     * override to apply any post-processing of a task before it is made available for external use (ex: decompression)
-     */
-    @NotNull
-    public Task post(@NotNull Task t) {
-        return t;
-    }
-
-    /**
-     * override to apply any post-processing of a term before it is made available for external use (ex: decompression)
-     */
-    @NotNull
-    public Term post(@NotNull Term t) {
-        return t;
-    }
 
 
 //    protected void processDuplicate(@NotNull Task input, Task existing) {
@@ -797,11 +737,60 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 //    }
 //
 
+    /**
+     * ¿qué?  que-stion or que-st
+     */
+    public Task que(@NotNull Term term, byte punc, long when) {
+
+
+        //TODO use input method like believe uses which avoids creation of redundant Budget instance
+        assert ((punc == QUESTION) || (punc == QUEST)); //throw new RuntimeException("invalid punctuation");
+
+        return inputAndGet(
+                new NALTask(term.unneg(), punc, null,
+                        time(), when, when,
+                        new long[]{time.nextStamp()}
+                ).budget(this)
+        );
+    }
+
+    /**
+     * logs tasks and other budgeted items with a summary exceeding a threshold
+     */
+    @NotNull
+    public NAR logPriMin(@NotNull Appendable out, float priThresh) {
+        return log(out, v -> {
+            Prioritized b = null;
+            if (v instanceof Prioritized) {
+                b = ((Prioritized) v);
+            } else if (v instanceof Twin) {
+                if (((Pair) v).getOne() instanceof Prioritized) {
+                    b = (Prioritized) ((Pair) v).getOne();
+                }
+            }
+            return b != null && b.pri() > priThresh;
+        });
+    }
+
+    /**
+     * main task entry point
+     */
+    @Override
+    public final void input(@NotNull ITask... t) {
+        for (ITask x : t)
+            input(x);
+    }
+
+    public final void input(ITask x) {
+        if (x == null) return;
+
+        exe.add(x);
+    }
+
     @Override
     public final void accept(@NotNull ITask task) {
         input(task);
     }
-
 
     /**
      * asynchronously adds the service
@@ -809,7 +798,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public void on(@NotNull NARService s) {
         runLater(() -> add(s.term(), s));
     }
-
 
     /**
      * simplified wrapper for use cases where only the arguments of an operation task, and not the task itself matter
@@ -865,15 +853,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 //            }
 //
 //        });
-    }
-
-
-    public void input(Function<NAR, Task>... tasks) {
-        for (Function<NAR, Task> x : tasks) {
-
-            input(x.apply(this));
-
-        }
     }
 
     public final int dur() {
@@ -945,11 +924,25 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return truth(concept, GOAL, when);
     }
 
+//    private void runAsyncFrameTasks() {
+//        try {
+//            int active = asyncPerFrame.getActiveCount();
+//            if (active > 0) {
+//
+//                asyncPerFrame.awaitTermination(0, TimeUnit.MINUTES);
+//                //asyncPerFrame.shutdown();
+//                asyncPerFrame = null;
+//
+//            }
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     @Nullable
     public Truth goalTruth(Termed concept, long start, long end) {
         return truth(concept, GOAL, start, end);
     }
-
 
     /**
      * Exits an iteration loop if running
@@ -962,7 +955,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         //clear();
         super.stop();
 
-        derivation.forEach(Derivation::clear);
+//        derivation.forEach(Derivation::clear);
         //derivation.forEach(c -> c.transformsCache.invalidateAll());
 
         exe.stop();
@@ -977,7 +970,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         time.cycle(this);
 
-        exe.cause(can);
+        exe.should(can);
 
         eventCycle.emit(this); //synchronous only
 
@@ -985,7 +978,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         emotion.cycle();
     }
-
 
     /**
      * Runs multiple frames, unless already running (then it return -1).
@@ -1001,21 +993,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         return this;
     }
-
-//    private void runAsyncFrameTasks() {
-//        try {
-//            int active = asyncPerFrame.getActiveCount();
-//            if (active > 0) {
-//
-//                asyncPerFrame.awaitTermination(0, TimeUnit.MINUTES);
-//                //asyncPerFrame.shutdown();
-//                asyncPerFrame = null;
-//
-//            }
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     @NotNull
     public NAR trace(@NotNull Appendable out, Predicate<String> includeKey) {
@@ -1069,46 +1046,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return trace(out, NAR.logEvents::contains, includeValue);
     }
 
-    public void outputEvent(@NotNull Appendable out, String previou, @NotNull String chan, Object v) throws IOException {
-        //indent each cycle
-        if (!"eventCycleStart".equals(chan)) {
-            out.append("  ");
-        }
-
-        if (!chan.equals(previou)) {
-            out
-                    //.append(ANSI.COLOR_CONFIG)
-                    .append(chan)
-                    //.append(ANSI.COLOR_RESET )
-                    .append(": ");
-            //previou = chan;
-        } else {
-            //indent
-            for (int i = 0; i < chan.length() + 2; i++)
-                out.append(' ');
-        }
-
-        if (v instanceof Object[]) {
-            v = Arrays.toString((Object[]) v);
-        } else if (v instanceof Task) {
-            Task tv = ((Task) v);
-            v = ansi()
-                    //.a(tv.originality() >= 0.33f ?
-                    .a(tv.pri() >= 0.25f ?
-                            Ansi.Attribute.INTENSITY_BOLD :
-                            Ansi.Attribute.INTENSITY_FAINT)
-                    .a(tv.pri() > 0.75f ? Ansi.Attribute.NEGATIVE_ON : Ansi.Attribute.NEGATIVE_OFF)
-                    .fg(Prioritized.budgetSummaryColor(tv))
-                    .a(
-                            tv.toString(true)
-                    )
-                    .reset()
-                    .toString();
-        }
-
-        out.append(v.toString()).append('\n');
-    }
-
     /**
      * creates a new loop which runs at max speed
      */
@@ -1122,7 +1059,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         assert (initialFPS >= 0);
 
         float millisecPerFrame = initialFPS > 0 ? 1000.0f / initialFPS : 0 /* infinite speed */;
-        return startPeriodMS((int) millisecPerFrame);
+        return startPeriodMS(Math.round(millisecPerFrame));
     }
 
     /**
@@ -1136,7 +1073,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return loop;
     }
 
-
     /**
      * adds a task to the queue of task which will be executed in batch
      * after the end of the current frame before the next frame.
@@ -1144,17 +1080,16 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final void runLater(@NotNull Runnable t) {
         time.at(time(), t);
     }
+
     public final void runLater(@NotNull Consumer<NAR> t) {
         time.at(time(), t);
     }
-
 
     @NotNull
     @Override
     public String toString() {
         return self() + ":" + getClass().getSimpleName();
     }
-
 
     @NotNull
     public NAR input(@NotNull String... ss) throws NarseseException {
@@ -1176,7 +1111,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * TODO this needs refactoring to use a central scheduler
      */
-    @NotNull
     public NAR inputAt(long time, @NotNull String... tt) {
 
         assert (tt.length > 0);
@@ -1215,7 +1149,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
-
     /**
      * schedule a task to be executed no sooner than a given NAR time
      */
@@ -1240,7 +1173,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return tasks(true, true, true, true);
     }
 
-
     /**
      * resolves a term or concept to its currrent Concept
      */
@@ -1264,39 +1196,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    @Deprecated
-    public NAR forEachProtoTask(@NotNull Consumer<ITask> recip) {
-        exe.forEach(recip);
-        return this;
-    }
-
-    public Stream<Activate> conceptActive() {
-        return exe.stream().map(x -> x instanceof Activate ? (Activate) x : null).filter(Objects::nonNull);
-    }
-
-    @Deprecated
-    public NAR forEachConceptActive(@NotNull Consumer<Activate> recip) {
-        return forEachProtoTask(t -> {
-            if (t instanceof Activate) {
-                recip.accept(((Activate) t));
-            }
-        });
-    }
-
-    public Stream<Concept> concepts() {
-        return terms.stream().filter(t -> t instanceof Concept).map(t -> (Concept) t);
-    }
-
-
-    @NotNull
-    public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
-        terms.forEach(x -> {
-            if (x instanceof Concept)
-                recip.accept((Concept) x);
-        });
-        return this;
-    }
-
 
 //    /**
 //     * activate the concept and other features (termlinks, etc)
@@ -1311,15 +1210,22 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 //        return activate(termed, new Activation(b, 1f));
 //    }
 
-    @NotNull
-    public NAR stopIf(@NotNull BooleanSupplier stopCondition) {
+    public Stream<Activate> conceptsActive() {
+        return exe.active();
+    }
+
+    public Stream<Concept> concepts() {
+        return terms.stream().filter(Concept.class::isInstance).map(Concept.class::cast);
+    }
+
+    /** warning: the condition will be tested each cycle so it may affect performance */
+    @NotNull public NAR stopIf(@NotNull BooleanSupplier stopCondition) {
         onCycle(n -> {
             if (stopCondition.getAsBoolean())
                 stop();
         });
         return this;
     }
-
 
     /**
      * a frame batches a burst of multiple cycles, for coordinating with external systems in which multiple cycles
@@ -1370,7 +1276,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         taskStream.filter(Objects::nonNull).forEach(this::input);
     }
 
-
     @Override
     public final boolean equals(Object obj) {
         //TODO compare any other stateful values from NAR class in addition to Memory
@@ -1412,7 +1317,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return on(f(termAtom, f));
     }
 
-
     @Override
     public final int nal() {
         return nal;
@@ -1426,11 +1330,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return this;
     }
 
-
     public final long time() {
         return time.now();
     }
-
 
     public @NotNull NAR inputBinary(@NotNull File input) throws IOException {
         return inputBinary(new BufferedInputStream(new FileInputStream(input), 64 * 1024));
@@ -1467,7 +1369,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         tasks().forEach(_x -> {
 
             total.increment();
-            Task x = post(_x);
+            Task x = _x;
             if (x.truth() != null && x.conf() < confMin.floatValue())
                 return; //ignore task if it is below confMin
 
@@ -1519,7 +1421,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         tasks().forEach(_x -> {
 
             total.increment();
-            Task x = post(_x);
+            Task x = _x;
             if (x.truth() != null && x.conf() < confMin.floatValue())
                 return; //ignore task if it is below confMin
 
@@ -1574,7 +1476,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return this;
     }
 
-
     /**
      * The id/name of the reasoner
      */
@@ -1600,10 +1501,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final Task belief(Term c, long when) {
         return belief(c, when, when);
     }
+
     public final Task belief(Term c) {
         return belief(c, time());
     }
-
 
     /**
      * strongest matching goal for the target time
@@ -1629,7 +1530,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return ((BeliefTable) ((BaseConcept) concept).table(punc)).answer(start, end, c, this);
     }
 
-
     public SortedMap<String, Object> stats(Appendable out) {
 
         SortedMap<String, Object> stat = stats();
@@ -1645,34 +1545,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
 
         return stat;
-    }
-
-    /**
-     * table of values influencing reasoner heuristics
-     */
-    public final FasterList<Cause> causes = new FasterList(256);
-
-    /**
-     * optional actions whose potential invocation is heuristically controlled
-     */
-    public final FasterList<Can> can = new FasterList(8);
-
-
-    private final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[want.length + 1 /* for global norm */];
-
-    /**
-     * default deriver
-     */
-    @Deprecated
-    public Derivation derivation() {
-        return derivation(deriver);
-    }
-
-    /**
-     * another deriver
-     */
-    public Derivation derivation(PrediTerm<Derivation> deriver) {
-        return derivation.get().cycle(deriver);
     }
 
 
@@ -1838,5 +1710,15 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
+
+    public void activate(Termed t, float activationApplied) {
+        Concept c = concept(t, true);
+        if (c!=null)
+            exe.activate(c, activationApplied);
+    }
+
+    public Stream<Service<NAR>> services() {
+        return services.values().stream();
+    }
 
 }

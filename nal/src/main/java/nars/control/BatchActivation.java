@@ -5,19 +5,19 @@ import nars.NAR;
 import nars.concept.Concept;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 
-public class BatchActivate {
+public class BatchActivation {
 
     final ObjectFloatHashMap<Concept> a = new SaneObjectFloatHashMap<>(64);
 
-    final static ThreadLocal<BatchActivate> the = ThreadLocal.withInitial(BatchActivate::new);
+    final static ThreadLocal<BatchActivation> the = ThreadLocal.withInitial(BatchActivation::new);
 
     //final static LongHashSet active = new LongHashSet();
 
-    public static BatchActivate get() {
+    public static BatchActivation get() {
         return the.get();
     }
 
-    BatchActivate() {
+    BatchActivation() {
 
     }
 
@@ -26,7 +26,7 @@ public class BatchActivate {
     public void commit(NAR nar) {
         if (!a.isEmpty()) {
             try {
-                a.forEachKeyValue((c, p) -> nar.input(new Activate(c, p)));
+                a.forEachKeyValue(nar::activate);
             } catch (Throwable t) {
                 t.printStackTrace();
             } finally {

@@ -4,8 +4,7 @@ import jcog.bag.Bag;
 import jcog.list.FasterList;
 import jcog.pri.*;
 import nars.*;
-import nars.control.Activate;
-import nars.control.BatchActivate;
+import nars.control.BatchActivation;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Int;
@@ -131,14 +130,14 @@ public enum TermLinks {
                 //new PLink<>(t, activation)
         );
 
-        n.input(new Activate(cc, activationApplied));
+        n.activate(cc, activationApplied);
 
         if (activationApplied >= Prioritized.EPSILON_VISIBLE) {
             n.eventTask.emit(t);
         }
     }
 
-    public static void linkTemplate(Term srcTerm, Bag srcTermLinks, Termed target, float priForward, float priReverse, BatchActivate a, NAR nar, MutableFloat refund) {
+    public static void linkTemplate(Term srcTerm, Bag srcTermLinks, Termed target, float priForward, float priReverse, BatchActivation a, NAR nar, MutableFloat refund) {
 
         float priSum = priForward + priReverse;
         if (target instanceof Concept) {
@@ -272,7 +271,7 @@ public enum TermLinks {
             return 0;
 
         MutableFloat refund = new MutableFloat(0);
-        BatchActivate ba = BatchActivate.get();
+        BatchActivation ba = BatchActivation.get();
 
         int nextTarget = nar.random().nextInt(n);
         Term srcTerm = src.term();

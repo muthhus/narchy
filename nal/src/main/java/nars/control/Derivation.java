@@ -27,11 +27,9 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.impl.factory.Maps;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.roaringbitmap.RoaringBitmap;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,17 +46,20 @@ public class Derivation extends Unify {
 
     public static final Atomic _taskTerm = Atomic.the("_taskTerm");
     public static final Atomic _beliefTerm = Atomic.the("_beliefTerm");
+    private final Functor.LambdaFunctor polarizeFunc;
 
-    public final NAR nar;
+    public NAR nar;
 
     public final Versioned<Term> derivedTerm;
 
     public final ByteShuffler shuffler = new ByteShuffler(64);
 
-    /** temporary buffer for derivations before input so they can be merged in case of duplicates */
+    /**
+     * temporary buffer for derivations before input so they can be merged in case of duplicates
+     */
     public final Map<DerivedTask, DerivedTask> derivations = new LinkedHashMap<>();
 
-    private final ImmutableMap<Term, Termed> derivationFunctors;
+    private ImmutableMap<Term, Termed> derivationFunctors;
 
     public float truthResolution;
 
@@ -95,7 +96,9 @@ public class Derivation extends Unify {
     public int termSub0Struct;
     public int termSub1Struct;
 
-    /** current NAR time, set at beginning of derivation */
+    /**
+     * current NAR time, set at beginning of derivation
+     */
     public long time = ETERNAL;
 
     public Truth taskTruth, beliefTruth, beliefTruthRaw;
@@ -111,8 +114,9 @@ public class Derivation extends Unify {
     public boolean temporal;
 
 
-
-    /** evidential overlap */
+    /**
+     * evidential overlap
+     */
     public float overlapDouble, overlapSingle;
 
     public float premisePri;
@@ -123,13 +127,14 @@ public class Derivation extends Unify {
     public TemporalizeDerived temporalize;
     public int parentComplexity;
 
-    /** choices mapping the available post targets */
+    /**
+     * choices mapping the available post targets
+     */
     public final RoaringBitmap preToPost = new RoaringBitmap();
 
     public float premiseConfSingle;
     public float premiseConfDouble;
     private long[] evidenceDouble, evidenceSingle;
-
 
 
 //    private transient Term[][] currentMatch;
@@ -143,13 +148,12 @@ public class Derivation extends Unify {
     /**
      * if using this, must set: nar, index, random, DerivationBudgeting
      */
-    public Derivation(NAR nar) {
+    public Derivation() {
         super(
                 null /* any var type */
                 //VAR_PATTERN
-                , nar.random(), Param.UnificationStackMax, 0);
+                , null, Param.UnificationStackMax, 0);
 
-        this.nar = nar;
 
 //        Caffeine cb = Caffeine.newBuilder().executor(nar.exe);
 //            //.executor(MoreExecutors.directExecutor());
@@ -165,7 +169,7 @@ public class Derivation extends Unify {
 
         //final Functor substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
 
-        final Functor polarize = Functor.f2("polarize", (subterm, whichTask) -> {
+        polarizeFunc = Functor.f2("polarize", (subterm, whichTask) -> {
             Truth compared;
             if (whichTask.equals(PremiseRule.Task)) {
                 compared = taskTruth;
@@ -179,34 +183,16 @@ public class Derivation extends Unify {
         });
 
 
-        derivationFunctors = functors(
-                new uniSubAny(this),
-                polarize,
-                Subst.the,
-                union.the,
-                differ.the,
-                intersect.the,
-                nar.get(Atomic.the("dropAnyEvent")),
-                nar.get(Atomic.the("dropAnySet")),
-                nar.get(Atomic.the("conjEvent")),
-                nar.get(Atomic.the("conjDropIfEarliest")),
-                nar.get(Atomic.the("ifConjCommNoDepVars")),
-                nar.get(Atomic.the("without")),
-                nar.get(Atomic.the("indicesOf")),
-                nar.get(Atomic.the("substDiff"))
-        );
-
-
         derivedTerm = new Versioned(this, 3);
     }
 
     ImmutableMap<Term, Termed> functors(Termed... t) {
-        java.util.Map<Term,Termed> m = new HashMap(t.length + 2);
+        java.util.Map<Term, Termed> m = new HashMap(t.length + 2);
         for (Termed x : t) {
             m.put(x.term(), x);
         }
-        m.put(_taskTerm, ()->taskTerm);
-        m.put(_beliefTerm, ()->beliefTerm);
+        m.put(_taskTerm, () -> taskTerm);
+        m.put(_beliefTerm, () -> beliefTerm);
         return Maps.immutable.ofMap(m);
     }
 
@@ -225,8 +211,13 @@ public class Derivation extends Unify {
         return super.apply(x);
     }
 
-    public Derivation cycle(PrediTerm<Derivation> deriver) {
-        long now = this.nar.time();
+    public Derivation cycle(NAR nar, PrediTerm<Derivation> deriver) {
+        NAR pnar = this.nar;
+        if (pnar != nar) {
+            init(nar);
+        }
+
+        long now = nar.time();
         if (now != this.time) {
             this.time = now;
             this.dur = nar.dur();
@@ -239,10 +230,32 @@ public class Derivation extends Unify {
         return this;
     }
 
+    public void init(NAR nar) {
+        this.clear();
+        this.nar = nar;
+        this.random = nar.random();
+        this.derivationFunctors = functors(
+                new uniSubAny(this),
+                polarizeFunc,
+                Subst.the,
+                union.the,
+                differ.the,
+                intersect.the,
+                nar.get(Atomic.the("dropAnyEvent")),
+                nar.get(Atomic.the("dropAnySet")),
+                nar.get(Atomic.the("conjEvent")),
+                nar.get(Atomic.the("conjDropIfEarliest")),
+                nar.get(Atomic.the("ifConjCommNoDepVars")),
+                nar.get(Atomic.the("without")),
+                nar.get(Atomic.the("indicesOf")),
+                nar.get(Atomic.the("substDiff"))
+        );
+    }
+
     /**
      * tasklink/termlink scope
      */
-    public Collection<DerivedTask> run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, final int ttl) {
+    public void set(Premise p, Task belief, Term beliefTerm) {
 
         if (revert(0)) {
             //remove common variable entries because they will just consume memory if retained as empty
@@ -264,7 +277,7 @@ public class Derivation extends Unify {
         this.single = false;
         this.evidenceDouble = evidenceSingle = null;
 
-        this.task = task;
+        final Task task = this.task = p.task;
 
 
         Term taskTerm = task.term();
@@ -277,7 +290,8 @@ public class Derivation extends Unify {
 
         this.belief = belief;
 
-        Term bt = beliefTerm.unneg(); assert (!(bt instanceof Bool));
+        Term bt = beliefTerm.unneg();
+        assert (!(bt instanceof Bool));
 
         this.concOcc[0] = this.concOcc[1] = ETERNAL;
 
@@ -289,7 +303,7 @@ public class Derivation extends Unify {
         this.parentComplexity =
                 //Util.sum(
                 Math.max(
-                    taskTerm.complexity(), bt.complexity()
+                        taskTerm.complexity(), bt.complexity()
                 );
 
 
@@ -313,12 +327,12 @@ public class Derivation extends Unify {
              */
             if (!belief.isEternal()) {
 
-               //project belief truth to task's time
-               long beliefTruthTime = task.isEternal() ?
+                //project belief truth to task's time
+                long beliefTruthTime = task.isEternal() ?
                         ETERNAL :
                         //task.start();
                         belief.nearestTimeBetween(task.start(), task.end());
-                        //nar.time(); //now
+                //nar.time(); //now
 
                 this.beliefTruth = belief.truth(beliefTruthTime, dur, confMin);
             } else {
@@ -329,18 +343,15 @@ public class Derivation extends Unify {
             this.overlapDouble =
                     //Math.min(1, Util.sum(
                     Util.or(
-                    //Util.max(
-                        overlapSingle,
-                        Stamp.overlapFraction(taskStamp, beliefStamp),
-                        Stamp.cyclicity(beliefStamp)
+                            //Util.max(
+                            overlapSingle,
+                            Stamp.overlapFraction(taskStamp, beliefStamp),
+                            Stamp.cyclicity(beliefStamp)
                     );
         } else {
             this.beliefTruth = this.beliefTruthRaw = null;
             this.overlapDouble = 0;
         }
-
-
-
 
 
         this.termSub1Struct = beliefTerm.structure();
@@ -349,7 +360,7 @@ public class Derivation extends Unify {
         this.termSub1op = bOp.id;
 
         this.temporal = (!task.isEternal() || taskTerm.isTemporal()) ||
-                (belief!=null && (!belief.isEternal() || beliefTerm.isTemporal()));
+                (belief != null && (!belief.isEternal() || beliefTerm.isTemporal()));
 
         this.parentCause = belief != null ?
                 Cause.zip(task, belief) :
@@ -368,23 +379,16 @@ public class Derivation extends Unify {
                 Math.min(premiseConfSingle, beliefTruth.conf()) : //to be fair to the lesser confidence
                 premiseConfSingle;
 
-        setTTL(ttl); assert (ttl > 0);
-
-        deriver.test(this);
-
-        int ds = derivations.size();
-        if (ds > 0) {
-            return derivations.values();
-        } else {
-            return null;
-        }
-
     }
 
+    public void derive(int ttl) {
+        setTTL(ttl);
+        assert (ttl > 0);
+        deriver.test(this);
+    }
 
     @Override
     public final void tryMatch() {
-
 
 
         int now = now();
@@ -418,7 +422,8 @@ public class Derivation extends Unify {
                 //for question/quest, use the relative priority
                 te = task.priElseZero();
                 be = belief.priElseZero();
-                tb = te + be; tb = tb < Pri.EPSILON ? 0.5f : te / tb;
+                tb = te + be;
+                tb = tb < Pri.EPSILON ? 0.5f : te / tb;
             }
             return evidenceDouble = Stamp.zip(task.stamp(), belief.stamp(), tb);
         } else {
@@ -432,8 +437,11 @@ public class Derivation extends Unify {
                 + ' ' + super.toString();
     }
 
-    /** include any .clear() for data structures in case of emergency we can continue to assume they will be clear on next run() */
-    @Override public void clear() {
+    /**
+     * include any .clear() for data structures in case of emergency we can continue to assume they will be clear on next run()
+     */
+    @Override
+    public void clear() {
         derivations.clear();
         termutes.clear();
         preToPost.clear();
@@ -445,6 +453,18 @@ public class Derivation extends Unify {
         int before = this.ttl;
         this.ttl = next;
         return before;
+    }
+
+    /**
+     * called at the end of the cycle, input all generated derivations
+     */
+    public void commit(NAR nar) {
+        int s = derivations.size();
+        if (s > 0) {
+            nar.emotion.taskDerived.increment(s);
+            nar.input(derivations.values());
+            derivations.clear();
+        }
     }
 
     //    /**

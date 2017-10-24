@@ -43,8 +43,7 @@ public abstract class Unify extends Versioning implements Subst {
 
     protected final static Logger logger = LoggerFactory.getLogger(Unify.class);
 
-    @NotNull
-    public final Random random;
+    public Random random;
 
     @Nullable
     public final Op type;

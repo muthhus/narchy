@@ -6,10 +6,7 @@ import jcog.data.FloatParam;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.pri.mix.control.MixContRL;
-import nars.control.Cause;
-import nars.control.Derivation;
-import nars.control.DurService;
-import nars.control.MetaGoal;
+import nars.control.*;
 import nars.derive.PrediTerm;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
@@ -153,7 +150,7 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        Function<NAR, PrediTerm<Derivation>> deriver = nars.control.Deriver.getDefault(8
+        Function<NAR, PrediTerm<Derivation>> deriver = Deriver.deriver(8
                 , "motivation.nal"
                 //., "relation_introduction.nal"
         );
@@ -188,8 +185,6 @@ abstract public class NAgentX extends NAgent {
         n.defaultWants();
 
         n.dtMergeOrChoose.set(true);
-
-        n.setEmotion(new Emotivation(n));
 
         n.confMin.set(0.01f);
         n.truthResolution.set(0.01f);

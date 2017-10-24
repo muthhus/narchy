@@ -48,29 +48,30 @@ public class AIMATests {
     @Test
     public void testWeaponsDomain() throws Narsese.NarseseException {
 
-        n.truthResolution.set(0.1f);
+        n.truthResolution.set(0.05f);
         n.priDefault(QUESTION, 0.5f);
-        n.priDefault(BELIEF, 0.4f);
+        n.priDefault(BELIEF, 0.3f);
 
         //new QuerySpider(n);
         //new PrologCore(n);
-
-        n.run(1);
+        //n.run(1);
 
         n.believe(
-            "((((American(#x) && Weapon(#y)) && Sells(#x,#y,#z)) && Hostile(z)) ==> Criminal(x))",
+            "((&&, American($x),Weapon(#y),Sells($x,#y,#z),Hostile(#z)) ==> Criminal($x))",
             "Owns(Nono, M1)",
             "Missile(M1)",
-            "((Missile(#x) && Owns(Nono,#x)) ==> Sells(West,#x,Nono))",
-            "(Missile(#x) ==> Weapon(#x))",
-            "(Enemy(#x,America) ==> Hostile(#x))",
+            "((Missile($x) && Owns(Nono,$x)) ==> Sells(West,$x,Nono))",
+            "(Missile($x) ==> Weapon($x))",
+            "(Enemy($x,America) ==> Hostile($x))",
             "American(West)",
             "Enemy(Nono,America)"
         );
 
-        n.run(20);
-        n.clear();
+//        n.run(20);
+//        n.clear();
         n.log();
+
+
 
         Set<Task> questions = new LinkedHashSet();
         n.onTask(x -> {
@@ -80,26 +81,28 @@ public class AIMATests {
         });
 
 
-        n.input("Criminal(?x)?");
+//        n.input("Criminal(?x)?");
 //        n.input("Criminal(?x)?");
 //                n.input("Criminal(?x)?");
 
+//        n.run(100);
+        n.question($.$("Criminal(?x)"), ETERNAL, (q,a)->{
+            System.out.println(a);
+        });
+//        n.run(1);
+//        n.concept($.$("Criminal")).tasklinks().commit();
+//        n.concept($.$("Criminal")).print();
 
-//        n.question($.$("Criminal(?x)"), ETERNAL, (q,a)->{
-//            System.out.println(a);
-//        });
+
+        n.run(2000);
 
         if (!questions.isEmpty()) {
             System.out.println("Questions Generated:");
             questions.forEach(System.out::println);
         }
 
-        //n.concept($.$("Criminal")).print();
-
-        assertBelief(true, "Criminal(West)", 2000);
-
-
-
+        Task y = n.belief($.$("Criminal(West)"));
+        assertNotNull(y);
 
     }
 
