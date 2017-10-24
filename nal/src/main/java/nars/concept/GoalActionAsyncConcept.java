@@ -35,7 +35,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
     private final PredictionFeedback beliefFeedback;
     final CauseChannel<ITask> in;
 
-    public GoalActionAsyncConcept(@NotNull Term c, @NotNull NAct act, @NotNull BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor) {
+    public GoalActionAsyncConcept(@NotNull Term c, @NotNull NAct act, CauseChannel<ITask> cause, @NotNull BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor) {
         super(c,
                 //new SensorBeliefTable(n.conceptBuilder.newTemporalBeliefTable(c)),
                 //new SensorBeliefTable(n.conceptBuilder.newTemporalBeliefTable(c)),
@@ -47,7 +47,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
 //        this.action = new Signal(GOAL, n.truthResolution).pri(() -> n.priDefault(GOAL));
         //((SensorBeliefTable) goals).sensor = action;
 
-        this.in = n.newCauseChannel(term());
+        this.in = cause;
 
         //for dynamic change
         final FloatSupplier myResolution = () -> this.resolution.asFloat();

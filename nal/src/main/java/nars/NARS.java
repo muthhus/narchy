@@ -120,7 +120,7 @@ public class NARS {
 
         time = new CycleTime();
 
-        exe = () -> new SynchExec(32);
+        exe = () -> new SynchExec(24);
 
         rng = () -> new XorShift128PlusRandom(1);
 
@@ -235,10 +235,8 @@ public class NARS {
 
             this.nal = nal;
 
-            deriverAdd(nal);
-
             if (nal > 0)
-                deriverAdd(Deriver.deriver(nal));
+                deriverAdd(nal);
 
             if (threadSafe)
                 index = () -> new CaffeineIndex(64 * 1024 );

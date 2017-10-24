@@ -18,7 +18,7 @@ public class NARchy extends NARS {
 
     public static NAR ui() {
         NAR nar = new DefaultNAR(8, true)
-                .exe(new SynchExec(64, 1) {
+                .exe(new SynchExec(64) {
                     @Override
                     public boolean concurrent() {
                         return true;

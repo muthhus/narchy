@@ -83,13 +83,13 @@ abstract public class DurService extends NARService implements Runnable {
                     this.now = nar.time();
                 } else {
                     //too soon, reschedule
-                    System.out.println("too early");
+//                    System.out.println("too early");
                 }
 
-                nar.at(this.now + durCycles, this);
             } catch (Exception e) {
                 logger.error("{} {}", this, e);
             } finally {
+                nar.at(this.now + durCycles, this);
                 busy.set(false);
             }
         }

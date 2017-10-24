@@ -240,16 +240,7 @@ public class TextUI {
                 p.addComponent(new BagListBox<Activate>(64) {
                     @Override
                     public void update() {
-                        nar.forEachConceptActive(this::add);
-                        super.update();
-                    }
-                }, CENTER);
-            });
-            menu.addItem("Activity", () -> {
-                p.addComponent(new BagListBox<ITask>(64) {
-                    @Override
-                    public void update() {
-                        nar.forEachProtoTask(this::add);
+                        nar.conceptsActive().forEach(this::add);
                         super.update();
                     }
                 }, CENTER);

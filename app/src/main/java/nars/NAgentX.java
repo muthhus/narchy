@@ -8,7 +8,7 @@ import jcog.list.FasterList;
 import jcog.pri.mix.control.MixContRL;
 import nars.control.*;
 import nars.derive.PrediTerm;
-import nars.exe.MultiExec;
+import nars.exe.SynchExec;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
@@ -150,10 +150,10 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        Function<NAR, PrediTerm<Derivation>> deriver = Deriver.deriver(8
-                , "motivation.nal"
-                //., "relation_introduction.nal"
-        );
+//        Function<NAR, PrediTerm<Derivation>> deriver = Deriver.deriver(8
+//                , "motivation.nal"
+//                //., "relation_introduction.nal"
+//        );
 
 
         int THREADS = 4;
@@ -169,9 +169,16 @@ abstract public class NAgentX extends NAgent {
 //                (x) -> true);
 
         NAR n = new NARS()
-                .exe(new MultiExec(THREADS))
+                .exe(new SynchExec(64) {
+                    @Override
+                    public boolean concurrent() {
+                        return true;
+                    }
+                })
+//                .exe(new MultiExec(THREADS))
                 .time(clock)
-                .deriver(deriver)
+                .deriverAdd(8)
+                .deriverAdd("motivation.nal", "list.nal") //aux
                 .index(
                         //new CaffeineIndex(128 * 1024)
                         new PriMapTermIndex()

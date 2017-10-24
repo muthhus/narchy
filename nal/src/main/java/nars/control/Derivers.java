@@ -49,8 +49,6 @@ public class Derivers {
                 files.add("nal1.nal");
                 files.add("nal1.guess.nal");
                 break;
-            default:
-                throw new UnsupportedOperationException();
         }
 
         Collections.addAll(files, otherFiles);

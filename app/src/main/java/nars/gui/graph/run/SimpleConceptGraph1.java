@@ -19,12 +19,11 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
 
     public SimpleConceptGraph1(NAR nar, int visibleNodes, int maxEdgesPerNodeMax) {
-        this(nar, ()->nar.exe.active().
-                        map(x -> x instanceof Activate ? (Activate)x : null).filter(Objects::nonNull).iterator(),
+        this(nar, ()->nar.exe.active().iterator(),
                 visibleNodes, maxEdgesPerNodeMax);
     }
 
-    public SimpleConceptGraph1(NAR nar, @NotNull Iterable<Activate> concepts, int maxNodes, int maxEdgesPerNodeMax) {
+    public SimpleConceptGraph1(NAR nar, Iterable<Activate> concepts, int maxNodes, int maxEdgesPerNodeMax) {
         super(nar, concepts, maxNodes, maxEdgesPerNodeMax);
     }
 
@@ -120,8 +119,9 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         //n.run(600);
         n.log();
-        //n.input(
-                //"(a-->b).", "(b-->c).","(c-->d).","(d-->e).","(e-->a)."
+        n.input(
+                "(a-->b).", "(b-->c).","(c-->d).","(d-->e).","(e-->a)."
+        );
 
         n.run(1).input("x(set,3)!  :|:");
         n.run(1).input("x(set,3).  :|:");
@@ -177,21 +177,21 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                 .classify("NALTask", x -> x instanceof NALTask)
                 .classify("ConceptFire", x -> x instanceof Activate)
                 ;
-        n.onCycle((nn)->{
-            n.exe.forEach(exeTasks);
-            csv.out(
-                    nn.time(),
-
-                    ((StatisticalSummary) exeTasks.cond.get(0)).getSum(),
-
-                    ((StatisticalSummary) exeTasks.cond.get(1)).getSum(),
-
-                    ((StatisticalSummary) exeTasks.cond.get(2)).getSum(),
-
-                    nn.emotion.busyVol.getSum()
-            );
-            exeTasks.clear();
-        });
+//        n.onCycle((nn)->{
+//            n.exe.forEach(exeTasks);
+//            csv.out(
+//                    nn.time(),
+//
+//                    ((StatisticalSummary) exeTasks.cond.get(0)).getSum(),
+//
+//                    ((StatisticalSummary) exeTasks.cond.get(1)).getSum(),
+//
+//                    ((StatisticalSummary) exeTasks.cond.get(2)).getSum(),
+//
+//                    nn.emotion.busyVol.getSum()
+//            );
+//            exeTasks.clear();
+//        });
     }
 
 }
