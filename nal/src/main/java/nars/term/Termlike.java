@@ -34,18 +34,18 @@ public interface Termlike {
     int subs();
 
     /**
-     * volume = total number of terms = complexity + # total variables
+     * volume = 1 + total volume of terms = complexity of subterms - # variable instances
      */
     default int volume() {
-        return intify((v, c) -> c == null ? 0 : v + c.volume());
+        return 1+ intify((v, c) -> c == null ? 0 : v + c.volume());
     }
 
 
     /**
-     * total number of leaf terms, excluding variables which have a complexity of zero
+     * complexity 1 + total complexity number of leaf terms, excluding variables which have a complexity of zero
      */
     default int complexity() {
-        return intify((v, c) -> c == null ? 0 : v + c.complexity());
+        return 1 + intify((v, c) -> c == null ? 0 : v + c.complexity());
     }
 
     /**

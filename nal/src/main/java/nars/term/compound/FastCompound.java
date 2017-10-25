@@ -80,11 +80,12 @@ public class FastCompound implements Compound {
 //        System.out.println(skeleton.toDebugString());
 //        System.out.println(skeleton.toHexString());
 //        System.out.println(skeleton.to8bitString());
-        System.out.println(new UncheckedBytes(Bytes.wrapForRead(skeleton)).to8bitString());
+
+        System.out.println("skeleton: (" + skeleton.length + " bytes)\t");
         System.out.println(new UncheckedBytes(Bytes.wrapForRead(skeleton)).toHexString());
-        System.out.print("atoms:\t");
+        System.out.println("atoms:\t");
         for (byte[] b : atoms) {
-            System.out.print(new String(b) + " ");
+            System.out.println("\t" + IO.termFromBytes(b) + " (" + b.length + " bytes)");
         }
         System.out.println();
     }
@@ -130,8 +131,10 @@ public class FastCompound implements Compound {
             else
                 layerLength[layer]++;
 
+            /*
             System.out.println(ov[op] + " layer " + layer + " pos=" + i +
                     "\t" + Arrays.toString(layerStack) + "\t" +Arrays.toString(layerLength));
+            */
 
 
             boolean descend;
@@ -154,7 +157,8 @@ public class FastCompound implements Compound {
 
         }
 
-        System.out.println("offsets: " + Arrays.toString(offsets));
+        //System.out.println("offsets: " + Arrays.toString(offsets));
+
         return offsets;
     }
 
