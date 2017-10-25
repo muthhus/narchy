@@ -81,7 +81,8 @@ abstract public class MultiExec extends UniExec {
 
         @Override
         protected Executor initExe() {
-            return Executors.newCachedThreadPool();
+            //return Executors.newCachedThreadPool();
+            return Executors.newFixedThreadPool(threads);
         }
 
         @Override
@@ -97,6 +98,11 @@ abstract public class MultiExec extends UniExec {
     @Override
     public synchronized void start(NAR nar) {
         super.start(nar);
+    }
+
+    @Override
+    public boolean concurrent() {
+        return true;
     }
 
     @Override

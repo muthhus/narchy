@@ -195,6 +195,15 @@ public interface Bag<K, V> extends Table<K, V> {
         });
     }
 
+    default Bag<K, V> sampleOrPop(boolean pop, int max, Predicate<? super V> each) {
+        final int[] count = {max};
+        return sample(x ->
+                (each.test(x) && ((--count[0]) > 0)) ?
+                        (pop ? Remove : Next)
+                        :
+                        (pop ? RemoveAndStop : Stop));
+    }
+
     @Nullable
     default V maxBy(FloatFunction<V> rank) {
         final float[] best = {Float.NEGATIVE_INFINITY};

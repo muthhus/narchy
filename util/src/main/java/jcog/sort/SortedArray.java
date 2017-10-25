@@ -587,7 +587,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
 
 
     @SuppressWarnings("unchecked")
-    public int indexOf(@NotNull final E element, FloatFunction<E> cmp) {
+    public int indexOf(final E element, FloatFunction<E> cmp) {
 
 		/*if (element == null)
             return -1;*/

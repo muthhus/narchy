@@ -99,6 +99,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
 
             @Override
             public void evict(float strength) {
+                if (nar!=null) //HACK
                 nar.runLater(() -> {
                     if (!evicting.compareAndSet(false, true))
                         return;

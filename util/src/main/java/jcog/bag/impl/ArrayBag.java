@@ -562,7 +562,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
     }
 
-    public boolean insert(/*@NotNull*/ Y incoming, @Nullable List<Y>[] trash) {
+    private boolean insert(/*@NotNull*/ Y incoming, @Nullable List<Y>[] trash) {
         float p = pri(incoming);
         pressurize(p);
 
@@ -588,7 +588,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         boolean atCap = s == capacity;
 
         int posBefore = items.indexOf(existing, this);
-        assert (posBefore != -1);
+        if (posBefore == -1)
+            throw new RuntimeException("Bag Map and List became unsynchronized"); //TODO handle better. this will indicate an implementation problem.  it shouldnt happen normally
 
         float priBefore = existing.priElseZero();
 
@@ -618,7 +619,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         return mergeFunction.merge(existing, incoming);
     }
 
-    public Y mapRemove(Y x) {
+    private Y mapRemove(Y x) {
         return map.remove(key(x));
     }
 
@@ -646,7 +647,9 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     private void commit(@Nullable Consumer<Y> update, boolean checkCapacity) {
 
         if (update == null && !checkCapacity) {
-            ensureSorted();
+            synchronized (items) {
+                ensureSorted();
+            }
             return;
         }
 

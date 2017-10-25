@@ -52,6 +52,9 @@ public abstract class Param extends Services<Term, NAR> {
     /** hard limit to prevent infinite looping */
     public static final int MAX_TASK_FORWARD_HOPS = 8;
 
+    /** default max time for a cycle when executing in synchronous (step) mode */
+    public static final double SynchronousExecution_Max_CycleTime = 0.0001; //sec;
+
 
     /**
      * controls interpolation policy:

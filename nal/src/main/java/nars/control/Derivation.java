@@ -16,6 +16,7 @@ import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
 import nars.task.DerivedTask;
+import nars.task.ITask;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
@@ -30,9 +31,11 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.Nullable;
 import org.roaringbitmap.RoaringBitmap;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static nars.Op.*;
 import static nars.op.SubstUnified.uniSubAny;
@@ -456,13 +459,14 @@ public class Derivation extends Unify {
     /**
      * called at the end of the cycle, input all generated derivations
      */
-    public void commit(NAR nar) {
+    public int commit(Consumer<Collection<DerivedTask>> target) {
         int s = derivations.size();
         if (s > 0) {
             nar.emotion.taskDerived.increment(s);
-            nar.input(derivations.values());
+            target.accept(derivations.values());
             derivations.clear();
         }
+        return s;
     }
 
     //    /**

@@ -13,7 +13,7 @@ import nars.task.ITask;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -49,7 +49,7 @@ public class UniExec extends Exec {
     }
 
     @Override
-    public void fire(int n, Consumer<Activate> each) {
+    public void fire(int n, Predicate<Activate> each) {
         active.sample(n, each);
     }
 

@@ -119,7 +119,7 @@ public class NARS {
 
         time = new CycleTime();
 
-        exe = () -> new UniExec(24);
+        exe = () -> new UniExec(64);
 
         rng = () -> new XorShift128PlusRandom(1);
 

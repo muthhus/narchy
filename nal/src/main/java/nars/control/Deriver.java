@@ -2,7 +2,6 @@ package nars.control;
 
 import jcog.Util;
 import nars.NAR;
-import nars.NARS;
 import nars.Op;
 import nars.Param;
 import nars.derive.AbstractPred;
@@ -12,34 +11,19 @@ import nars.derive.TrieDeriver;
 import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternIndex;
+import nars.task.ITask;
 
 import java.io.PrintStream;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class Deriver extends CycleService {
-
-
-    public final PrediTerm<Derivation> deriver;
-    private final NAR nar;
-
-    private float minPremisesPerConcept = 1;
-    private float maxPremisesPerConcept = 4;
-
-    int conceptsPerCycle = 2;
-
-    protected Deriver(NAR nar, String... rulesets) {
-        this(PrediTrie.the(
-                new PremiseRuleSet(
-                        new PatternIndex(), nar, rulesets
-                )), nar);
-    }
-
-    protected Deriver(PrediTerm<Derivation> deriver, NAR nar) {
-        super(nar);
-        this.deriver = deriver;
-        this.nar = nar;
-    }
+/**
+ * an individual deriver process: executes a particular Deriver model
+ * specified by a set of premise rules.
+ * <p>
+ * runtime intensity is metered and throttled by causal feedback
+ */
+public class Deriver extends NARService {
 
     public static Function<NAR, Deriver> deriver(Function<NAR, PremiseRuleSet> rules) {
         return (nar) ->
@@ -57,40 +41,90 @@ public class Deriver extends CycleService {
                 ));
     }
 
+    public final PrediTerm<Derivation> deriver;
+    private final NAR nar;
+    private final Causable can;
+    private final CauseChannel<ITask> cause;
 
-    @Override
-    protected void run(NAR nar) {
-        Derivation d = nar.derivation.get().cycle(nar,deriver);
+    private float minPremisesPerConcept = 2;
+    private float maxPremisesPerConcept = 5;
+
+    protected Deriver(NAR nar, String... rulesets) {
+        this(PrediTrie.the(
+                new PremiseRuleSet(
+                        new PatternIndex(), nar, rulesets
+                )), nar);
+    }
+
+    protected Deriver(PrediTerm<Derivation> deriver, NAR nar) {
+        super(nar);
+        this.deriver = deriver;
+        this.nar = nar;
+
+        this.cause = nar.newCauseChannel(this);
+        this.can = new Causable(nar) {
+            @Override
+            protected int next(NAR n, int iterations) {
+                return Deriver.this.run(iterations);
+            }
+
+            @Override
+            public float value() {
+                return cause.value();
+            }
+        };
+    }
+
+
+    protected int run(int work) {
+        NAR nar = this.nar;
+        Derivation d = derivation.get().cycle(nar, deriver);
 
         int matchTTL = Param.TTL_PREMISE_MIN * 3;
         int ttlMin = nar.matchTTLmin.intValue();
         int ttlMax = nar.matchTTLmax.intValue();
+        final int conceptBatch = 8;
 
         BatchActivation activator = BatchActivation.get();
 
-        nar.exe.fire(conceptsPerCycle, a -> {
+        final int[] derivations = {0};
 
-            Iterable<Premise> h = a.hypothesize(nar, activator, premises(a));
-            if (h == null)
-                return;
+        int derivationsBefore;
+        while ((derivationsBefore = derivations[0]) < work) {
 
-            h.forEach(p -> {
+            nar.exe.fire(Math.min(work - derivations[0], conceptBatch), a -> {
 
-                if (p.match(d, matchTTL) != null) {
+                Iterable<Premise> h = a.hypothesize(nar, activator,
+                        Math.min(work - derivations[0], premises(a)));
 
-                    int deriveTTL = Util.lerp(Util.unitize(
-                            p.task.priElseZero() / nar.priDefault(p.task.punc())),
-                            ttlMin, ttlMax);
+                if (h != null) {
 
-                    d.derive(deriveTTL);
+                    for (Premise p : h) {
+
+                        if (p.match(d, matchTTL) != null) {
+
+                            int deriveTTL = Util.lerp(Util.unitize(
+                                    p.task.priElseZero() / nar.priDefault(p.task.punc())),
+                                    ttlMin, ttlMax);
+
+                            d.derive(deriveTTL);
+                            derivations[0]++;
+                        }
+                    }
+                } else {
+                    //premise miss
                 }
 
+                return derivations[0] > 0;
             });
+            if (derivations[0] == derivationsBefore)
+                break; //nothing happened
+        }
 
-        });
-
-        d.commit(nar);
+        int derived = d.commit(cause::input);
         activator.commit(nar);
+
+        return derivations[0];
     }
 
 
@@ -118,6 +152,12 @@ public class Deriver extends CycleService {
             p.println();
         });
     }
+
+    //    public final IterableThreadLocal<Derivation> derivation =
+//            new IterableThreadLocal<>(() -> new Derivation(this));
+    public static final ThreadLocal<Derivation> derivation =
+            ThreadLocal.withInitial(Derivation::new);
+
 }
 
 

@@ -18,7 +18,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static jcog.Util.sqr;
@@ -61,7 +61,7 @@ abstract public class Exec implements Executor {
 
     }
 
-    abstract public void fire(int n, Consumer<Activate> each);
+    abstract public void fire(int n, Predicate<Activate> each);
 
     /** an estimate or exact number of parallel processes this runs */
     abstract public int concurrency();
@@ -118,12 +118,12 @@ abstract public class Exec implements Executor {
     /** allocates what can be done */
     public void cycle(List<Can> can) {
 
-        double defaultCycleTime = 1.0; //sec
+
 
         NARLoop loop = nar.loop;
 
         double nextCycleTime = Math.max(1, concurrency() - 1) * (
-                loop.isRunning() ? loop.periodMS.intValue() * 0.001 : defaultCycleTime
+                loop.isRunning() ? loop.periodMS.intValue() * 0.001 : Param.SynchronousExecution_Max_CycleTime
         );
 
         float throttle = loop.throttle.floatValue();

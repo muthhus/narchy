@@ -109,13 +109,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final FasterList<Can> can = new FasterList(8);
     protected final Random random;
 
-    /**
-     * scoped to this NAR so it can be reset by it
-     */
-//    public final IterableThreadLocal<Derivation> derivation =
-//            new IterableThreadLocal<>(() -> new Derivation(this));
-    public final ThreadLocal<Derivation> derivation =
-            ThreadLocal.withInitial(Derivation::new);
 
     private final AtomicReference<Term> self;
 

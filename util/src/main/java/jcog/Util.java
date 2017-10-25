@@ -1351,7 +1351,7 @@ public enum Util {
         return true;
     }
 
-    public static <X> Collection<X> select(int sampled, Random random, X[] x) {
+    public static <X> Collection<X> select(int sampled, Random random, @NotNull X[] x) {
         int choices = x.length;
         sampled = Math.min(choices, sampled);
         if (sampled == 0) return Collections.emptyList();
