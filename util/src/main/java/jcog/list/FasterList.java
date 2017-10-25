@@ -101,7 +101,7 @@ public class FasterList<X> extends FastList<X> {
     }
 
     @Override
-    public final X get(int index) {
+    public X get(int index) {
         //if (index < this.size) {
         return items[index];
         //}

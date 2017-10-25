@@ -34,7 +34,7 @@ public class GenericCompound implements Compound {
     public transient boolean normalized;
 
 
-    public GenericCompound(/*@NotNull*/ Op op, @NotNull TermContainer subterms) {
+    public GenericCompound(/*@NotNull*/ Op op, TermContainer subterms) {
 
         this.op = op;
 

@@ -12,7 +12,7 @@ import static nars.Op.ATOM;
  */
 public class Atom extends AtomicConst {
 
-    @NotNull public final String id;
+    public final String id;
 
 
     protected Atom(@NotNull String id) {
@@ -26,7 +26,7 @@ public class Atom extends AtomicConst {
     }
 
     @NotNull
-    private static String validateAtomID(@NotNull String id) {
+    private static String validateAtomID(String id) {
         if (id.isEmpty())
             throw new UnsupportedOperationException("Empty Atom ID");
 
