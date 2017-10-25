@@ -2,12 +2,16 @@ package nars.exe;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.ConcurrentCurveBag;
+import jcog.bag.impl.CurveBag;
+import jcog.exe.Can;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.control.Activate;
 import nars.task.ITask;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -53,20 +57,22 @@ public class UniExec extends Exec {
     public synchronized void start(NAR nar) {
 
         active =
-                //new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), CAPACITY) {
-                new ConcurrentCurveBag<>(PriMerge.plus, new ConcurrentHashMap<>(), nar.random(), CAPACITY) {
-
-                    @Override
-                    public Activate key(Activate value) {
-                        return value;
-                    }
-
-                    //
-                };
+            concurrent() ?
+                new ConcurrentCurveBag<>(PriMerge.plus, new ConcurrentHashMap<>(), nar.random(), CAPACITY)
+                    //new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), CAPACITY) {
+                        :
+                new CurveBag<>(PriMerge.plus, new HashMap(), nar.random(), CAPACITY);
 
         super.start(nar);
     }
 
+
+    @Override
+    public void cycle(List<Can> can) {
+        super.cycle(can);
+
+        active.commit();
+    }
 
     @Override
     public synchronized void stop() {

@@ -1,73 +1,126 @@
-//package nars.exe;
-//
-//import com.google.common.util.concurrent.AtomicDouble;
-//import jcog.Util;
-//import jcog.exe.AffinityExecutor;
-//import jcog.exe.Can;
-//import nars.NAR;
-//import nars.Task;
-//import nars.control.Activate;
-//import nars.control.BatchActivate;
-//import nars.control.Cause;
-//import nars.control.Premise;
-//import nars.derive.Conclude;
-//import nars.task.ITask;
-//import nars.task.NativeTask;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//
-//import java.util.concurrent.BlockingQueue;
-//import java.util.concurrent.atomic.AtomicInteger;
-//import java.util.concurrent.atomic.AtomicLong;
-//import java.util.stream.Stream;
-//
-//import static nars.time.Tense.ETERNAL;
-//
-//public class MultiExec extends Exec {
-//
-//    public static final Logger logger = LoggerFactory.getLogger(MultiExec.class);
-//
-//    private final BlockingQueue<ITask> q;
-//    private AffinityExecutor exe;
-//
-//    final Sub[] sub;
-//    private final int num;
-//
-//    final static int SUB_CAPACITY = 256;
-//
-//
-//    @Deprecated
-//    final SharedCan deriver = new SharedCan();
-//
-//    public MultiExec(int threads) {
-//        this(threads, threads * 64);
-//    }
-//
-//    public MultiExec(int threads, int qSize) {
-//        num = threads;
-//        sub = new Sub[num];
-//        q = Util.blockingQueue(qSize);
-//    }
-//
-//    @Override
-//    public synchronized void start(NAR nar) {
-//        super.start(nar);
-//
-//        //exe = Executors.newFixedThreadPool(num);
-//        exe = new AffinityExecutor();
-//
-//        for (int i = 0; i < num; i++) {
-//            exe.execute(sub[i] = new Sub(SUB_CAPACITY, deriver));
-//        }
-//
-//        nar.can.add(deriver);
-//    }
-//
-//    @Override
-//    public void execute(Runnable r) {
-//        add(new NativeTask.RunTask(r));
-//    }
-//
+package nars.exe;
+
+import com.lmax.disruptor.*;
+import com.lmax.disruptor.dsl.Disruptor;
+import jcog.exe.AffinityExecutor;
+import nars.NAR;
+import nars.Task;
+import nars.task.ITask;
+import nars.task.NativeTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+abstract public class MultiExec extends UniExec {
+
+    public static final Logger logger = LoggerFactory.getLogger(MultiExec.class);
+    protected final Disruptor<ITask[]> disruptor;
+
+    protected  Executor exe;
+
+    protected RingBuffer<ITask[]> buffer;
+    protected int threads;
+
+
+    public MultiExec(int concepts, int threads, int qSize) {
+        super(concepts);
+
+        this.threads = threads;
+
+        exe = initExe();
+
+        disruptor = new Disruptor<ITask[]>(
+                () -> new ITask[1],
+                qSize,
+                exe
+        );
+
+        initWorkers();
+
+        buffer = disruptor.getRingBuffer();
+
+        disruptor.start();
+    }
+
+    protected abstract Executor initExe();
+
+    abstract protected void initWorkers();
+
+    public static class Intense extends MultiExec {
+
+        public Intense(int concepts, int threads, int qSize) {
+            super(concepts, threads, qSize);
+        }
+
+        @Override
+        protected Executor initExe() {
+            return new AffinityExecutor();
+        }
+
+        @Override
+        protected void initWorkers() {
+            WorkHandler[] w = new WorkHandler[threads];
+            WorkHandler<ITask[]> wh = event -> {
+                ITask e = event[0];
+                event[0] = null;
+                execute(e);
+            };
+            for (int i = 0; i < threads; i++)
+                w[i] = wh;
+            disruptor.handleEventsWithWorkerPool(w);
+        }
+    }
+
+    public static class CoolNQuiet extends MultiExec {
+
+        public CoolNQuiet(int concepts, int threads, int qSize) {
+            super(concepts, threads, qSize);
+        }
+
+        @Override
+        protected Executor initExe() {
+            return Executors.newCachedThreadPool();
+        }
+
+        @Override
+        protected void initWorkers() {
+            disruptor.handleEventsWith((event, seq, endOfBatch)->{
+                ITask e = event[0];
+                event[0] = null;
+                execute(e);
+            });
+        }
+    }
+
+    @Override
+    public synchronized void start(NAR nar) {
+        super.start(nar);
+    }
+
+    @Override
+    public synchronized void stop() {
+        disruptor.halt();
+        disruptor.shutdown();
+        super.stop();
+    }
+
+    static final EventTranslatorOneArg<ITask[], ITask> ein = (event, sequence, arg0) -> {
+        event[0] = arg0;
+    };
+
+    public void queue(ITask i) {
+        if (!buffer.tryPublishEvent(ein, i)) {
+            i.run(nar); //queue full, in-thread
+        }
+    }
+
+    @Override
+    public void execute(Runnable r) {
+        add(new NativeTask.RunTask(r));
+    }
+
 //    class Sub extends UniExec implements Runnable {
 //
 //        public final Logger logger = LoggerFactory.getLogger(Sub.class);
@@ -181,37 +234,32 @@
 //
 //
 //    }
-//
-//    @Override
-//    public void add(ITask t) {
-//        if (t instanceof Activate) {
-//            sub[which(t)].active.putAsync(t);
-//        } else if (t instanceof Task) {
-//
-//            execute(t);
-//
-//        } else  {
-//            if (!q.offer(t)) {
+
+    @Override
+    public void add(ITask t) {
+        if (t instanceof Task) {
+
+            execute(t);
+
+        } else {
+            queue(t);
+//            if (!buffer.offer(t)) {
 //                execute(t); //in same thread, dangerous could deadlock
 //            }
-//        }
-//    }
-//
+        }
+    }
+
 //
 //    protected int which(ITask t) {
 //        return Math.abs(t.hashCode() % sub.length);
 //    }
-//
-//    @Override
-//    public int concurrency() {
-//        return sub.length;
-//    }
-//
-//    @Override
-//    public Stream<Activate> active() {
-//        return Stream.of(sub).flatMap(UniExec::active);
-//    }
-//
+
+    @Override
+    public int concurrency() {
+        return threads;
+    }
+
+
 //    private class SharedCan extends Can {
 //
 //        final AtomicInteger workDone = new AtomicInteger(0);
@@ -260,4 +308,4 @@
 //        }
 //
 //    }
-//}
+}

@@ -120,7 +120,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     private final AtomicReference<Term> self;
 
 
-
     private final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[want.length + 1 /* for global norm */];
     /**
      * maximum NAL level currently supported by this memory, for restricting it to activity below NAL8
@@ -661,8 +660,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 //    }
 
 
-
-
 //    protected void processDuplicate(@NotNull Task input, Task existing) {
 //        if (existing != input) {
 //
@@ -787,7 +784,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @Override
-    public final void accept(@NotNull ITask task) {
+    public final void accept(ITask task) {
         input(task);
     }
 
@@ -973,7 +970,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         exe.cycle(can);
 
-        eventCycle.emit(this); //synchronous only
+        if (exe.concurrent()) {
+            eventCycle.emitAsync(this, exe);
+        } else {
+            eventCycle.emit(this);
+        }
 
         emotion.cycle();
     }
@@ -1195,7 +1196,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-
 //    /**
 //     * activate the concept and other features (termlinks, etc)
 //     *
@@ -1217,8 +1217,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return terms.stream().filter(Concept.class::isInstance).map(Concept.class::cast);
     }
 
-    /** warning: the condition will be tested each cycle so it may affect performance */
-    @NotNull public NAR stopIf(@NotNull BooleanSupplier stopCondition) {
+    /**
+     * warning: the condition will be tested each cycle so it may affect performance
+     */
+    @NotNull
+    public NAR stopIf(@NotNull BooleanSupplier stopCondition) {
         onCycle(n -> {
             if (stopCondition.getAsBoolean())
                 stop();
@@ -1712,7 +1715,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     public void activate(Termed t, float activationApplied) {
         Concept c = concept(t, true);
-        if (c!=null)
+        if (c != null)
             exe.activate(c, activationApplied);
     }
 

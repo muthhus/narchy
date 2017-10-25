@@ -19,17 +19,17 @@ public class SerialCompoundTest {
         //testSerialize("x");
         //testSerialize("#y");
         //testSerialize("\"sdhfdkjsf\"");
-        testSerialize("a:b");
-        testSerialize("(a ==>+1 b)");
-        testSerialize("(&&,(MedicalCode-->MedicalIntangible),(MedicalIntangible-->#1),(SuperficialAnatomy-->#1),label(MedicalCode,MedicalCode),label(MedicalIntangible,MedicalIntangible),label(SuperficialAnatomy,SuperficialAnatomy))");
+        assertEqual("a:b");
+        assertEqual("(a ==>+1 b)");
+        assertEqual("(&&,(MedicalCode-->MedicalIntangible),(MedicalIntangible-->#1),(SuperficialAnatomy-->#1),label(MedicalCode,MedicalCode),label(MedicalIntangible,MedicalIntangible),label(SuperficialAnatomy,SuperficialAnatomy))");
 
     }
 
-    public static void testSerialize(String x) throws Narsese.NarseseException {
-        testSerialize($(x));
+    public static void assertEqual(String x) throws Narsese.NarseseException {
+        assertEqual($(x));
     }
 
-    public static void testSerialize(Compound x) {
+    static void assertEqual(Compound x) {
         SerialCompound y = new SerialCompound(x);
 
         System.out.println(x + " encoded to " + y.length() + " bytes");

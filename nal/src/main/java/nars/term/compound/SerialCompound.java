@@ -134,6 +134,46 @@ public class SerialCompound extends DynBytes implements Compound {
         }
     }
 
+//        public ByteSource in;
+//
+//    final byte volume;
+//    boolean normalized;
+//
+//
+//    public static SerialCompound heap(Compound c) {
+//        return heap(c.op(), c.dt(), c.theArray());
+//    }
+//
+//    public static SerialCompound heap(Op op, int dt, Term... subterms) {
+//
+//
+//        UncheckedBytes h = new UncheckedBytes(Bytes.allocateDirect(new byte[64 * subterms.length /* est */]));
+//        h.writeByte(op.id);
+//        h.writeByte((byte) subterms.length);
+//
+//        int v = 1;
+//
+//        try {
+//
+//            for (int i = 0; i < subterms.length; i++) {
+//                Term x = subterms[i];
+//
+//                x.append((ByteArrayDataOutput) this);
+//
+//                v += x.volume();
+//            }
+//
+//            IO.writeCompoundSuffix(this, dt, op);
+//
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        assert(v < Param.COMPOUND_VOLUME_MAX);
+//        this.volume = (byte) v;
+//
+//    }
+
 
 }
 

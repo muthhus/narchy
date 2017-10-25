@@ -9,6 +9,7 @@ import jcog.pri.mix.control.MixContRL;
 import nars.control.Cause;
 import nars.control.DurService;
 import nars.control.MetaGoal;
+import nars.exe.MultiExec;
 import nars.exe.UniExec;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
@@ -170,13 +171,13 @@ abstract public class NAgentX extends NAgent {
 //                (x) -> true);
 
         NAR n = new NARS()
-                .exe(new UniExec(64) {
-                    @Override
-                    public boolean concurrent() {
-                        return true;
-                    }
-                })
-//                .exe(new MultiExec(THREADS))
+//                .exe(new UniExec(64) {
+//                    @Override
+//                    public boolean concurrent() {
+//                        return true;
+//                    }
+//                })
+                .exe(new MultiExec.Intense(THREADS, 4, 256))
                 .time(clock)
                 .deriverAdd(8)
                 .deriverAdd("motivation.nal", "list.nal") //aux

@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -94,39 +95,51 @@ public class PriMapTermIndex extends MaplikeTermIndex {
                 return super.updateMemory(used);
             }
 
+            final AtomicBoolean evicting = new AtomicBoolean(false);
+
             @Override
             public void evict(float strength) {
+                nar.runLater(() -> {
+                    if (!evicting.compareAndSet(false, true))
+                        return;
+                    try {
 
-                if (strength > 0) {
+                        if (strength > 0) {
 
-                    if (strength > 0.95f) {
-                        System.gc();
-                    }
+                            if (strength > 0.95f) {
+                                System.gc();
+                            }
 
-                    int nv = bad.size();
-                    if (nv > 0) {
-                        int kill = Math.round(strength * nv);
-                        if (kill > 0) {
+                            int nv = bad.size();
+                            if (nv > 0) {
+                                int kill = Math.round(strength * nv);
+                                if (kill > 0) {
 
-                            System.err.println("evicting " + kill + " victims (" + bad.size() + " remain;\ttotal concepts=" + size());
-                            bad.pop(kill, (t) -> {
-                                Concept x = t.get();
-                                if (x != null)
-                                    removeGenocidally(x);
-                            });
+                                    System.err.println("evicting " + kill + " victims (" + bad.size() + " remain;\ttotal concepts=" + size());
+                                    bad.pop(kill, (t) -> {
+                                        Concept x = t.get();
+                                        if (x != null)
+                                            removeGenocidally(x);
+                                    });
 
+                                }
+                            }
                         }
+
+                        probeEvict(strength, probeRate);
+
+                        //active.commit();
+
+                        good.commit();
+                        //System.out.println(good.summary("good"));
+                        bad.commit();
+                        //System.out.println(bad.summary("bad"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        evicting.set(false);
                     }
-                }
-
-                probeEvict(strength, probeRate);
-
-                //active.commit();
-
-                good.commit();
-                System.out.println(good.summary("good"));
-                bad.commit();
-                System.out.println(bad.summary("bad"));
+                });
             }
 
             private Iterator<TLink<Term, Concept>> probe;

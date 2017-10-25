@@ -19,7 +19,7 @@ public class PriArrayBag<X extends Priority> extends ArrayBag<X,X> {
     }
 
     @Nullable
-    @Override public X key(@NotNull X k) {
+    @Override public X key(X k) {
         return k;
     }
 }
