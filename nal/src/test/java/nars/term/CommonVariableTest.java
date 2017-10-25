@@ -54,7 +54,7 @@ public class CommonVariableTest {
     }
 
 
-    public static @NotNull Variable common(@NotNull UnnormalizedVariable v1, @NotNull UnnormalizedVariable v2) {
+    public static Variable common(UnnormalizedVariable v1, UnnormalizedVariable v2) {
         return CommonVariable.common(
                 (AbstractVariable)v1.normalize(1),
                 (AbstractVariable)v2.normalize(2)

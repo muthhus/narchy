@@ -13,7 +13,7 @@ import nars.term.atom.Atom;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * the proxy concepts present a bidirectional facade between a referenced and an alias term (alias term can be just a serial # atom wrapped in a product).
@@ -104,7 +104,7 @@ public final class AliasConcept extends BaseConcept {
     }
 
     @Override
-    public Collection<Termed> templates() {
+    public List<Termed> templates() {
         return abbr.templates();
     }
 

@@ -89,7 +89,7 @@ public class UnnormalizedVariable extends AtomicConst implements Variable {
     }
 
     /** produce a normalized version of this identified by the serial integer */
-    @Override public @NotNull Variable normalize(int serial) {
+    @Override public Variable normalize(int serial) {
         return $.v(type, serial);
     }
 
@@ -100,7 +100,7 @@ public class UnnormalizedVariable extends AtomicConst implements Variable {
     }
 
     @Override
-    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+    public boolean unify(Term y,Unify subst) {
         throw new UnsupportedOperationException();
     }
 

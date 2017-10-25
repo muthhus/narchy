@@ -1,6 +1,7 @@
 package jcog.bit;
 
 import java.util.Arrays;
+import java.util.BitSet;
 
 /**
  * Bare metal bitset implementation. For performance reasons, this
@@ -37,6 +38,15 @@ public class MetalBitSet {
 	public void set(long index) {
 		data[(int) (index >>> 6)] |= (1L << index);
 	}
+
+
+	/** number of bits set to true */
+	public int cardinality() {
+        int sum = 0;
+        for (long l : data)
+            sum += Long.bitCount(l);
+        return sum;
+    }
 
 	public boolean getAndSet(int index, boolean next) {
 		int i = (int) (index >>> 6);

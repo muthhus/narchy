@@ -119,7 +119,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
         this.gl = drawable.getGL().getGL2();
 
-        if (gl.getGLProfile().isHardwareRasterizer()) {
+        if (!gl.getGLProfile().isHardwareRasterizer()) {
             gl.setSwapInterval(4); //reduce CPU strain
         } else {
             gl.setSwapInterval(0); //0=disable vsync

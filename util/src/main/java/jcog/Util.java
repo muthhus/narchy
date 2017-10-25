@@ -29,7 +29,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import jcog.bit.MetalBitSet;
 import jcog.io.BinTxt;
-import jcog.list.FasterList;
 import jcog.math.NumberException;
 import jcog.math.OneDHaar;
 import jcog.pri.Pri;
@@ -41,6 +40,7 @@ import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.block.function.primitive.DoubleToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
+import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -60,10 +60,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.IntFunction;
+import java.util.function.*;
 import java.util.stream.DoubleStream;
 
 import static java.lang.Float.NaN;
@@ -1290,8 +1287,6 @@ public enum Util {
         float weightSum = 0;
         for (int i = 0; i < weightCount; i++) {
             float w = weight.valueOf(i);
-            if (w != w || w < 0)
-                System.err.println("x");
             assert (w == w && w >= 0);
             weightSum += Math.max(0, w);
         }
@@ -1318,7 +1313,7 @@ public enum Util {
         return true;
     }
 
-    public static boolean equals(@NotNull long[] a, long[] b, int firstN) {
+    public static boolean equals(long[] a, long[] b, int firstN) {
         if (a == b) return true;
         for (int i = 0; i < firstN; i++) {
             if (a[i] != b[i])
@@ -1327,7 +1322,7 @@ public enum Util {
         return true;
     }
 
-    public static boolean equals(@NotNull long[] a, long[] b) {
+    public static boolean equals(long[] a, long[] b) {
         if (a == b) return true;
         int l = a.length;
         if (b.length != l)
@@ -1339,7 +1334,7 @@ public enum Util {
         return true;
     }
 
-    public static boolean equals(@NotNull short[] a, short[] b) {
+    public static boolean equals(short[] a, short[] b) {
         if (a == b) return true;
         int l = a.length;
         if (b.length != l)
@@ -1351,28 +1346,45 @@ public enum Util {
         return true;
     }
 
-    public static <X> Collection<X> select(int sampled, Random random, @NotNull X[] x) {
-        int choices = x.length;
-        sampled = Math.min(choices, sampled);
-        if (sampled == 0) return Collections.emptyList();
-        if (sampled == choices) {
-            return List.of(x);
-        } else {
-            //TODO better selection method
-
-            List<X> l = new FasterList(sampled);
-            MetalBitSet b = new MetalBitSet(choices);
-            int limit = sampled * 4;
-            int c = 0;
-            for (int i = 0; c < sampled && i < limit; i++) {
-                int w = random.nextInt(choices); //<- TODO weighted roullette selection here
-                if (!b.getAndSet(w, true)) {
-                    l.add(x[w]);
-                    c++;
-                }
+    public static <X> void selectRouletteUnique(int sampled, Random random, int choices, IntToFloatFunction choiceWeight, IntPredicate tgt) {
+        MetalBitSet selected = new MetalBitSet(choices);
+        int hardLimit = 2 * choices;
+        final int[] tries = {0};
+        IntToFloatFunction cc = ii -> {
+            if (selected.get(ii)) {
+                return 0;
+            } else {
+                float w  = choiceWeight.valueOf(ii);
+                if (w == 0)
+                    selected.set(ii);
+                return w;
             }
-            return l;
-        }
+        };
+        Util.decideRoulette(choices, cc, random, (int y) -> {
+            selected.set(y);
+            return tgt.test(y) && (tries[0]++ < hardLimit) && (selected.cardinality()<choices) ?
+                    RouletteControl.WEIGHTS_CHANGED : RouletteControl.STOP;
+        });
+
+//        if (sampled == 0) return Collections.emptyList();
+//        if (sampled == choices) {
+//            return List.of(x);
+//        } else {
+//            //TODO better selection method
+//
+//            List<X> l = new FasterList(sampled);
+//            MetalBitSet b = new MetalBitSet(choices);
+//            int limit = sampled * 4;
+//            int c = 0;
+//            for (int i = 0; c < sampled && i < limit; i++) {
+//                int w = random.nextInt(choices); //<- TODO weighted roullette selection here
+//                if (!b.getAndSet(w, true)) {
+//                    l.add(x[w]);
+//                    c++;
+//                }
+//            }
+//            return l;
+//        }
     }
 
     public static float max(float a, float b, float c) {

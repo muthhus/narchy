@@ -12,7 +12,7 @@ public class STRIPSTest {
 
     @Test
     public void testBanana1() throws Narsese.NarseseException {
-        NAR n = new NARS().get();
+        NAR n = new NARS().tmp();
         n.log();
         n.input(
                 /*
@@ -49,7 +49,7 @@ public class STRIPSTest {
                Postconditions: Eat(bananas) */
                 "(((At(#Location) &&+0 BananasAt(#Location)) &&+0 Level(high)) ==>+1 Eat(bananas))."
         );
-        n.run(100);
+        n.run(1000);
 
     }
 }

@@ -60,7 +60,7 @@ public interface Topic<V> {
                 return;
 
             try {
-                Topic<?> t = ((Topic) field.get(obj));
+                Topic t = ((Topic) field.get(obj));
 
                 // could send start message: f.accept(f.getName(),  );
 

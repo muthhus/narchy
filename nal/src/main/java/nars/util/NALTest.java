@@ -45,9 +45,7 @@ public abstract class NALTest {
 
 
         this.metagoals = new MetaGoal.Report().add(nar.causes);
-        System.out.println(
-            metagoals.table().toString()
-        );
+        metagoals.print(System.out);
     }
 
 }

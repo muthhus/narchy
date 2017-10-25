@@ -24,10 +24,7 @@ import org.junit.platform.commons.util.Preconditions;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -176,13 +173,18 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
             Task cause = invokingGoal.get();
             boolean explicit = cause != null;
 
-            long now = nar.time();
             float pri = nar.priDefault(BELIEF);
 
-            //this essentially synchronizes on each (method,resultValue) tuple
+            // this essentially synchronizes on each (method,resultValue) tuple
             // so it can form a coherent, synchronzed sequence of value change events
+
+
+            List<Task> pending = $.newArrayList(2); //max 2
+            Term nextTerm = opTerm(method, args, nextValue).normalize();
+
             value.compute(method, (m, p1) -> {
 
+                long now = nar.time();
                 if (p1 != null && Objects.equals(p1.value, nextValue)) {
                     //just continue the existing task
 
@@ -191,9 +193,8 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                     return p1; //keep
                 }
 
-                Term f = opTerm(method, args, nextValue).normalize();
 
-                ValueSignalTask next = new ValueSignalTask(f,
+                ValueSignalTask next = new ValueSignalTask(nextTerm,
                         BELIEF, $.t(invocationBeliefFreq, nar.confDefault(BELIEF)),
                         now, now, nar.time.nextStamp(), nextValue);
 
@@ -221,14 +222,17 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                     if (Param.DEBUG)
                         prevEnd.log("Invoked");
 
-                    nar.input(prevEnd);
+                    pending.add(prevEnd);
                 }
 
-                nar.input(next);
+                pending.add(next);
                 return next;
             });
 
+            nar.runLater(()->nar.input(pending));
+
             return nextValue;
+
         }
 
 

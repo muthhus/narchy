@@ -26,18 +26,16 @@ public class TreeChart<X> extends Surface {
 
 
     private final boolean sort = false;
+    private double heightLeft, widthLeft, top, left;
+    private float width;
+    private float height;
 
 
     enum LayoutOrient {
         VERTICAL, HORIZONTAL
     }
 
-    protected double height;
-    protected double width;
-    private double heightLeft;
-    private double widthLeft;
-    private double left;
-    private double top;
+
     private LayoutOrient layoutOrient = LayoutOrient.HORIZONTAL;
 
     final Flip<CircularArrayList<ItemVis<X>>> phase = new Flip(CircularArrayList::new);
@@ -51,20 +49,15 @@ public class TreeChart<X> extends Surface {
     @Override
     protected void paint(GL2 gl) {
 
-        double totalArea = width * height;
+        double totalArea = w() * h();
         for (ItemVis v : phase.read()) {
             v.paint(gl, v.area * totalArea);
         }
     }
 
     public void update(Collection<? extends X> children, BiConsumer<X, ItemVis<X>> update) {
-        update(1, 1, children, update, cached(i -> new ItemVis<>(i, i.toString())));
+        update(children, update, cached(i -> new ItemVis<>(i, i.toString())));
     }
-
-    public void update(double width, double height, Collection<? extends X> children, BiConsumer<X, ItemVis<X>> update) {
-        update(width, height, children, update, cached(i -> new ItemVis<>(i, i.toString())));
-    }
-
 
     public static <X> Function<X, ItemVis<X>> cached(Function<X, ItemVis<X>> vis) {
         return new Function<>() {
@@ -80,11 +73,11 @@ public class TreeChart<X> extends Surface {
         };
     }
 
-    public void update(double width, double height, Collection<? extends X> next, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> vis) {
-        this.width = width;
-        this.height = height;
-        left = 0.0;
-        top = 0.0;
+    public void update(Collection<? extends X> next, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> vis) {
+        width = w();
+        height = h();
+        left = bounds.min.x;
+        top = bounds.min.y;
 
         CircularArrayList<ItemVis<X>> display = phase.commit();
         int ns = next.size();
@@ -118,8 +111,8 @@ public class TreeChart<X> extends Surface {
 
         int size = display.size();
         if (size > 0) {
-            heightLeft = this.height;
-            widthLeft = this.width;
+            heightLeft = height;
+            widthLeft = width;
             layoutOrient = width > height ? LayoutOrient.VERTICAL : LayoutOrient.HORIZONTAL;
 
             float areaNormalization = (float) ((width * height) / weight[0]);
@@ -188,6 +181,8 @@ public class TreeChart<X> extends Surface {
     }
 
     private void layoutrow(Iterable<ItemVis> row, double w) {
+
+
 
         double totalArea = 0.0;
         for (ItemVis item : row) {

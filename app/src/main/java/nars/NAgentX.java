@@ -180,7 +180,7 @@ abstract public class NAgentX extends NAgent {
                 .exe(new MultiExec.
                             Intense
                             //CoolNQuiet
-                        (THREADS, 4, 128))
+                        (64, THREADS, 128))
 
                 .time(clock)
                 .deriverAdd(8)
@@ -503,7 +503,7 @@ abstract public class NAgentX extends NAgent {
             {
 
                 on = a.onFrame(() -> {
-                    update(1, 1, a.nar.causes, (c, i) -> {
+                    update(a.nar.causes, (c, i) -> {
                         float v = c.value();
                         float r, g, b;
                         if (v < 0) {

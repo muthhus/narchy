@@ -91,13 +91,16 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
     public void start(SpaceGraph<Concept> space) {
         super.start(space);
         on = DurService.build(nar, () -> {
-            long s = rw.writeLock();
+            long s = rw.tryWriteLock();
+            if (s == 0) return;
             try {
                 if (concepts.update()) {
                     updates.set(true);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             } finally {
-                rw.unlock(s);
+                rw.unlockWrite(s);
             }
         });
     }
@@ -124,19 +127,21 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
             updates.set(false); //acquired this set
 
             long s = rw.tryReadLock();
-            try {
-                concepts.forEach((clink) -> {
-                    ConceptWidget cw = space.getOrAdd(clink.get().id, ConceptWidget::new);
-                    if (cw != null) {
+            if (s > 0) {
+                try {
+                    concepts.forEach((clink) -> {
+                        ConceptWidget cw = space.getOrAdd(clink.get().id, ConceptWidget::new);
+                        if (cw != null) {
 
-                        cw.pri = clink.priElseZero();
-                        l.add(cw);
+                            cw.pri = clink.priElseZero();
+                            l.add(cw);
 
-                    }
-                    //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
-                });
-            } finally {
-                rw.unlock(s);
+                        }
+                        //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
+                    });
+                } finally {
+                    rw.unlockRead(s);
+                }
             }
 
             vis.accept(l);

@@ -472,7 +472,7 @@ public class FasterList<X> extends FastList<X> {
     }
 
     public X[] toArrayRecycled(IntFunction<X[]> ii) {
-        X[] a = array();
+        X[] a = items;
         int s = size;
         if (s == a.length && a.getClass() != Object[].class)
             return a;
@@ -507,8 +507,9 @@ public class FasterList<X> extends FastList<X> {
     }
 
     public void reverse() {
-        if (size > 1) {
-            Util.reverse(items, 0, size - 1);
+        int s = this.size;
+        if (s > 1) {
+            Util.reverse(items, 0, s - 1);
         }
     }
 

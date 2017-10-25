@@ -747,7 +747,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * logs tasks and other budgeted items with a summary exceeding a threshold
      */
     @NotNull
-    public NAR logPriMin(@NotNull Appendable out, float priThresh) {
+    public NAR logPriMin(Appendable out, float priThresh) {
         return log(out, v -> {
             Prioritized b = null;
             if (v instanceof Prioritized) {
@@ -996,7 +996,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      *  for this reasoner to a stream
      * */
     @NotNull
-    public NAR trace(@NotNull Appendable out, Predicate<String> includeKey, @Nullable Predicate includeValue) {
+    public NAR trace(Appendable out, Predicate<String> includeKey, @Nullable Predicate includeValue) {
 
 
         String[] previous = {null};
@@ -1030,12 +1030,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR log(@NotNull Appendable out) {
+    public NAR log(Appendable out) {
         return log(out, null);
     }
 
     @NotNull
-    public NAR log(@NotNull Appendable out, Predicate includeValue) {
+    public NAR log(Appendable out, Predicate includeValue) {
         return trace(out, NAR.logEvents::contains, includeValue);
     }
 
@@ -1706,10 +1706,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public void activate(Termed t, float activationApplied) {
+    public Concept activate(Termed t, float activationApplied) {
         Concept c = concept(t, true);
         if (c != null)
             exe.activate(c, activationApplied);
+        return c;
     }
 
     public Stream<Service<NAR>> services() {

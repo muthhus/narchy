@@ -34,7 +34,7 @@ import nars.util.SoftException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -177,8 +177,10 @@ public interface Concept extends Termed, Comparable<Termed>, MetaMap {
      */
     ConceptState state(ConceptState c);
 
-    /** should not include itself, although this will be included with these templates on activation */
-    Collection<Termed> templates();
+    /** should not include itself, although this will be included with these templates on activation
+     *  should use something like an ArrayList which supports fast random access by index
+     * */
+    List<Termed> templates();
 
 
     void process(Task task, /*@NotNull*/ NAR n);

@@ -162,18 +162,7 @@ public interface Bag<K, V> extends Table<K, V> {
     }
 
 
-    /**
-     * convenience macro for using sample(BagCursor).
-     * continues while either the predicate hasn't returned false and
-     * < max true's have been returned
-     */
-    default Bag<K, V> sample(int max, Predicate<? super V> kontinue) {
-        final int[] count = {max};
-        return sample((x) -> {
-            return (kontinue.test(x) && ((count[0]--) > 0)) ?
-                    Next : Stop;
-        });
-    }
+
 
     default Stream<V> stream() {
         return StreamSupport.stream(this::spliterator, 0, false);
@@ -188,13 +177,30 @@ public interface Bag<K, V> extends Table<K, V> {
     }
 
     default Bag<K, V> sampleOrPop(boolean pop, int max, Consumer<? super V> each) {
+        if (max == 0)
+            return this;
+
         final int[] count = {max};
         return sample(x -> {
             each.accept(x);
             return ((--count[0]) > 0) ? (pop ? Remove : Next) : (pop ? RemoveAndStop : Stop);
         });
     }
+    /**
+     * convenience macro for using sample(BagCursor).
+     * continues while either the predicate hasn't returned false and
+     * < max true's have been returned
+     */
+    default Bag<K, V> sample(int max, Predicate<? super V> kontinue) {
+        if (max == 0)
+            return this;
 
+        final int[] count = {max};
+        return sample((x) -> {
+            return (kontinue.test(x) && ((--count[0]) > 0)) ?
+                    Next : Stop;
+        });
+    }
     default Bag<K, V> sampleOrPop(boolean pop, int max, Predicate<? super V> each) {
         final int[] count = {max};
         return sample(x ->

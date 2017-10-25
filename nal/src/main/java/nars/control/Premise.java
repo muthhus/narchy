@@ -112,7 +112,6 @@ public class Premise extends PLink<Pair<Task,Term>> {
         }
 
 
-        //WARNING: this exchange is not thread safe
         Collection<Concept> l = links;
         if (l != null) {
             links = null;

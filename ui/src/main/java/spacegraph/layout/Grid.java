@@ -124,7 +124,6 @@ public class Grid extends MutableLayout {
             layoutGrid(1, n, margin);
         }
 
-        super.doLayout();
 
     }
 

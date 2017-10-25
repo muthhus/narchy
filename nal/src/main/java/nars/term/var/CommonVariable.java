@@ -17,7 +17,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
     }
 
 
-    public static @NotNull Variable common(@NotNull AbstractVariable A, @NotNull AbstractVariable B) {
+    public static Variable common(AbstractVariable A, AbstractVariable B) {
 
         int ai = A.id;        assert(ai < (1 << 7));
         Op Aop = A.op();

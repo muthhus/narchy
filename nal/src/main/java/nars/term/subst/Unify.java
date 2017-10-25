@@ -153,7 +153,7 @@ public abstract class Unify extends Versioning implements Subst {
      * <p>
      * setting finish=false allows matching in pieces before finishing
      */
-    public boolean unify(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public boolean unify(Term x, Term y, boolean finish) {
 
         //accumulate any new free variables in this next matched term
 //        Set<Term> freeX = freeVariables(x);
@@ -317,7 +317,7 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
     private class ConstrainedVersionMap extends VersionMap<Term, Term> {
-        public ConstrainedVersionMap(@NotNull Versioning versioning, int mapCap) {
+        public ConstrainedVersionMap(Versioning versioning, int mapCap) {
             super(versioning, mapCap, 1);
         }
 

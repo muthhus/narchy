@@ -397,18 +397,21 @@ public enum Op {
                 while (csi.hasNext()) {
                     Term x = csi.next();
 
-                    if (x.op() == NEG && x.subIs(0, CONJ)) { //DISJUNCTION
-                        Term disj = x.unneg();
-                        SortedSet<Term> disjSubs = disj.subterms().toSortedSet();
-                        //factor out occurrences of the disj's contents outside the disjunction, so remove from inside it
-                        if (disjSubs.removeAll(cs)) {
-                            //reconstruct disj if changed
-                            csi.remove();
+                    if (x.op() == NEG) {
+                        Term x0 = x.sub(0);
+                        if (x0.op() == CONJ && commute(x0.dt(), x0.subs())) { //DISJUNCTION
+                            Term disj = x.unneg();
+                            SortedSet<Term> disjSubs = disj.subterms().toSortedSet();
+                            //factor out occurrences of the disj's contents outside the disjunction, so remove from inside it
+                            if (disjSubs.removeAll(cs)) {
+                                //reconstruct disj if changed
+                                csi.remove();
 
-                            if (!disjSubs.isEmpty()) {
-                                if (csa == null)
-                                    csa = $.newArrayList(1);
-                                csa.add(CONJ.the(disj.dt(), sorted(disjSubs)).neg());
+                                if (!disjSubs.isEmpty()) {
+                                    if (csa == null)
+                                        csa = $.newArrayList(1);
+                                    csa.add(CONJ.the(disj.dt(), sorted(disjSubs)).neg());
+                                }
                             }
                         }
                     }

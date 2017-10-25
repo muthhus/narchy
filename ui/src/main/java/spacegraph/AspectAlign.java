@@ -49,6 +49,7 @@ public class AspectAlign extends Layout {
 
     @Override
     protected void doLayout() {
+
         //        v2 scale = this.scale;
 //
 //        float sx, sy;

@@ -47,7 +47,7 @@ public class BaseConcept implements Concept {
     public final Bag<Term, PriReference<Term>> termLinks;
     @NotNull
     public transient ConceptState state = Deleted;
-    private final Collection<Termed> templates;
+    private final List<Termed> templates;
 
     protected final CompactArrayMap<String, Object> meta = new CompactArrayMap<>();
 
@@ -120,7 +120,7 @@ public class BaseConcept implements Concept {
 
 
     @Override
-    public Collection<Termed> templates() {
+    public List<Termed> templates() {
         return templates;
     }
 
@@ -283,7 +283,7 @@ public class BaseConcept implements Concept {
      * Called exactly once on each task.
      */
     @Override
-    public void process(Task t, @NotNull NAR n) {
+    public void process(Task t, NAR n) {
         table(t.punc()).add(t, this, n);
     }
 

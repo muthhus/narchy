@@ -328,7 +328,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             if (sx.stretch == null) {
                 sx.stretch = this.stretch;
             } else {
-                assert (sx.stretch == null); //should only be input once, when it has no stretch to update otherwise
+//                if (sx.stretch == null) {
+//                    System.err.println("wtf rtree");
+                    assert (sx.stretch == null); //should only be input once, when it has no stretch to update otherwise
+//                }
+
+                //return; //but it can happen in multithread conditions?
             }
         }
 

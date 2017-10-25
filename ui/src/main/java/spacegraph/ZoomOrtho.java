@@ -210,7 +210,7 @@ public class ZoomOrtho extends Ortho {
 
                             if (windowMoving.compareAndSet(false, true)) {
 
-                                window.window.getScreen().getDisplay().getEDTUtil().invoke(false, () ->
+                                window.window.getScreen().getDisplay().getEDTUtil().invoke(true, () ->
                                         resizeWindow(windowStart[0], windowStart[1], resizeTarget[0], resizeTarget[1]));
                                 //this::resizeWindow);
                                 if (panStart != null) {

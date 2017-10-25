@@ -6,6 +6,7 @@ import jcog.list.FasterList;
 import jcog.pri.PLink;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -14,7 +15,6 @@ import nars.concept.TermLinks;
 import nars.term.Term;
 import nars.term.Termed;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -24,34 +24,32 @@ import java.util.function.Consumer;
  */
 public class Activate extends PLink<Concept> implements Termed {
 
-//    /**
-//     * per batch, on empty
-//     */
-//    static final int TASKLINKS_SAMPLED = 2;
-//    /**
-//     * per batch, on empty
-//     */
-//    static final int TERMLINKS_SAMPLED = 2;
-
-
-    private List<Termed> templates;
-    private Concept[] templateConcepts;
+//    /** lazily computed */
+//    private List<Termed> templates;
+//
+//    /** lazily computed */
+//    private Concept[] templateConcepts;
 
     public Activate(Concept c, float pri) {
         super(c, pri);
-        assert (c.isNormalized()) : c + " not normalized";
     }
 
     public Iterable<Premise> hypothesize(NAR nar, BatchActivation ba, int premisesMax) {
 
+        assert(premisesMax > 0);
+
         nar.emotion.conceptFires.increment();
 
-        if (templates == null) {
-            this.templates = TermLinks.templates(id, nar);
-            this.templateConcepts = TermLinks.templateConcepts(templates);
-        }
+//        if (templates == null) {
+//            synchronized(id) {
+//                if (templates == null) {
+//                    this.templates = TermLinks.templates(id, nar);
+//                    this.templateConcepts = TermLinks.templateConcepts(templates);
+//                }
+//            }
+//        }
 
-        float cost = TermLinks.linkTemplates(id, templates, priElseZero(), nar.momentum.floatValue(), nar, ba);
+        float cost = TermLinks.linkTemplates(id, id.templates(), priElseZero(), nar.momentum.floatValue(), nar, ba);
         if (cost >= Pri.EPSILON)
             priSub(cost);
 
@@ -102,7 +100,7 @@ public class Activate extends PLink<Concept> implements Termed {
                     Premise p = new Premise(task, term, pri1,
 
                             //targets:
-                            randomTemplates(rng, TERMLINKS_SAMPLED /* heuristic */)
+                            randomTemplateConcepts(rng, TERMLINKS_SAMPLED /* heuristic */, nar)
 
                     );
 
@@ -115,7 +113,7 @@ public class Activate extends PLink<Concept> implements Termed {
     }
 
 
-    private Collection<Concept> randomTemplates(Random rng, int count) {
+    private List<Concept> randomTemplateConcepts(Random rng, int count, NAR nar) {
 
 //            {
 //                //this allows the tasklink, if activated to be inserted to termlinks of this concept
@@ -130,7 +128,21 @@ public class Activate extends PLink<Concept> implements Termed {
 
         }
 
-        return Util.select(count, rng, this.templateConcepts);
+
+        List<Termed> tt = id.templates();
+        List<Concept> uu = $.newArrayList(count);
+        Util.selectRouletteUnique(count, rng, tt.size(), (w) -> {
+            Term t = tt.get(w).term();
+            return t.op().conceptualizable && !t.equals(id.term()) ? 1f : 0f;
+            //TODO try biasing toward larger template components so the activation trickles down to atoms with less probabilty
+        }, z -> {
+            Concept cc = nar.conceptualize(tt.get(z));
+            if (cc==null)
+                return true;
+            uu.add(cc);
+            return (uu.size() < count);
+        });
+        return uu;
     }
 
 

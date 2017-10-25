@@ -94,8 +94,10 @@ public class Deriver extends NARService {
 
             nar.exe.fire(Math.min(work - derivations[0], conceptBatch), a -> {
 
-                Iterable<Premise> h = a.hypothesize(nar, activator,
-                        Math.min(work - derivations[0], premises(a)));
+                int hh = Math.min(work - derivations[0], premises(a));
+                if (hh == 0)
+                    return false;
+                Iterable<Premise> h = a.hypothesize(nar, activator, hh);
 
                 if (h != null) {
 

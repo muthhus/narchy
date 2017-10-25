@@ -20,7 +20,7 @@ abstract public class BagChart<X extends Prioritized> extends TreeChart<X> imple
     public void update() {
         if (busy.compareAndSet(false, true)) {
             try {
-                update(1f, 1f, input, this, ii -> {
+                update(input, this, ii -> {
                     return ii != null ? newItem(ii) : null;
                 });
             } finally {
@@ -29,7 +29,7 @@ abstract public class BagChart<X extends Prioritized> extends TreeChart<X> imple
         }
     }
 
-    @NotNull protected ItemVis<X> newItem(@NotNull X i) {
+    @NotNull protected ItemVis<X> newItem(X i) {
         return new ItemVis<>(i, label(i, 24));
     }
 
@@ -39,25 +39,25 @@ abstract public class BagChart<X extends Prioritized> extends TreeChart<X> imple
 //        this(b, -1);
 //    }
 
-    public BagChart(@NotNull Collection<X> b) {
+    public BagChart(Collection<X> b) {
         super();
         this.input = b;
         update();
     }
 
-    @Override
-    protected void paint(GL2 gl) {
-        if (busy.compareAndSet(false,true)) {
-            try {
-                super.paint(gl);
-            } finally {
-                busy.set(false);
-            }
-        }
-    }
+//    @Override
+//    protected void paint(GL2 gl) {
+//        if (busy.compareAndSet(false,true)) {
+//            try {
+//                super.paint(gl);
+//            } finally {
+//                busy.set(false);
+//            }
+//        }
+//    }
 
 
-    protected static <X> String label(@NotNull X i, int MAX_LEN) {
+    protected static <X> String label( X i, int MAX_LEN) {
         String s = i.toString();
         if (s.length() > MAX_LEN)
             s = s.substring(0, MAX_LEN);

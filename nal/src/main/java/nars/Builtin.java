@@ -13,8 +13,8 @@ import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
-import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -57,15 +57,16 @@ public class Builtin {
                 int n;
                 if (from.op() == to.op() && (n = from.subs()) == to.subs()) {
                     //likely they have the same structure
-                    Map<Term,Term> m = new HashMap();
+                    Map<Term,Term> m = null; //lazy alloc
                     for (int i = 0; i < n; i++) {
                         Term f = from.sub(i);
                         Term t = to.sub(i);
                         if (!f.equals(t)) {
+                            if (m == null) m = new UnifiedMap(1);
                             m.put(f, t);
                         }
                     }
-                    if (!m.isEmpty()) { //can be empty in 'dt' cases
+                    if (m!=null) { //can be empty in 'dt' cases
                         Term y = target.replace(m);
                         if (y!=null && !y.equals(target))
                             return y;

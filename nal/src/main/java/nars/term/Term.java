@@ -47,7 +47,6 @@ import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.list.primitive.ImmutableByteList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
-import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
@@ -311,12 +310,12 @@ public interface Term extends Termed, Comparable<Termed> {
             }
             //all matched, proceed downward to the next layer
         }
-        return i == 0 ? this : sub(i, subpaths.get(0));
+        return i == 0 ? this : subPath(i, subpaths.get(0));
 
     }
 
     @Nullable
-    default Term sub(/*@NotNull*/ ByteList path) {
+    default Term subPath(/*@NotNull*/ ByteList path) {
         Term ptr = this;
         int s = path.size();
         for (int i = 0; i < s; i++)
@@ -330,12 +329,12 @@ public interface Term extends Termed, Comparable<Termed> {
      * returns null if specified subterm does not exist
      */
     @Nullable
-    default Term sub(/*@NotNull*/ byte... path) {
-        return sub(path.length, path);
+    default Term subPath(/*@NotNull*/ byte... path) {
+        return subPath(path.length, path);
     }
 
     @Nullable
-    default Term sub(int n, /*@NotNull*/ byte... path) {
+    default Term subPath(int n, /*@NotNull*/ byte... path) {
         Term ptr = this;
         for (int i = 0; i < n; i++) {
             if ((ptr = ptr.sub(path[i])) == Null)

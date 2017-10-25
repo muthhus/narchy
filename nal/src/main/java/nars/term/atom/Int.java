@@ -349,7 +349,7 @@ public class Int implements Intlike {
 
 
                         //x is contained within range expression p
-                        Term xpp = x.subs() > 0 ? x.sub(pp) : x;
+                        Term xpp = x.subs() > 0 ? x.subPath(pp) : x;
 
                         boolean connected;
                         if (xpp instanceof Intlike) {

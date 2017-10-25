@@ -78,7 +78,6 @@ public class UniExec extends Exec {
     public synchronized void stop() {
         if (active != null) {
             active.clear();
-            active = null;
         }
     }
 

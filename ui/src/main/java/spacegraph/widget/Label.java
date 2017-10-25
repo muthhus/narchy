@@ -14,7 +14,7 @@ public class Label extends Surface {
 
     public float fontScaleX = 1f, fontScaleY = 1f;
     public final Color4f color = new Color4f(1f,1f,1f,1f);
-    public float lineWidth = 5f;
+    public float lineWidth = 3f;
 
     public Label() {
         this("");

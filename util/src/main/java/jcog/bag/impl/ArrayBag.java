@@ -170,10 +170,10 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
 
     protected void ensureSorted() {
-        if (mustSort) {
+        //if (mustSort) {
             sort();
             mustSort = false;
-        }
+        //}
     }
 
     protected void sort() {
@@ -458,9 +458,6 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
         synchronized (items) {
 
-            if (capacity == 0) //check again, this time inside the synch
-                return null;
-
             inserted = map.compute(key, (kk, existing) -> {
                 Y v;
                 if (existing != null) {
@@ -577,12 +574,12 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         } else {
             int i = items.add(incoming, -p, this);
             assert (i >= 0);
-            updateRange(p);
+            mass += p;
         }
         return true;
     }
 
-    protected final Y merge(Y existing, Y incoming, @Nullable MutableFloat overflow) {
+    private final Y merge(Y existing, Y incoming, @Nullable MutableFloat overflow) {
 
         int s = size();
         boolean atCap = s == capacity;
@@ -600,7 +597,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         if (Math.abs(delta) > Pri.EPSILON) {
             items.adjust(posBefore, delta, this);
 
-            updateRange(delta);
+            mass += delta;
 
             if (delta >= Prioritized.EPSILON) {
                 if (atCap) {
@@ -623,10 +620,15 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         return map.remove(key(x));
     }
 
-    private void updateRange(float deltaMass) {
-        mass += deltaMass;
-        min = pri(items.last());
-        max = pri(items.first());
+    private void updateRange() {
+        min = priElse(items.last(), 0);
+        max = priElse(items.first(), 0);
+
+        //max and min could be changed in concurrent situation
+//        if (!(max>=min)) {
+//            throw new RuntimeException("bag fault");
+//        }
+//        assert(max>=min);
     }
 
 
@@ -648,7 +650,10 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
         if (update == null && !checkCapacity) {
             synchronized (items) {
-                ensureSorted();
+                if (size() > 0) {
+                    ensureSorted();
+                    updateRange();
+                }
             }
             return;
         }

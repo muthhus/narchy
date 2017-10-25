@@ -10,6 +10,7 @@ import nars.term.Termed;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -21,11 +22,11 @@ public enum TermLinks {
     ;
 
 
-    public static Collection<Termed> templates(Term term) {
+    public static List<Termed> templates(Term term) {
 
         if (term.subs() > 0) {
 
-            Collection<Termed> templates;
+            List<Termed> templates;
 
             Set<Termed> tc =
                     //new UnifiedSet<>(id.volume() /* estimate */);
@@ -140,67 +141,72 @@ public enum TermLinks {
     public static void linkTemplate(Term srcTerm, Bag srcTermLinks, Termed target, float priForward, float priReverse, BatchActivation a, NAR nar, MutableFloat refund) {
 
         float priSum = priForward + priReverse;
-        if (target instanceof Concept) {
-            Concept c = (Concept) target;
-            c.termlinks().put(
-                    new PLink(srcTerm, priReverse), refund
-            );
-            a.put(c, priSum);
-        } else {
-            refund.add(priReverse);
+        Term targetTerm = target.term();
+        boolean reverseLinked = false;
+        if (!srcTerm.equals(targetTerm)) {
+            Concept c = nar.activate(target, priSum);
+            if (c != null) {
+                c.termlinks().put(
+                        new PLink(srcTerm, priReverse), refund
+                );
+                reverseLinked = true;
+            }
         }
 
+        if (!reverseLinked)
+            refund.add(priReverse);
+
         srcTermLinks.put(
-                new PLink(target.term(), priForward), refund
+                new PLink(targetTerm, priForward), refund
         );
 
     }
 
-    @Nullable
-    public static List<Termed> templates(Concept id, NAR nar) {
-
-        Collection<Termed> localTemplates = id.templates();
-        int n = localTemplates.size();
-        if (n <= 0)
-            return null;
-
-        Term thisTerm = id.term();
-
-        List<Termed> localSubConcepts =
-                //new HashSet<>(); //temporary for this function call only, so as not to retain refs to Concepts
-                //new UnifiedSet(); //allows concurrent read
-                $.newArrayList(n); //maybe contain duplicates but its ok, this is fast to construct
-
-        //Random rng = nar.random();
-        //float balance = Param.TERMLINK_BALANCE;
-
-        float spent = 0;
-        for (Termed localSub : localTemplates) {
-
-            //localSub = mutateTermlink(localSub.term(), rng); //for special Termed instances, ex: RotatedInt etc
-//                if (localSub instanceof Bool)
-//                    continue; //unlucky mutation
-
-
-            Termed target = localSub.term(); //if mutated then localSubTerm would change so do it here
-
-            float d;
-
-            if (target.op().conceptualizable && !target.equals(thisTerm)) {
-
-                Concept targetConcept = nar.conceptualize(localSub);
-                if (targetConcept != null) {
-                    target = (targetConcept);
-
-                }
-            }
-
-            localSubConcepts.add(target);
-        }
-
-        return !localSubConcepts.isEmpty() ? localSubConcepts : null;
-
-    }
+//    @Nullable
+//    public static List<Termed> templates(Concept id, NAR nar) {
+//
+//        Collection<Termed> localTemplates = id.templates();
+//        int n = localTemplates.size();
+//        if (n <= 0)
+//            return null;
+//
+//        Term thisTerm = id.term();
+//
+//        List<Termed> localSubConcepts =
+//                //new HashSet<>(); //temporary for this function call only, so as not to retain refs to Concepts
+//                //new UnifiedSet(); //allows concurrent read
+//                $.newArrayList(n); //maybe contain duplicates but its ok, this is fast to construct
+//
+//        //Random rng = nar.random();
+//        //float balance = Param.TERMLINK_BALANCE;
+//
+//        float spent = 0;
+//        for (Termed localSub : localTemplates) {
+//
+//            //localSub = mutateTermlink(localSub.term(), rng); //for special Termed instances, ex: RotatedInt etc
+////                if (localSub instanceof Bool)
+////                    continue; //unlucky mutation
+//
+//
+//            Termed target = localSub.term(); //if mutated then localSubTerm would change so do it here
+//
+//            float d;
+//
+//            if (target.op().conceptualizable && !target.equals(thisTerm)) {
+//
+//                Concept targetConcept = nar.conceptualize(localSub);
+//                if (targetConcept != null) {
+//                    target = (targetConcept);
+//
+//                }
+//            }
+//
+//            localSubConcepts.add(target);
+//        }
+//
+//        return !localSubConcepts.isEmpty() ? localSubConcepts : null;
+//
+//    }
 
     /**
      * preprocess termlink
@@ -242,18 +248,19 @@ public enum TermLinks {
         return t;
     }
 
-    public static Concept[] templateConcepts(List<Termed> templates) {
-        if (templates.isEmpty())
-            return Concept.EmptyArray;
-
-        FasterList<Concept> templateConcepts = new FasterList(0, new Concept[templates.size()]);
-        for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
-            Termed x = templates.get(i);
-            if (x instanceof Concept)
-                templateConcepts.add((Concept) x);
-        }
-        return templateConcepts.toArrayRecycled(Concept[]::new);
-    }
+//    @NotNull
+//    public static Concept[] templateConcepts(List<Termed> templates) {
+//        if (templates.isEmpty())
+//            return Concept.EmptyArray;
+//
+//        FasterList<Concept> templateConcepts = new FasterList(0, new Concept[templates.size()]);
+//        for (int i = 0, templatesSize = templates.size(); i < templatesSize; i++) {
+//            Termed x = templates.get(i);
+//            if (x instanceof Concept)
+//                templateConcepts.add((Concept) x);
+//        }
+//        return templateConcepts.toArrayRecycled(Concept[]::new);
+//    }
 
     /** send some activation, returns the cost */
     public static float linkTemplates(Concept src, List<Termed> templates, float totalBudget, float momentum, NAR nar, BatchActivation ba) {

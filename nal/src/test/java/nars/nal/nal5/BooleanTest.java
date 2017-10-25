@@ -46,7 +46,7 @@ public class BooleanTest {
         NAR d = new NARS().get();
         d.truthResolution.set(0.05f);
         d.nal(6);
-        d.termVolumeMax.set(18);
+        d.termVolumeMax.set(24);
 
         String[] outcomes = {
                 "x:{0}", //"(x-->(0,0))",

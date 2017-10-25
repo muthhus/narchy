@@ -127,7 +127,7 @@ import static nars.time.Tense.*;
     }
 
     @Override
-    public Task apply(@NotNull NAR n) throws Concept.InvalidConceptException, InvalidTaskException {
+    public Task apply(NAR n) throws Concept.InvalidConceptException, InvalidTaskException {
 
         if (isDeleted())
             throw new InvalidTaskException(this, "Deleted");
@@ -142,7 +142,7 @@ import static nars.time.Tense.*;
         if (cntt == null)
             throw new InvalidTaskException(t, "Failed normalization");
 
-        if (!Task.taskContentValid(cntt, punc, n, !Param.DEBUG))
+        if (!Task.taskContentValid(cntt, punc, n, !isInput() && !Param.DEBUG))
             throw new InvalidTaskException(cntt, "Invalid content");
 
         if (cntt != t) {

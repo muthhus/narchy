@@ -112,13 +112,13 @@ public class QueryVariableTest {
                 "<b --> a>. %1.0;0.5%");
         n.run(cyclesBeforeQuestion);
 
-        n.stopIf(b::get);
 
         n.question(question, ETERNAL, (q, a) -> {
             if (!a.isDeleted())
                 b.set(true);
         });
 
+        n.stopIf(b::get);
         n.run(cyclesAfterQuestion);
 
         assertTrue(b.get());

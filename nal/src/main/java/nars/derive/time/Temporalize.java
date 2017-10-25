@@ -321,7 +321,7 @@ public class Temporalize implements ITemporalize {
                         know(a, relative(a, x, at)); //link to its position in the super-conj
                         if (i > 0) {
                             know(a, relative(a, pa, at-pt)); //chain to previous
-                            know(a, relative(pa, a, pt-at)); //chain to previous //is this one necessary?
+                            know(pa, relative(pa, a, pt-at)); //chain to previous //is this one necessary?
                         }
                         pa = a;
                         pt = at;
