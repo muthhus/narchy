@@ -1,5 +1,6 @@
 package nars.exe;
 
+import jcog.Util;
 import jcog.constraint.continuous.exceptions.InternalSolverError;
 import jcog.event.On;
 import jcog.exe.Can;
@@ -20,8 +21,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-
-import static jcog.Util.sqr;
 
 /**
  *
@@ -109,7 +108,11 @@ abstract public class Exec implements Executor {
 
 
     public float load() {
-        return 0;
+        if (nar.loop.isRunning()) {
+            return Util.unitize(nar.loop.lag());
+        } else {
+            return 0;
+        }
     }
 
 
@@ -127,7 +130,7 @@ abstract public class Exec implements Executor {
         );
 
         float throttle = loop.throttle.floatValue();
-        double dutyCycleTime = nextCycleTime * throttle * (1f - sqr(nar.exe.load()));
+        double dutyCycleTime = nextCycleTime * throttle * (1f - nar.exe.load());
 
         if (dutyCycleTime > 0) {
             try {

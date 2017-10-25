@@ -16,6 +16,13 @@ import static jcog.Util.sum;
  */
 public interface Prioritized extends Deleteable {
 
+    /**
+     * default minimum difference necessary to indicate a significant modification in budget float number components
+     */
+    float EPSILON =             0.001f;
+
+    /** epsilon necessary to cause a visible disturbance */
+    float EPSILON_VISIBLE =     0.01f;
 
 
     /**
@@ -40,13 +47,6 @@ public interface Prioritized extends Deleteable {
      * common instance for a 'zero budget'.
      */
     Prioritized Zero = new PriRO(0);
-    /**
-     * default minimum difference necessary to indicate a significant modification in budget float number components
-     */
-    float EPSILON =             0.0001f;
-
-    /** epsilon necessary to cause a visible disturbance */
-    float EPSILON_VISIBLE =     0.001f;
 
 
 //    /**

@@ -116,6 +116,11 @@ abstract public class MultiExec extends UniExec {
         event[0] = arg0;
     };
 
+//    @Override
+//    public float load() {
+//        return ((float)buffer.remainingCapacity())/buffer.getBufferSize();
+//    }
+
     public void queue(ITask i) {
         if (!buffer.tryPublishEvent(ein, i)) {
             i.run(nar); //queue full, in-thread

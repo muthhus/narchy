@@ -71,7 +71,7 @@ public final class PrediTrie {
             assert (ll.length != 0);
 
             ValueFork cx = ValueFork.the(ll, postChoices, v);
-            path.add(cx.can);
+            path.add(cx.valueBranch);
             this.pre.put(path, cx);
         });
 

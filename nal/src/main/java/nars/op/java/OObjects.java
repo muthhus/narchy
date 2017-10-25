@@ -8,8 +8,10 @@ import javassist.util.proxy.ProxyObject;
 import jcog.Util;
 import jcog.map.CustomConcurrentHashMap;
 import nars.*;
+import nars.control.CauseChannel;
 import nars.op.AtomicExec;
 import nars.op.Operator;
+import nars.task.ITask;
 import nars.task.LatchingSignalTask;
 import nars.task.NALTask;
 import nars.term.Term;
@@ -82,9 +84,11 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
     private final float metadataPriority = 0.1f;
 
     final static ThreadLocal<Task> invokingGoal = new ThreadLocal<>();
+    private final CauseChannel<ITask> in;
 
     public OObjects(NAR n) {
         nar = n;
+        in = n.newCauseChannel(this);
     }
 
 
@@ -229,7 +233,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                 return next;
             });
 
-            nar.runLater(()->nar.input(pending));
+            in.input(pending);
 
             return nextValue;
 

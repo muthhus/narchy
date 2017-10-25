@@ -20,9 +20,7 @@ abstract public class BagChart<X extends Prioritized> extends TreeChart<X> imple
     public void update() {
         if (busy.compareAndSet(false, true)) {
             try {
-                update(input, this, ii -> {
-                    return ii != null ? newItem(ii) : null;
-                });
+                update(input, this, ii -> ii != null ? newItem(ii) : null);
             } finally {
                 busy.set(false);
             }
