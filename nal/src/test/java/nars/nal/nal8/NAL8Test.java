@@ -164,12 +164,23 @@ public class NAL8Test extends NALTest {
 
     @Test
     public void testDesiredConjNeg() {
-        TestNAR t = test;
-        t
-                .believe("--x")
-                .goal("(--x && y)")
-                .mustGoal(cycles, "y", 1f, 0.81f);
+        test.believe("--x")
+            .goal("(--x && y)")
+            .mustGoal(cycles, "y", 1f, 0.81f);
     }
+
+    @Test public void testImplGoalDuration() {
+        /* wrong time
+        $.30 x(intValue,(),3)! 5648⋈5696 %1.0;.13% {6874: 1;2;4;9;d;e;l;q} ((%1,(%2==>%3),notImpl(%1)),(subIfUnifiesAny(%2,%3,%1,"$"),((AbductionPB-->Belief),(DeciInduction-->Goal))))
+            $1.0 x(intValue,(),3)! 5600 %1.0;.90% {5600: q}
+            $.07 (x(intValue,(),3) ==>-48 x(intValue,(),3)). 3600 %1.0;.19% {5415: 1;2;4;9;d;e;l}
+        */
+        test.log()
+            .goal("x(intValue,(),3)", Tense.Present, 1f, 0.9f)
+            .believe("(x(intValue,(),3) ==>-48 x(intValue,(),3))")
+            .mustGoal(cycles, "x(intValue,(),3)", 1f, 0.81f, 48, 48);
+    }
+
 
     @Test
     public void testBelievedImplOfDesire() {

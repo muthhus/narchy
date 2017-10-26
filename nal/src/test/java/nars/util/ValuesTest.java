@@ -4,7 +4,6 @@ import jcog.pri.Priority;
 import nars.Task;
 import nars.term.Term;
 import nars.truth.Truth;
-import net.openhft.chronicle.bytes.BytesIn;
 import net.openhft.chronicle.bytes.BytesStore;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;

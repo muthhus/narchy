@@ -49,16 +49,21 @@ public class RelativeEvent extends Event {
     public Time start(Map<Term, Time> trail) {
 
 
-        if (self && start!=DTERNAL) {
+        return presolve(start,trail);
+    }
+
+    public @Nullable Time presolve(long t, Map<Term, Time> trail) {
+        if (self && t!=DTERNAL) {
             //terminate here but apply the relative offset indicated to any matching absolute term constraint
-            SortedSet<Event> m = ((Temporalize) t).constraints.get(term);
+            SortedSet<Event> m = ((Temporalize) this.t).constraints.get(term);
             if (m!=null) {
                 for (Event e : m) {
                     if (e instanceof AbsoluteEvent) {
-                        long ae = ((AbsoluteEvent) e).start;
-                        if (ae == ETERNAL)
+                        AbsoluteEvent ae = (AbsoluteEvent) e;
+                        long aet = t==this.start ? ae.start : ae.end;
+                        if (aet == ETERNAL)
                             return null; //cant do anything
-                        return Time.the(this.start + ae, 0);
+                        return Time.the(t + aet, 0);
                     }
                 }
             }
@@ -71,7 +76,7 @@ public class RelativeEvent extends Event {
 
     @Override
     public Time end(Map<Term, Time> trail) {
-        return resolve(this.end, trail);
+        return presolve(this.end, trail);
     }
 
     @Nullable

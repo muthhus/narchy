@@ -1,6 +1,5 @@
 package nars.term.compound;
 
-import com.google.common.base.Joiner;
 import nars.IO;
 import nars.Op;
 import nars.term.Compound;
@@ -12,8 +11,6 @@ import org.eclipse.collections.api.block.function.primitive.ByteFunction0;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
 
 import static nars.time.Tense.DTERNAL;
 

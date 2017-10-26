@@ -8,7 +8,6 @@ import nars.Op;
 import nars.term.atom.Atom;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
-import nars.term.transform.Retemporalize;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;

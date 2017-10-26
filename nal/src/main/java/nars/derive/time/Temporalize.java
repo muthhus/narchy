@@ -1,6 +1,5 @@
 package nars.derive.time;
 
-import jcog.list.FasterList;
 import jcog.math.Interval;
 import jcog.random.XorShift128PlusRandom;
 import nars.Op;
@@ -8,7 +7,6 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
-import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

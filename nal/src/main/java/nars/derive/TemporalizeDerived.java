@@ -10,7 +10,6 @@ import nars.derive.time.Event;
 import nars.derive.time.Temporalize;
 import nars.derive.time.Time;
 import nars.index.term.TermContext;
-import nars.task.Revision;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.Subst;

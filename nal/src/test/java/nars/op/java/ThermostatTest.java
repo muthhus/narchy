@@ -4,9 +4,11 @@ import jcog.data.MutableInteger;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
+import nars.control.Deriver;
 import nars.control.MetaGoal;
 
 import static nars.Op.*;
+import static org.junit.Assert.assertEquals;
 
 public class ThermostatTest {
 
@@ -33,7 +35,9 @@ public class ThermostatTest {
         Param.DEBUG = true;
 
         n = NARS.tmp();
+        Deriver.deriver(0, "list.nal").apply(n);
 
+        //n.log();
         n.priDefault(BELIEF, 0.2f);
         n.priDefault(QUESTION, 0.1f);
         n.priDefault(QUEST, 0.1f);
@@ -64,12 +68,10 @@ public class ThermostatTest {
             n.run(10);
         }
 
-        x.set(3);
+        assertEquals(4, x.intValue());
+
         n.run(1);
 
-
-
-        //n.log();
         n.onTask(x -> {
             if (x.isGoal() && !x.isInput())
                 System.out.println(x.proof());
@@ -79,18 +81,31 @@ public class ThermostatTest {
         n.termVolumeMax.set(24);
 
 
-        while (x.intValue()!=1 && n.time() < 7000) {
+        while (x.intValue()!=3 && n.time() < 7000) {
             if (n.time() % 400 == 0) {
                 n.input("$1.0 x(intValue, (), 3)! :|: %1.00;0.90%");
-                n.input("$1.0 x(intValue, (), 4)! :|: %0.00;0.90%");
+                //n.input("$1.0 x(intValue, (), 4)! :|: %0.00;0.90%");
                 //n.input("$1.0 (set:?1 <-> intValue:?2)?");
                 //n.input("$1.0 x(set, 1)@ :|:");
             }
             n.run(1);
         }
 
-        new MetaGoal.Report().add(n.causes).print(System.out);
+        assertEquals(3, x.intValue());
 
+        while (x.intValue()!=5 && n.time() < 14000) {
+            if (n.time() % 400 == 0) {
+                n.input("$1.0 x(intValue, (), 5)! :|: %1.00;0.90%");
+                n.input("$0.5 x(intValue, (), 3)! :|: %0.00;0.90%");
+                n.input("$0.5 x(intValue, (), 4)! :|: %0.00;0.90%");
+                //n.input("$1.0 (set:?1 <-> intValue:?2)?");
+                //n.input("$1.0 x(set, 1)@ :|:");
+            }
+            n.run(1);
+        }
+        assertEquals(5, x.intValue());
+
+        //new MetaGoal.Report().add(n.causes).print(System.out);
 
 
     }

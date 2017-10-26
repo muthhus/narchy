@@ -11,7 +11,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.ben-manes.versions' version '0.15.0' //dependencyUpdates
+    id 'com.github.ben-manes.versions' version '0.17.0' //dependencyUpdates
     id 'com.gradle.build-scan' version '1.9.1'
 }
 

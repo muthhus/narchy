@@ -48,6 +48,8 @@ public class TestNAR {
 
     public boolean trace = true;
 
+
+
     /**
      * holds must (positive) conditions
      */

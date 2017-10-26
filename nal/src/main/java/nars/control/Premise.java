@@ -4,7 +4,6 @@
  */
 package nars.control;
 
-import jcog.Util;
 import jcog.pri.PLink;
 import nars.NAR;
 import nars.Param;

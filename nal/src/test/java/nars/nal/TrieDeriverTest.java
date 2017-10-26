@@ -8,9 +8,6 @@ import nars.control.Derivation;
 import nars.control.Deriver;
 import nars.derive.PrediTerm;
 import nars.derive.PrediTrie;
-import nars.derive.Taskify;
-import nars.derive.TrieDeriver;
-import nars.derive.constraint.MatchConstraint;
 import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
@@ -28,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static nars.Op.QUEST;

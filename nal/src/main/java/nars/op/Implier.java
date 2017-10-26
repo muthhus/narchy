@@ -22,7 +22,6 @@ import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
 import nars.util.graph.TermGraph;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
-import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.jetbrains.annotations.Nullable;
 

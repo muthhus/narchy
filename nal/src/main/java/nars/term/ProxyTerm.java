@@ -7,7 +7,6 @@ import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.Retemporalize;
 import org.eclipse.collections.api.list.primitive.ByteList;
-import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

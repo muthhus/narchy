@@ -8,7 +8,6 @@ import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
-import java.util.function.Consumer;
 
 /**
  * what differentiates TermVector from TermContainer is that

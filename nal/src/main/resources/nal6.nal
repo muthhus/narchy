@@ -119,8 +119,8 @@
     B, (--A ==> C),  notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
         //B, (--A ==> C), time(urgent),  notImpl(B) |- varIntro(subIfUnifiesAny(C,A,B)), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
 
-    B, (C ==> A), notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:AbductionPB, Goal:DeciInduction)
-
+    B, (C ==> A), notImpl(B), neq(B,C) |- subIfUnifiesAny(C,A,B,"$"), (Belief:AbductionPB, Goal:DeciInduction)
+        //neq(B,C) on this one but not the others
 
     Z, (C==>Y), task("?") |- subIfUnifiesAny(C,Y,Z), (Punctuation:Question)
 

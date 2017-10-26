@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LinkageTest extends NALTest {
 
-    int runCycles = 10;
+    int runCycles = 25;
 
 
 //    @Override
@@ -133,7 +133,7 @@ public class LinkageTest extends NALTest {
         assertTrue(p21, premise1 + " no link to " + p2);
 
 
-        //System.err.println(premise1 + " not linked with " + premise2);
+        System.err.println(premise1 + " not linked with " + premise2);
 
         int numNodes = g.nodeCount();
         assertTrue(numNodes > 0);

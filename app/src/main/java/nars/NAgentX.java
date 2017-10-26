@@ -10,7 +10,6 @@ import nars.control.Cause;
 import nars.control.DurService;
 import nars.control.MetaGoal;
 import nars.exe.MultiExec;
-import nars.exe.UniExec;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;

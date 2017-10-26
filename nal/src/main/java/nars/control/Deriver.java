@@ -46,8 +46,8 @@ public class Deriver extends NARService {
     private final Causable can;
     private final CauseChannel<ITask> cause;
 
-    private float minPremisesPerConcept = 2;
-    private float maxPremisesPerConcept = 5;
+    private float minPremisesPerConcept = 1;
+    private float maxPremisesPerConcept = 3;
 
     protected Deriver(NAR nar, String... rulesets) {
         this(PrediTrie.the(
@@ -73,6 +73,7 @@ public class Deriver extends NARService {
                 return cause.value();
             }
         };
+        //this.can.can.update(1,1,0.0);
     }
 
 
@@ -119,12 +120,14 @@ public class Deriver extends NARService {
 
                 return derivations[0] > 0;
             });
+
+            int derived = d.commit(cause::input);
+            activator.commit(nar);
+
             if (derivations[0] == derivationsBefore)
                 break; //nothing happened
         }
 
-        int derived = d.commit(cause::input);
-        activator.commit(nar);
 
         return derivations[0];
     }

@@ -1,6 +1,5 @@
 package nars.gui;
 
-import com.jogamp.opengl.GL2;
 import jcog.pri.Prioritized;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.widget.meter.TreeChart;

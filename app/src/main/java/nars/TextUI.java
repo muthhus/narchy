@@ -30,7 +30,6 @@ import nars.control.DurService;
 import nars.control.NARService;
 import nars.op.Operator;
 import nars.op.nlp.Hear;
-import nars.task.ITask;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;

@@ -4,7 +4,6 @@ import nars.Op;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Terms;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class union extends Functor.BinaryFunctor {

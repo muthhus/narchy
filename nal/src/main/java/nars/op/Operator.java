@@ -5,25 +5,17 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.concept.BaseConcept;
-import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.task.NALTask;
-import nars.task.NativeTask;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
-import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 import static nars.Op.ATOM;
 import static nars.Op.INH;

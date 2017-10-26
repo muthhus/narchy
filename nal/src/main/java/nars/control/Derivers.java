@@ -1,18 +1,8 @@
 package nars.control;
 
-import nars.NAR;
-import nars.Param;
-import nars.derive.PrediTerm;
-import nars.derive.PrediTrie;
-import nars.derive.instrument.DebugDerivationPredicate;
-import nars.derive.rule.PremiseRuleSet;
-import nars.index.term.PatternIndex;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Function;
 
 /**
  * utility class for working witih Deriver's

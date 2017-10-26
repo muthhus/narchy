@@ -1,6 +1,5 @@
 package nars.test.condition;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import java.io.Serializable;
@@ -22,7 +21,7 @@ public interface NARCondition extends Serializable {
     /** max possible cycle time in which this condition could possibly be satisfied. */
     long getFinalCycle();
 
-    default void log(@NotNull Logger logger) {
+    default void log(Logger logger) {
         String s = toString();
         if (isTrue())
             logger.info(s);

@@ -9,10 +9,6 @@ import nars.control.Activate;
 import nars.gui.graph.DynamicConceptSpace;
 import nars.task.ITask;
 import nars.task.NALTask;
-import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 public class SimpleConceptGraph1 extends DynamicConceptSpace {
 

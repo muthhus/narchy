@@ -3,6 +3,7 @@ package nars.test.condition;
 
 import jcog.Texts;
 import nars.*;
+import nars.control.MetaGoal;
 import nars.task.Tasked;
 import nars.term.Term;
 import nars.term.Terms;
@@ -32,6 +33,9 @@ public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Ta
     private final Term term;
     private final LongPredicate start;
     private final LongPredicate end;
+
+    /** whether to apply meta-feedback to drive the reasoner toward success conditions */
+    public boolean feedback = true;
 
     boolean succeeded;
     //long successTime = Tense.TIMELESS;
@@ -130,7 +134,7 @@ public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Ta
      * a heuristic for measuring the difference between terms
      * in range of 0..100%, 0 meaning equal
      */
-    public static float termDistance(@NotNull Term a, @NotNull Term b, float ifLessThan) {
+    public static float termDistance(Term a, Term b, float ifLessThan) {
         if (a.equals(b)) return 0;
 
         float dist = 0;
@@ -281,24 +285,28 @@ public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Ta
                 ((creationEnd == -1) || (now <= creationEnd)));
     }
 
-    protected boolean occurrenceTimeMatches(@NotNull Task t) {
+    protected boolean occurrenceTimeMatches(Task t) {
         return start.test(t.start()) && end.test(t.end());
     }
 
     @Override
-    public final boolean test(@NotNull Task task) {
+    public final boolean test(Task t) {
 
-        if (matches(task)) {
-            matched.add(task);
+        if (matches(t)) {
+            matched.add(t);
             succeeded = true;
-            return true;
-        }
 
-        recordSimilar(task);
-        return false;
+            if (feedback)
+                MetaGoal.learn(MetaGoal.Accurate, t.cause(), 1, nar);
+
+            return true;
+        } else {
+            recordSimilar(t);
+            return false;
+        }
     }
 
-    public void recordSimilar(@NotNull Task task) {
+    public void recordSimilar(Task task) {
         //synchronized (similar = this.similar) {
         final TreeMap<Float, Task> similar = this.similar;
 
@@ -385,24 +393,24 @@ public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Ta
 
 
     @Override
-    public final void accept(@NotNull Tasked tasked) {
-        accept(tasked.task());
-    }
-
-    public final void accept(@NotNull Task task) {
-
+    public final void accept(Tasked tasked) {
         if (succeeded) return; //no need to test any further
-
-
-        if (test(task)) {
-            succeeded = true;
-            //successTime = nar.time();
-        } else {
-            //logger.info("non-matched: {}", task);
-            //logger.info("\t{}", task.getLogLast());
-        }
-
+        test(tasked.task());
     }
+
+//    public final void accept(Task task) {
+//
+//
+//
+//        if (test(task)) {
+//            succeeded = true;
+//            //successTime = nar.time();
+//        } else {
+//            //logger.info("non-matched: {}", task);
+//            //logger.info("\t{}", task.getLogLast());
+//        }
+//
+//    }
 
 
     @Override

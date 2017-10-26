@@ -1,7 +1,6 @@
 package jcog.bit;
 
 import java.util.Arrays;
-import java.util.BitSet;
 
 /**
  * Bare metal bitset implementation. For performance reasons, this

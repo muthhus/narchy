@@ -1,6 +1,8 @@
 package nars.exe;
 
-import com.lmax.disruptor.*;
+import com.lmax.disruptor.EventTranslatorOneArg;
+import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.WorkHandler;
 import com.lmax.disruptor.dsl.Disruptor;
 import jcog.exe.AffinityExecutor;
 import nars.NAR;

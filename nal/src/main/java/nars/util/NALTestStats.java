@@ -1,7 +1,9 @@
 package nars.util;
 
 import nars.control.MetaGoal;
-import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class NALTestStats implements AfterEachCallback, AfterAllCallback {
 

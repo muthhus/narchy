@@ -3,7 +3,6 @@ package nars.op.data;
 import nars.Op;
 import nars.term.Functor;
 import nars.term.Term;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * all X which are in the first term AND not in the second term

@@ -2,13 +2,10 @@ package nars;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.math.FloatNormalized;
-import jcog.math.FloatPolarNormalized;
 import jcog.pri.Pri;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;
-import nars.control.Cause;
 import nars.control.CauseChannel;
 import nars.task.ITask;
 import nars.term.Term;
@@ -26,8 +23,10 @@ import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 
 import static jcog.Util.unitize;
-import static nars.Op.*;
-import static nars.truth.TruthFunctions.*;
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
+import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Created by me on 9/30/16.

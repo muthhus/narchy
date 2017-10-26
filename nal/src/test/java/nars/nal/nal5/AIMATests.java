@@ -4,7 +4,6 @@ import com.google.common.math.PairedStatsAccumulator;
 import jcog.io.SparkLine;
 import jcog.list.FasterList;
 import nars.*;
-import nars.op.QuerySpider;
 import nars.term.Term;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

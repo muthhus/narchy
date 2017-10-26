@@ -16,7 +16,6 @@ import nars.op.data.differ;
 import nars.op.data.intersect;
 import nars.op.data.union;
 import nars.task.DerivedTask;
-import nars.task.ITask;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;

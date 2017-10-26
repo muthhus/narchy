@@ -3,15 +3,16 @@ package nars.concept;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
 import jcog.pri.*;
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
+import nars.Task;
 import nars.control.BatchActivation;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -295,8 +296,8 @@ public enum TermLinks {
         return cost;
     }
 
-    public static void linkTask(Task task, Collection<Concept> subs, float cPri) {
-        int numSubs = subs.size();
+    public static void linkTask(Task task, Collection<Concept> targets, float cPri) {
+        int numSubs = targets.size();
         if (numSubs == 0)
             return;
 
@@ -304,9 +305,9 @@ public enum TermLinks {
         float tfaEach = tfa / numSubs;
 
 
-        for (Concept localSubConcept : subs) {
+        for (Concept target : targets) {
 
-            localSubConcept.tasklinks().putAsync(
+            target.tasklinks().putAsync(
                     new PLinkUntilDeleted(task, tfaEach)
             );
 //                localSubConcept.termlinks().putAsync(

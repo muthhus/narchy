@@ -17,6 +17,7 @@
 package jcog.util;
 
 import com.google.common.collect.FluentIterable;
+
 import java.io.PrintStream;
 import java.util.Collections;
 
