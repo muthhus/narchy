@@ -2,7 +2,6 @@ package nars.gui.graph;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.bag.impl.PLinkArrayBag;
 import jcog.bag.util.Bagregate;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
@@ -11,6 +10,7 @@ import jcog.pri.op.PriMerge;
 import jcog.util.Flip;
 import nars.NAR;
 import nars.Task;
+import nars.bag.ConcurrentArrayBag;
 import nars.concept.Concept;
 import nars.control.Activate;
 import nars.control.DurService;
@@ -24,6 +24,7 @@ import spacegraph.render.Draw;
 
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.BiConsumer;
@@ -176,15 +177,23 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
             this.maxEdges = maxEdges;
 
             this.edges =
-                    //new PLinkHijackBag(0, 2);
-                    new PLinkArrayBag<>(maxEdges,
+                    new ConcurrentArrayBag<>(
+                            //new PLinkHijackBag(0, 2);
+                            //new PLinkArrayBag<>(maxEdges,
                             //PriMerge.max,
                             //PriMerge.replace,
-                            PriMerge.plus,
+                            PriMerge.max,
                             //new UnifiedMap()
                             //new LinkedHashMap()
-                            new LinkedHashMap() //maybe: edgeBagSharedMap
-                    );
+                            //new LinkedHashMap() //maybe: edgeBagSharedMap
+                            maxEdges
+                    ) {
+                        @Nullable
+                        @Override
+                        public ConceptWidget.EdgeComponent key(ConceptWidget.EdgeComponent x) {
+                            return x;
+                        }
+                    };
         }
 
         @Override
@@ -200,12 +209,15 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
 
             edges.commit(ee -> {
                 ConceptWidget src = ee.src;
+                Map<Concept, ConceptWidget.ConceptEdge> eee = src.currentEdges.write();
                 if (ee.tgt.active()) {
-                    src.currentEdges.write().computeIfAbsent(ee.tgt.id, (t) ->
+                    eee.computeIfAbsent(ee.tgt.id, (t) ->
                             new ConceptWidget.ConceptEdge(src, ee.tgt, 0)
                     ).merge(ee);
+                } else {
+                    ee.delete();
+                    eee.remove(ee.tgt.id);
                 }
-
             });
             float termlinkOpac = termlinkOpacity.floatValue();
             float tasklinkOpac = tasklinkOpacity.floatValue();

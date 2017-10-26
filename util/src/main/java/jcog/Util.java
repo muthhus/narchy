@@ -602,11 +602,17 @@ public enum Util {
      * clamps a value to 0..1 range
      */
     public static float unitize(float x) {
-        if (notNaN(x) > 1.0f)
-            x = 1.0f;
-        else if (x < 0.0f)
-            x = 0.0f;
-        return x;
+        if (x <= 1f) {
+            if (x >= 0f) {
+                return x;
+            } else {
+                notNaN(x);
+                return 0f;
+            }
+        } else {
+            notNaN(x);
+            return 1f;
+        }
     }
 
     public static float notNaN(float x) throws NumberException {
@@ -615,11 +621,11 @@ public enum Util {
         return x;
     }
 
-    public static float notNaNOrNeg(float x) throws NumberException {
-        if (notNaN(x) < 0)
-            throw new NumberException("Negative");
-        return x;
-    }
+//    public static float notNaNOrNeg(float x) throws NumberException {
+//        if (notNaN(x) < 0)
+//            throw new NumberException("Negative");
+//        return x;
+//    }
 
     /**
      * clamps a value to 0..1 range
@@ -1353,7 +1359,7 @@ public enum Util {
             if (selected.get(ii)) {
                 return 0;
             } else {
-                float w  = choiceWeight.valueOf(ii);
+                float w = choiceWeight.valueOf(ii);
                 if (w == 0)
                     selected.set(ii);
                 return w;
@@ -1361,7 +1367,7 @@ public enum Util {
         };
         Util.decideRoulette(choices, cc, random, (int y) -> {
             selected.set(y);
-            return tgt.test(y) && (tries[0]++ < hardLimit) && (selected.cardinality()<choices) ?
+            return tgt.test(y) && (tries[0]++ < hardLimit) && (selected.cardinality() < choices) ?
                     RouletteControl.WEIGHTS_CHANGED : RouletteControl.STOP;
         });
 
@@ -1387,7 +1393,7 @@ public enum Util {
     }
 
     public static float max(float a, float b, float c) {
-        return Math.max(Math.max(a,b),c);
+        return Math.max(Math.max(a, b), c);
     }
 
     public static enum RouletteControl {
@@ -1749,7 +1755,7 @@ public enum Util {
     }
 
     public static float and(float a, float b, float c) {
-        return a * b  * c;
+        return a * b * c;
     }
 
     public static float or(float a, float b, float c) {

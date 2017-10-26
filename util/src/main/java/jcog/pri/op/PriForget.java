@@ -41,7 +41,7 @@ public class PriForget<P extends Priority> implements Consumer<P> {
             float eachForget = (temperature * pressure)/c;
 
             if (eachForget > priEpsilon)
-                return f.valueOf(Math.min(0.5f /*max removed */, eachForget));
+                return f.valueOf(eachForget);
 
         }
         return null;

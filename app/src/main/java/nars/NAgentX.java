@@ -356,7 +356,7 @@ abstract public class NAgentX extends NAgent {
                                 metaGoalPlot(a),
                                 metaGoalControls(n)
                         )),
-            0.1f), 800, 800);
+            0.9f), 800, 800);
 
         });
 

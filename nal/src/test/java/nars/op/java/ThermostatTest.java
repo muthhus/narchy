@@ -35,7 +35,7 @@ public class ThermostatTest {
         Param.DEBUG = true;
 
         n = NARS.tmp();
-        Deriver.deriver(0, "list.nal").apply(n);
+        //Deriver.deriver(0, "list.nal").apply(n);
 
         //n.log();
         n.priDefault(BELIEF, 0.2f);
@@ -105,7 +105,7 @@ public class ThermostatTest {
         }
         assertEquals(5, x.intValue());
 
-        //new MetaGoal.Report().add(n.causes).print(System.out);
+        new MetaGoal.Report().add(n.causes).print(System.out);
 
 
     }
