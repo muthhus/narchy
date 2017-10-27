@@ -20,15 +20,15 @@ public class NAL1Test extends NALTest {
     }
 
     @Override protected NAR nar() {
-          Builder.Compound.the = new BiFunction<Op, Term[], Term>() {
-            @Override public Term apply(Op op, Term[] terms) {
-                GenericCompound g = new GenericCompound(op, Op.subterms(terms));
-                if (g.complexity() > 4)
-                    return g;
-                else
-                    return FastCompound.get(g);
-            }
-        };
+//          Builder.Compound.the = new BiFunction<Op, Term[], Term>() {
+//            @Override public Term apply(Op op, Term[] terms) {
+//                GenericCompound g = new GenericCompound(op, Op.subterms(terms));
+//                if (g.complexity() > 4)
+//                    return g;
+//                else
+//                    return FastCompound.get(g);
+//            }
+//        };
         return NARS.tmp(1); }
 
 //    static {
