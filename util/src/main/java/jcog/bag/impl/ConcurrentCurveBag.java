@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Random;
+import java.util.function.IntConsumer;
 
 /**
  * adds a QueueLock wrapping the putAsync methods
@@ -19,14 +20,16 @@ public class ConcurrentCurveBag<X extends Priority> extends CurveBag<X> {
     public ConcurrentCurveBag(@NotNull PriMerge mergeFunction, @NotNull Map<X, X> map, Random rng, int cap) {
         super(mergeFunction, map, rng, cap);
 
-        this.toPut = new QueueLock<X>(Util.blockingQueue(cap), super::putAsync, (batchSize) -> {
-            commit();
-//            if (mustSort) {
-//                synchronized (items) {
-//                    super.ensureSorted();
-//                }
-//            }
-        });
+        IntConsumer afterBatch = null; //assumes the bag will be manually commit()'d
+//                (batchSize) -> {
+//            commit();
+////            if (mustSort) {
+////                synchronized (items) {
+////                    super.ensureSorted();
+////                }
+////            }
+//        };
+        this.toPut = new QueueLock<X>(Util.blockingQueue(cap/2), super::putAsync, afterBatch);
     }
 
     @Override

@@ -85,10 +85,10 @@ public enum TermLinks {
 
             case SETe:
             case SETi:
-                return 1;
+                return 2;
 
             case PROD:
-                return 1;
+                return 2;
 
             case DIFFe:
             case DIFFi:
@@ -96,13 +96,13 @@ public enum TermLinks {
             case SECTe:
 
 
-                return 1;
+                return 2;
 
             case CONJ:
-                return 2;
+                return 3;
 
             case SIM:
-                return 2;
+                return 3;
 
             case INH:
                 return 4;
@@ -119,24 +119,24 @@ public enum TermLinks {
         }
     }
 
-    public static void linkTask(Task t, float activationApplied, NAR n, Concept cc) {
+    public static void linkTask(Task t, float activationApplied, NAR nar, Concept cc) {
 
-        n.emotion.onActivate(t, activationApplied, cc, n);
-
-        float evalAmp = n.evaluate(t.cause());
-
-        activationApplied *= evalAmp;
 
         cc.tasklinks().putAsync(
                 new PLinkUntilDeleted<>(t, activationApplied)
                 //new PLink<>(t, activation)
         );
 
-        n.activate(cc, activationApplied);
-
         if (activationApplied >= Prioritized.EPSILON_VISIBLE) {
-            n.eventTask.emit(t);
+            nar.eventTask.emit(t);
         }
+
+        float conceptActivation = activationApplied * nar.evaluate(t.cause());
+
+        nar.emotion.onActivate(t, conceptActivation, cc, nar);
+
+        nar.activate(cc, conceptActivation);
+
     }
 
     public static void linkTemplate(Term srcTerm, Bag srcTermLinks, Termed target, float priForward, float priReverse, BatchActivation a, NAR nar, MutableFloat refund) {
@@ -218,7 +218,7 @@ public enum TermLinks {
         if (Param.MUTATE_INT_CONTAINING_TERMS_RATE > 0) {
             if (t.hasAny(INT)) {
                 TermContainer ts = t.subterms();
-                if (ts.OR(xx -> xx instanceof Int) && rng.nextFloat() <= Param.MUTATE_INT_CONTAINING_TERMS_RATE) {
+                if (ts.OR(Int.class::isInstance) && rng.nextFloat() <= Param.MUTATE_INT_CONTAINING_TERMS_RATE) {
 
                     Term[] xx = ts.toArray();
                     boolean changed = false;

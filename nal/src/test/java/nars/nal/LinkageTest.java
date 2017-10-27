@@ -26,17 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LinkageTest extends NALTest {
 
-    int runCycles = 25;
-
-
-//    @Override
-//    public TestNAR test(NAR n) {
-//        return new TestNAR(n) {
-//            @Override protected boolean requireConditions() {
-//                return false;
-//            }
-//        };
-//    }
+    final int runCycles = 100;
 
 
     public void ProperlyLinkedTest(@NotNull String premise1, @NotNull String premise2) throws Exception {
@@ -54,13 +44,6 @@ public class LinkageTest extends NALTest {
         Concept ret2 = tester.nar.conceptualize(premise2);
         assertTrue(isPassed2(premise1, ret2), ret2 + " termlinks contains " + premise1);
 
-
-//        if(passed && passed2) { //dummy to pass the test:
-//            tester.believe("<a --> b>");
-//        } else {
-//            throw new Exception("failed");
-//        }
-//        tester.mustBelieve(10,"<a --> b>",0.9f);
     }
 
     public boolean isPassed2(String premise1Str, @Nullable Concept ret2) {

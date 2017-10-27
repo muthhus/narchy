@@ -95,16 +95,16 @@ public class ValueFork extends Fork {
 //                } while (--s > 0);
 //            }
 //        } else { // Use insertion sort on small arrays
-            for (int i = left, j = i; i < right; j = ++i) {
-                byte ai = a[i + 1];
-                while (v.valueOf(ai) < v.valueOf(a[j])) {
-                    a[j + 1] = a[j];
-                    if (j-- == left) {
-                        break;
-                    }
+        for (int i = left, j = i; i < right; j = ++i) {
+            byte ai = a[i + 1];
+            while (v.valueOf(ai) < v.valueOf(a[j])) {
+                a[j + 1] = a[j];
+                if (j-- == left) {
+                    break;
                 }
-                a[j + 1] = ai;
             }
+            a[j + 1] = ai;
+        }
 //        }
     }
 
@@ -120,33 +120,45 @@ public class ValueFork extends Fork {
             return d.revertLive(before);
         } else {
 
+            final boolean[] continued = {true};
+            Util.selectRouletteUnique(branches, d.random, branches, (i) -> causes[i].amp(), (b) -> {
+
+                this.branches[b].test(d);
+
+                if (!d.revertLive(before)) {
+                    continued[0] = false;
+                    return false;
+                }
+                return true;
+            });
+            return continued[0];
+
             //RANDOM
             //ByteShuffler b = d.shuffler;
             //byte[] order = b.shuffle(d.random, branches, true); //must get a copy because recursion will re-use the shuffler's internal array
 
 
-            //BY VALUE
-            byte[] order = new byte[branches];
-            for (byte i = 0; i < branches; i++)
-                order[i] = i;
-            sort(order, 0, branches-1, a -> -causes[a].value());
+//            //BY VALUE
+//            byte[] order = new byte[branches];
+//            for (byte i = 0; i < branches; i++)
+//                order[i] = i;
+            //sort(order, 0, branches-1, a -> -causes[a].value());
 
+//            int ttl = d.ttl;
 
-            int ttl = d.ttl;
-
-            for (int i = 0; i < branches; i++) {
-
-//                int subTTL = Math.round(ttl * (value[i] / valueTotal));
-//                int reserve = d.getAndSetTTL(subTTL) - subTTL;
-
-                this.branches[order[i]].test(d);
-
-//                d.addTTL(reserve);
-
-                if (!d.revertLive(before))
-                    return false;
-            }
-            return true;
+//            for (int i = 0; i < branches; i++) {
+//
+////                int subTTL = Math.round(ttl * (value[i] / valueTotal));
+////                int reserve = d.getAndSetTTL(subTTL) - subTTL;
+//
+//                this.branches[order[i]].test(d);
+//
+////                d.addTTL(reserve);
+//
+//                if (!d.revertLive(before))
+//                    return false;
+//            }
+//            return true;
         }
     }
 

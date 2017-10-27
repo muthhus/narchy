@@ -33,9 +33,13 @@ public abstract class ConsoleSurface extends AbstractConsoleSurface {
         resize(cols, rows);
     }
 
-
     @Override
     public void paint(GL2 gl) {
+        Draw.bounds(gl, this, this::doPaint);
+    }
+
+
+    void doPaint(GL2 gl) {
 
         float charScaleX = this.charScaleX;
         float charScaleY = this.charScaleY;
@@ -67,9 +71,8 @@ public abstract class ConsoleSurface extends AbstractConsoleSurface {
             Draw.textStart(gl,
                     charScaleX, charScaleY,
                     //0, (rows - 1 - jj) * charAspect,
-                    0.5f,  (rows - 1 - row),
+                    0.5f, (rows - 1 - row),
                     dz);
-
 
 
             for (int col = 0; col < cols; col++) {
@@ -80,8 +83,8 @@ public abstract class ConsoleSurface extends AbstractConsoleSurface {
 
                 if (setBackgroundColor(gl, c, col, row)) {
                     Draw.rect(gl,
-                        Math.round((col - 0.5f) * 20/charScaleX), 0,
-                        Math.round(20f/charScaleX), 24
+                            Math.round((col - 0.5f) * 20 / charScaleX), 0,
+                            Math.round(20f / charScaleX), 24
                     );
                 }
 
@@ -89,7 +92,6 @@ public abstract class ConsoleSurface extends AbstractConsoleSurface {
 //                    continue;
 
                 //TODO: Background color
-
 
 
                 char cc = visible(c.getCharacter());
@@ -103,9 +105,9 @@ public abstract class ConsoleSurface extends AbstractConsoleSurface {
                     //TODO: if (!fg.equals(previousFG))
 
                     Color fg = c.getForegroundColor().toColor();
-                    gl.glColor4f(fg.getRed()/256f,fg.getGreen()/256f,fg.getBlue()/256f, fgAlpha);
+                    gl.glColor4f(fg.getRed() / 256f, fg.getGreen() / 256f, fg.getBlue() / 256f, fgAlpha);
 
-                    Draw.textNext(gl, cc, col/charScaleX);
+                    Draw.textNext(gl, cc, col / charScaleX);
 
                 }
             }
@@ -120,11 +122,11 @@ public abstract class ConsoleSurface extends AbstractConsoleSurface {
 
         //DRAW CURSOR
         float p = (1f + (float) Math.sin(t / 100.0)) * 0.5f;
-        float m = ( p);
+        float m = (p);
         gl.glColor4f(1f, 0.7f, 0f, 0.4f + p * 0.4f);
 
         Draw.rect(gl,
-                (float) (curx) + m/2f,
+                (float) (curx) + m / 2f,
                 (rows - 1 - cury),
                 1 - m, (1 - m)
                 , -dz
@@ -134,13 +136,15 @@ public abstract class ConsoleSurface extends AbstractConsoleSurface {
 
     }
 
-    /** return true to paint a character's background. if so, then it should set the GL color */
+    /**
+     * return true to paint a character's background. if so, then it should set the GL color
+     */
     protected boolean setBackgroundColor(GL2 gl, TextCharacter ch, int col, int row) {
-        if (ch!=null) {
+        if (ch != null) {
             bg = ch.getBackgroundColor().toColor();
 //            if (!nextColor.equals(bg)) {
 //                this.bg = nextColor;
-                gl.glColor3f(bg.getRed() / 256f, bg.getGreen() / 256f, bg.getBlue() / 256f);
+            gl.glColor3f(bg.getRed() / 256f, bg.getGreen() / 256f, bg.getBlue() / 256f);
             //}
             return true;
         }

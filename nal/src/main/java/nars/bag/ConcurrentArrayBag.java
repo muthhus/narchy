@@ -7,8 +7,8 @@ import jcog.pri.op.PriMerge;
 import jcog.util.QueueLock;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 abstract public class ConcurrentArrayBag<K,X extends Priority> extends ArrayBag<K,X> {
 
@@ -16,7 +16,7 @@ abstract public class ConcurrentArrayBag<K,X extends Priority> extends ArrayBag<
 
 
     protected ConcurrentArrayBag(PriMerge mergeFunction, int cap) {
-        this(mergeFunction, new ConcurrentHashMap<>(cap), cap);
+        this(mergeFunction, new HashMap<>(cap), cap);
     }
 
     protected ConcurrentArrayBag(PriMerge mergeFunction, @NotNull Map<K, X> map, int cap) {

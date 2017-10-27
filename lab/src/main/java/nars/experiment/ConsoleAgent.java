@@ -3,6 +3,7 @@ package nars.experiment;
 import com.googlecode.lanterna.TextCharacter;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
+import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
@@ -23,7 +24,7 @@ import spacegraph.widget.console.ConsoleTerminal;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.BlockingQueue;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -35,7 +36,7 @@ import static nars.Op.BELIEF;
  */
 public abstract class ConsoleAgent extends NAgentX {
 
-    final ConcurrentLinkedDeque<Task> queue = new ConcurrentLinkedDeque<Task>();
+    final BlockingQueue<Task> queue = Util.blockingQueue(16);
 
 
     final static int WIDTH = 4;
@@ -163,7 +164,7 @@ public abstract class ConsoleAgent extends NAgentX {
         private final Signal[][] beliefs;
         int c[] = new int[2];
         private boolean write;
-        private long nextStamp;
+        //private long nextStamp;
 
 
         public TestConsole(Term id, boolean read, int w, int h) {
@@ -172,7 +173,7 @@ public abstract class ConsoleAgent extends NAgentX {
             this.terms = new Compound[w][h];
             this.beliefs = new Signal[w][h];
 
-            nextStamp = nar.time.nextStamp();
+            //nextStamp = nar.time.nextStamp();
 
             for (int x = 0; x < w; x++) {
                 for (int y = 0; y < h; y++) {
@@ -328,7 +329,7 @@ public abstract class ConsoleAgent extends NAgentX {
                 beliefs[cx][cy].set(
                         $.inst(terms[cx][cy], $.the(String.valueOf(value))),
                         $.t(1f, 0.9f),
-                        () -> nextStamp,
+                        () -> nar.time.nextStamp(),
                         nar.time(), nar.dur(), nar);
             }
         }
@@ -375,7 +376,7 @@ public abstract class ConsoleAgent extends NAgentX {
         }
 
         public Stream<SignalTask> input() {
-            nextStamp = nar.time.nextStamp();
+            //nextStamp = nar.time.nextStamp();
             return IntStream.range(0, rows() * cols()).mapToObj(i -> {
                 int x = i % cols();
                 int y = (i - x) / cols();

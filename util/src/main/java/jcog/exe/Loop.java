@@ -5,6 +5,7 @@ import jcog.Util;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 
+import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -25,6 +26,8 @@ abstract public class Loop {
 
     /** in seconds */
     public final DescriptiveStatistics dutyTime = new DescriptiveStatistics(windowLength); //in millisecond
+
+
 
     public static Loop of(Runnable iteration) {
         return new Loop() {
@@ -217,5 +220,11 @@ abstract public class Loop {
         float l = lagSum;
         this.lagSum = 0;
         return l;
+    }
+
+    public void stats(String prefix, SortedMap<String, Object> x) {
+        x.put(prefix + " duty time mean", dutyTime.getMean()); //in seconds
+        x.put(prefix + " duty time variance", dutyTime.getVariance()); //in seconds
+        x.put(prefix + " lag", lag);
     }
 }

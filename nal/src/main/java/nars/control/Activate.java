@@ -77,16 +77,29 @@ public class Activate extends PLink<Concept> implements Termed {
         int ntasklinks = tasklinks.size();
         if (ntasklinks == 0) return null;
 
-        int TASKLINKS_SAMPLED = (int) Math.ceil(((float)premisesMax) / termlSize);
-
         final int[] remaining = {premisesMax};
-
         Random rng = nar.random();
-        tasklinks.sample(Math.min(ntasklinks, TASKLINKS_SAMPLED), (tasklink) -> {
 
+        int TASKLINKS_SAMPLED = (int) Math.ceil(((float)premisesMax) / termlSize);
+        int TASKLINK_oversample = 2 * TASKLINKS_SAMPLED;
+        List<PriReference<Task>> tasklinkCandidates = $.newArrayList();
+        tasklinks.sample(TASKLINK_oversample, (Consumer<PriReference<Task>>) /* not pred */(x -> tasklinkCandidates.add(x)));
+        if (tasklinkCandidates.isEmpty())
+            return null;
+
+        //apply the nar valuation to further refine selection of the tasks collected in the oversample prestep
+        Util.selectRouletteUnique(TASKLINKS_SAMPLED, rng, tasklinkCandidates.size(), (i)-> {
+                PriReference<Task> tl = tasklinkCandidates.get(i);
+                Task t = tl.get();
+                if (t == null) return 0;
+                return tl.priElseZero() * nar.evaluate(t.cause());
+        }, tli-> {
+        //tasklinks.sample(Math.min(ntasklinks, TASKLINKS_SAMPLED), (tasklink) -> {
+
+            PriReference<Task> tasklink = tasklinkCandidates.get(tli);
             final Task task = tasklink.get();
             if (task == null)
-                return;
+                return true;
 
             float tPri = task.priElseZero();
             for (int j = 0; j < termlSize && remaining[0]-- > 0; j++) {
@@ -107,6 +120,8 @@ public class Activate extends PLink<Concept> implements Termed {
                     next.add(p);
                 }
             }
+
+            return true;
         });
 
         return next;

@@ -9,6 +9,7 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.control.Activate;
 import nars.task.ITask;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectShortHashMap;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +59,7 @@ public class UniExec extends Exec {
 
         active =
             concurrent() ?
-                new ConcurrentCurveBag<>(PriMerge.plus, new ConcurrentHashMap<>(), nar.random(), CAPACITY)
+                new ConcurrentCurveBag<>(PriMerge.plus, new HashMap<>(), nar.random(), CAPACITY)
                     //new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), CAPACITY) {
                         :
                 new CurveBag<>(PriMerge.plus, new HashMap(), nar.random(), CAPACITY);

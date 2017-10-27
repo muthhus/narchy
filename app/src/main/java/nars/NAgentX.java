@@ -178,8 +178,8 @@ abstract public class NAgentX extends NAgent {
 //                    }
 //                })
                 .exe(new MultiExec.
-                            //Intense
-                            CoolNQuiet
+                            Intense
+                            //CoolNQuiet
                         (256, THREADS, 32))
 
                 .time(clock)
@@ -680,6 +680,7 @@ abstract public class NAgentX extends NAgent {
                         );
                         EdgeDirected fd = new EdgeDirected();
                         s.dyn.addBroadConstraint(fd);
+                        fd.attraction.set(fd.attraction.get()*4);
                         s.camPos(0, 0, 90);
                         return s;
                     }),

@@ -4,7 +4,7 @@ import com.google.common.collect.Iterables;
 import jcog.bag.Bag;
 import jcog.bloom.YesNoMaybe;
 import jcog.pri.PLink;
-import jcog.pri.PriMap;
+import jcog.pri.PriCache;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.IO;
@@ -29,14 +29,14 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static jcog.Texts.n2;
-import static jcog.pri.PriMap.Hold.SOFT;
-import static jcog.pri.PriMap.Hold.STRONG;
+import static jcog.pri.PriCache.Hold.SOFT;
+import static jcog.pri.PriCache.Hold.STRONG;
 
 public class PriMapTermIndex extends MaplikeTermIndex {
 
     //final IntCountsHistogram conceptScores = new IntCountsHistogram(1000, 2);
 
-    private final PriMap<Term, Concept> concepts;
+    private final PriCache<Term, Concept> concepts;
 
 
     /**
@@ -70,7 +70,7 @@ public class PriMapTermIndex extends MaplikeTermIndex {
 
     public PriMapTermIndex() {
         super();
-        this.concepts = new PriMap<>() {
+        this.concepts = new PriCache<>() {
 
 
 //            public final CountMinSketch hit = new CountMinSketch(1024,10);

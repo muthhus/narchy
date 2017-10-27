@@ -148,7 +148,16 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
             //TODO handle static methods
 
             boolean isVoid = method.getReturnType() == void.class;
+            boolean isBoolean = method.getReturnType() == boolean.class;
+            boolean negate = false;
+            if (isBoolean ) {
 
+                boolean b = (Boolean) result;
+                if (!b) {
+                    result = true;
+                    negate = true;
+                }
+            }
             Term[] x = new Term[isVoid ? 2 : 3];
             x[0] = $.the(method.getName());
             switch (args.length) {
@@ -168,9 +177,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                 assert (x[2] != null) : "could not termize: " + result;
             }
 
-            Term y = $.func(id, x);
-
-            return y;
+            return $.func(id, x).negIf(negate);
         }
 
         public Object update(Object obj, Method method, Object[] args, Object nextValue) {
@@ -198,8 +205,14 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                 }
 
 
-                ValueSignalTask next = new ValueSignalTask(nextTerm,
-                        BELIEF, $.t(invocationBeliefFreq, nar.confDefault(BELIEF)),
+                float f = invocationBeliefFreq;
+                Term nt = nextTerm;
+                if (nt.op() == NEG) {
+                    nt = nt.unneg();
+                    f = 1-f;
+                }
+                ValueSignalTask next = new ValueSignalTask(nt,
+                        BELIEF, $.t(f, nar.confDefault(BELIEF)),
                         now, now, nar.time.nextStamp(), nextValue);
 
                 if (Param.DEBUG)
@@ -215,7 +228,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                 }
 
 
-                if (p1 != null) {
+                if (p1 != null && !p1.equals(nt)) {
                     p1.end(now); //dont need to re-input prev, this takes care of it
                     next.priMax(pri);
 

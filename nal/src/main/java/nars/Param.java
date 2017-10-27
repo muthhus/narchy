@@ -8,6 +8,7 @@ import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
 import jcog.util.FloatFloatToFloatFunction;
 import nars.control.Derivation;
+import nars.control.MetaGoal;
 import nars.task.Tasked;
 import nars.task.TruthPolation;
 import nars.term.Term;
@@ -87,8 +88,8 @@ public abstract class Param extends Services<Term, NAR> {
     public static final PriMerge activateMerge = PriMerge.plus;
 
     public static final PriMerge termlinkMerge =
-            PriMerge.max;
-            //PriMerge.plus;
+            //PriMerge.max;
+            PriMerge.plus;
 
     public static final PriMerge tasklinkMerge =
             PriMerge.max;
@@ -139,7 +140,7 @@ public abstract class Param extends Services<Term, NAR> {
      * 'time to live', unification steps until unification is stopped
      */
     public final MutableInteger matchTTLmax = new MutableInteger(256);
-    public final MutableInteger matchTTLmin = new MutableInteger(64);
+    public final MutableInteger matchTTLmin = new MutableInteger(32);
 
     /**
      * how much percent of a premise's allocated TTL can be used in the belief matching phase.
@@ -187,6 +188,7 @@ public abstract class Param extends Services<Term, NAR> {
      * so 0.5 is equal amounts for both.
      */
     public static final float TERMLINK_BALANCE = 0.5f;
+
 
 
     public final float[] want = newWants();

@@ -26,14 +26,13 @@ import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 import static nars.Op.*;
@@ -71,12 +70,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     public Bag[] newLinkBags(Term t) {
         int v = t.volume();
         //if (/*v > 3 && */v < 16) {
-        Map sharedMap = newBagMap(v);
+//        Map sharedMap = newBagMap(v);
         Random rng = nar.random();
         @NotNull Bag<Term, PriReference<Term>> termbag =
-                new CurveBag<>(Param.termlinkMerge, sharedMap, rng, 0);
+                new CurveBag<>(Param.termlinkMerge, newBagMap(v), rng, 0);
         @NotNull CurveBag<PriReference<Task>> taskbag =
-                new TaskLinkCurveBag(sharedMap, rng);
+                new TaskLinkCurveBag(newBagMap(v), rng);
 
         return new Bag[]
 
@@ -393,26 +392,26 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         //int defaultInitialCap = 0;
         float loadFactor = 0.75f;
 
-        if (concurrent()) {
-//            //return new ConcurrentHashMap(defaultInitialCap, 1f);
-//            //return new NonBlockingHashMap(cap);
-//            return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe<>();
-//            //ConcurrentHashMapUnsafe(cap);
+//        if (concurrent()) {
+////            //return new ConcurrentHashMap(defaultInitialCap, 1f);
+////            //return new NonBlockingHashMap(cap);
+////            return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe<>();
+////            //ConcurrentHashMapUnsafe(cap);
+////        } else {
+////            return new HashMap(defaultInitialCap, 1f);
+//            //   if (volume < 16) {
+//            return new ConcurrentHashMap(0, loadFactor);
+//
+////            } else if (volume < 32) {
+////                return new SynchronizedHashMap(0, loadFactor);
+////                //return new TrieMap();
+////            } else {
+////                return new SynchronizedUnifiedMap(0, loadFactor);
+////            }
 //        } else {
-//            return new HashMap(defaultInitialCap, 1f);
-            //   if (volume < 16) {
-            return new ConcurrentHashMap(0, loadFactor);
-
-//            } else if (volume < 32) {
-//                return new SynchronizedHashMap(0, loadFactor);
-//                //return new TrieMap();
-//            } else {
-//                return new SynchronizedUnifiedMap(0, loadFactor);
-//            }
-        } else {
-            //return new UnifiedMap(0, loadFactor);
-            return new HashMap(0, loadFactor);
-        }
+            return new UnifiedMap(0, loadFactor);
+            //return new HashMap(0, loadFactor);
+//        }
 
     }
 

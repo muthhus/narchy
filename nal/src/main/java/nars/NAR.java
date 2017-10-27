@@ -94,7 +94,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final transient Topic<NAR> eventCycle = new ListTopic<>();
     public final transient Topic<Task> eventTask = new ListTopic<>();
 
+
+    public final MetaGoal.Revaluator revaluator;
     public final Emotion emotion;
+
     public final Time time;
 
     public final TermIndex terms;
@@ -113,7 +116,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     private final AtomicReference<Term> self;
 
 
-    private final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[want.length + 1 /* for global norm */];
+
     /**
      * maximum NAL level currently supported by this memory, for restricting it to activity below NAL8
      */
@@ -134,12 +137,15 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         self = new AtomicReference<>(null);
         setSelf(Param.randomSelf());
 
+
+        this.revaluator =
+                //new MetaGoal.DefaultRevaluator();
+                new MetaGoal.DefaultRevaluator.RBMRevaluator(rng);
+
         newCauseChannel("input"); //generic non-self source of input
 
         this.nal = 8;
 
-        for (int i = 0; i < valueSummary.length; i++)
-            valueSummary[i] = new RecycledSummaryStatistics();
 
         this.emotion = new Emotion(this);
 
@@ -247,6 +253,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         SortedMap<String, Object> x = new TreeMap();
 
         //x.put("time real", new Date());
+        if (loop.isRunning()) {
+            loop.stats("loop", x);
+        }
 
         x.put("time", time());
 
@@ -959,7 +968,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         time.cycle(this);
 
-        MetaGoal.update(causes, want, valueSummary);
+        revaluator.update(causes, want);
 
         exe.cycle(can);
 

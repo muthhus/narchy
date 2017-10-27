@@ -70,23 +70,40 @@ public enum MetaGoal {
      */
     Inaccurate;
 
-    /**
-     * goal and goalSummary instances correspond to the possible MetaGoal's enum
-     * however summary has an additional instance for the global normalization step
-     */
-    public static void update(FasterList<Cause> causes, float[] goal, RecycledSummaryStatistics[] causeSummary) {
+    public interface Revaluator {
+        /**
+         * goal and goalSummary instances correspond to the possible MetaGoal's enum
+         */
+        void update(FasterList<Cause> causes, float[] goal);
+    }
 
-        for (RecycledSummaryStatistics r : causeSummary) {
-            r.clear();
+    public static class DefaultRevaluator implements Revaluator {
+
+        final RecycledSummaryStatistics[] causeSummary = new RecycledSummaryStatistics[MetaGoal.values().length];
+
+        {
+            for (int i = 0; i < causeSummary.length; i++)
+                causeSummary[i] = new RecycledSummaryStatistics();
         }
 
-        int cc = causes.size();
-        for (int i = 0, causesSize = cc; i < causesSize; i++) {
-            causes.get(i).commit(causeSummary);
-        }
+        float momentum =
+//                    0f;
+                0.99f;
+
+        @Override
+        public void update(FasterList<Cause> causes, float[] goal) {
+
+            for (RecycledSummaryStatistics r : causeSummary) {
+                r.clear();
+            }
+
+            int cc = causes.size();
+            for (int i = 0, causesSize = cc; i < causesSize; i++) {
+                causes.get(i).commit(causeSummary);
+            }
 
 
-        int goals = goal.length;
+            int goals = goal.length;
 //        float[] goalFactor = new float[goals];
 //        for (int j = 0; j < goals; j++) {
 //            float m = 1;
@@ -95,79 +112,94 @@ public enum MetaGoal {
 //            goalFactor[j] = goal[j] / ( Util.equals(m, 0, epsilon) ? 1 : m );
 //        }
 
-        for (int i = 0, causesSize = cc; i < causesSize; i++) {
-            Cause c = causes.get(i);
+            final float momentum = this.momentum;
+            for (int i = 0, causesSize = cc; i < causesSize; i++) {
+                Cause c = causes.get(i);
 
-            Traffic[] cg = c.goalValue;
+                Traffic[] cg = c.goalValue;
 
-            //mix the weighted current values of each purpose, each independently normalized against the values (the reason for calculating summary statistics in previous step)
-            float next = 0;
-            for (int j = 0; j < goals; j++) {
-                next += goal[j] * cg[j].current;
-            }
+                //mix the weighted current values of each purpose, each independently normalized against the values (the reason for calculating summary statistics in previous step)
+                float next = 0;
+                for (int j = 0; j < goals; j++) {
+                    next += goal[j] * cg[j].current;
+                }
 
-            float prev = c.value();
-            final float momentum =
-//                    0f;
-                    0.98f;
+                float prev = c.value();
+
 //                    0.99f * (1f - Util.unitize(
 //                            Math.abs(next) / (1 + Math.max(Math.abs(next), Math.abs(prev)))));
 
-            //c.setValue(Util.lerp(momentum, next, prev));
-            c.setValue(0.9f * (next + prev));
-
-            //TODO
-            //variation of volume weighted moving average
-//            float prev = c.value();
-//            float aPrev = Math.abs(prev);
-//            float av = Math.abs(v);
-//            float momentum = 0.5f;
-//            float momDenom = Math.max(av, momentum * aPrev);
-//            if (momDenom > 0)
-//                c.setValue(Util.lerp((av / momDenom), prev, v));
+                //c.setValue(Util.lerp(momentum, next, prev));
+                c.setValue(0.9f * (next + prev));
+            }
         }
 
-//        float max = (float) goalCausePreNorm.getMax();
-//        float min = (float) goalCausePreNorm.getMin();
-//
-//        if (Util.equals(max, min, epsilon)) {
-//            causes.forEach(Cause::setValueZero); //flat
-//        } else {
-//
-////            boolean bipolar = !(min <= 0 ^ max < 0);
-////            float mid = bipolar ? 0 : (max+min)/2f;
-////            float rangePos = max - mid;
-////            float rangeNeg = mid - min;
-//
-//            float valueMag =
-//                    //Math.max(Math.abs(max), Math.abs(min)); //normalized to absolute range
-//                    1; //no normalization
-//
-////            for (int i = 0, causesSize = cc; i < causesSize; i++) {
-////                Cause c = causes.get(i);
-////
-////                float n = c.valuePreNorm;
-//////                float v = n >= 0 ?
-//////                        (n - mid) / rangePos :
-//////                        (mid - n) / rangeNeg
-//////                        ;
-////                float v = n / valueMag; //normalize to -1..+1
-//////
-////                float nextValue =
-////                        Util.lerp(momentum, v, c.value());
-////
-////                c.setValue(nextValue);
-////            }
-//        }
+        /**
+         * uses an RBM as an adaptive associative memory to learn and reinforce the co-occurrences of the causes
+         * the RBM is an unsupervised network to learn and propagate co-occurring value between coherent Causes
+         */
+        public static class RBMRevaluator extends DefaultRevaluator {
+
+            private final Random rng;
+            public double[] next;
+
+            /** learning iterations applied per NAR cycle */
+            public int learning_iters = 1;
+
+            public double learning_rate = 0.03f;
+
+            public double[] cur;
+            public RBM rbm;
+
+            /** hidden to visible neuron ratio */
+            private int hiddenMultipler = 3;
+
+            public RBMRevaluator(Random rng) {
+                this.rng = rng;
+                momentum = 0.98f;
+            }
+
+            @Override
+            public void update(FasterList<Cause> causes, float[] goal) {
+                super.update(causes, goal);
+
+                int numCauses = causes.size();
+                if (numCauses < 2)
+                    return;
+
+                if (rbm == null || rbm.n_visible != numCauses) {
+                    int numHidden = Math.round(hiddenMultipler * numCauses);
+
+                    rbm = new RBM(numCauses, numHidden, null, null, null, rng) {
+                        @Override
+                        public double activate(double a) {
+                            return super.activate(a);
+                            //return Util.tanhFast((float) a);
+                            //return Util.sigmoidBipolar((float) a, 5);
+                        }
+                    };
+                    cur = new double[numCauses];
+                    next = new double[numCauses];
+                }
 
 
-//        System.out.println("WORST");
-//        causes.stream().map(x -> PrimitiveTuples.pair(x, x.value())).sorted(
-//                (x,y) -> Doubles.compare(x.getTwo(), y.getTwo())
-//        ).limit(20).forEach(x -> {
-//            System.out.println("\t" + x);
-//        });
-//        System.out.println();
+                for (int i = 0; i < numCauses; i++)
+                    cur[i] = causes.get(i).value();
+
+                rbm.reconstruct(cur, next);
+                rbm.contrastive_divergence(cur, learning_rate, learning_iters);
+
+                //float momentum = 0.5f;
+                //float noise = 0.1f;
+                for (int i = 0; i < numCauses; i++) {
+                    //float j = Util.tanhFast((float) (cur[i] + next[i]));
+                    float j = /*((rng.nextFloat()-0.5f)*2*noise)*/ +
+                            //((float) (next[i]));
+                            0.5f * (float) (cur[i]) + 0.5f * ((float) (next[i]));
+                    causes.get(i).setValue(j);
+                }
+            }
+        }
 
     }
 
@@ -201,7 +233,7 @@ public enum MetaGoal {
 
             //trace decay curve
             //linear triangle increasing to inc, warning this does not integrate to 100% here
-            float vPer = (((float) (i + 1)) / numCauses) * strength;
+            float vPer = (strength * (i + 1)) / numCauses;
 
             cc.learn(p, vPer);
 
@@ -260,62 +292,6 @@ public enum MetaGoal {
         return value / effects;
     }
 
-    /**
-     * creates an unsupervised network to learn and propagate co-occurring value between coherent Causes
-     */
-    public static CycleService newValueSynergizer(NAR n) {
-        return new CycleService(n) {
-
-            public double[] next;
-            public int learning_iters = 5;
-            public double learning_rate = 0.01f;
-
-            public double[] cur;
-            public RBM rbm;
-
-
-            @Override
-            protected void run(NAR nar) {
-                int numCauses = nar.causes.size();
-                if (numCauses < 2)
-                    return;
-
-                if (rbm == null || rbm.n_visible != numCauses) {
-                    int numHidden = numCauses / 4;
-
-                    rbm = new RBM(numCauses, numHidden, null, null, null, nar.random()) {
-                        @Override
-                        public double activate(double a) {
-                            return super.activate(a);
-                            //return Util.tanhFast((float) a);
-                            //return Util.sigmoidBipolar((float) a, 5);
-                        }
-                    };
-                    cur = new double[numCauses];
-                    next = new double[numCauses];
-                }
-
-                FasterList<Cause> cause = nar.causes;
-                for (int i = 0; i < numCauses; i++)
-                    cur[i] = cause.get(i).value();
-
-                rbm.reconstruct(cur, next);
-                rbm.contrastive_divergence(cur, learning_rate, learning_iters);
-
-                //float momentum = 0.5f;
-                Random rng = nar.random();
-                float noise = 0.1f;
-                for (int i = 0; i < numCauses; i++) {
-                    //float j = Util.tanhFast((float) (cur[i] + next[i]));
-                    float j = /*((rng.nextFloat()-0.5f)*2*noise)*/ +
-                            0.5f * (float) (cur[i]) + 0.5f * ((float) (next[i]));
-                    cause.get(i).setValue(j);
-                }
-
-            }
-        };
-
-    }
 
     public static AgentService newController(NAgent a) {
         NAR n = a.nar;
@@ -383,10 +359,10 @@ public enum MetaGoal {
 
     public static class Report extends ObjectDoubleHashMap<ObjectBytePair<Cause>> {
 
-        public TreeBasedTable<Cause,MetaGoal,Double> table() {
+        public TreeBasedTable<Cause, MetaGoal, Double> table() {
             TreeBasedTable<Cause, MetaGoal, Double> tt = TreeBasedTable.create();
             MetaGoal[] mv = MetaGoal.values();
-            synchronized(this) {
+            synchronized (this) {
                 forEachKeyValue((k, v) -> {
                     Cause c = k.getOne();
                     MetaGoal m = mv[k.getTwo()];
@@ -397,7 +373,7 @@ public enum MetaGoal {
         }
 
         public Report add(Report r) {
-            synchronized(this) {
+            synchronized (this) {
                 r.forEachKeyValue(this::addToValue);
             }
             return this;
@@ -412,7 +388,7 @@ public enum MetaGoal {
                     MetaGoal m = MetaGoal.values()[i];
                     double tt = t.total;
                     if (tt != 0) {
-                        synchronized(this) {
+                        synchronized (this) {
                             addToValue(PrimitiveTuples.pair(c, (byte) i), tt);
                         }
                     }
@@ -426,10 +402,10 @@ public enum MetaGoal {
         public void print(PrintStream out) {
             synchronized (this) {
                 keyValuesView().toSortedListBy(x -> -x.getTwo()).forEach(x ->
-                  out.println(
-                      n4(x.getTwo()) + "\t" + MetaGoal.values()[x.getOne().getTwo()] + "\t" + x.getOne().getOne()
-                  )
-               );
+                        out.println(
+                                n4(x.getTwo()) + "\t" + MetaGoal.values()[x.getOne().getTwo()] + "\t" + x.getOne().getOne()
+                        )
+                );
             }
         }
     }

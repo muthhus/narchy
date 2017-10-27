@@ -13,7 +13,7 @@ public class CaffeineMemoize<K, V> implements Memoize<K, V> {
     private final Cache<K, V> cache;
     private final Function<K, V> func;
 
-    public CaffeineMemoize(Cache<K, V> cache, Function<K, V> compute) {
+    CaffeineMemoize(Cache<K, V> cache, Function<K, V> compute) {
         this.cache = cache;
         this.func = compute;
     }

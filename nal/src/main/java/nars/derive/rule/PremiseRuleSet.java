@@ -2,6 +2,7 @@ package nars.derive.rule;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Streams;
+import jcog.memoize.CaffeineMemoize;
 import nars.NAR;
 import nars.Narsese;
 import nars.index.term.PatternIndex;
@@ -19,14 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -57,35 +57,36 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
         return rs;
     }
 
-    public static Stream<Pair<PremiseRule, String>> parsedRules(Collection<String> name) {
-        return name.stream()./*parallel().*/flatMap(n -> {
-
-                    InputStream nn = null;
-                    try {
-                        nn = ClassLoader.getSystemResource(n).openStream();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+    final static CaffeineMemoize<String, List<Pair<PremiseRule, String>>> ruleCache = CaffeineMemoize.build((String n) -> {
+        InputStream nn = null;
+        try {
+            nn = ClassLoader.getSystemResource(n).openStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 //                    InputStream nn = NAR.class.getResourceAsStream(
 //                            //"nal/" + n
 //                            n
 //                    );
-                    byte[] bb;
-                    try {
-                        bb = nn.readAllBytes();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        bb = ArrayUtils.EMPTY_BYTE_ARRAY;
-                    }
-                    return parse(load(bb));
+        byte[] bb;
+        try {
+            bb = nn.readAllBytes();
+        } catch (IOException e) {
+            e.printStackTrace();
+            bb = ArrayUtils.EMPTY_BYTE_ARRAY;
+        }
+        return parse(load(bb)).collect(toList());
 
-                }
-        );
+
+    }, 32, false);
+
+    public static Stream<Pair<PremiseRule, String>> parsedRules(Collection<String> name) {
+        return name.stream().flatMap(n -> ruleCache.apply(n).stream());
     }
 
 
-    public PremiseRuleSet(PatternIndex index, NAR nar, @NotNull String... rules) {
-        this(parse(Stream.of(rules)), index, nar);//$.terms, rules));
+    public PremiseRuleSet(PatternIndex index, NAR nar, String... rules) {
+        this(parse(Stream.of(rules)), index, nar);
     }
 
 
@@ -106,7 +107,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
     @NotNull
     static Stream<String> load(@NotNull byte[] data) {
-        return preprocess( Streams.stream(Splitter.on('\n').split(new String(data)) ) );
+        return preprocess(Streams.stream(Splitter.on('\n').split(new String(data))));
     }
 
     @NotNull
@@ -186,7 +187,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     }
 
 
-    final static Map<String,PremiseRule> lines = new ConcurrentHashMap<>(1024);
+    final static Map<String, PremiseRule> lines = new ConcurrentHashMap<>(1024);
 //    static {
 //        Map<String, Compound> m;
 //        try {
@@ -208,12 +209,12 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
         return rawRules.map(src -> Tuples.pair(lines.computeIfAbsent(src, s -> {
             try {
-                return PremiseRuleSet.parse( s);
+                return PremiseRuleSet.parse(s);
             } catch (Narsese.NarseseException e) {
                 logger.error("rule parse: {}:\t{}", e, src);
                 return null;
             }
-        }), src)).filter(x -> x.getOne()!=null);
+        }), src)).filter(x -> x.getOne() != null);
 
     }
 
@@ -329,7 +330,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     }
 
     @NotNull
-    static PremiseRule normalize( PremiseRule q, PatternIndex index, NAR nar) {
+    static PremiseRule normalize(PremiseRule q, PatternIndex index, NAR nar) {
         return q.normalize(index).setup(index, nar);
     }
 

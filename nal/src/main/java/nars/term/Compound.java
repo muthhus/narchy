@@ -769,11 +769,11 @@ public interface Compound extends Term, IPair, TermContainer {
         Op o = op();
         int necessaryBits = o == INH ? Op.funcInnerBits : Op.funcBits;
         boolean changed = false, recurseChange = false;
-        int ellipsisAddition = 0, ellipsisSub = 0;
+        int ellipsisAdds = 0, ellipsisRemoves = 0;
 
         for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
             Term xi = xy[i];
-            Term yi = xi.evalSafe(context, remain);
+            Term yi= xi.evalSafe(context, remain);
             if (yi == null) {
                 return Null;
             } else if (xi != yi && (!xi.equals(yi) || yi.getClass() != xi.getClass())) {
@@ -785,14 +785,14 @@ public interface Compound extends Term, IPair, TermContainer {
                 recurseChange |= yi.hasAll(necessaryBits);
             }
             if (yi instanceof EllipsisMatch) {
-                ellipsisAddition += ((EllipsisMatch) yi).subs();
-                ellipsisSub++;
+                ellipsisAdds += ((EllipsisMatch) yi).subs();
+                ellipsisRemoves++;
             }
         }
 
-        if (ellipsisAddition > 0) {
+        if (ellipsisAdds > 0) {
             //flatten ellipsis
-            Term[] z = new Term[xy.length + ellipsisAddition - ellipsisSub];
+            Term[] z = new Term[xy.length + ellipsisAdds - ellipsisRemoves];
             int k = 0;
             for (int i = 0; i < xy.length; i++) {
                 Term x = xy[i];

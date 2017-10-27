@@ -18,7 +18,7 @@ public abstract class CollectorMap<K, V> {
     @NotNull
     public final Map<K, V> map;
 
-    protected CollectorMap(@NotNull Map<K, V> map) {
+    protected CollectorMap(Map<K, V> map) {
         this.map = map;
     }
 
@@ -153,14 +153,14 @@ public abstract class CollectorMap<K, V> {
     public final V get(@NotNull Object key) {
         return map.get(key);
     }
-
-    public final V merge(@NotNull K key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> c) {
-        return map.merge(key, value, c);
-    }
-
-    public final V compute(@NotNull K key, @NotNull BiFunction<? super K, ? super V, ? extends V> c) {
-        return map.compute(key, c);
-    }
+//
+//    public final V merge(@NotNull K key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> c) {
+//        return map.merge(key, value, c);
+//    }
+//
+//    public final V compute(@NotNull K key, @NotNull BiFunction<? super K, ? super V, ? extends V> c) {
+//        return map.compute(key, c);
+//    }
 
 
     public boolean containsKey(@NotNull K name) {
