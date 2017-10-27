@@ -60,7 +60,7 @@ abstract public class Exec implements Executor {
 
     }
 
-    abstract public void fire(int n, Predicate<Activate> each);
+    abstract public void fire(Predicate<Activate> each);
 
     /** an estimate or exact number of parallel processes this runs */
     abstract public int concurrency();

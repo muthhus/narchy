@@ -114,15 +114,17 @@
 // Conditional syllogism && Independent Variable Elimination
 //      If after M, P usually happens, and M happens, it means P is expected to happen
 
-    B, (A ==> C),  notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionRecursivePB, Goal:DeciDeduction)
-        //B, (A ==> C), time(urgent),  notImpl(B) |- varIntro(subIfUnifiesAny(C,A,B)), (Belief:DeductionRecursivePB, Goal:DeciDeduction)
-    B, (--A ==> C),  notImpl(B) |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
-        //B, (--A ==> C), time(urgent),  notImpl(B) |- varIntro(subIfUnifiesAny(C,A,B)), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
+    B, (A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionRecursivePB)
+        B, (A ==> C),  notImpl(B), task("!") |- C, (Goal:DeciInduction)
 
-    B, (C ==> A), notImpl(B), neq(B,C) |- subIfUnifiesAny(C,A,B,"$"), (Belief:AbductionPB, Goal:DeciInduction)
-        //neq(B,C) on this one but not the others
+    B, (--A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionRecursivePBN)
+        B, (--A ==> C),  notImpl(B), task("!") |- C, (Goal:DeciInductionN)
 
-    Z, (C==>Y), task("?") |- subIfUnifiesAny(C,Y,Z), (Punctuation:Question)
+    //neq(B,C) on this one but not the others since C is at the 'start' time of the impl
+    B, (C ==> A), notImpl(B), neq(B,C), task(".") |- subIfUnifiesAny(C,A,B,"$"), (Belief:AbductionPB)
+        B, (C ==> A), notImpl(B), neq(B,C), task("!") |- C, (Goal:DeciDeduction)
+
+
 
     //answering
     //Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Z), Y, Z, "$", strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
@@ -157,6 +159,7 @@
         //((&&,M,A..+) ==> C), (B ==> M), neq(B,M) |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
 
     (X ==> C), (Y==>C), is(X,"&&"), is(Y,"&&"), neq(X,Y)   |- differ(Y,X), (Belief:AbductionPB)
+        (X ==> C), (Y==>C), is(X,"&&"), subOf(Y,X), neq(X,Y)   |- without(X,Y), (Belief:AbductionPB)
         //((&&,M,A..+) ==> C), ((&&,A..+) ==> C)   |- M, (Belief:AbductionPB)
 
     (X ==> C), (B==>M), is(X,"&&"), subOf(B,X), neq(B,M) |- ((without(X,B) &&+- M) ==>+- C), (Belief:AbductionPB)

@@ -49,7 +49,7 @@ public class Deriver extends NARService {
         this.deriver = deriver;
         this.nar = nar;
 
-        Try t = (Try) ((AndCondition)(deriver)).cache[((AndCondition)(deriver)).cache.length-1]; //HACK
+        Try t = (Try) ((AndCondition) (deriver)).cache[((AndCondition) (deriver)).cache.length - 1]; //HACK
 
         //this.cause = nar.newCauseChannel(this);
         this.can = new Causable(nar) {
@@ -68,59 +68,52 @@ public class Deriver extends NARService {
     }
 
 
-    protected int run(int work) {
+    protected int run(int toFire) {
+
+
         NAR nar = this.nar;
         Derivation d = derivation.get().cycle(nar, deriver);
 
         int matchTTL = Param.TTL_PREMISE_MIN * 3;
         int ttlMin = nar.matchTTLmin.intValue();
         int ttlMax = nar.matchTTLmax.intValue();
-        final int conceptBatch = 8;
 
+
+        int fireRemain[] = new int[]{toFire};
         BatchActivation activator = BatchActivation.get();
 
-        final int[] derivations = {0};
 
-        int derivationsBefore;
-        while ((derivationsBefore = derivations[0]) < work) {
+        nar.exe.fire(a -> {
 
-            nar.exe.fire(Math.min(work - derivations[0], conceptBatch), a -> {
+            int hh = premises(a);
+            Iterable<Premise> h = a.hypothesize(nar, activator, hh);
 
-                int hh = Math.min(work - derivations[0], premises(a));
-                if (hh == 0)
-                    return false;
-                Iterable<Premise> h = a.hypothesize(nar, activator, hh);
+            if (h != null) {
 
-                if (h != null) {
+                for (Premise p : h) {
 
-                    for (Premise p : h) {
+                    if (p.match(d, matchTTL) != null) {
 
-                        if (p.match(d, matchTTL) != null) {
+                        int deriveTTL = Util.lerp(Util.unitize(
+                                p.task.priElseZero() / nar.priDefault(p.task.punc())),
+                                ttlMin, ttlMax);
 
-                            int deriveTTL = Util.lerp(Util.unitize(
-                                    p.task.priElseZero() / nar.priDefault(p.task.punc())),
-                                    ttlMin, ttlMax);
-
-                            d.derive(deriveTTL);
-                            derivations[0]++;
-                        }
+                        d.derive(deriveTTL);
                     }
-                } else {
-                    //premise miss
                 }
-
-                return derivations[0] > 0;
-            });
-
-            int derived = d.commit(nar::input);
-            activator.commit(nar);
-
-            if (derivations[0] == derivationsBefore)
-                break; //nothing happened
-        }
+            } else {
+                //premise miss
+            }
 
 
-        return derivations[0];
+            return --fireRemain[0] > 0;
+        });
+
+        activator.commit(nar);
+
+        int derived = d.commit(nar::input);
+
+        return toFire - fireRemain[0];
     }
 
 

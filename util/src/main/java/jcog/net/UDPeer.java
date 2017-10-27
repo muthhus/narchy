@@ -248,12 +248,12 @@ public class UDPeer extends UDP {
             byte[] bytes = o.array();
 
             final int[] remain = {Math.round(them.size() * pri)};
-            them.sample((to) -> {
+            them.sample((Bag.BagCursor<UDProfile>)((to) -> {
                 if (o.id() != to.id /*&& (pri >= 1 || rng.nextFloat() <= pri)*/ ) {
                     outBytes(bytes, to.addr);
                 }
                 return ((remain[0]--) > 0) ? Bag.BagSample.Next : Bag.BagSample.Stop;
-            });
+            }));
             return remain[0];
 
         }

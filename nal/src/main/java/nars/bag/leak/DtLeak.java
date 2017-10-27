@@ -2,6 +2,7 @@ package nars.bag.leak;
 
 import jcog.bag.Bag;
 import jcog.data.FloatParam;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -77,7 +78,7 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
 
         final float[] budget = {nextBudget};
 
-        bag.sample((v) -> {
+        bag.sample((Bag.BagCursor<Y>)((v) -> {
 
             float cost = receive(v);
             budget[0] -= cost;
@@ -90,7 +91,7 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
             }
 
             return Bag.BagSample.Remove; //continue
-        });
+        }));
 
         this.lastBudget = Math.min(0, budget[0]); //only store surplus, which will be added to the next. otherwise if positive is also stored, it can explode
 

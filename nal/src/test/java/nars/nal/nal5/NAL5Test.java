@@ -407,7 +407,7 @@ public class NAL5Test extends NALTest {
         tester.log();
         tester.believe("(flyingrobin ==> birdrobin)"); //.en("If robin can fly then robin is a bird.");
         tester.believe("((swimmerrobin && flyingrobin) ==> birdrobin)"); //.en("If robin both swims and flys then robin is a bird.");
-        tester.mustBelieve(cycles * 4, "swimmerrobin", 1.00f, 0.45f /*0.4f*/); //.en("I guess robin swims.");
+        tester.mustBelieve(cycles * 2, "swimmerrobin", 1.00f, 0.45f /*0.4f*/); //.en("I guess robin swims.");
 
     }
 

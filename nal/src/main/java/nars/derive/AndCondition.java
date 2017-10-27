@@ -26,7 +26,7 @@ public final class AndCondition<D> extends AbstractPred<D> {
         }
         return true;
     }
-    AndCondition(@NotNull PrediTerm<D>[] p) {
+    AndCondition(PrediTerm<D>[] p) {
         super($.p((Term[]) p));
         assert (p.length >= 2) : "unnecessary use of AndCondition";
         this.cache = p;

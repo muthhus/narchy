@@ -71,10 +71,10 @@ public interface Bag<K, V> extends Table<K, V> {
     @Nullable
     default V sample() {
         Object[] result = new Object[1];
-        sample((x) -> {
+        sample(((Predicate<? super V>)(x) -> {
             result[0] = x;
-            return Stop;
-        });
+            return false;
+        }));
         return (V) result[0];
     }
 
@@ -123,6 +123,10 @@ public interface Bag<K, V> extends Table<K, V> {
     /* sample the bag, optionally removing each visited element as decided by the visitor's
      * returned value */
     /*@NotNull*/ Bag<K, V> sample(/*@NotNull */Bag.BagCursor<? super V> each);
+
+    default Bag<K, V> sample(Predicate<? super V> each) {
+        return sample((BagCursor<? super V>)((x) -> each.test(x) ? BagSample.Next : BagSample.Stop));
+    }
 
 
     default List<V> copyToList(int n) {
@@ -181,10 +185,10 @@ public interface Bag<K, V> extends Table<K, V> {
             return this;
 
         final int[] count = {max};
-        return sample(x -> {
+        return sample((BagCursor<? super V>)(x -> {
             each.accept(x);
             return ((--count[0]) > 0) ? (pop ? Remove : Next) : (pop ? RemoveAndStop : Stop);
-        });
+        }));
     }
     /**
      * convenience macro for using sample(BagCursor).
@@ -196,18 +200,17 @@ public interface Bag<K, V> extends Table<K, V> {
             return this;
 
         final int[] count = {max};
-        return sample((x) -> {
-            return (kontinue.test(x) && ((--count[0]) > 0)) ?
-                    Next : Stop;
-        });
+        return sample((BagCursor<? super V>)((x) ->
+                (kontinue.test(x) && ((--count[0]) > 0)) ?
+                    Next : Stop));
     }
     default Bag<K, V> sampleOrPop(boolean pop, int max, Predicate<? super V> each) {
         final int[] count = {max};
-        return sample(x ->
+        return sample((BagCursor<? super V>)(x ->
                 (each.test(x) && ((--count[0]) > 0)) ?
                         (pop ? Remove : Next)
                         :
-                        (pop ? RemoveAndStop : Stop));
+                        (pop ? RemoveAndStop : Stop)));
     }
 
     @Nullable

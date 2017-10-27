@@ -140,7 +140,7 @@ public abstract class Param extends Services<Term, NAR> {
      * 'time to live', unification steps until unification is stopped
      */
     public final MutableInteger matchTTLmax = new MutableInteger(256);
-    public final MutableInteger matchTTLmin = new MutableInteger(32);
+    public final MutableInteger matchTTLmin = new MutableInteger(64);
 
     /**
      * how much percent of a premise's allocated TTL can be used in the belief matching phase.
@@ -381,7 +381,7 @@ public abstract class Param extends Services<Term, NAR> {
      * 0 momentum means an activation is fired completely and suddenly
      * 1 momentum means it retains all activation
      */
-    public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
+    public final FloatParam momentum = new FloatParam(0f, 0, 1f);
 
     /**
      * computes the projected evidence at a specific distance (dt) from a perceptual moment evidence

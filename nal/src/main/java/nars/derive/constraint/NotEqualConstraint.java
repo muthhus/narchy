@@ -21,12 +21,12 @@ public final class NotEqualConstraint extends MatchConstraint {
     }
 
     @Override
-    public boolean invalid(@NotNull Term y, @NotNull Unify f) {
-        @Nullable Term canNotEqual = f.xy(other);
+    public boolean invalid(Term y, Unify f) {
+        Term canNotEqual = f.xy(other);
         return canNotEqual!=null &&
                 //Terms.equalAtemporally(y, canNotEqual);
                 //y.equals(canNotEqual);
-                y.equalsRoot(canNotEqual);
+                y.equals(canNotEqual);
     }
 
 

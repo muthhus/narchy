@@ -15,7 +15,7 @@ import static nars.time.Tense.ETERNAL;
  */
 public class NAL8EternalMixTest extends NALTest {
 
-    final int cycles = 450;
+    final int cycles = 250;
 
 
     @Test

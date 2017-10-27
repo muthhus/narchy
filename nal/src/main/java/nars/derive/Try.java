@@ -1,16 +1,11 @@
 package nars.derive;
 
 import jcog.Util;
-import jcog.pri.Pri;
 import nars.$;
-import nars.Param;
 import nars.control.Cause;
 import nars.control.Derivation;
-import org.roaringbitmap.IntIterator;
-import org.roaringbitmap.PeekableIntIterator;
 import org.roaringbitmap.RoaringBitmap;
 
-import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -45,6 +40,18 @@ public class Try extends AbstractPred<Derivation> {
         );
     }
 
+    float value(PrediTerm<Derivation> branch) {
+        if (branch instanceof ValueFork) {
+            ValueFork vf = (ValueFork) branch;
+            float sum = 0;
+            for (Cause c : vf.causes)
+                sum += 1 + (c.gain()); //softmax-like
+            return sum;
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     @Override
     public boolean test(Derivation d) {
 
@@ -62,71 +69,82 @@ public class Try extends AbstractPred<Derivation> {
 
                 cache.update(d.time);
 
-                short[] routing = new short[N * 2]; //sequence of (choice, score) pairs
-
-                final int[] p = {0, Integer.MAX_VALUE, Integer.MIN_VALUE};
-
-                Random rng = d.random;
-                int startTTL = d.ttl;
-
-                short minTTL = Param.TTL_PREMISE_MIN;
-
-                int denom = startTTL - (minTTL * N);
-                short toApply;
-                if (denom > N) {
-                    //bonus beyond minTTL according to their value
-                    choices.runOptimize();
-
-                    float[] minmax = cache.minmax(choices.getIntIterator());
-                    if (!Util.equals(minmax[0], minmax[1], Pri.EPSILON)) {
-
-                        IntIterator ii = rng.nextBoolean() ? choices.getIntIterator() : choices.getReverseIntIterator();
-                        cache.getNormalized(minmax[0], minmax[1], ii, denom, (c, v) -> {
-                            int pp = p[0]++ * 2;
-                            routing[pp++] = (short) c;
-                            routing[pp] += (short) (v); //minTTL + v
-                            if (v < p[1]) p[1] = (int) v;
-                            if (v > p[2]) p[2] = (int) v;
-                            return true;
-                        });
-                        toApply = -1;
-
-                    } else {
-                        toApply = (short) (startTTL / N); //evenly distribute
-                    }
-                } else {
-                    toApply = minTTL;
-                }
-
-                if (toApply >= 0) {
-                    //have to assign route using the iterator as it was not done in the bonus mode
-                    PeekableIntIterator ii = choices.getIntIterator();
-                    int k = 0;
-                    while (ii.hasNext()) {
-                        routing[k++] = (short) ii.next();
-                        routing[k++] = toApply;
-                    }
-                }
-
-                int weightSum = 0;
-                for (int i = 0; i < N; i++) {
-                    weightSum += routing[i * 2 + 1];
-                }
+                int[] c = choices.toArray();
+                float[] score = new float[N];
+                for (int x = 0; x < N; x++)
+                    score[x] = value(branches[c[x]]);
 
                 int before = d.now();
-                int ttlSaved;
-                do {
+                Util.selectRouletteUnique(N, d.random, N, i -> score[i], (i) -> {
+                    branches[c[i]].test(d);
+                    return d.revertLive(before);
+                });
 
-                    int sample = Util.decideRoulette(N, (choice) -> g2(routing, choice, VAL), weightSum, rng);
-
-                    ttlSaved = tryBranch(d, routing, sample);
-                    if (ttlSaved < 0)
-                        break;
-
-                    a2(routing, sample, false, (short) -ttlSaved);
-                    weightSum -= ttlSaved;
-
-                } while (d.addTTL(ttlSaved) >= 0);
+//                short[] routing = new short[N * 2]; //sequence of (choice, score) pairs
+//
+//                final int[] p = {0, Integer.MAX_VALUE, Integer.MIN_VALUE};
+//
+//                Random rng = d.random;
+//                int startTTL = d.ttl;
+//
+//                short minTTL = Param.TTL_PREMISE_MIN;
+//
+//                int denom = startTTL - (minTTL * N);
+//                short toApply;
+//                if (denom > N) {
+//                    //bonus beyond minTTL according to their value
+//                    choices.runOptimize();
+//
+//                    float[] minmax = cache.minmax(choices.getIntIterator());
+//                    if (!Util.equals(minmax[0], minmax[1], Pri.EPSILON)) {
+//
+//                        IntIterator ii = rng.nextBoolean() ? choices.getIntIterator() : choices.getReverseIntIterator();
+//                        cache.getNormalized(minmax[0], minmax[1], ii, denom, (c, v) -> {
+//                            int pp = p[0]++ * 2;
+//                            routing[pp++] = (short) c;
+//                            routing[pp] += (short) (v); //minTTL + v
+//                            if (v < p[1]) p[1] = (int) v;
+//                            if (v > p[2]) p[2] = (int) v;
+//                            return true;
+//                        });
+//                        toApply = -1;
+//
+//                    } else {
+//                        toApply = (short) (startTTL / N); //evenly distribute
+//                    }
+//                } else {
+//                    toApply = minTTL;
+//                }
+//
+//                if (toApply >= 0) {
+//                    //have to assign route using the iterator as it was not done in the bonus mode
+//                    PeekableIntIterator ii = choices.getIntIterator();
+//                    int k = 0;
+//                    while (ii.hasNext()) {
+//                        routing[k++] = (short) ii.next();
+//                        routing[k++] = toApply;
+//                    }
+//                }
+//
+//                int weightSum = 0;
+//                for (int i = 0; i < N; i++) {
+//                    weightSum += routing[i * 2 + 1];
+//                }
+//
+//                int before = d.now();
+//                int ttlSaved;
+//                do {
+//
+//                    int sample = Util.decideRoulette(N, (choice) -> g2(routing, choice, VAL), weightSum, rng);
+//
+//                    ttlSaved = tryBranch(d, routing, sample);
+//                    if (ttlSaved < 0)
+//                        break;
+//
+//                    a2(routing, sample, false, (short) -ttlSaved);
+//                    weightSum -= ttlSaved;
+//
+//                } while (d.addTTL(ttlSaved) >= 0);
                 break;
         }
 
@@ -135,27 +153,27 @@ public class Try extends AbstractPred<Derivation> {
         return false;
     }
 
-    public int tryBranch(Derivation d, short[] routing, int sample) {
-//        float branchScore =
-//                minVal!=maxVal ? ((float) (g2(routing, sample, VAL)) - minVal) / (maxVal - minVal) : 0.5f;
-        int loopBudget = g2(routing, sample, VAL); //Util.lerp(branchScore, minPerBranch, maxPerBranch);
-        if (loopBudget < Param.TTL_PREMISE_MIN)
-            return -1;
-
-
-        int ttlSaved = d.getAndSetTTL(loopBudget) - loopBudget - 1;
-
-        int n = g2(routing, sample, KEY);
-
-//        System.out.println(d.time + " " + d.ttl + " " + d.task + " " + d.belief + " "+ d.beliefTerm + " " + n);
-//        //TrieDeriver.print(branches[n]);
-//        System.out.println(branches[n]);
-//        System.out.println();
-
-        branches[n].test(d);
-
-        return ttlSaved;
-    }
+//    public int tryBranch(Derivation d, short[] routing, int sample) {
+////        float branchScore =
+////                minVal!=maxVal ? ((float) (g2(routing, sample, VAL)) - minVal) / (maxVal - minVal) : 0.5f;
+//        int loopBudget = g2(routing, sample, VAL); //Util.lerp(branchScore, minPerBranch, maxPerBranch);
+//        if (loopBudget < Param.TTL_PREMISE_MIN)
+//            return -1;
+//
+//
+//        int ttlSaved = d.getAndSetTTL(loopBudget) - loopBudget - 1;
+//
+//        int n = g2(routing, sample, KEY);
+//
+////        System.out.println(d.time + " " + d.ttl + " " + d.task + " " + d.belief + " "+ d.beliefTerm + " " + n);
+////        //TrieDeriver.print(branches[n]);
+////        System.out.println(branches[n]);
+////        System.out.println();
+//
+//        branches[n].test(d);
+//
+//        return ttlSaved;
+//    }
 
 
     /**

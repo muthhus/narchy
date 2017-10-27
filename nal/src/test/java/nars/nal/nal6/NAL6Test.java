@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends NALTest {
 
 
-    final int cycles = 1500;
+    final int cycles = 800;
 
     @BeforeEach
     public void nal() {
@@ -718,9 +718,9 @@ public class NAL6Test extends NALTest {
                 .believe("num:x", 1.0f, 0.9f)
                 .believe("( num:$1 ==> num($1) )", 1.0f, 0.9f)
                 .ask("num(((x)))")
-                .mustBelieve(cycles * 10, "num(x)", 1.0f, 1.0f, 0.81f, 1.0f)
-                .mustBelieve(cycles * 10, "num((x))", 0.99f, 1.0f, 0.50f, 1.0f)
-                .mustBelieve(cycles * 10, "num(((x)))", 0.99f, 1.0f, 0.25f, 1.0f)
+                .mustBelieve(cycles * 2, "num(x)", 1.0f, 1.0f, 0.81f, 1.0f)
+                .mustBelieve(cycles * 2, "num((x))", 0.99f, 1.0f, 0.50f, 1.0f)
+                .mustBelieve(cycles * 2, "num(((x)))", 0.99f, 1.0f, 0.25f, 1.0f)
         //.mustBelieve(time, "num:((((0))))", 1.0f, 1.0f, 0.81f, 1.0f)
         // ''outputMustContain('<(((0))) --> num>. %1.00;0.26%')
         ;
@@ -738,8 +738,8 @@ public class NAL6Test extends NALTest {
                 .believe("num(x)", 1.0f, 0.9f)
                 .believe("( num($1) ==> num(($1)) )", 1.0f, 0.9f)
                 .ask("num(((x)))")
-                .mustBelieve(cycles * 4, "num((x))", 1.0f, 1.0f, 0.8f, 1.0f)
-                .mustBelieve(cycles * 4 , "num(((x)))", 1.0f, 1.0f, 0.1f /*0.66f*/, 1.0f);
+                .mustBelieve(cycles * 2, "num((x))", 1.0f, 1.0f, 0.8f, 1.0f)
+                .mustBelieve(cycles * 2 , "num(((x)))", 1.0f, 1.0f, 0.1f /*0.66f*/, 1.0f);
 //        test.nar.at(100, ()->{
 //            nar.concepts().forEach(System.out::println);
 //        });

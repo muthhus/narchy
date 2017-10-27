@@ -146,17 +146,17 @@ public enum MetaGoal {
             /** learning iterations applied per NAR cycle */
             public int learning_iters = 1;
 
-            public double learning_rate = 0.03f;
+            public double learning_rate = 0.01f;
 
             public double[] cur;
             public RBM rbm;
 
             /** hidden to visible neuron ratio */
-            private int hiddenMultipler = 3;
+            private float hiddenMultipler = 0.5f;
 
             public RBMRevaluator(Random rng) {
                 this.rng = rng;
-                momentum = 0.98f;
+                momentum = 0.9f;
             }
 
             @Override
@@ -195,6 +195,7 @@ public enum MetaGoal {
                     //float j = Util.tanhFast((float) (cur[i] + next[i]));
                     float j = /*((rng.nextFloat()-0.5f)*2*noise)*/ +
                             //((float) (next[i]));
+                            //(float)( Math.abs(next[i]) > Math.abs(cur[i]) ? next[i] : cur[i]);
                             0.5f * (float) (cur[i]) + 0.5f * ((float) (next[i]));
                     causes.get(i).setValue(j);
                 }

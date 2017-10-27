@@ -50,8 +50,8 @@ public class UniExec extends Exec {
     }
 
     @Override
-    public void fire(int n, Predicate<Activate> each) {
-        active.sample(n, each);
+    public void fire( Predicate<Activate> each) {
+        active.sample( each);
     }
 
     @Override
