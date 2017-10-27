@@ -1,9 +1,12 @@
 package nars;
 
+import com.google.common.collect.Lists;
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.On;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
+import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
@@ -14,6 +17,7 @@ import nars.control.NARService;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
 import nars.truth.DiscreteTruth;
@@ -32,6 +36,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static jcog.Texts.n2;
+import static nars.$.t;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 
@@ -109,15 +114,38 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         this.id = id;
         this.now = ETERNAL; //not started
 
-        this.happy = senseNumber(id == null ?
-                        $.the("happy") : //generally happy
-                        //$.p(id, $.the("happy")), //happy in this environment
-                        $.inh($.the("happy"), id),
-                new FloatPolarNormalized(
-                        //new FloatHighPass(
-                                () -> rewardCurrent
-                        //)
-                ).relax(0.01f));
+        Term happyTerm = id == null ?
+                $.the("happy") : //generally happy
+                //$.p(id, $.the("happy")), //happy in this environment
+                $.inh($.the("happy"), id);
+        FloatNormalized happyValue = new FloatPolarNormalized(
+                //new FloatHighPass(
+                () -> rewardCurrent
+                //)
+        ).relax(0.01f);
+
+        SensorConcept h = new SensorConcept(happyTerm, nar(), happyValue,
+                (x) -> t(Util.unitize(x), nar().confDefault(Op.BELIEF))
+        ) {
+
+            List<Termed> extTemplates = null;
+            @Override
+            public List<Termed> templates() {
+                List<Termed> superTemplates = super.templates();
+                if (extTemplates == null || extTemplates.size()!=(superTemplates.size() + actions.size())) {
+                    List<Termed> l = $.newArrayList(superTemplates.size() + actions.size());
+                    l.addAll(superTemplates);
+                    l.addAll(actions.keySet());
+                    this.extTemplates = l;
+                }
+                return extTemplates;
+            }
+        };
+        addSensor(this.happy = h);
+
+
+        //this.happy = senseNumber(happyTerm, happyValue);
+
 
         this.happyGoal = new NALTask(happy.term(), GOAL, $.t(1f, nar.confDefault(GOAL)), now,
                 ETERNAL, ETERNAL,

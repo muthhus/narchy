@@ -166,6 +166,16 @@ public class LongBitsetBloomFilter {
         add(intToByteArrayLE(val));
     }
 
+    public boolean addIfNotContained(int val) {
+        // puts int in little endian order
+        byte[] bb = intToByteArrayLE(val);
+        boolean b = test(bb);
+        if (!b) {
+            add(bb);
+            return true;
+        }
+        return false;
+    }
 
     public void addLong(long val) {
         // puts long in little endian order
@@ -206,7 +216,7 @@ public class LongBitsetBloomFilter {
         return testLong(Double.doubleToLongBits(val));
     }
 
-    private static byte[] intToByteArrayLE(int val) {
+    public static byte[] intToByteArrayLE(int val) {
         return new byte[]{(byte) (val >> 0),
                 (byte) (val >> 8),
                 (byte) (val >> 16),

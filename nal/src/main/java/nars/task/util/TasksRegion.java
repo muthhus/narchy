@@ -4,6 +4,7 @@ import nars.Task;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * dimensions:
@@ -17,6 +18,8 @@ public class TasksRegion implements TaskRegion {
     public long end; //allow end to stretch for ongoing tasks
 
     public final float freqMin, freqMax, confMin, confMax;
+
+    private final int serial;
 
     @Override
     public final long start() {
@@ -35,7 +38,7 @@ public class TasksRegion implements TaskRegion {
 
     @Override
     public int hashCode() {
-        throw new UnsupportedOperationException();
+        return serial;
     }
 
     @Override
@@ -50,7 +53,10 @@ public class TasksRegion implements TaskRegion {
         this.freqMax = freqMax;
         this.confMin = confMin;
         this.confMax = confMax;
+        this.serial = serials.incrementAndGet();
     }
+
+    private static final AtomicInteger serials = new AtomicInteger(0);
 
 
 

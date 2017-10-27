@@ -49,7 +49,7 @@ public class Deriver extends NARService {
         this.deriver = deriver;
         this.nar = nar;
 
-        Try t = (Try) ((AndCondition)(deriver)).cache[1]; //HACK
+        Try t = (Try) ((AndCondition)(deriver)).cache[((AndCondition)(deriver)).cache.length-1]; //HACK
 
         //this.cause = nar.newCauseChannel(this);
         this.can = new Causable(nar) {

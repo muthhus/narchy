@@ -3,6 +3,7 @@ package nars.table;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import jcog.Util;
+import jcog.bloom.LongBitsetBloomFilter;
 import jcog.pri.Prioritized;
 import jcog.sort.TopN;
 import jcog.tree.rtree.*;
@@ -19,6 +20,7 @@ import nars.task.Revision;
 import nars.task.SignalTask;
 import nars.task.Tasked;
 import nars.task.util.TaskRegion;
+import nars.task.util.TasksRegion;
 import nars.task.util.TimeRange;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -29,12 +31,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static jcog.bloom.LongBitsetBloomFilter.intToByteArrayLE;
 import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 import static nars.time.Tense.ETERNAL;
 
@@ -52,7 +57,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     public static final float PRESENT_AND_FUTURE_BOOST = 1f;
 
-    static final int SCAN_DIVISIONS = 3;
+    static final int SCAN_DIVISIONS = 4;
 
     public static final int MIN_TASKS_PER_LEAF = 2;
     public static final int MAX_TASKS_PER_LEAF = 4;
@@ -270,7 +275,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             long end = Math.min(boundsEnd, _end);
 
             float timeRange = boundsEnd - boundsStart;
-            long expand = Math.max(1, Math.round(timeRange / (2*SCAN_DIVISIONS)));
+
+            long expand = Math.max(1, Math.round(timeRange / (1 << (1 + SCAN_DIVISIONS)))); //extra divide by two because it scans bidirectionally
 
             //TODO use a polynomial or exponential scan expansion, to start narrow and grow wider faster
 
@@ -279,7 +285,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             long leftStart = start, leftMid = mid, rightMid = mid, rightEnd = end;
             int complete;
             //TODO float complete and use this as the metric for limiting with scan quality parameter
-            TimeRange r = new TimeRange(); //recycled
+            TimeRange r = new TimeRangeUniqueNodes(); //recycled
             do {
                 complete = 0;
 
@@ -304,6 +310,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 rightMid = rightMid + 1;
                 rightEnd = rightEnd + expand + 1;
 
+                expand *= 2;
             } while (true);
 
         });
@@ -327,7 +334,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             } else {
 //                if (sx.stretch == null) {
 //                    System.err.println("wtf rtree");
-                    assert (sx.stretch == null); //should only be input once, when it has no stretch to update otherwise
+                assert (sx.stretch == null); //should only be input once, when it has no stretch to update otherwise
 //                }
 
                 //return; //but it can happen in multithread conditions?
@@ -728,6 +735,33 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         }
 
+    }
+
+    private static class TimeRangeUniqueNodes extends TimeRange {
+        //Set<HyperRegion> visited = new HashSet();
+        final LongBitsetBloomFilter bpp = new LongBitsetBloomFilter(64, 0.01f);
+
+        public TimeRangeUniqueNodes() {
+
+        }
+
+        @Override
+        public boolean intersects(HyperRegion x) {
+            //if (x instanceof Task) {
+                int h = x.hashCode();
+                byte[] hh = intToByteArrayLE(h);
+                if (bpp.test(hh))
+                    return false;
+
+                if (super.intersects(x)) {
+                    if (x instanceof Task || contains(x)) //only record visited if intersecting a task or containing an entire node
+                        bpp.add(hh);
+                    return true;
+                }
+                return false;
+            /*} else
+                return super.intersects(x);*/
+        }
     }
 
 //    private static class BeliefLeaf extends Leaf<TaskRegion> {

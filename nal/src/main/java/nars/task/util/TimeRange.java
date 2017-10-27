@@ -5,7 +5,7 @@ import jcog.tree.rtree.HyperRegion;
 /**
  * only valid for comparison during rtree iteration
  */
-public final class TimeRange implements HyperRegion {
+public class TimeRange implements HyperRegion {
 
     long start = Long.MIN_VALUE, end = Long.MAX_VALUE;
 
@@ -36,22 +36,15 @@ public final class TimeRange implements HyperRegion {
     @Override
     public boolean intersects(HyperRegion x) {
         TaskRegion t = (TaskRegion)x;
-        return !(
-                start > t.end()
-                        ||
-                end < t.start()
-        );
+        return start <= t.end() && end >= t.start();
     }
 
 
     @Override
     public boolean contains(HyperRegion x) {
         TaskRegion t = (TaskRegion)x;
-        return !(
-                start > t.start()
-                        ||
-                end < t.end()
-        );
+        return start <= t.start() && end >= t.end();
+
     }
 
     @Override

@@ -13,7 +13,8 @@ import java.util.function.BiFunction;
 
 public class NAL1Test extends NALTest {
 
-    final int CYCLES = 575;
+    final int CYCLES = 300;
+
     static {
         Param.DEBUG = true;
         //Param.TRACE = true;

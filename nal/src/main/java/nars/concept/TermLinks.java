@@ -85,10 +85,10 @@ public enum TermLinks {
 
             case SETe:
             case SETi:
-                return 2;
+                return 1;
 
             case PROD:
-                return 2;
+                return 1;
 
             case DIFFe:
             case DIFFi:
@@ -96,13 +96,13 @@ public enum TermLinks {
             case SECTe:
 
 
-                return 2;
+                return 1;
 
             case CONJ:
-                return 3;
+                return 2;
 
             case SIM:
-                return 3;
+                return 2;
 
             case INH:
                 return 4;
@@ -311,7 +311,7 @@ public enum TermLinks {
             target.tasklinks().putAsync(
                     new PLinkUntilDeleted(task, tfaEach)
             );
-//                localSubConcept.termlinks().putAsync(
+//                target.termlinks().putAsync(
 //                        new PLink(task.term(), tfaEach)
 //                );
 

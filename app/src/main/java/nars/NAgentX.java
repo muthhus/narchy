@@ -13,7 +13,7 @@ import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
-import nars.index.term.PriMapTermIndex;
+import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.ConjClustering;
 import nars.term.Term;
@@ -28,6 +28,7 @@ import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.ugens.*;
 import org.HdrHistogram.DoubleHistogram;
 import org.apache.commons.lang.StringUtils;
+import org.bridj.cpp.std.list;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
@@ -177,16 +178,19 @@ abstract public class NAgentX extends NAgent {
 //                    }
 //                })
                 .exe(new MultiExec.
-                            Intense
-                            //CoolNQuiet
-                        (128, THREADS, 64))
+                            //Intense
+                            CoolNQuiet
+                        (256, THREADS, 32))
 
                 .time(clock)
                 .deriverAdd(8)
-                .deriverAdd("motivation.nal", "list.nal") //aux
+                .deriverAdd("nal6.nal") //extra NAL6
+                .deriverAdd("goal_analogy.nal")
+                .deriverAdd("motivation.nal")
+                .deriverAdd("list.nal")
                 .index(
-                        //new CaffeineIndex(128 * 1024)
-                        new PriMapTermIndex()
+                        new CaffeineIndex(128 * 1024)
+                       // new PriMapTermIndex()
                         //new CaffeineIndex2(64 * 1024)
                         //new CaffeineIndex2(-1)
                         //new HijackTermIndex(Primes.nextPrime( 64 * 1024 + 1),  3)

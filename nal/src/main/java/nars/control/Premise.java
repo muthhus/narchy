@@ -45,7 +45,7 @@ public class Premise extends PLink<Pair<Task,Term>> {
     public final Term termLink;
 
     @Nullable
-    public Collection<Concept> links;
+    public final Collection<Concept> links;
 
     public Premise(Task tasklink, Term termlink, float pri, Collection<Concept> links) {
         super(Tuples.pair(tasklink, termlink), pri);
@@ -57,7 +57,6 @@ public class Premise extends PLink<Pair<Task,Term>> {
     @Override
     public boolean delete() {
         if (super.delete()) {
-            links = null;
             return true;
         }
         return false;
@@ -113,8 +112,6 @@ public class Premise extends PLink<Pair<Task,Term>> {
 
         Collection<Concept> l = links;
         if (l != null) {
-            links = null;
-
             linkTask(task, l,
                     1f
                     /*decayed*/);
