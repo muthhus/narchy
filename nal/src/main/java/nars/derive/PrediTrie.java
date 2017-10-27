@@ -78,9 +78,6 @@ public final class PrediTrie {
     }
 
 
-    public static PrediTerm<Derivation> the(PremiseRuleSet r) {
-        return the(r, x->x);
-    }
 
     public static PrediTerm<Derivation> the(PremiseRuleSet r, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
         PrediTrie t = new PrediTrie(r);

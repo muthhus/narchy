@@ -389,13 +389,14 @@ public class TreeChart<X> extends Surface {
 
             //float z = 0;
 
+
             gl.glColor3f(r, g, b);
             float m = 0.0f; //margin, space between cells
             Draw.rect(gl, left + m / 2, top + m / 2, width - m, height - m);
 
             float labelSize = 1f / (1 + label.length()); //Math.min(16, (float) (height * percent * 20f ) ); /// 4f * Math.min(0.5f,percent));
 
-            if (labelSize * area > 1f) {
+            if (area > 16f*label.length()) {
 
                 gl.glLineWidth(1f);
                 gl.glColor3f(1, 1, 1);

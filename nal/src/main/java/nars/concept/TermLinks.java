@@ -145,11 +145,12 @@ public enum TermLinks {
         Term targetTerm = target.term();
         boolean reverseLinked = false;
         if (!srcTerm.equals(targetTerm)) {
-            Concept c = nar.activate(target, priSum);
+            Concept c = nar.conceptualize(target);
             if (c != null) {
                 c.termlinks().put(
                         new PLink(srcTerm, priReverse), refund
                 );
+                a.put(c, priSum);
                 reverseLinked = true;
             }
         }

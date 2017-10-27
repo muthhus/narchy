@@ -215,10 +215,11 @@ public enum Op {
                 ci = null;
                 for (int i = 0; i < u.length; i++) {
 
-                    //PROMOTE DTERNAL to ZERO
-                    if (u[i].op() == CONJ && u[i].dt() == DTERNAL) {
-                        u[i] = u[i].dt(0);
-                    }
+//                    //PROMOTE DTERNAL to ZERO
+//                    if (u[i].op() == CONJ && u[i].dt() == DTERNAL) {
+//                        u[i] = u[i].dt(0);
+//                    }
+
                     //HACK cut to prevent infinite recursion due to impl conj reduction
 //                    if (u[0].op() == IMPL && u[0].containsRecursively(u[1].unneg())) {
 //                        Term ui = u[0];
@@ -424,17 +425,18 @@ public enum Op {
 
                 Term[] scs = sorted(cs);
 
-                //promote DTERNAL to ZERO if any components are ZERO
                 boolean dtChange = false;
-                if (dt == DTERNAL) {
-                    for (Term x : scs) {
-                        if (x.op() == CONJ && x.dt() == 0) {
-                            dt = 0;
-                            dtChange = true;
-                            break;
-                        }
-                    }
-                }
+
+                //promote DTERNAL to ZERO if any components are ZERO
+//                if (dt == DTERNAL) {
+//                    for (Term x : scs) {
+//                        if (x.op() == CONJ && x.dt() == 0) {
+//                            dt = 0;
+//                            dtChange = true;
+//                            break;
+//                        }
+//                    }
+//                }
 
 
                 return (dtChange || !Arrays.equals(scs, u)) ?
@@ -1023,7 +1025,11 @@ public enum Op {
                             if (o == NEG) {
                                 if (xa.contains(xb.unneg())) return null;
                             } else {
-                                if (xa.contains(xb.neg())) return null;
+                                //if (xa.contains(xb.neg())) return null;
+                                for (Term z : xa) {
+                                    if (z.op() == NEG && z.sub(0).equals(xb))
+                                        return null;
+                                }
                             }
                         }
                         return xa;
@@ -1326,8 +1332,8 @@ public enum Op {
             case 2:
                 Term et0 = t[0], et1 = t[1];
                 if (et0.equals(et1)
-                        || et0.containsRecursively(et1, recursiveCommonalityDelimeterWeak)
-                        || et1.containsRecursively(et0, recursiveCommonalityDelimeterWeak))
+                        || et0.containsRecursively(et1, true, recursiveCommonalityDelimeterWeak)
+                        || et1.containsRecursively(et0, true, recursiveCommonalityDelimeterWeak))
 
                     return Null;
                 else if ((et0.op() == set && et1.op() == set))
@@ -1441,7 +1447,7 @@ public enum Op {
     final static int relationDelimeterWeak = Op.or(Op.PROD, Op.CONJ, Op.NEG);
     public static final Predicate<Term> recursiveCommonalityDelimeterWeak =
             c -> !c.isAny(relationDelimeterWeak);
-    final static int relationDelimeterStrong = Op.or(Op.PROD);
+    final static int relationDelimeterStrong = Op.or(Op.PROD, Op.NEG);
     public static final Predicate<Term> recursiveCommonalityDelimeterStrong =
             c -> !c.isAny(relationDelimeterStrong);
 
@@ -1458,16 +1464,21 @@ public enum Op {
             return Null;
 
         boolean dtConcurrent = concurrent(dt);
+        if (dtConcurrent) {
+            //if (subject.equals(predicate))
+            //return True;
+            if (subject.equalsRoot(predicate))
+                return True;
+        }
+
         switch (op) {
 
             case SIM:
             case INH:
 
-                if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
-                    return $.the(subject.equals(predicate));
 
-                if (subject.equals(predicate) || subject.root().equals(predicate.root()))
-                    return True;
+                if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
+                    return False; //$.the(subject.equals(predicate));
 
                 break;
 
@@ -1491,12 +1502,6 @@ public enum Op {
                     //negated predicate gets unwrapped to outside
                     return IMPL.the(dt, subject, predicate.unneg()).neg();
                 }
-
-                if (dtConcurrent) {
-                    if (subject.equals(predicate))
-                        return True;
-                }
-
 
 
                 //factor out any common subterms iff concurrent
@@ -1607,7 +1612,7 @@ public enum Op {
                 if (dt != XTERNAL && subject.dt() != XTERNAL && predicate.dt() != XTERNAL) {
 
                     MutableSet<LongObjectPair<Term>> se = new UnifiedSet();
-                    subject.eventsWhile((w,t)->{
+                    subject.eventsWhile((w, t) -> {
                         se.add(PrimitiveTuples.pair(w, t));
                         return true;
                     }, 0, true, true, 0);
@@ -1648,8 +1653,8 @@ public enum Op {
                                     subject,
                                     /*subject.dt()!=DTERNAL ? Op.conj(se.toList()) :
                                         CONJ.the(DTERNAL, (Collection)se.collect(x->x.getTwo())),*/
-                                    predicate.dt()!=DTERNAL ? Op.conj(pe.toList()) :
-                                        CONJ.the(DTERNAL, (Collection)pe.collect(LongObjectPair::getTwo))
+                                    predicate.dt() != DTERNAL ? Op.conj(pe.toList()) :
+                                            CONJ.the(DTERNAL, (Collection) pe.collect(LongObjectPair::getTwo))
                             );
                         }
                     }
@@ -1671,11 +1676,12 @@ public enum Op {
         }
 
 
-        Predicate<Term> delim = (op == IMPL && dtConcurrent) ?
-                recursiveCommonalityDelimeterStrong : Op.recursiveCommonalityDelimeterWeak;
 
-        if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
-                (op != IMPL || dtConcurrent)) { //apply to: inh, sim, and current impl
+        if ((dtConcurrent || op != IMPL) && (subject.varPattern() == 0 && predicate.varPattern() == 0)) {
+            Predicate<Term> delim = (op == IMPL && dtConcurrent) ?
+                    recursiveCommonalityDelimeterStrong : Op.recursiveCommonalityDelimeterWeak;
+
+            //apply to: inh, sim, and concurrent impl
             if ((containEachOther(subject, predicate, delim))) {
                 //(!(su instanceof Variable) && predicate.contains(su)))
                 return Null; //cyclic
@@ -1743,11 +1749,11 @@ public enum Op {
         int xv = x.volume();
         int yv = y.volume();
         if (xv == yv)
-            return x.containsRecursively(y, delim) || y.containsRecursively(x, delim);
+            return x.containsRecursively(y, true, delim) || y.containsRecursively(x, true, delim);
         else if (xv > yv)
-            return x.containsRecursively(y, delim);
+            return x.containsRecursively(y, true, delim);
         else
-            return y.containsRecursively(x, delim);
+            return y.containsRecursively(x, true, delim);
     }
 
     @Nullable

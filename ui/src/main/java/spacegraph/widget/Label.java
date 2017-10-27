@@ -22,12 +22,16 @@ public class Label extends Surface {
 
     public Label(String s) {
         super();
-        //align(Align.Center);
         set(s);
     }
 
     @Override
     public void paint(GL2 gl) {
+        Draw.bounds(gl, this, this::paintUnit);
+    }
+
+    public void paintUnit(GL2 gl) {
+
 
         color.apply(gl);
         gl.glLineWidth(lineWidth);
@@ -44,17 +48,10 @@ public class Label extends Surface {
         this.value = newValue;
 
         int len = newValue.length();
-        float ratio = 1.5f;
+        float ratio = 1f;
         float fontScaleX = 1f / len;
         float fontScaleY = ratio * fontScaleX;
-        if (fontScaleX > fontScaleY) {
-            //wider than tall, limit by width
-//            fontScaleY =
-        } else {
-            //taller than wide, limit by height
-            fontScaleY = 1f;
-            fontScaleX = 1f / (ratio*len);
-        }
+
         this.fontScaleX = fontScaleX;
         this.fontScaleY = fontScaleY;
     }

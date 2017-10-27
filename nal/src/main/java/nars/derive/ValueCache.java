@@ -71,4 +71,8 @@ public class ValueCache  {
             ));
 //        }
     }
+
+    public float valueSum() {
+        return Util.sum(value);
+    }
 }

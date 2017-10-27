@@ -2,6 +2,8 @@ package spacegraph.widget.button;
 
 import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.AspectAlign;
+import spacegraph.render.Draw;
 import spacegraph.widget.AbstractButton;
 import spacegraph.widget.Label;
 
@@ -13,6 +15,7 @@ import java.util.function.Consumer;
 public class PushButton extends AbstractButton {
 
     private final Label label;
+    private final AspectAlign labelWrapper;
 
     @Nullable private Consumer<PushButton> onClick;
 
@@ -23,6 +26,7 @@ public class PushButton extends AbstractButton {
     public PushButton(String s) {
         super();
         label = new Label(s);
+        labelWrapper = new AspectAlign(label, Align.Center, 1);
     }
 
     public PushButton(Consumer<PushButton> onClick) {
@@ -49,9 +53,16 @@ public class PushButton extends AbstractButton {
 
     @Override
     protected void paintContent(GL2 gl, float x, float y, float w, float h) {
-        text(gl, label, x, y, w, h);
+        Draw.bounds(gl, this, labelWrapper::render);
+        //labelWrapper.render(gl);
     }
 
+    @Override
+    public void doLayout() {
+        //labelWrapper.pos(bounds);
+        //label.pos(bounds);
+        labelWrapper.layout();
+    }
 
     @Override
     protected void onClick() {

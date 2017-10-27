@@ -46,12 +46,12 @@ public class VSplit<X extends Surface, Y extends Surface> extends MutableLayout 
 
         Surface top = top();
         if (top!=null) {
-            top.pos(X,  Y, X+w, Ysplit);
+            top.pos(X, Ysplit, X+w, Y+h);
         }
 
         Surface bottom = bottom();
-        if (top != null) {
-            bottom.pos(X, Ysplit, X+w, Y+h);
+        if (bottom != null) {
+            bottom.pos(X,  Y, X+w, Ysplit);
         }
 
         super.doLayout();

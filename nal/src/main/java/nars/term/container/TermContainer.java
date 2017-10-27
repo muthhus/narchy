@@ -277,13 +277,14 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
 
 
-    @Override
-    default boolean containsRecursively(/*@NotNull*/ Term y, Predicate<Term> subTermOf) {
+
+
+    default boolean containsRecursively(/*@NotNull*/ Term y, boolean root, Predicate<Term> subTermOf) {
         int s = subs();
         if (s > 0 && !impossibleSubTerm(y)) {
             for (int i = 0; i < s; i++) {
                 Term x = sub(i);
-                if (x.equals(y) || x.containsRecursively(y, subTermOf))
+                if (x==y || (root ? x.equals(y) : x.equalsRoot(y)) || x.containsRecursively(y, subTermOf))
                     return true;
             }
         }

@@ -79,7 +79,12 @@ public interface Termlike {
         return containsRecursively(t, (x) -> true);
     }
 
-    boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf);
+    default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
+        return containsRecursively(t, false, inSubtermsOf);
+    }
+
+    /** if root is true, the root()'s of the terms will be compared */
+    boolean containsRecursively(Term t, boolean root, Predicate<Term> inSubtermsOf);
 
 
     default boolean hasAll(int structuralVector) {

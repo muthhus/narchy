@@ -177,7 +177,7 @@ public class ZoomOrtho extends Ortho {
                 } else {
                     if (bd[0] == PAN_BUTTON) {
 
-                        cam.add(dx/scale.x, -dy/scale.y);
+                        cam.add(-dx/scale.x, +dy/scale.y);
                         panStart[0] = mx;
                         panStart[1] = my;
 
@@ -253,6 +253,7 @@ public class ZoomOrtho extends Ortho {
             t.printStackTrace();
         } finally {
             windowMoving.set(false);
+            surface.layout();
         }
     }
 
@@ -317,16 +318,16 @@ public class ZoomOrtho extends Ortho {
 
         @Override
         protected void paint(GL2 gl) {
-            {
-                //world coordinates alignment and scaling indicator
-                gl.glLineWidth(2);
-                gl.glColor3f(0.5f, 0.5f, 0.5f);
-                float cx = wmx;
-                float cy = wmy;
-                Draw.rectStroke(gl, cx + -100, cy + -100, 200, 200);
-                Draw.rectStroke(gl, cx + -200, cy + -200, 400, 400);
-                Draw.rectStroke(gl, cx + -300, cy + -300, 600, 600);
-            }
+//            {
+//                //world coordinates alignment and scaling indicator
+//                gl.glLineWidth(2);
+//                gl.glColor3f(0.5f, 0.5f, 0.5f);
+//                float cx = wmx;
+//                float cy = wmy;
+//                Draw.rectStroke(gl, cx + -100, cy + -100, 200, 200);
+//                Draw.rectStroke(gl, cx + -200, cy + -200, 400, 400);
+//                Draw.rectStroke(gl, cx + -300, cy + -300, 600, 600);
+//            }
 
             super.paint(gl);
 
@@ -372,11 +373,11 @@ public class ZoomOrtho extends Ortho {
             Draw.line(gl, smx - cw, smy, smx + cw, smy);
 
 
-            gl.glLineWidth(2);
-            gl.glColor3f(0.8f, 0.5f, 0);
-            Draw.text(gl, str(notifications.top().get()), 32, smx + cw, smy + ch, 0);
-            gl.glColor3f(0.4f, 0f, 0.8f);
-            Draw.text(gl, wmx + "," + wmy, 32, smx - cw, smy - ch, 0);
+//            gl.glLineWidth(2);
+//            gl.glColor3f(0.8f, 0.5f, 0);
+//            Draw.text(gl, str(notifications.top().get()), 32, smx + cw, smy + ch, 0);
+//            gl.glColor3f(0.4f, 0f, 0.8f);
+//            Draw.text(gl, wmx + "," + wmy, 32, smx - cw, smy - ch, 0);
 
             gl.glPopMatrix();
 

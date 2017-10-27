@@ -70,7 +70,7 @@ public class FastCompound implements Compound {
             a[p.getTwo()] = IO.termToBytes(p.getOne());
         }
 
-        return new FastCompound(a, skeleton.toByteArray(), c.hashCode(), c.hashCodeSubTerms(), (byte)c.volume(), c.isNormalized());
+        return new FastCompound(a, skeleton.toByteArray(), c.hashCode(), c.hashCodeSubTerms(), (byte) c.volume(), c.isNormalized());
     }
 
     public void print() {
@@ -108,7 +108,7 @@ public class FastCompound implements Compound {
         byte[] layerStack = new byte[MAX_LAYERS];
 
 
-        byte subsAtRoot = layerLength[0] = layerStack[0] = skeleton[after+1]; //expected # subterms
+        byte subsAtRoot = layerLength[0] = layerStack[0] = skeleton[after + 1]; //expected # subterms
         byte[] offsets = new byte[subsAtRoot];
 
         after += 2; //compound header
@@ -116,16 +116,13 @@ public class FastCompound implements Compound {
 
         for (int i = after; i < skeleton.length; ) {
 
-            if (layerStack[layer] ==0) {
-                if (--layer < 0)
+            if (layer == 0) {
+                if (layerStack[0] == 0)
                     break;
-            }
-
-            byte op = skeleton[i];
-
-            if (layer == 0)
-                offsets[layerLength[0] - layerStack[0]] = (byte)i;
-            else
+                int oi = layerLength[0] - layerStack[0];
+                assert(oi >= 0 && oi < offsets.length && offsets[oi] == 0);
+                offsets[oi] = (byte) i;
+            } else
                 layerLength[layer]++;
 
             /*
@@ -133,25 +130,48 @@ public class FastCompound implements Compound {
                     "\t" + Arrays.toString(layerStack) + "\t" +Arrays.toString(layerLength));
             */
 
+            layerStack[layer]--;
+
+
+            byte op = skeleton[i];
 
             boolean descend;
             if (ov[op].atomic) {
                 descend = false;
-                i+=2; //skip past atom id
+                i += 2; //skip past atom id
             } else {
-                byte subSubs = skeleton[i+1]; //skip past sub count
-                layerStack[layer+1] = subSubs;
+                byte subSubs = skeleton[i + 1]; //skip past sub count
+
+                assert(layerStack[layer+1] == 0);
+                layerStack[layer + 1] = subSubs;
                 descend = true;
-                i+=2; //compound header
+                i += 2; //compound header
             }
 
-            layerStack[layer]--;
 
             if (descend)
                 layer++;
+            else {
+                if (layerStack[layer] == 0 && layer > 0) {
+
+                    layer--;
+//                    if (--layer < 0)
+//                        break;
+
+                }
+            }
 
 
+        }
 
+        //HACK
+        if (layer > 0) {
+            offsets[offsets.length - 1] = (byte) (skeleton.length - 1);
+        }
+
+//        assert(layer == 0); //return to layer 0
+        for (int i = 0; i < offsets.length - 1; i++) {
+            assert (offsets[i] < offsets[i + 1]); //increasing only
         }
 
         //System.out.println("offsets: " + Arrays.toString(offsets));
@@ -205,7 +225,7 @@ public class FastCompound implements Compound {
         }
 
         public SubtermView go(int offset) {
-            if (this.offset==offset)
+            if (this.offset == offset)
                 return this;
 
             this.offset = offset;
@@ -229,20 +249,19 @@ public class FastCompound implements Compound {
         }
 
 
-
         @Override
         public Term sub(int i) {
-            assert(i < subs);
+            assert (i < subs);
 
             byte[] subOffests = subOffsets();
 
             int subOffset = subOffsets[i];
             Op opAtSub = Op.values()[c.skeleton[subOffset]];
             if (opAtSub.atomic) {
-                return IO.termFromBytes(c.atoms[c.skeleton[subOffset+1]]);
+                return IO.termFromBytes(c.atoms[c.skeleton[subOffset + 1]]);
             } else {
                 //TODO sub view
-                return opAtSub.the(DTERNAL, new SubtermView(c, subOffset).toArray());
+                return opAtSub.the(DTERNAL, new SubtermView(c, subOffset).theArray());
             }
         }
 

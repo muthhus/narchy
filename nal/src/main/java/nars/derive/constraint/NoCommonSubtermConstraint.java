@@ -39,7 +39,7 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
                 Op.recursiveCommonalityDelimeterWeak;
 
 
-    static boolean isSubtermOfTheOther(@NotNull Term a, @NotNull Term b, boolean recurse, boolean excludeVariables) {
+    static boolean isSubtermOfTheOther(Term a, Term b, boolean recurse, boolean excludeVariables) {
 
         if ((excludeVariables) && (a instanceof Variable || b instanceof Variable))
             return false;
@@ -47,8 +47,8 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
         return recurse ?
 
                 //a.containsRecursively(b) || b.containsRecursively(a) :
-                a.containsRecursively(b, limit) ||
-                        b.containsRecursively(a, limit) :
+                a.containsRecursively(b,  limit) ||
+                        b.containsRecursively(a,  limit) :
 
                 a.contains(b) || b.contains(a);
     }

@@ -30,7 +30,6 @@ public class BaseSlider extends Widget {
 
 
 
-
     public BaseSlider(float p) {
         this.p = p;
     }
@@ -61,14 +60,15 @@ public class BaseSlider extends Widget {
     @Override
     protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
 
-        if (leftButton(buttons)) {
+        if (hitPoint!=null && leftButton(buttons)) {
             //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
 
             _set(p(hitPoint));
 
             return true;
         }
-        return true;
+
+        return super.onTouching(finger, hitPoint, buttons);
     }
 
     public void _set(float p) {

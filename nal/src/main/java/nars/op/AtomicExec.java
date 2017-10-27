@@ -68,7 +68,7 @@ public class AtomicExec implements BiFunction<Task, NAR, Task> {
 
         if (xs <= now + presentDurs * dur) {
             n.runLater(possiblyExec); //triggers truth eval AFTER the cycle is over. coalesces with equivalent tasks
-        } else {
+        } else if (xs > now) {
             //schedule for future execution
             n.time.at(xs, possiblyExec);
         }

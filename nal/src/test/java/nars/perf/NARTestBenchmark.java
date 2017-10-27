@@ -1,15 +1,21 @@
 package nars.perf;
 
+import nars.Builder;
+import nars.Op;
 import nars.nal.nal1.NAL1Test;
+import nars.term.Term;
+import nars.term.compound.FastCompound;
+import nars.term.compound.GenericCompound;
 import org.junit.jupiter.api.Disabled;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
-import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
-import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
+import org.junit.platform.launcher.listeners.LoggingListener;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
+
+import java.util.function.BiFunction;
 
 import static nars.perf.JmhBenchmark.perf;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
@@ -29,30 +35,32 @@ public class NARTestBenchmark {
     @BenchmarkMode(Mode.AverageTime)
     public void testExample() {
 
+//        Builder.Compound.the = new BiFunction<Op, Term[], Term>() {
+//            @Override public Term apply(Op op, Term[] terms) {
+//                return FastCompound.get(new GenericCompound(op, Op.subterms(terms)));
+//            }
+//        };
 
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
                 .selectors(
                         //selectPackage("com.example.mytests"),
                         selectClass(NAL1Test.class)
                 )
-//                .filters(
-//                        includeClassNamePatterns(".*Tests")
-//                )
+                // .filters( includeClassNamePatterns(".*Tests")  )
                 .build();
+
 
         Launcher launcher = LauncherFactory.create();
 
-// Register a listener of your choice
-        TestExecutionListener listener = new SummaryGeneratingListener();
-        launcher.registerTestExecutionListeners(listener);
 
+        LoggingListener listener = LoggingListener.forJavaUtilLogging();
+        //SummaryGeneratingListener listener = new SummaryGeneratingListener();
+        launcher.registerTestExecutionListeners(listener);
         launcher.execute(request, listener);
 
+        //listener.getSummary().printTo(new PrintWriter(System.out));
 
-//        RunNotifier n = new RunNotifier();
-//        new BlockJUnit4ClassRunnerWithParametersFactory().createRunnerForTestWithParameters(new TestWithParameters(
-//            "x", new TestClass(NAL1Test.class), Lists.newArrayList( (Supplier)(()-> new NARS().get()) )
-//        )).run(n);
+
     }
 
     public static void main(String[] args) throws RunnerException {

@@ -1,11 +1,15 @@
 package nars.nal.nal1;
 
-import nars.NAR;
-import nars.NARS;
-import nars.Param;
+import nars.*;
+import nars.derive.match.Ellipsis;
+import nars.term.Term;
+import nars.term.compound.FastCompound;
+import nars.term.compound.GenericCompound;
 import nars.test.TestNAR;
 import nars.util.NALTest;
 import org.junit.jupiter.api.Test;
+
+import java.util.function.BiFunction;
 
 public class NAL1Test extends NALTest {
 
@@ -15,7 +19,17 @@ public class NAL1Test extends NALTest {
         //Param.TRACE = true;
     }
 
-    @Override protected NAR nar() { return NARS.tmp(1); }
+    @Override protected NAR nar() {
+          Builder.Compound.the = new BiFunction<Op, Term[], Term>() {
+            @Override public Term apply(Op op, Term[] terms) {
+                GenericCompound g = new GenericCompound(op, Op.subterms(terms));
+                if (g.complexity() > 4)
+                    return g;
+                else
+                    return FastCompound.get(g);
+            }
+        };
+        return NARS.tmp(1); }
 
 //    static {
 //        Param.TRACE = true;

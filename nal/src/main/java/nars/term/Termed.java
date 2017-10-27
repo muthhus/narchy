@@ -80,15 +80,14 @@ public interface Termed extends Termlike {
         Term t = term(); if (this!=t) return t.vars(); else return Termlike.super.vars();
     }
 
-    @NotNull
+    /*@NotNull*/
     default Term unneg() {
         return term().unneg();
     }
 
-
     @Override
-    default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
-        return term().containsRecursively(t, inSubtermsOf);
+    default boolean containsRecursively(Term t, boolean root, Predicate<Term> inSubtermsOf) {
+        return term().containsRecursively(t, root, inSubtermsOf);
     }
 
     @Override

@@ -32,8 +32,12 @@ public interface Atomic extends Term {
         return v.test(this);
     }
 
-    /** for speed, elides virtual call to the complete containsRecursively procedure with additional predicate arg */
     @Override default boolean containsRecursively(Term t) {
+        return false;
+    }
+
+    @Override
+    default boolean containsRecursively(Term t, boolean root, Predicate<Term> inSubtermsOf) {
         return false;
     }
 
@@ -85,6 +89,7 @@ public interface Atomic extends Term {
     default Term replace(Term from, Term to) {
         return equals(from) ? to : this; //atom substitution
     }
+
 
     @NotNull
     static Atomic the(String id) {

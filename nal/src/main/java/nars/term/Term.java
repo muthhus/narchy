@@ -718,7 +718,7 @@ public interface Term extends Termed, Comparable<Termed> {
 
     /* collects any contained events */
     default void events(Consumer<LongObjectPair<Term>> events) {
-        eventsWhile((w, t)-> {
+        eventsWhile((w, t) -> {
             events.accept(PrimitiveTuples.pair(w, t));
             return true; //continue
         }, 0);
@@ -726,17 +726,18 @@ public interface Term extends Termed, Comparable<Termed> {
 
     default MutableSet<LongObjectPair<Term>> eventSet(long offset) {
         MutableSet<LongObjectPair<Term>> events = new UnifiedSet<>();
-        eventsWhile((w, t)-> {
+        eventsWhile((w, t) -> {
             events.add(PrimitiveTuples.pair(w, t));
             return true; //continue
         }, offset);
         return events;
     }
+
     default LongObjectHashMap<Term> eventMap(long offset) {
         LongObjectHashMap<Term> events = new LongObjectHashMap();
-        eventsWhile((w, t)-> {
+        eventsWhile((w, t) -> {
             Term existed = events.put(w, t);
-            if (existed!=null) {
+            if (existed != null) {
                 events.put(w, CONJ.the(0, existed, t));
             }
             return true;
@@ -744,15 +745,19 @@ public interface Term extends Termed, Comparable<Termed> {
         return events;
     }
 
-    /** event list, sorted by time */
+    /**
+     * event list, sorted by time
+     */
     default FastList<LongObjectPair<Term>> eventList() {
         return eventList(0);
     }
 
-   /** event list, sorted by time */
+    /**
+     * event list, sorted by time
+     */
     default FastList<LongObjectPair<Term>> eventList(int offset) {
         MutableSet<LongObjectPair<Term>> s = eventSet(offset);
-        return (FastList)s.toSortedList();
+        return (FastList) s.toSortedList();
     }
 
     default boolean eventsWhile(LongObjectPredicate<Term> whileEachEvent, long dt) {
@@ -852,6 +857,10 @@ public interface Term extends Termed, Comparable<Termed> {
     default Term root() {
         return this;
     }
+    default boolean equalsRoot(Term x) {
+        return equals(x);
+    }
+
 
     default int dt() {
         return DTERNAL;
@@ -867,11 +876,12 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
 
-    @Nullable default Term replace(/*@NotNull*/ Map<Term, Term> m) {
+    @Nullable
+    default Term replace(/*@NotNull*/ Map<Term, Term> m) {
         return transform((m.size() == 1) ?
-            new MapSubst1(m.entrySet().iterator().next())
+                new MapSubst1(m.entrySet().iterator().next())
                 :
-            new MapSubst(m)
+                new MapSubst(m)
         );
     }
 
@@ -889,6 +899,7 @@ public interface Term extends Termed, Comparable<Termed> {
 
     @Nullable
     Term temporalize(Retemporalize r);
+
 
 
 }

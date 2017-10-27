@@ -1,6 +1,6 @@
 package nars.bag;
 
-import jcog.bag.impl.ArrayBag;
+import jcog.bag.Bag;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Centroid;
 import jcog.list.FasterList;
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  */
 public class BagClustering<X> {
 
-    public final ArrayBag<X, VLink<X>> bag;
+    public final Bag<X, VLink<X>> bag;
 
     final Dimensionalize<X> model;
 
@@ -50,11 +50,7 @@ public class BagClustering<X> {
 
         this.net = new NeuralGasNet(model.dims, centroids, model::distanceSq);
 
-
-
-        PriMerge merge = PriMerge.plus;
-        this.bag = new ArrayBag<>(merge, new ConcurrentHashMap<>(initialCap)) {
-
+        this.bag = new ConcurrentArrayBag<>(PriMerge.max, initialCap) {
 
             @Nullable
             @Override
@@ -62,16 +58,7 @@ public class BagClustering<X> {
                 return x.id;
             }
 
-//            @Override
-//            public void onRemove(@NotNull VLink<X> value) {
-//                //value.delete();
-//            }
-
-
         };
-        bag.setCapacity(initialCap);
-
-
     }
 
 
@@ -164,7 +151,7 @@ public class BagClustering<X> {
         if (busy.compareAndSet(false, true)) {
 
             try {
-                synchronized (bag.items) {
+                synchronized (bag) {
 
                     int s = bag.size();
                     if (s == 0)
@@ -209,7 +196,7 @@ public class BagClustering<X> {
     }
 
     public void clear() {
-        synchronized (bag.items) {
+        synchronized (bag) {
             bag.clear();
             net.clear();
         }

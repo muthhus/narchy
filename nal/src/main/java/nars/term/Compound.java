@@ -82,8 +82,8 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
-        return inSubtermsOf.test(this) && subterms().containsRecursively(t, inSubtermsOf);
+    default boolean containsRecursively(Term t, boolean root,  Predicate<Term> inSubtermsOf) {
+        return inSubtermsOf.test(this) && subterms().containsRecursively(t, root, inSubtermsOf);
     }
 
     @Override
@@ -900,8 +900,8 @@ public interface Compound extends Term, IPair, TermContainer {
         return term == null ? Null : term;
     }
 
+
     @Override
-            /*@NotNull*/
     default Term conceptual() {
 
         if (op() == NEG)
@@ -915,6 +915,30 @@ public interface Compound extends Term, IPair, TermContainer {
         term = term.normalize();
 
         return term != null ? term : Null;
+    }
+    default boolean equalsRoot(Term x) {
+        if (this == x)
+            return true;
+
+        Op op;
+        if ((structure() == x.structure() && volume() == x.volume() && (op=op()) == x.op())) {
+
+            if (op.temporal) {
+                return root().equals(x.root());
+            } else {
+                TermContainer a = subterms();
+                TermContainer b = x.subterms();
+                int aa;
+                if ((aa = a.subs()) == b.subs()) {
+                    for (int i = 0; i < aa; i++) {
+                        if (!a.sub(i).equalsRoot(b.sub(i)))
+                            return false;
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 

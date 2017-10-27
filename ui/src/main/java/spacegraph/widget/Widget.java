@@ -18,6 +18,7 @@ import spacegraph.widget.button.PushButton;
 import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.console.TextEdit;
 import spacegraph.widget.slider.BaseSlider;
+import spacegraph.widget.slider.FloatSlider;
 import spacegraph.widget.slider.XYSlider;
 
 import java.io.IOException;
@@ -80,7 +81,7 @@ abstract public class Widget extends Stacking {
             Draw.colorHash(gl, getClass().hashCode(), 0.5f);
             //gl.glColor3f(1f, 1f, 0f);
             gl.glLineWidth(4);
-            Draw.rectStroke(gl, 0, 0, 1, 1);
+            Draw.rectStroke(gl, x(), y(), w(), h());
         }
 
 
@@ -118,7 +119,7 @@ abstract public class Widget extends Stacking {
 
     @Override
     protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
-        if (finger!=null && finger.clickReleased(2)) { //released right button
+        if (finger != null && finger.clickReleased(2)) { //released right button
 
             root().zoom(cx(), cy(), w(), h());
 
@@ -158,25 +159,32 @@ abstract public class Widget extends Stacking {
     public static Layout widgetDemo() {
         return
             grid(
-                    row(new PushButton("row1"), new PushButton("row2"), new PushButton("row3")),
-                    col(new PushButton("col1"), new PushButton("col2"), new PushButton("col3")),
-                    new VSplit(new PushButton("vsplit top"), new PushButton("vsplit bottom")),
-                    new VSplit(new PushButton("grid within"), grid(
-                        new BaseSlider(.25f  /* pause */),
-                        col(new CheckBox("ABC"), new CheckBox("XYZ"))
-                    ), 0.8f),
-                    new PushButton("clickMe()", (p) -> {
-                      p.setLabel(Texts.n2(Math.random()));
-                    }),
-                    new XYSlider(),
-                    new DummyConsole().align(Align.Center, 1f)
+                row(new PushButton("row1"), new PushButton("row2"), new PushButton("clickMe()", (p) -> {
+                    p.setLabel(Texts.n2(Math.random()));
+                })),
+                new VSplit(
+                        new PushButton("vsplit"),
+                        row(
+                            col(new CheckBox("checkbox"), new CheckBox("checkbox")),
+                            grid(
+                                    new PushButton("a"), new PushButton("b"), new PushButton("c"), new PushButton("d")
+                            )
+                        ), 0.8f
+                ),
+                col(
+                        new Label("label"),
+                        new FloatSlider("solid slider", .25f  /* pause */, 0, 1),
+                        new FloatSlider("knob slider", 0.75f, 0, 1).draw(BaseSlider.Knob)
+                ),
+                new XYSlider(),
+                new DummyConsole().align(Align.Center, 1f)
             );
     }
 
     private static class DummyConsole extends ConsoleTerminal implements Runnable {
 
         public DummyConsole() {
-            super(new TextEdit(15,15));
+            super(new TextEdit(15, 15));
             new Thread(this).start();
         }
 

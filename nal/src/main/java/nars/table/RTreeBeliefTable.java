@@ -52,6 +52,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     public static final float PRESENT_AND_FUTURE_BOOST = 1f;
 
+    static final int SCAN_DIVISIONS = 3;
 
     public static final int MIN_TASKS_PER_LEAF = 2;
     public static final int MAX_TASKS_PER_LEAF = 4;
@@ -269,8 +270,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             long end = Math.min(boundsEnd, _end);
 
             float timeRange = boundsEnd - boundsStart;
-            int divisions = 4;
-            long expand = Math.max(1, Math.round(timeRange / (1 << divisions)));
+            long expand = Math.max(1, Math.round(timeRange / (2*SCAN_DIVISIONS)));
 
             //TODO use a polynomial or exponential scan expansion, to start narrow and grow wider faster
 
@@ -303,9 +303,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 leftMid = leftMid - 1;
                 rightMid = rightMid + 1;
                 rightEnd = rightEnd + expand + 1;
-
-
-                expand *= 2; //accelerate on the next cycle
 
             } while (true);
 

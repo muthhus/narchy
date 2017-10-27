@@ -4,14 +4,10 @@ import jcog.Util;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
-import nars.derive.AbstractPred;
-import nars.derive.PrediTerm;
-import nars.derive.PrediTrie;
-import nars.derive.TrieDeriver;
+import nars.derive.*;
 import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternIndex;
-import nars.task.ITask;
 
 import java.io.PrintStream;
 import java.util.function.Function;
@@ -44,24 +40,18 @@ public class Deriver extends NARService {
     public final PrediTerm<Derivation> deriver;
     private final NAR nar;
     private final Causable can;
-    private final CauseChannel<ITask> cause;
 
     private float minPremisesPerConcept = 1;
     private float maxPremisesPerConcept = 3;
-
-    protected Deriver(NAR nar, String... rulesets) {
-        this(PrediTrie.the(
-                new PremiseRuleSet(
-                        new PatternIndex(), nar, rulesets
-                )), nar);
-    }
 
     protected Deriver(PrediTerm<Derivation> deriver, NAR nar) {
         super(nar);
         this.deriver = deriver;
         this.nar = nar;
 
-        this.cause = nar.newCauseChannel(this);
+        Try t = (Try) ((AndCondition)(deriver)).cache[1]; //HACK
+
+        //this.cause = nar.newCauseChannel(this);
         this.can = new Causable(nar) {
             @Override
             protected int next(NAR n, int iterations) {
@@ -70,7 +60,8 @@ public class Deriver extends NARService {
 
             @Override
             public float value() {
-                return cause.value();
+                t.cache.update(nar.time());
+                return t.cache.valueSum();
             }
         };
         //this.can.can.update(1,1,0.0);
@@ -121,7 +112,7 @@ public class Deriver extends NARService {
                 return derivations[0] > 0;
             });
 
-            int derived = d.commit(cause::input);
+            int derived = d.commit(nar::input);
             activator.commit(nar);
 
             if (derivations[0] == derivationsBefore)

@@ -1,15 +1,15 @@
 package spacegraph.widget.slider;
 
 import com.jogamp.opengl.GL2;
-import spacegraph.Surface;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
+import spacegraph.widget.Widget;
 
 /**
  * Created by me on 6/26/16.
  */
-public class XYSlider extends Surface {
+public class XYSlider extends Widget {
 
     final v2 knob = new v2(0.5f, 0.5f);
 
@@ -26,13 +26,16 @@ public class XYSlider extends Surface {
             knob.set(hitPoint);
             return true;
         }
-        return false;
+        return super.onTouching(finger, hitPoint, buttons);
     }
 
 
     @Override
-    protected void paint(GL2 gl) {
+    protected void paintComponent(GL2 gl) {
+        Draw.bounds(gl, this, this::paintUnit);
+    }
 
+    protected void paintUnit(GL2 gl) {
         //float margin = 0.1f;
         //float mh = margin / 2.0f;
 

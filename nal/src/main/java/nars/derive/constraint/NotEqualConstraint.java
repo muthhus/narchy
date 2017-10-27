@@ -25,7 +25,8 @@ public final class NotEqualConstraint extends MatchConstraint {
         @Nullable Term canNotEqual = f.xy(other);
         return canNotEqual!=null &&
                 //Terms.equalAtemporally(y, canNotEqual);
-                y.equals(canNotEqual);
+                //y.equals(canNotEqual);
+                y.equalsRoot(canNotEqual);
     }
 
 

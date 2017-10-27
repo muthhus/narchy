@@ -60,16 +60,36 @@ public class AspectAlign extends Layout {
         float th = vh;
         float aspect = this.aspect;
         if (aspect == aspect /* not NaN */) {
-//
-            if (vh / vw > aspect) {
-                //wider, shrink y
-                tw = vw;
-                th = vw * aspect;
+
+            if (vh > vw) {
+                if (aspect > 1) {
+                    //taller than wide
+                    tw = vw/aspect;
+                    th = vh;
+                } else {
+                    //wider than tall
+                    tw = vw;
+                    th = vh*aspect;
+                }
             } else {
-                //taller, shrink x
-                tw = vh * aspect;
-                th = vh;
+                if (aspect > 1) {
+                    //taller than wide
+                    tw = vw;
+                    th = vh/aspect;
+                } else {
+                    tw = vw*aspect;
+                    th = vh;
+                }
             }
+//            if (vh / vw > aspect) {
+//                //wider, shrink y
+//                tw = vw;
+//                th = vw * aspect;
+//            } else {
+//                //taller, shrink x
+//                tw = vh * aspect;
+//                th = vh;
+//            }
         }
 
         float tx = 0, ty = 0;
