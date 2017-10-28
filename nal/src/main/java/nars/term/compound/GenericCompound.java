@@ -18,7 +18,7 @@ public class GenericCompound implements Compound {
      * subterm vector
      */
     @NotNull
-    private TermContainer subterms;
+    private final TermContainer subterms;
 
 
     /**

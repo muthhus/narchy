@@ -53,8 +53,6 @@ public class Activate extends PLink<Concept> implements Termed {
         if (cost >= Pri.EPSILON)
             priSub(cost);
 
-        List<Premise> next = new FasterList(premisesMax);
-
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks();
 
         termlinks.commit(termlinks.forget(Param.LINK_FORGET_TEMPERATURE));
@@ -77,17 +75,18 @@ public class Activate extends PLink<Concept> implements Termed {
         int ntasklinks = tasklinks.size();
         if (ntasklinks == 0) return null;
 
-        final int[] remaining = {premisesMax};
         Random rng = nar.random();
 
         int TASKLINKS_SAMPLED = (int) Math.ceil(((float)premisesMax) / termlSize);
         int TASKLINK_oversample = 2 * TASKLINKS_SAMPLED;
         List<PriReference<Task>> tasklinkCandidates = $.newArrayList();
-        tasklinks.sample(TASKLINK_oversample, (Consumer<PriReference<Task>>) /* not pred */(x -> tasklinkCandidates.add(x)));
+        tasklinks.sample(TASKLINK_oversample, (Consumer<PriReference<Task>>) /* not pred */(tasklinkCandidates::add));
         if (tasklinkCandidates.isEmpty())
             return null;
 
         //apply the nar valuation to further refine selection of the tasks collected in the oversample prestep
+        List<Premise> next = new FasterList(premisesMax);
+        final int[] remaining = {premisesMax};
         Util.selectRouletteUnique(rng, tasklinkCandidates.size(), (i)-> {
                 PriReference<Task> tl = tasklinkCandidates.get(i);
                 Task t = tl.get();
@@ -101,16 +100,13 @@ public class Activate extends PLink<Concept> implements Termed {
             if (task == null)
                 return true;
 
-            float tPri = task.priElseZero();
             for (int j = 0; j < termlSize && remaining[0]-- > 0; j++) {
                 PriReference<Term> termlink = terml.get(j);
 
                 final Term term = termlink.get();
                 if (term != null) {
 
-                    float pri1 = Param.termTaskLinkToPremise.apply(tPri, termlink.priElseZero());
-
-                    Premise p = new Premise(task, term, pri1,
+                    Premise p = new Premise(task, term,
 
                             //targets:
                             randomTemplateConcepts(rng, TERMLINKS_SAMPLED /* heuristic */, nar)

@@ -50,7 +50,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * max allowed truths to be truthpolated in one test
      */
-    static final int TRUTHPOLATION_LIMIT = 4;
+    static final int TRUTHPOLATION_LIMIT = 3;
 
     public static final float PRESENT_AND_FUTURE_BOOST = 1f;
 
@@ -107,13 +107,21 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
     @Override
-    public Truth truth(long start, long end, EternalTable eternal, NAR nar) {
-
+    public Truth truth(long start, long end, EternalTable eternal, int dur) {
 
         final Task ete = eternal != null ? eternal.strongest() : null;
 
-        if (start == ETERNAL) start = end = nar.time();
+        if (start == ETERNAL) {
+            TaskRegion r = ((TaskRegion) tree.root().region());
+            if (r == null)
+                return ete!=null ? ete.truth() : null;
+
+            start = r.start();
+            end = r.end();
+        }
+
         assert (end >= start);
+
 
         int s = size();
         if (s > 0) {
@@ -141,7 +149,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 //                }
 
                 //applying eternal should not influence the scan for temporal so it is left null here
-                return Param.truth(ete, start, end, nar.dur(), tt);
+                return Param.truth(ete, start, end, dur, tt);
 
                 //        if (t != null /*&& t.conf() >= confMin*/) {
                 //            return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
@@ -268,45 +276,55 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             long boundsStart = bounds.start();
             long boundsEnd = bounds.end();
 
-            long start = Math.max(boundsStart, _start);
-            long end = Math.min(boundsEnd, _end);
+            long start = Math.min(boundsEnd, Math.max(boundsStart, _start));
+            long end = Math.max(boundsStart, Math.min(boundsEnd, _end));
 
-            float timeRange = boundsEnd - boundsStart;
+            float maxTimeRange = boundsEnd - boundsStart;
+            long expand = Math.max(1,
+                    (
+                    //Math.min(
+                        //(end-start)/2,
+                        Math.round(maxTimeRange / (1 << (1 + SCAN_DIVISIONS)))));
 
-            //long expand = Math.max(1, Math.round(timeRange / (1 << (1 + SCAN_DIVISIONS)))); //extra divide by two because it scans bidirectionally
-            long expand = 1;
 
             //TODO use a polynomial or exponential scan expansion, to start narrow and grow wider faster
 
 
             long mid = (start + end) / 2;
             long leftStart = start, leftMid = mid, rightMid = mid, rightEnd = end;
-            int complete;
+            boolean leftComplete = false, rightComplete = false;
             //TODO float complete and use this as the metric for limiting with scan quality parameter
-            TimeRange r = new TimeRangeUniqueNodes(); //recycled
+            TimeRange r =
+                    //new TimeRange();
+                    new TimeRangeUniqueNodes(); //recycled
             do {
-                complete = 0;
 
-                if (leftStart >= boundsStart)
+
+                if (!leftComplete)
                     tree.intersecting(r.set(leftStart, leftMid), update);
-                else
-                    complete++;
 
-                if (rightEnd <= boundsEnd && !(leftStart == rightMid && leftMid == rightEnd))
+                if (!rightComplete && !(leftStart == rightMid && leftMid == rightEnd))
                     tree.intersecting(r.set(rightMid, rightEnd), update);
-                else
-                    complete++;
 
-                if (complete == 2 || attempts[0] >= maxTries)
+                if (attempts[0] >= maxTries || !continueScanning.test(u, r.set(leftStart, rightEnd)))
                     break;
 
-                if (!continueScanning.test(u, r.set(leftStart, rightEnd)))
-                    break;
+                leftMid = leftStart - 1;
+                long ls0 = leftStart;
+                leftStart = Math.max(boundsStart, leftStart - expand - 1);
+                if (ls0 == leftStart) { //no change
+                    leftComplete = true;
+                }
 
-                leftStart = leftStart - expand - 1;
-                leftMid = leftMid - 1;
-                rightMid = rightMid + 1;
-                rightEnd = rightEnd + expand + 1;
+                rightMid = rightEnd + 1;
+                long rs0 = rightEnd;
+                rightEnd = Math.min(boundsEnd, rightEnd + expand + 1);
+                if (rs0 == rightEnd) {
+                    rightComplete = true;
+                }
+
+                if (leftComplete && rightComplete)
+                    break;
 
                 expand *= 2;
             } while (true);
@@ -687,8 +705,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     private static final class RTreeBeliefModel extends Spatialization<TaskRegion> {
 
 
-        public static Spatialization<TaskRegion> the = new RTreeBeliefModel();
-        ;
+        public static final Spatialization<TaskRegion> the = new RTreeBeliefModel();
+
 
         public RTreeBeliefModel() {
             super((t -> t), RTreeBeliefTable.SPLIT, RTreeBeliefTable.MIN_TASKS_PER_LEAF, RTreeBeliefTable.MAX_TASKS_PER_LEAF);

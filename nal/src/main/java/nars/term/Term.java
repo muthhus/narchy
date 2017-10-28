@@ -60,7 +60,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -68,7 +67,6 @@ import java.util.function.Predicate;
 
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.XTERNAL;
 
 
 public interface Term extends Termed, Comparable<Termed> {
@@ -127,20 +125,11 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
     @Override
-    default int subs() {
-        return subterms().subs();
-    }
-
-    @Override
     boolean equals(Object o);
 
     @Override
     int hashCode();
 
-
-    default boolean recurseTerms(BiPredicate<Term, Term> whileTrue) {
-        return recurseTerms(whileTrue, null);
-    }
 
 
     /**
@@ -152,9 +141,9 @@ public interface Term extends Termed, Comparable<Termed> {
         return whileTrue.test(this);
     }
 
-    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue) {
-        return recurseTerms(parentsMust, whileTrue, this);
-    }
+//    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue) {
+//        return recurseTerms(parentsMust, whileTrue, this);
+//    }
 
     /**
      * whether this term is or contains, as subterms, any temporal terms
@@ -485,48 +474,7 @@ public interface Term extends Termed, Comparable<Termed> {
      * total span across time represented by a sequence conjunction compound
      */
     default int dtRange() {
-        Op o = op();
-        switch (o) {
-//
-////            case NEG:
-////                return sub(0).dtRange();
-//
-//
-            case CONJ:
-
-                if (subs() == 2) {
-                    int dt = dt();
-
-                    switch (dt) {
-                        case DTERNAL:
-                        case XTERNAL:
-                        case 0:
-                            dt = 0;
-                            break;
-                        default:
-                            dt = Math.abs(dt);
-                            break;
-                    }
-
-                    return sub(0).dtRange() + (dt) + sub(1).dtRange();
-
-                } else {
-                    int s = 0;
-
-                    TermContainer tt = subterms();
-                    int l = tt.subs();
-                    for (int i = 0; i < l; i++) {
-                        Term x = tt.sub(i);
-                        s = Math.max(s, x.dtRange());
-                    }
-
-                    return s;
-                }
-
-            default:
-                return 0;
-        }
-
+        return 0;
     }
 
 
@@ -816,30 +764,30 @@ public interface Term extends Termed, Comparable<Termed> {
         return this;
     }
 
-    /**
-     * return null if none, cheaper than using an empty iterator
-     */
-    @Nullable
-    default Set<Variable> varsUnique(@Nullable Op type/*, Set<Term> exceptIfHere*/) {
-        int num = vars(type);
-        if (num == 0)
-            return null;
-
-        //must check all in case of repeats
-        MutableSet<Variable> u = new UnifiedSet(num);
-        final int[] remain = {num};
-
-        recurseTerms(parent -> vars(type) > 0,
-                (sub) -> {
-                    if (sub instanceof Variable && (type == null || sub.op() == type)) {
-                        //if (!unlessHere.contains(sub))
-                        u.add((Variable) sub);
-                        remain[0]--;
-                    }
-                    return (remain[0] > 0);
-                });
-        return u.isEmpty() ? null : u;
-    }
+//    /**
+//     * return null if none, cheaper than using an empty iterator
+//     */
+//    @Nullable
+//    default Set<Variable> varsUnique(@Nullable Op type/*, Set<Term> exceptIfHere*/) {
+//        int num = vars(type);
+//        if (num == 0)
+//            return null;
+//
+//        //must check all in case of repeats
+//        MutableSet<Variable> u = new UnifiedSet(num);
+//        final int[] remain = {num};
+//
+//        recurseTerms(parent -> vars(type) > 0,
+//                (sub) -> {
+//                    if (sub instanceof Variable && (type == null || sub.op() == type)) {
+//                        //if (!unlessHere.contains(sub))
+//                        u.add((Variable) sub);
+//                        remain[0]--;
+//                    }
+//                    return (remain[0] > 0);
+//                });
+//        return u.isEmpty() ? null : u;
+//    }
 
     /**
      * returns this term in a form which can identify a concept, or Null if it can't

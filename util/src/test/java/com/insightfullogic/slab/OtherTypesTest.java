@@ -26,7 +26,7 @@ public class OtherTypesTest {
 	}
 
 	private static final Allocator<OtherTypes> allocator = Allocator.of(OtherTypes.class);
-	private static final OtherTypes value = allocator.allocate(1);
+	private final OtherTypes value = allocator.allocate(1);
 
 	@Test
 	public void fieldsGettableSettable() {
@@ -47,7 +47,7 @@ public class OtherTypesTest {
 	}
 	
 	@AfterEach
-	public static void free() {
+	public void free() {
 		value.close();
 	}
 

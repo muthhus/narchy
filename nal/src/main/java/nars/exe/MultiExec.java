@@ -33,7 +33,7 @@ abstract public class MultiExec extends UniExec {
 
         exe = initExe();
 
-        disruptor = new Disruptor<ITask[]>(
+        disruptor = new Disruptor<>(
                 () -> new ITask[1],
                 qSize,
                 exe
@@ -97,10 +97,6 @@ abstract public class MultiExec extends UniExec {
         }
     }
 
-    @Override
-    public synchronized void start(NAR nar) {
-        super.start(nar);
-    }
 
     @Override
     public boolean concurrent() {
@@ -114,9 +110,8 @@ abstract public class MultiExec extends UniExec {
         super.stop();
     }
 
-    static final EventTranslatorOneArg<ITask[], ITask> ein = (event, sequence, arg0) -> {
-        event[0] = arg0;
-    };
+    static final EventTranslatorOneArg<ITask[], ITask> ein =
+            (event, sequence, arg0) -> event[0] = arg0;
 
 //    @Override
 //    public float load() {

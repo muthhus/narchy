@@ -106,9 +106,9 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 
     private static int hash(int id, int minArity) {
         //the 31th bit (arbitrarily chosen here) is what will store the 1-bit minArity value. provided id's should all have that bit free
-        if (minArity > 1 || ((id & (1 << 31)) != 0)) throw new UnsupportedOperationException();
+        if (minArity > 1 || ((id & (1 << 30)) != 0)) throw new UnsupportedOperationException();
         if (minArity==1)
-            id |= (1 << 31);
+            id |= (1 << 30);
         return id;
     }
 

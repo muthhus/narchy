@@ -11,7 +11,7 @@ import nars.video.SwingBitmap2D;
 public class Arkancide extends NAgentX {
 
     static boolean numeric = true;
-    static boolean cam = true;
+    static boolean cam = false;
 
     public final FloatParam ballSpeed = new FloatParam(1.5f, 0.04f, 6f);
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);

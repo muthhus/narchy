@@ -9,15 +9,11 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.derive.time.Event;
-import nars.derive.time.Temporalize;
 import nars.table.BeliefTable;
-import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.Unify;
 import nars.term.subst.UnifySubst;
-import nars.term.transform.Retemporalize;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +33,7 @@ import static nars.time.Tense.ETERNAL;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public class Premise extends PLink<Pair<Task,Term>> {
+public class Premise  {
 
     static final Logger logger = LoggerFactory.getLogger(Premise.class);
 
@@ -47,19 +43,10 @@ public class Premise extends PLink<Pair<Task,Term>> {
     @Nullable
     public final Collection<Concept> links;
 
-    public Premise(Task tasklink, Term termlink, float pri, Collection<Concept> links) {
-        super(Tuples.pair(tasklink, termlink), pri);
+    public Premise(Task tasklink, Term termlink, Collection<Concept> links) {
         this.task = tasklink;
         this.termLink = termlink;
         this.links = links;
-    }
-
-    @Override
-    public boolean delete() {
-        if (super.delete()) {
-            return true;
-        }
-        return false;
     }
 
     /**

@@ -513,8 +513,7 @@ public class Revision {
     public static boolean equivalent(Task input, Truth output, long start, long end, Term cc, NAR nar) {
         Truth bt = input.truth();
         if (input.conf() >= output.conf() && Util.equals(input.freq(),output.freq(), nar.truthResolution.asFloat())) {
-            if (cc.equals(input.term()) && start == input.start() && end == input.end())
-                return true;
+            return cc.equals(input.term()) && start == input.start() && end == input.end();
         }
         return false;
     }
@@ -565,11 +564,11 @@ public class Revision {
                 //a) inter-term distance if both are non-XTERNAL
                 if (a.dt() != XTERNAL && b.dt() != XTERNAL) {
 
-                    final float[] xd = {0};
                     ObjectLongHashMap<Term> ab = new ObjectLongHashMap(len);
                     a.events((tw) -> ab.put(tw.getTwo().root(), tw.getOne()));
                     b.events((tw) -> ab.addToValue(tw.getTwo().root(), -tw.getOne()));
 
+                    final float[] xd = {0};
                     ab.forEachValue(x -> xd[0] += Math.abs(x));
                     d += xd[0];
                 }

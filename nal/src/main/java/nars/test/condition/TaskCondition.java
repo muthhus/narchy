@@ -338,6 +338,9 @@ public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Ta
                 return;
         }
 
+        if (task.punc()!=punc)
+            difference += 4;
+
         if (difference >= worstDiff)
             return;
 

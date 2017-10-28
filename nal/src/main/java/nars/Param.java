@@ -94,16 +94,16 @@ public abstract class Param extends Services<Term, NAR> {
             PriMerge.max;
     //PriMerge.plus; //not safe to plus without enough headroom
 
-    /**
-     * budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links)
-     */
-    public static final FloatFloatToFloatFunction termTaskLinkToPremise =
-            Util::or;
-            //Util::and;
-            //UtilityFunctions::aveGeo;
-            //UtilityFunctions::aveAri;
-            //Math::min;
-            //Math::max;
+//    /**
+//     * budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links)
+//     */
+//    public static final FloatFloatToFloatFunction termTaskLinkToPremise =
+//            Util::or;
+//            //Util::and;
+//            //UtilityFunctions::aveGeo;
+//            //UtilityFunctions::aveAri;
+//            //Math::min;
+//            //Math::max;
 
     public static final PriMerge premiseMerge = PriMerge.max;
 
@@ -138,8 +138,8 @@ public abstract class Param extends Services<Term, NAR> {
     /**
      * 'time to live', unification steps until unification is stopped
      */
-    public final MutableInteger matchTTLmax = new MutableInteger(512);
-    public final MutableInteger matchTTLmin = new MutableInteger(128);
+    public final MutableInteger matchTTLmax = new MutableInteger(256);
+    public final MutableInteger matchTTLmin = new MutableInteger(64);
 
     /**
      * how much percent of a premise's allocated TTL can be used in the belief matching phase.

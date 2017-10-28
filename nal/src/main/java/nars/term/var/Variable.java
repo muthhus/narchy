@@ -1,12 +1,8 @@
 package nars.term.var;
 
-import nars.Op;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Set;
 
 /**
  * similar to a plain atom, but applies altered operating semantics according to the specific
@@ -51,17 +47,17 @@ public interface Variable extends Atomic {
 
 
 
-    @Override
-    @Nullable
-    default Set<Variable> varsUnique(@Nullable Op type) {
-        if ((type == null || op() == type))
-            return Set.of(this);
-        else
-            return null;
-    }
+//    @Override
+//    @Nullable
+//    default Set<Variable> varsUnique(@Nullable Op type) {
+//        if ((type == null || op() == type))
+//            return Set.of(this);
+//        else
+//            return null;
+//    }
 
     @Override
-    default void init(@NotNull int[] meta) {
+    default void init(int[] meta) {
         int i;
         switch (op()) {
             case VAR_DEP:

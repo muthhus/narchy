@@ -166,13 +166,13 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
                     return fail(t, "InDep variables must be subterms of statements", safe);
                 } else {
                     //TODO use a byte[] path thing to reduce duplicate work performed in indepValid findPaths
-                    if (t.hasAny(Op.VAR_INDEP)) {
-                        Set unique = new UnifiedSet(1); //likely only one var indep repeated twice
-                        if (!t.ANDrecurse(
-                                v -> (v.op() != VAR_INDEP) || !unique.add(v) || indepValid(t, v))) {
-                            return fail(t, "unbalanced InDep variable pairing", safe);
-                        }
+
+                    Set unique = new UnifiedSet(1); //likely only one var indep repeated twice
+                    if (!t.ANDrecurse(
+                            v -> (v.op() != VAR_INDEP) || !unique.add(v) || indepValid(t, v))) {
+                        return fail(t, "unbalanced InDep variable pairing", safe);
                     }
+
                 }
         }
 
@@ -356,7 +356,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
                     if (dur <= 0) {
                         System.err.println("dur=0");
                     }
-                    assert (dur > 0): "dur=0";
+                    assert (dur > 0) : "dur=0";
 
                     float ete = eternalizable();
                     float ecw = ete > 0 ? this.eviEternalized() * ete : 0;
@@ -555,8 +555,8 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         }
 
         Task forward = meta("@");
-        long s,e;
-        if (forward == null || (forward!=answer && forward.conf(s = start(), e = end()) < answer.conf(s, e))) {
+        long s, e;
+        if (forward == null || (forward != answer && forward.conf(s = start(), e = end()) < answer.conf(s, e))) {
             meta("@", answer); //forward to the top answer if this ever gets deleted
         }
 

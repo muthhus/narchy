@@ -11,7 +11,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.LongSupplier;
 
 /**
@@ -30,7 +29,7 @@ public class Signal {
      */
     public final FloatSupplier resolution;
 
-    public final AtomicBoolean busy = new AtomicBoolean(false);
+//    public final AtomicBoolean busy = new AtomicBoolean(false);
 
 //    boolean inputIfSame;
 //    int maxTimeBetweenUpdates;
@@ -54,10 +53,11 @@ public class Signal {
 
     public Task set(Term term, @Nullable Truth nextTruth, LongSupplier stamper, long now, int dur, NAR nar) {
 
-        if (!busy.compareAndSet(false, true))
-            return last;
+//        if (!busy.compareAndSet(false, true))
+//            return last;
+//        try {
+        synchronized (resolution) {
 
-        try {
             SignalTask last = this.last;
             @Nullable PreciseTruth tt = nextTruth != null ? nextTruth.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f) : null;
 
@@ -91,21 +91,20 @@ public class Signal {
 
 
             if (last == next) {
-                if (last!=null) {
-                    last.priMax(pri.asFloat());
+                if (last != null) {
                     last.grow(now);
                 }
                 return null;  //dont re-input the task, just stretch it where it is in the temporal belief table
             } else {
-                if (last!=null) {
-                    last.priMax(pri.asFloat());
+                if (last != null) {
                     last.end(now);
                 }
                 return this.last = next; //new or null input; stretch will be assigned on first insert to the belief table (if this happens)
             }
 
-        } finally {
-            busy.set(false);
+//        } finally {
+//            busy.set(false);
+//        }
         }
     }
 

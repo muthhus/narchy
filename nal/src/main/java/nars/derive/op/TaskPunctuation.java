@@ -4,7 +4,6 @@ import nars.Op;
 import nars.control.Derivation;
 import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
-import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.*;
 
@@ -26,7 +25,7 @@ final public class TaskPunctuation extends AbstractPred<Derivation> {
 
 
     @Override
-    public final boolean test(@NotNull Derivation m) {
+    public final boolean test( Derivation m) {
         return m.taskPunct == punc;
     }
 
@@ -40,7 +39,7 @@ final public class TaskPunctuation extends AbstractPred<Derivation> {
 
     public static final PrediTerm<Derivation> BeliefOrGoal = new AbstractPred<Derivation>("task:\".!\"") {
         @Override
-        public boolean test(@NotNull Derivation o) {
+        public boolean test( Derivation o) {
             byte c = o.taskPunct;
             return c == BELIEF || c == GOAL;
         }
@@ -53,7 +52,7 @@ final public class TaskPunctuation extends AbstractPred<Derivation> {
 
     public static final PrediTerm<Derivation> QuestionOrQuest = new AbstractPred<Derivation>("task:\"?@\"") {
         @Override
-        public boolean test(@NotNull Derivation o) {
+        public boolean test( Derivation o) {
             byte c = o.taskPunct;
             return c == Op.QUESTION || c == QUEST;
         }
@@ -70,14 +69,14 @@ final public class TaskPunctuation extends AbstractPred<Derivation> {
 
     //    /** only belief, not goal or question */
 //    public static final AtomicBoolCondition NotGoal = new AtomicBoolCondition()  {
-//        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
+//        @Override public boolean booleanValueOf( PremiseEval o) {
 //            return (o.premise.task().punc() != Symbols.GOAL);
 //        }
 //        @Override public String toString() { return "task:\".\""; }
 //    };
 //    public static final AtomicPred<Derivation> NotQuestion = new AtomicPred<>() {
 //        @Override
-//        public boolean test(@NotNull Derivation o) {
+//        public boolean test( Derivation o) {
 //            byte p = o.taskPunct;
 //            return (p != Op.QUESTION && p != Op.QUEST);
 //        }
@@ -88,14 +87,14 @@ final public class TaskPunctuation extends AbstractPred<Derivation> {
 //        }
 //    };
 //    public static final AtomicBoolCondition NotBelief = new AtomicBoolCondition()  {
-//        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
+//        @Override public boolean booleanValueOf( PremiseEval o) {
 //            return (o.premise.task().punc() != Symbols.BELIEF);
 //        }
 //        @Override public String toString() { return "task:\"!?@\""; }
 //    };
 
 
-    //    @NotNull
+    //    
 //    @Override
 //    public String toJavaConditionString() {
 //        return "'" + punc + "' == p.getTask().getPunctuation()";

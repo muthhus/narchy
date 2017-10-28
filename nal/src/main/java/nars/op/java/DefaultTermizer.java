@@ -163,7 +163,7 @@ public class DefaultTermizer implements Termizer {
         }
 
         if (o instanceof List) {
-            if (((List)o).isEmpty()) return EMPTY;
+            if (((Collection) o).isEmpty()) return EMPTY;
 
             //TODO can this be done with an array to avoid duplicate collection allocation
 

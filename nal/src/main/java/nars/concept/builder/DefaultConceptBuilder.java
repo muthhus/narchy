@@ -109,7 +109,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 Op po = pred.op();
 
                 if (dmt == null && (po.atomic || po == PROD || po.isSet())) {
-                    if ((so == Op.SECTi) || (so == Op.SECTe) || (so == Op.DIFFi) || (subj instanceof Int.IntRange) || (so == PROD && subj.OR(x -> x instanceof Int.IntRange))) {
+                    if ((so == Op.SECTi) || (so == Op.SECTe) || (so == Op.DIFFi) || (subj instanceof Int.IntRange) || (so == PROD && subj.OR(Int.IntRange.class::isInstance))) {
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
@@ -284,8 +284,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
         Op o = c.op();
         if (beliefOrGoal ? o.beliefable : goalable(c)) {
-            DefaultBeliefTable b = new DefaultBeliefTable(newTemporalBeliefTable(c));
-            return b;
+            return new DefaultBeliefTable(newTemporalBeliefTable(c));
         }
 
         return BeliefTable.Empty;

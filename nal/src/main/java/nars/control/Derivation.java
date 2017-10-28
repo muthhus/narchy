@@ -1,6 +1,5 @@
 package nars.control;
 
-import jcog.Util;
 import jcog.math.ByteShuffler;
 import jcog.pri.Pri;
 import jcog.version.Versioned;
@@ -371,8 +370,8 @@ public class Derivation extends Unify {
                 //p.priElseZero(); //use the premise pri directly
                 belief == null ? task.priElseZero() : Param.TaskBeliefDerivation.apply(task.priElseZero(), belief.priElseZero());
 
-        //float parentValue = nar.evaluate(parentCause); /* value of the parent cause as a multiplier */
-        //this.premisePri *= parentValue;
+        float parentValue = nar.evaluate(parentCause); /* value of the parent cause as a multiplier */
+        this.premisePri *= parentValue;
 
 
         this.premiseConfSingle = this.taskTruth != null ? taskTruth.conf() : 0;

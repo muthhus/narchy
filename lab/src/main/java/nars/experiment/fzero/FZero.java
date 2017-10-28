@@ -300,7 +300,7 @@ public class FZero extends NAgentX {
 
         double distance = fz.vehicleMetrics[0][1];
         double deltaDistance;
-        deltaDistance = (distance - lastDistance) / 25f;
+        deltaDistance = (distance - lastDistance) / 35f;
         if (deltaDistance > 1f) deltaDistance = 1f;
         if (deltaDistance < -1f) deltaDistance = -1f;
 

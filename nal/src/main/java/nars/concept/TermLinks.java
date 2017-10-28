@@ -141,7 +141,6 @@ public enum TermLinks {
 
     public static void linkTemplate(Term srcTerm, Bag srcTermLinks, Termed target, float priForward, float priReverse, BatchActivation a, NAR nar, MutableFloat refund) {
 
-        float priSum = priForward + priReverse;
         Term targetTerm = target.term();
         boolean reverseLinked = false;
         if (!srcTerm.equals(targetTerm)) {
@@ -150,6 +149,7 @@ public enum TermLinks {
                 c.termlinks().put(
                         new PLink(srcTerm, priReverse), refund
                 );
+                float priSum = priForward + priReverse;
                 a.put(c, priSum);
                 reverseLinked = true;
             }

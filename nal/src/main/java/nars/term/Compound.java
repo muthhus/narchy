@@ -75,14 +75,15 @@ public interface Compound extends Term, IPair, TermContainer {
      * whether any subterms (recursively) have
      * non-DTernal temporal relation
      */
-    @Override default boolean isTemporal() {
+    @Override
+    default boolean isTemporal() {
         return (dt() != DTERNAL && op().temporal)
                 ||
                 (subterms().isTemporal());
     }
 
     @Override
-    default boolean containsRecursively(Term t, boolean root,  Predicate<Term> inSubtermsOf) {
+    default boolean containsRecursively(Term t, boolean root, Predicate<Term> inSubtermsOf) {
         return inSubtermsOf.test(this) && subterms().containsRecursively(t, root, inSubtermsOf);
     }
 
@@ -121,13 +122,6 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
 
-    /**
-     * temporary: this will be replaced with a smart visitor api
-     */
-    @Override
-    default boolean recurseTerms(BiPredicate<Term, Term> whileTrue) {
-        return recurseTerms(whileTrue, this);
-    }
 
     @Override
     default boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent) {
@@ -678,7 +672,6 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
 
-
     /* collects any contained events within a conjunction*/
     @Override
     default boolean eventsWhile(LongObjectPredicate<Term> events, long offset, boolean decomposeConjParallel, boolean decomposeConjDTernal, int level) {
@@ -700,7 +693,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 if (!reverse) {
                     for (int i = 0; i < s; i++) {
                         Term st = tt.sub(i);
-                        if (!st.eventsWhile(events, t, decomposeConjParallel, decomposeConjDTernal,level + 1)) //recurse
+                        if (!st.eventsWhile(events, t, decomposeConjParallel, decomposeConjDTernal, level + 1)) //recurse
                             return false;
                         t += dt + st.dtRange();
                     }
@@ -773,7 +766,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
             Term xi = xy[i];
-            Term yi= xi.evalSafe(context, remain);
+            Term yi = xi.evalSafe(context, remain);
             if (yi == null) {
                 return Null;
             } else if (xi != yi && (!xi.equals(yi) || yi.getClass() != xi.getClass())) {
@@ -872,6 +865,51 @@ public interface Compound extends Term, IPair, TermContainer {
         return t.transform(this, op(), DTERNAL);
     }
 
+    @Override
+    default int dtRange() {
+        Op o = op();
+        switch (o) {
+//
+////            case NEG:
+////                return sub(0).dtRange();
+//
+//
+            case CONJ:
+
+                if (subs() == 2) {
+                    int dt = dt();
+
+                    switch (dt) {
+                        case DTERNAL:
+                        case XTERNAL:
+                        case 0:
+                            dt = 0;
+                            break;
+                        default:
+                            dt = Math.abs(dt);
+                            break;
+                    }
+
+                    return sub(0).dtRange() + (dt) + sub(1).dtRange();
+
+                } else {
+                    int s = 0;
+
+                    TermContainer tt = subterms();
+                    int l = tt.subs();
+                    for (int i = 0; i < l; i++) {
+                        Term x = tt.sub(i);
+                        s = Math.max(s, x.dtRange());
+                    }
+
+                    return s;
+                }
+
+            default:
+                return 0;
+        }
+
+    }
 
     @Override
     @Nullable
@@ -916,12 +954,13 @@ public interface Compound extends Term, IPair, TermContainer {
 
         return term != null ? term : Null;
     }
+
     default boolean equalsRoot(Term x) {
         if (this == x)
             return true;
 
         Op op;
-        if ((structure() == x.structure() && volume() == x.volume() && (op=op()) == x.op())) {
+        if ((structure() == x.structure() && volume() == x.volume() && (op = op()) == x.op())) {
 
             if (op.temporal) {
                 return root().equals(x.root());

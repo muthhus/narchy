@@ -210,7 +210,7 @@ public interface Termlike {
 
         //TODO save the last in a variable to avoid sub(i) call
         for (int i = 1; i < s; i++) {
-            if (sub(i - 1).compareTo(sub(i)) != -1)
+            if (sub(i - 1).compareTo(sub(i)) >= 0)
                 return false;
         }
         return true;

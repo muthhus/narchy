@@ -31,7 +31,7 @@ public final class PrediTrie {
 
         pre = new TermTrie<>();
 
-        Map<Set<Term>, RoaringBitmap> pre = new HashMap<>();
+        Map<Set<Term>, RoaringBitmap> pre = new HashMap<>(r.size());
         List<PrediTerm<Derivation>> conclusions = $.newArrayList(r.size() * 4);
 
         ObjectIntHashMap<Term> preconditionCount = new ObjectIntHashMap(256);

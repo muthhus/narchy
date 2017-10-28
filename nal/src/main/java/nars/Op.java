@@ -211,16 +211,17 @@ public enum Op {
 
 
             Term ci;
-            if (dt == 0) {
-                ci = null;
-                for (int i = 0; i < u.length; i++) {
+            switch (dt) {
+                case 0:
+                    ci = null;
+                    for (int i = 0; i < u.length; i++) {
 
 //                    //PROMOTE DTERNAL to ZERO
 //                    if (u[i].op() == CONJ && u[i].dt() == DTERNAL) {
 //                        u[i] = u[i].dt(0);
 //                    }
 
-                    //HACK cut to prevent infinite recursion due to impl conj reduction
+                        //HACK cut to prevent infinite recursion due to impl conj reduction
 //                    if (u[0].op() == IMPL && u[0].containsRecursively(u[1].unneg())) {
 //                        Term ui = u[0];
 //                        int id = ui.dt();
@@ -254,32 +255,34 @@ public enum Op {
 //                        }
 //                    }
 
-                    ci = i > 0 ? conjMerge(ci, 0, u[i], 0) : u[0];
-                    if (ci instanceof Bool)
-                        return ci;
-                }
+                        ci = i > 0 ? conjMerge(ci, 0, u[i], 0) : u[0];
+                        if (ci instanceof Bool)
+                            return ci;
+                    }
 
-            } else if (dt == DTERNAL) {
+                    break;
+                case DTERNAL:
 
-                ci = junctionFlat(dt, u);
+                    ci = junctionFlat(dt, u);
 
-            } else {
+                    break;
+                default:
 
-                //sequence or xternal
-                //assert (n == 2) : "invalid non-commutive conjunction arity!=2, arity=" + n;
+                    //sequence or xternal
+                    //assert (n == 2) : "invalid non-commutive conjunction arity!=2, arity=" + n;
 
-                //rebalance and align
-                //convention: left align all sequences
-                //ex: (x &&+ (y &&+ z))
-                //      becomes
-                //    ((x &&+ y) &&+ z)
+                    //rebalance and align
+                    //convention: left align all sequences
+                    //ex: (x &&+ (y &&+ z))
+                    //      becomes
+                    //    ((x &&+ y) &&+ z)
 
-                if (dt == XTERNAL) {
-                    Arrays.sort(u); //pre-sort but should have been sorted already
-                }
+                    if (dt == XTERNAL) {
+                        Arrays.sort(u); //pre-sort but should have been sorted already
+                    }
 
-                Term a = u[0];
-                Term b = u[1];
+                    Term a = u[0];
+                    Term b = u[1];
 //                int eventsLeft = a.eventCount();
 //                int eventsRight = b.eventCount();
 //                assert(eventsLeft > 0);
@@ -288,30 +291,30 @@ public enum Op {
 //                boolean heavyRight = (eventsRight - eventsLeft) > 0; // notice the difference in 0, 1. if the # of events is odd, left gets it
 
 
-                if (dt == XTERNAL) {
-                    if (n == 2) {
+                    if (dt == XTERNAL) {
+                        if (n == 2) {
 
-                        int va = a.volume();
-                        int vb = b.volume();
+                            int va = a.volume();
+                            int vb = b.volume();
 
-                        boolean heavyLeft, heavyRight;
+                            boolean heavyLeft, heavyRight;
 
-                        if (va > vb && a.op() == CONJ && a.dt() == XTERNAL && a.subs() == 2) {
-                            int va0 = a.sub(0).volume();
-                            int va1 = a.sub(1).volume();
+                            if (va > vb && a.op() == CONJ && a.dt() == XTERNAL && a.subs() == 2) {
+                                int va0 = a.sub(0).volume();
+                                int va1 = a.sub(1).volume();
 
-                            int vamin = Math.min(va0, va1);
+                                int vamin = Math.min(va0, va1);
 
-                            //if left remains heavier by donating its smallest
-                            if ((va - vamin) > (vb + vamin)) {
-                                int min = va0 <= va1 ? 0 : 1;
-                                Term aToB = a.sub(min);
-                                return CONJ.the(XTERNAL,
-                                        CONJ.the(XTERNAL, b, aToB), a.sub(1 - min));
+                                //if left remains heavier by donating its smallest
+                                if ((va - vamin) > (vb + vamin)) {
+                                    int min = va0 <= va1 ? 0 : 1;
+                                    Term aToB = a.sub(min);
+                                    return CONJ.the(XTERNAL,
+                                            CONJ.the(XTERNAL, b, aToB), a.sub(1 - min));
+                                }
                             }
-                        }
 
-                        //b volume should not be larger than a, it is guaranteed by commutive ordinality convention
+                            //b volume should not be larger than a, it is guaranteed by commutive ordinality convention
 
                         /*else if (vb > va && b.op() == CONJ && b.dt() == XTERNAL && b.subs() == 2) {
                             int vb0 = b.sub(0).volume();
@@ -326,28 +329,29 @@ public enum Op {
                         }*/
 
 
-                    }
-                    return compound(CONJ, XTERNAL, u);
-                } else {
+                        }
+                        return compound(CONJ, XTERNAL, u);
+                    } else {
 
 
-                    {
+                        {
 
-                        if (dt < 0) { //&& (dt != XTERNAL)
-                            Term x = a;
-                            a = b;
-                            b = x;
-                            ci = conjMerge(a, 0, b, -dt + a.dtRange());
-                        } else {
+                            if (dt < 0) { //&& (dt != XTERNAL)
+                                Term x = a;
+                                a = b;
+                                b = x;
+                                ci = conjMerge(a, 0, b, -dt + a.dtRange());
+                            } else {
 //                                if (heavyRight) {
 //                                    return conjMerge(b, 0, a, dt + a.dtRange());
 //                                } else {
-                            ci = conjMerge(a, 0, b, dt + a.dtRange());
+                                ci = conjMerge(a, 0, b, dt + a.dtRange());
 //                                }
+                            }
                         }
                     }
-                }
 
+                    break;
             }
 
             return implInConjReduction(ci);
@@ -1324,7 +1328,7 @@ public enum Op {
             case 1:
                 Term single = t[0];
                 if (single instanceof EllipsisMatch) {
-                    return newDiff(op, ((EllipsisMatch) single).theArray());
+                    return newDiff(op, ((TermContainer) single).theArray());
                 }
                 return single instanceof Ellipsislike ?
                         new UnitCompound1(op, single) :
@@ -1799,7 +1803,7 @@ public enum Op {
 
                 Term single = t[0];
                 if (single instanceof EllipsisMatch) {
-                    return intersect(((EllipsisMatch) single).theArray(), intersection, setUnion, setIntersection);
+                    return intersect(((TermContainer) single).theArray(), intersection, setUnion, setIntersection);
                 }
                 return single instanceof Ellipsislike ?
                         new UnitCompound1(intersection, single) :

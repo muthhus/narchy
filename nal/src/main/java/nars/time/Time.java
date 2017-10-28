@@ -85,8 +85,7 @@ public abstract class Time implements Clock, Serializable {
     @Nullable
     public List<SchedTask> exeScheduled() {
 
-        long now;
-//        now = now();
+        //        now = now();
 //        SchedTask firstQuick = scheduled.peek(); //it's safe to call this outside synchronized block for speed
 //        if (firstQuick == null || firstQuick.when > now)
 //            return null; //too soon for the next one
@@ -95,7 +94,7 @@ public abstract class Time implements Clock, Serializable {
 
         synchronized (scheduled) {
 
-            now = now(); //get time now inside the synch in case it had to wait to enter
+            long now = now(); //get time now inside the synch in case it had to wait to enter
 
             SchedTask next;
             while (((next = scheduled.peek()) != null) && (next.when <= now)) {

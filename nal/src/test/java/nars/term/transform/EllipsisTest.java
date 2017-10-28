@@ -11,8 +11,6 @@ import nars.derive.match.EllipsisOneOrMore;
 import nars.derive.match.EllipsisZeroOrMore;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.PatternIndex;
-import nars.index.term.TermIndex;
-import nars.index.term.map.MapTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -24,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.Random;
 import java.util.Set;
 

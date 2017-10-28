@@ -4,7 +4,6 @@ import nars.$;
 import nars.Op;
 import nars.control.Derivation;
 import nars.derive.AbstractPred;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,16 +52,14 @@ public final class SubTermStructure extends AbstractPred<Derivation> {
 
 
         this.bits = filter(matchingType, bits);
-        if (this.bits == 0) {
-            throw new RuntimeException("no filter effected");
-        }
+        assert(this.bits > 0): "no filter effected";
 
     }
 
 
 
     @Override
-    public boolean test(@NotNull Derivation ff) {
+    public boolean test(Derivation ff) {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);

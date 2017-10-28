@@ -111,7 +111,7 @@ public class Int implements Intlike {
 
 
     @Override
-    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+    public boolean unify(Term y,  Unify subst) {
         if (Intlike.super.unify(y, subst))
             return true;
         //if (equals(y)) return true;

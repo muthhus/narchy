@@ -21,6 +21,9 @@ import java.util.stream.Stream;
  */
 public class Deriver extends NARService {
 
+    private float minPremisesPerConcept = 2;
+    private float maxPremisesPerConcept = 4;
+
     public static Function<NAR, Deriver> deriver(Function<NAR, PremiseRuleSet> rules) {
         return (nar) ->
                 new Deriver(PrediTrie.the(rules.apply(nar),
@@ -41,8 +44,6 @@ public class Deriver extends NARService {
     private final NAR nar;
     private final Causable can;
 
-    private float minPremisesPerConcept = 3;
-    private float maxPremisesPerConcept = 9;
 
     protected Deriver(PrediTerm<Derivation> deriver, NAR nar) {
         super(nar);
@@ -60,8 +61,7 @@ public class Deriver extends NARService {
 
             @Override
             public float value() {
-                t.cache.update(nar.time());
-                return t.cache.valueSum();
+                return Util.sum(Cause::value, t.causes);
             }
         };
         //this.can.can.update(1,1,0.0);

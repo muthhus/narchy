@@ -38,7 +38,7 @@ public class ScalarSignal extends Signal implements  DoubleSupplier {
     private final FloatToObjectFunction<Truth> truthFloatFunction;
 
 
-    public float currentValue;
+    public float currentValue = Float.NaN;
 
 
     public final static FloatToFloatFunction direct = n -> n;
@@ -52,10 +52,6 @@ public class ScalarSignal extends Signal implements  DoubleSupplier {
         this.term = t;
         this.value = value;
         this.truthFloatFunction = truthFloatFunction == null ? (v)->null : truthFloatFunction;
-
-
-
-        this.currentValue = Float.NaN;
     }
 
 
@@ -82,42 +78,21 @@ public class ScalarSignal extends Signal implements  DoubleSupplier {
         //int timeSinceLastInput = (int) (now - lastInputTime);
 
 
-        float next = Util.round(value.floatValueOf(term), resolution.asFloat());
-        Truth truth = (next == next) ? truthFloatFunction.valueOf(Util.unitize(this.currentValue = next)) : null;
 
-//        Task current = get();
-//        long currentEnd = current!=null ? current.end() : ETERNAL;
-        Task nextTask = set(term,
-                truth,
-                stamp(truth, nar),
-                now, dur, nar);
-//        if (nextTask == current && !(nextTask!=null && nextTask.end()!=currentEnd))
-//            return null; //dont input anything unless its a new task, or it has stretched
-//        else
+            float nextRaw = value.floatValueOf(term);
+            float cur = currentValue;
+
+            float next = Util.unitize(Util.round(nextRaw, resolution.asFloat()));
+
+            currentValue = (next);
+
+            Truth truth = (next == next) ? truthFloatFunction.valueOf(next) : null;
+
+            Task nextTask = set(term,
+                    truth,
+                    stamp(truth, nar),
+                    now, dur, nar);
             return nextTask;
-
-
-//        int maxT = this.maxTimeBetweenUpdates;
-//        boolean limitsMaxTime = maxT > 0;
-//        int minT = this.minTimeBetweenUpdates;
-//        boolean limitsMinTime = minT > 0;
-
-//        boolean tooSoon = (limitsMinTime && (timeSinceLastInput < minT));
-//        boolean lateEnough = (limitsMaxTime && (timeSinceLastInput >= maxT));
-//        boolean different = (currentValue != currentValue /* NaN */) || !Util.equals(next, currentValue, resolution);
-
-        //if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
-
-
-
-        //}
-
-//        //nothing new was input, continue previous task if exists
-//        if (current!=null && !current.isDeleted()) {
-//            current.setEnd(now);
-//        }
-
-//        return null;
     }
 
     protected LongSupplier stamp(Truth currentBelief, @NotNull NAR nar) {

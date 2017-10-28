@@ -69,20 +69,24 @@ abstract public class Causable extends NARService {
         }
 
         Throwable error = null;
-        long start = System.nanoTime();
         int completed = 0;
         try {
-            completed = next(n, iterations);
-            assert (completed >= 0);
-        } catch (Throwable t) {
-            error = t;
+            long start = System.nanoTime();
+            try {
+                completed = next(n, iterations);
+                assert (completed >= 0);
+            } catch (Throwable t) {
+                error = t;
+            }
+            long end = System.nanoTime();
+
+            can.update(completed, value(), (end - start) / 1.0E9);
+        } catch (Exception e) {
+            logger.error("{} {}", this, e);
+        } finally {
+            if (busy != null)
+                busy.set(false);
         }
-        long end = System.nanoTime();
-
-        can.update(completed, value(), (end - start) / 1.0E9);
-
-        if (busy != null)
-            busy.set(false);
 
         if (error != null) {
             logger.error("{} {}", this, error);
@@ -141,7 +145,8 @@ abstract public class Causable extends NARService {
             this.nar = nar;
         }
 
-        @Override public void commit() {
+        @Override
+        public void commit() {
             int ii = iterations();
             if (ii > 0)
                 nar.exe.add(new InvokeCause(Causable.this, ii));

@@ -17,8 +17,6 @@ public class IntroVars extends AbstractPred<Derivation> {
     @Override
     public boolean test(Derivation p) {
         Term x = p.derivedTerm.get();
-        if (x == null)
-            return false; //spent all TTL or something
 
         //var intro before temporalizing.  otherwise any calculated temporal data may not applied to the changed term (ex: occ shift)
         @Nullable Pair<Term, Map<Term, Term>> vc = DepIndepVarIntroduction.varIntroX(x, p.random);

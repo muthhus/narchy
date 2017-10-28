@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 public class ArrayTermVector extends TermVector {
 
     /*@NotNull*/
-    private Term[] terms;
+    private final Term[] terms;
 
 //    public ArrayTermVector(/*@NotNull */Collection<Term> terms) {
 //        this(terms.toArray(new Term[terms.size()]));

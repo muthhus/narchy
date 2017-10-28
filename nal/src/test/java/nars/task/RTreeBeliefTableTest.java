@@ -7,6 +7,7 @@ import nars.concept.BaseConcept;
 import nars.table.BeliefTable;
 import nars.table.RTreeBeliefTable;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.LongToFloatFunction;
 import org.jetbrains.annotations.NotNull;
@@ -68,11 +69,31 @@ public class RTreeBeliefTableTest {
     }
 
     @NotNull
-    public Task add(RTreeBeliefTable r, Term x, float freq, float conf, int start, int end, NAR n) {
-        Task a = $.belief(x, freq, conf).time(start, start, end).apply(n);
+    static Task add(RTreeBeliefTable r, Termed x, float freq, float conf, int start, int end, NAR n) {
+        Task a = $.belief(x.term(), freq, conf).time(start, start, end).apply(n);
         a.pri(0.5f);
         r.add(a, (BaseConcept) n.concept(x), n);
         return a;
+    }
+
+    @Test
+    public void testProjection() throws Narsese.NarseseException {
+        NAR n = NARS.shell();
+        BaseConcept x = (BaseConcept) n.conceptualize($.$("a:b"));
+        RTreeBeliefTable r = new RTreeBeliefTable();
+        r.setCapacity(4);
+
+        add(r, x, 1f, 0.9f, 0, 1, n);
+        assertEquals(1f, r.truth(0,0, null, 1).freq());
+
+        add(r, x, 0f, 0.9f, 2, 3, n);
+        assertEquals(0f, r.truth(3,3, null, 1).freq());
+
+        assertEquals("%.50;.95%", r.truth(1,2, null, 1).toString());
+
+        assertEquals("%0.0;.83%", r.truth(4,4, null, 1).toString());
+        assertEquals("%0.0;.83%", r.truth(4,5, null, 1).toString());
+        assertEquals("%0.0;.72%", r.truth(5,5, null, 1).toString());
     }
 
 

@@ -279,6 +279,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
 
 
+    @Override
     default boolean containsRecursively(/*@NotNull*/ Term y, boolean root, Predicate<Term> subTermOf) {
         int s = subs();
         if (s > 0 && !impossibleSubTerm(y)) {

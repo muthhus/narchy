@@ -82,8 +82,6 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
 //    }
 
 
-
-
     final AtomicBoolean updates = new AtomicBoolean(false);
 
     @Override
@@ -112,13 +110,11 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
     }
 
 
-
     @Override
     protected List<ConceptWidget> get() {
 
 
-
-        if (updates.get()) {
+        if (updates.compareAndSet(true, false)) {
 
             List<ConceptWidget> l;
             l = next.write();
@@ -138,13 +134,17 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
                         }
                         //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
                     });
+                } catch (Exception e) {
+                    e.printStackTrace();
                 } finally {
                     rw.unlockRead(s);
                 }
+
+                vis.accept(l);
+                next.commit();
             }
 
-            vis.accept(l);
-            next.commit();
+
         }
 
         List<ConceptWidget> r = next.read();
@@ -240,15 +240,18 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
                     if (edgeSum >= 0) {
 
                         float p = e.priElseZero();
+                        if (p != p)
+                            return true;
+
                         e.width = minLineWidth + 0.5f * sqr(1 + p * MaxEdgeWidth);
 
-                        float taskish = e.tasklinkPri / edgeSum* termlinkOpac;
+                        float taskish = e.tasklinkPri / edgeSum * termlinkOpac;
                         e.r = 0.05f + 0.65f * sqr(taskish);
-                        float termish = e.termlinkPri / edgeSum* tasklinkOpac;
+                        float termish = e.termlinkPri / edgeSum * tasklinkOpac;
                         e.b = 0.05f + 0.65f * sqr(termish);
                         e.g = 0.1f * (1f - (e.r + e.g) / 1.5f);
 
-                        e.a = Util.lerp(p * Math.max( taskish , termish  ), lineAlphaMin, lineAlphaMax);
+                        e.a = Util.lerp(p * Math.max(taskish, termish), lineAlphaMin, lineAlphaMax);
 
                         //0.05f + 0.9f * Util.and(this.r * tasklinkBoost, this.g * termlinkBoost);
 

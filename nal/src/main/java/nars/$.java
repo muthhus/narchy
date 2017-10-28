@@ -176,7 +176,7 @@ public enum $ {
     }
 
     @NotNull
-    public static Term p(@NotNull Collection<? super Term> t) {
+    public static Term p(@NotNull Collection<Term> t) {
         return $.p(t.toArray(new Term[t.size()]));
     }
 

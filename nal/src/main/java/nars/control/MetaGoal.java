@@ -317,7 +317,7 @@ public enum MetaGoal {
                                 new FloatFirstOrderDifference(n::time, () -> n.emotion.conceptFirePremises.getValue().longValue())
                         ).relax(0.1f)
                 ).in(new FloatNormalized(
-                                () -> n.emotion.busyVol.getSum()
+                        n.emotion.busyVol::getSum
                         ).relax(0.1f)
                 );
 

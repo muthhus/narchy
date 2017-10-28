@@ -33,6 +33,7 @@ public class AtomicFloat extends AtomicInteger {
 
 
 
+
     public final void set(float newValue) {
         this.set(floatToIntBits(newValue));
     }

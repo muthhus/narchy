@@ -92,6 +92,7 @@ public class FastCompound implements Compound {
         return Op.values()[skeleton[0]];
     }
 
+    @Override
     public int subs() {
         return skeleton[1];
     }

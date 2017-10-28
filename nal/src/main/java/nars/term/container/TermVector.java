@@ -144,7 +144,7 @@ public abstract class TermVector implements TermContainer {
 
 
     @Override
-    abstract public boolean equals(@NotNull Object obj);
+    abstract public boolean equals(Object obj);
 //        return
 //            (this == obj)
 //            ||
@@ -152,6 +152,10 @@ public abstract class TermVector implements TermContainer {
 //    }
 
 
+    @Override
+    public final int hashCodeSubTerms() {
+        return hash;
+    }
 
     @Override
     public final int hashCode() {

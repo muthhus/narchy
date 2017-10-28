@@ -9,6 +9,7 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -116,6 +117,7 @@ public class ArrayBagTest {
         System.out.println();
         assertEquals(2, a.size());
 
+        a.commit(null);
         assertEquals(0.1f, a.priMin(), 0.01f);
 
         a.put(new PLink("z", 0.05f));
@@ -132,6 +134,7 @@ public class ArrayBagTest {
         BagTest.testRemoveByKey(new PLinkArrayBag(2, plus, new HashMap<>(2)));
     }
 
+    @Disabled
     @Test
     public void testInsertOrBoostDoesntCauseSort() {
         final int[] sorts = {0};

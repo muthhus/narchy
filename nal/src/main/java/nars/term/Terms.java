@@ -264,6 +264,7 @@ public enum Terms {
                 else if (c > 0) return new Term[]{b, a};
                 else /*if (c == 0)*/ return new Term[]{a}; //equal
 
+
                 //TODO fast sorted array for arg.length == 3 ?
 
             default:
@@ -567,8 +568,7 @@ public enum Terms {
         //sort by volume, decreasing first. necessary for proper subsumption of events into sibling sequence compounds that may contain them
         //may also provide some performance benefit for accelerated early termination in case of invalid construction attempts (ex: co-negation)
 
-        u = u.clone(); //dont modify input, it will confuse callee's
-
+        //u = u.clone(); //dont modify input, it will confuse callee's
         //Arrays.sort(u, volumeComparator);
 
         for (Term x : u) {

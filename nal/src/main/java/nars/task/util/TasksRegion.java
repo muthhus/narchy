@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TasksRegion implements TaskRegion {
 
     public final long start;
-    public long end; //allow end to stretch for ongoing tasks
+    public final long end; //allow end to stretch for ongoing tasks
 
     public final float freqMin, freqMax, confMin, confMax;
 

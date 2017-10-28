@@ -149,7 +149,7 @@ public class TemporalizeTest {
         Map<Term, Time> h = new HashMap();
         Event s = t.solve($("a"), h);
         assertNotNull(s);
-        assertEquals("a@-1->b", s.toString());
+        assertEquals("a@0", s.toString());
         assertEquals(0, s.start(h).abs());
     }
 
@@ -598,7 +598,7 @@ public class TemporalizeTest {
         assertEquals("(a &&+5 b)@[1..6]", t.solve($("(a &&+- b)")).toString());
         assertEquals("((a &&+5 b) &&+5 c)@[1..11]", t.solve($("((a &&+- b) &&+- c)")).toString());
         assertEquals("((a &&+5 b) ==>+5 c)@1", t.solve($("((a &&+5 b) ==>+- (b &&+5 c))")).toString());
-        assertEquals("((b &&+5 c) ==>-10 (a &&+5 b))@6", t.solve($("((b &&+5 c) ==>+- (a &&+5 b))")).toString());
+        assertEquals("((b &&+5 c) ==>-10 a)@6", t.solve($("((b &&+5 c) ==>+- (a &&+5 b))")).toString());
 
     }
 
@@ -911,8 +911,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         Event s = t.solve(p);
         assertNotNull(s);
         assertEquals(
-                //only the eternal nature can be inferred. but during derivation this will typically be un-eternalized if the premise has temporality
-                "((a-->b) ==>+4 (c-->d))@ETE",
+                "((a-->b) ==>+4 (c-->d))@1",
                 s.toString());
 
     }

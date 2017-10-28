@@ -622,8 +622,13 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     }
 
     private void updateRange() {
-        min = priElse(items.last(), 0);
-        max = priElse(items.first(), 0);
+        Y last = items.last();
+        if (last!=null) {
+            min = priElse(last, 0);
+            max = priElse(items.first(), 0);
+        } else {
+            min = max = 0;
+        }
 
         //max and min could be changed in concurrent situation
 //        if (!(max>=min)) {
@@ -667,6 +672,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                 trash.forEach(this::mapRemove);
             }
             ensureSorted();
+            updateRange();
         }
 
         //then outside the synch:

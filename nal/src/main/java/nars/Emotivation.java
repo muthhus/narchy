@@ -46,7 +46,7 @@ public class Emotivation extends Emotion {
 
 
     @Override
-    public synchronized void cycle() {
+    public void cycle() {
         long deltaSinceLastCycle = -(lastCycleTime - (lastCycleTime = nar.time()));
         long deltaRealtimeSinceLastCycle = -(this.lastRealTime - (this.lastRealTime = System.currentTimeMillis()));
         cycleDT.set(deltaSinceLastCycle);

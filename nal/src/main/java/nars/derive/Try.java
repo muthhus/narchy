@@ -14,19 +14,15 @@ import java.util.stream.Stream;
  */
 public class Try extends AbstractPred<Derivation> {
 
-    public final ValueCache cache;
+//    public final ValueCache cache;
     public final PrediTerm<Derivation>[] branches;
-    private final Cause[] causes;
+    public final Cause[] causes;
 
     Try(PrediTerm<Derivation>[] branches, Cause[] causes) {
-        this(branches, causes, new ValueCache(causes));
-    }
-
-    Try(PrediTerm<Derivation>[] branches, Cause[] causes, ValueCache cache) {
         super($.func("try", branches));
         this.branches = branches;
         this.causes = causes;
-        this.cache = cache;
+//        this.cache = cache;
     }
 
     public Try(ValueFork[] branches) {
@@ -36,20 +32,20 @@ public class Try extends AbstractPred<Derivation> {
     @Override
     public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
         return new Try(
-                PrediTerm.transform(f, branches), causes, cache
+                PrediTerm.transform(f, branches), causes
         );
     }
 
-    float value(PrediTerm<Derivation> branch) {
-        if (branch instanceof ValueFork) {
+    static float value(PrediTerm<Derivation> branch) {
+//        if (branch instanceof ValueFork) {
             ValueFork vf = (ValueFork) branch;
             float sum = 0;
             for (Cause c : vf.causes)
                 sum += 1 + (c.gain()); //softmax-like
             return sum;
-        } else {
-            throw new UnsupportedOperationException();
-        }
+//        } else {
+//            throw new UnsupportedOperationException();
+//        }
     }
 
     @Override
@@ -66,8 +62,6 @@ public class Try extends AbstractPred<Derivation> {
 
                 break;
             default:
-
-                cache.update(d.time);
 
                 int[] c = choices.toArray();
                 float[] score = new float[N];

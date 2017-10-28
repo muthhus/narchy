@@ -91,7 +91,7 @@ public class AtomicExec implements BiFunction<Task, NAR, Task> {
 
         @Override
         public boolean equals(Object obj) {
-            return obj instanceof FutureTask && ((FutureTask)obj).task.equals(task) && ((FutureTask)obj).when == when;
+            return obj instanceof FutureTask && ((FutureTask)obj).task.equals(task) && ((SchedTask) obj).when == when;
         }
     }
 

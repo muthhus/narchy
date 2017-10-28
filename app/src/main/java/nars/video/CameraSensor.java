@@ -75,6 +75,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
     public static Int2Function<Compound> XY(Term root, int width, int height) {
         return (x, y) -> $.inh($.p(x, y), root);
     }
+
     public static Int2Function<Compound> XY(Term root, int radix, int width, int height) {
         return (x, y) -> $.inh($.p($.pRadix(x, radix, width), $.pRadix(y, radix, height)), root);
     }
@@ -86,23 +87,25 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
                     //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
                     //new Term[]{coord('x', x, width), coord('y', y, height)} :
                     $.p(x, y);
-            return root==null ? coords : $.inh( coords, root);
+            return root == null ? coords : $.inh(coords, root);
         };
     }
+
     private static Int2Function<Term> RadixRecurse(@Nullable Term root, int width, int height, int radix) {
         return (x, y) -> {
             Term coords = radix > 1 ?
-                    $.pRecurse( zipCoords(coord(x, width, radix), coord(y, height, radix)) ) :
+                    $.pRecurse(zipCoords(coord(x, width, radix), coord(y, height, radix))) :
                     $.p(x, y);
-            return root==null ? coords : $.inh( coords, root);
+            return root == null ? coords : $.inh(coords, root);
         };
     }
+
     private static Int2Function<Term> InhRecurse(@Nullable Term root, int width, int height, int radix) {
         return (x, y) -> {
             Term coords = radix > 1 ?
-                    $.inhRecurse( zipCoords(coord(x, width, radix), coord(y, height, radix)) ) :
+                    $.inhRecurse(zipCoords(coord(x, width, radix), coord(y, height, radix))) :
                     $.p(x, y);
-            return root==null ? coords : $.inh( coords, root);
+            return root == null ? coords : $.inh(coords, root);
         };
     }
 
@@ -126,7 +129,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
                 xy = $.p($.the(levelPrefix), $.the(x[ix++]));
             } else { //if (i < y.length) {
                 //xy = Atomic.the(levelPrefix + "_" + y[iy++]);
-                xy = $.p( $.the(y[iy++]), $.the(levelPrefix));
+                xy = $.p($.the(y[iy++]), $.the(levelPrefix));
             }
             r[i] = xy;
         }
@@ -198,7 +201,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         return true;
     }
 
-    @Override public float value() {
+    @Override
+    public float value() {
         return in.value();
     }
 
@@ -221,20 +225,23 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         int actualPixels = pixels.size();
         int pixelsSize = Math.min(actualPixels, work);
         int start, end;
-        if (pixelsSize == actualPixels) {
-            update(0, actualPixels, nar);
-        } else {
-            start = this.lastPixel;
-            end = (start + pixelsSize);
-            if (end > actualPixels) {
-                //wrap around
-                int extra = end - actualPixels;
-                update(start, actualPixels, nar); //last 'half'
-                update(0, extra, nar); //first half after wrap around
-            } else {
-                update(start, end, nar);
-            }
 
+        float pixelPri =
+                nar.priDefault(BELIEF);
+                //(float) (nar.priDefault(BELIEF) / (Math.sqrt(numPixels)));
+        ///2;
+        ///((float)Math.sqrt(end-start));
+
+
+        start = this.lastPixel;
+        end = (start + pixelsSize);
+        if (end > actualPixels) {
+            //wrap around
+            int extra = end - actualPixels;
+            update(start, actualPixels, pixelPri, nar); //last 'half'
+            update(0, extra, pixelPri, nar); //first half after wrap around
+        } else {
+            update(start, end, pixelPri, nar);
         }
 
         //System.out.println(value + " " + fraction + " "+ start + " " + end);
@@ -243,20 +250,15 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         return pixelsSize;
     }
 
-    private void update(int start, int end, NAR nar) {
+    private void update(int start, int end, float pixelPri, NAR nar) {
         long now = nar.time();
         int dur = nar.dur();
 
-        float pixelPri =
-                //nar.priDefault(BELIEF);
-                (float) (nar.priDefault(BELIEF)/(Math.sqrt(numPixels)));
-                ///2;
-                ///((float)Math.sqrt(end-start));
 
         for (int i = start; i < end; i++) {
             PixelConcept p = pixels.get(i);
             @Nullable Task t = p.update(now, dur, nar);
-            if (t!=null) {
+            if (t != null) {
                 t.pri(pixelPri);
                 in.input(t);
             }
@@ -283,7 +285,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         PixelConcept(Term cell, int x, int y, NAR nar) {
             super(cell, nar, null, brightnessTruth);
             setSignal(() -> Util.unitize(src.brightness(x, y)));
-            this.resolution = ()->CameraSensor.this.resolution;
+            this.resolution = () -> CameraSensor.this.resolution;
 
             //            this.x = x;
 //            this.y = y;

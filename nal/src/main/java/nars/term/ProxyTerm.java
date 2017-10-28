@@ -153,12 +153,6 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
 
 
     @Override
-    @NotNull
-    public String structureString() {
-        return ref.structureString();
-    }
-
-    @Override
     public boolean isNormalized() {
         return ref.isNormalized();
     }

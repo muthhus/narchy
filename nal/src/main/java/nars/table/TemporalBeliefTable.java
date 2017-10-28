@@ -67,7 +67,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
      * the eternal table's top value, if existent, contributes a 'background'
      * level in interpolation.
      * */
-    Truth truth(long start, long end, EternalTable eternal, NAR nar);
+    Truth truth(long start, long end, EternalTable eternal, int dur);
 
 
     void setCapacity(int temporals);
@@ -135,7 +135,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Truth truth(long start, long end, EternalTable eternal, NAR nar) {
+        public Truth truth(long start, long end, EternalTable eternal, int dur) {
             return null;
         }
 
