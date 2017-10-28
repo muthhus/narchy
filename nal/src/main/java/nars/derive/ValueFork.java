@@ -122,7 +122,7 @@ public class ValueFork extends Fork {
         } else {
 
             final boolean[] continued = {true};
-            Util.selectRouletteUnique(branches, d.random, branches, (i) -> 1 + causes[i].gain(), (b) -> {
+            Util.selectRouletteUnique(d.random, branches, (i) -> 1 + causes[i].gain(), (b) -> {
 
                 this.branches[b].test(d);
 

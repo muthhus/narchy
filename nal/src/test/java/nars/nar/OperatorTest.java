@@ -23,7 +23,7 @@ public class OperatorTest {
 
     @Test
     public void testEcho() throws Narsese.NarseseException {
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
         AtomicBoolean invoked = new AtomicBoolean();
         n.on("c", (args) -> {
             assertEquals("(x)", args.toString());
@@ -124,7 +124,7 @@ public class OperatorTest {
 
         Param.DEBUG = true;
 
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
         n.log();
         n.input("(slice((a,b,c),2)).");
         n.input("assertEquals(c, slice((a,b,c),add(1,1)));");

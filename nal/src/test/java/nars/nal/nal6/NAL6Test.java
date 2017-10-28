@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends NALTest {
 
 
-    final int cycles = 800;
+    final int cycles = 500;
 
     @BeforeEach
     public void nal() {

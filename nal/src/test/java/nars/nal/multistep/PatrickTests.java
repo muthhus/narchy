@@ -153,7 +153,6 @@ public class PatrickTests extends NALTest {
 
     }
 
-    @Disabled
     @Test
     public void testConditioningWithoutAnticipation() throws Narsese.NarseseException {
         /*
@@ -179,7 +178,7 @@ public class PatrickTests extends NALTest {
         the strongest hypothesis based on the last two inputs where neither a nor b "leaded to" c.
          */
 
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
         n.DEFAULT_BELIEF_PRIORITY = 0.01f;
         n.termVolumeMax.set(16);
 
@@ -194,7 +193,7 @@ public class PatrickTests extends NALTest {
         n.run(224);
         n.clear();
 
-        n.input("       $0.9;0.9$ (?x ==>   C:c)?");
+        n.input("       $0.9 (?x ==>   C:c)?");
         //n.input("       $0.9;0.9$ (?x ==>+8 C:c)?");
         //n.input("       $0.9;0.9$ ((A:a && B:b) ==> C:c)?");
         //n.input("       $0.9;0.9$ ((A:a && B:b) ==> C:c)? :|:");
@@ -213,12 +212,11 @@ public class PatrickTests extends NALTest {
 
     }
 
-    @Disabled
     @Test
     public void testPixelImage() throws Narsese.NarseseException {
 
         //this.activeTasks = activeTasks;
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
         //n.log();
         //n.truthResolution.setValue(0.05f);
         n.termVolumeMax.set(60);

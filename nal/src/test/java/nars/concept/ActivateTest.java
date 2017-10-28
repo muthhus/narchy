@@ -26,7 +26,7 @@ public class ActivateTest {
     public void testConceptFireLinkSelection() throws Narsese.NarseseException {
         int count = 8;
 
-        NAR nar = new NARS().get();
+        NAR nar = new NARS().tmp();
         nar.input("$0.01 a:b."); //low priority so it doesnt affect links
         nar.run(1);
 

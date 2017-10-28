@@ -14,6 +14,7 @@ public class Derivers {
         switch (level) {
             case 8:
                 //files.add("motivation.nal");
+                //files.add("list.nal");  //experimental
             case 7:
                 //TODO move temporal induction to a separate file
                 //fallthru
@@ -24,14 +25,13 @@ public class Derivers {
                 files.add("induction.nal");  //TODO nal6 only needs general induction, not the temporal parts
 
                 files.add("misc.nal"); //TODO split this up
-                //files.add("list.nal");  //experimental
                 //fallthru
             case 5:
             case 4:
             case 3:
             case 2:
                 files.add("nal3.nal");
-                //files.add("nal3.guess.nal");
+                files.add("nal3.guess.nal");
                 files.add("nal2.nal");
                 files.add("nal2.guess.nal");
                 //fallthru

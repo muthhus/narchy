@@ -75,7 +75,7 @@ public class Try extends AbstractPred<Derivation> {
                     score[x] = value(branches[c[x]]);
 
                 int before = d.now();
-                Util.selectRouletteUnique(N, d.random, N, i -> score[i], (i) -> {
+                Util.selectRouletteUnique(d.random, N, i -> score[i], (i) -> {
                     branches[c[i]].test(d);
                     return d.revertLive(before);
                 });

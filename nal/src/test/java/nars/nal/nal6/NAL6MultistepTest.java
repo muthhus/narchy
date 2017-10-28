@@ -35,7 +35,7 @@ public class NAL6MultistepTest {
 //                query(burglary).
 //                query(earthquake).
 
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
         n.nal(6);
 
         //d.log();

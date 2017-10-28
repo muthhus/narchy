@@ -419,7 +419,7 @@ public class LinkageTest extends NALTest {
     @Test
     public void Variable_Normalization_1() throws Exception {
         //this.activeTasks = activeTasks;
-        NAR tester = new NARS().get();
+        NAR tester = NARS.tmp();
         test.requireConditions = false;
 
         String nonsense = "<(&&,<#1 --> M>,<#2 --> M>) ==> <#1 --> nonsense>>";

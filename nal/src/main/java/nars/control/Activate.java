@@ -88,7 +88,7 @@ public class Activate extends PLink<Concept> implements Termed {
             return null;
 
         //apply the nar valuation to further refine selection of the tasks collected in the oversample prestep
-        Util.selectRouletteUnique(TASKLINKS_SAMPLED, rng, tasklinkCandidates.size(), (i)-> {
+        Util.selectRouletteUnique(rng, tasklinkCandidates.size(), (i)-> {
                 PriReference<Task> tl = tasklinkCandidates.get(i);
                 Task t = tl.get();
                 if (t == null) return 0;
@@ -118,6 +118,8 @@ public class Activate extends PLink<Concept> implements Termed {
                     );
 
                     next.add(p);
+                    if (next.size() >= premisesMax)
+                        return false;
                 }
             }
 
@@ -145,8 +147,14 @@ public class Activate extends PLink<Concept> implements Termed {
 
 
         List<Termed> tt = id.templates();
+        int tts = tt.size();
+        if (tts == 0)
+            return List.of();
+//        if (tts == 1)
+//            return tt;
+
         List<Concept> uu = $.newArrayList(count);
-        Util.selectRouletteUnique(count, rng, tt.size(), (w) -> {
+        Util.selectRouletteUnique(rng, tts, (w) -> {
             Term t = tt.get(w).term();
             return t.op().conceptualizable && !t.equals(id.term()) ? 1f : 0f;
             //TODO try biasing toward larger template components so the activation trickles down to atoms with less probabilty

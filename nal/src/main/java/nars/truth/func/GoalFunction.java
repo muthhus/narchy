@@ -33,6 +33,7 @@ public enum GoalFunction implements TruthOperator {
     },
 
 
+    //@AllowOverlap
     DeciDeduction() {
         @Override
         public Truth apply(Truth T, Truth B, NAR m, float minConf) {
@@ -51,6 +52,7 @@ public enum GoalFunction implements TruthOperator {
 
     },
 
+    //@AllowOverlap
     DeciInduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {

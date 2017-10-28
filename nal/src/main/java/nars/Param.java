@@ -54,7 +54,7 @@ public abstract class Param extends Services<Term, NAR> {
     public static final int MAX_TASK_FORWARD_HOPS = 8;
 
     /** default max time for a cycle when executing in synchronous (step) mode */
-    public static final double SynchronousExecution_Max_CycleTime = 0.0001; //sec;
+    public static final double SynchronousExecution_Max_CycleTime = 0.00001; //sec;
 
 
     /**
@@ -199,7 +199,7 @@ public abstract class Param extends Services<Term, NAR> {
         //follows the pos/neg guidelines described in the comment of each MetaGoal
         Perceive.want(w, 0.0f);
         Believe.want(w, 0.1f);
-        Desire.want(w, 0.1f);
+        Desire.want(w, 0.2f);
         Accurate.want(w, 0.1f);
         Inaccurate.want(w, -0.05f);
         Answer.want(w, 0.05f);

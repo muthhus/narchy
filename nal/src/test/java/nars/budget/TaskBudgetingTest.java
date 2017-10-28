@@ -18,7 +18,7 @@ public class TaskBudgetingTest {
     public void structuralDeduction1() throws Narsese.NarseseException {
 
 
-        NAR d = new NARS().get();
+        NAR d = NARS.tmp();
 
 
         d.log();

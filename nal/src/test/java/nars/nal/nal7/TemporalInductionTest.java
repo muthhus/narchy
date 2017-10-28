@@ -75,7 +75,7 @@ public class TemporalInductionTest {
         String task = "<a --> b>. :|:";
         String task2 = "<c --> d>. :|:";
 
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
 
         //TextOutput.out(n);
 
@@ -89,7 +89,7 @@ public class TemporalInductionTest {
 
     @Test public void testTemporalRevision() throws Narsese.NarseseException {
 
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
         n.time.dur(1);
 
         n.log();
@@ -130,7 +130,7 @@ public class TemporalInductionTest {
 
     @Test public void testTemporalRevisionOfTemporalRelation() throws Narsese.NarseseException {
 
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
 
         //TextOutput.out(n);
 
@@ -145,7 +145,7 @@ public class TemporalInductionTest {
     }
     @Test public void testQuestionProjection() throws Narsese.NarseseException {
 
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
 
         n.log();
 
@@ -168,7 +168,7 @@ public class TemporalInductionTest {
 
     @Test public void testInductionStability() throws Narsese.NarseseException {
         //two entirely disjoint events, and all inductable beliefs from them, should produce a finite system that doesn't explode
-        NAR d = new NARS().get();
+        NAR d = NARS.tmp();
         d.input("a:b. :|:");
         d.run(5);
         d.input("c:d. :|:");

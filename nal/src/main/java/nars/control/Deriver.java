@@ -41,8 +41,8 @@ public class Deriver extends NARService {
     private final NAR nar;
     private final Causable can;
 
-    private float minPremisesPerConcept = 1;
-    private float maxPremisesPerConcept = 3;
+    private float minPremisesPerConcept = 2;
+    private float maxPremisesPerConcept = 6;
 
     protected Deriver(PrediTerm<Derivation> deriver, NAR nar) {
         super(nar);

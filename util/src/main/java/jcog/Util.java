@@ -1351,10 +1351,16 @@ public enum Util {
         return true;
     }
 
-    public static <X> void selectRouletteUnique(int sampled, Random random, int choices, IntToFloatFunction choiceWeight, IntPredicate tgt) {
+    public static <X> void selectRouletteUnique(Random random, int choices, IntToFloatFunction choiceWeight, IntPredicate tgt) {
+        assert(choices > 0);
+        if (choices == 1) {
+            tgt.test(0);
+            return;
+        }
+
         MetalBitSet selected = new MetalBitSet(choices);
-        int hardLimit = 2 * choices;
-        final int[] tries = {0};
+
+        final int[] hardLimit = {choices*2};
         IntToFloatFunction cc = ii -> {
             if (selected.get(ii)) {
                 return 0;
@@ -1367,7 +1373,15 @@ public enum Util {
         };
         Util.decideRoulette(choices, cc, random, (int y) -> {
             selected.set(y);
-            return tgt.test(y) && (tries[0]++ < hardLimit) && (selected.cardinality() < choices) ?
+//            int remain = choices - selected.cardinality();
+            boolean kontinue = tgt.test(y) && (hardLimit[0]-- > 0);
+//            if (kontinue && remain == 1) {
+//                //"tail" roulette optimization
+//                int x = selected.nextClearBit();
+//                tgt.test(x);
+//                return RouletteControl.STOP;
+//            }
+            return kontinue ?
                     RouletteControl.WEIGHTS_CHANGED : RouletteControl.STOP;
         });
 

@@ -48,7 +48,7 @@ public class NARTest {
     public void testMemoryTransplant() throws Narsese.NarseseException {
 
         //this.activeTasks = activeTasks;
-        NAR nar = new NARS().get();
+        NAR nar = NARS.tmp();
         //DefaultAlann nar = new DefaultAlann(m, 32);
 
         //TextOutput.out(nar);
@@ -67,7 +67,7 @@ public class NARTest {
         //a new nar with the same memory is allowed to
         //take control of it after the first stops
         //this.activeTasks = activeTasks;
-        NAR nar2 = new NARS().get();
+        NAR nar2 = NARS.tmp();
 
         assertTrue(nar.time() > 1);
 
@@ -84,13 +84,13 @@ public class NARTest {
         AtomicInteger cycCount = new AtomicInteger(0);
         StringWriter sw = new StringWriter( );
 
-        new NARS().get()
+        NARS.tmp()
                 .input("<a --> b>.", "<b --> c>.")
                 .stopIf( () -> false )
                 .eachCycle(n -> cycCount.incrementAndGet() )
                 .trace(sw).run(frames);
 
-        new NARS().get()
+        NARS.tmp()
                 .input("<a --> b>.", "<b --> c>.")
                 .stopIf(() -> false)
                 .eachCycle(n -> cycCount.incrementAndGet())
@@ -133,7 +133,7 @@ public class NARTest {
 
     @Test
     public void testConceptInstancing() throws Narsese.NarseseException {
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
 
         String statement1 = "<a --> b>.";
 
@@ -164,7 +164,7 @@ public class NARTest {
     }
 
     @Test public void testCycleScheduling() {
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
 
         final int[] runs = {0};
 

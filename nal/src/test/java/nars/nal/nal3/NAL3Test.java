@@ -23,13 +23,13 @@ public class NAL3Test extends NALTest {
         test.nar.nal(3);
     }
 
-    @Override
-    protected NAR nar() {
-        return new NARS().nal(3).
-                deriverAdd(Deriver.deriver(3,
-                "nal3.guess.nal" //additional rules
-        )).get();
-    }
+//    @Override
+//    protected NAR nar() {
+//        return new NARS().nal(3).
+//                deriverAdd(Deriver.deriver(3,
+//                "nal3.guess.nal" //additional rules
+//        )).get();
+//    }
 
     @Test
     public void compound_composition_two_premises() {

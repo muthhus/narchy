@@ -50,7 +50,7 @@ public class QuestionTest {
 
         Term expectedSolutionTerm = $.$(expectedSolution);
 
-        NAR nar = new NARS().get();
+        NAR nar = NARS.tmp();
         //nar.nal(1);
         //nar.log();
 
@@ -140,7 +140,7 @@ public class QuestionTest {
         DoubleSummaryStatistics withOutTime = new DoubleSummaryStatistics();
 
         IntFunction<NAR> narProvider = (seed) -> {
-            NAR d = new NARS().get();
+            NAR d = NARS.tmp();
             d.random().setSeed(seed);
             d.nal(4);
             d.termVolumeMax.set(16);
@@ -196,7 +196,7 @@ public class QuestionTest {
 
     @Test @Disabled
     public void testMathBackchain() throws Narsese.NarseseException {
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
         n.log();
 
         Param.DEBUG = true;
@@ -229,7 +229,7 @@ public class QuestionTest {
 
     @Disabled @Test
     public void testDeriveQuestionOrdinary() throws Narsese.NarseseException {
-        new TestNAR(new NARS().get()) //requires NAL3 single premise
+        new TestNAR(NARS.tmp()) //requires NAL3 single premise
                 .ask("((S | P) --> M)")
                 .believe("(S --> M)")
                 .mustQuestion(512, "(P --> M)").test();
@@ -237,7 +237,7 @@ public class QuestionTest {
     @Disabled @Test
     public void testDeriveQuestOrdinary() throws Narsese.NarseseException {
         //this.activeTasks = activeTasks;
-        new TestNAR(new NARS().get()) //requires NAL3 single premise
+        new TestNAR(NARS.tmp()) //requires NAL3 single premise
                 .quest("((S | P) --> M)")
                 .believe("(S --> M)")
                 .mustQuest(256, "(P --> M)").test();

@@ -131,10 +131,10 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
         }
 
-        abstract protected boolean matchEllipsis(@NotNull TermContainer y, @NotNull Unify subst);
+        abstract protected boolean matchEllipsis( TermContainer y,  Unify subst);
 
         @Override
-        public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
+        public final boolean unify(Term y, Unify subst) {
             return /*y.hasAll(structureNecessary) && */op() == y.op() && matchEllipsis(y.subterms(), subst);
         }
 
@@ -387,7 +387,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
          * @param y the compound being matched to this
          */
         @Override
-        protected boolean matchEllipsis(@NotNull TermContainer y, @NotNull Unify u) {
+        protected boolean matchEllipsis( TermContainer y, Unify u) {
             //return subst.matchEllipsedCommutative(
             //        this, ellipsis, y
             //);
