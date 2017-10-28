@@ -1,15 +1,11 @@
 package nars.nal.nal1;
 
-import nars.*;
-import nars.derive.match.Ellipsis;
-import nars.term.Term;
-import nars.term.compound.FastCompound;
-import nars.term.compound.GenericCompound;
+import nars.NAR;
+import nars.NARS;
+import nars.Param;
 import nars.test.TestNAR;
 import nars.util.NALTest;
 import org.junit.jupiter.api.Test;
-
-import java.util.function.BiFunction;
 
 public class NAL1Test extends NALTest {
 

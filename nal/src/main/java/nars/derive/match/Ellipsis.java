@@ -95,20 +95,20 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 //    }
 
 
-    protected Ellipsis(@NotNull AbstractVariable target, int minArity) {
-        this(target, minArity, target.id);
+    protected Ellipsis(AbstractVariable target, int minArity) {
+        this(target, minArity, target.id());
     }
 
-    protected Ellipsis(@NotNull AbstractVariable target, int minArity, int id) {
+    protected Ellipsis(AbstractVariable target, int minArity, int id) {
         super(target.op(), hash(id, minArity));
         this.minArity = minArity;
     }
 
     private static int hash(int id, int minArity) {
-        //the 30th bit (arbitrarily chosen here) is what will store the 1-bit minArity value. provided id's should all have that bit free
-        if (minArity > 1 || ((id & (1 << 30)) != 0)) throw new UnsupportedOperationException();
+        //the 31th bit (arbitrarily chosen here) is what will store the 1-bit minArity value. provided id's should all have that bit free
+        if (minArity > 1 || ((id & (1 << 31)) != 0)) throw new UnsupportedOperationException();
         if (minArity==1)
-            id |= (1 << 30);
+            id |= (1 << 31);
         return id;
     }
 

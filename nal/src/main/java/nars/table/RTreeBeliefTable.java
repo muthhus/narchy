@@ -20,7 +20,6 @@ import nars.task.Revision;
 import nars.task.SignalTask;
 import nars.task.Tasked;
 import nars.task.util.TaskRegion;
-import nars.task.util.TasksRegion;
 import nars.task.util.TimeRange;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -31,9 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;

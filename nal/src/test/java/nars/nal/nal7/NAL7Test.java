@@ -553,63 +553,63 @@ public class NAL7Test extends NALTest {
                         0);
     }
 
-//    @Test
-//    public void induction_on_events_composition1() {
-//        compositionTest(1, 5);
-//    }
-//
-//    @Test
-//    public void induction_on_events_composition2() {
-//        compositionTest(1, 7);
-//    }
-//
-//    @Test
-//    public void induction_on_events_composition3() {
-//        compositionTest(4, 3);
-//    }
-//
-//    @Test
-//    public void induction_on_events_composition_post() {
-//        TestNAR tester = test();
-//
-//        int t = 1;
-//        int dt = 7;
-//        String component = "(open(John,door) &&+0 hold(John,key))";
-//        tester.inputAt(t, component + ". :|:");
-//        tester.inputAt(t + dt, "enter(John,room). :|:");
-//
-//        tester.mustBelieve((t + dt) + dt + 1 /** approx */,
-//                "(" + component + " ==>+" + dt + " enter(John,room))",
-//                1.00f, 0.45f,
-//                t);
-//
-//
-//    }
+    @Test
+    public void induction_on_events_composition1() {
+        compositionTest(1, 5);
+    }
+
+    @Test
+    public void induction_on_events_composition2() {
+        compositionTest(1, 7);
+    }
+
+    @Test
+    public void induction_on_events_composition3() {
+        compositionTest(4, 3);
+    }
+
+    @Test
+    public void induction_on_events_composition_post() {
+        TestNAR tester = test;
+
+        int t = 1;
+        int dt = 7;
+        String component = "(open(John,door) &&+0 hold(John,key))";
+        tester.inputAt(t, component + ". :|:");
+        tester.inputAt(t + dt, "enter(John,room). :|:");
+
+        tester.mustBelieve((t + dt) + dt + 1 /** approx */,
+                "(" + component + " ==>+" + dt + " enter(John,room))",
+                1.00f, 0.45f,
+                t);
+
+
+    }
 
     private void compositionTest(int t, int dt) {
 
-        TestNAR tester = test;
-        tester.inputAt(t, "hold(John,key). :|:");
-        tester.inputAt(t, "(open(John,door) ==>+" + dt + " enter(John,room)). :|:");
+        test.log();
+        test.inputAt(t, "hold(John,key). :|:");
+        test.inputAt(t, "(open(John,door) ==>+" + dt + " enter(John,room)). :|:");
 
         //tester;
 
         String component = "(open(John,door) &&+0 hold(John,key))";
 
         //Given:
-        tester.mustBelieve(cycles * 2, "hold(John,key)",
+        test.mustBelieve(cycles * 2, "hold(John,key)",
                 1.00f, 0.9f,
                 t);
 
         //Result of 2nd Input's Decomposition
-        tester.mustBelieve(cycles * 2, "open(John,door)",
+        test.mustBelieve(cycles * 2, "open(John,door)",
                 1.00f, 0.81f,
                 t);
-        tester.mustBelieve(cycles * 2, "enter(John,room)",
+        test.mustBelieve(cycles * 2, "enter(John,room)",
                 1.00f, 0.81f,
                 t + dt);
 
-        tester.mustBelieve(cycles * 2, component,
+        test.mustBelieve(cycles * 2, component,
                 1.00f, 0.73f,
                 t);
 
@@ -1063,8 +1063,10 @@ public class NAL7Test extends NALTest {
             x += 2 * eventDT;
         }
 
-        t.mustBelieve(x - 1, "(x)", 1f, 0.73f, x)
-                .mustBelieve(x - 1, "(y)", 1f, 0.73f, x + eventDT);
+
+        int xx = x;
+        t.mustBelieve(x - 1, "(y)", 1f, 0.73f,
+                (y)-> y >= xx && y <= (xx +eventDT));
     }
 
     @Test

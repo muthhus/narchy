@@ -9,7 +9,6 @@
      (P-->C), ((Q-->C) ==> A), neq(Q,P), task("!") |- ((P-->C) ==>+- substDiff(A, Q, P)), (Punctuation:Question)
         (P-->C), ((Q-->C) ==> A), neq(Q,P), task("!") |- substDiff(A, Q, P), (Punctuation:Quest)
 
-Z, (C==>Y), task("?") |- subIfUnifiesAny(C,Y,Z), (Punctuation:Question)
 
 //2. CONJ-based
 (P-->C), (A && (Q-->C)), neq(Q,P), task("!") |- (substDiff(A,Q,P) &&+- (P-->C)), (Punctuation:Quest)

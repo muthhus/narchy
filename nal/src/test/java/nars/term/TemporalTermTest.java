@@ -241,7 +241,10 @@ public class TemporalTermTest {
                 nt.toString());
 
         //assertNotNull(n.conceptualize(nt, UnitBudget.One));
-        assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt).toString());
+        assertEquals(
+                //"(&&,do(that),(a),(b))",
+                "(((a) &&+- (b)) &&+- do(that))",
+                n.conceptualize(nt).toString(), ()->nt.toString() + " conceptualized");
 
         //assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt, UnitBudget.One).toString()); ????????
 
@@ -920,11 +923,15 @@ public class TemporalTermTest {
         Term x = $("((--,(vy &&+- happy)) &&+- (happy &&+- vy))");
         assertTrue(x instanceof Compound);
         Term y = $("((--,(vy &&+84 happy))&&(happy&|vy))");
-        assertEquals("(&|,(--,(vy &&+84 happy)),happy,vy)", y.toString());
-        assertEquals("(&&,(--,(happy &&+- vy)),happy,vy)", y.conceptual().toString());
-//        assertConceptual(
-//                "((--,(happy &&+- vy)) &&+- (happy &&+- vy))",
-//                y.conceptual().toString());
+        assertEquals(
+                //"(&|,(--,(vy &&+84 happy)),happy,vy)",
+                "((--,(vy &&+84 happy))&&(happy&|vy))",
+                y.toString());
+        assertEquals(
+                //"(&&,(--,(happy &&+- vy)),happy,vy)",
+                "((--,(happy &&+- vy)) &&+- (happy &&+- vy))",
+                y.conceptual().toString());
+
     }
 
 //    @Test

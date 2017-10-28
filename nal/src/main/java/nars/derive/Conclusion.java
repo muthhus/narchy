@@ -109,7 +109,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
         }
 
 
-        if (d.taskPunct==BELIEF || d.taskPunct==GOAL) {
+        if (d.concPunc==BELIEF || d.concPunc==GOAL) {
             //only should eliminate XTERNAL from beliefs and goals.  ok if it's in questions/quests since it's the only way to express indefinite temporal repetition
             c2 = c2.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
             if (c2 == null)

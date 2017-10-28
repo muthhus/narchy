@@ -9,11 +9,9 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.control.Activate;
 import nars.task.ITask;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectShortHashMap;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 

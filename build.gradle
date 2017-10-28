@@ -7,12 +7,13 @@ buildscript {
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
         classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.0'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
     }
 }
 
 plugins {
-    id 'com.github.ben-manes.versions' version '0.17.0' //dependencyUpdates
     id 'com.gradle.build-scan' version '1.10'
+    id 'com.github.ben-manes.versions' version '0.17.0' //dependencyUpdates
 }
 
 buildScan {
@@ -31,12 +32,13 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'com.kncept.junit5.reporter'
+    apply plugin: 'org.junit.platform.gradle.plugin'
 
     sourceCompatibility = 1.9
     targetCompatibility = 1.9
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
-        //options.incremental = true // one flag, and things will get MUCH faster
+        options.incremental = true // one flag, and things will get MUCH faster
     }
 
     test {

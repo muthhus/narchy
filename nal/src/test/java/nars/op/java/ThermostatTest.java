@@ -4,7 +4,6 @@ import jcog.data.MutableInteger;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
-import nars.control.Deriver;
 import nars.control.MetaGoal;
 
 import static nars.Op.*;

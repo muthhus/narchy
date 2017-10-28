@@ -10,7 +10,6 @@ import jcog.event.On;
 import jcog.event.Topic;
 import jcog.exe.Can;
 import jcog.list.FasterList;
-import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import nars.Narsese.NarseseException;

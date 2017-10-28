@@ -190,6 +190,7 @@ public class TemporalInductionTest {
 
     }
 
+
     private static int getBeliefCount(@NotNull NAR n) {
         AtomicInteger a = new AtomicInteger(0);
         n.tasks(true,false,false,false).forEach(t->{
@@ -197,4 +198,6 @@ public class TemporalInductionTest {
         });
         return a.intValue();
     }
+
+
 }

@@ -37,26 +37,34 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class AbstractVariable implements Variable {
 
+    /** lowest 4 bits specify the type of variable */
     public final int id;
-    protected transient final int hash;
+
+    static final byte DEP_ORD = Op.VAR_DEP.id;
+    static {
+
+        //test for the expected ordering of the variable op ordinals
+        assert(Op.VAR_PATTERN.id - DEP_ORD == 3);
+    }
 
     protected AbstractVariable(/*@NotNull*/ Op type, int id) {
 
-        this.id = id;
-        this.hash = Terms.hashVar(type, id); //lower 16 bits reserved for the type, which includes all permutations of 2x 8-bit id'd common variables
+
+        this.id = id << 2 | (type.id-DEP_ORD);
 
     }
+
 
 
     @Override
     public void append(ByteArrayDataOutput out) {
         out.writeByte(op().id);
-        out.writeInt(id);
+        out.writeInt(id());
     }
 
     @Override
     public final int id() {
-        return id;
+        return id >> 2;
     }
 
     //@Override abstract public boolean equals(Object other);
@@ -65,7 +73,7 @@ public abstract class AbstractVariable implements Variable {
     public final boolean equals(Object obj) {
         return obj == this ||
                 (obj instanceof AbstractVariable
-                        && ((AbstractVariable) obj).hash == hash); //hash first, it is more likely to differ
+                        && ((AbstractVariable) obj).id == id); //hash first, it is more likely to differ
         //((obj instanceof Variable) && ((Variable)obj).hash == hash);
     }
 
@@ -81,7 +89,8 @@ public abstract class AbstractVariable implements Variable {
         //var pattern will unify anything (below)
         //see: https://github.com/opennars/opennars/blob/4515f1d8e191a1f097859decc65153287d5979c5/nars_core/nars/language/Variables.java#L18
         if (commonalizableVariable(this) && commonalizableVariable(y)) {
-            if ((op().id >= y.op().id)) { //allow indep to subsume dep but not vice versa
+            //if ((op().id >= y.op().id)) { //allow indep to subsume dep but not vice versa
+            if (op() == y.op()) {
 
 
                 //TODO check if this is already a common variable containing y
@@ -131,7 +140,7 @@ public abstract class AbstractVariable implements Variable {
 
     @Override
     public @Nullable Variable normalize(int vid) {
-        if (id == vid)
+        if (id() == vid)
             return this;
         else
             return $.v(op(), vid);
@@ -140,14 +149,14 @@ public abstract class AbstractVariable implements Variable {
 
     @Override
     public final int hashCode() {
-        return hash;
+        return id;
     }
 
 
     @NotNull
     @Override
     public String toString() {
-        return op().ch + Integer.toString(id); //Integer.toString(id);;
+        return op().ch + Integer.toString(id()); //Integer.toString(id);;
     }
 
     /**

@@ -5,7 +5,6 @@ import nars.$;
 import nars.control.Cause;
 import nars.control.Derivation;
 import nars.derive.op.UnifyTerm;
-import org.eclipse.collections.api.block.function.primitive.ByteToFloatFunction;
 import org.roaringbitmap.RoaringBitmap;
 
 import java.util.List;

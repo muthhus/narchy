@@ -242,6 +242,13 @@ public class Temporalize implements ITemporalize {
                 Term implSubj = implComponents.sub(0);
                 Term implPred = implComponents.sub(1);
 
+                if (superterm instanceof AbsoluteEvent) {
+                    if (((AbsoluteEvent)superterm).start!=ETERNAL)
+                        knowAbsolute(implSubj,
+                            ((AbsoluteEvent)superterm).start, ((AbsoluteEvent)superterm).end
+                        );
+                }
+
                 /*if (!implSubj.equals(implPred))*/
                 if (implDT == DTERNAL) {
                     //do not infer any specific temporal relation between the subterms
@@ -575,8 +582,9 @@ public class Temporalize implements ITemporalize {
                         }
                     }
                 }
-                return new AmbientEvent(x); //last resort, use the input as-is
-            } else {
+//                return new AmbientEvent(x); //last resort, use the input as-is
+            }
+            {
                 TermContainer tt = x.subterms();
 //
                 int tts = tt.subs();

@@ -927,13 +927,15 @@ public class TermReductionsTest extends NarseseTest {
         );
 
         assertEquals(
-                $("((X,x)&|#1)"),
-                $("( ((X,x)&&#1) &| ((X,x)&|#1) )") //differ in dt=0 and dt=DTERNAL
+                //$("((X,x)&|#1)"),
+                "(&|,((X,x)&&#1),(X,x),#1)",
+                $("( ((X,x)&&#1) &| ((X,x)&|#1) )").toString() //differ in dt=0 and dt=DTERNAL
         );
 
         assertEquals(
-                $("(--,((X,x)&|#1)"),
-                $("( (--,((X,x)&&#1)) &| (--,((X,x)&|#1)) )") //differ in dt=0 and dt=DTERNAL
+                //$("(--,((X,x)&|#1)"),
+                "((--,((X,x)&&#1))&|(--,((X,x)&|#1)))",
+                $("( (--,((X,x)&&#1)) &| (--,((X,x)&|#1)) )").toString() //differ in dt=0 and dt=DTERNAL
         );
     }
 
@@ -1293,9 +1295,12 @@ public class TermReductionsTest extends NarseseTest {
 //    }
 
     @Test
-    public void testPromoteEternalToParallel() throws Narsese.NarseseException {
+    public void testDontPromoteEternalToParallel() throws Narsese.NarseseException {
         String s = "(a&|(b && c))";
-        assertEquals("(&|,a,b,c)", $(s).toString());
+        assertEquals(
+                //"(&|,a,b,c)",
+                "((b&&c)&|a)",
+                $(s).toString());
     }
 
     @Test
@@ -1310,8 +1315,10 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testCoNegatedConjunctionParallelEternal() throws Narsese.NarseseException {
         //mix of parallel and eternal
-        assertEquals(False,
-                $("((--,(happy-->noid))&|((--,((x-->ball)&&(x-->paddle)))&&(happy-->noid)))")
+        assertEquals(
+                //False,
+                "(((--,(y&&z))&&x)&|(--,x))",
+                $("((--,x)&|((--,(z&&y))&&x))").toString()
         );
     }
 

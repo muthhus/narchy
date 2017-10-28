@@ -22,7 +22,6 @@ import spacegraph.SpaceGraph;
 import spacegraph.phys.shape.SphereShape;
 import spacegraph.render.Draw;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;

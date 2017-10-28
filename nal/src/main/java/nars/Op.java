@@ -1601,9 +1601,8 @@ public enum Op {
                     //if (cprDT != XTERNAL) {
                     Term a = predicate.sub(0);
 
-                    subject = CONJ.the(dt /*caDT */, subject, a);
-                    predicate = predicate.sub(1);
-                    return IMPL.the(abDT, subject, predicate);
+
+                    return IMPL.the(abDT, CONJ.the(dt /*caDT */, subject, a), predicate.sub(1));
                     //}
                 }
 

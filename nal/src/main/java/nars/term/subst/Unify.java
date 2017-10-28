@@ -272,6 +272,8 @@ public abstract class Unify extends Versioning implements Subst {
     public boolean putCommon(AbstractVariable x, AbstractVariable y) {
 
         Term common = CommonVariable.common(x, y);
+        if (common == null)
+            return false; //could not create common variable
 
         return xy.tryPut(x, common) && xy.tryPut(y, common);
     }

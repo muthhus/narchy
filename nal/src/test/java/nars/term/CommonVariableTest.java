@@ -1,13 +1,14 @@
 package nars.term;
 
-import nars.Op;
+import nars.$;
 import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
-import nars.term.var.UnnormalizedVariable;
 import nars.term.var.Variable;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
@@ -18,46 +19,35 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 public class CommonVariableTest {
 
 
+    static final Variable p1 = $.varDep(1);
+    static final Variable p2 = $.varDep(2);
+    static final Variable p3 = $.varDep(3);
 
-    static final UnnormalizedVariable p1 = new UnnormalizedVariable(Op.VAR_PATTERN, "%1");
-    static final UnnormalizedVariable p2 = new UnnormalizedVariable(Op.VAR_PATTERN, "%2");
-    static final UnnormalizedVariable p3 = new UnnormalizedVariable(Op.VAR_PATTERN, "%3");
-    static final UnnormalizedVariable p12 = new UnnormalizedVariable(Op.VAR_PATTERN, "%12");
 
     @Test
     public void commonVariableTest1() {
-        assertEquals("%1%2",
-                common(
-                        p1,
-                        p2).toString(),
+        //same forward and reverse
+        Variable p1p2 = common(p1, p2);
+        Variable p2p1 = common(p2, p1);
+        Variable p1p3 = common(p1, p3);
+        Variable p1p1 = common(p1, p1);
 
-        //reverse order
-                common(
-                        p2,
-                        p1).toString());
-    }
+        System.out.println(p1p2);
+        System.out.println(p2p1);
+        System.out.println(p1p3);
+        System.out.println(p1p1);
 
-    @Test
-    public void commonVariableTest2() {
-        //different lengths
+        assertEquals(p1p2, p2p1);
 
-        assertEquals("%12%2",
-                common(
-                        p12,
-                        p2).toString(),
-        //different lengths
-                common(
-                        p2,
-                        p12).toString());
+        assertTrue(!p1p2.equals(p1p3));
+        assertNotEquals(p1p2, p1p3);
 
+        assertNotEquals(p1, p1p1);
     }
 
 
-    public static Variable common(UnnormalizedVariable v1, UnnormalizedVariable v2) {
-        return CommonVariable.common(
-                (AbstractVariable)v1.normalize(1),
-                (AbstractVariable)v2.normalize(2)
-        );
+    static Variable common(Variable v1, Variable v2) {
+        return CommonVariable.common( (AbstractVariable) v1, (AbstractVariable) v2);
     }
 
     @Disabled
@@ -77,11 +67,11 @@ public class CommonVariableTest {
         assertEquals(0, c12_reverse.compareTo(c12));
         assertNotSame(c12, c12_reverse);
 
-        Variable c123 = CommonVariable.common((AbstractVariable)c12, (AbstractVariable)p3.normalize(3));
+        Variable c123 = CommonVariable.common((AbstractVariable) c12, (AbstractVariable) p3.normalize(3));
         assertEquals("%770%3 class nars.term.var.UnnormalizedVariable", (c123 + " " + c123.getClass()));
 
         //duplicate: already included
-        Variable c122 = CommonVariable.common((AbstractVariable)c12, (AbstractVariable)p2.normalize(2));
+        Variable c122 = CommonVariable.common((AbstractVariable) c12, (AbstractVariable) p2.normalize(2));
         assertEquals("%770 class nars.term.var.CommonVariable", (c122 + " " + c122.getClass()));
 
 

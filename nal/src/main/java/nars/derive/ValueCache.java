@@ -2,7 +2,6 @@ package nars.derive;
 
 import jcog.Util;
 import nars.control.Cause;
-import nars.control.Derivation;
 import nars.time.Tense;
 import org.eclipse.collections.api.block.predicate.primitive.IntFloatPredicate;
 import org.roaringbitmap.IntIterator;

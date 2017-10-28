@@ -2,7 +2,6 @@ package nars.term;
 
 import nars.Op;
 import nars.term.container.TermContainer;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;

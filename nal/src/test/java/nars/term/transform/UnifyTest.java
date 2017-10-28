@@ -719,14 +719,14 @@ public class UnifyTest {
     }
 
     @Test
-    public void ellipsisCommutiveRepeat2_b() {
+    public void ellipsisCommutiveRepeat2_set() {
         test(Op.VAR_PATTERN,
                 "{{a, %X..+, %B}, {z, %X..+, %A}}",
                 "{{a, b, c, d}, {z, b, c, d}}", true);
     }
 
     @Test
-    public void ellipsisCommutiveRepeat2_bb() {
+    public void ellipsisCommutiveRepeat2_product() {
         test(Op.VAR_PATTERN,
                 "({a, %X..+, %B}, {z, %X..+, %A})",
                 "({a, b, c, d}, {z, b, c, d})", true);

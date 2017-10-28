@@ -99,10 +99,10 @@ public enum TermLinks {
                 return 2;
 
             case CONJ:
-                return 2;
+                return 3;
 
             case SIM:
-                return 2;
+                return 3;
 
             case INH:
                 return 3;

@@ -117,8 +117,6 @@ public class Premise extends PLink<Pair<Task,Term>> {
                     /*decayed*/);
         }
 
-        //float taskPri = task.priElseZero();
-
         int dur = d.dur;
         long now = d.time;
 
@@ -127,59 +125,6 @@ public class Premise extends PLink<Pair<Task,Term>> {
 
 
         Term taskTerm = task.term();
-        if (beliefTerm.isTemporal()) {
-            //try to temporalize the termlink to match what appears in the task
-            try {
-                Temporalize t = new Temporalize();
-                t.knowAmbient(taskTerm);
-                Event bs = t.solve(beliefTerm);
-                if (bs != null && !(bs.term instanceof Bool)) {
-//                    if (bs.term.op() == NEG) {
-//                        Temporalize t2 = new Temporalize();
-//                        t2.knowAmbient(taskTerm);
-//                        Event c = t2.solve(beliefTerm);
-//                        System.err.println("NEG why");
-//                    }
-
-                    beliefTerm = bs.term.unneg();
-
-                    //HACK HACK HACK this is temporary until Temporalize correctly differnetiates between && and &| etc
-                    if (beliefTerm.isTemporal() && n.nal() < 7) {
-
-                        Term beliefTermRaw = beliefTerm;
-
-                        beliefTerm = beliefTerm.temporalize(Retemporalize.retemporalizeAllToDTERNAL);
-
-                        if (beliefTerm == null)
-                            beliefTerm = beliefTermRaw; //HACK
-
-                        if (beliefTerm instanceof Bool)
-                            return null;
-
-//                        Temporalize t2 = new Temporalize();
-//                        t2.knowTerm(task.term(), ETERNAL);
-//                        t2.solve(rawBeliefTerm);
-                        //TEMPORARY for DEBUG
-
-                        //assert (nar.nal() >= 7 || !beliefTerm.isTemporal()) : "non-eternal beliefTerm in premise: " + beliefTerm + " from " + rawBeliefTerm + " to match " + task.term();
-                    }
-
-                }
-
-            } catch (InvalidTermException t) {
-                if (Param.DEBUG) {
-                    logger.error("temporalize failure: {} {} {}", taskTerm, beliefTerm, t.getMessage());
-                    //return 0;
-                }
-            }
-        }
-
-
-        //Terms.equalAtemporally(task.term(), (beliefTerm));
-
-
-        //if (taskTerm.varQuery() > 0) {
-
 
         boolean beliefConceptCanAnswerTaskConcept = false;
 

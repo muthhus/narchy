@@ -17,8 +17,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
+import nars.term.atom.Bool;
 import nars.term.subst.Unify;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Disabled;
@@ -43,21 +43,23 @@ public class EllipsisTest {
     public interface EllipsisTestCase {
         @NotNull
         Compound getPattern();
+
         @NotNull
         Term getResult() throws Narsese.NarseseException;
+
         @Nullable
-        Compound getMatchable(int arity) throws Narsese.NarseseException;
+        Term getMatchable(int arity) throws Narsese.NarseseException;
 
         default Set<Term> test(int arity, int repeats) throws Narsese.NarseseException {
             Set<Term> selectedFixed = $.newHashSet(arity);
 
-            TermIndex index = new MapTermIndex(new HashMap(128));
-
-            Compound y = getMatchable(arity);
+            Term y = getMatchable(arity);
+            assertTrue(!(y instanceof Bool));
             assertNotNull(y);
             assertTrue(y.isNormalized());
             //no variables in Y
-            y.forEach(yy -> assertFalse(yy instanceof Variable));
+            assertEquals(0, y.vars());
+            assertEquals(0, y.varPattern());
 
             Term r = getResult();
             assertTrue(r.isNormalized());
@@ -69,17 +71,16 @@ public class EllipsisTest {
             ///x.forEach(xx -> { assertFalse(xx.toString() + " is var", xx instanceof Variable ); });
 
             Term ellipsisTerm = firstEllipsis(x);
-                        assertNotNull(ellipsisTerm);
+            assertNotNull(ellipsisTerm);
 
 
-
-            for (int seed = 0; seed < Math.max(1,repeats*arity) /* enough chances to select all combinations */; seed++) {
+            for (int seed = 0; seed < Math.max(1, repeats * arity) /* enough chances to select all combinations */; seed++) {
 
                 //AtomicBoolean matched = new AtomicBoolean(false);
 
                 System.out.println(seed + ": " + x + " " + y + " .. " + r);
 
-                Unify f = new Unify(VAR_PATTERN, new XorShift128PlusRandom(1+seed), Param.UnificationStackMax, 128) {
+                Unify f = new Unify(VAR_PATTERN, new XorShift128PlusRandom(1 + seed), Param.UnificationStackMax, 128) {
 
                     @Override
                     public void tryMatch() {
@@ -101,7 +102,7 @@ public class EllipsisTest {
 
                             Set<Term> varArgTerms = $.newHashSet(1);
                             if (u instanceof EllipsisMatch) {
-                                EllipsisMatch m = (EllipsisMatch)u;
+                                EllipsisMatch m = (EllipsisMatch) u;
                                 m.forEach(varArgTerms::add);
                             } else {
                                 varArgTerms.add(u);
@@ -121,17 +122,14 @@ public class EllipsisTest {
             changed |= (u!=this);*/
 
 
-
-
-
                         //2. test substitution
                         Term s = Termed.termOrNull(x.transform(this));
-                        if (s!=null) {
+                        if (s != null) {
                             //System.out.println(s);
-                            if (s.varPattern()==0)
+                            if (s.varPattern() == 0)
                                 selectedFixed.add(s);
 
-                            assertEquals( 0, s.varPattern(), s + " should be all subbed by " + this.xy);
+                            assertEquals(0, s.varPattern(), s + " should be all subbed by " + this.xy);
                         }
 
                     }
@@ -182,8 +180,8 @@ public class EllipsisTest {
         static String termSequence(int arity) {
             StringBuilder sb = new StringBuilder(arity * 3);
             for (int i = 0; i < arity; i++) {
-                sb.append( (char)('a' + i) );
-                if (i < arity-1)
+                sb.append((char) ('a' + i));
+                if (i < arity - 1)
                     sb.append(',');
             }
             return sb.toString();
@@ -199,10 +197,13 @@ public class EllipsisTest {
             return p;
         }
 
-        @Nullable
         @Override
-        public Compound getMatchable(int arity) throws Narsese.NarseseException {
-            return $(prefix + termSequence(arity) + suffix);
+        public @Nullable Term getMatchable(int arity) throws Narsese.NarseseException {
+            String s = termSequence(arity);
+            String p = this.prefix;
+            if ((arity == 0) && (p.endsWith(",")))
+                p = p.substring(0, p.length()-1);
+            return $(p + s + suffix);
         }
     }
 
@@ -226,10 +227,11 @@ public class EllipsisTest {
 
         @Override
         public int getExpectedUniqueTerms(int arity) {
-            return arity-1;
+            return arity - 1;
         }
 
-        @Override public void testFurther(Set<Term> selectedFixed, @NotNull Unify f, @NotNull Set<Term> varArgTerms) {
+        @Override
+        public void testFurther(Set<Term> selectedFixed, @NotNull Unify f, @NotNull Set<Term> varArgTerms) {
             assertEquals(2, f.xy.size());
             Term fixedTermValue = f.xy(fixedTerm);
             assertNotNull(fixedTermValue, f.toString());
@@ -247,7 +249,6 @@ public class EllipsisTest {
         }
 
 
-
         @Override
         public @NotNull Term getResult() throws Narsese.NarseseException {
             final PatternIndex pi = new PatternIndex();
@@ -256,7 +257,9 @@ public class EllipsisTest {
 
     }
 
-    /** for testing zero-or-more matcher */
+    /**
+     * for testing zero-or-more matcher
+     */
     public static class CommutiveEllipsisTest2 extends CommutiveEllipsisTest {
 
         public CommutiveEllipsisTest2(String ellipsisTerm, String[] openClose) throws Narsese.NarseseException {
@@ -268,7 +271,8 @@ public class EllipsisTest {
             Set<Term> s = super.test(arity, repeats);
             Term the = s.isEmpty() ? null : s.iterator().next();
             assertNotNull(the);
-            assertTrue(!the.toString().substring(1).isEmpty() && the.toString().substring(1).charAt(0) == 'Z');
+            assertTrue(!the.toString().substring(1).isEmpty(), () -> the.toString() + " is empty");
+            assertTrue(the.toString().substring(1).charAt(0) == 'Z', () -> the.toString() + " does not begin with Z");
             return s;
         }
 
@@ -277,7 +281,6 @@ public class EllipsisTest {
         public Compound getPattern(String prefix, String suffix) throws Narsese.NarseseException {
             return $(prefix + ellipsisTerm + suffix);
         }
-
 
 
         @Override
@@ -318,7 +321,8 @@ public class EllipsisTest {
         //assertEquals(t.target, $("%prefix")); //equality between target and itself
     }
 
-    @Test public void testEllipsisZeroOrMore() throws Narsese.NarseseException {
+    @Test
+    public void testEllipsisZeroOrMore() throws Narsese.NarseseException {
         String s = "%prefix..*";
         Term t = $(s);
         assertNotNull(t);
@@ -333,16 +337,19 @@ public class EllipsisTest {
 //    }
 
     @NotNull
-    public static String[] p(String a, String b) { return new String[] { a, b}; }
+    public static String[] p(String a, String b) {
+        return new String[]{a, b};
+    }
 
     @Disabled
-    @Test public void testVarArg0() throws Narsese.NarseseException {
+    @Test
+    public void testVarArg0() throws Narsese.NarseseException {
         //String rule = "(%S --> %M), ((|, %S, %A..+ ) --> %M) |- ((|, %A, ..) --> %M), (Belief:DecomposePositiveNegativeNegative)";
         String rule = "(%S ==> %M), ((&&,%S,%A..+) ==> %M) |- ((&&,%A..+) ==> %M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame, SequenceIntervals:FromBelief)";
 
         Compound _x = $.$('<' + rule + '>');
         assertTrue(_x instanceof PremiseRule, _x.toString());
-        PremiseRule x = (PremiseRule)_x;
+        PremiseRule x = (PremiseRule) _x;
         //System.out.println(x);
         x = x.normalize(new PatternIndex());
         //System.out.println(x);
@@ -354,39 +361,55 @@ public class EllipsisTest {
 
     }
 
-    @Test public void testEllipsisMatchCommutive1_0() throws Narsese.NarseseException {
+    @Test
+    public void testEllipsisMatchCommutive1_0() throws Narsese.NarseseException {
         new EllipsisTest.CommutiveEllipsisTest1("%2..+", p("(|,", ")")).test(2, 2, 4);
     }
-    @Test public void testEllipsisMatchCommutive1_00() throws Narsese.NarseseException {
+
+    @Test
+    public void testEllipsisMatchCommutive1_00() throws Narsese.NarseseException {
         new EllipsisTest.CommutiveEllipsisTest1("%2..+", p("(&,", ")")).test(2, 2, 4);
     }
 
-    @Test public void testEllipsisMatchCommutive1_1() throws Narsese.NarseseException {
+    @Test
+    public void testEllipsisMatchCommutive1_1() throws Narsese.NarseseException {
         new EllipsisTest.CommutiveEllipsisTest1("%2..+", p("{", "}")).test(2, 4, 4);
     }
-    @Test public void testEllipsisMatchCommutive1_2() throws Narsese.NarseseException {
+
+    @Test
+    public void testEllipsisMatchCommutive1_2() throws Narsese.NarseseException {
         new EllipsisTest.CommutiveEllipsisTest1("%2..+", p("[", "]")).test(2, 4, 4);
     }
-    @Test public void testEllipsisMatchCommutive1_3() throws Narsese.NarseseException {
+
+    @Test
+    public void testEllipsisMatchCommutive1_3() throws Narsese.NarseseException {
         new EllipsisTest.CommutiveEllipsisTest1("%2..+", p("(&&,", ")")).test(2, 4, 4);
     }
 
-
-
-    @Test public void testEllipsisMatchCommutive2() throws Narsese.NarseseException {
-        for (String e : new String[] { "%1..+" }) {
-            for (String[] s : new String[][] { p("{", "}"), p("[", "]"), p("(", ")") }) {
-                new EllipsisTest.CommutiveEllipsisTest2(e, s).test(1, 5, 0);
-            }
-        }
+    @Test
+    public void testEllipsisMatchCommutive1_3with() throws Narsese.NarseseException {
+        new EllipsisTest.CommutiveEllipsisTest1("%2..+", p("(&&,x,", ")")).test(2, 4, 4);
     }
 
-    @Test public void testEllipsisMatchCommutive2_empty() throws Narsese.NarseseException {
-        for (String e : new String[] { "%1..*" }) {
-            for (String[] s : new String[][] { p("(", ")") }) {
-                new EllipsisTest.CommutiveEllipsisTest2(e, s).test(0, 2, 0);
-            }
-        }
+
+    @Test
+    public void testEllipsisMatchCommutive2one_sete() throws Narsese.NarseseException {
+        new EllipsisTest.CommutiveEllipsisTest2("%1..+", p("{", "}")).test(1, 5, 0);
+    }
+
+    @Test
+    public void testEllipsisMatchCommutive2one_seti() throws Narsese.NarseseException {
+        new EllipsisTest.CommutiveEllipsisTest2("%1..+", p("[", "]")).test(1, 5, 0);
+    }
+
+    @Test
+    public void testEllipsisMatchCommutive2one_prod() throws Narsese.NarseseException {
+        new EllipsisTest.CommutiveEllipsisTest2("%1..+", p("(Z,", ")")).test(1, 5, 0);
+    }
+
+    @Test
+    public void testEllipsisMatchCommutive2empty_prod() throws Narsese.NarseseException {
+        new EllipsisTest.CommutiveEllipsisTest2("%1..*", p("(Z,", ")")).test(0, 2, 0);
     }
 
     static void testCombinations(Compound X, @NotNull Compound Y, int expect) {
@@ -412,7 +435,8 @@ public class EllipsisTest {
 
     }
 
-    @Test public void testEllipsisCombinatorics1() throws Narsese.NarseseException {
+    @Test
+    public void testEllipsisCombinatorics1() throws Narsese.NarseseException {
         //rule: ((&&,M,A..+) ==> C), ((&&,A,..) ==> C) |- M, (Truth:Abduction, Order:ForAllSame)
         testCombinations(
                 $("(&&, %1..+, %2)"),
@@ -420,27 +444,32 @@ public class EllipsisTest {
                 3);
     }
 
-    @Test public void testMatchAll2() throws Narsese.NarseseException {
+    @Test
+    public void testMatchAll2() throws Narsese.NarseseException {
         testCombinations(
                 $("((|,%1,%2) --> (|,%2,%3))"),
                 $("((|,bird,swimmer)-->(|,animal,swimmer))"),
                 1);
     }
-    @Test public void testMatchAll3() throws Narsese.NarseseException {
+
+    @Test
+    public void testMatchAll3() throws Narsese.NarseseException {
         testCombinations(
                 $("((|,%X,%Z,%A) --> (|,%Y,%Z,%A))"),
                 $("((|,bird,man, swimmer)-->(|,man, animal,swimmer))"),
                 2);
     }
 
-    @Test public void testRepeatEllipsisAWithoutEllipsis() throws Narsese.NarseseException {
+    @Test
+    public void testRepeatEllipsisAWithoutEllipsis() throws Narsese.NarseseException {
         testCombinations(
                 $("((|,%X,%Y) --> (|,%Y,%Z))"),
                 $("((|,bird,swimmer)-->(|,animal,swimmer))"),
                 1 /* weird */);
     }
 
-    @Test public void testRepeatEllipsisA() throws Narsese.NarseseException {
+    @Test
+    public void testRepeatEllipsisA() throws Narsese.NarseseException {
 
         //should match the same with ellipsis
         testCombinations(
@@ -448,7 +477,9 @@ public class EllipsisTest {
                 $("((|,bird,swimmer)-->(|,animal,swimmer))"),
                 1);
     }
-    @Test public void testRepeatEllipsisA2() throws Narsese.NarseseException {
+
+    @Test
+    public void testRepeatEllipsisA2() throws Narsese.NarseseException {
 
         testCombinations(
                 $("((%X,%A..+) --> (%Y,%A..+))"),
@@ -456,14 +487,16 @@ public class EllipsisTest {
                 1);
     }
 
-    @Test public void testRepeatEllipsisA0() throws Narsese.NarseseException {
+    @Test
+    public void testRepeatEllipsisA0() throws Narsese.NarseseException {
         testCombinations(
                 $("((%A, %X) --> (%B, %X))"),
                 $("((bird,swimmer)-->(animal,swimmer))"),
                 1);
     }
 
-    @Test public void testRepeatEllipsisB() throws Narsese.NarseseException {
+    @Test
+    public void testRepeatEllipsisB() throws Narsese.NarseseException {
 
         //should match the same with ellipsis
         testCombinations(
@@ -472,7 +505,8 @@ public class EllipsisTest {
                 1);
     }
 
-    @Test public void testIntersection1() throws Narsese.NarseseException {
+    @Test
+    public void testIntersection1() throws Narsese.NarseseException {
         testCombinations(
                 $("(%M --> (|,%S,%A..+))"),
                 $("(m-->(|,s,a))"),
@@ -484,8 +518,8 @@ public class EllipsisTest {
     }
 
 
-
-    @Test public void testEllipsisInMinArity() {
+    @Test
+    public void testEllipsisInMinArity() {
         Atomic a = Atomic.the("a");
         Ellipsis b = new EllipsisOneOrMore($.varPattern(1));
 
@@ -496,7 +530,7 @@ public class EllipsisTest {
 
             if (o.statement) continue;
 
-            if (o!=DIFFe && o!=DIFFi) {
+            if (o != DIFFe && o != DIFFi) {
                 assertEquals(a, o.the(DTERNAL, a), o + " with normal term");
             } else {
                 assertEquals(Null, o.the(DTERNAL, a));

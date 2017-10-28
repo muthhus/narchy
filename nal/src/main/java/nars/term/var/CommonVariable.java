@@ -2,6 +2,7 @@ package nars.term.var;
 
 import nars.Op;
 import nars.term.Term;
+import org.jetbrains.annotations.Nullable;
 
 public final class CommonVariable extends GenericNormalizedVariable {
 
@@ -16,18 +17,35 @@ public final class CommonVariable extends GenericNormalizedVariable {
     }
 
 
+    @Nullable
     public static Variable common(AbstractVariable A, AbstractVariable B) {
 
-        int ai = A.id;        assert(ai < (1 << 7));
         Op Aop = A.op();
-        byte ao = Aop.id;
-        int bi = B.id;        assert(bi < (1 << 7));
-        byte bo = B.op().id;
+        assert(B.op()==Aop);
 
-        int h = (ao << 24) | (ai << 16) | (bi << 8) | bo;
+        if (A.compareTo(B) < 0) {
+            //swap
+            AbstractVariable C = A;
+            A = B;
+            B = C;
+        }
+
+        int ai = A.id();
+        if (ai >= (1 << 7)) {
+            //TODO support multi-common variables
+            return null;
+        }
+        int bi = B.id();
+        if (bi >= (1 << 7)) {
+            //TODO support multi-common variables
+            return null;
+        }
+
+
+
+        int h = (bi << 8) | ai;
 
         return new CommonVariable(Aop, h);
-
     }
 
 //    public boolean common(@NotNull AbstractVariable y) {

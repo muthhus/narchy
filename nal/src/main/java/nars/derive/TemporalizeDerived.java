@@ -77,12 +77,12 @@ public class TemporalizeDerived extends Temporalize {
                 taskStart, taskEnd);
 
 
-        if (!task.term().equals(d.beliefTerm)) { //dont re-know the term
-
-            Term b = d.beliefTerm;
-            knowDerivedAmbient(d, b);
-
-        }
+//        if (!task.term().equals(d.beliefTerm)) { //dont re-know the term
+//
+//            Term b = d.beliefTerm;
+//            knowDerivedAmbient(d, b);
+//
+//        }
 
         sng = constraints;
 
@@ -94,13 +94,13 @@ public class TemporalizeDerived extends Temporalize {
             long beliefStart = belief.start();
             long beliefEnd = belief.end();
 
-            if (belief.op().temporal && taskStart != ETERNAL) {
-                beliefStart = beliefEnd = ETERNAL; //pretend as if belief is eternal, allowing task to override the result determination
-            }
+//            if (belief.op().temporal && taskStart != ETERNAL) {
+//                beliefStart = beliefEnd = ETERNAL; //pretend as if belief is eternal, allowing task to override the result determination
+//            }
 
             knowDerivedAbsolute(d,
                     polarizedTaskTerm(belief),
-                    beliefStart, beliefEnd); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
+                    beliefStart, beliefEnd);
 
 
         } else {
@@ -116,22 +116,22 @@ public class TemporalizeDerived extends Temporalize {
         return t.term().negIf(tt != null && tt.isNegative());
     }
 
-    void knowDerivedAmbient(TermContext d, Term x) {
-        knowAmbient(x);
-        if (knowTransformed) {
-            Term y = //x.transform(d);
-                    x.eval(d);
-            if (!y.equals(x) && y.op().conceptualizable)
-                knowAmbient(y);
-        }
-    }
+//    void knowDerivedAmbient(TermContext d, Term x) {
+//        knowAmbient(x);
+//        if (knowTransformed) {
+//            Term y = //x.transform(d);
+//                    x.eval(d);
+//            if (!y.equals(x) && y.op().conceptualizable)
+//                knowAmbient(y);
+//        }
+//    }
 
     void knowDerivedAbsolute(Subst d, Term x, long start, long end) {
-        if (x.op() == IMPL && (!fullyEternal())) {
-            //only know an impl as ambient if there is already non-eternal events detected
-            knowDerivedAmbient(d, x);
-            return;
-        }
+//        if (x.op() == IMPL && (!fullyEternal())) {
+//            //only know an impl as ambient if there is already non-eternal events detected
+//            knowDerivedAmbient(d, x);
+//            return;
+//        }
 
         knowAbsolute(x, start, end);
 

@@ -1,6 +1,5 @@
 package nars;
 
-import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.On;

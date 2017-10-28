@@ -342,12 +342,13 @@ public class Derivation extends Unify {
             long[] beliefStamp = belief.stamp();
             this.overlapDouble =
                     //Math.min(1, Util.sum(
-                    Util.or(
-                            //Util.max(
-                            overlapSingle,
-                            Stamp.overlapFraction(taskStamp, beliefStamp),
-                            Stamp.cyclicity(beliefStamp)
-                    );
+//                    Util.or(
+//                            //Util.max(
+//                            overlapSingle,
+//                            Stamp.overlapFraction(taskStamp, beliefStamp),
+//                            Stamp.cyclicity(beliefStamp)
+//                    );
+                      Stamp.overlapFraction(taskStamp, beliefStamp);
         } else {
             this.beliefTruth = this.beliefTruthRaw = null;
             this.overlapDouble = 0;

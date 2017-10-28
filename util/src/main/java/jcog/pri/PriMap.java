@@ -10,46 +10,12 @@
 
 package jcog.pri;
 
-import org.eclipse.collections.api.LazyIterable;
-import org.eclipse.collections.api.LazyShortIterable;
-import org.eclipse.collections.api.RichIterable;
-import org.eclipse.collections.api.ShortIterable;
-import org.eclipse.collections.api.bag.primitive.MutableShortBag;
-import org.eclipse.collections.api.block.function.primitive.*;
-import org.eclipse.collections.api.block.predicate.primitive.ObjectShortPredicate;
-import org.eclipse.collections.api.block.predicate.primitive.ShortPredicate;
+import org.eclipse.collections.api.block.function.primitive.ShortToShortFunction;
 import org.eclipse.collections.api.block.procedure.Procedure;
-import org.eclipse.collections.api.block.procedure.Procedure2;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
-import org.eclipse.collections.api.block.procedure.primitive.ObjectIntProcedure;
-import org.eclipse.collections.api.block.procedure.primitive.ShortProcedure;
-import org.eclipse.collections.api.collection.MutableCollection;
-import org.eclipse.collections.api.collection.primitive.ImmutableShortCollection;
-import org.eclipse.collections.api.collection.primitive.MutableShortCollection;
-import org.eclipse.collections.api.iterator.MutableShortIterator;
-import org.eclipse.collections.api.iterator.ShortIterator;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.list.primitive.MutableShortList;
-import org.eclipse.collections.api.map.primitive.MutableShortObjectMap;
 import org.eclipse.collections.api.map.primitive.ObjectShortMap;
-import org.eclipse.collections.api.set.primitive.MutableShortSet;
-import org.eclipse.collections.api.set.primitive.ShortSet;
-import org.eclipse.collections.api.tuple.primitive.ObjectShortPair;
-import org.eclipse.collections.impl.bag.mutable.primitive.ShortHashBag;
-import org.eclipse.collections.impl.collection.mutable.primitive.SynchronizedShortCollection;
-import org.eclipse.collections.impl.collection.mutable.primitive.UnmodifiableShortCollection;
-import org.eclipse.collections.impl.factory.primitive.ShortLists;
-import org.eclipse.collections.impl.factory.primitive.ShortObjectMaps;
-import org.eclipse.collections.impl.lazy.AbstractLazyIterable;
-import org.eclipse.collections.impl.lazy.primitive.LazyShortIterableAdapter;
-import org.eclipse.collections.impl.list.mutable.FastList;
-import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
-import org.eclipse.collections.impl.set.mutable.primitive.ShortHashSet;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 
 import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.lang.reflect.Array;
 import java.util.*;
 

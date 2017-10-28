@@ -2,8 +2,6 @@ package nars.derive.constraint;
 
 import nars.term.Term;
 import nars.term.subst.Unify;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 
 public final class NotEqualConstraint extends MatchConstraint {

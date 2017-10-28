@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 //@RunWith(Parameterized.class)
 public class NAL5Test extends NALTest {
 
-    final int cycles = 250;
+    final int cycles = 550;
 
     @BeforeEach
     public void nal() {
@@ -65,7 +65,8 @@ public class NAL5Test extends NALTest {
         tester.mustBelieve(cycles, "<<robin --> [flying]> ==> <robin --> bird>>", 0.80f, 0.45f); //.en("I guess if robin can fly then robin is a type of bird.");
 
     }
-   @Test
+
+    @Test
     public void inductionNegNeg() {
         TestNAR tester = test;
         tester.believe("<<robin --> bird> ==> --<robin --> cyborg>>"); //.en("If robin is a type of bird then robin is not of type cyborg.");
@@ -128,9 +129,9 @@ public class NAL5Test extends NALTest {
     public void detachment() {
 
         test
-            .believe("<<robin --> bird> ==> <robin --> animal>>") //.en("If robin is a type of bird then robin can fly.");
-            .believe("<robin --> bird>") //.en("Robin is a type of bird.");
-            .mustBelieve(cycles, "<robin --> animal>", 1.00f, 0.81f); //.en("Robin is a type of animal.");
+                .believe("<<robin --> bird> ==> <robin --> animal>>") //.en("If robin is a type of bird then robin can fly.");
+                .believe("<robin --> bird>") //.en("Robin is a type of bird.");
+                .mustBelieve(cycles, "<robin --> animal>", 1.00f, 0.81f); //.en("Robin is a type of animal.");
 
     }
 
@@ -143,8 +144,8 @@ public class NAL5Test extends NALTest {
         tester.believe("<robin --> animal>"); //.en("Robin is a type of animal.");
         tester.mustBelieve(cycles, "<robin --> bird>",
                 0.7f, 0.45f); //.en("I guess robin is a type of bird.");
-                //0.7f, 0.9f);
-                //1.00f, 0.36f);
+        //0.7f, 0.9f);
+        //1.00f, 0.36f);
 
     }
 
@@ -258,7 +259,8 @@ public class NAL5Test extends NALTest {
     }
 
 
-    @Test
+    /** not sure this one makes logical sense */
+    @Disabled @Test
     public void compound_composition_one_premises() throws nars.Narsese.NarseseException {
 
         TestNAR tester = test;
@@ -354,6 +356,7 @@ public class NAL5Test extends NALTest {
         tester.mustBelieve(cycles, " <<robin --> [withWings]> ==> <robin --> bird>>", 1.00f, 0.81f); //.en("If robin has wings then robin is a bird");
 
     }
+
     @Test
     public void conditional_deduction_neg() {
 
@@ -399,6 +402,7 @@ public class NAL5Test extends NALTest {
         tester.mustBelieve(cycles * 4, "swimmer:robin", 1.00f, 0.45f /*0.4f*/); //.en("I guess robin swims.");
 
     }
+
     @Test
     public void conditional_abduction_viaMultiConditionalSyllogismEasier() {
         //((&&,M,A_1..n) ==> C), ((&&,A_1..n) ==> C) |- M, (Truth:Abduction, Order:ForAllSame)
@@ -445,7 +449,6 @@ public class NAL5Test extends NALTest {
     }
 
 
-
     @Test
     public void conditional_abduction3_semigeneric3() {
 
@@ -490,6 +493,7 @@ public class NAL5Test extends NALTest {
         tester.mustBelieve(cycles, "<(&&,<robin --> [chirping]>,<robin --> [withBeak]>) ==> <robin --> bird>>", 1.00f, 0.42f); //.en("I guess that if robin chirps and robin has a beak, then robin is a bird.");
 
     }
+
     @Test
     public void conditional_induction0() {
         ////((&&,M,A..+) ==> C), ((&&,B,A..+)==>C)   |- (B ==>+- M), (Belief:Induction)
@@ -601,7 +605,8 @@ public class NAL5Test extends NALTest {
         ;
     }
 
-    @Disabled @Test //???
+    @Disabled
+    @Test //???
     public void testAbductionNegNegImplicationPred() {
 
         test
@@ -612,7 +617,8 @@ public class NAL5Test extends NALTest {
         ;
     }
 
-    @Disabled @Test //???
+    @Disabled
+    @Test //???
     public void testAbductionPosNegImplicationPred() {
 
         test
@@ -654,6 +660,16 @@ public class NAL5Test extends NALTest {
 //    }
 
     @Test
+    public void testConversion0() {
+
+        test
+                .input("(x==>y)?")
+                .input("(y==>x).")
+                .mustBelieve(cycles, "(x==>y).", 1.0f, 0.47f)
+        ;
+    }
+
+    @Test
     public void testConversion() {
 
         test
@@ -691,7 +707,6 @@ public class NAL5Test extends NALTest {
                 .mustBelieve(cycles, "(--x ==> y).", 0f, 0.47f)
         ;
     }
-
 
 
 }

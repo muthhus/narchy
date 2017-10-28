@@ -2,9 +2,7 @@ package nars.term.compound;
 
 import nars.Narsese;
 import nars.term.Compound;
-import org.intelligentjava.machinelearning.decisiontree.feature.P;
 import org.junit.Test;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.conversions.Conversion;
 
 import static nars.$.$;
 import static org.junit.Assert.assertEquals;

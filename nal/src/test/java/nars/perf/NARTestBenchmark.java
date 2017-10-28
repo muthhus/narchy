@@ -1,11 +1,6 @@
 package nars.perf;
 
-import nars.Builder;
-import nars.Op;
 import nars.nal.nal1.NAL1Test;
-import nars.term.Term;
-import nars.term.compound.FastCompound;
-import nars.term.compound.GenericCompound;
 import org.junit.jupiter.api.Disabled;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
@@ -14,8 +9,6 @@ import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.LoggingListener;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
-
-import java.util.function.BiFunction;
 
 import static nars.perf.JmhBenchmark.perf;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;

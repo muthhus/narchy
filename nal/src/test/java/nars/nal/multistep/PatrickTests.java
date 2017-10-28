@@ -119,10 +119,10 @@ public class PatrickTests extends NALTest {
 
 
         tt.truthTolerance(0.1f);
-        tt.nar.truthResolution.set(0.05f);
+        tt.nar.truthResolution.set(0.03f);
         //tt.nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
         tt.nar.time.dur(10);
-        tt.nar.termVolumeMax.set(32);
+        tt.nar.termVolumeMax.set(36);
 
 //        tt.nar.onCycle(()->{
 //            System.err.println(tt.nar.time());
@@ -153,7 +153,8 @@ public class PatrickTests extends NALTest {
 
     }
 
-    @Test
+    /** TODO */
+    @Disabled @Test
     public void testConditioningWithoutAnticipation() throws Narsese.NarseseException {
         /*
         <a --> A>. :|: <b --> B>. :|: %0% <c --> C>. %0%
@@ -212,7 +213,8 @@ public class PatrickTests extends NALTest {
 
     }
 
-    @Test
+    /** TODO */
+    @Test @Disabled
     public void testPixelImage() throws Narsese.NarseseException {
 
         //this.activeTasks = activeTasks;

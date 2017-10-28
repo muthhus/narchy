@@ -430,7 +430,9 @@ public class NAL6Test extends NALTest {
         //      there is a lock which is opened by any/all keys
 
         tester.believe("<{key1} --> key>", 1.00f, 0.90f); //en("key1 is a key");
-        tester.mustBelieve(cycles * 2, "((#1-->lock)==>open(#1,{key1}))", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
+        tester.mustBelieve(cycles * 2, "((#1-->lock)==>open(#1,{key1}))", 1.00f,
+                0.73f
+                /*0.81f*/); //en("there is a lock which is opened by key1");
     }
 
     @Test

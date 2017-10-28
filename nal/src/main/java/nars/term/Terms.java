@@ -35,18 +35,11 @@ import static nars.time.Tense.DTERNAL;
 public enum Terms {
     ;
 
-    /**
-     * TODO decide on some reasonable coding scheme for bundling these numeric values
-     * into 32-bit or 64-bit fields/arrays
-     */
-    public static int hashVar(/*@NotNull*/ Op type, int id) {
-        return (type.id << 16) | id;
-    }
 
     /**
      * computes the content hash while accumulating subterm metadata summary fields into int[] meta
      */
-    public static int hashSubterms(@NotNull Term[] term, @NotNull int[] meta) {
+    public static int hashSubterms(Term[] term, int[] meta) {
 
         /*
         int result = 1;

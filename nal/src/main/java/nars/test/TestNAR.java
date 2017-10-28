@@ -564,6 +564,11 @@ public class TestNAR {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, goalTerm, GOAL, freq, freq, conf, conf, start, end);
     }
+    @NotNull
+    public TestNAR mustBelieve(long withinCycles, @NotNull String goalTerm, float freq, float conf, LongPredicate occ) {
+        long t = nar.time();
+        return mustOutput(t, t + withinCycles, goalTerm, BELIEF, freq, freq, conf, conf, occ);
+    }
 
     public TestNAR ask(@NotNull String termString) throws Narsese.NarseseException {
         nar.question(termString);
