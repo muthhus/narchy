@@ -101,15 +101,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        });
 //    }
 
-    /**
-     * int reduction operation
-     */
-    default int intValue(int x, IntObjectToIntFunction<Term> reduce) {
-        int l = subs();
-        for (int t = 0; t < l; t++)
-            x = reduce.intValueOf(x, sub(t));
-        return x;
-    }
+
 
     default /*@NotNull*/ TreeSet<Term> toSortedSet() {
         int s = subs();

@@ -1,5 +1,6 @@
 package nars.term.compound;
 
+import nars.Builder;
 import nars.IO;
 import nars.Op;
 import nars.term.Compound;
@@ -104,142 +105,98 @@ public class FastCompound implements Compound {
         return new SubtermView(this, 0);
     }
 
-
-    abstract public static class SubVisitor {
-        protected final FastCompound c;
-        protected int at;
-        protected byte[] stack = new byte[MAX_LAYERS]; //where to continue at each level
-
-        public SubVisitor(FastCompound c, int at) {
-            this.c = c;
-            byte subsAtRoot = c.skeleton[at + 1]; //expected # subterms
-            stack[0] = subsAtRoot;
-            this.at = at;
-        }
+    public interface ByteIntPredicate {
+        boolean test(byte a, int b);
     }
 
-    public static class SubTermVisitor extends SubVisitor {
-        public SubTermVisitor(FastCompound c, int at) {
-            super(c, at);
-        }
+    public int[] subtermOffsetsAt(int at) {
+        int[] b = new int[subtermCountAt(at)];
+        subtermsAt(at, (i, c) -> {
+            b[i] = c;
+            return true;
+        });
+        return b;
+    }
 
-        /**
-         * seeks and returns the offset of the ith subterm
-         */
-        public int go(int subterm) {
+    /**
+     * returns byte[] of the offset of each subterm
+     */
+    public void subtermsAt(int at, ByteIntPredicate each /* subterm #, offset # */) {
+        byte[] skeleton = this.skeleton;
 
-            assert(!ov[c.skeleton[at]].atomic);
+        assert (!ov[skeleton[at]].atomic);
 
-            byte[] layerStack = new byte[MAX_LAYERS];
+        byte[] stack = new byte[MAX_LAYERS];
 
-            byte[] ss = c.skeleton;
-            byte depth = 0;
-            layerStack[0] = c.skeleton[at+1];
+        byte depth = 0;
+        byte subs0 = stack[0] = subtermCountAt(at);
 
-            at += 2; //skip compound header
+        at += 2; //skip compound header
 
-            for (int i = 0; i < subterm; ) {
-                byte op = ss[at];
+        for (byte i = 0; i < subs0; ) {
+            if (!each.test(i, at))
+                break;
 
-                boolean descend;
-                if (ov[op].atomic) {
-                    at += 2; //skip past atom id
-                } else {
-                    byte subSubs = ss[at + 1]; //skip past sub count
-                    at += 2; //compound header
-                    layerStack[depth + 1] = subSubs;
-                    depth++;
-                }
+            byte op = skeleton[at++]; //get op and skip past it
 
-                if (depth==0)
-                    i++;
-
-                if (--layerStack[depth] == 0) {
-                    //ascend
-                    depth--;
-                }
-
+            if (ov[op].atomic) {
+                at++; //skip past atom id
+            } else {
+                stack[++depth] = skeleton[at++]; //store subcount and skip past it
             }
-            return at;
+
+            if (depth == 0)
+                i++;
+
+            if (--stack[depth] == 0)
+                depth--; //ascend
         }
+
     }
 
-//    public byte[] subOffsets(int after) {
-//        Op[] ov = Op.values();
-//        byte[] layerLength = new byte[MAX_LAYERS];
-//        byte[] layerStack = new byte[MAX_LAYERS];
-//
-//
-//        byte subsAtRoot = layerLength[0] = layerStack[0] = skeleton[after + 1]; //expected # subterms
-//        byte[] offsets = new byte[subsAtRoot];
-//
-//        after += 2; //compound header
-//        int layer = 0;
-//
-//        for (int i = after; i < skeleton.length; ) {
-//
-//            if (layer == 0) {
-//                if (layerStack[0] == 0)
-//                    break;
-//                int oi = layerLength[0] - layerStack[0];
-//                assert (oi >= 0 && oi < offsets.length && offsets[oi] == 0);
-//                offsets[oi] = (byte) i;
-//            } else
-//                layerLength[layer]++;
-//
-//            /*
-//            System.out.println(ov[op] + " layer " + layer + " pos=" + i +
-//                    "\t" + Arrays.toString(layerStack) + "\t" +Arrays.toString(layerLength));
-//            */
-//
-//            layerStack[layer]--;
-//
-//
-//            byte op = skeleton[i];
-//
-//            boolean descend;
-//            if (ov[op].atomic) {
-//                descend = false;
-//                i += 2; //skip past atom id
-//            } else {
-//                byte subSubs = skeleton[i + 1]; //skip past sub count
-//
-//                assert (layerStack[layer + 1] == 0);
-//                layerStack[layer + 1] = subSubs;
-//                descend = true;
-//                i += 2; //compound header
-//            }
-//
-//
-//            if (descend)
-//                layer++;
-//            else {
-//                if (layerStack[layer] == 0 && layer > 0) {
-//
-//                    layer--;
-////                    if (--layer < 0)
-////                        break;
-//
-//                }
-//            }
-//
-//
-//        }
-//
-//        //HACK
-//        if (layer > 0) {
-//            offsets[offsets.length - 1] = (byte) (skeleton.length - 1);
-//        }
-//
-////        assert(layer == 0); //return to layer 0
-//        for (int i = 0; i < offsets.length - 1; i++) {
-//            assert (offsets[i] < offsets[i + 1]); //increasing only
-//        }
-//
-//        //System.out.println("offsets: " + Arrays.toString(offsets));
-//
-//        return offsets;
-//    }
+    public byte subtermCountAt(int at) {
+        return skeleton[at + 1];
+    }
+
+    /**
+     * seeks and returns the offset of the ith subterm
+     */
+    public int subtermOffsetAt(int subterm, int at) {
+
+        byte[] skeleton = this.skeleton;
+
+        assert (!ov[skeleton[at]].atomic);
+
+        if (subterm == 0) {
+            //quick case
+            return at + 2;
+        }
+
+        byte[] stack = new byte[MAX_LAYERS];
+
+        byte depth = 0;
+        stack[0] = skeleton[at + 1];
+
+        at += 2; //skip compound header
+
+        for (byte i = 0; i < subterm; ) {
+            byte op = skeleton[at++]; //get op and skip past it
+
+            if (ov[op].atomic) {
+                at++; //skip past atom id
+            } else {
+                stack[++depth] = skeleton[at++]; //store subcount and skip past it
+            }
+
+            if (depth == 0)
+                i++;
+
+            if (--stack[depth] == 0)
+                depth--; //ascend
+        }
+
+        return at;
+    }
 
 
     @Override
@@ -273,6 +230,31 @@ public class FastCompound implements Compound {
         return IO.Printer.stringify(this).toString();
     }
 
+    public Term sub(byte i, int containerOffset) {
+
+        int subOffset = subtermOffsetAt(i, containerOffset);
+        Op opAtSub = Op.values()[skeleton[subOffset]];
+        if (opAtSub.atomic) {
+            return IO.termFromBytes(atoms[skeleton[subOffset + 1]]);
+        } else {
+            //TODO sub view
+            //return opAtSub.the(DTERNAL, subs(subOffset));
+            return new GenericCompound(opAtSub, Builder.Subterms.the.apply(new SubtermView(this, subOffset).theArray()));
+        }
+
+    }
+
+    public Term[] subs(int offset) {
+        //new SubtermView(this, offset).theArray()
+        int[] b = subtermOffsetsAt(offset);
+        byte bb = (byte) b.length;
+        Term[] t = new Term[bb];
+        for (byte i = 0; i < bb; i++) {
+            t[i] = sub(i, offset);
+        }
+        return t;
+    }
+
     private static class SubtermView implements TermContainer {
         private final FastCompound c;
 
@@ -285,6 +267,12 @@ public class FastCompound implements Compound {
             this.c = terms;
             go(offset);
         }
+
+        @Override
+        public int hashCode() {
+            throw new UnsupportedOperationException();
+        }
+
 
         public SubtermView go(int offset) {
             if (this.offset == offset)
@@ -314,17 +302,7 @@ public class FastCompound implements Compound {
         @Override
         public Term sub(int i) {
             assert (i < subs);
-
-            //byte subOffests = new subOffsets();
-
-            int subOffset = new SubTermVisitor(c, this.offset).go(i);
-            Op opAtSub = Op.values()[c.skeleton[subOffset]];
-            if (opAtSub.atomic) {
-                return IO.termFromBytes(c.atoms[c.skeleton[subOffset + 1]]);
-            } else {
-                //TODO sub view
-                return opAtSub.the(DTERNAL, new SubtermView(c, subOffset).theArray());
-            }
+            return c.sub((byte) i, offset);
         }
 
         @Override

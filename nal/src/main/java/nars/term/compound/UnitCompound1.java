@@ -71,8 +71,8 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     public Term dt(int nextDT) {
         switch (nextDT) {
             case DTERNAL:
-            case XTERNAL:
-            case 0:
+//            case XTERNAL:
+//            case 0:
                 return this;
         }
         throw new UnsupportedOperationException();

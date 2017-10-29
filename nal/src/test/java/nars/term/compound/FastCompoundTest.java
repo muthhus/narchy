@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 
 public class FastCompoundTest {
 
-        @Test
+    @Test
     public void test1() throws Narsese.NarseseException {
         assertEquivalent("(((x)))");
         assertEquivalent("((x))");
@@ -27,6 +27,7 @@ public class FastCompoundTest {
         assertEquivalent("(((Conversion-->Belief),(Belief-->Punctuation)),(P-->S))");
         assertEquivalent("((P-->S),((Conversion-->Belief),(Belief-->Punctuation)))");
     }
+
     @Test
     public void test2() throws Narsese.NarseseException {
         assertEquivalent("(&&,(MedicalCode-->MedicalIntangible),(MedicalIntangible-->#1),(SuperficialAnatomy-->#1),label(MedicalCode,MedicalCode),label(MedicalIntangible,MedicalIntangible),label(SuperficialAnatomy,SuperficialAnatomy))");
@@ -42,7 +43,7 @@ public class FastCompoundTest {
     }
 
     static void assertEquivalent(Compound c) {
-        FastCompound f = FastCompound.get( c );
+        FastCompound f = FastCompound.get(c);
         assertEquals(c.op(), f.op());
         assertEquals(c.subs(), f.subs());
         int s = f.subterms().subs();

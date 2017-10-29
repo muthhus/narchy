@@ -38,11 +38,10 @@ public class GenericCompound implements Compound {
 
         this.op = op;
 
-        this.hash = Util.hashCombine(subterms.hashCode(), op.id);
+        this.hash = Util.hashCombine((this.subterms = subterms).hashCode(), op.id);
 
         this.normalized = !(subterms.vars() > 0 || subterms.varPattern() > 0);
 
-        this.subterms = subterms;
         this.structureCached = Compound.super.structure();
 
 //        //HACK

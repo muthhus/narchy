@@ -16,7 +16,7 @@ public abstract class AtomicConst implements Atomic {
 
 
     private final transient byte[] bytesCached;
-    protected final transient int hashCached;
+    protected final transient int hash;
 
     protected AtomicConst(Op op, @Nullable String s) {
         if (s == null) s = toString(); //must be a constant method
@@ -30,7 +30,7 @@ public abstract class AtomicConst implements Atomic {
         arraycopy(stringbytes, 0, sbytes, 3, stringbytes.length);
         this.bytesCached = sbytes;
 
-        this.hashCached = Util.hashWangJenkins(s.hashCode());
+        this.hash = Util.hashWangJenkins(s.hashCode());
     }
 
     @Override
@@ -39,9 +39,9 @@ public abstract class AtomicConst implements Atomic {
 
         if (u instanceof AtomicConst) {
             AtomicConst c = (AtomicConst) u;
-            return hashCached == c.hashCached && Arrays.equals(bytesCached, c.bytesCached);
+            return hash == c.hash && Arrays.equals(bytesCached, c.bytesCached);
         } else if (u instanceof Atomic) {
-            if (hashCached != u.hashCode())
+            if (hash != u.hashCode())
                 return false;
             Atomic a = (Atomic) u;
             return opX() == a.opX() && toString().equals(a.toString());
@@ -70,7 +70,7 @@ public abstract class AtomicConst implements Atomic {
 
     @Override
     public int hashCode() {
-        return hashCached;
+        return hash;
     }
 
 }

@@ -15,9 +15,9 @@ public class Atom extends AtomicConst {
     public final String id;
 
 
-    protected Atom(@NotNull String id) {
-        super(ATOM, id);
-        this.id = validateAtomID(id);
+    protected Atom(String id) {
+        super(ATOM, validateAtomID(id));
+        this.id = id;
     }
 
     @Override

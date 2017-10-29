@@ -41,17 +41,19 @@ public enum Terms {
      */
     public static int hashSubterms(Term[] term, int[] meta) {
 
-        /*
-        int result = 1;
-        for (Object element : a)
-            result = 31 * result + (element == null ? 0 : element.hashCode());
-        return result;
-         */
         int result = 1;
         for (int i = 0; i < term.length; i++) {
             Term t = term[i];
-            //result = 31 /*Util.PRIME1 */ * result + t.init(meta);
             t.init(meta);
+            result = Util.hashCombine(t.hashCode(), result);
+        }
+        return result;
+    }
+
+    public static int hashSubterms(Term[] term) {
+        int result = 1;
+        for (int i = 0; i < term.length; i++) {
+            Term t = term[i];
             result = Util.hashCombine(t.hashCode(), result);
         }
         return result;
