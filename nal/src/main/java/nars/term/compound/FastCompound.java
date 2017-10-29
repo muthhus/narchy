@@ -20,6 +20,8 @@ import static nars.time.Tense.DTERNAL;
  */
 public class FastCompound implements Compound {
 
+    static public final Op[] ov = Op.values();
+
     private static final int MAX_LAYERS = 8;
     private int MAX_LAYER_LEN = 8;
 
@@ -103,82 +105,141 @@ public class FastCompound implements Compound {
     }
 
 
-    public byte[] subOffsets(int after) {
-        Op[] ov = Op.values();
-        byte[] layerLength = new byte[MAX_LAYERS];
-        byte[] layerStack = new byte[MAX_LAYERS];
+    abstract public static class SubVisitor {
+        protected final FastCompound c;
+        protected int at;
+        protected byte[] stack = new byte[MAX_LAYERS]; //where to continue at each level
 
-
-        byte subsAtRoot = layerLength[0] = layerStack[0] = skeleton[after + 1]; //expected # subterms
-        byte[] offsets = new byte[subsAtRoot];
-
-        after += 2; //compound header
-        int layer = 0;
-
-        for (int i = after; i < skeleton.length; ) {
-
-            if (layer == 0) {
-                if (layerStack[0] == 0)
-                    break;
-                int oi = layerLength[0] - layerStack[0];
-                assert(oi >= 0 && oi < offsets.length && offsets[oi] == 0);
-                offsets[oi] = (byte) i;
-            } else
-                layerLength[layer]++;
-
-            /*
-            System.out.println(ov[op] + " layer " + layer + " pos=" + i +
-                    "\t" + Arrays.toString(layerStack) + "\t" +Arrays.toString(layerLength));
-            */
-
-            layerStack[layer]--;
-
-
-            byte op = skeleton[i];
-
-            boolean descend;
-            if (ov[op].atomic) {
-                descend = false;
-                i += 2; //skip past atom id
-            } else {
-                byte subSubs = skeleton[i + 1]; //skip past sub count
-
-                assert(layerStack[layer+1] == 0);
-                layerStack[layer + 1] = subSubs;
-                descend = true;
-                i += 2; //compound header
-            }
-
-
-            if (descend)
-                layer++;
-            else {
-                if (layerStack[layer] == 0 && layer > 0) {
-
-                    layer--;
-//                    if (--layer < 0)
-//                        break;
-
-                }
-            }
-
-
+        public SubVisitor(FastCompound c, int at) {
+            this.c = c;
+            byte subsAtRoot = c.skeleton[at + 1]; //expected # subterms
+            stack[0] = subsAtRoot;
+            this.at = at;
         }
-
-        //HACK
-        if (layer > 0) {
-            offsets[offsets.length - 1] = (byte) (skeleton.length - 1);
-        }
-
-//        assert(layer == 0); //return to layer 0
-        for (int i = 0; i < offsets.length - 1; i++) {
-            assert (offsets[i] < offsets[i + 1]); //increasing only
-        }
-
-        //System.out.println("offsets: " + Arrays.toString(offsets));
-
-        return offsets;
     }
+
+    public static class SubTermVisitor extends SubVisitor {
+        public SubTermVisitor(FastCompound c, int at) {
+            super(c, at);
+        }
+
+        /**
+         * seeks and returns the offset of the ith subterm
+         */
+        public int go(int subterm) {
+
+            assert(!ov[c.skeleton[at]].atomic);
+
+            byte[] layerStack = new byte[MAX_LAYERS];
+
+            byte[] ss = c.skeleton;
+            byte depth = 0;
+            layerStack[0] = c.skeleton[at+1];
+
+            at += 2; //skip compound header
+
+            for (int i = 0; i < subterm; ) {
+                byte op = ss[at];
+
+                boolean descend;
+                if (ov[op].atomic) {
+                    at += 2; //skip past atom id
+                } else {
+                    byte subSubs = ss[at + 1]; //skip past sub count
+                    at += 2; //compound header
+                    layerStack[depth + 1] = subSubs;
+                    depth++;
+                }
+
+                if (depth==0)
+                    i++;
+
+                if (--layerStack[depth] == 0) {
+                    //ascend
+                    depth--;
+                }
+
+            }
+            return at;
+        }
+    }
+
+//    public byte[] subOffsets(int after) {
+//        Op[] ov = Op.values();
+//        byte[] layerLength = new byte[MAX_LAYERS];
+//        byte[] layerStack = new byte[MAX_LAYERS];
+//
+//
+//        byte subsAtRoot = layerLength[0] = layerStack[0] = skeleton[after + 1]; //expected # subterms
+//        byte[] offsets = new byte[subsAtRoot];
+//
+//        after += 2; //compound header
+//        int layer = 0;
+//
+//        for (int i = after; i < skeleton.length; ) {
+//
+//            if (layer == 0) {
+//                if (layerStack[0] == 0)
+//                    break;
+//                int oi = layerLength[0] - layerStack[0];
+//                assert (oi >= 0 && oi < offsets.length && offsets[oi] == 0);
+//                offsets[oi] = (byte) i;
+//            } else
+//                layerLength[layer]++;
+//
+//            /*
+//            System.out.println(ov[op] + " layer " + layer + " pos=" + i +
+//                    "\t" + Arrays.toString(layerStack) + "\t" +Arrays.toString(layerLength));
+//            */
+//
+//            layerStack[layer]--;
+//
+//
+//            byte op = skeleton[i];
+//
+//            boolean descend;
+//            if (ov[op].atomic) {
+//                descend = false;
+//                i += 2; //skip past atom id
+//            } else {
+//                byte subSubs = skeleton[i + 1]; //skip past sub count
+//
+//                assert (layerStack[layer + 1] == 0);
+//                layerStack[layer + 1] = subSubs;
+//                descend = true;
+//                i += 2; //compound header
+//            }
+//
+//
+//            if (descend)
+//                layer++;
+//            else {
+//                if (layerStack[layer] == 0 && layer > 0) {
+//
+//                    layer--;
+////                    if (--layer < 0)
+////                        break;
+//
+//                }
+//            }
+//
+//
+//        }
+//
+//        //HACK
+//        if (layer > 0) {
+//            offsets[offsets.length - 1] = (byte) (skeleton.length - 1);
+//        }
+//
+////        assert(layer == 0); //return to layer 0
+//        for (int i = 0; i < offsets.length - 1; i++) {
+//            assert (offsets[i] < offsets[i + 1]); //increasing only
+//        }
+//
+//        //System.out.println("offsets: " + Arrays.toString(offsets));
+//
+//        return offsets;
+//    }
 
 
     @Override
@@ -218,7 +279,7 @@ public class FastCompound implements Compound {
         private int offset = -1;
         int subs; //subterms at current offset
         private Op op; //op at current offset
-        private byte[] subOffsets;
+//        private byte[] subOffsets;
 
         public SubtermView(FastCompound terms, int offset) {
             this.c = terms;
@@ -237,26 +298,26 @@ public class FastCompound implements Compound {
                 subs = c.skeleton[offset + 1];
             }
 
-            this.subOffsets = null; //TODO avoid recompute offsets if at the same layer
+            //this.subOffsets = null; //TODO avoid recompute offsets if at the same layer
 
             return this;
         }
 
-        byte[] subOffsets() {
-            if (subOffsets == null) {
-                subOffsets = c.subOffsets(offset);
-            }
-            return subOffsets;
-        }
+//        byte[] subOffsets() {
+//            if (subOffsets == null) {
+//                subOffsets = c.subOffsets(offset);
+//            }
+//            return subOffsets;
+//        }
 
 
         @Override
         public Term sub(int i) {
             assert (i < subs);
 
-            byte[] subOffests = subOffsets();
+            //byte subOffests = new subOffsets();
 
-            int subOffset = subOffsets[i];
+            int subOffset = new SubTermVisitor(c, this.offset).go(i);
             Op opAtSub = Op.values()[c.skeleton[subOffset]];
             if (opAtSub.atomic) {
                 return IO.termFromBytes(c.atoms[c.skeleton[subOffset + 1]]);

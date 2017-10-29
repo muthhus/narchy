@@ -46,8 +46,8 @@ public class NARTestBenchmark {
         Launcher launcher = LauncherFactory.create();
 
 
-        LoggingListener listener = LoggingListener.forJavaUtilLogging();
         //SummaryGeneratingListener listener = new SummaryGeneratingListener();
+        LoggingListener listener = LoggingListener.forJavaUtilLogging();
         launcher.registerTestExecutionListeners(listener);
         launcher.execute(request, listener);
 

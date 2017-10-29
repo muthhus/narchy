@@ -116,7 +116,8 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         //n.run(600);
         //n.log();
         n.input(
-                "(a-->b).", "(b-->c).","(c-->d).","(d-->e).","(e-->a)."
+                "(a-->b).", "(b-->c).","(c-->d).","(d-->e).","(e-->a).",
+                "(a<->x)!"
         );
 
         n.run(1).input("x(set,3)!  :|:");

@@ -9,18 +9,15 @@ import static org.junit.Assert.assertEquals;
 
 public class FastCompoundTest {
 
-
-    @Test
-    public void test1() throws Narsese.NarseseException {
-        assertEquivalent("(&&,(MedicalCode-->MedicalIntangible),(MedicalIntangible-->#1),(SuperficialAnatomy-->#1),label(MedicalCode,MedicalCode),label(MedicalIntangible,MedicalIntangible),label(SuperficialAnatomy,SuperficialAnatomy))");
-    }
         @Test
-    public void test2() throws Narsese.NarseseException {
+    public void test1() throws Narsese.NarseseException {
         assertEquivalent("(((x)))");
         assertEquivalent("((x))");
         assertEquivalent("(((P-->S)))");
         assertEquivalent("(P-->S)");
         assertEquivalent("((P-->S))");
+        assertEquivalent("(x,y)");
+        assertEquivalent("(x,(P-->S))");
         assertEquivalent("((P-->S),x)");
 
         assertEquivalent("(((P-->S)),x)");
@@ -31,7 +28,12 @@ public class FastCompoundTest {
         assertEquivalent("((P-->S),((Conversion-->Belief),(Belief-->Punctuation)))");
     }
     @Test
-    public void test2b() throws Narsese.NarseseException {
+    public void test2() throws Narsese.NarseseException {
+        assertEquivalent("(&&,(MedicalCode-->MedicalIntangible),(MedicalIntangible-->#1),(SuperficialAnatomy-->#1),label(MedicalCode,MedicalCode),label(MedicalIntangible,MedicalIntangible),label(SuperficialAnatomy,SuperficialAnatomy))");
+    }
+
+    @Test
+    public void test3() throws Narsese.NarseseException {
         assertEquivalent("(((P-->S),(S-->P),task(\"?\")),((P-->S),((Conversion-->Belief),(Belief-->Punctuation))))");
     }
 

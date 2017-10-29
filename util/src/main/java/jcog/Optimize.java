@@ -9,9 +9,7 @@ import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
-import org.apache.commons.math3.random.MersenneTwister;
-import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import org.eclipse.collections.api.tuple.primitive.DoubleObjectPair;
@@ -21,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -34,7 +31,7 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 public class Optimize<X> {
     final Supplier<X> subject;
 
-    public final List<Tweak<X>> tweaks = new ArrayList();
+    public final List<Tweak<X>> tweaks = new FasterList();
     private final boolean trace = true;
     private final static Logger logger = LoggerFactory.getLogger(Optimize.class);
     private CSVOutput csv;
@@ -89,7 +86,7 @@ public class Optimize<X> {
     /*@NotNull*/
     public Result run(int maxIterations, @NotNull FloatFunction<X> eval) {
         return run(
-                (int)(16 * Math.round(Util.sqr(tweaks.size()))) /* estimate */,
+                (int) (16 * Math.round(Util.sqr(tweaks.size()))) /* estimate */,
                 maxIterations, 1, eval);
     }
 
@@ -122,8 +119,6 @@ public class Optimize<X> {
         List<DoubleObjectPair<double[]>> experiments = new FasterList();
 
 
-
-
         ObjectiveFunction func = new ObjectiveFunction(point -> {
 
 
@@ -143,7 +138,7 @@ public class Optimize<X> {
 
             if (trace)
                 csv.out(ArrayUtils.add(point, score));
-                //System.out.println(Joiner.on(",").join(Doubles.asList(point)) + ",\t" + score);
+            //System.out.println(Joiner.on(",").join(Doubles.asList(point)) + ",\t" + score);
 
             experiments.add(pair((double) score, point));
             onExperiment(point, score);
@@ -151,47 +146,28 @@ public class Optimize<X> {
         });
 
 
-//        MyCMAESOptimizer optim = new MyCMAESOptimizer(maxIterations, 0, true, 0,
-//                0, new MersenneTwister(3), true, null);
-//
-//        startExperiments();
-//
-//        /*PointValuePair r = */optim.start(
+        startExperiments();
+
+//        CMAESOptimizer optim = new CMAESOptimizer(maxIterations, Double.NEGATIVE_INFINITY, true, 0,
+//                1, new MersenneTwister(3), false, null);
+//        PointValuePair r = optim.optimize(
 //                new MaxEval(maxIterations), //<- ignored?
 //                func,
 //                GoalType.MAXIMIZE,
 //                new SimpleBounds(min, max),
 //                new InitialGuess(mid),
-//                new MyCMAESOptimizer.Sigma(MathArrays.scale(1f, inc)),
-//                new MyCMAESOptimizer.PopulationSize(2 * tweaks.size() /* estimate */))
-//        .run(maxIterations);
-//        return null;
+//                new CMAESOptimizer.Sigma(MathArrays.scale(1f, inc)),
+//                new CMAESOptimizer.PopulationSize(populationSize)
+//            );
 
-
-        CMAESOptimizer optim = new CMAESOptimizer(maxIterations, Double.NEGATIVE_INFINITY, true, 0,
-                1, new MersenneTwister(3), false, null);
-
-        startExperiments();
-
-        PointValuePair r = optim.optimize(
-                new MaxEval(maxIterations), //<- ignored?
-                func,
-                GoalType.MAXIMIZE,
-                new SimpleBounds(min, max),
-                new InitialGuess(mid),
-                new CMAESOptimizer.Sigma(MathArrays.scale(1f, inc)),
-                new CMAESOptimizer.PopulationSize(populationSize)
-            );
-
-            return new Result(experiments, r);
-
-//        final int numIterpolationPoints = 3 * dim; //2 * dim + 1 + 1;
-//        PointValuePair r = new BOBYQAOptimizer(numIterpolationPoints, dim * 2.0, 1.0E-8D)
-//                    .optimize(new MaxEval(maxIterations),
-//                        func,
-//                        GoalType.MAXIMIZE,
-//                        new SimpleBounds(min, max),
-//                        new InitialGuess(mid));
+        int dim = tweaks.size();
+        final int numIterpolationPoints = 3 * dim; //2 * dim + 1 + 1;
+        PointValuePair r = new BOBYQAOptimizer(numIterpolationPoints, dim * 2.0, 1.0E-8D)
+                    .optimize(new MaxEval(maxIterations),
+                        func,
+                        GoalType.MAXIMIZE,
+                        new SimpleBounds(min, max),
+                        new InitialGuess(mid));
 
 //        PointValuePair r = new SimplexOptimizer(1e-10, 1e-30).optimize(
 //                new MaxEval(maxIterations),
@@ -203,6 +179,7 @@ public class Optimize<X> {
 //        );
 
 
+        return new Result(experiments, r);
 
 
     }
@@ -255,8 +232,8 @@ public class Optimize<X> {
 
 
             FloatTable<String> data = new FloatTable<>(
-                ArrayUtils.add(
-                        tweaks.stream().map(Tweak::toString).toArray(String[]::new), "score")
+                    ArrayUtils.add(
+                            tweaks.stream().map(Tweak::toString).toArray(String[]::new), "score")
             );
 
             int cols = data.cols.length;
@@ -265,9 +242,9 @@ public class Optimize<X> {
                 float[] r = new float[cols];
                 int i = 0;
                 for (double x : exp.getTwo()) {
-                    r[i++] = (float)x;
+                    r[i++] = (float) x;
                 }
-                r[i] = (float)exp.getOne();
+                r[i] = (float) exp.getOne();
                 data.add(r);
             }
 
