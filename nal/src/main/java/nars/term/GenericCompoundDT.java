@@ -139,7 +139,7 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
             }
         } else {
 
-            return Compound.equals(this, that);
+            return Compound.equals(this, (Term)that);
         }
     }
 

@@ -290,7 +290,7 @@ public interface Termlike {
      * counts subterms matching the predicate
      */
     default int subs(Predicate<Term> match) {
-        return intify((c, sub) -> sub == null ? 0 : c + 1);
+        return intify((c, sub) -> sub == null ? 0 : c + 1, 0);
     }
 
     /**

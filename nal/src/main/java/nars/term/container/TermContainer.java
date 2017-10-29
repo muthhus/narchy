@@ -874,12 +874,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     default boolean recurseSubTerms(BiPredicate<Term, Term> whileTrue, Compound parent) {
-        int s = subs();
-        for (int i = 0; i < s; i++) {
-            if (!sub(i).recurseTerms(whileTrue, parent))
-                return false;
-        }
-        return true;
+        return AND(x -> x.recurseTerms(whileTrue, parent));
+//        int s = subs();
+//        for (int i = 0; i < s; i++) {
+//            if (!sub(i).recurseTerms(whileTrue, parent))
+//                return false;
+//        }
+//        return true;
     }
 
     @Override

@@ -146,7 +146,7 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     }
 
     @Override
-    public void append(@NotNull Appendable w) throws IOException {
+    public void append(Appendable w) throws IOException {
         ref.append(w);
     }
 

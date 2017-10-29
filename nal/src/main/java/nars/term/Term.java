@@ -408,7 +408,7 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
 
-    void append(@NotNull Appendable w) throws IOException;
+    void append(Appendable w) throws IOException;
 
 //    default public void append(Writer w, boolean pretty) throws IOException {
 //        //try {

@@ -121,7 +121,7 @@ public class GenericCompound implements Compound {
         if (!(that instanceof Term) || hash != that.hashCode())
             return false;
 
-        if (Compound.equals(this, that)) {
+        if (Compound.equals(this, (Term)that)) {
             if (that instanceof GenericCompound) {
                 equivalent((GenericCompound)that);
             }

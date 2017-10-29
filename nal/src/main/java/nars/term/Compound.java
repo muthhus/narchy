@@ -57,10 +57,9 @@ import static nars.time.Tense.XTERNAL;
 public interface Compound extends Term, IPair, TermContainer {
 
 
-    static boolean equals(/*@NotNull*/ Term a, @Nullable Object b) {
-        assert (a != b) : "instance check should have already been performed before calling this";
+    static boolean equals(/*@NotNull*/ Term a, @Nullable Term bb) {
+        assert (a != bb) : "instance check should have already been performed before calling this";
 
-        Term bb = (Term) b;
 
         return
                 (a.subterms().equals(bb.subterms()))
@@ -404,6 +403,21 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default int varIndep() {
         return subterms().varIndep();
+    }
+
+    @Override
+    default boolean hasVarQuery() {
+        return hasAny(Op.VAR_QUERY);
+    }
+
+    @Override
+    default boolean hasVarDep() {
+        return hasAny(Op.VAR_DEP);
+    }
+
+    @Override
+    default boolean hasVarIndep() {
+        return hasAny(Op.VAR_INDEP);
     }
 
     @Override

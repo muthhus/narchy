@@ -85,7 +85,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         if (!(that instanceof Compound) || hash!=that.hashCode())
             return false;
 
-        return Compound.equals(this, that);
+        return Compound.equals(this, (Term)that);
 //
 //        if (hash == that.hashCode()) {
 //            Term t = (Term)that;

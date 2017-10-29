@@ -1,5 +1,6 @@
 package nars.term.compound;
 
+import jcog.Util;
 import nars.Builder;
 import nars.IO;
 import nars.Op;
@@ -47,6 +48,9 @@ public class FastCompound implements Compound {
 
 
     public static FastCompound get(Compound c) {
+        if (c instanceof FastCompound)
+            return ((FastCompound)c);
+
         ObjectByteHashMap<Term> atoms = new ObjectByteHashMap();
         UncheckedBytes skeleton = new UncheckedBytes(Bytes.wrapForWrite(new byte[128]));
 
@@ -230,17 +234,23 @@ public class FastCompound implements Compound {
         return IO.Printer.stringify(this).toString();
     }
 
-    public Term sub(byte i, int containerOffset) {
 
-        int subOffset = subtermOffsetAt(i, containerOffset);
-        Op opAtSub = Op.values()[skeleton[subOffset]];
+    /** subterm, or sub-subterm, etc. */
+    public Term term(int offset) {
+        Op opAtSub = ov[skeleton[offset]];
         if (opAtSub.atomic) {
-            return IO.termFromBytes(atoms[skeleton[subOffset + 1]]);
+            return IO.termFromBytes(atoms[skeleton[offset + 1]]);
         } else {
             //TODO sub view
             //return opAtSub.the(DTERNAL, subs(subOffset));
-            return new GenericCompound(opAtSub, Builder.Subterms.the.apply(new SubtermView(this, subOffset).theArray()));
+            return new GenericCompound(opAtSub, Builder.Subterms.the.apply(new SubtermView(this, offset).theArray()));
         }
+    }
+
+    public Term sub(byte i, int containerOffset) {
+
+        int subOffset = subtermOffsetAt(i, containerOffset);
+        return term(subtermOffsetAt(i, containerOffset));
 
     }
 
@@ -250,7 +260,7 @@ public class FastCompound implements Compound {
         byte bb = (byte) b.length;
         Term[] t = new Term[bb];
         for (byte i = 0; i < bb; i++) {
-            t[i] = sub(i, offset);
+            t[i] = term(b[i]);
         }
         return t;
     }
@@ -270,7 +280,8 @@ public class FastCompound implements Compound {
 
         @Override
         public int hashCode() {
-            throw new UnsupportedOperationException();
+            return intify((i,t)-> Util.hashCombine(t.hashCode(), i), 1);
+            //throw new UnsupportedOperationException();
         }
 
 
