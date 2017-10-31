@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.XTERNAL;
 
 /**
  * Compound inheriting directly from TermVector1

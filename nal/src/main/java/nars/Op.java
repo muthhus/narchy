@@ -370,15 +370,15 @@ public enum Op {
             assert (u.length > 1 && (dt == 0 || dt == DTERNAL)); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
 
-            //simple accelerated case:
-            if (u.length == 2 && !u[0].hasAny(CONJ) && !u[1].hasAny(CONJ)) { //if it's simple
-
-                //already checked in callee
-                //if (u[0].unneg().equals(u[1].unneg()))
-                //    return False; //co-neg
-
-                return Op.implInConjReduction(compound(CONJ, dt, u));
-            }
+//            //simple accelerated case:
+//            if (u.length == 2 && !u[0].hasAny(CONJ) && !u[1].hasAny(CONJ)) { //if it's simple
+//
+//                //already checked in callee
+//                //if (u[0].unneg().equals(u[1].unneg()))
+//                //    return False; //co-neg
+//
+//                return Op.implInConjReduction(compound(CONJ, dt, u));
+//            }
 
 
             ObjectByteHashMap<Term> s = new ObjectByteHashMap<>(u.length);
@@ -610,6 +610,7 @@ public enum Op {
      */
     //SUBTERMS("...", 1, OpType.Other)
     ;
+
 
     private static boolean conegated(Term a, Term b) {
         Term ua = a.unneg();
@@ -1056,6 +1057,7 @@ public enum Op {
                 pp = sps[0];
             else {
                 pp = compound(CONJ, 0, sps); //direct
+                //pp = CONJ.the(0, sps);
             }
             if (pp instanceof Bool) {
                 cut[0] = pp;
@@ -1235,7 +1237,8 @@ public enum Op {
         }
 
 
-        return compound(CONJ, dt, left, right);
+        return implInConjReduction(compound(CONJ, dt, left, right));
+        //return CONJ.the(dt, left, right);
 
     }
 

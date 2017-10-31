@@ -151,6 +151,7 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals("((--,(P))<->(Q))", $("((--,(P))<->(Q))").toString()); //NO change
     }
 
+
 //    @Test
 //    public void testEquivalenceNegatedSubterms() throws Narsese.NarseseException {
 //        assertEquals(("(--,((P)<=>(Q)))"), $("((P)<=>(--,(Q)))").toString());
@@ -340,6 +341,14 @@ public class TermReductionsTest extends NarseseTest {
     public void testDisjunctEqual() {
         @NotNull Term pp = p(this.p);
         assertEquals(pp, disj(pp, pp));
+    }
+
+    @Test
+    public void testDisjReduction1() {
+        //"(||,R,R) |- R"
+        Term x = $.the("x");
+        assertEquals(x, $.disj(x, x));
+        assertEquals(x, CONJ.the(DTERNAL, x.neg(), x.neg()  ).neg());
     }
 
     @Disabled
@@ -1156,6 +1165,7 @@ public class TermReductionsTest extends NarseseTest {
                 $("((y &| x) ==> (y &| z))").toString()
         );
     }
+
     @Test
     public void testReducibleImplFactored2() throws Narsese.NarseseException {
         assertEquals("((x&&y)==>z)",
@@ -1188,9 +1198,10 @@ public class TermReductionsTest extends NarseseTest {
                 $("((--,$1)=|>((--,$1)&|(--,#2)))").toString()
         );
     }
+
     @Test
     public void testReducibleImplConjCoNeg() throws Narsese.NarseseException {
-        for (String i : new String[] { "==>", "=|>"}) {
+        for (String i : new String[]{"==>", "=|>"}) {
             for (String c : new String[]{"&&", "&|"}) {
                 assertEquals(Null,
                         $("(x " + i + " (y " + c + " --x))")

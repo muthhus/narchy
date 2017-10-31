@@ -8,7 +8,6 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;

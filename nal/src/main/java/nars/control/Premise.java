@@ -4,7 +4,6 @@
  */
 package nars.control;
 
-import jcog.pri.PLink;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -14,8 +13,6 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.Unify;
 import nars.term.subst.UnifySubst;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -199,13 +196,14 @@ public class Premise  {
 
 
         if (belief != null) {
-            beliefTerm = belief.term(); //use the belief's actual possibly-temporalized term
+            beliefTerm = belief.term().unneg(); //use the belief's actual possibly-temporalized term
 
             if (belief.equals(task)) { //do not repeat the same task for belief
                 belief = null; //force structural transform; also prevents potential inductive feedback loop
             }
         }
 
+        assert (!(beliefTerm instanceof Bool));
 
         d.set(this, belief, beliefTerm);
         return d;

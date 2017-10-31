@@ -2,11 +2,7 @@ package nars.perf;
 
 import jcog.Optimize;
 import nars.nal.nal1.NAL1MultistepTest;
-import nars.nal.nal1.NAL1Test;
-import nars.nal.nal6.NAL6Test;
 import nars.util.NALTest;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 
 public class NARTestOptimize {
 

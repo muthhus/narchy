@@ -551,7 +551,7 @@ public enum Terms {
         int l = modified.length;
         Term[] u = new Term[l];
         for (int i = 0; i < l; i++) {
-            u[i] = NEG.the(modified[i]);
+            u[i] = modified[i].neg();
         }
         return u;
     }

@@ -5,7 +5,6 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.WorkHandler;
 import com.lmax.disruptor.dsl.Disruptor;
 import jcog.exe.AffinityExecutor;
-import nars.NAR;
 import nars.Task;
 import nars.task.ITask;
 import nars.task.NativeTask;

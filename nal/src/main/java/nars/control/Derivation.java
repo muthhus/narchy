@@ -20,7 +20,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.Bool;
 import nars.term.subst.Unify;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -289,8 +288,7 @@ public class Derivation extends Unify {
 
         this.belief = belief;
 
-        Term bt = beliefTerm.unneg();
-        assert (!(bt instanceof Bool));
+
 
         this.concOcc[0] = this.concOcc[1] = ETERNAL;
 
@@ -298,11 +296,11 @@ public class Derivation extends Unify {
 //        if (ttv > 0 && bt.vars() > 0) {
 //            bt = bt.normalize(ttv); //shift variables up to be unique compared to taskTerm's
 //        }
-        this.beliefTerm = bt;
+        this.beliefTerm = beliefTerm;
         this.parentComplexity =
                 //Util.sum(
                 Math.max(
-                        taskTerm.complexity(), bt.complexity()
+                        taskTerm.complexity(), beliefTerm.complexity()
                 );
 
 
