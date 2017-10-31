@@ -46,13 +46,18 @@ public class CompactArrayMap<K, V> extends FasterList {
         return null;
     }
 
+    @Override
+    public int size() {
+        throw new UnsupportedOperationException();
+    }
+
     public void put(K key, V value) {
         synchronized (this) {
             Object[] a = items;
             if (a == null) {
                 this.items = new Object[] { key, value };
             } else {
-                int s = size;
+                int s = a.length;
                 for (int i = 0; i < s; ) {
                     if (keyEquals(a[i], key)) {
                         a[i + 1] = value; //directly modify
@@ -103,14 +108,14 @@ public class CompactArrayMap<K, V> extends FasterList {
     @Override
     public void clear() {
         synchronized(this) {
-            clearFast();
+            items = null;
         }
     }
 
     public void clearExcept(K key) {
         synchronized(this) {
             V exist = get(key);
-            clearFast();
+            clear();
             if (exist!=null)
                 put(key, exist);
         }
@@ -118,7 +123,7 @@ public class CompactArrayMap<K, V> extends FasterList {
 
     public void clearPut(K key, V value) {
         synchronized(this) {
-            clearFast();
+            clear();
             if (value!=null)
                 put(key, value);
         }
