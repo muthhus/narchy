@@ -247,6 +247,7 @@ public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Ta
 
         if (!task.term().equals(term)) {
             if (term.toString().equals(task.term().toString())) {
+//                task.term().equals(term); //TEMPORARY FOR DEBUG
                 throw new RuntimeException("term construction problem: " + term + " .toString() is equal to " + task.term() + " but inequal otherwise");
             }
             return false;

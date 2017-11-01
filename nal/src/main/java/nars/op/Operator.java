@@ -40,7 +40,7 @@ public class Operator extends BaseConcept implements PermanentConcept {
 
     public final BiFunction<Task, NAR, Task> execute;
 
-    public Operator(@NotNull Atom atom, BiFunction<Task, NAR, Task> execute, NAR n) {
+    public Operator(Atom atom, BiFunction<Task, NAR, Task> execute, NAR n) {
         super(atom, n);
         this.execute = execute;
     }

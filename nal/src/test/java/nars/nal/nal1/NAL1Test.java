@@ -17,22 +17,8 @@ public class NAL1Test extends NALTest {
     }
 
     @Override protected NAR nar() {
-//          Builder.Compound.the = new BiFunction<Op, Term[], Term>() {
-//            @Override public Term apply(Op op, Term[] terms) {
-//                GenericCompound g = new GenericCompound(op, Op.subterms(terms));
-//                try {
-//
-//                    if ((g.complexity() < 4) && (!g.isTemporal()))
-//                        return FastCompound.get(g);
-//                    else
-//                        return g;
-//
-//                } catch (Throwable t) {
-//                    return g;
-//                }
-//            }
-//        };
-        return NARS.tmp(1); }
+        return NARS.tmp(1);
+    }
 
 //    static {
 //        Param.TRACE = true;

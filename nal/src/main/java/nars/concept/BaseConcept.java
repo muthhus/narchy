@@ -32,7 +32,6 @@ import static nars.concept.state.ConceptState.New;
  */
 public class BaseConcept implements Concept {
 
-    @NotNull
     public final Term term;
 
     protected final BeliefTable beliefs;
@@ -40,18 +39,15 @@ public class BaseConcept implements Concept {
     protected final QuestionTable quests;
     protected final QuestionTable questions;
 
-    @NotNull
     public final Bag<Task, PriReference<Task>> taskLinks;
-    @NotNull
     public final Bag<Term, PriReference<Term>> termLinks;
-    @NotNull
     public transient ConceptState state = Deleted;
     private final List<Termed> templates;
 
     protected final CompactArrayMap<String, Object> meta = new CompactArrayMap<>();
 
 
-    public BaseConcept(@NotNull Term term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder conceptBuilder) {
+    public BaseConcept(Term term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder conceptBuilder) {
         this(term,
                 beliefs != null ? beliefs : conceptBuilder.newBeliefTable(term, true),
                 goals != null ? goals : conceptBuilder.newBeliefTable(term, false),
@@ -65,10 +61,10 @@ public class BaseConcept implements Concept {
      * @param termLinks
      * @param taskLinks
      */
-    public BaseConcept(@NotNull Term term,
+    public BaseConcept(Term term,
                        BeliefTable beliefs, BeliefTable goals,
                        QuestionTable questions, QuestionTable quests,
-                       @NotNull Bag[] bags) {
+                       Bag[] bags) {
         assert (term.op().conceptualizable);
         this.term = term;
         this.termLinks = bags[0];
@@ -81,6 +77,21 @@ public class BaseConcept implements Concept {
 
         templates = TermLinks.templates(term);
     }
+
+    /**
+     * used for setting an explicit OperationConcept instance via java; activates it on initialization
+     */
+    public BaseConcept(Term term, NAR n) {
+        this(term, n.terms.conceptBuilder);
+    }
+
+
+    public BaseConcept(Term term,  ConceptBuilder b) {
+        this(term, b.newBeliefTable(term, true), b.newBeliefTable(term, false),
+                b.newQuestionTable(term, true), b.newQuestionTable(term, false),
+                b.newLinkBags(term));
+    }
+
 
 
 //    @Override
@@ -107,7 +118,7 @@ public class BaseConcept implements Concept {
 
 
     @Override
-    public @NotNull Bag<Task, PriReference<Task>> tasklinks() {
+    public Bag<Task, PriReference<Task>> tasklinks() {
         return taskLinks;
     }
 
@@ -123,33 +134,17 @@ public class BaseConcept implements Concept {
         return templates;
     }
 
-    /**
-     * used for setting an explicit OperationConcept instance via java; activates it on initialization
-     */
-    public BaseConcept(@NotNull Term term, @NotNull NAR n) {
-        this(term, n.terms.conceptBuilder);
-    }
-
-
-    public BaseConcept(@NotNull Term term, @NotNull ConceptBuilder b) {
-        this(term, b.newBeliefTable(term, true), b.newBeliefTable(term, false),
-                b.newQuestionTable(term, true), b.newQuestionTable(term, false),
-                b.newLinkBags(term));
-    }
-
     @Override
     public final ConceptState state() {
         return state;
     }
 
     @Override
-    @NotNull
     public QuestionTable quests() {
         return quests;
     }
 
     @Override
-    @NotNull
     public QuestionTable questions() {
         return questions;
     }
@@ -159,7 +154,6 @@ public class BaseConcept implements Concept {
      * and insertion in the middle
      */
     @Override
-    @NotNull
     public BeliefTable beliefs() {
         return beliefs;
     }
@@ -168,7 +162,6 @@ public class BaseConcept implements Concept {
      * Desire values on the term, similar to the above one
      */
     @Override
-    @NotNull
     public BeliefTable goals() {
         return goals;
     }
@@ -182,7 +175,7 @@ public class BaseConcept implements Concept {
 
 
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         return this == obj || (obj instanceof Termed && term.equals(((Termed) obj).term()));
     }
 
@@ -253,7 +246,7 @@ public class BaseConcept implements Concept {
 
 
     @Override
-    public ConceptState state(@NotNull ConceptState p) {
+    public ConceptState state(ConceptState p) {
         ConceptState current = this.state;
         if (current != p) {
             this.state = p;
@@ -348,7 +341,7 @@ public class BaseConcept implements Concept {
         if (includeConceptQuests && quests!=null) quests.forEachTask(each);
     }
 
-    public void forEachTask(@NotNull Consumer<Task> each) {
+    public void forEachTask(Consumer<Task> each) {
         if (beliefs!=null) beliefs.forEachTask(each);
         if (questions!=null) questions.forEachTask(each);
         if (goals!=null) goals.forEachTask(each);

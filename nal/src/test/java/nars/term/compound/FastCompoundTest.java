@@ -1,11 +1,16 @@
 package nars.term.compound;
 
-import nars.Narsese;
+import nars.*;
+import nars.nal.nal1.NAL1Test;
 import nars.term.Compound;
+import nars.term.Term;
 import org.junit.jupiter.api.Test;
+
+import java.util.function.BiFunction;
 
 import static nars.$.$;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class FastCompoundTest {
@@ -45,6 +50,9 @@ public class FastCompoundTest {
 
     static void assertEquivalent(Compound c) {
         FastCompound f = FastCompound.get(c);
+        assertTrue(f!=c,
+                ()->"identical, nothing is being tested");
+
         assertEquals(c.op(), f.op());
         assertEquals(c.subs(), f.subs());
         int s = f.subterms().subs();
@@ -56,6 +64,10 @@ public class FastCompoundTest {
         assertEquals(c.complexity(), f.complexity());
         assertEquals(c.volume(), f.volume());
         assertEquals(c.toString(), f.toString());
+        assertEquals(c, f);
+        assertEquals(f, c);
+        assertEquals(0, f.compareTo(c));
+        assertEquals(0, c.compareTo(f));
 
 //        f.print();
     }

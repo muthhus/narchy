@@ -144,10 +144,12 @@ public enum TermLinks {
         assert(!(srcTerm instanceof Bool));
         assert(!(targetTerm instanceof Bool));
 
+
         boolean reverseLinked = false;
         if (!srcTerm.equals(targetTerm)) {
             Concept c = nar.conceptualize(target);
             if (c != null) {
+                targetTerm = c.term();
                 c.termlinks().put(
                         new PLink(srcTerm, priReverse), refund
                 );

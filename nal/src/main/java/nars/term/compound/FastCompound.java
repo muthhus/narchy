@@ -13,6 +13,10 @@ import org.eclipse.collections.api.block.function.primitive.ByteFunction0;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.function.BiFunction;
 
 import static nars.time.Tense.DTERNAL;
 
@@ -49,7 +53,7 @@ public class FastCompound implements Compound {
 
     public static FastCompound get(Compound c) {
         if (c instanceof FastCompound)
-            return ((FastCompound)c);
+            return ((FastCompound) c);
 
         ObjectByteHashMap<Term> atoms = new ObjectByteHashMap();
         UncheckedBytes skeleton = new UncheckedBytes(Bytes.wrapForWrite(new byte[128]));
@@ -235,7 +239,9 @@ public class FastCompound implements Compound {
     }
 
 
-    /** subterm, or sub-subterm, etc. */
+    /**
+     * subterm, or sub-subterm, etc.
+     */
     public Term term(int offset) {
         Op opAtSub = ov[skeleton[offset]];
         if (opAtSub.atomic) {
@@ -265,6 +271,35 @@ public class FastCompound implements Compound {
         return t;
     }
 
+    @Override
+    public boolean equals(@Nullable Object that) {
+        if (this == that) return true;
+
+        if (!(that instanceof Term) || hash != that.hashCode())
+            return false;
+
+        if (that instanceof FastCompound) {
+            FastCompound f = (FastCompound)that;
+            int aa = atoms.length;
+            if (aa == f.atoms.length) {
+                if (Arrays.equals(skeleton, f.skeleton)) {
+                    for (int i = 0; i < aa; i++)
+                        if (!Arrays.equals(atoms[i], f.atoms[i]))
+                            return false;
+                    return true;
+                }
+            }
+        } else {
+            if (Compound.equals(this, (Term) that)) {
+                //            if (that instanceof GenericCompound) {
+                //                equivalent((GenericCompound)that);
+                //            }
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static class SubtermView implements TermContainer {
         private final FastCompound c;
 
@@ -279,8 +314,16 @@ public class FastCompound implements Compound {
         }
 
         @Override
+        public boolean equals(Object obj) {
+            return
+                (this == obj)
+                        ||
+                (obj instanceof TermContainer) && equalTerms(((TermContainer) obj).theArray());
+        }
+
+        @Override
         public int hashCode() {
-            return intify((i,t)-> Util.hashCombine(t.hashCode(), i), 1);
+            return intify((i, t) -> Util.hashCombine(t.hashCode(), i), 1);
             //throw new UnsupportedOperationException();
         }
 
@@ -321,4 +364,22 @@ public class FastCompound implements Compound {
             return subs;
         }
     }
+
+    /**
+     * for use in: Builder.Compound.the
+     */
+    public static final BiFunction<Op, Term[], Term> FAST_COMPOUND_BUILDER = (op, terms) -> {
+        GenericCompound g = new GenericCompound(op, Op.subterms(terms));
+        try {
+
+            if (!g.isTemporal())
+                return get(g);
+            else
+                return g;
+
+        } catch (Throwable t) {
+            return g;
+        }
+    };
+
 }
