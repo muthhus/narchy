@@ -2,6 +2,7 @@ package nars.term.container;
 
 import jcog.list.ArrayIterator;
 import nars.term.Term;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -91,6 +92,12 @@ public class ArrayTermVector extends TermVector {
         return false;
     }
 
+
+    public final int intify(IntObjectToIntFunction<Term> reduce, int v) {
+        for (Term x : terms)
+            v = reduce.intValueOf(v, x);
+        return v;
+    }
 
     @Override
     /*@NotNull*/ public final Term sub(int i) {

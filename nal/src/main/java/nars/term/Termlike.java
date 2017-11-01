@@ -103,7 +103,7 @@ public interface Termlike {
      * WARNING currently this does not detect presence of pattern variables
      */
     default boolean hasAny(/*@NotNull*/ Op op) {
-        return (op == Op.VAR_PATTERN) ? (varPattern() > 0) : hasAny(op.bit);
+        return hasAny(op.bit);
     }
 
     default boolean impossibleSubTerm(/*@NotNull*/Termlike target) {
@@ -263,19 +263,19 @@ public interface Termlike {
      * # of contained dependent variables in subterms (1st layer only)
      */
     default int varDep() {
-        return intify((c, x) -> c + x.varDep(), 0);
+        return hasAny(Op.VAR_DEP) ? intify((c, x) -> c + x.varDep(), 0) : 0;
     }
 
     default int varIndep() {
-        return intify((c, x) -> c + x.varIndep(), 0);
-    }
-
-    default int varPattern() {
-        return intify((c, x) -> c + x.varPattern(), 0);
+        return hasAny(Op.VAR_INDEP) ? intify((c, x) -> c + x.varIndep(), 0) : 0;
     }
 
     default int varQuery() {
-        return intify((c,x) -> c+x.varQuery(), 0);
+        return hasAny(Op.VAR_QUERY) ? intify((c,x) -> c+x.varQuery(), 0) : 0;
+    }
+
+    default int varPattern() {
+        return /*hasAny(Op.VAR_PATTERN) ? */intify((c, x) -> c + x.varPattern(), 0)/* : 0*/;
     }
 
 //    default boolean unifyPossible(@Nullable Op t) {
@@ -343,28 +343,29 @@ public interface Termlike {
 //        return sub(i).equals(sub);
 //    }
 
-    /**
-     * if type is null, returns total # of variables
-     */
-    default int vars(@Nullable Op type) {
-        if (type == null)
-            return vars() + varPattern();
-
-        switch (type) {
-            case VAR_PATTERN:
-                return varPattern();
-            case VAR_QUERY:
-                return varQuery();
-            case VAR_DEP:
-                return varDep();
-            case VAR_INDEP:
-                return varIndep();
-            default:
-                throw new UnsupportedOperationException();
-        }
-
-
-    }
+//    /**
+//     * if type is null, returns total # of variables
+//     */
+//    default int vars(@Nullable Op type) {
+//        if (type == null)
+//            return vars() + varPattern();
+//
+//        switch (type) {
+//            case VAR_PATTERN:
+//                return varPattern();
+//            case VAR_QUERY:
+//                return varQuery();
+//            case VAR_DEP:
+//                return varDep();
+//            case VAR_INDEP:
+//                return varIndep();
+//            default:
+//                throw new UnsupportedOperationException();
+//        }
+//
+//
+//    }
 
 
 }
+

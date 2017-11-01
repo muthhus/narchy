@@ -92,17 +92,17 @@ public interface Term extends Termed, Comparable<Termed> {
     @Override
     int complexity();
 
-    @Override
-    int varPattern();
-
-    @Override
-    int varQuery();
-
-    @Override
-    int varIndep();
-
-    @Override
-    int varDep();
+//    @Override
+//    int varPattern();
+//
+//    @Override
+//    int varQuery();
+//
+//    @Override
+//    int varIndep();
+//
+//    @Override
+//    int varDep();
 
     @Override
     int structure();

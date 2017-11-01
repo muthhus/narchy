@@ -34,6 +34,7 @@ import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.Retemporalize;
 import nars.term.transform.VariableNormalization;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.LongObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
@@ -418,6 +419,11 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default boolean hasVarIndep() {
         return hasAny(Op.VAR_INDEP);
+    }
+
+    @Override
+    default int intify(IntObjectToIntFunction<Term> reduce, int v) {
+        return subterms().intify(reduce,v);
     }
 
     @Override

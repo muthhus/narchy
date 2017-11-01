@@ -308,9 +308,9 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
 //    }
 
 
-    @Override
-    public int vars(@Nullable Op type) {
-        return ref.vars(type);
-    }
+//    @Override
+//    public int vars(@Nullable Op type) {
+//        return ref.vars(type);
+//    }
 
 }

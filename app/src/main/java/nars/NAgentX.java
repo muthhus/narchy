@@ -9,6 +9,7 @@ import jcog.pri.mix.control.MixContRL;
 import nars.control.Cause;
 import nars.control.DurService;
 import nars.control.MetaGoal;
+import nars.control.Traffic;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
@@ -31,6 +32,7 @@ import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.ugens.*;
 import org.HdrHistogram.DoubleHistogram;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
@@ -519,7 +521,7 @@ abstract public class NAgentX extends NAgent {
                             r = 0;
                         }
 
-                        float t = Util.sum(p -> Math.abs(p.current + p.prev), c.goalValue) / 2f;
+                        float t = Util.sum(((FloatFunction<Traffic>) (p -> Math.abs(p.current + p.prev))), c.goalValue) / 2f;
 
                         b = Math.max(r, g) / 2f * Util.unitize(t);
 

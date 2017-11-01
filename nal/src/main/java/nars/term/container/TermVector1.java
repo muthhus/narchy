@@ -5,6 +5,7 @@ import jcog.Util;
 import nars.Op;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +37,11 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
+    public int intify(IntObjectToIntFunction<Term> reduce, int v) {
+        return sub.intify(reduce, v);
+    }
+
+    @Override
     public final boolean isTemporal() {
         return sub.isTemporal();
     }
@@ -57,7 +63,7 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public boolean equalTerms(@NotNull Term[] c) {
+    public boolean equalTerms(Term[] c) {
         return c.length == 1 && sub.equals(c[0]);
     }
 
@@ -80,7 +86,7 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public boolean subEquals(int i, @NotNull Term x) {
+    public boolean subEquals(int i, Term x) {
         return i == 0 && sub.equals(x);
     }
 
@@ -128,7 +134,7 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public void recurseTerms(@NotNull Consumer<Term> v) {
+    public void recurseTerms(Consumer<Term> v) {
         sub.recurseTerms(v);
     }
 
@@ -162,14 +168,14 @@ public class TermVector1 implements TermContainer {
 //    }
 
     @Override
-    public void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {
+    public void forEach(Consumer<? super Term> action, int start, int stop) {
         if (start != 0 || stop != 0)
             throw new ArrayIndexOutOfBoundsException();
         forEach(action);
     }
 
     @Override
-    public void forEach(@NotNull Consumer<? super Term> action) {
+    public void forEach(Consumer<? super Term> action) {
         action.accept(sub);
     }
 
@@ -181,17 +187,17 @@ public class TermVector1 implements TermContainer {
 
 
     @Override
-    public final boolean contains(@NotNull Term t) {
+    public final boolean contains(Term t) {
         return sub.equals(t);
     }
 
     @Override
-    public boolean OR(@NotNull Predicate<Term> p) {
+    public boolean OR(Predicate<Term> p) {
         return p.test(sub);
     }
 
     @Override
-    public boolean AND(@NotNull Predicate<Term> p) {
+    public boolean AND(Predicate<Term> p) {
         return p.test(sub);
     }
 
