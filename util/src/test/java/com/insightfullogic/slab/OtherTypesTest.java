@@ -37,7 +37,7 @@ public class OtherTypesTest {
 		assertEquals(15, value.getShort());
 		
 		value.setFloat(0.5f);
-		assertEquals(0.5f, value.getFloat(), 0.0f);
+		assertEquals(0.5f, value.getFloat(), 0.01f);
 		
 		value.setBool(true);
 		assertTrue(value.getBool());

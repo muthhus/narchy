@@ -15,6 +15,8 @@
  */
 package org.oakgp;
 
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.oakgp.function.Function;
 import org.oakgp.function.Signature;
@@ -281,14 +283,14 @@ public class NodeSimplifierTest {
             String simplifiedVersionString = writeNode(simplifiedVersion);
             for (Object[] assignedValue : assignedValues) {
                 Assignments assignments = new Assignments(assignedValue);
-                assertEquals(evaluate(inputNode, assignments), evaluate(simplifiedVersion, assignments), simplifiedVersionString);
+                Assertions.assertEquals(evaluate(simplifiedVersion, assignments), evaluate(inputNode, assignments));
             }
 
             // test actual simplified version matches expected
             Node expectedNode = readNode(expectedOutput);
             String expectedVersionString = writeNode(expectedNode);
-            assertEquals(expectedVersionString.length() + " vs. " + simplifiedVersionString.length(), expectedVersionString, simplifiedVersionString);
-            assertEquals(simplifiedVersionString, expectedNode.toString(), simplifiedVersion.toString());
+            assertEquals(expectedVersionString, simplifiedVersionString, ()->expectedVersionString.length() + " vs. " + simplifiedVersionString.length());
+            assertEquals(simplifiedVersionString, expectedNode.toString());
             assertEquals(expectedNode, simplifiedVersion);
         }
 

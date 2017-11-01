@@ -5,10 +5,8 @@ import nars.NAR;
 import nars.NARS;
 import nars.concept.SensorConcept;
 import nars.truth.Truth;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-
-import java.util.Arrays;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -30,7 +28,7 @@ public class CameraSensorTest {
             }
 
             @Override
-            protected int pixelWork(int work) {
+            protected int workToPixels(int work) {
                 return w*h; //all
             }
             //            @Override

@@ -48,16 +48,16 @@ public class TwoPlayerGameCacheTest {
         final TwoPlayerGameCache cache = new TwoPlayerGameCache(3, mockTwoPlayerGame);
 
         // test evaluate is only called once per node-pair
-        assertEquals(fitness1, cache.evaluate(n1, n2), 0);
-        assertEquals(-fitness1, cache.evaluate(n2, n1), 0);
-        assertEquals(-fitness1, cache.evaluate(n2, n1), 0);
-        assertEquals(fitness1, cache.evaluate(n1, n2), 0);
+        assertEquals(fitness1, cache.evaluate(n1, n2), 0.001f);
+        assertEquals(-fitness1, cache.evaluate(n2, n1), 0.001f);
+        assertEquals(-fitness1, cache.evaluate(n2, n1), 0.001f);
+        assertEquals(fitness1, cache.evaluate(n1, n2), 0.001f);
         assertEquals(1, evaluateCtr.get());
 
-        assertEquals(fitness2, cache.evaluate(n1, n3), 0);
-        assertEquals(-fitness2, cache.evaluate(n3, n1), 0);
-        assertEquals(fitness2, cache.evaluate(n1, n3), 0);
-        assertEquals(-fitness2, cache.evaluate(n3, n1), 0);
+        assertEquals(fitness2, cache.evaluate(n1, n3), 0.001f);
+        assertEquals(-fitness2, cache.evaluate(n3, n1), 0.001f);
+        assertEquals(fitness2, cache.evaluate(n1, n3), 0.001f);
+        assertEquals(-fitness2, cache.evaluate(n3, n1), 0.001f);
         assertEquals(2, evaluateCtr.get());
     }
 }

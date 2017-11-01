@@ -47,7 +47,7 @@ public class AIMATests {
     @Test
     public void testWeaponsDomain() throws Narsese.NarseseException {
 
-        n.truthResolution.set(0.05f);
+        n.truthResolution.set(0.02f);
         n.priDefault(QUESTION, 0.5f);
         n.priDefault(BELIEF, 0.3f);
 

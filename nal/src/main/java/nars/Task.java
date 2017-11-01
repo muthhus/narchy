@@ -16,8 +16,12 @@ import nars.task.util.InvalidTaskException;
 import nars.task.util.TaskRegion;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Bool;
 import nars.time.Tense;
-import nars.truth.*;
+import nars.truth.PreciseTruth;
+import nars.truth.Stamp;
+import nars.truth.Truth;
+import nars.truth.Truthed;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
@@ -238,6 +242,11 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
     @Nullable
     static NALTask clone(Task x, Term newContent) {
+        return clone(x, newContent, x.truth(), x.punc());
+    }
+
+    @Nullable
+    static NALTask clone(Task x, Term newContent, Truth newTruth, byte newPunc) {
 
         //TODO:
         //Task.tryTask()
@@ -248,12 +257,12 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
             newContent = newContent.unneg();
         }
 
-        if (!Task.taskContentValid(newContent, x.punc(), null, true)) {
+        if (!Task.taskContentValid(newContent, newPunc, null, true)) {
             return null;
         }
 
-        NALTask y = new NALTask(newContent, x.punc(),
-                x.isBeliefOrGoal() ? (DiscreteTruth) x.truth().negIf(negated) : null,
+        NALTask y = new NALTask(newContent, newPunc,
+                (newPunc == BELIEF || newPunc==GOAL)  ? newTruth.negIf(negated) : null,
                 x.creation(),
                 x.start(), x.end(),
                 x.stamp());
@@ -952,15 +961,22 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         Task t = this;
         if (!x.equals(y)) { //instances could have been substituted and this matters
 
-            if (y.hasAny(Op.BOOL))
-                return null;
+            Task result;
+            if (y instanceof Bool && isQuestOrQuestion()) {
+                //convert to implicit answer
+                byte p = isQuestion() ? BELIEF : GOAL;
+                result = clone(this, x.term(), $.t(y == True ? 1f : 0f, n.confDefault(p)), p);
+            } else {
+                if (y.hasAny(Op.BOOL))
+                    return null;
 
-            @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), !isInput() || !Param.DEBUG_EXTRA);
-                /* the evaluated result here acts as a memoization of possibly many results
-                   depending on whether the functor is purely static in which case
-                   it would be the only one.
-                 */
-            Task result = yy != null ? clone(this, yy.getOne().negIf(yy.getTwo())) : null;
+                @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), !isInput() || !Param.DEBUG_EXTRA);
+                    /* the evaluated result here acts as a memoization of possibly many results
+                       depending on whether the functor is purely static in which case
+                       it would be the only one.
+                     */
+                result = yy != null ? clone(this, yy.getOne().negIf(yy.getTwo())) : null;
+            }
 
             delete();
 
@@ -969,6 +985,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
             } else {
                 t = result;
             }
+
         }
 
         if (!cmd)

@@ -169,7 +169,7 @@ public class BuiltInExceptionsTestCase {
 		Struct validType = (Struct) info.getTerm("ValidType");
 		assertTrue(validType.isEqual(new Struct("integer")));
 		Double culprit = (Double) info.getTerm("Culprit");
-		assertEquals(1.5, culprit.doubleValue(), 0.0);
+		assertEquals(1.5, culprit.doubleValue(), 0.01);
 	}
 
 	// verifico che load_library(X) lancia un errore di instanziazione

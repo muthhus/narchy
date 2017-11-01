@@ -4,7 +4,6 @@ import nars.Task;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * dimensions:

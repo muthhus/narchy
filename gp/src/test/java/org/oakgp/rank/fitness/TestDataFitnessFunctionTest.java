@@ -49,7 +49,7 @@ public class TestDataFitnessFunctionTest {
         double result = fitnessFunction.evaluate(mockNode);
 
         // assert result
-        assertEquals(8d, result, 0d);
+        assertEquals(8d, result, 0.001d);
     }
 
     @Test
@@ -82,6 +82,6 @@ public class TestDataFitnessFunctionTest {
         double result = fitnessFunction.evaluate(mockNode);
 
         // assert result
-        assertEquals(4d, result, 0d);
+        assertEquals(4d, result, 0.001d);
     }
 }

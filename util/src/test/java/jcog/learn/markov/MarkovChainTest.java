@@ -53,7 +53,7 @@ public class MarkovChainTest {
         );
 
         TreeSet<String> sentences = new TreeSet();
-        int ii = 15;
+        int ii = 20;
         for (int i = 0; i < ii; i++) {
             long start = System.currentTimeMillis();
 
@@ -67,7 +67,7 @@ public class MarkovChainTest {
             System.out.println(s + "\t" + (end - start) + " ms");
         }
 
-        assertTrue(sentences.size() > (ii / 5), "unique sentences");
+        assertTrue(sentences.size() >= (ii / 5), "unique sentences");
 
     }
 

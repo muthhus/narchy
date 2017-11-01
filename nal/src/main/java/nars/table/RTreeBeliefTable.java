@@ -3,7 +3,6 @@ package nars.table;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import jcog.Util;
-import jcog.bloom.LongBitsetBloomFilter;
 import jcog.pri.Prioritized;
 import jcog.sort.TopN;
 import jcog.tree.rtree.*;
@@ -36,7 +35,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static jcog.bloom.LongBitsetBloomFilter.intToByteArrayLE;
 import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 import static nars.time.Tense.ETERNAL;
 

@@ -69,8 +69,13 @@ public class GoalActionConcept extends ActionConcept {
     public Stream<ITask> update(long now, int dur, NAR nar) {
 
 
-        long pStart = now;
-        long pEnd = now + dur/2;
+        long pStart =
+                //now;
+                now - dur/2;
+        long pEnd =
+                //now;
+                now + dur/2;
+
         LongSupplier stamper = nar.time::nextStamp;
 
 

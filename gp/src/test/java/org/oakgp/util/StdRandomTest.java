@@ -30,9 +30,9 @@ public class StdRandomTest {
         assertEquals(javaUtilRandom.nextInt(1000), adapter.nextInt(1000));
         assertEquals(javaUtilRandom.nextInt(Integer.MAX_VALUE), adapter.nextInt(Integer.MAX_VALUE));
 
-        assertEquals(javaUtilRandom.nextDouble(), adapter.nextDouble(), 0);
-        assertEquals(javaUtilRandom.nextDouble(), adapter.nextDouble(), 0);
-        assertEquals(javaUtilRandom.nextDouble(), adapter.nextDouble(), 0);
+        assertEquals(javaUtilRandom.nextDouble(), adapter.nextDouble(), 0.001);
+        assertEquals(javaUtilRandom.nextDouble(), adapter.nextDouble(), 0.001);
+        assertEquals(javaUtilRandom.nextDouble(), adapter.nextDouble(), 0.001);
 
         assertEquals(javaUtilRandom.nextBoolean(), adapter.nextBoolean());
         assertEquals(javaUtilRandom.nextBoolean(), adapter.nextBoolean());

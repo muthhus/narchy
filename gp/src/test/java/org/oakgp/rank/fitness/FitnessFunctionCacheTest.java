@@ -47,12 +47,12 @@ public class FitnessFunctionCacheTest {
         final FitnessFunctionCache cache = new FitnessFunctionCache(3, mockFitnessFunction);
 
         // test evaluate is only called once per node
-        assertEquals(fitness1, cache.evaluate(n1), 0);
+        assertEquals(fitness1, cache.evaluate(n1), 0.001f);
         assertEquals(1, evaluateCtr.get());
-        assertEquals(fitness2, cache.evaluate(n2), 0);
+        assertEquals(fitness2, cache.evaluate(n2), 0.001f);
         assertEquals(2, evaluateCtr.get());
-        assertEquals(fitness1, cache.evaluate(n1), 0);
-        assertEquals(fitness2, cache.evaluate(n2), 0);
+        assertEquals(fitness1, cache.evaluate(n1), 0.001f);
+        assertEquals(fitness2, cache.evaluate(n2), 0.001f);
         assertEquals(2, evaluateCtr.get());
     }
 }

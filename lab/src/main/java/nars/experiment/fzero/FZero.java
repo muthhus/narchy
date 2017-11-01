@@ -9,7 +9,6 @@ import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.$.p;
 import static spacegraph.SpaceGraph.window;
 
 /**
@@ -265,7 +264,7 @@ public class FZero extends NAgentX {
     }
 
     public void initBipolar() {
-        actionBipolar(p("fwd"), (f) -> {
+        actionBipolar($.the("fwd"), (f) -> {
             //if (f > 0) {
             //accelerator
             //if (f > 0.5f)
@@ -280,7 +279,7 @@ public class FZero extends NAgentX {
             return f;
         });//.resolution.setValue(0.02f);
 
-        actionBipolar($.p("x"), (x) -> {
+        actionBipolar($.the("x"), (x) -> {
             fz.playerAngle += (x) * rotSpeed;
             return x;
         });

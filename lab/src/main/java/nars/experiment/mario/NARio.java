@@ -169,7 +169,8 @@ public class NARio extends NAgentX {
     }
 
     public void initBipolar() {
-        actionBipolar($.inh($.the("x"), id), (x) -> {
+        //actionBipolar($.inh($.the("x"), id), (x) -> {
+        actionBipolar($.the("x"), (x) -> {
             float thresh = 0.2f;
             float thresh2 = 0.9f;
             if (x <= -thresh) {
@@ -195,7 +196,8 @@ public class NARio extends NAgentX {
                 //return Float.NaN;
             }
         });
-        actionBipolar($.inh($.the("y"), id), (y) -> {
+        //actionBipolar($.inh($.the("y"), id), (y) -> {
+        actionBipolar($.the("y"), (y) -> {
             float thresh = 0.2f;
             if (y <= -thresh) {
                 mario.scene.key(Mario.KEY_DOWN, true);

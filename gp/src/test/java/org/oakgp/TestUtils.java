@@ -178,7 +178,7 @@ public class TestUtils {
 
     public static void assertRankedCandidate(RankedCandidate actual, Node expectedNode, double expectedFitness) {
         assertSame(expectedNode, actual.getNode());
-        assertEquals(expectedFitness, actual.getFitness(), 0);
+        assertEquals(expectedFitness, actual.getFitness(), 0.001f);
     }
 
     public static void assertNodeEquals(String expected, Node actual) {

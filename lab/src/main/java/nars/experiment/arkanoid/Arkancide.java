@@ -3,8 +3,8 @@ package nars.experiment.arkanoid;
 
 import jcog.data.FloatParam;
 import nars.*;
-import nars.video.BufferedImageBitmap2D;
 import nars.util.signal.CameraSensor;
+import nars.video.BufferedImageBitmap2D;
 import nars.video.Scale;
 import nars.video.SwingBitmap2D;
 

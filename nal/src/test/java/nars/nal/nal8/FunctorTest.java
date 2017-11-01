@@ -61,7 +61,7 @@ public class FunctorTest {
         t.log();
         t.believe("((complexity($1)<->3)==>c3($1))");
         t.ask("c3(x:y)");
-        t.mustBelieve(512, "c3(x:y)", 1f, 0.81f);
+        t.mustBelieve(1024, "c3(x:y)", 1f, 0.81f);
         t.test(true);
     }
 
@@ -69,7 +69,7 @@ public class FunctorTest {
     public void testFunctor2() throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        int TIME = 2048;
+        int TIME = 4096;
         TestNAR t = new TestNAR(NARS.tmp());
 
         Param.DEBUG = true; t.log();

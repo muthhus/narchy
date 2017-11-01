@@ -29,7 +29,7 @@ public class RankedCandidateTest {
         double f = 7.5;
         RankedCandidate a = new RankedCandidate(n, f);
         assertSame(n, a.getNode());
-        assertEquals(f, a.getFitness(), 0);
+        assertEquals(f, a.getFitness(), 0.001f);
     }
 
     @Test

@@ -170,19 +170,19 @@ public class NAL5Test extends NALTest {
 
     @Test
     public void anonymous_analogy1_pos3() {
-        TestNAR tester = test;
-        tester.log();
-        tester.believe("(&&, x, y, z)");
-        tester.believe("x", 0.80f, 0.9f);
-        tester.mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.43f);
+
+        test
+                .believe("(&&, x, y, z)")
+                .believe("x", 0.80f, 0.9f)
+                .mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.43f);
     }
 
     @Test
     public void anonymous_analogy1_neg2() {
-        TestNAR tester = test;
-        tester.believe("(&&, --x, y, z)");
-        tester.believe("x", 0.20f, 0.9f);
-        tester.mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.43f /*0.43f*/);
+        test
+                .believe("(&&, --x, y, z)")
+                .believe("x", 0.20f, 0.9f)
+                .mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.43f /*0.43f*/);
     }
 
     @Test
@@ -259,8 +259,11 @@ public class NAL5Test extends NALTest {
     }
 
 
-    /** not sure this one makes logical sense */
-    @Disabled @Test
+    /**
+     * not sure this one makes logical sense
+     */
+    @Disabled
+    @Test
     public void compound_composition_one_premises() throws nars.Narsese.NarseseException {
 
         TestNAR tester = test;

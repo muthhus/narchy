@@ -10,6 +10,7 @@ import nars.Task;
 import nars.control.BatchActivation;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -57,24 +58,22 @@ public enum TermLinks {
             case VAR_QUERY:
             case VAR_DEP:
             case VAR_INDEP:
-                return; //NO
-                //break; //YES
+                //return; //NO
+                break; //YES
 
         }
 
         if (!tc.add(b))
             return; //already added
 
-        if ((--layersRemain <= 0) || !b.op().conceptualizable)
-            return;
-
-        int bs = b.subs();
-        if (bs == 0)
+        if ((layersRemain <= 1) || !o.conceptualizable)
             return;
 
         TermContainer bb = b.subterms();
-        for (int i = 0; i < bs; i++) {
-            templates(bb.sub(i), tc, layersRemain);
+        int bs = bb.subs();
+        if (bs > 0) {
+            int r = layersRemain-1;
+            bb.forEach(s -> templates(s, tc, r));
         }
     }
 
@@ -103,7 +102,7 @@ public enum TermLinks {
                 return 3;
 
             case INH:
-                return 3;
+                return 4;
 
             case IMPL:
 //                if (host.hasAny(Op.CONJ))
@@ -138,8 +137,13 @@ public enum TermLinks {
     }
 
     public static void linkTemplate(Term srcTerm, Bag srcTermLinks, Termed target, float priForward, float priReverse, BatchActivation a, NAR nar, MutableFloat refund) {
-
         Term targetTerm = target.term();
+
+//        if (targetTerm instanceof Bool)
+//            throw new RuntimeException("invalid termlink for " + srcTerm);
+        assert(!(srcTerm instanceof Bool));
+        assert(!(targetTerm instanceof Bool));
+
         boolean reverseLinked = false;
         if (!srcTerm.equals(targetTerm)) {
             Concept c = nar.conceptualize(target);
@@ -295,12 +299,12 @@ public enum TermLinks {
         return cost;
     }
 
-    public static void linkTask(Task task, Collection<Concept> targets, float cPri) {
+    public static void linkTask(Task task, Collection<Concept> targets) {
         int numSubs = targets.size();
         if (numSubs == 0)
             return;
 
-        float tfa = cPri * task.priElseZero();
+        float tfa = task.priElseZero();
         float tfaEach = tfa / numSubs;
 
 

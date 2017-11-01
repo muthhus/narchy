@@ -178,7 +178,7 @@ public class Inperience extends LeakBack {
 
         //return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
         Term r = c.normalize();
-        if (r == null)
+        if (r == null || !r.op().conceptualizable)
             return 0;
 
         long now = nar.time();
@@ -226,7 +226,7 @@ public class Inperience extends LeakBack {
     }
 
     @Nullable
-    public static Term reify(@NotNull Task s, Term self) {
+    public static Term reify(Task s, Term self) {
 
         Truth tr = s.truth();
 

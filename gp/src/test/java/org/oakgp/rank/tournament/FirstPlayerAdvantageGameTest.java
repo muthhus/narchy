@@ -34,7 +34,7 @@ public class FirstPlayerAdvantageGameTest {
 
         FirstPlayerAdvantageGame g = new FirstPlayerAdvantageGame(mockTwoPlayerGame);
 
-        assertEquals(3d, g.evaluate(n1, n2), 0);
-        assertEquals(-3d, g.evaluate(n2, n1), 0);
+        assertEquals(3d, g.evaluate(n1, n2), 0.001f);
+        assertEquals(-3d, g.evaluate(n2, n1), 0.001f);
     }
 }

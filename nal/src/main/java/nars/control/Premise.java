@@ -41,7 +41,7 @@ public class Premise  {
     public final Collection<Concept> links;
 
     public Premise(Task tasklink, Term termlink, Collection<Concept> links) {
-        assert(!(termlink instanceof Bool));
+        //assert(!(termlink instanceof Bool));
         this.task = tasklink;
         this.termLink = termlink;
         this.links = links;
@@ -97,9 +97,7 @@ public class Premise  {
 
         Collection<Concept> l = links;
         if (l != null) {
-            linkTask(task, l,
-                    1f
-                    /*decayed*/);
+            linkTask(task, l);
         }
 
         int dur = d.dur;
@@ -164,7 +162,7 @@ public class Premise  {
                     }
                 }
             } else {
-                long focus = matchFocus(task, now, dur, n);
+                long focus = matchTime(task, now, dur, n);
                 long focusStart, focusEnd;
                 if (focus == ETERNAL) {
                     focusStart = focusEnd = ETERNAL;
@@ -214,19 +212,22 @@ public class Premise  {
     /**
      * temporal focus control: determines when a matching belief or answer should be projected to
      */
-    static long matchFocus(Task task, long now, int dur, NAR nar) {
+    static long matchTime(Task task, long now, int dur, NAR nar) {
         assert(now!=ETERNAL);
 
-        if (task.isEternal())
+        if (task.isEternal()) {
             return ETERNAL;
+            //return now;
+        } else {
 
-        return now;
+            return now;
 
-        //return task.nearestTimeTo(now);
+            //return task.nearestTimeTo(now);
 
-//        return nar.random().nextBoolean() ?
-//                task.nearestTimeTo(now) :
-//                now + Math.round((-0.5f + nar.random().nextFloat()) * 2f * (Math.abs(now - task.mid())));
+            //        return nar.random().nextBoolean() ?
+            //                task.nearestTimeTo(now) :
+            //                now + Math.round((-0.5f + nar.random().nextFloat()) * 2f * (Math.abs(now - task.mid())));
+        }
 
         //return now + dur;
 

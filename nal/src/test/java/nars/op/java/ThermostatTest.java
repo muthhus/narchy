@@ -7,7 +7,7 @@ import nars.Param;
 import nars.control.MetaGoal;
 
 import static nars.Op.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ThermostatTest {
 

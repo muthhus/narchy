@@ -6,7 +6,7 @@ import nars.term.Term;
 import nars.truth.Truth;
 import net.openhft.chronicle.bytes.BytesStore;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 

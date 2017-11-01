@@ -226,7 +226,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
 
         //frame-rate timeslicing
         int actualPixels = pixels.size();
-        int pixelsSize = Math.min(actualPixels, pixelWork(work));
+        int pixelsSize = Math.min(actualPixels, workToPixels(work));
         int start, end;
 
         float pixelPri =
@@ -253,8 +253,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         return pixelsSize;
     }
 
-    /** how many pixels to process given a work amount */
-    protected int pixelWork(int work) {
+    /** how many pixels to process for the given work amount */
+    protected int workToPixels(int work) {
         return work;
     }
 
