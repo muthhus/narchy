@@ -240,7 +240,7 @@ abstract public class NAgentX extends NAgent {
 //        ), 800, 600);
 
 
-        ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, true, 32, 128);
+        ConjClustering conjClusterB = new ConjClustering(n, 3, BELIEF, true, 32, 128);
         ConjClustering conjClusterG = new ConjClustering(n, 2, GOAL, true, 16, 64);
 
 //        n.runLater(() -> {
@@ -277,8 +277,6 @@ abstract public class NAgentX extends NAgent {
 
 
 //        AgentService mc = MetaGoal.newController(a);
-
-//        MetaGoal.newValueSynergizer(n);
 
         //init();
 

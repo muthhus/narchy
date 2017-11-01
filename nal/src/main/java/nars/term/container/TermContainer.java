@@ -56,18 +56,12 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    /*@NotNull*/
-    default Compound compound(int i) {
-        return ((Compound) sub(i));
-    }
 
     /*@NotNull*/
     @Override
     default Iterator<Term> iterator() {
         throw new UnsupportedOperationException();
     }
-
-
 
 
     @Override
@@ -99,7 +93,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //            return (x.op() == o) ? (sum + 1) : sum;
 //        });
 //    }
-
 
 
     default /*@NotNull*/ TreeSet<Term> toSortedSet() {
@@ -135,7 +128,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (s > 0) {
             Set u = new UnifiedSet(s);
             for (int i = 0; i < s; i++) {
-                /*@NotNull*/ Term x = sub(i);
+                /*@NotNull*/
+                Term x = sub(i);
                 if (ifTrue.test(x))
                     u.add(x);
             }
@@ -199,7 +193,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return b.subterms().recurseTermsToSet(commonStructure, scratch, false);
     }
 
-    /*@NotNull*/ default Set<Term> recurseTermsToSet() {
+    /*@NotNull*/
+    default Set<Term> recurseTermsToSet() {
         return recurseTermsToSet(null);
     }
 
@@ -209,7 +204,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      */
     /*@NotNull*/
     default Set<Term> recurseTermsToSet(@Nullable Op onlyType) {
-        if (onlyType!=null && !hasAny(onlyType))
+        if (onlyType != null && !hasAny(onlyType))
             return Sets.mutable.empty();
 
         Set<Term> t = new HashSet(volume());//$.newHashSet(volume() /* estimate */);
@@ -232,7 +227,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
         int l = subs();
         for (int i = 0; i < l; i++) {
-            /*@NotNull*/ Term s = sub(i);
+            /*@NotNull*/
+            Term s = sub(i);
             if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
                 r |= (addOrRemoved) ? t.add(s) : t.remove(s);
                 if (!addOrRemoved && r) //on removal we can exit early
@@ -267,16 +263,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-
-
-
     @Override
     default boolean containsRecursively(/*@NotNull*/ Term y, boolean root, Predicate<Term> subTermOf) {
         int s = subs();
         if (s > 0 && !impossibleSubTerm(y)) {
             for (int i = 0; i < s; i++) {
                 Term x = sub(i);
-                if (x==y || (root ? x.equals(y) : x.equalsRoot(y)) || x.containsRecursively(y, subTermOf))
+                if (x == y || (root ? x.equals(y) : x.equalsRoot(y)) || x.containsRecursively(y, subTermOf))
                     return true;
             }
         }
@@ -575,13 +568,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //    }
 
 
-
-
     default boolean isTemporal() {
         return hasAny(Op.TemporalBits) && OR(Term::isTemporal);
     }
-
-
 
 
 //    default int compareTo(/*@NotNull*/ Termlike o) {
@@ -672,7 +661,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 output[j++] = x;
         }
 
-        assert(j == output.length):"permute underflow";
+        assert (j == output.length) : "permute underflow";
 
 
         return output;
@@ -715,7 +704,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //    }
 
 
-
     //TODO
 //    default Stream<? extends Term> streamRecursive() {
 //        return IntStream.range(0, size()).
@@ -728,7 +716,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //                }).collect(Collectors.);
 //    }
 
-    /** matches in the correct ordering conditions for CONJ */
+    /**
+     * matches in the correct ordering conditions for CONJ
+     */
     static boolean unifyConj(TermContainer X, int Xdt, TermContainer Y, int Ydt, /*@NotNull*/ Unify u) {
         boolean xCommutes = communify(Xdt);
         boolean yCommutes = communify(Ydt);
@@ -746,7 +736,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return X.unifyCommute(Y, u);
     }
 
-    /** commutes for unify */
+    /**
+     * commutes for unify
+     */
     static boolean communify(int Xdt) {
         return Xdt == XTERNAL || Xdt == DTERNAL || Xdt == 0;
     }
@@ -781,16 +773,19 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 //begin at random offset to shuffle the order of the match sequence
                 int jj = u.random.nextInt();
                 int j = Math.abs(jj) % s;
-                boolean direction = (jj & (1<<15)) == 0;
-                for (int i = s - 1; ;) {
+                boolean direction = (jj & (1 << 15)) == 0;
+                for (int i = s - 1; ; ) {
                     if (!sub(j).unify(Y.sub(j), u))
                         return false;
 
                     if (--i == -1)
                         break;
 
-                    if (direction) { if (++j == s) j = 0;}
-                    else { if (--j == -1) j = s-1; }
+                    if (direction) {
+                        if (++j == s) j = 0;
+                    } else {
+                        if (--j == -1) j = s - 1;
+                    }
                 }
                 return true;
         }
@@ -813,7 +808,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         ////xs.removeIf(s -> !subst.matchType(s) && ys.remove(s));
 
         xs.removeIf(x -> {
-            if (x.vars()==0) {
+            if (x.vars() == 0) {
                 return ys.remove(x);
             }
             return false;

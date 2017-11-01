@@ -6,8 +6,8 @@ import nars.Param;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Termlike;
 import nars.term.Terms;
-import org.intelligentjava.machinelearning.decisiontree.feature.P;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -49,18 +49,18 @@ public abstract class TermVector implements TermContainer {
 //                 if (x == null) throw new NullPointerException();
 //         }
 
-        int[] meta = new int[2];
-        this.hash = Terms.hashSubterms(terms, meta);
+
+        this.hash = Terms.hashSubterms(terms);
 
 //        final int vD = meta[0];  this.varDeps = (byte)vD;
 //        final int vI = meta[1];  this.varIndeps = (byte)vI;
 //        final int vQ = meta[2];  this.varQuerys = (byte)vQ;
 //        final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
 
-        final int vol = meta[0] + 1;
-        this.structure = meta[1];
+        final int vol = 1 + Util.sum(Term::volume, terms); // meta[0] + 1;
+        this.structure = Util.or(Term::structure, terms); //TermContainer.super.structure();
 
-        int varTot = Util.sum((Termed t)->(t.vars()+t.varPattern()), terms);
+        int varTot = Util.sum((Term t)->(t.vars()+t.varPattern()), terms);
         final int cmp = vol - varTot;
         this.complexity = (short)(cmp);
         this.volume = (short)( vol );

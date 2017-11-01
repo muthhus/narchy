@@ -36,25 +36,24 @@ public enum Terms {
     ;
 
 
-    /**
-     * computes the content hash while accumulating subterm metadata summary fields into int[] meta
-     */
-    public static int hashSubterms(Term[] term, int[] meta) {
-
-        int result = 1;
-        for (int i = 0; i < term.length; i++) {
-            Term t = term[i];
-            t.init(meta);
-            result = Util.hashCombine(t.hashCode(), result);
-        }
-        return result;
-    }
+//    /**
+//     * computes the content hash while accumulating subterm metadata summary fields into int[] meta
+//     */
+//    public static int hashSubterms(Term[] term, int[] meta) {
+//
+//        int result = 1;
+//        for (int i = 0; i < term.length; i++) {
+//            Term t = term[i];
+//            t.init(meta);
+//            result = Util.hashCombine(t.hashCode(), result);
+//        }
+//        return result;
+//    }
 
     public static int hashSubterms(Term[] term) {
         int result = 1;
         for (int i = 0; i < term.length; i++) {
-            Term t = term[i];
-            result = Util.hashCombine(t.hashCode(), result);
+            result = Util.hashCombine(term[i].hashCode(), result);
         }
         return result;
     }
@@ -62,7 +61,7 @@ public enum Terms {
     /**
      * should be consistent with the other hash method(s)
      */
-    public static int hashSubterms(@NotNull TermContainer container) {
+    public static int hashSubterms( TermContainer container) {
         int h = 1;
         int s = container.subs();
         for (int i = 0; i < s; i++) {

@@ -31,12 +31,6 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public void init(int[] meta) {
-        sub.init(meta);
-        meta[0]++; //for wrapping it
-    }
-
-    @Override
     public int intify(IntObjectToIntFunction<Term> reduce, int v) {
         return sub.intify(reduce, v);
     }
@@ -74,7 +68,7 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public final @NotNull Term sub(int i) {
+    public final Term sub(int i) {
         if (i != 0)
             throw new ArrayIndexOutOfBoundsException();
         return sub;
@@ -220,11 +214,6 @@ public class TermVector1 implements TermContainer {
     public int varPattern() {
         return sub.varPattern();
     }
-
-//    @Override
-//    public boolean isDynamic() {
-//        return sub.isDynamic();
-//    }
 
     @Override
     public int vars() {

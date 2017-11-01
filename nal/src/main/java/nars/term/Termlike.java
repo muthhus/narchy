@@ -143,17 +143,6 @@ public interface Termlike {
     }
 
 
-    /**
-     * @param meta 6-element array that accumulates the metadata
-     * @return returns hashcode if a Term, but TermContainers may return zero
-     */
-    default void init(/*@NotNull*/int[] meta) {
-
-
-        meta[0] += volume();
-        meta[1] |= structure();
-
-    }
 
     default boolean impossibleSubTermOrEquality(/*@NotNull*/Term target) {
         return ((!hasAll(target.structure())) ||
@@ -236,27 +225,27 @@ public interface Termlike {
 
     void recurseTerms(/*@NotNull*/Consumer<Term> v);
 
-    /**
-     * note: if the function returns null, null will not be added to the result set
-     */
-    /*@NotNull*/
-    default Set<Term> subsUnique(/*@NotNull*/ Function<Term, Term> each) {
-        Set<Term> r = new HashSet(subs());
-        int s = subs();
-        for (int i = 0; i < s; i++) {
-            Term e = each.apply(sub(i));
-            if (e != null)
-                r.add(e);
-        }
-        return r;
-    }
+//    /**
+//     * note: if the function returns null, null will not be added to the result set
+//     */
+//    /*@NotNull*/
+//    default Set<Term> subsUnique(/*@NotNull*/ Function<Term, Term> each) {
+//        Set<Term> r = new HashSet(subs());
+//        int s = subs();
+//        for (int i = 0; i < s; i++) {
+//            Term e = each.apply(sub(i));
+//            if (e != null)
+//                r.add(e);
+//        }
+//        return r;
+//    }
 
     /**
      * total # of variables, excluding pattern variables
      */
     default int vars() {
-        return intify((c, x) -> c + x.vars(), 0);
-        //return subs(x -> x.op().var);
+        return hasAny(Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_QUERY.bit) ?
+            intify((c, x) -> c + x.vars(), 0) : 0;
     }
 
     /**

@@ -26,11 +26,6 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
     @Override
-    public void init(@NotNull int[] meta) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public int structure() {
         return srcsubs.structure();
     }

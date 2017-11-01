@@ -1186,6 +1186,12 @@ public enum Util {
             y += value.applyAsInt(x);
         return y;
     }
+    public static <X> int or(ToIntFunction<X> value, X... xx) {
+        int y = 0;
+        for (X x : xx)
+            y |= value.applyAsInt(x);
+        return y;
+    }
 
     public static <X> float max(FloatFunction<X> value, X... xx) {
         float y = Float.NEGATIVE_INFINITY;

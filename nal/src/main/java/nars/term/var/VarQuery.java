@@ -20,17 +20,17 @@ public final class VarQuery extends AbstractVariable {
 
     @NotNull
     @Override
-    public Op op() {
+    public final Op op() {
         return VAR_QUERY;
     }
 
     @Override
-    public int vars() {
+    public final int vars() {
         return 1;
     }
 
     @Override
-    public int varQuery() {
+    public final int varQuery() {
         return 1;
     }
 

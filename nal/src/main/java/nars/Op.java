@@ -12,6 +12,7 @@ import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.UnitCompound1;
+import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.var.UnnormalizedVariable;
 import nars.time.Tense;
@@ -621,7 +622,6 @@ public enum Op {
         return false;
     }
 
-    @NotNull
     public static final Compound ZeroProduct = new GenericCompound(Op.PROD, TermContainer.NoSubterms);
 
     public static final int StatementBits = Op.or(Op.INH, Op.SIM, Op.IMPL);

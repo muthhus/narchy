@@ -40,13 +40,6 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     }
 
 
-
-    @Override
-    public void init(int[] meta) {
-        super.init(meta);
-        meta[1] |= op.bit;
-    }
-
     @Override
     public void recurseTerms(/*@NotNull*/ Consumer<Term> v) {
         v.accept(this);
@@ -84,7 +77,8 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         if (!(that instanceof Compound) || hash!=that.hashCode())
             return false;
 
-        return Compound.equals(this, (Term)that);
+        Term tt = (Term) that;
+        return tt.subs()==1 && opX()==tt.opX() && sub.equals(tt.sub(0)); //elides dt() comparison
 //
 //        if (hash == that.hashCode()) {
 //            Term t = (Term)that;

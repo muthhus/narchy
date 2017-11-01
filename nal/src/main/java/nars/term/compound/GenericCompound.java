@@ -6,9 +6,11 @@ import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
+import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.Null;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -31,7 +33,8 @@ public class GenericCompound implements Compound {
 
     final int structureCached;
 
-    public transient boolean normalized;
+    private transient boolean normalized;
+    private transient Term rooted = null;
 
 
     public GenericCompound(/*@NotNull*/ Op op, TermContainer subterms) {
@@ -49,6 +52,15 @@ public class GenericCompound implements Compound {
 //                (op() == INH && subOpIs(1,ATOM) && subOpIs(0, PROD)) /* potential function */
 //                        ||
 //                (hasAll(EvalBits) && OR(Termlike::isDynamic)); /* possible function in subterms */
+    }
+
+    @Override
+    public Term root() {
+       if (rooted!=null)
+            return rooted;
+
+        Term term = Compound.super.temporalize(Retemporalize.retemporalizeConceptual);
+        return rooted = term;
     }
 
     @Override
@@ -145,6 +157,11 @@ public class GenericCompound implements Compound {
             //one of them is normalized so both must be
             this.normalized = that.normalized = true;
         }
+
+        if (this.rooted == null && that.rooted!=null)
+            this.rooted = that.rooted;
+        else if (that.rooted==null && this.rooted!=null)
+            that.rooted = this.rooted;
     }
 
 

@@ -77,13 +77,6 @@ public class Atom extends AtomicConst {
         return ATOM.bit;
     }
 
-    @Override
-    public final void init(int[] meta) {
-
-        meta[0] ++; //volume
-        meta[1] |= ATOM.bit; //structure();
-
-    }
 
 }
 

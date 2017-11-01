@@ -99,6 +99,7 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     @Override
     public Term conceptual() {
         return Compound.super.conceptual();
+        //return ref.conceptual();
     }
 
 
@@ -106,6 +107,7 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     @Nullable
     public final Term root() {
         return Compound.super.root();
+        //return ref.root();
     }
 
     public @Nullable Term transform(CompoundTransform t, Compound parent) {

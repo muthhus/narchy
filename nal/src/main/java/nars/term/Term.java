@@ -478,31 +478,7 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
 
-    /**
-     * meta is int[] that collects term metadata:
-     * 0: patternVar
-     * 1: depVars
-     * 2: indepVars
-     * 3: queryVars
-     * 4: volume
-     * 5: struct
-     * <p>
-     * subclasses can override this for more efficient aggregation if certain features are sure to be absent
-     */
-    @Override
-    default void init(/*@NotNull*/ int[] meta) {
-//
-//        if (vars() > 0) {
-//            meta[0] += varDep();
-//            meta[1] += varIndep();
-//            meta[2] += varQuery();
-//        }
 
-//        meta[3] += varPattern();
-        meta[0] += volume();
-        meta[1] |= structure();
-
-    }
 
 //    default boolean equalsIgnoringVariables(@NotNull Term other, boolean requireSameTime) {
 //        return (this instanceof Variable) || (other instanceof Variable) || equals(other);

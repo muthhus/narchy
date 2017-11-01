@@ -240,14 +240,6 @@ public interface Compound extends Term, IPair, TermContainer {
         return subterms().ANDrecurse(p);
     }
 
-    @Override
-    default void init(int[] meta) {
-
-        subterms().init(meta);
-
-        meta[1] |= op().bit;
-
-    }
 
 
     @Override
@@ -467,6 +459,11 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default Term[] toArray() {
         return subterms().toArray();
+    }
+
+    @Override
+    default Term[] theArray() {
+        return subterms().theArray();
     }
 
 
@@ -934,7 +931,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     @Nullable
     default Term temporalize(Retemporalize r) {
-        return r.transform(this, op(), DTERNAL);
+//        return r.transform(this, op(), DTERNAL);
 //        if (!hasAny(Op.TemporalBits))
 //            return this;
 //        else {
@@ -942,12 +939,8 @@ public interface Compound extends Term, IPair, TermContainer {
 //            boolean ot = o.temporal;
 //            int dt = ot ? r.dt(this) : DTERNAL;
 //
-//            Term t = r.transform(this, o, dt);
-//            if (t == null) {
-//                return null;
-//            } else {
-//                return t;
-//            }
+        Term t = r.transform(this, op(), DTERNAL);
+        return t == null ? Null : t; //why happens Null?
 //        }
     }
 
@@ -957,6 +950,8 @@ public interface Compound extends Term, IPair, TermContainer {
         Term term = temporalize(Retemporalize.retemporalizeConceptual);
         return term == null ? Null : term;
     }
+
+
 
 
     @Override

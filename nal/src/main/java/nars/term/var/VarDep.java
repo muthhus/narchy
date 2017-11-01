@@ -20,17 +20,17 @@ public final class VarDep extends AbstractVariable {
 
     @NotNull
     @Override
-    public Op op() {
+    public final Op op() {
         return VAR_DEP;
     }
 
     @Override
-    public int vars() {
+    public final int vars() {
         return 1;
     }
 
     @Override
-    public int varDep() {
+    public final int varDep() {
         return 1;
     }
 

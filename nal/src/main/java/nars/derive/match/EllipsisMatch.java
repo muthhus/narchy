@@ -50,11 +50,6 @@ public class EllipsisMatch extends GenericCompound  {
     }
 
     @Override
-    public void init(int[] meta) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Term neg() {
         throw new UnsupportedOperationException();
     }
