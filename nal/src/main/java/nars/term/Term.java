@@ -491,16 +491,16 @@ public interface Term extends Termed, Comparable<Termed> {
      */
     @Override
     default void init(/*@NotNull*/ int[] meta) {
+//
+//        if (vars() > 0) {
+//            meta[0] += varDep();
+//            meta[1] += varIndep();
+//            meta[2] += varQuery();
+//        }
 
-        if (vars() > 0) {
-            meta[0] += varDep();
-            meta[1] += varIndep();
-            meta[2] += varQuery();
-        }
-
-        meta[3] += varPattern();
-        meta[4] += volume();
-        meta[5] |= structure();
+//        meta[3] += varPattern();
+        meta[0] += volume();
+        meta[1] |= structure();
 
     }
 

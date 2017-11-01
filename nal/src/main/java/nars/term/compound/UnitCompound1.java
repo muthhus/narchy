@@ -44,7 +44,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     @Override
     public void init(int[] meta) {
         super.init(meta);
-        meta[5] |= op.bit;
+        meta[1] |= op.bit;
     }
 
     @Override

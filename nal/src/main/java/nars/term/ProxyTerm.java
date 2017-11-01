@@ -158,13 +158,13 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     }
 
     @Override
-    public void init(@NotNull int[] meta) {
+    public void init(int[] meta) {
         ref.init(meta);
     }
 
 
     @Override
-    public @Nullable byte[] pathTo(@NotNull Term subterm) {
+    public @Nullable byte[] pathTo(Term subterm) {
         return ref.pathTo(subterm);
     }
 

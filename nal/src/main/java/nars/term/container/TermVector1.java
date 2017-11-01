@@ -32,7 +32,7 @@ public class TermVector1 implements TermContainer {
     @Override
     public void init(int[] meta) {
         sub.init(meta);
-        meta[4]++; //for wrapping it
+        meta[0]++; //for wrapping it
     }
 
     @Override

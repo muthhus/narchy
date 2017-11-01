@@ -23,7 +23,7 @@ public class QuerySpider extends NARService {
     protected void start(NAR nar) {
         super.start(nar);
         nar.onTask(t -> {
-            if (t.isQuestOrQuestion() && t.varQuery() > 0) {
+            if (t.isQuestOrQuestion() && t.term().hasVarQuery()) {
                 Term tt = t.term();
                 AdjGraph<Term, Float> g = spider(nar, t, 3);
                 g.nodes.keysView().takeWhile(r -> {

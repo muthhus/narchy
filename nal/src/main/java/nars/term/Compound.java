@@ -244,7 +244,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         subterms().init(meta);
 
-        meta[5] |= op().bit;
+        meta[1] |= op().bit;
 
     }
 

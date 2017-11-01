@@ -40,7 +40,7 @@ public class GenericCompound implements Compound {
 
         this.hash = Util.hashCombine((this.subterms = subterms).hashCode(), op.id);
 
-        this.normalized = !(subterms.vars() > 0 || subterms.varPattern() > 0);
+        this.normalized = (subterms.vars() == 0 && subterms.varPattern() == 0);
 
         this.structureCached = Compound.super.structure();
 

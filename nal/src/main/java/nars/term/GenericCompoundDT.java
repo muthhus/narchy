@@ -192,7 +192,7 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
 //    }
 
     @Override
-    public @NotNull TermContainer subterms() {
+    public TermContainer subterms() {
         return ref.subterms();
     }
 

@@ -13,7 +13,8 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static nars.Op.*;
+import static nars.Op.Null;
+import static nars.Op.VAR_QUERY;
 
 /**
  * something which is like a term but isnt quite,
@@ -37,7 +38,7 @@ public interface Termlike {
      * volume = 1 + total volume of terms = complexity of subterms - # variable instances
      */
     default int volume() {
-        return 1+ intify((v, c) -> c == null ? 0 : v + c.volume());
+        return 1 + intify((v, c) -> v + c.volume(), 0);
     }
 
 
@@ -45,14 +46,14 @@ public interface Termlike {
      * complexity 1 + total complexity number of leaf terms, excluding variables which have a complexity of zero
      */
     default int complexity() {
-        return 1 + intify((v, c) -> c == null ? 0 : v + c.complexity());
+        return 1 + intify((v, c) -> c == null ? 0 : v + c.complexity(), 0);
     }
 
     /**
      * structure hash bitvector
      */
     default int structure() {
-        return intify((s, x) -> x == null ? 0 : s | x.structure());
+        return intify((s, x) -> x == null ? 0 : s | x.structure(), 0);
     }
 
     /**
@@ -83,7 +84,9 @@ public interface Termlike {
         return containsRecursively(t, false, inSubtermsOf);
     }
 
-    /** if root is true, the root()'s of the terms will be compared */
+    /**
+     * if root is true, the root()'s of the terms will be compared
+     */
     boolean containsRecursively(Term t, boolean root, Predicate<Term> inSubtermsOf);
 
 
@@ -146,13 +149,9 @@ public interface Termlike {
      */
     default void init(/*@NotNull*/int[] meta) {
 
-        meta[0] += varDep();
-        meta[1] += varIndep();
-        meta[2] += varQuery();
 
-        meta[3] += varPattern();
-        meta[4] += volume();
-        meta[5] |= structure();
+        meta[0] += volume();
+        meta[1] |= structure();
 
     }
 
@@ -215,16 +214,21 @@ public interface Termlike {
         }
         return true;
     }
-  /**
+
+    /**
      * stream of each subterm
      */
     default Stream<Term> subStream() {
         int subs = subs();
-        switch (subs)  {
-            case 0: return Stream.empty();
-            case 1: return Stream.of(sub(0));
-            case 2: return Stream.of(sub(0), sub(1));
-            case 3: return Stream.of(sub(0), sub(1), sub(2));
+        switch (subs) {
+            case 0:
+                return Stream.empty();
+            case 1:
+                return Stream.of(sub(0));
+            case 2:
+                return Stream.of(sub(0), sub(1));
+            case 3:
+                return Stream.of(sub(0), sub(1), sub(2));
             default:
                 return IntStream.range(0, subs).mapToObj(this::sub);
         }
@@ -251,26 +255,27 @@ public interface Termlike {
      * total # of variables, excluding pattern variables
      */
     default int vars() {
-        return subs(x -> x.isAny(VAR_DEP.bit | VAR_INDEP.bit | VAR_QUERY.bit));
+        return intify((c, x) -> c + x.vars(), 0);
+        //return subs(x -> x.op().var);
     }
 
     /**
      * # of contained dependent variables in subterms (1st layer only)
      */
     default int varDep() {
-        return subs(VAR_DEP);
+        return intify((c, x) -> c + x.varDep(), 0);
     }
 
     default int varIndep() {
-        return subs(VAR_INDEP);
+        return intify((c, x) -> c + x.varIndep(), 0);
     }
 
     default int varPattern() {
-        return subs(Op.VAR_PATTERN);
+        return intify((c, x) -> c + x.varPattern(), 0);
     }
 
     default int varQuery() {
-        return subs(VAR_QUERY);
+        return intify((c,x) -> c+x.varQuery(), 0);
     }
 
 //    default boolean unifyPossible(@Nullable Op t) {
@@ -290,20 +295,13 @@ public interface Termlike {
      * counts subterms matching the predicate
      */
     default int subs(Predicate<Term> match) {
-        return intify((c, sub) -> sub == null ? 0 : c + 1, 0);
-    }
-
-    /**
-     * invokes the reducer with null for the subterm argument to obtain the initial value before iteration the actual subterms
-     */
-    default int intify(IntObjectToIntFunction<Term> reduce) {
-        return intify(reduce, reduce.intValueOf(Integer.MIN_VALUE, null));
+        return intify((c, sub) -> match.test(sub) ? c + 1 : c, 0);
     }
 
     default int intify(IntObjectToIntFunction<Term> reduce, int v) {
         int n = subs();
         for (int i = 0; i < n; i++)
-            v = reduce.intValueOf(v, sub(i, Null));
+            v = reduce.intValueOf(v, sub(i));
         return v;
     }
 

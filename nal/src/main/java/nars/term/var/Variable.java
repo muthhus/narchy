@@ -58,26 +58,26 @@ public interface Variable extends Atomic {
 
     @Override
     default void init(int[] meta) {
-        int i;
-        switch (op()) {
-            case VAR_DEP:
-                i = 0;
-                break;
-            case VAR_INDEP:
-                i = 1;
-                break;
-            case VAR_QUERY:
-                i = 2;
-                break;
-            case VAR_PATTERN:
-                i = 3;
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
-        meta[i] ++;
-        meta[4] ++;
-        meta[5] |= structure();
+//        int i;
+//        switch (op()) {
+//            case VAR_DEP:
+//                i = 0;
+//                break;
+//            case VAR_INDEP:
+//                i = 1;
+//                break;
+//            case VAR_QUERY:
+//                i = 2;
+//                break;
+//            case VAR_PATTERN:
+//                i = 3;
+//                break;
+//            default:
+//                throw new UnsupportedOperationException();
+//        }
+//        meta[i] ++;
+        meta[0] ++;
+        meta[1] |= structure();
     }
 
 }

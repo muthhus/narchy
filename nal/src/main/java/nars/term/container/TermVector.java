@@ -1,10 +1,13 @@
 package nars.term.container;
 
 import com.google.common.base.Joiner;
+import jcog.Util;
 import nars.Param;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.Terms;
+import org.intelligentjava.machinelearning.decisiontree.feature.P;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -27,14 +30,15 @@ public abstract class TermVector implements TermContainer {
     public  final short volume;
     /** stored as complexity+1 as if this termvector were already wrapped in its compound */
     public  final short complexity;
-    /**
-     * # variables contained, of each type & total
-     * this means maximum of 127 variables per compound
-     */
-    public final byte varQuerys;
-    public final byte varIndeps;
-    public final byte varPatterns;
-    public final byte varDeps;
+
+//    /**
+//     * # variables contained, of each type & total
+//     * this means maximum of 127 variables per compound
+//     */
+//    public final byte varQuerys;
+//    public final byte varIndeps;
+//    public final byte varPatterns;
+//    public final byte varDeps;
 
     protected TermVector(Term... terms) {
 
@@ -45,19 +49,19 @@ public abstract class TermVector implements TermContainer {
 //                 if (x == null) throw new NullPointerException();
 //         }
 
-        int[] meta = new int[6];
+        int[] meta = new int[2];
         this.hash = Terms.hashSubterms(terms, meta);
 
-        final int vD = meta[0];  this.varDeps = (byte)vD;
-        final int vI = meta[1];  this.varIndeps = (byte)vI;
-        final int vQ = meta[2];  this.varQuerys = (byte)vQ;
-        final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
+//        final int vD = meta[0];  this.varDeps = (byte)vD;
+//        final int vI = meta[1];  this.varIndeps = (byte)vI;
+//        final int vQ = meta[2];  this.varQuerys = (byte)vQ;
+//        final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
 
-        final int vol = meta[4] + 1;
-        this.structure = meta[5];
+        final int vol = meta[0] + 1;
+        this.structure = meta[1];
 
-        int varTot = vD + vI + vQ ;
-        final int cmp = vol - varTot - vP;
+        int varTot = Util.sum((Termed t)->(t.vars()+t.varPattern()), terms);
+        final int cmp = vol - varTot;
         this.complexity = (short)(cmp);
         this.volume = (short)( vol );
 
@@ -111,32 +115,6 @@ public abstract class TermVector implements TermContainer {
     public String toString() {
         return '(' + Joiner.on(',').join(toArray()) + ')';
     }
-
-    @Override
-    public final int varDep() {
-        return varDeps;
-    }
-
-    @Override
-    public final int varIndep() {
-        return varIndeps;
-    }
-
-    @Override
-    public final int varQuery() {
-        return varQuerys;
-    }
-
-    @Override
-    public final int varPattern() {
-        return varPatterns;
-    }
-
-    @Override
-    public final int vars() {
-        return volume-complexity-varPatterns;
-    }
-
 
 
     @Override
