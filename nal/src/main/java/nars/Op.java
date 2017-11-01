@@ -1056,7 +1056,7 @@ public enum Op {
             if (sps.length == 1)
                 pp = sps[0];
             else {
-                pp = compound(CONJ, 0, sps); //direct
+                pp = implInConjReduction(compound(CONJ, 0, sps)); //direct
                 //pp = CONJ.the(0, sps);
             }
             if (pp instanceof Bool) {
@@ -1263,11 +1263,10 @@ public enum Op {
                 whichImpl = i;
                 implication = conj.sub(whichImpl);
                 implDT = implication.dt();
-                assert(implDT!=XTERNAL);
-//                if (implDT == XTERNAL) {
-//                    //dont proceed any further if XTERNAL
-//                    return conj;
-//                }
+                if (implDT == XTERNAL) {
+                    //dont proceed any further if XTERNAL
+                    return conj;
+                }
                 break;
             }
         }
@@ -1731,7 +1730,7 @@ public enum Op {
         return compound(op, dt, subject, predicate);
     }
 
-    private static Term conjDrop(@NotNull Term conj, int i) {
+    private static Term conjDrop(Term conj, int i) {
         TermContainer cs = conj.subterms();
         if (cs.subs() == 2) {
             return conj.sub(1 - i);

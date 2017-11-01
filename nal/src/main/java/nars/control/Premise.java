@@ -41,6 +41,7 @@ public class Premise  {
     public final Collection<Concept> links;
 
     public Premise(Task tasklink, Term termlink, Collection<Concept> links) {
+        assert(!(termlink instanceof Bool));
         this.task = tasklink;
         this.termLink = termlink;
         this.links = links;

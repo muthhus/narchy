@@ -119,10 +119,10 @@ public class PatrickTests extends NALTest {
 
 
         tt.truthTolerance(0.1f);
-        tt.nar.truthResolution.set(0.03f);
+        tt.nar.truthResolution.set(0.04f);
         //tt.nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
         tt.nar.time.dur(10);
-        tt.nar.termVolumeMax.set(36);
+        tt.nar.termVolumeMax.set(31);
 
 //        tt.nar.onCycle(()->{
 //            System.err.println(tt.nar.time());
@@ -141,7 +141,7 @@ public class PatrickTests extends NALTest {
 //                "<toothbrush --> [unscrews]>! :|:", //make something that is here a screwdriver
 //                "<toothbrush --> [unscrews]>! :|:", //make something that is here a screwdriver
 //                "<toothbrush --> [unscrews]>! :|:", //make something that is here a screwdriver
-                "$1.0 <toothbrush --> [unscrews]>! :|:" //make something that is here a screwdriver
+                "$1.0 (toothbrush --> [unscrews])! :|:" //make something that is here a screwdriver
                 //"<toothbrush --> here>. :|:" //there is a toothbrush here NOW
         );
 

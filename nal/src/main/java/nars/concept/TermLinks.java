@@ -94,12 +94,10 @@ public enum TermLinks {
             case DIFFi:
             case SECTi:
             case SECTe:
-
-
                 return 2;
 
             case CONJ:
-                return 3;
+                return 2;
 
             case SIM:
                 return 3;

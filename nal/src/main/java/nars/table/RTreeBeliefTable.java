@@ -753,32 +753,32 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     }
 
-    private static class TimeRangeUniqueNodes extends TimeRange {
-        //Set<HyperRegion> visited = new HashSet();
-        final LongBitsetBloomFilter bpp = new LongBitsetBloomFilter(64, 0.01f);
-
-        public TimeRangeUniqueNodes() {
-
-        }
-
-        @Override
-        public boolean intersects(HyperRegion x) {
-            //if (x instanceof Task) {
-                int h = x.hashCode();
-                byte[] hh = intToByteArrayLE(h);
-                if (bpp.test(hh))
-                    return false;
-
-                if (super.intersects(x)) {
-                    if (x instanceof Task || contains(x)) //only record visited if intersecting a task or containing an entire node
-                        bpp.add(hh);
-                    return true;
-                }
-                return false;
-            /*} else
-                return super.intersects(x);*/
-        }
-    }
+//    private static class TimeRangeUniqueNodes extends TimeRange {
+//        //Set<HyperRegion> visited = new HashSet();
+//        final LongBitsetBloomFilter bpp = new LongBitsetBloomFilter(64, 0.01f);
+//
+//        public TimeRangeUniqueNodes() {
+//
+//        }
+//
+//        @Override
+//        public boolean intersects(HyperRegion x) {
+//            //if (x instanceof Task) {
+//                int h = x.hashCode();
+//                byte[] hh = intToByteArrayLE(h);
+//                if (bpp.test(hh))
+//                    return false;
+//
+//                if (super.intersects(x)) {
+//                    if (x instanceof Task || contains(x)) //only record visited if intersecting a task or containing an entire node
+//                        bpp.add(hh);
+//                    return true;
+//                }
+//                return false;
+//            /*} else
+//                return super.intersects(x);*/
+//        }
+//    }
 
 //    private static class BeliefLeaf extends Leaf<TaskRegion> {
 //        public BeliefLeaf(int max) {

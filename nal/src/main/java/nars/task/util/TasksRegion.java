@@ -19,7 +19,7 @@ public class TasksRegion implements TaskRegion {
 
     public final float freqMin, freqMax, confMin, confMax;
 
-    private final int serial;
+//    private final int serial;
 
     @Override
     public final long start() {
@@ -38,7 +38,8 @@ public class TasksRegion implements TaskRegion {
 
     @Override
     public int hashCode() {
-        return serial;
+        //return serial;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -53,10 +54,10 @@ public class TasksRegion implements TaskRegion {
         this.freqMax = freqMax;
         this.confMin = confMin;
         this.confMax = confMax;
-        this.serial = serials.incrementAndGet();
+        //this.serial = serials.incrementAndGet();
     }
 
-    private static final AtomicInteger serials = new AtomicInteger(0);
+    //private static final AtomicInteger serials = new AtomicInteger(0);
 
 
 
