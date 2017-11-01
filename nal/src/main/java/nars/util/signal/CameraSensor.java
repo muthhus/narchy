@@ -1,4 +1,4 @@
-package nars.video;
+package nars.util.signal;
 
 import jcog.Util;
 import nars.$;
@@ -44,20 +44,23 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
 
 
     public CameraSensor(@Nullable Term root, P src, NAgent a) {
-        super(src, src.width(), src.height(), a.nar);
+        this(root, src, a.nar);
+    }
+    public CameraSensor(@Nullable Term root, P src, NAR n) {
+        super(src, src.width(), src.height(), n);
 
         this.w = src.width();
         this.h = src.height();
         numPixels = w * h;
 
-        this.in = a.nar.newCauseChannel(this);
+        this.in = n.newCauseChannel(this);
 
 
         pixels = encode(
                 RadixProduct(root, w, h, RADIX)
                 //RadixRecurse(root, w, h, RADIX)
                 //InhRecurse(root, w, h, RADIX)
-                , a.nar);
+                , n);
 
     }
 
@@ -109,7 +112,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         };
     }
 
-    private static Term[] zipCoords(@NotNull Term[] x, @NotNull Term[] y) {
+    private static Term[] zipCoords(Term[] x, Term[] y) {
         int m = Math.max(x.length, y.length);
         Term[] r = new Term[m];
         int sx = m - x.length;
@@ -184,17 +187,17 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         return this;
     }
 
-    public PixelConcept concept(int x, int y) {
-        if (x < 0)
-            x += w;
-        if (y < 0)
-            y += h;
-        if (x >= w)
-            x -= w;
-        if (y >= h)
-            y -= h;
-        return (PixelConcept) matrix[x][y]; //pixels.get(x * width + y);
-    }
+//    public PixelConcept concept(int x, int y) {
+//        if (x < 0)
+//            x += w;
+//        if (y < 0)
+//            y += h;
+//        if (x >= w)
+//            x -= w;
+//        if (y >= h)
+//            y -= h;
+//        return (PixelConcept) matrix[x][y]; //pixels.get(x * width + y);
+//    }
 
     @Override
     public boolean singleton() {
@@ -223,7 +226,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
 
         //frame-rate timeslicing
         int actualPixels = pixels.size();
-        int pixelsSize = Math.min(actualPixels, work);
+        int pixelsSize = Math.min(actualPixels, pixelWork(work));
         int start, end;
 
         float pixelPri =
@@ -248,6 +251,11 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
 
 
         return pixelsSize;
+    }
+
+    /** how many pixels to process given a work amount */
+    protected int pixelWork(int work) {
+        return work;
     }
 
     private void update(int start, int end, float pixelPri, NAR nar) {

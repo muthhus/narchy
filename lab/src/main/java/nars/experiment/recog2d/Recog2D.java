@@ -15,7 +15,7 @@ import nars.gui.BeliefTableChart;
 import nars.term.Termed;
 import nars.time.Tense;
 import nars.truth.Truth;
-import nars.video.CameraSensor;
+import nars.util.signal.CameraSensor;
 import nars.video.PixelBag;
 import nars.video.Scale;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;

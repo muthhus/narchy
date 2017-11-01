@@ -1195,10 +1195,9 @@ public enum Op {
         return conjSeqFinal(dt, left, right);
     }
 
-    /**
-     * HACK
-     */
+
     private static Term conjSeqFinal(int dt, Term left, Term right) {
+        assert(dt!=XTERNAL);
         if (left == False) return False;
         if (left == Null) return Null;
 
@@ -1220,8 +1219,7 @@ public enum Op {
         //return CONJ.the(dt, left, right);
         if (left.compareTo(right) > 0) {
             //larger on left
-            if (dt != XTERNAL)
-                dt = -dt;
+            dt = -dt;
             Term t = right;
             right = left;
             left = t;
@@ -1252,10 +1250,7 @@ public enum Op {
             return conj; //fall-through
 
         int conjDT = conj.dt();
-
-        if (conjDT == XTERNAL)
-            return conj;
-
+        assert(conjDT!=XTERNAL);
 
         //if there is only one implication subterm (first layer only), then fold into that.
         int whichImpl = -1;
@@ -1268,10 +1263,11 @@ public enum Op {
                 whichImpl = i;
                 implication = conj.sub(whichImpl);
                 implDT = implication.dt();
-                if (implDT == XTERNAL) {
-                    //dont proceed any further if XTERNAL
-                    return conj;
-                }
+                assert(implDT!=XTERNAL);
+//                if (implDT == XTERNAL) {
+//                    //dont proceed any further if XTERNAL
+//                    return conj;
+//                }
                 break;
             }
         }

@@ -4,7 +4,7 @@ import jcog.Util;
 import nars.*;
 import nars.concept.ScalarConcepts;
 import nars.gui.Vis;
-import nars.video.CameraSensor;
+import nars.util.signal.CameraSensor;
 import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;

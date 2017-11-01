@@ -20,6 +20,7 @@ import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.util.signal.Bitmap2D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

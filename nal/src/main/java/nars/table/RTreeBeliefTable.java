@@ -294,9 +294,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             long leftStart = start, leftMid = mid, rightMid = mid, rightEnd = end;
             boolean leftComplete = false, rightComplete = false;
             //TODO float complete and use this as the metric for limiting with scan quality parameter
-            TimeRange r =
-                    //new TimeRange();
-                    new TimeRangeUniqueNodes(); //recycled
+            TimeRange r = //recycled
+                    new TimeRange();
+                    //new TimeRangeUniqueNodes(); <- not safe yet because task's taskregion is re-used for branch/leaf bounds and this could cause a false positive in the bloom filter test
             do {
 
 

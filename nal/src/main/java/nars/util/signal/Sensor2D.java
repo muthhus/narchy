@@ -1,4 +1,4 @@
-package nars.video;
+package nars.util.signal;
 
 import nars.NAR;
 import nars.concept.SensorConcept;

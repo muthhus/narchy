@@ -2,6 +2,7 @@ package nars.video;
 
 import jcog.learn.Autoencoder;
 import jcog.random.XorShift128PlusRandom;
+import nars.util.signal.Bitmap2D;
 
 /**
  * Autoencoder dimensional reduction of bitmap input

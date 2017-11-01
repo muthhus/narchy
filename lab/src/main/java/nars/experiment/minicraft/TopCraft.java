@@ -7,7 +7,7 @@ import nars.Narsese;
 import nars.experiment.minicraft.top.InputHandler;
 import nars.experiment.minicraft.top.TopDownMinicraft;
 import nars.video.PixelAutoClassifier;
-import nars.video.Sensor2D;
+import nars.util.signal.Sensor2D;
 
 //import org.jcodec.codecs.h264.H264Encoder;
 //import org.jcodec.codecs.h264.H264Utils;

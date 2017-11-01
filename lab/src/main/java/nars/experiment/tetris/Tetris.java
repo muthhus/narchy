@@ -4,8 +4,8 @@ import jcog.data.FloatParam;
 import nars.*;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.op.java.OObjects;
-import nars.video.Bitmap2D;
-import nars.video.CameraSensor;
+import nars.util.signal.Bitmap2D;
+import nars.util.signal.CameraSensor;
 
 import static nars.experiment.tetris.impl.TetrisState.*;
 
@@ -559,7 +559,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            });
 
             return a;
-        }, 15f);
+        }, 5f);
 
 
 //

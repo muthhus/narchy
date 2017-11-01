@@ -99,7 +99,7 @@ public class Schedulearn {
         solver.update();
 
         can.forEach(c -> {
-            c.iterations.value(c.iterations.value() * OVER_DEMAND_IMPL);
+            c.iterations.value(Math.max(1, c.iterations.value() * OVER_DEMAND_IMPL));
             c.commit();
         });
 

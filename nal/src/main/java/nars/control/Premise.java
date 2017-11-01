@@ -203,7 +203,7 @@ public class Premise  {
             }
         }
 
-        assert (!(beliefTerm instanceof Bool));
+        assert (!(beliefTerm instanceof Bool)): "beliefTerm boolean; termLink=" + termLink + ", belief=" + belief;
 
         d.set(this, belief, beliefTerm);
         return d;

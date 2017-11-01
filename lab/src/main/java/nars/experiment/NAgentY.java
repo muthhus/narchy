@@ -13,8 +13,8 @@ import nars.control.AgentService;
 import nars.task.ITask;
 import nars.term.Term;
 import nars.util.signal.Signal;
-import nars.video.Bitmap2D;
-import nars.video.CameraSensor;
+import nars.util.signal.Bitmap2D;
+import nars.util.signal.CameraSensor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

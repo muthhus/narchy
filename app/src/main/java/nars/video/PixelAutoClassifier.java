@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 import static nars.truth.TruthFunctions.w2c;
-import static nars.video.CameraSensor.coord;
+import static nars.util.signal.CameraSensor.coord;
 import static spacegraph.layout.Grid.col;
 
 /**

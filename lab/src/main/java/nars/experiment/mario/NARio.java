@@ -7,7 +7,7 @@ import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
 import nars.experiment.mario.sprites.Mario;
-import nars.video.CameraSensor;
+import nars.util.signal.CameraSensor;
 import nars.video.PixelBag;
 
 import javax.swing.*;

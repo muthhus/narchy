@@ -6,6 +6,7 @@ import nars.NAgent;
 import nars.concept.BaseConcept;
 import nars.control.DurService;
 import nars.truth.Truth;
+import nars.util.signal.Sensor2D;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
