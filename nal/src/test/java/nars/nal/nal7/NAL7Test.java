@@ -425,7 +425,7 @@ public class NAL7Test extends NALTest {
 
         TestNAR tester = test;
 
-        tester.log();
+
         tester.input("<(John,door) --> open>. :|:");
         tester.inputAt(4, "<(John,room) --> enter>. :|:");
 
@@ -588,7 +588,7 @@ public class NAL7Test extends NALTest {
 
     private void compositionTest(int t, int dt) {
 
-        test.log();
+
         test.inputAt(t, "hold(John,key). :|:");
         test.inputAt(t, "(open(John,door) ==>+" + dt + " enter(John,room)). :|:");
 
@@ -725,7 +725,7 @@ public class NAL7Test extends NALTest {
     public void testEternalImplicationDecompositionWithConj() {
 
         test
-                .log()
+
                 .inputAt(1, "(a &&+1 b). :|:")
                 .inputAt(1, "((a &&+1 b) ==>+4 c). :|:")
                 .mustBelieve(cycles, "c", 1f, 0.81f, 6 /* occ */)
@@ -771,7 +771,7 @@ public class NAL7Test extends NALTest {
         */
 
         test
-                .log()
+
                 .inputAt(2, "a:x. :|: %1.0;0.45%")
                 .inputAt(5, "b:x. :|: %1.0;0.90%")
                 .mustBelieve(cycles, "(a:#1 &&+3 b:#1)", 1f, 0.40f, 2, 5)

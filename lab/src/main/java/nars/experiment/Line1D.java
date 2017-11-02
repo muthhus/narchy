@@ -44,6 +44,7 @@ public class Line1D {
             Param.DEBUG = true;
 
             NARS nn = new NARS().threadable().nal(8);
+            nn.deriverAdd(8);
 //            nn.deriver(
 //                    "B, (A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:DeductionRecursivePB, Goal:DeciDeduction)",
 //                    "B, (--A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)",
@@ -54,25 +55,25 @@ public class Line1D {
             NAR n = nn.get();
 
 
-        ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, true, 16, 64);
-//        ConjClustering conjClusterG = new ConjClustering(n, 3, GOAL, true, 16, 64);
+//            ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, true, 16, 64);
 
-//            LinkClustering linkClusterPri = new LinkClustering(n,
-//                    Prioritized::priElseZero /* anything temporal */,
-//                    4, 16);
-
-            n.onTask(x -> {
-                if (x instanceof DerivedTask) {
-                    System.err.println(x);
-                }
+//            n.onTask(x -> {
+//                if (x instanceof DerivedTask) {
+//                    System.err.println(x);
+//                }
+//            });
+            n.onCycle(()->{
+                System.out.println(n.time()+":");
+                n.exe.active().forEach(System.out::println);
+                System.out.println();
             });
 //            n.log();
 
-            n.runLater(()->{
+            n.runLater(() -> {
                 try {
                     n.input(""
-                        //"(y,())! %0.5;0.02%",
-                        //"((),y)! %0.5;0.02%"
+                            //"(y,())! %0.5;0.02%",
+                            //"((),y)! %0.5;0.02%"
 //                            "$0.99 ((&&, i, --o) &&+1 ((),y))!",
 //                            "$0.99 ((&&, --i, o) &&+1 (y,()))!"
 //                            "$0.99 ((&|, i, --o) =|> happy).",
@@ -94,7 +95,6 @@ public class Line1D {
                     e.printStackTrace();
                 }
             });
-
 
 
             //n.beliefConfidence(0.9f);

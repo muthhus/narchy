@@ -10,6 +10,7 @@ import nars.term.container.TermVector1;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static nars.time.Tense.DTERNAL;
 
@@ -46,7 +47,11 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         sub.recurseTerms(v);
     }
 
-    
+    @Override
+    public boolean containsRecursively(Term t, boolean root, Predicate<Term> inSubtermsOf) {
+        return inSubtermsOf.test(this) && (sub.equals(t) || sub.containsRecursively(t, root, inSubtermsOf));
+    }
+
 
     @Override
     public int hashCode() {

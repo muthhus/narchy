@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.BufferOverflowException;
 import java.util.Arrays;
 
 /**
@@ -406,6 +407,10 @@ public class DynBytes implements ByteArrayDataOutput, Appendable, AbstractBytes 
 
     public void appendTo(@NotNull DataOutput out) throws IOException {
         out.write(bytes, 0, len);
+    }
+
+    public void writeUnsignedByte(int i) {
+        writeByte(i & 0xff);
     }
 
 //    @Override

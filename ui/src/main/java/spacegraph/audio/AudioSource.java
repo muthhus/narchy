@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Signal sampled from system sound devices (via Java Media)
  */
 public class AudioSource implements WaveSource {
-    private final float frameRate;
+    private final FloatParam frameRate;
     private TargetDataLine line;
     private final Mixer mixer;
     private final DataLine.Info dataLineInfo;
@@ -28,8 +28,9 @@ public class AudioSource implements WaveSource {
     private short sampleMin, sampleMax;
 
 
+
     public AudioSource(int device, float frameRate) {
-        this.frameRate = frameRate;
+        this.frameRate = new FloatParam(frameRate, 1f, 40f);
 
         // Pick a format...
         // NOTE: It is better to enumerate the formats that the system supports,
@@ -69,7 +70,7 @@ public class AudioSource implements WaveSource {
             int sampleRate = (int) audioFormat.getSampleRate();
             int numChannels = audioFormat.getChannels();
 
-            float period = 1.0f / frameRate;
+            float period = 1.0f / frameRate.floatValue();
 
             int audioBufferSize = (int) (sampleRate * numChannels * period);
 

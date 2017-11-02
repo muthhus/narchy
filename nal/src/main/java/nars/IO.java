@@ -4,6 +4,7 @@ package nars;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.google.common.primitives.Ints;
 import jcog.TODO;
 import jcog.byt.DynBytes;
 import jcog.data.string.Utf8Writer;
@@ -15,6 +16,7 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.*;
 import nars.term.container.TermContainer;
+import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
@@ -30,6 +32,7 @@ import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;
 import static nars.Op.*;
+import static nars.term.compound.FastCompound.ov;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -211,8 +214,17 @@ public class IO {
         if (oo == SPECIAL_OP)
             return (Atomic) termFromBytes(b);
 
-        Op o = Op.values()[oo];
+        Op o = ov[oo];
         switch (o) {
+
+            case ATOM:
+                return new Atom(b);
+
+            case VAR_PATTERN:
+            case VAR_DEP:
+            case VAR_QUERY:
+            case VAR_INDEP:
+                return $.v(o, Ints.fromBytes(b[1], b[2], b[3], b[4]));
 
             case INT:
 //                byte subType = in.readByte();
@@ -224,8 +236,6 @@ public class IO {
                 return (Atomic) termFromBytes(b);
                 //throw new TODO();
 
-            case ATOM:
-                return new Atom(b);
 
             //TODO normalized Variable cases
 
@@ -389,6 +399,8 @@ public class IO {
     public static byte[] termToBytes(Term t) {
         if (t instanceof Atom) {
             return ((AtomicConst)t).bytesCached;
+        } else if (t instanceof AbstractVariable) {
+            return ((AbstractVariable)t).bytes();
         }
 
         //bb = ArrayPool.bytes().

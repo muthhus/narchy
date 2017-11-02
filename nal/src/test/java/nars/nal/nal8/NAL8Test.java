@@ -175,7 +175,8 @@ public class NAL8Test extends NALTest {
             $1.0 x(intValue,(),3)! 5600 %1.0;.90% {5600: q}
             $.07 (x(intValue,(),3) ==>-48 x(intValue,(),3)). 3600 %1.0;.19% {5415: 1;2;4;9;d;e;l}
         */
-        test.log()
+        test
+            //.log()
             .goal("x(intValue,(),3)", Tense.Present, 1f, 0.9f)
             .believe("(x(intValue,(),3) ==>-48 x(intValue,(),3))")
             .mustGoal(cycles, "x(intValue,(),3)", 1f, 0.81f, 48, 48);
@@ -436,7 +437,7 @@ public class NAL8Test extends NALTest {
     public void testInhibition0() {
 
         test
-                .log()
+                //.log()
                 .goal("reward")
                 .believe("(bad ==> --reward)", 1, 0.9f)
                 .mustGoal(cycles, "bad", 0.0f, 0.45f)
@@ -448,7 +449,7 @@ public class NAL8Test extends NALTest {
         //deisreDed, and its negative counterpart for the negated belief
 
         test
-                .log()
+                //.log()
                 .goal("(reward)")
                 .believe("((good) ==> (reward))", 1, 0.9f)
                 .believe("((bad) ==> --(reward))", 1, 0.9f)
@@ -495,7 +496,7 @@ public class NAL8Test extends NALTest {
     public void testGoalPosNegSimilaritySpreading() {
 
         test
-                .log()
+                //.log()
                 .input("--(R)!")
                 .input("((G) <-> --(R)).")
                 .mustGoal(cycles, "(G)", 1f, 0.4f, (x) -> x == ETERNAL);
@@ -730,7 +731,7 @@ public class NAL8Test extends NALTest {
     public void conjDecomposeGoalAfterNegNeg() {
 
         test
-                .log()
+                //.log()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(6, "(--,(b))! :|:")
                 .mustGoal(cycles, "(a)", 1f, 0.81f, (t) -> t >= 6) //since b is not desired now, it should reverse predict the goal of (a)
@@ -762,7 +763,7 @@ public class NAL8Test extends NALTest {
         //predictive impl
         test
                 .truthTolerance(0.05f)
-                .log()
+                //.log()
                 .inputAt(1, "(x ==>-1 y). :|:") //should not affect the fact that the goal is relative to the 'y!' task, except it is slightly weaker
                 .inputAt(2, "y! :|:")
                 .mustGoal(cycles, "x", 1f, 0.45f, 3);

@@ -13,10 +13,8 @@ import org.jetbrains.annotations.NotNull;
 public enum AbstractPatternOp  {
     ;
 
-    @NotNull
-    static Term name(@NotNull Class c, int subterm, String param) {
-        return $.func(c.getSimpleName(), $.the('p' + Integer.toString(subterm))
-                , $.quote(param));
+    static Term name(Class c, int subterm, String param) {
+        return $.func(c.getSimpleName(), $.the(subterm) , $.quote(param));
     }
 
     public static final class PatternOp extends AbstractPred<Derivation> {

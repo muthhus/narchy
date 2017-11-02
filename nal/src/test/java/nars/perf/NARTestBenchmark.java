@@ -1,6 +1,8 @@
 package nars.perf;
 
-import nars.nal.nal1.NAL1Test;
+import nars.Builder;
+import nars.nal.nal6.NAL6Test;
+import nars.term.compound.FastCompound;
 import org.junit.jupiter.api.Disabled;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
@@ -16,28 +18,38 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass
 /**
  * Created by me on 4/24/17.
  */
-@State(Scope.Benchmark)
+@State(Scope.Thread)
 @Disabled
 public class NARTestBenchmark {
 
-//    @Setup public void prepare() {
-//        System.out.println(DefaultDeriver.the); //warm
-//    }
+    static final Class testclass = NAL6Test.class;
+
+    /**
+     * CONTROL
+     */
+    @Benchmark
+    @BenchmarkMode(Mode.AverageTime)
+    @Fork(0)
+    public void testX() {
+        junit(testclass);
+    }
+
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    public void testExample() {
+    @Fork(1)
+    public void testY() {
+        Builder.Compound.the = FastCompound.FAST_COMPOUND_BUILDER;
+//        Param.SynchronousExecution_Max_CycleTime = 0.0001f;
 
-//        Builder.Compound.the = new BiFunction<Op, Term[], Term>() {
-//            @Override public Term apply(Op op, Term[] terms) {
-//                return FastCompound.get(new GenericCompound(op, Op.subterms(terms)));
-//            }
-//        };
+        junit(testclass);
+    }
 
+    static void junit(Class testclass) {
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
                 .selectors(
                         //selectPackage("com.example.mytests"),
-                        selectClass(NAL1Test.class)
+                        selectClass(testclass)
                         //selectClass(FastCompoundNAL1Test.class)
                 )
                 // .filters( includeClassNamePatterns(".*Tests")  )
@@ -53,15 +65,13 @@ public class NARTestBenchmark {
         launcher.execute(request, listener);
 
         //listener.getSummary().printTo(new PrintWriter(System.out));
-
-
     }
 
     public static void main(String[] args) throws RunnerException {
-        perf(NARTestBenchmark.class, (x)->{
-            x.measurementIterations(5);
-            x.warmupIterations(2);
-            x.forks(1);
+        perf(NARTestBenchmark.class, (x) -> {
+            x.measurementIterations(2);
+            x.warmupIterations(1);
+            //x.forks(1);
             x.threads(1);
             x.addProfiler(StackProfiler2.class);
         });

@@ -49,7 +49,8 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        Param.DEBUG = true;
         //Param.TRACE = true;
         NAR n = NARS.threadSafe();
-        float fps = 64;
+        float fps = 16;
+        n.conceptActivation.set(0.2f);
 
         //csvPriority(n, "/tmp/x.csv");
 
@@ -92,7 +93,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        );
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                /* TODO */ 64, 5);
+                /* TODO */ 128, 5);
 
         cs.show(800, 800, false);
 

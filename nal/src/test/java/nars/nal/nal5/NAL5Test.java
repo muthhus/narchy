@@ -375,7 +375,7 @@ public class NAL5Test extends NALTest {
     public void conditional_deduction2() {
 
         TestNAR tester = test;
-        tester.log();
+        //tester.log();
         tester.believe("<(&&,<robin --> [chirping]>,<robin --> [flying]>,<robin --> [withWings]>) ==> <robin --> bird>>"); //.en("If robin can fly, has wings, and chirps, then robin is a bird");
         tester.believe("<robin --> [flying]>"); //.en("robin can fly.");
         tester.mustBelieve(cycles * 2, " <(&&,<robin --> [chirping]>,<robin --> [withWings]>) ==> <robin --> bird>>", 1.00f, 0.81f); //.en("If robin has wings and chirps then robin is a bird.");
@@ -399,7 +399,7 @@ public class NAL5Test extends NALTest {
         //((&&,M,A_1..n) ==> C), ((&&,A_1..n) ==> C) |- M, (Truth:Abduction, Order:ForAllSame)
 
         TestNAR tester = test;
-        tester.log();
+        //tester.log();
         tester.believe("([flying]:robin ==> bird:robin)"); //.en("If robin can fly then robin is a bird.");
         tester.believe("((swimmer:robin && [flying]:robin) ==> bird:robin)"); //.en("If robin both swims and flys then robin is a bird.");
         tester.mustBelieve(cycles * 4, "swimmer:robin", 1.00f, 0.45f /*0.4f*/); //.en("I guess robin swims.");
@@ -411,7 +411,7 @@ public class NAL5Test extends NALTest {
         //((&&,M,A_1..n) ==> C), ((&&,A_1..n) ==> C) |- M, (Truth:Abduction, Order:ForAllSame)
 
         TestNAR tester = test;
-        tester.log();
+        //tester.log();
         tester.believe("(flyingrobin ==> birdrobin)"); //.en("If robin can fly then robin is a bird.");
         tester.believe("((swimmerrobin && flyingrobin) ==> birdrobin)"); //.en("If robin both swims and flys then robin is a bird.");
         tester.mustBelieve(cycles * 2, "swimmerrobin", 1.00f, 0.45f /*0.4f*/); //.en("I guess robin swims.");
@@ -541,7 +541,7 @@ public class NAL5Test extends NALTest {
 
         // ((%1,(%2==>%3),belief(positive),notImpl(%1),time(urgent)),(subIfUnifiesAny(%3,%2,%1),((DeductionRecursive-->Belief),(InductionRecursive-->Goal))))
         test
-                .log()
+                //.log()
                 .input("(x). %1.0;0.90%")
                 .input("((x) ==> (y)).")
                 .mustBelieve(cycles, "(y)", 1.0f, 0.81f)
@@ -676,7 +676,7 @@ public class NAL5Test extends NALTest {
     public void testConversion() {
 
         test
-                .log()
+                //.log()
                 .input("((x)==>(y))?")
                 .input("((y)==>(x)).")
                 .mustBelieve(cycles, "((x)==>(y)).", 1.0f, 0.47f)

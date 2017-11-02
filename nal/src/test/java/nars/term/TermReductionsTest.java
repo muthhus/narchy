@@ -895,10 +895,10 @@ public class TermReductionsTest extends NarseseTest {
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) ==>+0 (a))"));
     }
 
-    @Test
-    public void testXternalIsInvalidForTaskContent() {
-        assertValidTermValidConceptInvalidTaskContent(("((--,(a)) <=>+- (a))"));
-    }
+//    @Test
+//    public void testXternalIsInvalidForTaskContent() {
+//        assertValidTermValidConceptInvalidTaskContent(("((--,(a)) <=>+- (a))"));
+//    }
 
 //    @Test
 //    public void testCoNegatedEqui() throws Narsese.NarseseException {

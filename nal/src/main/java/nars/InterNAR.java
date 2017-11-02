@@ -31,7 +31,7 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
 
 
     @Override
-    public void accept(NAR nar, @NotNull Task t) {
+    public void accept(NAR nar, Task t) {
         buffer.accept(nar, t);
     }
 
@@ -46,10 +46,12 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
     }
 
     @Override
-    protected void stop(NAR nar)  {
+    protected synchronized void stop(NAR nar)  {
         super.stop(nar);
-        peer.stop();
-        peer = null;
+        if (peer!=null) {
+            peer.stop();
+            peer = null;
+        }
     }
 
 
@@ -114,7 +116,7 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
             }
 
             @Override
-            public boolean preFilter(@NotNull Task next) {
+            public boolean preFilter(Task next) {
                 if (next.isCommand() || !peer.connected())
                     return false;
 

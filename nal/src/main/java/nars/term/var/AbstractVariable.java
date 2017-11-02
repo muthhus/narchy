@@ -22,6 +22,7 @@ package nars.term.var;
 
 
 import com.google.common.io.ByteArrayDataOutput;
+import jcog.Util;
 import nars.$;
 import nars.Op;
 import nars.Param;
@@ -59,6 +60,12 @@ public abstract class AbstractVariable implements Variable {
     public void append(ByteArrayDataOutput out) {
         out.writeByte(op().id);
         out.writeInt(id());
+    }
+    public byte[] bytes() {
+        byte[] b = new byte[5];
+        b[0] = op().id;
+        Util.int2Bytes(id(), b, 1);
+        return b;
     }
 
     @Override
@@ -247,6 +254,8 @@ public abstract class AbstractVariable implements Variable {
             return AbstractVariable.varCache[AbstractVariable.opToVarIndex(type)][id];
         }
     }
+
+
 
 
     //    //TODO replace this with a generic counting method of how many subterms there are present

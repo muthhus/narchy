@@ -20,17 +20,19 @@ public class InterNARTest {
     void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<NAR, NAR> afterConnect) {
 
         final int CONNECTION_TIME = 200;
-        int preCycles = 15;
-        int postCycles = 10;
+        int preCycles = 1;
+        int postCycles = 25;
 
         Param.ANSWER_REPORTING = false;
 
-        try {
-            NAR a = NARS.threadSafe();
-            a.setSelf("a");
+        NAR a = NARS.threadSafe();
+        a.setSelf("a");
 
-            NAR b = NARS.threadSafe();
-            b.setSelf("b");
+        NAR b = NARS.threadSafe();
+        b.setSelf("b");
+
+        try {
+
 
             beforeConnect.accept(a, b);
 
@@ -43,40 +45,52 @@ public class InterNARTest {
                 @Override
                 protected void start(NAR nar) {
                     super.start(nar);
-                    nar.runLater(() -> {
+                    {
 
                         runFPS(5f);
 
-                        Util.sleep(CONNECTION_TIME);
+//                        Util.sleep(CONNECTION_TIME);
 
-                        afterConnect.accept(a, b);
 
-                        a.run(postCycles);
-
-                        a.stop();
-
-                    });
+                    }
                 }
             };
             InterNAR bi = new InterNAR(b, 10, 0, false) {
                 @Override
                 protected void start(NAR nar) {
                     super.start(nar);
-                    nar.runLater(() -> {
+                    {
                         runFPS(5f);
 
-                        Util.sleep(CONNECTION_TIME);
+//                        Util.sleep(CONNECTION_TIME);
 
                         ping(ai.addr());
 
-                        b.run(postCycles);
 
-                        b.stop();
-                    });
+                    }
                 }
             };
 
+            /* init */
+            for (int i = 0; i < 1; i++) {
+                a.run(1);
+                b.run(1);
+            }
             Util.sleep(CONNECTION_TIME * 4);
+
+            afterConnect.accept(a, b);
+
+            /* init */
+            for (int i = 0; i < postCycles; i++) {
+                a.run(1);
+                b.run(1);
+            }
+
+            ai.stop();
+            bi.stop();
+//            a.stop();
+//            b.stop();
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -86,14 +100,14 @@ public class InterNARTest {
 
     @Test
     public void testInterNAR1() {
-        AtomicBoolean recv = new AtomicBoolean();
+        AtomicBoolean aRecvQuestionFromB = new AtomicBoolean();
 
         testAB((a, b) -> {
 
             a.onTask(tt -> {
                 //System.out.println(b + ": " + tt);
-                if (tt.toString().contains("(X-->y)"))
-                    recv.set(true);
+                if (tt.toString().contains("(?1-->y)"))
+                    aRecvQuestionFromB.set(true);
             });
 
             try {
@@ -116,7 +130,7 @@ public class InterNARTest {
 
         });
 
-        assertTrue(recv.get());
+        assertTrue(aRecvQuestionFromB.get());
 
     }
 
@@ -131,13 +145,6 @@ public class InterNARTest {
         testAB((a, b) -> {
 
 
-            try {
-                b.believe("(a --> b)");
-                b.believe("(c --> d)");
-            } catch (Narsese.NarseseException e) {
-                fail(e);
-            }
-
             b.onTask(tt -> {
                 //System.out.println(b + ": " + tt);
                 if (tt.isBelief() && tt.toString().contains("(a-->d)"))
@@ -146,15 +153,21 @@ public class InterNARTest {
 
         }, (a, b) -> {
 
+            try {
+                b.believe("(a --> b)");
+                b.believe("(c --> d)");
+            } catch (Narsese.NarseseException e) {
+                fail(e);
+            }
 
             try {
-                b.question("(a --> d)");
+                a.believe($("(b --> c)"), Tense.Eternal, 1f, 0.9f);
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
             }
 
             try {
-                a.believe($("(b --> c)"), Tense.Eternal, 1f, 0.9f);
+                b.question("(a --> d)");
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
             }

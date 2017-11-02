@@ -11,6 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FastCompoundTest {
 
+    @Test public void testVar() throws Narsese.NarseseException {
+        assertEquivalent("(?1-->x)");
+        assertEquivalent("(?x-->x)");
+        assertEquivalent("(x-->?1)");
+        assertEquivalent("(x-->?x)");
+    }
+
     @Test
     public void test1() throws Narsese.NarseseException {
         assertEquivalent("(((x)))");
@@ -53,8 +60,14 @@ public class FastCompoundTest {
         assertEquals(c.subs(), f.subs());
         int s = f.subterms().subs();
         assertEquals(c.subterms().subs(), s);
-        for (int i = 0; i < s; i++)
+
+
+        for (int i = 0; i < s; i++) {
             assertEquals(c.subterms().sub(i), f.subterms().sub(i));
+            assertEquals(f.subterms().sub(i), c.subterms().sub(i));
+            assertEquals(-f.subterms().sub(i).compareTo( c.subterms().sub(i) ),
+                         c.subterms().sub(i).compareTo( f.subterms().sub(i) ) );
+        }
 
         assertEquals(c.structure(), f.structure());
         assertEquals(c.complexity(), f.complexity());

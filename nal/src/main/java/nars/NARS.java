@@ -115,7 +115,7 @@ public class NARS {
 
         index = () ->
                 //new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
-                new MapTermIndex(new LinkedHashMap(128, 0.9f));
+                new MapTermIndex(new LinkedHashMap(64, 0.9f));
 
         time = new CycleTime();
 

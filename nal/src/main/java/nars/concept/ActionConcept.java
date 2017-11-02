@@ -27,7 +27,7 @@ public abstract class ActionConcept extends WiredConcept {
     @Nullable abstract public Stream<ITask> update(long now, int dur, NAR nar);
 
    @Override
-    public void value(@NotNull Task t, float activation, NAR n) {
+    public void value(Task t, float activation, NAR n) {
 
         super.value(t, activation, n);
 

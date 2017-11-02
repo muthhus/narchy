@@ -229,7 +229,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
 
                 if (p1 != null && !p1.equals(nt)) {
-                    p1.end(now); //dont need to re-input prev, this takes care of it
+                    p1.end(Math.max(p1.start(), now-1)); //dont need to re-input prev, this takes care of it. ends in the cycle previous to now
                     next.priMax(pri);
 
                     NALTask prevEnd = new NALTask(p1.term(),

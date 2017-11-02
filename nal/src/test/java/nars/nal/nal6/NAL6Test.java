@@ -35,7 +35,7 @@ public class NAL6Test extends NALTest {
     public void variable_unification2() {
 
         test
-                .log()
+                //.log()
                 .believe("<<$x --> bird> ==> <$x --> animal>>") //en("If something is a bird, then it is a animal.");
                 .believe("<<$y --> robin> ==> <$y --> bird>>") //en("If something is a robin, then it is a bird.");
                 .mustBelieve(cycles, "<<$1 --> robin> ==> <$1 --> animal>>", 1.00f, 0.81f) //en("If something is a robin, then it is a animal.")
@@ -193,7 +193,7 @@ public class NAL6Test extends NALTest {
     public void variable_elimination_sim() {
 
         TestNAR tester = test;
-        tester.log();
+
         tester.believe("(<$x --> bird> <-> <$x --> swimmer>)"); //en("Some bird can swim.");
         tester.believe("<swan --> bird>", 0.90f, 0.9f); //en("Swan is a type of bird.");
         tester.mustBelieve(cycles, "<swan --> swimmer>", 0.90f, //en("I guess swan can swim.");
@@ -217,7 +217,7 @@ public class NAL6Test extends NALTest {
     //        $.21 (((Tweety-->chirping)&&(Tweety-->eatsWorms))==>(Tweety-->bird)). %1.0;.81%
         //  ((%1,((%3&&%1073742338..+)==>%4),task(".")),(subIfUnifiesAny(((&&,%1073742338..+) ==>+- %4),%3,%1,"$"),((DeductionPB-->Belief))))
         TestNAR tester = test;
-        tester.log();
+
         tester.believe("((&&, flyer:$x, chirping:$x, eatsWorms:$x) ==> bird:$x)"); //en("If something can fly, chirp, and eats worms, then it is a bird.");
         tester.believe("flyer:Tweety"); //en("Tweety can fly.");
         tester.mustBelieve(cycles*2,
@@ -301,7 +301,7 @@ public class NAL6Test extends NALTest {
     public void variable_introduction() {
 
         TestNAR tester = test;
-        tester.log();
+
         tester.believe("<swan --> bird>"); //en("A swan is a bird.");
         tester.believe("<swan --> swimmer>", 0.80f, 0.9f); //en("A swan is usually a swimmer.");
         tester.mustBelieve(cycles, "<<$1 --> swimmer> ==> <$1 --> bird>>", 1.00f, 0.39f); //en("I guess a swimmer is a bird.");
@@ -375,7 +375,7 @@ public class NAL6Test extends NALTest {
     public void variables_introduction() {
 
         test
-                .log()
+
                 .believe("open({key1},{lock1})") //en("Key-1 opens Lock-1.");
                 .believe("key:{key1}") //en("Key-1 is a key.");
                 .mustBelieve(cycles, "(key:$1 ==> open($1,{lock1}))", 1.00f, 0.45f) //en("I guess every key can open Lock-1.");
