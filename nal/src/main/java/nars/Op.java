@@ -972,7 +972,7 @@ public enum Op {
         switch (str) {
             case "==>":
             case "&&":
-            //case "*": //HACK necessary for ellipsematch?
+            case "*": //HACK necessary for ellipsematch content
                 allowsBool = true;
                 break;
             default:

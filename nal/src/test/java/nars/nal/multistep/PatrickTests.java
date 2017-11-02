@@ -121,7 +121,7 @@ public class PatrickTests extends NALTest {
 
         tt.truthTolerance(0.1f);
 //        MetaGoal.Desire.want(nar.want, 0.5f);
-        tt.nar.truthResolution.set(0.02f);
+        tt.nar.truthResolution.set(0.04f);
         //tt.nar.DEFAULT_BELIEF_PRIORITY = 0.1f;
         tt.nar.time.dur(10);
         tt.nar.termVolumeMax.set(38);
@@ -129,7 +129,7 @@ public class PatrickTests extends NALTest {
 //        tt.nar.onCycle(()->{
 //            System.err.println(tt.nar.time());
 //        });
-        tt.log();
+        //tt.log();
         tt.input(
                 "made_of(toothbrush,plastic).",
                 "( ( made_of($1, plastic) &| lighter(I, $1) ) ==>+10 <$1 --> [heated]>).",
