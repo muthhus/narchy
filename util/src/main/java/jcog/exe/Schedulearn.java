@@ -78,10 +78,10 @@ public class Schedulearn {
             solver.add(proportionalToValue);
 
             //demand slightly more than supply limit
-            double prevIter = x.supply();
-            //double maxIter = Math.max(1, Math.ceil((1 + prevIter) * OVER_DEMAND));
+            double supply = x.supply();
+            double overSupply = Math.max(1, Math.ceil((1 + supply) * OVER_DEMAND_IMPL));
 
-            ContinuousConstraint meetsSupply = C.lessThanOrEqualTo(xi, x.supply());
+            ContinuousConstraint meetsSupply = C.lessThanOrEqualTo(xi, overSupply);
             meetsSupply.setStrength(Strength.STRONG);
             solver.add(meetsSupply);
 

@@ -317,20 +317,32 @@ public class Temporalize implements ITemporalize {
                 } else if (tdt != XTERNAL) {
                     //add the known timing of the conj's events
 
-                    //the raw events HACK this should be handled by some use of .events() will add flags later for including the compounds not just the fully decomposed events
-                    Term pa = null; int pt = 0;
-                    for (int i = 0, s = x.subs(); i < s; i++) {
-                        Term a = x.sub(i); //conj subevent
-
-                        int at = x.subTime(a);
-                        know(a, relative(a, x, at)); //link to its position in the super-conj
-                        if (i > 0) {
-                            know(a, relative(a, pa, at-pt)); //chain to previous
-                            know(pa, relative(pa, a, pt-at)); //chain to previous //is this one necessary?
+                    //the raw events
+                    final Term[] pa = {null};
+                    final long[] pt = {0};
+                    x.eventsWhile((at,a)->{
+                        know(a, relative(a, x, (int) at)); //link to its position in the super-conj
+                        if (pa[0] !=null) {
+                            know(a, relative(a, pa[0], (int) (at- pt[0]))); //chain to previous
+                            know(pa[0], relative(pa[0], a, (int) (pt[0] -at))); //chain to previous //is this one necessary?
                         }
-                        pa = a;
-                        pt = at;
-                    }
+                        pa[0] = a;
+                        pt[0] = at+a.dtRange();
+                        return true;
+                    }, 0);
+//                    Term pa = null; int pt = 0;
+//                    for (int i = 0, s = x.subs(); i < s; i++) {
+//                        Term a = x.sub(i); //conj subevent
+//
+//                        int at = x.subTime(a);
+//                        know(a, relative(a, x, at)); //link to its position in the super-conj
+//                        if (i > 0) {
+//                            know(a, relative(a, pa, at-pt)); //chain to previous
+//                            know(pa, relative(pa, a, pt-at)); //chain to previous //is this one necessary?
+//                        }
+//                        pa = a;
+//                        pt = at;
+//                    }
 
 //                    FasterList<ObjectLongPair<Term>> ee = x.eventList();
 //                    int numEvents = ee.size();

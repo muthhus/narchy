@@ -72,16 +72,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         //if (/*v > 3 && */v < 16) {
 //        Map sharedMap = newBagMap(v);
         Random rng = nar.random();
-        @NotNull Bag<Term, PriReference<Term>> termbag =
+        Bag<Term, PriReference<Term>> termbag =
                 new CurveBag<>(Param.termlinkMerge, newBagMap(v), rng, 0);
-        @NotNull CurveBag<PriReference<Task>> taskbag =
+        CurveBag<PriReference<Task>> taskbag =
                 new TaskLinkCurveBag(newBagMap(v), rng);
 
-        return new Bag[]
-
-                {
-                        termbag, taskbag
-                }
+        return new Bag[] {  termbag, taskbag }
 
                 ;
 //        } else {

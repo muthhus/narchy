@@ -17,7 +17,7 @@ public class Can {
     final static int WINDOW = 8;
 
     final DescriptiveStatistics iterationTime = new DescriptiveStatistics(WINDOW);
-    final DescriptiveStatistics supply = new DescriptiveStatistics(WINDOW);
+    public final DescriptiveStatistics supply = new DescriptiveStatistics(WINDOW);
     protected final DescriptiveStatistics value = new DescriptiveStatistics(WINDOW);
 
     /**

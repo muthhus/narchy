@@ -39,7 +39,7 @@ public class UniExec extends Exec {
 
     @Override
     public void activate(Concept c, float activationApplied) {
-        active.putAsync(new Activate(c, activationApplied));
+        active.putAsync(new Activate(c, activationApplied * nar.conceptActivation.floatValue()));
     }
 
     @Override
@@ -70,7 +70,7 @@ public class UniExec extends Exec {
     public void cycle(List<Can> can) {
         super.cycle(can);
 
-        active.commit();
+        active.commit(active.forget(nar.forgetRate.floatValue()));
     }
 
     @Override

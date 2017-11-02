@@ -247,7 +247,7 @@ public class NARS {
 
             nar.nal(nal);
 
-            nar.termVolumeMax.set(46);
+            nar.termVolumeMax.set(38);
             //nar.confMin.setValue(0.05f);
 
             nar.DEFAULT_BELIEF_PRIORITY = 0.5f;

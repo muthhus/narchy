@@ -8,7 +8,6 @@ import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
 import nars.concept.TermLinks;
@@ -55,7 +54,8 @@ public class Activate extends PLink<Concept> implements Termed {
 
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks();
 
-        termlinks.commit(termlinks.forget(Param.LINK_FORGET_TEMPERATURE));
+        float linkForgetting = nar.forgetRate.floatValue();
+        termlinks.commit(termlinks.forget(linkForgetting));
         int ntermlinks = termlinks.size();
         if (ntermlinks == 0)
             return null;
@@ -71,7 +71,7 @@ public class Activate extends PLink<Concept> implements Termed {
 
 
         final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
-        tasklinks.commit(tasklinks.forget(Param.LINK_FORGET_TEMPERATURE));
+        tasklinks.commit(tasklinks.forget(linkForgetting));
         int ntasklinks = tasklinks.size();
         if (ntasklinks == 0) return null;
 

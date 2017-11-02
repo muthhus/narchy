@@ -220,9 +220,12 @@ public class Premise  {
             //return now;
         } else {
 
-            return now;
+            //return now;
 
             //return task.nearestTimeTo(now);
+
+            return nar.random().nextBoolean() ?
+                    now : task.nearestTimeTo(now);
 
             //        return nar.random().nextBoolean() ?
             //                task.nearestTimeTo(now) :

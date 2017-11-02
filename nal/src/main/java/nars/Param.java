@@ -3,6 +3,7 @@ package nars;
 import jcog.Services;
 import jcog.Util;
 import jcog.data.FloatParam;
+import jcog.data.MutableDouble;
 import jcog.data.MutableInteger;
 import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
@@ -14,7 +15,6 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
-import nars.util.UtilityFunctions;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +47,7 @@ public abstract class Param extends Services<Term, NAR> {
      */
     public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
 
-    public static final float LINK_FORGET_TEMPERATURE = PriForget.FORGET_TEMPERATURE_DEFAULT;
+    public static final FloatParam forgetRate = new FloatParam(PriForget.FORGET_TEMPERATURE_DEFAULT, 0f, 1f);
 
     /** hard limit to prevent infinite looping */
     public static final int MAX_TASK_FORWARD_HOPS = 8;
@@ -91,8 +91,8 @@ public abstract class Param extends Services<Term, NAR> {
             PriMerge.plus;
 
     public static final PriMerge tasklinkMerge =
-            PriMerge.max;
-    //PriMerge.plus; //not safe to plus without enough headroom
+            //PriMerge.max;
+            PriMerge.plus; //not safe to plus without enough headroom
 
 //    /**
 //     * budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links)
@@ -139,7 +139,7 @@ public abstract class Param extends Services<Term, NAR> {
      * 'time to live', unification steps until unification is stopped
      */
     public final MutableInteger matchTTLmax = new MutableInteger(512);
-    public final MutableInteger matchTTLmin = new MutableInteger(128);
+    public final MutableInteger matchTTLmin = new MutableInteger(32);
 
     /**
      * how much percent of a premise's allocated TTL can be used in the belief matching phase.
@@ -188,7 +188,7 @@ public abstract class Param extends Services<Term, NAR> {
      */
     public static final float TERMLINK_BALANCE = 0.5f;
 
-
+    public final FloatParam conceptActivation = new FloatParam(0.1f, 0, 1f);
 
     public final float[] want = newWants();
 
@@ -196,7 +196,7 @@ public abstract class Param extends Services<Term, NAR> {
         float[] w = this.want;
 
         //follows the pos/neg guidelines described in the comment of each MetaGoal
-        Perceive.want(w, 0.0f);
+        Perceive.want(w, -0.01f);
         Believe.want(w, 0.1f);
         Desire.want(w, 0.2f);
         Accurate.want(w, 0.1f);
@@ -389,11 +389,10 @@ public abstract class Param extends Services<Term, NAR> {
      */
     public static double evi(float evi, long dt, long dur) {
 
-        return evi / (1.0 + ( ((double)dt) / dur) ); //inverse linear
+        //return evi / (1.0 + ( ((double)dt) / dur) ); //inverse linear
 
-        //use high precision math here
-        //double ddt = dt;
-        //return (float) (evi / (1.0 + ddt * ddt / dur)); //inverse square
+        double ddt = dt;
+        return (float) (evi / (1.0 + ddt * ddt / dur)); //inverse square
 
         //return evi / Util.sqr( 1f + dt / dur ); //inverse square suck
 
