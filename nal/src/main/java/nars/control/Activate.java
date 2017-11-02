@@ -17,6 +17,7 @@ import nars.term.Termed;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * concept firing, activation, etc
@@ -35,7 +36,7 @@ public class Activate extends PLink<Concept> implements Termed {
 
     public Iterable<Premise> hypothesize(NAR nar, BatchActivation ba, int premisesMax) {
 
-        assert(premisesMax > 0);
+        assert (premisesMax > 0);
 
         nar.emotion.conceptFires.increment();
 
@@ -61,7 +62,7 @@ public class Activate extends PLink<Concept> implements Termed {
             return null;
 
         //TODO add a termlink vs. tasklink balance parameter
-        int TERMLINKS_SAMPLED = (int) Math.ceil((float)Math.sqrt(premisesMax));
+        int TERMLINKS_SAMPLED = (int) Math.ceil((float) Math.sqrt(premisesMax));
 
         int tlSampled = Math.min(ntermlinks, TERMLINKS_SAMPLED);
         FasterList<PriReference<Term>> terml = new FasterList(tlSampled);
@@ -77,30 +78,19 @@ public class Activate extends PLink<Concept> implements Termed {
 
         Random rng = nar.random();
 
-        int TASKLINKS_SAMPLED = (int) Math.ceil(((float)premisesMax) / termlSize);
-        int TASKLINK_oversample = 2 * TASKLINKS_SAMPLED;
-        List<PriReference<Task>> tasklinkCandidates = $.newArrayList();
-        tasklinks.sample(TASKLINK_oversample, (Consumer<PriReference<Task>>) /* not pred */(tasklinkCandidates::add));
-        if (tasklinkCandidates.isEmpty())
-            return null;
 
         //apply the nar valuation to further refine selection of the tasks collected in the oversample prestep
         List<Premise> next = new FasterList(premisesMax);
         final int[] remaining = {premisesMax};
-        Util.selectRouletteUnique(rng, tasklinkCandidates.size(), (i)-> {
-                PriReference<Task> tl = tasklinkCandidates.get(i);
-                Task t = tl.get();
-                if (t == null) return 0;
-                return tl.priElseZero() * nar.evaluate(t.cause());
-        }, tli-> {
-        //tasklinks.sample(Math.min(ntasklinks, TASKLINKS_SAMPLED), (tasklink) -> {
 
-            PriReference<Task> tasklink = tasklinkCandidates.get(tli);
+        tasklinks.sample((Predicate<PriReference<Task>>) tasklink -> {
+            //tasklinks.sample(Math.min(ntasklinks, TASKLINKS_SAMPLED), (tasklink) -> {
+
             final Task task = tasklink.get();
             if (task == null)
                 return true;
 
-            for (int j = 0; j < termlSize && remaining[0]-- > 0; j++) {
+            for (int j = 0; j < termlSize; j++) {
                 PriReference<Term> termlink = terml.get(j);
 
                 final Term term = termlink.get();
@@ -114,9 +104,11 @@ public class Activate extends PLink<Concept> implements Termed {
                     );
 
                     next.add(p);
-                    if (next.size() >= premisesMax)
-                        return false;
+
                 }
+
+                if (--remaining[0] <= 0)
+                    return false;
             }
 
             return true;
@@ -156,7 +148,7 @@ public class Activate extends PLink<Concept> implements Termed {
             //TODO try biasing toward larger template components so the activation trickles down to atoms with less probabilty
         }, z -> {
             Concept cc = nar.conceptualize(tt.get(z));
-            if (cc==null)
+            if (cc == null)
                 return true;
             uu.add(cc);
             return (uu.size() < count);
