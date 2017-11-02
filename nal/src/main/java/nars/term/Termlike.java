@@ -2,19 +2,14 @@ package nars.term;
 
 import nars.Op;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static nars.Op.Null;
-import static nars.Op.VAR_QUERY;
 
 /**
  * something which is like a term but isnt quite,

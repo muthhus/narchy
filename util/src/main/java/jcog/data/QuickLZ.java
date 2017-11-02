@@ -16,11 +16,11 @@ package jcog.data;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-
+/** http://www.quicklz.com/QuickLZ.java */
 public final class QuickLZ {
 
-    public static int MATCH_THRESH = 7;
-    public static int UNCONDITIONAL_MATCHLEN = 2;
+    public static final int MATCH_THRESH = 7;
+    public static final int UNCONDITIONAL_MATCHLEN = 2;
 
 
     final private static int HASH_VALUES = 4096;
@@ -32,42 +32,38 @@ public final class QuickLZ {
     static int headerLen(byte[] source) {
         return ((source[0] & 2) == 2) ? 9 : 3;
     }
-
+    static boolean headerLong(byte[] source) {
+        return ((source[0] & 2) == 2);
+    }
     static public long sizeDecompressed(byte[] source) {
-        if (headerLen(source) == 9)
-            return fastread(source, 5, 4);
-        else
-            return fastread(source, 2, 1);
+        return headerLong(source) ? fastread(source, 5, 4) : fastread(source, 2, 1);
     }
 
     static public long sizeCompressed(byte[] source) {
-        if (headerLen(source) == 9)
-            return fastread(source, 1, 4);
-        else
-            return fastread(source, 1, 1);
+        return headerLong(source) ? fastread(source, 1, 4) : fastread(source, 1, 1);
     }
 
     public static byte[] compress(byte[] source) {
-        int src = 0;
         int headerlen = DEFAULT_HEADERLEN;
-        int dst = headerlen + CWORD_LEN;
-        long cword_val = 0x80000000L;
-        int cword_ptr = headerlen;
         byte[] destination = new byte[source.length + 400];
-        int[] hashtable = new int[HASH_VALUES];
-        int[] cachetable = new int[HASH_VALUES];
-        byte[] hash_counter = new byte[HASH_VALUES];
-        byte[] d2;
-        int fetch = 0;
         int last_matchstart = (source.length - UNCONDITIONAL_MATCHLEN -
                 UNCOMPRESSED_END - 1);
 
         if (source.length == 0)
             return ArrayUtils.EMPTY_BYTE_ARRAY;
 
+        int fetch = 0;
+        int src = 0;
         if (src <= last_matchstart)
             fetch = (int) fastread(source, src, 3);
 
+        byte[] d2;
+        byte[] hash_counter = new byte[HASH_VALUES];
+        int[] cachetable = new int[HASH_VALUES];
+        int[] hashtable = new int[HASH_VALUES];
+        int cword_ptr = headerlen;
+        long cword_val = 0x80000000L;
+        int dst = headerlen + CWORD_LEN;
         while (src <= last_matchstart) {
             if ((cword_val & 1) == 1) {
                 if (src > 3 * (source.length >> 2) && dst > src - (src >> 5)) {
@@ -221,15 +217,7 @@ public final class QuickLZ {
         int size = (int) sizeDecompressed(source);
 
         int src = headerLen(source);
-        int dst = 0;
-        long cword_val = 1;
-        byte[] destination = new byte[size];
-        int[] hashtable = new int[4096];
-        byte[] hash_counter = new byte[4096];
         int last_matchstart = size - UNCONDITIONAL_MATCHLEN - UNCOMPRESSED_END - 1;
-        int last_hashed = -1;
-        int hash;
-        int fetch = 0;
 
         if ((source[0] & 1) != 1) {
             byte[] d2 = new byte[size];
@@ -237,7 +225,13 @@ public final class QuickLZ {
             return d2;
         }
 
-        for (; ; ) {
+        int last_hashed = -1;
+        byte[] hash_counter = new byte[4096];
+        int[] hashtable = new int[4096];
+        byte[] destination = new byte[size];
+        long cword_val = 1;
+        int dst = 0;
+        for (int fetch = 0; ; ) {
             if (cword_val == 1) {
                 cword_val = fastread(source, src, 4);
                 src += 4;
@@ -245,14 +239,14 @@ public final class QuickLZ {
                     fetch = (int) fastread(source, src, 3);
             }
 
+            int hash;
             if ((cword_val & 1) == 1) {
-                int matchlen;
-                int offset2;
 
                 cword_val = cword_val >>> 1;
                 hash = (fetch >>> 4) & 0xfff;
-                offset2 = hashtable[hash];
+                int offset2 = hashtable[hash];
 
+                int matchlen;
                 if ((fetch & 0xf) != 0) {
                     matchlen = (fetch & 0xf) + 2;
                     src += 2;
@@ -265,9 +259,7 @@ public final class QuickLZ {
                 destination[dst + 1] = destination[offset2 + 1];
                 destination[dst + 2] = destination[offset2 + 2];
 
-                for (int i = 3; i < matchlen; i += 1) {
-                    destination[dst + i] = destination[offset2 + i];
-                }
+                System.arraycopy(destination, offset2 + 3, destination, dst + 3, matchlen - 3);
                 dst += matchlen;
 
                 fetch = (int) fastread(destination, last_hashed + 1, 3);

@@ -51,7 +51,7 @@ public class PrologCore extends PrologAgent implements Consumer<Task> {
                             .getResourceAsStream("nars/prolog/default.prolog")
             );
         } catch (Throwable e) {
-            logger.error("default.prolog {}", e);
+            logger.error("default.prolog {}", e.getMessage());
             a = "";
         }
         AxiomTheory = a;

@@ -4,7 +4,6 @@ import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
-import nars.control.MetaGoal;
 import nars.test.TestNAR;
 import nars.util.NALTest;
 import org.junit.jupiter.api.Disabled;

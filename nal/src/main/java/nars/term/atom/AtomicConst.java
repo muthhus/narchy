@@ -3,7 +3,6 @@ package nars.term.atom;
 import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
 import nars.Op;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 

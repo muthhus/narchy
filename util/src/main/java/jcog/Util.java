@@ -1423,6 +1423,13 @@ public enum Util {
         return Math.max(Math.max(a, b), c);
     }
 
+    public static int intFromShorts(short high, short low) {
+        return high << 16 | low;
+    }
+    public static short intFromShorts(int x, boolean high) {
+        return high ? (short) (x >> 16) : (short) (x & 0xffff);
+    }
+
     public static enum RouletteControl {
         STOP, CONTINUE, WEIGHTS_CHANGED
     }

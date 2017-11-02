@@ -5,8 +5,6 @@ import jcog.Util;
 import nars.Param;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
-import nars.term.Termed;
-import nars.term.Termlike;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 

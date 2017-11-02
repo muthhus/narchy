@@ -1,133 +1,181 @@
-//package jcog.bag.impl;
+package jcog.bag.impl;
+
+import jcog.Util;
+import jcog.pri.PriMap;
+import jcog.util.FloatFloatToFloatFunction;
+import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.block.function.primitive.ShortToShortFunction;
+
+/**
+ * lighter-weight 2nd-generation arraybag
+ * TODO not finished
+ */
+public class ArrayBag2<X> extends PriMap<X> {
+    public int capacity;
+
+    /**
+     * holds the hash indices of the items in sorted order
+     */
+    public short[] sorted = ArrayUtils.EMPTY_SHORT_ARRAY;
+
+    public final ShortShortToShortFunction merge = (x, y) -> (short) (x + y);
+    short min, max;
+    int pressure = 0;
+    int mass = 0;
+
+    public ArrayBag2(int capacity) {
+        super(0);
+        setCapacity(capacity);
+    }
+
+    public boolean put(X x, float pri) {
+        return put(x, shortPri(pri));
+    }
+
+    public boolean put(X x, short pri) {
+        short from, to;
+        synchronized (this) {
+            pressure += pri;
+            if (isFull()) {
+                assert (min >= 0);
+                if (pri < min && !containsKey(x)) {
+                    return false; //rejected
+                }
+            }
+            int ch = update(x, pri, merge);
+            from = Util.intFromShorts(ch, true);
+            to = Util.intFromShorts(ch, false);
+            if (from != to) {
+                sort(from, to); //change occurred
+            }
+        }
+
+        if (from == -1) {
+            onAdded(x);
+        }
+        return true;
+    }
+
+    /**
+     * from and to are the range of values that would have changed, so that a partial sort can be isolated to the sub-range of the list that has changed
+     */
+    protected void sort(short from, short to) {
+        int toRemove = size - capacity;
+        Object[] keys = this.keys;
+        for (int i = 0; i < toRemove; i++) {
+            int s = size;
+            short lowest = lowestIndex();
+            remove(keys[lowest]);
+            assert (size < s);
+        }
+        short[] s;
+        if (sorted.length != size) {
+            s = this.sorted = new short[size];
+            int i = 0;
+            for (short index = 0, keysLength = (short) keys.length; index < keysLength; index++) {
+                Object o = keys[index];
+                if (o != null)
+                    s[i++] = index;
+            }
+            assert (i == size);
+        } else {
+            s = this.sorted;
+        }
+
+        //TODO partial sort the affected range
+        sort(sorted, 0, s.length-1, (x) -> {
+            return values[x]; //descending
+        });
+
+    }
+
+    public X lowest() {
+        synchronized (this) {
+            short i = lowestIndex();
+            if (i < 0)
+                return null;
+            else
+                return (X) keys[i];
+        }
+    }
+
+    public X highest() {
+        synchronized (this) {
+            short i = highestIndex();
+            if (i < 0)
+                return null;
+            else
+                return (X) keys[i];
+        }
+    }
+
+    private short lowestIndex() {
+        return size > 0 ? sorted[size - 1] : -1;
+    }
+    private short highestIndex() {
+        return size > 0 ? sorted[0] : -1;
+    }
+
+
+
+    @Override
+    public void remove(Object key) {
+        boolean removed;
+        X x = (X) key;
+        synchronized (this) {
+            removed = super.removeKey(x);
+        }
+        if (removed) {
+            onRemoved(x);
+        }
+    }
+
+    public void onAdded(X x) {
+
+    }
+
+    public void onRemoved(X x) {
+
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public boolean isFull() {
+        return size() == capacity;
+    }
+
+
+    static void sort(short[] a, int left, int right, ShortToShortFunction v) {
+//        // Use counting sort on large arrays
+//        if (right - left > COUNTING_SORT_THRESHOLD_FOR_BYTE) {
+//            int[] count = new int[NUM_BYTE_VALUES];
 //
-//import edu.virginia.cs.skiptree.ConcurrentSkipTreeMap;
-//import edu.virginia.cs.skiptree.ConcurrentSkipTreeSet;
-//import jcog.bag.Bag;
-//import jcog.data.graph.AdjGraph;
-//import jcog.pri.PriReference;
-//import jcog.pri.Priority;
-//import org.apache.commons.lang3.mutable.MutableFloat;
-//import org.jetbrains.annotations.NotNull;
-//import org.jetbrains.annotations.Nullable;
+//            for (int i = left - 1; ++i <= right;
+//                 count[a[i] - Byte.MIN_VALUE]++
+//                    )
+//                ;
+//            for (int i = NUM_BYTE_VALUES, k = right + 1; k > left; ) {
+//                while (count[--i] == 0) ;
+//                byte value = (byte) (i + Byte.MIN_VALUE);
+//                int s = count[i];
 //
-//import java.util.Iterator;
-//import java.util.concurrent.ConcurrentSkipListMap;
-//import java.util.function.Consumer;
-//
-//public class ArrayBag2<X> implements Bag<X,PriReference<X>> {
-//
-//    @Override
-//    public void clear() {
-//        map.clear();
-//    }
-//
-//    @Nullable
-//    @Override
-//    public PriReference<X> get(@NotNull Object key) {
-//        return map.get(key);
-//    }
-//
-//    @Nullable
-//    @Override
-//    public PriReference<X> remove(@NotNull X x) {
-//        return map.remove(x);
-//    }
-//
-//    @Override
-//    public PriReference<X> put(@NotNull PriReference<X> p, @Nullable MutableFloat overflowing) {
-//        map.size()
-//        PNode k = new PNode(p.get(), p.priElseZero());
-//        map.merge(k, k, (a, b) -> {
-//            return a;
-//        });
-//    }
-//
-//    @NotNull
-//    @Override
-//    public Bag<X, PriReference<X>> sample(BagCursor<? super PriReference<X>> each) {
-//        return null;
-//    }
-//
-//    @Override
-//    public int size() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public int capacity() {
-//        return 0;
-//    }
-//
-//    @NotNull
-//    @Override
-//    public Iterator<PriReference<X>> iterator() {
-//        return null;
-//    }
-//
-//    @Override
-//    public float pri(@NotNull PriReference<X> key) {
-//        return 0;
-//    }
-//
-//    @Override
-//    public X key(PriReference<X> value) {
-//        return null;
-//    }
-//
-//    @Override
-//    public void setCapacity(int c) {
-//
-//    }
-//
-//    @Override
-//    public Bag<X, PriReference<X>> commit() {
-//        return null;
-//    }
-//
-//    @NotNull
-//    @Override
-//    public Bag<X, PriReference<X>> commit(Consumer<PriReference<X>> update) {
-//        return null;
-//    }
-//
-//    public static class PNode<X> implements PriReference<X>, Comparable<PNode> {
-//
-//        @Override
-//        public X get() {
-//            return null;
+//                do {
+//                    a[--k] = value;
+//                } while (--s > 0);
+//            }
+//        } else { // Use insertion sort on small arrays
+        for (int i = left, j = i; i < right; j = ++i) {
+            short ai = a[i + 1];
+            while (v.valueOf(ai) > v.valueOf(a[j])) {
+                a[j + 1] = a[j];
+                if (j-- == left) {
+                    break;
+                }
+            }
+            a[j + 1] = ai;
+        }
 //        }
-//
-//        @Override
-//        public float setPri(float p) {
-//            return 0;
-//        }
-//
-//        @Override
-//        public @Nullable Priority clonePri() {
-//            return null;
-//        }
-//
-//        @Override
-//        public float pri() {
-//            return 0;
-//        }
-//
-//        @Override
-//        public boolean delete() {
-//            return false;
-//        }
-//
-//        @Override
-//        public boolean isDeleted() {
-//            return false;
-//        }
-//
-//        @Override
-//        public int compareTo(@NotNull ArrayBag2.PNode o) {
-//            return 0;
-//        }
-//    }
-//
-//    final ConcurrentSkipTreeMap<PNode<X>,PNode<X>> map = new ConcurrentSkipTreeMap<>();
-//    //final ConcurrentSkipListMap<PNode<X>,PNode<X>> map = new ConcurrentSkipListMap<>();
-//}
+    }
+}

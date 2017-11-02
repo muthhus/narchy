@@ -1,7 +1,6 @@
 package nars.perf;
 
 import nars.nal.nal1.NAL1Test;
-import nars.term.compound.FastCompoundNAL1Test;
 import org.junit.jupiter.api.Disabled;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;

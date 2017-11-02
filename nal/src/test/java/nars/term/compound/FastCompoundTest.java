@@ -1,12 +1,8 @@
 package nars.term.compound;
 
-import nars.*;
-import nars.nal.nal1.NAL1Test;
+import nars.Narsese;
 import nars.term.Compound;
-import nars.term.Term;
 import org.junit.jupiter.api.Test;
-
-import java.util.function.BiFunction;
 
 import static nars.$.$;
 import static org.junit.jupiter.api.Assertions.assertEquals;

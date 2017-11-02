@@ -10,7 +10,6 @@ import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.Null;
 import static nars.time.Tense.DTERNAL;
 
 

@@ -1,6 +1,8 @@
 package nars.prolog;
 
+import alice.tuprolog.InvalidTheoryException;
 import alice.tuprolog.MalformedGoalException;
+import alice.tuprolog.Theory;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
@@ -16,6 +18,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Created by me on 3/3/16.
  */
 public class PrologCoreTest {
+
+    @Test public void testPrologShell() throws MalformedGoalException {
+        NAR n = NARS.tmp();
+        PrologCore p = new PrologCore(n);
+        try {
+            p.addTheory(new Theory(PrologCoreTest.class.getClassLoader().getResource("shell.prolog").openStream()));
+        } catch (InvalidTheoryException | IOException e) {
+            e.printStackTrace();
+        }
+
+        p.solve("do(help).");
+    }
 
     @Test
     public void testPrologCoreBeliefAssertion() throws MalformedGoalException, IOException, Narsese.NarseseException {

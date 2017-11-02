@@ -33,7 +33,7 @@ public interface PriMerge extends BiConsumer<Priority, Prioritized> {
 
     @Nullable
     @Override
-    default void accept(@NotNull Priority existing, @NotNull Prioritized incoming) {
+    default void accept(Priority existing, Prioritized incoming) {
         merge(existing, incoming);
     }
 
@@ -58,7 +58,7 @@ public interface PriMerge extends BiConsumer<Priority, Prioritized> {
      *
      //TODO will this work for a possible negative pri value case?
      * */
-    static float blend(@NotNull Priority exi, @NotNull Prioritized inc, @NotNull PriMerge.PriMergeOp priMerge) {
+    static float blend(Priority exi, Prioritized inc, PriMerge.PriMergeOp priMerge) {
 
         float ePri = exi.priElseZero();
         float iPri = inc.priElseZero();

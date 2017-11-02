@@ -3,7 +3,6 @@ package nars;
 import jcog.Services;
 import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.data.MutableDouble;
 import jcog.data.MutableInteger;
 import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;

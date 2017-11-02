@@ -7,7 +7,6 @@ import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.Term;
 import nars.term.transform.Retemporalize;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
