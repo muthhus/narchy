@@ -29,6 +29,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -123,6 +124,132 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
         }
     }
 
+    interface InstanceMethodValueModel {
+
+        Object update(Instance instance, Object obj, Method method, Object[] args, Object nextValue);
+    }
+
+    public class ExtendedMethodValueModel implements InstanceMethodValueModel {
+        /**
+         * current (previous) value
+         */
+        public final ConcurrentHashMap<Method, ValueSignalTask> value = new ConcurrentHashMap();
+
+        @Override
+        public Object update(Instance instance, Object obj, Method method, Object[] args, Object nextValue) {
+            Task cause = invokingGoal.get();
+            boolean explicit = cause != null;
+
+            float pri = nar.priDefault(BELIEF);
+
+            // this essentially synchronizes on each (method,resultValue) tuple
+            // so it can form a coherent, synchronzed sequence of value change events
+
+
+            List<Task> pending = $.newArrayList(2); //max 2
+            Term nextTerm = instance.opTerm(method, args, nextValue).normalize();
+
+            value.compute(method, (m, p1) -> {
+
+                long now = nar.time();
+                if (p1 != null && Objects.equals(p1.value, nextValue)) {
+                    //just continue the existing task
+
+                    p1.priMax(pri); //rebudget
+                    p1.grow(now);
+                    return p1; //keep
+                }
+
+
+                float f = invocationBeliefFreq;
+                Term nt = nextTerm;
+                if (nt.op() == NEG) {
+                    nt = nt.unneg();
+                    f = 1 - f;
+                }
+                ValueSignalTask next = new ValueSignalTask(nt,
+                        BELIEF, $.t(f, nar.confDefault(BELIEF)),
+                        now, now, nar.time.nextStamp(), nextValue);
+
+                if (Param.DEBUG)
+                    next.log("Invocation" /* via VM */);
+
+                if (explicit) {
+                    next.causeMerge(cause);
+                    next.priMax(cause.priElseZero());
+                    cause.pri(0); //drain
+                    cause.meta("@", next);
+                } else {
+                    next.priMax(pri);
+                }
+
+
+                if (p1 != null && !p1.equals(nt)) {
+                    p1.end(Math.max(p1.start(), now - 1)); //dont need to re-input prev, this takes care of it. ends in the cycle previous to now
+                    next.priMax(pri);
+
+                    NALTask prevEnd = new NALTask(p1.term(),
+                            BELIEF, $.t(1f - invocationBeliefFreq, nar.confDefault(BELIEF)),
+                            now, now, now, nar.time.nextInputStamp());
+                    prevEnd.priMax(pri);
+                    if (Param.DEBUG)
+                        prevEnd.log("Invoked");
+
+                    pending.add(prevEnd);
+                }
+
+                pending.add(next);
+                return next;
+            });
+
+            in.input(pending);
+            return nextValue;
+        }
+    }
+
+    final InstanceMethodValueModel pointTasks = new PointMethodValueModel();
+    final Function<String, InstanceMethodValueModel> valueModel = (x) -> pointTasks /* memoryless */;
+
+    public class PointMethodValueModel implements InstanceMethodValueModel {
+
+
+        @Override
+        public Object update(Instance instance, Object obj, Method method, Object[] args, Object nextValue) {
+            float f = invocationBeliefFreq;
+            Term nextTerm = instance.opTerm(method, args, nextValue).normalize();
+            Term nt = nextTerm;
+            if (nt.op() == NEG) {
+                nt = nt.unneg();
+                f = 1 - f;
+            }
+            long now = nar.time();
+            ValueSignalTask next = new ValueSignalTask(nt,
+                    BELIEF, $.t(f, nar.confDefault(BELIEF)),
+                    now, now, nar.time.nextStamp(), nextValue);
+
+            if (Param.DEBUG)
+                next.log("Invocation" /* via VM */);
+
+            float pri = nar.priDefault(BELIEF);
+            Task cause = invokingGoal.get();
+            boolean explicit = cause != null;
+
+            if (explicit) {
+                next.causeMerge(cause);
+                next.priMax(cause.priElseZero());
+                cause.pri(0); //drain
+                cause.meta("@", next);
+            } else {
+                next.priMax(pri);
+            }
+
+            in.input(next);
+
+            return nextValue;
+        }
+    }
+
+
     class Instance extends Atom {
 
         /**
@@ -130,17 +257,18 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
          */
         public final Object object;
 
-
-        /**
-         * current (previous) value
-         */
-        public final ConcurrentHashMap<Method, ValueSignalTask> value = new ConcurrentHashMap();
+        final InstanceMethodValueModel values;
 
         public Instance(String id, Object object) {
             super(id);
             this.object = object;
+            this.values = valueModel.apply(id);
 
             nar.onOp(this, new MethodExec(object));
+        }
+
+        public Object update(Object obj, Method method, Object[] args, Object nextValue) {
+            return values.update(this, obj, method, args, nextValue);
         }
 
         private Term opTerm(Method method, Object[] args, Object result) {
@@ -150,7 +278,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
             boolean isVoid = method.getReturnType() == void.class;
             boolean isBoolean = method.getReturnType() == boolean.class;
             boolean negate = false;
-            if (isBoolean ) {
+            if (isBoolean) {
 
                 boolean b = (Boolean) result;
                 if (!b) {
@@ -179,79 +307,6 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
             return $.func(toString(), x).negIf(negate);
         }
-
-        public Object update(Object obj, Method method, Object[] args, Object nextValue) {
-            Task cause = invokingGoal.get();
-            boolean explicit = cause != null;
-
-            float pri = nar.priDefault(BELIEF);
-
-            // this essentially synchronizes on each (method,resultValue) tuple
-            // so it can form a coherent, synchronzed sequence of value change events
-
-
-            List<Task> pending = $.newArrayList(2); //max 2
-            Term nextTerm = opTerm(method, args, nextValue).normalize();
-
-            value.compute(method, (m, p1) -> {
-
-                long now = nar.time();
-                if (p1 != null && Objects.equals(p1.value, nextValue)) {
-                    //just continue the existing task
-
-                    p1.priMax(pri); //rebudget
-                    p1.grow(now);
-                    return p1; //keep
-                }
-
-
-                float f = invocationBeliefFreq;
-                Term nt = nextTerm;
-                if (nt.op() == NEG) {
-                    nt = nt.unneg();
-                    f = 1-f;
-                }
-                ValueSignalTask next = new ValueSignalTask(nt,
-                        BELIEF, $.t(f, nar.confDefault(BELIEF)),
-                        now, now, nar.time.nextStamp(), nextValue);
-
-                if (Param.DEBUG)
-                    next.log("Invocation" /* via VM */);
-
-                if (explicit) {
-                    next.causeMerge(cause);
-                    next.priMax(cause.priElseZero());
-                    cause.pri(0); //drain
-                    cause.meta("@", next);
-                } else {
-                    next.priMax(pri);
-                }
-
-
-                if (p1 != null && !p1.equals(nt)) {
-                    p1.end(Math.max(p1.start(), now-1)); //dont need to re-input prev, this takes care of it. ends in the cycle previous to now
-                    next.priMax(pri);
-
-                    NALTask prevEnd = new NALTask(p1.term(),
-                            BELIEF, $.t(1f - invocationBeliefFreq, nar.confDefault(BELIEF)),
-                            now, now, now, nar.time.nextInputStamp());
-                    prevEnd.priMax(pri);
-                    if (Param.DEBUG)
-                        prevEnd.log("Invoked");
-
-                    pending.add(prevEnd);
-                }
-
-                pending.add(next);
-                return next;
-            });
-
-            in.input(pending);
-
-            return nextValue;
-
-        }
-
 
     }
 
