@@ -24,7 +24,7 @@ abstract public class Bool extends AtomicConst {
 
     private final String id;
 
-    protected Bool(@NotNull String id) {
+    protected Bool(String id) {
         super(BOOL, id);
         this.id = id;
     }

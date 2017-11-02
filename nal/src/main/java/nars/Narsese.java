@@ -1262,7 +1262,7 @@ public class Narsese extends BaseParser<Object> {
     @NotNull
     public static Term term(@NotNull String s) throws NarseseException {
 
-        Exception ee = null;
+        Exception ee;
         try {
             //Term x = singleTerms.get(s);
 

@@ -79,6 +79,7 @@ public interface Atomic extends Term {
     default int varPattern() {
         return 0;
     }
+
     @Override
     default Term replace(Map<Term, Term> m) {
         Term y = m.get(this); //atom substitutions
@@ -91,14 +92,15 @@ public interface Atomic extends Term {
     }
 
 
-    @NotNull
+    /*@NotNull*/
     static Atomic the(String id) {
         int l = id.length();
         assert(l>0): "attempted zero-length Atomic id";
 
         //special cases
         if (l ==1) {
-            switch (id.charAt(0)) {
+            char c = id.charAt(0);
+            switch (c) {
                 case Op.ImdexSym:  return Op.Imdex;
                 case Op.NullSym:  return Op.Null;
                 case Op.TrueSym:  return Op.True;

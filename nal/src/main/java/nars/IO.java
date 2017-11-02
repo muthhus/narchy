@@ -4,6 +4,7 @@ package nars;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import jcog.TODO;
 import jcog.byt.DynBytes;
 import jcog.data.string.Utf8Writer;
 import jcog.pri.Prioritized;
@@ -12,9 +13,7 @@ import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.term.atom.Atomic;
-import nars.term.atom.Bool;
-import nars.term.atom.Int;
+import nars.term.atom.*;
 import nars.term.container.TermContainer;
 import nars.term.var.UnnormalizedVariable;
 import nars.truth.DiscreteTruth;
@@ -205,7 +204,44 @@ public class IO {
         return $.v(o, in.readInt());
     }
 
-    @NotNull
+
+    /** direct method of reading Atomic from a byte[] */
+    public static Atomic readAtomic(byte[] b)  {
+        byte oo = b[0];
+        if (oo == SPECIAL_OP)
+            return (Atomic) termFromBytes(b);
+
+        Op o = Op.values()[oo];
+        switch (o) {
+
+            case INT:
+//                byte subType = in.readByte();
+//                switch (subType) {
+//                    case 0: return Int.the( in.readInt());
+//                    case 1: return Int.range( in.readInt(), in.readInt() );
+//                    default: throw new TODO();
+//                }
+                return (Atomic) termFromBytes(b);
+                //throw new TODO();
+
+            case ATOM:
+                return new Atom(b);
+
+            //TODO normalized Variable cases
+
+            default:
+
+
+//                try {
+//                    return $.$(new String(b));
+//                } catch (Narsese.NarseseException e) {
+//                }
+//                    throw new TODO();
+                return (Atomic) termFromBytes(b);
+
+        }
+    }
+
     public static Atomic readAtomic(DataInput in, /*@NotNull*/ Op o) throws IOException {
 
         switch (o) {
@@ -215,7 +251,7 @@ public class IO {
                 switch (subType) {
                     case 0: return Int.the( in.readInt());
                     case 1: return Int.range( in.readInt(), in.readInt() );
-                    default: throw new UnsupportedOperationException();
+                    default: throw new TODO();
                 }
             case ATOM: {
 
@@ -234,7 +270,6 @@ public class IO {
                 }
         }
 
-        //return (Atomic) t.get(key, true); //<- can cause synchronization deadlocks
     }
 
 
@@ -352,8 +387,12 @@ public class IO {
     }
 
     public static byte[] termToBytes(Term t) {
+        if (t instanceof Atom) {
+            return ((AtomicConst)t).bytesCached;
+        }
+
         //bb = ArrayPool.bytes().
-        DynBytes d = new DynBytes(t.volume() * 16 /* estimate */);
+        DynBytes d = new DynBytes(t.volume() * 4 /* estimate */);
         //ByteArrayOutputStream bs = new ByteArrayOutputStream();
 
         t.append((ByteArrayDataOutput) d);

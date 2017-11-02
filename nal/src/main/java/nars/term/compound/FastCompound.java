@@ -56,7 +56,7 @@ public class FastCompound implements Compound {
             return ((FastCompound) c);
 
         ObjectByteHashMap<Term> atoms = new ObjectByteHashMap();
-        UncheckedBytes skeleton = new UncheckedBytes(Bytes.wrapForWrite(new byte[128]));
+        UncheckedBytes skeleton = new UncheckedBytes(Bytes.wrapForWrite(new byte[256]));
 
         skeleton.writeUnsignedByte(c.op().ordinal());
         skeleton.writeUnsignedByte(c.subs());
@@ -245,7 +245,8 @@ public class FastCompound implements Compound {
     public Term term(int offset) {
         Op opAtSub = ov[skeleton[offset]];
         if (opAtSub.atomic) {
-            return IO.termFromBytes(atoms[skeleton[offset + 1]]);
+            //return IO.termFromBytes(atoms[skeleton[offset + 1]]);
+            return IO.readAtomic(atoms[skeleton[offset + 1]]);
         } else {
             //TODO sub view
             //return opAtSub.the(DTERNAL, subs(subOffset));

@@ -177,7 +177,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                 assert (x[2] != null) : "could not termize: " + result;
             }
 
-            return $.func(id, x).negIf(negate);
+            return $.func(toString(), x).negIf(negate);
         }
 
         public Object update(Object obj, Method method, Object[] args, Object nextValue) {

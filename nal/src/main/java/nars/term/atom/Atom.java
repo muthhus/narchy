@@ -12,12 +12,13 @@ import static nars.Op.ATOM;
  */
 public class Atom extends AtomicConst {
 
-    public final String id;
 
+    public Atom(byte[] b) {
+        super(b);
+    }
 
     protected Atom(String id) {
         super(ATOM, validateAtomID(id));
-        this.id = id;
     }
 
     @Override
@@ -29,6 +30,7 @@ public class Atom extends AtomicConst {
     private static String validateAtomID(String id) {
         if (id.isEmpty())
             throw new UnsupportedOperationException("Empty Atom ID");
+
 
         char c = id.charAt(0);
         switch (c) {
@@ -69,7 +71,7 @@ public class Atom extends AtomicConst {
     }
 
     @Override public final String toString() {
-        return id;
+        return new String(bytesCached, 3, bytesCached.length-3);
     }
 
     @Override

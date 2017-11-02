@@ -21,7 +21,7 @@ public class UnnormalizedVariable extends AtomicConst implements Variable {
 
     @Override public int opX() { return Term.opX(op(), 10);    }
 
-    public UnnormalizedVariable(/*@NotNull*/ Op type, @NotNull String label) {
+    public UnnormalizedVariable(/*@NotNull*/ Op type, String label) {
         super(type, label);
         this.str = label;
         this.type = type;

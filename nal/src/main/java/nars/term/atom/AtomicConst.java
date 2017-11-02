@@ -15,22 +15,31 @@ import static java.lang.System.arraycopy;
 public abstract class AtomicConst implements Atomic {
 
 
-    private final transient byte[] bytesCached;
+    public final transient byte[] bytesCached;
     protected final transient int hash;
 
-    protected AtomicConst(Op op, @Nullable String s) {
-        if (s == null) s = toString(); //must be a constant method
-        int slen = s.length();
+    protected AtomicConst(byte[] raw) {
+        this.bytesCached = raw;
+        this.hash = (int) Util.hashELF(raw, 1); //Util.hashWangJenkins(s.hashCode());
+    }
 
-        byte[] stringbytes = s.getBytes();
-        byte[] sbytes = new byte[stringbytes.length + 3];
-        sbytes[0] = (op != null ? op : op()).id;
+    protected AtomicConst(Op op, String s) {
+        this(bytes(op, s));
+    }
+
+    private static byte[] bytes(Op op, String str) {
+        //if (s == null) s = toString(); //must be a constant method
+        //int slen = str.length(); //TODO will this work for UTF-16 containing strings?
+
+        byte[] stringbytes = str.getBytes();
+        int slen = stringbytes.length;
+
+        byte[] sbytes = new byte[slen + 3];
+        sbytes[0] = op.id; //(op != null ? op : op()).id;
         sbytes[1] = (byte) (slen >> 8 & 0xff);
         sbytes[2] = (byte) (slen & 0xff);
-        arraycopy(stringbytes, 0, sbytes, 3, stringbytes.length);
-        this.bytesCached = sbytes;
-
-        this.hash = Util.hashWangJenkins(s.hashCode());
+        arraycopy(stringbytes, 0, sbytes, 3, slen);
+        return sbytes;
     }
 
     @Override

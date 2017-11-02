@@ -118,7 +118,9 @@ abstract public class MultiExec extends UniExec {
 //    }
 
     public void queue(ITask i) {
-        if (!buffer.tryPublishEvent(ein, i)) {
+        //tryPublishEvent throws an exception internally; try to avoid that by checking capacity first
+        final int THRESH = 1;
+        if (buffer.remainingCapacity() <= THRESH || !buffer.tryPublishEvent(ein, i)) {
             i.run(nar); //queue full, in-thread
         }
     }
