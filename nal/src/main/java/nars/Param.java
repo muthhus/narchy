@@ -113,9 +113,9 @@ public abstract class Param extends Services<Term, NAR> {
      */
     public static final FloatFloatToFloatFunction TaskBeliefDerivation =
             //Math::max;
-            //Util::or;
+            Util::or;
             //Util::and;
-            UtilityFunctions::aveAri;
+            //UtilityFunctions::aveAri;
 
 
     public static final PriMerge taskMerge = PriMerge.max;
@@ -138,8 +138,8 @@ public abstract class Param extends Services<Term, NAR> {
     /**
      * 'time to live', unification steps until unification is stopped
      */
-    public final MutableInteger matchTTLmax = new MutableInteger(256);
-    public final MutableInteger matchTTLmin = new MutableInteger(64);
+    public final MutableInteger matchTTLmax = new MutableInteger(512);
+    public final MutableInteger matchTTLmin = new MutableInteger(128);
 
     /**
      * how much percent of a premise's allocated TTL can be used in the belief matching phase.

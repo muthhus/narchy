@@ -24,7 +24,9 @@ import nars.term.Term;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.LongObjectProcedure;
+import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectBooleanHashMap;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -381,10 +383,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             }
         });
 
-        Float partialActivation = x.meta("partialActivation");
+        ObjectFloatPair<Task> partialActivation = x.meta("partialActivation");
         if (partialActivation != null) {
             assert (x.isDeleted());
-            TermLinks.linkTask(x, partialActivation, n, c);
+            TermLinks.linkTask(partialActivation.getOne(), partialActivation.getTwo(), n, c);
         }
 
     }
@@ -745,7 +747,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             if (activationApplied < Prioritized.EPSILON)
                 return;
 
-            i.meta("partialActivation", activationApplied);
+            i.meta("partialActivation", PrimitiveTuples.pair(existing,activationApplied));
 
         }
 

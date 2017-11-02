@@ -230,10 +230,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         int start, end;
 
         float pixelPri =
-                nar.priDefault(BELIEF);
-                //(float) (nar.priDefault(BELIEF) / (Math.sqrt(numPixels)));
-        ///2;
-        ///((float)Math.sqrt(end-start));
+                //nar.priDefault(BELIEF);
+                (float) (nar.priDefault(BELIEF) / (Math.sqrt(numPixels)));
+                ///((float)Math.sqrt(end-start));
 
 
         start = this.lastPixel;

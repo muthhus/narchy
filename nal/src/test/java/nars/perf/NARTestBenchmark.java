@@ -1,6 +1,7 @@
 package nars.perf;
 
 import nars.nal.nal1.NAL1Test;
+import nars.term.compound.FastCompoundNAL1Test;
 import org.junit.jupiter.api.Disabled;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
@@ -38,6 +39,7 @@ public class NARTestBenchmark {
                 .selectors(
                         //selectPackage("com.example.mytests"),
                         selectClass(NAL1Test.class)
+                        //selectClass(FastCompoundNAL1Test.class)
                 )
                 // .filters( includeClassNamePatterns(".*Tests")  )
                 .build();
@@ -58,8 +60,8 @@ public class NARTestBenchmark {
 
     public static void main(String[] args) throws RunnerException {
         perf(NARTestBenchmark.class, (x)->{
-            x.measurementIterations(1);
-            x.warmupIterations(1);
+            x.measurementIterations(5);
+            x.warmupIterations(2);
             x.forks(1);
             x.threads(1);
             x.addProfiler(StackProfiler2.class);

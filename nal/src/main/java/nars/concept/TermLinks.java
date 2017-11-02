@@ -87,7 +87,7 @@ public enum TermLinks {
                 return 2;
 
             case PROD:
-                return 2;
+                return 3;
 
             case DIFFe:
             case DIFFi:
@@ -96,7 +96,7 @@ public enum TermLinks {
                 return 2;
 
             case CONJ:
-                return 2;
+                return 3;
 
             case SIM:
                 return 3;
