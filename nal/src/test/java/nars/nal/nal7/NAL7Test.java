@@ -31,13 +31,13 @@ public class NAL7Test extends NALTest {
 
         test
                 .input("x:before. :|:")
-                .inputAt(10, "--x:after. :|:")
+                .inputAt(10, "(--,x:after). :|:")
                 .mustBelieve(cycles, "(x:before ==>+10 x:after)", 0.00f, 0.45f /*abductionConf*/, 0)
-                .mustBelieve(cycles, "(--x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 10)
-//                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0, 10)
-                .mustBelieve(cycles, "(x:before &&+10 --x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
-                .mustNotOutput(cycles, "(x:before &&-10 --x:after)", BELIEF,
+                .mustBelieve(cycles, "((--,x:after) ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 10)
+                .mustBelieve(cycles, "(x:before &&+10 (--,x:after))", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
+                .mustNotOutput(cycles, "(x:before &&-10 (--,x:after))", BELIEF,
                         (t -> t == 0 || t == 10));
+//                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0, 10)
     }
 
     @Test

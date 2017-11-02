@@ -14,13 +14,13 @@
 //    B, A, time(raw), task("."), time(dtEvents)                       notImpl(A) |- (A ==>+- B), (Belief:Induction)
 //    B, A, time(raw), task("."), time(dtEventsOrEternals), neqAndCom(A,B),       notImpl(A) |- varIntro((A ==>+- B)), (Belief:Induction)
 
-    B, A, time(raw), belief(positive), task("."), time(dtAfter),  notImpl(A) |- (A ==>+- B), (Belief:Induction)
-    B, A, time(raw), belief(positive), task("."), time(dtAfterOrEternals), neqAndCom(A,B),       notImpl(A) |- varIntro((A ==>+- B)), (Belief:Induction)
-        B, A, time(raw), belief(negative), task("."), time(dtAfter), notImpl(A) |- (--A ==>+- B), (Belief:InductionN)
-        B, A, time(raw), belief(negative), task("."), time(dtAfterOrEternals), neqAndCom(A,B),   notImpl(A) |- varIntro((--A ==>+- B)), (Belief:InductionN)
+    B, A, time(raw), belief(positive), task("."), time(dtEvents),  notImpl(A) |- (A ==>+- B), (Belief:Induction)
+    B, A, time(raw), belief(positive), task("."), time(dtEventsOrEternals), neqAndCom(A,B),       notImpl(A) |- varIntro((A ==>+- B)), (Belief:Induction)
+        B, A, time(raw), belief(negative), task("."), time(dtEvents), notImpl(A) |- (--A ==>+- B), (Belief:InductionN)
+        B, A, time(raw), belief(negative), task("."), time(dtEventsOrEternals), neqAndCom(A,B),   notImpl(A) |- varIntro((--A ==>+- B)), (Belief:InductionN)
 
-    B, A, time(raw), task("."), time(dtAfter), notImpl(B) |- (B ==>+- A), (Belief:AbductionPB)
-    B, A, time(raw), task("."), time(dtAfterOrEternals), neqAndCom(A,B),         notImpl(B) |- varIntro((B ==>+- A)), (Belief:AbductionPB)
+    B, A, time(raw), task("."), time(dtEvents), notImpl(B) |- (B ==>+- A), (Belief:AbductionPB)
+    B, A, time(raw), task("."), time(dtEventsOrEternals), neqAndCom(A,B),         notImpl(B) |- varIntro((B ==>+- A)), (Belief:AbductionPB)
         //B, A, time(raw), task("."), time(dtAfter), notImpl(B) |- (--B ==>+- A), (Belief:AbductionPBN)
         //B, A, time(raw), task("."), time(dtAfterOrEternals), neqAndCom(A,B),     notImpl(B) |- varIntro((--B ==>+- A)), (Belief:AbductionPBN)
 

@@ -389,11 +389,11 @@ public abstract class Param extends Services<Term, NAR> {
      */
     public static double evi(float evi, long dt, long dur) {
 
-        //return evi / (1 + ( dt / dur) ); //inverse linear
+        return evi / (1.0 + ( ((double)dt) / dur) ); //inverse linear
 
         //use high precision math here
-        double ddt = dt;
-        return (float) (evi / (1.0 + ddt * ddt / dur)); //inverse square
+        //double ddt = dt;
+        //return (float) (evi / (1.0 + ddt * ddt / dur)); //inverse square
 
         //return evi / Util.sqr( 1f + dt / dur ); //inverse square suck
 

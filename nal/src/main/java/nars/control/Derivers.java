@@ -13,7 +13,7 @@ public class Derivers {
         Set<String> files = new TreeSet();
         switch (level) {
             case 8:
-                files.add("motivation.nal");
+                //files.add("motivation.nal");
                 //files.add("list.nal");  //experimental
             case 7:
                 //TODO move temporal induction to a separate file

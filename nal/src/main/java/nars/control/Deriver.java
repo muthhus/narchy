@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 public class Deriver extends NARService {
 
     private float minPremisesPerConcept = 2;
-    private float maxPremisesPerConcept = 4;
+    private float maxPremisesPerConcept = 6;
 
     public static Function<NAR, Deriver> deriver(Function<NAR, PremiseRuleSet> rules) {
         return (nar) ->
