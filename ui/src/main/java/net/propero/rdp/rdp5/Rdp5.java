@@ -78,7 +78,7 @@ public class Rdp5 extends Rdp {
      */
     public void rdp5_process(RdpPacket_Localised s, boolean encryption) throws RdesktopException, OrderException,
             CryptoException {
-        logger.debug("Processing RDP 5 order");
+//        logger.debug("Processing RDP 5 order");
 
         int length, count;
         int type;

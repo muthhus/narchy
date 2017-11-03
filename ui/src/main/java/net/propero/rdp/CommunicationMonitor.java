@@ -33,6 +33,8 @@
 
 package net.propero.rdp;
 
+import jcog.Util;
+
 public class CommunicationMonitor {
 
     public static Object locker;
@@ -55,14 +57,16 @@ public class CommunicationMonitor {
         if (locker == null)
             locker = o;
         else {
+            int p = 0;
             while (locker != null) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    System.err.println("InterruptedException: "
-                            + e.getMessage());
-                    e.printStackTrace();
-                }
+//                try {
+                    //Thread.sleep(100);
+                    Util.pauseNext(p++);
+//                } catch (InterruptedException e) {
+//                    System.err.println("InterruptedException: "
+//                            + e.getMessage());
+//                    e.printStackTrace();
+//                }
             }
         }
     }

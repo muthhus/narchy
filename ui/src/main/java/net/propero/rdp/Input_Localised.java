@@ -48,11 +48,11 @@ public class Input_Localised extends Input {
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
                 .setDefaultFocusTraversalKeys(
                         KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
-                        Collections.<AWTKeyStroke>emptySet());
+                        Collections.emptySet());
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
                 .setDefaultFocusTraversalKeys(
                         KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
-                        Collections.<AWTKeyStroke>emptySet());
+                        Collections.emptySet());
     }
 
     public Input_Localised(RdesktopCanvas c, Rdp r, String k) {
@@ -60,11 +60,11 @@ public class Input_Localised extends Input {
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
                 .setDefaultFocusTraversalKeys(
                         KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
-                        Collections.<AWTKeyStroke>emptySet());
+                        Collections.emptySet());
         KeyboardFocusManager.getCurrentKeyboardFocusManager()
                 .setDefaultFocusTraversalKeys(
                         KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
-                        Collections.<AWTKeyStroke>emptySet());
+                        Collections.emptySet());
     }
 
     @Override

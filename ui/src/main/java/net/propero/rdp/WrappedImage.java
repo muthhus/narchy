@@ -31,6 +31,7 @@
  */
 package net.propero.rdp;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
@@ -40,14 +41,19 @@ import java.awt.image.IndexColorModel;
 public class WrappedImage {
     static final Logger logger = Logger.getLogger(WrappedImage.class);
     final BufferedImage bi;
+    private final Graphics gfx;
     IndexColorModel cm;
 
     public WrappedImage(int arg0, int arg1, int arg2) {
         bi = new BufferedImage(arg0, arg1, arg2);
+        this.gfx = bi.getGraphics();
+        this.bi.setAccelerationPriority(1f);
     }
 
     public WrappedImage(int arg0, int arg1, int arg2, IndexColorModel cm) {
         bi = new BufferedImage(arg0, arg1, BufferedImage.TYPE_INT_RGB); // super(arg0,
+        this.bi.setAccelerationPriority(1f);
+        this.gfx = bi.getGraphics();
         // arg1,
         // BufferedImage.TYPE_INT_RGB);
         this.cm = cm;
@@ -66,11 +72,13 @@ public class WrappedImage {
     }
 
     public Graphics getGraphics() {
-        return bi.getGraphics();
+        return gfx;
     }
 
     public BufferedImage getSubimage(int x, int y, int width, int height) {
-        return bi.getSubimage(x, y, width, height);
+        return bi.getSubimage(x, y,
+                Math.min(bi.getWidth() - x, width),
+                Math.min(bi.getHeight() - y, height));
     }
 
     /**
@@ -124,9 +132,11 @@ public class WrappedImage {
     public void setRGB(int x, int y, int cx, int cy, int[] data, int offset,
                        int w) {
         if (cm != null && data != null && data.length > 0) {
-            for (int i = 0; i < data.length; i++)
-                data[i] = cm.getRGB(data[i]);
+//            for (int i = 0; i < data.length; i++)
+//                data[i] = cm.getRGB(data[i]);
+            cm.getRGBs(data);
         }
+
         bi.setRGB(x, y, cx, cy, data, offset, w);
     }
 
@@ -145,7 +155,7 @@ public class WrappedImage {
             int pix = bi.getRGB(x, y) & 0xFFFFFF;
             int[] vals = {(pix >> 16) & 0xFF, (pix >> 8) & 0xFF, (pix) & 0xFF};
             int out = cm.getDataElement(vals, 0);
-            if (cm.getRGB(out) != bi.getRGB(x, y))
+            if (cm.getRGB(out) != bi.getRGB(x, y) && logger.isEnabledFor(Level.INFO))
                 logger.info("Did not get correct colour value for color ("
                         + Integer.toHexString(pix) + "), got ("
                         + cm.getRGB(out) + ") instead");

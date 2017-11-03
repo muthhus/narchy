@@ -93,9 +93,9 @@ public class JRdpLoader {
                 }
             }
 
-            if (server != null && server != "") {
+            if (!server.isEmpty()) {
                 outArgs += server;
-                if (port != null && port != "")
+                if (!port.isEmpty())
                     outArgs += ':' + port;
 
                 // String[] finArgs = outArgs.split(" ");

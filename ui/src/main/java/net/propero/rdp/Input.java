@@ -318,7 +318,7 @@ public abstract class Input {
             case KeyEvent.VK_ENTER:
                 sendScancode(time, RDP_KEYRELEASE, 0x38);
                 altDown = false;
-                ((RdesktopFrame_Localised) canvas.getParent()).toggleFullScreen();
+                ((RdesktopFrame) canvas.getParent()).toggleFullScreen();
                 break;
 
             /*
@@ -673,7 +673,7 @@ public abstract class Input {
         @Override
         public void mousePressed(MouseEvent e) {
             if (e.getY() != 0)
-                ((RdesktopFrame_Localised) canvas.getParent()).hideMenu();
+                ((RdesktopFrame) canvas.getParent()).hideMenu();
 
             int time = getTime();
             if (rdp != null) {
@@ -729,7 +729,7 @@ public abstract class Input {
 
             // TODO: complete menu show/hide section
             if (e.getY() == 0)
-                ((RdesktopFrame_Localised) canvas.getParent()).showMenu();
+                ((RdesktopFrame) canvas.getParent()).showMenu();
             // else ((RdesktopFrame_Localised) canvas.getParent()).hideMenu();
 
             if (rdp != null) {

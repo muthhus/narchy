@@ -244,8 +244,11 @@ public class Rdesktop {
      * @throws OrderException
      * @throws RdesktopException
      */
-    public static void main(String[] args) throws RdesktopException {
+    public static void main(String... args) throws RdesktopException {
+        RDPwindow(args);
+    }
 
+    public static RdesktopFrame RDPwindow(String... args) throws RdesktopException {
         // Ensure that static variables are properly initialised
         keep_running = true;
         loggedon = false;
@@ -491,14 +494,16 @@ public class Rdesktop {
             Options.height -= 46;
         }
 
-        String server = null;
+        VChannels channels = new VChannels();
+
+        final String[] server = {null};
 
         if (g.getOptind() < args.length) {
             int colonat = args[args.length - 1].indexOf(':', 0);
             if (colonat == -1) {
-                server = args[args.length - 1];
+                server[0] = args[args.length - 1];
             } else {
-                server = args[args.length - 1].substring(0, colonat);
+                server[0] = args[args.length - 1].substring(0, colonat);
                 Options.port = Integer.parseInt(args[args.length - 1]
                         .substring(colonat + 1));
             }
@@ -507,7 +512,6 @@ public class Rdesktop {
             usage();
         }
 
-        VChannels channels = new VChannels();
 
         // Initialise all RDP5 channels
         if (Options.use_rdp5) {
@@ -547,191 +551,197 @@ public class Rdesktop {
         if (Constants.OS == Constants.MAC)
             Options.caps_sends_up_and_down = false;
 
-        Rdp5 RdpLayer = null;
-        Common.rdp = RdpLayer;
         RdesktopFrame window = new RdesktopFrame_Localised();
-        window.setClip(clipChannel);
+        int finalLogonflags = logonflags;
+        new Thread(() -> {
+            Rdp5 RdpLayer = null;
+            Common.rdp = RdpLayer;
 
-        // Configure a keyboard layout
-        KeyCode_FileBased keyMap = null;
-        try {
-            // logger.info("looking for: " + "/" + keyMapPath + mapFile);
+            window.setClip(clipChannel);
 
-            InputStream istr = Rdesktop.class.getClassLoader().getResourceAsStream(
-                    keyMapPath + mapFile);
+            // Configure a keyboard layout
+            KeyCode_FileBased keyMap = null;
+            try {
+                // logger.info("looking for: " + "/" + keyMapPath + mapFile);
+
+                InputStream istr = Rdesktop.class.getClassLoader().getResourceAsStream(
+                        keyMapPath + mapFile);
 //			// logger.info("istr = " + istr);
 //			if (istr == null) {
 //				logger.debug("Loading keymap from filename");
 //				keyMap = new KeyCode_FileBased_Localised(keyMapPath + mapFile);
 //			} else {
-            logger.debug("Loading keymap from InputStream");
-            keyMap = new KeyCode_FileBased_Localised(istr);
+                logger.debug("Loading keymap from InputStream");
+                keyMap = new KeyCode_FileBased_Localised(istr);
 //			}
-            if (istr != null)
-                istr.close();
-            Options.keylayout = keyMap.getMapCode();
-        } catch (Exception kmEx) {
-            String[] msg = {(kmEx.getClass() + ": " + kmEx.getMessage())};
-            window.showErrorDialog(msg);
-            kmEx.printStackTrace();
-            Rdesktop.exit(0, null, null, true);
-        }
+                if (istr != null)
+                    istr.close();
+                Options.keylayout = keyMap.getMapCode();
+            } catch (Exception kmEx) {
+                String[] msg = {(kmEx.getClass() + ": " + kmEx.getMessage())};
+                window.showErrorDialog(msg);
+                kmEx.printStackTrace();
+                Rdesktop.exit(0, null, null, true);
+            }
 
-        logger.debug("Registering keyboard...");
-        if (keyMap != null)
-            window.registerKeyboard(keyMap);
+            logger.debug("Registering keyboard...");
+            if (keyMap != null)
+                window.registerKeyboard(keyMap);
 
-        boolean[] deactivated = new boolean[1];
-        int[] ext_disc_reason = new int[1];
+            boolean[] deactivated = new boolean[1];
+            int[] ext_disc_reason = new int[1];
 
-        logger.debug("keep_running = " + keep_running);
-        while (keep_running) {
-            logger.debug("Initialising RDP layer...");
-            RdpLayer = new Rdp5(channels);
-            Common.rdp = RdpLayer;
-            logger.debug("Registering drawing surface...");
-            RdpLayer.registerDrawingSurface(window);
-            logger.debug("Registering comms layer...");
-            window.registerCommLayer(RdpLayer);
-            loggedon = false;
-            readytosend = false;
-            logger.info("Connecting to " + server + ':' + Options.port
-                    + " ...");
+            logger.debug("keep_running = " + keep_running);
+            while (keep_running) {
+                logger.debug("Initialising RDP layer...");
+                RdpLayer = new Rdp5(channels);
+                Common.rdp = RdpLayer;
+                logger.debug("Registering drawing surface...");
+                RdpLayer.registerDrawingSurface(window);
+                logger.debug("Registering comms layer...");
+                window.registerCommLayer(RdpLayer);
+                loggedon = false;
+                readytosend = false;
+                logger.info("Connecting to " + server[0] + ':' + Options.port
+                        + " ...");
 
-            if (server.equalsIgnoreCase("localhost"))
-                server = "127.0.0.1";
+                if (server[0].equalsIgnoreCase("localhost"))
+                    server[0] = "127.0.0.1";
 
-            if (RdpLayer != null) {
-                // Attempt to connect to server on port Options.port
-                try {
-                    RdpLayer.connect(Options.username, InetAddress
-                                    .getByName(server), logonflags, Options.domain,
-                            Options.password, Options.command,
-                            Options.directory);
+                if (RdpLayer != null) {
+                    // Attempt to connect to server on port Options.port
+                    try {
+                        RdpLayer.connect(Options.username, InetAddress
+                                        .getByName(server[0]), finalLogonflags, Options.domain,
+                                Options.password, Options.command,
+                                Options.directory);
 
-                    // Remove to get rid of sendEvent tool
-                    if (showTools) {
-                        toolFrame = new SendEvent(RdpLayer);
-                        toolFrame.show();
-                    }
-                    // End
+                        // Remove to get rid of sendEvent tool
+                        if (showTools) {
+                            toolFrame = new SendEvent(RdpLayer);
+                            toolFrame.show();
+                        }
+                        // End
 
-                    if (keep_running) {
+                        if (keep_running) {
 
-                        /*
-                         * By setting encryption to False here, we have an
-                         * encrypted login packet but unencrypted transfer of
-                         * other packets
-                         */
-                        if (!Options.packet_encryption)
-                            Options.encryption = false;
+                            /*
+                             * By setting encryption to False here, we have an
+                             * encrypted login packet but unencrypted transfer of
+                             * other packets
+                             */
+                            if (!Options.packet_encryption)
+                                Options.encryption = false;
 
-                        logger.info("Connection successful");
-                        // now show window after licence negotiation
-                        RdpLayer.mainLoop(deactivated, ext_disc_reason);
+                            logger.info("Connection successful");
+                            // now show window after licence negotiation
+                            RdpLayer.mainLoop(deactivated, ext_disc_reason);
 
-                        if (deactivated[0]) {
-                            /* clean disconnect */
-                            Rdesktop.exit(0, RdpLayer, window, true);
-                            // return 0;
-                        } else {
-                            if (ext_disc_reason[0] == exDiscReasonAPIInitiatedDisconnect
-                                    || ext_disc_reason[0] == exDiscReasonAPIInitiatedLogoff) {
-                                /*
-                                 * not so clean disconnect, but nothing to worry
-                                 * about
-                                 */
+                            if (deactivated[0]) {
+                                /* clean disconnect */
                                 Rdesktop.exit(0, RdpLayer, window, true);
                                 // return 0;
+                            } else {
+                                if (ext_disc_reason[0] == exDiscReasonAPIInitiatedDisconnect
+                                        || ext_disc_reason[0] == exDiscReasonAPIInitiatedLogoff) {
+                                    /*
+                                     * not so clean disconnect, but nothing to worry
+                                     * about
+                                     */
+                                    Rdesktop.exit(0, RdpLayer, window, true);
+                                    // return 0;
+                                }
+
+                                if (ext_disc_reason[0] >= 2) {
+                                    String reason = textDisconnectReason(ext_disc_reason[0]);
+                                    String msg[] = {"Connection terminated",
+                                            reason};
+                                    window.showErrorDialog(msg);
+                                    logger.warn("Connection terminated: " + reason);
+                                    Rdesktop.exit(0, RdpLayer, window, true);
+                                }
+
                             }
 
-                            if (ext_disc_reason[0] >= 2) {
-                                String reason = textDisconnectReason(ext_disc_reason[0]);
-                                String msg[] = {"Connection terminated",
-                                        reason};
+                            keep_running = false; // exited main loop
+                            if (!readytosend) {
+                                // maybe the licence server was having a comms
+                                // problem, retry?
+                                String msg1 = "The terminal server disconnected before licence negotiation completed.";
+                                String msg2 = "Possible cause: terminal server could not issue a licence.";
+                                String[] msg = {msg1, msg2};
+                                logger.warn(msg1);
+                                logger.warn(msg2);
                                 window.showErrorDialog(msg);
-                                logger.warn("Connection terminated: " + reason);
-                                Rdesktop.exit(0, RdpLayer, window, true);
                             }
+                        } // closing bracket to if(running)
 
+                        // Remove to get rid of tool window
+                        if (showTools)
+                            toolFrame.dispose();
+                        // End
+
+                    } catch (ConnectionException e) {
+                        String msg[] = {"Connection Exception", e.getMessage()};
+                        window.showErrorDialog(msg);
+                        Rdesktop.exit(0, RdpLayer, window, true);
+                    } catch (UnknownHostException e) {
+                        error(e, RdpLayer, window, true);
+                    } catch (SocketException s) {
+                        if (RdpLayer.isConnected()) {
+                            logger.fatal(s.getClass().getName() + ' '
+                                    + s.getMessage());
+                            s.printStackTrace();
+                            error(s, RdpLayer, window, true);
+                            Rdesktop.exit(0, RdpLayer, window, true);
                         }
+                    } catch (RdesktopException e) {
+                        String msg1 = e.getClass().getName();
+                        String msg2 = e.getMessage();
+                        logger.fatal(msg1 + ": " + msg2);
 
-                        keep_running = false; // exited main loop
+                        e.printStackTrace(System.err);
+
                         if (!readytosend) {
                             // maybe the licence server was having a comms
                             // problem, retry?
-                            String msg1 = "The terminal server disconnected before licence negotiation completed.";
-                            String msg2 = "Possible cause: terminal server could not issue a licence.";
-                            String[] msg = {msg1, msg2};
-                            logger.warn(msg1);
-                            logger.warn(msg2);
-                            window.showErrorDialog(msg);
-                        }
-                    } // closing bracket to if(running)
-
-                    // Remove to get rid of tool window
-                    if (showTools)
-                        toolFrame.dispose();
-                    // End
-
-                } catch (ConnectionException e) {
-                    String msg[] = {"Connection Exception", e.getMessage()};
-                    window.showErrorDialog(msg);
-                    Rdesktop.exit(0, RdpLayer, window, true);
-                } catch (UnknownHostException e) {
-                    error(e, RdpLayer, window, true);
-                } catch (SocketException s) {
-                    if (RdpLayer.isConnected()) {
-                        logger.fatal(s.getClass().getName() + ' '
-                                + s.getMessage());
-                        s.printStackTrace();
-                        error(s, RdpLayer, window, true);
-                        Rdesktop.exit(0, RdpLayer, window, true);
-                    }
-                } catch (RdesktopException e) {
-                    String msg1 = e.getClass().getName();
-                    String msg2 = e.getMessage();
-                    logger.fatal(msg1 + ": " + msg2);
-
-                    e.printStackTrace(System.err);
-
-                    if (!readytosend) {
-                        // maybe the licence server was having a comms
-                        // problem, retry?
-                        String msg[] = {
-                                "The terminal server reset connection before licence negotiation completed.",
-                                "Possible cause: terminal server could not connect to licence server.",
-                                "Retry?"};
-                        boolean retry = window.showYesNoErrorDialog(msg);
-                        if (!retry) {
-                            logger.info("Selected not to retry.");
-                            Rdesktop.exit(0, RdpLayer, window, true);
-                        } else {
-                            if (RdpLayer != null && RdpLayer.isConnected()) {
-                                logger.info("Disconnecting ...");
-                                RdpLayer.disconnect();
-                                logger.info("Disconnected");
+                            String msg[] = {
+                                    "The terminal server reset connection before licence negotiation completed.",
+                                    "Possible cause: terminal server could not connect to licence server.",
+                                    "Retry?"};
+                            boolean retry = window.showYesNoErrorDialog(msg);
+                            if (!retry) {
+                                logger.info("Selected not to retry.");
+                                Rdesktop.exit(0, RdpLayer, window, true);
+                            } else {
+                                if (RdpLayer != null && RdpLayer.isConnected()) {
+                                    logger.info("Disconnecting ...");
+                                    RdpLayer.disconnect();
+                                    logger.info("Disconnected");
+                                }
+                                logger.info("Retrying connection...");
+                                keep_running = true; // retry
+                                continue;
                             }
-                            logger.info("Retrying connection...");
-                            keep_running = true; // retry
-                            continue;
+                        } else {
+                            String msg[] = {e.getMessage()};
+                            window.showErrorDialog(msg);
+                            Rdesktop.exit(0, RdpLayer, window, true);
                         }
-                    } else {
-                        String msg[] = {e.getMessage()};
-                        window.showErrorDialog(msg);
-                        Rdesktop.exit(0, RdpLayer, window, true);
+                    } catch (Exception e) {
+                        logger.warn(e.getClass().getName() + ' ' + e.getMessage());
+                        e.printStackTrace();
+                        error(e, RdpLayer, window, true);
                     }
-                } catch (Exception e) {
-                    logger.warn(e.getClass().getName() + ' ' + e.getMessage());
-                    e.printStackTrace();
-                    error(e, RdpLayer, window, true);
+                } else { // closing bracket to if(!rdp==null)
+                    logger
+                            .fatal("The communications layer could not be initiated!");
                 }
-            } else { // closing bracket to if(!rdp==null)
-                logger
-                        .fatal("The communications layer could not be initiated!");
             }
-        }
-        Rdesktop.exit(0, RdpLayer, window, true);
+            Rdesktop.exit(0, RdpLayer, window, true);
+
+        }).start();
+        return window;
     }
 
     /**
@@ -765,7 +775,7 @@ public class Rdesktop {
             window.dispose();
         }
 
-        System.gc();
+//        System.gc();
 
         if (sysexit && Constants.SystemExit) {
             if (!Common.underApplet)

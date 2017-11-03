@@ -65,7 +65,7 @@ public abstract class RdesktopCanvas extends Canvas {
     public String sKeys;
     public Rdp rdp;
     protected IndexColorModel colormap;
-    WrappedImage backstore;
+    public WrappedImage backstore;
 
     // private int[] colors = null; // needed for integer backstore
     private Cursor previous_cursor; // for setBusyCursor and
@@ -96,7 +96,8 @@ public abstract class RdesktopCanvas extends Canvas {
         this.bottom = height - 1; // changed
         setSize(width, height);
 
-        backstore = new WrappedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        backstore =  new WrappedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        setIgnoreRepaint(true);
 
         // now do input listeners in registerCommLayer() / registerKeyboard()
     }
@@ -216,7 +217,7 @@ public abstract class RdesktopCanvas extends Canvas {
         /* ********* Useful test for identifying image boundaries ************ */
         // g.setColor(Color.RED);
         // g.drawRect(x,y,data.getWidth(null),data.getHeight(null));
-        g.dispose();
+//        g.dispose();
 
     }
 

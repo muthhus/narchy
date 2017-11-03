@@ -13,30 +13,41 @@
  *******************************************************************************/
 package nars.video;
 
-import com.jogamp.nativewindow.util.PixelFormat;
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.texture.Texture;
-import net.propero.rdp.applet.RdpApplet;
+import nars.$;
+import nars.NAR;
+import nars.NAgentX;
+import nars.Narsese;
+import net.propero.rdp.Rdesktop;
+import net.propero.rdp.RdesktopException;
+import net.propero.rdp.RdesktopFrame;
 import org.slf4j.LoggerFactory;
-import spacegraph.SpaceGraph;
-import spacegraph.Surface;
-
-import spacegraph.render.Draw;
 
 
 /**
- * /usr/bin/qemu-system-x86_64 -boot c  -m 512 -hda '/home/me/img/Linux.qcow' -cdrom  '/home/me/Downloads/cm-x86-13.0-rc1.iso' -net nic,vlan=0 -net user,vlan=0 -localtime -vnc :1 -monitor stdio
+ * Remote Desktop Protocol
  */
-public class Rdp {
+public class RDP extends NAgentX {
 
-    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(Rdp.class);
-    final RdpApplet rdp;
+    private final static org.slf4j.Logger logger = LoggerFactory.getLogger(RDP.class);
 
-    public Rdp(String host, int port) {
-        rdp = new RdpApplet();
-        //rdp.host, port);
+    public RDP(NAR n, String host, int port) throws RdesktopException, Narsese.NarseseException {
+        super(n);
+        RdesktopFrame w = Rdesktop.RDPwindow(host + ":" + port);
+
+        senseCameraRetina(("video"), ()->w.canvas.backstore.getBufferedImage(), 64, 64);
+
     }
 
+    public static void main(String[] args) {
+        NAgentX.runRT((n)->{
+            try {
+                return new RDP(n, "localhost", 3389);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }, 16f);
+    }
 
 //    public void newFXWindow() {
 //        FX.run(()->{
@@ -134,39 +145,45 @@ public class Rdp {
 //        };
 //    }
 
-    public static void main(String[] args) {
-        Rdp v = new Rdp("localhost", 5901);
-
-        //1.
-        //v.newFXWindow();
-
-        //2.
-        //SpaceGraph.window(v.newSurface(), 800, 800);
-
-//        Default nar = NAgents.newMultiThreadNAR(2, new RealTime.CS(true).dur(0.25f));
-//
-//        NAgents a = new NAgents(nar) {
-//
-//            {
-//                PixelBag pb = v.newSensor(64, 64);
-//                pb.addActions("vnc", this);
-//
-//                addCamera("vnc", pb, (v) -> t(v, alpha));
-//            }
-//
-//            @Override
-//            protected float act() {
-//                return 0;
-//            }
-//
-//
-//        };
-//        NAgents.chart(a);
-//
-//        a.runRT(55f);
-
-
+    @Override
+    protected float act() {
+        return 0;
     }
+
+//    public static void main(String[] args) throws RdesktopException {
+//        RDP v = new RDP("localhost", 3389);
+//
+//        //1.
+//        //v.newFXWindow();
+//
+//        //2.
+//        //SpaceGraph.window(v.newSurface(), 800, 800);
+//
+////        Default nar = NAgents.newMultiThreadNAR(2, new RealTime.CS(true).dur(0.25f));
+////
+////        NAgents a = new NAgents(nar) {
+////
+////            {
+////                PixelBag pb = v.newSensor(64, 64);
+////                pb.addActions("vnc", this);
+////
+////                addCamera("vnc", pb, (v) -> t(v, alpha));
+////            }
+////
+////            @Override
+////            protected float act() {
+////                return 0;
+////            }
+////
+////
+////        };
+////        NAgents.chart(a);
+////
+////        a.runRT(55f);
+//
+//
+//    }
+
 
 
 }

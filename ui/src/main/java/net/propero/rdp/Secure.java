@@ -235,7 +235,7 @@ public class Secure {
     public void connect(InetAddress host, int port)
             throws IOException, RdesktopException,
             CryptoException, OrderException {
-        if (Options.hostname == "") {
+        if (Options.hostname.isEmpty()) {
             InetAddress localhost = InetAddress.getLocalHost();
             String name = localhost.getHostName();
             StringTokenizer tok = new StringTokenizer(name, ".");
@@ -617,8 +617,8 @@ public class Secure {
      */
     public byte[] sign(byte[] session_key, int length, int keylen, byte[] data,
                        int datalength) {
-        byte[] shasig = new byte[20];
-        byte[] md5sig = new byte[16];
+        byte[] shasig;// = new byte[20];
+        byte[] md5sig;// = new byte[16];
         byte[] lenhdr = new byte[4];
         byte[] signature = new byte[length];
 

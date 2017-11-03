@@ -40,7 +40,7 @@ public abstract class RdpPacket {
     public static final int SECURE_HEADER = 2;
     public static final int RDP_HEADER = 3;
     public static final int CHANNEL_HEADER = 4;
-    static Logger logger = Logger.getLogger(RdpPacket.class);
+    static final Logger logger = Logger.getLogger(RdpPacket.class);
     protected int mcs = -1;
 
     protected int secure = -1;

@@ -148,9 +148,8 @@ public abstract class KeyCode_FileBased {
 
             Vector newMap = new Vector();
 
-            Iterator i = keyMap.iterator();
-            while (i.hasNext()) {
-                MapDef current = (MapDef) i.next();
+            for (Object aKeyMap : keyMap) {
+                MapDef current = (MapDef) aKeyMap;
                 if (current.isCharacterDef()
                         && !(current.isAltDown() || current.isCtrlDown()
                         || current.isShiftDown() || current
@@ -315,10 +314,8 @@ public abstract class KeyCode_FileBased {
             FileOutputStream out = new FileOutputStream(filename);
             PrintStream p = new PrintStream(out);
 
-            Iterator i = keyMap.iterator();
-
-            while (i.hasNext()) {
-                ((MapDef) i.next()).writeToStream(p);
+            for (Object aKeyMap : keyMap) {
+                ((MapDef) aKeyMap).writeToStream(p);
             }
 
             p.close();

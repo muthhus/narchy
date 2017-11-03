@@ -42,6 +42,8 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.NoRouteToHostException;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class Rdp {
 
@@ -1349,18 +1351,21 @@ public class Rdp {
 
         n_updates = data.getLittleEndian16();
 
+        ByteBuffer bb = data.bb;
+
         for (int i = 0; i < n_updates; i++) {
 
-            left = data.getLittleEndian16();
-            top = data.getLittleEndian16();
-            right = data.getLittleEndian16();
-            bottom = data.getLittleEndian16();
-            width = data.getLittleEndian16();
-            height = data.getLittleEndian16();
-            bitsperpixel = data.getLittleEndian16();
+            bb.order(ByteOrder.LITTLE_ENDIAN);
+            left = bb.getShort();
+            top = bb.getShort();
+            right = bb.getShort();
+            bottom = bb.getShort();
+            width = bb.getShort();
+            height = bb.getShort();
+            bitsperpixel = bb.getShort();
             int Bpp = (bitsperpixel + 7) / 8;
-            compression = data.getLittleEndian16();
-            buffersize = data.getLittleEndian16();
+            compression = bb.getShort();
+            buffersize = bb.getShort();
 
             cx = right - left + 1;
             cy = bottom - top + 1;
@@ -1464,10 +1469,9 @@ public class Rdp {
         data.copyToByteArray(palette, 0, data.getPosition(), palette.length);
         data.incrementPosition(palette.length);
         for (int i = 0; i < n_colors; i++) {
-            red[i] = palette[j];
-            green[i] = palette[j + 1];
-            blue[i] = palette[j + 2];
-            j += 3;
+            red[i] = palette[j++];
+            green[i] = palette[j++];
+            blue[i] = palette[j++];
         }
         cm = new IndexColorModel(8, n_colors, red, green, blue);
         surface.registerPalette(cm);

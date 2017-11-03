@@ -163,7 +163,7 @@ public class RdpApplet extends Applet {
         String s = this.getParameter(parameter);
         if (s != null) {
             //System.out.println("<PARAM name=\"" + parameter + "\" value=\"" + s + "\"> NAME=\"" + name + "\"");
-            if (name != "") {
+            if (!name.isEmpty()) {
                 args[i] = name;
                 i++;
                 args[i] = s;

@@ -13,6 +13,6 @@ public interface Device {
 
     void setChannel(VChannel channel);
 
-    int process(RdpPacket data, IRP irp) throws IOException;
+    int process(RdpPacket data, IRP irp);
 
 }
