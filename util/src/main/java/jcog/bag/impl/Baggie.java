@@ -7,12 +7,13 @@ import jcog.list.FasterList;
 import jcog.pri.PriMap;
 import jcog.pri.Prioritized;
 import org.apache.commons.lang3.ArrayUtils;
-import org.eclipse.collections.api.block.function.primitive.ShortToShortFunction;
+import org.eclipse.collections.api.block.function.primitive.IntToShortFunction;
 import org.eclipse.collections.api.block.predicate.primitive.ObjectFloatPredicate;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ public class Baggie<X> extends PriMap<X> {
     /**
      * holds the hash indices of the items in sorted order
      */
-    public short[] sorted = ArrayUtils.EMPTY_SHORT_ARRAY;
+    public int[] sorted = ArrayUtils.EMPTY_INT_ARRAY;
 
     public final ShortShortToShortFunction merge = (x, y) -> clamp(x + y);
     short min, max;
@@ -47,30 +48,30 @@ public class Baggie<X> extends PriMap<X> {
     }
 
     public boolean put(@NotNull X x, short pri) {
-        assert(pri >= 0);
+        assert (pri >= 0);
 
 
         short from, to;
 
-        List<X> trash = null;
+        final List[] trash = {null};
 
         synchronized (this) {
             pressure += pri;
-            if (isFull()) {
+            boolean full = isFull();
+            if (full) {
                 //assert (min >= 0);
                 if (pri < min && !containsKey(x)) {
                     return false; //rejected
                 }
             }
 
-            int sbefore = size;  //for debugging
-            int ch = update(x, pri, merge);
+            int ch = update(x, pri, merge, full ? () -> {
+                trash[0] = removeLowest(1);
+            } : null);
             from = Util.intFromShorts(ch, true);
-            assert(from!=-1 ? size==sbefore : size == sbefore+1); //for debugging
-
             to = Util.intFromShorts(ch, false);
             if (from != to) {
-                trash = update(from, to); //change occurred
+                update(from, to); //change occurred
             } else {
                 return true; //no change
             }
@@ -78,8 +79,8 @@ public class Baggie<X> extends PriMap<X> {
 
         //after synch:
 
-        if (trash != null) {
-            trash.forEach(this::onRemoved);
+        if (trash[0] != null) {
+            ((List<X>) trash[0]).forEach(this::onRemoved);
         }
 
         if (from == -1) {
@@ -93,61 +94,60 @@ public class Baggie<X> extends PriMap<X> {
     public void clear() {
         synchronized (this) {
             super.clear();
-            this.sorted = ArrayUtils.EMPTY_SHORT_ARRAY;
+            this.sorted = ArrayUtils.EMPTY_INT_ARRAY;
             this.min = this.max = -1;
         }
+    }
+
+    protected List<X> removeLowest(int toRemove) {
+        assert (toRemove > 0);
+
+        List<X> trash = new FasterList<>(toRemove);
+        for (int i = 0; i < toRemove; i++) {
+            int lowest = sorted[sorted.length - 1 - i];
+            Object k = keys[lowest];
+            assert (k != REMOVED_KEY);
+            trash.add((X) k);
+        }
+
+        //remove each by key because each removal will have changed the indexing that sorted refers to
+        trash.forEach(this::removeKey);
+
+        return trash;
     }
 
     /**
      * from and to are the range of values that would have changed, so that a partial sort can be isolated to the sub-range of the list that has changed
      * returns trashed items, if any, or null if none
      */
-    protected List<X> update(short from, short to) {
+    protected void update(short from, short to) {
         assert (size > 0);
 
-        int toRemove = size - capacity;
-
-        List<X> trash;
-        if (toRemove > 0) {
-            trash = new FasterList<>(toRemove);
-            for (int i = 0; i < toRemove; i++) {
-                short lowest = sorted[sorted.length - 1 - i];
-                trash.add((X)keys[lowest]);
-            }
-
-            //remove each by key because each removal will have changed the indexing that sorted refers to
-            trash.forEach(this::remove);
-        } else {
-            trash = null;
-        }
-
-        boolean refill;
-
-
-//        if (refill || from == -1 /* new entry */) {
-            reBuildSort(from, to);
+        //if (sorted.length!=size || from == -1 /* new entry */) {
+        reBuildSort(from, to);
 //        } else {
 //            reSort(from, to);
 //        }
 
-        return trash;
     }
 
     private void reBuildSort(short from, short to) {
-        if (size == 0) {
+
+        int slen = size; //Math.min(size, capacity); //TODO prealloc once and fill remainder with empties
+        if (slen == 0) {
             clear();
             return;
         }
-        int slen = size; //Math.min(size, capacity); //TODO prealloc once and fill remainder with empties
+
         if (sorted.length != slen) {
-            this.sorted = new short[slen];
+            this.sorted = new int[slen];
         } else {
         }
 
-        short[] s = this.sorted;
+        int[] s = this.sorted;
 
         int i = 0;
-        for (short index = 0, keysLength = (short) keys.length; index < keysLength; index++) {
+        for (int index = 0, keysLength = (short) keys.length; index < keysLength; index++) {
             Object o = keys[index];
             if (isNonSentinel(o))// o != null && o!=REM)
                 s[i++] = index;
@@ -161,32 +161,32 @@ public class Baggie<X> extends PriMap<X> {
      * TODO partial sort the affected range
      */
     private void reSort(short from, short to) {
-        short[] s = this.sorted;
+        int[] s = this.sorted;
         sort(s, 0, s.length - 1, (x) -> values[x]); //descending
         this.max = values[s[0]];
-        this.min = values[s[s.length-1]];
+        this.min = values[s[s.length - 1]];
     }
 
     public X lowest() {
         synchronized (this) {
-            short i = lowestIndex();
+            int i = lowestIndex();
             return i < 0 ? null : (X) keys[i];
         }
     }
 
     public X highest() {
         synchronized (this) {
-            short i = highestIndex();
+            int i = highestIndex();
             return i < 0 ? null : (X) keys[i];
         }
     }
 
-    private short lowestIndex() {
+    private int lowestIndex() {
         int s = this.size;
         return s > 0 ? sorted[s - 1] : -1;
     }
 
-    private short highestIndex() {
+    private int highestIndex() {
         return size > 0 ? sorted[0] : -1;
     }
 
@@ -199,7 +199,7 @@ public class Baggie<X> extends PriMap<X> {
         synchronized (this) {
             boolean x = removeKey(key);
             if (x) {
-                reBuildSort((short)-1, (short)-1);
+                reBuildSort((short) -1, (short) -1);
             }
             return x;
         }
@@ -221,7 +221,7 @@ public class Baggie<X> extends PriMap<X> {
         return size() == capacity;
     }
 
-    static void sort(short[] a, int left, int right, ShortToShortFunction v) {
+    static void sort(int[] a, int left, int right, IntToShortFunction v) {
 //        // Use counting sort on large arrays
 //        if (right - left > COUNTING_SORT_THRESHOLD_FOR_BYTE) {
 //            int[] count = new int[NUM_BYTE_VALUES];
@@ -241,7 +241,7 @@ public class Baggie<X> extends PriMap<X> {
 //            }
 //        } else { // Use insertion sort on small arrays
         for (int i = left, j = i; i < right; j = ++i) {
-            short ai = a[i + 1];
+            int ai = a[i + 1];
             while (v.valueOf(ai) > v.valueOf(a[j])) {
                 a[j + 1] = a[j];
                 if (j-- == left)
@@ -258,11 +258,14 @@ public class Baggie<X> extends PriMap<X> {
 
     public boolean forEach(ObjectFloatPredicate<X> each) {
         synchronized (this) {
-            short[] sorted = this.sorted;
+            int[] sorted = this.sorted;
             for (int i = 0; i < size; i++) {
-                short ii = sorted[i];
-                if (!each.accept((X) keys[ii], priShort(values[ii])))
-                    return false;
+                int ii = sorted[i];
+                short v = values[ii];
+                if (v >= 0) {
+                    if (!each.accept((X) keys[ii], priShort(v)))
+                        return false;
+                }
             }
         }
         return true;
@@ -275,21 +278,30 @@ public class Baggie<X> extends PriMap<X> {
         }
     }
 
-    /** use with caution, only for non-concurrent situations */
+    /**
+     * use with caution, only for non-concurrent situations
+     */
     public Stream<LightObjectFloatPair<X>> streamDirect() {
         return IntStream.range(0, size).mapToObj((int i) -> {
-            short ii = sorted[i];
-            return new LightObjectFloatPair<>((X) keys[ii], priShort(values[ii]));
-        });
+            int ii = sorted[i];
+            if (ii >= 0)
+                return new LightObjectFloatPair<>((X) keys[ii], priShort(values[ii]));
+            else
+                return null;
+        }).filter(Objects::nonNull);
     }
 
-    /** creates a copy for concurrency purposes */
+    /**
+     * creates a copy for concurrency purposes
+     */
     public Stream<ObjectFloatPair<X>> stream() {
         return toList().stream();
     }
 
 
-    /** iterate all elements while each returns true, applying changed values afterward and batch sorting at the end */
+    /**
+     * iterate all elements while each returns true, applying changed values afterward and batch sorting at the end
+     */
     public void commit(Random rng, Predicate<LightObjectFloatPair<X>> each) {
         throw new TODO();
     }
@@ -301,13 +313,13 @@ public class Baggie<X> extends PriMap<X> {
             X x;
             synchronized (this) {
 
-                assert(sorted.length == size): "sorted=" + sorted.length + " but size=" + size;
+                assert (sorted.length == size) : "sorted=" + sorted.length + " but size=" + size;
 
                 int i = sorted[sample(rng)];
                 x = (X) keys[i];
-                assert(x!=null);
+                assert (x != null);
                 short v = values[i];
-                assert(v >= 0);
+                assert (v >= 0);
                 l.set(x, priShort(v));
             }
 
@@ -367,6 +379,7 @@ public class Baggie<X> extends PriMap<X> {
     public float priMax() {
         return priShort(max);
     }
+
     public float priMin() {
         return priShort(min);
     }

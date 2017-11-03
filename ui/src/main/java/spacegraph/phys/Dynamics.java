@@ -1006,7 +1006,12 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
     private boolean updateAnimation(Animated animated) {
-        return !animated.animate(curDT); //invert for the 'removeIf'
+        try {
+            return !animated.animate(curDT); //invert for the 'removeIf'
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true;
+        }
     }
 
     public String summary() {

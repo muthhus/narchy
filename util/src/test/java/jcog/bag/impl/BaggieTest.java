@@ -5,7 +5,6 @@ import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.math3.stat.Frequency;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,13 +41,13 @@ public class BaggieTest {
         assertEquals("e", s.highest());
         assertEquals("a", s.lowest());
 
-        int sortsBeforeaddedAzero = s.sorts;
+        //int sortsBeforeaddedAzero = s.sorts;
         boolean addedAzero = s.put("a", 0f); //no change
         assertTrue(addedAzero);
         assertEquals(4, s.size());
         assertEquals("e", s.highest());
         assertEquals("a", s.lowest());
-        assertEquals(sortsBeforeaddedAzero, s.sorts);
+        //assertEquals(sortsBeforeaddedAzero, s.sorts);
 
         s.clear();
         assertEquals(0, s.size());
@@ -60,7 +59,7 @@ public class BaggieTest {
         public int evictions = 0;
         public int insertions = 0;
         public int rejections = 0;
-        public int sorts = 0;
+        //public int sorts = 0;
 
         public InstrumentedBaggie() {
             super(4);
@@ -87,12 +86,7 @@ public class BaggieTest {
             evictions++;
         }
 
-        @Override
-        protected List<X> update(short from, short to) {
-            List<X> x = super.update(from, to);
-            sorts++;
-            return x;
-        }
+
     }
 
     @Test
@@ -149,4 +143,15 @@ public class BaggieTest {
         }
     }
 
+    @Test
+    public void testSustainedAdd() {
+        int cap = 256;
+        int uniq = cap * 2;
+        Baggie<String> s = new Baggie<>(cap);
+        Random rng = new XorShift128PlusRandom(1);
+        for (int i = 0; i < cap * 256; i++) {
+            s.put("x" + i, rng.nextFloat());
+        }
+        assertEquals(cap, s.size());
+    }
 }
