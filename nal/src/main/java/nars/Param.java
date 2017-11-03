@@ -183,9 +183,9 @@ public abstract class Param extends Services<Term, NAR> {
 //     * number between 0 and 1 controlling the proportion of activation going
 //     * forward (compound to subterms) vs. reverse (subterms to parent compound).
 //     * when calculated, the total activation will sum to 1.0.
-//     * so 0.5 is equal amounts for both.
+//     * so 0.5 is equal amounts for both, 0 is full backward, 1 is full forward.
 //     */
-//    public static final float TERMLINK_BALANCE = 0.5f;
+    public final FloatParam termlinkBalance = new FloatParam(0.5f, 0, 1f);
 
     public final FloatParam conceptActivation = new FloatParam(1f, 0, 1f);
 

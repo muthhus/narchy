@@ -1,19 +1,20 @@
 package jcog.data;
 
 import jcog.Texts;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class QuickLZTest {
 
-    float testCompressDecompress(String s) {
+    static float testCompressDecompress(String s, int level) {
         System.out.print(s + "\n\t");
-        return testCompressDecompress(s.getBytes());
+        return testCompressDecompress(s.getBytes(), level);
     }
 
-    float testCompressDecompress(byte[] input) {
-        byte[] compressed = QuickLZ.compress(input);
+    static float testCompressDecompress(byte[] input, int level) {
+        byte[] compressed = QuickLZ.compress(input,level);
         byte[] decompress = QuickLZ.decompress(compressed);
 
         //System.out.println(new String(input));
@@ -28,8 +29,10 @@ public class QuickLZTest {
     }
 
 
-    @Test
-    public void testSome() {
+
+    @ParameterizedTest
+    @ValueSource(ints={1,3})
+    public void testSome(int level) {
 
 //        float minRatio = Float.POSITIVE_INFINITY;
 //
@@ -38,11 +41,11 @@ public class QuickLZTest {
 //                QuickLZ.MATCH_THRESH = matchThresh;
 //                QuickLZ.UNCONDITIONAL_MATCHLEN = unc;
 //                System.out.println("matchThresh=" + matchThresh + "," + unc);
-                testCompressDecompress("x");
-                testCompressDecompress("abc");
-                testCompressDecompress("abcsdhfjdklsfjdklsfjd;s fja;dksfj;adskfj;adsfkdas;fjadksfj;kasdf");
-                testCompressDecompress("222222222222211111111111111112122222222222111111122222");
-                float r = testCompressDecompress("(a --> (b --> (c --> (d --> e))))");
+                testCompressDecompress("x", level);
+                testCompressDecompress("abc", level);
+                testCompressDecompress("abcsdhfjdklsfjdklsfjd;s fja;dksfj;adskfj;adsfkdas;fjadksfj;kasdf", level);
+                testCompressDecompress("222222222222211111111111111112122222222222111111122222", level);
+                float r = testCompressDecompress("(a --> (b --> (c --> (d --> e))))", level);
 //                if (r < minRatio) {
 //                    minRatio = r;
 //                    System.out.println("BEST so far");

@@ -48,7 +48,9 @@ public enum TermLinks {
         }
     }
 
-    /** recurses */
+    /**
+     * recurses
+     */
     static void templates(Term root, Set<Termed> tc, int layersRemain) {
 
         Term b = root.unneg();
@@ -72,12 +74,14 @@ public enum TermLinks {
         TermContainer bb = b.subterms();
         int bs = bb.subs();
         if (bs > 0) {
-            int r = layersRemain-1;
+            int r = layersRemain - 1;
             bb.forEach(s -> templates(s, tc, r));
         }
     }
 
-    /** includes the host as layer 0, so if this returns 1 it will only include the host */
+    /**
+     * includes the host as layer 0, so if this returns 1 it will only include the host
+     */
     static int layers(Term host) {
         switch (host.op()) {
 
@@ -106,7 +110,7 @@ public enum TermLinks {
 
             case IMPL:
 //                if (host.hasAny(Op.CONJ))
-                    return 4;
+                return 4;
 //                else
 //                    return 3;
 
@@ -137,26 +141,28 @@ public enum TermLinks {
     }
 
     public static void linkTemplate(Term srcTerm, Bag srcTermLinks, Termed target, float priForward, float priReverse, BatchActivation a, NAR nar, MutableFloat refund) {
-        Term targetTerm = target.term();
+
 
 //        if (targetTerm instanceof Bool)
 //            throw new RuntimeException("invalid termlink for " + srcTerm);
-        assert(!(srcTerm instanceof Bool));
-        assert(!(targetTerm instanceof Bool));
+        assert (!(srcTerm instanceof Bool));
+        //assert (!(targetTerm instanceof Bool));
 
 
+        Term targetTerm;
         boolean reverseLinked = false;
-        if (!srcTerm.equals(targetTerm)) {
-            Concept c = nar.conceptualize(target);
-            if (c != null) {
-                targetTerm = c.term();
-                c.termlinks().put(
-                        new PLink(srcTerm, priReverse), refund
-                );
-                float priSum = priForward + priReverse;
-                a.put(c, priSum);
-                reverseLinked = true;
-            }
+        Concept c = nar.conceptualize(target);
+        if (c != null && !srcTerm.equals(c.term())) {
+
+            c.termlinks().put(
+                    new PLink(srcTerm, priReverse), refund
+            );
+            float priSum = priForward + priReverse;
+            a.put(c, priSum);
+            reverseLinked = true;
+            targetTerm = c.term();
+        } else {
+            targetTerm = target.term();
         }
 
         if (!reverseLinked)
@@ -268,7 +274,9 @@ public enum TermLinks {
 //        return templateConcepts.toArrayRecycled(Concept[]::new);
 //    }
 
-    /** send some activation, returns the cost */
+    /**
+     * send some activation, returns the cost
+     */
     public static float linkTemplates(Concept src, List<Termed> templates, float totalBudget, float momentum, NAR nar, BatchActivation ba) {
 
         int n = templates.size();
@@ -288,12 +296,16 @@ public enum TermLinks {
         int nextTarget = nar.random().nextInt(n);
         Term srcTerm = src.term();
         Bag<Term, PriReference<Term>> srcTermLinks = src.termlinks();
+        float balance = nar.termlinkBalance.floatValue();
         for (int i = 0; i < toFire; i++) {
 
             Termed t = templates.get(nextTarget++);
             if (nextTarget == n) nextTarget = 0; //wrap around
 
-            linkTemplate(srcTerm, srcTermLinks, t, budgetedToEach/2f, budgetedToEach/2f, ba, nar, refund);
+            linkTemplate(srcTerm, srcTermLinks, t,
+                    budgetedToEach * balance,
+                    budgetedToEach * (1f - balance),
+                    ba, nar, refund);
         }
 
         float r = refund.floatValue();
