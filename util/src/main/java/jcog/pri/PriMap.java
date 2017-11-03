@@ -29,7 +29,7 @@ import static jcog.Util.unitize;
  *
  * @since 3.0.
  */
-public class PriMap<K>  {
+public class PriMap<K> {
     public static final short EMPTY_VALUE = (short) -1;
 
     private static final long serialVersionUID = 1L;
@@ -37,7 +37,7 @@ public class PriMap<K>  {
     private static final int OCCUPIED_SENTINEL_RATIO = 4;
     private static final int DEFAULT_INITIAL_CAPACITY = 8;
 
-    private static final Object NULL_KEY = new Object() {
+    private static final Object NULL_KEY = null; /*new Object() {
         
         public boolean equals(Object obj) {
             throw new RuntimeException("Possible corruption through unsynchronized concurrent modification.");
@@ -52,20 +52,20 @@ public class PriMap<K>  {
         public String toString() {
             return "ObjectShortHashMap.NULL_KEY";
         }
-    };
+    };*/
 
     private static final Object REMOVED_KEY = new Object() {
-        
+
         public boolean equals(Object obj) {
             throw new RuntimeException("Possible corruption through unsynchronized concurrent modification.");
         }
 
-        
+
         public int hashCode() {
             throw new RuntimeException("Possible corruption through unsynchronized concurrent modification.");
         }
 
-        
+
         public String toString() {
             return "ObjectShortHashMap.REMOVED_KEY";
         }
@@ -107,7 +107,7 @@ public class PriMap<K>  {
         return possibleResult;
     }
 
-    
+
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -124,26 +124,26 @@ public class PriMap<K>  {
         }
 
         for (int i = 0; i < this.keys.length; i++) {
-            if (isNonSentinel(this.keys[i]) && (!other.containsKey(this.toNonSentinel(this.keys[i])) || this.values[i] != other.getOrThrow(this.toNonSentinel(this.keys[i])))) {
+            if (isNonSentinel(this.keys[i]) && (!other.containsKey((K) this.keys[i]) || this.values[i] != other.getOrThrow((K) this.keys[i]))) {
                 return false;
             }
         }
         return true;
     }
 
-    
+
     public int hashCode() {
         int result = 0;
 
         for (int i = 0; i < this.keys.length; i++) {
             if (isNonSentinel(this.keys[i])) {
-                result += (this.toNonSentinel(this.keys[i]) == null ? 0 : this.keys[i].hashCode()) ^ (int) this.values[i];
+                result += ((K) this.keys[i] == null ? 0 : this.keys[i].hashCode()) ^ (int) this.values[i];
             }
         }
         return result;
     }
 
-    
+
     public String toString() {
         StringBuilder appendable = new StringBuilder();
 
@@ -157,7 +157,7 @@ public class PriMap<K>  {
                 if (!first) {
                     appendable.append(", ");
                 }
-                appendable.append(this.toNonSentinel(key)).append("=").append(this.values[i]);
+                appendable.append((K) key).append("=").append(this.values[i]);
                 first = false;
             }
         }
@@ -166,49 +166,49 @@ public class PriMap<K>  {
         return appendable.toString();
     }
 
-    
+
     public int size() {
         return this.size;
     }
 
-    
+
     public boolean isEmpty() {
         return this.size() == 0;
     }
 
-    
+
     public boolean notEmpty() {
         return this.size() != 0;
     }
 
-    
+
     public String makeString() {
         return this.makeString(", ");
     }
 
-    
+
     public String makeString(String separator) {
         return this.makeString("", separator, "");
     }
 
-    
+
     public String makeString(String start, String separator, String end) {
         Appendable stringBuilder = new StringBuilder();
         this.appendString(stringBuilder, start, separator, end);
         return stringBuilder.toString();
     }
 
-    
+
     public void appendString(Appendable appendable) {
         this.appendString(appendable, ", ");
     }
 
-    
+
     public void appendString(Appendable appendable, String separator) {
         this.appendString(appendable, "", separator, "");
     }
 
-    
+
     public void appendString(Appendable appendable, String start, String separator, String end) {
         try {
             appendable.append(start);
@@ -244,7 +244,7 @@ public class PriMap<K>  {
         return result;
     }
 
-    
+
     public void clear() {
         this.size = 0;
         this.occupiedWithSentinels = 0;
@@ -254,36 +254,39 @@ public class PriMap<K>  {
 
 
     static final float resolution = Short.MAX_VALUE - 1;
+
     public static short shortPri(float p) {
-        assert(p==p);
-            return (short)Math.round(resolution * unitize(p));
+        assert (p == p);
+        return (short) Math.round(resolution * unitize(p));
     }
+
     public static short shortPriOrNeg1(float p) {
-        if (p!=p)
+        if (p != p)
             return -1;
         else
-            return (short)Math.round(resolution * unitize(p));
+            return (short) Math.round(resolution * unitize(p));
     }
 
     public static float priShort(short p) {
         if (p < 0)
             return Float.NaN;
         else
-            return ((float)p)/resolution;
+            return ((float) p) / resolution;
     }
 
     public void set(K key, float pri) {
         set(key, shortPriOrNeg1(pri));
     }
+
     public void add(K key, float pri) {
-        assert(pri == pri);
+        assert (pri == pri);
         addToValue(key, shortPri(pri));
     }
 
     protected void set(K key, short value) {
         int index = this.probe(key);
 
-        if (isNonSentinel(this.keys[index]) && nullSafeEquals(this.toNonSentinel(this.keys[index]), key)) {
+        if (isNonSentinel(this.keys[index]) && nullSafeEquals((K) this.keys[index], key)) {
             // key already present in map
             this.values[index] = value;
             return;
@@ -292,19 +295,19 @@ public class PriMap<K>  {
         this.addKeyValueAtIndex(key, value, index);
     }
 
-    
+
     public void putAll(ObjectShortMap<? extends K> map) {
         map.forEachKeyValue(this::set);
     }
 
-    
+
     public boolean removeKey(K key) {
         int index = this.probe(key);
         return this.removeKeyAtIndex(key, index);
     }
 
-    private boolean removeKeyAtIndex(K key, int index) {
-        if (isNonSentinel(this.keys[index]) && nullSafeEquals(this.toNonSentinel(this.keys[index]), key)) {
+    protected boolean removeKeyAtIndex(K key, int index) {
+        if (isNonSentinel(this.keys[index]) && nullSafeEquals((K) this.keys[index], key)) {
             this.keys[index] = REMOVED_KEY;
             this.values[index] = EMPTY_VALUE;
             this.size--;
@@ -314,15 +317,26 @@ public class PriMap<K>  {
         return false;
     }
 
-    
+    protected K removeAtIndex(int index) {
+        Object k = this.keys[index];
+        if (isNonSentinel(this.keys[index])) {
+            this.keys[index] = REMOVED_KEY;
+            this.values[index] = EMPTY_VALUE;
+            this.size--;
+            this.occupiedWithSentinels++;
+            return (K) k;
+        }
+        return null;
+    }
+
     public void remove(Object key) {
         this.removeKey((K) key);
     }
 
-    
+
     public short removeKeyIfAbsent(K key, short value) {
         int index = this.probe(key);
-        if (isNonSentinel(this.keys[index]) && nullSafeEquals(this.toNonSentinel(this.keys[index]), key)) {
+        if (isNonSentinel(this.keys[index]) && nullSafeEquals((K) this.keys[index], key)) {
             this.keys[index] = REMOVED_KEY;
             short oldValue = this.values[index];
             this.values[index] = EMPTY_VALUE;
@@ -334,25 +348,24 @@ public class PriMap<K>  {
         return value;
     }
 
-    
+
     public short getIfAbsentPut(K key, short value) {
         int index = this.probe(key);
-        if (isNonSentinel(this.keys[index]) && nullSafeEquals(this.toNonSentinel(this.keys[index]), key)) {
+        if (isNonSentinel(this.keys[index]) && nullSafeEquals((K) this.keys[index], key)) {
             return this.values[index];
         }
         this.addKeyValueAtIndex(key, value, index);
         return value;
     }
 
-    
 
     public void updateValue(K key, float initialValueIfAbsent, FloatToFloatFunction function) {
-        updateValue(key, shortPri(initialValueIfAbsent), (short v)->shortPri(function.valueOf(priShort(v))));
+        updateValue(key, shortPri(initialValueIfAbsent), (short v) -> shortPri(function.valueOf(priShort(v))));
     }
 
     public short updateValue(K key, short initialValueIfAbsent, ShortToShortFunction function) {
         int index = this.probe(key);
-        if (isNonSentinel(this.keys[index]) && nullSafeEquals(this.toNonSentinel(this.keys[index]), key)) {
+        if (isNonSentinel(this.keys[index]) && nullSafeEquals((K) this.keys[index], key)) {
             this.values[index] = function.valueOf(this.values[index]);
             return this.values[index];
         }
@@ -365,7 +378,7 @@ public class PriMap<K>  {
         if (this.keys[index] == REMOVED_KEY) {
             --this.occupiedWithSentinels;
         }
-        this.keys[index] = toSentinelIfNull(key);
+        this.keys[index] = key;
         this.values[index] = value;
         ++this.size;
         if (this.size + this.occupiedWithSentinels > this.maxOccupiedWithData()) {
@@ -373,10 +386,10 @@ public class PriMap<K>  {
         }
     }
 
-    
+
     protected short addToValue(K key, short toBeAdded) {
         int index = this.probe(key);
-        if (isNonSentinel(this.keys[index]) && nullSafeEquals(this.toNonSentinel(this.keys[index]), key)) {
+        if (isNonSentinel(this.keys[index]) && nullSafeEquals((K) this.keys[index], key)) {
             short v = this.values[index];
             if (v == -1)
                 v = toBeAdded; //NaN -> value
@@ -393,16 +406,20 @@ public class PriMap<K>  {
     }
 
 
-    /** previous value in high 16 bits, next value in low 16 bits */
+    /**
+     * previous value in high 16 bits, next value in low 16 bits
+     */
     protected int update(K key, float incoming, FloatFloatToFloatFunction merge) {
         return update(key, shortPri(incoming), (short v, short i) -> shortPri(merge.apply(priShort(v), priShort(i))));
     }
 
-    /** previous value in high 16 bits, next value in low 16 bits */
+    /**
+     * previous value in high 16 bits, next value in low 16 bits
+     */
     protected int update(K key, short incoming, ShortShortToShortFunction merge) {
         int index = this.probe(key);
         short v0, v;
-        if (isNonSentinel(this.keys[index]) && nullSafeEquals(this.toNonSentinel(this.keys[index]), key)) {
+        if (isNonSentinel(this.keys[index]) && nullSafeEquals((K) this.keys[index], key)) {
             v = v0 = this.values[index];
             if (v == -1)
                 v = incoming; //NaN -> value
@@ -413,7 +430,7 @@ public class PriMap<K>  {
                 removeKeyAtIndex(key, index);
                 return v;
             }
-            return v0!=v ? (this.values[index] = v) : Short.MIN_VALUE;
+            this.values[index] = v;
         } else {
             this.addKeyValueAtIndex(key, incoming, index);
             v = this.values[index];
@@ -422,26 +439,27 @@ public class PriMap<K>  {
         return Util.intFromShorts(v0, v);
     }
 
-    
+
     public float get(Object key) {
         return priShort(getShort(key));
     }
+
     protected short getShort(Object key) {
         return this.getIfAbsent(key, EMPTY_VALUE);
     }
 
     public short getIfAbsent(Object key, short ifAbsent) {
         int index = this.probe(key);
-        if (isNonSentinel(this.keys[index]) && nullSafeEquals(this.toNonSentinel(this.keys[index]), key)) {
+        if (isNonSentinel(this.keys[index]) && nullSafeEquals((K) this.keys[index], key)) {
             return this.values[index];
         }
         return ifAbsent;
     }
 
-    
+
     public boolean containsKey(Object key) {
         int index = this.probe(key);
-        return isNonSentinel(this.keys[index]) && nullSafeEquals(this.toNonSentinel(this.keys[index]), key);
+        return isNonSentinel(this.keys[index]) && nullSafeEquals((K) this.keys[index], key);
     }
 
 //
@@ -454,7 +472,7 @@ public class PriMap<K>  {
 //        return false;
 //    }
 
-    
+
 //    public void forEach(ShortProcedure procedure) {
 //        this.each(procedure);
 //    }
@@ -476,20 +494,20 @@ public class PriMap<K>  {
 //        }
 //    }
 //
-    
+
     public void forEachKey(Procedure<? super K> procedure) {
         for (int i = 0; i < this.keys.length; i++) {
             if (isNonSentinel(this.keys[i])) {
-                procedure.value(this.toNonSentinel(this.keys[i]));
+                procedure.value((K) this.keys[i]);
             }
         }
     }
 
-    
+
     public void forEachKeyValue(ObjectFloatProcedure<? super K> procedure) {
         for (int i = 0; i < this.keys.length; i++) {
             if (isNonSentinel(this.keys[i])) {
-                procedure.value(this.toNonSentinel(this.keys[i]), priShort(this.values[i]));
+                procedure.value((K) this.keys[i], priShort(this.values[i]));
             }
         }
     }
@@ -516,19 +534,20 @@ public class PriMap<K>  {
 
         for (int i = 0; i < oldLength; i++) {
             if (isNonSentinel(old[i])) {
-                this.set(this.toNonSentinel(old[i]), oldValues[i]);
+                this.set((K) old[i], oldValues[i]);
             }
         }
     }
 
     // exposed for testing
     int probe(Object element) {
-        int index = this.spread(element);
+        final int index = this.spread(element);
 
         int removedIndex = -1;
-        if (isRemovedKey(this.keys[index])) {
+        final Object ki = this.keys[index];
+        if (isRemovedKey(ki)) {
             removedIndex = index;
-        } else if (this.keys[index] == null || nullSafeEquals(this.toNonSentinel(this.keys[index]), element)) {
+        } else if (ki == null || nullSafeEquals((K) ki, element)) {
             return index;
         }
 
@@ -540,15 +559,16 @@ public class PriMap<K>  {
             // Probe algorithm: 17*n*(n+1)/2 where n = no. of collisions
             nextIndex += probe;
             probe += 17;
-            nextIndex &= this.keys.length - 1;
+            final int ni = (nextIndex &= this.keys.length - 1);
 
-            if (isRemovedKey(this.keys[nextIndex])) {
+            Object kni = this.keys[ni];
+            if (isRemovedKey(kni)) {
                 if (removedIndex == -1) {
                     removedIndex = nextIndex;
                 }
-            } else if (nullSafeEquals(this.toNonSentinel(this.keys[nextIndex]), element)) {
+            } else if (nullSafeEquals((K) kni, element)) {
                 return nextIndex;
-            } else if (this.keys[nextIndex] == null) {
+            } else if (kni == null) {
                 return removedIndex == -1 ? nextIndex : removedIndex;
             }
         }
@@ -585,16 +605,9 @@ public class PriMap<K>  {
         return key == REMOVED_KEY;
     }
 
-    private static <K> boolean isNonSentinel(K key) {
-        return key != null && !isRemovedKey(key);
-    }
-
-    private K toNonSentinel(Object key) {
-        return key == NULL_KEY ? null : (K) key;
-    }
-
-    private static Object toSentinelIfNull(Object key) {
-        return key == null ? NULL_KEY : key;
+    protected static <K> boolean isNonSentinel(K key) {
+        //return /*key != null && */!isRemovedKey(key);
+        return key != null && key != REMOVED_KEY;
     }
 
     private int maxOccupiedWithData() {
@@ -613,7 +626,7 @@ public class PriMap<K>  {
 
 
     private class KeySet implements Set<K> {
-        
+
         public boolean equals(Object obj) {
             if (obj instanceof Set) {
                 Set<?> other = (Set<?>) obj;
@@ -624,36 +637,36 @@ public class PriMap<K>  {
             return false;
         }
 
-        
+
         public int hashCode() {
             int hashCode = 0;
             Object[] table = PriMap.this.keys;
             for (int i = 0; i < table.length; i++) {
                 Object key = table[i];
                 if (PriMap.isNonSentinel(key)) {
-                    K nonSentinelKey = PriMap.this.toNonSentinel(key);
+                    K nonSentinelKey = (K) key;
                     hashCode += nonSentinelKey == null ? 0 : nonSentinelKey.hashCode();
                 }
             }
             return hashCode;
         }
 
-        
+
         public int size() {
             return PriMap.this.size();
         }
 
-        
+
         public boolean isEmpty() {
             return PriMap.this.isEmpty();
         }
 
-        
+
         public boolean contains(Object o) {
             return PriMap.this.containsKey(o);
         }
 
-        
+
         public Object[] toArray() {
             int size = PriMap.this.size();
             Object[] result = new Object[size];
@@ -661,7 +674,7 @@ public class PriMap<K>  {
             return result;
         }
 
-        
+
         public <T> T[] toArray(T[] result) {
             int size = PriMap.this.size();
             if (result.length < size) {
@@ -674,19 +687,19 @@ public class PriMap<K>  {
             return result;
         }
 
-        
+
         public boolean add(K key) {
             throw new UnsupportedOperationException("Cannot call add() on " + this.getClass().getSimpleName());
         }
 
-        
+
         public boolean remove(Object key) {
             int oldSize = PriMap.this.size();
             PriMap.this.removeKey((K) key);
             return oldSize != PriMap.this.size();
         }
 
-        
+
         public boolean containsAll(Collection<?> collection) {
             for (Object aCollection : collection) {
                 if (!PriMap.this.containsKey(aCollection)) {
@@ -696,12 +709,12 @@ public class PriMap<K>  {
             return true;
         }
 
-        
+
         public boolean addAll(Collection<? extends K> collection) {
             throw new UnsupportedOperationException("Cannot call addAll() on " + this.getClass().getSimpleName());
         }
 
-        
+
         public boolean retainAll(Collection<?> collection) {
             int oldSize = PriMap.this.size();
             Iterator<K> iterator = this.iterator();
@@ -714,7 +727,7 @@ public class PriMap<K>  {
             return oldSize != PriMap.this.size();
         }
 
-        
+
         public boolean removeAll(Collection<?> collection) {
             int oldSize = PriMap.this.size();
             for (Object object : collection) {
@@ -723,12 +736,12 @@ public class PriMap<K>  {
             return oldSize != PriMap.this.size();
         }
 
-        
+
         public void clear() {
             PriMap.this.clear();
         }
 
-        
+
         public Iterator<K> iterator() {
             return new KeySetIterator();
         }
@@ -750,12 +763,12 @@ public class PriMap<K>  {
         private K currentKey;
         private boolean isCurrentKeySet;
 
-        
+
         public boolean hasNext() {
             return this.count < PriMap.this.size();
         }
 
-        
+
         public K next() {
             if (!this.hasNext()) {
                 throw new NoSuchElementException();
@@ -768,10 +781,10 @@ public class PriMap<K>  {
             this.currentKey = (K) PriMap.this.keys[this.position];
             this.isCurrentKeySet = true;
             this.position++;
-            return PriMap.this.toNonSentinel(this.currentKey);
+            return (K) this.currentKey;
         }
 
-        
+
         public void remove() {
             if (!this.isCurrentKeySet) {
                 throw new IllegalStateException();
@@ -782,7 +795,7 @@ public class PriMap<K>  {
 
             if (isNonSentinel(this.currentKey)) {
                 int index = this.position - 1;
-                PriMap.this.removeKeyAtIndex(PriMap.this.toNonSentinel(this.currentKey), index);
+                PriMap.this.removeKeyAtIndex((K) this.currentKey, index);
             } else {
                 PriMap.this.removeKey(this.currentKey);
             }

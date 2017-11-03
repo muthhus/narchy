@@ -1,10 +1,12 @@
 package jcog.bag.impl;
 
 import jcog.Util;
+import jcog.list.FasterList;
 import jcog.pri.PriMap;
-import jcog.util.FloatFloatToFloatFunction;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.ShortToShortFunction;
+
+import java.util.List;
 
 /**
  * lighter-weight 2nd-generation arraybag
@@ -34,6 +36,9 @@ public class ArrayBag2<X> extends PriMap<X> {
 
     public boolean put(X x, short pri) {
         short from, to;
+
+        List<X> trash = null;
+
         synchronized (this) {
             pressure += pri;
             if (isFull()) {
@@ -46,88 +51,125 @@ public class ArrayBag2<X> extends PriMap<X> {
             from = Util.intFromShorts(ch, true);
             to = Util.intFromShorts(ch, false);
             if (from != to) {
-                sort(from, to); //change occurred
+                trash = sort(from, to); //change occurred
+            } else {
+                return true; //no change
             }
+        }
+
+        //after synch:
+
+        if (trash != null) {
+            trash.forEach(this::onRemoved);
         }
 
         if (from == -1) {
             onAdded(x);
         }
+
         return true;
+    }
+
+    @Override
+    public void clear() {
+        synchronized (this) {
+            super.clear();
+            this.sorted = ArrayUtils.EMPTY_SHORT_ARRAY;
+            this.min = this.max = -1;
+        }
     }
 
     /**
      * from and to are the range of values that would have changed, so that a partial sort can be isolated to the sub-range of the list that has changed
+     * returns trashed items, if any, or null if none
      */
-    protected void sort(short from, short to) {
+    protected List<X> sort(short from, short to) {
+        assert(size > 0);
+
         int toRemove = size - capacity;
         Object[] keys = this.keys;
+
+        List<X> trash = null;
         for (int i = 0; i < toRemove; i++) {
-            int s = size;
-            short lowest = lowestIndex();
-            remove(keys[lowest]);
-            assert (size < s);
+
+
+            short lowest = sorted[sorted.length - 1 - i];
+
+            X rem = removeIt(lowest);
+            if (rem != null) {
+                if (trash == null)
+                    trash = new FasterList(1);
+                trash.add(rem);
+            } else {
+                assert (false);
+            }
+
         }
+
         short[] s;
-        if (sorted.length != size) {
-            s = this.sorted = new short[size];
+        boolean refill;
+        int slen = Math.min(size, capacity); //TODO prealloc once and fill remainder with empties
+        if (sorted.length != slen) {
+            s = this.sorted = new short[slen];
+            refill = true;
+        } else {
+            s = this.sorted;
+            refill = false;
+        }
+
+
+        if (refill || from==-1 /* new entry */) {
             int i = 0;
             for (short index = 0, keysLength = (short) keys.length; index < keysLength; index++) {
                 Object o = keys[index];
-                if (o != null)
+                if (isNonSentinel(o))// o != null && o!=REM)
                     s[i++] = index;
             }
             assert (i == size);
-        } else {
-            s = this.sorted;
         }
 
         //TODO partial sort the affected range
-        sort(sorted, 0, s.length-1, (x) -> {
-            return values[x]; //descending
-        });
-
+        sort(sorted, 0, s.length - 1, (x) -> values[x]); //descending
+        max = values[highestIndex()];
+        this.min = values[lowestIndex()];
+        return trash;
     }
 
     public X lowest() {
         synchronized (this) {
             short i = lowestIndex();
-            if (i < 0)
-                return null;
-            else
-                return (X) keys[i];
+            return i < 0 ? null : (X) keys[i];
         }
     }
 
     public X highest() {
         synchronized (this) {
             short i = highestIndex();
-            if (i < 0)
-                return null;
-            else
-                return (X) keys[i];
+            return i < 0 ? null : (X) keys[i];
         }
     }
 
     private short lowestIndex() {
-        return size > 0 ? sorted[size - 1] : -1;
+        int s = this.size;
+        return s > 0 ? sorted[s - 1] : -1;
     }
+
     private short highestIndex() {
         return size > 0 ? sorted[0] : -1;
     }
 
-
-
     @Override
     public void remove(Object key) {
+        throw new UnsupportedOperationException();
+    }
+
+    protected X removeIt(int index) {
         boolean removed;
-        X x = (X) key;
+        X x;
         synchronized (this) {
-            removed = super.removeKey(x);
+            x = removeAtIndex(index);
         }
-        if (removed) {
-            onRemoved(x);
-        }
+        return x;
     }
 
     public void onAdded(X x) {
@@ -145,7 +187,6 @@ public class ArrayBag2<X> extends PriMap<X> {
     public boolean isFull() {
         return size() == capacity;
     }
-
 
     static void sort(short[] a, int left, int right, ShortToShortFunction v) {
 //        // Use counting sort on large arrays
@@ -170,12 +211,16 @@ public class ArrayBag2<X> extends PriMap<X> {
             short ai = a[i + 1];
             while (v.valueOf(ai) > v.valueOf(a[j])) {
                 a[j + 1] = a[j];
-                if (j-- == left) {
+                if (j-- == left)
                     break;
-                }
             }
             a[j + 1] = ai;
         }
 //        }
     }
+
+    public boolean contains(X b) {
+        return containsKey(b);
+    }
+
 }
