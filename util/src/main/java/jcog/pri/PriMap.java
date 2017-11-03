@@ -78,7 +78,7 @@ public class PriMap<K> {
     private int occupiedWithSentinels;
 
     public PriMap() {
-        this.allocateTable(DEFAULT_INITIAL_CAPACITY << 1);
+        this.resize(DEFAULT_INITIAL_CAPACITY << 1);
     }
 
     public PriMap(int initialCapacity) {
@@ -86,13 +86,13 @@ public class PriMap<K> {
             throw new IllegalArgumentException("initial capacity cannot be less than 0");
         }
         int capacity = this.smallestPowerOfTwoGreaterThan(this.fastCeil(initialCapacity * OCCUPIED_DATA_RATIO));
-        this.allocateTable(capacity);
+        this.resize(capacity);
     }
 
-    public PriMap(ObjectShortMap<? extends K> map) {
-        this(Math.max(map.size(), DEFAULT_INITIAL_CAPACITY));
-        this.putAll(map);
-    }
+//    public PriMap(ObjectShortMap<? extends K> map) {
+//        this(Math.max(map.size(), DEFAULT_INITIAL_CAPACITY));
+//        this.putAll(map);
+//    }
 
 
     private int smallestPowerOfTwoGreaterThan(int n) {
@@ -108,40 +108,40 @@ public class PriMap<K> {
     }
 
 
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
+//    public boolean equals(Object obj) {
+//        if (this == obj) {
+//            return true;
+//        }
+//
+//        if (!(obj instanceof ObjectShortMap)) {
+//            return false;
+//        }
+//
+//        ObjectShortMap<K> other = (ObjectShortMap<K>) obj;
+//
+//        if (this.size() != other.size()) {
+//            return false;
+//        }
+//
+//        for (int i = 0; i < this.keys.length; i++) {
+//            if (isNonSentinel(this.keys[i]) && (!other.containsKey((K) this.keys[i]) || this.values[i] != other.getOrThrow((K) this.keys[i]))) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
-        if (!(obj instanceof ObjectShortMap)) {
-            return false;
-        }
 
-        ObjectShortMap<K> other = (ObjectShortMap<K>) obj;
-
-        if (this.size() != other.size()) {
-            return false;
-        }
-
-        for (int i = 0; i < this.keys.length; i++) {
-            if (isNonSentinel(this.keys[i]) && (!other.containsKey((K) this.keys[i]) || this.values[i] != other.getOrThrow((K) this.keys[i]))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    public int hashCode() {
-        int result = 0;
-
-        for (int i = 0; i < this.keys.length; i++) {
-            if (isNonSentinel(this.keys[i])) {
-                result += ((K) this.keys[i] == null ? 0 : this.keys[i].hashCode()) ^ (int) this.values[i];
-            }
-        }
-        return result;
-    }
+//    public int hashCode() {
+//        int result = 0;
+//
+//        for (int i = 0; i < this.keys.length; i++) {
+//            if (isNonSentinel(this.keys[i])) {
+//                result += ((K) this.keys[i] == null ? 0 : this.keys[i].hashCode()) ^ (int) this.values[i];
+//            }
+//        }
+//        return result;
+//    }
 
 
     public String toString() {
@@ -177,72 +177,72 @@ public class PriMap<K> {
     }
 
 
-    public boolean notEmpty() {
-        return this.size() != 0;
-    }
+//    public boolean notEmpty() {
+//        return this.size() != 0;
+//    }
 
 
-    public String makeString() {
-        return this.makeString(", ");
-    }
+//    public String makeString() {
+//        return this.makeString(", ");
+//    }
 
 
-    public String makeString(String separator) {
-        return this.makeString("", separator, "");
-    }
+//    public String makeString(String separator) {
+//        return this.makeString("", separator, "");
+//    }
 
 
-    public String makeString(String start, String separator, String end) {
-        Appendable stringBuilder = new StringBuilder();
-        this.appendString(stringBuilder, start, separator, end);
-        return stringBuilder.toString();
-    }
+//    public String makeString(String start, String separator, String end) {
+//        Appendable stringBuilder = new StringBuilder();
+//        this.appendString(stringBuilder, start, separator, end);
+//        return stringBuilder.toString();
+//    }
 
 
-    public void appendString(Appendable appendable) {
-        this.appendString(appendable, ", ");
-    }
-
-
-    public void appendString(Appendable appendable, String separator) {
-        this.appendString(appendable, "", separator, "");
-    }
-
-
-    public void appendString(Appendable appendable, String start, String separator, String end) {
-        try {
-            appendable.append(start);
-
-            boolean first = true;
-
-            for (int i = 0; i < this.keys.length; i++) {
-                Object key = this.keys[i];
-                if (isNonSentinel(key)) {
-                    if (!first) {
-                        appendable.append(separator);
-                    }
-                    appendable.append(String.valueOf(String.valueOf(this.values[i])));
-                    first = false;
-                }
-            }
-            appendable.append(end);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public short[] toArray() {
-        short[] result = new short[this.size()];
-        int index = 0;
-
-        for (int i = 0; i < this.keys.length; i++) {
-            if (isNonSentinel(this.keys[i])) {
-                result[index] = this.values[i];
-                index++;
-            }
-        }
-        return result;
-    }
+//    public void appendString(Appendable appendable) {
+//        this.appendString(appendable, ", ");
+//    }
+//
+//
+//    public void appendString(Appendable appendable, String separator) {
+//        this.appendString(appendable, "", separator, "");
+//    }
+//
+//
+//    public void appendString(Appendable appendable, String start, String separator, String end) {
+//        try {
+//            appendable.append(start);
+//
+//            boolean first = true;
+//
+//            for (int i = 0; i < this.keys.length; i++) {
+//                Object key = this.keys[i];
+//                if (isNonSentinel(key)) {
+//                    if (!first) {
+//                        appendable.append(separator);
+//                    }
+//                    appendable.append(String.valueOf(String.valueOf(this.values[i])));
+//                    first = false;
+//                }
+//            }
+//            appendable.append(end);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//
+//    public short[] toArray() {
+//        short[] result = new short[this.size()];
+//        int index = 0;
+//
+//        for (int i = 0; i < this.keys.length; i++) {
+//            if (isNonSentinel(this.keys[i])) {
+//                result[index] = this.values[i];
+//                index++;
+//            }
+//        }
+//        return result;
+//    }
 
 
     public void clear() {
@@ -256,15 +256,19 @@ public class PriMap<K> {
     static final float resolution = Short.MAX_VALUE - 1;
 
     public static short shortPri(float p) {
-        assert (p == p);
-        return (short) Math.round(resolution * unitize(p));
-    }
-
-    public static short shortPriOrNeg1(float p) {
+//        assert (p == p);
+//        return (short) Math.round(resolution * unitize(p));
+//    }
+//
+//    public static short shortPriOrNeg1(float p) {
         if (p != p)
             return -1;
         else
-            return (short) Math.round(resolution * unitize(p));
+            return clamp(Math.round(resolution * unitize(p)));
+    }
+
+    protected static short clamp(int x) {
+        return (short) Util.clamp(x, -1, Short.MAX_VALUE);
     }
 
     public static float priShort(short p) {
@@ -275,7 +279,7 @@ public class PriMap<K> {
     }
 
     public void set(K key, float pri) {
-        set(key, shortPriOrNeg1(pri));
+        set(key, shortPri(pri));
     }
 
     public void add(K key, float pri) {
@@ -428,12 +432,12 @@ public class PriMap<K> {
             }
             if (v < 0) {
                 removeKeyAtIndex(key, index);
-                return v;
+                return Util.intFromShorts(v0, (short) -1);
             }
             this.values[index] = v;
         } else {
             this.addKeyValueAtIndex(key, incoming, index);
-            v = this.values[index];
+            v = incoming;
             v0 = -1;
         }
         return Util.intFromShorts(v0, v);
@@ -524,11 +528,11 @@ public class PriMap<K> {
         this.rehash(this.keys.length << 1);
     }
 
-    private void rehash(int newCapacity) {
+    protected void rehash(int newCapacity) {
         int oldLength = this.keys.length;
         Object[] old = this.keys;
         short[] oldValues = this.values;
-        this.allocateTable(newCapacity);
+        this.resize(newCapacity);
         this.size = 0;
         this.occupiedWithSentinels = 0;
 
@@ -596,9 +600,10 @@ public class PriMap<K> {
         return false;
     }
 
-    private void allocateTable(int sizeToAllocate) {
+    private void resize(int sizeToAllocate) {
         this.keys = new Object[sizeToAllocate];
         this.values = new short[sizeToAllocate];
+        Arrays.fill(values, EMPTY_VALUE);
     }
 
     private static boolean isRemovedKey(Object key) {
@@ -618,10 +623,6 @@ public class PriMap<K> {
 
     private int maxOccupiedWithSentinels() {
         return this.keys.length / OCCUPIED_SENTINEL_RATIO;
-    }
-
-    public Set<K> keySet() {
-        return new KeySet();
     }
 
 
@@ -645,7 +646,7 @@ public class PriMap<K> {
                 Object key = table[i];
                 if (PriMap.isNonSentinel(key)) {
                     K nonSentinelKey = (K) key;
-                    hashCode += nonSentinelKey == null ? 0 : nonSentinelKey.hashCode();
+                    hashCode += nonSentinelKey.hashCode();
                 }
             }
             return hashCode;

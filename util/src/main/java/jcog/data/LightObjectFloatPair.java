@@ -2,18 +2,22 @@ package jcog.data;
 
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 
-public final class LightObjectFloatPair<Z> implements ObjectFloatPair<Z> {
+public class LightObjectFloatPair<X> implements ObjectFloatPair<X> {
 
-    private final float val;
-    private final Z the;
+    protected float val;
+    private X the;
 
-    public LightObjectFloatPair(Z the, float val) {
+    public LightObjectFloatPair(X the, float val) {
         this.val = val;
         this.the = the;
     }
 
+    public LightObjectFloatPair() {
+
+    }
+
     @Override
-    public Z getOne() {
+    public X getOne() {
         return the;
     }
 
@@ -22,8 +26,22 @@ public final class LightObjectFloatPair<Z> implements ObjectFloatPair<Z> {
         return val;
     }
 
+    public void set(X x, float v) {
+        this.the = x;
+        this.val = v;
+    }
+
+    public void set(float v) {
+        this.val = v;
+    }
+
     @Override
-    public int compareTo(ObjectFloatPair<Z> zObjectFloatPair) {
+    public int hashCode() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int compareTo(ObjectFloatPair<X> zObjectFloatPair) {
         throw new UnsupportedOperationException();
     }
 
