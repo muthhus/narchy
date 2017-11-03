@@ -1,12 +1,17 @@
 package nars.exe;
 
+import jcog.bag.Bag;
 import jcog.bag.impl.Baggie;
+import jcog.bag.impl.ConcurrentCurveBag;
+import jcog.bag.impl.CurveBag;
 import jcog.exe.Can;
+import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.control.Activate;
 import nars.task.ITask;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -19,8 +24,8 @@ public class UniExec extends Exec {
 
     private final int CAPACITY;
 
-    //protected Bag<Activate, Activate> active;
-    protected Baggie<Concept> active;
+    protected Bag<Activate, Activate> active;
+    //protected Baggie<Concept> active;
 
     public UniExec(int capacity) {
 
@@ -35,8 +40,8 @@ public class UniExec extends Exec {
 
     @Override
     public void activate(Concept c, float activationApplied) {
-        //active.putAsync(new Activate(c, activationApplied * nar.conceptActivation.floatValue()));
-        active.put(c, activationApplied);
+        active.putAsync(new Activate(c, activationApplied * nar.conceptActivation.floatValue()));
+        //active.put(c, activationApplied);
     }
 
     @Override
@@ -47,25 +52,29 @@ public class UniExec extends Exec {
     @Override
     public void fire(Predicate<Activate> each) {
 
-        //active.sample( each);
-        active.sample(nar.random(), (l) -> {
-            float pri = l.getTwo();
-            boolean cont = each.test(new Activate(l.getOne(), pri)); //TODO eliminate Activate class middle-man
-            l.set(0.5f * pri); //TODO continuous rate forget based on pressure release
-            return cont;
-        });
+        active.sample( each);
+
+//        float forgetRate = nar.forgetRate.floatValue();
+//        active.sample(nar.random(), (l) -> {
+//            float pri = l.pri();
+//            boolean cont = each.test(new Activate(l.get(), pri)); //TODO eliminate Activate class middle-man
+//            //l.set(0.5f * pri); //TODO continuous rate forget based on pressure release
+//            l.forget(forgetRate);
+//            return cont;
+//        });
+//        active.depressurize();
     }
 
     @Override
     public synchronized void start(NAR nar) {
 
         active =
-                new Baggie(CAPACITY);
-//            concurrent() ?
-//                new ConcurrentCurveBag<>(PriMerge.plus, new HashMap<>(), nar.random(), CAPACITY)
-//                    //new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), CAPACITY) {
-//                        :
-//                new CurveBag<>(PriMerge.plus, new HashMap(), nar.random(), CAPACITY);
+//                new Baggie(CAPACITY);
+            concurrent() ?
+                new ConcurrentCurveBag<>(PriMerge.plus, new HashMap<>(), nar.random(), CAPACITY)
+                    //new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), CAPACITY) {
+                        :
+                new CurveBag<>(PriMerge.plus, new HashMap(), nar.random(), CAPACITY);
 
         super.start(nar);
     }
@@ -75,7 +84,7 @@ public class UniExec extends Exec {
     public void cycle(List<Can> can) {
         super.cycle(can);
 
-        //active.commit(active.forget(nar.forgetRate.floatValue()));
+        active.commit(active.forget(nar.forgetRate.floatValue()));
     }
 
     @Override
@@ -93,8 +102,8 @@ public class UniExec extends Exec {
     @Override
     public Stream<Activate> active() {
 
-        //return active.stream();
-        return active.stream().map(x -> new Activate(x.getOne(), x.getTwo()));
+        return active.stream();
+        //return active.stream().map(x -> new Activate(x.getOne(), x.getTwo()));
     }
 
 //    final int WINDOW_SIZE = 32;

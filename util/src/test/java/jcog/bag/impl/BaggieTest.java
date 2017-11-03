@@ -97,13 +97,13 @@ public class BaggieTest {
             s.put("x" + i, i / ((float) cap));
         }
         String t = Joiner.on(",").join(s.toList());
-        assertEquals("x7=0.8749924,x6=0.75001526,x5=0.6250076,x4=0.5,x3=0.37499237,x2=0.25001526,x1=0.12500763,x0=0.0", t);
+        assertEquals("x7=0.87498856,x6=0.7500076,x5=0.6249962,x4=0.50001526,x3=0.3750038,x2=0.24999237,x1=0.12501144,x0=0.0", t);
 
         Random rng = new XorShift128PlusRandom(1);
         Frequency f = new Frequency();
         final int[] num = {cap * 100};
         s.sample(rng, (x) -> {
-            f.addValue(x.getOne());
+            f.addValue(x.get());
             return num[0]-- > 0;
         });
         System.out.println(f);

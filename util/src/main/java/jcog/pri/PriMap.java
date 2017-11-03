@@ -257,7 +257,7 @@ public class PriMap<K> {
     }
 
 
-    static final float resolution = Short.MAX_VALUE - 1;
+    static final float resolution = Short.MAX_VALUE - 2;
 
     public static short shortPri(float p) {
 //        assert (p == p);

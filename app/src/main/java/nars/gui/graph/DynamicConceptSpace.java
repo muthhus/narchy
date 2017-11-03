@@ -245,10 +245,15 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
 
                         e.width = minLineWidth + 0.5f * sqr(1 + p * MaxEdgeWidth);
 
-                        float taskish = e.tasklinkPri / edgeSum * termlinkOpac;
-                        e.r = 0.05f + 0.65f * sqr(taskish);
-                        float termish = e.termlinkPri / edgeSum * tasklinkOpac;
-                        e.b = 0.05f + 0.65f * sqr(termish);
+                        float taskish, termish;
+                        if (edgeSum > 0) {
+                            taskish = e.tasklinkPri / edgeSum * termlinkOpac;
+                            termish = e.termlinkPri / edgeSum * tasklinkOpac;
+                        } else {
+                            taskish = termish = 0.5f;
+                        }
+                        e.r = 0.05f + 0.65f * (taskish);
+                        e.b = 0.05f + 0.65f * (termish);
                         e.g = 0.1f * (1f - (e.r + e.g) / 1.5f);
 
                         e.a = Util.lerp(p * Math.max(taskish, termish), lineAlphaMin, lineAlphaMax);

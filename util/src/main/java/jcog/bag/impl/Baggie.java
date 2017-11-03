@@ -56,11 +56,11 @@ public class Baggie<X> extends PriMap<X> {
         final List[] trash = {null};
 
         synchronized (this) {
-            pressure += pri;
             boolean full = isFull();
             if (full) {
                 //assert (min >= 0);
                 if (pri < min && !containsKey(x)) {
+                    pressure += pri;
                     return false; //rejected
                 }
             }
@@ -71,6 +71,8 @@ public class Baggie<X> extends PriMap<X> {
             from = Util.intFromShorts(ch, true);
             to = Util.intFromShorts(ch, false);
             if (from != to) {
+                if (from>0 && to>0)
+                    pressure += to - from;
                 update(from, to); //change occurred
             } else {
                 return true; //no change
@@ -306,7 +308,23 @@ public class Baggie<X> extends PriMap<X> {
         throw new TODO();
     }
 
-    public void sample(Random rng, Predicate<LightObjectFloatPair<X>> each) {
+    public short forgetShare(float rate) {
+        synchronized (this) {
+            if (pressure > 0 && size > 0) {
+                short toForget = clamp(Math.round(rate * pressure / capacity) );
+                pressure = Math.max(0, pressure - toForget);
+                return toForget;
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    public void depressurize() {
+        pressure = 0;
+    }
+
+    public void sample(Random rng, Predicate<ChangeAwareLightObjectFloatPair<X>> each) {
         ChangeAwareLightObjectFloatPair<X> l = new ChangeAwareLightObjectFloatPair<>();
 
         while (size > 0) {
@@ -320,7 +338,7 @@ public class Baggie<X> extends PriMap<X> {
                 assert (x != null);
                 short v = values[i];
                 assert (v >= 0);
-                l.set(x, priShort(v));
+                l.set(x, v);
             }
 
             boolean done = !each.test(l);
@@ -384,23 +402,36 @@ public class Baggie<X> extends PriMap<X> {
         return priShort(min);
     }
 
-    private static class ChangeAwareLightObjectFloatPair<X> extends LightObjectFloatPair<X> {
+    public class ChangeAwareLightObjectFloatPair<X>  {
 
+        X the;
         short nextPri, pri;
 
         /**
          * called by this before iteration
          */
         public void set(X x, short v) {
-            set(x, priShort(this.nextPri = this.pri = v));
+            this.the = x;
+            this.nextPri = pri = v;
+        }
+
+        public float pri() {
+            return priShort(this.pri);
         }
 
         /**
          * called by callee during iteration
          */
-        @Override
         public void set(float v) {
             this.nextPri = shortPri(v);
+        }
+
+        public void forget(float rate) {
+            this.nextPri = clamp(Math.max(0, pri - forgetShare(rate)));
+        }
+
+        public X get() {
+            return the;
         }
     }
 }

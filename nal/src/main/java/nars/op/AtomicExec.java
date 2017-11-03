@@ -98,7 +98,7 @@ public class AtomicExec implements BiFunction<Task, NAR, Task> {
     public void tryInvoke(Task x, NAR n) {
 
         long now= n.time();
-        if (lastActivity == ETERNAL || ((now ) - lastActivity > minPeriod * n.dur()) && rise.compareAndSet(ETERNAL, now)) {
+        if (!x.isDeleted() && lastActivity == ETERNAL || ((now ) - lastActivity > minPeriod * n.dur()) && rise.compareAndSet(ETERNAL, now)) {
             try {
                 @Nullable Concept cc = x.concept(n, true);
                 if (cc != null) {
