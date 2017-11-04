@@ -15,6 +15,7 @@ import nars.term.var.Variable;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -367,10 +368,13 @@ public class Builtin {
             }
         }));
 
-        nar.onOp("assertEquals", (args, nn) -> {
+        nar.onOp("assertEquals", (task, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';
-            assertEquals(/*msg,*/ 2, args.subs());
-            assertEquals(/*msg,*/ args.sub(0), args.sub(1));
+            @Nullable TermContainer args = Operator.args(task);
+            if (args.subs()==2) {
+                //assertEquals(/*msg,*/ 2, args.subs());
+                assertEquals(/*msg,*/ args.sub(0), args.sub(1));
+            }
         });
 
         nar.on(f0("self", nar::self));

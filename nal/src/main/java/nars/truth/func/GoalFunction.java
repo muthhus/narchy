@@ -16,7 +16,7 @@ import static nars.truth.TruthFunctions.*;
 
 public enum GoalFunction implements TruthOperator {
 
-    Strong() {
+    @AllowOverlap Strong() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return desireStrongOriginal(T, B, minConf);
@@ -24,7 +24,7 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    Weak() {
+    @AllowOverlap Weak() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return desireWeakOriginal(T, B, minConf);
@@ -118,13 +118,13 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    @SinglePremise
-    Identity() {
-        @Override
-        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return TruthOperator.identity(T, minConf);
-        }
-    },
+//    @SinglePremise
+//    Identity() {
+//        @Override
+//        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+//            return TruthOperator.identity(T, minConf);
+//        }
+//    },
 
 //    @AllowOverlap @SinglePremise
 //    StructuralStrongNeg() {
@@ -135,21 +135,21 @@ public enum GoalFunction implements TruthOperator {
 //    },
 
 
-    Union() {
+    @AllowOverlap Union() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return union(T, B, minConf);
         }
     },
 
-    Intersection() {
+    @AllowOverlap Intersection() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return intersection(T, B, minConf);
         }
     },
 
-    Difference() {
+    @AllowOverlap Difference() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return difference(T, B, minConf);

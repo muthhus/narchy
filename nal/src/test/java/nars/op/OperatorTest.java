@@ -1,9 +1,9 @@
-package nars.nar;
+package nars.op;
 
 import nars.*;
-import nars.op.AtomicExec;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.test.TestNAR;
 import nars.time.Tense;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -14,10 +14,9 @@ import static nars.Op.COMMAND;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-@Disabled
 public class OperatorTest {
 
-    public static Term[] args(Task t) {
+    static Term[] args(Task t) {
         return ((Compound) (t.sub(0)/*subject*/)).toArray();
     }
 
@@ -141,6 +140,14 @@ public class OperatorTest {
         n.run(5);
     }
 
+    @Test
+    public void testCommandDefault() throws Narsese.NarseseException {
+        final NAR t = NARS.shell();
+        Task a = t.input("(a b c);").get(0);
+        assertNotNull(a);
+        assertTrue(a.isCommand());
+        assertEquals($.$("(a b c)"), a.term());
+    }
 ////    @Test public void testOperatorEquality() {
 ////        assertNotNull( $.oper("echo") );
 ////        assertEquals( $.oper("echo"), $.oper("echo"));
@@ -178,17 +185,27 @@ public class OperatorTest {
 //    }
 //
 //
-////
-////    public void testIO(String input, String output) {
-////
-////        //TextOutput.out(nar);
-////
-////        nar.mustOutput(16, output);
-////        nar.input(input);
-////
-////        nar.run(4);
-////
-////    }
+
+    @Disabled
+    @Test
+    public void testRecursiveEvaluation2() {
+        //assertTrue( t.nar.concept($.the("count")) instanceof Functor);
+
+        testIO("count({ count({a,b}), 2})!",
+                "(count({count({a,b},SELF),2},$1,SELF) ==> ($1 <-> 1)). :|: %1.00;0.90%"
+        );
+    }
+
+    static void testIO(String input, String output) {
+
+        TestNAR t = new TestNAR(NARS.tmp());
+        t.log();
+        t.mustOutput(16, output);
+        t.input(input);
+
+        t.test(4);
+
+    }
 ////
 ////    @Test public void testOutputInVariablePosition() {
 ////        testIO("count({a,b}, #x)!",
@@ -378,10 +395,35 @@ public class OperatorTest {
 ////        );
 ////    }
 ////
-////    @Test public void testRecursiveEvaluation2() {
-////        testIO("count({ count({a,b}), 2})!",
-////                "<(^count,{(^count,{a,b},SELF),2},$1,SELF) =/> <$1 <-> 1>>. :|: %1.00;0.90%"
-////        );
-////    }
+
+
+//    @Test public void testEval1() {
+//        assertEquals("(1)",
+//                t.eval(
+//                        //"(add 1 2)"
+//                        "(list 1)"
+//                ).toString());
+//    }
+
+//    @Test public void testStaticMethodInvoke() {
+//        assertEquals(System.getProperty("java.vm.version"),
+//                t.eval("(System/getProperty \"java.vm.version\")").toString() );
+//    }
+//    @Test public void testClojuredCompound() {
+//        assertEquals("[\"==>\" ([\"-->\" (a b)] (println x))]", t.eval("(quote <<a-->b> ==> (println x)>)").toString());
+//    }
+
+//    @Test public void testClojure2() {
+//            //t.eval("(\"org.junit.Assert/assertTrue\" false)");
+//        NAR n = new Default();
+//        n.log();
+//        n.input("a:b!");
+//        //n.input("<(println (System/getProperty \"java.vm.version\"))==>a:b>.");
+//        n.input("<(println 1)==>a:b>.");
+//        //n.input("<echo(y)==>a:b>.");
+//        //n.input("echo(z)!");
+//        n.run(16);
+//
+//    }
 
 }

@@ -925,6 +925,43 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
         Term x = term();
 
+
+
+        Term y = x.eval(n.terms.intern());
+
+        if (y == null)
+            return null;
+
+        Task t = this;
+        if (!x.equals(y)) { //instances could have been substituted and this matters
+
+            Task result;
+            if (y instanceof Bool && isQuestOrQuestion()) {
+                //convert to implicit answer
+                byte p = isQuestion() ? BELIEF : GOAL;
+                result = clone(this, x.term(), $.t(y == True ? 1f : 0f, n.confDefault(p)), p);
+            } else {
+                if (y.op()==Op.BOOL)
+                    return null;
+
+                @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), !isInput() || !Param.DEBUG_EXTRA);
+                    /* the evaluated result here acts as a memoization of possibly many results
+                       depending on whether the functor is purely static in which case
+                       it would be the only one.
+                     */
+                result = yy != null ? clone(this, yy.getOne().negIf(yy.getTwo())) : null;
+            }
+
+            delete();
+
+            if (result == null) {
+                return null; //result = Operator.log(n.time(), $.p(x, y));
+            } else {
+                return result.run(n); //recurse
+            }
+
+        }
+
         //invoke possible Operation
         boolean cmd = isCommand();
 
@@ -950,42 +987,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
                 }
                 //otherwise: allow processing goal
             }
-        }
-
-
-        Term y = x.eval(n.terms.intern());
-
-        if (y == null)
-            return null;
-
-        Task t = this;
-        if (!x.equals(y)) { //instances could have been substituted and this matters
-
-            Task result;
-            if (y instanceof Bool && isQuestOrQuestion()) {
-                //convert to implicit answer
-                byte p = isQuestion() ? BELIEF : GOAL;
-                result = clone(this, x.term(), $.t(y == True ? 1f : 0f, n.confDefault(p)), p);
-            } else {
-                if (y.hasAny(Op.BOOL))
-                    return null;
-
-                @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), !isInput() || !Param.DEBUG_EXTRA);
-                    /* the evaluated result here acts as a memoization of possibly many results
-                       depending on whether the functor is purely static in which case
-                       it would be the only one.
-                     */
-                result = yy != null ? clone(this, yy.getOne().negIf(yy.getTwo())) : null;
-            }
-
-            delete();
-
-            if (result == null) {
-                return null; //result = Operator.log(n.time(), $.p(x, y));
-            } else {
-                t = result;
-            }
-
         }
 
         if (!cmd)
