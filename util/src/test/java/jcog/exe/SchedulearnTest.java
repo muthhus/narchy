@@ -37,7 +37,9 @@ public class SchedulearnTest {
         assertTrue(a.iterations() > a.supply());
 
         double te = Schedulearn.estimatedTimeTotal(List.of(a, b, c));
-        assertEquals(te, timeSlice, timeSlice/3f /* within a value near the target */);
+        assertTrue( te <= timeSlice * 1.1 /* limited overshoot */ );
+        assertTrue(te >= timeSlice * 0.5f /* maximal efficiency */);
+
 
     }
 }

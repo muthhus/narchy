@@ -361,7 +361,7 @@ public class Derivation extends Unify {
                 (belief != null && (!belief.isEternal() || beliefTerm.isTemporal()));
 
         this.parentCause = belief != null ?
-                Cause.zip(task, belief) :
+                Cause.zip(nar.causeCapacity.intValue(), task, belief) :
                 task.cause();
 
         this.premisePri =

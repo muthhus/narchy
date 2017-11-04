@@ -503,7 +503,7 @@ public class Revision {
 
         //t.setPri(a.priElseZero() + b.priElseZero());
 
-        t.cause = Cause.zip(a, b);
+        t.cause = Cause.zip(nar.causeCapacity.intValue(), a, b);
 
         if (Param.DEBUG)
             t.log("Revection Merge");

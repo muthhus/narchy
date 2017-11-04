@@ -3,115 +3,114 @@ package nars.op.java;
 import jcog.data.MutableInteger;
 import nars.NAR;
 import nars.NARS;
+import nars.Narsese;
 import nars.Param;
 import nars.control.MetaGoal;
+import org.junit.jupiter.api.Test;
 
 import static nars.Op.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ThermostatTest {
 
-    static final float speed = 0.02f;
-    final float tolerance = 0.15f;
-    private final MutableInteger x;
-    long cyclePause;
+    public static class ThermostatTester {
 
-    NAR n;
-    float targetX;
+        protected final MutableInteger x;
+        protected final NAR n;
 
-    final int amp = 2; //discrete range
+        public ThermostatTester() throws Exception {
 
-//    void move() {
-//        //targetX = Util.unitize( targetX + (float)(Math.random()-0.5f)*2*driftRate );
-//        targetX = Math.round(
-//                (float) (Math.sin(n.time() / 10.0f) + 1f) * 0.5f * amp
-//        );
-//    }
+            Param.DEBUG = true;
+
+            n = NARS.tmp();
 
 
-    public ThermostatTest() throws Exception {
+            OObjects objs = new OObjects(n);
 
-        Param.DEBUG = true;
-
-        n = NARS.tmp();
-        //Deriver.deriver(0, "list.nal").apply(n);
-
-        //n.log();
-        n.priDefault(BELIEF, 0.2f);
-        n.priDefault(QUESTION, 0.1f);
-        n.priDefault(QUEST, 0.1f);
-
-
-        OObjects objs = new OObjects(n);
-
-        this.x =
-                //objs.the("x", MutableInteger.class, 0);
-                objs.the("x", new MyMutableInteger());
-
-        n.time.dur(4);
-        MetaGoal.Desire.want(n.want, 0.5f);
-
-        for (int i = 0; i < 3; i++) {
-            x.set(3);
-            n.run(1);
-            x.intValue();
-            n.run(1);
-
-            n.run(10);
-
-            x.set(4);
-            n.run(1);
-            x.intValue();
-            n.run(1);
-
-            n.run(10);
+            this.x =
+                    objs.a("x", MutableInteger.class, 0);
+                 //objs.the("x", new MyMutableInteger());
         }
-
-        assertEquals(4, x.intValue());
-
-        n.run(1);
-
-        n.onTask(x -> {
-            if (x.isGoal() && !x.isInput())
-                System.out.println(x.proof());
-        });
-
-        //n.truthResolution.set(0.1f);
-        n.termVolumeMax.set(24);
-
-
-        while (x.intValue()!=3 && n.time() < 7000) {
-            if (n.time() % 400 == 0) {
-                n.input("$1.0 x(intValue, (), 3)! :|: %1.00;0.90%");
-                //n.input("$1.0 x(intValue, (), 4)! :|: %0.00;0.90%");
-                //n.input("$1.0 (set:?1 <-> intValue:?2)?");
-                //n.input("$1.0 x(set, 1)@ :|:");
-            }
-            n.run(1);
-        }
-
-        assertEquals(3, x.intValue());
-
-        while (x.intValue()!=5 && n.time() < 14000) {
-            if (n.time() % 400 == 0) {
-                n.input("$1.0 x(intValue, (), 5)! :|: %1.00;0.90%");
-                n.input("$0.5 x(intValue, (), 3)! :|: %0.00;0.90%");
-                n.input("$0.5 x(intValue, (), 4)! :|: %0.00;0.90%");
-                //n.input("$1.0 (set:?1 <-> intValue:?2)?");
-                //n.input("$1.0 x(set, 1)@ :|:");
-            }
-            n.run(1);
-        }
-        assertEquals(5, x.intValue());
-
-        new MetaGoal.Report().add(n.causes).print(System.out);
-
-
     }
 
+    @Test
+    public void test1() throws Exception {
+        new ThermostatTester() {
 
-    public static void main(String[] args) throws Exception {
-        new ThermostatTest();
+            {
+                int period = 100;
+                int subPeriods = 2;
+                int subPeriod = period/subPeriods;
+
+                n.log();
+                n.priDefault(BELIEF, 0.2f);
+                n.priDefault(QUESTION, 0.1f);
+                n.priDefault(QUEST, 0.1f);
+                n.truthResolution.set(0.02f);
+                n.termVolumeMax.set(28);
+                n.time.dur(subPeriod/2);
+                //MetaGoal.Desire.want(n.want, 1.5f);
+
+                for (int i = 0; i < 2; i++) {
+                    x.set(3);
+                    n.run(subPeriod);
+
+                    x.intValue();
+                    n.run(subPeriod);
+
+                    x.set(4);
+                    n.run(subPeriod);
+
+                    x.intValue();
+                    n.run(subPeriod);
+                }
+
+                assertEquals(4, x.intValue());
+
+                n.run(1);
+
+                n.onTask(x -> {
+                    if (x.isGoal() && !x.isInput())
+                        System.out.println(x.proof());
+                });
+
+
+                while (x.intValue() != 3 && n.time() < period) {
+                    if (n.time() % (period/subPeriods) == 0) {
+                        try {
+                            n.input("$1.0 x(intValue, (), 3)! :|: %1.00;0.90%");
+                        } catch (Narsese.NarseseException e) {
+                            e.printStackTrace();
+                        }
+                        //n.input("$1.0 x(intValue, (), 4)! :|: %0.00;0.90%");
+                        //n.input("$1.0 (set:?1 <-> intValue:?2)?");
+                        //n.input("$1.0 x(set, 1)@ :|:");
+                    }
+                    n.run(1);
+                }
+
+                assertEquals(3, x.intValue());
+
+                while (x.intValue() != 5 && n.time() < period*2) {
+                    if (n.time() % (period/subPeriods) == 0) {
+                        try {
+                            n.input("$1.0 x(intValue, (), 5)! :|: %1.00;0.90%");
+//                            n.input("$0.5 x(intValue, (), 3)! :|: %0.00;0.90%");
+//                            n.input("$0.5 x(intValue, (), 4)! :|: %0.00;0.90%");
+                            //n.input("$1.0 (set:?1 <-> intValue:?2)?");
+                            //n.input("$1.0 x(set, 1)@ :|:");
+                        } catch (Narsese.NarseseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    n.run(1);
+                }
+                assertEquals(5, x.intValue());
+
+                new MetaGoal.Report().add(n.causes).print(System.out);
+
+            }
+        };
     }
 
     public static class MyMutableInteger extends MutableInteger {

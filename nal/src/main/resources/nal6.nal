@@ -114,10 +114,12 @@
 // Conditional syllogism && Independent Variable Elimination
 //      If after M, P usually happens, and M happens, it means P is expected to happen
 
-    B, (A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionRecursivePB)
+    B, (A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionPB)
+        //B, (A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$",strict), (Belief:DeductionRecursivePB)
         B, (B ==> C),  notImpl(B), task("!") |- C, (Goal:DeciDeduction)
 
-    B, (--A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionRecursivePBN)
+    B, (--A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionPBN)
+        //B, (--A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$",strict), (Belief:DeductionRecursivePBN)
         B, (--B ==> C),  notImpl(B), task("!") |- C, (Goal:DeciDeductionN)
 
     //neq(B,C) on this one but not the others since C is at the 'start' time of the impl

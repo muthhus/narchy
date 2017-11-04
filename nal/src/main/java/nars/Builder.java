@@ -31,14 +31,17 @@ public class Builder {
         public static final Function<Term[], TermContainer> HeapSubtermBuilder =
                 TermVector::the;
 
-        public static final Supplier<Function<Term[], TermContainer>> SoftSubtermBuilder = () ->
-                new MemoizeSubtermBuilder(new SoftMemoize<>((n)->HeapSubtermBuilder.apply(n.subs), 64 * 1024, true));
+        static final Function<NewCompound, TermContainer> heapSubtermBuilderBuilder = (n) -> HeapSubtermBuilder.apply(n.subs);
+
+        public static final Supplier<Function<Term[], TermContainer>> SoftSubtermBuilder = () -> {
+            return new MemoizeSubtermBuilder(new SoftMemoize<>(heapSubtermBuilderBuilder, 64 * 1024, true));
+        };
 
         public static final Supplier<Function<Term[], TermContainer>> WeakSubtermBuilder = () ->
-                new MemoizeSubtermBuilder(new SoftMemoize<>((n)->HeapSubtermBuilder.apply(n.subs), 64 * 1024, false));
+                new MemoizeSubtermBuilder(new SoftMemoize<>(heapSubtermBuilderBuilder, 64 * 1024, false));
 
         public static final Supplier<Function<Term[], TermContainer>> CaffeineSubtermBuilder = () ->
-                new MemoizeSubtermBuilder(CaffeineMemoize.build((n)->HeapSubtermBuilder.apply(n.subs), 64 * 1024, false));
+                new MemoizeSubtermBuilder(CaffeineMemoize.build(heapSubtermBuilderBuilder, 64 * 1024, false));
 
 
         public static final Supplier<Function<Term[], TermContainer>> HijackSubtermBuilder = () ->
@@ -56,7 +59,9 @@ public class Builder {
                     }
                 };
 
-        public static Function<Term[], TermContainer> the = HeapSubtermBuilder;
+        public static Function<Term[], TermContainer> the =
+                //CaffeineSubtermBuilder.get();
+                HeapSubtermBuilder;
 
         private static class MemoizeSubtermBuilder implements Function<Term[], TermContainer> {
             final Memoize<NewCompound, TermContainer> cache;
@@ -70,8 +75,6 @@ public class Builder {
                 return cache.apply(new NewCompound(PROD, terms).commit());
             }
         }
-        //CaffeineSubtermBuilder;
-        //HijackSubtermBuilder;
 
     }
 
@@ -115,7 +118,8 @@ public class Builder {
 
         public static final Supplier<BiFunction<Op, Term[], Term>> CaffeineCompoundBuilder = ()->new BiFunction<>() {
 
-            final CaffeineMemoize<NewCompound, Term> cache = CaffeineMemoize.build((v) -> HeapCompoundBuilder.apply(v.op, v.subs), 64 * 1024, false);
+            final CaffeineMemoize<NewCompound, Term> cache = CaffeineMemoize.build((v) -> HeapCompoundBuilder.apply(v.op, v.subs),
+                    128 * 1024, false);
 
             @Override
             public Term apply(Op op, Term[] terms) {
@@ -139,7 +143,8 @@ public class Builder {
 
         public static BiFunction<Op, Term[], Term> the =
                 HeapCompoundBuilder;
-        //HijackCompoundBuilder;
+                //CaffeineCompoundBuilder.get();
+                //HijackCompoundBuilder;
 
     }
 }

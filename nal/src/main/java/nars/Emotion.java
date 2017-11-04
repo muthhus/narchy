@@ -317,6 +317,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
 
         float cost = unitize(vol / nar.termVolumeMax.floatValue())
                 * pri;
+                //;
 
         MetaGoal.learn(MetaGoal.Perceive, t.cause(), cost, nar);
 

@@ -1,6 +1,7 @@
 package jcog.exe;
 
 import jcog.Texts;
+import jcog.Util;
 import jcog.constraint.continuous.DoubleVar;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
@@ -53,12 +54,12 @@ public class Can {
 
     /**
      * relative value of an iteration; ie. past value estimate divided by the actual supplied unit count
-     * between 0..1.0
+     * >=0
      */
     public float value() {
         double mean = value.getMean();
-        if (mean!=mean) mean = 0.5f;
-        return (float) mean;
+
+        return mean != mean ? 0f : Math.max(0,Util.tanhFast((float) mean)+1);
     }
 
     /**
@@ -70,6 +71,11 @@ public class Can {
             value.addValue(totalValue / supplied);
             iterationTime.addValue(totalTimeSec / supplied);
         }
+    }
+
+    public final void commit(double iterations) {
+        this.iterations.value(iterations);
+        commit();
     }
 
     /** called after the iteration variable has been set */

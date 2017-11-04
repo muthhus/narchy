@@ -2,6 +2,7 @@ package jcog.bag;
 
 import jcog.Util;
 import jcog.bag.impl.ArrayBag;
+import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
 import jcog.pri.PLink;
@@ -281,6 +282,8 @@ public class BagTest {
         assertEquals(pri, a.priMin(), 0.01f);
         assertEquals(a.priMin(), a.priMax(), 0.08f);
 
+        if (a instanceof HijackBag)
+            assertTrue(((HijackBag)a).density() > 0.75f);
     }
 
     public static void populate(Bag<String, PriReference<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float qua) {

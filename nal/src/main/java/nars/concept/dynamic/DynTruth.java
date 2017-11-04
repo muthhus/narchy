@@ -65,8 +65,8 @@ public final class DynTruth implements Truthed {
     }
 
     @Nullable
-    public short[] cause() {
-        return e != null ? Cause.zip(e.array(Task[]::new) /* HACK */) : ArrayUtils.EMPTY_SHORT_ARRAY;
+    public short[] cause(NAR nar) {
+        return e != null ? Cause.zip(nar.causeCapacity.intValue(), e.array(Task[]::new) /* HACK */) : ArrayUtils.EMPTY_SHORT_ARRAY;
     }
 
     @Override
@@ -105,7 +105,7 @@ public final class DynTruth implements Truthed {
 
         NALTask dyn = new NALTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 tr, nar.time(), start, end /*+ dur*/, evidence());
-        dyn.cause = cause();
+        dyn.cause = cause(nar);
         dyn.setPri(priority);
 
         if (Param.DEBUG)

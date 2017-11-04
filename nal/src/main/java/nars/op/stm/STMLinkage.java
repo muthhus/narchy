@@ -54,7 +54,7 @@ public final class STMLinkage extends TaskService {
     }
 
     @Override
-    public final void accept(NAR nar, @NotNull Task t) {
+    public final void accept(NAR nar, Task t) {
 
         if (!t.isBeliefOrGoal())
             return;

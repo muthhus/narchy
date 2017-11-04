@@ -15,7 +15,8 @@ import java.util.Random;
  */
 public class CurveBag<X extends Priority> extends PriArrayBag<X> {
 
-    @Nullable
+    /** TODO pass random as argument to sample(..) rather than store field here */
+    @Deprecated @Nullable
     private final Random random;
 
     public CurveBag(@NotNull PriMerge mergeFunction, @NotNull Map<X, X> map, Random rng, int cap) {
@@ -31,6 +32,7 @@ public class CurveBag<X extends Priority> extends PriArrayBag<X> {
 
     @Override
     protected int sampleStart(Random random, int size) {
+        assert(size > 0);
         if (size == 1 || random==null)
             return 0;
         else {
@@ -41,9 +43,9 @@ public class CurveBag<X extends Priority> extends PriArrayBag<X> {
                 float i = random.nextFloat(); //uniform
                 //normalize to the lack of dynamic range
                 i = Util.lerp(diff, i /* flat */, (i*i) /* curved */);
-                int j = (int) Math.floor(i * (size-0.5f));
+                int j = (int) /*Math.floor*/(i * (size-0.5f));
                 if (j >= size) j = size-1;
-                if (j < 0) j = 0;
+                else if (j < 0) j = 0;
                 return j;
             } else {
                 return random.nextInt(size);

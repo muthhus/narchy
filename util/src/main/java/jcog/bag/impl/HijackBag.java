@@ -216,6 +216,17 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         return map.length();
     }
 
+    public float density() {
+        AtomicReferenceArray<V> m = map;
+        int mm = m.length();
+        int filled = 0;
+        for (int i = 0; i < mm; i++) {
+            if (m.get(i)!=null)
+                filled++;
+        }
+        return ((float)filled)/mm;
+    }
+
     enum Mode {
         GET, PUT, REMOVE
     }

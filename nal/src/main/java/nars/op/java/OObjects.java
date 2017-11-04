@@ -223,9 +223,9 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                 f = 1 - f;
             }
             long now = nar.time();
-            ValueSignalTask next = new ValueSignalTask(nt,
+            NALTask next = new NALTask(nt,
                     BELIEF, $.t(f, nar.confDefault(BELIEF)),
-                    now, now, nar.time.nextStamp(), nextValue);
+                    now, now, now, nar.time.nextInputStamp());
 
             if (Param.DEBUG)
                 next.log("Invocation" /* via VM */);

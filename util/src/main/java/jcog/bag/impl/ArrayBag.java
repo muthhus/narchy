@@ -351,7 +351,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 //        return this;
 //    }
 
-    @Nullable
+    @Deprecated @Nullable
     protected Random random() {
         return null;
     }

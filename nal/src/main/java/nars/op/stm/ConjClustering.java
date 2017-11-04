@@ -233,7 +233,7 @@ public class ConjClustering extends Causable {
                     long[] evidence = Stamp.zip(uu, Param.STAMP_CAPACITY);
                     NALTask m = new STMClusterTask(cp, t, start, end, evidence, punc, now); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
-                    m.cause = Cause.zip(uu);
+                    m.cause = Cause.zip(nar.causeCapacity.intValue(), uu);
 
                     float maxPri = priMax;
 

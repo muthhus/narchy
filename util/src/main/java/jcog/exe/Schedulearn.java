@@ -3,9 +3,7 @@ package jcog.exe;
 import com.google.common.base.Joiner;
 import jcog.constraint.continuous.*;
 import jcog.list.FasterList;
-import jcog.pri.Pri;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static jcog.Texts.strNS;
@@ -31,30 +29,38 @@ public class Schedulearn {
 
         ContinuousConstraintSolver solver = new ContinuousConstraintSolver();
 
-        float minValue = Float.POSITIVE_INFINITY,
-                maxValue = Float.NEGATIVE_INFINITY,
+//        float minValue = Float.POSITIVE_INFINITY,
+//                maxValue = Float.NEGATIVE_INFINITY,
+        float
                 totalValue = 0;
         float[] v = new float[canSize]; //normalized value
         for (int i = 0; i < canSize; i++) {
-            float cv = can.get(i).value();
-            if (cv > maxValue) maxValue = cv;
-            if (cv < minValue) minValue = cv;
-            v[i] = cv;
+            float vi = can.get(i).value();
+//            if (cv > maxValue) maxValue = cv;
+//            if (cv < minValue) minValue = cv;
+            assert (vi >= 0): can.get(i) + " produced negative Can value";
+            v[i] = vi;
+            totalValue += vi;
+        }
+        if (totalValue == 0) {
+            //flat case
+            can.forEach(c -> c.commit(1) );
+            return;
         }
 
-        //normalize
-        float range = maxValue - minValue;
-        if (jcog.Util.equals(range, 0, Pri.EPSILON)) {
-            range = 1f;
-            minValue = 0f;
-            Arrays.fill(v, 0.5f);
-        }
+//        //normalize
+//        float range = maxValue - minValue;
+//        if (jcog.Util.equals(range, 0, Pri.EPSILON)) {
+//            range = 1f;
+//            minValue = 0f;
+//            Arrays.fill(v, 0.5f);
+//        }
 
-        float base = 1/(canSize*canSize); //HEURISTIC
-        for (int i = 0; i < canSize; i++) {
-            v[i] = base + (v[i] - minValue) / range;
-            totalValue += v[i];
-        }
+//        float base = 0;// 1/(canSize*canSize); //HEURISTIC
+//        for (int i = 0; i < canSize; i++) {
+//            v[i] = base + (v[i] - minValue) / range;
+//            totalValue += v[i];
+//        }
 
 
         List<DoubleTerm> times = new FasterList(canSize);
@@ -67,14 +73,16 @@ public class Schedulearn {
             DoubleTerm xt = C.multiply(xi, Math.max(minIterationTime, x.iterationTimeMean()));
             times.add(xt);
 
+
             //fraction of component time is proportional to
             ContinuousConstraint proportionalToValue =
-                C.equals(
-                //C.lessThanOrEqualTo(
-                    v[i]/totalValue,
-                    C.divide(xt, timeslice)
-            );
-            proportionalToValue.setStrength(Strength.STRONG);
+                    C.equals(
+                            //C.lessThanOrEqualTo(
+                            C.divide(xt, timeslice),
+                            v[i] / totalValue
+
+                    );
+            proportionalToValue.setStrength(Strength.MEDIUM);
             solver.add(proportionalToValue);
 
             //demand slightly more than supply limit
@@ -82,7 +90,7 @@ public class Schedulearn {
             double overSupply = Math.max(1, Math.ceil((1 + supply) * OVER_DEMAND_IMPL));
 
             ContinuousConstraint meetsSupply = C.lessThanOrEqualTo(xi, overSupply);
-            meetsSupply.setStrength(Strength.STRONG);
+            meetsSupply.setStrength(Strength.MEDIUM);
             solver.add(meetsSupply);
 
         }
@@ -98,10 +106,9 @@ public class Schedulearn {
 
         solver.update();
 
-        can.forEach(c -> {
-            c.iterations.value(Math.max(1, c.iterations.value() * OVER_DEMAND_IMPL));
-            c.commit();
-        });
+        can.forEach(c ->
+            c.commit(Math.max(1, c.iterations.value()))
+        );
 
     }
 
@@ -117,7 +124,7 @@ public class Schedulearn {
             //tMax += c.supply() * im;
         }
 
-        System.out.println(strNS(tEst*1.0E9) + " est cycle time\t" + Joiner.on(",").join(cc));
+        System.out.println(strNS(tEst * 1.0E9) + " est cycle time\t" + Joiner.on(",").join(cc));
 
         return tEst;
     }

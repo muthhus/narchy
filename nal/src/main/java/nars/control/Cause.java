@@ -9,8 +9,6 @@ import org.eclipse.collections.api.block.predicate.primitive.ShortPredicate;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Param.CAUSE_CAPACITY;
-
 /**
  * represents a causal influence and tracks its
  * positive and negative gain (separately).  this is thread safe
@@ -94,7 +92,7 @@ public class Cause implements Comparable<Cause> {
         return Short.compare(id, o.id);
     }
 
-    public static short[] zip(@Nullable Task... e) {
+    public static short[] zip(int causeCapacity, @Nullable Task... e) {
         short[] a = e[0].cause();
         switch (e.length) {
             case 0: throw new NullPointerException();
@@ -113,9 +111,9 @@ public class Cause implements Comparable<Cause> {
                 if (Util.equals(a,b))
                     return a;
 
-                return zip(CAUSE_CAPACITY, a, b);
+                return zip(causeCapacity, a, b);
             default:
-                return zip(CAUSE_CAPACITY, Util.map(Task::cause, short[][]::new, e)); //HACK
+                return zip(causeCapacity, Util.map(Task::cause, short[][]::new, e)); //HACK
         }
     }
 

@@ -90,8 +90,8 @@ public abstract class Param extends Services<Term, NAR> {
             PriMerge.plus;
 
     public static final PriMerge tasklinkMerge =
-            //PriMerge.max;
-            PriMerge.plus; //not safe to plus without enough headroom
+            PriMerge.max;
+            //PriMerge.plus; //not safe to plus without enough headroom
 
 //    /**
 //     * budgets premises from their links, but isolated from affecting the derivation budgets, which are from the tasks (and not the links)
@@ -323,9 +323,10 @@ public abstract class Param extends Services<Term, NAR> {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 16;
-    public static final int CAUSE_CAPACITY = 32;
 
-    public final static int UnificationStackMax = 32; //how many assignments can be stored in the 'versioning' maps
+    public static final FloatParam causeCapacity = new FloatParam(16, 0, 256);
+
+    public final static int UnificationStackMax = 64; //how many assignments can be stored in the 'versioning' maps
 
     public static final int UnificationVariableCapInitial = 8;
 

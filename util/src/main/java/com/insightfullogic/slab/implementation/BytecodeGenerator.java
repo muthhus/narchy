@@ -4,7 +4,6 @@ import com.insightfullogic.slab.ConcreteCursor;
 import com.insightfullogic.slab.Cursor;
 import com.insightfullogic.slab.SlabOptions;
 import org.objectweb.asm.*;
-import org.objectweb.asm.util.CheckClassAdapter;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Constructor;
@@ -52,7 +51,7 @@ public class BytecodeGenerator<T extends Cursor> implements Opcodes {
     @SuppressWarnings("unchecked")
 	public Class<T> generate() {
     	ClassWriter out = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-    	CheckClassAdapter writer = new CheckClassAdapter(out);
+    	ClassVisitor writer = out; //new CheckClassAdapter(out);
 
 		declareClass(writer);
     	declareConstructor(writer);
@@ -70,7 +69,7 @@ public class BytecodeGenerator<T extends Cursor> implements Opcodes {
     	writer.visit(V1_6, ACC_PUBLIC + ACC_SUPER, implementationName, null, classExtended, interfacesImplemented);
     }
 
-    private void declareConstructor(CheckClassAdapter writer) {
+    private void declareConstructor(ClassVisitor writer) {
     	MethodVisitor method = writer.visitMethod(ACC_PUBLIC, "<init>", GENERATED_CONSTRUCTOR, null, null);
     	method.visitCode();
 		method.visitVarInsn(ALOAD, 0);
