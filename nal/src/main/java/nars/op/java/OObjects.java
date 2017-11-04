@@ -5,8 +5,11 @@ import com.google.common.primitives.Primitives;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyFactory;
 import javassist.util.proxy.ProxyObject;
+import jcog.TODO;
 import jcog.Util;
+import jcog.list.FasterList;
 import jcog.map.CustomConcurrentHashMap;
+import jcog.memoize.SoftMemoize;
 import nars.*;
 import nars.control.CauseChannel;
 import nars.op.AtomicExec;
@@ -19,9 +22,12 @@ import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.platform.commons.util.Preconditions;
+import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -47,6 +53,10 @@ import static nars.Op.*;
  */
 public class OObjects extends DefaultTermizer implements MethodHandler {
 
+    final static org.slf4j.Logger logger = LoggerFactory.getLogger(OObjects.class);
+
+    public static final float DESIRE_THRESH = 0.6f;
+
     @NotNull
     public final Set<String> methodExclusions = Sets.newConcurrentHashSet(Set.of(
             "hashCode",
@@ -62,7 +72,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
     ));
 
     static final Map<Class, Class> proxyCache = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, IDENTITY, 64);
-    final static Map<Term, Method> methodCache = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, IDENTITY, 64); //cache: (class,method) -> Method
+    static final Map<Term, Method> methodCache = new CustomConcurrentHashMap(STRONG, EQUALS, SOFT, IDENTITY, 64); //cache: (class,method) -> Method
 
 
     public static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
@@ -86,6 +96,25 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
     final static ThreadLocal<Task> invokingGoal = new ThreadLocal<>();
     private final CauseChannel<ITask> in;
+    private final static SoftMemoize<Pair<Pair<Class, String>, List<Class>>, MethodHandle> methodArgCache = new SoftMemoize<>((xx) -> {
+
+        Class c = xx.getOne().getOne();
+        String m = xx.getOne().getTwo();
+        List<Class> types = xx.getTwo();
+        Method x = findMethod(c, m, types.isEmpty() ? ArrayUtils.EMPTY_CLASS_ARRAY : ((FasterList<Class>) types).array());
+        if (x == null)
+            return null;
+
+        x.trySetAccessible();
+
+        try {
+            return MethodHandles.lookup().unreflect(x);
+        } catch (IllegalAccessException e) {
+            logger.warn("{} {} {} {}", c, m, types, e);
+            return null;
+        }
+
+    }, 512, true /* soft */);
 
     public OObjects(NAR n) {
         nar = n;
@@ -126,9 +155,12 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
     interface InstanceMethodValueModel {
 
-        Object update(Instance instance, Object obj, Method method, Object[] args, Object nextValue);
+        Object update(Instance instance, Task cause, Object obj, Method method, Object[] args, Object nextValue);
     }
 
+    /**
+     * TODO not fully tested, and missing Quench support
+     */
     public class ExtendedMethodValueModel implements InstanceMethodValueModel {
         /**
          * current (previous) value
@@ -136,9 +168,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
         public final ConcurrentHashMap<Method, ValueSignalTask> value = new ConcurrentHashMap();
 
         @Override
-        public Object update(Instance instance, Object obj, Method method, Object[] args, Object nextValue) {
-            Task cause = invokingGoal.get();
-            boolean explicit = cause != null;
+        public Object update(Instance instance, Task cause, Object obj, Method method, Object[] args, Object nextValue) {
 
             float pri = nar.priDefault(BELIEF);
 
@@ -174,14 +204,14 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                 if (Param.DEBUG)
                     next.log("Invocation" /* via VM */);
 
-                if (explicit) {
-                    next.causeMerge(cause);
-                    next.priMax(cause.priElseZero());
-                    cause.pri(0); //drain
-                    cause.meta("@", next);
-                } else {
-                    next.priMax(pri);
-                }
+//                if (explicit) {
+                next.causeMerge(cause);
+                next.priMax(cause.priElseZero());
+                cause.pri(0); //drain
+                cause.meta("@", next);
+//                } else {
+//                    next.priMax(pri);
+//                }
 
 
                 if (p1 != null && !p1.equals(nt)) {
@@ -214,7 +244,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
 
         @Override
-        public Object update(Instance instance, Object obj, Method method, Object[] args, Object nextValue) {
+        public Object update(Instance instance, Task cause, Object obj, Method method, Object[] args, Object nextValue) {
             float f = invocationBeliefFreq;
             Term nextTerm = instance.opTerm(method, args, nextValue);
             Term nt = nextTerm;
@@ -227,22 +257,32 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                     BELIEF, $.t(f, nar.confDefault(BELIEF)),
                     now, now, now, nar.time.nextInputStamp());
 
-            Task cause = invokingGoal.get();
-            boolean explicit = cause != null;
-
             if (Param.DEBUG)
-                next.log(explicit ? "Invoke" : "Invoked"/* via VM */);
+                next.log("Invoked");
 
             float pri = nar.priDefault(BELIEF);
 
 
-            if (explicit) {
+            if (cause != null) {
                 next.causeMerge(cause);
                 next.priMax(cause.priElseZero());
                 cause.pri(0); //drain
                 cause.meta("@", next);
             } else {
                 next.priMax(pri);
+            }
+
+
+            if (cause != null && !next.term().equals(cause.term())) {
+                //input quenching invocation belief term corresponding to the goal
+                NALTask quench = new NALTask(cause.term(), BELIEF, $.t(f, nar.confDefault(BELIEF)),
+                        now, now, now, nar.time.nextInputStamp());
+                quench.priMax(next.priElseZero());
+                quench.causeMerge(next);
+                quench.meta("@", next);
+                if (Param.DEBUG)
+                    quench.log("InvoQuench");
+                in.input(quench);
             }
 
             in.input(next);
@@ -261,7 +301,9 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
         final InstanceMethodValueModel belief;
 
-        /** for VM-caused invocations: if true, inputs a goal task since none was involved. assists learning the interface */
+        /**
+         * for VM-caused invocations: if true, inputs a goal task since none was involved. assists learning the interface
+         */
         static private final boolean goalMimic = true;
 
         public Instance(String id, Object object) {
@@ -274,29 +316,34 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
         public Object update(Object obj, Method method, Object[] args, Object nextValue) {
             Task cause = invokingGoal.get();
-            if (cause==null && goalMimic) {
-                goalMimic(obj, method, args);
+
+            if (cause == null && goalMimic) {
+                cause = goalMimic(obj, method, args);
             }
 
-            return belief.update(this, obj, method, args, nextValue);
+            Object o = belief.update(this, cause, obj, method, args, nextValue);
+
+            return o;
         }
 
-        private void goalMimic(Object obj, Method method, Object[] args) {
+        private Task goalMimic(Object obj, Method method, Object[] args) {
             long now = nar.time();
-            NALTask g = new NALTask(opTerm(method, args, $.varDep(1)), GOAL,
-                    $.t(1f,nar.confDefault(GOAL)), now, now, now, nar.time.nextInputStamp());
+            NALTask g = new NALTask(opTerm(method, args,
+                    method.getReturnType() == void.class ? null : $.varDep(1)), GOAL,
+                    $.t(1f, nar.confDefault(GOAL)), now, now, now, nar.time.nextInputStamp());
             g.priMax(nar.priDefault(GOAL));
-            g.meta("mimic","");
+            g.meta("mimic", "");
             if (Param.DEBUG)
                 g.log("Mimic");
             in.input(g);
+            return g;
         }
 
         private Term opTerm(Method method, Object[] args, Object result) {
 
             //TODO handle static methods
 
-            boolean isVoid = result==null && method.getReturnType() == void.class;
+            boolean isVoid = result == null && method.getReturnType() == void.class;
             Term[] x = new Term[isVoid ? 2 : 3];
             x[0] = $.the(method.getName());
             switch (args.length) {
@@ -315,8 +362,8 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
             boolean negate = false;
 
             if (result instanceof Term) {
-                Term tr = (Term)result;
-                if (tr.op()==NEG) {
+                Term tr = (Term) result;
+                if (tr.op() == NEG) {
                     tr = tr.unneg();
                     negate = true;
                 }
@@ -345,7 +392,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
     private class MethodExec extends AtomicExec {
         public MethodExec(Object object) {
-            super(operator(object.getClass()), 0.5f);
+            super(operator(object.getClass()), DESIRE_THRESH);
         }
 
         @Override
@@ -415,7 +462,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
         try {
 
-            T newInstance = (T) clazz.getDeclaredConstructor(typesOf(args)).newInstance(args);
+            T newInstance = (T) clazz.getDeclaredConstructor(typesOfArray(args)).newInstance(args);
             ((ProxyObject) newInstance).setHandler(this);
 
             return register(id, newInstance);
@@ -453,47 +500,35 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
             int aa = maWrapped ? methodArgs.subs() : 1;
 
             Object[] orgs;
-            Class[] types;
+            List<Class> types;
             if (aa == 0) {
                 orgs = ArrayUtils.EMPTY_OBJECT_ARRAY;
-                types = ArrayUtils.EMPTY_CLASS_ARRAY;
+                types = List.of();
             } else {
                 orgs = object(maWrapped ? methodArgs.subterms().theArray() : new Term[]{methodArgs});
                 types = typesOf(orgs);
             }
 
             MethodHandle mm;
-            try {
 
-                Method x = findMethod(c, method.toString(), types);
-
-//                if (x == null) {
-//                    x = findMethod(Object.class, method.toString(), types);
-//                }
-
-                if (x == null)
-                    return;
-
-                x.trySetAccessible();
-
-                mm = MethodHandles.lookup().unreflect(x);
-
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-                return;
-            }
-
+            mm = methodArgCache.apply(Tuples.pair(Tuples.<Class,String>pair(c, method.toString()), types));
             if (mm == null)
                 return;
 
 
+            Atom ins = Operator.func(taskTerm);
+            Object inst = termToObj.get(ins);
+            assert (inst != null);
+
+            if (invokingGoal.get() != null) {
+                throw new TODO("we need a stack: " + invokingGoal.get() + " -> " + task);
+            }
             invokingGoal.set(task);
+
             try {
-                Atom ins = Operator.func(taskTerm);
-                Object inst = termToObj.get(ins);
-                assert (inst != null);
                 mm.bindTo(inst).invokeWithArguments(orgs);
             } catch (Throwable throwable) {
+                logger.error("{} {} {} {}", task, inst, mm, args);
                 throwable.printStackTrace();
             } finally {
                 invokingGoal.set(null);
@@ -524,11 +559,16 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
         return method;
     }
 
-    private Class[] typesOf(Object[] orgs) {
+
+    private Class[] typesOfArray(Object[] orgs) {
         Class[] types;
         types = Util.map(x -> Primitives.unwrap(x.getClass()),
                 new Class[orgs.length], orgs);
         return types;
+    }
+
+    private FasterList<Class> typesOf(Object[] orgs) {
+        return new FasterList<>(typesOfArray(orgs));
     }
 
 
@@ -562,12 +602,12 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
      * has the supplied name and parameter types, taking method sub-signatures
      * and generics into account.
      */
-    private static boolean hasCompatibleSignature(Method candidate, String methodName, Class<?>[] parameterTypes) {
+    private static boolean hasCompatibleSignature(Method candidate, String method, Class<?>[] parameterTypes) {
 
         if (parameterTypes.length != candidate.getParameterCount()) {
             return false;
         }
-        if (!methodName.equals(candidate.getName())) {
+        if (!method.equals(candidate.getName())) {
             return false;
         }
 
@@ -605,7 +645,13 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
     @Override
     public final Object invoke(Object obj, Method wrapper, Method wrapped, Object[] args) throws Throwable {
 
-        Object result = wrapped.invoke(obj, args);
+        Object result;
+        try {
+            result = wrapped.invoke(obj, args);
+        } catch (Throwable t) {
+            logger.error("{} args={}: {}", obj, args, t);
+            result = t;
+        }
 
         return invoked(obj, wrapper, args, result);
     }
@@ -627,7 +673,6 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
      */
     public static Method findMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
         Preconditions.notNull(clazz, "Class must not be null");
-        Preconditions.notBlank(methodName, "Method name must not be null or blank");
         Preconditions.notNull(parameterTypes, "Parameter types array must not be null");
         Preconditions.containsNoNullElements(parameterTypes, "Individual parameter types must not be null");
 

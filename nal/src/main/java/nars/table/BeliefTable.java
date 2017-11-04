@@ -217,7 +217,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return match(when, when, template, nar);
     }
 
-    @Nullable default Task answer(long start, long end, Term template, NAR nar) {
+    @Nullable default Task answer(long start, long end, @Nullable Term template, NAR nar) {
         return answer(start, end, nar.dur(), null, template, nar);
     }
 

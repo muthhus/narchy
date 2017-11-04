@@ -244,6 +244,10 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
     static NALTask clone(Task x, Term newContent) {
         return clone(x, newContent, x.truth(), x.punc());
     }
+    @Nullable
+    static NALTask clone(Task x, byte newPunc) {
+        return clone(x, x.term(), x.truth(), newPunc);
+    }
 
     @Nullable
     static NALTask clone(Task x, Term newContent, Truth newTruth, byte newPunc) {

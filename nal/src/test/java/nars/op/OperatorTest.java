@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static nars.Op.BELIEF;
 import static nars.Op.COMMAND;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,11 +51,13 @@ public class OperatorTest {
         n.onOp("x", new AtomicExec((x, nar) -> {
             System.err.println("INVOKE " + x);
             count[0]++;
-        }, 0.66f, 2));
+            n.input(Task.clone(x, BELIEF)); //quench
+        }, 0.66f));
         n.run(1);
         n.input("x(1)! :|:");
-        n.input("x(\"too soon\")! :|:"); //<- not invoked because x(1) is
-        n.run(1);
+        n.run(4);
+        assertEquals(1, count[0]);
+
         n.run(10);
         n.input("x(3)! :|:");
         n.run(10);

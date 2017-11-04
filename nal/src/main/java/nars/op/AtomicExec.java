@@ -3,8 +3,8 @@ package nars.op;
 import jcog.bag.impl.ArrayBag;
 import jcog.pri.PLink;
 import jcog.pri.op.PriMerge;
+import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
 import nars.control.DurService;
@@ -15,10 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-
-import static nars.time.Tense.ETERNAL;
 
 /**
  * debounced and atomically/asynchronously executable operation
@@ -85,22 +84,26 @@ public class AtomicExec implements BiFunction<Task, NAR, Task> {
         int dur = n.dur();
         long start = now - dur /2;
         long end = now + dur /2;
+        List<Task> toInvoke = $.newArrayList(0);
         active.forEach(x -> {
-            Task desire = n.goal(x.get(), start, end);
+            Term term = x.get();
+            Concept c = n.concept(term);
+            Task desire = c.goals().match(start, end, null, n);
             Truth desireTruth;
-            float dFreq;
+            float d;
             if (desire == null
                     || (desireTruth = desire.truth(now,  now)) == null
-                    || (dFreq = desireTruth.freq()) < desireThresh) {
+                    || (d = desireTruth.expectation()) < desireThresh) {
                 x.delete();
                 return;
             }
-            Truth belief = n.beliefTruth(x.get(), start, end);
-            float bFreq = belief == null ? 0 /* assume false with no evidence */ : belief.freq();
+            Truth belief = c.beliefs().truth(start, end, n);
+            float b = belief == null ? 0 /* assume false with no evidence */ :
+                    belief.expectation();
 
-            float delta = dFreq - bFreq;
-            if (delta > desireThresh) {
-                n.runLater(()->exe.accept(desire, n));
+            float delta = d - b;
+            if (delta >= desireThresh) {
+                toInvoke.add(desire);
             }
         });
         active.commit();
@@ -108,12 +111,18 @@ public class AtomicExec implements BiFunction<Task, NAR, Task> {
             onCycle.stop();
             onCycle = null;
         }
+        if (!toInvoke.isEmpty()) {
+            n.runLater(()->{
+                for (int i = 0, toInvokeSize = toInvoke.size(); i < toInvokeSize; i++)
+                    exe.accept(toInvoke.get(i), n);
+            });
+        }
     }
 
     @Override
     public @Nullable Task apply(Task x, NAR n) {
 
-        if (x.expectation() < desireThresh)
+        if (x.freq() < 0.5f)
             return x; //dont even think about executing it, but pass thru to reasoner
 
         if (x.meta("mimic")!=null)

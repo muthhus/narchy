@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
+/** WARNING dont call get() directly; use apply() */
 public class SoftMemoize<X, Y> extends CustomConcurrentHashMap<X, Y> implements Memoize<X, Y> {
 
     private final Function<X, Y> f;
@@ -23,4 +24,5 @@ public class SoftMemoize<X, Y> extends CustomConcurrentHashMap<X, Y> implements 
     public Y apply(X x) {
         return computeIfAbsent(x, f);
     }
+
 }
