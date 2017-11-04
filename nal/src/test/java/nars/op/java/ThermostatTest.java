@@ -38,7 +38,7 @@ public class ThermostatTest {
         new ThermostatTester() {
 
             {
-                int period = 100;
+                int period = 500;
                 int subPeriods = 2;
                 int subPeriod = period/subPeriods;
 

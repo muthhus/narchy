@@ -91,7 +91,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     protected void start(NAR nar) {
         super.start(nar);
 
-        onDur = DurService.build(nar, this::update);
+        onDur = DurService.on(nar, this::update);
     }
 
     @Override

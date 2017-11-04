@@ -1497,7 +1497,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * strongest matching belief for the target time
      */
-    public Task belief(Term c, long start, long end) {
+    @Nullable public Task belief(Term c, long start, long end) {
         return answer(c, BELIEF, start, end);
     }
 
@@ -1512,7 +1512,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * strongest matching goal for the target time
      */
-    public final Task goal(Term c, long start, long end) {
+    @Nullable public final Task goal(Term c, long start, long end) {
         return answer(c, GOAL, start, end);
     }
 
@@ -1520,11 +1520,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return goal(c, when, when);
     }
 
-    public Task answer(Term c, byte punc, long when) {
+    @Nullable public Task answer(Term c, byte punc, long when) {
         return answer(c, punc, when, when);
     }
 
-    public Task answer(Term c, byte punc, long start, long end) {
+    @Nullable public Task answer(Term c, byte punc, long start, long end) {
         assert (punc == BELIEF || punc == GOAL);
         Concept concept = concept(c);
         if (!(concept instanceof BaseConcept))

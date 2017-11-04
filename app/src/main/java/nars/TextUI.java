@@ -335,7 +335,7 @@ public class TextUI {
 
 
         DurService newGUIUpdate(/* TODO AtomicBoolean busy, */Runnable r) {
-            return DurService.build(nar, r);
+            return DurService.on(nar, r);
 //            return nar.eventCycle.on(
 //                    System::currentTimeMillis,
 //                    () -> Math.round(1000f / guiUpdateFPS.asFloat()),

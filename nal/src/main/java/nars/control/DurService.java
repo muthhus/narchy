@@ -36,14 +36,14 @@ abstract public class DurService extends NARService implements Runnable {
     }
 
     /** simple convenient adapter for Runnable's */
-    public static DurService build(NAR nar, Runnable r) {
+    public static DurService on(NAR nar, Runnable r) {
         return new DurService(nar) {
             @Override protected void run(NAR n, long dt) {
                 r.run();
             }
         };
     }
-    public static DurService build(NAR nar, Consumer<NAR> r) {
+    public static DurService on(NAR nar, Consumer<NAR> r) {
         return new DurService(nar) {
             @Override protected void run(NAR n, long dt) {
                 r.accept(n);

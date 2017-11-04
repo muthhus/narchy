@@ -147,7 +147,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
 
             List<Task> pending = $.newArrayList(2); //max 2
-            Term nextTerm = instance.opTerm(method, args, nextValue).normalize();
+            Term nextTerm = instance.opTerm(method, args, nextValue);
 
             value.compute(method, (m, p1) -> {
 
@@ -216,7 +216,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
         @Override
         public Object update(Instance instance, Object obj, Method method, Object[] args, Object nextValue) {
             float f = invocationBeliefFreq;
-            Term nextTerm = instance.opTerm(method, args, nextValue).normalize();
+            Term nextTerm = instance.opTerm(method, args, nextValue);
             Term nt = nextTerm;
             if (nt.op() == NEG) {
                 nt = nt.unneg();
@@ -227,12 +227,14 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                     BELIEF, $.t(f, nar.confDefault(BELIEF)),
                     now, now, now, nar.time.nextInputStamp());
 
-            if (Param.DEBUG)
-                next.log("Invocation" /* via VM */);
-
-            float pri = nar.priDefault(BELIEF);
             Task cause = invokingGoal.get();
             boolean explicit = cause != null;
+
+            if (Param.DEBUG)
+                next.log(explicit ? "Invoke" : "Invoked"/* via VM */);
+
+            float pri = nar.priDefault(BELIEF);
+
 
             if (explicit) {
                 next.causeMerge(cause);
@@ -257,35 +259,44 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
          */
         public final Object object;
 
-        final InstanceMethodValueModel values;
+        final InstanceMethodValueModel belief;
+
+        /** for VM-caused invocations: if true, inputs a goal task since none was involved. assists learning the interface */
+        static private final boolean goalMimic = true;
 
         public Instance(String id, Object object) {
             super(id);
             this.object = object;
-            this.values = valueModel.apply(id);
+            this.belief = valueModel.apply(id);
 
             nar.onOp(this, new MethodExec(object));
         }
 
         public Object update(Object obj, Method method, Object[] args, Object nextValue) {
-            return values.update(this, obj, method, args, nextValue);
+            Task cause = invokingGoal.get();
+            if (cause==null && goalMimic) {
+                goalMimic(obj, method, args);
+            }
+
+            return belief.update(this, obj, method, args, nextValue);
+        }
+
+        private void goalMimic(Object obj, Method method, Object[] args) {
+            long now = nar.time();
+            NALTask g = new NALTask(opTerm(method, args, $.varDep(1)), GOAL,
+                    $.t(1f,nar.confDefault(GOAL)), now, now, now, nar.time.nextInputStamp());
+            g.priMax(nar.priDefault(GOAL));
+            g.meta("mimic","");
+            if (Param.DEBUG)
+                g.log("Mimic");
+            in.input(g);
         }
 
         private Term opTerm(Method method, Object[] args, Object result) {
 
             //TODO handle static methods
 
-            boolean isVoid = method.getReturnType() == void.class;
-            boolean isBoolean = method.getReturnType() == boolean.class;
-            boolean negate = false;
-            if (isBoolean) {
-
-                boolean b = (Boolean) result;
-                if (!b) {
-                    result = true;
-                    negate = true;
-                }
-            }
+            boolean isVoid = result==null && method.getReturnType() == void.class;
             Term[] x = new Term[isVoid ? 2 : 3];
             x[0] = $.the(method.getName());
             switch (args.length) {
@@ -300,12 +311,34 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                     break;
             }
             assert (x[1] != null) : "could not termize: " + Arrays.toString(args);
-            if (!isVoid) {
-                x[2] = OObjects.this.term(result);
-                assert (x[2] != null) : "could not termize: " + result;
+
+            boolean negate = false;
+
+            if (result instanceof Term) {
+                Term tr = (Term)result;
+                if (tr.op()==NEG) {
+                    tr = tr.unneg();
+                    negate = true;
+                }
+                x[2] = tr;
+            } else {
+                boolean isBoolean = method.getReturnType() == boolean.class;
+                if (isBoolean) {
+
+                    boolean b = (Boolean) result;
+                    if (!b) {
+                        result = true;
+                        negate = true;
+                    }
+                }
+
+                if (!isVoid) {
+                    x[2] = OObjects.this.term(result);
+                    assert (x[2] != null) : "could not termize: " + result;
+                }
             }
 
-            return $.func(toString(), x).negIf(negate);
+            return $.func(toString(), x).negIf(negate).normalize();
         }
 
     }

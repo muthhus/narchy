@@ -35,7 +35,7 @@ public class CameraSensorView extends BitmapMatrixView implements BitmapMatrixVi
     @Override
     public void start(@Nullable Surface parent) {
         super.start(parent);
-        on = DurService.build(nar, this::accept);
+        on = DurService.on(nar, this::accept);
     }
 
     @Override

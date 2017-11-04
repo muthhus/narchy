@@ -87,7 +87,7 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
     @Override
     public void start(SpaceGraph<Concept> space) {
         super.start(space);
-        on = DurService.build(nar, () -> {
+        on = DurService.on(nar, () -> {
             long s = rw.tryWriteLock();
             if (s == 0) return;
             try {

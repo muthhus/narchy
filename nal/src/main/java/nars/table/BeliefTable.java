@@ -217,14 +217,14 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return match(when, when, template, nar);
     }
 
-    default Task answer(long start, long end, Term template, NAR nar) {
+    @Nullable default Task answer(long start, long end, Term template, NAR nar) {
         return answer(start, end, nar.dur(), null, template, nar);
     }
 
     /**
      * projects a match
      */
-    default Task answer(long start, long end, int dur, @Nullable Task question, Term template, NAR nar) {
+    @Nullable default Task answer(long start, long end, int dur, @Nullable Task question, Term template, NAR nar) {
 
 
         Task answer = match(start, end, template, nar);

@@ -44,15 +44,8 @@ public class OperatorTest {
     }
 
     @Test
-    public void testGoal1() throws Narsese.NarseseException {
+    public void testAtomicExec() throws Narsese.NarseseException {
         NAR n = NARS.tmp();
-//        n.on(new Command((Atom) $.the("x"), n) {
-//            @Override
-//            public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
-//                System.out.println(t);
-//                return super.run(t, nar);
-//            }
-//        });
         final int[] count = {0};
         n.onOp("x", new AtomicExec((x, nar) -> {
             System.err.println("INVOKE " + x);

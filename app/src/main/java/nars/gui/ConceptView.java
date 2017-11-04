@@ -59,7 +59,7 @@ public class ConceptView extends Grid {
     @Override
     public void start(@Nullable Surface parent) {
         super.start(parent);
-        on = DurService.build(nar, this::update);
+        on = DurService.on(nar, this::update);
     }
 
     @Override
