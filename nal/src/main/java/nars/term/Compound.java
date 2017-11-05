@@ -583,7 +583,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
             if (nextDT == XTERNAL) {
-                return Op.compound(base, XTERNAL);
+                return new GenericCompoundDT(base, XTERNAL);
             } else {
                 TermContainer subs = subterms();
                 int ns = subs.subs();

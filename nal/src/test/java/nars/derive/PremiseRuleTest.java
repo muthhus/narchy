@@ -82,7 +82,7 @@ public class PremiseRuleTest {
 //        );
             PremiseRule x = parse("<A --> B>, <B --> A> |- <A <-> B>, (Belief:Revision, Goal:Weak)");
             //x = PremiseRule.rule(x);
-            assertEquals(vv, x.volume());
+            assertEquals(vv, x.id.volume());
             //assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Revision-->Belief),(Weak-->Desire))))", x.toString());
 
         }
@@ -93,7 +93,7 @@ public class PremiseRuleTest {
 //        );
             PremiseRule x = parse("<A --> B>, <B --> A> |- <A <-> nonvar>, (Belief:Revision, Goal:Weak)");
             //x = PremiseRule.rule(x);
-            assertEquals(vv, x.volume()); //same volume as previous block
+            assertEquals(vv, x.id.volume()); //same volume as previous block
             //assertEquals("(((%1-->%2),(%2-->%1)),((nonvar<->%1),((Revision-->Belief),(Weak-->Desire))))", x.toString());
         }
         {
@@ -103,7 +103,7 @@ public class PremiseRuleTest {
 //        );
             PremiseRule x = parse(" <A --> B>, <B --> A> |- <A <-> B>,  (Belief:Conversion, Punctuation:Belief)");
             //x = PremiseRule.rule(x);
-            assertEquals(vv, x.volume());
+            assertEquals(vv, x.id.volume());
             //assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Conversion-->Belief),(Judgment-->Punctuation))))", x.toString());
         }
 
@@ -122,7 +122,7 @@ public class PremiseRuleTest {
         PremiseRule x = parse("(S --> M), (P --> M) |- (P <-> S), (Belief:Comparison,Goal:Strong)");
         //x = PremiseRule.rule(x);
         //assertEquals("(((%1-->%2),(%3-->%2)),((%1<->%3),((Comparison-->Belief),(Strong-->Desire))))", x.toString());
-        assertEquals(vv, x.volume());
+        assertEquals(vv, x.id.volume());
 
     }
 
@@ -154,13 +154,13 @@ public class PremiseRuleTest {
 //        return rule(
 //                r
 //        );
-        Compound y = parse("(S --> P), (--,%S) |- (P --> S), (Belief:Conversion)");
+        Compound y = (Compound) parse("(S --> P), (--,%S) |- (P --> S), (Belief:Conversion)").id;
         assertTrue(y.hasAny(Op.NEG));
 
         assertNotNull(y);
 
         PatternIndex i = new PatternIndex();
-        y = ((PremiseRule) y).normalize(i);
+        y = (Compound) ((PremiseRule) y).normalize(i).id;
         assertNotNull(y);
         PremiseRule.printRecursive(y);
 
@@ -176,7 +176,7 @@ public class PremiseRuleTest {
 //        return rule(
 //                r
 //        );
-        Compound y = parse("(S --> P), --%S |- (P --> S), (Belief:Conversion, Info:SeldomUseful)");
+        Compound y = (Compound) parse("(S --> P), --%S |- (P --> S), (Belief:Conversion, Info:SeldomUseful)").id;
         PremiseRule.printRecursive(y);
     }
 

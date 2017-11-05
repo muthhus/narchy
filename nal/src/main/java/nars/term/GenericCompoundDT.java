@@ -96,19 +96,19 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
         return ref.hashCodeSubTerms();
     }
 
-    @Override
-    public Term conceptual() {
-        return Compound.super.conceptual();
-        //return ref.conceptual();
-    }
+//    @Override
+//    public Term conceptual() {
+//        return Compound.super.conceptual();
+//        //return ref.conceptual();
+//    }
 
 
-    @Override
-    @Nullable
-    public final Term root() {
-        return Compound.super.root();
-        //return ref.root();
-    }
+//    @Override
+//    @Nullable
+//    public final Term root() {
+//        return Compound.super.root();
+//        //return ref.root();
+//    }
 
     public @Nullable Term transform(CompoundTransform t, Compound parent) {
         return transform(t);

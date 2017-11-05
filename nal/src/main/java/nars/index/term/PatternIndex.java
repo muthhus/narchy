@@ -41,14 +41,17 @@ public class PatternIndex extends MapTermIndex {
         //avoid recursion-caused concurrent modifiation exception
         Termed y = concepts.get(x);
         if (y == null) {
-            concepts.put(x, y = x instanceof Compound ? patternify((Compound) x) : x);
+            concepts.put(x,
+                    y = x instanceof Compound ? patternify((Compound) x) : x
+                    //y = x //NOT YET
+            );
         }
         return y;
     }
 
 
     /*@NotNull*/
-    protected Term patternify(/*@NotNull*/ Compound x) {
+    @Deprecated protected Term patternify(/*@NotNull*/ Compound x) {
 
 
         TermContainer s = x.subterms();
@@ -86,7 +89,7 @@ public class PatternIndex extends MapTermIndex {
         Ellipsis e = Ellipsis.firstEllipsis(v);
         return e != null ?
                 ellipsis(x, v, e) :
-                new PatternCompound.PatternCompoundSimple(x.op(), x.dt(), v);
+                x.op().the(x.dt(), v.theArray()); //new PatternCompound.PatternCompoundSimple(x.op(), x.dt(), v);
     }
 
 //    static boolean canBuildConcept(/*@NotNull*/ Term y) {

@@ -6,6 +6,7 @@ import nars.derive.match.EllipsisMatch;
 import nars.derive.mutate.Choose1;
 import nars.derive.mutate.Choose2;
 import nars.op.mental.AliasConcept;
+import nars.term.Compound;
 import nars.term.GenericCompoundDT;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
@@ -19,112 +20,27 @@ import java.util.TreeSet;
 
 import static nars.Op.*;
 
-abstract public class PatternCompound extends GenericCompoundDT {
+@Deprecated abstract public class PatternCompound extends GenericCompoundDT {
 
-    final int sizeCached;
-    final int structureNecessary;
-    private final boolean commutative; //cached
-    transient final private Op op; //cached
-    private final int minVolumeNecessary;
-    private final int size;
+//    final int sizeCached;
+//    final int structureNecessary;
+//    private final boolean commutative; //cached
+//    transient final private Op op; //cached
+//    private final int minVolumeNecessary;
+//    private final int size;
 
 //    @Nullable public final Set<Variable> uniqueVars;
 
-    PatternCompound(/*@NotNull*/ Op op, int dt, @NotNull TermContainer subterms) {
-        super(new GenericCompound(op, subterms), dt);
-
-        this.op = op;
-        sizeCached = subterms.subs();
-        structureNecessary =
-                structure() &
-                          ~(VAR_PATTERN.bit
-                        | (subterms.hasAny(ATOM) ?
-                                  (INH.bit | PROD.bit) : 0) // inh and prod (in case of any contained functors HACK)
-                        );
-        commutative = super.isCommutative();
-        minVolumeNecessary = volume();
-        size = subs();
-
-//        this.uniqueVars = varsUnique(VAR_PATTERN);
+    PatternCompound(/*@NotNull*/ Op op, int dt, TermContainer subterms) {
+        super((Compound) op.the(subterms.theArray()), dt);
     }
 
-
-    @Override
-    public boolean isCommutative() {
-        return commutative;
-    }
-
-
-//    /** invoked by derivation Conclusion; combines substitution and evaluation in one step */
-//    @Override public @Nullable Term transform(@NotNull CompoundTransform t) {
-//        Term y = super.transform(t);
-//        if (t instanceof Derivation) {
-//            return (y != null && y!=this) ? y.eval((Derivation) t) : null;
-//        } else {
-//            return y;
-//        }
-//    }
-
-
-    /**
-     * slightly modified from general compound unification
-     */
-    @Override
-    public boolean unify(Term y, Unify subst) {
-        if (this == y)
-            return true;
-
-        if (y instanceof AliasConcept.AliasAtom) {
-            return unify(((AliasConcept.AliasAtom) y).target, subst);
-        }
-
-        if (
-                y.hasAll(structureNecessary) &&
-                op == y.op() &&
-                size == y.subs()
-            //ty.volume() >= minVolumeNecessary
-                ) {
-
-//            if (op.temporal) {
-//                int sdur = subst.dur;
-//                if (sdur >= 0) {
-//                    if (!Compound.matchTemporalDT(this, y, sdur))
-//                        return false;
-//                }
-//            }
-
-            TermContainer xsubs = subterms();
-            TermContainer ysubs = y.subterms();
-
-
-            if (op() == CONJ) { //non-commutive, temporal CONJ
-                return TermContainer.unifyConj(xsubs, dt(), ysubs, y.dt(), subst);
-            } else if (commutative) {
-                return xsubs.unifyCommute(ysubs, subst);
-            } else {
-                return xsubs.unifyLinear(ysubs, subst);
-            }
-
-        }
-
-        return false;
-
-    }
-//    //TODO generalize
-//    static boolean matchTemporalDT(Term aa, Term bb, int dur) {
-//        int a = aa.dt();
-//        if (a == XTERNAL || a == DTERNAL) return true;
-//        int b = bb.dt();
-//        if (a == b || b == XTERNAL || b == DTERNAL) return true;
-//
-//        return Math.abs(a - b) <= dur;
-//    }
     abstract protected static class PatternCompoundWithEllipsis extends PatternCompound {
 
         @NotNull
         final Ellipsis ellipsis;
 
-        PatternCompoundWithEllipsis(/*@NotNull*/ Op seed, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        PatternCompoundWithEllipsis(/*@NotNull*/ Op seed, int dt, Ellipsis ellipsis, TermContainer subterms) {
             super(seed, dt, subterms);
 
             this.ellipsis = ellipsis;
@@ -144,12 +60,12 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
     public static class PatternCompoundWithEllipsisLinear extends PatternCompoundWithEllipsis {
 
-        public PatternCompoundWithEllipsisLinear(/*@NotNull*/ Op op, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        public PatternCompoundWithEllipsisLinear(/*@NotNull*/ Op op, int dt, Ellipsis ellipsis, TermContainer subterms) {
             super(op, dt, ellipsis, subterms);
         }
 
         @Override
-        protected boolean matchEllipsis(@NotNull TermContainer y, @NotNull Unify subst) {
+        protected boolean matchEllipsis(TermContainer y, Unify subst) {
             return matchEllipsedLinear(y, subst);
         }
 
@@ -162,10 +78,10 @@ abstract public class PatternCompound extends GenericCompoundDT {
          * WARNING this implementation only works if there is one ellipse in the subterms
          * this is not tested for either
          */
-        final boolean matchEllipsedLinear(@NotNull TermContainer Y, @NotNull Unify u) {
+        final boolean matchEllipsedLinear(TermContainer Y, Unify u) {
 
             int i = 0, j = 0;
-            int xsize = sizeCached;
+            int xsize = subs();
             int ysize = Y.subs();
 
             //TODO check for shim and subtract xsize?
@@ -237,111 +153,6 @@ abstract public class PatternCompound extends GenericCompoundDT {
     }
 
 
-//    /**
-//     * requies dt exact match, for example, when matching Images (but not temporal terms)
-//     */
-//    abstract public static class PatternCompoundWithEllipsisLinearDT extends PatternCompoundWithEllipsisLinear {
-//
-//        public PatternCompoundWithEllipsisLinearDT(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
-//            super(seed, ellipsis, subterms);
-//        }
-//
-////        @Override
-////        protected boolean canMatch(@NotNull Compound y) {
-////            return (dt == y.dt() && super.canMatch(y));
-////        }
-//
-//
-//    }
-
-//    public static final class PatternCompoundWithEllipsisLinearImage extends PatternCompoundWithEllipsisLinearDT {
-//
-//        //private final int ellipseIndex;
-//
-//        public PatternCompoundWithEllipsisLinearImage(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
-//            super(seed, ellipsis, subterms);
-//            //this.ellipseIndex = indexOf(ellipsis);
-//        }
-//
-////        @Override
-////        protected boolean canMatch(@NotNull Compound y) {
-////            return super.canMatch(y);
-////        }
-//
-////        @Override
-////        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
-////            return matchEllipsisWithImage(y) && super.matchEllipsis(y, subst);
-////        }
-//
-////        public boolean matchEllipsisWithImage(@NotNull Compound y) {
-////
-////            int xdt = dt();
-////
-////            //compare relation from beginning as in non-ellipsis case
-////            //OR compare relation from end
-////            return (ellipseIndex >= xdt) ? (xdt == y.dt()) : ((sizeCached - xdt) == (y.size() - y.dt()));
-////
-////        }
-//
-//
-//    }
-
-//    /**
-//     * does not compare specific image dt
-//     */
-//    public static final class PatternCompoundWithEllipsisLinearImageTransform extends PatternCompoundWithEllipsisLinear {
-//
-//        @NotNull
-//        private final EllipsisTransform ellipsisTransform;
-//
-//        public PatternCompoundWithEllipsisLinearImageTransform(@NotNull Compound seed, @NotNull EllipsisTransform ellipsis, @NotNull TermContainer subterms) {
-//            super(seed, ellipsis, subterms);
-//            this.ellipsisTransform = ellipsis;
-//        }
-//
-//        @Override
-//        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
-//
-//            //return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
-//            //public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull EllipsisTransform et, @NotNull Compound Y) {
-//
-//            EllipsisTransform et = this.ellipsisTransform;
-//            @NotNull Term from = et.from;
-//            if (from.equals(Op.Imdex)) {
-//                Term n = subst.xy(et.to);
-//                if (n != null /*&& !n.equals(y)*/) {
-//
-//                    //the indicated term should be inserted
-//                    //at the index location of the image
-//                    //being processed. (this is the opposite
-//                    //of the other condition of this if { })
-//
-//                    return matchEllipsedLinear(y, subst) &&
-//                            subst.putXY(et,
-//                                    ImageMatch.put(subst.xy(et), n, y));
-//
-//                }
-//            } else {
-//                Term n = subst.xy(from);
-////                if (n == null) {
-////                    //select at random TODO make termutator
-////                    int imageIndex = random.nextInt(Y.size());
-////                    return (putXY(et.from, Y.term(imageIndex)) && matchEllipsedLinear(X, e, Y)) &&
-////                            replaceXY(e, ImageMatch.take(term(e), imageIndex));
-////                }
-//
-//                if (n != null /*&& n.op() != subst.type*/) {
-//                    int imageIndex = y.indexOf(n);
-//                    if (imageIndex != -1)
-//                        return matchEllipsedLinear(y, subst) &&
-//                                subst.putXY(et,
-//                                        ImageMatch.take(subst.xy(et), imageIndex));
-//                }
-//            }
-//            return false;
-//        }
-//
-//    }
 
     public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis {
 
@@ -349,7 +160,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
 //        /** the components of this pattern compound other than the ellipsis "*/
 //        final ImmutableSet<Term> fixed;
 
-        public PatternCompoundWithEllipsisCommutive(Op op, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
+        public PatternCompoundWithEllipsisCommutive(Op op, int dt, Ellipsis ellipsis, TermContainer subterms) {
             super(op, dt, ellipsis, subterms);
 
 //            MutableSet<Term> f = new UnifiedSet();
@@ -391,7 +202,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
             //return subst.matchEllipsedCommutative(
             //        this, ellipsis, y
             //);
-            //public final boolean matchEllipsedCommutative(@NotNull Compound X, @NotNull Ellipsis Xellipsis, @NotNull Compound Y) {
+            //public final boolean matchEllipsedCommutative(Compound X, Ellipsis Xellipsis, Compound Y) {
 
             SortedSet<Term> xFixed = new TreeSet();//$.newHashSet(0); //Global.newHashSet(0);
 
@@ -508,7 +319,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
         /**
          * toMatch matched into some or all of Y's terms
          */
-        boolean matchEllipsisCommutive(@NotNull Unify subst, @NotNull SortedSet<Term> xFixed, @NotNull SortedSet<Term> yFree) {
+        boolean matchEllipsisCommutive(Unify subst, SortedSet<Term> xFixed, SortedSet<Term> yFree) {
             int xs = xFixed.size();
 
             switch (xs) {
@@ -535,157 +346,6 @@ abstract public class PatternCompound extends GenericCompoundDT {
         }
     }
 
-    public static final class PatternCompoundSimple extends PatternCompound {
-
-//        private final int subStructureCached;
-//        private final boolean commutative;
-
-        public PatternCompoundSimple(Op op, int dt, @NotNull TermContainer subterms) {
-            super(op, dt, subterms);
-//            this.commutative = Compound.commutative(op(), size());
-//            this.subStructureCached = subterms().structure();
-        }
-
-//        @Override
-//        public boolean unify(@NotNull Term y, @NotNull FindSubst subst) {
-//
-//            //since the compound op will already have been determined equal prior to calling this method,
-//            // compare the subterms structure (without the compound superterm's bit contribution)
-//            // because this will be more specific in cases where the bits are already set
-//
-//            TermContainer ysubs = y.subterms();
-//
-//            return ysubs.hasAll(sizeCached, subStructureCached, volCached) &&
-//                    (
-//                        commutative ?
-//                            (subst.matchPermute(subterms, ysubs))
-//                            :
-//                            ((!imgCached || (dt == y.dt())) && subst.matchLinear(subterms, ysubs))
-//                    );
-//        }
-
-
-    }
 
 
 }
-/**
- * Created by me on 12/26/15.
- */ //    public static class VariableDependencies extends DirectedAcyclicGraph<Term,String> {
-//
-//
-//        public Op type;
-//
-//        /* primary ==> secondary */
-//        protected void dependency(Term primary, Term secondary) {
-//            addVertex(primary);
-//            addVertex(secondary);
-//            try {
-//                addDagEdge(primary, secondary, "d" + edgeSet().size()+1);
-//            } catch (CycleFoundException e) {
-//                //System.err.println(e);
-//            }
-//        }
-//
-//
-//        public static class PatternVariableIndex extends VarPattern {
-//
-//            public final Compound parent;
-//            public final int index;
-//
-//            public PatternVariableIndex(String id, Compound parent, int index) {
-//                super(id);
-//                this.parent = parent;
-//                this.index = index; //first index
-//            }
-//            public PatternVariableIndex(Variable v, Compound parent) {
-//                this(v.id, parent, parent.indexOf(v));
-//            }
-//
-//            public String toString() {
-//                return super.toString() + " @ " + parent + " index " + index;
-//            }
-//        }
-//
-//        public static class RematchedPatternVariableIndex extends PatternVariableIndex {
-//
-//            public RematchedPatternVariableIndex(PatternVariableIndex i) {
-//                super(i.id + "_", i.parent, i.index);
-//            }
-//        }
-//
-//
-//        final Map<Variable,PatternVariableIndex> variables = Global.newHashMap();
-//
-//        public VariableDependencies(Compound c, Op varType) {
-//            super(null);
-//
-//            this.type = varType;
-//
-//            c.recurseTerms( (s, p) -> {
-//                boolean existed = !addVertex(s);
-//
-//                if (p == null)
-//                    return; //top level
-//
-//                addVertex(p);
-//
-//                //if (t instanceof Compound) {
-//
-//                //compoundIn.put((Compound)p, (Compound)t);
-//
-//                if (s.op(varType)) {
-//                    if (existed) {
-//                        PatternVariableIndex s0 = variables.get(s);
-//                        s = new RematchedPatternVariableIndex(s0); //shadow variable dependent
-//                        //dependency(s0, s); //variable re-use after first match
-//
-//                        //compound depends on existing variable
-//                        dependency(s0, p);
-//                        dependency(p, s);
-//                    } else {
-//                        //variable depends on existing compound
-//                        PatternVariableIndex ss = new PatternVariableIndex((Variable) s, (Compound) p);
-//                        variables.put((Variable) s, ss);
-//                        dependency(p, ss);
-//                    }
-//                }
-//                else {
-//                    if (s.isCommutative()) {
-//                        //term is commutive
-//                        //delay commutive terms to the 2nd stage
-//                        dependency(Op.Imdex, s);
-//                    } else {
-//
-//                        //term depends on existing compound
-//                        dependency(p, s);
-//                    }
-//                }
-////                }
-////                else {
-////                    if (!t.op(varType)) return;
-////
-////                    varIn.put((Variable) t, (Compound) p);
-////                    compHas.put((Compound)p, (Variable)t);
-////
-////                    try {
-////                        addDagEdge(p, t,  "requries(" + t + "," + p + ")");
-////                    } catch (Exception e1) {
-////                        System.err.println(e1);
-////                    }
-////                }
-//            });
-//
-//            Term last = null;
-//            //DepthFirstIterator ii = new DepthFirstIterator(this, c);
-//            Iterator ii = iterator(); //topological
-//            while (ii.hasNext()) last = (Term) ii.next();
-//
-//            //second stage as a shadow node
-//            dependency(last, Op.Imdex);
-//
-//
-//
-//        }
-//    }
-//

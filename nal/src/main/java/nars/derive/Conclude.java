@@ -179,7 +179,7 @@ public final class Conclude {
 
         @Override
         public String toString() {
-            return $.p(rule, $.the(id)).toString();
+            return $.p(rule.id, $.the(id)).toString();
         }
     }
 

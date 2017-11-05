@@ -42,13 +42,14 @@ import static org.eclipse.collections.impl.tuple.Tuples.pair;
  * A rule which matches a Premise and produces a Task
  * contains: preconditions, predicates, postconditions, post-evaluations and metainfo
  */
-public class PremiseRule extends GenericCompound {
+public class PremiseRule /*extends GenericCompound*/ {
 
     static final Atomic UNPROJ = Atomic.the("unproj");
     public static final Atomic Task = Atomic.the("task");
     public static final Atomic Belief = Atomic.the("belief");
     private static final Term TaskAny = $.func("task", Atomic.the("any"));
     private static final Term QUESTION_PUNCTUATION = $.inh(Atomic.the("Question"), Atomic.the("Punctuation"));
+    public final Term id;
 
 
     public boolean permuteBackward;
@@ -83,8 +84,8 @@ public class PremiseRule extends GenericCompound {
     final List<PrediTerm<Derivation>> pre = $.newArrayList();
     final List<PrediTerm<Derivation>> post = $.newArrayList();
 
-    public PremiseRule(Pair<PremiseRule, String> x) {
-        this(x.getOne());
+    PremiseRule(Pair<PremiseRule, String> x) {
+        this((TermContainer)(x.getOne().id));
         withSource(x.getTwo());
     }
 
@@ -97,16 +98,16 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     private Compound match() {
-        return (Compound) sub(0);
+        return (Compound) id.sub(0);
     }
 
     @NotNull
     public Compound conclusion() {
-        return (Compound) sub(1);
+        return (Compound) id.sub(1);
     }
 
     public PremiseRule(TermContainer premiseAndResult) {
-        super(PROD, premiseAndResult);
+        this.id = $.p(premiseAndResult);
     }
 
 
@@ -192,7 +193,6 @@ public class PremiseRule extends GenericCompound {
     /**
      * the task-term pattern
      */
-    @NotNull
     public final Term getTask() {
         return (match().sub(0));
     }
@@ -200,12 +200,10 @@ public class PremiseRule extends GenericCompound {
     /**
      * the belief-term pattern
      */
-    @NotNull
     public final Term getBelief() {
         return (match().sub(1));
     }
 
-    @NotNull
     private Term getConclusionTermPattern() {
         return conclusion().sub(0);
     }
@@ -214,8 +212,8 @@ public class PremiseRule extends GenericCompound {
     /**
      * deduplicate and generate match-optimized compounds for rules
      */
-    private void compile(@NotNull TermIndex index) {
-        Term[] premisePattern = ((TermContainer) sub(0)).toArray();
+    private void compile(TermIndex index) {
+        Term[] premisePattern = ((TermContainer) id.sub(0)).toArray();
         premisePattern[0] = index.get(premisePattern[0], true).term(); //task pattern
         premisePattern[1] = index.get(premisePattern[1], true).term(); //belief pattern
     }
@@ -238,7 +236,7 @@ public class PremiseRule extends GenericCompound {
 
 
     public final PremiseRule normalize(PatternIndex index) {
-        Compound t = index.pattern((Compound) transform(UppercaseAtomsToPatternVariables));
+        Compound t = index.pattern((Compound) id.transform(UppercaseAtomsToPatternVariables));
         if (t != this)
             return new PremiseRule(t);
         else
@@ -247,15 +245,15 @@ public class PremiseRule extends GenericCompound {
 
 
     @NotNull
-    public final PremiseRule setup(PatternIndex index, NAR nar) /* throws PremiseRuleException */ {
+    final PremiseRule setup(PatternIndex index, NAR nar) /* throws PremiseRuleException */ {
 
         compile(index);
 
         //1. construct precondition term array
         //Term[] terms = terms();
 
-        Term[] precon = ((TermContainer) sub(0)).toArray();
-        Term[] postcons = ((TermContainer) sub(1)).toArray();
+        Term[] precon = ((TermContainer) id.sub(0)).toArray();
+        Term[] postcons = ((TermContainer) id.sub(1)).toArray();
 
 
         Set<PrediTerm> pres =
@@ -760,7 +758,7 @@ public class PremiseRule extends GenericCompound {
         m.put(getConclusionTermPattern(), newR);
 
 
-        Compound remapped = (Compound) replace(m);
+        Compound remapped = (Compound) id.replace(m);
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.sub(0);
