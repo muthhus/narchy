@@ -39,7 +39,7 @@ public class NARTestBenchmark {
     @BenchmarkMode(Mode.AverageTime)
     @Fork(1)
     public void testY() {
-        The.Compound.the = FastCompound.FAST_COMPOUND_BUILDER;
+        //The.Compound.the = FastCompound.FAST_COMPOUND_BUILDER;
 //        Param.SynchronousExecution_Max_CycleTime = 0.0001f;
 
         junit(testclass);

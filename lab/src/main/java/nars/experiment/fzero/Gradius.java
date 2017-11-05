@@ -31,7 +31,7 @@ public class Gradius extends NAgentX {
 
         senseCamera($.p(id, $.the("global")), new Scale(() -> g.image, 16, 16)).resolution(0.05f);
 
-        senseCameraRetina($.p(id,$.the("local")), () -> g.image, 24, 16).resolution(0.25f);
+        senseCameraRetina($.p(id,$.the("local")), () -> g.image, 24, 16).resolution(0.1f);
 
         //BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
 //        senseCamera($.p(id, $.the("r")), new Scale(() -> g.image, 4, 4).mode(BufferedImageBitmap2D.ColorMode.R)).resolution(0.1f);

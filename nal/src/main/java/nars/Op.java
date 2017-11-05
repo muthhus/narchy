@@ -1401,18 +1401,7 @@ public enum Op {
      */
     /*@NotNull*/
     static Term compound(Op op, int dt, Term... subterms) {
-        return compound(The.compound(op, subterms), dt);
-    }
-
-
-//        else
-//            return compound(new NewCompound(op, subterms), dt);
-
-
-    /**
-     * last stage constructor: use with caution
-     */
-    public static Term compound(Term c, int dt) {
+        Term c = The.compound(op, subterms);
         if (dt != DTERNAL && (c instanceof Compound)) {
 //            if (c.dt() == dt)
 //                return c;
@@ -1421,6 +1410,11 @@ public enum Op {
         }
         return c;
     }
+
+
+//        else
+//            return compound(new NewCompound(op, subterms), dt);
+
 
     static boolean in(int needle, int haystack) {
         return (needle & haystack) == needle;

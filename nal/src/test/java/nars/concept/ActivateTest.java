@@ -112,7 +112,7 @@ public class ActivateTest {
     public void testTemplates2() throws Narsese.NarseseException {
         //layer 2:
         testTemplates("open(John,door)",
-                "[open, door, open(John,door), John, (John,door)]");
+                "[door, open, open(John,door), (John,door), John]");
     }
 
     @Test
@@ -138,7 +138,7 @@ public class ActivateTest {
     @Test
     public void testFunction() throws Narsese.NarseseException {
         testTemplates("f(x)",
-                "[f(x), f, x, (x)]");
+                "[(x), x, f(x), f]");
     }
 
     @Test
@@ -174,7 +174,7 @@ public class ActivateTest {
     @Test
     public void testTemplateConj2() throws Narsese.NarseseException {
         testTemplates("(&&,<#x --> lock>,(<$y --> key> ==> open($y,#x)))",
-                "[(($1-->key)&&(#2-->lock)), (#2-->lock), ($1,#2), ((($1-->key)&&(#2-->lock))==>open($1,#2)), key, open($1,#2), open, ($1-->key), lock]");
+                "[lock, ((($1-->key)&&(#2-->lock))==>open($1,#2)), ($1,#2), (#2-->lock), $1, open, open($1,#2), #2, (($1-->key)&&(#2-->lock)), key, ($1-->key)]");
 
     }
 
