@@ -39,7 +39,7 @@ public class ThermostatTest {
 
             {
                 int period = 500;
-                int subPeriods = 2;
+                int subPeriods = 6;
                 int subPeriod = period/subPeriods;
 
                 n.log();

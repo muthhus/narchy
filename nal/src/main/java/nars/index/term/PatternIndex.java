@@ -3,6 +3,7 @@ package nars.index.term;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
+import nars.The;
 import nars.derive.PatternCompound;
 import nars.derive.match.Ellipsis;
 import nars.index.term.map.MapTermIndex;
@@ -78,7 +79,7 @@ public class PatternIndex extends MapTermIndex {
         }
 
 
-        TermContainer v = (changed ? Op.subterms(bb.length > 1 && x.op().commutative && (concurrent(x.dt())) ?
+        TermContainer v = (changed ? The.subterms(bb.length > 1 && x.op().commutative && (concurrent(x.dt())) ?
                 Terms.sorted(bb) :
                 bb) : s);
 

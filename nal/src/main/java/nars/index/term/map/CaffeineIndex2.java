@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.*;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
+import nars.The;
 import nars.index.util.TermContainerToOpMap;
 import nars.term.Term;
 import nars.term.Termed;
@@ -171,7 +172,7 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
         TermContainer xs = x.subterms();
         if (xs.subs() == 0) {
             //atomic
-            return Op.subterms(x, True); //to distinguish from: (x)
+            return The.subterms(x, True); //to distinguish from: (x)
         } else {
             return xs;
         }

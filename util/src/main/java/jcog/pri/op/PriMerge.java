@@ -3,7 +3,6 @@ package jcog.pri.op;
 import jcog.Util;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;

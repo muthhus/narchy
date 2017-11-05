@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.nio.BufferOverflowException;
 import java.util.Arrays;
 
 /**

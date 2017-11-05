@@ -126,8 +126,8 @@ public abstract class Param extends Services<Term, NAR> {
     public final static int SIGNAL_LATCH_TIME_MAX =
             //0;
             //Integer.MAX_VALUE;
-            8;
-    //8;
+            //8;
+            32;
 
     /**
      * derivation severity - how completely confidence is reduced in derivation (default: 1.0)

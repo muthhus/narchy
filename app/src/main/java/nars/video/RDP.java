@@ -13,7 +13,6 @@
  *******************************************************************************/
 package nars.video;
 
-import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;

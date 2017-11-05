@@ -13,7 +13,6 @@ import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 

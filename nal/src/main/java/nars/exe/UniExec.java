@@ -1,7 +1,6 @@
 package nars.exe;
 
 import jcog.bag.Bag;
-import jcog.bag.impl.Baggie;
 import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
 import jcog.exe.Can;

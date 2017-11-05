@@ -257,13 +257,14 @@ public class Derivation extends Unify {
      */
     public void set(Premise p, Task belief, Term beliefTerm) {
 
-        if (revert(0)) {
+        size = 0; //revert zero
+//        if (revert(0)) {
             //remove common variable entries because they will just consume memory if retained as empty
 //            xy.map.keySet().removeIf(k -> {
 //                return !(k instanceof AbstractVariable) || k instanceof CommonVariable;
 //            });
 //            xy.map.clear();
-        }
+//        }
         xy.map.clear();
         termutes.clear();
         preToPost.clear();
@@ -395,6 +396,8 @@ public class Derivation extends Unify {
         try {
             //xy.replace(nar::applyTermIfPossible); //resolve to an abbreviation or other indexed term
             forEachMatch.test(this);
+        } catch (Exception e) {
+            logger.error("{} {}", this, e);
         } finally {
             revert(now); //undo any changes applied in conclusion
         }

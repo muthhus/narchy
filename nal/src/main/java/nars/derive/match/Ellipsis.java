@@ -174,14 +174,6 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
         return null;
     }
 
-    public static boolean hasEllipsis(@NotNull Term[] xx) {
-        for (Term x : xx) {
-            if (x instanceof Ellipsis) {
-                return true;
-            }
-        }
-        return false;
-    }
 
 //    /** recursively */
 //    public static boolean containsEllipsis(Term _x) {

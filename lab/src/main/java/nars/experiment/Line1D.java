@@ -8,7 +8,6 @@ import jcog.math.FloatSupplier;
 import jcog.net.MeshOptimize;
 import nars.*;
 import nars.gui.Vis;
-import nars.op.stm.ConjClustering;
 import nars.task.DerivedTask;
 import nars.test.agent.Line1DSimplest;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.PI;
-import static nars.Op.BELIEF;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
 

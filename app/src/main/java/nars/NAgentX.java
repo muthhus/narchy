@@ -146,7 +146,7 @@ abstract public class NAgentX extends NAgent {
 //        Builder.Subterms.the =
 //                //Builder.Subterms.WeakSubtermBuilder.get();
 //                Builder.Subterms.CaffeineSubtermBuilder.get();
-        Builder.Compound.the = Builder.Compound.CaffeineCompoundBuilder.get();
+//        The.Compound.the = The.Compound.CaffeineCompoundBuilder.get();
 
 
         float durFPS = agentFPS;

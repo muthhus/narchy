@@ -2,7 +2,7 @@ package nars.term.compound;
 
 import jcog.Util;
 import jcog.byt.DynBytes;
-import nars.Builder;
+import nars.The;
 import nars.IO;
 import nars.Op;
 import nars.term.Compound;
@@ -12,7 +12,6 @@ import nars.term.container.TermContainer;
 import net.openhft.chronicle.bytes.Bytes;
 import net.openhft.chronicle.bytes.UncheckedBytes;
 import org.eclipse.collections.api.block.function.primitive.ByteFunction0;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.function.BiFunction;
-import java.util.function.Predicate;
 
 import static nars.time.Tense.DTERNAL;
 
@@ -352,7 +350,7 @@ abstract public class FastCompound implements Compound {
         } else {
             //TODO sub view
             //return opAtSub.the(DTERNAL, subs(subOffset));
-            return new GenericCompound(opAtSub, Builder.Subterms.the.apply(new SubtermView(this, offset).theArray()));
+            return new GenericCompound(opAtSub, The.subterms(new SubtermView(this, offset).theArray()));
             //return opAtSub.the(DTERNAL, (Term[]) new SubtermView(this, offset).theArray());
         }
     }
@@ -472,7 +470,7 @@ abstract public class FastCompound implements Compound {
      * for use in: Builder.Compound.the
      */
     public static final BiFunction<Op, Term[], Term> FAST_COMPOUND_BUILDER = (op, terms) -> {
-        GenericCompound g = new GenericCompound(op, Op.subterms(terms));
+        GenericCompound g = new GenericCompound(op, The.subterms(terms));
         try {
 
             if (!g.isTemporal())

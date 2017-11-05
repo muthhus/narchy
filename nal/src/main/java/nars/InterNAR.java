@@ -8,7 +8,6 @@ import nars.control.CauseChannel;
 import nars.control.TaskService;
 import nars.task.ActiveQuestionTask;
 import nars.task.ITask;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;

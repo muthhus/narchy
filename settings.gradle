@@ -14,3 +14,6 @@ include ':lab'
 //project(':nal').projectDir = "$rootDir/nal" as File
 //project(':app').projectDir = "$rootDir/app" as File
 //project(':lab').projectDir = "$rootDir/lab" as File
+include 'logic:web'
+findProject(':logic:web')?.name = 'logicweb'
+

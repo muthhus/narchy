@@ -63,7 +63,7 @@ public enum Op {
                 case NEG:
                     return x.unneg();
                 default:
-                    return compound(NEG, x);
+                    return The.compound(NEG, x);
             }
         }
     },
@@ -561,7 +561,7 @@ public enum Op {
     @Deprecated
     INSTANCE("-{-", 2, OpType.Statement, Args.Two) {
         @Override
-        @NotNull Term _the(int dt, Term[] u) {
+        @NotNull protected Term _the(int dt, Term[] u) {
             assert (u.length == 2);
             return INH.the(SETe.the(u[0]), u[1]);
         }
@@ -570,7 +570,7 @@ public enum Op {
     @Deprecated
     PROPERTY("-]-", 2, OpType.Statement, Args.Two) {
         @Override
-        @NotNull Term _the(int dt, Term[] u) {
+        @NotNull protected Term _the(int dt, Term[] u) {
             assert (u.length == 2);
             return INH.the(u[0], SETi.the(u[1]));
         }
@@ -579,7 +579,7 @@ public enum Op {
     @Deprecated
     INSTANCE_PROPERTY("{-]", 2, OpType.Statement, Args.Two) {
         @Override
-        @NotNull Term _the(int dt, Term[] u) {
+        @NotNull protected Term _the(int dt, Term[] u) {
             assert (u.length == 2);
             return INH.the(SETe.the(u[0]), SETi.the(u[1]));
         }
@@ -588,7 +588,7 @@ public enum Op {
     @Deprecated
     DISJ("||", true, 5, Args.GTETwo) {
         @Override
-        @NotNull Term _the(int dt, Term[] u) {
+        @NotNull protected Term _the(int dt, Term[] u) {
             assert (dt == DTERNAL);
             if (u.length == 1 && u[0].op() != VAR_PATTERN)
                 return u[0];
@@ -812,19 +812,10 @@ public enum Op {
 //        }
 //    }
 
-    /**
-     * creates new instance
-     */
-    @NotNull
-    protected static Term compound(Op o, Term... subterms) {
-        return Builder.Compound.the.apply(o, subterms);
-    }
 
-    @NotNull
-    public static TermContainer subterms(Term... s) {
-        return Builder.Subterms.the.apply(s);
+    public final Term the(/*@NotNull*/ Term... u) {
+        return the(DTERNAL, u);
     }
-
 
     static final ImmutableMap<String, Op> stringToOperator;
 
@@ -1340,7 +1331,7 @@ public enum Op {
                 else if ((et0.op() == set && et1.op() == set))
                     return difference(set, et0, et1);
                 else
-                    return compound(op, t);
+                    return The.compound(op, t);
 
 
         }
@@ -1410,7 +1401,7 @@ public enum Op {
      */
     /*@NotNull*/
     static Term compound(Op op, int dt, Term... subterms) {
-        return compound(compound(op, subterms), dt);
+        return compound(The.compound(op, subterms), dt);
     }
 
 
@@ -1869,7 +1860,7 @@ public enum Op {
         if (aa.length == 1)
             return aa[0]; //reduction to one element
 
-        return compound(intersection, aa);
+        return The.compound(intersection, aa);
     }
 
     public static boolean goalable(Term c) {
@@ -1877,7 +1868,7 @@ public enum Op {
     }
 
     public static TermContainer subterms(Collection<? extends Term> t) {
-        return subterms(t.toArray(new Term[t.size()]));
+        return The.subterms(t.toArray(new Term[t.size()]));
     }
 
     @NotNull
@@ -1953,10 +1944,6 @@ public enum Op {
     }
 
 
-    public final Term the(/*@NotNull*/ Term... u) {
-        return the(DTERNAL, u);
-    }
-
     public final Term the(int dt, /*@NotNull*/ Collection<Term> sub) {
         int s = sub.size();
         return _the(dt, commute(dt, s) ? sorted(sub) : sub.toArray(new Term[s]));
@@ -1967,7 +1954,7 @@ public enum Op {
         return _the(dt, commute(dt, u.length) ? sorted(u) : u);
     }
 
-    /*@NotNull*/ Term _the(int dt, Term[] u) {
+    /*@NotNull*/ protected Term _the(int dt, Term[] u) {
 
         if (statement) {
             if (u.length == 1) { //similarity has been reduced

@@ -332,8 +332,8 @@ public class TemporalTermTest {
         Term t0 = $.$("((SELF,#1)-->at)").term();
         Term t1 = $.$("goto(#1)").term();
         assertEquals(
-                Op.subterms(Terms.sorted(t0, t1)),
-                Op.subterms(Terms.sorted(t1, t0))
+                The.subterms(Terms.sorted(t0, t1)),
+                The.subterms(Terms.sorted(t1, t0))
         );
     }
 

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SchedulearnTest {
@@ -37,7 +36,7 @@ public class SchedulearnTest {
         assertTrue(a.iterations() > a.supply());
 
         double te = Schedulearn.estimatedTimeTotal(List.of(a, b, c));
-        assertTrue( te <= timeSlice * 1.1 /* limited overshoot */ );
+        assertTrue( te <= timeSlice * 1.25 /* limited overshoot */ );
         assertTrue(te >= timeSlice * 0.5f /* maximal efficiency */);
 
 

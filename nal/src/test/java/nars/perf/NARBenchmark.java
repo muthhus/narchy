@@ -1,7 +1,7 @@
 
 package nars.perf;
 
-import nars.Builder;
+import nars.The;
 import nars.NAR;
 import nars.NARS;
 import nars.term.Term;
@@ -39,11 +39,11 @@ public class NARBenchmark {
     public void start() {
         Function<Term[], TermContainer> h = null;
         switch (subtermBuilder) {
-            case "heap": h = Builder.Subterms.HeapSubtermBuilder; break;
-            case "hijack": h = Builder.Subterms.HijackSubtermBuilder.get(); break;
-            case "caffeine": h = Builder.Subterms.CaffeineSubtermBuilder.get(); break;
+            case "heap": h = The.Subterms.RawSubtermBuilder; break;
+            case "hijack": h = The.Subterms.HijackSubtermBuilder.get(); break;
+            case "caffeine": h = The.Subterms.CaffeineSubtermBuilder.get(); break;
         }
-        Builder.Subterms.the = h;
+        The.Subterms.the = h;
 
         n = NARS.tmp();
         n.nal(Integer.parseInt(nalLevel));
