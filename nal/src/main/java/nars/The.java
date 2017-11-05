@@ -35,7 +35,7 @@ public enum The {  ;
         return Compound.the.apply(o, subterms);
     }
 
-    static final class Subterms {
+    public static final class Subterms {
 
         public static final Function<Term[], TermContainer> RawSubtermBuilder =
                 TermVector::the;
@@ -86,7 +86,7 @@ public enum The {  ;
 
     }
 
-    static class Compound {
+    public static class Compound {
 
         public static final BiFunction<Op, Term[], Term> rawCompoundBuilder = (o, subterms) -> {
             assert (!o.atomic) : o + " is atomic, with subterms: " + Arrays.toString(subterms);
