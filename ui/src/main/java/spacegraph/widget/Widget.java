@@ -58,6 +58,11 @@ abstract public class Widget extends Stacking {
     }
 
     @Override
+    public boolean tangible() {
+        return true;
+    }
+
+    @Override
     protected void paint(GL2 gl) {
 
         paintComponent(gl);

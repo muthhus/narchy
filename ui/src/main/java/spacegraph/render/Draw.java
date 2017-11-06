@@ -7,11 +7,11 @@
  * This software is provided 'as-is', without any express or implied warranty.
  * In no event will the authors be held liable for any damages arising from
  * the use of this software.
- * 
- * Permission is granted to anyone to use this software for any purpose, 
+ *
+ * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
- * 
+ *
  * 1. The origin of this software must not be misrepresented; you must not
  *    claim that you wrote the original software. If you use this software
  *    in a product, an acknowledgment in the product documentation would be
@@ -462,17 +462,28 @@ public enum Draw {
         gl.glVertex2i(x2, y2);
         gl.glEnd();
     }
+
     public static void line(GL2 gl, float x1, float y1, float x2, float y2) {
         gl.glBegin(GL2.GL_LINES);
         gl.glVertex2f(x1, y1);
         gl.glVertex2f(x2, y2);
         gl.glEnd();
     }
+
     public static void tri2d(GL2 gl, int x1, int y1, int x2, int y2, int x3, int y3) {
         gl.glBegin(GL2.GL_TRIANGLES);
         gl.glVertex2i(x1, y1);
         gl.glVertex2i(x2, y2);
         gl.glVertex2i(x3, y3);
+        gl.glEnd();
+    }
+
+    public static void quad2d(GL2 gl, float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
+        gl.glBegin(GL2.GL_QUADS);
+        gl.glVertex2f(x1, y1);
+        gl.glVertex2f(x2, y2);
+        gl.glVertex2f(x3, y3);
+        gl.glVertex2f(x4, y4);
         gl.glEnd();
     }
 
@@ -484,6 +495,7 @@ public enum Draw {
         gl.glVertex2i(x4, y4);
         gl.glEnd();
     }
+
     public static void line(GL2 gl, v3 a, v3 b) {
         gl.glBegin(GL2.GL_LINES);
         gl.glVertex3f(a.x, a.y, a.z);
@@ -583,7 +595,6 @@ public enum Draw {
     }
 
 
-
 //    @Deprecated
 //    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
 //        text(gl, scaleX, scaleY, label, dx, dy, dz, null);
@@ -655,7 +666,7 @@ public enum Draw {
 
         gl.glColor4f(e.r, e.g, e.b, e.a);
         //gl.glNormal3f(0,0,1);
-        gl.glNormal3f(ww.x,ww.y,ww.z);
+        gl.glNormal3f(ww.x, ww.y, ww.z);
 
         gl.glVertex3f(sx + vv.x, sy + vv.y, sz + vv.z); //right base
 
@@ -664,7 +675,7 @@ public enum Draw {
                 //sx, sy, sz  //half triangle
         );
 
-        gl.glColor4f(e.r/2f, e.g/2f, e.b/2f, e.a*2/3);
+        gl.glColor4f(e.r / 2f, e.g / 2f, e.b / 2f, e.a * 2 / 3);
         gl.glVertex3f(tx, ty, tz); //tip
 
         gl.glEnd();
@@ -767,7 +778,7 @@ public enum Draw {
     }
 
     public static int colorBipolarHSB(float v) {
-        return hsb(v/2f + 0.5f, 0.7f, 0.75f);
+        return hsb(v / 2f + 0.5f, 0.7f, 0.75f);
     }
 
     public static int colorBipolar(float v) {
@@ -838,7 +849,7 @@ public enum Draw {
 
     public static void bounds(GL2 gl, float x1, float y1, float w, float h, Consumer<GL2> c) {
         gl.glPushMatrix();
-        gl.glTranslatef(x1 , y1 , 0);
+        gl.glTranslatef(x1, y1, 0);
         gl.glScalef(w, h, 1);
         c.accept(gl);
         gl.glPopMatrix();
@@ -990,12 +1001,12 @@ public enum Draw {
     }
 
     /*
- * Hershey Fonts
- * http://paulbourke.net/dataformats/hershey/
- *
- * Drawn in Processing.
- *
- */
+     * Hershey Fonts
+     * http://paulbourke.net/dataformats/hershey/
+     *
+     * Drawn in Processing.
+     *
+     */
 
 //    // a curly brace from the Hershey characters
 //    String exampleCurly = " 2226 40KYPBRCSDTFTHSJRKQMQOSQ R" +
@@ -1160,7 +1171,7 @@ public enum Draw {
         switch (a) {
             case Left:
                 //nothing
-                x += scaleX/2f; //half letter towrads the right
+                x += scaleX / 2f; //half letter towrads the right
                 break;
             case Right:
                 x -= totalWidth; //TODO check this
@@ -1234,7 +1245,7 @@ public enum Draw {
     static {
 
         List<HGlyph> glyphs = new FasterList();
-        String[] lines = null ;
+        String[] lines = null;
 
         //this started happening after switching back to gradle which at the present seems to cause malfunctioned class loading on jdk9
         for (int tries = 0; tries < 2 && lines == null; tries++) {
@@ -1498,9 +1509,9 @@ public enum Draw {
 
         public Glyph getGlyph(char c) {
             int n = (int) c;
-        /* if c is out of the BitFont-glyph bounds, return
-         * the defaultChar glyph (the space char by
-		 * default). */
+            /* if c is out of the BitFont-glyph bounds, return
+             * the defaultChar glyph (the space char by
+             * default). */
             n = (n >= 128) ? defaultChar : n;
             return glyphs[n];
         }

@@ -26,7 +26,7 @@ public class MutableLayout extends Layout {
         children.forEach(Surface::layout);
     }
 
-    public final Layout set(Surface... next) {
+    public Layout set(Surface... next) {
         if (!equals(this.children, next)) {
             synchronized (mustLayout) {
                 children.clear();

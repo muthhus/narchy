@@ -10,11 +10,11 @@ import jcog.pri.op.PriMerge;
 import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
-import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
+import spacegraph.widget.Windo;
 
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,7 +41,7 @@ public class ZoomOrtho extends Ortho {
     private int[] windowStart = new int[2];
     private InsetsImmutable windowInsets;
 
-    final HUD HUDSurface = new HUD();
+    final HUD hud = new HUD();
     private int pmx, pmy;
 
     public ZoomOrtho(Surface content) {
@@ -72,7 +72,7 @@ public class ZoomOrtho extends Ortho {
 
     @Override
     public void setSurface(Surface content) {
-        this.surface = HUDSurface.set(content);
+        this.surface = hud.set(content);
     }
 
     @Override
@@ -83,16 +83,32 @@ public class ZoomOrtho extends Ortho {
     }
 
 
-//    public float cx() {
-//        AnimVector2f s = (AnimVector2f) this.scale;
-//        return (0.5f - pos.x) / s.targetX();
-//    }
-//
-//    public float cy() {
-//        AnimVector2f s = (AnimVector2f) this.scale;
-//        return (0.5f - pos.y) / s.targetY();
-//    }
+    final AtomicBoolean windowMoving = new AtomicBoolean(false);
 
+    int windowMinWidth = 64;
+    int windowMinHeight = 64;
+
+
+    private void moveWindow() {
+        try {
+            window.window.setPosition(moveTarget[0], moveTarget[1]);
+        } finally {
+            windowMoving.set(false);
+        }
+    }
+
+    private void resizeWindow(int x, int y, int w, int h) {
+        try {
+            //System.out.println(Arrays.toString(moveTarget) + " " + Arrays.toString(resizeTarget));
+            window.window.setSize(w, h);
+            window.window.setPosition(x, y);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        } finally {
+            windowMoving.set(false);
+            surface.layout();
+        }
+    }
 
     @Override
     public void mouseMoved(MouseEvent e) {
@@ -105,37 +121,21 @@ public class ZoomOrtho extends Ortho {
         pmx = e.getX();
         pmy = windowHeight - e.getY();
 
-        if ((pmx < resizeBorder) && (pmy < resizeBorder)) {
-            potentialDragMode = WindowDragMode.RESIZE_SW; //&& window.isResizable()
-        } else if ((pmx > windowWidth - resizeBorder) && (pmy < resizeBorder)) {
-            potentialDragMode = WindowDragMode.RESIZE_SE;  //&& window.isResizable()
+        if ((pmx < hud.resizeBorder) && (pmy < hud.resizeBorder)) {
+            hud.potentialDragMode = Windo.WindowDragMode.RESIZE_SW; //&& window.isResizable()
+        } else if ((pmx > windowWidth - hud.resizeBorder) && (pmy < hud.resizeBorder)) {
+            hud.potentialDragMode = Windo.WindowDragMode.RESIZE_SE;  //&& window.isResizable()
         } else {
-            potentialDragMode = WindowDragMode.MOVE;
+            hud.potentialDragMode = Windo.WindowDragMode.MOVE;
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        dragMode = null;
+        hud.dragMode = null;
         panStart = null;
         super.mouseReleased(e);
     }
-
-    final AtomicBoolean windowMoving = new AtomicBoolean(false);
-
-    final int resizeBorder = 48; //pixels
-
-    enum WindowDragMode {
-        MOVE,
-        RESIZE_NW,
-        RESIZE_SW,
-        RESIZE_NE,
-        RESIZE_SE
-    }
-
-    final int windowMinWidth = resizeBorder * 3;
-    final int windowMinHeight = resizeBorder * 3;
-    WindowDragMode dragMode = null, potentialDragMode = null;
 
 
     @Override
@@ -163,7 +163,7 @@ public class ZoomOrtho extends Ortho {
                     windowStart[1] = window.windowY;
                     windowInsets = window.window.getInsets();
 
-                    dragMode = potentialDragMode;
+                    hud.dragMode = hud.potentialDragMode;
 
                     //System.out.println("window drag mode: " + dragMode);
                 }
@@ -177,7 +177,7 @@ public class ZoomOrtho extends Ortho {
                 } else {
                     if (bd[0] == PAN_BUTTON) {
 
-                        cam.add(-dx/scale.x, +dy/scale.y);
+                        cam.add(-dx / scale.x, +dy / scale.y);
                         panStart[0] = mx;
                         panStart[1] = my;
 
@@ -185,7 +185,7 @@ public class ZoomOrtho extends Ortho {
 
                         //compute even if the window is in progress
 
-                        if (dragMode == WindowDragMode.MOVE) {
+                        if (hud.dragMode == Windo.WindowDragMode.MOVE) {
 
 
                             if (windowMoving.compareAndSet(false, true)) {
@@ -194,7 +194,7 @@ public class ZoomOrtho extends Ortho {
                                 window.window.getScreen().getDisplay().getEDTUtil().invoke(true, this::moveWindow);
                             }
 
-                        } else if (dragMode == WindowDragMode.RESIZE_SE) {
+                        } else if (hud.dragMode == Windo.WindowDragMode.RESIZE_SE) {
 
                             int windowWidth = window.getWidth();
                             int windowHeight = window.getHeight();
@@ -204,6 +204,7 @@ public class ZoomOrtho extends Ortho {
 
                             moveTarget[0] = windowStart[0];
                             moveTarget[1] = windowStart[1];
+
 
                             resizeTarget[0] = Math.min(window.window.getScreen().getWidth(), Math.max(windowMinWidth, windowWidth + dx));
                             resizeTarget[1] = Math.min(window.window.getScreen().getHeight(), Math.max(windowMinHeight, windowHeight + dy));
@@ -226,35 +227,14 @@ public class ZoomOrtho extends Ortho {
             }
         } else {
             panStart = null;
-            dragMode = null;
+            hud.dragMode = null;
         }
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
         super.mouseExited(e);
-        potentialDragMode = null;
-    }
-
-    private void moveWindow() {
-        try {
-            window.window.setPosition(moveTarget[0], moveTarget[1]);
-        } finally {
-            windowMoving.set(false);
-        }
-    }
-
-    private void resizeWindow(int x, int y, int w, int h) {
-        try {
-            //System.out.println(Arrays.toString(moveTarget) + " " + Arrays.toString(resizeTarget));
-            window.window.setSize(w, h);
-            window.window.setPosition(x, y);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        } finally {
-            windowMoving.set(false);
-            surface.layout();
-        }
+        hud.potentialDragMode = null;
     }
 
     @Override
@@ -276,11 +256,11 @@ public class ZoomOrtho extends Ortho {
 
         sx = Math.max(sx, minZoom);
         sx = Math.min(sx, maxZoom);
-        scale.set(sx,sx);
+        scale.set(sx, sx);
 
     }
 
-    private class HUD extends Stacking {
+    private class HUD extends Windo {
 
         float smx, smy;
         final CurveBag<PLink> notifications = new CurveBag(PriMerge.plus, new ConcurrentHashMap(), new XorShift128PlusRandom(1));
@@ -315,51 +295,19 @@ public class ZoomOrtho extends Ortho {
             }
         };
 
+        @Override
+        public boolean opaque() {
+            return false;
+        }
 
         @Override
-        protected void paint(GL2 gl) {
-//            {
-//                //world coordinates alignment and scaling indicator
-//                gl.glLineWidth(2);
-//                gl.glColor3f(0.5f, 0.5f, 0.5f);
-//                float cx = wmx;
-//                float cy = wmy;
-//                Draw.rectStroke(gl, cx + -100, cy + -100, 200, 200);
-//                Draw.rectStroke(gl, cx + -200, cy + -200, 400, 400);
-//                Draw.rectStroke(gl, cx + -300, cy + -300, 600, 600);
-//            }
-
-            super.paint(gl);
-
+        protected void prepaint(GL2 gl) {
             gl.glPushMatrix();
             gl.glLoadIdentity();
+        }
 
-            int W = window.getWidth();
-            int H = window.getHeight();
-
-            gl.glColor4f(0.8f, 0.6f, 0f, 0.25f);
-
-            int borderThick = 8;
-            gl.glLineWidth(borderThick);
-            Draw.line(gl, 0, 0, W, 0);
-            Draw.line(gl, 0, 0, 0, H);
-            Draw.line(gl, W, 0, W, H);
-            Draw.line(gl, 0, H, W, H);
-
-            WindowDragMode p;
-            if ((p = potentialDragMode) != null) {
-                switch (p) {
-                    case RESIZE_SE:
-                        gl.glColor4f(1f, 0.8f, 0f, 0.5f);
-                        Draw.quad2d(gl, pmx, pmy, W, resizeBorder, W, 0, W - resizeBorder, 0);
-                        break;
-                    case RESIZE_SW:
-                        gl.glColor4f(1f, 0.8f, 0f, 0.5f);
-                        Draw.quad2d(gl, pmx, pmy, 0, resizeBorder, 0, 0, resizeBorder, 0);
-                        break;
-                }
-            }
-
+        @Override
+        protected void postpaint(GL2 gl) {
             gl.glLineWidth(8f);
 
             float ch = 175f; //TODO proportional to ortho height (pixels)
@@ -372,17 +320,9 @@ public class ZoomOrtho extends Ortho {
             Draw.line(gl, smx, smy - ch, smx, smy + ch);
             Draw.line(gl, smx - cw, smy, smx + cw, smy);
 
-
-//            gl.glLineWidth(2);
-//            gl.glColor3f(0.8f, 0.5f, 0);
-//            Draw.text(gl, str(notifications.top().get()), 32, smx + cw, smy + ch, 0);
-//            gl.glColor3f(0.4f, 0f, 0.8f);
-//            Draw.text(gl, wmx + "," + wmy, 32, smx - cw, smy - ch, 0);
-
             gl.glPopMatrix();
-
-
         }
+
 
         String str(@Nullable Object x) {
             if (x instanceof Object[])
@@ -402,7 +342,6 @@ public class ZoomOrtho extends Ortho {
 //            clipTouchBounds = false;
         }
 
-        boolean canDragBR = false;
 
         @Override
         public Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
@@ -419,15 +358,7 @@ public class ZoomOrtho extends Ortho {
                 smx = finger.hitGlobal.x;
                 smy = finger.hitGlobal.y;
 
-                //boolean nearEdge = Math.abs(sx - )
-                canDragBR = (smx > 1f - hudMarginThick && smy > hudMarginThick);
-//                    if (canDragBR) {
-//                        System.out.println("draggable");
-//                    }
-            } else {
-                canDragBR = false;
             }
-
             Surface x = super.onTouch(finger, hitPoint, buttons);
 
             if (x == this) {

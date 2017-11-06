@@ -98,7 +98,11 @@ abstract public class Layout extends Surface {
                 return found[0];
         }
 
-        return this;
+        return tangible() ? this : null;
+    }
+
+    public boolean tangible() {
+        return false;
     }
 
     @Override

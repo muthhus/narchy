@@ -1,0 +1,71 @@
+package spacegraph;
+
+import org.jetbrains.annotations.Nullable;
+import spacegraph.layout.Layout;
+
+import java.util.function.Consumer;
+
+import static spacegraph.Surface.Align.Center;
+
+public class Scale extends Layout {
+
+    /**
+     * not used unless aspect ratio is set to non-NaN value
+     */
+
+    /**
+     * height/width target aspect ratio; if aspect is NaN, no adjustment applied
+     */
+    protected float scale;
+
+    public final Surface the;
+
+    public Scale(Surface the, float s) {
+        this.the = the;
+        this.scale = s;
+    }
+
+    public Scale scale(float scale) {
+        this.scale = scale;
+        return this;
+    }
+
+    public float scale() {
+        return scale;
+    }
+
+    @Override
+    public void start(@Nullable Surface parent) {
+        super.start(parent);
+        the.start(this);
+    }
+
+    @Override
+    public void stop() {
+        the.stop();
+        super.stop();
+    }
+
+    @Override
+    protected void doLayout() {
+
+        //        v2 scale = this.scale;
+//
+//        float sx, sy;
+
+        float w = w();
+        float vw = w * scale; //TODO factorin scale
+        float h = h();
+        float vh = h * scale;
+        float marginAmt = (1f - scale) / 2;
+        float tx = w * marginAmt, ty = h * marginAmt;
+
+        the.pos(tx, ty, tx+vw, ty+vh);
+    }
+
+
+    @Override
+    public void forEach(Consumer<Surface> o) {
+        o.accept(the);
+    }
+}
