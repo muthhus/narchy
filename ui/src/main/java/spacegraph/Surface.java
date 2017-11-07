@@ -149,7 +149,7 @@ abstract public class Surface {
     abstract protected void paint(GL2 gl);
 
     public Surface move(float dx, float dy) {
-        bounds = bounds.move(dx, dy);
+        pos(bounds.move(dx, dy));
         return this;
     }
 
@@ -190,7 +190,7 @@ abstract public class Surface {
     }
 
     public Surface pos(float x1, float y1, float x2, float y2) {
-        bounds = new RectFloat2D(x1, y1, x2, y2);
+        pos(new RectFloat2D(x1, y1, x2, y2));
         return this;
     }
 

@@ -58,7 +58,7 @@ public class Scale extends Layout {
         float h = h();
         float vh = h * scale;
         float marginAmt = (1f - scale) / 2;
-        float tx = w * marginAmt, ty = h * marginAmt;
+        float tx = x() + w * marginAmt, ty = y() + h * marginAmt;
 
         the.pos(tx, ty, tx+vw, ty+vh);
     }

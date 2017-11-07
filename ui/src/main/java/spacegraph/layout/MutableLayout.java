@@ -28,7 +28,7 @@ public class MutableLayout extends Layout {
 
     public Layout set(Surface... next) {
         if (!equals(this.children, next)) {
-            synchronized (mustLayout) {
+            synchronized (children) {
                 children.clear();
                 for (Surface c : next) {
                     if (c != null)
@@ -41,7 +41,7 @@ public class MutableLayout extends Layout {
 
     public Layout set(List<Surface> next) {
         if (!equals(this.children, next)) {
-            synchronized (mustLayout) {
+            synchronized (children) {
                 children.clear();
                 children.addAll(next);
             }
@@ -62,7 +62,7 @@ public class MutableLayout extends Layout {
     private class Children extends CopyOnWriteArrayList<Surface> {
         @Override
         public boolean add(Surface surface) {
-            synchronized (mustLayout) {
+            synchronized (children) {
                 if (!super.add(surface)) {
                     return false;
                 }
@@ -77,7 +77,7 @@ public class MutableLayout extends Layout {
         @Override
         public Surface set(int index, Surface neww) {
             Surface old;
-            synchronized (mustLayout) {
+            synchronized (children) {
                 while (size() <= index) {
                     add(null);
                 }
@@ -99,7 +99,7 @@ public class MutableLayout extends Layout {
 
         @Override
         public boolean addAll(Collection<? extends Surface> c) {
-            synchronized (mustLayout) {
+            synchronized (children) {
                 for (Surface s : c)
                     add(s);
             }
@@ -110,7 +110,7 @@ public class MutableLayout extends Layout {
         @Override
         public Surface remove(int index) {
             Surface x;
-            synchronized (mustLayout) {
+            synchronized (children) {
                 x = super.remove(index);
                 if (x == null)
                     return null;
@@ -122,7 +122,7 @@ public class MutableLayout extends Layout {
 
         @Override
         public boolean remove(Object o) {
-            synchronized (mustLayout) {
+            synchronized (children) {
                 if (!super.remove(o))
                     return false;
                 ((Surface) o).stop();
@@ -134,7 +134,7 @@ public class MutableLayout extends Layout {
 
         @Override
         public void add(int index, Surface element) {
-            synchronized (mustLayout) {
+            synchronized (children) {
                 super.add(index, element);
                 element.start(MutableLayout.this);
             }
@@ -143,7 +143,7 @@ public class MutableLayout extends Layout {
 
         @Override
         public void clear() {
-            synchronized (mustLayout) {
+            synchronized (children) {
                 this.removeIf(x -> {
                     x.stop();
                     return true;

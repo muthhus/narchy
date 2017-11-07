@@ -3,6 +3,7 @@ package spacegraph.layout;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
 import jcog.Texts;
+import jcog.tree.rtree.rect.RectFloat2D;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
@@ -17,13 +18,14 @@ import java.util.function.Consumer;
  */
 abstract public class Layout extends Surface {
 
-    final AtomicBoolean mustLayout = new AtomicBoolean(true);
+    //final AtomicBoolean mustLayout = new AtomicBoolean(true);
+    boolean mustLayout = true;
 
     protected boolean clipTouchBounds = true;
 
 
     public final void layout() {
-        mustLayout.set(true);
+        mustLayout = true;
     }
 
     abstract protected void doLayout();
@@ -38,12 +40,23 @@ abstract public class Layout extends Surface {
         });
     }
 
+
+
+    @Override
+    public void pos(RectFloat2D r) {
+        RectFloat2D b = this.bounds;
+        super.pos(r);
+        if (bounds!=b) //if different
+            layout();
+    }
+
     @Override
     protected void paint(GL2 gl) {
 
         //TODO maybe in a separate update thread
-        if (mustLayout.compareAndSet(true, false)) {
+        if (mustLayout) {
             doLayout();
+            mustLayout = false;
         }
 
         forEach(c -> c.render(gl));

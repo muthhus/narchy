@@ -92,7 +92,7 @@ public class AspectAlign extends Layout {
 //            }
         }
 
-        float tx = 0, ty = 0;
+        float tx = x(), ty = y();
         switch (align) {
 
             //TODO others

@@ -226,7 +226,6 @@ public class UnifyTest {
                 true);
     }
 
-    @Disabled
     @Test
     public void pattern_trySubs_Var_2_product_and_common_depvar_bidirectional() {
         Unify sub = test(Op.VAR_DEP,
@@ -454,7 +453,6 @@ public class UnifyTest {
                 true);
     }
 
-    @Disabled
     @Test
     public void pattern_trySubs_set3_1_b() {
         test(Op.VAR_PATTERN,
@@ -471,7 +469,6 @@ public class UnifyTest {
                 true);
     }
 
-    @Disabled
     @Test
     public void pattern_trySubs_set3_1_b_commutative_inside_statement() {
         test(Op.VAR_PATTERN,
@@ -480,7 +477,6 @@ public class UnifyTest {
                 true);
     }
 
-    @Disabled
     @Test
     public void pattern_trySubs_set3_1_statement_of_specific_commutatives() {
         test(Op.VAR_PATTERN,
@@ -497,7 +493,6 @@ public class UnifyTest {
                 true);
     }
 
-    @Disabled
     @Test
     public void pattern_trySubs_set3_1_c() {
         test(Op.VAR_PATTERN,
@@ -748,7 +743,6 @@ public class UnifyTest {
                 "{{a, b, c, d}, {z, b, c, d}}", true);
     }
 
-    @Disabled
     @Test
     public void ellipsisLinearInner() {
 
@@ -911,7 +905,6 @@ public class UnifyTest {
     /**
      * this case is unrealistic as far as appearing in rules but it would be nice to get working
      */
-    @Disabled
     @Test
     public void ellipsisCommutiveRepeat() {
         test(Op.VAR_PATTERN,

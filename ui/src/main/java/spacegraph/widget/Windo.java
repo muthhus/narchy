@@ -14,6 +14,8 @@ import spacegraph.widget.button.PushButton;
 
 import java.util.Arrays;
 
+import static spacegraph.layout.Grid.grid;
+
 /**
  * draggable panel
  */
@@ -33,7 +35,7 @@ public class Windo extends Stacking {
     public final float resizeBorder = 0.05f;
 
     private boolean hover;
-    float pmx, pmy;
+//    float pmx, pmy;
 
     public Windo() {
         super();
@@ -96,9 +98,20 @@ public class Windo extends Stacking {
 
         }
 
+//        @Override
+//        public void doLayout() {
+//            //super.doLayout();
+//        }
+
         public Windo newWindo() {
             Windo w = new Windo();
             children.add(w);
+            return w;
+        }
+
+        public Windo newWindo(Surface content) {
+            Windo w = newWindo();
+            w.set(content);
             return w;
         }
 
@@ -107,32 +120,41 @@ public class Windo extends Stacking {
 
     @Override
     public Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
-        Surface s = super.onTouch(finger, hitPoint, buttons);
+        Surface s = dragMode == null ? super.onTouch(finger, hitPoint, buttons) : this;
         if (s == this) {
             if (hitPoint != null) {
-                System.out.println(hitPoint + " " + Arrays.toString(buttons));
-                pmx = hitPoint.x;
-                pmy = hitPoint.y;
+                //System.out.println(hitPoint + " " + Arrays.toString(buttons));
                 hover = true;
+                if (buttons!=null && buttons.length > 0 && buttons[0]==1) {
+                    if (dragMode == null) {
+//                        pmx = finger.hitGlobal.x;
+//                        pmy = finger.hitGlobal.y;
+                        dragMode = WindowDragMode.MOVE;
+                    } else {
+                        switch (dragMode) {
+                            case MOVE:
+                                float speed = 1;
+                                move(speed * (finger.hitGlobal.x - finger.hitOnDownGlobal[0].x), speed * (finger.hitGlobal.y - finger.hitOnDownGlobal[0].y));
+
+                                break;
+                        }
+                    }
+                } else {
+                    dragMode = null;
+                }
                 return this;
             }
         }
         hover = false;
+        dragMode = null;
         return s;
     }
+
 
     public boolean opaque() {
         return true;
     }
 
-//    @Override
-//    protected void paint(GL2 gl) {
-//        super.paint(gl);
-//        if (hover && opaque()) {
-//            gl.glColor3f(0.25f, 0.25f, 0.25f);
-//            Draw.rect(gl, x(), y(), w(), h());
-//        }
-//    }
 
     protected void prepaint(GL2 gl) {
 
@@ -144,16 +166,10 @@ public class Windo extends Stacking {
 
     @Override
     protected void paint(GL2 gl) {
-//            {
-//                //world coordinates alignment and scaling indicator
-//                gl.glLineWidth(2);
-//                gl.glColor3f(0.5f, 0.5f, 0.5f);
-//                float cx = wmx;
-//                float cy = wmy;
-//                Draw.rectStroke(gl, cx + -100, cy + -100, 200, 200);
-//                Draw.rectStroke(gl, cx + -200, cy + -200, 400, 400);
-//                Draw.rectStroke(gl, cx + -300, cy + -300, 600, 600);
-//            }
+        if (hover && opaque()) {
+            gl.glColor3f(0.25f, 0.25f, 0.25f);
+            Draw.rect(gl, x(), y(), w(), h());
+        }
 
         super.paint(gl);
 
@@ -162,14 +178,14 @@ public class Windo extends Stacking {
         float W = w(); //window.getWidth();
         float H = h(); //window.getHeight();
 
-        gl.glColor4f(0.8f, 0.6f, 0f, 0.25f);
+//        gl.glColor4f(0.8f, 0.6f, 0f, 0.25f);
 
-        int borderThick = 8;
-        gl.glLineWidth(borderThick);
-        Draw.line(gl, 0, 0, W, 0);
-        Draw.line(gl, 0, 0, 0, H);
-        Draw.line(gl, W, 0, W, H);
-        Draw.line(gl, 0, H, W, H);
+//        int borderThick = 8;
+//        gl.glLineWidth(borderThick);
+//        Draw.line(gl, 0, 0, W, 0);
+//        Draw.line(gl, 0, 0, 0, H);
+//        Draw.line(gl, W, 0, W, H);
+//        Draw.line(gl, 0, H, W, H);
 
         float resizeBorder = Math.max(W,H)*this.resizeBorder;
 
@@ -177,12 +193,12 @@ public class Windo extends Stacking {
         if ((p = potentialDragMode) != null) {
             switch (p) {
                 case RESIZE_SE:
-                    gl.glColor4f(1f, 0.8f, 0f, 0.5f);
-                    Draw.quad2d(gl, pmx, pmy, W, resizeBorder, W, 0, W - resizeBorder, 0);
+                    //gl.glColor4f(1f, 0.8f, 0f, 0.5f);
+                    //Draw.quad2d(gl, pmx, pmy, W, resizeBorder, W, 0, W - resizeBorder, 0);
                     break;
                 case RESIZE_SW:
-                    gl.glColor4f(1f, 0.8f, 0f, 0.5f);
-                    Draw.quad2d(gl, pmx, pmy, 0, resizeBorder, 0, 0, resizeBorder, 0);
+                    //gl.glColor4f(1f, 0.8f, 0f, 0.5f);
+                    //Draw.quad2d(gl, pmx, pmy, 0, resizeBorder, 0, 0, resizeBorder, 0);
                     break;
             }
         }
@@ -226,8 +242,9 @@ public class Windo extends Stacking {
                 )
                 , 800, 800
         );
-        Windo w = d.newWindo();
-        w.set(new Scale(new PushButton("x"), 0.9f));
+        d.newWindo(new Scale(new PushButton("x"), 0.9f)).pos(10, 10, 50, 50);
+//        Windo b = d.newWindo(new Scale(new PushButton("x"), 0.9f));
+        d.newWindo(new Scale(grid(new PushButton("x"), new PushButton("y")), 0.9f)).move(-5,-5);
     }
 
 }

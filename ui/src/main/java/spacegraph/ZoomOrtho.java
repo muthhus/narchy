@@ -302,8 +302,20 @@ public class ZoomOrtho extends Ortho {
 
         @Override
         protected void prepaint(GL2 gl) {
+
             gl.glPushMatrix();
             gl.glLoadIdentity();
+
+            //            {
+//                //world coordinates alignment and scaling indicator
+//                gl.glLineWidth(2);
+//                gl.glColor3f(0.5f, 0.5f, 0.5f);
+//                float cx = wmx;
+//                float cy = wmy;
+//                Draw.rectStroke(gl, cx + -100, cy + -100, 200, 200);
+//                Draw.rectStroke(gl, cx + -200, cy + -200, 400, 400);
+//                Draw.rectStroke(gl, cx + -300, cy + -300, 600, 600);
+//            }
         }
 
         @Override
@@ -353,7 +365,6 @@ public class ZoomOrtho extends Ortho {
                 float lmx = finger.hit.x; //hitPoint.x;
                 float lmy = finger.hit.y; //hitPoint.y;
 
-                float hudMarginThick = 0.05f; //pixels
 
                 smx = finger.hitGlobal.x;
                 smy = finger.hitGlobal.y;
@@ -367,6 +378,15 @@ public class ZoomOrtho extends Ortho {
                 return x;
         }
 
+        @Override
+        public float w() {
+            return window.getWidth();
+        }
+
+        @Override
+        public float h() {
+            return window.getHeight();
+        }
     }
 
 }

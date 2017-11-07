@@ -230,6 +230,7 @@ public abstract class Param extends Services<Term, NAR> {
         float relGrowth =
                 unitize(((float) pCompl) / (pCompl + dCompl));
 
+        //relGrowth *= relGrowth; //^2
 
         discount *= (relGrowth);
 
