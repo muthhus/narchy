@@ -81,6 +81,10 @@ abstract public class Layout extends Surface {
             //HACK
             final Surface[] found = {null};
             forEach(c -> {
+
+                if (found[0]!=null) //TODO use whileEach() with a predicate for fast terminate
+                    return;
+
                 //TODO factor in the scale if different from 1
                 float csx = c.w();
                 float csy = c.h();

@@ -4,12 +4,9 @@ import com.jogamp.nativewindow.util.InsetsImmutable;
 import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
-import jcog.bag.impl.CurveBag;
-import jcog.pri.PLink;
-import jcog.pri.op.PriMerge;
-import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
+import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
 import spacegraph.render.Draw;
@@ -17,7 +14,6 @@ import spacegraph.widget.Widget;
 import spacegraph.widget.Windo;
 
 import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -263,11 +259,11 @@ public class ZoomOrtho extends Ortho {
     private class HUD extends Windo {
 
         float smx, smy;
-        final CurveBag<PLink> notifications = new CurveBag(PriMerge.plus, new ConcurrentHashMap(), new XorShift128PlusRandom(1));
+//        final CurveBag<PLink> notifications = new CurveBag(PriMerge.plus, new ConcurrentHashMap(), new XorShift128PlusRandom(1));
 
         {
-            notifications.setCapacity(8);
-            notifications.putAsync(new PLink("ready", 0.5f));
+//            notifications.setCapacity(8);
+//            notifications.putAsync(new PLink("ready", 0.5f));
         }
 
 
@@ -282,8 +278,8 @@ public class ZoomOrtho extends Ortho {
                 else
                     m = t.toString();
 
-                notifications.putAsync(new PLink(m, 1f));
-                notifications.commit();
+//                notifications.putAsync(new PLink(m, 1f));
+//                notifications.commit();
             });
         }
 
@@ -362,20 +358,24 @@ public class ZoomOrtho extends Ortho {
             //System.out.println(hitPoint);
             if (hitPoint != null) {
 
-                float lmx = finger.hit.x; //hitPoint.x;
-                float lmy = finger.hit.y; //hitPoint.y;
+//                float lmx = finger.hit.x; //hitPoint.x;
+//                float lmy = finger.hit.y; //hitPoint.y;
 
 
                 smx = finger.hitGlobal.x;
                 smy = finger.hitGlobal.y;
 
             }
-            Surface x = super.onTouch(finger, hitPoint, buttons);
 
+            Surface x = super.onTouch(finger, hitPoint, buttons);
             if (x == this) {
                 return null; //pass-thru
             } else
                 return x;
+        }
+
+        public boolean moveable() {
+            return false; //prevent drag the HUD itself
         }
 
         @Override

@@ -204,4 +204,8 @@ public class RectFloat2D implements HyperRegion<Float2D>, Comparable<RectFloat2D
     public float mag() {
         return Math.max( w(), h() );
     }
+
+    public boolean contains(float x, float y) {
+        return (x >= min.x && y >= min.y && x <= max.x && y <= max.y);
+    }
 }

@@ -118,36 +118,64 @@ public class Windo extends Stacking {
 
     }
 
+    float pmx, pmy;
+
     @Override
     public Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
-        Surface s = dragMode == null ? super.onTouch(finger, hitPoint, buttons) : this;
+
+        if (!moveable())
+            return super.onTouch(finger, hitPoint, buttons); //pass-through
+
+        if (!bounds.contains(finger.hit.x, finger.hit.y)) {
+            hover = false;
+            dragMode = null;
+            return null;
+        }
+
+        Surface s = //dragMode == null ? super.onTouch(finger, hitPoint, buttons) : this;
+                super.onTouch(finger, hitPoint, buttons);
+
         if (s == this) {
+            //if (moveable()) System.out.println(bounds + " " + finger.hit + " " + finger.hitGlobal);
             if (hitPoint != null) {
-                //System.out.println(hitPoint + " " + Arrays.toString(buttons));
+
                 hover = true;
                 if (buttons!=null && buttons.length > 0 && buttons[0]==1) {
                     if (dragMode == null) {
-//                        pmx = finger.hitGlobal.x;
-//                        pmy = finger.hitGlobal.y;
-                        dragMode = WindowDragMode.MOVE;
+                        {
+                            dragMode = WindowDragMode.MOVE;
+                            pmx = x();
+                            pmy =  y();
+
+                            //finger.lock(0, )..
+                        }
                     } else {
                         switch (dragMode) {
                             case MOVE:
-                                float speed = 1;
-                                move(speed * (finger.hitGlobal.x - finger.hitOnDownGlobal[0].x), speed * (finger.hitGlobal.y - finger.hitOnDownGlobal[0].y));
+
+//                                System.out.println(this + " " + finger.hit);
+                                //System.out.println("\t" + Arrays.toString(finger.hitOnDown));
+                                float tx = pmx + (finger.hit.x - finger.hitOnDown[0].x);
+                                float ty = pmy + (finger.hit.y - finger.hitOnDown[0].y);
+                                pos(tx,ty, w()+tx, h()+ty);
 
                                 break;
                         }
                     }
+                    return this;
                 } else {
                     dragMode = null;
+                    return s;
                 }
-                return this;
             }
         }
         hover = false;
         dragMode = null;
         return s;
+    }
+
+    public boolean moveable() {
+        return true;
     }
 
 
@@ -242,9 +270,10 @@ public class Windo extends Stacking {
                 )
                 , 800, 800
         );
-        d.newWindo(new Scale(new PushButton("x"), 0.9f)).pos(10, 10, 50, 50);
-//        Windo b = d.newWindo(new Scale(new PushButton("x"), 0.9f));
-        d.newWindo(new Scale(grid(new PushButton("x"), new PushButton("y")), 0.9f)).move(-5,-5);
+        //d.newWindo(new Scale(new PushButton("x"), 0.9f)).pos(10, 10, 50, 50);
+        d.newWindo(new Scale(new PushButton("x"), 0.9f));
+        d.newWindo(new Scale(new PushButton("w"), 0.9f));
+        d.newWindo(new Scale(grid(new PushButton("x"), new PushButton("y")), 0.9f)).pos(-100, -100, 0, 0);
     }
 
 }

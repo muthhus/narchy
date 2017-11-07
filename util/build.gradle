@@ -12,7 +12,7 @@ dependencies {
     compile group: 'org.roaringbitmap', name: 'RoaringBitmap', version: '0.6.51'
     compile group: 'com.google.guava', name: 'guava', version: '23.3-jre'
     compile group: 'org.ow2.asm', name: 'asm', version: '6.0'
-    compile group: 'net.bytebuddy', name: 'byte-buddy', version: '1.7.8'
+    compile group: 'net.bytebuddy', name: 'byte-buddy', version: '1.7.9'
     compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 
     compile group: 'org.javassist', name: 'javassist', version: '3.22.0-GA'
