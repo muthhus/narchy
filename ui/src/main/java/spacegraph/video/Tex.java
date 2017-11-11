@@ -19,7 +19,7 @@ import static com.jogamp.opengl.GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV;
 
 public class Tex {
 
-    com.jogamp.opengl.util.texture.Texture texture;
+    public com.jogamp.opengl.util.texture.Texture texture;
 
     public boolean mipmap;
 
@@ -33,7 +33,11 @@ public class Tex {
     private IntBuffer buffer;
     private Object src;
 
-    public void paint(GL2 gl, RectFloat2D bounds) {
+    public final void paint(GL2 gl, RectFloat2D bounds) {
+        paint(gl, bounds, -1);
+    }
+
+    public void paint(GL2 gl, RectFloat2D bounds, float repeatScale) {
 
 
         if (profile == null)
@@ -53,7 +57,7 @@ public class Tex {
         }
 
         if (texture != null) {
-            Draw.rectTex(gl, texture, bounds.min.x, bounds.min.y, bounds.w(), bounds.h(), 0);
+            Draw.rectTex(gl, texture, bounds.min.x, bounds.min.y, bounds.w(), bounds.h(), 0, repeatScale);
         }
 
     }
@@ -66,13 +70,27 @@ public class Tex {
 
         if (nextData == null || this.src!=iimage) {
 
+            update(((DataBufferInt)(iimage.getRaster().getDataBuffer())).getData(), iimage.getWidth(), iimage.getHeight());
+
+        }
+
+        textureUpdated.set(true);
+    }
+    public void update(int[] iimage, int width, int height) {
+
+        if (profile == null)
+            return;
+
+
+        if (nextData == null || this.src!=iimage) {
+
             this.src = iimage;
-            array = ((DataBufferInt)(iimage.getRaster().getDataBuffer())).getData();
+            array = iimage;
 
             //buffer = IntBuffer.allocate(pixels);
             buffer = IntBuffer.wrap(array);
             nextData = new TextureData(profile, GL_RGB,
-                    iimage.getWidth(), iimage.getHeight(),
+                    width, height,
                     0 /* border */,
                     GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,
                     mipmap,
@@ -83,8 +101,6 @@ public class Tex {
         }
 
         textureUpdated.set(true);
-
-
     }
 
     public Surface view() {

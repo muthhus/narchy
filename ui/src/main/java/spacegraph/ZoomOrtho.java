@@ -6,7 +6,6 @@ import com.jogamp.opengl.GL2;
 import jcog.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
-import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
 import spacegraph.render.Draw;
@@ -118,11 +117,11 @@ public class ZoomOrtho extends Ortho {
         pmy = windowHeight - e.getY();
 
         if ((pmx < hud.resizeBorder) && (pmy < hud.resizeBorder)) {
-            hud.potentialDragMode = Windo.WindowDragMode.RESIZE_SW; //&& window.isResizable()
+            hud.potentialDragMode = Windo.WindowDragging.RESIZE_SW; //&& window.isResizable()
         } else if ((pmx > windowWidth - hud.resizeBorder) && (pmy < hud.resizeBorder)) {
-            hud.potentialDragMode = Windo.WindowDragMode.RESIZE_SE;  //&& window.isResizable()
+            hud.potentialDragMode = Windo.WindowDragging.RESIZE_SE;  //&& window.isResizable()
         } else {
-            hud.potentialDragMode = Windo.WindowDragMode.MOVE;
+            hud.potentialDragMode = Windo.WindowDragging.MOVE;
         }
     }
 
@@ -181,7 +180,7 @@ public class ZoomOrtho extends Ortho {
 
                         //compute even if the window is in progress
 
-                        if (hud.dragMode == Windo.WindowDragMode.MOVE) {
+                        if (hud.dragMode == Windo.WindowDragging.MOVE) {
 
 
                             if (windowMoving.compareAndSet(false, true)) {
@@ -190,7 +189,7 @@ public class ZoomOrtho extends Ortho {
                                 window.window.getScreen().getDisplay().getEDTUtil().invoke(true, this::moveWindow);
                             }
 
-                        } else if (hud.dragMode == Windo.WindowDragMode.RESIZE_SE) {
+                        } else if (hud.dragMode == Windo.WindowDragging.RESIZE_SE) {
 
                             int windowWidth = window.getWidth();
                             int windowHeight = window.getHeight();
@@ -267,6 +266,10 @@ public class ZoomOrtho extends Ortho {
             clipTouchBounds = false;
         }
 
+        @Override
+        protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
+            return false;
+        }
 
         @Override
         public void start(@Nullable Surface parent) {
@@ -375,7 +378,7 @@ public class ZoomOrtho extends Ortho {
                 return x;
         }
 
-        public boolean moveable() {
+        public boolean editable() {
             return false; //prevent drag the HUD itself
         }
 

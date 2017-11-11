@@ -551,7 +551,7 @@ public enum Draw {
         }
     }
 
-    public static void rectTex(GL2 gl, Texture tt, float x1, float y1, float w, float h, float z) {
+    public static void rectTex(GL2 gl, Texture tt, float x1, float y1, float w, float h, float z, float repeatScale) {
 
 //        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 //        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
@@ -572,18 +572,30 @@ public enum Draw {
         //gl.glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
         gl.glColor3f(1.0f, 1.0f, 1.0f);
 
-        //sharp pixels on magnification
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+        boolean repeat = repeatScale > 0;
+        if (repeat) {
+            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            gl.glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
+            gl.glGenerateMipmap(GL_TEXTURE_2D);
+        } else {
+            //sharp pixels on magnification
+            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            repeatScale = 1f;
+        }
 
         gl.glBegin(GL2.GL_QUADS);
 
 //        gl.glNormal3f(0, 0, 1);
-        gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glTexCoord2f(0.0f, repeatScale);
         gl.glVertex3f(x1, y1, z);
-        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glTexCoord2f(repeatScale, repeatScale);
         gl.glVertex3f(x1 + w, y1, z);
-        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glTexCoord2f(repeatScale, 0.0f);
         gl.glVertex3f(x1 + w, y1 + h, z);
         gl.glTexCoord2f(0.0f, 0.0f);
         gl.glVertex3f(x1, y1 + h, z);

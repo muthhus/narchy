@@ -6,20 +6,20 @@ import spacegraph.Scale;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
-import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
+import spacegraph.render.GridTex;
 import spacegraph.widget.button.PushButton;
 
 import static spacegraph.layout.Grid.grid;
-import static spacegraph.widget.Windo.WindowDragMode.MOVE;
+import static spacegraph.widget.Windo.WindowDragging.MOVE;
 
 /**
  * draggable panel
  */
-public class Windo extends Stacking {
+public class Windo extends Widget {
 
-    public enum WindowDragMode {
+    public enum WindowDragging {
         MOVE,
         RESIZE_N, RESIZE_E, RESIZE_S, RESIZE_W,
         RESIZE_NW,
@@ -28,10 +28,10 @@ public class Windo extends Stacking {
         RESIZE_SE
     }
 
-    public WindowDragMode dragMode = null;
-    public WindowDragMode potentialDragMode = null;
+    public WindowDragging dragMode = null;
+    public WindowDragging potentialDragMode = null;
 
-    public final static float resizeBorder = 0.05f;
+    public final static float resizeBorder = 0.1f;
     protected final static float maxAspectRatioChange = 0.1f;
 
     private boolean hover;
@@ -87,185 +87,163 @@ public class Windo extends Stacking {
 //        return false;
 //    }
 
-    /**
-     * anchor region for Windo's to populate
-     */
-    public static class Desktop extends Stacking {
-
-        public Desktop() {
-
-            clipTouchBounds = false;
-
-        }
-
-
-        @Override
-        public void doLayout() {
-            //super.doLayout();
-            children.forEach(Surface::layout);
-        }
-
-        public Windo newWindo() {
-            Windo w = new Windo();
-            children.add(w);
-            return w;
-        }
-
-        public Windo newWindo(Surface content) {
-            Windo w = newWindo();
-            w.set(content);
-            return w;
-        }
-
-
-    }
-
     RectFloat2D before = null;
 
     @Override
     public Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
 
-        if (!moveable())
+        if (!editable())
             return super.onTouch(finger, hitPoint, buttons); //pass-through
 
-        if (dragMode == null && !bounds.contains(finger.hit.x, finger.hit.y)) {
-            hover = false;
-            dragMode = null;
-            return null;
-        }
+        if (finger != null) {
+            float fx = finger.hit.x;
+            float fy = finger.hit.y;
 
-        Surface s = //dragMode == null ? super.onTouch(finger, hitPoint, buttons) : this;
-                super.onTouch(finger, hitPoint, buttons);
-
-        if (s == this) {
-
-            //if (moveable()) System.out.println(bounds + "\thit=" + finger.hit + "\thitGlobal=" + finger.hitGlobal);
-
-            if (hitPoint != null) {
-
-                hover = true;
-                float fx = finger.hit.x;
-                float fy = finger.hit.y;
-
-                if (dragMode == null) {
-
-                    potentialDragMode = null;
-
-                    if (potentialDragMode == null && hitPoint.x >= 0.5f - resizeBorder / 2f && hitPoint.x <= 0.5f + resizeBorder / 2) {
-                        if (potentialDragMode == null && hitPoint.y <= resizeBorder) {
-                            potentialDragMode = WindowDragMode.RESIZE_S;
-                        }
-                        if (potentialDragMode == null && hitPoint.y >= 1f - resizeBorder) {
-                            potentialDragMode = WindowDragMode.RESIZE_N;
-                        }
-                    }
-                    if (potentialDragMode == null && hitPoint.y >= 0.5f - resizeBorder / 2f && hitPoint.y <= 0.5f + resizeBorder / 2) {
-                        if (potentialDragMode == null && hitPoint.x <= resizeBorder) {
-                            potentialDragMode = WindowDragMode.RESIZE_W;
-                        }
-                        if (potentialDragMode == null && hitPoint.x >= 1f - resizeBorder) {
-                            potentialDragMode = WindowDragMode.RESIZE_E;
-                        }
-                    }
-
-                    if (potentialDragMode == null && hitPoint.x <= resizeBorder) {
-                        if (potentialDragMode == null && hitPoint.y <= resizeBorder) {
-                            potentialDragMode = WindowDragMode.RESIZE_SW;
-                        }
-                        if (potentialDragMode == null && hitPoint.y >= 1f - resizeBorder) {
-                            potentialDragMode = WindowDragMode.RESIZE_NW;
-                        }
-                    }
-
-                    if (potentialDragMode == null && hitPoint.x >= 1f - resizeBorder) {
-
-                        if (potentialDragMode == null && hitPoint.y <= resizeBorder) {
-                            potentialDragMode = WindowDragMode.RESIZE_SE;
-                        }
-                        if (potentialDragMode == null && hitPoint.y >= 1f - resizeBorder) {
-                            potentialDragMode = WindowDragMode.RESIZE_NE;
-                        }
-                    }
-
-
-                    if (potentialDragMode == null)
-                        potentialDragMode = MOVE;
-                }
-
-
-                boolean bDrag = buttons != null && buttons.length > 0 && buttons[0] == 1;
-                if (bDrag) {
-                    if (dragMode == null && potentialDragMode != null) {
-
-                        dragMode = potentialDragMode;
-
-                        //finger.lock(0, )..
-                        before = bounds; //TODO store these in a shared Finger-context "posOnHit" field, not in this instance
-
-                    }
-                    if (dragMode != null) {
-                        switch (dragMode) {
-                            case RESIZE_N: {
-                                float pmy = before.min.y;
-                                float bh = before.h();
-                                float ty = (fy - finger.hitOnDown[0].y);
-                                pos(before.min.x, pmy, before.max.x, Math.max(pmy + maxAspectRatioChange * bh, bh + pmy + ty));
-                            }
-                            break;
-                            case RESIZE_NE: {
-                                float pmx = before.min.x;
-                                float pmy = before.min.y;
-                                float bw = before.w();
-                                float bh = before.h();
-                                float tx = (fx - finger.hitOnDown[0].x);
-                                float ty = (fy - finger.hitOnDown[0].y);
-                                pos(pmx, pmy, Math.max(pmx + maxAspectRatioChange * bw, bw + pmx + tx), Math.max(pmy + maxAspectRatioChange * bh, bh + pmy + ty));
-                            }
-                            break;
-
-                            case RESIZE_SW: {
-                                float pmx = before.max.x;
-                                float pmy = before.max.y;
-                                float bw = before.w();
-                                float bh = before.h();
-                                float tx = (fx - finger.hitOnDown[0].x);
-                                float ty = (fy - finger.hitOnDown[0].y);
-                                pos(pmx - bw + tx, pmy - bh + ty, pmx, pmy); //TODO limit aspect ratio change
-                            }
-                            break;
-                            case MOVE: {
-                                float pmx = before.min.x;
-                                float pmy = before.min.y;
-                                float tx = pmx + (fx - finger.hitOnDown[0].x);
-                                float ty = pmy + (fy - finger.hitOnDown[0].y);
-                                pos(tx, ty, w() + tx, h() + ty);
-                            }
-                            break;
-                            default:
-                                return s;
-                        }
-                    }
-                } else {
-                    dragMode = null;
-                }
-
-                return this;
-            } else {
-                potentialDragMode = dragMode = null;
-                return s;
+            if (dragMode == null && !bounds.contains(fx, fy)) {
+                hover = false;
+                dragMode = null;
+                return null;
             }
-        }
 
+            Surface s = //dragMode == null ? super.onTouch(finger, hitPoint, buttons) : this;
+                    super.onTouch(finger, hitPoint, buttons);
+
+            if (s == this) {
+
+                //if (moveable()) System.out.println(bounds + "\thit=" + finger.hit + "\thitGlobal=" + finger.hitGlobal);
+
+                if (hitPoint != null) {
+
+                    hover = true;
+
+
+                    if (dragMode == null) {
+
+                        potentialDragMode = null;
+
+                        if (potentialDragMode == null && hitPoint.x >= 0.5f - resizeBorder / 2f && hitPoint.x <= 0.5f + resizeBorder / 2) {
+                            if (potentialDragMode == null && hitPoint.y <= resizeBorder) {
+                                potentialDragMode = WindowDragging.RESIZE_S;
+                            }
+                            if (potentialDragMode == null && hitPoint.y >= 1f - resizeBorder) {
+                                potentialDragMode = WindowDragging.RESIZE_N;
+                            }
+                        }
+
+                        if (potentialDragMode == null && hitPoint.y >= 0.5f - resizeBorder / 2f && hitPoint.y <= 0.5f + resizeBorder / 2) {
+                            if (potentialDragMode == null && hitPoint.x <= resizeBorder) {
+                                potentialDragMode = WindowDragging.RESIZE_W;
+                            }
+                            if (potentialDragMode == null && hitPoint.x >= 1f - resizeBorder) {
+                                potentialDragMode = WindowDragging.RESIZE_E;
+                            }
+                        }
+
+                        if (potentialDragMode == null && hitPoint.x <= resizeBorder) {
+                            if (potentialDragMode == null && hitPoint.y <= resizeBorder) {
+                                potentialDragMode = WindowDragging.RESIZE_SW;
+                            }
+                            if (potentialDragMode == null && hitPoint.y >= 1f - resizeBorder) {
+                                potentialDragMode = WindowDragging.RESIZE_NW;
+                            }
+                        }
+
+                        if (potentialDragMode == null && hitPoint.x >= 1f - resizeBorder) {
+
+                            if (potentialDragMode == null && hitPoint.y <= resizeBorder) {
+                                potentialDragMode = WindowDragging.RESIZE_SE;
+                            }
+                            if (potentialDragMode == null && hitPoint.y >= 1f - resizeBorder) {
+                                potentialDragMode = WindowDragging.RESIZE_NE;
+                            }
+                        }
+
+
+                        if (potentialDragMode == null)
+                            potentialDragMode = MOVE;
+                    }
+
+
+                    boolean bDrag = buttons != null && buttons.length > 0 && buttons[0] == 1;
+                    if (bDrag) {
+                        if (dragMode == null && potentialDragMode != null) {
+
+                            if (editable(potentialDragMode)) {
+                                dragMode = potentialDragMode;
+                                //finger.lock(0, )..
+                                before = bounds; //TODO store these in a shared Finger-context "posOnHit" field, not in this instance
+                            } else {
+                                dragMode = null;
+                            }
+
+                        }
+                        if (dragMode != null) {
+                            switch (dragMode) {
+                                case RESIZE_N: {
+                                    float pmy = before.min.y;
+                                    float bh = before.h();
+                                    float ty = (fy - finger.hitOnDown[0].y);
+                                    pos(before.min.x, pmy, before.max.x, Math.max(pmy + maxAspectRatioChange * bh, bh + pmy + ty));
+                                }
+                                break;
+                                case RESIZE_NE: {
+                                    float pmx = before.min.x;
+                                    float pmy = before.min.y;
+                                    float bw = before.w();
+                                    float bh = before.h();
+                                    float tx = (fx - finger.hitOnDown[0].x);
+                                    float ty = (fy - finger.hitOnDown[0].y);
+                                    pos(pmx, pmy, Math.max(pmx + maxAspectRatioChange * bw, bw + pmx + tx), Math.max(pmy + maxAspectRatioChange * bh, bh + pmy + ty));
+                                }
+                                break;
+
+                                case RESIZE_SW: {
+                                    float pmx = before.max.x;
+                                    float pmy = before.max.y;
+                                    float bw = before.w();
+                                    float bh = before.h();
+                                    float tx = (fx - finger.hitOnDown[0].x);
+                                    float ty = (fy - finger.hitOnDown[0].y);
+                                    pos(pmx - bw + tx, pmy - bh + ty, pmx, pmy); //TODO limit aspect ratio change
+                                }
+                                break;
+                                case MOVE: {
+                                    float pmx = before.min.x;
+                                    float pmy = before.min.y;
+                                    float tx = pmx + (fx - finger.hitOnDown[0].x);
+                                    float ty = pmy + (fy - finger.hitOnDown[0].y);
+                                    pos(tx, ty, w() + tx, h() + ty);
+                                }
+                                break;
+                                default:
+                                    return s;
+                            }
+                        }
+                    } else {
+                        dragMode = null;
+                    }
+
+                    return this;
+                } else {
+                    potentialDragMode = dragMode = null;
+                }
+            }
+
+            return s;
+        }
 
         hover = false;
         potentialDragMode = dragMode = null;
-        return s;
+        return null;
     }
 
-    public boolean moveable() {
+    public boolean editable() {
         return true;
     }
 
+    public boolean editable(WindowDragging d) {
+        return true;
+    }
 
     public boolean opaque() {
         return true;
@@ -281,7 +259,7 @@ public class Windo extends Stacking {
     }
 
     @Override
-    protected void paint(GL2 gl) {
+    protected void paintComponent(GL2 gl) {
         if (hover && opaque()) {
             switch (potentialDragMode) {
                 case RESIZE_N:
@@ -303,7 +281,6 @@ public class Windo extends Stacking {
             Draw.rect(gl, x(), y(), w(), h());
         }
 
-        super.paint(gl);
 
         prepaint(gl);
 
@@ -321,7 +298,7 @@ public class Windo extends Stacking {
 
         float resizeBorder = Math.max(W, H) * this.resizeBorder;
 
-        WindowDragMode p;
+        WindowDragging p;
         if ((p = potentialDragMode) != null) {
             switch (p) {
                 case RESIZE_SE:
@@ -359,23 +336,71 @@ public class Windo extends Stacking {
 //        Draw.rect(gl, x(), y(), w(), h());
 //    }
 
+
     public static void main(String[] args) {
-        Desktop d;
-        SpaceGraph.window(
-                //new Layout(
-                //new Windo("x", Widget.widgetDemo()).scale(0.75f, 0.5f).move(-0.5f, -0.5f),
-                d = new Desktop(
-//                    new Windo("xy", Widget.widgetDemo()),//.move(0.5f,0.5f),
-//                    (Windo)(new Windo("xy", Widget.widgetDemo()).move(0.5f,0.5f).scale(0.25f,0.25f))
-                )
-                , 800, 800
-        );
-        d.newWindo(new Scale(grid(new PushButton("x"), new PushButton("y")), 0.9f)).pos(80, 80, 250, 150);
-        d.newWindo(new Scale(new PushButton("x"), 0.9f)).pos(10, 10, 50, 50);
-        ;
-        d.newWindo(new Scale(new PushButton("w"), 0.9f)).pos(-50, -50, 10, 10);
-        ;
+        Wall d = new Wall() {
+//            boolean init = true;
+//            int shaderprogram;
+//            String vsrc;
+//
+//            {
+//                try {
+//                    vsrc = new StringBuilder(new String(GLSL.class.getClassLoader().getResourceAsStream(
+//                            "glsl/grid.glsl"
+//                            //"glsl/16seg.glsl"
+//                            //"glsl/metablob.glsl"
+//                    ).readAllBytes())).toString();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            protected void paint(GL2 gl) {
+//                if (init) {
+////                    int v = gl.glCreateShader(GL2.GL_VERTEX_SHADER);
+//                    int f = gl.glCreateShader(GL2.GL_FRAGMENT_SHADER);
+//
+//                    {
+//
+//                        gl.glShaderSource(f, 1, new String[]{vsrc}, new int[]{vsrc.length()}, 0);
+//                        gl.glCompileShader(f);
+//                    }
+////                        {
+////                            String vsrc = new StringBuilder(new String(GLSL.class.getClassLoader().getResourceAsStream(
+////                                    "glsl/16seg.glsl"
+////                            ).readAllBytes())).toString();
+////                            gl.glShaderSource(f, 1, new String[]{vsrc}, new int[]{vsrc.length()}, 0);
+////                            gl.glCompileShader(f);
+////                        }
+//
+//                    shaderprogram = gl.glCreateProgram();
+//                    //gl.glAttachShader(shaderprogram, v);
+//                    gl.glAttachShader(shaderprogram, f);
+//                    gl.glLinkProgram(shaderprogram);
+//                    gl.glValidateProgram(shaderprogram);
+//
+//                    init = false;
+//                }
+//
+//                gl.glUseProgram(shaderprogram);
+//                super.paint(gl);
+//                gl.glUseProgram(0);
+//            }
+
+        };
+
+        d.children.add(new GridTex(16).pos(0,0,1000,1000));
+
+        d.addWindo(new Scale(Widget.widgetDemo(), 0.9f)).pos(80, 80, 550, 450);
+
+        d.addWindo(new Scale(grid(new PushButton("x"), new PushButton("y")), 0.9f)).pos(10, 10, 50, 50);
+
+        d.addWindo(new Scale(new PushButton("w"), 0.9f)).pos(-50, -50, 10, 10);
+
         //d.newWindo(new Scale(grid(new PushButton("x"), new PushButton("y")), 0.9f)).pos(-100, -100, 0, 0);
+
+        SpaceGraph.window(d, 800, 800);
     }
 
 }
