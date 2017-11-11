@@ -80,27 +80,32 @@ abstract public class Layout extends Surface {
 
             //HACK
             final Surface[] found = {null};
+        float fx = finger.hit.x;
+        float fy = finger.hit.y;
             forEach(c -> {
 
                 if (found[0]!=null) //TODO use whileEach() with a predicate for fast terminate
                     return;
 
                 //TODO factor in the scale if different from 1
-                float csx = c.w();
-                float csy = c.h();
-                if (/*csx != csx || */csx <= 0 || /*csy != csy ||*/ csy <= 0)
-                    return;
+
+//                if (/*csx != csx || */csx <= 0 || /*csy != csy ||*/ csy <= 0)
+//                    return;
 
                 //project to child's space
-                v2 relativeHit = new v2(finger.hit);
-                relativeHit.sub(c.x(), c.y());
-                relativeHit.scale(1f / csx, 1f / csy);
 
                 //subHit.sub(tx, ty);
 
-                float hx = relativeHit.x, hy = relativeHit.y;
-                if (!clipTouchBounds || (hx >= 0f && hx <= 1f && hy >= 0 && hy <= 1f)) {
-                    //subHit.add(c.translateLocal.x*csx, c.translateLocal.y*csy);
+//                float hx = relativeHit.x, hy = relativeHit.y;
+
+                if (!clipTouchBounds || (
+                        fx >= c.bounds.min.x && fx <= c.bounds.max.x && fy >= c.bounds.min.y && fy <= c.bounds.max.y)) {
+
+                    v2 relativeHit = new v2(finger.hit);
+                    relativeHit.sub(c.x(), c.y());
+                    float csx = c.w();
+                    float csy = c.h();
+                    relativeHit.scale(1f / csx, 1f / csy);
 
                     Surface s = c.onTouch(finger, relativeHit, buttons);
                     if (s != null) {

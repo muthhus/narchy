@@ -264,6 +264,7 @@ public class ZoomOrtho extends Ortho {
         {
 //            notifications.setCapacity(8);
 //            notifications.putAsync(new PLink("ready", 0.5f));
+            clipTouchBounds = false;
         }
 
 

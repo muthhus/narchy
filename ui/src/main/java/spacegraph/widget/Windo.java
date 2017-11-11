@@ -1,18 +1,14 @@
 package spacegraph.widget;
 
-import com.jogamp.newt.event.MouseEvent;
 import com.jogamp.opengl.GL2;
 import spacegraph.Scale;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.ZoomOrtho;
 import spacegraph.input.Finger;
 import spacegraph.layout.Stacking;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
 import spacegraph.widget.button.PushButton;
-
-import java.util.Arrays;
 
 import static spacegraph.layout.Grid.grid;
 
@@ -98,10 +94,12 @@ public class Windo extends Stacking {
 
         }
 
-//        @Override
-//        public void doLayout() {
-//            //super.doLayout();
-//        }
+
+        @Override
+        public void doLayout() {
+            //super.doLayout();
+            children.forEach(Surface::layout);
+        }
 
         public Windo newWindo() {
             Windo w = new Windo();
@@ -126,7 +124,7 @@ public class Windo extends Stacking {
         if (!moveable())
             return super.onTouch(finger, hitPoint, buttons); //pass-through
 
-        if (!bounds.contains(finger.hit.x, finger.hit.y)) {
+        if (dragMode==null && !bounds.contains(finger.hit.x, finger.hit.y)) {
             hover = false;
             dragMode = null;
             return null;
@@ -136,16 +134,18 @@ public class Windo extends Stacking {
                 super.onTouch(finger, hitPoint, buttons);
 
         if (s == this) {
-            //if (moveable()) System.out.println(bounds + " " + finger.hit + " " + finger.hitGlobal);
+
+            //if (moveable()) System.out.println(bounds + "\thit=" + finger.hit + "\thitGlobal=" + finger.hitGlobal);
+
             if (hitPoint != null) {
 
                 hover = true;
-                if (buttons!=null && buttons.length > 0 && buttons[0]==1) {
+                if (buttons != null && buttons.length > 0 && buttons[0] == 1) {
                     if (dragMode == null) {
                         {
                             dragMode = WindowDragMode.MOVE;
                             pmx = x();
-                            pmy =  y();
+                            pmy = y();
 
                             //finger.lock(0, )..
                         }
@@ -157,7 +157,7 @@ public class Windo extends Stacking {
                                 //System.out.println("\t" + Arrays.toString(finger.hitOnDown));
                                 float tx = pmx + (finger.hit.x - finger.hitOnDown[0].x);
                                 float ty = pmy + (finger.hit.y - finger.hitOnDown[0].y);
-                                pos(tx,ty, w()+tx, h()+ty);
+                                pos(tx, ty, w() + tx, h() + ty);
 
                                 break;
                         }
@@ -215,7 +215,7 @@ public class Windo extends Stacking {
 //        Draw.line(gl, W, 0, W, H);
 //        Draw.line(gl, 0, H, W, H);
 
-        float resizeBorder = Math.max(W,H)*this.resizeBorder;
+        float resizeBorder = Math.max(W, H) * this.resizeBorder;
 
         WindowDragMode p;
         if ((p = potentialDragMode) != null) {
@@ -232,9 +232,6 @@ public class Windo extends Stacking {
         }
 
 
-
-
-
 //            gl.glLineWidth(2);
 //            gl.glColor3f(0.8f, 0.5f, 0);
 //            Draw.text(gl, str(notifications.top().get()), 32, smx + cw, smy + ch, 0);
@@ -245,7 +242,6 @@ public class Windo extends Stacking {
 
 
     }
-
 
 
     @Override
@@ -271,9 +267,9 @@ public class Windo extends Stacking {
                 , 800, 800
         );
         //d.newWindo(new Scale(new PushButton("x"), 0.9f)).pos(10, 10, 50, 50);
-        d.newWindo(new Scale(new PushButton("x"), 0.9f));
-        d.newWindo(new Scale(new PushButton("w"), 0.9f));
-        d.newWindo(new Scale(grid(new PushButton("x"), new PushButton("y")), 0.9f)).pos(-100, -100, 0, 0);
+        d.newWindo(new Scale(new PushButton("x"), 0.9f)).pos(10, 10, 50, 50);;
+        d.newWindo(new Scale(new PushButton("w"), 0.9f)).pos(-50, -50, 10, 10);;
+        //d.newWindo(new Scale(grid(new PushButton("x"), new PushButton("y")), 0.9f)).pos(-100, -100, 0, 0);
     }
 
 }
