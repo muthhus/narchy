@@ -25,9 +25,9 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class RevisionTest {
 
-    public static NAR newNAR(int fixedNumBeliefs) {
+    static NAR newNAR(int fixedNumBeliefs) {
         //this.activeTasks = activeTasks;
-        NAR d = new NARS().get();
+        NAR d = NARS.tmp();
 
         /*
         @Override
@@ -326,11 +326,13 @@ public class RevisionTest {
                 "[((a &&+3 b) &&+3 c), ((a &&+4 c) &&+2 c)]",
                 permutations(a, b).toString());
     }
+
     @Test public void testIntermpolation0b() throws Narsese.NarseseException {
         Compound a = $.$("(a &&+3 (b &&+3 c))");
         Compound b = $.$("(a &&+1 (b &&+1 c))");
         assertEquals("[((a &&+1 b) &&+1 c), ((a &&+1 b) &&+3 c), ((a &&+3 b) &&+1 c), ((a &&+3 b) &&+3 c)]", permutations(a, b).toString());
     }
+
     @Test public void testIntermpolation0invalid() throws Narsese.NarseseException {
         Compound a = $.$("(a &&+3 (b &&+3 c))");
         Compound b = $.$("(a &&+1 b)");
@@ -356,10 +358,11 @@ public class RevisionTest {
     @Test public void testIntermpolationInner() throws Narsese.NarseseException {
         Compound f = $.$("(x --> (a &&+1 b))");
         Compound g = $.$("(x --> (a &| b))");
-        assertEquals("[(x-->(a&|b)), (x-->(a &&+1 b))]", permutations(f, g).toString());
+        assertEquals("[(x-->(a&|b)), (x-->(a &&+1 b))]",
+                permutations(f, g).toString());
     }
 
-    private Set<Term> permutations(Term a, Term b) {
+    static Set<Term> permutations(Term a, Term b) {
 
         NAR s = NARS.shell();
         s.dtMergeOrChoose.set(false);

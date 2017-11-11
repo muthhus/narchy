@@ -7,6 +7,7 @@ import jcog.math.Interval;
 import nars.$;
 import nars.Op;
 import nars.Param;
+import nars.index.term.TermContext;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -69,6 +70,16 @@ public class Int implements Intlike {
         out.writeByte(0); //subtype
         out.writeInt(id);
 
+    }
+
+    @Override
+    public final Term eval(TermContext context) {
+        return this;
+    }
+
+    @Override
+    public final Term evalSafe(TermContext context, int remain) {
+        return this;
     }
 
     @Override

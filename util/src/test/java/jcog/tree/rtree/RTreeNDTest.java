@@ -88,7 +88,6 @@ public class RTreeNDTest {
         }
     }
 
-    @Disabled
     @Test
     public void testSearchAllWithOneDimensionRandomlyInfinite() {
         System.out.println("\n\nINfinites");
@@ -581,7 +580,6 @@ public class RTreeNDTest {
     }
 
     @Test
-    @Disabled
     public void testAddsubtreeWithSideTree() {
         final RTree<RectDouble2D> rTree = createRectDouble2DTree(3, 6, Spatialization.DefaultSplits.QUADRATIC);
 

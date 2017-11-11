@@ -10,7 +10,6 @@ import nars.term.subst.Unify;
 import nars.test.TestNAR;
 import nars.util.signal.RuleTest;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -46,6 +45,9 @@ public class UnifyTest {
 //        return t;
 //    }
 
+    static /*@NotNull*/ Compound pattern(/*@NotNull*/ String s) throws Narsese.NarseseException {
+        return new PatternIndex().pattern((Compound) Narsese.parse().term(s, false));
+    }
 
     @NotNull
     Unify test(/*@NotNull*/ Op type, @NotNull String s1, @NotNull String s2, boolean shouldSub) {
@@ -55,21 +57,20 @@ public class UnifyTest {
         //NAR nar = NARS.shell();
         try {
 
-            Compound t2 = (Compound)Narsese.parse().term(s2, true);
+            Compound t2 = (Compound) Narsese.parse().term(s2, true);
             assertNotNull(t2);
 
             Compound t1;
             if (type == Op.VAR_PATTERN) {
-                t1 = new PatternIndex().pattern( s1 ); //special handling for ellipsis
+                t1 = pattern(s1); //special handling for ellipsis
                 assertNotNull(t1);
             } else {
-                t1 = (Compound)Narsese.parse().term(s1, true);
+                t1 = (Compound) Narsese.parse().term(s1, true);
             }
 
 
 //            nar.question(s2);
 //            nar.run(cycles);
-
 
 
             Set<Term> t1u = t1.recurseTermsToSet(type);
@@ -89,7 +90,6 @@ public class UnifyTest {
             Unify sub = new Unify(type,
                     new XorShift128PlusRandom(1),
                     Param.UnificationStackMax, INITIAL_TTL) {
-
 
 
                 @Override
@@ -113,7 +113,6 @@ public class UnifyTest {
                         }*/
 
 //                        assertFalse("incomplete: " + toString(), this.isEmpty());
-
 
 
                     } else {

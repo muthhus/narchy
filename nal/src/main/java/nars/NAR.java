@@ -82,7 +82,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * <p>
  * Memory is serializable so it can be persisted and transported.
  */
-public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles<NAR>, TermContext {
+public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles<NAR> {
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
     static final Set<String> logEvents = Sets.newHashSet("eventTask");
@@ -1557,12 +1557,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public void retract(long stampComponent) {
         tasks().filter(x -> Longs.contains(x.stamp(), stampComponent)).forEach(Task::delete);
     }
-
-    @Override
-    public final Termed apply(Term term) {
-        return terms.apply(term);
-    }
-
 
     /**
      * computes an evaluation amplifier factor, in range 0..2.0.

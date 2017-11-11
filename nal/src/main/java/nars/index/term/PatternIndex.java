@@ -35,7 +35,7 @@ public class PatternIndex extends MapTermIndex {
     @SuppressWarnings("Java8MapApi")
     @Override
     public Termed get(/*@NotNull*/ Term x, boolean createIfMissing) {
-        if (x instanceof Variable)
+       if (!x.op().conceptualizable)
             return x;
 
         //avoid recursion-caused concurrent modifiation exception
@@ -43,7 +43,6 @@ public class PatternIndex extends MapTermIndex {
         if (y == null) {
             concepts.put(x,
                     y = x instanceof Compound ? patternify((Compound) x) : x
-                    //y = x //NOT YET
             );
         }
         return y;
@@ -60,27 +59,15 @@ public class PatternIndex extends MapTermIndex {
         boolean changed = false;//, temporal = false;
         for (int i = 0; i < ss; i++) {
             Term a = s.sub(i);
-
-            //            Termed b;
-//            if (a instanceof Compound) {
-//
-//                if (!canBuildConcept(a) || a.isTemporal()) {
-//                    //temporal = true;//dont store subterm arrays containing temporal compounds
-//                    b = a;
-//                } else {
-//                    /*if (b != a && a.isNormalized())
-//                        ((GenericCompound) b).setNormalized();*/
-//                    b = get(a, true);
-//                }
-//            } else {
             Termed b = get(a, true);
-//            }
             if (a != b) {
                 changed = true;
             }
             bb[i] = b.term();
         }
 
+        if (!changed && Ellipsis.firstEllipsis(s)==null)
+            return x;
 
         TermContainer v = (changed ? The.subterms(bb.length > 1 && x.op().commutative && (concurrent(x.dt())) ?
                 Terms.sorted(bb) :
@@ -140,9 +127,9 @@ public class PatternIndex extends MapTermIndex {
 
     }
 
-    public Term pattern(Term x) {
-        return x instanceof Compound ? pattern((Compound) x) : get(x, true).term();
-    }
+//    public Term pattern(Term x) {
+//        return x instanceof Compound ? pattern((Compound) x) : get(x, true).term();
+//    }
 
     /**
      * returns an normalized, optimized pattern term for the given compound
@@ -157,9 +144,7 @@ public class PatternIndex extends MapTermIndex {
 
     }
 
-    public /*@NotNull*/ Compound pattern(/*@NotNull*/ String s) throws Narsese.NarseseException {
-        return pattern( (Compound) Narsese.parse().term(s, false) );
-    }
+
 
     public static final class PremiseRuleVariableNormalization extends VariableNormalization {
 

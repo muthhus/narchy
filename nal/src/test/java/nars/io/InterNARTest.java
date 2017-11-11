@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class InterNARTest {
 
-    void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<NAR, NAR> afterConnect) {
+    static void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<NAR, NAR> afterConnect) {
 
         final int CONNECTION_TIME = 200;
         int preCycles = 1;

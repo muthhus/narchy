@@ -46,10 +46,10 @@ public class DepIndepVarIntroductionTest {
 
     }
 
-    TreeSet<Term> introduce(String term, int iterations) throws Narsese.NarseseException {
+    private TreeSet<Term> introduce(String term, int iterations) throws Narsese.NarseseException {
         TreeSet<Term> s = new TreeSet();
         for (int i = 0; i < iterations; i++) {
-            Term u = $.$("varIntro(" + term + ")").eval(n);
+            Term u = $.$("varIntro(" + term + ")").eval(n.terms);
             if (u!=null)
                 s.add(u);
         }

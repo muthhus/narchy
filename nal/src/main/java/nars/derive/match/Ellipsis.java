@@ -131,7 +131,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 
 
     /** this needs to use .term(x) instead of Term[] because of shuffle terms */
-    @Nullable public static Ellipsis firstEllipsis(@NotNull TermContainer x) {
+    @Nullable public static Ellipsis firstEllipsis(TermContainer x) {
         if (x.varPattern()==0)
             return null;
 

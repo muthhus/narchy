@@ -137,13 +137,17 @@ public class Revision {
                     return a;
                 }
 
-                switch (ao) {
-                    case CONJ:
-                        return dtMergeConj(a, dt, b, aProp, curDepth / 2f, rng, mergeOrChoose);
-                    case IMPL:
-                        return dtMergeImpl(a, b, aProp, curDepth / 2f, rng, mergeOrChoose);
-                    default:
-                        throw new RuntimeException();
+                if (!mergeOrChoose && !a.subterms().hasAny(Op.CONJ) && !b.subterms().hasAny(Op.CONJ) && (dt == 0 || dt == DTERNAL)) {
+                    return choose(a, b, aProp, rng);
+                } else {
+                    switch (ao) {
+                        case CONJ:
+                            return dtMergeConjMerge(a, dt, b, aProp, curDepth, rng);
+                        case IMPL:
+                            return dtMergeImpl(a, b, aProp, curDepth, rng, mergeOrChoose);
+                        default:
+                            throw new RuntimeException();
+                    }
                 }
             } else {
                 if (a.equals(b)) {
@@ -179,13 +183,13 @@ public class Revision {
 
     }
 
-    private static Term dtMergeConj(Term a, long dt, Term b, float aProp, float v, Random rng, boolean mergeOrChoose) {
+    private static Term dtMergeConjMerge(Term a, long dt, Term b, float aProp, float v, Random rng) {
         FastList<LongObjectPair<Term>> ab = Op.conjMerge(a, 0, b, dt).eventList();
 
         //it may not be valid to choose subsets of the events, in a case like where >1 occurrences of $ must remain parent
 
         FastList<LongObjectPair<Term>> x = new FasterList(ab);
-        int max = 1+x.size()/2; //HALF
+        int max = 1 + x.size() / 2; //HALF
         int all = x.size();
         int excess = all - max;
         if (excess > 0) {
@@ -512,7 +516,7 @@ public class Revision {
 
     public static boolean equivalent(Task input, Truth output, long start, long end, Term cc, NAR nar) {
         Truth bt = input.truth();
-        if (input.conf() >= output.conf() && Util.equals(input.freq(),output.freq(), nar.truthResolution.asFloat())) {
+        if (input.conf() >= output.conf() && Util.equals(input.freq(), output.freq(), nar.truthResolution.asFloat())) {
             return cc.equals(input.term()) && start == input.start() && end == input.end();
         }
         return false;

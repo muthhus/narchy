@@ -69,9 +69,13 @@ abstract public class Exec implements Executor {
     abstract public Stream<Activate> active();
 
     public synchronized void start(NAR nar) {
+        if (this.nar!=null) {
+            this.onClear.off();
+            this.onClear = null;
+        }
+
         this.nar = nar;
 
-        assert(onClear == null);
         onClear = nar.eventClear.on((n)->clear());
     }
 

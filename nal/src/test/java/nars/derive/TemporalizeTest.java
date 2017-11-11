@@ -791,7 +791,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         Term x = $(src);
         assertEquals(15, x.dtRange());
 
-        TermContext n = NARS.shell();
+        NAR n = NARS.shell();
 
         Set<String> result = new TreeSet();
         for (int i = 0; i < 100; i++) {
@@ -812,7 +812,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 //            }
 
 
-            Term a = $($("dropAnyEvent(" + src + ")").eval(n).toString()
+            Term a = $($("dropAnyEvent(" + src + ")").eval(n.terms).toString()
                     .replace("&&+5", "&&+-")
                     .replace("&&+10", "&&+-")
             );
@@ -949,7 +949,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 
         for (int i = 0; i < 10 * xe.size(); i++) {
 
-            Term y = $("dropAnyEvent( " + xs + " )").eval(n);
+            Term y = $("dropAnyEvent( " + xs + " )").eval(n.terms);
             int ydt = y.dtRange();
 
             assertNotEquals(xe, y);
