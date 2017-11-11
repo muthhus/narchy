@@ -1,7 +1,7 @@
 package nars;
 
 import jcog.list.FasterList;
-import jcog.random.XorShift128PlusRandom;
+import jcog.random.XoRoShiRo128PlusRandom;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
 import nars.control.Deriver;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -115,13 +115,15 @@ public class NARS {
 
         index = () ->
                 //new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
-                new MapTermIndex(new LinkedHashMap(64, 0.9f));
+                new MapTermIndex(new /*Linked*/HashMap(64, 0.9f));
 
         time = new CycleTime();
 
         exe = () -> new UniExec(64);
 
-        rng = () -> new XorShift128PlusRandom(1);
+        rng = () ->
+                new XoRoShiRo128PlusRandom(1);
+                //new XorShift128PlusRandom(1);
 
         concepts = DefaultConceptBuilder::new;
 

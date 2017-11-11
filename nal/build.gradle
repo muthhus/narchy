@@ -23,7 +23,7 @@ dependencies {
     testCompile group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.19'
 
 
-    compile group: 'net.openhft', name: 'chronicle-bytes', version: '1.9.8'
+    compile group: 'net.openhft', name: 'chronicle-bytes', version: '1.9.17-SNAPSHOT'
 
     compile group: 'com.lmax', name: 'disruptor', version: '3.3.7'
 
