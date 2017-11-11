@@ -1,6 +1,7 @@
 package spacegraph.widget;
 
 import com.jogamp.opengl.GL2;
+import jcog.tree.rtree.rect.RectFloat2D;
 import spacegraph.Scale;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -31,6 +32,7 @@ public class Windo extends Stacking {
     public WindowDragMode potentialDragMode = null;
 
     public final static float resizeBorder = 0.05f;
+    protected final static float maxAspectRatioChange = 0.1f;
 
     private boolean hover;
 //    float pmx, pmy;
@@ -118,7 +120,7 @@ public class Windo extends Stacking {
 
     }
 
-    float pmx, pmy;
+    RectFloat2D before = null;
 
     @Override
     public Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
@@ -175,7 +177,7 @@ public class Windo extends Stacking {
                         }
                     }
 
-                    if (potentialDragMode == null && hitPoint.x >= 1f-resizeBorder) {
+                    if (potentialDragMode == null && hitPoint.x >= 1f - resizeBorder) {
 
                         if (potentialDragMode == null && hitPoint.y <= resizeBorder) {
                             potentialDragMode = WindowDragMode.RESIZE_SE;
@@ -198,17 +200,47 @@ public class Windo extends Stacking {
                         dragMode = potentialDragMode;
 
                         //finger.lock(0, )..
-                        pmx = x(); //TODO store these in a shared Finger-context "posOnHit" field, not in this instance
-                        pmy = y();
+                        before = bounds; //TODO store these in a shared Finger-context "posOnHit" field, not in this instance
 
                     }
                     if (dragMode != null) {
                         switch (dragMode) {
-                            case MOVE:
+                            case RESIZE_N: {
+                                float pmy = before.min.y;
+                                float bh = before.h();
+                                float ty = (fy - finger.hitOnDown[0].y);
+                                pos(before.min.x, pmy, before.max.x, Math.max(pmy + maxAspectRatioChange * bh, bh + pmy + ty));
+                            }
+                            break;
+                            case RESIZE_NE: {
+                                float pmx = before.min.x;
+                                float pmy = before.min.y;
+                                float bw = before.w();
+                                float bh = before.h();
+                                float tx = (fx - finger.hitOnDown[0].x);
+                                float ty = (fy - finger.hitOnDown[0].y);
+                                pos(pmx, pmy, Math.max(pmx + maxAspectRatioChange * bw, bw + pmx + tx), Math.max(pmy + maxAspectRatioChange * bh, bh + pmy + ty));
+                            }
+                            break;
+
+                            case RESIZE_SW: {
+                                float pmx = before.max.x;
+                                float pmy = before.max.y;
+                                float bw = before.w();
+                                float bh = before.h();
+                                float tx = (fx - finger.hitOnDown[0].x);
+                                float ty = (fy - finger.hitOnDown[0].y);
+                                pos(pmx - bw + tx, pmy - bh + ty, pmx, pmy); //TODO limit aspect ratio change
+                            }
+                            break;
+                            case MOVE: {
+                                float pmx = before.min.x;
+                                float pmy = before.min.y;
                                 float tx = pmx + (fx - finger.hitOnDown[0].x);
                                 float ty = pmy + (fy - finger.hitOnDown[0].y);
                                 pos(tx, ty, w() + tx, h() + ty);
-                                break;
+                            }
+                            break;
                             default:
                                 return s;
                         }
