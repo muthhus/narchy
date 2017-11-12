@@ -2,6 +2,7 @@ package nars.term.container;
 
 import nars.$;
 import nars.Op;
+import nars.The;
 import nars.derive.mutate.CommutivePermutations;
 import nars.term.Compound;
 import nars.term.Term;
@@ -840,7 +841,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         } else if (yss == xss) {
 
             u.termutes.add(new CommutivePermutations(
-                    Op.subterms(xs), Op.subterms(ys)
+                    The.subterms(xs), The.subterms(ys)
             ));
             return true;
         } else /* yss!=xss */ {

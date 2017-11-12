@@ -615,6 +615,7 @@ public interface Term extends Termed, Comparable<Termed> {
     /**
      * for safety, dont override this method. override evalSafe
      */
+    /*@NotNull*/
     default Term eval(TermContext context) {
         return evalSafe(context, Param.MAX_EVAL_RECURSION);
     }

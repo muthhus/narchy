@@ -1,6 +1,7 @@
 package nars;
 
 
+import jcog.TODO;
 import jcog.list.FasterList;
 import nars.derive.match.EllipsisMatch;
 import nars.derive.match.Ellipsislike;
@@ -557,44 +558,45 @@ public enum Op {
     //SPACE("+", true, 7, Args.GTEOne),
 
 
-    //VIRTUAL TERMS
-    @Deprecated
-    INSTANCE("-{-", 2, OpType.Statement, Args.Two) {
-        @Override
-        @NotNull protected Term _the(int dt, Term[] u) {
-            assert (u.length == 2);
-            return INH.the(SETe.the(u[0]), u[1]);
-        }
-    },
+//    //VIRTUAL TERMS
+//    @Deprecated
+//    INSTANCE("-{-", 2, OpType.Statement, Args.Two) {
+//        @Override
+//        @NotNull protected Term _the(int dt, Term[] u) {
+//            assert (u.length == 2);
+//            return INH.the(SETe.the(u[0]), u[1]);
+//        }
+//    },
+//
+//    @Deprecated
+//    PROPERTY("-]-", 2, OpType.Statement, Args.Two) {
+//        @Override
+//        @NotNull protected Term _the(int dt, Term[] u) {
+//            assert (u.length == 2);
+//            return INH.the(u[0], SETi.the(u[1]));
+//        }
+//    },
+//
+//    @Deprecated
+//    INSTANCE_PROPERTY("{-]", 2, OpType.Statement, Args.Two) {
+//        @Override
+//        @NotNull protected Term _the(int dt, Term[] u) {
+//            assert (u.length == 2);
+//            return INH.the(SETe.the(u[0]), SETi.the(u[1]));
+//        }
+//    },
+//
+//    @Deprecated
+//    DISJ("||", true, 5, Args.GTETwo) {
+//        @Override
+//        @NotNull protected Term _the(int dt, Term[] u) {
+//            assert (dt == DTERNAL);
+//            if (u.length == 1 && u[0].op() != VAR_PATTERN)
+//                return u[0];
+//            return NEG.the(CONJ.the(Terms.neg(u)));
+//        }
+//    },
 
-    @Deprecated
-    PROPERTY("-]-", 2, OpType.Statement, Args.Two) {
-        @Override
-        @NotNull protected Term _the(int dt, Term[] u) {
-            assert (u.length == 2);
-            return INH.the(u[0], SETi.the(u[1]));
-        }
-    },
-
-    @Deprecated
-    INSTANCE_PROPERTY("{-]", 2, OpType.Statement, Args.Two) {
-        @Override
-        @NotNull protected Term _the(int dt, Term[] u) {
-            assert (u.length == 2);
-            return INH.the(SETe.the(u[0]), SETi.the(u[1]));
-        }
-    },
-
-    @Deprecated
-    DISJ("||", true, 5, Args.GTETwo) {
-        @Override
-        @NotNull protected Term _the(int dt, Term[] u) {
-            assert (dt == DTERNAL);
-            if (u.length == 1 && u[0].op() != VAR_PATTERN)
-                return u[0];
-            return NEG.the(CONJ.the(Terms.neg(u)));
-        }
-    },
 //    /**
 //     * extensional image
 //     */
@@ -611,6 +613,8 @@ public enum Op {
     //SUBTERMS("...", 1, OpType.Other)
     ;
 
+
+    public static final String DISJstr = "||";
 
     private static boolean conegated(Term a, Term b) {
         Term ua = a.unneg();
@@ -880,10 +884,7 @@ public enum Op {
     public final boolean hasNumeric;
     public final byte id;
 
-    /**
-     * whether these are not actual terms, being immediately constructed from other non-virtual types
-     */
-    public final boolean virtual;
+
 
     Op(char c, int minLevel, OpType type) {
         this(c, minLevel, type, Args.None);
@@ -935,8 +936,8 @@ public enum Op {
 
         this.var = (type == OpType.Variable);
 
-        this.statement = str.equals("-->") || str.equals("==>") || str.equals("<=>") || str.equals("<->");
-        this.temporal = str.equals("&&") || str.equals("==>") || str.equals("<=>");
+        this.statement = str.equals("-->") || str.equals("==>") || str.equals("<->");
+        this.temporal = str.equals("&&") || str.equals("==>");
         //in(or(CONJUNCTION, IMPLICATION, EQUIV));
 
         this.hasNumeric = temporal;
@@ -947,22 +948,14 @@ public enum Op {
         final Set<String> ATOMICS = Set.of(".", "+", "B");
         this.atomic = var || ATOMICS.contains(str);
 
-        switch (str) {
-            case "||":
-            case "{-]":
-            case "-]-":
-            case "-{-":
-                this.virtual = true;
-                break;
-            default:
-                this.virtual = false;
-                break;
-        }
+
 
         switch (str) {
             case "==>":
             case "&&":
             case "*": //HACK necessary for ellipsematch content
+            case "|":
+            case "&":
                 allowsBool = true;
                 break;
             default:
@@ -970,7 +963,7 @@ public enum Op {
                 break;
         }
 
-        conceptualizable = !(var || virtual ||
+        conceptualizable = !(var ||
                 str.equals("+") /* INT */ || str.equals("B") /* Bool */);
 
         goalable = conceptualizable && !str.equals("==>");
@@ -984,7 +977,7 @@ public enum Op {
         return ((existing | possiblyIncluded) == existing);
     }
 
-    public static boolean isTrueOrFalse(@NotNull Term x) {
+    public static boolean isTrueOrFalse(Term x) {
         return x == True || x == False;
     }
 
@@ -1714,21 +1707,21 @@ public enum Op {
         return compound(op, dt, subject, predicate);
     }
 
-    private static Term conjDrop(Term conj, int i) {
-        TermContainer cs = conj.subterms();
-        if (cs.subs() == 2) {
-            return conj.sub(1 - i);
-        } else {
-            Term[] s = cs.theArray();
-            int sl = s.length;
-            Term[] t = new Term[sl - 1];
-            if (i > 0)
-                System.arraycopy(s, 0, t, 0, i);
-            if (i < s.length - 1)
-                System.arraycopy(s, i + 1, t, i, sl - 1 - i);
-            return CONJ.the(conj.dt(), t);
-        }
-    }
+//    private static Term conjDrop(Term conj, int i) {
+//        TermContainer cs = conj.subterms();
+//        if (cs.subs() == 2) {
+//            return conj.sub(1 - i);
+//        } else {
+//            Term[] s = cs.theArray();
+//            int sl = s.length;
+//            Term[] t = new Term[sl - 1];
+//            if (i > 0)
+//                System.arraycopy(s, 0, t, 0, i);
+//            if (i < s.length - 1)
+//                System.arraycopy(s, i + 1, t, i, sl - 1 - i);
+//            return CONJ.the(conj.dt(), t);
+//        }
+//    }
 
     private static boolean containEachOther(Term x, Term y, Predicate<Term> delim) {
         int xv = x.volume();
@@ -1850,19 +1843,15 @@ public enum Op {
             args.add(term2);
         }
 
-        Term[] aa = args.toArray(new Term[args.size()]);
-        if (aa.length == 1)
-            return aa[0]; //reduction to one element
+        int aaa = args.size();
+        if (aaa == 1)
+            return args.first();
 
-        return The.compound(intersection, aa);
+        return The.compound(intersection, args.toArray(new Term[aaa]));
     }
 
     public static boolean goalable(Term c) {
         return !c.hasAny(Op.NonGoalable);// && c.op().goalable;
-    }
-
-    public static TermContainer subterms(Collection<? extends Term> t) {
-        return The.subterms(t.toArray(new Term[t.size()]));
     }
 
     @NotNull
@@ -1881,7 +1870,7 @@ public enum Op {
     /**
      * writes this operator to a Writer in (human-readable) expanded UTF16 mode
      */
-    public final void append(int dt, @NotNull Appendable w, boolean invertDT) throws IOException {
+    public final void append(int dt,  Appendable w, boolean invertDT) throws IOException {
 
 
         if (dt == 0) {
@@ -1954,8 +1943,9 @@ public enum Op {
             if (u.length == 1) { //similarity has been reduced
                 assert (this == SIM);
                 return u[0] == Null ? Null : True;
+            } else {
+                return statement(this, dt, u[0], u[1]);
             }
-            return statement(this, dt, u[0], u[1]);
         } else {
             return compound(this, dt, u);
         }
@@ -1993,7 +1983,7 @@ public enum Op {
                 }
             }
         } else {
-            throw new UnsupportedOperationException("TODO"); //this one is easy
+            throw new TODO(); //this one is easy
         }
         return Null; //wasnt contained
     }
@@ -2044,7 +2034,7 @@ public enum Op {
         }
 
         @Override
-        public @NotNull Term unneg() {
+        public Term unneg() {
             return this;
         }
     }
@@ -2066,7 +2056,6 @@ public enum Op {
             return True;
         }
 
-        @NotNull
         @Override
         public Term unneg() {
             return True;
@@ -2090,7 +2079,6 @@ public enum Op {
             return False;
         }
 
-        @NotNull
         @Override
         public Term unneg() {
             return True;

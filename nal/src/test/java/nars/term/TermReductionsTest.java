@@ -244,7 +244,7 @@ public class TermReductionsTest extends NarseseTest {
         //  (¬a ∧ (a ∨ b)) =⇒ b WRONG
         //  not(a) and (a or b)
         //  http://www.wolframalpha.com/input/?i=not(a)+and+(a+or+b)
-        assertEquals("((--,a)&&b)", $.$("(--a && (a || b))").toString());
+        assertEquals("((--,a)&&b)", $.$("(--a && (||,a,b))").toString());
     }
 
     @Test
@@ -802,7 +802,7 @@ public class TermReductionsTest extends NarseseTest {
 
         // \neg(P\and Q)\iff(\neg P)\or(\neg Q)
         assertEquals("(--,((p)&&(q)))",
-                $("(--(p) || --(q))").toString());
+                $("(||, --(p), --(q))").toString());
     }
 
     @Disabled
@@ -952,6 +952,18 @@ public class TermReductionsTest extends NarseseTest {
                 "((--,((X,x)&&#1))&|(--,((X,x)&|#1)))",
                 $("( (--,((X,x)&&#1)) &| (--,((X,x)&|#1)) )").toString() //differ in dt=0 and dt=DTERNAL
         );
+    }
+
+    @Test
+    public void testTrueDuh() throws Narsese.NarseseException {
+        assertEquals("x", $.impl(Op.True, $.$("x")).toString());
+    }
+    @Test
+    public void testTrueUnneg() throws Narsese.NarseseException {
+        assertEquals(True, True.unneg());
+        assertEquals(False, True.neg());
+        assertEquals(True, False.unneg());
+        assertEquals(True, False.neg());
     }
 
     @Test

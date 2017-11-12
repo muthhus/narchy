@@ -14,6 +14,7 @@ import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -31,7 +32,8 @@ public enum The {  ;
     @Deprecated /* @NotNull */ public static final TermContainer subterms(Term... s) {
         return Subterms.the.apply(s);
     }
-    /* @NotNull */ public static final TermContainer subterms(List<Term> s) {
+
+    /* @NotNull */ public static final TermContainer subterms(Collection<? extends Term> s) {
         return Subterms.the.apply(s.toArray(new Term[s.size()]));
     }
 
@@ -41,6 +43,8 @@ public enum The {  ;
     /* @NotNull */ protected static Term compound(Op o, List<Term> subterms) {
         return Compound.the.apply(o, subterms);
     }
+
+
 
     public static final class Subterms {
 

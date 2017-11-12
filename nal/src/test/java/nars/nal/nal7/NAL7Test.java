@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class NAL7Test extends NALTest {
 
-    public int cycles =250;
+    public int cycles = 250;
 
 
     @Test
@@ -126,15 +126,16 @@ public class NAL7Test extends NALTest {
                 .inputAt(2, "(b). :|:")
                 .inputAt(5, "(c). :|:")
                 .mustBelieve(cycles, "((b) &&+3 (c))", 1.00f, 0.81f, 2, 5)
-                .mustNotOutput(cycles, "(c)", BELIEF, (t) -> t!=5)
+                .mustNotOutput(cycles, "(c)", BELIEF, (t) -> t != 5)
         ;
     }
+
     @Test
     public void testDropAnyEventSimple2() {
         test
-            .inputAt(1, "((happy &&+4120 (i)) &&+1232 (--,(i)))! :|:")
-            .mustGoal(cycles, "(happy &&+4120 (i))", 1f, 0.81f, 1, 4121)
-            .mustNotOutput(cycles, "((i)&&happy)", GOAL, 1)
+                .inputAt(1, "((happy &&+4120 (i)) &&+1232 (--,(i)))! :|:")
+                .mustGoal(cycles, "(happy &&+4120 (i))", 1f, 0.81f, 1, 4121)
+                .mustNotOutput(cycles, "((i)&&happy)", GOAL, 1)
         ;
     }
 
@@ -228,6 +229,16 @@ public class NAL7Test extends NALTest {
         ;
     }
 
+    @Test
+    public void testSameDamnConjunction() {
+        test
+                .inputAt(6, "(b &&+5 c). :|: %1.0;0.66%")
+                .inputAt(6, "(b &&+5 c). :|: %1.0;0.90%")
+                //.mustBelieve(cycles, "(b &&+5 c)", 1f, 0.59f)
+                .mustNotOutput(cycles, "((b &&+5 c) &&+5 (b &&+5 c))", BELIEF, (x) -> true)
+                .mustNotOutput(cycles, "((b &&+5 c) &&+5 b)", BELIEF, (x) -> true);
+
+    }
 
     @Test
     public void testTminB() {
@@ -483,7 +494,7 @@ public class NAL7Test extends NALTest {
                 .inputAt(2, "a. :|:")
                 .mustBelieve(cycles, "(--b &&+1 a)", 1.00f, 0.81f, 1, 2) //i
                 .mustBelieve(cycles, "(--b ==>+1 a)", 1.00f, 0.45f, 1) //in
-                //.mustBelieve(cycles, "(a ==>-1 b)", 0.00f, 0.45f, 2) //ab
+        //.mustBelieve(cycles, "(a ==>-1 b)", 0.00f, 0.45f, 2) //ab
         ;
     }
 
@@ -1066,7 +1077,7 @@ public class NAL7Test extends NALTest {
 
         int xx = x;
         t.mustBelieve(x - 1, "(y)", 1f, 0.73f,
-                (y)-> y >= xx && y <= (xx +eventDT));
+                (y) -> y >= xx && y <= (xx + eventDT));
     }
 
     @Test

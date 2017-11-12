@@ -1,6 +1,5 @@
 package nars;
 
-import jcog.Texts;
 import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
 import jcog.list.FasterList;
@@ -30,7 +29,6 @@ import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.function.BiFunction;
 
@@ -108,8 +106,8 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
     static boolean validTaskTerm(@Nullable Term t, byte punc, @Nullable NAR nar, boolean safe) {
 
-        if (t == null)
-            return fail(t, "null content", safe);
+//        if (t == null)
+//            return fail(t, "null content", safe);
 
         if (punc != COMMAND) {
 
@@ -306,12 +304,9 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
     @Nullable
     static ObjectBooleanPair<Term> tryContent(/*@NotNull*/Term t, byte punc, boolean safe) {
 
-        Op o = t.op();
-
         boolean negated;
-        if (o == NEG) {
+        if (t.op() == NEG) {
             t = t.unneg();
-            o = t.op();
             negated = true;
         } else {
             negated = false;
@@ -362,10 +357,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
                 long dist = Math.abs(when - touched);
                 if (dist > 0) {
-                    if (dur <= 0) {
-                        System.err.println("dur=0");
-                    }
-                    assert (dur > 0) : "dur=0";
+                    assert (dur > 0) : "dur<=0 is invalid here";
 
                     float ete = eternalizable();
                     float ecw = ete > 0 ? this.eviEternalized() * ete : 0;
@@ -445,11 +437,11 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         return (punc() == COMMAND);
     }
 
-    @Nullable
-    default Appendable appendTo(Appendable sb) throws IOException {
-        sb.append(appendTo(null));
-        return sb;
-    }
+//    @Nullable
+//    default Appendable appendTo(Appendable sb) throws IOException {
+//        sb.append(appendTo(null));
+//        return sb;
+//    }
 
     @Nullable
     default Appendable toString(boolean showStamp) {
@@ -720,24 +712,24 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         return start() == ETERNAL;
     }
 
-    @Deprecated
-    default String getTense(long currentTime) {
-
-        long ot = start();
-
-        if (ot == ETERNAL) {
-            return "";
-        }
-
-        switch (Tense.order(currentTime, ot, 1)) {
-            case 1:
-                return Op.TENSE_FUTURE;
-            case -1:
-                return Op.TENSE_PAST;
-            default:
-                return Op.TENSE_PRESENT;
-        }
-    }
+//    @Deprecated
+//    default String getTense(long currentTime) {
+//
+//        long ot = start();
+//
+//        if (ot == ETERNAL) {
+//            return "";
+//        }
+//
+//        switch (Tense.order(currentTime, ot, 1)) {
+//            case 1:
+//                return Op.TENSE_FUTURE;
+//            case -1:
+//                return Op.TENSE_PAST;
+//            default:
+//                return Op.TENSE_PRESENT;
+//        }
+//    }
 
 
     default int dt() {
@@ -796,29 +788,29 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         return (s != ETERNAL) ? ((s + end()) / 2L) : ETERNAL;
     }
 
-    /**
-     * prints this task as a TSV/CSV line.  fields:
-     * Compound
-     * Punc
-     * Freq (blank space if quest/question)
-     * Conf (blank space if quest/question)
-     * Start
-     * End
-     */
-    default void appendTSV(Appendable a) throws IOException {
-
-        char sep = '\t'; //','
-
-        a
-                .append(term().toString()).append(sep).append("\"").append(String.valueOf(punc())).append("\"").append(sep)
-                .append(truth() != null ? Texts.n2(truth().freq()) : " ").append(sep)
-                .append(truth() != null ? Texts.n2(truth().conf()) : " ").append(sep)
-                .append(!isEternal() ? Long.toString(start()) : " ").append(sep)
-                .append(!isEternal() ? Long.toString(end()) : " ").append(sep)
-                .append(proof().replace("\n", "  ")).append(sep)
-                .append('\n');
-
-    }
+//    /**
+//     * prints this task as a TSV/CSV line.  fields:
+//     * Compound
+//     * Punc
+//     * Freq (blank space if quest/question)
+//     * Conf (blank space if quest/question)
+//     * Start
+//     * End
+//     */
+//    default void appendTSV(Appendable a) throws IOException {
+//
+//        char sep = '\t'; //','
+//
+//        a
+//                .append(term().toString()).append(sep).append("\"").append(String.valueOf(punc())).append("\"").append(sep)
+//                .append(truth() != null ? Texts.n2(truth().freq()) : " ").append(sep)
+//                .append(truth() != null ? Texts.n2(truth().conf()) : " ").append(sep)
+//                .append(!isEternal() ? Long.toString(start()) : " ").append(sep)
+//                .append(!isEternal() ? Long.toString(end()) : " ").append(sep)
+//                .append(proof().replace("\n", "  ")).append(sep)
+//                .append('\n');
+//
+//    }
 
     /**
      * append an entry to this task's log history
@@ -849,7 +841,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         return log == null || log.isEmpty() ? null : log.get(log.size() - 1);
     }
 
-    @NotNull
     default String proof() {
         StringBuilder sb = new StringBuilder(512);
         return proof(sb).toString();
@@ -866,7 +857,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 //        }
 //    }
 
-    @NotNull
     default StringBuilder proof(/*@NotNull*/StringBuilder temporary) {
         temporary.setLength(0);
         proof(this, 0, temporary);
@@ -898,24 +888,24 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         return this;
     }
 
-    default boolean during(long a, long b) {
-        return distanceTo(a, b) == 0;
-    }
-
-    default boolean during(long when) {
-        long start = start();
-        if (start != ETERNAL) {
-            if (start == when)
-                return true;
-            if (when >= start) {
-                if (when <= end())
-                    return true;
-            }
-            return false;
-        } else {
-            return true;
-        }
-    }
+//    default boolean during(long a, long b) {
+//        return distanceTo(a, b) == 0;
+//    }
+//
+//    default boolean during(long when) {
+//        long start = start();
+//        if (start != ETERNAL) {
+//            if (start == when)
+//                return true;
+//            if (when >= start) {
+//                if (when <= end())
+//                    return true;
+//            }
+//            return false;
+//        } else {
+//            return true;
+//        }
+//    }
 
     @Override
     default @Nullable Iterable<? extends ITask> run(NAR n) {
@@ -927,9 +917,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
 
         Term y = x.eval(n.terms.intern());
-
-        if (y == null)
-            return null;
 
         Task t = this;
         if (!x.equals(y)) { //instances could have been substituted and this matters
@@ -988,23 +975,20 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
             }
         }
 
-        if (!cmd)
-            t.process(n);
+        if (!cmd) {
 
-        return null;
-    }
+            n.emotion.onInput(t, n);
 
-    default void process(NAR n) {
-
-        n.emotion.onInput(this, n);
-
-        Concept c = concept(n, true);
-        if (c != null) {
+            Concept c = t.concept(n, true);
+            if (c != null) {
 
 
-            c.process(this, n);
+                c.process(t, n);
+            }
+
         }
 
+        return null;
     }
 
     /**
@@ -1055,28 +1039,28 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         return Math.abs(when - nearestTimeTo(when));
     }
 
-    /**
-     * TODO see if this can be made faster
-     */
-    default long distanceTo(long start, long end) {
-        assert (start != ETERNAL);
-
-        if (start == end) {
-            return distanceTo(start);
-        } else {
-            long s = this.start();
-            if (s == ETERNAL) return 0;
-
-
-            long e = this.end();
-
-            if (Interval.intersectLength(s, e, start, end) >= 0)
-                return 0; //intersects
-            else {
-                return Interval.unionLength(s, e, start, end) - (end - start) - (e - s);
-            }
-        }
-    }
+//    /**
+//     * TODO see if this can be made faster
+//     */
+//    default long distanceTo(long start, long end) {
+//        assert (start != ETERNAL);
+//
+//        if (start == end) {
+//            return distanceTo(start);
+//        } else {
+//            long s = this.start();
+//            if (s == ETERNAL) return 0;
+//
+//
+//            long e = this.end();
+//
+//            if (Interval.intersectLength(s, e, start, end) >= 0)
+//                return 0; //intersects
+//            else {
+//                return Interval.unionLength(s, e, start, end) - (end - start) - (e - s);
+//            }
+//        }
+//    }
 
     static long[] range(Iterable<Task> ie) {
         long start = Long.MAX_VALUE, end = Long.MIN_VALUE;

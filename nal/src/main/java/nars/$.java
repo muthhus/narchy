@@ -441,8 +441,10 @@ public enum $ {
         return CONJ.the(0, s);
     }
 
-    public static Term disj(@NotNull Term... a) {
-        return DISJ.the(a);
+    public static Term disj(Term... a) {
+        Term[] b = a.clone();
+        neg(b);
+        return CONJ.the(DTERNAL, b).neg();
     }
 
 

@@ -31,9 +31,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static nars.$.neg;
 import static nars.Op.*;
 import static nars.term.Term.nullIfNull;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * NARese, syntax and language for interacting with a NAR in NARS.
@@ -144,7 +146,7 @@ public class Narsese extends BaseParser<Object> {
 
                 ),
                 s() //optional trailing whitespace
-                );
+        );
     }
 
 //    /**
@@ -442,7 +444,6 @@ public class Narsese extends BaseParser<Object> {
                         seq(NEG.str, Term(true, false, true), push(($.the(pop())).neg())),
 
 
-
                         //TODO match Ellipsis as an optional continuation of the prefix variable that was already parsed.\
                         //popping the pushed value should be all that's needed to do this
                         //and it should reduce the redundancy and need to run Ellipsis first
@@ -472,7 +473,6 @@ public class Narsese extends BaseParser<Object> {
                                 //Term(false, false), //<-- allows non-atom terms for operator names
                                 //Atom(), //push(nonNull($.oper((String)pop()))), // <-- allows only atoms for operator names, normal
 
-
                                 COMPOUND_TERM_OPENER, s(),
 
                                 //push((pop())),
@@ -491,12 +491,16 @@ public class Narsese extends BaseParser<Object> {
                         seq(COMPOUND_TERM_OPENER, s(),
                                 firstOf(
 
+//                                        sequence(Term(), s(), "-{-", s(), Term(), s(), COMPOUND_TERM_CLOSER, push($.inst((Term) popTerm(null), (Term) popTerm(null)))),
+//                                        sequence(Term(), s(), "-]-", s(), Term(), s(), COMPOUND_TERM_CLOSER, push($.prop((Term) popTerm(null), (Term) popTerm(null)))),
+//                                        sequence(Term(), s(), "{-]", s(), Term(), s(), COMPOUND_TERM_CLOSER, push($.instprop(the(peek()).sub(1), the(pop()).sub(0)))),
+
                                         sequence(
                                                 COMPOUND_TERM_CLOSER, push(ZeroProduct)
                                         ),
 
-
                                         MultiArgTerm(null, COMPOUND_TERM_CLOSER, true, false),
+                                        Disj(),
 
                                         //default to product if no operator specified in ( )
                                         MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, false),
@@ -842,13 +846,8 @@ public class Narsese extends BaseParser<Object> {
 
                         IMPL.str,
 
-                        CONJ.str,
+                        CONJ.str
 
-                        //TODO make these special case macros
-                        DISJ.str,
-                        PROPERTY.str,
-                        INSTANCE.str,
-                        INSTANCE_PROPERTY.str
 
                 ),
 
@@ -919,6 +918,37 @@ public class Narsese extends BaseParser<Object> {
         );
     }
 
+    /**
+     * HACK
+     */
+    Rule Disj() {
+
+        return sequence(
+
+                push(Compound.class),
+
+                "||", push(Op.PROD),
+
+                zeroOrMore(sequence(
+                        sepArgSep(),
+                        Term()
+                )),
+
+                s(),
+
+                ')',
+
+                push(conj2disj(popTerm(CONJ)))
+        );
+    }
+
+    static Term conj2disj(Term x) {
+        System.out.println(x);
+        Term[] t = x.subterms().theArray();
+
+        neg(t);
+        return CONJ.the(DTERNAL, t).neg();
+    }
 //    /**
 //     * operation()
 //     */
@@ -1201,7 +1231,7 @@ public class Narsese extends BaseParser<Object> {
             t = $.t(t.freq(), m.confDefault(punct));
 
 
-        if (t == null && (punct==BELIEF || punct==GOAL)) {
+        if (t == null && (punct == BELIEF || punct == GOAL)) {
             t = $.t(1, m.confDefault(punct));
         }
 
@@ -1219,6 +1249,14 @@ public class Narsese extends BaseParser<Object> {
                                         (Tense) x[4],
                                         m
                                 ));
+
+        long st = ttt.start();
+        if (ttt.start() != ETERNAL && content.op() == CONJ) {
+            int dtRange = content.dtRange();
+            if (dtRange > 0) {
+                ttt.time(ttt.creation(), st, st + dtRange); //extend
+            }
+        }
 
         if (x[0] == null)  /* do not set, Memory will apply defaults */
             ttt.setPri(m.priDefault(punct));

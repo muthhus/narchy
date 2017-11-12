@@ -195,9 +195,9 @@ public class TemporalizeDerived extends Temporalize {
 
                         int dt;
                         if (reverse) {
-                            dt = (int) (task.start() - belief.end());
+                            dt = (int) (task.start() - belief.end() + belief.term().dtRange());
                         } else {
-                            dt = (int) (belief.start() - task.end());
+                            dt = (int) (belief.start() - task.end() + task.term().dtRange());
                         }
 
                         return pattern.dt(dt);

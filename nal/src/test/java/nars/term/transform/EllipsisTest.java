@@ -522,8 +522,6 @@ public class EllipsisTest {
 
         for (Op o : Op.values()) {
             if (o.minSize <= 1) continue;
-            if (o.virtual)
-                continue;
 
             if (o.statement) continue;
 

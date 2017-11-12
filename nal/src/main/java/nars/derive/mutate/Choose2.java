@@ -2,7 +2,7 @@ package nars.derive.mutate;
 
 import jcog.math.Combinations;
 import nars.$;
-import nars.Op;
+import nars.The;
 import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
@@ -38,7 +38,7 @@ public class Choose2 extends Termutator.AbstractTermutator {
 
         int yFreeSize = yFree.size();
 
-        this.yy = new ShuffledSubterms(f.random, Op.subterms(yFree) /*new ArrayTermVector(yFree)*/);
+        this.yy = new ShuffledSubterms(f.random, The.subterms(yFree) /*new ArrayTermVector(yFree)*/);
 
         this.comb = new Combinations(yFreeSize, 2);
     }

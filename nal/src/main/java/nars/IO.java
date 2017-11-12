@@ -412,36 +412,36 @@ public class IO {
         return d.array(); //bs.toByteArray();
     }
 
-    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException {
-        Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".tsv");
-        System.out.println("saving tasks: " + f);
-        FileOutputStream os = new FileOutputStream(f.toFile());
-        PrintStream ps = new PrintStream(os);
-        nar.tasks().forEach(t -> {
-            Task tt = t;
-            try {
-                tt.appendTSV(ps);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }
+//    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException {
+//        Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".tsv");
+//        System.out.println("saving tasks: " + f);
+//        FileOutputStream os = new FileOutputStream(f.toFile());
+//        PrintStream ps = new PrintStream(os);
+//        nar.tasks().forEach(t -> {
+//            Task tt = t;
+//            try {
+//                tt.appendTSV(ps);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        });
+//    }
 
-    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException {
-        Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".nal");
-        System.out.println("saving tasks: file://" + f);
-        FileOutputStream os = new FileOutputStream(f.toFile());
-        PrintStream ps = new PrintStream(os);
-        nar.tasks().forEach(t -> {
-            Task tt = t;
-            try {
-                tt.appendTo(ps);
-                ps.append('\n');
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-    }
+//    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException {
+//        Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".nal");
+//        System.out.println("saving tasks: file://" + f);
+//        FileOutputStream os = new FileOutputStream(f.toFile());
+//        PrintStream ps = new PrintStream(os);
+//        nar.tasks().forEach(t -> {
+//            Task tt = t;
+//            try {
+//                tt.appendTo(ps);
+//                ps.append('\n');
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        });
+//    }
 
     public enum TaskSerialization {
         TermFirst,
@@ -598,7 +598,7 @@ public class IO {
                         Term x = c.sub(0);
                         if (x.op() == CONJ) {
                             if (Terms.allNegated(x.subterms())) {
-                                compoundAppend(Op.DISJ.toString(), x.subterms(), Term::neg, p);
+                                compoundAppend(Op.DISJstr, x.subterms(), Term::neg, p);
                                 return;
                             }
                         }

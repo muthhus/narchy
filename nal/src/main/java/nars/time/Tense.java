@@ -98,12 +98,12 @@ public enum Tense  {
         return order(b - a, durationCycles);
     }
 
-    public static long getRelativeOccurrence(@NotNull Tense tense, @NotNull NAR m) {
+    public static long getRelativeOccurrence(Tense tense, NAR m) {
         return getRelativeOccurrence(m.time(), tense, 1 /*m.duration()*/);
     }
 
 
-    public static long getRelativeOccurrence(long creationTime, @NotNull Tense tense, int duration) {
+    public static long getRelativeOccurrence(long creationTime, Tense tense, int duration) {
         switch (tense) {
             case Present:
                 return creationTime;
