@@ -92,6 +92,7 @@ public class Signal {
 
             if (last == next) {
                 if (last != null) {
+                    last.pri(pri.asFloat());
                     last.grow(now);
                 }
                 return null;  //dont re-input the task, just stretch it where it is in the temporal belief table

@@ -225,4 +225,6 @@ public class ActivateTest {
     @Test public void testConceptualizeNonTaskable_IndepVarUnbalanced() throws Narsese.NarseseException {
         assertNull(NARS.tmp(1).conceptualize($("(x --> $1)")));
     }
+
+
 }

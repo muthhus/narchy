@@ -104,21 +104,19 @@ public abstract class TermIndex implements TermContext {
     @Nullable
     public final Concept concept(Termed x, boolean createIfMissing) {
 
-        Term xt;
+        Term y;
         if (x instanceof Concept) {
             Concept ct = (Concept) x;
             if (!ct.isDeleted())
                 return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
             //otherwise if it is deleted, continue
-            xt = ct.term();
+            y = ct.term();
         } else {
-            xt = x.term();
+            y = x.term().conceptual();
+            if (y == Null)
+                return null;
         }
-
-        Term y = xt.conceptual();
-        if (y == Null)
-            return null;
-
+        
         @Nullable Termed c = get(y, createIfMissing);
         if (!(c instanceof Concept)) {
 //            if (createIfMissing) {

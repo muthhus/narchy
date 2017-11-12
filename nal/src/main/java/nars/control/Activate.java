@@ -14,6 +14,7 @@ import nars.concept.TermLinks;
 import nars.term.Term;
 import nars.term.Termed;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -49,7 +50,8 @@ public class Activate extends PLink<Concept> implements Termed {
 //            }
 //        }
 
-        float cost = TermLinks.linkTemplates(id, id.templates(), priElseZero(), nar.momentum.floatValue(), nar, ba);
+        List<Concept> conceptualizedTemplates = $.newArrayList();
+        float cost = TermLinks.linkTemplates(id, id.templates(), conceptualizedTemplates, priElseZero(), nar.momentum.floatValue(), nar, ba);
         if (cost >= Pri.EPSILON)
             priSub(cost);
 
@@ -99,7 +101,7 @@ public class Activate extends PLink<Concept> implements Termed {
                     Premise p = new Premise(task, term,
 
                             //targets:
-                            randomTemplateConcepts(rng, TERMLINKS_SAMPLED /* heuristic */, nar)
+                            randomTemplateConcepts(conceptualizedTemplates, rng, TERMLINKS_SAMPLED /* heuristic */, nar)
 
                     );
 
@@ -118,7 +120,7 @@ public class Activate extends PLink<Concept> implements Termed {
     }
 
 
-    private List<Concept> randomTemplateConcepts(Random rng, int count, NAR nar) {
+    private List<Concept> randomTemplateConcepts(List<Concept> tt, Random rng, int count, NAR nar) {
 
 //            {
 //                //this allows the tasklink, if activated to be inserted to termlinks of this concept
@@ -134,26 +136,24 @@ public class Activate extends PLink<Concept> implements Termed {
         }
 
 
-        List<Termed> tt = id.templates();
         int tts = tt.size();
-        if (tts == 0)
-            return List.of();
-//        if (tts == 1)
-//            return tt;
+        if (tts == 0) {
+            return Collections.emptyList();
+        } else if (tts < count) {
+            return tt; //all of them
+        } else {
 
-        List<Concept> uu = $.newArrayList(count);
-        Util.selectRouletteUnique(rng, tts, (w) -> {
-            Term t = tt.get(w).term();
-            return t.op().conceptualizable && !t.equals(id.term()) ? 1f : 0f;
-            //TODO try biasing toward larger template components so the activation trickles down to atoms with less probabilty
-        }, z -> {
-            Concept cc = nar.conceptualize(tt.get(z));
-            if (cc == null)
-                return true;
-            uu.add(cc);
-            return (uu.size() < count);
-        });
-        return uu;
+            List<Concept> uu = $.newArrayList(count);
+            Util.selectRouletteUnique(rng, tts, (w) -> {
+                //Term t = tt.get(w).term();
+                return 1f;
+                //TODO try biasing toward larger template components so the activation trickles down to atoms with less probabilty
+            }, (z) -> {
+                uu.add(tt.get(z));
+                return (uu.size() < count);
+            });
+            return uu;
+        }
     }
 
 

@@ -198,6 +198,13 @@ public class TermReductionsTest extends NarseseTest {
 
 
     @Test
+    public void testImplicationShouldBeValid() throws Narsese.NarseseException {
+        String o = "(((--,tetris(isRow,2,true))&|tetris(isRowClear,8,true)) ==>-807 (((--,tetris(isRow,2,true))&&tetris(isRowClear,8,true))&|tetris(isRowClear,8,true)))";
+        Term oo = $(o);
+        assertEquals(o, oo.toString() );
+    }
+
+    @Test
     public void testImplicationNegatedPredicateImplicated() throws Narsese.NarseseException {
 
         //subject disallows implication
@@ -347,7 +354,7 @@ public class TermReductionsTest extends NarseseTest {
         //"(||,R,R) |- R"
         Term x = $.the("x");
         assertEquals(x, $.disj(x, x));
-        assertEquals(x, CONJ.the(DTERNAL, x.neg(), x.neg()  ).neg());
+        assertEquals(x, CONJ.the(DTERNAL, x.neg(), x.neg()).neg());
     }
 
     @Disabled

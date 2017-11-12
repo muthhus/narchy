@@ -1,6 +1,7 @@
 package nars.util.signal;
 
 import jcog.Util;
+import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -17,6 +18,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
 
@@ -216,44 +220,52 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         can.supply.clear();
         can.supply.addValue(width*height);
 
-        src.update(1);
-
 
         //stamp = nar.time.nextStamp();
-
 
         this.conf = nar.confDefault(BELIEF);
 
         //adjust resolution based on value - but can cause more noise in doing so
         //resolution(Util.round(Math.min(0.01f, 0.5f * (1f - this.in.amp())), 0.01f));
 
-
         //frame-rate timeslicing
-        int actualPixels = pixels.size();
-        int pixelsSize = Math.min(actualPixels, workToPixels(work));
+        int totalPixels = pixels.size();
+        int pixelsToProcess = Math.min(totalPixels, workToPixels(work));
+        if (pixelsToProcess == 0)
+            return 0;
+
         int start, end;
 
-        float pixelPri =
-                //nar.priDefault(BELIEF);
-                (float) (nar.priDefault(BELIEF) / (Math.sqrt(numPixels)));
-                ///((float)Math.sqrt(end-start));
+//        float pixelPri =
+//                //nar.priDefault(BELIEF);
+//                (float) (nar.priDefault(BELIEF) / (Math.sqrt(numPixels)));
+//                ///((float)Math.sqrt(end-start));
 
+        pixelPriCurrent = (float) (nar.priDefault(BELIEF) / pixelsToProcess);
 
         start = this.lastPixel;
-        end = (start + pixelsSize);
-        if (end > actualPixels) {
+        end = (start + pixelsToProcess);
+        Stream<Task> s;
+
+        src.update(1); //trigger camera at last possible moment
+
+        if (end > totalPixels) {
             //wrap around
-            int extra = end - actualPixels;
-            update(start, actualPixels, pixelPri, nar); //last 'half'
-            update(0, extra, pixelPri, nar); //first half after wrap around
+            int extra = end - totalPixels;
+            s = Stream.concat(
+                update(start, totalPixels, nar), //last 'half'
+                update(0, extra, nar) //first half after wrap around
+            );
         } else {
-            update(start, end, pixelPri, nar);
+            s = update(start, end, nar);
         }
+
+        in.input(s);
 
         //System.out.println(value + " " + fraction + " "+ start + " " + end);
 
 
-        return pixelsSize;
+        return pixelsToProcess;
     }
 
     /** how many pixels to process for the given work amount */
@@ -261,20 +273,16 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
         return work;
     }
 
-    private void update(int start, int end, float pixelPri, NAR nar) {
+    private Stream<Task> update(int start, int end, NAR nar) {
         long now = nar.time();
         int dur = nar.dur();
 
-
-        for (int i = start; i < end; i++) {
-            PixelConcept p = pixels.get(i);
-            @Nullable Task t = p.update(now, dur, nar);
-            if (t != null) {
-                t.pri(pixelPri);
-                in.input(t);
-            }
-        }
         this.lastPixel = end;
+
+        return IntStream.range(start, end).mapToObj(i -> {
+            PixelConcept p = pixels.get(i);
+            return p.update(now, dur, nar);
+        }).filter(Objects::nonNull);
     }
 
 
@@ -288,6 +296,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
 //    }
 
 
+    float pixelPriCurrent = 0;
+
+    final FloatSupplier pixelPri = ()->pixelPriCurrent;
+
     public class PixelConcept extends SensorConcept {
 
 //        //private final int x, y;
@@ -297,6 +309,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
             super(cell, nar, null, brightnessTruth);
             setSignal(() -> Util.unitize(src.brightness(x, y)));
             this.resolution = () -> CameraSensor.this.resolution;
+            sensor.pri(pixelPri);
 
             //            this.x = x;
 //            this.y = y;

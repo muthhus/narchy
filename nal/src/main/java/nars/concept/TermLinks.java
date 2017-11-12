@@ -14,6 +14,7 @@ import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -140,7 +141,8 @@ public enum TermLinks {
 
     }
 
-    public static void linkTemplate(Term srcTerm, Bag srcTermLinks, Termed target, float priForward, float priReverse, BatchActivation a, NAR nar, MutableFloat refund) {
+    @Nullable
+    public static Concept linkTemplate(Term srcTerm, Bag srcTermLinks, Termed target, float priForward, float priReverse, BatchActivation a, NAR nar, MutableFloat refund) {
 
 
 //        if (targetTerm instanceof Bool)
@@ -163,6 +165,7 @@ public enum TermLinks {
             reverseLinked = true;
             targetTerm = c.term();
         } else {
+            c = null;
             targetTerm = target.term();
         }
 
@@ -173,6 +176,7 @@ public enum TermLinks {
                 new PLink(targetTerm, priForward), refund
         );
 
+        return c;
     }
 
 //    @Nullable
@@ -278,7 +282,7 @@ public enum TermLinks {
     /**
      * send some activation, returns the cost
      */
-    public static float linkTemplates(Concept src, List<Termed> templates, float totalBudget, float momentum, NAR nar, BatchActivation ba) {
+    public static float linkTemplates(Concept src, List<Termed> templates, List<Concept> conceptualizedTemplates, float totalBudget, float momentum, NAR nar, BatchActivation ba) {
 
         int n = templates.size();
         if (n == 0)
@@ -303,10 +307,12 @@ public enum TermLinks {
             Termed t = templates.get(nextTarget++);
             if (nextTarget == n) nextTarget = 0; //wrap around
 
-            linkTemplate(srcTerm, srcTermLinks, t,
+            Concept c = linkTemplate(srcTerm, srcTermLinks, t,
                     budgetedToEach * balance,
                     budgetedToEach * (1f - balance),
                     ba, nar, refund);
+            if (c!=null)
+                conceptualizedTemplates.add(c);
         }
 
         float r = refund.floatValue();

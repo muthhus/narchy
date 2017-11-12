@@ -1306,7 +1306,7 @@ public enum Util {
         for (int i = 0; i < weightCount; i++) {
             float w = weight.valueOf(i);
             assert (w == w && w >= 0);
-            weightSum += Math.max(0, w);
+            weightSum += w;
         }
         return weightSum;
     }
@@ -1444,6 +1444,8 @@ public enum Util {
             if (weightSum != weightSum) {
                 weightSum = weightSum(choices, choiceWeight);
             }
+            if (weightSum < Float.MIN_NORMAL * choices)
+                return; //no more choices
             switch (each.apply(decideRoulette(choices, choiceWeight, weightSum, rng))) {
                 case STOP:
                     return;
