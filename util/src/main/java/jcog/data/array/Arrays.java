@@ -17,6 +17,9 @@ package jcog.data.array;
  */
 
 
+import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
+import org.eclipse.collections.api.block.function.primitive.IntToShortFunction;
+
 import java.util.Random;
 
 import static com.google.common.math.IntMath.factorial;
@@ -362,4 +365,68 @@ public enum Arrays {
         }
     }
 
+    public static void sort(int[] a, int left, int right, IntToShortFunction v) {
+//        // Use counting sort on large arrays
+//        if (right - left > COUNTING_SORT_THRESHOLD_FOR_BYTE) {
+//            int[] count = new int[NUM_BYTE_VALUES];
+//
+//            for (int i = left - 1; ++i <= right;
+//                 count[a[i] - Byte.MIN_VALUE]++
+//                    )
+//                ;
+//            for (int i = NUM_BYTE_VALUES, k = right + 1; k > left; ) {
+//                while (count[--i] == 0) ;
+//                byte value = (byte) (i + Byte.MIN_VALUE);
+//                int s = count[i];
+//
+//                do {
+//                    a[--k] = value;
+//                } while (--s > 0);
+//            }
+//        } else { // Use insertion sort on small arrays
+        for (int i = left, j = i; i < right; j = ++i) {
+            int ai = a[i + 1];
+            while (v.valueOf(ai) > v.valueOf(a[j])) {
+                a[j + 1] = a[j];
+                if (j-- == left)
+                    break;
+            }
+            a[j + 1] = ai;
+        }
+//        }
+    }
+
+    public static void sort(int[] a, IntToFloatFunction v) {
+        sort(a, 0, a.length-1, v);
+    }
+    public static void sort(int[] a, int left, int right /* inclusive */, IntToFloatFunction v) {
+//        // Use counting sort on large arrays
+//        if (right - left > COUNTING_SORT_THRESHOLD_FOR_BYTE) {
+//            int[] count = new int[NUM_BYTE_VALUES];
+//
+//            for (int i = left - 1; ++i <= right;
+//                 count[a[i] - Byte.MIN_VALUE]++
+//                    )
+//                ;
+//            for (int i = NUM_BYTE_VALUES, k = right + 1; k > left; ) {
+//                while (count[--i] == 0) ;
+//                byte value = (byte) (i + Byte.MIN_VALUE);
+//                int s = count[i];
+//
+//                do {
+//                    a[--k] = value;
+//                } while (--s > 0);
+//            }
+//        } else { // Use insertion sort on small arrays
+        for (int i = left, j = i; i < right; j = ++i) {
+            int ai = a[i + 1];
+            while (v.valueOf(ai) > v.valueOf(a[j])) {
+                a[j + 1] = a[j];
+                if (j-- == left)
+                    break;
+            }
+            a[j + 1] = ai;
+        }
+//        }
+    }
 }

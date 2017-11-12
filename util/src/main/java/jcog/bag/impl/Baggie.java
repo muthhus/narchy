@@ -3,11 +3,11 @@ package jcog.bag.impl;
 import jcog.TODO;
 import jcog.Util;
 import jcog.data.LightObjectFloatPair;
+import jcog.data.array.Arrays;
 import jcog.list.FasterList;
 import jcog.pri.PriMap;
 import jcog.pri.Prioritized;
 import org.apache.commons.lang3.ArrayUtils;
-import org.eclipse.collections.api.block.function.primitive.IntToShortFunction;
 import org.eclipse.collections.api.block.predicate.primitive.ObjectFloatPredicate;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
@@ -164,7 +164,7 @@ public class Baggie<X> extends PriMap<X> {
      */
     private void reSort(short from, short to) {
         int[] s = this.sorted;
-        sort(s, 0, s.length - 1, (x) -> values[x]); //descending
+        Arrays.sort(s, 0, s.length - 1, (int x) -> values[x]); //descending
         this.max = values[s[0]];
         this.min = values[s[s.length - 1]];
     }
@@ -221,37 +221,6 @@ public class Baggie<X> extends PriMap<X> {
 
     public boolean isFull() {
         return size() == capacity;
-    }
-
-    static void sort(int[] a, int left, int right, IntToShortFunction v) {
-//        // Use counting sort on large arrays
-//        if (right - left > COUNTING_SORT_THRESHOLD_FOR_BYTE) {
-//            int[] count = new int[NUM_BYTE_VALUES];
-//
-//            for (int i = left - 1; ++i <= right;
-//                 count[a[i] - Byte.MIN_VALUE]++
-//                    )
-//                ;
-//            for (int i = NUM_BYTE_VALUES, k = right + 1; k > left; ) {
-//                while (count[--i] == 0) ;
-//                byte value = (byte) (i + Byte.MIN_VALUE);
-//                int s = count[i];
-//
-//                do {
-//                    a[--k] = value;
-//                } while (--s > 0);
-//            }
-//        } else { // Use insertion sort on small arrays
-        for (int i = left, j = i; i < right; j = ++i) {
-            int ai = a[i + 1];
-            while (v.valueOf(ai) > v.valueOf(a[j])) {
-                a[j + 1] = a[j];
-                if (j-- == left)
-                    break;
-            }
-            a[j + 1] = ai;
-        }
-//        }
     }
 
     public boolean contains(X b) {

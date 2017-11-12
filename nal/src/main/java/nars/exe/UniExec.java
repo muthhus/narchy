@@ -1,8 +1,8 @@
 package nars.exe;
 
 import jcog.bag.Bag;
-import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
+import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.exe.Can;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
@@ -70,8 +70,15 @@ public class UniExec extends Exec {
         active =
 //                new Baggie(CAPACITY);
             concurrent() ?
-                new ConcurrentCurveBag<>(PriMerge.plus, new HashMap<>(), nar.random(), CAPACITY)
+                //new ConcurrentCurveBag<>(PriMerge.plus, new HashMap<>(), nar.random(), CAPACITY)
                     //new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), CAPACITY) {
+                    new PriorityHijackBag<Activate,Activate>(CAPACITY, 4) {
+
+                        @Override
+                        public Activate key(Activate value) {
+                            return value;
+                        }
+                    }
                         :
                 new CurveBag<>(PriMerge.plus, new HashMap(), nar.random(), CAPACITY);
 

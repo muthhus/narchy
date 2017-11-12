@@ -284,12 +284,12 @@ public class HijackMemoize<X, Y> extends PriorityHijackBag<X, HijackMemoize.Comp
     }
 
     @Override
-    protected boolean replace(float incoming, Computation<X, Y> existing) {
-        if (!super.replace(incoming, existing)) {
+    protected float replace(float incoming, Computation<X, Y> existing) {
+        float remain = super.replace(incoming, existing);
+        if (remain!=Float.POSITIVE_INFINITY) {
             existing.priSub(CACHE_DENY_DAMAGE);
-            return false;
         }
-        return true;
+        return remain;
     }
 
     @Override
