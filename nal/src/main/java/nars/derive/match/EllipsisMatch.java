@@ -9,6 +9,7 @@ import nars.term.container.TermVector;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.Retemporalize;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -79,6 +80,7 @@ public class EllipsisMatch extends GenericCompound  {
     }
 
 
+
     public static Term match(/*@NotNull*/ TermContainer y, int from, int to) {
 
 
@@ -101,6 +103,15 @@ public class EllipsisMatch extends GenericCompound  {
             case 0: return empty;
             case 1: return term.first();
             default: return new EllipsisMatch(term.toArray(new Term[num]));
+        }
+    }
+
+    public static Term matchExcept(Term[] x, Term without) {
+        int num = x.length - 1;
+        switch (num) {
+            case 0: return empty;
+            case 1: return x[0].equals(without) ? x[1] : x[0];
+            default: return new EllipsisMatch(ArrayUtils.removeElement(x, without));
         }
     }
 
@@ -165,6 +176,7 @@ public class EllipsisMatch extends GenericCompound  {
         }
         return true;
     }
+
 
 
 }

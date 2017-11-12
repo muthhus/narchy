@@ -1,7 +1,6 @@
 package nars.term.container;
 
 import com.google.common.collect.Iterators;
-import jcog.Util;
 import nars.Op;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Term;

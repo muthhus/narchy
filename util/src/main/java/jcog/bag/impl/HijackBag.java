@@ -1,6 +1,5 @@
 package jcog.bag.impl;
 
-import com.google.common.primitives.Ints;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.util.SpinMutex;

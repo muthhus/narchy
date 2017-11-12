@@ -17,9 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collection;
 
 import static nars.$.$;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ActivateTest {
 
@@ -157,7 +155,7 @@ public class ActivateTest {
     @Test
     public void testTemplatesWithInt1() throws Narsese.NarseseException {
         testTemplates("(0)",
-                "[(0)]");
+                "[0, (0)]");
     }
 
     @Test
@@ -194,7 +192,7 @@ public class ActivateTest {
     @Test
     public void testTemplateDiffRaw2() throws Narsese.NarseseException {
         testTemplates("((a,b)-y)",
-                "[((a,b)-y), (a,b), y]");
+                "[((a,b)-y), y, (a,b)]");
     }
 
     @Test
@@ -216,7 +214,7 @@ public class ActivateTest {
     @Test
     public void testTemplatesAreEternal() throws Narsese.NarseseException {
         testTemplates("((x ==>+1 y),(x ==>+2 y))",
-                "[(x==>y), ((x==>y),(x==>y))]");
+                "[((x==>y),(x==>y)), (x==>y)]");
     }
 
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {

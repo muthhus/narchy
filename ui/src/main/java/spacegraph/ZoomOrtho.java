@@ -9,8 +9,8 @@ import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
 import spacegraph.render.Draw;
-import spacegraph.widget.windo.Widget;
 import spacegraph.widget.Windo;
+import spacegraph.widget.windo.Widget;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;

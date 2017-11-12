@@ -1,7 +1,6 @@
 package nars.time;
 
 import nars.NAR;
-import org.jetbrains.annotations.NotNull;
 
 
 /** tense modes, and various Temporal utility functions and constants */

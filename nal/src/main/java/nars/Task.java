@@ -3,7 +3,6 @@ package nars;
 import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
 import jcog.list.FasterList;
-import jcog.math.Interval;
 import jcog.pri.PLink;
 import nars.concept.Concept;
 import nars.op.Operator;

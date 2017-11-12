@@ -5,8 +5,6 @@ import spacegraph.layout.Layout;
 
 import java.util.function.Consumer;
 
-import static spacegraph.Surface.Align.Center;
-
 public class Scale extends Layout {
 
     /**

@@ -20,9 +20,7 @@ import spacegraph.video.Tex;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 

@@ -4,8 +4,6 @@ import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.constraint.TypedConstraint;
-import spacegraph.phys.shape.CollisionShape;
-import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.render.Draw;
 
 import java.util.Collections;

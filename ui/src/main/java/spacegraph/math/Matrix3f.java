@@ -31,8 +31,6 @@
 
 package spacegraph.math;
 
-import spacegraph.phys.math.MatrixUtil;
-
 /**
  * A single precision floating point 3 by 3 matrix.
  * Primarily to support 3D rotations.

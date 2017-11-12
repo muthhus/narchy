@@ -115,7 +115,7 @@ public abstract class Unify extends Versioning implements Subst {
 
     @Nullable
     @Override
-    public Term xy(@NotNull Term x0) {
+    public Term xy(Term x0) {
         return xy.get(x0);
 
 //        Term xy = x0, y = null;
@@ -275,7 +275,7 @@ public abstract class Unify extends Versioning implements Subst {
         if (common == null)
             return false; //could not create common variable
 
-        return xy.tryPut(x, common) && xy.tryPut(y, common);
+        return putXY(x, common) && putXY(y, common);
     }
 
     @Override

@@ -19,7 +19,7 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
      * important note: using raw Set<Term> here to avoid the clobbering of PatternCompound subterms if interned with current impl
      * x and y must have same size
      */
-    public CommutivePermutations(@NotNull TermContainer x, @NotNull TermContainer y) {
+    public CommutivePermutations(TermContainer x, TermContainer y) {
         super($.p(x), $.p(y)); //assert(x.size()==y.size());
         this.y = y;
         this.x = x;
@@ -32,7 +32,7 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
     }
 
     @Override
-    public void mutate(@NotNull Unify f, Termutator[] chain, int current) {
+    public void mutate(Unify f, Termutator[] chain, int current) {
         int start = f.now();
 
         ShuffledSubterms p = new ShuffledSubterms(f.random, x);

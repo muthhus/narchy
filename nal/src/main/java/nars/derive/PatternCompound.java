@@ -5,11 +5,10 @@ import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
 import nars.derive.mutate.Choose1;
 import nars.derive.mutate.Choose2;
-import nars.op.mental.AliasConcept;
+import nars.derive.mutate.CommutivePermutations;
 import nars.term.Compound;
 import nars.term.GenericCompoundDT;
 import nars.term.Term;
-import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
@@ -18,9 +17,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static nars.Op.*;
 
-@Deprecated abstract public class PatternCompound extends GenericCompoundDT {
+@Deprecated
+abstract public class PatternCompound extends GenericCompoundDT {
 
 //    final int sizeCached;
 //    final int structureNecessary;
@@ -47,7 +46,7 @@ import static nars.Op.*;
 
         }
 
-        abstract protected boolean matchEllipsis( TermContainer y,  Unify subst);
+        abstract protected boolean matchEllipsis(TermContainer y, Unify subst);
 
         @Override
         public final boolean unify(Term y, Unify subst) {
@@ -153,7 +152,6 @@ import static nars.Op.*;
     }
 
 
-
     public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis {
 
 
@@ -198,7 +196,7 @@ import static nars.Op.*;
          * @param y the compound being matched to this
          */
         @Override
-        protected boolean matchEllipsis( TermContainer y, Unify u) {
+        protected boolean matchEllipsis(TermContainer y, Unify u) {
             //return subst.matchEllipsedCommutative(
             //        this, ellipsis, y
             //);
@@ -277,20 +275,23 @@ import static nars.Op.*;
 //                } else {
 
                 Op xo = x.op();
-                boolean xConst = xo!=NEG && !u.matchType(xo); //HACK exception for NEG
+                boolean xConst = !u.matchType(xo);
                 if (!xConst) {
                     //try to resolve an already assigned and thus resolvable to constant
-                    @Nullable Term xx = u.xy(x);
-                    if (xx!=null) {
-                        x = xx;
-                        xConst = !u.matchType(xo);
+                    @Nullable Term previouslyMatched = u.xy(x);
+                    if (previouslyMatched != null) {
+                        x = previouslyMatched;
+//                        xConst = !u.matchType(xo);
                     }
-                }
 
-                if (xConst && !yFree.remove(x))
-                    return false; //x requires a constant not even present in y
-                if (!xConst) {
                     xFixed.add(x); //x is a variable which must be termuted when everything non-X is assigned
+
+                } else {
+                    if (yFree.remove(x))
+                        xFixed.remove(x); //matched constant
+
+//                    if (!yFree.remove(x))
+//                        xFixed.add(x);
                 }
 
                 //         }
@@ -298,7 +299,7 @@ import static nars.Op.*;
 
             }
 
-            int xs = xFixed.size();
+            final int xs = xFixed.size();
             int ys = yFree.size();
             int numRemainingForEllipsis = ys - xs;
 
@@ -307,45 +308,40 @@ import static nars.Op.*;
             if (!vs)
                 return false;
 
-            if (xs == 0) {
-                return u.putXY(ellipsis, ys > 0 ? EllipsisMatch.match(yFree) : EllipsisMatch.empty);
-            } else {
-                return matchEllipsisCommutive(u, xFixed, yFree);
-            }
-
-
-        }
-
-        /**
-         * toMatch matched into some or all of Y's terms
-         */
-        boolean matchEllipsisCommutive(Unify subst, SortedSet<Term> xFixed, SortedSet<Term> yFree) {
-            int xs = xFixed.size();
-
             switch (xs) {
-                case 0:
-                    //match everything
-                    return ellipsis.unify(EllipsisMatch.match(yFree), subst);
+                case 0: //match everything to everything
+
+                    Term match = ys > 0 ? EllipsisMatch.match(yFree) : EllipsisMatch.empty;
+
+                    if (subs() > 1) {
+                        //permute may be necessary to unify the correct dep/indep terms for 2nd layer
+                        return u.termutes.add(new CommutivePermutations(subterms(), match.subterms()));
+                    } else {
+                        return this.ellipsis.unify(match, u);
+                    }
+
+                    //return this.ellipsis.unify(ys > 0 ? EllipsisMatch.match(yFree) : EllipsisMatch.empty, u);
 
                 case 1:
                     Term x0 = xFixed.first();
                     if (yFree.size() == 1) {
-                        return ellipsis.unify(EllipsisMatch.empty, subst) && x0.unify(yFree.first(), subst);
+                        return this.ellipsis.unify(EllipsisMatch.empty, u) && x0.unify(yFree.first(), u);
                     } else {
-                        return subst.termutes.add(new Choose1(ellipsis, x0, yFree));
+                        return u.termutes.add(new Choose1(this.ellipsis, x0, yFree));
                     }
 
                 case 2:
-                    return subst.termutes.add(new Choose2(ellipsis, subst, xFixed, yFree));
+                    return u.termutes.add(new Choose2(this.ellipsis, u, xFixed, yFree));
 
                 default:
                     //3 or more combination
                     throw new RuntimeException("unimpl: " + xs + " arity combination unimplemented");
             }
 
-        }
-    }
 
+        }
+
+    }
 
 
 }

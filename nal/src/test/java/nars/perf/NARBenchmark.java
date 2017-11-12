@@ -1,9 +1,9 @@
 
 package nars.perf;
 
-import nars.The;
 import nars.NAR;
 import nars.NARS;
+import nars.The;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.test.DeductiveMeshTest;

@@ -37,11 +37,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EllipsisTest {
 
 
-    public interface EllipsisTestCase {
-        @NotNull
+    interface EllipsisTestCase {
         Compound getPattern();
 
-        @NotNull
         Term getResult() throws Narsese.NarseseException;
 
         @Nullable
@@ -71,11 +69,11 @@ public class EllipsisTest {
             assertNotNull(ellipsisTerm);
 
 
-            for (int seed = 0; seed < Math.max(1, repeats * arity) /* enough chances to select all combinations */; seed++) {
+            for (int seed = 0; seed < Math.max(1, repeats) /* enough chances to select all combinations */; seed++) {
 
                 //AtomicBoolean matched = new AtomicBoolean(false);
 
-                System.out.println(seed + ": " + x + " " + y + " .. " + r);
+                System.out.println(seed + ": " + x + " unify " + y + " => " + r);
 
                 Unify f = new Unify(VAR_PATTERN, new XorShift128PlusRandom(1 + seed), Param.UnificationStackMax, 128) {
 
@@ -115,12 +113,8 @@ public class EllipsisTest {
                         }
 
 
-        /*else
-            changed |= (u!=this);*/
-
-
                         //2. test substitution
-                        Term s = Termed.termOrNull(x.transform(this));
+                        Term s = Termed.termOrNull(r.transform(this));
                         if (s != null) {
                             //System.out.println(s);
                             if (s.varPattern() == 0)
@@ -157,7 +151,7 @@ public class EllipsisTest {
         }
     }
 
-    public abstract static class CommutiveEllipsisTest implements EllipsisTestCase {
+    abstract static class CommutiveEllipsisTest implements EllipsisTestCase {
         protected final String prefix;
         protected final String suffix;
         @NotNull
@@ -218,7 +212,7 @@ public class EllipsisTest {
             Set<Term> selectedFixed = super.test(arity, repeats);
 
             /** should have iterated all */
-            assertEquals(p.isCommutative() ? 1 : arity, selectedFixed.size(), selectedFixed.toString());
+            assertEquals(!p.isCommutative() ? 1 : arity, selectedFixed.size(), selectedFixed.toString());
             return selectedFixed;
         }
 
@@ -257,7 +251,7 @@ public class EllipsisTest {
     /**
      * for testing zero-or-more matcher
      */
-    public static class CommutiveEllipsisTest2 extends CommutiveEllipsisTest {
+    static class CommutiveEllipsisTest2 extends CommutiveEllipsisTest {
 
         public CommutiveEllipsisTest2(String ellipsisTerm, String[] openClose) throws Narsese.NarseseException {
             super(ellipsisTerm, openClose[0], openClose[1]);
@@ -338,8 +332,7 @@ public class EllipsisTest {
         return new String[]{a, b};
     }
 
-    @Disabled
-    @Test
+    @Disabled @Test
     public void testVarArg0() throws Narsese.NarseseException {
         //String rule = "(%S --> %M), ((|, %S, %A..+ ) --> %M) |- ((|, %A, ..) --> %M), (Belief:DecomposePositiveNegativeNegative)";
         String rule = "(%S ==> %M), ((&&,%S,%A..+) ==> %M) |- ((&&,%A..+) ==> %M), (Belief:DecomposeNegativePositivePositive, Order:ForAllSame, SequenceIntervals:FromBelief)";
@@ -358,15 +351,17 @@ public class EllipsisTest {
 
     }
 
-    @Test
-    public void testEllipsisMatchCommutive1_0() throws Narsese.NarseseException {
-        new EllipsisTest.CommutiveEllipsisTest1("%2..+", p("(|,", ")")).test(2, 2, 4);
+    @Test public void testEllipsisMatchCommutive1_0a() throws Narsese.NarseseException {
+        testSect("|");
+    }
+    @Test public void testEllipsisMatchCommutive1_0b() throws Narsese.NarseseException {
+        testSect("&");
     }
 
-    @Test
-    public void testEllipsisMatchCommutive1_00() throws Narsese.NarseseException {
-        new EllipsisTest.CommutiveEllipsisTest1("%2..+", p("(&,", ")")).test(2, 2, 4);
+    void testSect(String o) throws Narsese.NarseseException {
+        new CommutiveEllipsisTest1("%2..+", p("(" + o + ",", ")")).test(2, 2, 4);
     }
+
 
     @Test
     public void testEllipsisMatchCommutive1_1() throws Narsese.NarseseException {

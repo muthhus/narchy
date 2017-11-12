@@ -7,7 +7,6 @@ import nars.term.Term;
 import nars.term.atom.AtomicConst;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static nars.IO.SPECIAL_OP;
 

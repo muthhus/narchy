@@ -1,6 +1,5 @@
 package nars.term.compound;
 
-import nars.The;
 import nars.NAR;
 import nars.NARS;
 import nars.nal.nal1.NAL1Test;

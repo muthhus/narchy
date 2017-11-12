@@ -2,9 +2,9 @@ package nars.term.compound;
 
 import jcog.Util;
 import jcog.byt.DynBytes;
-import nars.The;
 import nars.IO;
 import nars.Op;
+import nars.The;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;

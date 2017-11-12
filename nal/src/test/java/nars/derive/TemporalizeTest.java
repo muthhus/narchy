@@ -7,7 +7,6 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.derive.time.*;
-import nars.index.term.TermContext;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.impl.list.mutable.FastList;

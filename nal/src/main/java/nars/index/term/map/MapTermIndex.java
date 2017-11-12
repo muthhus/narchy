@@ -2,7 +2,6 @@ package nars.index.term.map;
 
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

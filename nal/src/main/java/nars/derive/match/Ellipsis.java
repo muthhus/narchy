@@ -33,9 +33,9 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 //    public abstract Variable clone(AbstractVariable newVar, VariableNormalization normalizer);
 
 
-    public final int sizeMin() {
-        return minArity;
-    }
+//    public final int sizeMin() {
+//        return minArity;
+//    }
 
 
 
@@ -145,7 +145,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
         return null;
     }
 
-    @Nullable public static Ellipsis firstEllipsisRecursive(@NotNull Term x) {
+    @Nullable public static Ellipsis firstEllipsisRecursive(Term x) {
         if (x instanceof Ellipsis)
             return (Ellipsis)x;
         else
@@ -153,7 +153,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
     }
 
     /** this needs to use .term(x) instead of Term[] because of shuffle terms */
-    @Nullable public static Ellipsis firstEllipsisRecursive(@NotNull TermContainer x) {
+    @Nullable public static Ellipsis firstEllipsisRecursive(TermContainer x) {
         int xsize = x.subs();
         for (int i = 0; i < xsize; i++) {
             Term xi = x.sub(i);
@@ -164,15 +164,29 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
         return null;
     }
 
-    @Nullable
-    public static Ellipsis firstEllipsis(@NotNull Term[] xx) {
-        for (Term x : xx) {
-            if (x instanceof Ellipsis) {
-                return (Ellipsis) x;
-            }
-        }
-        return null;
+    public final boolean validSize(int collectable) {
+        return collectable >= minArity;
     }
+
+    @Override
+    public Op op() {
+        return Op.VAR_PATTERN;
+    }
+
+    @Override
+    public int varPattern() {
+        return 1;
+    }
+
+//    @Nullable
+//    public static Ellipsis firstEllipsis(@NotNull Term[] xx) {
+//        for (Term x : xx) {
+//            if (x instanceof Ellipsis) {
+//                return (Ellipsis) x;
+//            }
+//        }
+//        return null;
+//    }
 
 
 //    /** recursively */
@@ -286,21 +300,6 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 //    }
 
 
-    public final boolean validSize(int collectable) {
-        return collectable >= minArity;
-    }
-
-    @NotNull
-    @Override
-    public
-    Op op() {
-        return Op.VAR_PATTERN;
-    }
-
-    @Override
-    public int varPattern() {
-        return 1;
-    }
 
     //    public static Ellipsis getFirstUnmatchedEllipsis(Compound X, Subst ff) {
 //        final int xsize = X.size();
