@@ -87,14 +87,14 @@ public class Quat4f extends Tuple4f {
         super(q1);
     }
 
-    /**
-     * Constructs and initializes a Quat4f from the specified Quat4d.
-     *
-     * @param q1 the Quat4d containing the initialization x y z w data
-     */
-    public Quat4f(Quat4d q1) {
-        super(q1);
-    }
+//    /**
+//     * Constructs and initializes a Quat4f from the specified Quat4d.
+//     *
+//     * @param q1 the Quat4d containing the initialization x y z w data
+//     */
+//    public Quat4f(Quat4d q1) {
+//        super(q1);
+//    }
 
 
     /**

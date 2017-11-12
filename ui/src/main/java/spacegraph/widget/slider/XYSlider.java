@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
-import spacegraph.widget.Widget;
+import spacegraph.widget.windo.Widget;
 
 /**
  * Created by me on 6/26/16.

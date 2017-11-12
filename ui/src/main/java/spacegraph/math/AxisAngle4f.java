@@ -106,17 +106,17 @@ public class AxisAngle4f implements java.io.Serializable, Cloneable {
     }
 
 
-    /**
-     * Constructs and initializes an AxisAngle4f from the specified AxisAngle4d.
-     *
-     * @param a1 the AxisAngle4d containing the initialization x y z angle data
-     */
-    public AxisAngle4f(AxisAngle4d a1) {
-        this.x = (float) a1.x;
-        this.y = (float) a1.y;
-        this.z = (float) a1.z;
-        this.angle = (float) a1.angle;
-    }
+//    /**
+//     * Constructs and initializes an AxisAngle4f from the specified AxisAngle4d.
+//     *
+//     * @param a1 the AxisAngle4d containing the initialization x y z angle data
+//     */
+//    public AxisAngle4f(AxisAngle4d a1) {
+//        this.x = (float) a1.x;
+//        this.y = (float) a1.y;
+//        this.z = (float) a1.z;
+//        this.angle = (float) a1.angle;
+//    }
 
 
     /**
@@ -188,18 +188,18 @@ public class AxisAngle4f implements java.io.Serializable, Cloneable {
         this.angle = a1.angle;
     }
 
-
-    /**
-     * Sets the value of this axis-angle to the value of axis-angle a1.
-     *
-     * @param a1 the axis-angle to be copied
-     */
-    public final void set(AxisAngle4d a1) {
-        this.x = (float) a1.x;
-        this.y = (float) a1.y;
-        this.z = (float) a1.z;
-        this.angle = (float) a1.angle;
-    }
+//
+//    /**
+//     * Sets the value of this axis-angle to the value of axis-angle a1.
+//     *
+//     * @param a1 the axis-angle to be copied
+//     */
+//    public final void set(AxisAngle4d a1) {
+//        this.x = (float) a1.x;
+//        this.y = (float) a1.y;
+//        this.z = (float) a1.z;
+//        this.angle = (float) a1.angle;
+//    }
 
 
     /**

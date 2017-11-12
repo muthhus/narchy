@@ -9,7 +9,7 @@ import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
 import spacegraph.render.Draw;
-import spacegraph.widget.Widget;
+import spacegraph.widget.windo.Widget;
 import spacegraph.widget.Windo;
 
 import java.util.Arrays;
@@ -70,12 +70,12 @@ public class ZoomOrtho extends Ortho {
         this.surface = hud.set(content);
     }
 
-    @Override
-    public void start(SpaceGraph s) {
-        super.start(s);
-
-        //window.window.setUndecorated(true);
-    }
+//    @Override
+//    public void start(SpaceGraph s) {
+//        super.start(s);
+//
+//        //window.window.setUndecorated(true);
+//    }
 
 
     final AtomicBoolean windowMoving = new AtomicBoolean(false);
@@ -378,6 +378,7 @@ public class ZoomOrtho extends Ortho {
                 return x;
         }
 
+        @Override
         public boolean editable() {
             return false; //prevent drag the HUD itself
         }

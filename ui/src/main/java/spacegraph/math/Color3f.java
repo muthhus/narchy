@@ -87,13 +87,13 @@ public class Color3f extends Tuple3f {
     }
 
 
-    /**
-     * Constructs and initializes a Color3f from the specified Tuple3d.
-     * @param t1 the Tuple3d containing the initialization x y z data
-     */
-    public Color3f(Tuple3d t1) {
-	super(t1);
-    }
+//    /**
+//     * Constructs and initializes a Color3f from the specified Tuple3d.
+//     * @param t1 the Tuple3d containing the initialization x y z data
+//     */
+//    public Color3f(Tuple3d t1) {
+//	super(t1);
+//    }
 
 
     /**

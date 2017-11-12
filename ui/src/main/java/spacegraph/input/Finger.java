@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.Ortho;
 import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.widget.Widget;
+import spacegraph.widget.windo.Widget;
 
 import java.util.Arrays;
 

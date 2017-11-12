@@ -152,27 +152,28 @@ public class OptimizedBvh implements Serializable {
 
 	public void mergeInternalNodeAabb(int nodeIndex, v3 newAabbMin, v3 newAabbMax) {
 		if (useQuantization) {
-			long quantizedAabbMin;
-			long quantizedAabbMax;
 
-			quantizedAabbMin = quantizeWithClamp(newAabbMin);
-			quantizedAabbMax = quantizeWithClamp(newAabbMax);
+			long quantizedAabbMin = quantizeWithClamp(newAabbMin);
+			long quantizedAabbMax = quantizeWithClamp(newAabbMax);
 			for (int i = 0; i < 3; i++) {
-				if (quantizedContiguousNodes.getQuantizedAabbMin(nodeIndex, i) > QuantizedBvhNodes.getCoord(quantizedAabbMin, i)) {
-					quantizedContiguousNodes.setQuantizedAabbMin(nodeIndex, i, QuantizedBvhNodes.getCoord(quantizedAabbMin, i));
+				int n = QuantizedBvhNodes.getCoord(quantizedAabbMin, i);
+				if (quantizedContiguousNodes.getQuantizedAabbMin(nodeIndex, i) > n) {
+					quantizedContiguousNodes.setQuantizedAabbMin(nodeIndex, i, n);
 				}
 
-				if (quantizedContiguousNodes.getQuantizedAabbMax(nodeIndex, i) < QuantizedBvhNodes.getCoord(quantizedAabbMax, i)) {
-					quantizedContiguousNodes.setQuantizedAabbMax(nodeIndex, i, QuantizedBvhNodes.getCoord(quantizedAabbMax, i));
+				int m = QuantizedBvhNodes.getCoord(quantizedAabbMax, i);
+				if (quantizedContiguousNodes.getQuantizedAabbMax(nodeIndex, i) < m) {
+					quantizedContiguousNodes.setQuantizedAabbMax(nodeIndex, i, m);
 				}
 			}
 		}
 		else {
 			// non-quantized
 			//return array[index];
-			VectorUtil.setMin(contiguousNodes.get(nodeIndex).aabbMinOrg, newAabbMin);
+			OptimizedBvhNode cn = contiguousNodes.get(nodeIndex);
+			VectorUtil.setMin(cn.aabbMinOrg, newAabbMin);
 			//return array[index];
-			VectorUtil.setMax(contiguousNodes.get(nodeIndex).aabbMaxOrg, newAabbMax);
+			VectorUtil.setMax(cn.aabbMaxOrg, newAabbMax);
 		}
 	}
 

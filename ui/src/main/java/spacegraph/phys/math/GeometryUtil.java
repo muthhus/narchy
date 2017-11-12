@@ -119,59 +119,59 @@ public class GeometryUtil {
 		}
 	}
 
-	public static void getVerticesFromPlaneEquations(OArrayList<Vector4f> planeEquations, OArrayList<v3> verticesOut) {
-		v3 n2n3 = new v3();
-		v3 n3n1 = new v3();
-		v3 n1n2 = new v3();
-		v3 potentialVertex = new v3();
-
-		int numbrushes = planeEquations.size();
-		// brute force:
-		for (int i = 0; i < numbrushes; i++) {
-            //return array[index];
-            Vector4f N1 = planeEquations.get(i);
-
-			for (int j = i + 1; j < numbrushes; j++) {
-                //return array[index];
-                Vector4f N2 = planeEquations.get(j);
-
-				for (int k = j + 1; k < numbrushes; k++) {
-                    //return array[index];
-                    Vector4f N3 = planeEquations.get(k);
-
-					VectorUtil.cross3(n2n3, N2, N3);
-					VectorUtil.cross3(n3n1, N3, N1);
-					VectorUtil.cross3(n1n2, N1, N2);
-
-					if ((n2n3.lengthSquared() > 0.0001f) &&
-							(n3n1.lengthSquared() > 0.0001f) &&
-							(n1n2.lengthSquared() > 0.0001f)) {
-						// point P out of 3 plane equations:
-
-						// 	     d1 ( N2 * N3 ) + d2 ( N3 * N1 ) + d3 ( N1 * N2 )
-						// P =  -------------------------------------------------------------------------
-						//    N1 . ( N2 * N3 )
-
-						float quotient = VectorUtil.dot3(N1, n2n3);
-						if (Math.abs(quotient) > 0.000001f) {
-							quotient = -1f / quotient;
-							n2n3.scale(N1.w);
-							n3n1.scale(N2.w);
-							n1n2.scale(N3.w);
-							potentialVertex.set(n2n3);
-							potentialVertex.add(n3n1);
-							potentialVertex.add(n1n2);
-							potentialVertex.scale(quotient);
-
-							// check if inside, and replace supportingVertexOut if needed
-							if (isPointInsidePlanes(planeEquations, potentialVertex, 0.01f)) {
-								verticesOut.add(new v3(potentialVertex));
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+//	public static void getVerticesFromPlaneEquations(OArrayList<Vector4f> planeEquations, OArrayList<v3> verticesOut) {
+//		v3 n2n3 = new v3();
+//		v3 n3n1 = new v3();
+//		v3 n1n2 = new v3();
+//		v3 potentialVertex = new v3();
+//
+//		int numbrushes = planeEquations.size();
+//		// brute force:
+//		for (int i = 0; i < numbrushes; i++) {
+//            //return array[index];
+//            Vector4f N1 = planeEquations.get(i);
+//
+//			for (int j = i + 1; j < numbrushes; j++) {
+//                //return array[index];
+//                Vector4f N2 = planeEquations.get(j);
+//
+//				for (int k = j + 1; k < numbrushes; k++) {
+//                    //return array[index];
+//                    Vector4f N3 = planeEquations.get(k);
+//
+//					VectorUtil.cross3(n2n3, N2, N3);
+//					VectorUtil.cross3(n3n1, N3, N1);
+//					VectorUtil.cross3(n1n2, N1, N2);
+//
+//					if ((n2n3.lengthSquared() > 0.0001f) &&
+//							(n3n1.lengthSquared() > 0.0001f) &&
+//							(n1n2.lengthSquared() > 0.0001f)) {
+//						// point P out of 3 plane equations:
+//
+//						// 	     d1 ( N2 * N3 ) + d2 ( N3 * N1 ) + d3 ( N1 * N2 )
+//						// P =  -------------------------------------------------------------------------
+//						//    N1 . ( N2 * N3 )
+//
+//						float quotient = VectorUtil.dot3(N1, n2n3);
+//						if (Math.abs(quotient) > 0.000001f) {
+//							quotient = -1f / quotient;
+//							n2n3.scale(N1.w);
+//							n3n1.scale(N2.w);
+//							n1n2.scale(N3.w);
+//							potentialVertex.set(n2n3);
+//							potentialVertex.add(n3n1);
+//							potentialVertex.add(n1n2);
+//							potentialVertex.scale(quotient);
+//
+//							// check if inside, and replace supportingVertexOut if needed
+//							if (isPointInsidePlanes(planeEquations, potentialVertex, 0.01f)) {
+//								verticesOut.add(new v3(potentialVertex));
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
 	
 }

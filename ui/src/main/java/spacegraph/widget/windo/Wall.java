@@ -1,7 +1,9 @@
-package spacegraph.widget;
+package spacegraph.widget.windo;
 
+import spacegraph.Scale;
 import spacegraph.Surface;
 import spacegraph.layout.Stacking;
+import spacegraph.widget.Windo;
 
 /**
  * a wall (virtual surface) contains zero or more windows;
@@ -32,7 +34,7 @@ public class Wall extends Stacking {
 
     public Windo addWindo(Surface content) {
         Windo w = addWindo();
-        w.set(content);
+        w.set(new Scale(content, 1f - Windo.resizeBorder));
         return w;
     }
 

@@ -117,6 +117,7 @@ public class AspectAlign extends Layout {
         return this;
     }
 
+    @Override
     public spacegraph.AspectAlign align(Align align, float aspect) {
         this.aspect = aspect;
         return align(align);

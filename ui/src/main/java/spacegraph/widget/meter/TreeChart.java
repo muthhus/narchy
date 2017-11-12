@@ -115,7 +115,7 @@ public class TreeChart<X> extends Surface {
             widthLeft = width;
             layoutOrient = width > height ? LayoutOrient.VERTICAL : LayoutOrient.HORIZONTAL;
 
-            float areaNormalization = (float) ((width * height) / weight[0]);
+            float areaNormalization = (width * height) / weight[0];
             display.forEach(c -> {
                 c.area = c.requestedArea() * areaNormalization;
                 //assert (c.area > Pri.EPSILON);

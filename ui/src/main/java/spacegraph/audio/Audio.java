@@ -21,12 +21,12 @@ public class Audio implements Runnable {
     /**
      * the default audio system
      */
-    public static Audio the() {
-        synchronized (logger) {
+    public synchronized static Audio the() {
+
             if (defaultAudio == null) {
                 defaultAudio = new Audio(4);
             }
-        }
+
         return defaultAudio;
     }
 
@@ -73,7 +73,7 @@ public class Audio implements Runnable {
 
 
         } catch (LineUnavailableException e) {
-            logger.error("initialize {}", e);
+            logger.error("initialize {} {}", this, e);
             thread = null;
             sdl = null;
 

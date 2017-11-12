@@ -75,14 +75,14 @@ public class Point4f extends Tuple4f {
   }
 
 
-  /**
-   * Constructs and initializes a Point4f from the specified Point4d.
-   * @param p1 the Point4d containing the initialization x y z w data
-   */
-  public Point4f(Point4d p1)
-  {
-      super(p1);
-  }
+//  /**
+//   * Constructs and initializes a Point4f from the specified Point4d.
+//   * @param p1 the Point4d containing the initialization x y z w data
+//   */
+//  public Point4f(Point4d p1)
+//  {
+//      super(p1);
+//  }
 
 
     /** 

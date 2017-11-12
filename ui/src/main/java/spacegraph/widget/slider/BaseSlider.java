@@ -9,7 +9,7 @@ import spacegraph.SpaceGraph;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
-import spacegraph.widget.Widget;
+import spacegraph.widget.windo.Widget;
 
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.grid;

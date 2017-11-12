@@ -300,7 +300,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
     }
 
     private FontRenderContext getFontRenderContext() {
-        return new FontRenderContext((AffineTransform) null, antialias ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
+        return new FontRenderContext(null, antialias ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
     }
 
     private int getFontWidth(Font font) {
@@ -432,7 +432,7 @@ public class ConsoleTerminal extends AbstractConsoleSurface /*ConsoleSurface*/ {
         BufferedImage newBackbuffer = new BufferedImage(getWidth(), getHeight(), 1);
         Graphics2D backbufferGraphics = newBackbuffer.createGraphics();
         backbufferGraphics.fillRect(0, 0, newBackbuffer.getWidth(), newBackbuffer.getHeight());
-        backbufferGraphics.drawImage(this.backbuffer, 0, 0, (ImageObserver) null);
+        backbufferGraphics.drawImage(this.backbuffer, 0, 0, null);
 
         backbufferGraphics.setFont(font);
         if (antialias) { //if (this.isTextAntiAliased()) {

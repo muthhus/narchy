@@ -474,7 +474,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         }
 
         @Override
-        public final boolean isStarted() {
+        public final synchronized boolean isStarted() {
             //return null != window;
             return true;
         }

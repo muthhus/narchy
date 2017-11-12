@@ -198,13 +198,13 @@ public class VectorUtil {
 		v.z *= norm;
 	}
 
-	public static void cross3(v3 dest, Vector4f v1, Vector4f v2) {
-        float x,y;
-        x = v1.y*v2.z - v1.z*v2.y;
-        y = v2.x*v1.z - v2.z*v1.x;
-        dest.z = v1.x*v2.y - v1.y*v2.x;
-        dest.x = x;
-        dest.y = y;
-	}
+//	public static void cross3(v3 dest, Vector4f v1, Vector4f v2) {
+//        float x,y;
+//        x = v1.y*v2.z - v1.z*v2.y;
+//        y = v2.x*v1.z - v2.z*v1.x;
+//        dest.z = v1.x*v2.y - v1.y*v2.x;
+//        dest.x = x;
+//        dest.y = y;
+//	}
 	
 }

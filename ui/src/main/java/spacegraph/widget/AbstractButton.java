@@ -5,6 +5,7 @@ import jcog.tree.rtree.rect.RectFloat2D;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
 import spacegraph.render.Draw;
+import spacegraph.widget.windo.Widget;
 
 /**
  * Created by me on 11/12/16.

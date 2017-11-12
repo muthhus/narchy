@@ -1,15 +1,19 @@
 package spacegraph.widget;
 
 import com.jogamp.opengl.GL2;
+import jcog.Util;
 import jcog.tree.rtree.rect.RectFloat2D;
-import spacegraph.Scale;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
-import spacegraph.render.GridTex;
 import spacegraph.widget.button.PushButton;
+import spacegraph.widget.windo.Wall;
+import spacegraph.widget.windo.Widget;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static spacegraph.layout.Grid.grid;
 import static spacegraph.widget.Windo.WindowDragging.MOVE;
@@ -32,10 +36,11 @@ public class Windo extends Widget {
     public WindowDragging potentialDragMode = null;
 
     public final static float resizeBorder = 0.1f;
-    protected final static float maxAspectRatioChange = 0.1f;
+    protected final static float aspectRatioRatioLimit = 0.1f;
 
     private boolean hover;
-//    float pmx, pmy;
+
+    Map<Object,Port> ports = null;
 
     public Windo() {
         super();
@@ -59,33 +64,6 @@ public class Windo extends Widget {
 //                );
     }
 
-
-//    @Override
-//    protected boolean onTouching(v2 hitPoint, short[] buttons) {
-//
-//        if (super.onTouching(hitPoint, buttons)) {
-//            return true;
-//        }
-//
-//        boolean lb = leftButton(buttons);
-//        if (hitPoint!=null && dragStart == null && lb) {
-//            //drag start
-//            dragStart = new v2(hitPoint);
-//        } else if ((hitPoint == null || !lb) && dragStart!=null) {
-//            //drag release
-//            dragStart = null;
-//        }
-//
-//        if (hitPoint!=null && dragStart!=null) {
-//            //float dx =  2 * ( hitPoint.x - dragStart.x );
-//            //float dy =  2 * ( hitPoint.y - dragStart.y );
-//            //move(dx, dy);
-//            //return true;
-//        }
-//
-//
-//        return false;
-//    }
 
     RectFloat2D before = null;
 
@@ -183,7 +161,7 @@ public class Windo extends Widget {
                                     float pmy = before.min.y;
                                     float bh = before.h();
                                     float ty = (fy - finger.hitOnDown[0].y);
-                                    pos(before.min.x, pmy, before.max.x, Math.max(pmy + maxAspectRatioChange * bh, bh + pmy + ty));
+                                    pos(before.min.x, pmy, before.max.x, Math.max(pmy + aspectRatioRatioLimit * bh, bh + pmy + ty));
                                 }
                                 break;
                                 case RESIZE_NE: {
@@ -193,7 +171,7 @@ public class Windo extends Widget {
                                     float bh = before.h();
                                     float tx = (fx - finger.hitOnDown[0].x);
                                     float ty = (fy - finger.hitOnDown[0].y);
-                                    pos(pmx, pmy, Math.max(pmx + maxAspectRatioChange * bw, bw + pmx + tx), Math.max(pmy + maxAspectRatioChange * bh, bh + pmy + ty));
+                                    pos(pmx, pmy, Math.max(pmx + aspectRatioRatioLimit * bw, bw + pmx + tx), Math.max(pmy + aspectRatioRatioLimit * bh, bh + pmy + ty));
                                 }
                                 break;
 
@@ -260,26 +238,7 @@ public class Windo extends Widget {
 
     @Override
     protected void paintComponent(GL2 gl) {
-        if (hover && opaque()) {
-            switch (potentialDragMode) {
-                case RESIZE_N:
-                case RESIZE_S:
-                case RESIZE_W:
-                case RESIZE_E:
-                    gl.glColor3f(0.15f, 0f, 0.2f);
-                    break;
-                case RESIZE_NE:
-                case RESIZE_SW:
-                case RESIZE_NW:
-                case RESIZE_SE:
-                    gl.glColor3f(0.15f, 0.2f, 0f);
-                    break;
-                default:
-                    gl.glColor3f(0.1f, 0.1f, 0.1f);
-                    break;
-            }
-            Draw.rect(gl, x(), y(), w(), h());
-        }
+        paintBack(gl);
 
 
         prepaint(gl);
@@ -324,18 +283,96 @@ public class Windo extends Widget {
 
     }
 
-
-    @Override
-    public boolean tangible() {
-        return true;
+    protected void paintBack(GL2 gl) {
+        if (hover && opaque()) {
+            switch (potentialDragMode) {
+                case RESIZE_N:
+                case RESIZE_S:
+                case RESIZE_W:
+                case RESIZE_E:
+                    gl.glColor3f(0.15f, 0f, 0.2f);
+                    break;
+                case RESIZE_NE:
+                case RESIZE_SW:
+                case RESIZE_NW:
+                case RESIZE_SE:
+                    gl.glColor3f(0.15f, 0.2f, 0f);
+                    break;
+                default:
+                    gl.glColor3f(0.1f, 0.1f, 0.1f);
+                    break;
+            }
+            Draw.rect(gl, x(), y(), w(), h());
+        }
     }
 
-    //    @Override
-//    protected void paintComponent(GL2 gl) {
-//        gl.glColor3f(0.25f,0.25f,0.25f);
-//        Draw.rect(gl, x(), y(), w(), h());
-//    }
 
+    static class Port<X> extends Windo {
+        public final X id;
+
+        public final v2 posRel;
+        public final v2 sizeRel;
+
+        Port(X id) {
+            this.id = id;
+            this.posRel = new v2(Float.NEGATIVE_INFINITY, 0);
+            this.sizeRel = new v2(0.1f, 0.2f);
+        }
+
+
+        @Override
+        protected void paintBack(GL2 gl) {
+            gl.glColor3f(1f,0,1f);
+            Draw.rect(gl, x(), y(), w(), h());
+        }
+    }
+
+
+    protected Port addPort(Object x) {
+        synchronized (children) {
+            if (ports == null)
+                ports = new LinkedHashMap<>();
+            return ports.computeIfAbsent(x, i -> {
+                Port p = new Port<>(i);
+                children.add(p);
+                return p;
+            });
+        }
+    }
+
+    @Override
+    public void doLayout() {
+        if (ports!=null) {
+            synchronized(ports) {
+                float W = w();
+                float H = h();
+                ports.values().forEach(p->{
+                    float x1, y1, x2, y2;
+                    float w = p.sizeRel.x * W;
+                    float h = p.sizeRel.y * H;
+                    if (p.posRel.x == Float.NEGATIVE_INFINITY) {
+                        //glued to left
+                        float y = Util.lerp((p.posRel.y)/2f + 0.5f, bounds.min.y, bounds.max.y);
+                        x1 = x()-w;
+                        y1 = y - h/2;
+                        x2 = x();
+                        y2 = y + h/2;
+                        p.pos(x1, y1, x2, y2);
+                    } else if (p.posRel.x  == Float.POSITIVE_INFINITY){
+                        //glued to right
+                    } else {
+                        //TODO
+                        //etc
+                    }
+                });
+            }
+        }
+        children.forEach((c) -> {
+            if (!(c instanceof Port))
+                c.pos(bounds);
+        });
+        children.forEach(Surface::layout);
+    }
 
     public static void main(String[] args) {
         Wall d = new Wall() {
@@ -390,15 +427,20 @@ public class Windo extends Widget {
 
         };
 
-        d.children.add(new GridTex(16).pos(0,0,1000,1000));
+        //d.children.add(new GridTex(16).pos(0,0,1000,1000));
 
-        d.addWindo(new Scale(Widget.widgetDemo(), 0.9f)).pos(80, 80, 550, 450);
+        {
+            Windo w = d.addWindo(Widget.widgetDemo());
+            w.pos(80, 80, 550, 450);
 
-        d.addWindo(new Scale(grid(new PushButton("x"), new PushButton("y")), 0.9f)).pos(10, 10, 50, 50);
+            Port p = w.addPort("X");
+        }
 
-        d.addWindo(new Scale(new PushButton("w"), 0.9f)).pos(-50, -50, 10, 10);
+        d.addWindo(grid(new PushButton("x"), new PushButton("y"))).pos(10, 10, 50, 50);
 
-        //d.newWindo(new Scale(grid(new PushButton("x"), new PushButton("y")), 0.9f)).pos(-100, -100, 0, 0);
+        d.addWindo(new PushButton("w")).pos(-50, -50, 10, 10);
+
+        //d.newWindo(grid(new PushButton("x"), new PushButton("y"))).pos(-100, -100, 0, 0);
 
         SpaceGraph.window(d, 800, 800);
     }

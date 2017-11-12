@@ -426,13 +426,10 @@ public abstract class Dynamics<X> extends Collisions<X> {
      */
 
     public void updateActions(float timeStep) {
-        try {
-            int n = actions.size();
-            for (int i = 0; i < n; i++) {
-                //return array[index];
-                actions.get(i).updateAction(this, timeStep);
-            }
-        } finally {
+        int n = actions.size();
+        for (int i = 0; i < n; i++) {
+            //return array[index];
+            actions.get(i).updateAction(this, timeStep);
         }
     }
 
@@ -450,41 +447,38 @@ public abstract class Dynamics<X> extends Collisions<X> {
 //    }
 
     protected void updateActivationState(float timeStep) {
-        try {
-            v3 tmp = new v3();
+        v3 tmp = new v3();
 
-            collidable.forEach(colObj -> {
-                Dynamic body = ifDynamic(colObj);
-                if (body != null) {
-                    body.updateDeactivation(timeStep);
+        collidable.forEach(colObj -> {
+            Dynamic body = ifDynamic(colObj);
+            if (body != null) {
+                body.updateDeactivation(timeStep);
 
-                    if (body.wantsSleeping()) {
-                        if (body.isStaticOrKinematicObject()) {
-                            body.setActivationState(Collidable.ISLAND_SLEEPING);
-                        } else {
-                            switch (body.getActivationState()) {
-                                case Collidable.ACTIVE_TAG:
-                                    body.setActivationState(Collidable.WANTS_DEACTIVATION);
-                                    break;
-                                case ISLAND_SLEEPING:
-                                    tmp.zero();
-                                    //body.setAngularVelocity(tmp);
-                                    body.angularVelocity.zero();
-                                    //body.setLinearVelocity(tmp);
-                                    body.linearVelocity.zero();
-                                    break;
-                            }
-
-                        }
+                if (body.wantsSleeping()) {
+                    if (body.isStaticOrKinematicObject()) {
+                        body.setActivationState(Collidable.ISLAND_SLEEPING);
                     } else {
-                        if (body.getActivationState() != Collidable.DISABLE_DEACTIVATION) {
-                            body.setActivationState(Collidable.ACTIVE_TAG);
+                        switch (body.getActivationState()) {
+                            case Collidable.ACTIVE_TAG:
+                                body.setActivationState(Collidable.WANTS_DEACTIVATION);
+                                break;
+                            case ISLAND_SLEEPING:
+                                tmp.zero();
+                                //body.setAngularVelocity(tmp);
+                                body.angularVelocity.zero();
+                                //body.setLinearVelocity(tmp);
+                                body.linearVelocity.zero();
+                                break;
                         }
+
+                    }
+                } else {
+                    if (body.getActivationState() != Collidable.DISABLE_DEACTIVATION) {
+                        body.setActivationState(Collidable.ACTIVE_TAG);
                     }
                 }
-            });
-        } finally {
-        }
+            }
+        });
     }
 
     public void addConstraint(TypedConstraint constraint, boolean disableCollisionsBetweenLinkedBodies) {
@@ -589,55 +583,48 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
         solverInfo.timeStep = timeStep;
 
-        try {
-            // sorted version of all btTypedConstraint, based on islandId
+        // sorted version of all btTypedConstraint, based on islandId
 
-            if (!constraints.isEmpty()) {
-                sortedConstraints.clear();
-                constraints.forEach(sortedConstraints::add);
+        if (!constraints.isEmpty()) {
+            sortedConstraints.clear();
+            constraints.forEach(sortedConstraints::add);
 
-                //Collections.sort(sortedConstraints, sortConstraintOnIslandPredicate);
-                MiscUtil.quickSort(sortedConstraints, sortConstraintOnIslandPredicate);
-            }
-
-            int num = sortedConstraints.size();
-            solverCallback.init(solverInfo,
-                    constrainer,
-                    sortedConstraints,
-                    num,
-                    /*,m_stackAlloc*/ intersecter);
-
-            // solve all the constraints for this island
-            islands.buildAndProcessIslands(intersecter, collidable, solverCallback);
-
-            constrainer.allSolved(solverInfo /*, m_stackAlloc*/);
-        } finally {
+            //Collections.sort(sortedConstraints, sortConstraintOnIslandPredicate);
+            MiscUtil.quickSort(sortedConstraints, sortConstraintOnIslandPredicate);
         }
+
+        int num = sortedConstraints.size();
+        solverCallback.init(solverInfo,
+                constrainer,
+                sortedConstraints,
+                num,
+                /*,m_stackAlloc*/ intersecter);
+
+        // solve all the constraints for this island
+        islands.buildAndProcessIslands(intersecter, collidable, solverCallback);
+
+        constrainer.allSolved(solverInfo /*, m_stackAlloc*/);
     }
 
     protected void calculateSimulationIslands() {
 
-        try {
+        islands.updateActivationState(this);
 
-            islands.updateActivationState(this);
+        forEachConstraint((TypedConstraint constraint) -> {
+            Dynamic colObj0 = constraint.getRigidBodyA();
+            if (colObj0 == null || !colObj0.isActive() || colObj0.isStaticOrKinematicObject())
+                return;
 
-            forEachConstraint((TypedConstraint constraint) -> {
-                Dynamic colObj0 = constraint.getRigidBodyA();
-                if (colObj0 == null || !colObj0.isActive() || colObj0.isStaticOrKinematicObject())
-                    return;
+            Dynamic colObj1 = constraint.getRigidBodyB();
+            if (colObj1 == null || !colObj1.isActive() || colObj1.isStaticOrKinematicObject())
+                return;
 
-                Dynamic colObj1 = constraint.getRigidBodyB();
-                if (colObj1 == null || !colObj1.isActive() || colObj1.isStaticOrKinematicObject())
-                    return;
-
-                islands.find.unite(colObj0.tag(), colObj1.tag());
-            });
+            islands.find.unite(colObj0.tag(), colObj1.tag());
+        });
 
 
-            // Store the island id in each body
-            islands.storeIslandActivationState(this);
-        } finally {
-        }
+        // Store the island id in each body
+        islands.storeIslandActivationState(this);
     }
 
     public void forEachConstraint(Consumer<TypedConstraint> e) {
@@ -646,76 +633,69 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
     protected void integrateTransforms(float timeStep) {
 
-        try {
+        v3 tmp = new v3();
+        Transform predictedTrans = new Transform();
+        SphereShape tmpSphere = new SphereShape(1);
 
-            v3 tmp = new v3();
-            Transform predictedTrans = new Transform();
-            SphereShape tmpSphere = new SphereShape(1);
+        for (Collidable colObj : collidable) {
+            Dynamic body = ifDynamic(colObj);
+            if (body != null) {
+                body.setHitFraction(1f);
 
-            for (Collidable colObj : collidable) {
-                Dynamic body = ifDynamic(colObj);
-                if (body != null) {
-                    body.setHitFraction(1f);
+                if (body.isActive() && (!body.isStaticOrKinematicObject())) {
+                    body.predictIntegratedTransform(timeStep, predictedTrans);
 
-                    if (body.isActive() && (!body.isStaticOrKinematicObject())) {
-                        body.predictIntegratedTransform(timeStep, predictedTrans);
+                    Transform BW = body.worldTransform;
 
-                        Transform BW = body.worldTransform;
+                    tmp.sub(predictedTrans, BW);
+                    float squareMotion = tmp.lengthSquared();
 
-                        tmp.sub(predictedTrans, BW);
-                        float squareMotion = tmp.lengthSquared();
+                    float motionThresh = body.getCcdSquareMotionThreshold();
 
-                        float motionThresh = body.getCcdSquareMotionThreshold();
+                    if (motionThresh != 0f && motionThresh < squareMotion) {
+                        try {
+                            if (body.shape().isConvex()) {
+                                BulletStats.gNumClampedCcdMotions++;
 
-                        if (motionThresh != 0f && motionThresh < squareMotion) {
-                            try {
-                                if (body.shape().isConvex()) {
-                                    BulletStats.gNumClampedCcdMotions++;
-
-                                    ClosestNotMeConvexResultCallback sweepResults = new ClosestNotMeConvexResultCallback(body, BW, predictedTrans, broadphase.getOverlappingPairCache(), intersecter);
-                                    //ConvexShape convexShape = (ConvexShape)body.getCollisionShape();
+                                ClosestNotMeConvexResultCallback sweepResults = new ClosestNotMeConvexResultCallback(body, BW, predictedTrans, broadphase.getOverlappingPairCache(), intersecter);
+                                //ConvexShape convexShape = (ConvexShape)body.getCollisionShape();
 
 
-                                    tmpSphere.setRadius(body.getCcdSweptSphereRadius()); //btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
+                                tmpSphere.setRadius(body.getCcdSweptSphereRadius()); //btConvexShape* convexShape = static_cast<btConvexShape*>(body->getCollisionShape());
 
-                                    Broadphasing bph = body.broadphase;
-                                    sweepResults.collisionFilterGroup = bph.collisionFilterGroup;
-                                    sweepResults.collisionFilterMask = bph.collisionFilterMask;
+                                Broadphasing bph = body.broadphase;
+                                sweepResults.collisionFilterGroup = bph.collisionFilterGroup;
+                                sweepResults.collisionFilterMask = bph.collisionFilterMask;
 
-                                    convexSweepTest(tmpSphere, BW, predictedTrans, sweepResults);
-                                    // JAVA NOTE: added closestHitFraction test to prevent objects being stuck
-                                    if (sweepResults.hasHit() && (sweepResults.closestHitFraction > 0.0001f)) {
-                                        body.setHitFraction(sweepResults.closestHitFraction);
-                                        body.predictIntegratedTransform(timeStep * body.getHitFraction(), predictedTrans);
-                                        body.setHitFraction(0f);
-                                        //System.out.printf("clamped integration to hit fraction = %f\n", sweepResults.closestHitFraction);
-                                    }
+                                convexSweepTest(tmpSphere, BW, predictedTrans, sweepResults);
+                                // JAVA NOTE: added closestHitFraction test to prevent objects being stuck
+                                if (sweepResults.hasHit() && (sweepResults.closestHitFraction > 0.0001f)) {
+                                    body.setHitFraction(sweepResults.closestHitFraction);
+                                    body.predictIntegratedTransform(timeStep * body.getHitFraction(), predictedTrans);
+                                    body.setHitFraction(0f);
+                                    //System.out.printf("clamped integration to hit fraction = %f\n", sweepResults.closestHitFraction);
                                 }
-                            } finally {
                             }
+                        } finally {
                         }
-
-                        body.proceedToTransform(predictedTrans);
                     }
+
+                    body.proceedToTransform(predictedTrans);
                 }
             }
-        } finally {
         }
     }
 
     protected void predictUnconstraintMotion(float timeStep) {
 
-        try {
-            collidables().forEach((colObj) -> {
-                Dynamic body = ifDynamic(colObj);
-                if (body != null && !body.isStaticOrKinematicObject() && body.isActive()) {
-                    body.integrateVelocities(timeStep);
-                    body.applyDamping(timeStep);
-                    body.predictIntegratedTransform(timeStep, body.interpolationWorldTransform);
-                }
-            });
-        } finally {
-        }
+        collidables().forEach((colObj) -> {
+            Dynamic body = ifDynamic(colObj);
+            if (body != null && !body.isStaticOrKinematicObject() && body.isActive()) {
+                body.integrateVelocities(timeStep);
+                body.applyDamping(timeStep);
+                body.predictIntegratedTransform(timeStep, body.interpolationWorldTransform);
+            }
+        });
     }
 
     protected static void startProfiling(float timeStep) {

@@ -53,7 +53,7 @@ public class GLSL extends Surface {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("Shader is " + sb.toString());
+        System.out.println("Shader is " + sb);
         return new String[]{sb.toString()};
     }
 
@@ -132,6 +132,7 @@ public class GLSL extends Surface {
 //    }
 
 
+    @Override
     public void paint(GL2 gl) {
         Draw.bounds(gl, this, this::doPaint);
     }
