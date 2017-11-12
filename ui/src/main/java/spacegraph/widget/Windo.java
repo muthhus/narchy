@@ -6,6 +6,8 @@ import jcog.tree.rtree.rect.RectFloat2D;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
+import spacegraph.input.FingerMove;
+import spacegraph.input.FingerResize;
 import spacegraph.input.Fingering;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
@@ -37,7 +39,7 @@ public class Windo extends Widget {
     public WindowDragging potentialDragMode = null;
 
     public final static float resizeBorder = 0.1f;
-    protected final static float aspectRatioRatioLimit = 0.1f;
+
 
     private boolean hover;
 
@@ -184,41 +186,11 @@ public class Windo extends Widget {
     private Fingering fingering(WindowDragging mode) {
 
         switch (mode) {
-//                case RESIZE_N: {
-//                    float pmy = before.min.y;
-//                    float bh = before.h();
-//                    float ty = (fy - finger.hitOnDown[0].y);
-//                    pos(before.min.x, pmy, before.max.x, Math.max(pmy + aspectRatioRatioLimit * bh, bh + pmy + ty));
-//                }
-//                break;
-//                case RESIZE_NE: {
-//                    float pmx = before.min.x;
-//                    float pmy = before.min.y;
-//                    float bw = before.w();
-//                    float bh = before.h();
-//                    float tx = (fx - finger.hitOnDown[0].x);
-//                    float ty = (fy - finger.hitOnDown[0].y);
-//                    pos(pmx, pmy, Math.max(pmx + aspectRatioRatioLimit * bw, bw + pmx + tx), Math.max(pmy + aspectRatioRatioLimit * bh, bh + pmy + ty));
-//                }
-//                break;
-//
-//                case RESIZE_SW: {
-//                    float pmx = before.max.x;
-//                    float pmy = before.max.y;
-//                    float bw = before.w();
-//                    float bh = before.h();
-//                    float tx = (fx - finger.hitOnDown[0].x);
-//                    float ty = (fy - finger.hitOnDown[0].y);
-//                    pos(pmx - bw + tx, pmy - bh + ty, pmx, pmy); //TODO limit aspect ratio change
-//                }
-//                break;
-            case MOVE: {
-                return new MoveFingering(this);
-            }
-
+            case MOVE:
+                return new FingerMove(this);
 
             default:
-                return null;
+                return new FingerResize(this, mode);
         }
 
     }
@@ -451,31 +423,6 @@ public class Windo extends Widget {
         //d.newWindo(grid(new PushButton("x"), new PushButton("y"))).pos(-100, -100, 0, 0);
 
         SpaceGraph.window(d, 800, 800);
-    }
-
-    public static class MoveFingering extends Fingering {
-        private final Surface moving;
-        private RectFloat2D before;
-
-        public MoveFingering(Surface moving) {
-            super();
-            this.moving = moving;
-        }
-
-        @Override
-        public void start(Finger f) {
-            this.before = moving.bounds;
-        }
-
-        @Override
-        public boolean update(Finger finger) {
-            float pmx = before.min.x;
-            float pmy = before.min.y;
-            float tx = pmx + (finger.hit.x - finger.hitOnDown[0].x);
-            float ty = pmy + (finger.hit.y - finger.hitOnDown[0].y);
-            moving.pos(tx, ty, moving.w() + tx, moving.h() + ty);
-            return finger.buttonDown.length > 0 && finger.buttonDown[0];
-        }
     }
 
 }
