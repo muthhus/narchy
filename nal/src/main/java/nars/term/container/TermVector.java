@@ -17,17 +17,23 @@ import java.util.Iterator;
  */
 public abstract class TermVector implements TermContainer {
 
-    /** normal high-entropy "content" hash */
-    public  final int hash;
+    /**
+     * normal high-entropy "content" hash
+     */
+    public final int hash;
     /**
      * bitvector of subterm types, indexed by Op.id and OR'd into by each subterm
      * low-entropy, use 'hash' for normal hash operations.
      */
-    public  final int structure;
-    /** stored as volume+1 as if this termvector were already wrapped in its compound */
-    public  final short volume;
-    /** stored as complexity+1 as if this termvector were already wrapped in its compound */
-    public  final short complexity;
+    public final int structure;
+    /**
+     * stored as volume+1 as if this termvector were already wrapped in its compound
+     */
+    public final short volume;
+    /**
+     * stored as complexity+1 as if this termvector were already wrapped in its compound
+     */
+    public final short complexity;
 
     protected transient boolean normalized;
 
@@ -43,7 +49,7 @@ public abstract class TermVector implements TermContainer {
 
     protected TermVector(Term... terms) {
 
-        assert(terms.length <= Param.COMPOUND_SUBTERMS_MAX);
+        assert (terms.length <= Param.COMPOUND_SUBTERMS_MAX);
 
 //         if (Param.DEBUG) {
 //             for (Term x : terms)
@@ -54,7 +60,6 @@ public abstract class TermVector implements TermContainer {
         this.hash = Terms.hashSubterms(terms);
 
 
-
 //        final int vD = meta[0];  this.varDeps = (byte)vD;
 //        final int vI = meta[1];  this.varIndeps = (byte)vI;
 //        final int vQ = meta[2];  this.varQuerys = (byte)vQ;
@@ -63,13 +68,34 @@ public abstract class TermVector implements TermContainer {
         final int vol = 1 + Util.sum(Term::volume, terms); // meta[0] + 1;
         this.structure = Util.or(Term::structure, terms); //TermContainer.super.structure();
 
-        int varTot = Util.sum((Term t)->(t.vars()+t.varPattern()), terms);
+        int varTot = Util.sum((Term t) -> (t.vars() + t.varPattern()), terms);
         final int cmp = vol - varTot;
-        this.complexity = (short)(cmp);
-        this.volume = (short)( vol );
+        this.complexity = (short) (cmp);
+        this.volume = (short) (vol);
 
         this.normalized = varTot == 0;
 
+    }
+
+    protected void equivalentTo(TermVector that) {
+        //EQUIVALENCE---
+//            //share since array is equal
+//            boolean srcXorY = System.identityHashCode(x) < System.identityHashCode(y);
+//            if (srcXorY)
+//                that.terms = x;
+//            else
+//                this.terms = y;
+        boolean an, bn = that.normalized;
+        if (!(an = this.normalized))
+            this.normalized = true;
+        if (an && !bn)
+            that.normalized = true;
+
+//        if (normalized ^ that.normalized) {
+//            //one of them is normalized so both must be
+//            this.normalized = that.normalized = true;
+//        }
+        //---EQUIVALENCE
     }
 
     /**
@@ -95,7 +121,7 @@ public abstract class TermVector implements TermContainer {
             case 1:
                 return new TermVector1(t[0]);
             //case 2:
-                //return new TermVector2(t);
+            //return new TermVector2(t);
             default:
                 return new ArrayTermVector(t);
         }
@@ -108,7 +134,8 @@ public abstract class TermVector implements TermContainer {
     }
 
     @Override
-    @NotNull abstract public Term sub(int i);
+    @NotNull
+    abstract public Term sub(int i);
 
     @Override
     public final int volume() {

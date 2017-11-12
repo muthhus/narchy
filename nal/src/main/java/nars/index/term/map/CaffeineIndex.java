@@ -8,6 +8,7 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -183,11 +184,28 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     }
 
 
+    final AtomicBoolean cleanupPending = new AtomicBoolean(false);
+
     @Override
     public final void execute(Runnable command) {
-        if (nar!=null)
-            nar.exe.execute(command);
-        else
+        if (nar!=null) {
+            if (command.getClass().getSimpleName().equals("PerformCleanupTask")) {
+                    //ignore while hopefully coalescing stateless repeat tasks,
+                    // there are too many it spams the worker pool
+                if (cleanupPending.compareAndSet(false, true)) {
+                    nar.exe.execute(()->{
+                       cleanupPending.set(false);
+                       concepts.cleanUp();
+                    });
+                } else {
+                    return;
+                }
+            } else {
+                //what is it?
+                nar.exe.execute(command);
+            }
+
+        } else
             command.run();
     }
 }

@@ -181,17 +181,15 @@ public class NarseseExtendedTest extends NarseseTest {
     }
 
     @Test public void testNegationShortHandOnAtomics() throws Narsese.NarseseException {
-        assertEquals( "(--,x)", term("--x").toString() );
-        assertEquals( "(--,wtf)", term("--wtf").toString() );
+        assertEquals("(--,x)", term("--x").toString());
+        assertEquals("(--,wtf)", term("--wtf").toString());
+        assertEquals("(--,1)", term("--1").toString());
 
-        //combined with colon reversed inh
-        assertEquals( "(--,(before-->x))", term("--x:before").toString() );
+        assertEquals("(--,(before-->x))", term("--x:before").toString());
+    }
 
-        assertEquals( "(--,sentence(x))", term("--sentence(x)").toString() );
-
-
-        //( --sentence($a,is,$b) ==> <$a --> $b> )
-
+    @Test public void testNegationShortHandOnFunc() throws Narsese.NarseseException {
+        assertEquals("(--,sentence(x))", term("--sentence(x)").toString());
     }
 
     @Test public void testNegation3() throws Narsese.NarseseException {
@@ -225,9 +223,15 @@ public class NarseseExtendedTest extends NarseseTest {
 
     /** tests correct order of operations */
     @Test public void testNegationOfShorthandInh() throws Narsese.NarseseException {
-        assertEquals( "(b-->(--,a))", term("--a:b").toString() );
+        assertEquals(
+                //"(b-->(--,a))",
+                "(--,(b-->a))",
+                term("--a:b").toString() );
         assertEquals( "((--,b)-->a)", term("a:--b").toString() );
-        assertEquals( "((--,b)-->(--,a))", term("--a:--b").toString() );
+        assertEquals(
+                //"((--,b)-->(--,a))",
+                "(--,((--,b)-->a))",
+                term("--a:--b").toString() );
     }
 
     @Test public void testOptionalCommas() throws Narsese.NarseseException {

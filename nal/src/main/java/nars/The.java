@@ -50,13 +50,13 @@ public enum The {  ;
         static final Function<NewCompound, TermContainer> rawSubtermBuilderBuilder = (n) -> RawSubtermBuilder.apply(n.subs);
 
         public static final Supplier<Function<Term[], TermContainer>> SoftSubtermBuilder = () ->
-                new MemoizeSubtermBuilder(new SoftMemoize<>(rawSubtermBuilderBuilder, 64 * 1024, true));
+                new MemoizeSubtermBuilder(new SoftMemoize<>(rawSubtermBuilderBuilder, 512 * 1024, true));
 
         public static final Supplier<Function<Term[], TermContainer>> WeakSubtermBuilder = () ->
-                new MemoizeSubtermBuilder(new SoftMemoize<>(rawSubtermBuilderBuilder, 64 * 1024, false));
+                new MemoizeSubtermBuilder(new SoftMemoize<>(rawSubtermBuilderBuilder, 512 * 1024, false));
 
         public static final Supplier<Function<Term[], TermContainer>> CaffeineSubtermBuilder = () ->
-                new MemoizeSubtermBuilder(CaffeineMemoize.build(rawSubtermBuilderBuilder, 64 * 1024, false));
+                new MemoizeSubtermBuilder(CaffeineMemoize.build(rawSubtermBuilderBuilder, 1024 * 1024, false));
 
 
         public static final Supplier<Function<Term[], TermContainer>> HijackSubtermBuilder = () ->

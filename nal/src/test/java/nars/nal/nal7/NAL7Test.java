@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class NAL7Test extends NALTest {
 
-    public int cycles = 350;
+    public int cycles =250;
 
 
     @Test

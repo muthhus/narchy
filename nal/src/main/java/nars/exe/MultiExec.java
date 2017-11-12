@@ -1,25 +1,34 @@
 package nars.exe;
 
+import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.WorkHandler;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
+import jcog.TODO;
+import jcog.Util;
 import jcog.exe.AffinityExecutor;
 import nars.Task;
 import nars.task.ITask;
 import nars.task.NativeTask;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 abstract public class MultiExec extends UniExec {
 
     public static final Logger logger = LoggerFactory.getLogger(MultiExec.class);
     protected final Disruptor<ITask[]> disruptor;
 
-    protected  Executor exe;
+    protected Executor exe;
 
     protected RingBuffer<ITask[]> buffer;
     protected int threads;
@@ -32,10 +41,12 @@ abstract public class MultiExec extends UniExec {
 
         exe = initExe();
 
-        disruptor = new Disruptor<>(
+        disruptor = new Disruptor(
                 () -> new ITask[1],
                 qSize,
-                exe
+                exe,
+                ProducerType.MULTI,
+                new BusySpinWaitStrategy()
         );
 
         initWorkers();
@@ -45,19 +56,29 @@ abstract public class MultiExec extends UniExec {
         disruptor.start();
     }
 
+    public abstract boolean isWorker(Thread t);
+
     protected abstract Executor initExe();
 
     abstract protected void initWorkers();
 
+
     public static class Intense extends MultiExec {
+
+        private AffinityExecutor aexe;
 
         public Intense(int concepts, int threads, int qSize) {
             super(concepts, threads, qSize);
         }
 
         @Override
+        public boolean isWorker(Thread t) {
+            return aexe != null && ArrayUtils.indexOf(aexe.threadIDs(), t.getId()) != -1;
+        }
+
+        @Override
         protected Executor initExe() {
-            return new AffinityExecutor();
+            return aexe = new AffinityExecutor();
         }
 
         @Override
@@ -76,6 +97,8 @@ abstract public class MultiExec extends UniExec {
 
     public static class CoolNQuiet extends MultiExec {
 
+        private ThreadPoolExecutor texe;
+
         public CoolNQuiet(int concepts, int threads, int qSize) {
             super(concepts, threads, qSize);
         }
@@ -83,7 +106,13 @@ abstract public class MultiExec extends UniExec {
         @Override
         protected Executor initExe() {
             //return Executors.newCachedThreadPool();
-            return Executors.newFixedThreadPool(threads);
+            return texe = ((ThreadPoolExecutor) Executors.newFixedThreadPool(threads));
+        }
+
+        @Override
+        public boolean isWorker(Thread t) {
+            //return texe!=null && ...
+            throw new TODO();
         }
 
         @Override
@@ -110,19 +139,21 @@ abstract public class MultiExec extends UniExec {
     }
 
     static final EventTranslatorOneArg<ITask[], ITask> ein =
-            (event, sequence, arg0) -> event[0] = arg0;
+            (event, sequence, arg0) ->
+                    event[0] = arg0;
+//    final EventTranslatorOneArg<ITask[], ITask> einCritical =
+//            (event, sequence, y) -> {
+//                ITask x = event[0];
+//                if (x!=null) {
+//                    execute(x);
+//                }
+//                event[0] = y;
+//            };
 
-//    @Override
-//    public float load() {
-//        return ((float)buffer.remainingCapacity())/buffer.getBufferSize();
-//    }
-
-    public void queue(ITask i) {
-        //tryPublishEvent throws an exception internally; try to avoid that by checking capacity first
-        final int THRESH = 1;
-        if (buffer.remainingCapacity() <= THRESH || !buffer.tryPublishEvent(ein, i)) {
-            i.run(nar); //queue full, in-thread
-        }
+    @Override
+    public float load() {
+        float bufferUsed = ((float) buffer.remainingCapacity()) / buffer.getBufferSize();
+        return Util.sqr(Util.sqr(Util.sqr(1f - bufferUsed)));
     }
 
     @Override
@@ -244,17 +275,37 @@ abstract public class MultiExec extends UniExec {
 //
 //    }
 
+
+    final Consumer<ITask> immediate = this::execute;
+
+    final Consumer<ITask> deferred = x->{
+        if (x instanceof Task)
+            execute(x);
+        else
+            buffer.publishEvent(ein, x);
+    };
+
+    @Override
+    public void add(Iterator<? extends ITask> input) {
+        input.forEachRemaining(input());
+    }
+
+    /** the input procedure according to the current thread */
+    protected Consumer<ITask> input() {
+        return isWorker(Thread.currentThread()) ? immediate : deferred;
+    }
+
+    @Override
+    public void add(Stream<? extends ITask> input) {
+        input.forEach(input());
+    }
+
     @Override
     public void add(ITask t) {
-        if (t instanceof Task) {
-
+        if ((t instanceof Task) || (isWorker(Thread.currentThread()))) {
             execute(t);
-
         } else {
-            queue(t);
-//            if (!buffer.offer(t)) {
-//                execute(t); //in same thread, dangerous could deadlock
-//            }
+            buffer.publishEvent(ein, t);
         }
     }
 

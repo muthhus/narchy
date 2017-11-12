@@ -113,11 +113,15 @@ public interface TaskRegion extends HyperRegion, Tasked {
                 Task er = (Task) r;
                 float ef = er.freq();
                 float ec = er.conf();
+                long es = er.start();
+                long ee = er.end();
                 if (this instanceof Task) {
                     Task tr = (Task) this;
                     float tf = tr.freq();
                     float tc = tr.conf();
                     float f0, f1, c0, c1;
+
+
                     if (tf <= ef) {
                         f0 = tf;
                         f1 = ef;
@@ -132,13 +136,25 @@ public interface TaskRegion extends HyperRegion, Tasked {
                         c0 = ec;
                         c1 = tc;
                     }
-                    return new TasksRegion(
-                            Math.min(start(), er.start()), Math.max(end(), er.end()),
+                    long ts = start();
+                    long te = end();
+                    long ns, ne;
+                    if (ts == es && te == ee) {
+                        if (tf == ef && tc == ec)
+                            return this; //identical taskregion, so use this
+                        else {
+                            ns = ts;
+                            ne = te;
+                        }
+                    } else {
+                        ns = Math.min(ts, es); ne = Math.max(te, ee);
+                    }
+                    return new TasksRegion( ns, ne,
                             f0, f1, c0, c1
                     );
                 } else {
                     return new TasksRegion(
-                            Math.min(start(), er.start()), Math.max(end(), er.end()),
+                            Math.min(start(), es), Math.max(end(), ee),
                             (float) Math.min(coord(false, 1), ef),
                             (float) Math.max(coord(true, 1), ef),
                             (float) Math.min(coord(false, 2), ec),

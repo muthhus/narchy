@@ -65,38 +65,34 @@ public class ArrayTermVector extends TermVector {
                 }
             }
 
-            //EQUIVALENCE---
-//            //share since array is equal
-//            boolean srcXorY = System.identityHashCode(x) < System.identityHashCode(y);
-//            if (srcXorY)
-//                that.terms = x;
-//            else
-//                this.terms = y;
-            if (normalized ^ that.normalized) {
-                //one of them is normalized so both must be
-                this.normalized = that.normalized = true;
-            }
-            //---EQUIVALENCE
+            equivalentTo(that);
+
 
             return true;
 
         } else if (obj instanceof TermContainer) {
 
-            TermContainer c = (TermContainer) obj;
-            if (hash != c.hashCodeSubTerms())
+            TermContainer that = (TermContainer) obj;
+            if (hash != that.hashCodeSubTerms())
                 return false;
 
             final Term[] x = this.terms;
             int s = x.length;
-            if (s != c.subs())
+            if (s != that.subs())
                 return false;
             for (int i = 0; i < s; i++)
-                if (!x[i].equals(c.sub(i)))
+                if (!x[i].equals(that.sub(i)))
                     return false;
+
+            if (that instanceof TermVector)
+                equivalentTo((TermVector) that);
+
             return true;
         }
         return false;
     }
+
+
 
 
     public final int intify(IntObjectToIntFunction<Term> reduce, int v) {

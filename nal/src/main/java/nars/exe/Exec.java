@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
@@ -23,9 +24,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- *
  * manages low level task scheduling and execution
- *
  */
 abstract public class Exec implements Executor {
 
@@ -36,9 +35,22 @@ abstract public class Exec implements Executor {
     private On onClear;
 
 
-    /** schedules the task for execution but makes no guarantee it will ever actually execute */
+    /**
+     * schedules the task for execution but makes no guarantee it will ever actually execute
+     */
     abstract public void add(/*@NotNull*/ ITask input);
 
+    public void add(/*@NotNull*/ Iterator<? extends ITask> input) {
+        input.forEachRemaining(this::add);
+    }
+
+    public final void add(/*@NotNull*/ Iterable<? extends ITask> input) {
+        add(input.iterator());
+    }
+
+    public void add(/*@NotNull*/ Stream<? extends ITask> input) {
+        add(input.iterator());
+    }
 
     protected void execute(ITask x) {
 
@@ -46,7 +58,7 @@ abstract public class Exec implements Executor {
 
             Iterable<? extends ITask> y = x.run(nar);
             if (y != null)
-                y.forEach(this::add);
+                add(y.iterator());
 
         } catch (Throwable e) {
             if (Param.DEBUG) {
@@ -62,25 +74,27 @@ abstract public class Exec implements Executor {
 
     abstract public void fire(Predicate<Activate> each);
 
-    /** an estimate or exact number of parallel processes this runs */
+    /**
+     * an estimate or exact number of parallel processes this runs
+     */
     abstract public int concurrency();
 
 
     abstract public Stream<Activate> active();
 
     public synchronized void start(NAR nar) {
-        if (this.nar!=null) {
+        if (this.nar != null) {
             this.onClear.off();
             this.onClear = null;
         }
 
         this.nar = nar;
 
-        onClear = nar.eventClear.on((n)->clear());
+        onClear = nar.eventClear.on((n) -> clear());
     }
 
     public synchronized void stop() {
-        if (onClear!=null) {
+        if (onClear != null) {
             onClear.off();
             onClear = null;
         }
@@ -88,7 +102,8 @@ abstract public class Exec implements Executor {
 
     abstract void clear();
 
-    /** true if this executioner executes procedures concurrently.
+    /**
+     * true if this executioner executes procedures concurrently.
      * in subclasses, if this is true but concurrency()==1, it will use
      * concurrent data structures to bve safe.
      */
@@ -122,9 +137,10 @@ abstract public class Exec implements Executor {
 
     final Schedulearn sched = new Schedulearn();
 
-    /** allocates what can be done */
+    /**
+     * allocates what can be done
+     */
     public void cycle(List<Can> can) {
-
 
 
         NARLoop loop = nar.loop;
@@ -152,7 +168,7 @@ abstract public class Exec implements Executor {
         double sleepTime = nextCycleTime * (1f - throttle);
         double sleepEach = sleepTime / divisor;
         if (sleepEach >= MIN_SLEEP_TIME) {
-            int msToSleep = (int)Math.ceil(sleepTime*1000);
+            int msToSleep = (int) Math.ceil(sleepTime * 1000);
             nar.exe.add(new NativeTask.SleepTask(msToSleep, divisor));
         }
 

@@ -94,8 +94,8 @@ public class Deriver extends NARService {
 
                     if (p.match(d, matchTTL) != null) {
 
-                        int deriveTTL = Util.lerp(Util.unitize(
-                                p.task.priElseZero() / nar.priDefault(p.task.punc())),
+                        int deriveTTL = Util.lerp(
+                                p.task.priElseZero() / nar.priDefault(p.task.punc()), //unitized
                                 ttlMin, ttlMax);
 
                         d.derive(deriveTTL);

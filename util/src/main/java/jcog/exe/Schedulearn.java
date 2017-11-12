@@ -15,7 +15,7 @@ import static jcog.Texts.strNS;
 public class Schedulearn {
 
     //float OVER_DEMAND = 1.1f; //factor for additional iterations to request above the observed supply, ie. demand growth rate
-    float OVER_DEMAND = 1.25f; //factor to hard multiply total iterations after solution.  this effectively boosts the demand even further, but beyond the solution's expectations
+    float OVER_DEMAND = 1.5f; //factor to hard multiply total iterations after solution.  this effectively boosts the demand even further, but beyond the solution's expectations
 
     final static double minIterationTime = 1.0E-9;
 
@@ -87,7 +87,7 @@ public class Schedulearn {
 
             //demand slightly more than supply limit
             double supply = x.supply();
-            double overSupply = Math.max(1, Math.ceil((1 + supply) * OVER_DEMAND));
+            double overSupply = Math.ceil((1 + supply) * OVER_DEMAND);
 
             ContinuousConstraint meetsSupply = C.lessThanOrEqualTo(xi, overSupply);
             meetsSupply.setStrength(Strength.STRONG);
@@ -108,7 +108,7 @@ public class Schedulearn {
         solver.update();
 
         can.forEach(c ->
-            c.commit(Math.max(1, c.iterations.value()))
+            c.commit( c.iterations.value())
         );
 
     }

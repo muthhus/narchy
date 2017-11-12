@@ -44,10 +44,23 @@ public class TermVector1 extends TermVector {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj instanceof TermContainer && hash== obj.hashCode()) {
-            TermContainer t = (TermContainer) obj;
-            if (t.subs() == 1 && sub.equals(t.sub(0)))
+        else if (obj instanceof TermVector) {
+            TermVector t = (TermVector)obj;
+            if (hash!=t.hash || t.subs()!=1)
+                return false;
+
+            if (t.sub(0).equals(sub)) {
+                equivalentTo(t);
                 return true;
+            }
+
+            return false;
+        }
+        else if (obj instanceof TermContainer && hash== obj.hashCode()) {
+            TermContainer t = (TermContainer) obj;
+            if (t.subs() == 1 && sub.equals(t.sub(0))) {
+                return true;
+            }
         }
         return false;
     }

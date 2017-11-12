@@ -21,7 +21,7 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
      */
     public final int dt;
     private final int hashDT;
-    Compound ref;
+    protected final Compound ref;
 
     public GenericCompoundDT(Compound base, int dt) {
         this.ref = base;
@@ -139,7 +139,7 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
             if (myRef == thatRef) {
                 return true;
             } else if (myRef.equals(thatRef)) {
-                this.ref = thatRef; //share
+//                this.ref = thatRef; //share
                 return true;
             } else {
                 return false;

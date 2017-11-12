@@ -19,7 +19,6 @@ import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
 import nars.control.*;
 import nars.exe.Exec;
-import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.op.Operator;
 import nars.table.BeliefTable;
@@ -780,7 +779,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     public final void input(ITask x) {
         if (x == null) return;
-
         exe.add(x);
     }
 
@@ -1266,16 +1264,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     public void input(Iterable<? extends ITask> tasks) {
-        if (tasks == null) return;
-        tasks.forEach(x -> {
-            if (x != null)
-                input(x);
-        });
+        //if (tasks == null) return;
+        exe.add(tasks);
     }
 
-    public final void input(Stream<? extends ITask> taskStream) {
-        if (taskStream == null) return;
-        taskStream.filter(Objects::nonNull).forEach(this::input);
+    public final void input(Stream<? extends ITask> tasks) {
+        //if (tasks == null) return;
+        exe.add(tasks.filter(Objects::nonNull));
     }
 
     @Override
@@ -1671,7 +1666,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
             final short ci = (short) (causes.size());
             final short[] sharedOneElement = {ci};
-            CauseChannel c = new CauseChannel<ITask>(ci, id, (x) -> {
+            CauseChannel c = new CauseChannel.TaskChannel(this, ci, id, (x) -> {
                 if (x instanceof NALTask) {
                     NALTask t = (NALTask) x;
                     int tcl = t.cause.length;
@@ -1684,7 +1679,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                         t.cause[tcl] = ci;
                     }
                 }
-                input(x);
             });
             causes.add(c);
             return c;

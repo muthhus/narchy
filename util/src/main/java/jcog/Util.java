@@ -1430,6 +1430,10 @@ public enum Util {
         return high ? (short) (x >> 16) : (short) (x & 0xffff);
     }
 
+    public static float min(float x,float y) {
+        return (x <= y) ? x : y;
+    }
+
     public static enum RouletteControl {
         STOP, CONTINUE, WEIGHTS_CHANGED
     }
