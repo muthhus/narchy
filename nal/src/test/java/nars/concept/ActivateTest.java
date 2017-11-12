@@ -44,22 +44,26 @@ public class ActivateTest {
         System.out.println();
 
         HashBag<String> termlinkHits = new HashBag();
-        HashBag<String> premiseHits = new HashBag();
+        HashBag<String> taskHits = new HashBag();
+        //HashBag<String> premiseHits = new HashBag();
         Activate cf = new Activate(c, 1f);
 
         Term A = $.the("a");
 
         BatchActivation ba = BatchActivation.get();
-        cf.hypothesize(nar, ba,500).forEach(p -> {
-            //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
-            if (p.termLink instanceof Atom || !A.equals(p.termLink.sub(0)))
-                return; //ignore
-            String tls = p.termLink.toString();
+        for (int i = 0; i < 100; i++) {
+            cf.hypothesize(nar, ba, 9).forEach(p -> {
+                System.out.println("tasklink=" + p.task + " termlink=" + p.termLink);
+                if (p.termLink instanceof Atom || !A.equals(p.termLink.sub(0)))
+                    return; //ignore
+                String tls = p.termLink.toString();
 
-            premiseHits.addOccurrences(p.toString(), 1);
-            termlinkHits.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
-        });
-        ba.commit(nar);
+                //premiseHits.addOccurrences(p.toString(), 1);
+                termlinkHits.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
+                taskHits.addOccurrences(/*tasklink.get() + " " +*/ p.task.toString(), 1);
+            });
+            ba.commit(nar);
+        }
 
 
         System.out.println("termlinks pri (after):\n");
@@ -67,14 +71,16 @@ public class ActivateTest {
 
         System.out.println("\ntermlink hits:\n");
         termlinkHits.topOccurrences(termlinkHits.size()).forEach(System.out::println);
+//        System.out.println("\ntask hits:\n");
+//        taskHits.topOccurrences(taskHits.size()).forEach(System.out::println);
 
-        System.out.println("\npremise hits:\n");
-        premiseHits.topOccurrences(premiseHits.size()).forEach(System.out::println);
+//        System.out.println("\npremise hits:\n");
+//        premiseHits.topOccurrences(premiseHits.size()).forEach(System.out::println);
 
-        System.out.println();
-        c.print();
+//        System.out.println();
+//        c.print();
 
-        System.out.println();
+//        System.out.println();
 
         ObjectIntPair<String> top = termlinkHits.topOccurrences(1).get(0);
         ObjectIntPair<String> bottom = termlinkHits.bottomOccurrences(1).get(0);
@@ -106,7 +112,7 @@ public class ActivateTest {
 
         //layer 1:
         testTemplates("open:door",
-                "[(door-->open), door, open]");
+                "[door, open, (door-->open)]");
     }
 
     @Test
@@ -120,7 +126,7 @@ public class ActivateTest {
     public void testTemplates3() throws Narsese.NarseseException {
         //layer 3:
         testTemplates("(open(John,door) ==> #x)",
-                "[open, (open(John,door)==>#1), door, open(John,door), John, (John,door)]");
+                "[(open(John,door)==>#1), #1, open, open(John,door), (John,door), John, door]");
     }
 
     @Test
@@ -157,7 +163,7 @@ public class ActivateTest {
     @Test
     public void testTemplatesWithQueryVar() throws Narsese.NarseseException {
         testTemplates("(x --> ?1)",
-                "[(x-->?1), x]");
+                "[x, ?1, (x-->?1)]");
     }
 
     @Test
@@ -196,7 +202,7 @@ public class ActivateTest {
         testTemplates("(a,b)",
                 "[a, (a,b), b]");
         testTemplates("(a,(b,c))",
-                "[(a,(b,c)), (b,c), a]");
+                "[a, (b,c), (a,(b,c))]");
     }
 
     @Test

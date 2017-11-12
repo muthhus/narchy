@@ -308,7 +308,7 @@ public class PrologCore extends PrologAgent implements Consumer<Task> {
                     case "&&":
                         return CONJ.the((nterms(s)));
                     case "||":
-                        return DISJ.the((nterms(s)));
+                        return $.disj(nterms(s));
                     case "not":
                         return (nterm(s, 0).neg());
 

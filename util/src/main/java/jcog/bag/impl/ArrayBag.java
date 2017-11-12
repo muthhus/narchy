@@ -172,8 +172,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
     protected void ensureSorted() {
         //if (mustSort) {
-            sort();
-            mustSort = false;
+        sort();
+        mustSort = false;
         //}
     }
 
@@ -358,7 +358,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 //        return this;
 //    }
 
-    @Deprecated @Nullable
+    @Deprecated
+    @Nullable
     protected Random random() {
         return null;
     }
@@ -386,29 +387,16 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     public Bag<X, Y> sample(/*@NotNull*/ Bag.BagCursor<? super Y> each) {
 
         Random rng = random();
-        final boolean direction =
-                true; //must always go down otherwise if it reverses then in curvebag's bias for early items, it will prioritize the last items yuk
-        //rng == null || rng.nextBoolean();
+
 
         newItemsArray:
         while (true) {
-            SortedArray<Y> itemsSampling = items;
-            final Object[] ii = itemsSampling.array();
-            int s = Math.min(ii.length, size());
-            if (s == 0) return this;
+            final Object[] ii = items.array();
+            int s;
 
-            int i = sampleStart(rng, s);
+            while ((s = Math.min(ii.length, size())) > 0) {
 
-
-            /*
-            sampled items will be limited to the current array.  if the array has resized by
-            an insertion from another thread, it will not be available in this sampling
-             */
-
-            while (size() > 0) {
-
-                if (items.array() != ii) //resized, due to another thread
-                    continue newItemsArray;
+                int i = sampleStart(rng, s);
 
                 Object x = ii[i];
 
@@ -423,19 +411,14 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                         return this;
                 }
 
-                if (direction) {
-                    if (++i == s)
-                        i = 0;
-                } else {
-                    if (--i == -1)
-                        i = s - 1;
-                }
+                if (items.array() != ii) //resized, due to another thread
+                    continue newItemsArray;
+
             }
 
             return this;
         }
 
-        //return this;
     }
 
     @Nullable
@@ -630,7 +613,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
     private void updateRange() {
         Y last = items.last();
-        if (last!=null) {
+        if (last != null) {
             min = priElse(last, 0);
             max = priElse(items.first(), 0);
         } else {
@@ -653,7 +636,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
 
     @Override
-    /*@NotNull*/
+            /*@NotNull*/
     public Bag<X, Y> commit(Consumer<Y> update) {
         commit(update, false);
         return this;
@@ -751,7 +734,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
 
     @Override
-    public void forEachKey( Consumer<? super X> each) {
+    public void forEachKey(Consumer<? super X> each) {
 
         forEach(x -> each.accept(key(x)));
     }
