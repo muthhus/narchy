@@ -2,7 +2,7 @@ package spacegraph.input;
 
 abstract public class FingerDragging extends Fingering {
 
-    private final int button;
+    protected final int button;
 
     public FingerDragging(int button) {
         super();

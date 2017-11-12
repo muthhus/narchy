@@ -15,18 +15,17 @@ import spacegraph.widget.button.PushButton;
 import spacegraph.widget.windo.Wall;
 import spacegraph.widget.windo.Widget;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static spacegraph.layout.Grid.grid;
-import static spacegraph.widget.Windo.WindowDragging.MOVE;
+import static spacegraph.widget.Windo.DragEdit.MOVE;
 
 /**
  * draggable panel
  */
 public class Windo extends Widget {
 
-    public enum WindowDragging {
+    public enum DragEdit {
         MOVE,
         RESIZE_N, RESIZE_E, RESIZE_S, RESIZE_W,
         RESIZE_NW,
@@ -36,7 +35,7 @@ public class Windo extends Widget {
     }
 
     public Fingering dragMode = null;
-    public WindowDragging potentialDragMode = null;
+    public DragEdit potentialDragMode = null;
 
     public final static float resizeBorder = 0.1f;
 
@@ -48,6 +47,8 @@ public class Windo extends Widget {
     public Windo() {
         super();
 
+
+//        clipTouchBounds = false;
 //        Surface menubar = //row(new PushButton("x"),
 //                new Label(title)
 //        ;
@@ -99,44 +100,44 @@ public class Windo extends Widget {
                     hover = true;
 
 
-                    if (dragMode == null) {
+                    if (dragMode == null/* && hitPoint.x >= 0 && hitPoint.y >= 0 && hitPoint.x <= 1f && hitPoint.y <= 1f*/) {
 
                         potentialDragMode = null;
 
                         if (potentialDragMode == null && hitPoint.x >= 0.5f - resizeBorder / 2f && hitPoint.x <= 0.5f + resizeBorder / 2) {
                             if (potentialDragMode == null && hitPoint.y <= resizeBorder) {
-                                potentialDragMode = WindowDragging.RESIZE_S;
+                                potentialDragMode = DragEdit.RESIZE_S;
                             }
                             if (potentialDragMode == null && hitPoint.y >= 1f - resizeBorder) {
-                                potentialDragMode = WindowDragging.RESIZE_N;
+                                potentialDragMode = DragEdit.RESIZE_N;
                             }
                         }
 
                         if (potentialDragMode == null && hitPoint.y >= 0.5f - resizeBorder / 2f && hitPoint.y <= 0.5f + resizeBorder / 2) {
                             if (potentialDragMode == null && hitPoint.x <= resizeBorder) {
-                                potentialDragMode = WindowDragging.RESIZE_W;
+                                potentialDragMode = DragEdit.RESIZE_W;
                             }
                             if (potentialDragMode == null && hitPoint.x >= 1f - resizeBorder) {
-                                potentialDragMode = WindowDragging.RESIZE_E;
+                                potentialDragMode = DragEdit.RESIZE_E;
                             }
                         }
 
                         if (potentialDragMode == null && hitPoint.x <= resizeBorder) {
                             if (potentialDragMode == null && hitPoint.y <= resizeBorder) {
-                                potentialDragMode = WindowDragging.RESIZE_SW;
+                                potentialDragMode = DragEdit.RESIZE_SW;
                             }
                             if (potentialDragMode == null && hitPoint.y >= 1f - resizeBorder) {
-                                potentialDragMode = WindowDragging.RESIZE_NW;
+                                potentialDragMode = DragEdit.RESIZE_NW;
                             }
                         }
 
                         if (potentialDragMode == null && hitPoint.x >= 1f - resizeBorder) {
 
                             if (potentialDragMode == null && hitPoint.y <= resizeBorder) {
-                                potentialDragMode = WindowDragging.RESIZE_SE;
+                                potentialDragMode = DragEdit.RESIZE_SE;
                             }
                             if (potentialDragMode == null && hitPoint.y >= 1f - resizeBorder) {
-                                potentialDragMode = WindowDragging.RESIZE_NE;
+                                potentialDragMode = DragEdit.RESIZE_NE;
                             }
                         }
 
@@ -183,7 +184,7 @@ public class Windo extends Widget {
         return null;
     }
 
-    private Fingering fingering(WindowDragging mode) {
+    protected Fingering fingering(DragEdit mode) {
 
         switch (mode) {
             case MOVE:
@@ -199,7 +200,7 @@ public class Windo extends Widget {
         return true;
     }
 
-    public boolean editable(WindowDragging d) {
+    public boolean editable(DragEdit d) {
         return true;
     }
 
@@ -237,7 +238,7 @@ public class Windo extends Widget {
 
         float resizeBorder = Math.max(W, H) * this.resizeBorder;
 
-        WindowDragging p;
+        DragEdit p;
         if ((p = potentialDragMode) != null) {
             switch (p) {
                 case RESIZE_SE:
@@ -287,72 +288,102 @@ public class Windo extends Widget {
     }
 
 
-    static class Port<X> extends Windo {
-        public final X id;
+    static class Port extends Windo {
+        public final String id;
 
         public final v2 posRel;
         public final v2 sizeRel;
+        private final Windo win;
 
-        Port(X id) {
+        Port(String id, Windo win) {
+            super();
             this.id = id;
+            this.win = win;
+
+            Wall.CSurface content = win.wall().newCurface(id);
+
+            set(content);
+            //set(new Scale(new PushButton("?"), 0.9f));
             this.posRel = new v2(Float.NEGATIVE_INFINITY, 0);
             this.sizeRel = new v2(0.1f, 0.2f);
         }
 
+        @Override
+        public void doLayout() {
+            float W = win.w();
+            float H = win.h();
+            {
+                float x1, y1, x2, y2;
+                float w = sizeRel.x * W;
+                float h = sizeRel.y * H;
+                if (posRel.x == Float.NEGATIVE_INFINITY) {
+                    //glued to left
+                    float y = Util.lerp((posRel.y) / 2f + 0.5f, win.bounds.min.y, win.bounds.max.y);
+                    x1 = win.x() - w;
+                    y1 = y - h / 2;
+                    x2 = win.x();
+                    y2 = y + h / 2;
+                    pos(x1, y1, x2, y2);
+                } else if (posRel.x == Float.POSITIVE_INFINITY) {
+                    //glued to right
+                } else {
+                    //TODO
+                    //etc
+                }
+            }
+
+            super.doLayout();
+        }
 
         @Override
         protected void paintBack(GL2 gl) {
             gl.glColor3f(1f, 0, 1f);
             Draw.rect(gl, x(), y(), w(), h());
         }
-    }
 
+//        @Override
+//        public Surface onTouch(Finger finger, v2 hitPoint, short[] buttons) {
+//            if (hitPoint != null && hitPoint.inUnit())
+//                return super.onTouch(finger, hitPoint, buttons);
+//            return null;
+//        }
 
-    protected Port addPort(Object x) {
-        synchronized (children) {
-            if (ports == null)
-                ports = new LinkedHashMap<>();
-            return ports.computeIfAbsent(x, i -> {
-                Port p = new Port<>(i);
-                children.add(p);
-                return p;
-            });
-        }
-    }
-
-    @Override
-    public void doLayout() {
-        if (ports != null) {
-            synchronized (ports) {
-                float W = w();
-                float H = h();
-                ports.values().forEach(p -> {
-                    float x1, y1, x2, y2;
-                    float w = p.sizeRel.x * W;
-                    float h = p.sizeRel.y * H;
-                    if (p.posRel.x == Float.NEGATIVE_INFINITY) {
-                        //glued to left
-                        float y = Util.lerp((p.posRel.y) / 2f + 0.5f, bounds.min.y, bounds.max.y);
-                        x1 = x() - w;
-                        y1 = y - h / 2;
-                        x2 = x();
-                        y2 = y + h / 2;
-                        p.pos(x1, y1, x2, y2);
-                    } else if (p.posRel.x == Float.POSITIVE_INFINITY) {
-                        //glued to right
-                    } else {
-                        //TODO
-                        //etc
+        @Override
+        protected Fingering fingering(DragEdit mode) {
+            if (mode == MOVE) {
+                return new FingerMove(this) {
+                    @Override
+                    public boolean moveX() {
+                        return false;
                     }
-                });
+
+                    @Override
+                    public boolean moveY() {
+                        return true;
+                    }
+                };
             }
+            return super.fingering(mode);
         }
-        children.forEach((c) -> {
-            if (!(c instanceof Port))
-                c.pos(bounds);
-        });
-        children.forEach(Surface::layout);
     }
+
+    protected Wall wall() {
+        return ((Wall) parent);
+    }
+
+    protected Port addPort(String x) {
+        Wall w = wall();
+        {
+//            if (ports == null)
+//                ports = new LinkedHashMap<>();
+//            return ports.computeIfAbsent(x, i -> {
+            Port p = new Port(x, this);
+            w.children.add(0, p);
+            return p;
+//            });
+        }
+    }
+
 
     public static void main(String[] args) {
         Wall d = new Wall() {

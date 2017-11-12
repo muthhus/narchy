@@ -109,7 +109,7 @@ abstract public class Layout extends Surface {
 
                     Surface s = c.onTouch(finger, relativeHit, buttons);
                     if (s != null) {
-                        if (found[0]==null || found[0].bounds.cost() < s.bounds.cost())
+                        if (found[0]==null || found[0].bounds.cost() > s.bounds.cost())
                             found[0] = s; //FIFO
                     }
                 }

@@ -32,86 +32,82 @@
 package spacegraph.math;
 
 /**
- * A 2-element vector that is represented by single-precision floating 
+ * A 2-element vector that is represented by single-precision floating
  * point x,y coordinates.
- *
  */
 public class v2 extends Tuple2f {
 
     // Combatible with 1.1
     static final long serialVersionUID = -2168194326883512320L;
-    public static v2 ONE = new v2RO(1,1);
+    public static v2 ONE = new v2RO(1, 1);
 
     /**
      * Constructs and initializes a Vector2f from the specified xy coordinates.
+     *
      * @param x the x coordinate
      * @param y the y coordinate
      */
-    public v2(float x, float y)
-    {
-      super(x,y);
+    public v2(float x, float y) {
+        super(x, y);
     }
 
 
     /**
      * Constructs and initializes a Vector2f from the specified array.
+     *
      * @param v the array of length 2 containing xy in order
      */
-    public v2(float[] v)
-    {
-      super(v);
+    public v2(float[] v) {
+        super(v);
     }
 
 
     /**
      * Constructs and initializes a Vector2f from the specified Vector2f.
+     *
      * @param v1 the Vector2f containing the initialization x y data
      */
-    public v2(v2 v1)
-    {
-       super(v1);
+    public v2(v2 v1) {
+        super(v1);
     }
 
 
     /**
      * Constructs and initializes a Vector2f from the specified Vector2d.
+     *
      * @param v1 the Vector2d containing the initialization x y data
      */
-    public v2(Vector2d v1)
-    {
-       super(v1);
+    public v2(Vector2d v1) {
+        super(v1);
     }
 
 
     /**
      * Constructs and initializes a Vector2f from the specified Tuple2f.
+     *
      * @param t1 the Tuple2f containing the initialization x y data
-     */  
-    public v2(Tuple2f t1)
-    {
-       super(t1);
+     */
+    public v2(Tuple2f t1) {
+        super(t1);
     }
 
 
     /**
      * Constructs and initializes a Vector2f from the specified Tuple2d.
+     *
      * @param t1 the Tuple2d containing the initialization x y data
-     */  
-    public v2(Tuple2d t1)
-    {
-       super(t1);
+     */
+    public v2(Tuple2d t1) {
+        super(t1);
     }
-
 
 
     /**
      * Constructs and initializes a Vector2f to (0,0).
      */
-    public v2()
-    {
+    public v2() {
         super();
     }
-
 
 
 //    /**
@@ -140,30 +136,36 @@ public class v2 extends Tuple2f {
 //    }
 
 
-  /**
-    *   Returns the angle in radians between this vector and the vector
-    *   parameter; the return value is constrained to the range [0,PI].
-    *   @param v1    the other vector
-    *   @return   the angle in radians in the range [0,PI]
-    */
-   public final float angle(v2 v1)
-   {
-      double vDot = this.dot(v1) / ( this.lengthSquared() );
-      if( vDot < -1.0) vDot = -1.0;
-      if( vDot >  1.0) vDot =  1.0;
-      return((float) (Math.acos( vDot )));
-   }
-
- /**
-   * Computes the dot product of the this vector and vector v1.
-   * @param v1 the other vector
-   */
-  public final float dot(v2 v1)
-    {
-      return (this.x*v1.x + this.y*v1.y);
+    /**
+     * Returns the angle in radians between this vector and the vector
+     * parameter; the return value is constrained to the range [0,PI].
+     *
+     * @param v1 the other vector
+     * @return the angle in radians in the range [0,PI]
+     */
+    public final float angle(v2 v1) {
+        double vDot = this.dot(v1) / (this.lengthSquared());
+        if (vDot < -1.0) vDot = -1.0;
+        if (vDot > 1.0) vDot = 1.0;
+        return ((float) (Math.acos(vDot)));
     }
 
-    /** read-only v2 */
+    /**
+     * Computes the dot product of the this vector and vector v1.
+     *
+     * @param v1 the other vector
+     */
+    public final float dot(v2 v1) {
+        return (this.x * v1.x + this.y * v1.y);
+    }
+
+    public boolean inUnit() {
+        return x >= 0 && x <= 1f && y >= 0 && y <= 1f;
+    }
+
+    /**
+     * read-only v2
+     */
     public static class v2RO extends v2 {
         public v2RO(float x, float y) {
             super(x, y);
