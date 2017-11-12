@@ -33,10 +33,10 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
         Caffeine<Term, Termed> builder = Caffeine.newBuilder().removalListener(this);
         if (capacity > 0) {
-            builder.maximumSize(capacity);
+            //builder.maximumSize(capacity); //may not protect PermanentConcept's from eviction
 
-//            builder.maximumWeight(capacity*10);
-//            builder.weigher(w);
+            builder.maximumWeight(capacity*10);
+            builder.weigher(w);
 
         } else
             builder.softValues();
@@ -181,6 +181,9 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
         if (value!=null)
             onRemove(value);
+        else {
+            System.err.println(key + " removed by " + this);
+        }
     }
 
 

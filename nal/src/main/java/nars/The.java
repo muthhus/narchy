@@ -56,7 +56,7 @@ public enum The {  ;
                 new MemoizeSubtermBuilder(new SoftMemoize<>(rawSubtermBuilderBuilder, 512 * 1024, false));
 
         public static final Supplier<Function<Term[], TermContainer>> CaffeineSubtermBuilder = () ->
-                new MemoizeSubtermBuilder(CaffeineMemoize.build(rawSubtermBuilderBuilder, 1024 * 1024, false));
+                new MemoizeSubtermBuilder(CaffeineMemoize.build(rawSubtermBuilderBuilder, 512 * 1024, false));
 
 
         public static final Supplier<Function<Term[], TermContainer>> HijackSubtermBuilder = () ->
@@ -139,7 +139,7 @@ public enum The {  ;
         public static final Supplier<BiFunction<Op, List<Term>, Term>> CaffeineCompoundBuilder = ()->new BiFunction<>() {
 
             final CaffeineMemoize<NewCompound, Term> cache = CaffeineMemoize.build((v) -> rawCompoundBuilder.apply(v.op, new FasterList(v.subs) /* HACK */),
-                    512 * 1024, false);
+                    256 * 1024, false);
 
             @Override
             public Term apply(Op op, List<Term> terms) {

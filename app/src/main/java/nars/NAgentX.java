@@ -184,9 +184,9 @@ abstract public class NAgentX extends NAgent {
 //                    }
 //                })
                 .exe(new MultiExec.
-                            //Intense
-                            CoolNQuiet
-                        (256, THREADS, 128))
+                            Intense
+                            //CoolNQuiet
+                        (512, THREADS, 128))
 
                 .time(clock)
                 .deriverAdd(8)
