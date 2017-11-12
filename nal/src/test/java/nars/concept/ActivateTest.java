@@ -18,6 +18,7 @@ import java.util.Collection;
 
 import static nars.$.$;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ActivateTest {
@@ -219,5 +220,9 @@ public class ActivateTest {
         Activate a = new Activate(c, 0.5f);
         Collection<Termed> t = c.templates();
         assertEquals(expect, t.toString());
+    }
+
+    @Test public void testConceptualizeNonTaskable_IndepVarUnbalanced() throws Narsese.NarseseException {
+        assertNull(NARS.tmp(1).conceptualize($("(x --> $1)")));
     }
 }

@@ -120,6 +120,11 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
     @Override
+    public Term root() {
+        return ref.root();
+    }
+
+    @Override
     public boolean equals(Object that) {
         if (this == that) return true;
 
@@ -214,18 +219,6 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
     @Override
-    public void setNormalized() {
-        ref.setNormalized();
-    }
-
-
-    @Override
-    public boolean isNormalized() {
-        return ref.isNormalized();
-    }
-
-
-    @Override
     public final int hashCode() {
         return hashDT;
     }
@@ -236,10 +229,7 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
 
-    @Override
-    public final Term term() {
-        return this;
-    }
+
 
 
     //    @Override

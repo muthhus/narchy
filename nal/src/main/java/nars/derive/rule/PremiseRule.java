@@ -89,6 +89,12 @@ public class PremiseRule /*extends GenericCompound*/ {
         withSource(x.getTwo());
     }
 
+    @Override
+    public String toString() {
+        return id.toString();
+    }
+
+
     /**
      * for printing complex terms as a recursive tree
      */

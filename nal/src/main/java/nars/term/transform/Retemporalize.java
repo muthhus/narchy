@@ -20,17 +20,17 @@ abstract public class Retemporalize implements CompoundTransform {
     public static final Retemporalize retemporalizeXTERNALToZero = new RetemporalizeFromTo(XTERNAL, 0);
     public static final Retemporalize retemporalizeDTERNALToZero = new RetemporalizeFromTo(DTERNAL, 0);
 
-    public static final Retemporalize retemporalizeConceptual = new Retemporalize() {
+    public static final Retemporalize retemporalizeRoot = new Retemporalize() {
 
         @Nullable
         @Override
         public Term transform(Compound x, Op op, int dt) {
             if (op == IMPL) {
-                if (x.dt()!=DTERNAL) {
+                if (x.dt()!=DTERNAL || x.subterms().hasAny(Op.TemporalBits)) {
                     //special handling
                     Term subj = x.sub(0).root();
                     Term pred = x.sub(1).root();
-                    return IMPL.the(subj.unneg().equals(pred) ? XTERNAL : DTERNAL, subj, pred);
+                    return IMPL.the(pred.unneg().equals(subj) ? XTERNAL : DTERNAL, subj, pred);
                 } else {
                     return x; //unchanged
                 }

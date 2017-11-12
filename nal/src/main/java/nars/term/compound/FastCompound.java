@@ -93,14 +93,12 @@ abstract public class FastCompound implements Compound {
     protected final int hashSubterms;
     final byte volume;
     protected final int structure;
-    boolean normalized;
 
     public FastCompound(byte[] skeleton, int structure, int hash, int hashSubterms, byte volume, boolean normalized) {
         this.skeleton = skeleton;
         this.hash = hash;
         this.hashSubterms = hashSubterms;
         this.volume = volume;
-        this.normalized = normalized;
         this.structure = structure;
     }
 
@@ -316,15 +314,6 @@ abstract public class FastCompound implements Compound {
         return hashSubterms;
     }
 
-    @Override
-    public void setNormalized() {
-        normalized = true;
-    }
-
-    @Override
-    public boolean isNormalized() {
-        return normalized;
-    }
 
     @Override
     public int dt() {
@@ -414,6 +403,7 @@ abstract public class FastCompound implements Compound {
             this.c = terms;
             go(offset);
         }
+
 
         @Override
         public boolean equals(Object obj) {

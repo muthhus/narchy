@@ -26,10 +26,12 @@ import jcog.data.sexpression.Pair;
 import nars.$;
 import nars.IO;
 import nars.Op;
+import nars.Task;
 import nars.derive.AbstractPred;
 import nars.derive.match.EllipsisMatch;
 import nars.index.term.TermContext;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.Retemporalize;
@@ -99,10 +101,6 @@ public interface Compound extends Term, IPair, TermContainer {
         return Term.opX(op(), subs());
     }
 
-    /**
-     * if the compound tracks normalization state, this will set the flag internally
-     */
-    void setNormalized();
 
 
     //    /*@NotNull*/
@@ -313,10 +311,6 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    @Override
-    default Term term() {
-        return this;
-    }
 
     @Override
     default void append(/*@NotNull*/ Appendable p) throws IOException {
@@ -544,7 +538,9 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    boolean isNormalized();
+    default boolean isNormalized() {
+        return subterms().isNormalized();
+    }
 
 //    /** whether the anonymized form of this term equals x */
 //    @Override default boolean equalsAnonymously(/*@NotNull*/ Term x) {
@@ -747,15 +743,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default Term unneg() {
-        if (op() == NEG) {
-            Term x = sub(0);
-            if (!x.isNormalized() && this.isNormalized()) { //the unnegated content will also be normalized if this is
-                ((Compound) x).setNormalized();
-            }
-            return x;
-        } else {
-            return this;
-        }
+        return op() == NEG ? sub(0) : this;
     }
 
     /*@NotNull*/
@@ -869,8 +857,11 @@ public interface Compound extends Term, IPair, TermContainer {
                         new VariableNormalization(totalVars /* estimate */, varOffset)
         );
 
-        if (varOffset == 0 && y != null && y instanceof Compound)
-            ((Compound) y).setNormalized();
+        if (varOffset == 0 && y != null && y instanceof Compound) {
+            TermContainer st = ((Compound) y).subterms();
+            if (st instanceof TermVector)
+                ((TermVector) st).setNormalized();
+        }
 
         return y;
     }
@@ -947,7 +938,7 @@ public interface Compound extends Term, IPair, TermContainer {
     /*@NotNull*/
     @Override
     default Term root() {
-        Term term = temporalize(Retemporalize.retemporalizeConceptual);
+        Term term = temporalize(Retemporalize.retemporalizeRoot);
         return term == null ? Null : term;
     }
 
@@ -966,8 +957,13 @@ public interface Compound extends Term, IPair, TermContainer {
             return Null;
 
         term = term.normalize();
+        if (term == null)
+            return Null;
 
-        return term != null ? term : Null;
+        if (!Task.validConceptTerm(term, true))
+            return Null;
+
+        return term;
     }
 
     default boolean equalsRoot(Term x) {

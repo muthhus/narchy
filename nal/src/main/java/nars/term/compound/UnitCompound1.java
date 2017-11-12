@@ -20,24 +20,29 @@ import static nars.time.Tense.DTERNAL;
 public class UnitCompound1 extends TermVector1 implements Compound {
 
     private final Op op;
-    private final int hash;
 
-    /** cached */
-    transient private final int structure;
+    /** hash including this compound's op (cached) */
+    transient private final int chash;
+
+    /** structure including this compound's op (cached) */
+    transient private final int cstruct;
 
     public UnitCompound1(/*@NotNull*/ Op op, /*@NotNull*/ Term arg) {
         super(arg);
 
         this.op = op;
-        this.hash = Util.hashCombine(hashCodeSubTerms(), op.id);
-        this.structure = op.bit | arg.structure();
+        this.chash = Util.hashCombine(hashCodeSubTerms(), op.id);
+        this.cstruct = op.bit | arg.structure();
+
+        if (!normalized && arg.isNormalized())
+            setNormalized();
     }
 
 
 
     @Override
     public final int structure() {
-        return structure;
+        return cstruct;
     }
 
 
@@ -55,13 +60,9 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
     @Override
     public int hashCode() {
-        return hash;
+        return chash;
     }
 
-    @Override
-    public final int hashCodeSubTerms() {
-        return super.hashCode();
-    }
 
 
     @Override
@@ -79,7 +80,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     @Override
     public final boolean equals(@Nullable Object that) {
         if (this == that) return true;
-        if (!(that instanceof Compound) || hash!=that.hashCode())
+        if (!(that instanceof Compound) || chash !=that.hashCode())
             return false;
 
         Term tt = (Term) that;
@@ -123,12 +124,6 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     @Override
     public boolean isNormalized() {
         return sub.isNormalized();
-    }
-
-    @Override
-    public void setNormalized() {
-        if (sub instanceof Compound)
-            ((Compound) sub).setNormalized();
     }
 
     @Override

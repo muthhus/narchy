@@ -223,6 +223,13 @@ public class NarseseExtendedTest extends NarseseTest {
 //        }
     }
 
+    /** tests correct order of operations */
+    @Test public void testNegationOfShorthandInh() throws Narsese.NarseseException {
+        assertEquals( "(b-->(--,a))", term("--a:b").toString() );
+        assertEquals( "((--,b)-->a)", term("a:--b").toString() );
+        assertEquals( "((--,b)-->(--,a))", term("--a:--b").toString() );
+    }
+
     @Test public void testOptionalCommas() throws Narsese.NarseseException {
         Term pABC1 = $.$("(a b c)");
         Term pABC2 = $.$("(a,b,c)");

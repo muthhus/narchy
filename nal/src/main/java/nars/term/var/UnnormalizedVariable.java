@@ -7,6 +7,7 @@ import nars.term.Term;
 import nars.term.atom.AtomicConst;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.IO.SPECIAL_OP;
 
@@ -53,6 +54,11 @@ public class UnnormalizedVariable extends AtomicConst implements Variable {
     @Override
     public final int complexity() {
         return 0;
+    }
+
+    @Override
+    public boolean isNormalized() {
+        return false;
     }
 
     @NotNull

@@ -45,8 +45,8 @@ public class OObjectsTest {
         n.run(1);
 
         String s = sb.toString();
-        assertTrue(s.contains("x(set,1). 1 %1.0;.90%"));
-        assertTrue(s.contains("x(get,(),1). 3 %1.0;.90%"));
+        assertTrue(s.contains("x(set,1). 3 %1.0;.90%"), ()->"result: " + s);
+        assertTrue(s.contains("x(get,(),1). 4 %1.0;.90%"), ()->"result: " + s);
     }
 
    @Test

@@ -50,7 +50,7 @@ public class NALTask extends Pri implements Task {
                 throw new InvalidTaskException(term, "null truth");
         }
 
-        Task.taskContentValid(term, punc, null, false);
+        Task.validTaskTerm(term, punc, null, false);
 
         this.pri = 0;
 

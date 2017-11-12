@@ -65,12 +65,18 @@ public class ArrayTermVector extends TermVector {
                 }
             }
 
+            //EQUIVALENCE---
 //            //share since array is equal
 //            boolean srcXorY = System.identityHashCode(x) < System.identityHashCode(y);
 //            if (srcXorY)
 //                that.terms = x;
 //            else
 //                this.terms = y;
+            if (normalized ^ that.normalized) {
+                //one of them is normalized so both must be
+                this.normalized = that.normalized = true;
+            }
+            //---EQUIVALENCE
 
             return true;
 

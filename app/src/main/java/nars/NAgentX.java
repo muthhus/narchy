@@ -145,7 +145,7 @@ abstract public class NAgentX extends NAgent {
 
 //        Builder.Subterms.the =
 //                //Builder.Subterms.WeakSubtermBuilder.get();
-//                Builder.Subterms.CaffeineSubtermBuilder.get();
+        The.Subterms.CaffeineSubtermBuilder.get();
 //        The.Compound.the = The.Compound.CaffeineCompoundBuilder.get();
 
 

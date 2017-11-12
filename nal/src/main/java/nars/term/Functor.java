@@ -60,7 +60,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
         return term.compareTo(o);
     }
 
-    public static Atom fName(@NotNull String termAtom) {
+    static Atom fName(String termAtom) {
         return atomOrNull(the(termAtom));
     }
 
@@ -127,7 +127,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
         return f1(fName(termAtom), safeFunctor(ff));
     }
 
-    public @NotNull
+    @NotNull
     static <X extends Term> Function<Term, Term> safeFunctor(@NotNull Function<X, Term> ff) {
         return x ->
                 (x==null || x instanceof Variable) ? null

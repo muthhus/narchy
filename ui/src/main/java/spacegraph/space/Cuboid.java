@@ -160,7 +160,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
             //float pp = 1f - (p / 2f);
             //float pp = 1f;
 
-            gl.glTranslatef(-0.5f, -0.5f, 0.5f + (shape instanceof SphereShape ? 10 : 0)+zOffset);
+            gl.glTranslatef(-0.5f, -0.5f, 0.5f + (shape instanceof SphereShape ? 5 : 0)+zOffset);
             //gl.glScalef(pp, pp, 1f);
 
             //Transform t = transform();

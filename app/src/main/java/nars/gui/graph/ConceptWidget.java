@@ -130,13 +130,13 @@ public class ConceptWidget extends TermWidget<Concept> {
         final int type;
         private final int hash;
 
-        EdgeComponent(PriReference<? extends Termed> link, ConceptWidget src, ConceptWidget to, int type, float pri) {
+        EdgeComponent(PriReference<? extends Termed> link, ConceptWidget src, ConceptWidget tgt, int type, float pri) {
             super(link, link.priElseZero());
             this.src = src;
-            this.tgt = to;
+            this.tgt = tgt;
             this.type = type;
             this.pri = pri;
-            this.hash = Util.hashCombine(src.hash, to.hash, type);
+            this.hash = Util.hashCombine(src.hash, tgt.hash, type);
         }
 
         @Override

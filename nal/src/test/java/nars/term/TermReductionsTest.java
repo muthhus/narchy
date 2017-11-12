@@ -196,17 +196,15 @@ public class TermReductionsTest extends NarseseTest {
 
     }
 
-    /**
-     * needs reviewed could be totally wrong
-     */
-    @Disabled
+
     @Test
     public void testImplicationNegatedPredicateImplicated() throws Narsese.NarseseException {
 
-        //((--,(x==>y)) ==> z)
-        //  ((x==>(--,y)) ==> z)
-        //((x && (--,y)) ==> z)
-        assertEquals("((x&&(--,y))==>z)", $("((--,(x==>y)) ==> z)").toString());
+        //subject disallows implication
+        assertEquals(Null, $("((--,(x==>y)) ==> z)"));
+
+        //but predicate it is reduced to conj in subj
+        assertEquals("(--,((x&&y)==>z))", $("(x ==> (--,(y==>z)))").toString());
     }
 
 
@@ -217,7 +215,8 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testReducedAndInvalidImplications5() {
-        assertInvalidTerms("<<P==>Q> ==> R>");
+
+        assertInvalidTerms("((P==>Q) ==> R)");
     }
 
 //    @Test
@@ -243,7 +242,7 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testReducedAndInvalidImplications2() throws Narsese.NarseseException {
-        assertEquals("((P&&R)==>Q)", $("<R==><P==>Q>>").toString());
+        assertEquals("((P&&R)==>Q)", $("(R==>(P==>Q))").toString());
         assertEquals("((R &&+2 P) ==>+1 Q)", $("(R ==>+2 (P ==>+1 Q))").toString());
         assertEquals("(((S &&+1 R) &&+2 P) ==>+1 Q)", $("((S &&+1 R) ==>+2 (P ==>+1 Q))").toString());
     }

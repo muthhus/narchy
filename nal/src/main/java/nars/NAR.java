@@ -1191,8 +1191,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @Nullable
-    public Concept concept(/*@NotNull */Termed x, boolean createIfMissing) {
-        //x = x.term().eval(this);
+    public final Concept concept(/*@NotNull */Termed x, boolean createIfMissing) {
         return terms.concept(x, createIfMissing);
     }
 

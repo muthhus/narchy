@@ -6,6 +6,7 @@ import jcog.map.CompactArrayMap;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
+import nars.Param;
 import nars.Task;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
@@ -76,6 +77,13 @@ public class BaseConcept implements Concept {
         this.state = New;
 
         templates = TermLinks.templates(term);
+        if (Param.DEBUG_EXTRA) {
+            for (Termed target : templates) {
+                if (!target.term().equals(target.term().root())) {
+                    throw new RuntimeException("attempted non-root linkage: " + target);
+                }
+            }
+        }
     }
 
     /**

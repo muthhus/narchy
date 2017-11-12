@@ -37,40 +37,41 @@ public abstract class AbstractSpatial<X> extends Spatial<X> {
         colorshape(gl);
         Draw.draw(gl, body.shape());
 
-        CollisionShape shape = body.shape();
+//        CollisionShape shape = body.shape();
 
-        if (shape instanceof SimpleBoxShape) {
-            //render surface on BoxShape face
-
-            SimpleBoxShape bshape = (SimpleBoxShape) shape;
-
-            gl.glPushMatrix();
-
-            float sx = bshape.x(); //HACK
-            float sy = bshape.y(); //HACK
-
-            //if (sx > sy) {
-            float ty = sy;
-            float tx = sy / sx;
-            //} else {
-            //  tx = sx;
-            //  ty = sx/sy;
-            //}
-
-            //gl.glTranslatef(-1/4f, -1/4f, 0f); //align TODO not quite right yet
-
-            gl.glScalef(tx, ty, 1f);
-
-            renderRelativeAspect(gl);
-
-            gl.glPopMatrix();
-        }
-
-    }
-
-    protected void renderRelativeAspect(GL2 gl) {
+//        if (shape instanceof SimpleBoxShape) {
+//            //render surface on BoxShape face
+//
+//            SimpleBoxShape bshape = (SimpleBoxShape) shape;
+//
+//            gl.glPushMatrix();
+//
+//            //if (sx > sy) {
+//            float ty = bshape.y();
+//            float tx = ty / bshape.x();
+//            //} else {
+//            //  tx = sx;
+//            //  ty = sx/sy;
+//            //}
+//
+//            //gl.glTranslatef(-1/4f, -1/4f, 0f); //align TODO not quite right yet
+//
+//            if (tx!=1 || ty!=1) {
+//                gl.glScalef(tx, ty, 1f);
+//            }
+//
+//            renderRelativeAspect(gl);
+//
+//            if (tx!=1 || ty!=1) {
+//                gl.glPopMatrix();
+//            }
+//        }
 
     }
+
+//    protected void renderRelativeAspect(GL2 gl) {
+//
+//    }
 
     protected void colorshape(GL2 gl) {
         gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);

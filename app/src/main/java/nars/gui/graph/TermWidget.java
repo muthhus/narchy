@@ -67,7 +67,7 @@ abstract public class TermWidget<T extends Termed> extends Cuboid<T> {
     }
 
 
-    public static void render(GL2 gl, SimpleSpatial src, float twist, Iterable<? extends EDraw> ee) {
+    static void render(GL2 gl, SimpleSpatial src, float twist, Iterable<? extends EDraw> ee) {
 
         Quat4f tmpQ = new Quat4f();
         ee.forEach(e -> {

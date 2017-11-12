@@ -52,10 +52,10 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
         return ref.dt();
     }
 
-    @Override
-    public final Term term() {
-        return this;
-    }
+//    @Override
+//    public final Term term() {
+//        return this;
+//    }
 
     @Override
     public Op op() {

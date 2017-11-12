@@ -18,16 +18,16 @@ import java.util.function.Predicate;
 /**
  * Size 1 TermVector
  */
-public class TermVector1 implements TermContainer {
+public class TermVector1 extends TermVector {
 
     public final Term sub;
-    private final int hash1;
+
 
     public TermVector1(Term sub) {
+        super(sub);
         assert(!(sub instanceof EllipsisMatch));
 
         this.sub = sub;
-        this.hash1 = Util.hashCombine(sub.hashCode(), 1); //HACK consistent with Terms.hash(..)
     }
 
     @Override
@@ -40,15 +40,11 @@ public class TermVector1 implements TermContainer {
         return sub.isTemporal();
     }
 
-    @Override
-    public int hashCode() {
-        return hash1;
-    }
 
     @Override
-    public boolean equals(@NotNull Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj instanceof TermContainer && hash1== obj.hashCode()) {
+        if (obj instanceof TermContainer && hash== obj.hashCode()) {
             TermContainer t = (TermContainer) obj;
             if (t.subs() == 1 && sub.equals(t.sub(0)))
                 return true;
@@ -84,26 +80,6 @@ public class TermVector1 implements TermContainer {
         return i == 0 && sub.equals(x);
     }
 
-    /**
-     * vol and complexity are reported as if they were already part of an enclosing Compound
-     */
-    @Override
-    public int volume() {
-        return sub.volume() + 1;
-    }
-
-    /**
-     * vol and complexity are reported as if they were already part of an enclosing Compound
-     */
-    @Override
-    public int complexity() {
-        return sub.complexity() + 1;
-    }
-
-    @Override
-    public int structure() {
-        return sub.structure();
-    }
 
     @Override
     public final int subs() {

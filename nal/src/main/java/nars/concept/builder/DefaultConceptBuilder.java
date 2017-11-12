@@ -351,7 +351,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             return null;
         }
 
-        boolean validForTask = Task.taskContentValid(t, (byte) 0, null /*nar -- checked above */, true);
+        boolean validForTask = Task.validTaskTerm(t, (byte) 0, null /*nar -- checked above */, true);
         Concept c;
         if (!validForTask) {
             c = new BaseConcept(t, BeliefTable.Empty, BeliefTable.Empty, QuestionTable.Empty, QuestionTable.Empty,

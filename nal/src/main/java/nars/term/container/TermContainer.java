@@ -146,6 +146,10 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        };
     }
 
+    default boolean isNormalized() {
+        return (vars()==0 && varPattern()==0); //assume un-normalized if any variable appears
+    }
+
     /**
      * returns sorted ready for commutive
      */

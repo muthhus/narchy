@@ -317,16 +317,16 @@ public class NAL5Test extends NALTest {
 
     }
 
-    @Disabled
-    @Test
-    public void negation2() throws nars.Narsese.NarseseException {
-
-        TestNAR tester = test;
-        tester.believe("<robin --> [flying]>", 0.9f, 0.9f); //.en("Robin can fly.");
-        tester.ask("(--,<robin --> [flying]>)"); //.en("Can robin fly or not?");
-        tester.mustBelieve(cycles, "(--,<robin --> [flying]>)", 0.10f, 0.90f); //.en("It is unlikely that robin cannot fly.");
-
-    }
+//    @Disabled
+//    @Test
+//    public void negation2() throws nars.Narsese.NarseseException {
+//
+//        TestNAR tester = test;
+//        tester.believe("<robin --> [flying]>", 0.9f, 0.9f); //.en("Robin can fly.");
+//        tester.ask("(--,<robin --> [flying]>)"); //.en("Can robin fly or not?");
+//        tester.mustBelieve(cycles, "(--,<robin --> [flying]>)", 0.10f, 0.90f); //.en("It is unlikely that robin cannot fly.");
+//
+//    }
 
 
     @Test
@@ -459,7 +459,7 @@ public class NAL5Test extends NALTest {
         tester.believe("<(&&,<R --> [f]>,<R --> [w]>) ==> <R --> [l]>>", 0.9f, 0.9f);
         tester.believe("<(&&,<R --> [f]>,<R --> b>) ==> <R --> [l]>>");
         tester.mustBelieve(cycles * 2, "<<R --> b> ==> <R --> [w]>>", 1f, 0.42f /*0.36f*/);
-        tester.mustBelieve(cycles * 2, "<<R --> [w]> ==> <R --> b>>", 0.90f, 0.45f);
+        tester.mustBelieve(cycles * 2, "<<R --> [w]> ==> <R --> b>>", 0.90f, 0.37f /*0.45f*/);
     }
 
     @Test
@@ -608,27 +608,35 @@ public class NAL5Test extends NALTest {
         ;
     }
 
-    @Disabled
-    @Test //???
-    public void testAbductionNegNegImplicationPred() {
-
-        test
-                .input("(y). %1.0;0.90%")
-                .input("(--,((--,(x)) ==> (y))).")
-                .mustBelieve(cycles, "(x)", 1.0f, 0.45f)
-                .mustNotOutput(cycles, "(x)", BELIEF, 0.0f, 0.5f, 0, 1, ETERNAL)
-        ;
-    }
 
     @Disabled
     @Test //???
     public void testAbductionPosNegImplicationPred() {
 
         test
-                .input("(y). %1.0;0.90%")
-                .input("(--,((x) ==> (y))).")
-                .mustBelieve(cycles, "(x)", 0.0f, 0.45f)
-                .mustNotOutput(cycles, "(x)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
+                .input("y. %1.0;0.90%")
+                .input("--(x ==> y).")
+                .mustBelieve(cycles, "x", 0.0f, 0.45f)
+                .mustNotOutput(cycles, "x", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
+        ;
+    }
+
+    @Disabled
+    @Test //???
+    public void testAbductionNegNegImplicationPred() {
+
+        /*
+        via contraposition:
+        $.32 x. %1.0;.30% {11: 1;2} ((%1,%2,time(raw),belief(positive),task("."),time(dtEvents),notImpl(%2)),((%2 ==>+- %1),((Induction-->Belief))))
+            $.21 ((--,y)==>x). %0.0;.47% {1: 2;;} ((((--,%1)==>%2),%2),(((--,%2) ==>+- %1),((Contraposition-->Belief))))
+              $.50 ((--,x)==>y). %0.0;.90% {0: 2}
+            $.50 y. %1.0;.90% {0: 1}
+         */
+        test
+                .input("y. %1.0;0.90%")
+                .input("--(--x ==> y).")
+                .mustBelieve(cycles, "x", 1.0f, 0.45f)
+                .mustNotOutput(cycles, "x", BELIEF, 0.0f, 0.5f, 0, 1, ETERNAL)
         ;
     }
 

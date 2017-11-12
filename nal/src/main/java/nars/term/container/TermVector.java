@@ -29,6 +29,9 @@ public abstract class TermVector implements TermContainer {
     /** stored as complexity+1 as if this termvector were already wrapped in its compound */
     public  final short complexity;
 
+    protected transient boolean normalized;
+
+
 //    /**
 //     * # variables contained, of each type & total
 //     * this means maximum of 127 variables per compound
@@ -50,6 +53,8 @@ public abstract class TermVector implements TermContainer {
 
         this.hash = Terms.hashSubterms(terms);
 
+
+
 //        final int vD = meta[0];  this.varDeps = (byte)vD;
 //        final int vI = meta[1];  this.varIndeps = (byte)vI;
 //        final int vQ = meta[2];  this.varQuerys = (byte)vQ;
@@ -63,8 +68,20 @@ public abstract class TermVector implements TermContainer {
         this.complexity = (short)(cmp);
         this.volume = (short)( vol );
 
+        this.normalized = varTot == 0;
+
     }
 
+    /**
+     * if the compound tracks normalization state, this will set the flag internally
+     */
+    public void setNormalized() {
+        normalized = true;
+    }
+
+    public boolean isNormalized() {
+        return normalized;
+    }
 
     @NotNull
     public static TermContainer the(Term... t) {
@@ -86,7 +103,7 @@ public abstract class TermVector implements TermContainer {
 
 
     @Override
-    public final int structure() {
+    public int structure() {
         return structure;
     }
 
@@ -134,7 +151,7 @@ public abstract class TermVector implements TermContainer {
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return hash;
     }
 

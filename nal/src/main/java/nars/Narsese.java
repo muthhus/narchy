@@ -436,10 +436,11 @@ public class Narsese extends BaseParser<Object> {
 
                         QuotedAtom(),
 
+                        seq(oper, ColonReverseInheritance()),
+
                         //negation shorthand
                         seq(NEG.str, Term(true, false, true), push(($.the(pop())).neg())),
 
-                        seq(oper, ColonReverseInheritance()),
 
 
                         //TODO match Ellipsis as an optional continuation of the prefix variable that was already parsed.\
@@ -714,7 +715,9 @@ public class Narsese extends BaseParser<Object> {
      */
     Rule ColonReverseInheritance() {
         return sequence(
-                Term(false, false, false), ':', Term(),
+                Term(false, false, false),
+                ':',
+                Term(true, false, true),
 
                 push($.inh(the(pop()), the(pop())))
                 ///*push(Compound.class), */push(the(pop())), push(the(pop())),
@@ -884,7 +887,6 @@ public class Narsese extends BaseParser<Object> {
     /**
      * list of terms prefixed by a particular compound term operate
      */
-    @Cached
     Rule MultiArgTerm(@Nullable Op defaultOp, char close, boolean initialOp, boolean allowInternalOp) {
 
         return sequence(
@@ -1126,7 +1128,7 @@ public class Narsese extends BaseParser<Object> {
      * ondemand
      */
     static void tasks(String input, Consumer<Task> c, NAR m) throws NarseseException {
-        @NotNull Narsese p = parse();
+        Narsese p = parse();
 
         int parsedTasks = 0;
 
@@ -1259,8 +1261,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * parse one term NOT NORMALIZED
      */
-    @NotNull
-    public static Term term(@NotNull String s) throws NarseseException {
+    public static Term term(String s) throws NarseseException {
 
         Exception ee;
         try {
@@ -1306,7 +1307,6 @@ public class Narsese extends BaseParser<Object> {
 //            });
 
 
-    @NotNull
     public static Term term(String s, boolean normalize) throws NarseseException {
 
         Term y = term(s);

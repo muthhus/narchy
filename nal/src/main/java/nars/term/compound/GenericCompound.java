@@ -18,7 +18,6 @@ public class GenericCompound implements Compound {
     /**
      * subterm vector
      */
-    @NotNull
     private final TermContainer subterms;
 
 
@@ -27,12 +26,10 @@ public class GenericCompound implements Compound {
      */
     public final int hash;
 
-    @NotNull
     public final Op op;
 
     final int structureCached;
 
-    private transient boolean normalized;
     private transient Term rooted = null;
 
 
@@ -42,7 +39,6 @@ public class GenericCompound implements Compound {
 
         this.hash = Util.hashCombine((this.subterms = subterms).hashCode(), op.id);
 
-        this.normalized = (subterms.vars() == 0 && subterms.varPattern() == 0);
 
         this.structureCached = Compound.super.structure();
 
@@ -55,10 +51,10 @@ public class GenericCompound implements Compound {
 
     @Override
     public Term root() {
-       if (rooted!=null)
+        if (rooted != null)
             return rooted;
 
-        Term term = Compound.super.temporalize(Retemporalize.retemporalizeConceptual);
+        Term term = temporalize(Retemporalize.retemporalizeRoot);
         return rooted = term;
     }
 
@@ -84,10 +80,7 @@ public class GenericCompound implements Compound {
         return hash;
     }
 
-    @Override
-    public final boolean isNormalized() {
-        return normalized;
-    }
+
 
 
     @Override
@@ -95,13 +88,6 @@ public class GenericCompound implements Compound {
         return DTERNAL;
     }
 
-    /**
-     * do not call this manually, it will be set by VariableNormalization only
-     */
-    @Override
-    public final void setNormalized() {
-        this.normalized = true;
-    }
 
     @Override
     public boolean isCommutative() {
@@ -127,21 +113,23 @@ public class GenericCompound implements Compound {
 
     @Override
     public final boolean equals(@Nullable Object that) {
-        if (this==that) return true;
+        if (this == that) return true;
 
         if (!(that instanceof Term) || hash != that.hashCode())
             return false;
 
-        if (Compound.equals(this, (Term)that)) {
+        if (Compound.equals(this, (Term) that)) {
             if (that instanceof GenericCompound) {
-                equivalent((GenericCompound)that);
+                equivalent((GenericCompound) that);
             }
             return true;
         }
         return false;
     }
 
-    /** data sharing */
+    /**
+     * data sharing
+     */
     private void equivalent(GenericCompound that) {
 //        TermContainer otherSubterms = that.subterms;
 //        TermContainer mySubterms = this.subterms;
@@ -152,14 +140,9 @@ public class GenericCompound implements Compound {
 //                this.subterms = otherSubterms;
 //        }
 
-        if (normalized ^ that.normalized) {
-            //one of them is normalized so both must be
-            this.normalized = that.normalized = true;
-        }
-
-        if (this.rooted == null && that.rooted!=null)
+        if (that.rooted != null && this.rooted!=this)
             this.rooted = that.rooted;
-        else if (that.rooted==null && this.rooted!=null)
+        if (this.rooted != null && that.rooted!=that)
             that.rooted = this.rooted;
     }
 

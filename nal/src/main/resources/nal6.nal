@@ -12,9 +12,11 @@
 
     //strong unification
     (Y ==> X), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:Deduction)
+    (Y ==> X), Z, task(".")     |- subIfUnifiesAny(--X,Y,Z,"$"), (Belief:DeductionN)
     (--Y ==> X), Z, task(".")   |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:DeductionPN)
+    (--Y ==> X), Z, task(".")   |- subIfUnifiesAny(--X,Y,Z,"$"), (Belief:DeductionNN)
     (X ==> Y), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:AbductionPB)
-    //(--X ==> Y), Z, task(".")   |- (--,subIfUnifiesAny(X,Y,Z)), (Belief:AbductionN)
+
 
     //If after S M happens, and after M P happens, so P happens after S
     (M ==> P), (S ==> M) |- (S ==>+- P), (Belief:Deduction)
@@ -98,12 +100,12 @@
         //(M ==> S), (M ==> (&&,(--,%S),A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
         //(M ==> S), (M ==> (||,S,A..+)) |- (M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
-    (M ==> C), (M ==> C), is(C,"&&") |- (M ==>+- dropAnyEvent(C)), (Belief:StructuralReduction)
+    (M ==> C), (M ==> C), is(C,"&&") |- (M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
           //(M ==> C), D, belief("&&") |- (M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D)), (Belief:StructuralDeduction)
         //(--M ==> C), C, belief("&&") |- (--M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
           //(--M ==> C), D, belief("&&") |- (--M ==>+- subIfUnifiesAny(dropAnyEvent(C), same, D, strict)), (Belief:StructuralDeduction)
         //(M ==> (&&,(--,%S),A..+)), M |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
-    (C ==> M), (C ==> M), is(C,"&&") |- (dropAnyEvent(C) ==>+- M), (Belief:StructuralReduction)
+    (C ==> M), (C ==> M), is(C,"&&") |- (dropAnyEvent(C) ==>+- M), (Belief:StructuralDeduction)
           //(C ==> M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D) ==>+- M), (Belief:StructuralDeduction)
         //(C ==> --M), C, belief("&&") |- (dropAnyEvent(C) ==>+- --M), (Belief:StructuralDeduction)
           //(C ==> --M), D, belief("&&") |- (subIfUnifiesAny(dropAnyEvent(C), same, D, strict) ==>+- --M), (Belief:StructuralDeduction)

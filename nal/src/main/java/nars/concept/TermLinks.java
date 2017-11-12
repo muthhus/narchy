@@ -53,7 +53,7 @@ public enum TermLinks {
      */
     static void templates(Term root, Set<Termed> tc, int layersRemain) {
 
-        Term b = root.unneg();
+        Term b = root.unneg().root();
 
         Op o = b.op();
         switch (o) {
@@ -147,6 +147,7 @@ public enum TermLinks {
 //            throw new RuntimeException("invalid termlink for " + srcTerm);
         assert (!(srcTerm instanceof Bool));
         //assert (!(targetTerm instanceof Bool));
+
 
 
         Term targetTerm;

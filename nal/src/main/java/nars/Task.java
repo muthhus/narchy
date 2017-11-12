@@ -38,6 +38,7 @@ import static java.util.Collections.singleton;
 import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.time.Tense.ETERNAL;
+import static nars.time.Tense.XTERNAL;
 import static nars.truth.TruthFunctions.w2c;
 import static org.eclipse.collections.impl.tuple.Tuples.twin;
 
@@ -101,53 +102,59 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
                 new BytesHashProvider<>(IO::taskToBytes));
     }
 
-    static boolean taskContentValid(@Nullable Term t, byte punc, @Nullable NAR nar, boolean safe) {
+    static boolean validConceptTerm(@Nullable Term t, boolean safe) {
+        return validTaskTerm(t, (byte) 0, null, safe);
+    }
+
+    static boolean validTaskTerm(@Nullable Term t, byte punc, @Nullable NAR nar, boolean safe) {
 
         if (t == null)
             return fail(t, "null content", safe);
 
-        if (t.op() == NEG)
+        if (punc != COMMAND) {
+
+//            if ((t = t.normalize()) == null)
+//                return fail(t, "not normalizable", safe);
+
+            if (!t.isNormalized())
+                return fail(t, "task term not a normalized Compound", safe);
+        }
+
+        Op o = t.op();
+
+        if (!o.conceptualizable)
+            return fail(t, "not conceptualizable", safe);
+
+        if (o == NEG)
             //must be applied before instantiating Task
             return fail(t, "negation operator invalid for task term", safe);
 
         if (!t.hasAny(Op.ATOM.bit | Op.INT.bit | Op.VAR_PATTERN.bit))
             return fail(t, "filter terms which have been completely variable-ized", safe); //filter any terms that have been completely variable introduced
 
-        if (punc != COMMAND) {
-            if (!t.isNormalized())
-                return fail(t, "task term not a normalized Compound", safe);
-
-
-            if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
+        if (punc == Op.BELIEF || punc == Op.GOAL) {
+            if (t.hasVarQuery())
                 return fail(t, "belief or goal with query variable", safe);
-            }
-
-            if (nar != null) {
-                int maxVol = nar.termVolumeMax.intValue();
-                if (t.volume() > maxVol)
-                    return fail(t, "task term exceeds maximum volume", safe);
-
-                int nalLevel = nar.nal();
-                if (!t.levelValid(nalLevel))
-                    return fail(t, "task term exceeds maximum NAL level", safe);
-            }
-
-//        if (t.op().temporal && t.dt() == XTERNAL) {
-//            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
-//        }
-
-            if (!(t.op().conceptualizable)) {
-                return fail(t, "op not conceptualizable", safe);
-            }
-            if (Param.DEBUG && !t.conceptual().op().conceptualizable) {
-                return fail(t, "term not conceptualizable", safe);
-            }
-
-            return (t.subs() == 0) || validTaskCompound(t, punc, safe);
+            if (o.temporal && t.dt() == XTERNAL)
+                return fail(t, "belief/goal content with dt=XTERNAL", safe);
         }
 
-        return true;
+        if (nar != null) {
+            int maxVol = nar.termVolumeMax.intValue();
+            if (t.volume() > maxVol)
+                return fail(t, "task term exceeds maximum volume", safe);
+
+            int nalLevel = nar.nal();
+            if (!t.levelValid(nalLevel))
+                return fail(t, "task term exceeds maximum NAL level", safe);
+        }
+
+        if ((punc == Op.GOAL || punc == Op.QUEST) && !goalable(t))
+            return fail(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
+
+        return o.atomic || validTaskCompound(t, punc, safe);
     }
+
 
     /**
      * call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
@@ -181,8 +188,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         }
 
 
-        if ((punc == Op.GOAL || punc == Op.QUEST) && !goalable(t))
-            return fail(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
 
         return true;
     }
@@ -244,6 +249,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
     static NALTask clone(Task x, Term newContent) {
         return clone(x, newContent, x.truth(), x.punc());
     }
+
     @Nullable
     static NALTask clone(Task x, byte newPunc) {
         return clone(x, x.term(), x.truth(), newPunc);
@@ -261,12 +267,12 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
             newContent = newContent.unneg();
         }
 
-        if (!Task.taskContentValid(newContent, newPunc, null, true)) {
+        if (!Task.validTaskTerm(newContent, newPunc, null, true)) {
             return null;
         }
 
         NALTask y = new NALTask(newContent, newPunc,
-                (newPunc == BELIEF || newPunc==GOAL)  ? newTruth.negIf(negated) : null,
+                (newPunc == BELIEF || newPunc == GOAL) ? newTruth.negIf(negated) : null,
                 x.creation(),
                 x.start(), x.end(),
                 x.stamp());
@@ -311,18 +317,8 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
             negated = false;
         }
 
-        if (!o.conceptualizable) {
-            if (!safe) Task.fail(t, "not conceptualizable", false);
-            return null;
-        }
 
-        //return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
-        if ((t = t.normalize()) == null) {
-            if (!safe) Task.fail(t, "not normalizable", false);
-            return null;
-        }
-
-        if (Task.taskContentValid(t, punc, null, safe)) {
+        if (Task.validTaskTerm(t, punc, null, safe)) {
             return PrimitiveTuples.pair(t, negated);
         } else {
             return null;
@@ -930,7 +926,6 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         Term x = term();
 
 
-
         Term y = x.eval(n.terms.intern());
 
         if (y == null)
@@ -945,7 +940,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
                 byte p = isQuestion() ? BELIEF : GOAL;
                 result = clone(this, x.term(), $.t(y == True ? 1f : 0f, n.confDefault(p)), p);
             } else {
-                if (y.op()==Op.BOOL)
+                if (y.op() == Op.BOOL)
                     return null;
 
                 @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), !isInput() || !Param.DEBUG_EXTRA);

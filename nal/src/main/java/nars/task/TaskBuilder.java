@@ -142,7 +142,7 @@ import static nars.time.Tense.*;
         if (cntt == null)
             throw new InvalidTaskException(t, "Failed normalization");
 
-        if (!Task.taskContentValid(cntt, punc, n, !isInput() && !Param.DEBUG))
+        if (!Task.validTaskTerm(cntt, punc, n, !isInput() && !Param.DEBUG))
             throw new InvalidTaskException(cntt, "Invalid content");
 
         if (cntt != t) {

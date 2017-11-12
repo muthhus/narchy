@@ -98,7 +98,7 @@ public final class DynTruth implements Truthed {
         long end = se[1];
 
         // then if the term is valid, see if it is valid for a task
-        if (!Task.taskContentValid(c.temporalize(
+        if (!Task.validTaskTerm(c.temporalize(
                 start == ETERNAL ? Retemporalize.retemporalizeXTERNALToDTERNAL : Retemporalize.retemporalizeXTERNALToZero),
                 beliefOrGoal ? BELIEF : GOAL, nar, true))
             return null;
