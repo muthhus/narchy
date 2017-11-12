@@ -1,26 +1,28 @@
 package nars.exe;
 
-import com.lmax.disruptor.BusySpinWaitStrategy;
-import com.lmax.disruptor.EventTranslatorOneArg;
-import com.lmax.disruptor.RingBuffer;
-import com.lmax.disruptor.WorkHandler;
+import com.lmax.disruptor.*;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import jcog.TODO;
 import jcog.Util;
 import jcog.exe.AffinityExecutor;
+import nars.$;
 import nars.Task;
 import nars.task.ITask;
 import nars.task.NativeTask;
-import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.set.primitive.LongSet;
+import org.eclipse.collections.impl.factory.primitive.LongSets;
+import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.LongPredicate;
 import java.util.stream.Stream;
 
 abstract public class MultiExec extends UniExec {
@@ -46,7 +48,7 @@ abstract public class MultiExec extends UniExec {
                 qSize,
                 exe,
                 ProducerType.MULTI,
-                new BusySpinWaitStrategy()
+                waitStrategy()
         );
 
         initWorkers();
@@ -56,12 +58,23 @@ abstract public class MultiExec extends UniExec {
         disruptor.start();
     }
 
-    public abstract boolean isWorker(Thread t);
+
+    abstract protected WaitStrategy waitStrategy();
+
+    protected boolean isWorker(Thread t) {
+        return isActiveThreadId.test(t.getId());
+    }
+
 
     protected abstract Executor initExe();
 
     abstract protected void initWorkers();
 
+    final WorkHandler<ITask[]> wh = event -> {
+                ITask e = event[0];
+                event[0] = null;
+                execute(e);
+            };
 
     public static class Intense extends MultiExec {
 
@@ -72,26 +85,47 @@ abstract public class MultiExec extends UniExec {
         }
 
         @Override
-        public boolean isWorker(Thread t) {
-            return aexe != null && ArrayUtils.indexOf(aexe.threadIDs(), t.getId()) != -1;
+        protected WaitStrategy waitStrategy() {
+            return new BusySpinWaitStrategy();
         }
 
         @Override
         protected Executor initExe() {
-            return aexe = new AffinityExecutor();
+            return aexe = new AffinityExecutor() {
+                @Override
+                protected void add(AffinityExecutor.AffinityThread at) {
+                    super.add(at);
+                    register(at);
+                }
+            };
         }
 
         @Override
         protected void initWorkers() {
             WorkHandler[] w = new WorkHandler[threads];
-            WorkHandler<ITask[]> wh = event -> {
-                ITask e = event[0];
-                event[0] = null;
-                execute(e);
-            };
+
             for (int i = 0; i < threads; i++)
                 w[i] = wh;
             disruptor.handleEventsWithWorkerPool(w);
+            aexe.threads.forEach(this::register);
+        }
+    }
+
+    final List<Thread> activeThreads = $.newArrayList();
+    LongSet activeThreadIds = new LongHashSet();
+    LongPredicate isActiveThreadId = (x)->false;
+
+    /** to be called in initWorkers() impl for each thread constructed */
+    protected synchronized void register(Thread t) {
+        activeThreads.add(t);
+        activeThreadIds = LongSets.mutable.ofAll(activeThreadIds).with(t.getId()).toImmutable();
+        long max = activeThreadIds.max();
+        long min = activeThreadIds.min();
+        if (max - min == activeThreadIds.size()-1) {
+            //contiguous id's, use fast id tester
+            isActiveThreadId = (x) -> x >= min && x <= max;
+        } else {
+            isActiveThreadId = activeThreadIds::contains;
         }
     }
 
@@ -104,24 +138,37 @@ abstract public class MultiExec extends UniExec {
         }
 
         @Override
-        protected Executor initExe() {
-            //return Executors.newCachedThreadPool();
-            return texe = ((ThreadPoolExecutor) Executors.newFixedThreadPool(threads));
+        protected WaitStrategy waitStrategy() {
+            return new SleepingWaitStrategy();
+            //return new LiteBlockingWaitStrategy();
         }
 
         @Override
-        public boolean isWorker(Thread t) {
-            //return texe!=null && ...
-            throw new TODO();
+        protected Executor initExe() {
+            //return Executors.newCachedThreadPool();
+            //return texe = ((ThreadPoolExecutor) Executors.newFixedThreadPool(threads));
+
+
+            return texe = new ThreadPoolExecutor(threads, threads,
+                     60L, TimeUnit.SECONDS,
+                     //new LinkedBlockingQueue<Runnable>(),
+                     new ArrayBlockingQueue(8),
+                     r -> {
+                         Thread t = new Thread(r);
+                         t.setDaemon(false);
+                         t.setName("worker" + activeThreads.size());
+                         register(t);
+                         return t;
+                     }, new ThreadPoolExecutor.AbortPolicy()
+             );
         }
 
         @Override
         protected void initWorkers() {
-            disruptor.handleEventsWith((event, seq, endOfBatch)->{
-                ITask e = event[0];
-                event[0] = null;
-                execute(e);
-            });
+            WorkHandler<ITask[]>[] w = new WorkHandler[threads];
+            for (int i = 0; i < threads; i++)
+                w[i] = wh;
+            disruptor.handleEventsWithWorkerPool(w);
         }
     }
 
@@ -161,7 +208,16 @@ abstract public class MultiExec extends UniExec {
         add(new NativeTask.RunTask(r));
     }
 
-//    class Sub extends UniExec implements Runnable {
+    @Override
+    protected synchronized void clear() {
+        super.clear();
+        activeThreads.forEach(Thread::interrupt);
+        activeThreads.clear();
+        activeThreadIds = new LongHashSet();
+        isActiveThreadId = (x)->false;
+    }
+
+    //    class Sub extends UniExec implements Runnable {
 //
 //        public final Logger logger = LoggerFactory.getLogger(Sub.class);
 //

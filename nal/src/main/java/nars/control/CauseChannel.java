@@ -55,12 +55,11 @@ public class CauseChannel<X extends Priority> extends Cause implements Consumer<
     }
 
     public void input(X x) {
-        if (process(x))
+        if (x!=null && process(x))
             target.accept(x);
     }
 
     protected boolean process(X x) {
-        if (x == null) return false;
 
         float p = x.pri();
         if (p != p) return false;
@@ -101,7 +100,7 @@ public class CauseChannel<X extends Priority> extends Cause implements Consumer<
             super(id, idObj, null);
             this.nar = nar;
             this.each = (ITask x)-> {
-                if (process(x)) {
+                if (x!=null && process(x)) {
                     each.accept(x);
                     return true;
                 }

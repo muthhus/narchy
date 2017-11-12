@@ -36,7 +36,7 @@ public class AgentTest {
         assert(agent.inputs >= 1);
         assert(agent.actions == 2);
 
-        final float minRatio = 3f;
+        final float minRatio = 2f;
 
         int cycles = 100;
 

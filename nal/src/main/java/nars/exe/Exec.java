@@ -105,7 +105,7 @@ abstract public class Exec implements Executor {
     /**
      * true if this executioner executes procedures concurrently.
      * in subclasses, if this is true but concurrency()==1, it will use
-     * concurrent data structures to bve safe.
+     * concurrent data structures to be safe.
      */
     public boolean concurrent() {
         return concurrency() > 1;

@@ -146,7 +146,7 @@ abstract public class NAgentX extends NAgent {
 //        Builder.Subterms.the =
 //                //Builder.Subterms.WeakSubtermBuilder.get();
         The.Subterms.CaffeineSubtermBuilder.get();
-//        The.Compound.the = The.Compound.CaffeineCompoundBuilder.get();
+        The.Compound.the = The.Compound.CaffeineCompoundBuilder.get();
 
 
         float durFPS = agentFPS;
@@ -184,8 +184,8 @@ abstract public class NAgentX extends NAgent {
 //                    }
 //                })
                 .exe(new MultiExec.
-                            Intense
-                            //CoolNQuiet
+                            //Intense
+                            CoolNQuiet
                         (256, THREADS, 128))
 
                 .time(clock)

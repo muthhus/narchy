@@ -145,9 +145,8 @@ public class Activate extends PLink<Concept> implements Termed {
 
             List<Concept> uu = $.newArrayList(count);
             Util.selectRouletteUnique(rng, tts, (w) -> {
-                //Term t = tt.get(w).term();
-                return 1f;
-                //TODO try biasing toward larger template components so the activation trickles down to atoms with less probabilty
+                return tt.get(w).volume(); //biased toward larger template components so the activation trickles down to atoms with less probabilty
+                //return 1f; //flat
             }, (z) -> {
                 uu.add(tt.get(z));
                 return (uu.size() < count);

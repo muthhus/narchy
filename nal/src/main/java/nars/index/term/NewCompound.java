@@ -2,6 +2,7 @@ package nars.index.term;
 
 import com.google.common.io.ByteArrayDataOutput;
 import jcog.byt.DynBytes;
+import jcog.list.FasterList;
 import jcog.util.ArrayPool;
 import nars.Op;
 import nars.term.Term;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -36,7 +38,14 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
     int hash;
 
 
-    public NewCompound(@Nullable Op op, @NotNull Term[] prepopulated) {
+    public NewCompound(@Nullable Op op, List<Term> prepopulated) {
+        super();
+        this.op = op;
+        this.size = prepopulated.size();
+        this.subs = prepopulated instanceof FasterList ? ((FasterList<Term>)prepopulated).toArrayRecycled(Term[]::new) : prepopulated.toArray(new Term[size]);
+    }
+
+    public NewCompound(@Nullable Op op, Term[] prepopulated) {
         super();
         this.op = op;
         this.subs = prepopulated; //zero-copy direct usage

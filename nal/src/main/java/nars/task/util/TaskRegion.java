@@ -139,16 +139,17 @@ public interface TaskRegion extends HyperRegion, Tasked {
                     long ts = start();
                     long te = end();
                     long ns, ne;
-                    if (ts == es && te == ee) {
-                        if (tf == ef && tc == ec)
-                            return this; //identical taskregion, so use this
-                        else {
+//                    if (ts == es && te == ee) {
+                        //may not be safe:
+//                        if (tf == ef && tc == ec)
+//                            return this; //identical taskregion, so use this
+//                        else {
                             ns = ts;
                             ne = te;
-                        }
-                    } else {
+//                        }
+//                    } else {
                         ns = Math.min(ts, es); ne = Math.max(te, ee);
-                    }
+//                    }
                     return new TasksRegion( ns, ne,
                             f0, f1, c0, c1
                     );

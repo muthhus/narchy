@@ -40,7 +40,7 @@ public class AffinityExecutor implements Executor {
         stop();
     }
 
-    final class AffinityThread extends Thread {
+    protected final class AffinityThread extends Thread {
 
         Runnable cmd;
 
@@ -92,11 +92,16 @@ public class AffinityExecutor implements Executor {
                 AffinityThread at = new AffinityThread(
                     id + "_" + serial.getAndIncrement(),
                         worker);
-                threads.add(at);
+                add(at);
+
                 at.start();
             }
 
 
+    }
+
+    protected void add(AffinityThread at) {
+        threads.add(at);
     }
 
 
