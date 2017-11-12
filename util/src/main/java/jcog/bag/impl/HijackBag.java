@@ -33,25 +33,28 @@ import static jcog.bag.impl.HijackBag.Mode.*;
  */
 public abstract class HijackBag<K, V> implements Bag<K, V> {
 
-     private static final AtomicIntegerFieldUpdater<HijackBag> sizeUpdater =
-        AtomicIntegerFieldUpdater.newUpdater(HijackBag.class, "size");
-     private static final AtomicIntegerFieldUpdater<HijackBag> capUpdater =
-        AtomicIntegerFieldUpdater.newUpdater(HijackBag.class, "capacity");
-     private static final AtomicReferenceFieldUpdater<HijackBag,AtomicReferenceArray> mapUpdater =
-        AtomicReferenceFieldUpdater.newUpdater(HijackBag.class, AtomicReferenceArray.class, "map");
+    private static final AtomicIntegerFieldUpdater<HijackBag> sizeUpdater =
+            AtomicIntegerFieldUpdater.newUpdater(HijackBag.class, "size");
+    private static final AtomicIntegerFieldUpdater<HijackBag> capUpdater =
+            AtomicIntegerFieldUpdater.newUpdater(HijackBag.class, "capacity");
+    private static final AtomicReferenceFieldUpdater<HijackBag, AtomicReferenceArray> mapUpdater =
+            AtomicReferenceFieldUpdater.newUpdater(HijackBag.class, AtomicReferenceArray.class, "map");
 
 
-    /** id unique to this bag instance, for use in treadmill */
+    /**
+     * id unique to this bag instance, for use in treadmill
+     */
     private final int id;
 
     volatile int size, capacity;
 
-    /** TODO make non-public */
+    /**
+     * TODO make non-public
+     */
     public volatile AtomicReferenceArray<V> map;
 
     private static final SpinMutex mutex = new Treadmill2();
     private static final AtomicInteger serial = new AtomicInteger(0);
-
 
 
     /**
@@ -59,7 +62,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      */
     static final float loadFactor = 0.5f;
 
-    /** how quickly the current space grows towards the full capacity, using LERP */
+    /**
+     * how quickly the current space grows towards the full capacity, using LERP
+     */
     static final float growthLerpRate = 0.5f;
 
     final static float PRESSURE_THRESHOLD = 0.05f;
@@ -221,10 +226,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         int mm = m.length();
         int filled = 0;
         for (int i = 0; i < mm; i++) {
-            if (m.get(i)!=null)
+            if (m.get(i) != null)
                 filled++;
         }
-        return ((float)filled)/mm;
+        return ((float) filled) / mm;
     }
 
     enum Mode {
@@ -332,9 +337,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
             }
 
-            int delta = (toAdd!=null ? +1 : 0) + (toRemove!=null ? -1 : 0);
-            if (delta!=0)
-                sizeUpdater.addAndGet(this,delta);
+            int delta = (toAdd != null ? +1 : 0) + (toRemove != null ? -1 : 0);
+            if (delta != 0)
+                sizeUpdater.addAndGet(this, delta);
 
 
         } catch (Throwable t) {
@@ -348,9 +353,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         if (toAdd != null) {
             _onAdded(toAdd);
 
-            if (attemptRegrowForSize(toRemove != null ? (size+1) /* hypothetical size if we can also include the displaced */ : size /* size which has been increased by the insertion */)) {
+            if (attemptRegrowForSize(toRemove != null ? (size + 1) /* hypothetical size if we can also include the displaced */ : size /* size which has been increased by the insertion */)) {
                 //the insert has regrown the map so try reinserting this displaced item
-                if (toRemove!=null) {
+                if (toRemove != null) {
                     update(key(toRemove), toRemove, Mode.PUT, null); //recurse, maybe set a limit on this cuckoo-like resize
                     toRemove = null;
                 }
@@ -361,7 +366,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             _onRemoved(toRemove);
         }
 
-        if (mode == PUT && toAdd==null) {
+        if (mode == PUT && toAdd == null) {
 
             if (attemptRegrowForSize(size + 1)) {
                 return update(k, incoming, PUT, overflowing); //try once more
@@ -425,7 +430,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Nullable
     @Override
-    public V remove( K k) {
+    public V remove(K k) {
         return update(k, null, REMOVE, null);
     }
 
@@ -508,7 +513,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         if (s <= 0)
             return this;
 
-        restart: while ( true ) {
+        restart:
+        while (true) {
             final AtomicReferenceArray<V> map = this.map;
             int c = map.length();
             if (c == 0)
@@ -517,30 +523,83 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             final Random random = random();
             int i = random.nextInt(c);
 
-            BagSample next = BagSample.Next;
+
             boolean direction = random.nextBoolean();
 
-            while (size > 0) {
+            int windowCap = Math.min(s, (1 + reprobes) * 2); //ESTIMATE HUERISTIC
+            float[] wPri = new float[windowCap];
+            Object[] wVal = new Object[windowCap];
+
+            /** emergency brake, in case map becomes totally null avoids infinite loop*/
+            int contigNulls = 0;
+
+            //0. seek to some non-null item
+            while (contigNulls < c && size > 0) {
                 V v = map
                         //.get(i);
                         .getPlain(i);
+
+                //move ahead now in case it terminates on the first try, it wont remain on the same value when the next phase starts
+                if (direction) {
+                    if (++i == c) i = 0;
+                } else {
+                    if (--i == -1) i = c - 1;
+                }
+
+                if (v != null) {
+                    wVal[windowCap - 1] = v;
+                    wPri[windowCap - 1] = pri(v);
+                    break;
+                } else {
+                    contigNulls++;
+                }
+
+            }
+
+
+            //2. slide window, roulette sampling from it as it changes
+
+            contigNulls = 0;
+            while (contigNulls < c && size > 0) {
+                V v0 = map
+                        //.get(i);
+                        .getPlain(i);
                 float p;
-                if (v != null && ((p = pri(v)) == p /* not deleted*/)) {
-                    next = each.next(v);
+                if (v0 == null) {
+                    contigNulls++;
+                } else  if ((p = pri(v0)) == p /* not deleted*/) {
+                    contigNulls=0;
+
+                    //shift window TODO condense null's rather than niavely shift
+                    System.arraycopy(wVal, 1, wVal, 0, windowCap - 1);
+                    System.arraycopy(wPri, 1, wPri, 0, windowCap - 1);
+                    wVal[windowCap - 1] = v0;
+                    wPri[windowCap - 1] = p;
+
+                    int which = Util.decideRoulette(windowCap, (r) -> wPri[r], random);
+                    V v = (V) wVal[which];
+
+                    BagSample next = each.next(v);
                     if (next.remove) {
                         if (map.compareAndSet(i, v, null)) {
                             //modified = true;
                             //else: already removed
 
+                            sizeUpdater.addAndGet(this, -1);
                             _onRemoved(v);
                         }
                     }
+
+                    if (next.stop) {
+                        break;
+                    } else if (next.remove) {
+                        wVal[which] = null; //prevent from selection
+                        wPri[which] = 0;
+                    }
                 }
 
-                if (next.stop)
-                    break;
 
-                if (map!=this.map)
+                if (map != this.map)
                     continue restart;
 
                 if (direction) {
@@ -589,7 +648,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      */
     @Override
     public float depressurize() {
-        return Math.max(0,pressure.getAndSet(0f));  //max() in case it becomes negative
+        return Math.max(0, pressure.getAndSet(0f));  //max() in case it becomes negative
     }
 
 
@@ -639,9 +698,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
             float p = priUpdate(f);
             if (p == p) {
-                if (update!=null) {
+                if (update != null) {
                     update.accept(f);
-                    p = priElse(f,0); //HACK in case it changed TODO make update.accept return the float pri
+                    p = priElse(f, 0); //HACK in case it changed TODO make update.accept return the float pri
                 }
                 mass += p;
                 if (p > max) max = p;
@@ -682,13 +741,13 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         //grow if load is reached
         int sp = space();
         int cp = capacity;
-        if (sp < cp && s >= (int)(loadFactor * sp)) {
+        if (sp < cp && s >= (int) (loadFactor * sp)) {
 
             int ns = Util.lerp(growthLerpRate, sp, cp);
-            if ((cp - ns)/((float)cp) >= loadFactor)
+            if ((cp - ns) / ((float) cp) >= loadFactor)
                 ns = cp; //just grow to full capacity, it is close enough
 
-            if (ns!=sp) {
+            if (ns != sp) {
                 resize(ns);
                 return true;
             }
