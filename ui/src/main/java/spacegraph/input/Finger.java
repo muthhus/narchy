@@ -1,6 +1,7 @@
 package spacegraph.input;
 
 import com.jogamp.nativewindow.util.Point;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Ortho;
 import spacegraph.Surface;
@@ -19,6 +20,9 @@ import static java.util.Arrays.fill;
  * tracks state changes and signals widgets of these
  */
 public class Finger {
+
+    /** exclusive state which may be requested by a surface */
+    Fingering fingering = null;
 
     /**
      * global pointer screen coordinate, set by window the (main) cursor was last active in
@@ -75,13 +79,21 @@ public class Finger {
 
 
         //START DESCENT:
+        Surface s;
+        if (fingering == null) {
 
-        Surface s = root.surface.onTouch(this, hit, nextButtonDown);
-        if (s instanceof Widget) {
-            if (!on((Widget) s))
+            s = root.surface.onTouch(this, hit, nextButtonDown);
+            if (s instanceof Widget) {
+                if (!on((Widget) s))
+                    s = null;
+            } else {
                 s = null;
+            }
         } else {
             s = null;
+            if (!fingering.update(this)) {
+                fingering = null;
+            }
         }
 
         for (int j = 0, jj = hitOnDown.length; j < jj; j++) {
@@ -142,4 +154,16 @@ public class Finger {
     public boolean clickReleased(int button) {
         return released(button) && !dragging(button);
     }
+
+    /** acquire an exclusive fingering state */
+    public synchronized boolean tryFingering(Fingering f) {
+        if (fingering == null) {
+            fingering = f;
+            f.start(this);
+            root.surface.onTouch(this, null, ArrayUtils.EMPTY_SHORT_ARRAY); //release all fingering on surfaces
+            return true;
+        }
+        return false;
+    }
+
 }

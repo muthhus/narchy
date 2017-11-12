@@ -158,7 +158,8 @@ public class ZoomOrtho extends Ortho {
                     windowStart[1] = window.windowY;
                     windowInsets = window.window.getInsets();
 
-                    hud.dragMode = hud.potentialDragMode;
+                    //TODO
+                    //hud.dragMode = hud.potentialDragMode;
 
                     //System.out.println("window drag mode: " + dragMode);
                 }
@@ -180,43 +181,44 @@ public class ZoomOrtho extends Ortho {
 
                         //compute even if the window is in progress
 
-                        if (hud.dragMode == Windo.WindowDragging.MOVE) {
-
-
-                            if (windowMoving.compareAndSet(false, true)) {
-                                moveTarget[0] = windowStart[0] + dx;
-                                moveTarget[1] = windowStart[1] + dy;
-                                window.window.getScreen().getDisplay().getEDTUtil().invoke(true, this::moveWindow);
-                            }
-
-                        } else if (hud.dragMode == Windo.WindowDragging.RESIZE_SE) {
-
-                            int windowWidth = window.getWidth();
-                            int windowHeight = window.getHeight();
-
-                            windowStart[0] = window.windowX;
-                            windowStart[1] = window.windowY;
-
-                            moveTarget[0] = windowStart[0];
-                            moveTarget[1] = windowStart[1];
-
-
-                            resizeTarget[0] = Math.min(window.window.getScreen().getWidth(), Math.max(windowMinWidth, windowWidth + dx));
-                            resizeTarget[1] = Math.min(window.window.getScreen().getHeight(), Math.max(windowMinHeight, windowHeight + dy));
-
-                            if (windowMoving.compareAndSet(false, true)) {
-
-                                window.window.getScreen().getDisplay().getEDTUtil().invoke(true, () ->
-                                        resizeWindow(windowStart[0], windowStart[1], resizeTarget[0], resizeTarget[1]));
-                                //this::resizeWindow);
-                                if (panStart != null) {
-                                    panStart[0] = mx;
-                                    panStart[1] = my;
-                                }
-                            }
-
-                        }
-
+                        //TODO
+//                        if (hud.dragMode == Windo.WindowDragging.MOVE) {
+//
+//
+//                            if (windowMoving.compareAndSet(false, true)) {
+//                                moveTarget[0] = windowStart[0] + dx;
+//                                moveTarget[1] = windowStart[1] + dy;
+//                                window.window.getScreen().getDisplay().getEDTUtil().invoke(true, this::moveWindow);
+//                            }
+//
+//                        } else if (hud.dragMode == Windo.WindowDragging.RESIZE_SE) {
+//
+//                            int windowWidth = window.getWidth();
+//                            int windowHeight = window.getHeight();
+//
+//                            windowStart[0] = window.windowX;
+//                            windowStart[1] = window.windowY;
+//
+//                            moveTarget[0] = windowStart[0];
+//                            moveTarget[1] = windowStart[1];
+//
+//
+//                            resizeTarget[0] = Math.min(window.window.getScreen().getWidth(), Math.max(windowMinWidth, windowWidth + dx));
+//                            resizeTarget[1] = Math.min(window.window.getScreen().getHeight(), Math.max(windowMinHeight, windowHeight + dy));
+//
+//                            if (windowMoving.compareAndSet(false, true)) {
+//
+//                                window.window.getScreen().getDisplay().getEDTUtil().invoke(true, () ->
+//                                        resizeWindow(windowStart[0], windowStart[1], resizeTarget[0], resizeTarget[1]));
+//                                //this::resizeWindow);
+//                                if (panStart != null) {
+//                                    panStart[0] = mx;
+//                                    panStart[1] = my;
+//                                }
+//                            }
+//
+//                        }
+//
                     }
                 }
             }
