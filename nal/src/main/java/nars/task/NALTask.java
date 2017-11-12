@@ -44,6 +44,7 @@ public class NALTask extends Pri implements Task {
 
 
     public NALTask(Term term, byte punc, @Nullable Truthed truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
+        super(0 /* 0 pri by default */);
 
         if ((punc == BELIEF) || (punc == GOAL)) {
             if (truth == null)
@@ -51,8 +52,6 @@ public class NALTask extends Pri implements Task {
         }
 
         Task.validTaskTerm(term, punc, null, false);
-
-        this.pri = 0;
 
         this.term = term;
 

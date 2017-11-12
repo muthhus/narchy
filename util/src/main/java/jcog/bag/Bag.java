@@ -339,6 +339,11 @@ public interface Bag<K, V> extends Table<K, V> {
      */
     float pri(V key);
 
+    /** allows a Prioritized.priUpdate call in impl */
+    default float priUpdate(V key) {
+        return pri(key);
+    }
+
     default float pri(Object key, float ifMissing) {
         V x = get(key);
         if (x == null)

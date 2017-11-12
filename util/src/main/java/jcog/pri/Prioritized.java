@@ -26,10 +26,18 @@ public interface Prioritized extends Deleteable {
 
 
     /**
-     * a value in range 0..1.0 inclusive.
+     * returns the local (cached) priority value in range 0..1.0 inclusive.
      * if the value is NaN, then it means this has been deleted
      */
     float pri();
+
+
+    /** used during periodic async updates to allow implementations to
+     *  modify the local value depending on the referent or other condition
+     */
+    default float priUpdate() {
+        return pri();
+    }
 
     /**
      * common instance for a 'Deleted budget'.

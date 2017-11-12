@@ -71,33 +71,31 @@ import static nars.time.Tense.*;
 //    /** Belief from which the Task is derived, or null if derived from a theorem     */
 //    @Nullable protected transient Reference<Task> parentBelief;
 
-    @Nullable
-    private List log;
 
 
-    public TaskBuilder(@NotNull Term t, byte punct, float freq, @NotNull NAR nar) throws InvalidTaskException {
+    public TaskBuilder(Term t, byte punct, float freq, @NotNull NAR nar) throws InvalidTaskException {
         this(t, punct, t(freq, nar.confDefault(punct)));
     }
 
     //    public MutableTask(@NotNull String compoundTermString, byte punct, float freq, float conf) throws Narsese.NarseseException {
 //        this($.$(compoundTermString), punct, t(freq, conf));
 //    }
-    public TaskBuilder(@NotNull Term t, byte punct, float freq, float conf) {
+    public TaskBuilder(Term t, byte punct, float freq, float conf) {
         this(t, punct, t(freq, conf));
     }
 
-    public TaskBuilder(@NotNull String compoundTermString, byte punct, @Nullable Truth truth) throws Narsese.NarseseException, InvalidTaskException {
+    public TaskBuilder(String compoundTermString, byte punct, @Nullable Truth truth) throws Narsese.NarseseException, InvalidTaskException {
         this($(compoundTermString), punct, truth);
     }
 
 
-    public TaskBuilder(@NotNull Term term, byte punct, @Nullable Truth truth) throws InvalidTaskException {
+    public TaskBuilder(Term term, byte punct, @Nullable Truth truth) throws InvalidTaskException {
         this(term, punct, truth,
             /* budget: */ 0, Float.NaN);
     }
 
-    public TaskBuilder(@NotNull Term term, byte punctuation /* TODO byte */, @Nullable Truth truth, float p, float q) throws InvalidTaskException {
-        super();
+    public TaskBuilder(Term term, byte punctuation /* TODO byte */, @Nullable Truth truth, float p, float q) throws InvalidTaskException {
+        super(0);
         pri = p; //direct set
 
         this.punc = punctuation;
@@ -556,13 +554,6 @@ import static nars.time.Tense.*;
         return this;
     }
 
-
-    public TaskBuilder log(String s) {
-        if (log == null)
-            log = $.newArrayList(1);
-        log.add(s);
-        return this;
-    }
 
 
 }

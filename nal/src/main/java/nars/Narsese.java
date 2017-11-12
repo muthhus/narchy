@@ -1226,7 +1226,7 @@ public class Narsese extends BaseParser<Object> {
             ttt.setPri((Float) x[0]);
 
 
-        return ttt.log(NARSESE_TASK_TAG).apply(m);
+        return ttt.apply(m).log(NARSESE_TASK_TAG);
     }
 
 //    final static Map<String,byte[]> termCache =

@@ -16,11 +16,8 @@ public abstract class AbstractPLink<X> extends Pri implements PriReference<X> {
     public boolean equals(/*@NotNull*/ Object that) {
         if (this == that) return true;
 
-        final X x = get();
-        if (that instanceof Supplier)
-            return Objects.equals(x, ((Supplier)that).get());
-        else
-            return Objects.equals(x, that);
+        return Objects.equals(get(),
+                (that instanceof Supplier) ? ((Supplier)that).get() : that);
 //        return
 //            (x!=null)
 //                &&

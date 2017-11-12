@@ -617,9 +617,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
 
 //        try {
-        if (update != null) {
-            update(update);
-        }
+//        if (update != null) {
+//            update(update);
+//        }
 
         float mass = 0;
         float min = Float.POSITIVE_INFINITY;
@@ -637,8 +637,12 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             if (f == null)
                 continue;
 
-            float p = pri(f);
+            float p = priUpdate(f);
             if (p == p) {
+                if (update!=null) {
+                    update.accept(f);
+                    p = priElse(f,0); //HACK in case it changed TODO make update.accept return the float pri
+                }
                 mass += p;
                 if (p > max) max = p;
                 if (p < min) min = p;

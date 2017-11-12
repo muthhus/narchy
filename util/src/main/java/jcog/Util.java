@@ -520,7 +520,7 @@ public enum Util {
      * maximum, simpler and faster than Math.max without its additional tests
      */
     public static float max(float a, float b) {
-        return (a > b) ? a : b;
+        return (a >= b) ? a : b;
     }
 
     public static float mean(float a, float b) {

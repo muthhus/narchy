@@ -16,7 +16,7 @@ public class PLink<X> extends AbstractPLink<X> {
 
     @Nullable @Override
     public PLink<X> clonePri() {
-        float p = pri();
+        float p = pri;
         return (p==p) ? new PLink<>(id, p) : null;
     }
 

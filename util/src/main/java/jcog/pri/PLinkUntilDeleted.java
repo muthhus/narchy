@@ -15,17 +15,17 @@ public class PLinkUntilDeleted<X extends Deleteable> extends PLink<X> {
 
     /** duplicate of Prioritized's impl, for speed (hopefully) */
     @Override public float priElseNeg1() {
-        float p = pri(); //pri() for this subclass
+        float p = pri; //pri() for this subclass
         return p == p ? p : -1;
     }
     /** duplicate of Prioritized's impl, for speed (hopefully) */
     @Override public float priElseZero() {
-        float p = pri(); //pri() for this subclass
+        float p = pri; //pri() for this subclass
         return p == p ? p : 0;
     }
 
     @Override
-    public final float pri() {
+    public final float priUpdate() {
         float p = this.pri;
         if (p == p) {
             if (id.isDeleted()) {

@@ -15,9 +15,9 @@ public class Pri implements Priority {
      */
     protected float pri;
 
-    public Pri() {
-        pri = Float.NaN;
-    }
+//    public Pri() {
+//        pri = Float.NaN;
+//    }
 
     public Pri(Prioritized b) {
         this(b.pri());
@@ -33,7 +33,7 @@ public class Pri implements Priority {
     @Deprecated @Override
     public Priority clonePri() {
 //        throw new UnsupportedOperationException();
-        float p = pri();
+        float p = pri;
         return p != p /* deleted? */ ? null : new Pri(p);
     }
 
@@ -43,9 +43,11 @@ public class Pri implements Priority {
      * @return The current priority
      */
     @Override
-    public float pri() {
+    public final float pri() {
         return pri;
     }
+
+
 
 
     /** duplicate of Prioritized's impl, for speed (hopefully) */
@@ -95,7 +97,7 @@ public class Pri implements Priority {
     }
 
     @Override
-    public float setPri(float p) {
+    public final float setPri(float p) {
         return this.pri = Util.unitize(p);
     }
 

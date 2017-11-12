@@ -1,5 +1,6 @@
 package jcog.bag.impl;
 
+import jcog.Util;
 import jcog.bag.Bag;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
@@ -96,7 +97,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
      */
     @Override
     public float depressurize() {
-        return Math.max(0, pressure.getAndSet(0f)); //max() in case it becomes negative
+        return Util.max(0, pressure.getAndSet(0f)); //max() in case it becomes negative
     }
 
     @Override
@@ -199,6 +200,12 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 //        );
 //    };
 
+
+    @Override
+    public final float priUpdate(Y key) {
+        return key.priUpdate();
+    }
+
     private int update(@Deprecated boolean toAdd, int s, List<Y> trash, @Nullable Consumer<Y> update) {
 
         float min = Float.POSITIVE_INFINITY, max = Float.NEGATIVE_INFINITY, mass = 0;
@@ -215,7 +222,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         for (int i = 0; i < s; i++) {
             Y x = (Y) l[i];
             float p;
-            if (x == null || ((p = x.pri()) != p /* deleted */) && trash.add(x)) {
+            if (x == null || ((p = priUpdate(x)) != p /* deleted */) && trash.add(x)) {
                 items2.removeFast(i);
                 removedFromMap++;
             } else {
@@ -223,8 +230,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                     update.accept(x);
                     p = x.priElseZero(); //update pri because it may have changed during update
                 }
-                min = Math.min(min, p);
-                max = Math.max(max, p);
+                min = Util.min(min, p);
+                max = Util.max(max, p);
                 mass += p;
                 if (p - above >= Prioritized.EPSILON)
                     mustSort = true;
@@ -654,18 +661,21 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
     private void commit(@Nullable Consumer<Y> update, boolean checkCapacity) {
 
-        if (update == null && !checkCapacity) {
-            synchronized (items) {
-                if (size() > 0) {
-                    ensureSorted();
-                    updateRange();
-                }
-            }
-            return;
-        }
+//        if (update == null && !checkCapacity) {
+//            synchronized (items) {
+//                if (size() > 0) {
+//                    ensureSorted();
+//                    updateRange();
+//                }
+//            }
+//            return;
+//        }
 
         @Nullable List<Y> trash = null;
         synchronized (items) {
+            if (size() == 0)
+                return;
+
             trash = update(null, update);
 
             if (trash != null) {

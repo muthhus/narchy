@@ -10,8 +10,4 @@ public class WLink<T> extends PLink<T>  {
         super(n, weight);
     }
 
-    @Override public float setPri(float p) {
-        return pri = p; //allow any value
-    }
-
 }
