@@ -69,16 +69,12 @@ public class Wall extends Stacking {
         }
 
         public void set(float x1, float y1, float x2, float y2) {
-            float eps = 0.01f;
+            X.value(0.5f*(x1+x2));
+            Y.value(0.5f*(y1+y2));
+            W.value(x2-x1);
+            H.value(y2-y1);
 
-            boolean change =
-                X.valueChanged(0.5f*(x1+x2), eps) |
-                Y.valueChanged(0.5f*(y1+y2), eps) |
-                W.valueChanged(Math.abs(x2-x1), eps) |
-                H.valueChanged(Math.abs(y2-y1), eps);
-
-            if (change) //only trigger layout if significantly changed
-                layout();
+            layout(); //TODO only trigger layout if significantly changed
         }
 
         public void delete() {

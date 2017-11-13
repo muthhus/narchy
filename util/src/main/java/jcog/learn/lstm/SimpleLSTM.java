@@ -13,6 +13,7 @@ public class SimpleLSTM  {
 	public double[] in;
 
 	private final double init_weight_range = 0.5;
+	private final double SCALE_OUTPUT_DELTA = 1.0;
 
 	private final int full_input_dimension;
 	private final int output_dimension;
@@ -33,8 +34,7 @@ public class SimpleLSTM  {
 	private final NeuronType neuron_type_F = NeuronType.Sigmoid;
 	private final NeuronType neuron_type_G = NeuronType.Sigmoid;
 	
-	private final double SCALE_OUTPUT_DELTA = 1.0;
-	
+
 
 	private double[] sumF;
 	private double[] actF;

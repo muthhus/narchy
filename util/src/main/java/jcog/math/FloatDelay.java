@@ -1,5 +1,7 @@
 package jcog.math;
 
+import jcog.Texts;
+
 import java.util.Arrays;
 
 /**
@@ -18,6 +20,10 @@ public class FloatDelay implements FloatSupplier {
         Arrays.fill(data, input.asFloat()); //fill with initial value, HACK
     }
 
+    @Override
+    public String toString() {
+        return input.toString() + "=" + Texts.n4(data);
+    }
 
     @Override
     public float asFloat() {

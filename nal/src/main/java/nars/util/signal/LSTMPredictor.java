@@ -15,25 +15,25 @@ import static jcog.Texts.n4;
 
 /**
  * NOT TESTED YET
+ * http://www.jakob-aungiers.com/articles/a/LSTM-Neural-Network-for-Time-Series-Prediction
  */
 public class LSTMPredictor {
 
     @NotNull
     private final LiveSTM net;
     @NotNull
-    private final DelayedFloats INhistoric;
+    private final DelayedFloats Ihistory;
+    private final DelayedFloats Ohistory;
     //private final List<FloatSupplier> OUTSSprev;
     private final @NotNull FloatSupplier[] INS;
     private final @NotNull FloatSupplier[] OUTS;
 
-    /** history length */
-    private final int history;
 
-    float learningRate = 0.05f;
+    float learningRate = 0.01f;
 
     //boolean training = true;
 
-    public LSTMPredictor(@NotNull FloatSupplier[] INS, @NotNull FloatSupplier[] OUTS, int history  /* used when training */) {
+    public LSTMPredictor(@NotNull FloatSupplier[] INS, int iHistory, @NotNull FloatSupplier[] OUTS, int oHistory) {
 
         int numInputs = INS.length;
         int numOutputs = OUTS.length;
@@ -41,10 +41,10 @@ public class LSTMPredictor {
 
         this.INS = INS;
         this.OUTS = OUTS;
-        this.INhistoric = delay(INS, history);
-        this.history = history;
+        this.Ihistory = DelayedFloats.delay(INS, iHistory);
+        this.Ohistory = DelayedFloats.delay(OUTS, oHistory);
 
-        this.net = new LiveSTM(numInputs*history, numOutputs, numInputs * numOutputs) {
+        this.net = new LiveSTM(numInputs * iHistory, numOutputs * oHistory, numInputs * numOutputs * Math.max(iHistory, oHistory)) {
 
             //final Interaction i = Interaction.the(numInputs, numOutputs); //reused
 
@@ -91,27 +91,37 @@ public class LSTMPredictor {
         public DelayedFloats(int size) {
             super(size);
         }
+
         public void next() {
             forEach(FloatDelay::next);
+        }
+
+        @NotNull
+        static DelayedFloats delay(@NotNull FloatSupplier[] vector, int history) {
+            DelayedFloats delayed = new DelayedFloats(vector.length);
+            for (FloatSupplier f : vector)
+                delayed.add(new FloatDelay(f, history));
+            return delayed;
+        }
+        public void print() {
+            forEach(System.out::println);
         }
     }
 
 
-    @NotNull
-    public static DelayedFloats delay(@NotNull FloatSupplier[] vector, int history) {
-        DelayedFloats delayed = new DelayedFloats(vector.length);
-        for (FloatSupplier f : vector)
-            delayed.add( new FloatDelay(f, history) );
-        return delayed;
-    }
-
     public double[] next() {
-        INhistoric.next();
+        Ihistory.next();
+        //Ihistory.print();
+
+        Ohistory.next();
+        //Ohistory.print();
 
         //train on previous
         //net.agent.forget(0.002f);
 
-        double[] q = net.agent.learn(dH(INhistoric, history),d(OUTS), learningRate);
+        double[] q = net.agent.learn(dH(Ihistory,Ihistory.get(0).data.length), dH(Ohistory, Ohistory.get(0).data.length), learningRate);
+
+        //System.out.println();
 
         //double[] p = net.agent.predict(d(INS)); //predict with current
         //System.out.println(n4(q) + " " + n4(p));
@@ -153,24 +163,23 @@ public class LSTMPredictor {
         MutableFloat m = new MutableFloat();
 
         FloatSupplier[] in = {
-                () -> 1f * (m.floatValue() % 2),
-                () -> 1f * ((m.floatValue() % 3) > 1 ? 1 : 0)
+                () -> 1f * (m.floatValue() % 2) > 0 ? 1 : -1,
+                () -> 1f * ((m.floatValue() % 3) > 0 ? 1 : -1)
         };
         FloatSupplier[] out = {
-                () -> 1f * (((m.floatValue() % 2) + (m.floatValue() % 3)) > 2 ? 1 : 0)
+                () -> 1f * (((m.floatValue() % 2) + (m.floatValue() % 3)) > 2 ? 1 : -1)
         };
         LSTMPredictor l = new LSTMPredictor(
                 in,
-                out,
-                5
+                5, out, 1
         );
 
-        double[] lastPredict = ArrayUtils.EMPTY_DOUBLE_ARRAY;
-        for (int i= 0 ;i < 500; i++) {
-            m.increment();
-            System.out.println(n4(d(in)) + "\t\t" + n4(d(out)) + "\t=?=\t" + n4(lastPredict));
+        for (int i = 0; i < 1500; i++) {
             double[] prediction = l.next();
-            lastPredict = prediction;
+
+            System.out.print( n4(prediction) + "\t=?=\t");
+            m.increment();
+            System.out.println(n4(d(in)) + "\t" + n4(d(out)) );
         }
 
     }

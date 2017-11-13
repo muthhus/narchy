@@ -3,9 +3,12 @@ package nars.experiment.polecart;
 import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.math.FloatPolarNormalized;
+import jcog.math.FloatSupplier;
 import nars.*;
 import nars.concept.SensorConcept;
+import nars.control.DurService;
 import nars.gui.Vis;
+import nars.util.signal.LSTMPredictor;
 import spacegraph.SpaceGraph;
 
 import javax.swing.*;
@@ -15,6 +18,7 @@ import java.awt.event.KeyEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static jcog.Texts.n2;
+import static jcog.Texts.n4;
 
 /**
  * adapted from: https://github.com/B00075594/CI_Lab2_CartAndPole/blob/master/src/pole.java
@@ -143,6 +147,22 @@ public class PoleCart extends NAgentX {
 //                action = Util.clampBi((float) (action - a));
 //            return a;
 //        });
+
+
+        FloatSupplier[] ins = new FloatSupplier[2];
+        ins[0] = ()-> (float) angleDot;
+        ins[1] = ()-> (float) posDot;
+        LSTMPredictor p = new LSTMPredictor(ins, 8, new FloatSupplier[]{()-> {
+            return (float) (0.5f + 0.5f * Math.sin(angle));
+        }}, 8);
+        DurService.on(nar, ()->{
+           double[] trained = p.next();
+           System.out.println(n4(trained));
+//           float y = (float)trained[7];
+//           nar.believe(angY.term, nar.time() + 1 * nar.time.dur(), y, 0.5f);
+           float y1 = (float)trained[7];
+           nar.believe(angY.term, nar.time() + 8 * nar.time.dur(), y1, 0.5f);
+        });
 
         SpaceGraph.window(Vis.beliefCharts(100,
                 Lists.newArrayList(x, xVel,
