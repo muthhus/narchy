@@ -28,13 +28,4 @@ public class ListSpace<X,Y> extends AbstractSpace<X,Y> {
         return active.size();
     }
 
-
-    @Override
-    public int forEachWithInt(int offset, IntObjectProcedure<Y> each) {
-        //return active.forEach(offset ,each);
-        int[] o = { offset };
-        active.forEach(x -> each.value(o[0]++, x));
-        return o[0];
-    }
-
 }

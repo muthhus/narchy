@@ -71,10 +71,6 @@ abstract public class AbstractSpace<X, Y>  {
 
     }
 
-
     public abstract int size();
-
-
-    abstract public int forEachWithInt(int offset, IntObjectProcedure<Y> each);
 
 }

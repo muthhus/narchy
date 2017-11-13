@@ -50,65 +50,65 @@ public class BulletGlobals {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	private static final ThreadLocal<BulletGlobals> threadLocal = ThreadLocal.withInitial(BulletGlobals::new);
+	public static final ThreadLocal<BulletGlobals> the = ThreadLocal.withInitial(BulletGlobals::new);
 
 	private ContactDestroyedCallback gContactDestroyedCallback;
 	private ContactAddedCallback gContactAddedCallback;
 	private ContactProcessedCallback gContactProcessedCallback;
 
-	private float contactBreakingThreshold = 0.02f;
+	protected float contactBreakingThreshold = 0.02f;
 	// RigidBody
 	private float deactivationTime = 2f;
 	private boolean disableDeactivation;
 
-	public static ContactAddedCallback getContactAddedCallback() {
-		return threadLocal.get().gContactAddedCallback;
+	public ContactAddedCallback getContactAddedCallback() {
+		return gContactAddedCallback;
 	}
 
-	public static void setContactAddedCallback(ContactAddedCallback callback) {
-		threadLocal.get().gContactAddedCallback = callback;
+	public void setContactAddedCallback(ContactAddedCallback callback) {
+		gContactAddedCallback = callback;
 	}
 
-	public static ContactDestroyedCallback getContactDestroyedCallback() {
-		return threadLocal.get().gContactDestroyedCallback;
+	public ContactDestroyedCallback getContactDestroyedCallback() {
+		return gContactDestroyedCallback;
 	}
 
-	public static void setContactDestroyedCallback(ContactDestroyedCallback callback) {
-		threadLocal.get().gContactDestroyedCallback = callback;
+	public void setContactDestroyedCallback(ContactDestroyedCallback callback) {
+		gContactDestroyedCallback = callback;
 	}
 
-	public static ContactProcessedCallback getContactProcessedCallback() {
-		return threadLocal.get().gContactProcessedCallback;
+	public ContactProcessedCallback getContactProcessedCallback() {
+		return gContactProcessedCallback;
 	}
 
-	public static void setContactProcessedCallback(ContactProcessedCallback callback) {
-		threadLocal.get().gContactProcessedCallback = callback;
+	public void setContactProcessedCallback(ContactProcessedCallback callback) {
+		gContactProcessedCallback = callback;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////
 
-	public static float getContactBreakingThreshold() {
-		return threadLocal.get().contactBreakingThreshold;
+	public float getContactBreakingThreshold() {
+		return contactBreakingThreshold;
 	}
 
-	public static void setContactBreakingThreshold(float threshold) {
-		threadLocal.get().contactBreakingThreshold = threshold;
+	public void setContactBreakingThreshold(float threshold) {
+		contactBreakingThreshold = threshold;
 	}
 
-	public static float getDeactivationTime() {
-		return threadLocal.get().deactivationTime;
+	public float getDeactivationTime() {
+		return deactivationTime;
 	}
 
-	public static void setDeactivationTime(float time) {
-		threadLocal.get().deactivationTime = time;
+	public void setDeactivationTime(float time) {
+		deactivationTime = time;
 	}
 
-	public static boolean isDeactivationDisabled() {
-		return threadLocal.get().disableDeactivation;
+	public boolean isDeactivationDisabled() {
+		return disableDeactivation;
 	}
 
-	public static void setDeactivationDisabled(boolean disable) {
-		threadLocal.get().disableDeactivation = disable;
+	public void setDeactivationDisabled(boolean disable) {
+		disableDeactivation = disable;
 	}
 
 	////////////////////////////////////////////////////////////////////////////

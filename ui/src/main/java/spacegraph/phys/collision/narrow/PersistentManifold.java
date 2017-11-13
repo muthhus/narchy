@@ -26,6 +26,7 @@ package spacegraph.phys.collision.narrow;
 import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
+import spacegraph.phys.collision.ContactProcessedCallback;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.VectorUtil;
 
@@ -54,6 +55,7 @@ public class PersistentManifold {
 	public static final int MANIFOLD_CACHE_SIZE = 4;
 	
 	private final ManifoldPoint[] pointCache = new ManifoldPoint[MANIFOLD_CACHE_SIZE];
+	public final BulletGlobals globals;
 	/// this two body pointers can point to the physics rigidbody class.
 	/// void* will allow any rigidbody class
 	private Object body0;
@@ -66,12 +68,13 @@ public class PersistentManifold {
 		for (int i=0; i<pointCache.length; i++) pointCache[i] = new ManifoldPoint();
 	}
 
-	public PersistentManifold() {
+	public PersistentManifold(BulletGlobals globals) {
+		this.globals = globals;
 	}
 
-	public PersistentManifold(Object body0, Object body1, int bla) {
-		init(body0, body1, bla);
-	}
+//	public PersistentManifold(Object body0, Object body1, int bla) {
+//		init(body0, body1, bla);
+//	}
 
 	public void init(Object body0, Object body1, int bla) {
 		this.body0 = body0;
@@ -171,7 +174,7 @@ public class PersistentManifold {
 		this.body1 = body1;
 	}
 	
-	public static void clearUserCache(ManifoldPoint pt) {
+	public void clearUserCache(ManifoldPoint pt) {
 		Object oldPtr = pt.userPersistentData;
 		if (oldPtr != null) {
 //#ifdef DEBUG_PERSISTENCY
@@ -188,8 +191,8 @@ public class PersistentManifold {
 //			assert (occurance <= 0);
 //#endif //DEBUG_PERSISTENCY
 
-			if (pt.userPersistentData != null && BulletGlobals.getContactDestroyedCallback() != null) {
-				BulletGlobals.getContactDestroyedCallback().contactDestroyed(pt.userPersistentData);
+			if (pt.userPersistentData != null && globals.getContactDestroyedCallback() != null) {
+				globals.getContactDestroyedCallback().contactDestroyed(pt.userPersistentData);
 				pt.userPersistentData = null;
 			}
 
@@ -199,7 +202,7 @@ public class PersistentManifold {
 		}
 	}
 
-	public int getNumContacts() {
+	public int numContacts() {
 		return cachedPoints;
 	}
 
@@ -208,12 +211,12 @@ public class PersistentManifold {
 	}
 
 	// todo: get this margin from the current physics / collision environment
-	public static float getContactBreakingThreshold() {
-		return BulletGlobals.getContactBreakingThreshold();
+	public float getContactBreakingThreshold() {
+		return globals.getContactBreakingThreshold();
 	}
 
-	public int getCacheEntry(ManifoldPoint newPoint) {
-		float shortestDist = getContactBreakingThreshold() * getContactBreakingThreshold();
+	public int getCacheEntry(ManifoldPoint newPoint, float shortestDist) {
+
         int size = cachedPoints;
 		int nearestPoint = -1;
 		v3 diffA = new v3();
@@ -298,8 +301,8 @@ public class PersistentManifold {
 //#endif
 	}
 
-	private static boolean validContactDistance(ManifoldPoint pt) {
-		return pt.distance1 <= getContactBreakingThreshold();
+	private boolean validContactDistance(ManifoldPoint pt) {
+		return pt.distance1 <= globals.getContactBreakingThreshold();
 	}
 
 	/// calculated new worldspace coordinates and depth, and reject points that exceed the collision margin
@@ -316,7 +319,7 @@ public class PersistentManifold {
 //		trB.getOrigin().getZ());
 //#endif //DEBUG_PERSISTENCY
 		// first refresh worldspace positions and distance
-		for (i = getNumContacts() - 1; i >= 0; i--) {
+		for (i = numContacts() - 1; i >= 0; i--) {
 
 			ManifoldPoint manifoldPoint = pointCache[i];
 
@@ -337,7 +340,7 @@ public class PersistentManifold {
 		float distance2d;
 		v3 projectedDifference = new v3(), projectedPoint = new v3();
 
-		for (i = getNumContacts() - 1; i >= 0; i--) {
+		for (i = numContacts() - 1; i >= 0; i--) {
 
 			ManifoldPoint manifoldPoint = pointCache[i];
 			// contact becomes invalid when signed distance exceeds margin (projected on contactnormal direction)
@@ -355,8 +358,9 @@ public class PersistentManifold {
 				}
 				else {
 					// contact point processed callback
-					if (BulletGlobals.getContactProcessedCallback() != null) {
-						BulletGlobals.getContactProcessedCallback().contactProcessed(manifoldPoint, body0, body1);
+					ContactProcessedCallback cpc = globals.getContactProcessedCallback();
+					if (cpc != null) {
+						cpc.contactProcessed(manifoldPoint, body0, body1);
 					}
 				}
 			}

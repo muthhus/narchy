@@ -413,10 +413,10 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 		convex_algorithm = newAlgorithm(body0, body1);
 	}
 
-	protected void addContactPoint(Collidable body0, Collidable body1, v3 point, v3 normal, float distance) {
+	protected void addContactPoint(Collidable body0, Collidable body1, v3 point, v3 normal, float distance, float breakingThresh) {
 		resultOut.setShapeIdentifiers(part0, triface0, part1, triface1);
 		checkManifold(body0, body1);
-		resultOut.addContactPoint(normal, point, distance);
+		resultOut.addContactPoint(normal, point, distance, breakingThresh);
 	}
 
 	/*
@@ -439,6 +439,7 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 
 		int pair_pointer = 0;
 
+		float breakingThresh = manifoldPtr.getContactBreakingThreshold();
 		while ((pair_count--) != 0) {
 			//triface0 = pairs.get(pair_pointer);
 			//triface1 = pairs.get(pair_pointer + 1);
@@ -474,7 +475,7 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 						addContactPoint(body0, body1,
 								contact_data.points[j],
 								tmp,
-								-contact_data.penetration_depth);
+								-contact_data.penetration_depth, breakingThresh);
 					}
 				}
 			}
@@ -603,6 +604,7 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 		v3 tmp = new v3();
 
 		int vi = shape0.getVertexCount();
+		float breakingThresh = manifoldPtr.getContactBreakingThreshold();
 		while ((vi--) != 0) {
 			shape0.getVertex(vi, vertex);
 			orgtrans0.transform(vertex);
@@ -613,11 +615,11 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 			{
 				if (swapped) {
 					tmp.set(-plane.x, -plane.y, -plane.z);
-					addContactPoint(body1, body0, vertex, tmp, distance);
+					addContactPoint(body1, body0, vertex, tmp, distance, breakingThresh);
 				}
 				else {
 					tmp.set(plane.x, plane.y, plane.z);
-					addContactPoint(body0, body1, vertex, tmp, distance);
+					addContactPoint(body0, body1, vertex, tmp, distance, breakingThresh);
 				}
 			}
 		}

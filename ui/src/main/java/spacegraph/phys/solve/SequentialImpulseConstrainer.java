@@ -84,8 +84,8 @@ public class SequentialImpulseConstrainer extends Constrainer {
     // btSeed2 is used for re-arranging the constraint rows. improves convergence/quality of friction
     protected long btSeed2;
 
-    public SequentialImpulseConstrainer() {
-        BulletGlobals.setContactDestroyedCallback(new ContactDestroyedCallback() {
+    public SequentialImpulseConstrainer(BulletGlobals globals) {
+        globals.setContactDestroyedCallback(new ContactDestroyedCallback() {
             @Override
             public boolean contactDestroyed(Object userPersistentData) {
                 assert (userPersistentData != null);
@@ -498,7 +498,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
                     int solverBodyIdA = -1;
                     int solverBodyIdB = -1;
 
-                    if (manifold.getNumContacts() != 0) {
+                    if (manifold.numContacts() != 0) {
                         if (colObj0.tag() >= 0) {
                             if (colObj0.getCompanionId() >= 0) {
                                 // body has already been converted
@@ -539,7 +539,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
                     float relaxation;
 
-                    for (int j = 0; j < manifold.getNumContacts(); j++) {
+                    for (int j = 0; j < manifold.numContacts(); j++) {
 
                         ManifoldPoint cp = manifold.getContactPoint(j);
 
@@ -942,7 +942,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
                     prepareConstraints(manifold, info);
 
                     //return array[index];
-                    for (short p = 0; p < manifoldPtr.get(manifold_offset + j).getNumContacts(); p++) {
+                    for (short p = 0; p < manifoldPtr.get(manifold_offset + j).numContacts(); p++) {
                         gOrder[totalPoints].manifoldIndex = j;
                         gOrder[totalPoints].pointIndex = p;
                         totalPoints++;
@@ -1006,7 +1006,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
         //#ifdef FORCE_REFESH_CONTACT_MANIFOLDS
         //manifoldPtr->refreshContactPoints(body0->getCenterOfMassTransform(),body1->getCenterOfMassTransform());
         //#endif //FORCE_REFESH_CONTACT_MANIFOLDS
-        int numpoints = manifoldPtr.getNumContacts();
+        int numpoints = manifoldPtr.numContacts();
 
         BulletStats.gTotalContactPoints += numpoints;
 

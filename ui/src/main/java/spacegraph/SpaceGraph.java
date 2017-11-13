@@ -7,6 +7,7 @@ import com.jogamp.opengl.GL2;
 import jcog.list.FasterList;
 import jcog.map.MRUCache;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.input.FPSLook;
 import spacegraph.input.KeyXYZ;
 import spacegraph.input.OrbMouse;
@@ -18,6 +19,7 @@ import spacegraph.render.SpaceGraphFlat;
 import spacegraph.space.ListSpace;
 import spacegraph.widget.meta.ReflectionSurface;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -210,11 +212,18 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
+
+    @NotNull
     @Override
-    final public void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each) {
-        int n = 0;
+    public Iterator<Spatial<X>> iterator() {
+        throw new UnsupportedOperationException("use forEach()");
+    }
+
+    @Override
+    final public void forEach(Consumer<? super Spatial<X>> each) {
+
         for (int i = 0, inputsSize = inputs.size(); i < inputsSize; i++) {
-            n += inputs.get(i).forEachWithInt(n, each);
+            inputs.get(i).forEach(each);
         }
     }
 
@@ -369,6 +378,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         camPos.set(x, y, z);
         return this;
     }
+
 
 
     //    public static class PickDragMouse extends SpaceMouse {

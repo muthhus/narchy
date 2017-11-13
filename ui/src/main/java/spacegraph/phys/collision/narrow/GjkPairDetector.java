@@ -317,7 +317,7 @@ public class GjkPairDetector extends DiscreteCollisionDetectorInterface {
 			output.addContactPoint(
 					normalInB,
 					tmp,
-					distance);
+					distance, BulletGlobals.the.get().getContactBreakingThreshold());
 		//printf("gjk add:%f",distance);
 		}
 	}

@@ -43,7 +43,7 @@ public class PointCollector extends DiscreteCollisionDetectorInterface.Result {
 	}
 
 	@Override
-	public void addContactPoint(v3 normalOnBInWorld, v3 pointInWorld, float depth) {
+	public void addContactPoint(v3 normalOnBInWorld, v3 pointInWorld, float depth, float breakingThresh) {
 		if (depth < distance) {
 			hasResult = true;
 			this.normalOnBInWorld.set(normalOnBInWorld);

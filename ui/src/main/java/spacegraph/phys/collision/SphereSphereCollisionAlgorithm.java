@@ -119,7 +119,7 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 		pos1.add(col1.worldTransform, tmp);
 
 		// report a contact. internally this will be kept persistent, and contact reduction is done
-		resultOut.addContactPoint(normalOnSurfaceB, pos1, dist);
+		resultOut.addContactPoint(normalOnSurfaceB, pos1, dist, manifoldPtr.getContactBreakingThreshold());
 
 		//#ifndef CLEAR_MANIFOLD
 		resultOut.refreshContactPoints();

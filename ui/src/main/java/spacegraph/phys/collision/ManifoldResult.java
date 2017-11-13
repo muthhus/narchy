@@ -81,11 +81,11 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 	}
 
 	@Override
-    public void addContactPoint(v3 normalOnBInWorld, v3 pointInWorld, float depth) {
+    public void addContactPoint(v3 normalOnBInWorld, v3 pointInWorld, float depth, float breakingThresh) {
 		assert (manifoldPtr != null);
 		//order in manifold needs to match
 
-		if (depth > PersistentManifold.getContactBreakingThreshold()) {
+		if (depth > breakingThresh) {
 			return;
 		}
 
@@ -112,7 +112,7 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 		newPt.positionWorldOnA.set(pointA);
 		newPt.positionWorldOnB.set(pointInWorld);
 
-		int insertIndex = manifoldPtr.getCacheEntry(newPt);
+		int insertIndex = manifoldPtr.getCacheEntry(newPt, manifoldPtr.getContactBreakingThreshold());
 
 		newPt.combinedFriction = calculateCombinedFriction(body0, body1);
 		newPt.combinedRestitution = calculateCombinedRestitution(body0, body1);
@@ -133,14 +133,14 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 		}
 
 		// User can override friction and/or restitution
-		if (BulletGlobals.getContactAddedCallback() != null &&
+		if (manifoldPtr.globals.getContactAddedCallback() != null &&
 				// and if either of the two bodies requires custom material
 				((body0.getCollisionFlags() & CollisionFlags.CUSTOM_MATERIAL_CALLBACK) != 0 ||
 				(body1.getCollisionFlags() & CollisionFlags.CUSTOM_MATERIAL_CALLBACK) != 0)) {
 			//experimental feature info, for per-triangle material etc.
 			Collidable obj0 = isSwapped ? body1 : body0;
 			Collidable obj1 = isSwapped ? body0 : body1;
-			BulletGlobals.getContactAddedCallback().contactAdded(manifoldPtr.getContactPoint(insertIndex), obj0, partId0, index0, obj1, partId1, index1);
+			manifoldPtr.globals.getContactAddedCallback().contactAdded(manifoldPtr.getContactPoint(insertIndex), obj0, partId0, index0, obj1, partId1, index1);
 		}
 
 	}
@@ -165,7 +165,7 @@ public class ManifoldResult extends DiscreteCollisionDetectorInterface.Result {
 
 	public void refreshContactPoints() {
 		assert (manifoldPtr != null);
-		if (manifoldPtr.getNumContacts() == 0) {
+		if (manifoldPtr.numContacts() == 0) {
 			return;
 		}
 

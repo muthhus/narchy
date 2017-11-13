@@ -42,7 +42,7 @@ public abstract class DiscreteCollisionDetectorInterface {
 		///setShapeIdentifiers provides experimental support for per-triangle material / custom material combiner
 		public abstract void setShapeIdentifiers(int partId0, int index0, int partId1, int index1);
 
-		public abstract void addContactPoint(v3 normalOnBInWorld, v3 pointInWorld, float depth);
+		public abstract void addContactPoint(v3 normalOnBInWorld, v3 pointInWorld, float depth, float breakingThresh);
 	}
 	
 	public static class ClosestPointInput {

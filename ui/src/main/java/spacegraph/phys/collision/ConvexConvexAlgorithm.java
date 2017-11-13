@@ -106,7 +106,7 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 		// JAVA NOTE: original: TODO: if (dispatchInfo.m_useContinuous)
 		gjkPairDetector.setMinkowskiA(min0);
 		gjkPairDetector.setMinkowskiB(min1);
-		input.maximumDistanceSquared = min0.getMargin() + min1.getMargin() + PersistentManifold.getContactBreakingThreshold();
+		input.maximumDistanceSquared = min0.getMargin() + min1.getMargin() + manifoldPtr.getContactBreakingThreshold();
 		input.maximumDistanceSquared *= input.maximumDistanceSquared;
 		//input.m_stackAlloc = dispatchInfo.m_stackAllocator;
 
@@ -138,14 +138,11 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 		float resultFraction = 1f;
 
 		tmp.sub(col0.getInterpolationWorldTransform(tmpTrans1), col0.getWorldTransform(tmpTrans2));
-		float squareMot0 = tmp.lengthSquared();
-
-		tmp.sub(col1.getInterpolationWorldTransform(tmpTrans1), col1.getWorldTransform(tmpTrans2));
-		float squareMot1 = tmp.lengthSquared();
-
-		if (squareMot0 < col0.getCcdSquareMotionThreshold() &&
-				squareMot1 < col1.getCcdSquareMotionThreshold()) {
-			return resultFraction;
+		if (tmp.lengthSquared() < col0.getCcdSquareMotionThreshold()) {
+			tmp.sub(col1.getInterpolationWorldTransform(tmpTrans1), col1.getWorldTransform(tmpTrans2));
+			if (tmp.lengthSquared() < col1.getCcdSquareMotionThreshold()) {
+				return resultFraction;
+			}
 		}
 
 		if (disableCcd) {

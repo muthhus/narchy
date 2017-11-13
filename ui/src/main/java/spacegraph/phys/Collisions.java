@@ -23,7 +23,6 @@
 
 package spacegraph.phys;
 
-import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
 import spacegraph.math.Matrix3f;
@@ -38,6 +37,7 @@ import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.shape.*;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static spacegraph.math.v3.v;
 
@@ -46,11 +46,9 @@ import static spacegraph.math.v3.v;
  *
  * @author jezek2
  */
-public abstract class Collisions<X> {
+public abstract class Collisions<X> extends BulletGlobals {
     public static final float maxAABBLength = 1e12f;
 
-
-    //protected final OArrayList<Spatial<X>> objects = new OArrayList<>();
 
     /**
      * holds spatials which have not been added to 'objects' yet (beginning of next cycle)
@@ -90,10 +88,6 @@ public abstract class Collisions<X> {
 //		}
 //	}
 
-    /**
-     * the boolean returned by the predicate decides if the value will remain in the source that provides the impl
-     */
-    abstract public void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each);
 
     /**
      * list of current colidables in the engine, aggregated from the spatials that are present
@@ -132,7 +126,7 @@ public abstract class Collisions<X> {
     }
 
 
-    public void solveCollisions() {
+    protected void solveCollisions() {
         //BulletStats.pushProfile("performDiscreteCollisionDetection");
         //DispatcherInfo dispatchInfo = getDispatchInfo();
 
@@ -180,7 +174,10 @@ public abstract class Collisions<X> {
         colObj.shape().getAabb(colObj.getWorldTransform(tmpTrans), minAabb, maxAabb);
         // need to increase the aabb for contact thresholds
         v3 contactThreshold = new v3();
-        contactThreshold.set(BulletGlobals.getContactBreakingThreshold(), BulletGlobals.getContactBreakingThreshold(), BulletGlobals.getContactBreakingThreshold());
+
+        float bt = getContactBreakingThreshold();
+        contactThreshold.set(bt, bt, bt);
+
         minAabb.sub(contactThreshold);
         maxAabb.add(contactThreshold);
 

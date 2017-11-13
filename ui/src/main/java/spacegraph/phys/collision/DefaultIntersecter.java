@@ -23,6 +23,7 @@
 
 package spacegraph.phys.collision;
 
+import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.broad.*;
 import spacegraph.phys.collision.narrow.PersistentManifold;
@@ -132,7 +133,7 @@ public class DefaultIntersecter extends Intersecter {
 		m_manifoldsPtr.push_back(manifold);
 		*/
 
-		PersistentManifold manifold = new PersistentManifold();
+		PersistentManifold manifold = new PersistentManifold(BulletGlobals.the.get());
 		manifold.init(body0,body1,0);
 
 		manifold.index1a = manifolds.size();

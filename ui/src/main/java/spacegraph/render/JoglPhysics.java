@@ -30,7 +30,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLException;
 import com.jogamp.opengl.math.FloatUtil;
-import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
@@ -57,7 +56,7 @@ import static spacegraph.math.v3.v;
  * @author jezek2
  */
 
-abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
+abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener, Iterable<Spatial<X>> {
 
 
 
@@ -138,26 +137,18 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
 
 
         // Setup the basic world
-        DefaultCollisionConfiguration collision_config = new DefaultCollisionConfiguration();
 
-        Intersecter dispatcher = new DefaultIntersecter(collision_config);
+        Intersecter dispatcher = new DefaultIntersecter(new DefaultCollisionConfiguration());
 
         //btPoint3 worldAabbMin(-10000,-10000,-10000);
         //btPoint3 worldAabbMax(10000,10000,10000);
         //btBroadphaseInterface* overlappingPairCache = new btAxisSweep3 (worldAabbMin, worldAabbMax);
 
         Broadphase broadphase =
-                //new SimpleBroadphase();
+//                //new SimpleBroadphase();
                 new DbvtBroadphase();
 
-        dyn = new Dynamics<>(dispatcher, broadphase) {
-
-            @Override
-            public void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each) {
-                JoglPhysics.this.forEachIntSpatial(each);
-            }
-
-        };
+        dyn = new Dynamics<X>(dispatcher, broadphase, this);
 
 //        cameraDistance = new AnimFloat(55f, dyn, 4f);
 //        azi = new AnimFloatAngle(-180, dyn, 30f);
@@ -171,16 +162,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
     }
 
 
-    /**
-     * supplies the physics engine set of active physics objects at the beginning of each cycle
-     */
-    public abstract void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each);
-
-    public final void forEachSpatial(Consumer<Spatial<X>> each) {
-        forEachIntSpatial((i, x) -> {
-            each.accept(x);
-        });
-    }
 
     /**
      * return false to remove this object during the beginning of the physics frame
@@ -345,7 +326,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
         long timeMS = System.currentTimeMillis();
 
         gl.glEnable(GL2.GL_DEPTH_TEST);
-        forEachSpatial(s -> render(s,timeMS));
+        forEach(s -> render(s,timeMS));
     }
 
 

@@ -592,21 +592,18 @@ public class Dynamic<X> extends Collidable<X> {
 		}
 	}
 
-	public boolean wantsSleeping() {
-		if (getActivationState() == DISABLE_DEACTIVATION) {
+	public boolean wantsSleeping(float theDeactivationTime) {
+		int state = getActivationState();
+		if (state == DISABLE_DEACTIVATION) {
 			return false;
 		}
 
-		// disable deactivation
-		if (BulletGlobals.isDeactivationDisabled() || (BulletGlobals.getDeactivationTime() == 0f)) {
-			return false;
-		}
 
-		if ((getActivationState() == ISLAND_SLEEPING) || (getActivationState() == WANTS_DEACTIVATION)) {
+		if ((state == ISLAND_SLEEPING) || (state == WANTS_DEACTIVATION)) {
 			return true;
 		}
 
-		return deactivationTime > BulletGlobals.getDeactivationTime();
+		return deactivationTime > theDeactivationTime;
 	}
 
 

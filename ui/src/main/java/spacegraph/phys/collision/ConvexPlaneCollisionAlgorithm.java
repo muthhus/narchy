@@ -24,6 +24,7 @@
 package spacegraph.phys.collision;
 
 import spacegraph.math.v3;
+import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.broad.CollisionAlgorithm;
 import spacegraph.phys.collision.broad.CollisionAlgorithmConstructionInfo;
@@ -114,7 +115,8 @@ public class ConvexPlaneCollisionAlgorithm extends CollisionAlgorithm {
 		v3 vtxInPlaneWorld = new v3(vtxInPlaneProjected);
 		planeObj.getWorldTransform(tmpTrans).transform(vtxInPlaneWorld);
 
-		hasCollision = distance < PersistentManifold.getContactBreakingThreshold();
+		float breakingThresh = manifoldPtr.getContactBreakingThreshold();
+		hasCollision = distance < breakingThresh;
 		resultOut.setPersistentManifold(manifoldPtr);
 		if (hasCollision) {
 			// report a contact. internally this will be kept persistent, and contact reduction is done
@@ -122,10 +124,10 @@ public class ConvexPlaneCollisionAlgorithm extends CollisionAlgorithm {
 			planeObj.getWorldTransform(tmpTrans).basis.transform(normalOnSurfaceB);
 
 			v3 pOnB = new v3(vtxInPlaneWorld);
-			resultOut.addContactPoint(normalOnSurfaceB, pOnB, distance);
+			resultOut.addContactPoint(normalOnSurfaceB, pOnB, distance, breakingThresh);
 		}
 		if (ownManifold) {
-			if (manifoldPtr.getNumContacts() != 0) {
+			if (manifoldPtr.numContacts() != 0) {
 				resultOut.refreshContactPoints();
 			}
 		}
