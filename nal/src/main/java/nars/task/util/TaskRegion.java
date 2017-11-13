@@ -144,8 +144,8 @@ public interface TaskRegion extends HyperRegion, Tasked {
 //                        if (tf == ef && tc == ec)
 //                            return this; //identical taskregion, so use this
 //                        else {
-                            ns = ts;
-                            ne = te;
+//                            ns = ts;
+//                            ne = te;
 //                        }
 //                    } else {
                         ns = Math.min(ts, es); ne = Math.max(te, ee);
@@ -198,7 +198,7 @@ public interface TaskRegion extends HyperRegion, Tasked {
 
     @Override
     default boolean contains(HyperRegion x) {
-        if (this == x) return false;
+        if (this.equals(x)) return true;
 
         //    default boolean contains(HyperRegion<X> x) {
         //        int d = dim();

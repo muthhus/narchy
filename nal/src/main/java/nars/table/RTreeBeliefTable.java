@@ -50,14 +50,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * max allowed truths to be truthpolated in one test
      */
-    static final int TRUTHPOLATION_LIMIT = 4;
+    static final int TRUTHPOLATION_LIMIT = 3;
 
     public static final float PRESENT_AND_FUTURE_BOOST = 1.5f;
 
     static final int SCAN_DIVISIONS = 4;
 
     public static final int MIN_TASKS_PER_LEAF = 2;
-    public static final int MAX_TASKS_PER_LEAF = 4;
+    public static final int MAX_TASKS_PER_LEAF = 3;
     public static final Spatialization.DefaultSplits SPLIT =
             Spatialization.DefaultSplits.AXIAL; //Spatialization.DefaultSplits.LINEAR; //<- probably doesnt work here
 
@@ -504,11 +504,27 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         assert (a != null);
         Task at = a.task();
+        boolean aAlreadyDeleted = at.isDeleted();
+        if (!aAlreadyDeleted)
+            at.delete();
         treeRW.remove(at);
         changes.put(at, false);
 
+
+
         if (b != null) {
             Task bt = b.task();
+
+            if (bt.isDeleted()) {
+                treeRW.remove(bt);
+                changes.put(bt, false);
+                return true;
+            } else {
+                at.meta("@", bt);
+            }
+
+            if (aAlreadyDeleted)
+                return true;
 
             Task c = Revision.merge(at, bt, nar.time(), nar);
             if (c != null && !c.equals(a) && !c.equals(b)) {
@@ -541,20 +557,37 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             }
         }
 
-        //merge impossible, delete a
-        if (b != null)
-            ((NALTask) at).delete(b.task()); //forward
-        else
-            ((NALTask) at).delete();
+        if (aAlreadyDeleted)
+            return true;
+
+//        //merge impossible, delete a
+//        if (b != null)
+//            ((NALTask) at).delete(b.task()); //forward
+//        else
+//            ((NALTask) at).delete();
 
         return true;
     }
 
 
-    static void findEvictable(Space<TaskRegion> tree, Node<TaskRegion, ?> next, Top<Leaf<TaskRegion>> mergeVictims) {
+    static boolean findEvictable(Space<TaskRegion> tree, Node<TaskRegion, ?> next, Top<Leaf<TaskRegion>> mergeVictims) {
         if (next instanceof Leaf) {
 
-            Leaf<TaskRegion> l = (Leaf) next;
+            Leaf l = (Leaf) next;
+            for (Object _x : l.data) {
+                if (_x == null)
+                    break;
+                TaskRegion x = (TaskRegion)_x;
+                if (((Task)x).isDeleted()) {
+                    //found a deleted task in the leaf, we need look no further
+                    boolean removed = tree.remove(x);
+                    if (!removed) {
+                        tree.remove(x);
+                    }
+                    assert(removed);
+                    return false;
+                }
+            }
 
             mergeVictims.accept(l);
 
@@ -564,11 +597,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             int size = b.size();
             Node<TaskRegion, ?>[] ww = b.child;
             for (int i = 0; i < size; i++) {
-                findEvictable(tree, ww[i], mergeVictims);
+                if (!findEvictable(tree, ww[i], mergeVictims))
+                    return false; //done
             }
-
         }
 
+        return true;
     }
 
 

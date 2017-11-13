@@ -42,8 +42,8 @@ import java.util.stream.Stream;
  * Created by jcairns on 4/30/15.</p>
  */
 public class RTree<T> implements Space<T> {
-    public static final double EPSILON = 1e-12;
-    public static final float FPSILON = (float) EPSILON;
+    public static final double EPSILON = Float.MIN_NORMAL;;
+
 
     /*@NotNull*/
     private Node<T, ?> root;
@@ -109,7 +109,7 @@ public class RTree<T> implements Space<T> {
             return false;
         root = root.remove(x, xBounds, this, model);
         int after = size;
-        //assert (after == before || after == before - 1): "before: " + before + ", after: " + after;
+        assert (after == before || after == before - 1): "before: " + before + ", after: " + after;
         return before > after;
     }
 

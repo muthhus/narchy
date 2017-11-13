@@ -108,19 +108,14 @@ public class LivePredictor {
 
 
     public synchronized double[] next() {
+        Ohistory.next();
         Ihistory.next();
         //Ihistory.print();
-
-        Ohistory.next();
         //Ohistory.print();
 
         model.learn(ti = historyVector(Ihistory,Ihistory.get(0).data.length, ti), to = historyVector(Ohistory, Ohistory.get(0).data.length, to));
 
-        double[] q = model.predict();
-
-        //System.out.println();
-
-        return q;
+        return model.predict();
     }
 
     public static double[] d(FloatSupplier[] f) {

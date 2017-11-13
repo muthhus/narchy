@@ -123,7 +123,8 @@ public class RectFloat2D implements HyperRegion<Float2D>, Comparable<RectFloat2D
     }
 
     @Override
-    public boolean contains(@NotNull final HyperRegion r) {
+    public boolean contains(final HyperRegion r) {
+        if (this == r) return true;
         final RectFloat2D r2 = (RectFloat2D) r;
 
         return min.x <= r2.min.x &&
@@ -134,6 +135,7 @@ public class RectFloat2D implements HyperRegion<Float2D>, Comparable<RectFloat2D
 
     @Override
     public boolean intersects(final HyperRegion r) {
+        if (this == r) return true;
         final RectFloat2D r2 = (RectFloat2D) r;
 
         return !((min.x > r2.max.x) || (r2.min.x > max.x) ||

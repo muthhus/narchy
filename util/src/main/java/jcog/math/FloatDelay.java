@@ -5,7 +5,7 @@ import jcog.Texts;
 import java.util.Arrays;
 
 /**
- * simple delay line; shifts data on each access
+ * simple delay line; shifts data on each access to the right; newest data will be at index 0
  */
 public class FloatDelay implements FloatSupplier {
 

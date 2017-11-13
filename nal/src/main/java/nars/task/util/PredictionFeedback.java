@@ -1,5 +1,6 @@
 package nars.task.util;
 
+import jcog.list.FasterList;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -9,12 +10,14 @@ import nars.task.NALTask;
 import nars.task.SignalTask;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public class PredictionFeedback {
 
     final BeliefTable table;
     static final boolean deleteAny = false; //
 
-    static final float REWARD_PUNISH_COHERENCE_THRESHOLD = 0.75f;
+    static final float REWARD_PUNISH_COHERENCE_THRESHOLD = 0.9f;
 
     public PredictionFeedback(BeliefTable table) {
         this.table = table;
@@ -44,6 +47,7 @@ public class PredictionFeedback {
 
         float xFreq = x.freq();
 
+        List<Task> trash = new FasterList();
         //sensor feedback
         //punish any non-signal beliefs at the current time which contradict this sensor reading, and reward those which it supports
         table.forEachTask(false, start, end, (y) -> {
@@ -86,7 +90,7 @@ public class PredictionFeedback {
 
                 if (deleteIfIncoherent) {
                     //forward to the actual sensor reading
-                    ((NALTask)y).delete(x);
+                    trash.add(y);
                 } else {
                     y.setPri(0); //drain priority  TODO maybe transfer it to nearby tasks?
                 }
@@ -95,6 +99,11 @@ public class PredictionFeedback {
 
             }
 
+        });
+
+        trash.forEach(y -> {
+            ((NALTask) y).delete(x);
+            table.removeTask(y);
         });
     }
 

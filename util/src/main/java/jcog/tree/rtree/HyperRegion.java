@@ -129,9 +129,10 @@ public interface HyperRegion<X> {
      * Determines if this HyperRect fully contains parameter HyperRect
      *
      * @param r - HyperRect to test
-     * @return true if contains, false otherwise
+     * @return true if contains, false otherwise; a region contains itself
      */
     default boolean contains(HyperRegion<X> x) {
+        if (this == x) return true;
         int d = dim();
         for (int i = 0; i < d; i++)
             if (coord(false, i) > x.coord(false, i) ||

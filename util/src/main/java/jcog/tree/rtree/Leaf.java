@@ -249,7 +249,7 @@ public class Leaf<T> implements Node<T, T> {
     @Override
     public boolean containing(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
         short s = this.size;
-        if (s > 0 && rect.intersects(region)) {
+        if (s > 0 && rect.intersects(region)) { //not sure why but it seems this has to be intersects and not contains
             T[] data = this.data;
             for (int i = 0; i < s; i++) {
                 T d = data[i];
@@ -315,15 +315,17 @@ public class Leaf<T> implements Node<T, T> {
     public final void classify(final Node<T, T> l1Node, final Node<T, T> l2Node, final T t, Spatialization<T> model) {
 
         final HyperRegion tRect = model.region(t);
-        final HyperRegion l1Mbr = l1Node.region().mbr(tRect);
+        final HyperRegion l1Region = l1Node.region();
+        final HyperRegion l1Mbr = l1Region.mbr(tRect);
 
         double tCost = tRect.cost();
 
         double l1c = l1Mbr.cost();
-        final double l1CostInc = Math.max(l1c - (l1Node.region().cost() + tCost), 0.0);
-        final HyperRegion l2Mbr = l2Node.region().mbr(tRect);
+        final double l1CostInc = Math.max(l1c - (l1Region.cost() + tCost), 0.0);
+        final HyperRegion l2Region = l2Node.region();
+        final HyperRegion l2Mbr = l2Region.mbr(tRect);
         double l2c = l2Mbr.cost();
-        final double l2CostInc = Math.max(l2c - (l2Node.region().cost() + tCost), 0.0);
+        final double l2CostInc = Math.max(l2c - (l2Region.cost() + tCost), 0.0);
         if (l2CostInc > l1CostInc) {
             l1Node.add(t, this, model);
         } else if (Util.equals(l1CostInc, l2CostInc, RTree.EPSILON)) {

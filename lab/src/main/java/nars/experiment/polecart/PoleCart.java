@@ -64,11 +64,11 @@ public class PoleCart extends NAgentX {
     public static final double cartMass = 1.;
     public static final double poleMass = 0.1;
     public static final double poleLength = 1.;
-    public static final double forceMag = 10.;
+    public static final double forceMag = 20.;
     public static final double tau = 0.02;
     public static final double fricCart = 0.001;
     public static final double fricPole =
-            0.004;
+            0.008;
     public static final double totalMass = cartMass + poleMass;
     public static final double halfPole = 0.5 * poleLength;
     public static final double poleMassLength = halfPole * poleMass;
@@ -111,20 +111,20 @@ public class PoleCart extends NAgentX {
         //TODO extract 'senseAngle()' for NSense interface
 
         this.x = senseNumber("(x)",
-                new FloatPolarNormalized(() -> (float) pos)).resolution(0.1f);
+                new FloatPolarNormalized(() -> (float) pos)).resolution(0.04f);
         this.xVel = senseNumber("(xVel)",
                 //() -> Util.sigmoid((float) posDot)
                 new FloatPolarNormalized(() -> (float) posDot)
-        ).resolution(0.1f);
+        ).resolution(0.04f);
 
         //angle
 
         this.angX = senseNumber($.p("angX"),
                 () -> (float)(0.5f + 0.5f * (Math.sin(angle))))
-                .resolution(0.1f);
+                .resolution(0.04f);
         this.angY = senseNumber($.p("angY"),
                 () -> (float)(0.5f + 0.5f * (Math.cos(angle))))
-                .resolution(0.1f);
+                .resolution(0.04f);
 
         //angular velocity
         this.angVel = senseNumber("(angVel)",
@@ -149,20 +149,28 @@ public class PoleCart extends NAgentX {
 //        });
 
 
-        FloatSupplier[] ins = new FloatSupplier[2];
-        ins[0] = ()-> (float) angleDot;
-        ins[1] = ()-> (float) posDot;
-        LivePredictor p = new LivePredictor(ins, 8, new FloatSupplier[]{()-> {
-            return (float) (0.5f + 0.5f * Math.sin(angle));
-        }}, 8);
-        DurService.on(nar, ()->{
-           double[] trained = p.next();
-           System.out.println(n4(trained));
-//           float y = (float)trained[7];
-//           nar.believe(angY.term, nar.time() + 1 * nar.time.dur(), y, 0.5f);
-           float y1 = (float)trained[7];
-           nar.believe(angY.term, nar.time() + 8 * nar.time.dur(), y1, 0.5f);
+        FloatSupplier[] ins = new FloatSupplier[]{
+                () -> (float) angleDot,
+                () -> (float) pos,
+                () -> (float) posDot,
+        };
+        LivePredictor p = new LivePredictor(new LivePredictor.LSTMPredictor(),
+                ins, 16, new FloatSupplier[]{
+                    ()-> (float) (0.5f + 0.5f * Math.cos(angle)),
+                    ()-> (float) (0.5f + 0.5f * Math.sin(angle))
+        }, 8);
+        DurService d = DurService.on(nar, () -> {
+            double[] trained = p.next();
+
+            System.out.println(n4(trained));
+
+            float c = (float) trained[7];
+            nar.believe(angX.term, nar.time() + 8 * nar.time.dur(), c, 0.75f);
+
+            float s = (float) trained[15];
+            nar.believe(angY.term, nar.time() + 8 * nar.time.dur(), s, 0.75f);
         });
+//        d.durations.set(2);
 
         SpaceGraph.window(Vis.beliefCharts(100,
                 Lists.newArrayList(x, xVel,
@@ -277,21 +285,6 @@ public class PoleCart extends NAgentX {
         //start();
     }
 
-//    public void start() {
-//        //Start animating!
-//        if (animatorThread == null) {
-//            animatorThread = new Thread(this);
-//        }
-//        animatorThread.start();
-//    }
-//
-//    public void stop() {
-//        //Stop the animating thread.
-//        animatorThread = null;
-//        //Get rid of the objects necessary for double buffering.
-//        offGraphics = null;
-//        offImage = null;
-//    }
 
     @Override
     protected float act() {
@@ -372,15 +365,15 @@ public class PoleCart extends NAgentX {
     }
 
 
-    public int pixX(Dimension d, double v) {
+    int pixX(Dimension d, double v) {
         return (int) Math.round((v + 2.5) / 5.0 * d.width);
     }
 
-    public int pixY(Dimension d, double v) {
+    int pixY(Dimension d, double v) {
         return (int) Math.round(d.height - (v + 2.5) / 5.0 * d.height);
     }
 
-    public int pixDX(Dimension d, double v) {
+    int pixDX(Dimension d, double v) {
         return (int) Math.round(v / 5.0 * d.width);
     }
 
@@ -388,7 +381,7 @@ public class PoleCart extends NAgentX {
         return (int) Math.round(-v / 5.0 * d.height);
     }
 
-    public void resetPole() {
+    void resetPole() {
         pos = 0.;
         posDot = 0.;
         angle = 0.;

@@ -215,7 +215,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
     public Node<T, ?> remove(final T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
 
         for (int i = 0; i < size; i++) {
-            if (child[i].region().intersects(xBounds)) {
+            if (child[i].region().contains(xBounds)) {
                 child[i] = child[i].remove(x, xBounds, this, model);
                 if (reportNextSizeDelta(parent)) {
                     if (child[i].size() == 0) {
