@@ -524,7 +524,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        }
 
     public static void main(String[] args) {
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
 
         NAR nn = NAgentX.runRT((n) -> {

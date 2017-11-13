@@ -2,6 +2,7 @@ package jcog.bag.impl;
 
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.list.FasterList;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
@@ -115,23 +116,19 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
      * may include the item being added
      */
     @Nullable
-    private LinkedList<Y> update(@Nullable Y toAdd, @Nullable Consumer<Y> update) {
+    private FasterList<Y> update(@Nullable Y toAdd, @Nullable Consumer<Y> update, boolean commit) {
 
+        FasterList<Y> trash;
         int s = size();
-        if (s == 0 && toAdd == null) {
+        if (s == 0) {
             this.min = this.max = this.mass = 0;
-            return null;
-        }
-
-
-        LinkedList<Y> trash =
-                //new FasterList(1);
-                new LinkedList();
-        if (s > 0) {
-            s = update(toAdd != null, s, trash, update);
+            if (toAdd == null)
+                return null;
+            trash = null;
         } else {
-            this.min = this.max = this.mass = 0;
+            s = update(toAdd != null, s, trash = new FasterList(1), update, commit || (s == capacity));
         }
+
 
 
         if (toAdd != null) {
@@ -173,6 +170,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     protected void ensureSorted() {
         //if (mustSort) {
         sort();
+        updateRange();
         mustSort = false;
         //}
     }
@@ -206,7 +204,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         return key.priUpdate();
     }
 
-    private int update(@Deprecated boolean toAdd, int s, List<Y> trash, @Nullable Consumer<Y> update) {
+    private int update(@Deprecated boolean toAdd, int s, List<Y> trash, @Nullable Consumer<Y> update, boolean commit) {
 
         float min = Float.POSITIVE_INFINITY, max = Float.NEGATIVE_INFINITY, mass = 0;
 
@@ -222,7 +220,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         for (int i = 0; i < s; i++) {
             Y x = (Y) l[i];
             float p;
-            if (x == null || ((p = priUpdate(x)) != p /* deleted */) && trash.add(x)) {
+            if (x == null || ((p = (commit ? priUpdate(x) : pri(x))) != p /* deleted */) && trash.add(x)) {
                 items2.removeFast(i);
                 removedFromMap++;
             } else {
@@ -443,7 +441,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
         X key = key(incoming);
 
-        final @Nullable List<Y>[] trash = new List[1];
+        final @Nullable FasterList<Y>[] trash = new FasterList[1];
 
         Y inserted;
 
@@ -550,13 +548,13 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
     }
 
-    private boolean insert(/*@NotNull*/ Y incoming, @Nullable List<Y>[] trash) {
+    private boolean insert(/*@NotNull*/ Y incoming, @Nullable FasterList<Y>[] trash) {
         float p = pri(incoming);
         pressurize(p);
 
         if (size() == capacity) {
 
-            @Nullable LinkedList<Y> trsh = update(incoming, null);
+            @Nullable FasterList<Y> trsh = update(incoming, null, false);
             if (trsh != null) {
                 trash[0] = trsh; //what was displaced
                 if (trsh.getLast() == incoming)
@@ -579,14 +577,25 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         if (posBefore == -1)
             throw new RuntimeException("Bag Map and List became unsynchronized"); //TODO handle better. this will indicate an implementation problem.  it shouldnt happen normally
 
-        float priBefore = existing.priElseZero();
+        float priBefore = existing.priUpdate();
+        Y result;
+        float delta;
+        if (priBefore != priBefore) {
+            //existing entry has become deleted. remove that instance and replace with this
+            items.array()[posBefore] = incoming;
+            result = incoming; //replace the map's ref
+            delta = incoming.priElseZero();
+        } else {
+            float oo = merge(existing, incoming);
+            delta = existing.priElseZero() - priBefore;
+            if (oo >= Pri.EPSILON && overflow != null)
+                overflow.add(oo);
+            result = existing; //re-use the existing ref
+        }
 
-        float oo = merge(existing, incoming);
 
-        float delta = existing.priElseZero() - priBefore;
-
-        if (Math.abs(delta) > Pri.EPSILON) {
-            items.adjust(posBefore, delta, this);
+        if (Math.abs(delta) >= Pri.EPSILON) {
+            items.adjust(posBefore, this);
 
             mass += delta;
 
@@ -597,10 +606,9 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
             }
         }
 
-        if (oo > Pri.EPSILON && overflow != null)
-            overflow.add(oo);
 
-        return existing;
+
+        return result;
     }
 
     protected float merge(Y existing, Y incoming) {
@@ -659,13 +667,13 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
             if (size() == 0)
                 return;
 
-            trash = update(null, update);
+            trash = update(null, update, true);
 
             if (trash != null) {
                 trash.forEach(this::mapRemove);
             }
+
             ensureSorted();
-            updateRange();
         }
 
         //then outside the synch:

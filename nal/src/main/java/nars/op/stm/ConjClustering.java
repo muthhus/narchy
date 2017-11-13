@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -148,7 +149,7 @@ public class ConjClustering extends Causable {
         final long[] start = {Long.MAX_VALUE};
 
 
-        chunk(group.stream().map(x -> x.id), maxConjSize, volMax).forEach(subs -> {
+        chunk(group.stream().filter(Objects::nonNull).map(x -> x.id), maxConjSize, volMax).forEach(subs -> {
             //
 //                    //if temporal clustering is close enough, allow up to maxGroupSize in &&, otherwise lmiit to 2
 //

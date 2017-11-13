@@ -370,7 +370,8 @@ public class Derivation extends Unify {
                 belief == null ? task.priElseZero() : Param.TaskBeliefDerivation.apply(task.priElseZero(), belief.priElseZero());
 
         float parentValue =
-                nar.evaluate(parentCause); /* value of the parent cause as a multiplier */
+                0.5f * nar.evaluate(parentCause); /* can decrease only (0..1.0) */
+                //nar.evaluate(parentCause); /* value of the parent cause as a multiplier */
                 //Pri.EPSILON + 0.5f * nar.evaluate(parentCause); //bounded 0..1.0
         this.premisePri *= parentValue;
 

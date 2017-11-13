@@ -1,6 +1,7 @@
 package nars.bag;
 
 import jcog.Util;
+import jcog.bag.Bag;
 import jcog.bag.impl.ArrayBag;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 abstract public class ConcurrentArrayBag<K,X extends Priority> extends ArrayBag<K,X> {
 
@@ -30,6 +32,15 @@ abstract public class ConcurrentArrayBag<K,X extends Priority> extends ArrayBag<
                 }
             }
         });
+    }
+
+    @Override
+    public Bag<K, X> commit(Consumer<X> update) {
+        super.commit(update);
+        synchronized (items) {
+            super.ensureSorted();
+        }
+        return this;
     }
 
     @Override

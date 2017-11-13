@@ -35,44 +35,29 @@ import static org.eclipse.collections.impl.tuple.Tuples.pair;
  * @author Niall Gallagher
  * @modified by seth
  */
-public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, Iterable<X> {
+public class MyConcurrentRadixTree<X> /* TODO extends ReentrantReadWriteLock */ implements /*RadixTree<X>,*/Serializable, Iterable<X> {
 
-//    static final class AtomicReferenceArrayListAdapter<T> extends AbstractList<T> {
-//        private final AtomicReferenceArray<T> atomicReferenceArray;
-//
-//        public AtomicReferenceArrayListAdapter(AtomicReferenceArray<T> atomicReferenceArray) {
-//            this.atomicReferenceArray = atomicReferenceArray;
-//        }
-//
-//        public T get(int index) {
-//            return this.atomicReferenceArray.get(index);
-//        }
-//
-//        public int size() {
-//            return this.atomicReferenceArray.length();
-//        }
-//    }
 
     public interface Prefixed {
         byte getIncomingEdgeFirstCharacter();
     }
 
-    static class NodeCharacterKey implements Prefixed {
-        private final byte character;
-
-        public NodeCharacterKey(byte character) {
-            this.character = character;
-        }
-
-        @Override
-        public byte getIncomingEdgeFirstCharacter() {
-            return this.character;
-        }
-    }
+//    static class NodeCharacterKey implements Prefixed {
+//        private final byte character;
+//
+//        public NodeCharacterKey(byte character) {
+//            this.character = character;
+//        }
+//
+//        @Override
+//        public byte getIncomingEdgeFirstCharacter() {
+//            return this.character;
+//        }
+//    }
 
     public interface Node extends Prefixed, Serializable {
 
-        @NotNull AbstractBytes getIncomingEdge();
+        AbstractBytes getIncomingEdge();
 
         @Nullable Object getValue();
 
@@ -127,15 +112,15 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         return new ByteArrayNodeNonLeafNullValue(in.array(), outs);
     }
 
-    final static Comparator<? super Prefixed> NODE_COMPARATOR = (o1, o2) -> {
-        return o1.getIncomingEdgeFirstCharacter() - o2.getIncomingEdgeFirstCharacter();
-    };
+    final static Comparator<? super Prefixed> NODE_COMPARATOR = Comparator.comparingInt(Prefixed::getIncomingEdgeFirstCharacter);
 
     //    private static int cmp(byte o1, byte o2) {
 //        return o1 - o2;
 //    }
 
     static AbstractBytes getCommonPrefix(AbstractBytes first, AbstractBytes second) {
+        if (first == second) return first;
+
         int minLength = Math.min(first.length(), second.length());
 
         for (int i = 0; i < minLength; ++i) {
@@ -192,7 +177,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     static final class ByteArrayNodeDefault extends NonLeafNode {
         private final Object value;
 
-        public ByteArrayNodeDefault(@NotNull byte[] edgeCharSequence, Object value, @NotNull FasterList<Node> outgoingEdges) {
+        public ByteArrayNodeDefault(byte[] edgeCharSequence, Object value, FasterList<Node> outgoingEdges) {
             super(edgeCharSequence, outgoingEdges);
             this.value = value;
         }

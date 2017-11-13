@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static nars.Op.Null;
+import static nars.Op.VAR_PATTERN;
 
 /**
  * something which is like a term but isnt quite,
@@ -98,6 +99,7 @@ public interface Termlike {
      * WARNING currently this does not detect presence of pattern variables
      */
     default boolean hasAny(/*@NotNull*/ Op op) {
+        if (op == VAR_PATTERN) return varPattern() > 0;
         return hasAny(op.bit);
     }
 

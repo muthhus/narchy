@@ -1,10 +1,15 @@
 package nars.derive.mutate;
 
 import nars.$;
+import nars.Param;
+import nars.The;
+import nars.term.Term;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.SortedSet;
 
 /**
  * Created by me on 12/22/15.
@@ -15,15 +20,30 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
     private final TermContainer y;
     private final TermContainer x;
 
+    public CommutivePermutations(SortedSet<Term> x, SortedSet<Term> y) {
+        this(
+            The.Subterms.RawSubtermBuilder.apply(x.toArray(new Term[x.size()])),
+            The.Subterms.RawSubtermBuilder.apply(y.toArray(new Term[y.size()]))
+        );
+
+    }
+    public CommutivePermutations(TermContainer x, TermContainer y) {
+        this(
+            $.pFast(x), $.pFast(y)
+        );
+    }
     /**
      * important note: using raw Set<Term> here to avoid the clobbering of PatternCompound subterms if interned with current impl
      * x and y must have same size
      */
-    public CommutivePermutations(TermContainer x, TermContainer y) {
-        super($.p(x), $.p(y));
+    public CommutivePermutations(Term x, Term y) {
+        super(x, y);
+
         assert(x.subs()==y.subs());
-        this.y = y;
-        this.x = x;
+        if (Param.DEBUG) assert(!x.equals(y));
+
+        this.y = y.subterms();
+        this.x = x.subterms();
     }
 
     @Override

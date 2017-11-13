@@ -840,9 +840,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             return true; //they all unified
         } else if (yss == xss) {
 
-            u.termutes.add(new CommutivePermutations(
-                    The.subterms(xs), The.subterms(ys)
-            ));
+            u.termutes.add(new CommutivePermutations( xs, ys ));
             return true;
         } else /* yss!=xss */ {
             return false; //TODO this may possibly be handled

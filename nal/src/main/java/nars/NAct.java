@@ -390,13 +390,13 @@ public interface NAct {
     default void actionBipolarFrequencyDifferential(@NotNull Term s, @NotNull FloatToFloatFunction update) {
 
         Term pt =
-                //$.inh( $.the("\"+\""), s);
+                $.inh( $.the("\"+\""), s);
                 //$.p(s, ZeroProduct);
-                $.p(s,$.the("\"+\""));
+                //$.p(s,$.the("\"+\""));
         Term nt =
-                //$.inh($.the("\"-\""), s);
+                $.inh($.the("\"-\""), s);
                 //$.p(ZeroProduct, s);
-                $.p(s,$.the("\"-\""));
+                //$.p(s,$.the("\"-\""));
 
         final float f[] = new float[2];
         final float e[] = new float[2];

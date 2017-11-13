@@ -276,14 +276,17 @@ public interface Compound extends Term, IPair, TermContainer {
         if (op != ty.op())
             return false;
 
-
         //int xs;
         TermContainer xsubs = subterms();
         if ((/*xs = */xsubs.subs()) != ty.subs())
             return false;
 
-//            if (vars(subst.type) == 0)
-//                return false; //no free vars, the only way unification can proceed is if equal
+        Op st = subst.type;
+        boolean varsPresent =
+            st == null ? (vars()+varPattern()+ty.vars()+ty.varPattern() > 0) : hasAny(st) | ty.hasAny(st);
+        if (!varsPresent)
+            return false; //no free vars, the only way unification can proceed is if equal
+
         Compound y = (Compound) ty;
 //        if (op.temporal) {
 //            int sdur = subst.dur;

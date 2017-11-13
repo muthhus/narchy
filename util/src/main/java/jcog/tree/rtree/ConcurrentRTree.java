@@ -34,7 +34,9 @@ import java.util.stream.Stream;
 /**
  * Created by jcovert on 12/30/15.
  */
-public class ConcurrentRTree<T> implements Space<T> {
+public class ConcurrentRTree<T> extends ReentrantReadWriteLock implements Space<T> {
+
+    static final boolean FAIR_LOCK = false;
 
     public final RTree<T> tree;
 
@@ -47,21 +49,12 @@ public class ConcurrentRTree<T> implements Space<T> {
 //            toAdd = toRemove = null;
 //        }
 
-    private final Lock readLock;
-    public final Lock writeLock;
-
-
-
+    
     public ConcurrentRTree(RTree<T> tree) {
+        super(FAIR_LOCK);
         this.tree = tree;
-        ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
-        this.readLock = lock.readLock();
-        this.writeLock = lock.writeLock();
-
-
     }
-
-
+    
     @Override
     public Spatialization<T> model() {
         return tree.model();
@@ -76,11 +69,11 @@ public class ConcurrentRTree<T> implements Space<T> {
      */
     @Override
     public int containedToArray(HyperRegion rect, T[] t) {
-        readLock.lock();
+        readLock().lock();
         try {
             return tree.containedToArray(rect, t);
         } finally {
-            readLock.unlock();
+            readLock().unlock();
         }
     }
 
@@ -96,21 +89,21 @@ public class ConcurrentRTree<T> implements Space<T> {
      */
     @Override
     public boolean add(T t) {
-        writeLock.lock();
+        writeLock().lock();
         try {
             return tree.add(t);
         } finally {
-            writeLock.unlock();
+            writeLock().unlock();
         }
     }
 
 //    @Override
 //    public void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile) {
-//        readLock.lock();
+//        readLock().lock();
 //        try {
 //            tree.intersectingNodes(start, eachWhile);
 //        } finally {
-//            readLock.unlock();
+//            readLock().unlock();
 //        }
 //    }
 
@@ -140,58 +133,58 @@ public class ConcurrentRTree<T> implements Space<T> {
      */
     @Override
     public boolean remove(T x, HyperRegion xBounds) {
-        writeLock.lock();
+        writeLock().lock();
         try {
             return tree.remove(x, xBounds);
         } finally {
-            writeLock.unlock();
+            writeLock().unlock();
         }
     }
 
     @Override
     public boolean remove(T x) {
-        writeLock.lock();
+        writeLock().lock();
         try {
             return tree.remove(x);
         } finally {
-            writeLock.unlock();
+            writeLock().unlock();
         }
     }
 
     public void removeAll(Iterable<? extends T> t) {
-        writeLock.lock();
+        writeLock().lock();
         try {
             t.forEach(this::remove);
         } finally {
-            writeLock.unlock();
+            writeLock().unlock();
         }
     }
 
 
     public void read(Consumer<RTree<T>> x) {
-        readLock.lock();
+        readLock().lock();
         try {
             x.accept(tree);
         } finally {
-            readLock.unlock();
+            readLock().unlock();
         }
     }
 
     public <Y> Y read(Function<Space<T>,Y> x) {
-        readLock.lock();
+        readLock().lock();
         try {
             return x.apply(tree);
         } finally {
-            readLock.unlock();
+            readLock().unlock();
         }
     }
 
     public void write(Consumer<Space<T>> x) {
-        writeLock.lock();
+        writeLock().lock();
         try {
             x.accept(tree);
         } finally {
-            writeLock.unlock();
+            writeLock().unlock();
         }
     }
 
@@ -202,12 +195,12 @@ public class ConcurrentRTree<T> implements Space<T> {
 
     //    @Override
 //    public void change(T x, T y) {
-//        writeLock.lock();
+//        writeLock().lock();
 //        try {
 //            rTree.remove(x);
 //            rTree.add(y);
 //        } finally {
-//            writeLock.unlock();
+//            writeLock().unlock();
 //        }
 //    }
 
@@ -219,11 +212,11 @@ public class ConcurrentRTree<T> implements Space<T> {
      */
     @Override
     public void replace(T told, T tnew) {
-        writeLock.lock();
+        writeLock().lock();
         try {
             tree.replace(told, tnew);
         } finally {
-            writeLock.unlock();
+            writeLock().unlock();
         }
     }
 
@@ -235,11 +228,11 @@ public class ConcurrentRTree<T> implements Space<T> {
      * @return number of entries found or -1 if lock was not acquired
      */
     public int trySearch(HyperRegion rect, T[] t) {
-        if (readLock.tryLock()) {
+        if (readLock().tryLock()) {
             try {
                 return tree.containedToArray(rect, t);
             } finally {
-                readLock.unlock();
+                readLock().unlock();
             }
         }
         return -1;
@@ -252,11 +245,11 @@ public class ConcurrentRTree<T> implements Space<T> {
      * @return true if lock was acquired, false otherwise
      */
     public boolean tryAdd(T t) {
-        if (writeLock.tryLock()) {
+        if (writeLock().tryLock()) {
             try {
                 tree.add(t);
             } finally {
-                writeLock.unlock();
+                writeLock().unlock();
             }
             return true;
         }
@@ -270,11 +263,11 @@ public class ConcurrentRTree<T> implements Space<T> {
      * @return true if lock was acquired, false otherwise
      */
     public boolean tryRemove(T t) {
-        if (writeLock.tryLock()) {
+        if (writeLock().tryLock()) {
             try {
                 tree.remove(t);
             } finally {
-                writeLock.unlock();
+                writeLock().unlock();
             }
             return true;
         }
@@ -289,11 +282,11 @@ public class ConcurrentRTree<T> implements Space<T> {
      * @return true if lock was acquired, false otherwise
      */
     public boolean tryUpdate(T told, T tnew) {
-        if (writeLock.tryLock()) {
+        if (writeLock().tryLock()) {
             try {
                 tree.replace(told, tnew);
             } finally {
-                writeLock.unlock();
+                writeLock().unlock();
             }
             return true;
         }
@@ -307,41 +300,41 @@ public class ConcurrentRTree<T> implements Space<T> {
 
     @Override
     public void clear() {
-        writeLock.lock();
+        writeLock().lock();
         try {
             tree.clear();
         } finally {
-            writeLock.unlock();
+            writeLock().unlock();
         }
     }
 
     @Override
     public void forEach(Consumer<? super T> consumer) {
-        readLock.lock();
+        readLock().lock();
         try {
             tree.forEach(consumer);
         } finally {
-            readLock.unlock();
+            readLock().unlock();
         }
     }
 
     @Override
     public void containing(HyperRegion rect, Predicate<T> t) {
-        readLock.lock();
+        readLock().lock();
         try {
             tree.containing(rect, t);
         } finally {
-            readLock.unlock();
+            readLock().unlock();
         }
     }
 
     @Override
     public void intersecting(HyperRegion rect, Predicate<T> t) {
-        readLock.lock();
+        readLock().lock();
         try {
             tree.intersecting(rect, t);
         } finally {
-            readLock.unlock();
+            readLock().unlock();
         }
     }
 
@@ -358,11 +351,11 @@ public class ConcurrentRTree<T> implements Space<T> {
 
     @Override
     public Stats stats() {
-        readLock.lock();
+        readLock().lock();
         try {
             return tree.stats();
         } finally {
-            readLock.unlock();
+            readLock().unlock();
         }
     }
 

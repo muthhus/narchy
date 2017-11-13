@@ -4,6 +4,8 @@ import jcog.bag.Bag;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Centroid;
 import jcog.list.FasterList;
+import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import jcog.pri.VLink;
 import jcog.pri.op.PriMerge;
 import jcog.util.Flip;
@@ -110,6 +112,13 @@ public class BagClustering<X> {
             int bs = -1;
             for (int i = 0; i < n; i++) {
                 VLink<X> x = sorted.get(i);
+                X xx = x.get();
+                if (xx instanceof Prioritized && ((Prioritized)xx).isDeleted()) {
+                    x.delete();
+                    sorted.set(i, null);
+                    continue;
+                }
+
                 if (current != x.centroid) {
                     current = x.centroid;
                     if (bs != -1 && i - bs > 1)

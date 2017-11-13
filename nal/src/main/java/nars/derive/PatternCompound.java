@@ -10,9 +10,11 @@ import nars.derive.mutate.CommutivePermutations;
 import nars.term.Compound;
 import nars.term.GenericCompoundDT;
 import nars.term.Term;
+import nars.term.Terms;
+import nars.term.compound.GenericCompound;
+import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.SortedSet;
@@ -37,21 +39,21 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
     abstract protected static class PatternCompoundWithEllipsis extends PatternCompound {
 
-        @NotNull
         final Ellipsis ellipsis;
+        final int structureRequired;
 
         PatternCompoundWithEllipsis(/*@NotNull*/ Op seed, int dt, Ellipsis ellipsis, TermContainer subterms) {
             super(seed, dt, subterms);
 
             this.ellipsis = ellipsis;
-
+            this.structureRequired = subterms.structure() & ~(Op.VariableBits);
         }
 
         abstract protected boolean matchEllipsis(TermContainer y, Unify subst);
 
         @Override
         public final boolean unify(Term y, Unify subst) {
-            return op() == y.op() && matchEllipsis(y.subterms(), subst);
+            return y.hasAll(structureRequired) && op() == y.op() && matchEllipsis(y.subterms(), subst);
         }
 
 
@@ -289,7 +291,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
                 } else {
                     if (yFree.remove(x)) {
                         //matched constant
-                        //xFixed.remove(x); //<- probably not necessary
+                        xFixed.remove(x); //<- probably not necessary
                     } else {
                         if ((u.type == null && (x.vars()+x.varPattern()==0)) || (u.type!=null && !x.hasAny(u.type)))
                             return false; //unmatched constant offers no possibility of eventual unification
@@ -325,7 +327,9 @@ abstract public class PatternCompound extends GenericCompoundDT {
                     } else {
                         //permute may be necessary to unify the correct dep/indep terms for 2nd layer
                         if (xFixed.size()==match.subs())
-                            return u.termutes.add(new CommutivePermutations(The.subterms(xFixed), match.subterms()));
+                            return u.termutes.add(new CommutivePermutations(
+                                    The.subterms(xFixed),
+                                    match.subterms()));
                         else
                             return false; //?
                     }

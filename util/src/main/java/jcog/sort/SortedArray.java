@@ -327,45 +327,45 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
     /**
      * called when an item's sort order may have changed
      */
-    public void adjust(int index, float delta, FloatFunction<E> cmp) {
-        float cur = cmp.floatValueOf(list[index]);
+    public void adjust(int index, FloatFunction<E> cmp) {
+        E[] l = this.list;
+        float cur = cmp.floatValueOf(l[index]);
 
         boolean reinsert = false;
 
-        if (delta > 0 && index > 0) {
-            float f = cmp.floatValueOf(list[index - 1]);
+        if (index > 0) {
+            float f = cmp.floatValueOf(l[index - 1]);
             if (f > cur)
                 reinsert = true;
         }
 
-        //TODO only if decreased
         int s = this.size;
-        if (delta < 0 && index < s - 1) {
-            float f = cmp.floatValueOf(list[index + 1]);
-            if (f < cur)
-                reinsert = true;
+        if (!reinsert) {
+            if (index < s - 1) {
+                float f = cmp.floatValueOf(l[index + 1]);
+                if (f < cur)
+                    reinsert = true;
+            }
         }
 
         if (reinsert) {
             int next = this.findInsertionIndex(cur, 0, s - 1, new int[1], cmp);
             if (next == index - 1) {
                 //swap with above
-                swap(index, index - 1);
+                swap(l, index, index - 1);
             } else if (next == index + 1) {
                 //swap with below
-                swap(index, index + 1);
+                swap(l, index, index + 1);
             } else {
                 //remove and insert somewhere else
-                E i = remove(index);
-                insert(i, next, cur, cmp, s);
+                insert(remove(index), next, cur, cmp, s);
             }
         }
     }
 
-    private void swap(int a, int b) {
+    static void swap(Object[] l, int a, int b) {
         assert (a != b);
-        E[] l = this.list;
-        E x = l[b];
+        Object x = l[b];
         l[b] = l[a];
         l[a] = x;
     }

@@ -23,7 +23,7 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
 
     public final /*HACK make unpublic */ T ref;
 
-    public ProxyTerm(@NotNull T t) {
+    public ProxyTerm(T t) {
         this.ref = t;
     }
 
