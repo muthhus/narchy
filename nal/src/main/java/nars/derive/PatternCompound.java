@@ -1,6 +1,7 @@
 package nars.derive;
 
 import nars.Op;
+import nars.The;
 import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
 import nars.derive.mutate.Choose1;
@@ -50,7 +51,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
         @Override
         public final boolean unify(Term y, Unify subst) {
-            return /*y.hasAll(structureNecessary) && */op() == y.op() && matchEllipsis(y.subterms(), subst);
+            return op() == y.op() && matchEllipsis(y.subterms(), subst);
         }
 
 
@@ -281,14 +282,20 @@ abstract public class PatternCompound extends GenericCompoundDT {
                     @Nullable Term previouslyMatched = u.xy(x);
                     if (previouslyMatched != null) {
                         x = previouslyMatched;
-//                        xConst = !u.matchType(xo);
                     }
 
                     xFixed.add(x); //x is a variable which must be termuted when everything non-X is assigned
 
                 } else {
-                    if (yFree.remove(x))
-                        xFixed.remove(x); //matched constant
+                    if (yFree.remove(x)) {
+                        //matched constant
+                        //xFixed.remove(x); //<- probably not necessary
+                    } else {
+                        if ((u.type == null && (x.vars()+x.varPattern()==0)) || (u.type!=null && !x.hasAny(u.type)))
+                            return false; //unmatched constant offers no possibility of eventual unification
+
+                        xFixed.add(x);
+                    }
 
 //                    if (!yFree.remove(x))
 //                        xFixed.add(x);
@@ -313,14 +320,15 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
                     Term match = ys > 0 ? EllipsisMatch.match(yFree) : EllipsisMatch.empty;
 
-                    if (subs() > 1) {
-                        //permute may be necessary to unify the correct dep/indep terms for 2nd layer
-                        return u.termutes.add(new CommutivePermutations(subterms(), match.subterms()));
-                    } else {
+                    if (subs() == 1 || match.subs()==0 || xFixed.isEmpty()) {
                         return this.ellipsis.unify(match, u);
+                    } else {
+                        //permute may be necessary to unify the correct dep/indep terms for 2nd layer
+                        if (xFixed.size()==match.subs())
+                            return u.termutes.add(new CommutivePermutations(The.subterms(xFixed), match.subterms()));
+                        else
+                            return false; //?
                     }
-
-                    //return this.ellipsis.unify(ys > 0 ? EllipsisMatch.match(yFree) : EllipsisMatch.empty, u);
 
                 case 1:
                     Term x0 = xFixed.first();

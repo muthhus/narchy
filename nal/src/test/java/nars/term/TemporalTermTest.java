@@ -32,7 +32,7 @@ public class TemporalTermTest {
     }
 
     @Test
-    public void testCoNegatedSubtermConcept() throws Narsese.NarseseException {
+    public void testCoNegatedSubtermConceptConj() throws Narsese.NarseseException {
         assertEquals("((x) &&+- (x))", n.conceptualize($.$("((x) &&+10 (x))")).toString());
 
         assertEquals("((--,(x)) &&+- (x))", n.conceptualize($.$("((x) &&+10 (--,(x)))")).toString());
@@ -40,7 +40,10 @@ public class TemporalTermTest {
 
 //        assertEquals("((x) <=>+- (x))", n.conceptualize(n.term("((x) <=>+10 (--,(x)))")).toString());
 //        assertEquals("((x) <=>+- (x))", n.conceptualize(n.term("((x) <=>-10 (--,(x)))")).toString());
+    }
 
+    @Test
+    public void testCoNegatedSubtermConceptImpl() throws Narsese.NarseseException {
         assertEquals("((x) ==>+- (x))", n.conceptualize($.$("((x) ==>+10 (x))")).toString());
         assertEquals("((--,(x)) ==>+- (x))", n.conceptualize($.$("((--,(x)) ==>+10 (x))")).toString());
         assertEquals("((x) ==>+- (x))", n.conceptualize($.$("((x) ==>+10 (--,(x)))")).toString());

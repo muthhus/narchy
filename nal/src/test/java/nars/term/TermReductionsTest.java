@@ -696,6 +696,13 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
+    public void testImplicationTrue() throws Narsese.NarseseException {
+        assertEquals(True, $("(x==>x)"));
+        assertEquals(True, $("((x)==>(x))"));
+        assertEquals(Null, $("(--x==>x)"));
+        assertEquals(Null, $("(--(x)==>(x))"));
+    }
+    @Test
     public void testImplicationInequality() throws Narsese.NarseseException {
 
         assertNotEquals(

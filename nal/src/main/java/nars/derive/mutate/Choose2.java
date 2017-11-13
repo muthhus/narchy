@@ -38,7 +38,7 @@ public class Choose2 extends Termutator.AbstractTermutator {
 
         int yFreeSize = yFree.size();
 
-        this.yy = new ShuffledSubterms(f.random, The.subterms(yFree) /*new ArrayTermVector(yFree)*/);
+        this.yy = new ShuffledSubterms(The.subterms(yFree), f.random  /*new ArrayTermVector(yFree)*/);
 
         this.comb = new Combinations(yFreeSize, 2);
     }

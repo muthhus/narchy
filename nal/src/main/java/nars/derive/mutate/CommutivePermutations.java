@@ -20,7 +20,8 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
      * x and y must have same size
      */
     public CommutivePermutations(TermContainer x, TermContainer y) {
-        super($.p(x), $.p(y)); //assert(x.size()==y.size());
+        super($.p(x), $.p(y));
+        assert(x.subs()==y.subs());
         this.y = y;
         this.x = x;
     }
@@ -35,7 +36,7 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
     public void mutate(Unify f, Termutator[] chain, int current) {
         int start = f.now();
 
-        ShuffledSubterms p = new ShuffledSubterms(f.random, x);
+        ShuffledSubterms p = new ShuffledSubterms(x, f.random);
 
 
         while (p.hasNextThenNext()) {

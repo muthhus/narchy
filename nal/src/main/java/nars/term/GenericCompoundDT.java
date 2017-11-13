@@ -119,10 +119,6 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
         return t.transform(this, op(), dt);
     }
 
-    @Override
-    public Term root() {
-        return ref.root();
-    }
 
     @Override
     public boolean equals(Object that) {

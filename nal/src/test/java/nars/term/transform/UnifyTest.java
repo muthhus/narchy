@@ -45,12 +45,12 @@ public class UnifyTest {
 //        return t;
 //    }
 
-    static /*@NotNull*/ Compound pattern(/*@NotNull*/ String s) throws Narsese.NarseseException {
+    static /**/ Compound pattern(/**/ String s) throws Narsese.NarseseException {
         return new PatternIndex().pattern((Compound) Narsese.parse().term(s, false));
     }
 
-    @NotNull
-    Unify test(/*@NotNull*/ Op type, @NotNull String s1, @NotNull String s2, boolean shouldSub) {
+    
+    Unify test(/**/ Op type,  String s1,  String s2, boolean shouldSub) {
 
         //Param.DEBUG = true;
 
@@ -869,7 +869,7 @@ public class UnifyTest {
     }
 
 
-    void testIntroduction(String subj, Op relation, String pred, String belief, @NotNull String concl) {
+    void testIntroduction(String subj, Op relation, String pred, String belief,  String concl) {
 
         NAR n = NARS.shell();
         n.nal(6);
@@ -944,8 +944,8 @@ public class UnifyTest {
      */
 
 
-    @NotNull
-    Subst testUnify(@NotNull Compound a, @NotNull Compound b, boolean matches) {
+    
+    Subst testUnify( Compound a,  Compound b, boolean matches) {
 
         AtomicBoolean matched = new AtomicBoolean(false);
 

@@ -923,8 +923,8 @@ public interface Compound extends Term, IPair, TermContainer {
     @Nullable
     default Term temporalize(Retemporalize r) {
 //        return r.transform(this, op(), DTERNAL);
-//        if (!hasAny(Op.TemporalBits))
-//            return this;
+        if (!hasAny(Op.TemporalBits))
+            return this;
 //        else {
 //            Op o = op();
 //            boolean ot = o.temporal;

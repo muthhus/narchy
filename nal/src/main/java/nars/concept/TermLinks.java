@@ -101,13 +101,13 @@ public enum TermLinks {
                 return 2;
 
             case CONJ:
-                return 2;
+                return 3;
 
             case SIM:
                 return 3;
 
             case INH:
-                return 3;
+                return 4;
 
             case IMPL:
 //                if (host.hasAny(Op.CONJ))
