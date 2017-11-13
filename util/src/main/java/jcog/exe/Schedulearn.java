@@ -14,8 +14,10 @@ import static jcog.Texts.strNS;
  */
 public class Schedulearn {
 
-    //float OVER_DEMAND = 1.1f; //factor for additional iterations to request above the observed supply, ie. demand growth rate
-    float OVER_DEMAND = 1.5f; //factor to hard multiply total iterations after solution.  this effectively boosts the demand even further, but beyond the solution's expectations
+    /** factor for additional iterations to request above the observed supply, ie. demand growth rate
+     *  factor to hard multiply total iterations after solution.  this effectively boosts the demand even further, but beyond the solution's expectations
+     */
+    float OVER_DEMAND = 1.25f;
 
     final static double minIterationTime = 1.0E-9;
 

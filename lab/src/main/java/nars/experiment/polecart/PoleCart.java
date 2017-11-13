@@ -8,7 +8,7 @@ import nars.*;
 import nars.concept.SensorConcept;
 import nars.control.DurService;
 import nars.gui.Vis;
-import nars.util.signal.LSTMPredictor;
+import nars.util.signal.LivePredictor;
 import spacegraph.SpaceGraph;
 
 import javax.swing.*;
@@ -152,7 +152,7 @@ public class PoleCart extends NAgentX {
         FloatSupplier[] ins = new FloatSupplier[2];
         ins[0] = ()-> (float) angleDot;
         ins[1] = ()-> (float) posDot;
-        LSTMPredictor p = new LSTMPredictor(ins, 8, new FloatSupplier[]{()-> {
+        LivePredictor p = new LivePredictor(ins, 8, new FloatSupplier[]{()-> {
             return (float) (0.5f + 0.5f * Math.sin(angle));
         }}, 8);
         DurService.on(nar, ()->{

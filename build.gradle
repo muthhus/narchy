@@ -7,7 +7,7 @@ buildscript {
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
 //        classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.0'
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.1'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
     }
 }
 

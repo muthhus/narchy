@@ -14,7 +14,7 @@ public class PredictionFeedback {
     final BeliefTable table;
     static final boolean deleteAny = false; //
 
-    static final float REWARD_PUNISH_COHERENCE_THRESHOLD = 0.5f;
+    static final float REWARD_PUNISH_COHERENCE_THRESHOLD = 0.75f;
 
     public PredictionFeedback(BeliefTable table) {
         this.table = table;
