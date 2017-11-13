@@ -184,13 +184,13 @@ abstract public class NAgentX extends NAgent {
 //                    }
 //                })
                 .exe(new MultiExec.
-                            //Intense
-                            CoolNQuiet
-                        (256, THREADS, 64))
+                            Intense
+                            //CoolNQuiet
+                        (256, THREADS, 128))
 
                 .time(clock)
                 .deriverAdd(8)
-                //.deriverAdd("nal6.nal") //extra NAL6
+                .deriverAdd("nal6.nal") //extra NAL6
                 .deriverAdd("goal_analogy.nal")
                 .deriverAdd("motivation.nal")
                 .deriverAdd("list.nal")

@@ -20,6 +20,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static nars.Op.NEG;
 import static nars.Op.Null;
 import static nars.Op.PROD;
 
@@ -38,9 +39,13 @@ public enum The {  ;
     }
 
     @Deprecated /* @NotNull */ protected static Term compound(Op o, Term... subterms) {
+
         return Compound.the.apply(o, new FasterList<>(subterms));
     }
+
     /* @NotNull */ protected static Term compound(Op o, List<Term> subterms) {
+        if (o == NEG)
+            return Compound.rawCompoundBuilder.apply(o,subterms); //dont intern neg's
         return Compound.the.apply(o, subterms);
     }
 

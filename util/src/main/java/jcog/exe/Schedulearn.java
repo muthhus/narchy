@@ -109,8 +109,11 @@ public class Schedulearn {
 
         solver.update();
 
+//        double est = estimatedTimeTotal(can);
+//        System.out.println("scheduler efficiency: " + est + " vs " + timeslice);
+
         can.forEach(c ->
-            c.commit( c.iterations.value())
+            c.commit( Math.max(1, c.iterations.value() ))
         );
 
     }
