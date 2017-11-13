@@ -60,7 +60,7 @@ public class BulletStats {
 	public static int gNumClampedCcdMotions;
 
 	// JAVA NOTE: added for statistics in applet demo
-	public static long stepSimulationTime;
+	//public static long stepSimulationTime;
 	public static long updateTime;
 	
 	private static final boolean enableProfile = false;

@@ -91,11 +91,15 @@ public final class Transform extends v3 {
 	}
 
 	public void set(Transform tr) {
-		basis.set(tr.basis);
-		super.set(tr);
+		assert(this!=tr);
+
+		super.set(tr); //v3
+
+		basis.set(tr.basis); //m3
 	}
 	
 	public void set(Matrix3f mat) {
+		assert(this.basis!=mat);
 		basis.set(mat);
 		this.set(0f, 0f, 0f);
 	}

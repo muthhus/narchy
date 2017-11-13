@@ -17,17 +17,18 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
     private final Quaternion up = new Quaternion().setFromAngleNormalAxis(0, new float[] { 0,0,1});
 
 
-    private final float zTolerance = 0.05f;
+    private final float zTolerance = 0.01f;
 
-    private final float zSpeed = 0.2f;
-    float rotateRate = 0.25f;
+    float zSpeed;
+    float rotateRate;
 
-    public Flatten() {
+    public Flatten(float zSpeed, float rotateRate) {
+        this.zSpeed = zSpeed; this.rotateRate = rotateRate;
     }
 
     @Override
-    public void update(SpaceGraph<X> g, AbstractSpace<X, Spatial<X>> src, float dt) {
-        src.forEach(this);
+    public void update(Iterable<Spatial<X>> g, float dt) {
+        g.forEach(this);
     }
 
     @Override
@@ -43,18 +44,26 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
             if (b == null)
                 return;
 
-            float tz = b.transform().z;
+            float tz = b.worldTransform.z;
             if (Math.abs(tz) > zTolerance) {
-                b.impulse(v( 0, 0, -tz*zSpeed*b.mass()));
+//                b.velAdd(v( 0, 0,
+//                        -(tz > 0 ? (tz - zTolerance) : (tz + zTolerance)) * zSpeed));
+                b.linearVelocity.z *= zSpeed;
+                b.worldTransform.z *= zSpeed;
+            } else {
+                b.linearVelocity.z = 0;
+                b.worldTransform.z = 0;
             }
             s.rotate(up, rotateRate, new Quaternion());
+
 
 
             //dampening: keep upright and eliminate z-component of linear velocity
 //            b.linearVelocity.scale(
 //                    1f, 1f, 0.9f
 //            );
-            b.angularVelocity.scale(0.9f);
+            //b.angularVelocity.scale(1f-rotateRate);
+            //b.angularVelocity.zero();
         }
     }
 

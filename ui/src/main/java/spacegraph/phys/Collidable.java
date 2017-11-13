@@ -55,8 +55,8 @@ public class Collidable<X> {
 	public final Transform interpolationWorldTransform = new Transform();
 	//those two are experimental: just added for bullet time effect, so you can still apply impulses (directly modifying velocities) 
 	//without destroying the continuous interpolated motion (which uses this interpolation velocities)
-	protected final v3 interpolationLinearVelocity = new v3();
-	protected final v3 interpolationAngularVelocity = new v3();
+//	protected final v3 interpolationLinearVelocity = new v3();
+//	protected final v3 interpolationAngularVelocity = new v3();
 
 	/** broadphase handle */
 	public Broadphasing broadphase;
@@ -96,9 +96,6 @@ public class Collidable<X> {
 	protected boolean checkCollideWith;
 
 
-	public Collidable(Transform t) {
-		this(CollidableType.COLLISION_OBJECT, t);
-	}
 
 	public Collidable(CollidableType type, Transform t) {
 		this.internalType = type;
@@ -244,23 +241,15 @@ public class Collidable<X> {
 		this.interpolationWorldTransform.set(interpolationWorldTransform);
 	}
 
-	public void setInterpolationLinearVelocity(v3 linvel) {
-		interpolationLinearVelocity.set(linvel);
-	}
+//	public void setInterpolationLinearVelocity(v3 linvel) {
+//		interpolationLinearVelocity.set(linvel);
+//	}
+//
+//	public void setInterpolationAngularVelocity(v3 angvel) {
+//		interpolationAngularVelocity.set(angvel);
+//	}
+//
 
-	public void setInterpolationAngularVelocity(v3 angvel) {
-		interpolationAngularVelocity.set(angvel);
-	}
-
-	public v3 getInterpolationLinearVelocity(v3 out) {
-		out.set(interpolationLinearVelocity);
-		return out;
-	}
-
-	public v3 getInterpolationAngularVelocity(v3 out) {
-		out.set(interpolationAngularVelocity);
-		return out;
-	}
 
 	public final int tag() {
 		return islandTag1;

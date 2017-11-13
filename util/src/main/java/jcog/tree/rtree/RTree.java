@@ -42,7 +42,7 @@ import java.util.stream.Stream;
  * Created by jcairns on 4/30/15.</p>
  */
 public class RTree<T> implements Space<T> {
-    public static final double EPSILON = Float.MIN_NORMAL;;
+    public static final double EPSILON = Float.MIN_NORMAL;
 
 
     /*@NotNull*/

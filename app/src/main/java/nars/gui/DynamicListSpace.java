@@ -140,7 +140,7 @@ public abstract class DynamicListSpace<X,Y extends Spatial<X>> extends ListSpace
 
 
 
-        AbstractSpace ss = flat ? with(new Flatten()) : this;
+        AbstractSpace ss = flat ? with(new Flatten(0.1f, 0.25f)) : this;
         SpaceGraph<Term> s = new SpaceGraph<>(ss);
 
         EdgeDirected fd = new EdgeDirected();

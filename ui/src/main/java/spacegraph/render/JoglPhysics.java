@@ -47,8 +47,6 @@ import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.AnimVector3f;
 
-import java.util.function.Consumer;
-
 import static com.jogamp.opengl.GL2.*;
 import static spacegraph.math.v3.v;
 
@@ -307,7 +305,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener, I
 
         if (simulating) {
             // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
-            dyn.stepSimulation(
+            dyn.update(
                     Math.max(dt, 1000000f / FPS_IDEAL) / 1000000.f, maxSubsteps
                     //clock.getTimeThenReset()
             );

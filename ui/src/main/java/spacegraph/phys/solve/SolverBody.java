@@ -46,6 +46,7 @@ public class SolverBody {
 	public final v3 linearVelocity = new v3();
 	public final v3 centerOfMassPosition = new v3();
 
+	final Transform newTransform = new Transform();
 	public final v3 pushVelocity = new v3();
 	public final v3 turnVelocity = new v3();
 	
@@ -86,8 +87,8 @@ public class SolverBody {
 			body.setAngularVelocity(angularVelocity);
 
 			// correct the position/orientation based on push/turn recovery
-			Transform newTransform = new Transform();
-			Transform curTrans = body.getWorldTransform(new Transform());
+			newTransform.setIdentity();
+			Transform curTrans = body.transform(); //getWorldTransform(new Transform());
 			TransformUtil.integrateTransform(curTrans, pushVelocity, turnVelocity, timeStep, newTransform);
 			body.setWorldTransform(newTransform);
 

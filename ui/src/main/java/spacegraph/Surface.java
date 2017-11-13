@@ -16,6 +16,8 @@ import java.io.PrintStream;
  */
 abstract public class Surface {
 
+    /** smallest recognizable dimension change */
+    public static final float EPSILON = 0.0001f;
 
     public float x() {
         return bounds.min.x;
@@ -42,7 +44,8 @@ abstract public class Surface {
     }
 
     public void pos(RectFloat2D r) {
-        bounds = r;
+        if (bounds == null || !bounds.equals(r, Surface.EPSILON))
+            bounds = r;
     }
 
     public AspectAlign align(Align align, float aspectRatio) {

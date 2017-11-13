@@ -40,7 +40,7 @@ public class Windo extends Widget {
     public final static float resizeBorder = 0.1f;
 
 
-    private boolean hover;
+    protected boolean hover;
 
     Map<Object, Port> ports = null;
 
@@ -288,7 +288,7 @@ public class Windo extends Widget {
     }
 
 
-    static class Port extends Windo {
+    public static class Port extends Windo {
         public final String id;
 
         public final v2 posRel;
@@ -371,7 +371,7 @@ public class Windo extends Widget {
         return ((Wall) parent);
     }
 
-    protected Port addPort(String x) {
+    public Port addPort(String x) {
         Wall w = wall();
         {
 //            if (ports == null)

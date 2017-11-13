@@ -152,15 +152,19 @@ public class RectFloat2D implements HyperRegion<Float2D>, Comparable<RectFloat2D
 
     @Override
     public boolean equals(Object o) {
+        return equals(o, (float) RTree.EPSILON);
+    }
+
+    public boolean equals(Object o, float epsilon) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof RectFloat2D)) return false;
 
         RectFloat2D rect2D = (RectFloat2D) o;
 
-        return Util.equals(min.x, rect2D.min.x, RTree.EPSILON) &&
-                Util.equals(max.x, rect2D.max.x, RTree.EPSILON) &&
-                Util.equals(min.y, rect2D.min.y, RTree.EPSILON) &&
-                Util.equals(max.y, rect2D.max.y, RTree.EPSILON);
+        return Util.equals(min.x, rect2D.min.x, epsilon) &&
+                Util.equals(max.x, rect2D.max.x, epsilon) &&
+                Util.equals(min.y, rect2D.min.y, epsilon) &&
+                Util.equals(max.y, rect2D.max.y, epsilon);
     }
 
     @Override

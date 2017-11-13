@@ -765,47 +765,50 @@ public class SequentialImpulseConstrainer extends Constrainer {
             IntArrayList frictionPool = this.orderFrictionConstraintPool;
             for (iteration = 0; iteration < infoGlobal.numIterations; iteration++) {
 
-                int j;
                 if ((infoGlobal.solverMode & SolverMode.SOLVER_RANDMIZE_ORDER) != 0) {
                     if ((iteration & 7) == 0) {
-                        for (j = 0; j < numConstraintPool; ++j) {
+                        for (int j = 0; j < numConstraintPool; ++j) {
                             orderPool(j, constraintPool);
                         }
 
-                        for (j = 0; j < numFrictionPool; ++j) {
+                        for (int j = 0; j < numFrictionPool; ++j) {
                             orderPool(j, frictionPool);
                         }
                     }
                 }
 
-                for (j = 0; j < numConstraints; j++) {
+                for (int j = 0; j < numConstraints; j++) {
                     //return array[index];
-                    TypedConstraint constraint = constraints.get(constraints_offset + j);
+                    final TypedConstraint constraint = constraints.get(constraints_offset + j);
                     // todo: use solver bodies, so we don't need to copy from/to btRigidBody
 
-                    if ((constraint.getRigidBodyA().tag() >= 0) && (constraint.getRigidBodyA().getCompanionId() >= 0)) {
+                    final Dynamic ca = constraint.getRigidBodyA();
+                    final int cai = ca.getCompanionId();
+                    if ((ca.tag() >= 0) && (cai >= 0)) {
                         //return array[index];
-                        tmpSolverBodyPool.get(constraint.getRigidBodyA().getCompanionId()).writebackVelocity();
+                        tmpSolverBodyPool.get(cai).writebackVelocity();
                     }
-                    if ((constraint.getRigidBodyB().tag() >= 0) && (constraint.getRigidBodyB().getCompanionId() >= 0)) {
+                    Dynamic cb = constraint.getRigidBodyB();
+                    int cbi = cb.getCompanionId();
+                    if ((cb.tag() >= 0) && (cbi >= 0)) {
                         //return array[index];
-                        tmpSolverBodyPool.get(constraint.getRigidBodyB().getCompanionId()).writebackVelocity();
+                        tmpSolverBodyPool.get(cbi).writebackVelocity();
                     }
 
                     constraint.solveConstraint(infoGlobal.timeStep);
 
-                    if ((constraint.getRigidBodyA().tag() >= 0) && (constraint.getRigidBodyA().getCompanionId() >= 0)) {
+                    if ((ca.tag() >= 0) && (cai >= 0)) {
                         //return array[index];
-                        tmpSolverBodyPool.get(constraint.getRigidBodyA().getCompanionId()).readVelocity();
+                        tmpSolverBodyPool.get(cai).readVelocity();
                     }
-                    if ((constraint.getRigidBodyB().tag() >= 0) && (constraint.getRigidBodyB().getCompanionId() >= 0)) {
+                    if ((cb.tag() >= 0) && (cbi >= 0)) {
                         //return array[index];
-                        tmpSolverBodyPool.get(constraint.getRigidBodyB().getCompanionId()).readVelocity();
+                        tmpSolverBodyPool.get(cbi).readVelocity();
                     }
                 }
 
                 int numPoolConstraints = tmpSolverConstraintPool.size();
-                for (j = 0; j < numPoolConstraints; j++) {
+                for (int j = 0; j < numPoolConstraints; j++) {
 //return array[index];
                     SolverConstraint solveManifold = tmpSolverConstraintPool.get(constraintPool.get(j));
 //return array[index];
@@ -816,7 +819,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
                 int numFrictionPoolConstraints = tmpSolverFrictionConstraintPool.size();
 
-                for (j = 0; j < numFrictionPoolConstraints; j++) {
+                for (int j = 0; j < numFrictionPoolConstraints; j++) {
 //return array[index];
                     SolverConstraint solveManifold = tmpSolverFrictionConstraintPool.get(frictionPool.get(j));
 
@@ -836,8 +839,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
             if (infoGlobal.splitImpulse) {
                 for (iteration = 0; iteration < infoGlobal.numIterations; iteration++) {
                     int numPoolConstraints = tmpSolverConstraintPool.size();
-                    int j;
-                    for (j = 0; j < numPoolConstraints; j++) {
+                    for (int j = 0; j < numPoolConstraints; j++) {
 //return array[index];
                         SolverConstraint solveManifold = tmpSolverConstraintPool.get(constraintPool.get(j));
 

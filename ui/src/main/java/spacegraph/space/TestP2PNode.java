@@ -98,7 +98,7 @@ public class TestP2PNode extends Cuboid {
         TestP2PLink ab = new TestP2PLink(a, b);
 
         s.add(a, b, ab);
-        s.add(new ListSpace().with(new Flatten())); //HACK TODO make a Transform-only space input
+        s.add(new ListSpace().with(new Flatten(0.2f, 0.25f))); //HACK TODO make a Transform-only space input
 
         s.show(1000, 800)
                 .setWindowDestroyNotifyAction(() -> System.exit(1));

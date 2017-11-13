@@ -78,8 +78,8 @@ public class Dynamic<X> extends Collidable<X> {
 
 	private final v3 gravity = new v3();
 	public final v3 invInertiaLocal = new v3();
-	private final v3 totalForce = new v3();
-	private final v3 totalTorque = new v3();
+	public final v3 totalForce = new v3();
+	public final v3 totalTorque = new v3();
 
 
 	private float linearDamping;
@@ -157,8 +157,8 @@ public class Dynamic<X> extends Collidable<X> {
 //		}
 
 		interpolationWorldTransform.set(worldTransform);
-		interpolationLinearVelocity.set(0f, 0f, 0f);
-		interpolationAngularVelocity.set(0f, 0f, 0f);
+//		interpolationLinearVelocity.set(0f, 0f, 0f);
+//		interpolationAngularVelocity.set(0f, 0f, 0f);
 
 
 		/** Best simulation results when friction is non-zero. */
@@ -246,8 +246,8 @@ public class Dynamic<X> extends Collidable<X> {
 			//Vector3f linVel = new Vector3f(), angVel = new Vector3f();
 
 			TransformUtil.calculateVelocity(interpolationWorldTransform, worldTransform, timeStep, linearVelocity, angularVelocity);
-			interpolationLinearVelocity.set(linearVelocity);
-			interpolationAngularVelocity.set(angularVelocity);
+//			interpolationLinearVelocity.set(linearVelocity);
+//			interpolationAngularVelocity.set(angularVelocity);
 			interpolationWorldTransform.set(worldTransform);
 		//printf("angular = %f %f %f\n",m_angularVelocity.getX(),m_angularVelocity.getY(),m_angularVelocity.getZ());
 		}
@@ -257,7 +257,7 @@ public class Dynamic<X> extends Collidable<X> {
 		if (isStaticOrKinematicObject())
 			return;
 
-		applyCentralForce(gravity);
+		force(gravity);
 	}
 	
 	@Override
@@ -388,9 +388,9 @@ public class Dynamic<X> extends Collidable<X> {
 		}
 
 		linearVelocity.scaleAdd(inverseMass * step, totalForce, linearVelocity);
-		v3 tmp = new v3(totalTorque);
-		invInertiaTensorWorld.transform(tmp);
-		angularVelocity.scaleAdd(step, tmp, angularVelocity);
+
+		invInertiaTensorWorld.transform(totalTorque);
+		angularVelocity.scaleAdd(step, totalTorque, angularVelocity);
 
 		// clamp angular velocity. collision calculations will fail on higher angular velocities	
 		float angvel = angularVelocity.lengthSquared();
@@ -401,14 +401,15 @@ public class Dynamic<X> extends Collidable<X> {
 
 	public void setCenterOfMassTransform(Transform xform) {
 		interpolationWorldTransform.set(isStaticOrKinematicObject() ? worldTransform : xform);
-		getLinearVelocity(interpolationLinearVelocity);
-		getAngularVelocity(interpolationAngularVelocity);
+//		getLinearVelocity(interpolationLinearVelocity);
+//		getAngularVelocity(interpolationAngularVelocity);
 		worldTransform.set(xform);
 		updateInertiaTensor();
 	}
 
-	public void applyCentralForce(v3 force) {
-		totalForce.add(force);
+	public void force(v3 forcetoCenter) {
+		totalForce.add(forcetoCenter);
+		activate();
 	}
 	
 	public v3 getInvInertiaDiagLocal(v3 out) {
@@ -428,29 +429,28 @@ public class Dynamic<X> extends Collidable<X> {
 	public void torque(v3 torque) {
 		totalTorque.add(torque);
 	}
-
-	public void force(v3 force, v3 rel_pos) {
-		applyCentralForce(force);
-		
-		v3 tmp = new v3();
-		tmp.cross(rel_pos, force);
-		tmp.scale(angularFactor);
-		torque(tmp);
-	}
+//
+//	public void force(v3 force, v3 rel_pos) {
+//		applyCentralForce(force);
+//
+//		v3 tmp = new v3();
+//		tmp.cross(rel_pos, force);
+//		tmp.scale(angularFactor);
+//		torque(tmp);
+//	}
 
 	/** applied to the center */
 	public void impulse(v3 impulse) {
 		linearVelocity.scaleAdd(inverseMass, impulse, linearVelocity);
+		activate();
 	}
-	public void impulse(float ix, float iy, float iz) {
-		linearVelocity.scaleAdd(inverseMass, ix, iy, iz, linearVelocity);
-	}
-	
+
 
 	public void torqueImpulse(v3 torque) {
 		v3 tmp = new v3(torque);
 		invInertiaTensorWorld.transform(tmp);
 		angularVelocity.add(tmp);
+		activate();
 	}
 
 
@@ -673,11 +673,10 @@ public class Dynamic<X> extends Collidable<X> {
 
 	public void velAdd(v3 delta) {
 		linearVelocity.add(delta);
+		activate();
 	}
 
-	public void force(v3 delta) {
-		applyCentralForce(delta);
-	}
+
 
 
 //

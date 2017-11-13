@@ -116,24 +116,20 @@ public class Dynamics<X> extends Collisions<X> {
     }
 
     public static Dynamic newBody(float mass, CollisionShape shape, Transform t, int group, int mask) {
-        // rigidbody is dynamic if and only if mass is non zero, otherwise static
-        boolean isDynamic = (mass != 0f);
-        v3 localInertia = v(0, 0, 0);
-        if (isDynamic) {
-            shape.calculateLocalInertia(mass, localInertia);
-        }
 
-        Dynamic body = new Dynamic(mass, t, shape, localInertia);
-        body.setCenterOfMassTransform(t);
+        Dynamic body = new Dynamic(mass, t, shape);
         body.group = (short) group;
         body.mask = (short) mask;
+        if (mass != 0f) { // rigidbody is dynamic if and only if mass is non zero, otherwise static
+            shape.calculateLocalInertia(mass, v());
+        }
 
         return body;
     }
 
 
-    public final int stepSimulation(float dt, int maxSubSteps) {
-        return stepSimulation(dt, maxSubSteps, 1f / 60f);
+    public final int update(float dt, int maxSubSteps) {
+        return update(dt, maxSubSteps, 1f / 60f);
     }
 
     protected void synchronizeMotionStates(boolean clear) {
@@ -144,7 +140,8 @@ public class Dynamics<X> extends Collisions<X> {
 //        v3 tmpAngVel = new v3();
 
         // todo: iterate over awake simulation islands!
-        for (Collidable ccc : collidable) {
+        for (int i = 0, collidableSize = collidable.size(); i < collidableSize; i++) {
+            Collidable ccc = collidable.get(i);
 
             Dynamic body = ifDynamic(ccc);
             if (body == null) {
@@ -172,15 +169,17 @@ public class Dynamics<X> extends Collisions<X> {
 
     }
 
-    synchronized int stepSimulation(float timeStep, int maxSubSteps, float fixedTimeStep) {
+    synchronized int update(float timeStep, int maxSubSteps, float fixedTimeStep) {
         curDT = timeStep;
+
+        BulletGlobals.the.set(this);
+
+        //long t0 = System.nanoTime();
         updateAnimations();
 
         //startProfiling(timeStep);
 
-        BulletGlobals.the.set(this);
 
-        long t0 = System.nanoTime();
 
         //BulletStats.pushProfile("stepSimulation");
         try {
@@ -229,11 +228,11 @@ public class Dynamics<X> extends Collisions<X> {
         } catch (Throwable t) {
             t.printStackTrace();
             return 1;
-        } finally {
+        } /*finally {
             //BulletStats.popProfile();
 
-            BulletStats.stepSimulationTime = (System.nanoTime() - t0) / 1000000;
-        }
+            //BulletStats.stepSimulationTime = (System.nanoTime() - t0) / 1000000;
+        }*/
     }
 
 

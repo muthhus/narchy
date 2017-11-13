@@ -14,9 +14,9 @@ public class Spiral<X> implements SpaceTransform<X> {
     float angleRate = 0.5f;
 
     @Override
-    public void update(SpaceGraph<X> g, AbstractSpace<X, Spatial<X>> src, float dt) {
+    public void update(Iterable<Spatial<X>> g, float dt) {
         this.order = 0;
-        src.forEach(this::update);
+        g.forEach(this::update);
     }
 
 

@@ -1,7 +1,6 @@
 package spacegraph;
 
 import jcog.list.FasterList;
-import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 
 import java.util.Collections;
 import java.util.List;
@@ -66,7 +65,7 @@ abstract public class AbstractSpace<X, Y>  {
 
         List<SpaceTransform> ll = this.transforms;
         for (int i1 = 0, layoutSize = ll.size(); i1 < layoutSize; i1++) {
-            ll.get(i1).update(s, this, dt);
+            ll.get(i1).update(s, dt);
         }
 
     }
