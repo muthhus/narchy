@@ -12,7 +12,6 @@ import nars.video.PixelBag;
 
 import javax.swing.*;
 
-import static jcog.Util.unitize;
 import static nars.$.$;
 import static nars.$.p;
 

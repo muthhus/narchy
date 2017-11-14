@@ -4,7 +4,6 @@ import jcog.bag.Bag;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Centroid;
 import jcog.list.FasterList;
-import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.VLink;
 import jcog.pri.op.PriMerge;

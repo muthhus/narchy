@@ -1,7 +1,7 @@
 package de.julian.baehr.es.cma;
 
 
-import jcog.tensor.Tensor;
+import jcog.math.tensor.Tensor;
 
 public class Individual {
 

@@ -3,7 +3,7 @@ package nars.gui;
 import jcog.Util;
 import jcog.learn.lstm.DistractedSequenceRecall;
 import jcog.learn.lstm.SimpleLSTM;
-import jcog.random.XorShift128PlusRandom;
+import jcog.math.random.XorShift128PlusRandom;
 import spacegraph.layout.Grid;
 import spacegraph.render.Draw;
 import spacegraph.widget.meter.MatrixView;

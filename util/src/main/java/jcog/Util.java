@@ -27,11 +27,9 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import jcog.bit.MetalBitSet;
 import jcog.io.BinTxt;
 import jcog.math.NumberException;
 import jcog.math.OneDHaar;
-import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import org.HdrHistogram.AbstractHistogram;
 import org.HdrHistogram.DoubleHistogram;
@@ -62,7 +60,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.function.*;
 import java.util.stream.DoubleStream;
 
-import static java.lang.Float.NaN;
 import static java.util.Arrays.stream;
 import static jcog.Texts.iPad;
 import static jcog.Texts.n4;
@@ -1297,11 +1294,7 @@ public enum Util {
         return x;
     }
 
-    public static int decideRoulette(float[] x, Random rng) {
-        return decideRoulette(x.length, (n) -> x[n], rng);
-    }
-
-    private static float weightSum(int weightCount, IntToFloatFunction weight) {
+    public static float weightSum(int weightCount, IntToFloatFunction weight) {
         float weightSum = 0;
         for (int i = 0; i < weightCount; i++) {
             float w = weight.valueOf(i);
@@ -1309,16 +1302,6 @@ public enum Util {
             weightSum += w;
         }
         return weightSum;
-    }
-
-    /**
-     * https://en.wikipedia.org/wiki/Fitness_proportionate_selection
-     * Returns the selected index based on the weights(probabilities)
-     */
-    public static int decideRoulette(int weightCount, IntToFloatFunction weight, Random rng) {
-        // calculate the total weight
-        assert (weightCount > 0);
-        return decideRoulette(weightCount, weight, weightSum(weightCount, weight), rng);
     }
 
     public static boolean equals(double[] a, double[] b, double epsilon) {
@@ -1364,61 +1347,6 @@ public enum Util {
         return true;
     }
 
-    public static <X> void selectRouletteUnique(Random random, int choices, IntToFloatFunction choiceWeight, IntPredicate tgt) {
-        assert(choices > 0);
-        if (choices == 1) {
-            tgt.test(0);
-            return;
-        }
-
-        MetalBitSet selected = new MetalBitSet(choices);
-
-        final int[] hardLimit = {choices*2};
-        IntToFloatFunction cc = ii -> {
-            if (selected.get(ii)) {
-                return 0;
-            } else {
-                float w = choiceWeight.valueOf(ii);
-                if (w == 0)
-                    selected.set(ii);
-                return w;
-            }
-        };
-        Util.decideRoulette(choices, cc, random, (int y) -> {
-            selected.set(y);
-//            int remain = choices - selected.cardinality();
-            boolean kontinue = tgt.test(y) && (hardLimit[0]-- > 0);
-//            if (kontinue && remain == 1) {
-//                //"tail" roulette optimization
-//                int x = selected.nextClearBit();
-//                tgt.test(x);
-//                return RouletteControl.STOP;
-//            }
-            return kontinue ?
-                    RouletteControl.WEIGHTS_CHANGED : RouletteControl.STOP;
-        });
-
-//        if (sampled == 0) return Collections.emptyList();
-//        if (sampled == choices) {
-//            return List.of(x);
-//        } else {
-//            //TODO better selection method
-//
-//            List<X> l = new FasterList(sampled);
-//            MetalBitSet b = new MetalBitSet(choices);
-//            int limit = sampled * 4;
-//            int c = 0;
-//            for (int i = 0; c < sampled && i < limit; i++) {
-//                int w = random.nextInt(choices); //<- TODO weighted roullette selection here
-//                if (!b.getAndSet(w, true)) {
-//                    l.add(x[w]);
-//                    c++;
-//                }
-//            }
-//            return l;
-//        }
-    }
-
     public static float max(float a, float b, float c) {
         return Math.max(Math.max(a, b), c);
     }
@@ -1432,60 +1360,6 @@ public enum Util {
 
     public static float min(float x,float y) {
         return (x <= y) ? x : y;
-    }
-
-    public static enum RouletteControl {
-        STOP, CONTINUE, WEIGHTS_CHANGED
-    }
-
-    public static void decideRoulette(int choices, IntToFloatFunction choiceWeight, Random rng, IntFunction<RouletteControl> each) {
-        float weightSum = NaN;
-        while (true) {
-            if (weightSum != weightSum) {
-                weightSum = weightSum(choices, choiceWeight);
-            }
-            if (weightSum < Float.MIN_NORMAL * choices)
-                return; //no more choices
-            switch (each.apply(decideRoulette(choices, choiceWeight, weightSum, rng))) {
-                case STOP:
-                    return;
-                case CONTINUE:
-                    break;
-                case WEIGHTS_CHANGED:
-                    weightSum = Float.NaN;
-                    break;
-            }
-        }
-    }
-
-    public static int decideSoftmax(int count, IntToFloatFunction weight, float temperature, Random random) {
-        return decideRoulette(count, (i) ->
-                (float) Math.exp(weight.valueOf(i) / temperature), random);
-    }
-
-    /**
-     * faster if the sum is already known
-     */
-    public static int decideRoulette(final int count, IntToFloatFunction weight, float weight_sum, Random rng) {
-
-        int i = rng.nextInt(count); //random start location
-        assert (i >= 0);
-        if (weight_sum < Pri.EPSILON) {
-            return i; //flat, choose one at random
-        }
-
-        float distance = rng.nextFloat() * weight_sum;
-        boolean dir = rng.nextBoolean(); //randomize the direction
-
-        while ((distance = distance - weight.valueOf(i)) > 0) {
-            if (dir) {
-                if (++i == count) i = 0;
-            } else {
-                if (--i == -1) i = count - 1;
-            }
-        }
-
-        return i;
     }
 
 

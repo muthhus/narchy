@@ -2,7 +2,7 @@ package nars.experiment;
 
 import jcog.learn.Agent;
 import jcog.math.FloatSupplier;
-import jcog.util.IntIntToObjectFunc;
+import jcog.math.IntIntToObjectFunc;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;

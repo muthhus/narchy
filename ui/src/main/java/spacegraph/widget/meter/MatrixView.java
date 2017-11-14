@@ -2,7 +2,7 @@ package spacegraph.widget.meter;
 
 import com.jogamp.opengl.GL2;
 import jcog.math.FloatSupplier;
-import jcog.tensor.ArrayTensor;
+import jcog.math.tensor.ArrayTensor;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import spacegraph.render.Draw;
 import spacegraph.widget.windo.Widget;

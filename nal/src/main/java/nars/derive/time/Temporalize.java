@@ -1,7 +1,7 @@
 package nars.derive.time;
 
 import jcog.math.Interval;
-import jcog.random.XorShift128PlusRandom;
+import jcog.math.random.XorShift128PlusRandom;
 import nars.Op;
 import nars.term.Term;
 import nars.term.atom.Bool;

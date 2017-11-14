@@ -2,11 +2,11 @@ package jcog.bag;
 
 import jcog.Util;
 import jcog.list.FasterList;
+import jcog.list.table.Table;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriForget;
-import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;

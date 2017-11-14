@@ -1,6 +1,6 @@
 package nars.term.transform;
 
-import jcog.random.XorShift128PlusRandom;
+import jcog.math.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Narsese;
 import nars.Op;

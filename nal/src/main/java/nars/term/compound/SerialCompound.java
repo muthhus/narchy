@@ -2,7 +2,7 @@ package nars.term.compound;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.primitives.Ints;
-import jcog.byt.DynBytes;
+import jcog.data.byt.DynBytes;
 import nars.IO;
 import nars.Op;
 import nars.Param;

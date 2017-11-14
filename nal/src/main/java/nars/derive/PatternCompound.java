@@ -14,7 +14,6 @@ import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.instrument.Instrumentation;
 import java.util.SortedSet;
 import java.util.TreeSet;
 

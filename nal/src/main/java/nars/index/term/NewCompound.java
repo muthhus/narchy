@@ -1,7 +1,7 @@
 package nars.index.term;
 
 import com.google.common.io.ByteArrayDataOutput;
-import jcog.byt.DynBytes;
+import jcog.data.byt.DynBytes;
 import jcog.list.FasterList;
 import jcog.util.ArrayPool;
 import nars.Op;

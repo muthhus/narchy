@@ -1,7 +1,7 @@
 package nars.control;
 
-import jcog.Util;
 import jcog.bag.Bag;
+import jcog.decide.DecideRoulette;
 import jcog.list.FasterList;
 import jcog.pri.PLink;
 import jcog.pri.Pri;
@@ -144,7 +144,7 @@ public class Activate extends PLink<Concept> implements Termed {
         } else {
 
             List<Concept> uu = $.newArrayList(count);
-            Util.selectRouletteUnique(rng, tts, (w) -> {
+            DecideRoulette.selectRouletteUnique(rng, tts, (w) -> {
                 //return tt.get(w).volume(); //biased toward larger template components so the activation trickles down to atoms with less probabilty
                 return 1f; //flat
             }, (z) -> {

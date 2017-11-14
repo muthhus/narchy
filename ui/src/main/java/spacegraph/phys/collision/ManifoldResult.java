@@ -24,7 +24,6 @@
 package spacegraph.phys.collision;
 
 import spacegraph.math.v3;
-import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.narrow.DiscreteCollisionDetectorInterface;
 import spacegraph.phys.collision.narrow.ManifoldPoint;

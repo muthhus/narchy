@@ -6,7 +6,6 @@ import jcog.list.FasterList;
 import jcog.math.FloatDelay;
 import jcog.math.FloatSupplier;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 

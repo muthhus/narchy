@@ -1,7 +1,7 @@
 package nars.term.compound;
 
 import jcog.Util;
-import jcog.byt.DynBytes;
+import jcog.data.byt.DynBytes;
 import nars.IO;
 import nars.Op;
 import nars.The;

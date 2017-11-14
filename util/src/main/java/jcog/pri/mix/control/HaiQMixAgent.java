@@ -2,8 +2,8 @@ package jcog.pri.mix.control;
 
 import jcog.Util;
 import jcog.learn.ql.HaiQAgent;
-import jcog.tensor.ArrayTensor;
-import jcog.tensor.Tensor;
+import jcog.math.tensor.ArrayTensor;
+import jcog.math.tensor.Tensor;
 
 public class HaiQMixAgent implements MixAgent {
 

@@ -5,10 +5,11 @@ import jcog.bag.Bag;
 import jcog.bag.util.SpinMutex;
 import jcog.bag.util.Treadmill2;
 import jcog.data.array.Arrays;
+import jcog.decide.DecideRoulette;
 import jcog.list.FasterList;
+import jcog.math.AtomicFloat;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
-import jcog.util.AtomicFloat;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -623,7 +624,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                     wVal[windowCap - 1] = v0;
                     wPri[windowCap - 1] = Util.max(p, Pri.EPSILON); //to differentiate from absolute zero
 
-                    int which = Util.decideRoulette(windowCap, (r) -> wPri[r], random);
+                    int which = DecideRoulette.decideRoulette(windowCap, (r) -> wPri[r], random);
                     V v = (V) wVal[which];
                     if (v == null)
                         continue; //shouldnt happen but just in case

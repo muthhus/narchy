@@ -2,7 +2,6 @@ package nars.term.container;
 
 import nars.$;
 import nars.Op;
-import nars.The;
 import nars.derive.mutate.CommutivePermutations;
 import nars.term.Compound;
 import nars.term.Term;

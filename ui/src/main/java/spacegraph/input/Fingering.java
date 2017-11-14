@@ -1,7 +1,5 @@
 package spacegraph.input;
 
-import spacegraph.input.Finger;
-
 /** exclusive finger control state which a surface can activate in reaction to input events.
  * it has a specified termination condition (ex: button release) and
  * while active, locks any other surface from receiving interaction events.

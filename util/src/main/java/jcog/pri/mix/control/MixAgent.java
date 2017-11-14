@@ -1,7 +1,7 @@
 package jcog.pri.mix.control;
 
-import jcog.tensor.ArrayTensor;
-import jcog.tensor.Tensor;
+import jcog.math.tensor.ArrayTensor;
+import jcog.math.tensor.Tensor;
 
 public interface MixAgent {
     void act(Tensor in, float score, ArrayTensor out);

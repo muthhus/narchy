@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.List;
 
 import static java.lang.Math.PI;
-import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static spacegraph.layout.Grid.VERTICAL;
 

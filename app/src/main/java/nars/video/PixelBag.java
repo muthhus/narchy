@@ -1,7 +1,7 @@
 package nars.video;
 
 import jcog.Util;
-import jcog.random.XorShift128PlusRandom;
+import jcog.math.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAgent;
 import nars.concept.ActionConcept;

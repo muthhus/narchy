@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.tree.rtree.HyperRegion;
 import jcog.tree.rtree.RTree;
 import jcog.tree.rtree.point.Float2D;
-import org.jetbrains.annotations.NotNull;
 
 
 public class RectFloat2D implements HyperRegion<Float2D>, Comparable<RectFloat2D> {

@@ -9,7 +9,6 @@ import nars.control.MetaGoal;
 import org.junit.jupiter.api.Test;
 
 import static nars.Op.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ThermostatTest {
 

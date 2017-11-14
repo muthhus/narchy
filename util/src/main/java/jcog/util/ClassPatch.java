@@ -1,9 +1,7 @@
 package jcog.util;
 
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.dynamic.loading.ByteArrayClassLoader;
-import net.bytebuddy.dynamic.scaffold.MethodGraph;
 import net.bytebuddy.dynamic.scaffold.TypeValidation;
 import net.bytebuddy.implementation.StubMethod;
 import org.apache.commons.lang3.ArrayUtils;

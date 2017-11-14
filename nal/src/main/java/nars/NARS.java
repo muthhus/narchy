@@ -1,7 +1,7 @@
 package nars;
 
 import jcog.list.FasterList;
-import jcog.random.XoRoShiRo128PlusRandom;
+import jcog.math.random.XoRoShiRo128PlusRandom;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
 import nars.control.Deriver;

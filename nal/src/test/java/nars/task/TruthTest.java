@@ -1,6 +1,6 @@
 package nars.task;
 
-import jcog.random.XorShift128PlusRandom;
+import jcog.math.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Param;
 import nars.truth.DiscreteTruth;

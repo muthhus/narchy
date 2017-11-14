@@ -1,6 +1,7 @@
 package jcog.pri;
 
 import jcog.Util;
+import jcog.decide.DecideRoulette;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,7 +80,7 @@ public class MultiLink<X extends Prioritized,Y> extends AbstractPLink<Y> {
             return null;
         }
 
-        int s = Util.decideRoulette(c, i -> pri[i], ThreadLocalRandom.current());
+        int s = DecideRoulette.decideRoulette(c, i -> pri[i], ThreadLocalRandom.current());
         return transduce.apply(x[s]);
     }
 

@@ -1,6 +1,7 @@
 package nars.derive;
 
 import jcog.Util;
+import jcog.decide.DecideRoulette;
 import nars.$;
 import nars.control.Cause;
 import nars.control.Derivation;
@@ -121,7 +122,7 @@ public class ValueFork extends Fork {
         } else {
 
             final boolean[] continued = {true};
-            Util.selectRouletteUnique(d.random, branches, (i) -> 1 + causes[i].gain(), (b) -> {
+            DecideRoulette.selectRouletteUnique(d.random, branches, (i) -> 1 + causes[i].gain(), (b) -> {
 
                 this.branches[b].test(d);
 

@@ -2,10 +2,10 @@ package nars.experiment;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import jcog.optimize.Optimize;
 import jcog.Util;
 import jcog.math.FloatSupplier;
 import jcog.net.MeshOptimize;
+import jcog.optimize.Optimize;
 import nars.*;
 import nars.gui.Vis;
 import nars.task.DerivedTask;

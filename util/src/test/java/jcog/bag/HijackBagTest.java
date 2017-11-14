@@ -2,10 +2,10 @@ package jcog.bag;
 
 import com.google.common.base.Joiner;
 import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.math.random.XorShift128PlusRandom;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
-import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 

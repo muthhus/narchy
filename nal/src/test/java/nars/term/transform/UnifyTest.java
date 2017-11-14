@@ -1,6 +1,6 @@
 package nars.term.transform;
 
-import jcog.random.XorShift128PlusRandom;
+import jcog.math.random.XorShift128PlusRandom;
 import nars.*;
 import nars.index.term.PatternIndex;
 import nars.term.Compound;
@@ -9,7 +9,6 @@ import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.test.TestNAR;
 import nars.util.signal.RuleTest;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;

@@ -1,13 +1,13 @@
 package spacegraph.layout;
 
 import com.jogamp.opengl.math.Quaternion;
-import spacegraph.*;
+import spacegraph.SimpleSpatial;
+import spacegraph.SpaceTransform;
+import spacegraph.Spatial;
 import spacegraph.math.v3;
 import spacegraph.phys.Dynamic;
 
 import java.util.function.Consumer;
-
-import static spacegraph.math.v3.v;
 
 /**
  * TODO generalize to arbitrary plane sizes and orientations

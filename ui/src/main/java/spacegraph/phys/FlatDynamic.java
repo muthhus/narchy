@@ -1,6 +1,5 @@
 package spacegraph.phys;
 
-import spacegraph.math.v3;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.CollisionShape;
 

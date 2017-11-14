@@ -6,7 +6,6 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
 import jcog.list.FasterList;
 import jcog.map.MRUCache;
-import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.input.FPSLook;
 import spacegraph.input.KeyXYZ;

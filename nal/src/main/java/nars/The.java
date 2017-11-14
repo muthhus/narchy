@@ -20,9 +20,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static nars.Op.NEG;
-import static nars.Op.Null;
-import static nars.Op.PROD;
+import static nars.Op.*;
 
 /**
  * The the

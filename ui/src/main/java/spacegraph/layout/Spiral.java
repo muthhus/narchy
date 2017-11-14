@@ -1,6 +1,8 @@
 package spacegraph.layout;
 
-import spacegraph.*;
+import spacegraph.SimpleSpatial;
+import spacegraph.SpaceTransform;
+import spacegraph.Spatial;
 
 /**
  * Created by me on 6/21/16.

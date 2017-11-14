@@ -2,7 +2,7 @@ package jcog.decide;
 
 import jcog.Util;
 import jcog.data.array.Arrays;
-import jcog.random.XorShift128PlusRandom;
+import jcog.math.random.XorShift128PlusRandom;
 
 import java.util.Random;
 

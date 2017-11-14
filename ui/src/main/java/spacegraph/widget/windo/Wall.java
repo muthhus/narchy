@@ -1,6 +1,5 @@
 package spacegraph.widget.windo;
 
-import Jampack.H;
 import jcog.constraint.continuous.ContinuousConstraint;
 import jcog.constraint.continuous.ContinuousConstraintSolver;
 import jcog.constraint.continuous.DoubleVar;

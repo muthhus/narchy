@@ -2,7 +2,7 @@ package nars.audio;
 
 import jcog.Util;
 import jcog.learn.Autoencoder;
-import jcog.random.XorShift128PlusRandom;
+import jcog.math.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.SensorConcept;
 import spacegraph.SpaceGraph;

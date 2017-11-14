@@ -1,9 +1,9 @@
 package jcog.net;
 
 import com.google.common.primitives.Floats;
-import jcog.optimize.Optimize;
 import jcog.Util;
 import jcog.net.attn.MeshMap;
+import jcog.optimize.Optimize;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;

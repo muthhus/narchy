@@ -1,8 +1,8 @@
 package de.julian.baehr.es.cma.util;
 
-import jcog.tensor.ArrayTensor;
-import jcog.tensor.FuncTensor;
-import jcog.tensor.Tensor;
+import jcog.math.tensor.ArrayTensor;
+import jcog.math.tensor.FuncTensor;
+import jcog.math.tensor.Tensor;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 
 import java.util.Arrays;

@@ -15,7 +15,7 @@
  */
 package jcog.bloom;
 
-import jcog.bit.MetalBitSet;
+import jcog.data.bit.MetalBitSet;
 
 import java.util.ArrayList;
 import java.util.List;

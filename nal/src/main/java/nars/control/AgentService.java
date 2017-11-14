@@ -2,9 +2,9 @@ package nars.control;
 
 import jcog.learn.Agent;
 import jcog.math.FloatSupplier;
-import jcog.tensor.ScalarTensor;
-import jcog.tensor.Tensor;
-import jcog.util.IntIntToObjectFunc;
+import jcog.math.IntIntToObjectFunc;
+import jcog.math.tensor.ScalarTensor;
+import jcog.math.tensor.Tensor;
 import nars.$;
 import nars.NAR;
 import org.apache.commons.lang3.mutable.MutableFloat;

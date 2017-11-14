@@ -1,6 +1,6 @@
 package nars.term;
 
-import jcog.random.XorShift128PlusRandom;
+import jcog.math.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.builder.DefaultConceptBuilder;
 import nars.index.term.TermIndex;

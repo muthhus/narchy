@@ -2,7 +2,7 @@ package nars.op;
 
 import alice.tuprolog.*;
 import jcog.Util;
-import jcog.data.Range;
+import jcog.math.Range;
 import nars.$;
 import nars.NAR;
 import nars.Op;

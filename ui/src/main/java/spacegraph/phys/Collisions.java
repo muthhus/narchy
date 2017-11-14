@@ -24,7 +24,6 @@
 package spacegraph.phys;
 
 import org.jetbrains.annotations.NotNull;
-import spacegraph.Spatial;
 import spacegraph.math.Matrix3f;
 import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
@@ -37,7 +36,6 @@ import spacegraph.phys.math.VectorUtil;
 import spacegraph.phys.shape.*;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import static spacegraph.math.v3.v;
 

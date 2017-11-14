@@ -1,7 +1,5 @@
 package jcog.learn.lstm;
 
-import jcog.Util;
-
 final public class SigmoidNeuron implements Neuron
 {
 	@Override

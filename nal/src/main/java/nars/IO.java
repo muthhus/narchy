@@ -6,7 +6,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
 import jcog.TODO;
-import jcog.byt.DynBytes;
+import jcog.data.byt.DynBytes;
 import jcog.data.string.Utf8Writer;
 import jcog.pri.Prioritized;
 import nars.task.NALTask;

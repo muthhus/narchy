@@ -2,7 +2,7 @@ package jcog.learn.ql;
 
 import jcog.Util;
 import jcog.math.MyCMAESOptimizer;
-import jcog.random.XorShift128PlusRandom;
+import jcog.math.random.XorShift128PlusRandom;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;

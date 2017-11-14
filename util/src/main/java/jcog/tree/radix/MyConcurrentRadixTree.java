@@ -1,7 +1,7 @@
 package jcog.tree.radix;
 
-import jcog.byt.AbstractBytes;
-import jcog.byt.ArrayBytes;
+import jcog.data.byt.AbstractBytes;
+import jcog.data.byt.ArrayBytes;
 import jcog.list.FasterList;
 import jcog.sort.SortedArray;
 import org.eclipse.collections.api.tuple.Pair;
