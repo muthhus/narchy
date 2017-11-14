@@ -23,7 +23,7 @@ public class PrologCoreTest {
         NAR n = NARS.tmp();
         PrologCore p = new PrologCore(n);
         try {
-            p.addTheory(new Theory(PrologCoreTest.class.getClassLoader().getResource("shell.prolog").openStream()));
+            p.input(new Theory(PrologCoreTest.class.getClassLoader().getResource("shell.prolog").openStream()));
         } catch (InvalidTheoryException | IOException e) {
             e.printStackTrace();
         }

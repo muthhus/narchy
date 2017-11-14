@@ -46,11 +46,11 @@ public class LibraryManager
 	/**
 	 * Config this Manager
 	 */
-	void initialize(Prolog vm)
+	void start(Prolog vm)
 	{
 		prolog = vm;
-		theoryManager = vm.getTheoryManager();
-		primitiveManager = vm.getPrimitiveManager();
+		theoryManager = vm.theories;
+		primitiveManager = vm.prims;
 	}
 
 	/**
@@ -294,12 +294,12 @@ public class LibraryManager
 	 * @throws InvalidLibraryException
 	 *             if name is not a valid loaded library
 	 */
-	public void unload(String name) throws InvalidLibraryException
+	public synchronized void unload(String name) throws InvalidLibraryException
 	{
 		boolean found = currentLibraries.removeIf(lib -> {
 			if (lib.getName().equals(name)) 			{
 				lib.dismiss();
-				primitiveManager.deletePrimitiveInfo(lib);
+				primitiveManager.stop(lib);
 				return true;
 			}
 			return false;
@@ -333,7 +333,7 @@ public class LibraryManager
 			lib.setEngine(prolog);
 			currentLibraries.add(lib);
 			// set primitives
-			primitiveManager.createPrimitiveInfo(lib);
+			primitiveManager.start(lib);
 			// set theory
 			String th = lib.getTheory();
 			if (th != null)

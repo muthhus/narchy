@@ -17,9 +17,12 @@
  */
 package alice.tuprolog;
 
+import com.google.common.io.Resources;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 
 /**
@@ -36,6 +39,7 @@ public class Theory implements Serializable {
 	private static final long serialVersionUID = 1L;
     private String theory;
     private Struct clauseList;
+
 
     /**
      * Creates a theory getting its source text from an input stream
@@ -77,9 +81,13 @@ public class Theory implements Serializable {
         }
         this.clauseList = clauseList;
     }
-    
+
+    public static Theory resource(String classPath) throws IOException, URISyntaxException, InvalidTheoryException {
+        return new Theory(Resources.toString(Prolog.class.getResource(classPath).toURI().toURL(), java.nio.charset.Charset.defaultCharset()));
+    }
+
     public Iterator<? extends Term> iterator(Prolog engine) {
-        return isTextual() ? new Parser(engine.getOperatorManager(), theory).iterator() : clauseList.listIterator();
+        return isTextual() ? new Parser(engine.ops, theory).iterator() : clauseList.listIterator();
     }
 
     /**

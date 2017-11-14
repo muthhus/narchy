@@ -42,11 +42,11 @@ public class Struct extends Term {
     /**
      * to speedup hash map operation
      */
-    private String predicateIndicator;
+    private String key;
     /**
      * primitive behaviour
      */
-    private transient PrimitiveInfo primitive;
+    private transient PrologPrimitive primitive;
     /**
      * it indicates if the term is resolved
      */
@@ -170,7 +170,7 @@ public class Struct extends Term {
             for (int c = 0; c < subCount; c++)
                 subs[c] = al.removeFirst();
         }
-        predicateIndicator = name + '/' + subCount;
+        key = name + '/' + subCount;
         resolved = false;
     }
 
@@ -179,17 +179,17 @@ public class Struct extends Term {
         subs = new Term[subCount];
     }
 
-    private Struct(String name_, int arity_) {
+    private Struct(String name_, int arity) {
         if (name_ == null)
             throw new InvalidTermException("The functor of a Struct cannot be null");
-        if (name_.isEmpty() && arity_ > 0)
+        if (name_.isEmpty() && arity > 0)
             throw new InvalidTermException("The functor of a non-atom Struct cannot be an empty string");
         name = name_;
-        subCount = arity_;
+        key = name + '/' + arity;
+        subCount = arity;
         if (subCount > 0) {
             subs = new Term[subCount];
         }
-        predicateIndicator = name + '/' + subCount;
         resolved = false;
     }
 
@@ -197,8 +197,8 @@ public class Struct extends Term {
     /**
      * @return
      */
-    String getPredicateIndicator() {
-        return predicateIndicator;
+    String key() {
+        return key;
     }
 
     /**
@@ -478,7 +478,7 @@ public class Struct extends Term {
 
         Struct t = new Struct(name, targ);
         t.resolved = resolved;
-        t.predicateIndicator = predicateIndicator;
+        t.key = key;
         t.primitive = primitive;
 
         return t;
@@ -499,7 +499,7 @@ public class Struct extends Term {
 
         Struct t = new Struct(name, subCount);
         t.resolved = false;
-        t.predicateIndicator = predicateIndicator;
+        t.key = key;
         t.primitive = null;
         Term[] thatArg = t.subs;
         Term[] thisArg = this.subs;
@@ -687,7 +687,7 @@ public class Struct extends Term {
         if (isEmptyList()) {
             name = ".";
             subCount = 2;
-            predicateIndicator = name + '/' + subCount; /* Added by Paolo Contessi */
+            key = name + '/' + subCount; /* Added by Paolo Contessi */
             subs = new Term[subCount];
             subs[0] = t;
             subs[1] = new Struct();
@@ -756,14 +756,14 @@ public class Struct extends Term {
     /**
      * Set primitive behaviour associated at structure
      */
-    void setPrimitive(PrimitiveInfo b) {
+    void setPrimitive(PrologPrimitive b) {
         primitive = b;
     }
 
     /**
      * Get primitive behaviour associated at structure
      */
-    public PrimitiveInfo getPrimitive() {
+    public PrologPrimitive getPrimitive() {
         return primitive;
     }
 

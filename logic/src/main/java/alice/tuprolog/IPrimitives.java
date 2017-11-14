@@ -29,6 +29,6 @@ public interface IPrimitives {
     /**
      * gets the list of primitives defined in the library
      */
-    Map<Integer,List<PrimitiveInfo>> getPrimitives();
+    Map<Integer,List<PrologPrimitive>> getPrimitives();
     
 }

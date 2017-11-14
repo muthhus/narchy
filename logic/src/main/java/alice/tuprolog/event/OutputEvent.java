@@ -27,15 +27,14 @@ import java.util.EventObject;
  *
  */
 public class OutputEvent extends EventObject {
-	private static final long serialVersionUID = 1L;
     /**
 	 * text produced
 	 */
-    private final String msg;
+    public final String msg;
 
-    public OutputEvent(Object source, String msg_){
+    public OutputEvent(Object source, String m){
         super(source);
-        msg=msg_;
+        msg=m;
     }
 
     @Override
@@ -45,7 +44,4 @@ public class OutputEvent extends EventObject {
                 '}';
     }
 
-    public String getMsg(){
-        return msg;
-    }
 }

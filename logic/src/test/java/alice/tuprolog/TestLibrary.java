@@ -35,7 +35,7 @@ public class TestLibrary extends StringLibrary {
 	}
 	
 	public boolean println_1(Term arg0){
-		getEngine().stdOutput(arg0.toString());
+		engine.output(arg0.toString());
 		return true;
 	}
 	

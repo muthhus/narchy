@@ -184,7 +184,7 @@ public abstract class Term implements Serializable, SubTree {
      * @return true if the term is unifiable with this one
      */
     public final boolean unify(Prolog mediator, Term t1) {
-        EngineManager engine = mediator.getEngineManager();
+        EngineManager engine = mediator.engine;
 
         long now = System.currentTimeMillis();
         resolveTerm(now);

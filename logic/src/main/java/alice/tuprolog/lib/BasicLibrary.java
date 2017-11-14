@@ -54,12 +54,12 @@ public class BasicLibrary extends Library {
         }
         try {
             Struct theory = (Struct) th;
-            getEngine().setTheory(new Theory(theory.name()));
+            engine.setTheory(new Theory(theory.name()));
             return true;
         } catch (InvalidTheoryException ex) {
             /*Castagna 06/2011*/			
 			//throw PrologError.syntax_error(engine.getEngineManager(), ex.line, ex.pos, new Struct(ex.getMessage()));
-			throw PrologError.syntax_error(engine.getEngineManager(), ex.clause, ex.line, ex.pos, new Struct(ex.getMessage()));
+            throw PrologError.syntax_error(engine.engine, ex.clause, ex.line, ex.pos, new Struct(ex.getMessage()));
 			/**/
         }
     }
@@ -79,12 +79,12 @@ public class BasicLibrary extends Library {
         }
         try {
             Struct theory = (Struct) th.term();
-            getEngine().addTheory(new Theory(theory.name()));
+            engine.input(new Theory(theory.name()));
             return true;
         } catch (InvalidTheoryException ex) {
             /*Castagna 06/2011*/
         	//throw PrologError.syntax_error(engine.getEngineManager(), ex.line, ex.pos, new Struct(ex.getMessage()));
-        	throw PrologError.syntax_error(engine.getEngineManager(), ex.clause, ex.line, ex.pos, new Struct(ex.getMessage()));
+            throw PrologError.syntax_error(engine.engine, ex.clause, ex.line, ex.pos, new Struct(ex.getMessage()));
         	/**/
         }
     }
@@ -135,7 +135,7 @@ public class BasicLibrary extends Library {
             }
             Theory t = new Theory(theory.name());
             TheoryLibrary thlib = new TheoryLibrary(libN.name(), t);
-            getEngine().addLibrary(thlib);
+            engine.addLibrary(thlib);
             return true;
         } catch (Exception ex) {
             return false;
@@ -145,7 +145,7 @@ public class BasicLibrary extends Library {
     public boolean get_operators_list_1(Term argument) {
         Term arg = argument.term();
         Struct list = new Struct();
-        java.util.Iterator<Operator> it = getEngine().operators().iterator();
+        java.util.Iterator<Operator> it = engine.operators().iterator();
         while (it.hasNext()) {
             Operator o = it.next();
             list = new Struct(new Struct("op", new alice.tuprolog.Int(o.prio),
@@ -208,12 +208,12 @@ public class BasicLibrary extends Library {
     }
 
     public boolean spy_0() {
-        getEngine().setSpy(true);
+        engine.setSpy(true);
         return true;
     }
 
     public boolean nospy_0() {
-        getEngine().setSpy(false);
+        engine.setSpy(false);
         return true;
     }
     
@@ -228,12 +228,12 @@ public class BasicLibrary extends Library {
     /**/
     
     public boolean warning_0() {
-        getEngine().setWarning(true);
+        engine.setWarning(true);
         return true;
     }
 
     public boolean nowarning_0() {
-        getEngine().setWarning(false);
+        engine.setWarning(false);
         return true;
     }
 
@@ -309,7 +309,7 @@ public class BasicLibrary extends Library {
             ArithmeticException cause = (ArithmeticException) t;
             // System.out.println(cause.getMessage());
             if (cause.getMessage().equals("/ by zero"))
-                throw PrologError.evaluation_error(engine.getEngineManager(),
+                throw PrologError.evaluation_error(engine.engine,
                         arg, "zero_divisor");
         }
     }
@@ -744,14 +744,14 @@ public class BasicLibrary extends Library {
         arg1 = arg1.term();
         /*System.out.println(arg0);
         System.out.println(arg1);*/
-        getEngine().stdOutput(arg0.toString() +
+        engine.output(arg0.toString() +
                 '\n' + arg1);
         if (!arg0.isGround()) {
             return unify(arg0, new Struct(arg1.toString()));
         } else {
             try {
                 String text = alice.util.Tools.removeApostrophes(arg0.toString());
-                return unify(arg1, getEngine().toTerm(text));
+                return unify(arg1, engine.toTerm(text));
             } catch (Exception ex) {
                 return false;
             }
@@ -898,7 +898,7 @@ public class BasicLibrary extends Library {
                 }
             }
             if (term == null) {
-                throw PrologError.domain_error(engine.getEngineManager(), 2,
+                throw PrologError.domain_error(engine.engine, 2,
                         "num_atom", arg1);
             }
             return (unify(arg0, term));
@@ -1273,7 +1273,7 @@ public class BasicLibrary extends Library {
                     "compound", arg1);
         Int arg0int = (Int) arg0;
         if (arg0int.intValue() < 1)
-            throw PrologError.domain_error(engine.getEngineManager(), 1,
+            throw PrologError.domain_error(engine.engine, 1,
                     "greater_than_zero", arg0);
         return true;
     }
@@ -1383,13 +1383,13 @@ public class BasicLibrary extends Library {
     	Struct freeVarList = (Struct) varSet.term();
     	java.util.Iterator<? extends Term> it1 = freeVarList.listIterator();
     	if (it1.hasNext()) {
-    		(engine.getEngineManager()).setRelinkVar(true);
+            (engine.engine).setRelinkVar(true);
     		//ArrayList<String> l = new ArrayList<String>(); 
-    		
-    		(engine.getEngineManager()).setBagOFvarSet(varSet);
-    		(engine.getEngineManager()).setBagOFgoal(goal);
-    		if ((engine.getEngineManager()).getBagOFbag()==null)
-    			(engine.getEngineManager()).setBagOFbag(tList);
+
+            (engine.engine).setBagOFvarSet(varSet);
+            (engine.engine).setBagOFgoal(goal);
+            if ((engine.engine).getBagOFbag()==null)
+                (engine.engine).setBagOFbag(tList);
     		
     	}
     		
@@ -1414,8 +1414,8 @@ public class BasicLibrary extends Library {
             	//System.out.println("=====witness  "+witness+" unifica con w "+w+" metto t nel risultato "+t);
             	result.append(t);
             	//System.out.println("=====****result  "+result);
-            	ArrayList<Term> l = (engine.getEngineManager()).getBagOFres();
-            	ArrayList<String> lString = (engine.getEngineManager()).getBagOFresString();
+                ArrayList<Term> l = (engine.engine).getBagOFres();
+                ArrayList<String> lString = (engine.engine).getBagOFresString();
             	if(l==null){
             		l= new ArrayList<>();
             		lString= new ArrayList<>();
@@ -1426,8 +1426,8 @@ public class BasicLibrary extends Library {
             	/*for(int m=0; m<l.size(); m++){
             		System.out.println("=====****elemento lista engine.getEngineManager()).getBagOFres()  "+l.get(m));
             	}*/
-            	(engine.getEngineManager()).setBagOFres(l);
-            	(engine.getEngineManager()).setBagOFresString(lString);
+                (engine.engine).setBagOFres(l);
+                (engine.engine).setBagOFresString(lString);
                 //System.out.println("Ho unificato witness con w appendo t al risultato ");
             }
         } 
@@ -1457,7 +1457,7 @@ public class BasicLibrary extends Library {
      * Defines some synonyms
      */
     @Override
-    public String[][] getSynonymMap() {
+    public String[][] buildSynonyms() {
         return new String[][] { { "+", "expression_plus", "functor" },
                 { "-", "expression_minus", "functor" },
                 { "*", "expression_multiply", "functor" },

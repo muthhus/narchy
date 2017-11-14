@@ -167,7 +167,7 @@ public class PrologRepl extends Automaton implements OutputListener, SpyListener
 
     @Override
     public void onOutput(OutputEvent e) {
-        System.out.print(e.getMsg());
+        System.out.print(e.msg);
     }
     @Override
     public void onSpy(SpyEvent e) {

@@ -32,7 +32,7 @@ public class TestVarIsEqual {
 
     @Override
     public void onOutput(OutputEvent ev) {
-      builder.append(ev.getMsg());
+        builder.append(ev.msg);
     }
     public String getAllOutput() {
       return builder.toString();

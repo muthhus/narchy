@@ -71,7 +71,7 @@ public final class MutableClauseIndex extends ConcurrentHashMap<String,FamilyCla
 	 */
 	@Override
 	public List<ClauseInfo> getPredicates(Struct headt) {
-		FamilyClausesList family = get(headt.getPredicateIndicator());
+		FamilyClausesList family = get(headt.key());
 		//new ReadOnlyLinkedList<>();
 		return family == null ? null : family.get(headt);
 	}

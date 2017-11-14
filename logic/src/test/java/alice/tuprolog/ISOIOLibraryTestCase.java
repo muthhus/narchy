@@ -129,7 +129,7 @@ public class ISOIOLibraryTestCase {
 		final String dataToRead = "ciao";
 		// Per beccare l'output
 		//TODO Da rivedere
-		OutputListener listener = e -> assertEquals("", dataToRead, e.getMsg());
+		OutputListener listener = e -> assertEquals("", dataToRead, e.msg);
 
 		engine.addOutputListener(listener);
 
@@ -157,7 +157,7 @@ public class ISOIOLibraryTestCase {
 			@Override
 			public void onOutput(OutputEvent e) 
 			{
-				assertEquals("", dataToRead[count], e.getMsg());
+                assertEquals("", dataToRead[count], e.msg);
 				count++;
 			}
 		};
@@ -184,7 +184,7 @@ public class ISOIOLibraryTestCase {
 		final String dataToRead = "c";
 		// Per beccare l'output
 		//TODO Da rivedere
-		OutputListener listener = e -> assertEquals("", dataToRead, e.getMsg());
+		OutputListener listener = e -> assertEquals("", dataToRead, e.msg);
 
 		engine.addOutputListener(listener);
 
@@ -201,7 +201,7 @@ public class ISOIOLibraryTestCase {
 		final int dataToRead = 51;
 		// Per beccare l'output
 		//TODO Da rivedere
-		OutputListener listener = e -> assertEquals("", dataToRead+"", e.getMsg());
+		OutputListener listener = e -> assertEquals("", dataToRead+"", e.msg);
 
 		engine.addOutputListener(listener);
 
@@ -245,7 +245,7 @@ public class ISOIOLibraryTestCase {
 			@Override
 			public void onOutput(OutputEvent e) 
 			{
-				assertEquals(dataToRead[count]+"", e.getMsg(), "");
+                assertEquals(dataToRead[count]+"", e.msg, "");
 				count++;
 			}
 		};

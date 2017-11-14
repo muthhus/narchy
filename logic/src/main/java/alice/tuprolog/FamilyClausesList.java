@@ -208,7 +208,7 @@ public class FamilyClausesList extends
 				return Collections.unmodifiableList(
 					isAList((Struct) t) ?
 						(listCompClausesList) :
-						(structCompClausesIndex.get(((Struct) t).getPredicateIndicator()))
+						(structCompClausesIndex.get(((Struct) t).key()))
 				);
 			}
 		}
@@ -283,7 +283,7 @@ public class FamilyClausesList extends
 						listCompClausesList.addLast(ci);
 					}
 				} else {
-					structCompClausesIndex.insert(((Struct) t).getPredicateIndicator(), ci, first);
+					structCompClausesIndex.insert(((Struct) t).key(), ci, first);
 				}
 			}
 		}
@@ -316,7 +316,7 @@ public class FamilyClausesList extends
 				if(t.isList()){
 					listCompClausesList.remove(ci);
 				} else {
-					structCompClausesIndex.remove(((Struct) t).getPredicateIndicator(),ci);
+					structCompClausesIndex.remove(((Struct) t).key(),ci);
 				}
 			}
 		}

@@ -41,7 +41,7 @@ public class TheoryManagerTestCase {
 		Prolog engine = new Prolog();
 		String theory = "test(A, B) :- A is 1+2, B is 2+3.";
 		engine.setTheory(new Theory(theory));
-		TheoryManager manager = engine.getTheoryManager();
+		TheoryManager manager = engine.theories;
 		Struct testTerm = new Struct("test", new Struct("a"), new Struct("b"));
 		List<ClauseInfo> testClauses = manager.find(testTerm);
 		assertEquals(1, testClauses.size());

@@ -17,7 +17,6 @@
  */
 package alice.tuprolog;
 
-import alice.tuprolog.interfaces.IEngine;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +26,7 @@ import java.util.List;
 /**
  * @author Alex Benini
  */
-public class Engine /*Castagna 06/2011*/implements IEngine/**/{    
+public class Engine {
 
 	//PrintStream log;
 	State  nextState;

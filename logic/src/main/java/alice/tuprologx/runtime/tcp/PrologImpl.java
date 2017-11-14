@@ -39,7 +39,7 @@ public class PrologImpl implements java.io.Serializable {
     public void addTheory(ObjectInputStream in,ObjectOutputStream out) throws java.io.IOException, ClassNotFoundException {
         try {
             Theory th=(Theory)in.readObject();
-            core.addTheory(th);
+            core.input(th);
             out.writeObject(Boolean.TRUE);
         } catch (InvalidTheoryException ex){
             out.writeObject(Boolean.FALSE);

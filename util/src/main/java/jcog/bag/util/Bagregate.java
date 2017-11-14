@@ -1,7 +1,7 @@
 package jcog.bag.util;
 
 import jcog.bag.impl.PLinkArrayBag;
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;

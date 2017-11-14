@@ -284,7 +284,7 @@ public class PrologScriptEngine implements ScriptEngine, ExceptionListener, Outp
 	public void onOutput(OutputEvent e) {
 		try {
 			if(outputWriter != null) {
-				outputWriter.write(e.getMsg());
+                outputWriter.write(e.msg);
 			}
 		}
 		catch(IOException ex) {}

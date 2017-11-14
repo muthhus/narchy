@@ -17,7 +17,6 @@
  */
 package alice.tuprolog;
 
-import alice.tuprolog.interfaces.IParser;
 
 import java.io.*;
 import java.util.HashMap;
@@ -50,8 +49,7 @@ import java.util.regex.Pattern;
  *              '{' { exprA(1200) }* '}'
  * op(type,n) ::= atom | { symbol }+
  */
-public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
-{
+public class Parser {
 	private static final long serialVersionUID = 1L;
 	private static class IdentifiedTerm {
 		private final int priority;
@@ -142,7 +140,6 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	 * (a period), <tt>false</tt> otherwise.
 	 * @throws InvalidTermException if a syntax error is found. 
 	 */
-	@Override
 	public Term nextTerm(boolean endNeeded) {
 		try {
 			Token t = tokenizer.readToken();
@@ -637,19 +634,19 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
      * Offset / line tracking
      */
 
-    @Override
+
 	/**/
 	public int getCurrentLine() {
 		return tokenizer.lineno();
 	}
     
     /*Castagna 06/2011*/
-    @Override
+
 	public int getCurrentOffset() {
 		return tokenizer.tokenOffset();
 	}
 	
-	@Override
+
 	public int[] offsetToRowColumn(int offset) {
     	return tokenizer.offsetToRowColumn(offset);
 	}

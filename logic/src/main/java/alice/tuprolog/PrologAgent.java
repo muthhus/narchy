@@ -38,7 +38,7 @@ public class PrologAgent extends Prolog {
     private String goalText;
     
   
-    private final static OutputListener defaultOutputListener = ev -> System.out.print(ev.getMsg());
+    private final static OutputListener defaultOutputListener = ev -> System.out.print(ev.msg);
     
     
     /**

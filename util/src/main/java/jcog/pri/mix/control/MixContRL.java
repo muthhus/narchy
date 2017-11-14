@@ -1,13 +1,13 @@
 package jcog.pri.mix.control;
 
 import jcog.Util;
-import jcog.data.FloatParam;
 import jcog.exe.Loop;
 import jcog.learn.classify.AbstractClassifier;
 import jcog.learn.classify.BooleanClassifier;
 import jcog.learn.classify.EnumClassifier;
 import jcog.list.FasterList;
 import jcog.math.AtomicSummaryStatistics;
+import jcog.math.FloatParam;
 import jcog.math.FloatSupplier;
 import jcog.math.tensor.ArrayTensor;
 import jcog.math.tensor.Tensor;

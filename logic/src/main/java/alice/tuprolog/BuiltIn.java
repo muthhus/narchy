@@ -24,6 +24,8 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import static alice.tuprolog.PrologPrimitive.PREDICATE;
+
 /**
  * Library of built-in predicates
  * 
@@ -39,22 +41,22 @@ public final class BuiltIn extends Library {
 	private final PrimitiveManager primitiveManager;
 	private final OperatorManager operatorManager;
 
-	public BuiltIn(Prolog mediator) {
+	public BuiltIn(Prolog p) {
 		super();
-		setEngine(mediator);
-		engineManager = mediator.getEngineManager();
-		theoryManager = mediator.getTheoryManager();
-		libraryManager = mediator.getLibraryManager();
-		flagManager = mediator.getFlagManager();
-		primitiveManager = mediator.getPrimitiveManager();
-		operatorManager = mediator.getOperatorManager();
+		setEngine(p);
+		engineManager = p.engine;
+		theoryManager = p.theories;
+		libraryManager = p.libs;
+		flagManager = p.flags;
+		primitiveManager = p.prims;
+		operatorManager = p.ops;
 	}
 
 	/**
 	 * Defines some synonyms
 	 */
 	 @Override
-	 public String[][] getSynonymMap() {
+	 public String[][] buildSynonyms() {
 		 return new String[][] { { "!", "cut", "predicate" },
 				 { "=", "unify", "predicate" },
 				 { "\\=", "deunify", "predicate" },
@@ -349,7 +351,7 @@ public final class BuiltIn extends Library {
 			 return new Struct("call", term);
 		 if (term instanceof Struct) {
 			 Struct s = (Struct) term;
-			 String pi = s.getPredicateIndicator();
+			 String pi = s.key();
 			 if (pi.equals(";/2") || pi.equals(",/2") || pi.equals("->/2")) {
 				 for (int i = 0; i < s.subs(); i++) {
 					 Term t = s.sub(i);
@@ -594,8 +596,8 @@ public final class BuiltIn extends Library {
 	 public void initialization_1(Term goal) {
 		 goal = goal.term();
 		 if (goal instanceof Struct) {
-			 primitiveManager.identifyPredicate(goal);
-			 theoryManager.addStartGoal((Struct) goal);
+             primitiveManager.identify(goal, PREDICATE);
+             theoryManager.addStartGoal((Struct) goal);
 		 }
 	 }
 
@@ -613,7 +615,7 @@ public final class BuiltIn extends Library {
             path = engine.getCurrentDirectory()  + File.separator + path;
          }
          engine.pushDirectoryToList(new File(path).getParent());
-		 engine.addTheory(new Theory(new FileInputStream(path)));
+		 engine.input(new Theory(new FileInputStream(path)));
          engine.popDirectoryFromList();
 	 }
 

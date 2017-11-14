@@ -69,7 +69,7 @@ public class PJProlog /*extends alice.tuprolog.Prolog*/ {
     }
 
     public void addTheory(Theory theory) throws alice.tuprolog.InvalidTheoryException {
-        engine.addTheory(new alice.tuprolog.Theory(theory.marshal()));
+        engine.input(new alice.tuprolog.Theory(theory.marshal()));
     }
     
     public Theory getTheory() {

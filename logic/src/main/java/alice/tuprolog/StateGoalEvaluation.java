@@ -36,7 +36,7 @@ public class StateGoalEvaluation extends State {
     void run(Engine e) {
         if (e.currentContext.currentGoal.isPrimitive()) {
             // Recupero primitiva
-            PrimitiveInfo primitive = e.currentContext.currentGoal
+            PrologPrimitive primitive = e.currentContext.currentGoal
                     .getPrimitive();
             try {
                 e.nextState = (primitive

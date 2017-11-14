@@ -190,7 +190,7 @@ public class StateEnd extends State {
                         } else if (((Var) initBag).getLink() instanceof Struct) {
                             Struct s = (Struct) ((Var) initBag).getLink();
                             //System.out.println("primitive della bag iniziale "+s.getPredicateIndicator().toString());
-                            if (tgoal instanceof Struct && s.getPredicateIndicator().compareTo(((Struct) tgoal).getPredicateIndicator()) == 0) {
+                            if (tgoal instanceof Struct && s.key().compareTo(((Struct) tgoal).key()) == 0) {
                                 //System.out.println("primitive della bag tgoal "+((Struct)tgoal).getPredicateIndicator().toString());
                                 findSamePredicateIndicator = true;
                                 find = true;

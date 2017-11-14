@@ -1,6 +1,6 @@
 package jcog.pri.mix;
 
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 

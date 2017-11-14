@@ -48,7 +48,7 @@ public class PrologError extends Throwable {
 	}
 
 	public static PrologError instantiation_error(Prolog engine, int argNo) {
-		return instantiation_error(engine.getEngineManager(), argNo);
+		return instantiation_error(engine.engine, argNo);
 	}
 
 	public static PrologError instantiation_error(EngineManager engineManager, int argNo) {
@@ -64,7 +64,7 @@ public class PrologError extends Throwable {
 	}
 
 	public static PrologError type_error(Prolog engine, int argNo, String validType, Term culprit) {
-		return type_error(engine.getEngineManager(), argNo, validType, culprit);
+		return type_error(engine.engine, argNo, validType, culprit);
 	}
 
 	public static PrologError type_error(EngineManager e, int argNo, String validType, Term culprit) {

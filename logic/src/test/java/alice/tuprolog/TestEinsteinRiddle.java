@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static alice.tuprolog.TestGolog.theory;
+import static alice.tuprolog.Theory.resource;
 
 public class TestEinsteinRiddle {
     
@@ -19,7 +19,7 @@ public class TestEinsteinRiddle {
 
         //The answer is the German owns the fish.
         new Prolog()
-            .addTheory(theory("einsteinsRiddle.pl"))
+            .input(resource("einsteinsRiddle.pl"))
             .solve("einstein(_,X), write(X).", o -> {
                 System.out.println(o);
                 if (finished[0])

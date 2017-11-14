@@ -26,6 +26,8 @@ import java.io.OutputStream;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static alice.tuprolog.PrologPrimitive.PREDICATE;
+
 /**
  * This class defines the Theory Manager who manages the clauses/theory often referred to as the Prolog database.
  * The theory (as a set of clauses) are stored in the ClauseDatabase which in essence is a HashMap grouped by functor/arity.
@@ -64,7 +66,7 @@ public class TheoryManager {
         staticDBase = new MutableClauseIndex();
 
         lastConsultedTheory = new Theory();
-        primitiveManager = engine.getPrimitiveManager();
+        primitiveManager = engine.prims;
         startGoalStack = new ArrayDeque<>(32);
     }
 
@@ -73,7 +75,7 @@ public class TheoryManager {
      */
     public /*synchronized*/ void assertA(Struct clause, boolean dyn, String libName, boolean backtrackable) {
         ClauseInfo d = new ClauseInfo(toClause(clause), libName);
-        String key = d.head.getPredicateIndicator();
+        String key = d.head.key();
         if (dyn) {
             dynamicDBase.add(key, d, true);
             if (staticDBase.containsKey(key)) {
@@ -90,7 +92,7 @@ public class TheoryManager {
      */
     public /*synchronized*/ void assertZ(Struct clause, boolean dyn, String libName, boolean backtrackable) {
         ClauseInfo d = new ClauseInfo(toClause(clause), libName);
-        String key = d.head.getPredicateIndicator();
+        String key = d.head.key();
         if (dyn) {
             dynamicDBase.add(key, d, false);
             if (engine.isSpy() && staticDBase.containsKey(key)) {
@@ -107,7 +109,7 @@ public class TheoryManager {
     public synchronized int retract(final Struct cl, Predicate<ClauseInfo> each) {
         Struct clause = toClause(cl);
         Struct struct = ((Struct) clause.sub(0));
-        List<ClauseInfo> family = dynamicDBase.get(struct.getPredicateIndicator());
+        List<ClauseInfo> family = dynamicDBase.get(struct.key());
         //final ExecutionContext ctx = engine.getEngineManager().getCurrentContext();
 
 		/*creo un nuovo clause database x memorizzare la teoria all'atto della retract 
@@ -224,7 +226,7 @@ public class TheoryManager {
         startGoalStack.clear();
 
 		/*Castagna 06/2011*/
-        int clause = 1;
+        int clause = 0;
 		/**/
         // iterate all clauses in theory and assert them
         try {
@@ -256,7 +258,7 @@ public class TheoryManager {
         for (ClauseInfo d : dynamicDBase) {
             for (SubTree sge : d.body) {
                 Term t = (Term) sge;
-                primitiveManager.identifyPredicate(t);
+                primitiveManager.identify(t, PREDICATE);
             }
         }
     }
@@ -279,6 +281,7 @@ public class TheoryManager {
                     // Rimuovendolo da allClauses si elimina solo il valore e non la chiave
                     allClauses.remove();
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -291,10 +294,10 @@ public class TheoryManager {
             Struct dir = (Struct) c.subResolve(0);
             try {
                 if (!primitiveManager.evalAsDirective(dir))
-                    Prolog.warn("The directive " + dir.getPredicateIndicator() + " is unknown.");
+                    Prolog.warn("The directive " + dir.key() + " is unknown.");
             } catch (Throwable t) {
                 Prolog.warn("An exception has been thrown during the execution of the " +
-                        dir.getPredicateIndicator() + " directive.\n" + t.getMessage());
+                        dir.key() + " directive.\n" + t.getMessage());
             }
             return true;
         }
@@ -306,10 +309,10 @@ public class TheoryManager {
      */
     private Struct toClause(Struct t) {        //PRIMITIVE
         // TODO bad, slow way of cloning. requires approx twice the time necessary
-        t = (Struct) Term.createTerm(t.toString(), this.engine.getOperatorManager());
+        t = (Struct) Term.createTerm(t.toString(), this.engine.ops);
         if (!t.isClause())
             t = new Struct(":-", t, TRUE);
-        primitiveManager.identifyPredicate(t);
+        primitiveManager.identify(t, PREDICATE);
         return t;
     }
 
@@ -362,12 +365,12 @@ public class TheoryManager {
         StringBuilder buffer = new StringBuilder();
         for (Iterator<ClauseInfo> dynamicClauses = dynamicDBase.iterator(); dynamicClauses.hasNext(); ) {
             ClauseInfo d = dynamicClauses.next();
-            buffer.append(d.toString(engine.getOperatorManager())).append('\n');
+            buffer.append(d.toString(engine.ops)).append('\n');
         }
         if (!onlyDynamic)
             for (Iterator<ClauseInfo> staticClauses = staticDBase.iterator(); staticClauses.hasNext(); ) {
                 ClauseInfo d = staticClauses.next();
-                buffer.append(d.toString(engine.getOperatorManager())).append('\n');
+                buffer.append(d.toString(engine.ops)).append('\n');
             }
         return buffer.toString();
     }

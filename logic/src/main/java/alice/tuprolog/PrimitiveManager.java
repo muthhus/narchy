@@ -17,12 +17,15 @@
  */
 package alice.tuprolog;
 
-import alice.tuprolog.interfaces.IPrimitiveManager;
-import jcog.list.FasterList;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import static alice.tuprolog.PrologPrimitive.*;
 
 
 /**
@@ -30,66 +33,69 @@ import java.util.*;
  *
  * @author Alex Benini
  */
-public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/**/ {
+public class PrimitiveManager  {
 
     private static final Set<String> PRIMITIVE_PREDICATES = Set.of(",", "':-'", ":-");
-    private final Map<IPrimitives, List<PrimitiveInfo>> libHashMap;
-    private final Map<String, PrimitiveInfo> directives;
-    private final Map<String, PrimitiveInfo> predicates;
-    private final Map<String, PrimitiveInfo> functors;
+    private final Set<IPrimitives> libs;
+    private final Map<String, PrologPrimitive> directives;
+    private final Map<String, PrologPrimitive> predicates;
+    private final Map<String, PrologPrimitive> functors;
 
     public PrimitiveManager() {
-        libHashMap = //Collections.synchronizedMap(new IdentityHashMap<IPrimitives, List<PrimitiveInfo>>());
-                new IdentityHashMap();
+        libs = //Collections.synchronizedMap(new IdentityHashMap<IPrimitives, List<PrimitiveInfo>>());
+                new CopyOnWriteArraySet<>();
         directives = //Collections.synchronizedMap
-                new ConcurrentHashMapUnsafe();
+                new ConcurrentHashMap();
         predicates = //Collections.synchronizedMap(
-                new ConcurrentHashMapUnsafe();
+                new ConcurrentHashMap();
         functors = //Collections.synchronizedMap(new HashMap<String,PrimitiveInfo>());
-                new ConcurrentHashMapUnsafe();
-    }
-
-    /**
-     * Config this Manager
-     */
-    void initialize(Prolog vm) {
-        createPrimitiveInfo(new BuiltIn(vm));
-    }
-
-    void createPrimitiveInfo(IPrimitives src) {
-        Map<Integer, List<PrimitiveInfo>> prims = src.getPrimitives();
-        Iterator<PrimitiveInfo> it = prims.get(PrimitiveInfo.DIRECTIVE).iterator();
-        while (it.hasNext()) {
-            PrimitiveInfo p = it.next();
-            directives.put(p.key, p);
-        }
-        it = prims.get(PrimitiveInfo.PREDICATE).iterator();
-        while (it.hasNext()) {
-            PrimitiveInfo p = it.next();
-            predicates.put(p.key, p);
-        }
-        it = prims.get(PrimitiveInfo.FUNCTOR).iterator();
-        while (it.hasNext()) {
-            PrimitiveInfo p = it.next();
-            functors.put(p.key, p);
-        }
-        List<PrimitiveInfo> primOfLib =
-                //new LinkedList<>(prims.get(PrimitiveInfo.DIRECTIVE));
-                new FasterList();
-        primOfLib.addAll(prims.get(PrimitiveInfo.DIRECTIVE));
-        primOfLib.addAll(prims.get(PrimitiveInfo.PREDICATE));
-        primOfLib.addAll(prims.get(PrimitiveInfo.FUNCTOR));
-        libHashMap.put(src, primOfLib);
+                new ConcurrentHashMap();
     }
 
 
-    void deletePrimitiveInfo(IPrimitives src) {
-        for (PrimitiveInfo primitiveInfo : libHashMap.remove(src)) {
-            String k = primitiveInfo.key;
-            directives.remove(k);
-            predicates.remove(k);
-            functors.remove(k);
+    void start(Prolog prolog) {
+        start(new BuiltIn(prolog));
+    }
+
+    void start(IPrimitives src) {
+        if (!libs.add(src))
+            throw new RuntimeException("already loaded: " + src);
+
+        Map<Integer, List<PrologPrimitive>> prims = src.getPrimitives();
+
+
+        for (int type : new int[] { DIRECTIVE, PREDICATE, FUNCTOR }) {
+            Map<String, PrologPrimitive> table = table(type);
+            List<PrologPrimitive> pp = prims.get(type);
+            pp.forEach(p-> table.put(p.key, p));
         }
+    }
+
+
+    void stop(IPrimitives src) {
+        if (!libs.remove(src))
+            throw new RuntimeException("not loaded: " + src);
+
+        Map<Integer, List<PrologPrimitive>> prims = src.getPrimitives();
+
+        for (int type : new int[] { DIRECTIVE, PREDICATE, FUNCTOR }) {
+            Map<String, PrologPrimitive> table = table(type);
+            List<PrologPrimitive> pp = prims.get(type);
+            pp.forEach(p-> table.remove(p.key));
+        }
+    }
+
+
+    private Map<String, PrologPrimitive> table(int type) {
+        Map<String, PrologPrimitive> table;
+        switch (type) {
+            case DIRECTIVE: table = directives; break;
+            case PREDICATE: table = predicates; break;
+            case FUNCTOR: table = functors; break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+        return table;
     }
 
 
@@ -103,12 +109,12 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
      * @parm term the term to be identified
      */
     public Term identifyDirective(Term term) {
-        identify(term, PrimitiveInfo.DIRECTIVE);
+        identify(term, DIRECTIVE);
         return term;
     }
 
     public boolean evalAsDirective(Struct d) throws Throwable {
-        PrimitiveInfo pd = ((Struct) identifyDirective(d)).getPrimitive();
+        PrologPrimitive pd = ((Struct) identifyDirective(d)).getPrimitive();
         if (pd != null) {
             try {
                 pd.evalAsDirective(d);
@@ -120,31 +126,18 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
             return false;
     }
 
-    void identifyPredicate(Term term) {
-        identify(term, PrimitiveInfo.PREDICATE);
-    }
 
-    void identifyFunctor(Term term) {
-        identify(term, PrimitiveInfo.FUNCTOR);
-    }
-
-    private void identify(Term term, int typeOfPrimitive) {
-        if (term == null) {
-            return;
-        }
+    public void identify(Term term, int typeOfPrimitive) {
         term = term.term();
-        if (!(term instanceof Struct)) {
+        if (!(term instanceof Struct))
             return;
-        }
+
         Struct t = (Struct) term;
 
         int arity = t.subs();
-        String name = t.name();
         //------------------------------------------
-        int primType;
 
-        primType = PRIMITIVE_PREDICATES.contains(name) ? PrimitiveInfo.PREDICATE : PrimitiveInfo.FUNCTOR;
-
+        final int primType = PRIMITIVE_PREDICATES.contains(t.name()) ? PREDICATE : FUNCTOR;
         for (int c = 0; c < arity; c++) {
             identify(t.sub(c), primType);
         }
@@ -152,54 +145,39 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
         //------------------------------------------
         //log.debug("Identification "+t);    
 
-        Map<String, PrimitiveInfo> map = null;
-        switch (typeOfPrimitive) {
-            case PrimitiveInfo.DIRECTIVE:
-                map = directives;
-                break;
-            case PrimitiveInfo.PREDICATE:
-                map = predicates;
-                break;
-            case PrimitiveInfo.FUNCTOR:
-                map = functors;
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
-
-        String key = name + '/' + arity;
-        t.setPrimitive(map.get(key));
+        t.setPrimitive(table(typeOfPrimitive).get(t.key()));
     }
 
 
-    Library getLibraryDirective(String name, int nArgs) {
-        try {
-            return (Library) directives.get(name + '/' + nArgs).source;
-        } catch (NullPointerException e) {
-            return null;
-        }
-    }
+//    Library getLibraryDirective(String name, int nArgs) {
+//        try {
+//            return (Library) directives.get(name + '/' + nArgs).source;
+//        } catch (NullPointerException e) {
+//            return null;
+//        }
+//    }
 
-    Library getLibraryPredicate(String name, int nArgs) {
-        try {
-            return (Library) predicates.get(name + '/' + nArgs).source;
-        } catch (NullPointerException e) {
-            return null;
-        }
-    }
+//    Library getLibraryPredicate(String name, int nArgs) {
+//        try {
+//            return (Library) predicates.get(name + '/' + nArgs).source;
+//        } catch (NullPointerException e) {
+//            return null;
+//        }
+//    }
 
-    Library getLibraryFunctor(String name, int nArgs) {
-        try {
-            return (Library) functors.get(name + '/' + nArgs).source;
-        } catch (NullPointerException e) {
-            return null;
-        }
-    }
+//    Library getLibraryFunctor(String name, int nArgs) {
+//        try {
+//            return (Library) functors.get(name + '/' + nArgs).source;
+//        } catch (NullPointerException e) {
+//            return null;
+//        }
+//    }
 
     /*Castagna 06/2011*/
-    @Override
-    public boolean containsTerm(String name, int nArgs) {
-        return (functors.containsKey(name + '/' + nArgs) || predicates.containsKey(name + '/' + nArgs));
-    }
+//    public boolean containsTerm(String name, int nArgs) {
+//        String key = name + '/' + nArgs;
+//        return (functors.containsKey(key) ||
+//                predicates.containsKey(key));
+//    }
     /**/
 }

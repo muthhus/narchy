@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
  *
  * @see Struct
  */
-public class PrimitiveInfo {
+public class PrologPrimitive {
     
     public final static int DIRECTIVE  = 0;
     public final static int PREDICATE  = 1;
@@ -50,7 +50,7 @@ public class PrimitiveInfo {
     public final String key;
 
 
-    public PrimitiveInfo(int type, String key, Library lib, Method m, int arity) throws NoSuchMethodException {
+    public PrologPrimitive(int type, String key, Library lib, Method m, int arity) throws NoSuchMethodException {
         if (m==null) {
             throw new NoSuchMethodException();
         }

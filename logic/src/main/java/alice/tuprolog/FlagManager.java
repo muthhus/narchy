@@ -36,7 +36,7 @@ class FlagManager extends FasterList<Flag> {
     /**
      * Config this Manager
      */
-    public void initialize(Prolog vm) {
+    public void start(Prolog vm) {
         mediator = vm;
     }
 

@@ -14,6 +14,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static alice.tuprolog.PrologPrimitive.PREDICATE;
+
 /**
  * @author Alex Benini
  *
@@ -97,10 +99,10 @@ public class EngineRunner implements java.io.Serializable, Runnable{
      */
     EngineRunner initialize(Prolog vm) {
         mediator = vm;
-        theoryManager    = vm.getTheoryManager();
-        primitiveManager = vm.getPrimitiveManager();
-        libraryManager   = vm.getLibraryManager();
-        engineManager = vm.getEngineManager();
+        theoryManager    = vm.theories;
+        primitiveManager = vm.prims;
+        libraryManager   = vm.libs;
+        engineManager = vm.engine;
         
         detached = false;
         solving = false;
@@ -177,8 +179,8 @@ public class EngineRunner implements java.io.Serializable, Runnable{
             query.resolveTerm();
             
             libraryManager.onSolveBegin(query);
-            primitiveManager.identifyPredicate(query);
-//            theoryManager.transBegin();
+            primitiveManager.identify(query, PREDICATE);
+            //            theoryManager.transBegin();
             
             freeze();
             env = new Engine(this, query);
@@ -310,7 +312,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     }
     
     void identify(Term t) {
-        primitiveManager.identifyPredicate(t);
+        primitiveManager.identify(t, PREDICATE);
     }
     
 //    void saveLastTheoryStatus() {

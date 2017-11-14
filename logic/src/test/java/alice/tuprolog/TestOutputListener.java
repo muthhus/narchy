@@ -9,7 +9,7 @@ class TestOutputListener implements OutputListener {
 
 	@Override
 	public void onOutput(OutputEvent e) {
-		output += e.getMsg();
+        output += e.msg;
 	}
 
 }

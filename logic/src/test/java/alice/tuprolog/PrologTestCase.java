@@ -52,7 +52,7 @@ public class PrologTestCase  {
 		Prolog engine = new Prolog();
 		Theory t = new Theory("test :- notx existing(s).");
 		try {
-			engine.addTheory(t);
+			engine.input(t);
 			fail("");
 		} catch (InvalidTheoryException expected) {
 			assertEquals("", engine.getTheory().toString());
@@ -93,7 +93,7 @@ public class PrologTestCase  {
 		assertEquals("", a.firstMessage);
 		assertEquals("a(1).\n\na(2).\n\n", a.secondMessage);
 		t = new Theory("a(3).\na(4).\n");
-		engine.addTheory(t);
+		engine.input(t);
 		assertEquals("a(1).\n\na(2).\n\n", a.firstMessage);
 		assertEquals("a(1).\n\na(2).\n\na(3).\n\na(4).\n\n", a.secondMessage);
 	}

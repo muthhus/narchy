@@ -36,7 +36,7 @@ public class PrologImpl extends UnicastRemoteObject
 
     @Override
     public void addTheory(Theory theory) throws InvalidTheoryException {
-        imp.addTheory(theory);
+        imp.input(theory);
     }
 
 

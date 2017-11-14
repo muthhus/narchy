@@ -75,7 +75,7 @@ public class TestEvent {
             	"a(4).\n");
     
         
-        engine.addTheory(th);
+        engine.input(th);
         
         sinfo = engine.solve("a(X).");
         

@@ -18,11 +18,14 @@
 package alice.tuprolog;
 
 import jcog.list.FasterList;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static alice.tuprolog.PrologPrimitive.FUNCTOR;
 
 
 /**
@@ -44,19 +47,20 @@ import java.util.Map;
  * <p>
  */
 public abstract class Library implements Serializable, IPrimitives {
-	private static final long serialVersionUID = 1L;
+
+
     /**
-	 * prolog core which loaded the library
+	 * (current) prolog core which loaded this library
 	 */
-    protected Prolog engine;
+    protected Prolog engine = null;
     
     /**
 	 * operator mapping
 	 */
-    private final String[][] opMappingCached;
+    private final String[][] synonyms;
     
     public Library(){
-        opMappingCached = getSynonymMap();
+        synonyms = buildSynonyms();
     }
     
     /**
@@ -79,26 +83,19 @@ public abstract class Library implements Serializable, IPrimitives {
         return "";
     }
     
-    public static String getTheory(int a) {
-    	return "";
-    }
+//    public static String getTheory(int a) {
+//    	return "";
+//    }
     
     /**
      * Gets the synonym mapping, as array of
      * elements like  { synonym, original name}
      */
-    public String[][] getSynonymMap() {
+    @Nullable
+    public String[][] buildSynonyms() {
         return null;
     }
-    
-    /**
-	 * Gets the engine to which the library is bound
-	 * @return  the engine
-	 */
-    public Prolog getEngine() {
-        return engine;
-    }
-    
+
     /**
 	 * @param en
 	 */
@@ -133,10 +130,10 @@ public abstract class Library implements Serializable, IPrimitives {
             final Struct t = (Struct) val;
             boolean primitive = t.isPrimitive();
             if (!primitive && term != t) {
-                engine.identifyFunctor(t);
+                engine.prims.identify(t, FUNCTOR); //identifyFunctor(t);
             } else if (primitive) {
-                PrimitiveInfo bt = t.getPrimitive();
-                if ((bt.type == PrimitiveInfo.FUNCTOR)) // check for library functors
+                PrologPrimitive bt = t.getPrimitive();
+                if ((bt.type == FUNCTOR)) // check for library functors
                     return bt.evalAsFunctor(t);
             }
         } else if (val instanceof Number) {
@@ -171,13 +168,13 @@ public abstract class Library implements Serializable, IPrimitives {
      * gets the list of predicates defined in the library
      */
     @Override
-    public Map<Integer,List<PrimitiveInfo>> getPrimitives() {
+    public Map<Integer,List<PrologPrimitive>> getPrimitives() {
         try {
             java.lang.reflect.Method[] mlist = this.getClass().getMethods();
-            Map<Integer,List<PrimitiveInfo>> mapPrimitives = new HashMap<>();
-            mapPrimitives.put(PrimitiveInfo.DIRECTIVE, new FasterList<>());
-            mapPrimitives.put(PrimitiveInfo.FUNCTOR, new FasterList<>());
-            mapPrimitives.put(PrimitiveInfo.PREDICATE, new FasterList<>());
+            Map<Integer,List<PrologPrimitive>> mapPrimitives = new HashMap<>();
+            mapPrimitives.put(PrologPrimitive.DIRECTIVE, new FasterList<>());
+            mapPrimitives.put(FUNCTOR, new FasterList<>());
+            mapPrimitives.put(PrologPrimitive.PREDICATE, new FasterList<>());
             //{new ArrayList<PrimitiveInfo>(), new ArrayList<PrimitiveInfo>(), new ArrayList<PrimitiveInfo>()};
             
             for (int i = 0; i < mlist.length; i++) {
@@ -190,13 +187,13 @@ public abstract class Library implements Serializable, IPrimitives {
                 int type;
                 switch (returnTypeName) {
                     case "boolean":
-                        type = PrimitiveInfo.PREDICATE;
+                        type = PrologPrimitive.PREDICATE;
                         break;
                     case "alice.tuprolog.Term":
-                        type = PrimitiveInfo.FUNCTOR;
+                        type = FUNCTOR;
                         break;
                     case "void":
-                        type = PrimitiveInfo.DIRECTIVE;
+                        type = PrologPrimitive.DIRECTIVE;
                         break;
                     default:
                         continue;
@@ -218,18 +215,18 @@ public abstract class Library implements Serializable, IPrimitives {
                             if (valid) {
                                 String rawName = name.substring(0,index);
                                 String key = rawName + '/' + arity;
-                                PrimitiveInfo prim = new PrimitiveInfo(type, key, this, mlist[i], arity);
+                                PrologPrimitive prim = new PrologPrimitive(type, key, this, mlist[i], arity);
                                 mapPrimitives.get(type).add(prim);
                                 //
                                 // adding also or synonims
                                 //
-                                if (opMappingCached != null) {
+                                if (synonyms != null) {
                                     String[] stringFormat = {"directive", "predicate", "functor"};
-                                    for (int j = 0; j<opMappingCached.length; j++){
-                                        String[] map = opMappingCached[j];
-                                        if (map[2].equals(stringFormat[type]) && map[1].equals(rawName)){
+                                    for (int j = 0; j< synonyms.length; j++){
+                                        String[] map = synonyms[j];
+                                        if (map[1].equals(rawName) && map[2].equals(stringFormat[type])){
                                             key = map[0] + '/' + arity;
-                                            prim = new PrimitiveInfo(type, key, this, mlist[i], arity);
+                                            prim = new PrologPrimitive(type, key, this, mlist[i], arity);
                                             mapPrimitives.get(type).add(prim);
                                         }
                                     }

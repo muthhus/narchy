@@ -2,9 +2,9 @@ package jcog.bag.impl;
 
 import jcog.TODO;
 import jcog.Util;
-import jcog.data.LightObjectFloatPair;
 import jcog.data.array.Arrays;
 import jcog.list.FasterList;
+import jcog.math.LightObjectFloatPair;
 import jcog.pri.PriMap;
 import jcog.pri.Prioritized;
 import org.apache.commons.lang3.ArrayUtils;
