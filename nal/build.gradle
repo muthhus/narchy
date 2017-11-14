@@ -7,9 +7,9 @@ buildscript {
         classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.2.2'
     }
 }
-plugins {
-    id "net.ltgt.errorprone" version "0.0.13"
-}
+//plugins {
+//    id "net.ltgt.errorprone" version "0.0.13"
+//}
 
 
 dependencies {
@@ -19,13 +19,13 @@ dependencies {
         exclude(module: 'guava')
     }
     compile group: 'net.byteseek', name: 'byteseek', version: '2.0.3'
-    testCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.19'
-    testCompile group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.19'
-
 
     compile group: 'net.openhft', name: 'chronicle-bytes', version: '1.9.17-SNAPSHOT'
 
     compile group: 'com.lmax', name: 'disruptor', version: '3.3.7'
+
+    testCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.19'
+    testCompile group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.19'
 
 }
 
@@ -33,26 +33,25 @@ dependencies {
 apply plugin: "info.solidsoft.pitest"
 apply plugin: 'com.github.johnrengelman.shadow'
 
-tasks.withType(JavaCompile) {
-    // http://errorprone.info/bugpatterns
-    options.compilerArgs += [
-            '-XepAllErrorsAsWarnings',
-            '-Xep:DeadException:WARN',
-            '-Xep:DeadThread:WARN',
-            '-Xep:IsInstanceOfClass:WARN',
-            '-Xep:NullTernary:WARN',
-            '-Xep:RandomModInteger:WARN',
-            '-Xep:TryFailThrowable:WARN',
-            '-Xep:UnnecessaryTypeArgument:WARN',
-            '-Xep:UnusedAnonymousClass:WARN',
-            '-Xep:ReturnValueIgnored:WARN',
-            '-Xep:IdentityBinaryExpression:OFF',
-            '-Xep:DefaultCharset:OFF',
-            '-Xep:ReferenceEquality:OFF',
-            '-XepOpt:NullAway:AnnotatedPackages=nars'
-    ]
-
-}
+//tasks.withType(JavaCompile) {
+//    // http://errorprone.info/bugpatterns
+//    options.compilerArgs += [
+//            '-XepAllErrorsAsWarnings',
+//            '-Xep:DeadException:WARN',
+//            '-Xep:DeadThread:WARN',
+//            '-Xep:IsInstanceOfClass:WARN',
+//            '-Xep:NullTernary:WARN',
+//            '-Xep:RandomModInteger:WARN',
+//            '-Xep:TryFailThrowable:WARN',
+//            '-Xep:UnnecessaryTypeArgument:WARN',
+//            '-Xep:UnusedAnonymousClass:WARN',
+//            '-Xep:ReturnValueIgnored:WARN',
+//            '-Xep:IdentityBinaryExpression:OFF',
+//            '-Xep:DefaultCharset:OFF',
+//            '-Xep:ReferenceEquality:OFF',
+//            '-XepOpt:NullAway:AnnotatedPackages=nars'
+//    ]
+//}
 
 pitest {
 

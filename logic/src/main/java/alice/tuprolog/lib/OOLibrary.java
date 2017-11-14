@@ -199,7 +199,7 @@ public class OOLibrary extends Library {
         Struct arg = (Struct) argl.term();
         id = id.term();
         try {
-            if (!className.isAtom()) {
+            if (!className.isAtomic()) {
                 throw new JavaException(new ClassNotFoundException(
                         "Java class not found: " + className));
             }
@@ -431,20 +431,20 @@ public class OOLibrary extends Library {
 		String methodName = null;
 		try {
 			methodName = method.name();
-			if (!objId.isAtom()) {
+			if (!objId.isAtomic()) {
 				if (objId instanceof Var) {
 					throw new JavaException(new IllegalArgumentException(objId
 							.toString()));
 				}
 				Struct sel = (Struct) objId;
-				if (sel.name().equals(".") && sel.getArity() == 2
-						&& method.getArity() == 1) {
+				if (sel.name().equals(".") && sel.subs() == 2
+						&& method.subs() == 1) {
 					if (methodName.equals("set")) {
-						return java_set(sel.getTerm(0), sel.getTerm(1), method
-								.getTerm(0));
+						return java_set(sel.subResolve(0), sel.subResolve(1), method
+								.subResolve(0));
 					} else if (methodName.equals("get")) {
-						return java_get(sel.getTerm(0), sel.getTerm(1), method
-								.getTerm(0));
+						return java_get(sel.subResolve(0), sel.subResolve(1), method
+								.subResolve(0));
 					}
 				}
 			}
@@ -480,10 +480,10 @@ public class OOLibrary extends Library {
 				if (objId.isCompound()) {
 					Struct id = (Struct) objId;
 
-					if (id.getArity() == 1 && id.name().equals("class")) {
+					if (id.subs() == 1 && id.name().equals("class")) {
 						try {
 							String clName = alice.util.Tools
-									.removeApostrophes(id.term(0).toString());
+									.removeApostrophes(id.sub(0).toString());
 							Class<?> cl = Class.forName(clName, true, dynamicLoader);
 							
 							Method m = InspectionUtils.searchForMethod(cl, methodName, args.getTypes());
@@ -613,7 +613,7 @@ public class OOLibrary extends Library {
      */
     private boolean java_set(Term objId, Term fieldTerm, Term what) {
         what = what.term();
-        if (!fieldTerm.isAtom() || what instanceof Var)
+        if (!fieldTerm.isAtomic() || what instanceof Var)
             return false;
         String fieldName = ((Struct) fieldTerm).name();
         try {
@@ -623,8 +623,8 @@ public class OOLibrary extends Library {
             {
             	String clName = null;
             	// Case: class(className)
-            	if(((Struct) objId).getArity() == 1)         	
-            		 clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
+            	if(((Struct) objId).subs() == 1)
+            		 clName = alice.util.Tools.removeApostrophes(((Struct) objId).sub(0).toString());
             	if(clName != null)
             	{
             		try {
@@ -639,7 +639,7 @@ public class OOLibrary extends Library {
                                         + " not found in class "
                                         + alice.util.Tools
                                                 .removeApostrophes(((Struct) objId)
-                                                        .term(0).toString()));
+                                                        .sub(0).toString()));
                         return false;
                     }
             	}
@@ -695,7 +695,7 @@ public class OOLibrary extends Library {
      * get the value of the field
      */
     private boolean java_get(Term objId, Term fieldTerm, Term what) {
-        if (!fieldTerm.isAtom()) {
+        if (!fieldTerm.isAtomic()) {
             return false;
         }
         String fieldName = ((Struct) fieldTerm).name();
@@ -705,8 +705,8 @@ public class OOLibrary extends Library {
             if(objId.isCompound() && ((Struct) objId).name().equals("class"))
             {
             	String clName = null;
-            	if(((Struct) objId).getArity() == 1)         	
-            		 clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
+            	if(((Struct) objId).subs() == 1)
+            		 clName = alice.util.Tools.removeApostrophes(((Struct) objId).sub(0).toString());
             	if(clName != null)
             	{
             		try {
@@ -721,7 +721,7 @@ public class OOLibrary extends Library {
                                         + " not found in class "
                                         + alice.util.Tools
                                                 .removeApostrophes(((Struct) objId)
-                                                        .term(0).toString()));
+                                                        .sub(0).toString()));
                         return false;
                     }
             	}
@@ -1078,10 +1078,10 @@ public class OOLibrary extends Library {
      * creation of method signature from prolog data
      */
     private Signature parseArg(Struct method) {
-        Object[] values = new Object[method.getArity()];
-        Class<?>[] types = new Class[method.getArity()];
-        for (int i = 0; i < method.getArity(); i++) {
-            if (!parse_arg(values, types, i, method.getTerm(i)))
+        Object[] values = new Object[method.subs()];
+        Class<?>[] types = new Class[method.subs()];
+        for (int i = 0; i < method.subs(); i++) {
+            if (!parse_arg(values, types, i, method.subResolve(i)))
                 return null;
         }
         return new Signature(values, types);
@@ -1102,7 +1102,7 @@ public class OOLibrary extends Library {
             if (term == null) {
                 values[i] = null;
                 types[i] = null;
-            } else if (term.isAtom()) {
+            } else if (term.isAtomic()) {
                 String name = alice.util.Tools.removeApostrophes(term.toString());
                 switch (name) {
                     case "true":
@@ -1138,8 +1138,8 @@ public class OOLibrary extends Library {
                 // argument descriptors
                 Struct tc = (Struct) term;
                 if (tc.name().equals("as")) {
-                    return parse_as(values, types, i, tc.getTerm(0), tc
-                            .getTerm(1));
+                    return parse_as(values, types, i, tc.subResolve(0), tc
+                            .subResolve(1));
                 } else {
                     Object obj = currentObjects.get(alice.util.Tools
                             .removeApostrophes(tc.toString()));

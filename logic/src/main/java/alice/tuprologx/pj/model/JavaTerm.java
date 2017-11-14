@@ -192,8 +192,8 @@ public class JavaTerm<O> extends Compound<JavaTerm<O>> {
             throw new UnsupportedOperationException();
         Class<?> termKlass = hashtable.get(s.name());
         Vector<Term<?>> terms = new Vector<>();
-        for (int i = 0; i < s.getArity() ; i ++) {
-            terms.add(Term.unmarshal(s.term(i)));
+        for (int i = 0; i < s.subs() ; i ++) {
+            terms.add(Term.unmarshal(s.sub(i)));
         }
         return new JavaTerm<>(termKlass, terms);
     }

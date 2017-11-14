@@ -81,7 +81,7 @@ public class StateBacktrack extends State {
             if (curCtx.fatherCtx == null)
                 break;
             stopDeunify = curCtx.fatherVarsList;
-            SubGoalId fatherIndex = curCtx.fatherGoalId;
+            SubGoal fatherIndex = curCtx.fatherGoalId;
 
             Term prevGoal = curGoal;
             curCtx = curCtx.fatherCtx;

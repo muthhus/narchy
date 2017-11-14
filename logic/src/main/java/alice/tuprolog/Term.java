@@ -28,7 +28,7 @@ import java.util.*;
  * @see Var
  * @see  Number
  */
-public abstract class Term implements Serializable, AbstractSubGoalTree {
+public abstract class Term implements Serializable, SubTree {
 	private static final long serialVersionUID = 1L;
 
     // true and false constants
@@ -64,13 +64,13 @@ public abstract class Term implements Serializable, AbstractSubGoalTree {
     //
     
     /** is this term a constant prolog term? */
-    public abstract boolean isAtomic();
+    public abstract boolean isAtom();
     
     /** is this term a prolog compound term? */
     public abstract boolean isCompound();
     
     /** is this term a prolog (alphanumeric) atom? */
-    public abstract boolean isAtom();
+    public abstract boolean isAtomic();
     
     /** is this term a prolog list? */
     public abstract boolean isList();
@@ -165,14 +165,17 @@ public abstract class Term implements Serializable, AbstractSubGoalTree {
      *
      * The list argument passed contains the list of variables to be renamed
      * (if empty list then no renaming)
+     * @param vMap
      * @param idExecCtx Execution Context identifier
      */
-    abstract Term copy(AbstractMap<Var,Var> vMap, int idExecCtx);
+    abstract Term copy(Map<Var, Var> vMap, int idExecCtx);
     
     /**
      * gets a copy for result.
+     * @param vMap
+     * @param substMap
      */
-    abstract Term copy(AbstractMap<Var,Var> vMap, AbstractMap<Term,Var> substMap);
+    abstract Term copy(Map<Var, Var> vMap, Map<Term, Var> substMap);
     
     /**
      * Try to unify two terms
@@ -347,18 +350,12 @@ public abstract class Term implements Serializable, AbstractSubGoalTree {
     }
     
     /*Castagna 06/2011*/
-    /**
-	 * Visitor pattern
-	 * @param tv - Visitor
-	 */
-	public abstract void accept(TermVisitor tv);
     /**/
 
 
     @Override
     public final boolean isLeaf() { return true; }
-    @Override
-    public final boolean isRoot() { return false; }
+
 
 
 }

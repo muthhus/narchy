@@ -44,8 +44,8 @@ class StructIterator implements java.util.Iterator<Term>, java.io.Serializable {
         // Using Struct#getTerm(int) instead of Struct#listHead and Struct#listTail
         // to avoid redundant Struct#isList calls since it is only possible to get
         // a StructIterator on a Struct instance which is already a list.
-        Term head = list.getTerm(0);
-        list = (Struct) list.getTerm(1);
+        Term head = list.subResolve(0);
+        list = (Struct) list.subResolve(1);
         return head;
     }
     

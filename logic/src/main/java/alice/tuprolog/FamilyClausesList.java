@@ -170,13 +170,13 @@ public class FamilyClausesList extends
 			 * If no arguments no optimization can be applied
 			 * (and probably no optimization is needed)
 			 */
-			if(g.getArity() == 0){
+			if(g.subs() == 0){
 				//return new ReadOnlyLinkedList<>(this);
 				return Collections.unmodifiableList(this);
 			}
 
 			/* Retrieves first argument and checks type */
-			Term t = g.term(0).term();
+			Term t = g.sub(0).term();
 			if(t instanceof Var){
 				/*
 				 * if first argument is an unbounded variable,
@@ -184,7 +184,7 @@ public class FamilyClausesList extends
 				 */
 				//return new ReadOnlyLinkedList<>(this);
 				return Collections.unmodifiableList(this);
-			} else if(t.isAtomic()){
+			} else if(t.isAtom()){
 				if(t instanceof Number){
 					/* retrieves clauses whose first argument is numeric (or Var)
 					 * and same as goal's first argument, if no clauses
@@ -243,22 +243,22 @@ public class FamilyClausesList extends
 		 * A list can be an empty list, or a Struct with name equals to "."
 		 * and arity equals to 2.
 		 */
-		return t.isEmptyList() || (t.getArity() == 2 && t.name().equals("."));
+		return t.isEmptyList() || (t.subs() == 2 && t.name().equals("."));
 
 	}
 
 	// Updates indexes, storing informations about the last added clause
 	void register(ClauseInfo ci, boolean first){
 		// See FamilyClausesList.get(Term): same concept
-		Term clause = ci.getHead();
+        Term clause = ci.head;
 		if(clause instanceof Struct){
 			Struct g = (Struct) clause.term();
 
-			if(g.getArity() == 0){
+			if(g.subs() == 0){
 				return;
 			}
 
-			Term t = g.term(0).term();
+			Term t = g.sub(0).term();
 			if(t instanceof Var){
 				numCompClausesIndex.insertAsShared(ci, first);
 				constantCompClausesIndex.insertAsShared(ci, first);
@@ -269,7 +269,7 @@ public class FamilyClausesList extends
 				} else {
 					listCompClausesList.addLast(ci);
 				}
-			} else if(t.isAtomic()){
+			} else if(t.isAtom()){
 				if(t instanceof Number){
 					numCompClausesIndex.insert((Number) t,ci, first);
 				} else if(t instanceof Struct){
@@ -291,22 +291,22 @@ public class FamilyClausesList extends
 
 	// Updates indexes, deleting informations about the last removed clause
 	void unregister(ClauseInfo ci) {
-		Term clause = ci.getHead();
+        Term clause = ci.head;
 		if(clause != null){
 			Struct g = (Struct) clause.term();
 
-			if(g.getArity() == 0){
+			if(g.subs() == 0){
 				return;
 			}
 
-			Term t = g.term(0).term();
+			Term t = g.sub(0).term();
 			if(t instanceof Var){
 				numCompClausesIndex.removeShared(ci);
 				constantCompClausesIndex.removeShared(ci);
 				structCompClausesIndex.removeShared(ci);
 
 				listCompClausesList.remove(ci);
-			} else if(t.isAtomic()){
+			} else if(t.isAtom()){
 				if(t instanceof Number){
 					numCompClausesIndex.remove((Number) t,ci);
 				} else if(t instanceof Struct){

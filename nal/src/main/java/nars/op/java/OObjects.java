@@ -207,7 +207,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 //                if (explicit) {
                 next.causeMerge(cause);
                 next.priMax(cause.priElseZero());
-                cause.pri(0); //drain
+                //cause.pri(0); //drain
                 cause.meta("@", next);
 //                } else {
 //                    next.priMax(pri);
@@ -266,7 +266,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
             if (cause != null) {
                 next.causeMerge(cause);
                 next.priMax(cause.priElseZero());
-                cause.pri(0); //drain
+                //cause.pri(0); //drain
                 cause.meta("@", next);
             } else {
                 next.priMax(pri);

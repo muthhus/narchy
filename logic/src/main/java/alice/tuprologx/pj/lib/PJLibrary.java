@@ -154,7 +154,7 @@ public class PJLibrary extends Library {
 		Struct arg = (Struct) argl.term();
 		id = id.term();
 		try {
-			if (!className.isAtom()) {
+			if (!className.isAtomic()) {
 				return false;
 			}
 			String clName = ((Struct) className).name();
@@ -309,16 +309,16 @@ public class PJLibrary extends Library {
 			// check for accessing field   Obj.Field <- set/get(X)
 			//  in that case: objId is '.'(Obj, Field)
 			
-			if (!objId.isAtom()) {
+			if (!objId.isAtomic()) {
 				if (objId instanceof Var) {
 					return false;
 				}
 				Struct sel = (Struct) objId;
-				if (sel.name().equals(".") && sel.getArity() == 2 && method.getArity() == 1) {
+				if (sel.name().equals(".") && sel.subs() == 2 && method.subs() == 1) {
 					if (methodName.equals("set"))
-						return java_set(sel.getTerm(0), sel.getTerm(1), method.getTerm(0));
+						return java_set(sel.subResolve(0), sel.subResolve(1), method.subResolve(0));
 					else if (methodName.equals("get"))
-						return java_get(sel.getTerm(0), sel.getTerm(1), method.getTerm(0));
+						return java_get(sel.subResolve(0), sel.subResolve(1), method.subResolve(0));
 				}
 			}
 			
@@ -345,8 +345,8 @@ public class PJLibrary extends Library {
                     Object[] newValues = new Object[args_values.length];
                     Class<?>[] newTypes = new Class<?>[args_values.length];
                     //boolean ok = true;
-                    for (int i = 0; i < method.getArity();i++) {                        
-                        newValues[i] = alice.tuprologx.pj.model.Term.unmarshal(method.term(i));
+                    for (int i = 0; i < method.subs(); i++) {
+                        newValues[i] = alice.tuprologx.pj.model.Term.unmarshal(method.sub(i));
                         newTypes[i] = newValues[i].getClass();                        
                     }                    
                     m = lookupMethod(cl, methodName, newTypes, newValues);
@@ -371,9 +371,9 @@ public class PJLibrary extends Library {
 			} else {
 				if (objId.isCompound()) {
 					Struct id = (Struct) objId;
-					if (id.getArity() == 1 && id.name().equals("class")) {
+					if (id.subs() == 1 && id.name().equals("class")) {
 						try {
-							Class<?> cl = Class.forName(alice.util.Tools.removeApostrophes(id.term(0).toString()));
+							Class<?> cl = Class.forName(alice.util.Tools.removeApostrophes(id.sub(0).toString()));
 							Method m = cl.getMethod(methodName, args.getTypes());
 							m.setAccessible(true);
 							res = m.invoke(null, args.getValues());
@@ -425,22 +425,22 @@ public class PJLibrary extends Library {
 	private boolean java_set(Term objId, Term fieldTerm, Term what) {
 		//System.out.println("SET "+objId+" "+fieldTerm+" "+what);
 		what = what.term();
-		if (!fieldTerm.isAtom() || what instanceof Var)
+		if (!fieldTerm.isAtomic() || what instanceof Var)
 			return false;
 		String fieldName = ((Struct) fieldTerm).name();
 		try {
 			Class<?> cl = null;
 			Object obj = null;
 			if (objId.isCompound() &&
-					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
-				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
+					((Struct) objId).subs() == 1 && ((Struct) objId).name().equals("class")) {
+				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).sub(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).sub(0).toString()));
 					return false;
 				}
 			} else {
@@ -500,7 +500,7 @@ public class PJLibrary extends Library {
 	 */
 	private boolean java_get(Term objId, Term fieldTerm, Term what) {
 		//System.out.println("GET "+objId+" "+fieldTerm+" "+what);
-		if (!fieldTerm.isAtom()) {
+		if (!fieldTerm.isAtomic()) {
 			return false;
 		}
 		String fieldName = ((Struct) fieldTerm).name();
@@ -508,15 +508,15 @@ public class PJLibrary extends Library {
 			Class<?> cl = null;
 			Object obj = null;
 			if (objId.isCompound() &&
-					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
-				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
+					((Struct) objId).subs() == 1 && ((Struct) objId).name().equals("class")) {
+				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).sub(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).sub(0).toString()));
 					return false;
 				}
 			} else {
@@ -772,10 +772,10 @@ public class PJLibrary extends Library {
 	 * creation of method signature from prolog data
 	 */
 	private Signature parseArg(Struct method) {
-		Object[] values = new Object[method.getArity()];
-		Class<?>[] types = new Class[method.getArity()];
-		for (int i = 0; i < method.getArity(); i++) {
-			if (!parse_arg(values, types, i, method.getTerm(i)))
+		Object[] values = new Object[method.subs()];
+		Class<?>[] types = new Class[method.subs()];
+		for (int i = 0; i < method.subs(); i++) {
+			if (!parse_arg(values, types, i, method.subResolve(i)))
 				return null;
 		}
 		return new Signature(values, types);
@@ -796,7 +796,7 @@ public class PJLibrary extends Library {
 			if (term == null) {
 				values[i] = null;
 				types[i] = null;
-			} else if (term.isAtom()) {
+			} else if (term.isAtomic()) {
 				String name = alice.util.Tools.removeApostrophes(term.toString());
                 switch (name) {
                     case "true":
@@ -832,7 +832,7 @@ public class PJLibrary extends Library {
 				// argument descriptors
 				Struct tc = (Struct) term;
 				if (tc.name().equals("as")) {
-					return parse_as(values, types, i, tc.getTerm(0), tc.getTerm(1));
+					return parse_as(values, types, i, tc.subResolve(0), tc.subResolve(1));
 				} else {
 					Object obj = currentObjects.get(alice.util.Tools.removeApostrophes(tc.toString()));
 					values[i] = obj == null ? alice.util.Tools.removeApostrophes(tc.toString()) : obj;

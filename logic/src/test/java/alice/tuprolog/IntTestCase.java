@@ -9,11 +9,11 @@ public class IntTestCase {
 	
 	@Test
 	public void testIsAtomic() {
-		assertTrue(new Int(0).isAtomic());
+		assertTrue(new Int(0).isAtom());
 	}
 	
 	@Test public void testIsAtom() {
-		assertFalse(new Int(0).isAtom());
+		assertFalse(new Int(0).isAtomic());
 	}
 	
 	@Test public void testIsCompound() {

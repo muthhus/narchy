@@ -17,9 +17,9 @@
  */
 package alice.tuprolog;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents a variable term.
@@ -133,7 +133,7 @@ public class Var extends Term {
      * then the variable in the list is returned.
      */
     @Override
-    Term copy(AbstractMap<Var, Var> vMap, int idExecCtx) {
+    Term copy(Map<Var, Var> vMap, int idExecCtx) {
         Term tt = term();
         if (tt == this) {
             //No occurence of v before
@@ -146,9 +146,11 @@ public class Var extends Term {
 
     /**
      * Gets a copy of this variable.
+     * @param vMap
+     * @param substMap
      */
     @Override
-    Term copy(AbstractMap<Var, Var> vMap, AbstractMap<Term, Var> substMap) {
+    Term copy(Map<Var, Var> vMap, Map<Term, Var> substMap) {
         Var v;
         Object temp = vMap.get(this);
         if (temp == null) {
@@ -275,9 +277,9 @@ public class Var extends Term {
     }
 
     @Override
-    public boolean isAtomic() {
+    public boolean isAtom() {
         Term t = term();
-        return t != this && t.isAtomic();
+        return t != this && t.isAtom();
     }
 
     @Override
@@ -287,9 +289,9 @@ public class Var extends Term {
     }
 
     @Override
-    public boolean isAtom() {
+    public boolean isAtomic() {
         Term t = term();
-        return t != this && t.isAtom();
+        return t != this && t.isAtomic();
     }
 
     @Override
@@ -328,9 +330,11 @@ public class Var extends Term {
      * @param vl TODO
      */
     private boolean occurCheck(List<Var> vl, Struct t) {
-        int arity = t.getArity();
+
+        int arity = t.subs();
         for (int c = 0; c < arity; c++) {
-            Term at = t.getTerm(c);
+            Term at = t.subResolve(c);
+
             if (at instanceof Struct) {
                 if (occurCheck(vl, (Struct) at)) {
                     return true;
@@ -345,6 +349,7 @@ public class Var extends Term {
                 }
             }
         }
+
         return false;
 
     }
@@ -517,11 +522,6 @@ public class Var extends Term {
         }
     }
 
-    /*Castagna 06/2011*/
-    @Override
-    public final void accept(TermVisitor tv) {
-        tv.visit(this);
-    }
-	 /**/
+    /**/
 
 }

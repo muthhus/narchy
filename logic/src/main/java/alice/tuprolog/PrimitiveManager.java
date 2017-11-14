@@ -138,7 +138,7 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
         }
         Struct t = (Struct) term;
 
-        int arity = t.getArity();
+        int arity = t.subs();
         String name = t.name();
         //------------------------------------------
         int primType;
@@ -146,7 +146,7 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
         primType = PRIMITIVE_PREDICATES.contains(name) ? PrimitiveInfo.PREDICATE : PrimitiveInfo.FUNCTOR;
 
         for (int c = 0; c < arity; c++) {
-            identify(t.term(c), primType);
+            identify(t.sub(c), primType);
         }
 
         //------------------------------------------

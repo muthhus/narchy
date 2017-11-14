@@ -77,12 +77,12 @@ public class StateRuleSelection extends State {
          */
         ExecutionContext ec = new ExecutionContext(e.nDemoSteps++);
         ExecutionContext curCtx = e.currentContext;
-        ec.clause = clause.getClause();
+        ec.clause = clause.clause;
+
         //head and body with refresh variables (clause copied)
-        clause.performCopy(ec.getId());
-        ec.headClause = clause.getHeadCopy();
-        ec.goalsToEval = new SubGoalStore();
-        ec.goalsToEval.load( clause.getBodyCopy() );
+        clause.copyTo(ec.getId(), ec);
+
+
         // The following block encodes cut functionalities, and hardcodes the
         // special treatment that ISO Standard reserves for goal disjunction:
         // section 7.8.6.1 prescribes that ;/2 must be transparent to cut.
@@ -92,7 +92,7 @@ public class StateRuleSelection extends State {
             int depth = alternative.executionContext.depth;
             ec.choicePointAfterCut = choicePoint.prevChoicePointContext;
             Struct currentGoal = choicePoint.executionContext.currentGoal;
-            while (currentGoal.name().equals(";") && currentGoal.getArity() == 2) {
+            while (currentGoal.subs() == 2 && currentGoal.name().equals(";")) {
                 if (choicePoint.prevChoicePointContext != null) {
                     int distance = depth - choicePoint.prevChoicePointContext.executionContext.depth;
                     while (distance == 0 && choicePoint.prevChoicePointContext != null) {

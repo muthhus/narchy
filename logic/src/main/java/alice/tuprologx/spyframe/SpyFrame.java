@@ -52,8 +52,8 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
                 Struct s = (Struct) c;
                 String name = s.name();
                 ArrayList<Term> sub = new ArrayList<>();
-                for (AbstractSubGoalTree sgt : ec.getSubGoalStore().getSubGoals()) {
-                    if (sgt.isRoot()) {
+                for (SubTree sgt : ec.getSubGoalStore().getSubGoals()) {
+                    if (!sgt.isLeaf()) {
                         //SubGoalTree
                         cerca(sgt);
                         sub.addAll(elementi);
@@ -63,7 +63,7 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
                     }
                 }
                 if (":-".equals(name))
-                    sub.add(0, i + 1 < levels ? eclist.get(i + 1).getCurrentGoal() : s.term(0));
+                    sub.add(0, i + 1 < levels ? eclist.get(i + 1).getCurrentGoal() : s.sub(0));
                 else if (",".equals(name)) name = " ";//don't want to builder the ,-tree
                 else name = null;//indicates that we have a normal compound
                 int pos = sub.indexOf(ec.getCurrentGoal());
@@ -78,11 +78,11 @@ public class SpyFrame extends JFrame implements ActionListener, SpyListener{
         return bottom;//is at last the top
     }
 
-    private void cerca(AbstractSubGoalTree sgt) {
+    private void cerca(SubTree sgt) {
         elementi = new ArrayList<>();
         int dim = ((SubGoalTree) sgt).size();
         for (int i = 0; i < dim; i++) {
-            AbstractSubGoalTree ab = ((SubGoalTree) sgt).get(i);
+            SubTree ab = ((SubGoalTree) sgt).get(i);
             if (ab.isLeaf()) {
                 elementi.add((Term) ab);
             } else {

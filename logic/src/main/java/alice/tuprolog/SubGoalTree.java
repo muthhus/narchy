@@ -6,13 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public final class SubGoalTree extends FasterList<AbstractSubGoalTree> implements AbstractSubGoalTree {
+public final class SubGoalTree extends FasterList<SubTree> implements SubTree {
 
     public SubGoalTree() {
         super();
     }
 
-    public SubGoalTree(List<AbstractSubGoalTree> terms) {
+    public SubGoalTree(List<SubTree> terms) {
         super(terms);
     }
 
@@ -24,13 +24,11 @@ public final class SubGoalTree extends FasterList<AbstractSubGoalTree> implement
 
 
     @Override
-    public boolean isLeaf() { return false; }
-    @Override
-    public boolean isRoot() { return true; }
-    
+    public final boolean isLeaf() { return false; }
+
     public String toString() {
         String result = " [ ";
-        Iterator<AbstractSubGoalTree> i = iterator();
+        Iterator<SubTree> i = iterator();
         if (i.hasNext())
             result += i.next().toString();
         while (i.hasNext()) {

@@ -126,7 +126,7 @@ public class IOLibrary extends Library {
         arg = arg.term();
         if (arg instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
-        if (!arg.isAtom()) {
+        if (!arg.isAtomic()) {
             throw PrologError.type_error(engine.getEngineManager(), 1, "atom",
                     arg);
         }
@@ -174,7 +174,7 @@ public class IOLibrary extends Library {
         arg = arg.term();
         if (arg instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
-        if (!arg.isAtom()) {
+        if (!arg.isAtomic()) {
             throw PrologError.type_error(engine.getEngineManager(), 1, "atom",
                     arg);
         }
@@ -221,7 +221,7 @@ public class IOLibrary extends Library {
         arg = arg.term();
         if (arg instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
-        if (!arg.isAtom()) {
+        if (!arg.isAtomic()) {
             throw PrologError.type_error(engine.getEngineManager(), 1,
                     "character", arg);
         } else {
@@ -420,7 +420,7 @@ public class IOLibrary extends Library {
         file_name = file_name.term();
         if (file_name instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
-        if (!file_name.isAtom())
+        if (!file_name.isAtomic())
             throw PrologError.type_error(engine.getEngineManager(), 1, "atom",
                     file_name);
         Struct fileName = (Struct) file_name.term();
@@ -484,7 +484,7 @@ public class IOLibrary extends Library {
         arg1 = arg1.term();
         if (arg1 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 2);
-        if (!arg1.isAtom() && !arg1.isCompound()) {
+        if (!arg1.isAtomic() && !arg1.isCompound()) {
             throw PrologError.type_error(engine.getEngineManager(), 2,
                     "callable", arg1);
         }

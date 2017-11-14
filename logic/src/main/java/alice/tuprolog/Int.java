@@ -81,63 +81,7 @@ public class Int extends Number {
     final public boolean isReal() {
         return false;
     }
-    
-    
-    /** is an int Integer number? 
-     * @deprecated Use <tt>instanceof Int</tt> instead. */
-    @Override
-    final public boolean isTypeInt() {
-        return true;
-    }
 
-    /** is an int Integer number?
-     * @deprecated Use <tt>instanceof Int</tt> instead. */
-    @Override
-    final public boolean isInt() {
-        return true;
-    }
-    
-    /** is a float Real number? 
-     * @deprecated Use <tt>instanceof alice.tuprolog.Float</tt> instead. */
-    @Override
-    final public boolean isTypeFloat() {
-        return false;
-    }
-
-    /** is a float Real number?
-     * @deprecated Use <tt>instanceof alice.tuprolog.Float</tt> instead. */
-    @Override
-    final public boolean isFloat() {
-        return false;
-    }
-    
-    /** is a double Real number? 
-     * @deprecated Use <tt>instanceof alice.tuprolog.Double</tt> instead. */
-    @Override
-    final public boolean isTypeDouble() {
-        return false;
-    }
-
-    /** is a double Real number?
-     * @deprecated Use <tt>instanceof alice.tuprolog.Double</tt> instead. */
-    @Override
-    final public boolean isDouble() {
-        return false;
-    }
-    
-    /** is a long Integer number? 
-     * @deprecated Use <tt>instanceof alice.tuprolog.Long</tt> instead. */
-    @Override
-    final public boolean isTypeLong() {
-        return false;
-    }
-
-    /** is a long Integer number?
-     * @deprecated Use <tt>instanceof alice.tuprolog.Long</tt> instead. */
-    @Override
-    final public boolean isLong() {
-        return false;
-    }
     
     
     /**
@@ -169,7 +113,9 @@ public class Int extends Number {
      */
     @Override
     public boolean isEqual(Term t) {
+        if (this == t) return true;
         t = t.term();
+        if (this == t) return true;
         if (t instanceof Number) {
             Number n = (Number) t;
             if (!n.isInteger())

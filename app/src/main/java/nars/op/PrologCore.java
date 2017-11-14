@@ -145,7 +145,7 @@ public class PrologCore extends PrologAgent implements Consumer<Task> {
         beliefs.compute(c.term(), (pp, prev) -> {
 
             if (prev != null) {
-                if (prev.term(prev.getArity()-1).equals(ONE) ^ truth) {
+                if (prev.sub(prev.subs()-1).equals(ONE) ^ truth) {
                     //retract previous only do this if opposite the truth of this
                     solve(retraction(prev));
                 }
@@ -160,7 +160,7 @@ public class PrologCore extends PrologAgent implements Consumer<Task> {
             if (c.op()==IMPL) {
                 next = (Struct) pterm(t.term());
                 if (!_truth) {
-                    next = new Struct(":=", new Struct("not", next.getTerm(0)), next.getTerm(1));
+                    next = new Struct(":=", new Struct("not", next.subResolve(0)), next.subResolve(1));
                 }
             } else {
                 next = (Struct) pterm(t.term());
@@ -227,7 +227,7 @@ public class PrologCore extends PrologAgent implements Consumer<Task> {
 
     private void answer(Task question, Solution answer) {
         try {
-            Term nterm = nterm(answer.goal.term(0));
+            Term nterm = nterm(answer.goal.sub(0));
 
             if (nterm instanceof Compound) {
                 Concept c = nar.concept(nterm);
@@ -257,14 +257,14 @@ public class PrologCore extends PrologAgent implements Consumer<Task> {
     }
 
     private Term nterm(Struct s, int subterm) {
-        return nterm(s.term(subterm));
+        return nterm(s.sub(subterm));
     }
 
     private Term[] nterms(Struct s) {
-        int len = s.getArity();
+        int len = s.subs();
         Term[] n = new Term[len];
         for (int ni = 0; ni < len; ni++) {
-            if ((n[ni] = nterm(s.getTerm(ni))) == null)
+            if ((n[ni] = nterm(s.subResolve(ni))) == null)
                 return null; //abort
         }
         return n;
@@ -274,7 +274,7 @@ public class PrologCore extends PrologAgent implements Consumer<Task> {
     private Term nterm(alice.tuprolog.Term t) {
         if (t instanceof Struct) {
             Struct s = (Struct) t;
-            if (s.getArity() > 0) {
+            if (s.subs() > 0) {
                 switch (s.name()) {
 
                     case "-->":

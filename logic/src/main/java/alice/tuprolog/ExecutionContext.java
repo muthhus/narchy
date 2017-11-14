@@ -24,16 +24,15 @@ import java.util.List;
 
 
 /**
- * 
  * @author Alex Benini
  */
 public class ExecutionContext {
-    
+
     private final int id;
     int depth;
     Struct currentGoal;
     ExecutionContext fatherCtx;
-    SubGoalId fatherGoalId;
+    SubGoal fatherGoalId;
     Struct clause;
     Struct headClause;
     SubGoalStore goalsToEval;
@@ -41,47 +40,49 @@ public class ExecutionContext {
     OneWayList<List<Var>> fatherVarsList;
     ChoicePointContext choicePointAfterCut;
     boolean haveAlternatives;
-    
+
     ExecutionContext(int id) {
-        this.id=id;
+        this.id = id;
     }
-    
-    public int getId() { return id; }
-    
-    
-    public String toString(){
+
+    public int getId() {
+        return id;
+    }
+
+
+    public String toString() {
         return "         id: " + id + '\n' + "     currentGoal:  " + currentGoal + '\n' + "     clause:       " + clause + '\n' + "     subGoalStore: " + goalsToEval + '\n' + "     trailingVars: " + trailingVars + '\n';
     }
-    
-    
+
+
     /*
      * Methods for spyListeners
      */
-    
+
     public int getDepth() {
         return depth;
     }
-    
+
     public Struct getCurrentGoal() {
         return currentGoal;
     }
-    
-    public SubGoalId getFatherGoalId() {
+
+    public SubGoal getFatherGoalId() {
         return fatherGoalId;
     }
-    
+
     public Struct getClause() {
         return clause;
     }
-    
+
     public Struct getHeadClause() {
         return headClause;
     }
-    
+
     public SubGoalStore getSubGoalStore() {
         return goalsToEval;
     }
-    
+
     public List<List<Var>> getTrailingVars() {
         OneWayList<List<Var>> t = trailingVars;
         List<List<Var>> l = new FasterList<>();
@@ -90,9 +91,9 @@ public class ExecutionContext {
             l.add(t.getHead());
             t = t.getTail();
         }
-        return l;        
+        return l;
     }
-    
+
     /**
      * Save the state of the parent context to later bring the ExectutionContext
      * objects tree in a consistent state after a backtracking step.
@@ -103,29 +104,43 @@ public class ExecutionContext {
             fatherVarsList = fatherCtx.trailingVars;
         }
     }
-    
-   
+
+
     /**
      * If no open alternatives, no other term to execute and
      * current context doesn't contain as current goal a catch or java_catch predicate ->
      * current context no more needed ->
      * reused to execute g subgoal =>
-     * got TAIL RECURSION OPTIMIZATION!   
+     * got TAIL RECURSION OPTIMIZATION!
      */
-   
-    void performTailRecursionOptimization(Engine e){
-        	
-    	 	if(!haveAlternatives && e.currentContext.goalsToEval.getCurSGId() == null && !e.currentContext.goalsToEval.haveSubGoals() && !(e.currentContext.currentGoal.name().equalsIgnoreCase("catch") || e.currentContext.currentGoal.name().equalsIgnoreCase("java_catch")))
-        		{
-    	 			fatherCtx = e.currentContext.fatherCtx;
-    	 			//position of the new context in the list
-    	 			depth = e.currentContext.depth;
-        		}
-        	
-        	else
-        		{
-        			fatherCtx = e.currentContext;
-        			depth = e.currentContext.depth +1; 
-        		}
+
+    void performTailRecursionOptimization(Engine e) {
+
+        if (!haveAlternatives) {
+            SubGoalStore ge = e.currentContext.goalsToEval;
+            if (ge.getCurSGId() == null) {
+                if (!ge.haveSubGoals()) {
+                    String gn = e.currentContext.currentGoal.name();
+                    switch (gn) {
+                        case "catch":
+                        case "java_catch":
+                            break; //continue below
+
+                        default: {
+                            fatherCtx = e.currentContext.fatherCtx;
+                            //position of the new context in the list
+                            depth = e.currentContext.depth;
+                            return;
+
+                        }
+                    }
+                }
+            }
         }
+
+        fatherCtx = e.currentContext;
+        depth = e.currentContext.depth + 1;
+
+
+    }
 }

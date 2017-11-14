@@ -9,11 +9,11 @@ public class VarTestCase {
 	
 	@Test
 	public void testIsAtomic() {
-		assertFalse(new Var("X").isAtomic());
+		assertFalse(new Var("X").isAtom());
 	}
 	
 	@Test public void testIsAtom() {
-		assertFalse(new Var("X").isAtom());
+		assertFalse(new Var("X").isAtomic());
 	}
 	
 	@Test public void testIsCompound() {

@@ -9,11 +9,11 @@ public class DoubleTestCase {
 	
 	@Test
 	public void testIsAtomic() {
-		assertTrue(new alice.tuprolog.Double(0).isAtomic());
+		assertTrue(new alice.tuprolog.Double(0).isAtom());
 	}
 	
 	@Test public void testIsAtom() {
-		assertFalse(new alice.tuprolog.Double(0).isAtom());
+		assertFalse(new alice.tuprolog.Double(0).isAtomic());
 	}
 	
 	@Test public void testIsCompound() {

@@ -31,7 +31,7 @@ public class ChoicePointContext {
     ClauseStore compatibleGoals;
     ExecutionContext executionContext;
     ChoicePointContext prevChoicePointContext;
-    SubGoalId indexSubGoal;
+    SubGoal indexSubGoal;
     OneWayList<List<Var>> varsToDeunify;
     
     
@@ -55,7 +55,7 @@ public class ChoicePointContext {
         return executionContext;
     }
     
-    public SubGoalId getIndexBack() {
+    public SubGoal getIndexBack() {
         return indexSubGoal;
     }
     

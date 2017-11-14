@@ -1,7 +1,7 @@
 package alice.tuprolog;
 import java.net.InetAddress;
-import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Map;
 
 public abstract class AbstractSocket extends Term{
 	private static final long serialVersionUID = 1L;
@@ -40,7 +40,7 @@ public abstract class AbstractSocket extends Term{
 	}
 
 	@Override
-	public boolean isAtomic() {
+	public boolean isAtom() {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -52,7 +52,7 @@ public abstract class AbstractSocket extends Term{
 	}
 
 	@Override
-	public boolean isAtom() {
+	public boolean isAtomic() {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -103,22 +103,15 @@ public abstract class AbstractSocket extends Term{
 	}
 
 	@Override
-	Term copy(AbstractMap<Var, Var> vMap, int idExecCtx) {
+	Term copy(Map<Var, Var> vMap, int idExecCtx) {
 		return this;
 	}
 
 	@Override
-	Term copy(AbstractMap<Var, Var> vMap, AbstractMap<Term, Var> substMap) {
+	Term copy(Map<Var, Var> vMap, Map<Term, Var> substMap) {
 		return this;
 	}
 
-
-
-	@Override
-	public void accept(TermVisitor tv) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }
 

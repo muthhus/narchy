@@ -42,7 +42,7 @@ public class Atom extends Term<Atom> {
         }
         
         static boolean matches(alice.tuprolog.Term t) {
-            return (!(t instanceof alice.tuprolog.Var) && t.isAtom() && !t.isList() && !Bool.matches(t));
+            return (!(t instanceof alice.tuprolog.Var) && t.isAtomic() && !t.isList() && !Bool.matches(t));
         }
         
         public List<Atom> toCharList() {

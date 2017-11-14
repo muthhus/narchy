@@ -73,7 +73,7 @@ public class TheoryManager {
      */
     public /*synchronized*/ void assertA(Struct clause, boolean dyn, String libName, boolean backtrackable) {
         ClauseInfo d = new ClauseInfo(toClause(clause), libName);
-        String key = d.getHead().getPredicateIndicator();
+        String key = d.head.getPredicateIndicator();
         if (dyn) {
             dynamicDBase.add(key, d, true);
             if (staticDBase.containsKey(key)) {
@@ -82,7 +82,7 @@ public class TheoryManager {
         } else
             staticDBase.add(key, d, true);
         if (engine.isSpy())
-            engine.spy("INSERTA: " + d.getClause() + '\n');
+            engine.spy("INSERTA: " + d.clause + '\n');
     }
 
     /**
@@ -90,7 +90,7 @@ public class TheoryManager {
      */
     public /*synchronized*/ void assertZ(Struct clause, boolean dyn, String libName, boolean backtrackable) {
         ClauseInfo d = new ClauseInfo(toClause(clause), libName);
-        String key = d.getHead().getPredicateIndicator();
+        String key = d.head.getPredicateIndicator();
         if (dyn) {
             dynamicDBase.add(key, d, false);
             if (engine.isSpy() && staticDBase.containsKey(key)) {
@@ -98,7 +98,7 @@ public class TheoryManager {
             }
         } else
             staticDBase.add(key, d, false);
-        if (engine.isSpy()) engine.spy("INSERTZ: " + d.getClause() + '\n');
+        if (engine.isSpy()) engine.spy("INSERTZ: " + d.clause + '\n');
     }
 
     /**
@@ -106,7 +106,7 @@ public class TheoryManager {
      */
     public synchronized int retract(final Struct cl, Predicate<ClauseInfo> each) {
         Struct clause = toClause(cl);
-        Struct struct = ((Struct) clause.term(0));
+        Struct struct = ((Struct) clause.sub(0));
         List<ClauseInfo> family = dynamicDBase.get(struct.getPredicateIndicator());
         //final ExecutionContext ctx = engine.getEngineManager().getCurrentContext();
 
@@ -124,7 +124,7 @@ public class TheoryManager {
 
         final int[] removals = {0};
         family.removeIf(ci -> {
-            if (clause.match(ci.getClause())) {
+            if (clause.match(ci.clause)) {
                 if (each.test(ci)) {
                     removals[0]++;
                     return true;
@@ -162,13 +162,13 @@ public class TheoryManager {
      * predicate indicator passed as a parameter
      */
     public /*synchronized*/ boolean abolish(Struct pi) {
-        if (!(pi instanceof Struct) || !pi.isGround() || pi.getArity() != 2)
+        if (!(pi instanceof Struct) || !pi.isGround() || pi.subs() != 2)
             throw new IllegalArgumentException(pi + " is not a valid Struct");
         if (!pi.name().equals("/"))
             throw new IllegalArgumentException(pi + " has not the valid predicate name. Espected '/' but was " + pi.name());
 
-        String arg0 = Tools.removeApostrophes(pi.term(0).toString());
-        String arg1 = Tools.removeApostrophes(pi.term(1).toString());
+        String arg0 = Tools.removeApostrophes(pi.sub(0).toString());
+        String arg1 = Tools.removeApostrophes(pi.sub(1).toString());
         String key = arg0 + '/' + arg1;
         List<ClauseInfo> abolished = dynamicDBase.remove(key); /* Reviewed by Paolo Contessi: LinkedList -> List */
         if (abolished != null)
@@ -254,7 +254,7 @@ public class TheoryManager {
      */
     public void rebindPrimitives() {
         for (ClauseInfo d : dynamicDBase) {
-            for (AbstractSubGoalTree sge : d.getBody()) {
+            for (SubTree sge : d.body) {
                 Term t = (Term) sge;
                 primitiveManager.identifyPredicate(t);
             }
@@ -287,8 +287,8 @@ public class TheoryManager {
 
     private boolean runDirective(Struct c) {
         if ("':-'".equals(c.name()) ||
-                ((c.getArity() == 1) && ":-".equals(c.name()) && (c.getTerm(0) instanceof Struct))) {
-            Struct dir = (Struct) c.getTerm(0);
+                ((c.subs() == 1) && ":-".equals(c.name()) && (c.subResolve(0) instanceof Struct))) {
+            Struct dir = (Struct) c.subResolve(0);
             try {
                 if (!primitiveManager.evalAsDirective(dir))
                     Prolog.warn("The directive " + dir.getPredicateIndicator() + " is unknown.");

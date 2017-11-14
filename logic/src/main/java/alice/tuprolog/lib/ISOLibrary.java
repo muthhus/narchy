@@ -38,7 +38,7 @@ public class ISOLibrary extends Library {
         arg0 = arg0.term();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
-        if (!arg0.isAtom())
+        if (!arg0.isAtomic())
             throw PrologError.type_error(engine.getEngineManager(), 1, "atom",
                     arg0);
         Struct atom = (Struct) arg0;
@@ -59,7 +59,7 @@ public class ISOLibrary extends Library {
             }
             String st = "";
             while (!(list.isEmptyList())) {
-                String st1 = list.getTerm(0).toString();
+                String st1 = list.subResolve(0).toString();
                 try {
                     if (st1.startsWith("'") && st1.endsWith("'")) {
                         st1 = st1.substring(1, st1.length() - 1);
@@ -73,11 +73,11 @@ public class ISOLibrary extends Library {
                 } catch (Exception ex) {
                 }
                 st = st.concat(st1);
-                list = (Struct) list.getTerm(1);
+                list = (Struct) list.subResolve(1);
             }
             return unify(arg0, new Struct(st));
         } else {
-            if (!arg0.isAtom()) {
+            if (!arg0.isAtomic()) {
                 throw PrologError.type_error(engine.getEngineManager(), 1,
                         "atom", arg0);
             }
@@ -101,7 +101,7 @@ public class ISOLibrary extends Library {
         arg0 = arg0.term();
         arg1 = arg1.term();
         if (arg1 instanceof Var) {
-            if (arg0.isAtom()) {
+            if (arg0.isAtomic()) {
                 String st = ((Struct) arg0).name();
                 if (st.length() <= 1)
                     return unify(arg1, new Int(st.charAt(0)));
@@ -459,7 +459,7 @@ public class ISOLibrary extends Library {
     public boolean sub_atom_guard_5(Term arg0, Term arg1, Term arg2, Term arg3, Term arg4)
             throws PrologError {
         arg0 = arg0.term();
-        if (!arg0.isAtom())
+        if (!arg0.isAtomic())
             throw PrologError.type_error(engine.getEngineManager(), 1, "atom", arg0);
         return true;
     }

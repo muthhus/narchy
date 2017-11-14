@@ -43,10 +43,10 @@ public class TermPanel extends JPanel implements ActionListener{
         } else if (term instanceof Struct) {
             Struct struct = (Struct) term;
             node.text = struct.name();
-            int n = struct.getArity();
+            int n = struct.subs();
             node.kids = new Node[n];
             for (int i = 0; i < n; i++)
-                node.kids[i] = makeTreeFrom(struct.term(i));
+                node.kids[i] = makeTreeFrom(struct.sub(i));
         }
         return node;
     }

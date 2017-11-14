@@ -103,7 +103,7 @@ public final class BuiltIn extends Library {
 			 {
 				 for(int i=0; i<(((Struct) arg0).toList().listSize())-1; i++)
 				 {
-					 Term argi=((Struct) arg0).term(i);
+					 Term argi=((Struct) arg0).sub(i);
 					 if (!(argi instanceof Struct) )
 					 {
 						 if (argi instanceof Var)
@@ -129,7 +129,7 @@ public final class BuiltIn extends Library {
 			 {
 				 for(int i=0; i<(((Struct) arg0).toList().listSize())-1; i++)
 				 {
-					 Term argi=((Struct) arg0).term(i);
+					 Term argi=((Struct) arg0).sub(i);
 					 if (!(argi instanceof Struct) )
 					 {
 						 if (argi instanceof Var)
@@ -162,8 +162,7 @@ public final class BuiltIn extends Library {
 		 boolean sClause = sarg0.isClause();
 
 		 // if clause to retract found -> retract + true
-		 if (theoryManager.retract(sarg0, c ->
-			 unify(!sClause ? new Struct(":-", arg0, new Struct("true")) : sarg0, c.getClause())
+		 if (theoryManager.retract(sarg0, c -> unify(!sClause ? new Struct(":-", arg0, new Struct("true")) : sarg0, c.clause)
 		 ) > 0) {
 		 	return true;
 		 }
@@ -178,7 +177,7 @@ public final class BuiltIn extends Library {
 		 if (!(arg0 instanceof Struct) || !arg0.isGround()) 
 			 throw PrologError.type_error(engineManager, 1, "predicate_indicator", arg0);
 		 
-		 if( ((Struct)arg0).term(0).toString().equals("abolish") )
+		 if( ((Struct)arg0).sub(0).toString().equals("abolish") )
 			 throw PrologError.permission_error(engineManager, "modify", "static_procedure", arg0, new Struct(""));
 		 
 		 return theoryManager.abolish((Struct) arg0);
@@ -213,7 +212,7 @@ public final class BuiltIn extends Library {
 	  */
 	 public boolean load_library_1(Term arg0) throws PrologError {
 		 arg0 = arg0.term();
-		 if (!arg0.isAtom()) {
+		 if (!arg0.isAtomic()) {
 			 if (arg0 instanceof Var)
 				 throw PrologError.instantiation_error(engineManager, 1);
 			 else
@@ -234,7 +233,7 @@ public final class BuiltIn extends Library {
 	 public boolean load_library_2(Term arg0, Term arg1) throws PrologError {
 		 arg0 = arg0.term();
 		 arg1 = arg1.term();
-		 if (!arg0.isAtom()) {
+		 if (!arg0.isAtomic()) {
 			 if (arg0 instanceof Var)
 				 throw PrologError.instantiation_error(engineManager, 1);
 			 else
@@ -273,7 +272,7 @@ public final class BuiltIn extends Library {
 	  */
 	 public boolean unload_library_1(Term arg0) throws PrologError {
 		 arg0 = arg0.term();
-		 if (!arg0.isAtom()) {
+		 if (!arg0.isAtomic()) {
 			 if (arg0 instanceof Var)
 				 throw PrologError.instantiation_error(engineManager, 1);
 			 else
@@ -352,12 +351,12 @@ public final class BuiltIn extends Library {
 			 Struct s = (Struct) term;
 			 String pi = s.getPredicateIndicator();
 			 if (pi.equals(";/2") || pi.equals(",/2") || pi.equals("->/2")) {
-				 for (int i = 0; i < s.getArity(); i++) {
-					 Term t = s.term(i);
+				 for (int i = 0; i < s.subs(); i++) {
+					 Term t = s.sub(i);
 					 Term arg = convertTermToGoal(t);
 					 if (arg == null)
 						 return null;
-					 s.setArg(i, arg);
+					 s.setSub(i, arg);
 				 }
 			 }
 		 }
@@ -369,7 +368,7 @@ public final class BuiltIn extends Library {
 	  * definition in section 3.24.
 	  */
 	 private static boolean isCallable(Term goal) {
-		 return (goal.isAtom() || goal.isCompound());
+		 return (goal.isAtomic() || goal.isCompound());
 	 }
 
 	 private void handleError(Throwable t) throws PrologError {
@@ -477,9 +476,9 @@ public final class BuiltIn extends Library {
 
 		 }
 		 for (ClauseInfo b : l) {
-			 if (Prolog.match(arg0, b.getHead())) {
-				 b.getClause().resolveTerm();
-				 ((Struct) arg1).append(b.getClause());
+             if (Prolog.match(arg0, b.head)) {
+				 b.clause.resolveTerm();
+				 ((Struct) arg1).append(b.clause);
 			 }
 		 }
 		 return true;
@@ -493,7 +492,7 @@ public final class BuiltIn extends Library {
 			 throw PrologError.instantiation_error(engineManager, 1);
 		 if (arg1 instanceof Var)
 			 throw PrologError.instantiation_error(engineManager, 2);
-		 if ((!arg0.isAtom() && !(arg0 instanceof Struct)))
+		 if ((!arg0.isAtomic() && !(arg0 instanceof Struct)))
 			 throw PrologError.type_error(engineManager, 1, "struct", arg0);
 		 if (!arg1.isGround())
 			 throw PrologError.type_error(engineManager, 2, "ground", arg1);
@@ -516,7 +515,7 @@ public final class BuiltIn extends Library {
 		 arg1 = arg1.term();
 		 if (arg0 instanceof Var)
 			 throw PrologError.instantiation_error(engineManager, 1);
-		 if (!arg0.isAtom() && !(arg0 instanceof Struct)) {
+		 if (!arg0.isAtomic() && !(arg0 instanceof Struct)) {
 			 throw PrologError.type_error(engineManager, 1, "struct", arg0);
 		 }
 		 String name = arg0.toString();
@@ -539,9 +538,9 @@ public final class BuiltIn extends Library {
 			 throw PrologError.instantiation_error(engineManager, 3);
 		 if (!(arg0 instanceof Int))
 			 throw PrologError.type_error(engineManager, 1, "integer", arg0);
-		 if (!arg1.isAtom())
+		 if (!arg1.isAtomic())
 			 throw PrologError.type_error(engineManager, 2, "atom", arg1);
-		 if (!arg2.isAtom() && !arg2.isList())
+		 if (!arg2.isAtomic() && !arg2.isList())
 			 throw PrologError.type_error(engineManager, 3, "atom_or_atom_list",
 					 arg2);
 		 int priority = ((Int) arg0).intValue();
@@ -602,7 +601,7 @@ public final class BuiltIn extends Library {
 
 	 public void $load_library_1(Term lib) throws InvalidLibraryException {
 		 lib = lib.term();
-		 if (lib.isAtom())
+		 if (lib.isAtomic())
 			 libraryManager.loadClass(((Struct) lib).name());
 	 }
 

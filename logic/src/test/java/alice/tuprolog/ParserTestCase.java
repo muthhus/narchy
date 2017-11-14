@@ -168,7 +168,8 @@ public class ParserTestCase {
                                 new Struct(",", new Struct("hotel"), new Int(2))));
         result.resolveTerm();
         Parser p = new Parser(input);
-        assertEquals(result, p.nextTerm(false));
+        //assertEquals(result, p.nextTerm(false));
+		assertEquals(result.toString(), p.nextTerm(false).toString());
 	}
 	
 	@Test public void testMissingDCGActionElement() {

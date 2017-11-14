@@ -40,8 +40,7 @@ public class StateInit extends State {
         
         /* Initialize first executionContext */
         ExecutionContext eCtx = new ExecutionContext(0);
-        eCtx.goalsToEval = new SubGoalStore();
-        eCtx.goalsToEval.load(ClauseInfo.extractBody(e.startGoal));
+        eCtx.goalsToEval = new SubGoalStore(ClauseInfo.extractBody(e.startGoal));
         eCtx.clause = (Struct)e.query;
         eCtx.depth = 0;
         eCtx.fatherCtx = null;

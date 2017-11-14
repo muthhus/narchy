@@ -8,6 +8,8 @@ buildscript {
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
 //        classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.0'
         classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
+        classpath 'ca.cutterslade.gradle:gradle-dependency-analyze:1.2.1'
+
     }
 }
 
@@ -24,6 +26,8 @@ buildScan {
 allprojects {
     apply plugin: 'maven'
     apply plugin: 'idea'
+    apply plugin: 'ca.cutterslade.analyze'
+
     group = 'narchy'
     version = '1.0'
 }

@@ -17,7 +17,7 @@
  */
 package alice.tuprolog;
 
-import java.util.AbstractMap;
+import java.util.Map;
 
 /**
  *
@@ -61,51 +61,19 @@ public abstract class Number extends Term implements Comparable<Number> {
     public abstract boolean isReal();
     
     //
-    
-    /** is an int Integer number? 
-     * @deprecated Use <tt>instanceof Int</tt> instead. */
-    public abstract boolean isTypeInt();
 
-    /** is an int Integer number?
-     * @deprecated Use <tt>instanceof Int</tt> instead. */
-    public abstract boolean isInt();
-    
-    /** is a float Real number? 
-     * @deprecated Use <tt>instanceof alice.tuprolog.Float</tt> instead. */
-    public abstract boolean isTypeFloat();
-
-    /** is a float Real number?
-     * @deprecated Use <tt>instanceof alice.tuprolog.Float</tt> instead. */
-    public abstract boolean isFloat();
-    
-    /** is a double Real number? 
-     * @deprecated Use <tt>instanceof alice.tuprolog.Double</tt> instead.*/
-    public abstract boolean isTypeDouble();
-
-    /** is a double Real number?
-     * @deprecated Use <tt>instanceof alice.tuprolog.Double</tt> instead. */
-    public abstract boolean isDouble();
-    
-    /** is a long Integer number? 
-     * @deprecated Use <tt>instanceof alice.tuprolog.Long</tt> instead. */
-    public abstract boolean isTypeLong();
-
-    /** is a long Integer number?
-     * @deprecated Use <tt>instanceof alice.tuprolog.Long</tt> instead. */
-    public abstract boolean isLong();
-    
-    public static Number createNumber(String s) {
-        Term t = Term.createTerm(s);
-        if (t instanceof Number)
-            return (Number) t;
-        throw new InvalidTermException("Term " + t + " is not a number.");
-    }
+//    public static Number createNumber(String s) {
+//        Term t = Term.createTerm(s);
+//        if (t instanceof Number)
+//            return (Number) t;
+//        throw new InvalidTermException("Term " + t + " is not a number.");
+//    }
     
     /**
      * Gets the actual term referred by this Term.
      */
     @Override
-    public Term term() {
+    public final Term term() {
         return this;
     }
     
@@ -138,7 +106,7 @@ public abstract class Number extends Term implements Comparable<Number> {
     
     /** is this term a constant prolog term? */
     @Override
-    final public boolean isAtomic() {
+    final public boolean isAtom() {
         return true;
     }
     
@@ -150,7 +118,7 @@ public abstract class Number extends Term implements Comparable<Number> {
     
     /** is this term a prolog (alphanumeric) atom? */
     @Override
-    final public boolean isAtom() {
+    final public boolean isAtomic() {
         return false;
     }
     
@@ -183,15 +151,17 @@ public abstract class Number extends Term implements Comparable<Number> {
      * (if empty list then no renaming)
      */
     @Override
-    Term copy(AbstractMap<Var,Var> vMap, int idExecCtx) {
+    final Term copy(Map<Var, Var> vMap, int idExecCtx) {
         return this;
     }
     
     /**
      * gets a copy of the term.
+     * @param vMap
+     * @param substMap
      */
     @Override
-    Term copy(AbstractMap<Var,Var> vMap, AbstractMap<Term,Var> substMap) {
+    final Term copy(Map<Var, Var> vMap, Map<Term, Var> substMap) {
         return this;
     }
     
@@ -208,11 +178,6 @@ public abstract class Number extends Term implements Comparable<Number> {
     public void free() {}
     
     void restoreVariables() {}
-    
-/*Castagna 06/2011*/
-    @Override    
-    public void accept(TermVisitor tv) {		 
-    	tv.visit(this);		 
-    }
-/**/
+
+    /**/
 }

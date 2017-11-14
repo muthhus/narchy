@@ -48,7 +48,7 @@ public class BasicLibrary extends Library {
         th = th.term();
         if (th instanceof Var)
             throw PrologError.instantiation_error(engine, 1);
-        if (!th.isAtom()) {
+        if (!th.isAtomic()) {
             throw PrologError.type_error(engine, 1, "atom",
                     th);
         }
@@ -73,7 +73,7 @@ public class BasicLibrary extends Library {
         th = th.term();
         if (th instanceof Var)
             throw PrologError.instantiation_error(engine, 1);
-        if (!th.isAtom()) {
+        if (!th.isAtomic()) {
             throw PrologError.type_error(engine, 1, "atom",
                     th);
         }
@@ -127,10 +127,10 @@ public class BasicLibrary extends Library {
         Struct theory = (Struct) th.term();
         Struct libN = (Struct) libName.term();
         try {
-            if (!theory.isAtom()) {
+            if (!theory.isAtomic()) {
                 return false;
             }
-            if (!libN.isAtom()) {
+            if (!libN.isAtomic()) {
                 return false;
             }
             Theory t = new Theory(theory.name());
@@ -163,7 +163,7 @@ public class BasicLibrary extends Library {
         th = th.term();
         if (th instanceof Var)
             throw PrologError.instantiation_error(engine, 1);
-        if (!(th.isAtom()))
+        if (!(th.isAtomic()))
             throw PrologError.type_error(engine, 1, "atom",
                     th);
         Struct theory = (Struct) th;
@@ -188,7 +188,7 @@ public class BasicLibrary extends Library {
             throw PrologError.instantiation_error(engine, 1);
         if (g instanceof Var)
             throw PrologError.instantiation_error(engine, 2);
-        if (!(th.isAtom()))
+        if (!(th.isAtomic()))
             throw PrologError.type_error(engine, 1, "atom",
                     th);
         if (!(g instanceof Struct))
@@ -243,7 +243,7 @@ public class BasicLibrary extends Library {
 
     public static boolean constant_1(Term t) {
         t = t.term();
-        return (t.isAtomic());
+        return (t.isAtom());
     }
 
     public static boolean number_1(Term t) {
@@ -266,7 +266,7 @@ public class BasicLibrary extends Library {
 
     public static boolean atom_1(Term t) {
         t = t.term();
-        return (t.isAtom());
+        return (t.isAtomic());
     }
 
     public static boolean compound_1(Term t) {
@@ -291,7 +291,7 @@ public class BasicLibrary extends Library {
 
     public static boolean atomic_1(Term t) {
         t = t.term();
-        return t.isAtomic();
+        return t.isAtom();
     }
 
     public static boolean ground_1(Term t) {
@@ -767,10 +767,10 @@ public class BasicLibrary extends Library {
             throw PrologError.instantiation_error(engine, 1);
         if (source2 instanceof Var)
             throw PrologError.instantiation_error(engine, 2);
-        if (!source1.isAtom())
+        if (!source1.isAtomic())
             throw PrologError.type_error(engine, 1, "atom",
                     source1);
-        if (!source2.isAtom())
+        if (!source2.isAtomic())
             throw PrologError.type_error(engine, 2, "atom",
                     source2);
         return unify(dest, new Struct(((Struct) source1).name()
@@ -789,7 +789,7 @@ public class BasicLibrary extends Library {
             String st = n0.isInteger() ? Integer.valueOf(n0.intValue()).toString() : java.lang.Double.toString(n0.doubleValue());
             return (unify(arg1, new Struct(st)));
         } else {
-            if (!arg1.isAtom()) {
+            if (!arg1.isAtomic()) {
                 throw PrologError.type_error(engine, 2,
                         "atom", arg1);
             }
@@ -1289,7 +1289,7 @@ public class BasicLibrary extends Library {
         arg0 = arg0.term();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine, 1);
-        if (!arg0.isAtom() && !arg0.isCompound())
+        if (!arg0.isAtomic() && !arg0.isCompound())
             throw PrologError.type_error(engine, 1,
                     "callable", arg0);
         return true;
@@ -1304,7 +1304,7 @@ public class BasicLibrary extends Library {
         	//System.out.println("ECCEZIONE 1 ");
             throw PrologError.instantiation_error(engine, 2);
         }
-        if (!arg1.isAtom() && !arg1.isCompound()){
+        if (!arg1.isAtomic() && !arg1.isCompound()){
         	//System.out.println("ECCEZIONE 2 ");
             throw PrologError.type_error(engine, 2,
                     "callable", arg1); 
@@ -1364,8 +1364,8 @@ public class BasicLibrary extends Library {
         Struct result = new Struct();
         for (java.util.Iterator<? extends Term> it = list.listIterator(); it.hasNext();) {
             Struct element = (Struct) it.next();
-            Term w = element.term(0);
-            Term t = element.term(1);
+            Term w = element.sub(0);
+            Term t = element.sub(1);
             if (unify(witness, w))
                 result.append(t);
         }
@@ -1406,8 +1406,8 @@ public class BasicLibrary extends Library {
         for (java.util.Iterator<? extends Term> it = list.listIterator(); it.hasNext();) {
             Struct element = (Struct) it.next();
             //System.out.println("termine wtList "+element);
-            Term w = element.term(0);
-            Term t = element.term(1);
+            Term w = element.sub(0);
+            Term t = element.sub(1);
             //System.out.println("termine W wtList "+w);
             //System.out.println("termine T wtList "+t);
             if (unify(witness, w)){
@@ -1440,7 +1440,7 @@ public class BasicLibrary extends Library {
         Struct result = new Struct();
         for (java.util.Iterator<? extends Term> it = list.listIterator(); it.hasNext();) {
             Struct element = (Struct) it.next();
-            Term w = element.term(0);
+            Term w = element.sub(0);
             if (!unify(witness, w))
                 result.append(element);
         }

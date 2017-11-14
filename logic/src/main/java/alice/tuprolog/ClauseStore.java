@@ -134,7 +134,7 @@ public class ClauseStore {
         ClauseInfo clause = null;
         do {
             clause = clauses.getHead();
-            if (goal.match(clause.getHead())) return true;
+            if (goal.match(clause.head)) return true;
             this.clauses = clauses = this.clauses.getTail();
         } while (clauses != null);
         return false;

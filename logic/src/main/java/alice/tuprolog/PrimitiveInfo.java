@@ -73,7 +73,7 @@ public class PrimitiveInfo {
     public void evalAsDirective(Struct g) throws IllegalAccessException, InvocationTargetException {
         Object[] primitive_args = newArgs();
         for (int i=0; i<primitive_args.length; i++) {
-            primitive_args[i] = g.getTerm(i);
+            primitive_args[i] = g.subResolve(i);
         }
         method.invoke(source,primitive_args);
     }
@@ -86,7 +86,7 @@ public class PrimitiveInfo {
     public boolean evalAsPredicate(Struct g) throws Throwable {
         Object[] primitive_args = newArgs();
         for (int i=0; i<primitive_args.length; i++) {
-            primitive_args[i] = g.term(i);
+            primitive_args[i] = g.sub(i);
         }
         try {
         	//System.out.println("PRIMITIVE INFO evalAsPredicate sto invocando metodo "+method.getName());
@@ -107,7 +107,7 @@ public class PrimitiveInfo {
         try {
         Object[] primitive_args = newArgs();
             for (int i=0; i<primitive_args.length; i++) {
-                primitive_args[i] = g.getTerm(i);
+                primitive_args[i] = g.subResolve(i);
             }
             return ((Term)method.invoke(source,primitive_args));
         } catch (Exception ex) {

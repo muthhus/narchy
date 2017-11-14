@@ -150,8 +150,8 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
         if (!matches(s))
             throw new UnsupportedOperationException();
         Vector<Term<?>> termList = new Vector<>();
-        for (int i=0;i<s.getArity();i++) {       
-            termList.add(Term.unmarshal(s.term(i)));
+        for (int i = 0; i<s.subs(); i++) {
+            termList.add(Term.unmarshal(s.sub(i)));
         }
         //return (Z)new Cons(s.getName(),termList);
         return Cons.make(s.name(),termList.toArray(new Term<?>[termList.size()]));

@@ -6,13 +6,14 @@ public class SubGoalStore {
     private SubGoalTree goals;
     private SubGoalTree commaStruct;
     private int index;
-    private DefaultSubGoalId curSGId;
+    private SubGoal curSGId;
     private boolean fetched;
 
-    public SubGoalStore() {
+    public SubGoalStore(SubGoalTree subTrees) {
         commaStruct = goals = new SubGoalTree();
         index = 0;
         curSGId = null;
+        load(subTrees);
     }
 
     /**
@@ -28,24 +29,24 @@ public class SubGoalStore {
     /**
      * Ripristina ClauseStore allo stato i-esimo
      */
-    public Term backTo(SubGoalId identifier) {
-        popSubGoal((DefaultSubGoalId) identifier);
+    public Term backTo(SubGoal identifier) {
+        popSubGoal((SubGoal) identifier);
         index--;
         return fetch();
     }
 
     public void pushSubGoal(SubGoalTree subGoals) {
-        curSGId = new DefaultSubGoalId(curSGId, commaStruct, index);
+        curSGId = new SubGoal(curSGId, commaStruct, index);
         commaStruct = subGoals;
         goals = commaStruct.copy();
         index = 0;
     }
 
-    private void popSubGoal(DefaultSubGoalId id) {
-        commaStruct = id.getRoot();
+    private void popSubGoal(SubGoal id) {
+        commaStruct = id.root;
         goals = commaStruct.copy();
-        index = id.getIndex();
-        curSGId = id.getParent();
+        index = id.index;
+        curSGId = id.parent;
     }
 
     /**
@@ -64,7 +65,7 @@ public class SubGoalStore {
             } else {
 
                 int i = index++;
-                AbstractSubGoalTree s = commaStruct.get(i);
+                SubTree s = commaStruct.get(i);
                 if (s instanceof SubGoalTree) {
                     pushSubGoal((SubGoalTree) s);
                 } else {
@@ -78,8 +79,8 @@ public class SubGoalStore {
     /**
      * Indice del correntemente in esecuzione
      */
-    public SubGoalId getCurrentGoalId() {
-        return new DefaultSubGoalId(curSGId, commaStruct, index);
+    public SubGoal getCurrentGoalId() {
+        return new SubGoal(curSGId, commaStruct, index);
     }
 
     public boolean haveSubGoals() {
@@ -104,7 +105,7 @@ public class SubGoalStore {
     public boolean getFetched(){
         return fetched;
     }
-    public DefaultSubGoalId getCurSGId() {
+    public SubGoal getCurSGId() {
         return curSGId;
     }
         

@@ -107,7 +107,7 @@ public class PJLibraryNew extends OOLibrary {
 	//----------------------------------------------------------------------------
 
     public static boolean prolog_class_1(Term classname) {
-        if (!classname.isAtom())
+        if (!classname.isAtomic())
             return false;
         Class<?> clazz = null;
         try {
@@ -120,7 +120,7 @@ public class PJLibraryNew extends OOLibrary {
     }
 
     public boolean prolog_method_1(Term method) {
-        if (!method.isAtom())
+        if (!method.isAtomic())
             return false;
         Object o = null;
         try {
@@ -143,7 +143,7 @@ public class PJLibraryNew extends OOLibrary {
     }
 
     public boolean prolog_field_1(Term method) {
-        if (!method.isAtom())
+        if (!method.isAtomic())
             return false;
         Object o = null;
         try {
@@ -161,7 +161,7 @@ public class PJLibraryNew extends OOLibrary {
     }
 
     public boolean java_method_1(Term method) {
-        if (!method.term().isAtom())
+        if (!method.term().isAtomic())
             return false;
         Object o = null;
         try {
@@ -174,7 +174,7 @@ public class PJLibraryNew extends OOLibrary {
     }
 
     public boolean is_iterable_1(Term method) {
-        if (!method.term().isAtom())
+        if (!method.term().isAtomic())
             return false;
         Object o = null;
         try {
@@ -192,7 +192,7 @@ public class PJLibraryNew extends OOLibrary {
     }
 
     public boolean java_field_1(Term method) {
-        if (!method.term().isAtom())
+        if (!method.term().isAtomic())
             return false;
         Object o = null;
         try {
@@ -205,7 +205,7 @@ public class PJLibraryNew extends OOLibrary {
     }
     
     public boolean marshal_2(Term term, Term marshalledTerm) {
-        if (!term.isAtom())
+        if (!term.isAtomic())
             return false;
         Object o = null;
         try {
@@ -231,9 +231,9 @@ public class PJLibraryNew extends OOLibrary {
         if (! (term.term() instanceof Struct) )
             return false;
         Struct methodInfo = (Struct)term.term();
-        Term[] terms = new Term[methodInfo.getArity()];
-        for (int i = 0 ; i < methodInfo.getArity() ; i ++) {
-            terms[i] = registerDynamic(alice.tuprologx.pj.model.Term.unmarshal(methodInfo.getTerm(i).term()));
+        Term[] terms = new Term[methodInfo.subs()];
+        for (int i = 0; i < methodInfo.subs() ; i ++) {
+            terms[i] = registerDynamic(alice.tuprologx.pj.model.Term.unmarshal(methodInfo.subResolve(i).term()));
         }
         return unify(unmarshalledTerm, new Struct(methodInfo.name(), terms));
     }
@@ -241,7 +241,7 @@ public class PJLibraryNew extends OOLibrary {
     
 
     public boolean lookup_field_3(Term receiver, Term name, Term result) {
-        if (!receiver.isAtom())
+        if (!receiver.isAtomic())
             return false;
         Object o = null;
         try {
@@ -264,7 +264,7 @@ public class PJLibraryNew extends OOLibrary {
     }
 
     public boolean lookup_method_3(Term receiver, Term method, Term result) {
-        if (!receiver.isAtom())
+        if (!receiver.isAtomic())
             return false;
         Object o = null;
         try {
@@ -302,7 +302,7 @@ public class PJLibraryNew extends OOLibrary {
 
 
     public boolean java_object_std_3(Term className, Term args, Term id) {
-        if (!className.isAtom() && !args.isList())
+        if (!className.isAtomic() && !args.isList())
             return false;
         String clazz = ((Struct)className.term()).name();
         Signature sig = parseArg(getArrayFromList((Struct)args.term()));
@@ -318,7 +318,7 @@ public class PJLibraryNew extends OOLibrary {
     }
 
     public boolean java_object_prolog_3(Term className, Term args, Term id) {
-        if (!className.isAtom() && !args.isList())
+        if (!className.isAtomic() && !args.isList())
             return false;
         Signature sig = parseArg(getArrayFromList((Struct)args.term()));
         assert sig.types.length == 0;
@@ -334,7 +334,7 @@ public class PJLibraryNew extends OOLibrary {
     }
 
     public boolean java_method_call_6(Term objId, Term method, Term method_info, Term idResult, Term isProlog, Term isReentrant) {
-        if (!method.isAtom())
+        if (!method.isAtomic())
             return false;
         Object o = null;
         try {
@@ -357,8 +357,8 @@ public class PJLibraryNew extends OOLibrary {
             Object res = null;
             try {
                 Object[] args = parseArg((Struct)method_info.term()).getValues();
-                if (isProlog.isAtom() && ((Struct)isProlog).name().equals("true")) {
-                    boolean reentrant = isProlog.isAtom() && ((Struct)isReentrant).name().equals("true");
+                if (isProlog.isAtomic() && ((Struct)isProlog).name().equals("true")) {
+                    boolean reentrant = isProlog.isAtomic() && ((Struct)isReentrant).name().equals("true");
                     res = alice.tuprologx.pj.engine.PJ.call(receiver, m, args, reentrant);
                 }
                 else {
@@ -379,7 +379,7 @@ public class PJLibraryNew extends OOLibrary {
 	public boolean java_set_3(Term objId, Term fieldTerm, Term what) {
 		//System.out.println("SET "+objId+" "+fieldTerm+" "+what);
 		what = what.term();
-		if (!fieldTerm.isAtom() || what instanceof Var)
+		if (!fieldTerm.isAtomic() || what instanceof Var)
 			return false;
         fieldTerm = fieldTerm.term();
         objId = objId.term();
@@ -388,15 +388,15 @@ public class PJLibraryNew extends OOLibrary {
 			Class<?> cl = null;
             Object obj = null;
             if (objId.isCompound() &&
-					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
-				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
+					((Struct) objId).subs() == 1 && ((Struct) objId).name().equals("class")) {
+				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).sub(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).sub(0).toString()));
 					return false;
 				}
 			} else {				
@@ -445,7 +445,7 @@ public class PJLibraryNew extends OOLibrary {
 	}
 
     public boolean pj_assert_2(Term obj, Term clause) {
-        if (!obj.isAtom())
+        if (!obj.isAtomic())
             return false;
         Object o = null;
         try {
@@ -463,7 +463,7 @@ public class PJLibraryNew extends OOLibrary {
     }
 
     public boolean pj_retract_2(Term obj, Term clause) {
-        if (!obj.isAtom())
+        if (!obj.isAtomic())
             return false;
         Object o = null;
         try {
@@ -481,7 +481,7 @@ public class PJLibraryNew extends OOLibrary {
     }
 
     public boolean pj_retract_all_2(Term obj, Term clause) {
-        if (!obj.isAtom())
+        if (!obj.isAtomic())
             return false;
         Object o = null;
         try {
@@ -503,7 +503,7 @@ public class PJLibraryNew extends OOLibrary {
 	 */
 	public boolean java_get_3(Term objId, Term fieldTerm, Term what) {
 		//System.out.println("GET "+objId+" "+fieldTerm+" "+what);
-		if (!fieldTerm.isAtom()) {
+		if (!fieldTerm.isAtomic()) {
 			return false;
 		}
         fieldTerm = fieldTerm.term();
@@ -514,15 +514,15 @@ public class PJLibraryNew extends OOLibrary {
 			Class<?> cl = null;
             Object obj = null;
             if (objId.isCompound() &&
-					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
-				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
+					((Struct) objId).subs() == 1 && ((Struct) objId).name().equals("class")) {
+				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).sub(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).sub(0).toString()));
 					return false;
 				}
 			} else {
@@ -574,10 +574,10 @@ public class PJLibraryNew extends OOLibrary {
 	 * creation of method signature from prolog data
 	 */
 	private Signature parseArg(Struct method) {
-		Object[] values = new Object[method.getArity()];
-		Class<?>[] types = new Class[method.getArity()];
-		for (int i = 0; i < method.getArity(); i++) {
-			if (!parse_arg(values, types, i, method.getTerm(i)))
+		Object[] values = new Object[method.subs()];
+		Class<?>[] types = new Class[method.subs()];
+		for (int i = 0; i < method.subs(); i++) {
+			if (!parse_arg(values, types, i, method.subResolve(i)))
 				return null;
 		}
 		return new Signature(values, types);
@@ -598,7 +598,7 @@ public class PJLibraryNew extends OOLibrary {
 			if (term == null) {
 				values[i] = null;
 				types[i] = null;
-			} else if (term.isAtom()) {
+			} else if (term.isAtomic()) {
 				String name = alice.util.Tools.removeApostrophes(term.toString());
                 switch (name) {
                     case "true":
@@ -634,7 +634,7 @@ public class PJLibraryNew extends OOLibrary {
 				// argument descriptors
 				Struct tc = (Struct) term;
 				if (tc.name().equals("as")) {
-					return parse_as(values, types, i, tc.getTerm(0), tc.getTerm(1));
+					return parse_as(values, types, i, tc.subResolve(0), tc.subResolve(1));
 				} else {
 					Object obj = getRegisteredDynamicObject((Struct)tc.term());
                     values[i] = obj == null ? alice.util.Tools.removeApostrophes(tc.toString()) : obj;

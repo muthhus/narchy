@@ -66,7 +66,7 @@ public class StructTestCase {
 		assertTrue(list.isEmptyList());
 		assertEquals(0, list.listSize());
 		assertEquals("[]", list.name());
-		assertEquals(0, list.getArity());
+		assertEquals(0, list.subs());
 	}
 
 	/** Another correct method of building an empty list */
@@ -75,7 +75,7 @@ public class StructTestCase {
 		assertTrue(emptyList.isList());
 		assertTrue(emptyList.isEmptyList());
 		assertEquals("[]", emptyList.name());
-		assertEquals(0, emptyList.getArity());
+		assertEquals(0, emptyList.subs());
 		assertEquals(0, emptyList.listSize());
 	}
 	
@@ -85,7 +85,7 @@ public class StructTestCase {
 		assertFalse(notAnEmptyList.isList());
 		assertFalse(notAnEmptyList.isEmptyList());
 		assertEquals(".", notAnEmptyList.name());
-		assertEquals(0, notAnEmptyList.getArity());
+		assertEquals(0, notAnEmptyList.subs());
 	}
 	
 	/** Use dotted structs to builder lists with content */
@@ -94,7 +94,7 @@ public class StructTestCase {
 		assertTrue(notAnEmptyList.isList());
 		assertFalse(notAnEmptyList.isEmptyList());
 		assertEquals(".", notAnEmptyList.name());
-		assertEquals(2, notAnEmptyList.getArity());
+		assertEquals(2, notAnEmptyList.subs());
 	}
 	
 	@Test public void testListFromArgumentArray() {
@@ -210,21 +210,6 @@ public class StructTestCase {
 	
 	@Test public void testIsAtomic() {
 		Struct emptyList = new Struct();
-		assertTrue(emptyList.isAtomic());
-		Struct atom = new Struct("atom");
-		assertTrue(atom.isAtomic());
-		Struct list = new Struct(new Term[] {new Int(0), new Int(1)});
-		assertFalse(list.isAtomic());
-		Struct compound = new Struct("f", new Struct("a"), new Struct("b"));
-		assertFalse(compound.isAtomic());
-		Struct singleQuoted = new Struct("'atom'");
-		assertTrue(singleQuoted.isAtomic());
-		Struct doubleQuoted = new Struct("\"atom\"");
-		assertTrue(doubleQuoted.isAtomic());
-	}
-	
-	@Test public void testIsAtom() {
-		Struct emptyList = new Struct();
 		assertTrue(emptyList.isAtom());
 		Struct atom = new Struct("atom");
 		assertTrue(atom.isAtom());
@@ -236,6 +221,21 @@ public class StructTestCase {
 		assertTrue(singleQuoted.isAtom());
 		Struct doubleQuoted = new Struct("\"atom\"");
 		assertTrue(doubleQuoted.isAtom());
+	}
+	
+	@Test public void testIsAtom() {
+		Struct emptyList = new Struct();
+		assertTrue(emptyList.isAtomic());
+		Struct atom = new Struct("atom");
+		assertTrue(atom.isAtomic());
+		Struct list = new Struct(new Term[] {new Int(0), new Int(1)});
+		assertFalse(list.isAtomic());
+		Struct compound = new Struct("f", new Struct("a"), new Struct("b"));
+		assertFalse(compound.isAtomic());
+		Struct singleQuoted = new Struct("'atom'");
+		assertTrue(singleQuoted.isAtomic());
+		Struct doubleQuoted = new Struct("\"atom\"");
+		assertTrue(doubleQuoted.isAtomic());
 	}
 	
 	@Test public void testIsCompound() {
