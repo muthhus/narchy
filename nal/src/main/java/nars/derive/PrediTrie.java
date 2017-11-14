@@ -1,7 +1,7 @@
 package nars.derive;
 
 import jcog.list.FasterList;
-import jcog.trie.TrieNode;
+import jcog.tree.perfect.TrieNode;
 import nars.$;
 import nars.Op;
 import nars.control.Derivation;

@@ -41,7 +41,7 @@ public class PrologPrimitive {
     /**
 	 * lib object where the builtin is defined
 	 */
-    public final IPrimitives source;
+    public final Library source;
     public final int arity;
     /**
 	 * for optimization purposes

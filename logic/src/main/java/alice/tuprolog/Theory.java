@@ -17,6 +17,7 @@
  */
 package alice.tuprolog;
 
+import com.google.common.base.Joiner;
 import com.google.common.io.Resources;
 
 import java.io.IOException;
@@ -24,6 +25,8 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Iterator;
+
+import static alice.tuprolog.Parser.defaultOps;
 
 /**
  * This class represents prolog theory which can be provided
@@ -35,8 +38,11 @@ import java.util.Iterator;
  * @see Prolog
  *
  */
-public class Theory implements Serializable {
+public class Theory implements Iterable<Term>, Serializable {
 	private static final long serialVersionUID = 1L;
+
+	public static Theory Null = new Theory();
+
     private String theory;
     private Struct clauseList;
 
@@ -47,9 +53,8 @@ public class Theory implements Serializable {
      * @param is the input stream acting as source
      */
     public Theory(InputStream is) throws IOException {
-        byte[] info = new byte[is.available()];
-        is.read(info);
-        theory = new String(info);
+        theory = new String(is.readAllBytes());
+        is.close();
     }
 
     /**
@@ -59,13 +64,13 @@ public class Theory implements Serializable {
      * @throws s InvalidTheoryException if theory is null
      */
     public Theory(String theory) throws InvalidTheoryException {
+        this.theory=theory;
         if (theory == null) {
             throw new InvalidTheoryException();
         }
-        this.theory=theory;
     }
     
-    Theory() {
+    protected Theory() {
         this.theory = "";
     }
 
@@ -86,8 +91,12 @@ public class Theory implements Serializable {
         return new Theory(Resources.toString(Prolog.class.getResource(classPath).toURI().toURL(), java.nio.charset.Charset.defaultCharset()));
     }
 
-    public Iterator<? extends Term> iterator(Prolog engine) {
-        return isTextual() ? new Parser(engine.ops, theory).iterator() : clauseList.listIterator();
+    public Iterator<Term> iterator(OperatorManager ops) {
+        return isTextual() ? new Parser(theory, ops).iterator() : clauseList.listIterator();
+    }
+
+    public Iterator<Term> iterator() {
+        return iterator(defaultOps);
     }
 
     /**
@@ -135,4 +144,10 @@ public class Theory implements Serializable {
     }
 
 
+    public static Theory string(String s) throws InvalidTheoryException {
+        return new Theory(s);
+    }
+    public static Theory string(String... s) throws InvalidTheoryException {
+        return new Theory(Joiner.on("\n").join(s));
+    }
 }

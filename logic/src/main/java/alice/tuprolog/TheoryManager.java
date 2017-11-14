@@ -230,7 +230,7 @@ public class TheoryManager {
 		/**/
         // iterate all clauses in theory and assert them
         try {
-            for (Iterator<? extends Term> it = theory.iterator(engine); it.hasNext(); ) {
+            for (Iterator<? extends Term> it = theory.iterator(engine.ops); it.hasNext(); ) {
 				/*Castagna 06/2011*/
                 clause++;
 				/**/

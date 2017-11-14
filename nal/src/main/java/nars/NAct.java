@@ -1,7 +1,7 @@
 package nars;
 
 import jcog.Util;
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 import jcog.pri.Pri;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionAsyncConcept;

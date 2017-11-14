@@ -62,7 +62,7 @@ public class Theory extends List<Clause<?,?>> {
     
     public static Theory unmarshal(alice.tuprolog.Theory t) {
         Vector<Clause<?,?>> clauses = new Vector<>();
-        for (java.util.Iterator<? extends alice.tuprolog.Term> it = t.iterator(engine); it.hasNext();) {
+        for (java.util.Iterator<? extends alice.tuprolog.Term> it = t.iterator(engine.ops); it.hasNext();) {
             alice.tuprolog.Struct st = (alice.tuprolog.Struct) it.next();                        
             //Clause<?,?> clause = new Clause(Term.unmarshal(st.getArg(0)),Term.unmarshal(st.getArg(1)));
             Clause<?,?> clause = new Clause<>(st);
@@ -154,7 +154,7 @@ public class Theory extends List<Clause<?,?>> {
             throw new UnsupportedOperationException(e);
         }
         Vector<Clause<?, ?>> clauses = new Vector<>();
-        for (java.util.Iterator<? extends alice.tuprolog.Term> it = t.iterator(engine); it.hasNext();) {
+        for (java.util.Iterator<? extends alice.tuprolog.Term> it = t.iterator(engine.ops); it.hasNext();) {
             alice.tuprolog.Struct st = (alice.tuprolog.Struct) it.next();                        
             //Clause<?,?> clause = new Clause(Term.unmarshal(st.getArg(0)),Term.unmarshal(st.getArg(1)));
             Clause<?,?> clause = new Clause<>(st);

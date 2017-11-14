@@ -71,9 +71,9 @@ public class ParserTestCase {
 	
 	@Test public void testDotOperator() throws InvalidTermException {
 		String s = "class('java.lang.Integer').'MAX_VALUE'";
-		DefaultOperatorManager om = new DefaultOperatorManager();
+		DefaultOps om = new DefaultOps();
 		om.opNew(".", "xfx", 600);
-		Parser p = new Parser(om, s);
+		Parser p = new Parser(s, om);
 		Struct result = new Struct(".", new Struct("class", new Struct("java.lang.Integer")),
 				                        new Struct("MAX_VALUE"));
 		assertEquals(result, p.nextTerm(false));
@@ -81,24 +81,24 @@ public class ParserTestCase {
 	
 	@Test public void testBracketedOperatorAsTerm() throws InvalidTermException {
 		String s = "u (b1) b2 (b3)";
-		DefaultOperatorManager om = new DefaultOperatorManager();
+		DefaultOps om = new DefaultOps();
 		om.opNew("u", "fx", 200);
 		om.opNew("b1", "yfx", 400);
 		om.opNew("b2", "yfx", 500);
 		om.opNew("b3", "yfx", 300);
-		Parser p = new Parser(om, s);
+		Parser p = new Parser(s, om);
 		Struct result = new Struct("b2", new Struct("u", new Struct("b1")), new Struct("b3"));
 		assertEquals(result, p.nextTerm(false));
 	}
 	
 	@Test public void testBracketedOperatorAsTerm2() throws InvalidTermException {
 		String s = "(u) b1 (b2) b3 a";
-		DefaultOperatorManager om = new DefaultOperatorManager();
+		DefaultOps om = new DefaultOps();
 		om.opNew("u", "fx", 200);
 		om.opNew("b1", "yfx", 400);
 		om.opNew("b2", "yfx", 500);
 		om.opNew("b3", "yfx", 300);
-		Parser p = new Parser(om, s);
+		Parser p = new Parser(s, om);
 		Struct result = new Struct("b1", new Struct("u"), new Struct("b3", new Struct("b2"), new Struct("a")));
 		assertEquals(result, p.nextTerm(false));
 	}

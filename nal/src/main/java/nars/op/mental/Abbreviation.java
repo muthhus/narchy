@@ -1,7 +1,8 @@
 package nars.op.mental;
 
-import jcog.data.FloatParam;
-import jcog.data.MutableIntRange;
+
+import jcog.math.FloatParam;
+import jcog.math.MutableIntRange;
 import jcog.pri.PLink;
 import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;

@@ -1,4 +1,4 @@
-package nars.video.rawAttention;
+package nars.op.video.rawAttention;
 
 import java.util.List;
 

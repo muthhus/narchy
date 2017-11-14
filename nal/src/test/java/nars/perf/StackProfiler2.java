@@ -2,9 +2,9 @@ package nars.perf;
 
 import jcog.Texts;
 import jcog.list.FasterList;
-import jcog.trie.Trie;
-import jcog.trie.TrieMatch;
-import jcog.trie.Tries;
+import jcog.tree.perfect.Trie;
+import jcog.tree.perfect.TrieMatch;
+import jcog.tree.perfect.Tries;
 import joptsimple.OptionException;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.MutableSet;

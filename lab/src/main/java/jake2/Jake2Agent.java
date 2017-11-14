@@ -13,7 +13,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.experiment.NAgentY;
 import nars.util.signal.CameraSensor;
-import nars.video.PixelBag;
+import nars.op.video.PixelBag;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;

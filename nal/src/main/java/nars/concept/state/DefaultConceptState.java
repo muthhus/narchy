@@ -1,7 +1,7 @@
 package nars.concept.state;
 
 import jcog.Util;
-import jcog.data.MutableInteger;
+import jcog.math.MutableInteger;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import org.eclipse.collections.api.block.function.primitive.IntToIntFunction;

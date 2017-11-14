@@ -1,9 +1,9 @@
 package nars.util;
 
 import com.google.common.base.Joiner;
-import jcog.trie.Trie;
-import jcog.trie.TrieNode;
-import jcog.trie.TrieSequencer;
+import jcog.tree.perfect.Trie;
+import jcog.tree.perfect.TrieNode;
+import jcog.tree.perfect.TrieSequencer;
 import nars.term.Term;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;

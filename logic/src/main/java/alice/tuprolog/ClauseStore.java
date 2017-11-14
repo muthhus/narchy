@@ -152,15 +152,15 @@ public class ClauseStore {
      * Methods for spyListeners
      */
 
-    public List<ClauseInfo> getClauses() {
-        ArrayList<ClauseInfo> l = new ArrayList<>();
-        OneWayList<ClauseInfo> t = clauses;
-        while (t != null) {
-            l.add(t.getHead());
-            t = t.getTail();
-        }
-        return l;
-    }
+//    public List<ClauseInfo> getClauses() {
+//        ArrayList<ClauseInfo> l = new ArrayList<>();
+//        OneWayList<ClauseInfo> t = clauses;
+//        while (t != null) {
+//            l.add(t.getHead());
+//            t = t.getTail();
+//        }
+//        return l;
+//    }
 //
 //    public Term getMatchGoal() {
 //        return goal;

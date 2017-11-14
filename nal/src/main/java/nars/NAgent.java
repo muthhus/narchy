@@ -1,11 +1,11 @@
 package nars;
 
 import jcog.Util;
-import jcog.data.FloatParam;
 import jcog.event.On;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.math.FloatNormalized;
+import jcog.math.FloatParam;
 import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;

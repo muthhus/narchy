@@ -172,7 +172,7 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
     public Term getVarValue(String varName) throws NoSolutionException {
         if (isSuccess) {
             for (Var v : bindings) {
-                if (v != null && v.getName().equals(varName)) {
+                if (v != null && v.name().equals(varName)) {
                     return v.term();
                 }
             }
@@ -198,7 +198,7 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
             }
             for (Var v : bindings) {
                 if (v != null && !v.isAnonymous() && v.isBound() &&
-                        (!(v.term() instanceof Var) || (!((Var) (v.term())).getName().startsWith("_")))) {
+                        (!(v.term() instanceof Var) || (!((Var) (v.term())).name().startsWith("_")))) {
                     st.append(v);
                     st.append("  ");
                 }

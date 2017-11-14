@@ -119,8 +119,8 @@ public class PrologRepl extends Automaton implements OutputListener, SpyListener
         String s = "";
         try {
             for (Var v: result.getBindingVars()) {
-                if ( !v.isAnonymous() && v.isBound() && (!(v.term() instanceof Var) || (!((Var) (v.term())).getName().startsWith("_")))) {
-                    s += v.getName() + " / " + v.term() + '\n';
+                if ( !v.isAnonymous() && v.isBound() && (!(v.term() instanceof Var) || (!((Var) (v.term())).name().startsWith("_")))) {
+                    s += v.name() + " / " + v.term() + '\n';
                 }
             }
             /*Castagna 06/2011*/

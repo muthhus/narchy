@@ -42,7 +42,7 @@ public class Prolog  {
 	/* component managing operators */
 	public final OperatorManager ops;
 	/* component managing flags */
-	public final FlagManager flags;
+	public final Flags flags;
 	/* component managing libraries */
 	public final LibraryManager libs;
 	/* component managing engine */
@@ -163,7 +163,7 @@ public class Prolog  {
 		queryListeners = new ArrayList<>();
 		libraryListeners = new ArrayList<>();
 		absolutePathList = new ArrayList<>();
-		flags = new FlagManager();
+		flags = new Flags();
 		libs = new LibraryManager();
 		ops = new OperatorManager();
 		prims = new PrimitiveManager();
@@ -283,7 +283,7 @@ public class Prolog  {
 	 */
 	public void clearTheory() {	//no syn
 		try {
-			setTheory(new Theory());
+			setTheory(Theory.Null);
 		} catch (InvalidTheoryException e) {
 			// this should never happen
 		}
@@ -378,8 +378,8 @@ public class Prolog  {
 	 *
 	 *  @return the list of the operators
 	 */
-	public java.util.List<Operator> operators() {	//no syn
-		return ops.getOperators();
+	public Iterable<Operator> operators() {	//no syn
+		return ops.operators();
 	}
 
 
@@ -448,7 +448,7 @@ public class Prolog  {
 	}
 
 	public Term term(String toParse) throws InvalidTermException {
-		return new Parser(ops, toParse).nextTerm(true);
+		return new Parser(toParse, ops).nextTerm(true);
 	}
 
 	/**
@@ -996,7 +996,7 @@ public class Prolog  {
 
 	public Term termSolve(String st){
 		try{
-			Parser p = new Parser(ops, st);
+			Parser p = new Parser(st, ops);
 			return p.nextTerm(true);
 		}catch(InvalidTermException e)
 		{

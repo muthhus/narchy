@@ -1,8 +1,8 @@
 package spacegraph.widget.meta;
 
 import jcog.Services;
-import jcog.data.FloatParam;
 import jcog.list.FasterList;
+import jcog.math.FloatParam;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;

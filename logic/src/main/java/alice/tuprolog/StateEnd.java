@@ -109,11 +109,11 @@ public class StateEnd extends State {
                 Term gVar = (Var) a[y];
                 while (!findName && gVar != null && gVar instanceof Var) {
                     //System.out.println("**** ----- verifico uguaglianza con "+gVar);
-                    if (((Var) gVar).getName().compareTo(((Var) link).getName()) == 0) {
+                    if (((Var) gVar).name().compareTo(((Var) link).name()) == 0) {
                         //System.out.println(link +" **** ----- ***** il nome uguale a "+gVar);
                         //System.out.println(((Struct)initGoalBag).getArg(0));
                         //System.out.println(link +" **** ----- ***** sostituisco "+initGoalBag+" in pos "+pos+" con "+(Var)a[y]);
-                        ((Struct) initGoalBag).setSub(pos, new Var(((Var) a[y]).getName()));
+                        ((Struct) initGoalBag).setSub(pos, new Var(((Var) a[y]).name()));
                         findName = true;
                     }
                     gVar = ((Var) gVar).getLink();
@@ -236,7 +236,7 @@ public class StateEnd extends State {
                         ArrayList<String> initGoalBagListVar = new ArrayList<>();
                         for (int m = 0; m < initGoalBagList.size(); m++) {
                             if (initGoalBagList.get(m) instanceof Var)
-                                initGoalBagListVar.add(((Var) initGoalBagList.get(m)).getName());
+                                initGoalBagListVar.add(((Var) initGoalBagList.get(m)).name());
                         }
                         //System.out.println("Lista VAR "+initGoalBagListVar);
                         ArrayList<Term> left = new ArrayList<>();
@@ -392,10 +392,10 @@ public class StateEnd extends State {
                             t = resVar.getLink();
                             //System.out.println("---RESVAR BAG LINK "+resVar);
                         }
-                        lSolVar.add(resVar.getName());
+                        lSolVar.add(resVar.name());
                         bag.set(i, resVar);
                     }
-                } else lSolVar.add(resVar.getName());
+                } else lSolVar.add(resVar.name());
             }
             //System.out.println("le variabili nella sol sono lSolVar "+lSolVar);
 	    	/*
@@ -448,7 +448,7 @@ public class StateEnd extends State {
                         Term vLink = vv.getLink();
                         if (vLink != null && vLink.isEqual(var)/*&& !(var.toString().startsWith("_"))*/) {
                             //System.out.println("Aggiungo trovata uguaglianza "+vv+" e var "+var);
-                            lGoalVar.add(vv.getName());
+                            lGoalVar.add(vv.name());
                         }
                     }
                 }
@@ -508,7 +508,7 @@ public class StateEnd extends State {
                                 Struct s = substituteVar((Struct) vv_link.getLink(), lSolVar, lgoalBOVar);
                                 //System.out.println("****Nuovo link della var "+vv.getOriginalName()+" link "+s);
                             } else {
-                                int index = lSolVar.indexOf(resVar.getName());
+                                int index = lSolVar.indexOf(resVar.name());
                                 //System.out.println("Index i "+i);
                                 //come mai era lgoalBOVar ????
                                 setStructValue(vv, i, new Var(lgoalBOVar.get(index)));
@@ -685,13 +685,13 @@ public class StateEnd extends State {
                 Term tt = s.sub(1);
                 //System.out.println("---Termine "+t+" e termine "+tt);
                 if (tt instanceof Var) {
-                    allVar.add(((Var) tt).getName());
+                    allVar.add(((Var) tt).name());
                 } else if (tt instanceof Struct) {
                     findVar((Struct) tt, allVar);
                 }
             }
             if (t instanceof Var) {
-                allVar.add(((Var) t).getName());
+                allVar.add(((Var) t).name());
             } else if (t instanceof Struct) {
                 findVar((Struct) t, allVar);
             }
@@ -707,11 +707,11 @@ public class StateEnd extends State {
             tt = s.sub(1);
         //System.out.println("Substitute var ---Termine "+t+" e termine "+tt);
         if (tt != null && tt instanceof Var) {
-            int index = lSol.indexOf(((Var) tt).getName());
+            int index = lSol.indexOf(((Var) tt).name());
             //System.out.println("Substitute var ---Indice di tt in lSol "+index);
             s.setSub(1, new Var(lgoal.get(index)));
             if (t instanceof Var) {
-                int index1 = lSol.indexOf(((Var) t).getName());
+                int index1 = lSol.indexOf(((Var) t).name());
                 //System.out.println("Substitute var ---Indice di t in lSol "+index1);
                 s.setSub(0, new Var(lgoal.get(index1)));
             }
@@ -724,7 +724,7 @@ public class StateEnd extends State {
             }
         } else {
             if (t instanceof Var) {
-                int index1 = lSol.indexOf(((Var) t).getName());
+                int index1 = lSol.indexOf(((Var) t).name());
                 //System.out.println("Substitute var ---Indice di t in lSol "+index1);
                 s.setSub(0, new Var(lgoal.get(index1)));
             }

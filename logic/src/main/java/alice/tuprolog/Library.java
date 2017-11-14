@@ -46,7 +46,7 @@ import static alice.tuprolog.PrologPrimitive.FUNCTOR;
  * </ul>
  * <p>
  */
-public abstract class Library implements Serializable, IPrimitives {
+public abstract class Library implements Serializable {
 
 
     /**
@@ -167,8 +167,7 @@ public abstract class Library implements Serializable, IPrimitives {
     /**
      * gets the list of predicates defined in the library
      */
-    @Override
-    public Map<Integer,List<PrologPrimitive>> getPrimitives() {
+    public Map<Integer,List<PrologPrimitive>> primitives() {
         try {
             java.lang.reflect.Method[] mlist = this.getClass().getMethods();
             Map<Integer,List<PrologPrimitive>> mapPrimitives = new HashMap<>();

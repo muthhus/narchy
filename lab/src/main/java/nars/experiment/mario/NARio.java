@@ -1,17 +1,18 @@
 package nars.experiment.mario;
 
 import jcog.Util;
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
 import nars.experiment.mario.sprites.Mario;
 import nars.util.signal.CameraSensor;
-import nars.video.PixelBag;
+import nars.op.video.PixelBag;
 
 import javax.swing.*;
 
+import static jcog.Util.unitize;
 import static nars.$.$;
 import static nars.$.p;
 

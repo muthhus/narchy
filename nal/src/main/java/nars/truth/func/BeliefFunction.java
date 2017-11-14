@@ -88,13 +88,13 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    //@AllowOverlap
-//    DeductionRecursive() {
-//        @Override
-//        public Truth apply(Truth T, Truth B, NAR m, float minConf) {
-//            return Deduction.apply(T, B, m, minConf);
-//        }
-//    },
+    @AllowOverlap
+    DeductionRecursive() {
+        @Override
+        public Truth apply(Truth T, Truth B, NAR m, float minConf) {
+            return Deduction.apply(T, B, m, minConf);
+        }
+    },
 
     @AllowOverlap
     DeductionRecursivePB() {
@@ -163,13 +163,13 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-//    @AllowOverlap
-//    AbductionRecursivePB() {
-//        @Override
-//        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-//            return AbductionPB.apply(T,B,m,minConf);
-//        }
-//    },
+    @AllowOverlap
+    AbductionRecursivePB() {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return AbductionPB.apply(T,B,m,minConf);
+        }
+    },
 
 //    AbductionNeg() {
 //        

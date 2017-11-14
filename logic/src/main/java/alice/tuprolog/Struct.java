@@ -558,12 +558,12 @@ public class Struct extends Term {
                     t.setTimestamp(count);
                     if (!t.isAnonymous()) {
                         // searching a variable with the same name in the list
-                        String name = t.getName();
+                        String name = t.name();
                         Iterator<Var> it = vl.iterator();
                         Var found = null;
                         while (it.hasNext()) {
                             Var vn = it.next();
-                            if (name.equals(vn.getName())) {
+                            if (name.equals(vn.name())) {
                                 found = vn;
                                 break;
                             }
@@ -648,7 +648,7 @@ public class Struct extends Term {
      * If the callee structure is not a list, throws an <code>UnsupportedOperationException</code>
      * </p>
      */
-    public Iterator<? extends Term> listIterator() {
+    public Iterator<Term> listIterator() {
         if (!isList())
             throw new UnsupportedOperationException("The structure " + this + " is not a list.");
         return new StructIterator(this);

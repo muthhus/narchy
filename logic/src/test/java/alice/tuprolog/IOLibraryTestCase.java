@@ -13,7 +13,7 @@ public class IOLibraryTestCase {
 	
 	@Test public void testGetPrimitives() {
 		Library library = new IOLibrary();
-		Map<Integer, List<PrologPrimitive>> primitives = library.getPrimitives();
+		Map<Integer, List<PrologPrimitive>> primitives = library.primitives();
 		assertEquals(3, primitives.size());
 		assertEquals(0, primitives.get(PrologPrimitive.DIRECTIVE).size());
 		assertTrue(primitives.get(PrologPrimitive.PREDICATE).size() > 0);

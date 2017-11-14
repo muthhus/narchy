@@ -3,6 +3,7 @@ package nars.concept;
 import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Task;
+import nars.task.SignalTask;
 import nars.task.util.PredictionFeedback;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -38,7 +39,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
         this.sensor = new ScalarSignal(n, c, this, truth, ()->SensorConcept.this.resolution.asFloat()) {
             @Override
-            protected LongSupplier stamp(Truth currentBelief, @NotNull NAR nar) {
+            protected LongSupplier stamp(Truth currentBelief,  NAR nar) {
                 return SensorConcept.this.nextStamp(nar);
             }
         };
@@ -53,7 +54,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     /**
      * returns a new stamp for a sensor task
      */
-    protected LongSupplier nextStamp(@NotNull NAR nar) {
+    protected LongSupplier nextStamp(NAR nar) {
         return nar.time::nextStamp;
     }
 
@@ -75,6 +76,18 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
 
+    @Override
+    public void process(Task t, NAR n) {
+
+        //feedback prefilter non-signal beliefs
+        if (t.isBelief() && !(t instanceof SignalTask)) {
+            beliefFeedback.accept(t, n);
+            if (t.isDeleted())
+                return; //rejected
+        }
+
+        super.process(t, n);
+    }
 
     @Nullable
     public Task update(long time, int dur, NAR nar) {

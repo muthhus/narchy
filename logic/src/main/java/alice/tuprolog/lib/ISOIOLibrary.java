@@ -1661,7 +1661,7 @@ public class ISOIOLibrary extends Library{
             return !ignore_ops ? '[' + list + ']' : list;
         }
                 
-        List<Operator> operatorList = engine.operators();
+        Iterable<Operator> operatorList = engine.operators();
         String operator = "";
         int flagOp = 0;
         for(Operator op : operatorList){

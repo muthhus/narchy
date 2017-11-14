@@ -1,8 +1,8 @@
 package nars.op;
 
 import com.google.common.collect.Iterables;
-import jcog.data.FloatParam;
 import jcog.data.graph.AdjGraph;
+import jcog.math.FloatParam;
 import jcog.pri.Prioritized;
 import nars.$;
 import nars.NAR;

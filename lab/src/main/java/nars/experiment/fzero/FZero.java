@@ -5,7 +5,7 @@ import nars.*;
 import nars.concept.ScalarConcepts;
 import nars.gui.Vis;
 import nars.util.signal.CameraSensor;
-import nars.video.Scale;
+import nars.op.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 

@@ -37,7 +37,7 @@ public final class BuiltIn extends Library {
 	private final EngineManager engineManager;
 	private final TheoryManager theoryManager;
 	private final LibraryManager libraryManager;
-	private final FlagManager flagManager;
+	private final Flags flags;
 	private final PrimitiveManager primitiveManager;
 	private final OperatorManager operatorManager;
 
@@ -47,7 +47,7 @@ public final class BuiltIn extends Library {
 		engineManager = p.engine;
 		theoryManager = p.theories;
 		libraryManager = p.libs;
-		flagManager = p.flags;
+		flags = p.flags;
 		primitiveManager = p.prims;
 		operatorManager = p.ops;
 	}
@@ -294,7 +294,7 @@ public final class BuiltIn extends Library {
 	  */
 	 public boolean flag_list_1(Term arg0) {
 		 arg0 = arg0.term();
-		 Struct flist = flagManager.flags();
+		 Struct flist = flags.flags();
 		 return unify(arg0, flist);
 	 }
 
@@ -501,7 +501,7 @@ public final class BuiltIn extends Library {
 
 		 String name = arg0.toString();
 
-		 Flag f = flagManager.get(name);
+		 Flag f = flags.get(name);
 		 if (f == null)
 			 throw PrologError.domain_error(engineManager, 1, "prolog_flag",
 					 arg0);
@@ -524,7 +524,7 @@ public final class BuiltIn extends Library {
 			 throw PrologError.type_error(engineManager, 1, "struct", arg0);
 		 }
 		 String name = arg0.toString();
-		 Flag flag = flagManager.get(name);
+		 Flag flag = flags.get(name);
 		 if (flag == null)
 			 throw PrologError.domain_error(engineManager, 1, "prolog_flag",
 					 arg0);
@@ -591,7 +591,7 @@ public final class BuiltIn extends Library {
 			 // TODO libName che futuro deve avere?? --------------------
 			 String libName = "";
 			 // ------------
-			 flagManager.add(flagName.toString(), (Struct) flagSet,
+			 flags.add(flagName.toString(), (Struct) flagSet,
 					 flagDefault, isTrue, libName);
 		 }
 	 }

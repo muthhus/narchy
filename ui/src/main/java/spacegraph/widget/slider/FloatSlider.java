@@ -3,7 +3,7 @@ package spacegraph.widget.slider;
 import com.jogamp.opengl.GL2;
 import jcog.Texts;
 import jcog.Util;
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 import jcog.math.FloatSupplier;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;

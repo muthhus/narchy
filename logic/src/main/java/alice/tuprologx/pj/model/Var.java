@@ -67,7 +67,7 @@ public class Var<X extends Term<?>> extends Term<X> {
         if (!matches(a))
             throw new UnsupportedOperationException();
         //return new Var<Term<?>>(a.getName(),a.isBound() ? Term.unmarshal(a.getTerm()) : null);            
-        return a.isBound() ? Term.unmarshal(a.term()) : new Var<>(a.getName(), null);
+        return a.isBound() ? Term.unmarshal(a.term()) : new Var<>(a.name(), null);
     }
     
     static boolean matches(alice.tuprolog.Term t) {

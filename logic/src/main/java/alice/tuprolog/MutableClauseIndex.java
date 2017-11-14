@@ -33,8 +33,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class MutableClauseIndex extends ConcurrentHashMap<String,FamilyClausesList> implements ClauseIndex {
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public void add(String key, ClauseInfo d, boolean first) {
 		computeIfAbsent(key, (k)->new FamilyClausesList()).add(d, first);

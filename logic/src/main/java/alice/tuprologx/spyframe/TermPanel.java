@@ -32,7 +32,7 @@ public class TermPanel extends JPanel implements ActionListener{
         //make it more specific if possible
         if (term instanceof Var) {
             Var var = (Var) term;
-            node.text = var.getName();
+            node.text = var.name();
             node.textcolor = node.bordercolor = Color.BLUE;
             if (var.isBound()) {
                 node.kids = new Node[1];

@@ -1,7 +1,7 @@
 package nars.bag.leak;
 
 import jcog.bag.Bag;
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.op.PriMerge;
 import nars.NAR;

@@ -2,7 +2,7 @@ package spacegraph.audio;
 
 import com.google.common.base.Joiner;
 import jcog.Util;
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 
 import javax.sound.sampled.*;
 import java.nio.ByteBuffer;

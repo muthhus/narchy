@@ -1,7 +1,7 @@
 package nars.bag.leak;
 
 import jcog.bag.Bag;
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ThreadLocalRandom;

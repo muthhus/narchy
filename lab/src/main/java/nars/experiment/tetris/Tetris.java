@@ -1,6 +1,6 @@
 package nars.experiment.tetris;
 
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 import nars.*;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.op.java.OObjects;

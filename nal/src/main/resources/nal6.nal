@@ -11,11 +11,11 @@
     //nature of such a rule."
 
     //strong unification
-    (Y ==> X), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:Deduction)
-    (Y ==> X), Z, task(".")     |- subIfUnifiesAny(--X,Y,Z,"$"), (Belief:DeductionN)
-    (--Y ==> X), Z, task(".")   |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:DeductionPN)
-    (--Y ==> X), Z, task(".")   |- subIfUnifiesAny(--X,Y,Z,"$"), (Belief:DeductionNN)
-    (X ==> Y), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:AbductionPB)
+    (Y ==> X), Z, task(positive), task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:DeductionRecursive)
+    (Y ==> X), Z, task(negative), task(".")     |- subIfUnifiesAny(--X,Y,Z,"$"), (Belief:DeductionRecursiveN)
+    (--Y ==> X), Z, task(positive), task(".")   |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:DeductionRecursivePN)
+    (--Y ==> X), Z, task(negative), task(".")   |- subIfUnifiesAny(--X,Y,Z,"$"), (Belief:DeductionRecursiveNN)
+    (X ==> Y), Z, task(".")     |- subIfUnifiesAny(X,Y,Z,"$"), (Belief:AbductionRecursivePB)
 
 
     //If after S M happens, and after M P happens, so P happens after S
@@ -70,8 +70,8 @@
 // original:	    ( --S ==> P),   P |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
 // original:	    ( --S ==> P), --S |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
 
-    ( --S ==> P), P |- ( --P ==>+- S), (Belief:Contraposition)
-    ( --S ==> P), P |- ( P ==>+- S), (Belief:ContrapositionN)
+    ( --S ==> P), P, task(positive) |- ( --P ==>+- S), (Belief:Contraposition)
+    ( --S ==> P), P, task(negative) |- ( P ==>+- S), (Belief:ContrapositionN)
 
 
 
@@ -83,8 +83,8 @@
     (P ==> M), (S ==> M), neq(P,S) |- (--(--P &&+- --S) ==>+- M), (Belief:Union)
 
 
-    (M ==> P), (M ==> S), neq(P,S) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
-        (M ==> P), (M ==> S), neq(P,S) |- (M ==>+- (P &&+- --S)), (Belief:IntersectionPN)
+    (M ==> P), (M ==> S), belief(positive), neq(P,S) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
+        (M ==> P), (M ==> S), belief(negative), neq(P,S) |- (M ==>+- (P &&+- --S)), (Belief:IntersectionPN)
     (M ==> P), (M ==> S), neq(P,S) |- (M ==>+- --(--P &&+- --S)), (Belief:Union)
 
 
@@ -116,11 +116,11 @@
 // Conditional syllogism && Independent Variable Elimination
 //      If after M, P usually happens, and M happens, it means P is expected to happen
 
-    B, (A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionPB)
+    B, (A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionRecursivePB)
         //B, (A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$",strict), (Belief:DeductionRecursivePB)
         B, (B ==> C),  notImpl(B), task("!") |- C, (Goal:DeciDeduction)
 
-    B, (--A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionPBN)
+    B, (--A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$"), (Belief:DeductionRecursivePBN)
         //B, (--A ==> C),  notImpl(B), task(".") |- subIfUnifiesAny(C,A,B,"$",strict), (Belief:DeductionRecursivePBN)
         B, (--B ==> C),  notImpl(B), task("!") |- C, (Goal:DeciDeductionN)
 
@@ -299,8 +299,8 @@
 
 //Anonymous Analogy (NAL5)
     //originally this only unified depvar (dep var elimination)
-     (&&,X,A..+), Y    |- subIfUnifiesAny((&&,A..+),X,Y,"#","strict"), (Belief:AnonymousAnalogy)
-     (&&,--X,A..+), Y  |- subIfUnifiesAny((&&,A..+),X,Y,"#","strict"), (Belief:AnonymousAnalogyPN)
+     (&&,X,A..+), Y    |- subIfUnifiesAny((&&,A..+),X,Y,"#"), (Belief:AnonymousAnalogy)
+     (&&,--X,A..+), Y  |- subIfUnifiesAny((&&,A..+),X,Y,"#"), (Belief:AnonymousAnalogyPN)
 
 
      //((&&,X,A..+) && Z), Z |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)

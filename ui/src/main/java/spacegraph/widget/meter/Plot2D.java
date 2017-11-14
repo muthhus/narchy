@@ -314,10 +314,15 @@ public class Plot2D extends Surface {
 
             //float py = 0;
 
-            gl.glLineWidth(2);
+            gl.glLineWidth(3);
             gl.glColor3fv(s.color, 0);
 
-            gl.glBegin(GL.GL_LINE_STRIP);
+            gl.glBegin(
+                    GL.GL_LINE_STRIP
+                    //GL.GL_TRIANGLE_STRIP
+                    //GL.GL_TRIANGLE_FAN
+                    //GL2.GL_POLYGON
+            );
             float range = maxValue - minValue;
             float yy = Float.NaN;
             float x = 0;

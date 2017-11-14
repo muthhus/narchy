@@ -17,8 +17,7 @@
  */
 package alice.tuprolog;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class manages Prolog operators.
@@ -26,7 +25,7 @@ import java.util.List;
  * @see Operator
  */
 @SuppressWarnings("serial")
-/*Castagna 06/2911*/ public/**/ class OperatorManager extends OperatorRegister /**/ {
+public class OperatorManager extends ConcurrentHashMap<String, Operator> /**/ {
 
     /**
      * lowest operator priority
@@ -37,6 +36,19 @@ import java.util.List;
      * highest operator priority
      */
     public static final int OP_HIGH = 1200;
+
+    public OperatorManager() {
+        super(128, 0.9f);
+    }
+
+    public void addOperator(Operator op) {
+        put(op.name + op.type, op);
+    }
+
+    public Operator getOperator(String name, String type) {
+        return get(name + type);
+    }
+
 
     /**
      * Creates a new operator. If the operator is already provided,
@@ -62,8 +74,9 @@ import java.util.List;
     public int opNext(int prio) {
         int n = 0;
         for (Operator opFromList : values()) {
-            if (opFromList.prio > n && opFromList.prio < prio)
-                n = opFromList.prio;
+            int oprio = opFromList.prio;
+            if (oprio > n && oprio < prio)
+                n = oprio;
         }
         return n;
     }
@@ -73,8 +86,8 @@ import java.util.List;
      *
      * @return the list of the operators
      */
-    public List<Operator> getOperators() {
-        return new LinkedList<>(values());
+    public Iterable<Operator> operators() {
+        return values(); //new LinkedList<>(values());
     }
 
 

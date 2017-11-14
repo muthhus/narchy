@@ -1,7 +1,7 @@
 package nars.op.stm;
 
 import jcog.Util;
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.Prioritized;

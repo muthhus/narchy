@@ -36,7 +36,7 @@ import static alice.tuprolog.PrologPrimitive.*;
 public class PrimitiveManager  {
 
     private static final Set<String> PRIMITIVE_PREDICATES = Set.of(",", "':-'", ":-");
-    private final Set<IPrimitives> libs;
+    private final Set<Library> libs;
     private final Map<String, PrologPrimitive> directives;
     private final Map<String, PrologPrimitive> predicates;
     private final Map<String, PrologPrimitive> functors;
@@ -57,11 +57,11 @@ public class PrimitiveManager  {
         start(new BuiltIn(prolog));
     }
 
-    void start(IPrimitives src) {
+    void start(Library src) {
         if (!libs.add(src))
             throw new RuntimeException("already loaded: " + src);
 
-        Map<Integer, List<PrologPrimitive>> prims = src.getPrimitives();
+        Map<Integer, List<PrologPrimitive>> prims = src.primitives();
 
 
         for (int type : new int[] { DIRECTIVE, PREDICATE, FUNCTOR }) {
@@ -72,11 +72,11 @@ public class PrimitiveManager  {
     }
 
 
-    void stop(IPrimitives src) {
+    void stop(Library src) {
         if (!libs.remove(src))
             throw new RuntimeException("not loaded: " + src);
 
-        Map<Integer, List<PrologPrimitive>> prims = src.getPrimitives();
+        Map<Integer, List<PrologPrimitive>> prims = src.primitives();
 
         for (int type : new int[] { DIRECTIVE, PREDICATE, FUNCTOR }) {
             Map<String, PrologPrimitive> table = table(type);

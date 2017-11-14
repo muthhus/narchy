@@ -1,6 +1,6 @@
 package nars.bag.leak;
 
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 import nars.NAR;
 import nars.control.CauseChannel;
 import nars.task.ITask;

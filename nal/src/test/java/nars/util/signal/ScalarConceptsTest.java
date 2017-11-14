@@ -2,8 +2,8 @@ package nars.util.signal;
 
 import jcog.Texts;
 import jcog.Util;
-import jcog.data.FloatParam;
 import jcog.math.FloatNormalized;
+import jcog.math.FloatParam;
 import jcog.math.FloatPolarNormalized;
 import nars.$;
 import nars.NAR;

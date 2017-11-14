@@ -131,6 +131,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
     /**
      * minT and maxT inclusive
+     * TODO add Predicate<> form of this for early exit
      */
     void forEachTask(boolean includeEternal, long minT, long maxT, Consumer<? super Task> x);
 

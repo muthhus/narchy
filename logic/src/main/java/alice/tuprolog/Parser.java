@@ -18,10 +18,7 @@
 package alice.tuprolog;
 
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -63,45 +60,43 @@ public class Parser {
 		}
 	}
 
-	private static final OperatorManager defaultOperatorManager = new DefaultOperatorManager();
+	public static final OperatorManager defaultOps = new DefaultOps();
 
 	private final Tokenizer tokenizer;
-	private OperatorManager opManager = defaultOperatorManager;
+	private OperatorManager ops = defaultOps;
 	/*Castagna 06/2011*/
 	private HashMap<Term, Integer> offsetsMap;		 
 	private int tokenStart;
 	/**/    
 
-	/**
-	 * creating a Parser specifing how to handle operators
-	 * and what text to parse
-	 */
-	public Parser(OperatorManager op, InputStream theoryText) {
-		this(theoryText);
-		if (op != null)
-			opManager = op;
-	}
+//	/**
+//	 * creating a Parser specifing how to handle operators
+//	 * and what text to parse
+//	 */
+//	public Parser(OperatorManager op, InputStream theoryText) {
+//		this(theoryText);
+//		if (op != null)
+//			ops = op;
+//	}
 	
 	/*Castagna 06/2011*/    
 	/**
 	 * creating a Parser specifing how to handle operators
 	 * and what text to parse
 	 */	
-	public Parser(OperatorManager op, String theoryText, HashMap<Term, Integer> mapping) {		 
+	public Parser(String theoryText, OperatorManager op, HashMap<Term, Integer> mapping) {
 		this(theoryText, mapping);		 
 		if (op != null)		 
-			opManager = op;		 
+			ops = op;
 	}
-	/**/ 
+
 
 	/**
 	 * creating a Parser specifing how to handle operators
 	 * and what text to parse
 	 */
-	public Parser(OperatorManager op, String theoryText) {
-		this(theoryText);
-		if (op != null)
-			opManager = op;
+	public Parser(String theoryText, OperatorManager op) {
+		this(theoryText, op, null);
 	}
 	
 	/*Castagna 06/2011*/
@@ -114,22 +109,16 @@ public class Parser {
 	}
 	/**/
 
-	/**
-	 * creating a parser with default operator interpretation
-	 */
 	public Parser(String theoryText) {
-		tokenizer = new Tokenizer(theoryText);
-		/*Castagna 06/2011*/
-		offsetsMap = null;
-		/**/        
+		this(theoryText, defaultOps);
 	}
 
-	/**
-	 * creating a parser with default operator interpretation
-	 */
-	public Parser(InputStream theoryText) {
-		tokenizer = new Tokenizer(new BufferedReader(new InputStreamReader(theoryText)));
-	}
+//	/**
+//	 * creating a parser with default operator interpretation
+//	 */
+//	public Parser(InputStream theoryText) {
+//		tokenizer = new Tokenizer(new BufferedReader(new InputStreamReader(theoryText)));
+//	}
 
 	//  user interface
 
@@ -192,7 +181,7 @@ public class Parser {
 	 */
 	public static Term parseSingleTerm(String st, OperatorManager op) throws InvalidTermException {
 		try {
-			Parser p = new Parser(op, st);
+			Parser p = new Parser(st, op);
 			Token t = p.tokenizer.readToken();
 			if (t.isEOF())
 	            throw new InvalidTermException("Term starts with EOF");
@@ -226,8 +215,8 @@ public class Parser {
 		Token t = tokenizer.readToken();
 		for (; t.isOperator(commaIsEndMarker); t = tokenizer.readToken()) {
 
-			int YFX = opManager.opPrio(t.seq, "yfx");
-			int YF = opManager.opPrio(t.seq, "yf");
+			int YFX = ops.opPrio(t.seq, "yfx");
+			int YF = ops.opPrio(t.seq, "yf");
 
 			//YF and YFX has a higher priority than the left side expr and less then top limit
 			// if (YF < leftSide.priority && YF > OperatorManager.OP_HIGH) YF = -1;
@@ -268,9 +257,9 @@ public class Parser {
 		//2.left is followed by either xfx, xfy or xf operators, parse these
 		Token operator = tokenizer.readToken();
 		for (; operator.isOperator(commaIsEndMarker); operator = tokenizer.readToken()) {
-			int XFX = opManager.opPrio(operator.seq, "xfx");
-			int XFY = opManager.opPrio(operator.seq, "xfy");
-			int XF = opManager.opPrio(operator.seq, "xf");
+			int XFX = ops.opPrio(operator.seq, "xfx");
+			int XFY = ops.opPrio(operator.seq, "xfy");
+			int XF = ops.opPrio(operator.seq, "xf");
 
 			//check that no operator has a priority higher than permitted
 			//or a lower priority than the left side expression
@@ -343,8 +332,8 @@ public class Parser {
 		//1. prefix expression
 		Token f = tokenizer.readToken();
 		if (f.isOperator(commaIsEndMarker)) {
-			int FX = opManager.opPrio(f.seq, "fx");
-			int FY = opManager.opPrio(f.seq, "fy");
+			int FX = ops.opPrio(f.seq, "fx");
+			int FY = ops.opPrio(f.seq, "fy");
 
 			if (f.seq.equals("-")) {
 				Token t = tokenizer.readToken();

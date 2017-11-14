@@ -172,9 +172,11 @@ public class PrologAgent extends Prolog {
     public Solution run(){
         try {
 
-            setTheory( (theoryText==null) ?
-                new Theory() :
-                new Theory(theoryText));
+            if (theoryText!=null) {
+                setTheory(
+                        new Theory(theoryText)
+                );
+            }
 
             if (goalText!=null){
                 return solve(goalText);

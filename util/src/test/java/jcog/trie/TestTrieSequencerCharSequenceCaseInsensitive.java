@@ -16,7 +16,11 @@
 
 package jcog.trie;
 
+import jcog.tree.perfect.TrieSequencer;
+import jcog.tree.perfect.TrieSequencerCharSequenceCaseInsensitive;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class TestTrieSequencerCharSequenceCaseInsensitive

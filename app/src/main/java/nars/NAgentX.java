@@ -2,9 +2,9 @@ package nars;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
-import jcog.data.FloatParam;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
+import jcog.math.FloatParam;
 import jcog.pri.mix.control.MixContRL;
 import nars.control.Cause;
 import nars.control.DurService;
@@ -24,7 +24,7 @@ import nars.truth.Truth;
 import nars.util.signal.Bitmap2D;
 import nars.util.signal.CameraSensor;
 import nars.util.signal.Sensor2D;
-import nars.video.*;
+import nars.op.video.*;
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
 import net.beadsproject.beads.core.UGen;
@@ -184,9 +184,9 @@ abstract public class NAgentX extends NAgent {
 //                    }
 //                })
                 .exe(new MultiExec.
-                            Intense
-                            //CoolNQuiet
-                        (256, THREADS, 128))
+                            //Intense
+                            CoolNQuiet
+                        (128, THREADS, 64))
 
                 .time(clock)
                 .deriverAdd(8)
@@ -195,7 +195,7 @@ abstract public class NAgentX extends NAgent {
                 .deriverAdd("motivation.nal")
                 .deriverAdd("list.nal")
                 .index(
-                        new CaffeineIndex(128 * 1024)
+                        new CaffeineIndex(384 * 1024)
                        // new PriMapTermIndex()
                         //new CaffeineIndex2(64 * 1024)
                         //new CaffeineIndex2(-1)

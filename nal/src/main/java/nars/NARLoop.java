@@ -1,7 +1,7 @@
 package nars;
 
-import jcog.data.FloatParam;
 import jcog.exe.Loop;
+import jcog.math.FloatParam;
 import org.jetbrains.annotations.NotNull;
 
 /**

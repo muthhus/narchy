@@ -12,21 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author ivar.orstavik@hist.no
  */
-public class OperatorRegister extends ConcurrentHashMap<String, Operator> /*Castagna 06/2011*//**/ {
+public class OperatorRegister  /*Castagna 06/2011*//**/ {
     //map of operators by name and type
     //key is the nameType of an operator (for example ":-xfx") - value is an Operator
 
-    public OperatorRegister() {
-        super(128, 0.9f);
-    }
-
-    public void addOperator(Operator op) {
-        put(op.name + op.type, op);
-    }
-
-    public Operator getOperator(String name, String type) {
-        return get(name + type);
-    }
 
 //        /*Castagna 06/2011*/
 //        @Override

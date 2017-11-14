@@ -2,8 +2,8 @@ package nars;
 
 import jcog.Services;
 import jcog.Util;
-import jcog.data.FloatParam;
-import jcog.data.MutableInteger;
+import jcog.math.FloatParam;
+import jcog.math.MutableInteger;
 import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
 import jcog.util.FloatFloatToFloatFunction;

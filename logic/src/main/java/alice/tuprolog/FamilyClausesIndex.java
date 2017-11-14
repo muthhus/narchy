@@ -118,7 +118,7 @@ class FamilyClausesIndex<K extends Comparable<? super K>>
             insertedNode.parent = n;
         }
         insertCase1(insertedNode);
-        verifyProperties();
+        //verifyProperties();
     }
 
 

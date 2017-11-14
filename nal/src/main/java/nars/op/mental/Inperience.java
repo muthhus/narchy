@@ -1,6 +1,6 @@
 package nars.op.mental;
 
-import jcog.data.FloatParam;
+import jcog.math.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.Op;

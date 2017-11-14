@@ -191,7 +191,7 @@ public class Var extends Term {
     /**
      * Gets the name of the variable
      */
-    public String getName() {
+    public String name() {
         return name != null ? completeName.toString() : ANY;
     }
 
@@ -463,7 +463,7 @@ public class Var extends Term {
             //System.out.println("vorder "+vorder);
             //System.out.println("indice tt "+vorder.indexOf(((Var)tt).getName())+" indice t "+vorder.indexOf(((Var)t).getName()));
             //return timestamp > ((Var)t).timestamp;
-            return vorder.indexOf(((Var) tt).getName()) > vorder.indexOf(((Var) t).getName());
+            return vorder.indexOf(((Var) tt).name()) > vorder.indexOf(((Var) t).name());
         } else {
             return tt.isGreaterRelink(t, vorder);
         }

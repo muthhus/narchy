@@ -7,6 +7,7 @@ import jcog.io.Twokenize;
 import nars.*;
 import nars.concept.Concept;
 import nars.op.Operator;
+import nars.op.Wiki;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.apache.commons.lang.StringEscapeUtils;

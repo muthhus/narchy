@@ -7,9 +7,9 @@ import nars.NAgentX;
 import nars.Narsese;
 import nars.experiment.pacman.PacMan;
 import nars.term.atom.Atomic;
-import nars.video.BufferedImageBitmap2D;
-import nars.video.Scale;
-import nars.video.SwingBitmap2D;
+import nars.op.video.BufferedImageBitmap2D;
+import nars.op.video.Scale;
+import nars.op.video.SwingBitmap2D;
 
 
 public class Pacman extends NAgentX {

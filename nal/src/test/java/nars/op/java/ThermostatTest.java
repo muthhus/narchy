@@ -1,6 +1,6 @@
 package nars.op.java;
 
-import jcog.data.MutableInteger;
+import jcog.math.MutableInteger;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
@@ -9,6 +9,7 @@ import nars.control.MetaGoal;
 import org.junit.jupiter.api.Test;
 
 import static nars.Op.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ThermostatTest {
 
