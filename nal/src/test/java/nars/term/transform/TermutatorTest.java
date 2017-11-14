@@ -117,22 +117,22 @@ public class TermutatorTest {
 
     @Test public void testComm2() throws Narsese.NarseseException {
         assertTermutatorProducesUniqueResults(
-                new CommutivePermutations($("{%A,%B}"),
+                new CommutivePermutations((Term)$("{%A,%B}"),
                         $("{x,y}")), 2);
     }
     @Test public void testComm3() throws Narsese.NarseseException {
         assertTermutatorProducesUniqueResults(
-                new CommutivePermutations($("{%A,%B,%C}"),
+                new CommutivePermutations((Term)$("{%A,%B,%C}"),
                         $("{x,y,z}")), 6);
     }
     @Test public void testComm3Conj() throws Narsese.NarseseException {
         assertTermutatorProducesUniqueResults(
-                new CommutivePermutations($("(&&,%A,%B,%C)"),
+                new CommutivePermutations((Term)$("(&&,%A,%B,%C)"),
                         $("(&&,x,y,z)")), 6);
     }
     @Test public void testComm4() throws Narsese.NarseseException {
         assertTermutatorProducesUniqueResults(
-                new CommutivePermutations($("{%A,%B,%C,%D}"),
+                new CommutivePermutations((Term)$("{%A,%B,%C,%D}"),
                         $("{w,x,y,z}")), 24);
     }
 

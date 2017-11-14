@@ -27,6 +27,13 @@ public class MatrixView extends Widget {
             return 0;
         };
     }
+    public static ViewFunction2D arrayRenderer(double[][] ww) {
+        return (x, y, gl) -> {
+            float v = (float) ww[x][y];
+            Draw.colorBipolar(gl, v);
+            return 0;
+        };
+    }
 
     public static ViewFunction2D arrayRenderer(float[] w) {
         return (x, y, gl) -> {
@@ -74,6 +81,9 @@ public class MatrixView extends Widget {
     public MatrixView(float[][] w) {
         this(w.length, w[0].length, MatrixView.arrayRenderer(w));
     }
+    public MatrixView(double[][] w) {
+        this(w.length, w[0].length, MatrixView.arrayRenderer(w));
+    }
 
     public MatrixView(int w, int h, ViewFunction2D view) {
         this.w = w;
@@ -95,7 +105,7 @@ public class MatrixView extends Widget {
     }
 
     public MatrixView(float[] d, int stride, ViewFunction1D view) {
-        this((int) Math.floor(((float) d.length) / stride), stride, (x, y, gl) -> {
+        this(stride, (int) Math.ceil(((float) d.length) / stride), (x, y, gl) -> {
             int i = y * stride + x;
             if (i < d.length)
                 return view.update(d[i], gl);
@@ -105,7 +115,7 @@ public class MatrixView extends Widget {
     }
 
     public MatrixView(IntToFloatFunction d, int len, int stride, ViewFunction1D view) {
-        this((int) Math.floor(((float) len) / stride), stride, (x, y, gl) -> {
+        this(stride, (int) Math.ceil(((float) len) / stride), (x, y, gl) -> {
             int i = y * stride + x;
             if (i < len)
                 return view.update(d.valueOf(i), gl);
@@ -115,7 +125,7 @@ public class MatrixView extends Widget {
     }
 
     public MatrixView(double[] d, int stride, ViewFunction1D view) {
-        this((int) Math.floor(((float) d.length) / stride), stride, (x, y, gl) -> {
+        this(stride, (int) Math.ceil(((float) d.length) / stride), (x, y, gl) -> {
             int i = y * stride + x;
             if (i < d.length)
                 return view.update((float) d[i], gl);
@@ -125,7 +135,7 @@ public class MatrixView extends Widget {
     }
 
     public <P extends FloatSupplier> MatrixView(P[] d, int stride, ViewFunction1D view) {
-        this((int) Math.floor(((float) d.length) / stride), stride, (x, y, gl) -> {
+        this(stride, (int) Math.ceil(((float) d.length) / stride), (x, y, gl) -> {
             int i = y * stride + x;
             if (i < d.length)
                 return view.update(d[i].asFloat(), gl);
@@ -141,14 +151,14 @@ public class MatrixView extends Widget {
 
     public static MatrixView get(ArrayTensor t, int stride, ViewFunction1D view) {
         float[] d = t.data;
-        return new MatrixView((int) Math.floor(((float) t.volume()) / stride), stride, (x, y, gl) -> {
+        return new MatrixView(stride, (int) Math.ceil(((float) t.volume()) / stride), (x, y, gl) -> {
             float v = d[x * stride + y];
             return view.update(v, gl);
         });
     }
 
     public MatrixView(Supplier<double[]> e, int length, int stride, ViewFunction1D view) {
-        this((int) Math.floor(((float) length) / stride), stride, (x, y, gl) -> {
+        this(stride, (int) Math.ceil(((float) length) / stride), (x, y, gl) -> {
             double[] d = e.get();
             if (d != null) {
 
@@ -170,17 +180,23 @@ public class MatrixView extends Widget {
             return;
 
 
-        float dw = 1f / w;
-        float dh = 1f / h;
+        float dw = 1f / w * w();
+        float dh = 1f / h * h();
 
 
+        float tx = x();
+        float ty = y();
         for (int y = 0; y < h; y++) {
+
+            float yy = ty + 1f - (y + 1) * dh;
+
             for (int x = 0; x < w; x++) {
 
                 //try {
                 float dz = view.update(x, y, gl);
-                if (dz == dz)
-                    Draw.rect(gl, x * dw, 1f - (y + 1) * dh, dw, dh, dz);
+                if (dz == dz) {
+                    Draw.rect(gl, tx + x * dw, yy, dw, dh, dz);
+                }
                 /*} catch (Exception e) {
                     logger.error(" {}",e);
                     return;

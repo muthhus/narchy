@@ -44,8 +44,8 @@ public class DistractedSequenceRecall extends AbstractTraining {
 				input[seq[t]] = 1.0;
 
 				Interaction inter = new Interaction();
-				if (t == 0)
-					inter.forget = 1f;
+//				if (t == 0)
+//					inter.forget = 1f;
 				inter.actual = input;
 				experience.accept(inter);
 

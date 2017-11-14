@@ -12,7 +12,7 @@ public class SimpleLSTM  {
 	public double[] out;
 	public double[] in;
 
-	private final double init_weight_range = 0.5;
+	private final double init_weight_range = 1.0;
 	private final double SCALE_OUTPUT_DELTA = 1.0;
 
 	private final int full_input_dimension;
@@ -25,7 +25,7 @@ public class SimpleLSTM  {
 	
 	private final double [][] weightsF;
 	private final double [][] weightsG;
-	private final double [][] weightsOut;
+	public final double [][] weightsOut;
 	
 	//partials (Need this for each output? Need to remind myself..)
 	private final double [][] dSdF;
@@ -42,7 +42,7 @@ public class SimpleLSTM  {
 	private double[] actG;
 	private double[] actH;
 	public double[] full_hidden;
-	private double[] deltaOut;
+	public double[] deltaOut;
 	private double[] deltaH;
 
 	public SimpleLSTM(Random r, int input_dimension, int output_dimension, int cell_blocks)

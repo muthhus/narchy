@@ -18,9 +18,8 @@ public abstract class AbstractTraining {
         return new SimpleLSTM(random, inputs, outputs, cell_blocks);
     }
 
-    @Deprecated public double scoreSupervised(SimpleLSTM agent)  {
+    @Deprecated public double scoreSupervised(SimpleLSTM agent, float learningRate)  {
 
-        float learningRate = 0.1f;
         final double[] fit = {0};
         final double[] max_fit = {0};
 

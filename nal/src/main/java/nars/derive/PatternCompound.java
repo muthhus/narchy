@@ -10,13 +10,11 @@ import nars.derive.mutate.CommutivePermutations;
 import nars.term.Compound;
 import nars.term.GenericCompoundDT;
 import nars.term.Term;
-import nars.term.Terms;
-import nars.term.compound.GenericCompound;
-import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.instrument.Instrumentation;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -289,9 +287,10 @@ abstract public class PatternCompound extends GenericCompoundDT {
                     xFixed.add(x); //x is a variable which must be termuted when everything non-X is assigned
 
                 } else {
+
                     if (yFree.remove(x)) {
                         //matched constant
-                        xFixed.remove(x); //<- probably not necessary
+                        //xFixed.remove(x); //<- probably not necessary
                     } else {
                         if ((u.type == null && (x.vars()+x.varPattern()==0)) || (u.type!=null && !x.hasAny(u.type)))
                             return false; //unmatched constant offers no possibility of eventual unification

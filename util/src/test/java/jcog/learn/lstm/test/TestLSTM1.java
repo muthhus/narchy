@@ -28,10 +28,10 @@ public class TestLSTM1 {
 		int epochs = 150;
 		double error = 0;
 		for (int epoch = 0; epoch < epochs; epoch++) {
-			double fit = task.scoreSupervised(slstm);
+			double fit = task.scoreSupervised(slstm, 0.1f);
 			error = 1 - fit;
-			/*if (epoch % 10 == 0)
-				System.out.println("["+epoch+"] error = " + error);*/
+			if (epoch % 10 == 0)
+				System.out.println("["+epoch+"] error = " + error);
 		}
 		//System.out.println("done.");
 		assertTrue(error < 0.01f);

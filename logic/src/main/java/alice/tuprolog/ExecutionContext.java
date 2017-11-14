@@ -116,20 +116,21 @@ public class ExecutionContext {
 
     void performTailRecursionOptimization(Engine e) {
 
+        ExecutionContext ctx = e.currentContext;
         if (!haveAlternatives) {
-            SubGoalStore ge = e.currentContext.goalsToEval;
+            SubGoalStore ge = ctx.goalsToEval;
             if (ge.getCurSGId() == null) {
                 if (!ge.haveSubGoals()) {
-                    String gn = e.currentContext.currentGoal.name();
+                    String gn = ctx.currentGoal.name();
                     switch (gn) {
                         case "catch":
                         case "java_catch":
                             break; //continue below
 
                         default: {
-                            fatherCtx = e.currentContext.fatherCtx;
+                            fatherCtx = ctx.fatherCtx;
                             //position of the new context in the list
-                            depth = e.currentContext.depth;
+                            depth = ctx.depth;
                             return;
 
                         }
@@ -138,8 +139,8 @@ public class ExecutionContext {
             }
         }
 
-        fatherCtx = e.currentContext;
-        depth = e.currentContext.depth + 1;
+        fatherCtx = ctx;
+        depth = ctx.depth + 1;
 
 
     }
