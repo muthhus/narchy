@@ -3,6 +3,8 @@ package jcog.util;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.dynamic.loading.ByteArrayClassLoader;
+import net.bytebuddy.dynamic.scaffold.MethodGraph;
+import net.bytebuddy.dynamic.scaffold.TypeValidation;
 import net.bytebuddy.implementation.StubMethod;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -13,7 +15,9 @@ import java.util.Arrays;
 import java.util.Map;
 
 /** an patching/mocking/extending classloader which can be bootstrapped into
- *  by invoking the resulting classes in embedded context */
+ *  by invoking the resulting classes in embedded context
+ *  http://bytebuddy.net/#/tutorial
+ *  */
 public class ClassPatch {
 
     public static void main(String[] args) throws Exception {
@@ -30,9 +34,10 @@ public class ClassPatch {
         ;
 
 
-        String entryClass = "jcog.util.Virtual";
+        String entryClass = ClassPatch.class.getName();
         Map<String, byte[]> overrides = Map.of(
-            entryClass, (new ByteBuddy()
+            entryClass,
+                new ByteBuddy().with(TypeValidation.DISABLED)
                 //.subclass(Virtual.class)
                 .redefine(ClassPatch.class)
                 .name(ClassPatch.class.getName())
@@ -43,7 +48,7 @@ public class ClassPatch {
                         //.withoutCode()
                         //.intercept(MethodCall.invoke(ConventionBasedTestProxy.class.getMethod("test")))
                         //.annotateMethod(testAnnotationImpl)
-                .make()).getBytes()
+                .make().getBytes()
         );
 
         ClassLoader classloader =

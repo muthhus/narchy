@@ -1,4 +1,4 @@
-package jcog.util;
+package jcog.math;
 
 import jcog.map.SaneObjectFloatHashMap;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;

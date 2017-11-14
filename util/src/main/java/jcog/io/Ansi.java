@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package jcog.util;
+package jcog.io;
 
 import com.google.common.collect.FluentIterable;
 

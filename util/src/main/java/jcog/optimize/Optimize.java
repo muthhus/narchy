@@ -1,5 +1,6 @@
-package jcog;
+package jcog.optimize;
 
+import jcog.Util;
 import jcog.list.FasterList;
 import jcog.meter.event.CSVOutput;
 import org.apache.commons.lang3.ArrayUtils;
@@ -84,7 +85,7 @@ public class Optimize<X> {
 
 
     /*@NotNull*/
-    public Result run(int maxIterations, @NotNull FloatFunction<X> eval) {
+    public Result run(int maxIterations, FloatFunction<X> eval) {
         return run(
                 (int) (16 * Math.round(Util.sqr(tweaks.size()))) /* estimate */,
                 maxIterations, 1, eval);

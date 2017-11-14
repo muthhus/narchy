@@ -6,7 +6,7 @@ import jcog.Util;
 import jcog.pri.Prioritized;
 import jcog.sort.TopN;
 import jcog.tree.rtree.*;
-import jcog.util.CachedFloatFunction;
+import jcog.math.CachedFloatFunction;
 import jcog.util.Top;
 import jcog.util.Top2;
 import nars.NAR;
