@@ -67,15 +67,15 @@ public class StateBacktrack extends State {
         ExecutionContext curCtx = e.currentContext;
         OneWayList<List<Var>> pointer = curCtx.trailingVars;
         OneWayList<List<Var>> stopDeunify = curChoice.varsToDeunify;
-        List<Var> varsToDeunify = stopDeunify.getHead();
+        List<Var> varsToDeunify = stopDeunify.head;
         Var.free(varsToDeunify);
         varsToDeunify.clear();
         // bring parent contexts to a previous state in the demonstration
         do {
             // deunify variables in sibling contexts
             while (pointer != stopDeunify) {
-                Var.free(pointer.getHead());
-                pointer = pointer.getTail();
+                Var.free(pointer.head);
+                pointer = pointer.tail;
             }
             curCtx.trailingVars = pointer;
             if (curCtx.fatherCtx == null)

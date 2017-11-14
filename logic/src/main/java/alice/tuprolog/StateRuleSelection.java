@@ -20,6 +20,7 @@ package alice.tuprolog;
 import alice.util.OneWayList;
 import jcog.list.FasterList;
 
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -57,7 +58,7 @@ public class StateRuleSelection extends State {
             List<Var> varsList = new FasterList<>();
             e.currentContext.trailingVars = new OneWayList<>(varsList, e.currentContext.trailingVars);
 
-            List<ClauseInfo> g = c.find(goal);
+            Deque<ClauseInfo> g = c.find(goal);
             clauseStore = g!=null ? ClauseStore.build(goal, varsList, g) : null;
 
             if (clauseStore == null){
@@ -111,7 +112,7 @@ public class StateRuleSelection extends State {
         }
             
         Struct curGoal = curCtx.currentGoal;
-        List<Var> unifiedVars = e.currentContext.trailingVars.getHead();
+        List<Var> unifiedVars = e.currentContext.trailingVars.head;
         curGoal.unify(unifiedVars,unifiedVars,ec.headClause);
         
         ec.haveAlternatives = clauseStore.haveAlternatives();

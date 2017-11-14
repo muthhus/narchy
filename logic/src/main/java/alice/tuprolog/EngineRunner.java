@@ -7,8 +7,8 @@ package alice.tuprolog;
 import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -24,8 +24,8 @@ import static alice.tuprolog.PrologPrimitive.PREDICATE;
 public class EngineRunner implements java.io.Serializable, Runnable{
 	private static final long serialVersionUID = 1L;
     private Prolog                              mediator;
-    private TheoryManager       theoryManager;
-    private PrimitiveManager    primitiveManager;
+    private TheoryManager theories;
+    private PrimitiveManager primitives;
     private LibraryManager      libraryManager;
     private EngineManager             engineManager;
     
@@ -99,8 +99,8 @@ public class EngineRunner implements java.io.Serializable, Runnable{
      */
     EngineRunner initialize(Prolog vm) {
         mediator = vm;
-        theoryManager    = vm.theories;
-        primitiveManager = vm.prims;
+        theories = vm.theories;
+        primitives = vm.prims;
         libraryManager   = vm.libs;
         engineManager = vm.engine;
         
@@ -179,7 +179,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
             query.resolveTerm();
             
             libraryManager.onSolveBegin(query);
-            primitiveManager.identify(query, PREDICATE);
+            primitives.identify(query, PREDICATE);
             //            theoryManager.transBegin();
             
             freeze();
@@ -307,12 +307,12 @@ public class EngineRunner implements java.io.Serializable, Runnable{
      * Utility functions for Finite State Machine
      */
     
-    List<ClauseInfo> find(Term t) {
-        return theoryManager.find(t);
+    Deque<ClauseInfo> find(Term t) {
+        return theories.find(t);
     }
     
     void identify(Term t) {
-        primitiveManager.identify(t, PREDICATE);
+        primitives.identify(t, PREDICATE);
     }
     
 //    void saveLastTheoryStatus() {
@@ -454,8 +454,8 @@ public class EngineRunner implements java.io.Serializable, Runnable{
                 return msgs.size();
         }
         
-        TheoryManager getTheoryManager() {
-            return theoryManager;
+        TheoryManager getTheories() {
+            return theories;
          }
         
         public boolean getRelinkVar(){

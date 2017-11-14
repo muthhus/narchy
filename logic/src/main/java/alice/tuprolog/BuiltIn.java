@@ -20,9 +20,9 @@ package alice.tuprolog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Deque;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.List;
 
 import static alice.tuprolog.PrologPrimitive.PREDICATE;
 
@@ -344,7 +344,7 @@ public final class BuiltIn extends Library {
 	 static Term convertTermToGoal(Term term) {
 		 if (term instanceof Number)
 			 return null;
-		 if(term instanceof Var && ((Var)term).getLink() instanceof Number)
+		 if(term instanceof Var && ((Var)term).link() instanceof Number)
 			 return null;
 		 term = term.term();
 		 if (term instanceof Var)
@@ -471,7 +471,7 @@ public final class BuiltIn extends Library {
 			 throw PrologError.instantiation_error(engineManager, 1);
 		 if (/* !arg0 instanceof Struct || */!arg1.isList())
 			 throw PrologError.type_error(engineManager, 2, "list", arg1);
-		 List<ClauseInfo> l = null;
+		 Deque<ClauseInfo> l = null;
 		 try {
 			 l = theoryManager.find(arg0);
 		 } catch (RuntimeException e) {

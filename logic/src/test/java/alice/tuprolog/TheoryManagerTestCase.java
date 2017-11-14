@@ -3,7 +3,7 @@ package alice.tuprolog;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.util.Deque;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,7 +43,7 @@ public class TheoryManagerTestCase {
 		engine.setTheory(new Theory(theory));
 		TheoryManager manager = engine.theories;
 		Struct testTerm = new Struct("test", new Struct("a"), new Struct("b"));
-		List<ClauseInfo> testClauses = manager.find(testTerm);
+		Deque<ClauseInfo> testClauses = manager.find(testTerm);
 		assertEquals(1, testClauses.size());
 		manager.abolish(new Struct("/", new Struct("test"), new Int(2)));
 		testClauses = manager.find(testTerm);

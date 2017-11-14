@@ -1,5 +1,6 @@
 package alice.tuprolog;
 
+import java.util.Deque;
 import java.util.LinkedList;
 
 /**
@@ -12,7 +13,7 @@ import java.util.LinkedList;
 class FamilyClausesIndex<K extends Comparable<? super K>>
         extends RBTree<K, LinkedList<ClauseInfo>> {
 
-    private final LinkedList<ClauseInfo> varsClauses;
+    private final Deque<ClauseInfo> varsClauses;
 
     public FamilyClausesIndex(){
         super();
@@ -153,8 +154,8 @@ class FamilyClausesIndex<K extends Comparable<? super K>>
      * @param key   The key
      * @return      The related clauses
      */
-    public LinkedList<ClauseInfo> get(K key){
-        LinkedList<ClauseInfo> res = null;
+    public Deque<ClauseInfo> get(K key){
+        Deque<ClauseInfo> res = null;
         if(root != null){
             res = lookup(key);
         }

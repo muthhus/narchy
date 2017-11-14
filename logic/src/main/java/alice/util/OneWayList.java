@@ -1,36 +1,58 @@
 package alice.util;
 
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 public final class OneWayList<E> {
-    
-    private final E head;
-    private OneWayList<E> tail;
-    
-    public OneWayList(E head, OneWayList<E> tail){
+
+    public final E head;
+    public final OneWayList<E> tail;
+
+    public OneWayList(E head, OneWayList<E> tail) {
         this.head = head;
         this.tail = tail;
     }
 
-    public static <T> OneWayList<T> transform(List<T> list){
-        return list.isEmpty() ?
-                null :
-                new OneWayList<>(
-                    list.remove(0),
-                    transform(list)
-                );
-    }
+//    public static <T> OneWayList<T> transform(List<T> list) {
+//        return list.isEmpty() ?
+//                null :
+//                new OneWayList<>(
+//                        list.remove(0),
+//                        transform(list)
+//                );
+//    }
 
-    public static <T> OneWayList<T> transform2(List<T> list){
-        return list.isEmpty() ?
-                null :
-                new OneWayList<>(
-                        list.get(0),
-                        list.size() > 1 ? transform2(list.subList(1, list.size())) : null
-                );
-    }
+//    public static <T> OneWayList<T> transform2(List<T> list) {
+//        int s = list.size();
+//        return s == 0 ?
+//                null :
+//                new OneWayList<>(
+//                        list.get(0),
+//                        s > 1 ? transform2(list.subList(1, list.size())) : null
+//                );
+//    }
 
+    public static <T> OneWayList<T> get(Deque<T> d) {
+        int s = d.size();
+        switch (s) {
+            case 0:
+                return null;
+            case 1:
+                return new OneWayList<T>(d.getFirst(), null);
+            case 2:
+                return new OneWayList<T>(d.getFirst(), new OneWayList<T>(d.getLast(), null));
+            default:
+                Iterator<T> i = d.descendingIterator();
+                i.hasNext(); //trigger just in case
+                OneWayList<T> o = new OneWayList<>(i.next(), null); //inner seed
+                while (i.hasNext()) {
+                    o = new OneWayList<T>(i.next(), o); //wrap in prevous
+                }
+                return o;
+        }
+    }
 //    /**
 //     * Transforms given list into a OneWayList without any modification
 //     * to it
@@ -56,38 +78,30 @@ public final class OneWayList<E> {
 //
 //        return p;
 //    }
-    
-    public E getHead() {
-        return head;
-    }
-    
-//    public void setHead(E head) {
+
+    //    public void setHead(E head) {
 //        this.head = head;
 //    }
 
 
-    public OneWayList<E> getTail() {
-        return tail;
-    }
-    
-    public void setTail(OneWayList<E> tail) {
-        this.tail = tail;
-    }
+    //    public void setTail(OneWayList<E> tail) {
+//        this.tail = tail;
+//    }
 
-    public void addLast(OneWayList<E> newTail){
-        OneWayList<E> tail = this.tail;
-        if(tail == null){
-            this.tail = newTail;
-            return;
-        }
-        tail.addLast(newTail);
-    }
-    
-    public OneWayList<E> get(int index){
-        OneWayList<E> tail = this.tail;
-        if(tail == null) throw new NoSuchElementException();
-        return index <= 0 ? this : tail.get(index - 1);
-    }
+//    public void addLast(OneWayList<E> newTail) {
+//        OneWayList<E> tail = this.tail;
+//        if (tail == null) {
+//            this.tail = newTail;
+//            return;
+//        }
+//        tail.addLast(newTail);
+//    }
+//
+//    public OneWayList<E> get(int index) {
+//        OneWayList<E> tail = this.tail;
+//        if (tail == null) throw new NoSuchElementException();
+//        return index <= 0 ? this : tail.get(index - 1);
+//    }
 
     public String toString() {
         E head = this.head;
@@ -95,12 +109,12 @@ public final class OneWayList<E> {
         OneWayList<E> tail = this.tail;
         return '[' + (tail == null ? elem : tail.toString(elem)) + ']';
     }
-    
-    private String toString(String elems){
+
+    private String toString(String elems) {
         String elem;
         elem = head == null ? "null" : head.toString();
-        if(tail==null) return elems+ ',' +elem;
-        return elems+ ',' +tail.toString(elem);
+        if (tail == null) return elems + ',' + elem;
+        return elems + ',' + tail.toString(elem);
     }
-    
+
 }

@@ -19,8 +19,8 @@ package alice.tuprolog;
 
 import com.google.common.collect.Lists;
 
+import java.util.Deque;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -68,7 +68,7 @@ public final class MutableClauseIndex extends ConcurrentHashMap<String,FamilyCla
 	 * @return  The list of matching-compatible predicates
 	 */
 	@Override
-	public List<ClauseInfo> getPredicates(Struct headt) {
+	public Deque<ClauseInfo> getPredicates(Struct headt) {
 		FamilyClausesList family = get(headt.key());
 		//new ReadOnlyLinkedList<>();
 		return family == null ? null : family.get(headt);

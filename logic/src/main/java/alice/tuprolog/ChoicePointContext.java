@@ -63,8 +63,8 @@ public class ChoicePointContext {
         ArrayList<List<Var>> l = new ArrayList<>();
         OneWayList<List<Var>> t = varsToDeunify;
         while (t != null) {
-            l.add(t.getHead());
-            t = t.getTail();
+            l.add(t.head);
+            t = t.tail;
         }
         return l;
     }

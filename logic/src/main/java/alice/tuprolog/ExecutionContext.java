@@ -88,8 +88,8 @@ public class ExecutionContext {
         List<List<Var>> l = new FasterList<>();
 
         while (t != null) {
-            l.add(t.getHead());
-            t = t.getTail();
+            l.add(t.head);
+            t = t.tail;
         }
         return l;
     }

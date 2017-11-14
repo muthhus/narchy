@@ -49,8 +49,7 @@ public class StateException extends State {
 
                 // unifico l'argomento di throw/1 con il secondo argomento di
                 // catch/3
-                List<Var> unifiedVars = e.currentContext.trailingVars
-                        .getHead();
+                List<Var> unifiedVars = e.currentContext.trailingVars.head;
                 e.currentContext.currentGoal.sub(1).unify(unifiedVars,
                         unifiedVars, errorTerm);
 
@@ -121,8 +120,7 @@ public class StateException extends State {
 
                 // unifico l'argomento di java_throw/1 con il catcher
                 // appropriato e recupero l'handler corrispondente
-                List<Var> unifiedVars = e.currentContext.trailingVars
-                        .getHead();
+                List<Var> unifiedVars = e.currentContext.trailingVars.head;
                 Term handlerTerm = javaUnify(e.currentContext.currentGoal
                         .sub(1), exceptionTerm, unifiedVars);
                 if (handlerTerm == null) {

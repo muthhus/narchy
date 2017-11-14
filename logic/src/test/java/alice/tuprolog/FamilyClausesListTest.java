@@ -2,7 +2,7 @@ package alice.tuprolog;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.ListIterator;
+import java.util.Iterator;
 
 public class FamilyClausesListTest {
     // Short test about the new implementation of the ListItr
@@ -24,7 +24,7 @@ public class FamilyClausesListTest {
 
         // clauseList = [First, Second, Third, Fourh]
 
-        ListIterator<ClauseInfo> allClauses = clauseList.listIterator();
+        Iterator<ClauseInfo> allClauses = clauseList.iterator();
         // Get the first object and remove it
         allClauses.next();
 
@@ -43,9 +43,9 @@ public class FamilyClausesListTest {
         // Get the third object
         allClauses.next();
         // Get the third object
-        allClauses.previous();
+        //allClauses.previous();
         // Get the second object and remove it
-        allClauses.previous();
+        //allClauses.previous();
 //        allClauses.remove();
 //        if (clauseList.contains(second)) {
 //            System.out.println("Error!");

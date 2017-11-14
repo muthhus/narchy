@@ -2,10 +2,9 @@ package alice.tuprolog;
 
 import alice.util.OneWayList;
 import jcog.list.FasterList;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -36,9 +35,9 @@ public class ClauseStore {
 //     *
 //     * @param familyClauses
 //     */
-    public static ClauseStore build(Term goal, List<Var> vars, @NotNull List<ClauseInfo> familyClauses) {
+    public static ClauseStore build(Term goal, List<Var> vars, Deque<ClauseInfo> familyClauses) {
         ClauseStore clauseStore = new ClauseStore(goal, vars);
-        clauseStore.clauses = OneWayList.transform2(familyClauses);
+        clauseStore.clauses = OneWayList.get(familyClauses);
         if (clauseStore.clauses == null || !clauseStore.existCompatibleClause())
             return null;
         return clauseStore;
@@ -54,8 +53,8 @@ public class ClauseStore {
         deunify(vars, null);
         if (!checkCompatibility(goal))
             return null;
-        ClauseInfo clause = this.clauses.getHead();
-        this.clauses = this.clauses.getTail();
+        ClauseInfo clause = this.clauses.head;
+        this.clauses = this.clauses.tail;
         haveAlternatives = checkCompatibility(goal);
         return clause;
     }
@@ -94,7 +93,7 @@ public class ClauseStore {
         for (int i = 0, varsToDeunifySize = varsToDeunify.size(); i < varsToDeunifySize; i++) {
             Var v = varsToDeunify.get(i);
             if (saveUnifications != null)
-                saveUnifications.add(v.getLink());
+                saveUnifications.add(v.link());
             v.link = null;
         }
         return saveUnifications;
@@ -133,9 +132,9 @@ public class ClauseStore {
         if (clauses == null) return false;
         ClauseInfo clause = null;
         do {
-            clause = clauses.getHead();
+            clause = clauses.head;
             if (goal.unifiable(clause.head)) return true;
-            this.clauses = clauses = this.clauses.getTail();
+            this.clauses = clauses = this.clauses.tail;
         } while (clauses != null);
         return false;
     }

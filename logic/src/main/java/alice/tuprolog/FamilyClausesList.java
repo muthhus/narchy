@@ -18,7 +18,8 @@ import java.util.*;
  */
 public class FamilyClausesList extends
         //ConcurrentLinkedDeque<ClauseInfo> {
-        FasterList<ClauseInfo> {
+        //FasterList<ClauseInfo> {
+        ArrayDeque<ClauseInfo> {
 
     private final FamilyClausesIndex<Number> numCompClausesIndex;
     private final FamilyClausesIndex<String> constantCompClausesIndex;
@@ -49,8 +50,7 @@ public class FamilyClausesList extends
      */
     //@Override
     public void addFirst(ClauseInfo ci) {
-        //super.addFirst(ci);
-        super.add(0, ci);
+        super.addFirst( ci);
 
         // Add first in type related storage
         register(ci, true);
@@ -63,8 +63,7 @@ public class FamilyClausesList extends
      */
     //@Override
     public void addLast(ClauseInfo ci) {
-        //super.addLast(ci);
-        super.add(ci);
+        super.addLast(ci);
 
         // Add last in type related storage
         register(ci, false);
@@ -83,36 +82,12 @@ public class FamilyClausesList extends
         return true;
     }
 
-    @Override
-    public boolean addAll(int index, Collection<? extends ClauseInfo> c) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
 
-    @Override
-    public void add(int index, ClauseInfo element) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    @Override
-    public ClauseInfo set(int index, ClauseInfo element) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
-
-    //@Override
-    public ClauseInfo removeFirst() {
-        return remove(0);
-//		ClauseInfo ci = getFirst();
-//		if (remove(ci)){
-//			return ci;
-//		}
-//
-//		return null;
-    }
 
     @Override
     public ClauseInfo removeLast() {
         int s = size();
-        return s == 0 ? null : remove(s - 1);
+        return s == 0 ? null : super.removeLast();
 
 //		ClauseInfo ci = getLast();
 //		if (remove(ci)){
@@ -128,15 +103,6 @@ public class FamilyClausesList extends
         return removeFirst();
     }
 
-    @Override
-    public ClauseInfo remove(int index) {
-        ClauseInfo ci = super.remove(index);
-        //ClauseInfo ci = super.get(index);
-        if (ci != null)
-            unregister(ci);
-
-        return ci;
-    }
 
     @Override
     public boolean remove(Object ci) {
@@ -161,7 +127,7 @@ public class FamilyClausesList extends
      * @param goal The goal to be resolved
      * @return The list of goal-compatible predicates
      */
-    public List<ClauseInfo> get(Term goal) {
+    public Deque<ClauseInfo> get(Term goal) {
         // Gets the correct list and encapsulates it in ReadOnlyLinkedList
         if (goal instanceof Struct) {
             Struct g = (Struct) goal.term();
@@ -218,24 +184,18 @@ public class FamilyClausesList extends
         //return new ReadOnlyLinkedList<>(this);
     }
 
-    @Override
-    public Iterator<ClauseInfo> iterator() {
-        return listIterator(0);
-    }
 
-    @Override
-    public ListIterator<ClauseInfo> listIterator() {
-        return new ListItr(this, 0);
-    }
 
-    private ListIterator<ClauseInfo> superListIterator(int index) {
-        return super.listIterator(index);
-    }
 
-    @Override
-    public ListIterator<ClauseInfo> listIterator(int index) {
-        return new ListItr(this, index);
-    }
+
+//    private Iterator<ClauseInfo> superListIterator(int index) {
+//        return super.Iterator(index);
+//    }
+
+//    @Override
+//    public Iterator<ClauseInfo> listIterator(int index) {
+//        return new ListItr(this, index);
+//    }
 
     private static boolean isAList(Struct t) {
         /*
@@ -320,85 +280,85 @@ public class FamilyClausesList extends
         }
     }
 
-    private static class ListItr implements ListIterator<ClauseInfo> {
-
-        private final ListIterator<ClauseInfo> it;
-        private final List<ClauseInfo> l;
-        private int currentIndex;
-
-        public ListItr(FamilyClausesList list, int index) {
-            l = list;
-            it = list.superListIterator(index);
-        }
-
-        @Override
-        public boolean hasNext() {
-            return it.hasNext();
-        }
-
-        @Override
-        public ClauseInfo next() {
-            // Alessandro Montanari - alessandro.montanar5@studio.unibo.it
-            currentIndex = it.nextIndex();
-
-            return it.next();
-        }
-
-        @Override
-        public boolean hasPrevious() {
-            return it.hasPrevious();
-        }
-
-        @Override
-        public ClauseInfo previous() {
-            // Alessandro Montanari - alessandro.montanar5@studio.unibo.it
-            currentIndex = it.previousIndex();
-
-            return it.previous();
-        }
-
-        @Override
-        public int nextIndex() {
-            return it.nextIndex();
-        }
-
-        @Override
-        public int previousIndex() {
-            return it.previousIndex();
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
-        }
-
-        ////        @Override
-////        public void remove() {
-////            // Alessandro Montanari - alessandro.montanar5@studio.unibo.it
-////            ClauseInfo ci = l.get(currentIndex--);
-////
-////            it.remove();
-////
-////            unregister(ci);
-////        }
-
-        @Override
-        public void set(ClauseInfo o) {
-            it.set(o);
-            //throw new UnsupportedOperationException("Not supported.");
-        }
-
-        @Override
-        public void add(ClauseInfo o) {
-            l.add(o);
-        }
-
-//		public ListIterator<ClauseInfo> getIt(){
-//			return this;
-//		}
-
-
-    }
+//    private static class ListItr implements ListIterator<ClauseInfo> {
+//
+//        private final ListIterator<ClauseInfo> it;
+//        private final Deque<ClauseInfo> l;
+//        private int currentIndex;
+//
+//        public ListItr(FamilyClausesList list, int index) {
+//            l = list;
+//            it = list.superListIterator(index);
+//        }
+//
+//        @Override
+//        public boolean hasNext() {
+//            return it.hasNext();
+//        }
+//
+//        @Override
+//        public ClauseInfo next() {
+//            // Alessandro Montanari - alessandro.montanar5@studio.unibo.it
+//            currentIndex = it.nextIndex();
+//
+//            return it.next();
+//        }
+//
+//        @Override
+//        public boolean hasPrevious() {
+//            return it.hasPrevious();
+//        }
+//
+//        @Override
+//        public ClauseInfo previous() {
+//            // Alessandro Montanari - alessandro.montanar5@studio.unibo.it
+//            currentIndex = it.previousIndex();
+//
+//            return it.previous();
+//        }
+//
+//        @Override
+//        public int nextIndex() {
+//            return it.nextIndex();
+//        }
+//
+//        @Override
+//        public int previousIndex() {
+//            return it.previousIndex();
+//        }
+//
+//        @Override
+//        public void remove() {
+//            throw new UnsupportedOperationException();
+//        }
+//
+//        ////        @Override
+//////        public void remove() {
+//////            // Alessandro Montanari - alessandro.montanar5@studio.unibo.it
+//////            ClauseInfo ci = l.get(currentIndex--);
+//////
+//////            it.remove();
+//////
+//////            unregister(ci);
+//////        }
+//
+//        @Override
+//        public void set(ClauseInfo o) {
+//            it.set(o);
+//            //throw new UnsupportedOperationException("Not supported.");
+//        }
+//
+//        @Override
+//        public void add(ClauseInfo o) {
+//            l.add(o);
+//        }
+//
+////		public ListIterator<ClauseInfo> getIt(){
+////			return this;
+////		}
+//
+//
+//    }
 
 
 }

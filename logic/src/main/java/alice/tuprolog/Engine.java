@@ -47,7 +47,7 @@ public class Engine {
 		this.nextState = manager.INIT;
 		this.query = query;
 		this.mustStop = false;
-		this.manager.getTheoryManager();
+		this.manager.getTheories();
 	}
 
 

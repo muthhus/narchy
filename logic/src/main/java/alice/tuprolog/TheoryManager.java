@@ -23,7 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.function.Predicate;
 
 import static alice.tuprolog.PrologPrimitive.PREDICATE;
@@ -106,10 +109,10 @@ public class TheoryManager {
     /**
      * removing from dbase the first clause with head unifying with clause
      */
-    public synchronized int retract(final Struct cl, Predicate<ClauseInfo> each) {
+    public int retract(final Struct cl, Predicate<ClauseInfo> each) {
         Struct clause = toClause(cl);
         Struct struct = ((Struct) clause.sub(0));
-        List<ClauseInfo> family = dynamicDBase.get(struct.key());
+        Deque<ClauseInfo> family = dynamicDBase.get(struct.key());
         //final ExecutionContext ctx = engine.getEngineManager().getCurrentContext();
 
 		/*creo un nuovo clause database x memorizzare la teoria all'atto della retract 
@@ -172,7 +175,7 @@ public class TheoryManager {
         String arg0 = Tools.removeApostrophes(pi.sub(0).toString());
         String arg1 = Tools.removeApostrophes(pi.sub(1).toString());
         String key = arg0 + '/' + arg1;
-        List<ClauseInfo> abolished = dynamicDBase.remove(key); /* Reviewed by Paolo Contessi: LinkedList -> List */
+        Deque<ClauseInfo> abolished = dynamicDBase.remove(key); /* Reviewed by Paolo Contessi: LinkedList -> List */
         if (abolished != null)
             if (engine.isSpy())
                 engine.spy("ABOLISHED: " + key + " number of clauses=" + abolished.size() + '\n');
@@ -187,12 +190,12 @@ public class TheoryManager {
      * implementation
      */
     @NotNull
-    public /*synchronized*/ List<ClauseInfo> find(Term headt) {
+    public /*synchronized*/ Deque<ClauseInfo> find(Term headt) {
 
         if (headt instanceof Struct) {
             //String key = ((Struct) headt).getPredicateIndicator();
             Struct s = (Struct) headt;
-            List<ClauseInfo> list = dynamicDBase.getPredicates(s);
+            Deque<ClauseInfo> list = dynamicDBase.getPredicates(s);
             if (list == null) {
                 list = staticDBase.getPredicates(s);
                 if (list != null)
@@ -212,8 +215,34 @@ public class TheoryManager {
             //            return l;
             throw new RuntimeException();
         }
-        return Collections.emptyList(); //new LinkedList<>();
+        return EMPTY_ARRAYDEQUE;
     }
+
+    private static final Deque EMPTY_ARRAYDEQUE = new ArrayDeque(0) {
+        @Override
+        public void addFirst(Object o) {
+            throw new UnsupportedOperationException();
+        }
+        @Override
+        public void addLast(Object o) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Iterator iterator() {
+            return Collections.emptyIterator();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        @Override
+        public final int size() {
+            return 0;
+        }
+    };
 
     /**
      * Consults a theory.

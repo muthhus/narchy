@@ -116,11 +116,11 @@ public class StateEnd extends State {
                         ((Struct) initGoalBag).setSub(pos, new Var(((Var) a[y]).name()));
                         findName = true;
                     }
-                    gVar = ((Var) gVar).getLink();
+                    gVar = ((Var) gVar).link();
                 }
                 y++;
             }
-            link = ((Var) link).getLink();
+            link = ((Var) link).link();
         }
         return initGoalBag;
     }
@@ -174,21 +174,21 @@ public class StateEnd extends State {
                 Boolean findSamePredicateIndicator = false;
                 Boolean find = false; //trovo nel goal della bag una struct che unifica con la bag iniziale
                 Term initGoalBag = null;
-                while (tgoal instanceof Var && ((Var) tgoal).getLink() != null) {
-                    tgoal = ((Var) tgoal).getLink();
+                while (tgoal instanceof Var && ((Var) tgoal).link() != null) {
+                    tgoal = ((Var) tgoal).link();
                     //System.out.println("STATE END relinkvar(): scorro goal "+tgoal);
                     if (tgoal instanceof Struct) {
                         tgoal = ((Struct) tgoal).sub(1);
                         //System.out.println("STATE END relinkvar(): trovata struct con arg 1 "+tgoal);
 
-                        if (p.unify(tgoal, ((Var) initBag).getLink())) { //In realtˆ sembra che giˆ qui non unifichi
+                        if (p.unify(tgoal, ((Var) initBag).link())) { //In realtˆ sembra che giˆ qui non unifichi
                             //System.out.println("STATE END relinkvar(): trovata struct con arg 1 che unifica con bag iniziale");
                             initGoalBag = tgoal;
                             find = true;
                             findSamePredicateIndicator = true;
                             break;
-                        } else if (((Var) initBag).getLink() instanceof Struct) {
-                            Struct s = (Struct) ((Var) initBag).getLink();
+                        } else if (((Var) initBag).link() instanceof Struct) {
+                            Struct s = (Struct) ((Var) initBag).link();
                             //System.out.println("primitive della bag iniziale "+s.getPredicateIndicator().toString());
                             if (tgoal instanceof Struct && s.key().compareTo(((Struct) tgoal).key()) == 0) {
                                 //System.out.println("primitive della bag tgoal "+((Struct)tgoal).getPredicateIndicator().toString());
@@ -311,7 +311,7 @@ public class StateEnd extends State {
 
                     //System.out.println("Creo una lista a partire dalla struttura di initBag ");//serve per unificare
                     ArrayList<Term> initBagList = new ArrayList<>();
-                    Struct initBagTemp = (Struct) ((Var) initBag).getLink();
+                    Struct initBagTemp = (Struct) ((Var) initBag).link();
                     while (initBagTemp.subs() > 0) {
                         Term t0 = initBagTemp.sub(0);
                         initBagList.add(t0);
@@ -373,7 +373,7 @@ public class StateEnd extends State {
             for (int i = 0; i < bag.size(); i++) {
                 Var resVar = (Var) bag.get(i);
                 //System.out.println("RESVAR BAG "+resVar);
-                Term t = resVar.getLink();
+                Term t = resVar.link();
                 //System.out.println("RESVAR BAG LINK "+resVar);
                 if (t != null) {
                     if (t instanceof Struct) {
@@ -389,7 +389,7 @@ public class StateEnd extends State {
                         while (t != null && t instanceof Var) {
                             resVar = (Var) t;
                             //System.out.println("---RESVAR BAG � VAR "+resVar);
-                            t = resVar.getLink();
+                            t = resVar.link();
                             //System.out.println("---RESVAR BAG LINK "+resVar);
                         }
                         lSolVar.add(resVar.name());
@@ -408,7 +408,7 @@ public class StateEnd extends State {
             Var goalBO = (Var) engineMan.getBagOFgoal();
             //System.out.println("il goal interno bag of � var con link "+goalBO.getLink());
             ArrayList<String> lgoalBOVar = new ArrayList<>();
-            Term goalBOvalue = goalBO.getLink();
+            Term goalBOvalue = goalBO.link();
             if (goalBOvalue instanceof Struct) {
                 Struct t1 = ((Struct) goalBOvalue);
                 //ArrayList<String> l_temp= new ArrayList<>();
@@ -431,7 +431,7 @@ public class StateEnd extends State {
 	    	 */
             //System.out.println("Le var della bagof sono "+c.getEngineMan().getBagOFvarSet());
             Var v = (Var) engineMan.getBagOFvarSet();
-            Struct varList = (Struct) v.getLink(); //lista delle variabili nel goal bagof con nomi interni alla bagof
+            Struct varList = (Struct) v.link(); //lista delle variabili nel goal bagof con nomi interni alla bagof
             ArrayList<String> lGoalVar = new ArrayList<>(); //lista delle variabili nel goal bagof con nomi goal
             //ArrayList<String> lGoalVar_copy=new ArrayList<String>() ; //????????mi serve la copia per sostituire le var sia nel goal originale che nel risultato
             //System.out.println("Lista variabili goal bagof nomi interni alla bagof varList "+varList);
@@ -445,7 +445,7 @@ public class StateEnd extends State {
                     Term var = it.next();
                     for (int y = 0; y < a.length; y++) {
                         Var vv = (Var) a[y];
-                        Term vLink = vv.getLink();
+                        Term vLink = vv.link();
                         if (vLink != null && vLink.isEqual(var)/*&& !(var.toString().startsWith("_"))*/) {
                             //System.out.println("Aggiungo trovata uguaglianza "+vv+" e var "+var);
                             lGoalVar.add(vv.name());
@@ -482,7 +482,7 @@ public class StateEnd extends State {
                     //System.out.println("BAG SIZE "+bag.size());
                     Var resVar = (Var) bag.get(i);
                     //System.out.println("SOSTITUZIONE VAR "+resVar);
-                    Term t = resVar.getLink();
+                    Term t = resVar.link();
                     if (t == null) {
                         //System.out.println("----link null");
                         t = resVar;
@@ -504,8 +504,8 @@ public class StateEnd extends State {
                             //sostituzione delle var nella Struct della sol
                             //System.out.println("Sostituisco vv_link "+vv_link.getLink());
                             //System.out.println("Sostituisco vv "+vv_link);
-                            if (vv_link.getLink() != null && vv_link.getLink() instanceof Struct) {
-                                Struct s = substituteVar((Struct) vv_link.getLink(), lSolVar, lgoalBOVar);
+                            if (vv_link.link() != null && vv_link.link() instanceof Struct) {
+                                Struct s = substituteVar((Struct) vv_link.link(), lSolVar, lgoalBOVar);
                                 //System.out.println("****Nuovo link della var "+vv.getOriginalName()+" link "+s);
                             } else {
                                 int index = lSolVar.indexOf(resVar.name());
@@ -543,7 +543,7 @@ public class StateEnd extends State {
             for (int m = 0; m < bagString.size(); m++) {
                 String bagResString = bag.get(m).toString();
                 boolean var = false;
-                if (bag.get(m) instanceof Var && ((Var) bag.get(m)).getLink() != null && (((Var) bag.get(m)).getLink() instanceof Struct) && !((Var) bag.get(m)).getLink().isAtom())
+                if (bag.get(m) instanceof Var && ((Var) bag.get(m)).link() != null && (((Var) bag.get(m)).link() instanceof Struct) && !((Var) bag.get(m)).link().isAtom())
                     var = true;
                 //System.out.println("&&&&&& Var "+var);
                 if (var && bagResString.length() != bagString.get(m).length()) {
@@ -594,7 +594,7 @@ public class StateEnd extends State {
 //    }
     public static Var varValue2(Var v) {
         Term l;
-        while ((l = v.getLink()) != null) {
+        while ((l = v.link()) != null) {
             //System.out.println("+++ VARVALUE cerco il valore v "+v+" link "+v.getLink());
             if (l instanceof Var)
                 v = (Var) l;
@@ -609,7 +609,7 @@ public class StateEnd extends State {
         while (true) {
             Var vStruct = new Var();
             Term l;
-            while ((l = v.getLink()) != null) {
+            while ((l = v.link()) != null) {
                 //System.out.println("*** cerco il valore v "+v+" link "+v.getLink());
                 if (l instanceof Var) {
                     //System.out.println("*** il link � var");
@@ -627,7 +627,7 @@ public class StateEnd extends State {
                             s = (Struct) s1;
                         } else if (s1 instanceof Var) {
                             vStruct = ((Var) s1);
-                            if (vStruct.getLink() != null) {
+                            if (vStruct.link() != null) {
                                 i--;
                                 v = vStruct;
                                 continue structValue;
@@ -647,7 +647,7 @@ public class StateEnd extends State {
 
     public static void setStructValue(Var v, int i, Var v1) {
         Term l;
-        while ((l = v.getLink()) != null) {
+        while ((l = v.link()) != null) {
             //System.out.println("+++ cerco il valore v "+v+" link "+v.getLink());
             if (l instanceof Var) {
                 //System.out.println("+++ il link � var");
@@ -664,7 +664,7 @@ public class StateEnd extends State {
                         s = (Struct) s1;
                     else if (s1 instanceof Var) {
                         v = (Var) s1;
-                        s = ((Struct) v.getLink());
+                        s = ((Struct) v.link());
                     }
                     i--;
                 }
