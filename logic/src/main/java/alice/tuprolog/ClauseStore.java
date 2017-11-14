@@ -95,7 +95,7 @@ public class ClauseStore {
             Var v = varsToDeunify.get(i);
             if (saveUnifications != null)
                 saveUnifications.add(v.getLink());
-            v.free();
+            v.link = null;
         }
         return saveUnifications;
     }
@@ -134,7 +134,7 @@ public class ClauseStore {
         ClauseInfo clause = null;
         do {
             clause = clauses.getHead();
-            if (goal.match(clause.head)) return true;
+            if (goal.unifiable(clause.head)) return true;
             this.clauses = clauses = this.clauses.getTail();
         } while (clauses != null);
         return false;

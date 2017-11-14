@@ -17,90 +17,36 @@
  */
 package alice.tuprolog;
 
-import jcog.list.FasterList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Administrator of flags declared
  * 
  * @author Alex Benini
  */
-class FlagManager extends FasterList<Flag> {
+class FlagManager extends ConcurrentHashMap<String,Flag> {
 
-    /**
-	 * mediator owner of the manager
-	 */
-    protected Prolog mediator;
-
-
-
-    /**
-     * Config this Manager
-     */
-    public void start(Prolog vm) {
-        mediator = vm;
-    }
 
     /**
      * Defines a new flag
      */
-    public synchronized boolean defineFlag(String name, Struct valueList, Term defValue,
-            boolean modifiable, String libName) {
-        this.add(new Flag(name, valueList, defValue, modifiable, libName));
-        return true;
+    public void add(String name, Struct valueList, Term defValue,
+                    boolean modifiable, String libName) {
+        put(name, new Flag(valueList, defValue, modifiable, libName));
     }
 
-    public synchronized boolean setFlag(String name, Term value) {
-        for (Flag flag : this) {
-            if (flag.getName().equals(name)) {
-                if (flag.isModifiable() && flag.isValidValue(value)) {
-                    flag.setValue(value);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return false;
-    }
 
-    public synchronized Struct getPrologFlagList() {
+    @Deprecated public Struct flags() {
         Struct flist = new Struct();
-        for (Flag fl : this) {
-            flist = new Struct(new Struct("flag", new Struct(fl.getName()), fl
-                    .getValue()), flist);
+        for (Map.Entry<String,Flag> fl : entrySet()) {
+            flist = new Struct(new Struct("flag", new Struct(fl.getKey()), fl
+                    .getValue().getValue()), flist);
         }
         return flist;
     }
 
-    public synchronized Term getFlag(String name) {
-        for (Flag fl : this) {
-            if (fl.getName().equals(name)) {
-                return fl.getValue();
-            }
-        }
-        return null;
-    }
 
-    // restituisce true se esiste un flag di nome name, e tale flag ?
-    // modificabile
-    public boolean isModifiable(String name) {
-        for (Flag flag : this) {
-            if (flag.getName().equals(name)) {
-                return flag.isModifiable();
-            }
-        }
-        return false;
-    }
 
-    // restituisce true se esiste un flag di nome name, e Value ? un valore
-    // ammissibile per tale flag
-    public boolean isValidValue(String name, Term value) {
-        for (Flag flag : this) {
-            if (flag.getName().equals(name)) {
-                return flag.isValidValue(value);
-            }
-        }
-        return false;
-    }
 
 }

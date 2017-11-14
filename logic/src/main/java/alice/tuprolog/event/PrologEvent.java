@@ -26,18 +26,15 @@ import alice.tuprolog.Prolog;
  *
  */
 public abstract class PrologEvent extends java.util.EventObject {
-    private final long when;
-    private static final long serialVersionUID = 1L;
-    public PrologEvent(Prolog source){
-        super(source);
-        when = System.currentTimeMillis();
-    }
-    
     /**
      * Gets the VM time of  event occurrence.
      * @return time in millis
      */
-    public long getTime(){
-        return when;
+    public final long when;
+
+    public PrologEvent(Prolog source){
+        super(source);
+        when = System.currentTimeMillis();
     }
+
 }

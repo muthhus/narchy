@@ -91,15 +91,10 @@ public abstract class AbstractSocket extends Term{
 		return this;
 	}
 
-	@Override
-	public void free() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
-	long resolveTerm(long count) {
-		return count;
+	void resolveTerm(long count) {
+
 	}
 
 	@Override

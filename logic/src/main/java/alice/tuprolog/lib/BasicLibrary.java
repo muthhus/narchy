@@ -1039,7 +1039,7 @@ public class BasicLibrary extends Library {
                 + "repeat. \n                                                                                              "
                 + "repeat        :- repeat. \n                                                                             "
                 + "not(G)        :- G,!,fail. \n                                                                     "
-                + "not(_). \n                                                                                              "
+                + "not(_). \n"
                 +
                 // catch/3
                 "catch(Goal, Catcher, Handler) :- call(Goal).\n"

@@ -17,7 +17,10 @@
  */
 package alice.tuprolog.lib;
 
-import alice.tuprolog.*;
+import alice.tuprolog.Library;
+import alice.tuprolog.PrologError;
+import alice.tuprolog.Term;
+import alice.tuprolog.Var;
 
 /**
  * Library for managing DCGs.

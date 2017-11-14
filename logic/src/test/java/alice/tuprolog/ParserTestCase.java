@@ -50,9 +50,11 @@ public class ParserTestCase {
 	
 	@Test public void testListWithTail() throws InvalidTermException {
 		Parser p = new Parser("[p|Y]");
-		Struct result = new Struct(new Struct("p"), new Var("Y"));
-		result.resolveTerm();
-		assertEquals(result, p.nextTerm(false));
+		Struct a = new Struct(new Struct("p"), new Var("Y"));
+		//result.resolveTerm();
+		Term b = p.nextTerm(false);
+		a.resolveTerm(((Var)((Struct)b).sub(1)).timestamp);
+		assertEquals(a, b);
 	}
 	
 	@Test public void testBraces() throws InvalidTermException {

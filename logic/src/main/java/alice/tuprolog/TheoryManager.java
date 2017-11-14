@@ -126,7 +126,7 @@ public class TheoryManager {
 
         final int[] removals = {0};
         family.removeIf(ci -> {
-            if (clause.match(ci.clause)) {
+            if (clause.unifiable(ci.clause)) {
                 if (each.test(ci)) {
                     removals[0]++;
                     return true;

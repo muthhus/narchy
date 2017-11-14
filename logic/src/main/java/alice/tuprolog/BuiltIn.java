@@ -294,7 +294,7 @@ public final class BuiltIn extends Library {
 	  */
 	 public boolean flag_list_1(Term arg0) {
 		 arg0 = arg0.term();
-		 Struct flist = flagManager.getPrologFlagList();
+		 Struct flist = flagManager.flags();
 		 return unify(arg0, flist);
 	 }
 
@@ -489,26 +489,29 @@ public final class BuiltIn extends Library {
 	 // set_prolog_flag(+Name,@Value)
 	 public boolean set_prolog_flag_2(Term arg0, Term arg1) throws PrologError {
 		 arg0 = arg0.term();
-		 arg1 = arg1.term();
 		 if (arg0 instanceof Var)
 			 throw PrologError.instantiation_error(engineManager, 1);
+		 arg1 = arg1.term();
 		 if (arg1 instanceof Var)
 			 throw PrologError.instantiation_error(engineManager, 2);
 		 if ((!arg0.isAtomic() && !(arg0 instanceof Struct)))
 			 throw PrologError.type_error(engineManager, 1, "struct", arg0);
 		 if (!arg1.isGround())
 			 throw PrologError.type_error(engineManager, 2, "ground", arg1);
+
 		 String name = arg0.toString();
-		 if (flagManager.getFlag(name) == null)
+
+		 Flag f = flagManager.get(name);
+		 if (f == null)
 			 throw PrologError.domain_error(engineManager, 1, "prolog_flag",
 					 arg0);
-		 if (!flagManager.isValidValue(name, arg1))
-			 throw PrologError
-			 .domain_error(engineManager, 2, "flag_value", arg1);
-		 if (!flagManager.isModifiable(name))
+		 if (!f.isModifiable())
 			 throw PrologError.permission_error(engineManager, "modify", "flag",
 					 arg0, new Int(0));
-		 return flagManager.setFlag(name, arg1);
+		 if (!f.isValidValue(arg1))
+			 throw PrologError
+			 .domain_error(engineManager, 2, "flag_value", arg1);
+		 return f.setValue(arg1);
 	 }
 
 	 // get_prolog_flag(@Name,?Value)
@@ -521,11 +524,11 @@ public final class BuiltIn extends Library {
 			 throw PrologError.type_error(engineManager, 1, "struct", arg0);
 		 }
 		 String name = arg0.toString();
-		 Term value = flagManager.getFlag(name);
-		 if (value == null)
+		 Flag flag = flagManager.get(name);
+		 if (flag == null)
 			 throw PrologError.domain_error(engineManager, 1, "prolog_flag",
 					 arg0);
-		 return unify(value, arg1);
+		 return unify(flag.getValue(), arg1);
 	 }
 
 	 public boolean $op_3(Term arg0, Term arg1, Term arg2) throws PrologError {
@@ -582,14 +585,14 @@ public final class BuiltIn extends Library {
 		 flagSet = flagSet.term();
 		 flagDefault = flagDefault.term();
 		 flagModifiable = flagModifiable.term();
+		 boolean isTrue;
 		 if (flagSet.isList()
-				 && (flagModifiable.equals(Term.TRUE) || flagModifiable
-						 .equals(Term.FALSE))) {
+				 && (isTrue = flagModifiable.equals(Term.TRUE) || flagModifiable.equals(Term.FALSE))) {
 			 // TODO libName che futuro deve avere?? --------------------
 			 String libName = "";
 			 // ------------
-			 flagManager.defineFlag(flagName.toString(), (Struct) flagSet,
-					 flagDefault, flagModifiable.equals(Term.TRUE), libName);
+			 flagManager.add(flagName.toString(), (Struct) flagSet,
+					 flagDefault, isTrue, libName);
 		 }
 	 }
 

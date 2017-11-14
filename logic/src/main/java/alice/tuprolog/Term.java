@@ -18,9 +18,11 @@
 package alice.tuprolog;
 
 import alice.util.OneWayList;
+import jcog.list.FasterList;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Term class is the root abstract class for prolog data type
@@ -107,13 +109,13 @@ public abstract class Term implements Serializable, SubTree {
 	 */
     public abstract Term term();
     
-    
-    /**
-     * Unlink variables inside the term
-     */
-    public abstract void free();
-    
-    
+
+    public final static AtomicLong tick = new AtomicLong(0);
+    public static long now() {
+        // //System.currentTimeMillis();
+        return tick.getAndIncrement();
+    }
+
     /**
      * Resolves variables inside the term, starting from a specific time count.
      *
@@ -121,7 +123,7 @@ public abstract class Term implements Serializable, SubTree {
      * @param count new starting time count for resolving process
      * @return the new time count, after resolving process
      */
-    abstract long resolveTerm(long count);
+    abstract void resolveTerm(long count);
     
     
     /**
@@ -129,8 +131,8 @@ public abstract class Term implements Serializable, SubTree {
      * 
      * If the variables has been already resolved, no renaming is done.
      */
-    public void resolveTerm() {
-        resolveTerm(System.currentTimeMillis());
+    public final void resolveTerm() {
+        resolveTerm(now());
     }
 
     
@@ -186,12 +188,12 @@ public abstract class Term implements Serializable, SubTree {
     public final boolean unify(Prolog mediator, Term t1) {
         EngineManager engine = mediator.engine;
 
-        long now = System.currentTimeMillis();
+        long now = Term.now();
         resolveTerm(now);
         t1.resolveTerm(now);
 
-        List<Var> v1 = new LinkedList<>(); /* Reviewed by: Paolo Contessi (was: ArrayList()) */
-        List<Var> v2 = new LinkedList<>(); /* Reviewed by: Paolo Contessi (was: ArrayList()) */
+        List<Var> v1 = new FasterList();
+        List<Var> v2 = new FasterList();
         boolean ok = unify(v1,v2,t1);
         if (ok) {
             ExecutionContext ec = engine.getCurrentContext();
@@ -222,8 +224,8 @@ public abstract class Term implements Serializable, SubTree {
             }
             return true;
         }
-        Var.free(v1); v1.clear();
-        Var.free(v2); v2.clear();
+        Var.free(v1);
+        Var.free(v2);
     	return false;
     }
     
@@ -237,15 +239,15 @@ public abstract class Term implements Serializable, SubTree {
      *
      * @return true if the term is unifiable with this one
      */
-    public boolean match(Term t) {
-        long now = System.currentTimeMillis();
+    public boolean unifiable(Term t) {
+        long now = Term.now();
         resolveTerm(now);
         t.resolveTerm(now);
-        List<Var> v1 = new LinkedList<>(); /* Reviewed by: Paolo Contessi (was: ArrayList()) */
-        List<Var> v2 = new LinkedList<>(); /* Reviewed by: Paolo Contessi (was: ArrayList()) */
+        List<Var> v1 = new FasterList<>();
+        List<Var> v2 = new FasterList<>();
         boolean ok = unify(v1,v2,t);
-        Var.free(v1); v1.clear();
-        Var.free(v2); v2.clear();
+        Var.free(v1);
+        Var.free(v2);
         return ok;
     }
     

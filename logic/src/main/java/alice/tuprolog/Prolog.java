@@ -171,7 +171,6 @@ public class Prolog  {
 		//config managers
 		theories = new TheoryManager(this, dynamics);
 		libs.start(this);
-		flags.start(this);
 		prims.start(this);
 		engine.initialize();
 	}
@@ -510,7 +509,7 @@ public class Prolog  {
 	 * @return true if the unification was successful
 	 */
 	public static boolean match(Term t0, Term t1) {	//no syn
-		return t0.match(t1);
+		return t0.unifiable(t1);
 	}
 
 	/**
@@ -551,12 +550,12 @@ public class Prolog  {
 	}
 
 
-	/**
-	 * Defines a new flag
-	 */
-	public boolean defineFlag(String name, Struct valueList, Term defValue, boolean modifiable, String libName) {
-		return flags.defineFlag(name,valueList,defValue,modifiable,libName);
-	}
+//	/**
+//	 * Defines a new flag
+//	 */
+//	public boolean defineFlag(String name, Struct valueList, Term defValue, boolean modifiable, String libName) {
+//		return flags.defineFlag(name,valueList,defValue,modifiable,libName);
+//	}
 
 
 	// spy interface ----------------------------------------------------------

@@ -39,8 +39,8 @@ public class StateException extends State {
             // visito all'indietro l'albero di risoluzione alla ricerca di un
             // subgoal catch/3 il cui secondo argomento unifica con l?argomento
             // dell?eccezione lanciata
-            if (e.currentContext.currentGoal.match(catchTerm)
-                    && e.currentContext.currentGoal.sub(1).match(errorTerm)) {
+            if (e.currentContext.currentGoal.unifiable(catchTerm)
+                    && e.currentContext.currentGoal.sub(1).unifiable(errorTerm)) {
                 // ho identificato l?ExecutionContext con il corretto subgoal
                 // catch/3
 
@@ -110,7 +110,7 @@ public class StateException extends State {
             // visito all'indietro l'albero di risoluzione alla ricerca di un
             // subgoal java_catch/3 che abbia un catcher unificabile con
             // l'argomento dell'eccezione lanciata
-            if (e.currentContext.currentGoal.match(javaCatchTerm)
+            if (e.currentContext.currentGoal.unifiable(javaCatchTerm)
                     && javaMatch(e.currentContext.currentGoal.sub(1),
                             exceptionTerm)) {
                 // ho identificato l?ExecutionContext con il corretto subgoal
@@ -214,7 +214,7 @@ public class StateException extends State {
                 continue;
             if (element.subs() != 2)
                 continue;
-            if (element.sub(0).match(exceptionTerm)) {
+            if (element.sub(0).unifiable(exceptionTerm)) {
                 return true;
             }
         }
@@ -235,7 +235,7 @@ public class StateException extends State {
                 continue;
             if (element.subs() != 2)
                 continue;
-            if (element.sub(0).match(exceptionTerm)) {
+            if (element.sub(0).unifiable(exceptionTerm)) {
                 element.sub(0)
                         .unify(unifiedVars, unifiedVars, exceptionTerm);
                 return element.sub(1);

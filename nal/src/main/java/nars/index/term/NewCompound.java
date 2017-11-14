@@ -1,6 +1,7 @@
 package nars.index.term;
 
 import com.google.common.io.ByteArrayDataOutput;
+import jcog.TODO;
 import jcog.data.byt.DynBytes;
 import jcog.list.FasterList;
 import jcog.util.ArrayPool;
@@ -191,7 +192,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
     }
 
 
-    public boolean add(@NotNull Term x) {
+    public boolean add(Term x) {
         int c = subs.length;
         int len = this.size;
         if (c == len) {
@@ -203,11 +204,11 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
         return true;
     }
 
-    protected void _add(@NotNull Term x) {
+    protected void _add(Term x) {
         subs[size++] = x;
     }
 
-    private void appendKey(@NotNull Term x) {
+    private void appendKey(Term x) {
 
         x.append((ByteArrayDataOutput) this);
 
@@ -226,7 +227,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
         subs = newItems;
     }
 
-    public void addAll(@NotNull Term[] u) {
+    public void addAll(Term[] u) {
         int ul = u.length;
         if (ul > 0) {
             ensureCapacity(size + ul);
@@ -258,7 +259,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
 
     @Override
     public void forEach(Consumer<? super Term> action, int start, int stop) {
-        throw new UnsupportedOperationException("TODO");
+        throw new TODO();
     }
 
 

@@ -167,15 +167,10 @@ public abstract class Number extends Term implements Comparable<Number> {
     
     
     @Override
-    long resolveTerm(long count) {
-        return count;
+    void resolveTerm(long count) {
+
     }
-    
-    /**
-     *
-     */
-    @Override
-    public void free() {}
+
     
     void restoreVariables() {}
 

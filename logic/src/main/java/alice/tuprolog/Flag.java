@@ -17,19 +17,16 @@
  */
 package alice.tuprolog;
 
-import java.util.HashMap;
-
 /**
  * This class represents a prolog Flag
  */
 class Flag implements java.io.Serializable {
-	private static final long serialVersionUID = 1L;
-    private String name;
-    private Struct valueList;
-    private Term   value;
-    private Term   defaultValue;
-    private boolean modifiable;
-    private String  libraryName;
+
+    private volatile Term value;
+    private final Struct valueList;
+    private final Term   defaultValue;
+    private final boolean modifiable;
+    private final String  libraryName;
     
     /**
      * Builds a Prolog flag
@@ -40,34 +37,33 @@ class Flag implements java.io.Serializable {
      * @param modifiable states if the flag is modifiable
      * @param library is the library defining the flag
      */
-    public Flag(String name, Struct valueSet, Term defValue, boolean modifiable, String library) {
-        this.name = name;
+    public Flag(Struct valueSet, Term defValue, boolean modifiable, String library) {
         this.valueList = valueSet;
-        defaultValue = defValue;
+        this.defaultValue = defValue;
         this.modifiable = modifiable;
-        libraryName = library;
-        value = defValue;
+        this.libraryName = library;
+        this.value = defValue;
     }
     
-    protected Flag() {}
+//    protected Flag() {}
     
     
-    /**
-     * Gets a deep copy of the flag
-     *
-     * @return a copy of the flag
-     */
-    @Override
-    public Object clone() {
-        Flag f = new Flag();
-        f.name=name;
-        f.valueList=(Struct)valueList.copy(new HashMap<>(),Var.ORIGINAL);
-        f.value=value.copy(new HashMap<>(),Var.ORIGINAL);
-        f.defaultValue=defaultValue.copy(new HashMap<>(),Var.ORIGINAL);
-        f.modifiable=modifiable;
-        f.libraryName=libraryName;
-        return f;
-    }
+//    /**
+//     * Gets a deep copy of the flag
+//     *
+//     * @return a copy of the flag
+//     */
+//    @Override
+//    public Object clone() {
+//        Flag f = new Flag();
+//        f.name=name;
+//        f.valueList=(Struct)valueList.copy(new HashMap<>(),Var.ORIGINAL);
+//        f.value=value.copy(new HashMap<>(),Var.ORIGINAL);
+//        f.defaultValue=defaultValue.copy(new HashMap<>(),Var.ORIGINAL);
+//        f.modifiable=modifiable;
+//        f.libraryName=libraryName;
+//        return f;
+//    }
     
     /**
      * Checks if a value is valid according to flag description
@@ -78,20 +74,13 @@ class Flag implements java.io.Serializable {
     public boolean isValidValue(Term value) {
         java.util.Iterator<? extends Term> it=valueList.listIterator();
         while (it.hasNext()) {
-            if (value.match(it.next())) {
+            if (value.unifiable(it.next())) {
                 return true;
             }
         }
         return false;
     }
-    
-    /**
-	 * Gets the name of the flag
-	 * @return  the name
-	 */
-    public String getName() {
-        return name;
-    }
+
     
     /**
 	 * Gets the list of flag possible values

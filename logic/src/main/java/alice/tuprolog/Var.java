@@ -35,8 +35,8 @@ public class Var extends Term {
     // the name identifying the var
     private String name;
     private StringBuilder completeName;     /* Reviewed by Paolo Contessi: String -> StringBuilder */
-    private Term link;            /* link is used for unification process */
-    private long timestamp;        /* timestamp is used for fix vars order */
+    public Term link;            /* link is used for unification process */
+    protected long timestamp;        /* timestamp is used for fix vars order */
     private int id;            /* id of ExecCtx owners of this var util for renaming*/
 
 
@@ -178,19 +178,12 @@ public class Var extends Term {
 
 
     /**
-     * De-unify the variable
-     */
-    @Override
-    public void free() {
-        link = null;
-    }
-
-
-    /**
      * De-unify the variables of list
      */
-    public static void free(List<Var> varsUnified) {
-        varsUnified.forEach(Term::free);
+    static void free(List<Var> varsUnified) {
+        varsUnified.forEach(t -> {
+            t.link = null;
+        });
         //varsUnified.clear();
     }
 
@@ -360,13 +353,12 @@ public class Var extends Term {
      * Resolve the occurence of variables in a Term
      */
     @Override
-    long resolveTerm(long count) {
+    void resolveTerm(long count) {
         Term tt = term();
         if (tt != this) {
-            return tt.resolveTerm(count);
+            tt.resolveTerm(count);
         } else {
             timestamp = count;
-            return count++;
         }
     }
 
@@ -432,7 +424,7 @@ public class Var extends Term {
             //System.out.println("VAR "+name+" BOUND to "+link+" - time: "+time+" - mark: "+mark);
             return true;
         } else {
-            return (tt.unify(vl1, vl2, t));
+            return tt.unify(vl1, vl2, t);
         }
     }
 

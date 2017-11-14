@@ -37,7 +37,7 @@ public class Struct extends Term {
     /**
      * arity
      */
-    @Deprecated private int subCount;
+    private int subCount;
 
     /**
      * to speedup hash map operation
@@ -309,7 +309,7 @@ public class Struct extends Term {
      * Check is this struct is clause or directive
      */
     public boolean isClause() {
-        return (name.equals(":-") && subCount > 1 && subs[0].term() instanceof Struct);
+        return subCount > 1 && name.equals(":-") && subs[0].term() instanceof Struct;
         //return(name.equals(":-") && arity == 2 && arg[0].getTerm() instanceof Struct);
     }
 
@@ -330,7 +330,7 @@ public class Struct extends Term {
         if (subCount == 0) {
             return null;
         }
-        for (int i = 0; i < subs.length; i++) {
+        for (int i = 0; i < subCount; i++) {
             if (subs[i] instanceof Struct) {
                 Struct s = (Struct) subs[i];
                 if (s.name().equals(name)) {
@@ -338,7 +338,7 @@ public class Struct extends Term {
                 }
             }
         }
-        for (int i = 0; i < subs.length; i++) {
+        for (int i = 0; i < subCount; i++) {
             if (subs[i] instanceof Struct) {
                 Struct s = (Struct) subs[i];
                 Struct sol = s.sub(name);
@@ -367,14 +367,21 @@ public class Struct extends Term {
             if (subCount > tarity) {
                 return true;
             } else if (subCount == tarity) {
-                if (name.compareTo(ts.name) > 0) {
+                int nc = name.compareTo(ts.name);
+                if (nc > 0) {
                     return true;
-                } else if (name.compareTo(ts.name) == 0) {
-                    for (int c = 0; c < subCount; c++) {
-                        if (subs[c].isGreater(ts.subs[c])) {
-                            return true;
-                        } else if (!subs[c].isEqual(ts.subs[c])) {
-                            return false;
+                } else if (nc == 0) {
+                    Term[] bb = ts.subs;
+                    if (this.subs != bb) {
+                        for (int c = 0; c < subCount; c++) {
+                            Term a = this.subs[c];
+                            Term b = bb[c];
+                            if (a == b) continue;
+                            if (a.isGreater(b)) {
+                                return true;
+                            } else if (!a.equals(b)) {
+                                return false;
+                            }
                         }
                     }
                 }
@@ -418,13 +425,19 @@ public class Struct extends Term {
     @Override
     public boolean isEqual(Term t) {
         t = t.term();
+
+        if (t == this) return true;
+
         if (t instanceof Struct) {
             Struct ts = (Struct) t;
-            if (subCount == ts.subCount && name.equals(ts.name)) {
-                for (int c = 0; c < subCount; c++) {
-                    if (!subs[c].isEqual(ts.subs[c])) {
-                        return false;
+            if (subCount == ts.subCount && name.equals(ts.name)) { //key.equals(ts.key)) {
+                if (this.subs!=ts.subs) {
+                    for (int c = 0; c < subCount; c++) {
+                        if (!subs[c].equals(ts.subs[c])) {
+                            return false;
+                        }
                     }
+                    subs = ts.subs; //share the array
                 }
                 return true;
             } else {
@@ -443,7 +456,7 @@ public class Struct extends Term {
         for (Term x : subs) {
             if (x instanceof Var)
                 return false;
-            if ((x instanceof Struct) && (!((Struct)x).isConstant()))
+            if ((x instanceof Struct) && (!((Struct) x).isConstant()))
                 return false;
         }
         return true;
@@ -515,8 +528,9 @@ public class Struct extends Term {
      * resolve term
      */
     @Override
-    long resolveTerm(long count) {
-        return resolved ? count : resolveTerm(new LinkedList<>(), count);
+    void resolveTerm(long count) {
+        if (!resolved && subCount>0)
+            resolveTerm(new LinkedList<>(), count);
     }
 
 
@@ -527,8 +541,7 @@ public class Struct extends Term {
      * @param count start timestamp for variables of this term
      * @return next timestamp for other terms
      */
-    long resolveTerm(LinkedList<Var> vl, long count) {
-        long newcount = count;
+    void resolveTerm(LinkedList<Var> vl, final long count) {
 
         Term[] arg = this.subs;
         int arity = this.subCount;
@@ -542,7 +555,7 @@ public class Struct extends Term {
                 //--------------------------------
                 if (term instanceof Var) {
                     Var t = (Var) term;
-                    t.setTimestamp(newcount++);
+                    t.setTimestamp(count);
                     if (!t.isAnonymous()) {
                         // searching a variable with the same name in the list
                         String name = t.getName();
@@ -562,12 +575,11 @@ public class Struct extends Term {
                         }
                     }
                 } else if (term instanceof Struct) {
-                    newcount = ((Struct) term).resolveTerm(vl, newcount);
+                    ((Struct) term).resolveTerm(vl, count);
                 }
             }
         }
         resolved = true;
-        return newcount;
     }
 
     // services for list structures
@@ -722,8 +734,12 @@ public class Struct extends Term {
      */
     @Override
     boolean unify(List<Var> vl1, List<Var> vl2, Term t) {
-        // In fase di unificazione bisogna annotare tutte le variabili della struct completa.
-        t = t.term();
+        if (this == t) return true;
+
+        t = t.term(); // In fase di unificazione bisogna annotare tutte le variabili della struct completa.
+
+        if (this == t) return true;
+
         if (t instanceof Struct) {
             Struct ts = (Struct) t;
             final int arity = this.subCount;
@@ -743,13 +759,6 @@ public class Struct extends Term {
         return false;
     }
 
-
-    /**
-     * dummy method
-     */
-    @Override
-    public void free() {
-    }
 
     //
 
@@ -784,24 +793,26 @@ public class Struct extends Term {
      * Names starting with upper case letter are enclosed in apices.
      */
     public String toString() {
-        // empty list case
-        if (isEmptyList()) return "[]";
-        // list case
-        if (name.equals(".") && subCount == 2) {
-            return ('[' + toString0() + ']');
-        } else if (name.equals("{}")) {
-            return ('{' + toString0_bracket() + '}');
-        } else {
-            String s = (Parser.isAtom(name) ? name : '\'' + name + '\'');
-            if (subCount > 0) {
-                s = s + '(';
+
+        switch (name) {
+            case "[]":
+                if (subCount == 0) return "[]"; // empty list case
+                break;
+            case ".":
+                if (subCount == 2) return '[' + toString0() + ']';
+                break;
+            case "{}":
+                return '{' + toString0_bracket() + '}';
+        }
+        String s = (Parser.isAtom(name) ? name : '\'' + name + '\'');
+        if (subCount > 0) {
+            s = s + '(';
                 for (int c = 1; c < subCount; c++) {
                     s = s + (!(subs[c - 1] instanceof Var) ? subs[c - 1].toString() : ((Var) subs[c - 1]).toStringFlattened()) + ',';
-                }
-                s = s + (!(subs[subCount - 1] instanceof Var) ? subs[subCount - 1].toString() : ((Var) subs[subCount - 1]).toStringFlattened()) + ')';
             }
-            return s;
+                s = s + (!(subs[subCount - 1] instanceof Var) ? subs[subCount - 1].toString() : ((Var) subs[subCount - 1]).toStringFlattened()) + ')';
         }
+        return s;
     }
 
     private String toString0() {
