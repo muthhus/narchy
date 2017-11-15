@@ -92,7 +92,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
      * use only during actual builder step; should not be called while being compared
      */
     @Override
-    public Term[] theArray() {
+    public Term[] arrayShared() {
         compact(); //compact the key
 
         Term[] tt;
@@ -111,8 +111,8 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
 
 
     @Override
-    public Term[] toArray() {
-        return theArray().clone();
+    public Term[] arrayClone() {
+        return arrayShared().clone();
     }
 
 //    @Override

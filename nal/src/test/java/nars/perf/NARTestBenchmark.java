@@ -1,6 +1,8 @@
 package nars.perf;
 
-import nars.nal.nal6.NAL6Test;
+import nars.The;
+import nars.nal.nal1.NAL1Test;
+import nars.term.compound.FastCompound;
 import org.junit.jupiter.api.Disabled;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
@@ -20,7 +22,9 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass
 @Disabled
 public class NARTestBenchmark {
 
-    static final Class testclass = NAL6Test.class;
+    static final Class testclass =
+            NAL1Test.class;
+            //NAL6Test.class;
 
     /**
      * CONTROL
@@ -37,7 +41,7 @@ public class NARTestBenchmark {
     @BenchmarkMode(Mode.AverageTime)
     @Fork(1)
     public void testY() {
-        //The.Compound.the = FastCompound.FAST_COMPOUND_BUILDER;
+        The.Compound.the = FastCompound.FAST_COMPOUND_BUILDER;
 //        Param.SynchronousExecution_Max_CycleTime = 0.0001f;
 
         junit(testclass);

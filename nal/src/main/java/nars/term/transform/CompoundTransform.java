@@ -111,7 +111,7 @@ public interface CompoundTransform extends TermContext {
 
 
         if (target!=null || op != x.op()) {
-            return op.the(dt, ((target!=null) ? target : ss).theArray());
+            return op.the(dt, ((target!=null) ? target : ss).arrayShared());
         }
 
         return x.dt(dt);

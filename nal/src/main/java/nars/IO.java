@@ -722,7 +722,7 @@ public class IO {
             //        }
 
 
-            Term[] xt = argsProduct.toArray();
+            Term[] xt = argsProduct.arrayClone();
 
             p.append(operator.toString());
 

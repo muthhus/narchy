@@ -15,7 +15,6 @@ public class Versioned<X> extends
 {
 
 
-    @NotNull
     protected final Versioning context;
 
 //    public Versioned(@NotNull Versioned<X> copy) {
@@ -23,7 +22,7 @@ public class Versioned<X> extends
 //        this.context = copy.context;
 //    }
 
-    public Versioned(@NotNull Versioning sharedContext, int cap) {
+    public Versioned(Versioning sharedContext, int cap) {
         super(cap);
         this.context = sharedContext;
     }
@@ -99,11 +98,11 @@ public class Versioned<X> extends
 
     }
 
-    public final X getAndPop() {
-        X x = items[--size];
-        items[size+1] = null;
-        return x;
-    }
+//    public final X getAndPop() {
+//        X x = items[--size];
+//        items[size+1] = null;
+//        return x;
+//    }
 
     public void pop() {
 
@@ -120,9 +119,9 @@ public class Versioned<X> extends
 
     }
 
-    /** transparently replace the leading value */
-    public void replaceTop(X newValue) {
-        items[size-1] = newValue;
-    }
+//    /** transparently replace the leading value */
+//    public void replaceTop(X newValue) {
+//        items[size-1] = newValue;
+//    }
 
 }

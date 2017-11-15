@@ -505,7 +505,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
                 orgs = ArrayUtils.EMPTY_OBJECT_ARRAY;
                 types = List.of();
             } else {
-                orgs = object(maWrapped ? methodArgs.subterms().theArray() : new Term[]{methodArgs});
+                orgs = object(maWrapped ? methodArgs.subterms().arrayShared() : new Term[]{methodArgs});
                 types = typesOf(orgs);
             }
 

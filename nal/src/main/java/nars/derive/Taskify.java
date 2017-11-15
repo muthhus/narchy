@@ -45,8 +45,7 @@ public class Taskify extends AbstractPred<Derivation> {
     @Override
     public boolean test(Derivation d) {
         Term x = d.derivedTerm.get();
-        if (x == null)
-            return false;
+        assert(x!=null);
 
         long[] occ = d.concOcc;
         byte punc = d.concPunc;

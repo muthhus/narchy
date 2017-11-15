@@ -120,9 +120,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
         if (c2 == null)
             return false;
 
-        d.derivedTerm.set(c2);
-        return true;
-
+        return d.derivedTerm.set(c2)!=null;
     }
 
 

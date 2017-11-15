@@ -357,15 +357,15 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * lead to disaster. by default, it will call 'toArray' which
      * guarantees a clone. override with caution
      */
-    default Term[] theArray() {
-        return toArray();
+    default Term[] arrayShared() {
+        return arrayClone();
     }
 
     /**
      * an array of the subterms
      * this is meant to be a clone always
      */
-    default Term[] toArray() {
+    default Term[] arrayClone() {
         int s = subs();
         switch (s) {
             case 0:
@@ -375,11 +375,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             case 2:
                 return new Term[]{sub(0), sub(1)};
             default:
-                return toArray(new Term[s], 0, s);
+                return arrayClone(new Term[s], 0, s);
         }
     }
 
-    default Term[] toArray(Term[] x, int from, int to) {
+    default Term[] arrayClone(Term[] x, int from, int to) {
 
 //        if (s == 0)
 //            return Term.EmptyArray;
@@ -867,7 +867,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /*@NotNull*/
     default Term[] toArraySubRange(int from, int to) {
         if (from == 0 && to == subs()) {
-            return toArray();
+            return arrayClone();
         } else {
 
             int s = to - from;
@@ -892,6 +892,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        }
 //        return true;
     }
+
+
 
     @Override
     default void recurseTerms(/*@NotNull*/ Consumer<Term> v) {

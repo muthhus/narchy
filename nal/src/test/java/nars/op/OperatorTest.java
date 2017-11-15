@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OperatorTest {
 
     static Term[] args(Task t) {
-        return ((Compound) (t.sub(0)/*subject*/)).toArray();
+        return ((Compound) (t.sub(0)/*subject*/)).arrayClone();
     }
 
     @Test

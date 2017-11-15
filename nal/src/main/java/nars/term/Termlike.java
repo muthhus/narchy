@@ -6,6 +6,7 @@ import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFuncti
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.ToIntFunction;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ public interface Termlike {
      * volume = 1 + total volume of terms = complexity of subterms - # variable instances
      */
     default int volume() {
-        return 1 + intify((v, c) -> v + c.volume(), 0);
+        return 1 + sum(Term::volume);
     }
 
 
@@ -41,14 +42,24 @@ public interface Termlike {
      * complexity 1 + total complexity number of leaf terms, excluding variables which have a complexity of zero
      */
     default int complexity() {
-        return 1 + intify((v, c) -> c == null ? 0 : v + c.complexity(), 0);
+        return 1 + sum(Term::complexity);
+    }
+
+      /** only 1-layer (shallow, non-recursive) */
+    default int sum(ToIntFunction<Term> value) {
+        int x = 0;
+        int s = subs();
+        for (int i = 0; i < s; i++) {
+            x += value.applyAsInt(sub(i));
+        }
+        return x;
     }
 
     /**
      * structure hash bitvector
      */
     default int structure() {
-        return intify((s, x) -> x == null ? 0 : s | x.structure(), 0);
+        return intifyShallow((s, x) -> x == null ? 0 : s | x.structure(), 0);
     }
 
     /**
@@ -252,7 +263,7 @@ public interface Termlike {
      */
     default int vars() {
         return hasAny(VAR_INDEP.bit | Op.VAR_DEP.bit | VAR_QUERY.bit) ?
-                subs(x -> x.isAny(VAR_INDEP.bit | Op.VAR_DEP.bit | VAR_QUERY.bit)) : 0;
+                sum(Term::vars) : 0;
     }
 
     /**
@@ -274,18 +285,6 @@ public interface Termlike {
         return /*hasAny(Op.VAR_PATTERN) ? */subs(VAR_PATTERN); //since pattern vars are not included in structure, dont check it
     }
 
-//    default boolean unifyPossible(@Nullable Op t) {
-//        return (t == null) ? hasAny(Op.VariableBits) : hasAny(t);
-//    }
-
-//    /**
-//     * used to decide if a compound is "potentially" dynamic, or
-//     * whether it can safely be cached/memoized -- or if it must be evaluated.
-//     * if unsure, err on the side of caution and return true.
-//     */
-//    default boolean isDynamic() {
-//        return OR(Term::isDynamic);
-//    }
 
     /**
      * counts subterms matching the predicate
@@ -294,25 +293,30 @@ public interface Termlike {
         return intify((c, sub) -> match.test(sub) ? c + 1 : c, 0);
     }
 
+    /** recursive, visits each component */
     default int intify(IntObjectToIntFunction<Term> reduce, int v) {
         int n = subs();
-        for (int i = 0; i < n; i++) {
-            //v = reduce.intValueOf(v, sub(i));
-            v = sub(i).intify(reduce, v);//reduce.intValueOf(v, sub(i));
-        }
+        for (int i = 0; i < n; i++)
+            v = sub(i).intify(reduce, v); //recurse
         return v;
     }
-
-    default <X> X objectify(BiFunction<X, Term, X> reduce) {
-        return objectify(reduce, null);
-    }
-
-    default <X> X objectify(BiFunction<X, Term, X> reduce, X v) {
+   /** recursive, visits only 1 layer deep, and not the current superterm if compound */
+    default int intifyShallow(IntObjectToIntFunction<Term> reduce, int v) {
         int n = subs();
         for (int i = 0; i < n; i++)
-            v = reduce.apply(v, sub(i, Null));
+            v = reduce.intValueOf(v, sub(i)); //non-recurse
         return v;
     }
+//    default <X> X objectify(BiFunction<X, Term, X> reduce) {
+//        return objectify(reduce, null);
+//    }
+//
+//    default <X> X objectify(BiFunction<X, Term, X> reduce, X v) {
+//        int n = subs();
+//        for (int i = 0; i < n; i++)
+//            v = reduce.apply(v, sub(i, Null));
+//        return v;
+//    }
 
     /**
      * counts subterms matching the supplied op

@@ -52,21 +52,19 @@ public enum Terms {
 //    }
 
     public static int hashSubterms(Term[] term) {
-        int result = 1;
+        int h = 1;
         for (int i = 0; i < term.length; i++) {
-            result = Util.hashCombine(term[i].hashCode(), result);
+            h = Util.hashCombine(h, term[i].hashCode());
         }
-        return result;
+        return h;
     }
 
-    /**
-     * should be consistent with the other hash method(s)
-     */
+
     public static int hashSubterms( TermContainer container) {
         int h = 1;
         int s = container.subs();
         for (int i = 0; i < s; i++) {
-            h = container.sub(i).hashCode() + h * 31 /*Util.PRIME1 */;
+            h = Util.hashCombine(h, container.sub(i).hashCode());
         }
         return h;
     }

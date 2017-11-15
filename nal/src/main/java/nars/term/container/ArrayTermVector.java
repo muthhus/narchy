@@ -99,12 +99,12 @@ public class ArrayTermVector extends TermVector {
         //return terms.length > i ? terms[i] : Null;
     }
 
-    @Override public final Term[] toArray() {
+    @Override public final Term[] arrayClone() {
         return terms.clone();
     }
 
     @Override
-    public final Term[] theArray() {
+    public final Term[] arrayShared() {
         return terms;
     }
 

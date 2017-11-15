@@ -944,7 +944,7 @@ public class Narsese extends BaseParser<Object> {
 
     static Term conj2disj(Term x) {
         System.out.println(x);
-        Term[] t = x.subterms().theArray();
+        Term[] t = x.subterms().arrayShared();
 
         neg(t);
         return CONJ.the(DTERNAL, t).neg();

@@ -75,7 +75,7 @@ public class PatternIndex extends MapTermIndex {
         Ellipsis e = Ellipsis.firstEllipsis(v);
         return e != null ?
                 ellipsis(x, v, e) :
-                x.op().the(x.dt(), v.theArray()); //new PatternCompound.PatternCompoundSimple(x.op(), x.dt(), v);
+                x.op().the(x.dt(), v.arrayShared()); //new PatternCompound.PatternCompoundSimple(x.op(), x.dt(), v);
     }
 
 //    static boolean canBuildConcept(/*@NotNull*/ Term y) {

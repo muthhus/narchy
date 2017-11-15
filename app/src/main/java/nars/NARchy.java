@@ -50,7 +50,7 @@ public class NARchy extends NARS {
                     if (text.charAt(0) != '"')
                         text = "\"" + text + '"';
 
-                    n.believe($.func("speak", args.theArray()), Tense.Present);
+                    n.believe($.func("speak", args.arrayShared()), Tense.Present);
 
                     MaryTTSpeech.speak(text);
                 }

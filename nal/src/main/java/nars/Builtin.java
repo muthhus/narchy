@@ -486,7 +486,7 @@ public class Builtin {
                                         if (si == ei)
                                             return Op.ZeroProduct;
                                         if (si < ei) {
-                                            return $.p(Arrays.copyOfRange(x.subterms().toArray(), si, ei));
+                                            return $.p(Arrays.copyOfRange(x.subterms().arrayClone(), si, ei));
                                         }
                                     }
                                 }

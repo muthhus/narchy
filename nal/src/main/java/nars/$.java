@@ -188,7 +188,7 @@ public enum $ {
 
     @NotNull
     public static Term p(@NotNull TermContainer t) {
-        return p((Term[]) t.toArray());
+        return p((Term[]) t.arrayClone());
     }
 
     /**
@@ -778,7 +778,7 @@ public enum $ {
         Term nextInner = inner.op() != PROD ? $.p(inner) : inner; //wrap innermost item in product too, for fairness
         while (tl > 0) {
             Term next = t[--tl];
-            nextInner = next.op() != PROD ? $.p(next, nextInner) : $.p(ArrayUtils.add(next.subterms().theArray(), nextInner));
+            nextInner = next.op() != PROD ? $.p(next, nextInner) : $.p(ArrayUtils.add(next.subterms().arrayShared(), nextInner));
         }
         return nextInner;
     }

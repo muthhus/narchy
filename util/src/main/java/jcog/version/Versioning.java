@@ -9,14 +9,18 @@ import java.util.Collection;
  * versioning context that holds versioned instances
  * a maximum stack size is provided at construction and will not be exceeded
  */
-public class Versioning<X> extends
+public class Versioning<X>
         //FastList<Versioned<X>> {
-        FasterList<Versioned<X>> {
+        /*FasterList<Versioned<X>>*/ {
+
+    private final Versioned[] items;
+    protected int size = 0;
 
     public int ttl;
 
     public Versioning(int stackMax, int initialTTL) {
-        super(0, new Versioned[stackMax]);
+        //super(0, new Versioned[stackMax]);
+        this.items = new Versioned[stackMax];
         assert(stackMax > 0);
         setTTL(initialTTL);
     }
@@ -24,7 +28,7 @@ public class Versioning<X> extends
     @NotNull
     @Override
     public String toString() {
-        return size() + ":" + super.toString();
+        return size + ":" + super.toString();
     }
 
 
@@ -56,12 +60,10 @@ public class Versioning<X> extends
     }
 
 
-    @Override
     public void clear() {
         revert(0);
     }
 
-    @Override
     public final boolean add(/*@NotNull*/ Versioned<X> newItem) {
         Versioned<X>[] ii = this.items;
         if (ii.length > this.size) {
@@ -69,26 +71,6 @@ public class Versioning<X> extends
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void add(int index, Versioned<X> element) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends Versioned<X>> source) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends Versioned<X>> source) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean addAllIterable(Iterable<? extends Versioned<X>> iterable) {
-        throw new UnsupportedOperationException();
     }
 
     /** returns remaining TTL */

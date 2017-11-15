@@ -235,7 +235,7 @@ public enum TermLinks {
                 TermContainer ts = t.subterms();
                 if (ts.OR(Int.class::isInstance) && rng.nextFloat() <= Param.MUTATE_INT_CONTAINING_TERMS_RATE) {
 
-                    Term[] xx = ts.toArray();
+                    Term[] xx = ts.arrayClone();
                     boolean changed = false;
                     for (int i = 0; i < xx.length; i++) {
                         Term y = xx[i];

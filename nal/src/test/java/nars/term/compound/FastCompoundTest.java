@@ -73,6 +73,8 @@ public class FastCompoundTest {
         assertEquals(c.complexity(), f.complexity());
         assertEquals(c.volume(), f.volume());
         assertEquals(c.toString(), f.toString());
+        assertEquals(c, c);
+        assertEquals(f, f);
         assertEquals(c, f);
         assertEquals(f, c);
         assertEquals(0, f.compareTo(c));

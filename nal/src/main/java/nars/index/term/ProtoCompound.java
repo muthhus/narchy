@@ -21,7 +21,7 @@ public interface ProtoCompound extends TermContainer {
     Op op();
 
     /** subterms as an array for construction */
-    @Override /*@NotNull*/ Term[] theArray();
+    @Override /*@NotNull*/ Term[] arrayShared();
 
     @Override
     boolean equals(Object obj);

@@ -155,7 +155,7 @@ public abstract class TermVector implements TermContainer {
     @NotNull
     @Override
     public String toString() {
-        return '(' + Joiner.on(',').join(toArray()) + ')';
+        return '(' + Joiner.on(',').join(arrayClone()) + ')';
     }
 
 

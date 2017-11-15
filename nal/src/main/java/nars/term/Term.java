@@ -628,7 +628,8 @@ public interface Term extends Termed, Comparable<Termed> {
         if (op() == CONJ) {
             int dt = this.dt();
             if (dt != DTERNAL) {
-                return subterms().intify((sum, x) -> sum + x.eventCount(), 0);
+                return subterms().sum(Term::eventCount);
+                        //intify((sum, x) -> sum + x.eventCount(), 0);
             }
         }
 

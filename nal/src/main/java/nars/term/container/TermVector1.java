@@ -67,7 +67,7 @@ public class TermVector1 extends TermVector {
 
     @NotNull
     @Override
-    public Term[] toArray() {
+    public Term[] arrayClone() {
         return new Term[]{sub};
     }
 

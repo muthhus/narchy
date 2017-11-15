@@ -139,7 +139,7 @@ public class Hear extends Loop {
     static public void wiki(NAR nar) {
         nar.onOp( "readWiki",  (t, n) -> {
 
-            Term[] args = Operator.args(t).toArray();
+            Term[] args = Operator.args(t).arrayClone();
             try {
                 String base = "simple.wikipedia.org";
                 //"en.wikipedia.org";

@@ -220,7 +220,7 @@ public class NarseseBaseTest extends NarseseTest {
 
     private void testOperationStructure(@NotNull Compound t) {
         //Term[] aa = Operator.argArray(t);
-        Term[] aa = ((Compound) t.sub(0)).toArray();
+        Term[] aa = ((Compound) t.sub(0)).arrayClone();
         assertEquals(2, aa.length);
         assertEquals("believe", t.sub(1).toString());
         //assertEquals("^believe", Operator.operator(t).toString());

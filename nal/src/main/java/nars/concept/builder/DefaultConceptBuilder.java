@@ -235,13 +235,13 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             case CONJ:
                 //allow variables onlyif they are not themselves direct subterms of this
                 if (validUnwrappableSubterms(ts)) {
-                    dmt = new DynamicTruthModel.Intersection(ts.theArray());
+                    dmt = new DynamicTruthModel.Intersection(ts.arrayShared());
                 }
                 break;
 
             case DIFFe:
                 if (validUnwrappableSubterms(ts))
-                    dmt = new DynamicTruthModel.Difference(ts.theArray());
+                    dmt = new DynamicTruthModel.Difference(ts.arrayShared());
                 break;
 
             case NEG:

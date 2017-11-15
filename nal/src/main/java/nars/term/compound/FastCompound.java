@@ -17,7 +17,9 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.AbstractList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.BiFunction;
 
 import static nars.time.Tense.DTERNAL;
@@ -39,8 +41,8 @@ abstract public class FastCompound implements Compound {
         @NotNull
         private final byte[][] atoms;
 
-        public FastCompoundSerializedAtoms(byte[][] atoms, byte[] skeleton, int structure, int hash, int hashSubterms, byte volume, boolean normalized) {
-            super(skeleton, structure, hash, hashSubterms, volume, normalized);
+        public FastCompoundSerializedAtoms(byte[][] atoms, byte[] skeleton, int structure, int hash, byte volume, boolean normalized) {
+            super(skeleton, structure, hash, volume, normalized);
             this.atoms = atoms;
         }
 
@@ -59,8 +61,8 @@ abstract public class FastCompound implements Compound {
         @NotNull
         private final Term[] atoms;
 
-        public FastCompoundInstancedAtoms(Term[] atoms, byte[] skeleton, int structure, int hash, int hashSubterms, byte volume, boolean normalized) {
-            super(skeleton, structure, hash, hashSubterms, volume, normalized);
+        public FastCompoundInstancedAtoms(Term[] atoms, byte[] skeleton, int structure, int hash, byte volume, boolean normalized) {
+            super(skeleton, structure, hash, volume, normalized);
             this.atoms = atoms;
         }
 
@@ -90,14 +92,12 @@ abstract public class FastCompound implements Compound {
     protected final byte[] skeleton;
 
     final int hash;
-    protected final int hashSubterms;
     final byte volume;
     protected final int structure;
 
-    public FastCompound(byte[] skeleton, int structure, int hash, int hashSubterms, byte volume, boolean normalized) {
+    public FastCompound(byte[] skeleton, int structure, int hash, byte volume, boolean normalized) {
         this.skeleton = skeleton;
         this.hash = hash;
-        this.hashSubterms = hashSubterms;
         this.volume = volume;
         this.structure = structure;
     }
@@ -117,27 +117,50 @@ abstract public class FastCompound implements Compound {
         if (x instanceof FastCompound)
             return ((FastCompound) x);
 
+        FastCompound f = get(x.op(), x.subs(), x.subterms());
+        return f;
+    }
+
+    public static FastCompound get(Op o, List<Term> subterms) {
+        return get(o, subterms.size(), subterms);
+    }
+
+    public static FastCompound get(Op o, int subs, Iterable<Term> subterms) {
+
         ObjectByteHashMap<Term> atoms = new ObjectByteHashMap();
 
         DynBytes skeleton = new DynBytes(256);
         //UncheckedBytes skeleton = new UncheckedBytes(Bytes.wrapForWrite(new byte[256]));
 
 
-        skeleton.writeUnsignedByte(x.op().ordinal());
-        skeleton.writeUnsignedByte(x.subs());
+        skeleton.writeUnsignedByte(o.ordinal());
+        skeleton.writeUnsignedByte(subs);
         final byte[] numAtoms = {0};
         ByteFunction0 nextUniqueAtom = () -> numAtoms[0]++;
-        x.recurseSubTerms((child, parent) -> {
-            skeleton.writeUnsignedByte((byte) child.op().ordinal());
-            if (child.op().atomic) {
-                int aid = atoms.getIfAbsentPut(child, nextUniqueAtom);
-                skeleton.writeUnsignedByte((byte) aid);
-            } else {
-                skeleton.writeUnsignedByte(child.subs());
-                //TODO use last bit of the subs byte to indicate presence or absence of subsequent 'dt' value (32 bits)
-            }
-            return true;
-        }, null);
+        int structure = o.bit, hashCode = 1;
+        byte volume = 1;
+
+        for (Term x : subterms) {
+            x.recurseTerms((child, parent) -> {
+                skeleton.writeUnsignedByte((byte) child.op().ordinal());
+                if (child.op().atomic) {
+                    int aid = atoms.getIfAbsentPut(child, nextUniqueAtom);
+                    skeleton.writeUnsignedByte((byte) aid);
+                } else {
+                    skeleton.writeUnsignedByte(child.subs());
+                    //TODO use last bit of the subs byte to indicate presence or absence of subsequent 'dt' value (32 bits)
+                }
+                return true;
+            }, null);
+            structure |= x.structure();
+            hashCode = Util.hashCombine(hashCode, x.hashCode());
+            volume += x.volume();
+        }
+
+        hashCode = Util.hashCombine(hashCode, o.id);
+
+        assert(volume < 127);
+        boolean normalized = false; //TODO calculate normalized by the encountered sequence of variable id's - whether it is monotonically increasing by 1 each time the max value does increase or something
 
         //TODO sort atoms to canonicalize its dictionary for sharing with other terms
 
@@ -154,7 +177,7 @@ abstract public class FastCompound implements Compound {
             for (ObjectBytePair<Term> p : atoms.keyValuesView()) {
                 a[p.getTwo()] = p.getOne();
             }
-            y = new FastCompoundInstancedAtoms(a, skeleton.toByteArray(), x.structure(), x.hashCode(), x.hashCodeSubTerms(), (byte) x.volume(), x.isNormalized());
+            y = new FastCompoundInstancedAtoms(a, skeleton.toByteArray(), structure, hashCode, volume, normalized);
         }
 
         return y;
@@ -310,12 +333,6 @@ abstract public class FastCompound implements Compound {
     }
 
     @Override
-    public int hashCodeSubTerms() {
-        return hashSubterms;
-    }
-
-
-    @Override
     public int dt() {
         return DTERNAL; //TODO
     }
@@ -339,7 +356,11 @@ abstract public class FastCompound implements Compound {
         } else {
             //TODO sub view
             //return opAtSub.the(DTERNAL, subs(subOffset));
-            return new GenericCompound(opAtSub, The.subterms(new SubtermView(this, offset).theArray()));
+            SubtermView sv = new SubtermView(this, offset);
+            return new GenericCompound(opAtSub,
+                    //sv
+                    The.subterms(sv)
+            );
             //return opAtSub.the(DTERNAL, (Term[]) new SubtermView(this, offset).theArray());
         }
     }
@@ -349,7 +370,7 @@ abstract public class FastCompound implements Compound {
     public Term sub(byte i, int containerOffset) {
 
         int subOffset = subtermOffsetAt(i, containerOffset);
-        return term(subtermOffsetAt(i, containerOffset));
+        return term(subOffset);
 
     }
 
@@ -394,7 +415,7 @@ abstract public class FastCompound implements Compound {
 
     protected abstract int atomCount();
 
-    private static class SubtermView implements TermContainer {
+    private static class SubtermView extends AbstractList<Term> implements TermContainer {
         private final FastCompound c;
 
         private int offset = -1;
@@ -406,19 +427,24 @@ abstract public class FastCompound implements Compound {
 
 
         @Override
+        public Term get(int index) {
+            return sub(index);
+        }
+
+        @Override
         public boolean equals(Object obj) {
             return
                     (this == obj)
                             ||
                             (obj instanceof TermContainer)
                                     && hashCode() == ((TermContainer) obj).hashCodeSubTerms()
-                                    && equalTerms(((TermContainer) obj).theArray());
+                                    && equalTerms(((TermContainer) obj).arrayShared());
         }
 
         @Override
         public int hashCode() {
-            return intify((i, t) -> Util.hashCombine(t.hashCode(), i), 1);
-            //throw new UnsupportedOperationException();
+            //TODO maybe cache this value while offset doesnt change
+            return intifyShallow((i, t) -> Util.hashCombine(i, t.hashCode()), 1);
         }
 
 
@@ -454,12 +480,17 @@ abstract public class FastCompound implements Compound {
             }
         }
 
+        @Override
+        public int size() {
+            return subs();
+        }
     }
 
     /**
      * for use in: Builder.Compound.the
      */
-    public static final BiFunction<Op, Term[], Term> FAST_COMPOUND_BUILDER = (op, terms) -> {
+    public static final BiFunction<Op, List<Term>, Term> FAST_COMPOUND_BUILDER = (op, terms) -> {
+        //HACK creating an intermediate GenericCompound should not be necessary
         GenericCompound g = new GenericCompound(op, The.subterms(terms));
         try {
 

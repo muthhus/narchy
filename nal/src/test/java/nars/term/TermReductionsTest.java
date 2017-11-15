@@ -512,7 +512,7 @@ public class TermReductionsTest extends NarseseTest {
         //check consistency with differenceSorted
         assertArrayEquals(
                 new Term[]{r, s},
-                ((Compound) Op.difference(Op.SETe, sete(r, p, q, s), sete(p, q))).toArray()
+                ((Compound) Op.difference(Op.SETe, sete(r, p, q, s), sete(p, q))).arrayClone()
         );
     }
 

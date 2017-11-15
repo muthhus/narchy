@@ -50,7 +50,6 @@ public class Derivation extends Unify {
 
     public NAR nar;
 
-    public final Versioned<Term> derivedTerm;
 
     public final ByteShuffler shuffler = new ByteShuffler(64);
 
@@ -63,16 +62,21 @@ public class Derivation extends Unify {
 
     public float truthResolution;
 
+
+    /** mutable state */
+    public Truth concTruth;
+    public byte concPunc;
+    public float concConfFactor;
+    public final long[] concOcc = new long[2];
+    public final Versioned<Term> derivedTerm;
+
+
     /**
      * cached values ==========================================
      */
     public int termVolMax;
     public float confMin;
 
-    public Truth concTruth;
-    public byte concPunc;
-    public float concConfFactor;
-    public final long[] concOcc = new long[2];
 
 //    /**
 //     * the current premise being evaluated in this context TODO make private again
@@ -155,6 +159,8 @@ public class Derivation extends Unify {
                 , null, Param.UnificationStackMax, 0);
 
 
+         derivedTerm = new Versioned(this, 3);
+
 //        Caffeine cb = Caffeine.newBuilder().executor(nar.exe);
 //            //.executor(MoreExecutors.directExecutor());
 //        int cs = Param.DERIVATION_TRANSFORM_CACHE_SIZE_PER_THREAD;
@@ -183,7 +189,7 @@ public class Derivation extends Unify {
         });
 
 
-        derivedTerm = new Versioned(this, 3);
+
     }
 
     ImmutableMap<Term, Termed> functors(Termed... t) {
@@ -257,7 +263,12 @@ public class Derivation extends Unify {
      */
     public void set(Premise p, Task belief, Term beliefTerm) {
 
-        size = 0; //revert zero
+
+        size = 0; //HACK instant revert to zero
+        xy.map.clear(); //must also happen to be consistent
+        derivedTerm.clear();
+        //and any other Versioned or Versioned-containing instances referenced
+
 //        if (revert(0)) {
             //remove common variable entries because they will just consume memory if retained as empty
 //            xy.map.keySet().removeIf(k -> {
@@ -265,7 +276,8 @@ public class Derivation extends Unify {
 //            });
 //            xy.map.clear();
 //        }
-        xy.map.clear();
+
+
         termutes.clear();
         preToPost.clear();
         //assert(termutes.isEmpty() && preToPost.isEmpty());

@@ -1,15 +1,14 @@
 package jcog.version;
 
 import jcog.list.ArrayUnenforcedSet;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 
 
 public class VersionMap<X, Y> extends AbstractMap<X, Y> {
@@ -24,7 +23,7 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
     }
 
     public VersionMap(Versioning context, int mapCap) {
-        this(context, mapCap, 0);
+        this(context, mapCap, 1);
     }
 
     /**
@@ -34,9 +33,9 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
      */
     public VersionMap(Versioning context, int mapCap, int eleCap) {
         this(context,
-                //new HashMap(mapCap)
+                new HashMap(mapCap)
                 //new LinkedHashMap<>(mapCap)
-                new UnifiedMap(mapCap)
+                //new UnifiedMap(mapCap)
                 , eleCap
         );
     }
@@ -57,14 +56,12 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
 
     @Override
     public boolean remove(Object key, Object value) {
-        throw new RuntimeException("unimpl yet");
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void clear() {
-//        if (size()==0)
-//            return;
-        throw new RuntimeException("unimpl yet");
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -80,7 +77,6 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
     @Override
     public boolean isEmpty() {
         return size() == 0;
-        //throw new UnsupportedOperationException();
     }
 
 
@@ -136,7 +132,6 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
         return map.computeIfAbsent(key, this::newEntry);
     }
 
-    @NotNull
     protected Versioned<Y> newEntry(X ignored) {
         return new Versioned<>(context, elementStackSizeDefault);
         //return cache(k) ? new Versioned(context) :
@@ -156,17 +151,17 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
         return true;
     }
 
-    public boolean replace(Function<? super Y, Y> eachValue) {
-        Set<Entry<X, Versioned<Y>>> eee = map.entrySet();
-        for (Entry<X, Versioned<Y>> e : eee) {
-            Versioned<Y> ee = e.getValue();
-            Y x = ee.get();
-            if (x != null) {
-                ee.replaceTop(eachValue.apply(x));
-            }
-        }
-        return true;
-    }
+//    public boolean replace(Function<? super Y, Y> eachValue) {
+//        Set<Entry<X, Versioned<Y>>> eee = map.entrySet();
+//        for (Entry<X, Versioned<Y>> e : eee) {
+//            Versioned<Y> ee = e.getValue();
+//            Y x = ee.get();
+//            if (x != null) {
+//                ee.replaceTop(eachValue.apply(x));
+//            }
+//        }
+//        return true;
+//    }
 
 
     @Override

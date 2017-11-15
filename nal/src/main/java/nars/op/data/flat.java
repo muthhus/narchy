@@ -29,7 +29,7 @@ public abstract class flat extends Functor.UnaryFunctor {
     public @Nullable Term apply(Term x) {
         if (x instanceof TermContainer) {
             List<Term> l = $.newArrayList(x.volume());
-            collect(((TermContainer)x).toArray(), l);
+            collect(((TermContainer)x).arrayClone(), l);
             return result(l);
         } else {
             return null;

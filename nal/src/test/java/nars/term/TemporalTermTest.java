@@ -124,14 +124,18 @@ public class TemporalTermTest {
     @Test
     public void testEventsWithRepeatParallel() throws Narsese.NarseseException {
 
+        Term ab = $("(a&|b)");
         assertEquals("[0:a, 0:b]",
-                $("(a&|b)").eventList().toString());
+                ab.eventList().toString());
+        assertEquals(2, ab.eventCount());
 
+        Term abc = $("((a&|b) &&+5 (b&|c))");
         assertEquals(
                 //"[0:(a&|b), 5:(b&|c)]",
                 //"[a:0, b:0, (a&|b):0, b:5, c:5, (b&|c):5]",
                 "[0:a, 0:b, 5:b, 5:c]",
-                $("((a&|b) &&+5 (b&|c))").eventList().toString());
+                abc.eventList().toString());
+        assertEquals(4, abc.eventCount());
 
     }
 

@@ -94,18 +94,13 @@ public class GenericCompound implements Compound {
         return op().commutative && subs() > 1;
     }
 
-    @NotNull
     @Override
     public final Op op() {
         return op;
     }
 
-    @Override
-    public final int hashCodeSubTerms() {
-        return subterms.hashCode();
-    }
 
-    @NotNull
+
     @Override
     public String toString() {
         return IO.Printer.stringify(this).toString();

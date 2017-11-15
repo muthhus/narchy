@@ -146,7 +146,7 @@ public enum Op {
 
                     if (only instanceof EllipsisMatch) {
                         EllipsisMatch em = (EllipsisMatch) only;
-                        Term[] x = em.theArray();
+                        Term[] x = em.arrayShared();
                         return _the(dt, x); //unwrap
                     }
 
@@ -1309,7 +1309,7 @@ public enum Op {
             case 1:
                 Term single = t[0];
                 if (single instanceof EllipsisMatch) {
-                    return newDiff(op, ((TermContainer) single).theArray());
+                    return newDiff(op, ((TermContainer) single).arrayShared());
                 }
                 return single instanceof Ellipsislike ?
                         new UnitCompound1(op, single) :
@@ -1778,7 +1778,7 @@ public enum Op {
 
                 Term single = t[0];
                 if (single instanceof EllipsisMatch) {
-                    return intersect(((TermContainer) single).theArray(), intersection, setUnion, setIntersection);
+                    return intersect(((TermContainer) single).arrayShared(), intersection, setUnion, setIntersection);
                 }
                 return single instanceof Ellipsislike ?
                         new UnitCompound1(intersection, single) :

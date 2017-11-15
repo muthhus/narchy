@@ -31,7 +31,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
 //    @Nullable public final Set<Variable> uniqueVars;
 
     PatternCompound(/*@NotNull*/ Op op, int dt, TermContainer subterms) {
-        super((Compound) op.the(subterms.theArray()), dt);
+        super((Compound) op.the(subterms.arrayShared()), dt);
     }
 
     abstract protected static class PatternCompoundWithEllipsis extends PatternCompound {

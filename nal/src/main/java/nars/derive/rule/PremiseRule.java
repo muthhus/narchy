@@ -218,7 +218,7 @@ public class PremiseRule /*extends GenericCompound*/ {
      * deduplicate and generate match-optimized compounds for rules
      */
     private void compile(TermIndex index) {
-        Term[] premisePattern = ((TermContainer) id.sub(0)).toArray();
+        Term[] premisePattern = ((TermContainer) id.sub(0)).arrayClone();
         premisePattern[0] = index.get(premisePattern[0], true).term(); //task pattern
         premisePattern[1] = index.get(premisePattern[1], true).term(); //belief pattern
     }
@@ -257,8 +257,8 @@ public class PremiseRule /*extends GenericCompound*/ {
         //1. construct precondition term array
         //Term[] terms = terms();
 
-        Term[] precon = ((TermContainer) id.sub(0)).toArray();
-        Term[] postcons = ((TermContainer) id.sub(1)).toArray();
+        Term[] precon = ((TermContainer) id.sub(0)).arrayClone();
+        Term[] postcons = ((TermContainer) id.sub(1)).arrayClone();
 
 
         Set<PrediTerm> pres =
@@ -295,7 +295,7 @@ public class PremiseRule /*extends GenericCompound*/ {
 
             //if (predicate.getSubject() instanceof SetExt) {
             //decode precondition predicate arguments
-            args = ((TermContainer) (predicate.sub(0))).toArray();
+            args = ((TermContainer) (predicate.sub(0))).arrayClone();
             X = (args.length > 0) ? args[0] : null;
             Y = (args.length > 1) ? args[1] : null;
 //            Z = (args.length > 2) ? args[2] : null;
@@ -572,7 +572,7 @@ public class PremiseRule /*extends GenericCompound*/ {
             if (i >= postcons.length)
                 throw new RuntimeException("invalid rule: missing meta term for postcondition involving " + t);
 
-            postConditions.add(PostCondition.make(this, t, Terms.sorted(((TermContainer) postcons[i++]).toArray())));
+            postConditions.add(PostCondition.make(this, t, Terms.sorted(((TermContainer) postcons[i++]).arrayShared())));
         }
 
 
@@ -767,7 +767,7 @@ public class PremiseRule /*extends GenericCompound*/ {
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.sub(0);
-        Term[] pp = pc.toArray(); //premise component
+        Term[] pp = pc.arrayClone(); //premise component
         Compound newPremise;
 
         Compound newConclusion = (Compound) remapped.sub(1);

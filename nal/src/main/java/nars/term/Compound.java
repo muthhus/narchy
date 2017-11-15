@@ -94,7 +94,9 @@ public interface Compound extends Term, IPair, TermContainer {
     TermContainer subterms();
 
     @Override
-    int hashCodeSubTerms();
+    default int hashCodeSubTerms(){
+        return subterms().hashCode();
+    }
 
     @Override
     default int opX() {
@@ -403,6 +405,11 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
+    default int intifyShallow(IntObjectToIntFunction<Term> reduce, int v) {
+        return subterms().intifyShallow(reduce, v);
+    }
+
+    @Override
     default int varQuery() {
         return subterms().varQuery();
     }
@@ -441,13 +448,13 @@ public interface Compound extends Term, IPair, TermContainer {
 
     /*@NotNull*/
     @Override
-    default Term[] toArray() {
-        return subterms().toArray();
+    default Term[] arrayClone() {
+        return subterms().arrayClone();
     }
 
     @Override
-    default Term[] theArray() {
-        return subterms().theArray();
+    default Term[] arrayShared() {
+        return subterms().arrayShared();
     }
 
 
@@ -581,7 +588,7 @@ public interface Compound extends Term, IPair, TermContainer {
                     return Null; //tried to temporalize what can only be commutive
 
 
-                Term[] ss = subs.theArray();
+                Term[] ss = subs.arrayShared();
                 if (o.commutative) {
 
                     if (ss.length == 2) {
@@ -752,7 +759,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         /*if (subterms().hasAll(opBits))*/
 
-        Term[] xy = theArray();
+        Term[] xy = arrayShared();
         //any contained evaluables
         Op o = op();
         int necessaryBits = o == INH ? Op.funcInnerBits : Op.funcBits;
@@ -766,7 +773,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 return Null;
             } else if (xi != yi && (!xi.equals(yi) || yi.getClass() != xi.getClass())) {
                 if (!changed) {
-                    xy = toArray(); //begin clone copy
+                    xy = arrayClone(); //begin clone copy
                     changed = true;
                 }
                 xy[i] = yi;
@@ -785,7 +792,7 @@ public interface Compound extends Term, IPair, TermContainer {
             for (int i = 0; i < xy.length; i++) {
                 Term x = xy[i];
                 if (x instanceof EllipsisMatch) {
-                    Term[] xx = ((EllipsisMatch) x).theArray();
+                    Term[] xx = ((EllipsisMatch) x).arrayShared();
                     for (Term xxx : xx)
                         z[k++] = xxx;
                 } else {

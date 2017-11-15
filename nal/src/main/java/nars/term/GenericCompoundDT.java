@@ -39,7 +39,7 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
             int size = subterms.subs();
 
             if (op.temporal && (op != CONJ && size != 2))
-                throw new InvalidTermException(op, dt, "Invalid dt value for operator", subterms.toArray());
+                throw new InvalidTermException(op, dt, "Invalid dt value for operator", subterms.arrayClone());
 
             if (dt != XTERNAL && op.commutative && size == 2) {
                 if (sub(0).compareTo(sub(1)) > 0)
@@ -86,15 +86,15 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
         return IO.Printer.stringify(this).toString();
     }
 
-    @Override
-    public Term sub(int i, Term ifOutOfBounds) {
-        return ref.sub(i, ifOutOfBounds);
-    }
+//    @Override
+//    public Term sub(int i, Term ifOutOfBounds) {
+//        return ref.sub(i, ifOutOfBounds);
+//    }
 
-    @Override
-    public final int hashCodeSubTerms() {
-        return ref.hashCodeSubTerms();
-    }
+//    @Override
+//    public final int hashCodeSubTerms() {
+//        return ref.hashCodeSubTerms();
+//    }
 
 //    @Override
 //    public Term conceptual() {

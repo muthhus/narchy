@@ -27,7 +27,7 @@ public final class TermVector2 extends TermVector {
 
     @NotNull
     @Override
-    public Term[] toArray() {
+    public Term[] arrayClone() {
         return new Term[] { x, y };
     }
 
@@ -70,7 +70,7 @@ public final class TermVector2 extends TermVector {
 
     @Override
     public Iterator<Term> iterator() {
-        return new ArrayIterator(toArray());
+        return new ArrayIterator(arrayClone());
     }
 
     @Override

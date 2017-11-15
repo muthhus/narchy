@@ -29,7 +29,7 @@ public class SerialCompound extends DynBytes implements Compound {
     final byte volume;
 
     public SerialCompound(Compound c) {
-        this(c.op(), c.dt(), c.theArray());
+        this(c.op(), c.dt(), c.arrayShared());
     }
 
     public SerialCompound(Op op, int dt, Term[] subterms) {

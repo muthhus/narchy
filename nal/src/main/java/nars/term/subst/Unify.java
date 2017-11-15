@@ -320,7 +320,7 @@ public abstract class Unify extends Versioning implements Subst {
 
     private class ConstrainedVersionMap extends VersionMap<Term, Term> {
         public ConstrainedVersionMap(Versioning versioning, int mapCap) {
-            super(versioning, mapCap, 1);
+            super(versioning, mapCap, 1 /* maybe 2 is necessary for full 2nd-layer unification */);
         }
 
 //        @Nullable
@@ -357,7 +357,7 @@ public abstract class Unify extends Versioning implements Subst {
         @NotNull
         @Override
         public Versioned newEntry(Term key) {
-            return new ConstrainedVersionedTerm();
+            return new ConstrainedVersionedTerm(elementStackSizeDefault);
         }
 
         public NewCompound snapshot() {
@@ -387,8 +387,8 @@ public abstract class Unify extends Versioning implements Subst {
 //         */
 //        Versioned<MatchConstraint> fastConstraints = null;
 
-        ConstrainedVersionedTerm() {
-            super(Unify.this, 1);
+        ConstrainedVersionedTerm(int stackSize) {
+            super(Unify.this, stackSize);
         }
 
 //        @Override
