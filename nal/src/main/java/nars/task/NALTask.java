@@ -134,7 +134,7 @@ public class NALTask extends Pri implements Task {
      * combine cause: should be called in all Task bags and belief tables on merge
      */
     public void causeMerge(Task incoming) {
-        int causeCap = incoming.cause().length + cause().length; //TODO use NAR's?
+        int causeCap = Math.min(Param.CAUSE_LIMIT, incoming.cause().length + cause().length); //TODO use NAR's?
         this.cause = Cause.zip(causeCap, this, incoming);
     }
 

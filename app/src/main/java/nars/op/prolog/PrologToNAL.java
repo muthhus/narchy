@@ -43,6 +43,9 @@ public class PrologToNAL {
             Struct s = (Struct) t;
             String name = s.name();
             switch (name) {
+                case "?-": //question goal, just unwrap
+                    return N(s.sub(0));
+
                 case ":-":
                     assert(s.subs()==2);
                     nars.term.Term pre = N(s.sub(1)); //reverse, prolog is backwards

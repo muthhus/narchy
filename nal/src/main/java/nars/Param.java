@@ -55,6 +55,7 @@ public abstract class Param extends Services<Term, NAR> {
     public static double SynchronousExecution_Max_CycleTime = 0.00001; //sec;
 
 
+
     /**
      * controls interpolation policy:
      * true: dt values will be interpolated
@@ -325,7 +326,11 @@ public abstract class Param extends Services<Term, NAR> {
      */
     public static final int STAMP_CAPACITY = 16;
 
-    public static final FloatParam causeCapacity = new FloatParam(16, 0, 256);
+    public static final FloatParam causeCapacity = new FloatParam(16, 0, 128);
+
+    /** hard limit for cause capacity in case the runtime parameter otherwise disobeyed */
+    public static final int CAUSE_LIMIT = (int) (causeCapacity.max*2);
+
 
     public final static int UnificationStackMax = 64; //how many assignments can be stored in the 'versioning' maps
 

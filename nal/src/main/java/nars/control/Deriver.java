@@ -21,8 +21,8 @@ import java.util.stream.Stream;
  */
 public class Deriver extends NARService {
 
-    private float minPremisesPerConcept = 2;
-    private float maxPremisesPerConcept = 6;
+    private float minPremisesPerConcept = 1;
+    private float maxPremisesPerConcept = 5;
 
     public static Function<NAR, Deriver> deriver(Function<NAR, PremiseRuleSet> rules) {
         return (nar) ->
@@ -74,7 +74,7 @@ public class Deriver extends NARService {
         NAR nar = this.nar;
         Derivation d = derivation.get().cycle(nar, deriver);
 
-        int matchTTL = Param.TTL_PREMISE_MIN * 3;
+        int matchTTL = Param.TTL_PREMISE_MIN * 6;
         int ttlMin = nar.matchTTLmin.intValue();
         int ttlMax = nar.matchTTLmax.intValue();
 
@@ -95,18 +95,19 @@ public class Deriver extends NARService {
                     if (p.match(d, matchTTL) != null) {
 
                         int deriveTTL = Util.lerp(
-                                p.task.priElseZero() / nar.priDefault(p.task.punc()), //unitized
+                                //p.task.priElseZero() / nar.priDefault(p.task.punc()), //relative
+                                p.task.priElseZero(),                                   //absolute
                                 ttlMin, ttlMax);
 
                         d.derive(deriveTTL);
+                        --fireRemain[0]; //premise completed
                     }
                 }
-            } else {
-                //premise miss
             }
 
+            --fireRemain[0]; //premise miss for safety
 
-            return --fireRemain[0] > 0;
+            return fireRemain[0] > 0;
         });
 
         activator.commit(nar);

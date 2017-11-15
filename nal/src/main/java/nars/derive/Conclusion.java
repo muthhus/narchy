@@ -49,8 +49,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
         nar.emotion.derivationEval.increment();
 
-        Term c1 =
-                pattern.eval(d);
+        Term c1 = pattern.eval(d);
 
         int volMax = d.termVolMax;
         if (c1 == null || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)

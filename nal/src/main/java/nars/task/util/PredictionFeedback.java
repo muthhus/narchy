@@ -16,7 +16,6 @@ import java.util.List;
 public class PredictionFeedback {
 
     final BeliefTable table;
-    static final boolean deleteAny = false; //
 
     static final float REWARD_PUNISH_COHERENCE_THRESHOLD = 0.9f;
     float strength = 1;

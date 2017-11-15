@@ -45,7 +45,8 @@ public enum TermLinks {
                 return emptyList();
         } else {
 
-            return List.of(term);
+            //return List.of(term);
+            return List.of(); //atomic self term-link disabled
         }
     }
 

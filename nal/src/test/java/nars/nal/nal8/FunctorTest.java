@@ -69,7 +69,7 @@ public class FunctorTest {
     public void testFunctor2() throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        int TIME = 4096;
+        int TIME = 256;
         TestNAR t = new TestNAR(NARS.tmp());
 
         Param.DEBUG = true; t.log();

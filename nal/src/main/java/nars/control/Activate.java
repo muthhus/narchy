@@ -25,11 +25,8 @@ import java.util.function.Predicate;
  */
 public class Activate extends PLink<Concept> implements Termed {
 
-//    /** lazily computed */
-//    private List<Termed> templates;
-//
-//    /** lazily computed */
-//    private Concept[] templateConcepts;
+    /** controls the rate at which tasklinks 'spread' to interact with termlinks */
+    static int termlinksPerTasklink = 3;
 
     public Activate(Concept c, float pri) {
         super(c, pri);
@@ -40,15 +37,6 @@ public class Activate extends PLink<Concept> implements Termed {
         assert (premisesMax > 0);
 
         nar.emotion.conceptFires.increment();
-
-//        if (templates == null) {
-//            synchronized(id) {
-//                if (templates == null) {
-//                    this.templates = TermLinks.templates(id, nar);
-//                    this.templateConcepts = TermLinks.templateConcepts(templates);
-//                }
-//            }
-//        }
 
         List<Concept> conceptualizedTemplates = $.newArrayList();
         float cost = TermLinks.linkTemplates(id, id.templates(), conceptualizedTemplates, priElseZero(), nar.momentum.floatValue(), nar, ba);
@@ -66,11 +54,11 @@ public class Activate extends PLink<Concept> implements Termed {
         //TODO add a termlink vs. tasklink balance parameter
         int TERMLINKS_SAMPLED = (int) Math.ceil((float) Math.sqrt(premisesMax));
 
-        int tlSampled = Math.min(ntermlinks, TERMLINKS_SAMPLED);
-        FasterList<PriReference<Term>> terml = new FasterList(tlSampled);
-        termlinks.sample(tlSampled, ((Consumer<PriReference>) terml::add));
-        int termlSize = terml.size();
-        if (termlSize <= 0) return null;
+//        int tlSampled = Math.min(ntermlinks, TERMLINKS_SAMPLED);
+//        FasterList<PriReference<Term>> terml = new FasterList(tlSampled);
+//        termlinks.sample(tlSampled, ((Consumer<PriReference>) terml::add));
+//        int termlSize = terml.size();
+//        if (termlSize <= 0) return null;
 
 
         final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
@@ -86,15 +74,13 @@ public class Activate extends PLink<Concept> implements Termed {
         final int[] remaining = {premisesMax};
 
         tasklinks.sample((Predicate<PriReference<Task>>) tasklink -> {
-            //tasklinks.sample(Math.min(ntasklinks, TASKLINKS_SAMPLED), (tasklink) -> {
 
             final Task task = tasklink.get();
-            if (task == null)
+            if (task == null || task.isDeleted())
                 return true;
 
-            for (int j = 0; j < termlSize; j++) {
-                PriReference<Term> termlink = terml.get(j);
-
+            int termlinksSampled = Math.min(Math.max(1, (int) Math.ceil(task.priElseZero() * termlinksPerTasklink)), remaining[0]);
+            termlinks.sample(termlinksSampled, (termlink)->{
                 final Term term = termlink.get();
                 if (term != null) {
 
@@ -109,11 +95,10 @@ public class Activate extends PLink<Concept> implements Termed {
 
                 }
 
-                if (--remaining[0] <= 0)
-                    return false;
-            }
+                --remaining[0];
+            });
 
-            return true;
+            return (remaining[0] > 0);
         });
 
         return next;

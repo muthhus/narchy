@@ -57,6 +57,7 @@ public class Theory implements Iterable<Term>, Serializable {
         is.close();
     }
 
+
     /**
      * Creates a theory from its source text
      *
