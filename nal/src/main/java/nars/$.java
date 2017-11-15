@@ -166,8 +166,8 @@ public enum $ {
 
 
 
-    @NotNull
-    public static <T extends Term> T impl(@NotNull Term a, @NotNull Term b) {
+
+    public static <T extends Term> T impl(Term a, Term b) {
         return (T) IMPL.the(DTERNAL, a, b);
     }
 

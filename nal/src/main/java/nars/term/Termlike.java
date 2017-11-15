@@ -9,8 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static nars.Op.Null;
-import static nars.Op.VAR_PATTERN;
+import static nars.Op.*;
 
 /**
  * something which is like a term but isnt quite,
@@ -103,6 +102,18 @@ public interface Termlike {
         return hasAny(op.bit);
     }
 
+    default boolean hasVarIndep() {
+        return varIndep() != 0;
+    }
+
+    default boolean hasVarDep() {
+        return varDep() != 0;
+    }
+
+    default boolean hasVarQuery() {
+        return varQuery() != 0;
+    }
+
     default boolean impossibleSubTerm(/*@NotNull*/Termlike target) {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
@@ -138,7 +149,6 @@ public interface Termlike {
     default boolean impossibleSubTermVolume(int otherTermVolume) {
         return otherTermVolume > volume() - subs();
     }
-
 
 
     default boolean impossibleSubTermOrEquality(/*@NotNull*/Term target) {
@@ -241,27 +251,27 @@ public interface Termlike {
      * total # of variables, excluding pattern variables
      */
     default int vars() {
-        return hasAny(Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_QUERY.bit) ?
-            intify((c, x) -> c + x.vars(), 0) : 0;
+        return hasAny(VAR_INDEP.bit | Op.VAR_DEP.bit | VAR_QUERY.bit) ?
+                subs(x -> x.isAny(VAR_INDEP.bit | Op.VAR_DEP.bit | VAR_QUERY.bit)) : 0;
     }
 
     /**
      * # of contained dependent variables in subterms (1st layer only)
      */
     default int varDep() {
-        return hasAny(Op.VAR_DEP) ? intify((c, x) -> c + x.varDep(), 0) : 0;
+        return hasAny(Op.VAR_DEP) ? subs(VAR_DEP) : 0;
     }
 
     default int varIndep() {
-        return hasAny(Op.VAR_INDEP) ? intify((c, x) -> c + x.varIndep(), 0) : 0;
+        return hasAny(VAR_INDEP) ? subs(VAR_INDEP) : 0;
     }
 
     default int varQuery() {
-        return hasAny(Op.VAR_QUERY) ? intify((c,x) -> c+x.varQuery(), 0) : 0;
+        return hasAny(VAR_QUERY) ? subs(VAR_QUERY) : 0;
     }
 
     default int varPattern() {
-        return /*hasAny(Op.VAR_PATTERN) ? */intify((c, x) -> c + x.varPattern(), 0)/* : 0*/;
+        return /*hasAny(Op.VAR_PATTERN) ? */subs(VAR_PATTERN); //since pattern vars are not included in structure, dont check it
     }
 
 //    default boolean unifyPossible(@Nullable Op t) {
@@ -286,8 +296,10 @@ public interface Termlike {
 
     default int intify(IntObjectToIntFunction<Term> reduce, int v) {
         int n = subs();
-        for (int i = 0; i < n; i++)
-            v = reduce.intValueOf(v, sub(i));
+        for (int i = 0; i < n; i++) {
+            //v = reduce.intValueOf(v, sub(i));
+            v = sub(i).intify(reduce, v);//reduce.intValueOf(v, sub(i));
+        }
         return v;
     }
 

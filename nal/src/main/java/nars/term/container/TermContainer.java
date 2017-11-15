@@ -559,6 +559,20 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return hashCode();
     }
 
+  @Override
+    default boolean hasVarQuery() {
+        return hasAny(Op.VAR_QUERY);
+    }
+
+    @Override
+    default boolean hasVarDep() {
+        return hasAny(Op.VAR_DEP);
+    }
+
+    @Override
+    default boolean hasVarIndep() {
+        return hasAny(Op.VAR_INDEP);
+    }
 
 //    default int count(/*@NotNull*/ Predicate<Term> match) {
 //        int s = subs();

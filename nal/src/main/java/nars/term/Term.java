@@ -42,6 +42,7 @@ import nars.term.transform.Retemporalize;
 import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.LongObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.list.primitive.ImmutableByteList;
@@ -137,11 +138,21 @@ public interface Term extends Termed, Comparable<Termed> {
      */
     boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent);
 
-    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, Term parent) {
+    /** parent compounds must pass the descent filter before ts subterms are visited;
+     *      but if descent filter isnt passed, it will continue to the next sibling:
+     *  whileTrue must remain true after vistiing each subterm otherwise the entire
+     *      iteration terminates
+     */
+    default boolean recurseTerms(Predicate<Term> descendFilter, Predicate<Term> whileTrue, Term parent) {
         return whileTrue.test(this);
     }
 
-//    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue) {
+    @Override
+    default int intify(IntObjectToIntFunction<Term> reduce, int v) {
+        return reduce.intValueOf(v, this);
+    }
+
+    //    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue) {
 //        return recurseTerms(parentsMust, whileTrue, this);
 //    }
 
@@ -389,23 +400,7 @@ public interface Term extends Termed, Comparable<Termed> {
 //
 
 
-    default boolean hasVarIndep() {
-        return varIndep() != 0;
-    }
 
-//    /** returns the first ellipsis subterm or null if not present */
-//    @Nullable
-//    @Override default Ellipsis firstEllipsis() {
-//        return null;
-//    }
-
-    default boolean hasVarDep() {
-        return varDep() != 0;
-    }
-
-    default boolean hasVarQuery() {
-        return varQuery() != 0;
-    }
 
 
     void append(Appendable w) throws IOException;
@@ -633,7 +628,7 @@ public interface Term extends Termed, Comparable<Termed> {
         if (op() == CONJ) {
             int dt = this.dt();
             if (dt != DTERNAL) {
-                return intify((sum, x) -> sum + x.eventCount(), 0);
+                return subterms().intify((sum, x) -> sum + x.eventCount(), 0);
             }
         }
 

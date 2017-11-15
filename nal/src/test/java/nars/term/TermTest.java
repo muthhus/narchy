@@ -79,6 +79,10 @@ public class TermTest {
             assertSame(b, $.the(b.toString()));
     }
 
+    @Test public void testIntifyVarCountOfSubtermsContainingVars() throws Narsese.NarseseException {
+        assertEquals(2, $("(add(s(s(0)),s(s(0)),?R)==>goal(?R))").varQuery());
+    }
+
     @Test
     public void testConjCommutivity() {
 

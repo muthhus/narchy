@@ -1,11 +1,22 @@
 package nars.op.prolog;
 
-import alice.tuprolog.*;
+import alice.tuprolog.Int;
+import alice.tuprolog.Struct;
+import alice.tuprolog.Theory;
+import alice.tuprolog.Var;
 import com.google.common.collect.Iterables;
 import jcog.TODO;
 import jcog.Util;
 import nars.$;
-import org.eclipse.collections.impl.block.factory.PrimitiveFunctions;
+import nars.Op;
+import nars.term.Term;
+import nars.term.var.Variable;
+import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 public class PrologToNAL {
 
@@ -34,9 +45,40 @@ public class PrologToNAL {
             switch (name) {
                 case ":-":
                     assert(s.subs()==2);
-                    nars.term.Term pre = N(s.sub(1));
+                    nars.term.Term pre = N(s.sub(1)); //reverse, prolog is backwards
                     nars.term.Term post = N(s.sub(0));
-                    return $.impl(pre,post);
+
+                    //convert to implication first, then promote variables on the resulting pre/post
+                    Term impl = $.impl(pre, post);
+                    pre = impl.sub(0);
+                    post = impl.sub(1);
+
+                    if (pre.varQuery()>0 && post.varQuery()>0) {
+                        MutableSet<nars.term.var.Variable> prev = new UnifiedSet();
+                        pre.recurseTerms(aa -> aa.hasVarQuery(), (a) -> {
+                            if (a.op() == Op.VAR_QUERY)
+                                prev.add((Variable)a);
+                            return true;
+                        }, null);
+                        MutableSet<nars.term.var.Variable> posv = new UnifiedSet();
+                        post.recurseTerms(aa -> aa.hasVarQuery(), (a) -> {
+                            if (a.op() == Op.VAR_QUERY)
+                                posv.add((Variable)a);
+                            return true;
+                        }, null);
+
+                        MutableSet<nars.term.var.Variable> common = prev.intersect(posv);
+                        int cs = common.size();
+                        if (cs > 0) {
+                            Map<nars.term.Term,nars.term.Term> x = new UnifiedMap(cs);
+                            for (nars.term.var.Variable c : common) {
+                                x.put(c, $.varIndep(c.toString().substring(1)));
+                            }
+                            impl = impl.replace(x);
+                        }
+                    }
+
+                    return impl;
                 case ",":
                     return $.conj(N(s.sub(0)), N(s.sub(1)));
                 default:

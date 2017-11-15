@@ -29,10 +29,6 @@ public class TermVector1 extends TermVector {
         this.sub = sub;
     }
 
-    @Override
-    public int intify(IntObjectToIntFunction<Term> reduce, int v) {
-        return sub.intify(reduce, v);
-    }
 
     @Override
     public final boolean isTemporal() {

@@ -93,14 +93,6 @@ public class ArrayTermVector extends TermVector {
     }
 
 
-
-
-    public final int intify(IntObjectToIntFunction<Term> reduce, int v) {
-        for (Term x : terms)
-            v = reduce.intValueOf(v, x);
-        return v;
-    }
-
     @Override
     /*@NotNull*/ public final Term sub(int i) {
         return terms[i];

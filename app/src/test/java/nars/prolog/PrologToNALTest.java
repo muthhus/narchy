@@ -15,7 +15,7 @@ public class PrologToNALTest {
 
     @Test public void testRuleImpl() throws InvalidTheoryException, IOException, URISyntaxException {
 
-        String expected = "add(0,?X,?X) , (add(?X,?Y,?Z)==>add(s(?X),?Y,s(?Z))) , (add(s(s(0)),s(s(0)),?R)==>goal(?R))";
+        String expected = "add(0,?X,?X) , (add($X,$Y,$Z)==>add(s($X),$Y,s($Z))) , (add(s(s(0)),s(s(0)),$R)==>goal($R))";
         Iterable<alice.tuprolog.Term> input = Theory.resource(
             "../../../resources/prolog/add.pl"
         );
@@ -24,7 +24,7 @@ public class PrologToNALTest {
 
     @Test public void testConjCondition2() throws InvalidTheoryException, IOException, URISyntaxException {
 
-        String expected = "((?X&&?Y)==>conj(?X,?Y))";
+        String expected = "(($X&&$Y)==>conj($X,$Y))";
         Iterable<alice.tuprolog.Term> input = Theory.string(
             "conj(X,Y) :- X, Y."
         );
@@ -32,7 +32,7 @@ public class PrologToNALTest {
     }
     @Test public void testConjCondition3() throws InvalidTheoryException, IOException, URISyntaxException {
 
-        String expected = "((&&,?X,?Y,?Z)==>conj(?X,?Y,?Z))";
+        String expected = "((&&,$X,$Y,$Z)==>conj($X,$Y,$Z))";
         Iterable<alice.tuprolog.Term> input = Theory.string(
             "conj(X,Y,Z) :- X, Y, Z."
         );

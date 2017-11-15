@@ -208,11 +208,11 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Override
-    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, @Nullable Term parent) {
-        if (parentsMust.test(this)) {
-            return subterms().recurseTerms(parentsMust, whileTrue, this);
+    default boolean recurseTerms(Predicate<Term> descendFilter, Predicate<Term> whileTrue, @Nullable Term parent) {
+        if (descendFilter.test(this)) {
+            return subterms().recurseTerms(descendFilter, whileTrue, this);
         }
-        return false;
+        return true; //continue
     }
 
 
@@ -395,24 +395,11 @@ public interface Compound extends Term, IPair, TermContainer {
         return subterms().varIndep();
     }
 
-    @Override
-    default boolean hasVarQuery() {
-        return hasAny(Op.VAR_QUERY);
-    }
 
-    @Override
-    default boolean hasVarDep() {
-        return hasAny(Op.VAR_DEP);
-    }
-
-    @Override
-    default boolean hasVarIndep() {
-        return hasAny(Op.VAR_INDEP);
-    }
 
     @Override
     default int intify(IntObjectToIntFunction<Term> reduce, int v) {
-        return subterms().intify(reduce,v);
+        return subterms().intify(reduce, Term.super.intify(reduce, v) );
     }
 
     @Override
