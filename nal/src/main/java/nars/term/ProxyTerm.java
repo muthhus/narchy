@@ -99,7 +99,7 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     }
 
     @Override
-    public @NotNull Term conceptual() {
+    public Term conceptual() {
         return ref.conceptual();
     }
 
@@ -121,7 +121,7 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     }
 
     @Override
-    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+    public boolean unify(Term y, Unify subst) {
         return ref.unify(y, subst);
     }
 
@@ -163,12 +163,12 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     }
 
     @Override
-    public @NotNull ByteList structureKey() {
+    public ByteList structureKey() {
         return ref.structureKey();
     }
 
     @Override
-    public @NotNull ByteList structureKey(@NotNull ByteArrayList appendTo) {
+    public ByteList structureKey(ByteArrayList appendTo) {
         return ref.structureKey(appendTo);
     }
 
@@ -185,12 +185,12 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     }
 
     @Override
-    public boolean pathsTo(@NotNull Term subterm, @NotNull BiPredicate<ByteList, Term> receiver) {
+    public boolean pathsTo(Term subterm, BiPredicate<ByteList, Term> receiver) {
         return ref.pathsTo(subterm, receiver);
     }
 
     @Override
-    public <X> boolean pathsTo(@NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
+    public <X> boolean pathsTo(Function<Term, X> subterm, BiPredicate<ByteList, X> receiver) {
         return ref.pathsTo(subterm, receiver);
     }
 
@@ -222,7 +222,7 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     }
 
 //    @Override
-//    public boolean impossibleSubTerm(@NotNull Termlike target) {
+//    public boolean impossibleSubTerm(Termlike target) {
 //        return ref.impossibleSubTerm(target);
 //    }
 //
@@ -242,7 +242,7 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     }
 
     @Override
-    public boolean impossibleSubTermOrEquality(@NotNull Term target) {
+    public boolean impossibleSubTermOrEquality(Term target) {
         return ref.impossibleSubTermOrEquality(target);
     }
 
@@ -252,12 +252,12 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     }
 
     @Override
-    public boolean ANDrecurse(@NotNull Predicate<Term> v) {
+    public boolean ANDrecurse(Predicate<Term> v) {
         return ref.ANDrecurse(v);
     }
 
     @Override
-    public void recurseTerms(@NotNull Consumer<Term> v) {
+    public void recurseTerms(Consumer<Term> v) {
         ref.recurseTerms(v);
     }
 
@@ -267,7 +267,7 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     }
 
     @Override
-    public boolean ORrecurse(@NotNull Predicate<Term> v) {
+    public boolean ORrecurse(Predicate<Term> v) {
         return ref.ORrecurse(v);
     }
 

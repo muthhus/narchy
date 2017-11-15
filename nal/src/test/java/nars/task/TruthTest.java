@@ -6,9 +6,11 @@ import nars.Param;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static nars.Param.TRUTH_EPSILON;
+import static nars.truth.TruthFunctions.w2c;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -186,5 +188,17 @@ public class TruthTest {
         assertEquals(1f, $.t(0f, 0.9f).polarity(), 0.01f);
         assertEquals(1f, $.t(1f, 0.9f).polarity(), 0.01f);
         assertEquals(1f, $.t(1f, 0.5f).polarity(), 0.01f);
+    }
+
+    @Disabled
+    @Test public void testEvidenceHorizonDistortion() {
+        Truth a = $.t(1f, 0.9f);
+        float eviA = a.evi();
+        Truth b = $.t(1f, 0.9f);
+        float eviB = b.evi();
+        float eviABintersect = TruthFunctions.c2w(0.81f);
+        float eviABintersectRaw = eviA * eviB;
+        float eviABintersectRawToConf = w2c(eviA * eviB);
+        System.out.println();
     }
 }

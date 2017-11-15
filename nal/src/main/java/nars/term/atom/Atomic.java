@@ -6,6 +6,7 @@ import nars.Narsese;
 import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.Term;
+import nars.term.Termlike;
 import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.Nullable;
 
@@ -171,6 +172,21 @@ public interface Atomic extends Term {
     @Override
     default boolean impossibleSubTermVolume(int otherTermVolume) {
         return true;
+    }
+
+    @Override
+    default boolean impossibleSubTermOrEquality(Term target) {
+        return !equals(target);
+    }
+
+    @Override
+    default boolean impossibleSubTerm(Termlike target) {
+        return true;
+    }
+
+    @Override
+    default boolean impossibleSubTermOrEqualityVolume(int otherTermsVolume) {
+        return otherTermsVolume!=1;
     }
 
     @Override

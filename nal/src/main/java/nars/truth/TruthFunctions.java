@@ -305,6 +305,7 @@ public final class TruthFunctions {
     public static Truth desireStrongOriginal(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float bFreq = b.freq();
         float c = and(a.conf(), b.conf(), bFreq);
+        //float c = w2cSafe(and(a.evi(), b.evi(), bFreq));
         return c < minConf ? null : desire(a.freq(), bFreq, c);
     }
 
@@ -389,9 +390,10 @@ public final class TruthFunctions {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth intersection(@Nullable Truth v1, /*@NotNull*/ Truth v2, float minConf) {
-        if (v1 == null) return null;
-        float c = and(v1.conf(), v2.conf());
+    public static Truth intersection(Truth v1, /*@NotNull*/ Truth v2, float minConf) {
+        float c =
+                and(v1.conf(), v2.conf());
+                //w2c(and(v1.evi(), v2.evi()));
         return (c < minConf) ?
                 null :
                 t(and(v1.freq(), v2.freq()), c);
@@ -553,7 +555,11 @@ public final class TruthFunctions {
      * @return The corresponding confidence, in [0, 1)
      */
     public static float w2c(float w) {
-        assert (w == w && w > 0): "w2c(" + w + ") is invalid";
+        assert (w == w && w > 0) : "w2c(" + w + ") is invalid";
+        return w2cSafe(w);
+    }
+
+    public static float w2cSafe(float w) {
         return w / (w + Param.HORIZON);
     }
 

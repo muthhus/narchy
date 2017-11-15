@@ -210,13 +210,13 @@ abstract public class NAgentX extends NAgent {
 
         n.confMin.set(0.01f);
         n.truthResolution.set(0.01f);
-        n.termVolumeMax.set(38);
+        n.termVolumeMax.set(28);
 
-        n.beliefConfidence(0.9f);
-        n.goalConfidence(0.9f);
+        n.beliefConfidence(0.75f);
+        n.goalConfidence(0.5f);
 
 
-        float priFactor = 0.25f;
+        float priFactor = 0.1f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;

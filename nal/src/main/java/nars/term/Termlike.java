@@ -215,6 +215,7 @@ public interface Termlike {
         if (s < 2) return true;
 
         //TODO save the last in a variable to avoid sub(i) call
+        //Term prev = sub(0);
         for (int i = 1; i < s; i++) {
             if (sub(i - 1).compareTo(sub(i)) >= 0)
                 return false;
@@ -270,19 +271,19 @@ public interface Termlike {
      * # of contained dependent variables in subterms (1st layer only)
      */
     default int varDep() {
-        return hasAny(Op.VAR_DEP) ? subs(VAR_DEP) : 0;
+        return hasAny(Op.VAR_DEP) ? sum(Term::varDep) : 0;
     }
 
     default int varIndep() {
-        return hasAny(VAR_INDEP) ? subs(VAR_INDEP) : 0;
+        return hasAny(VAR_INDEP) ? sum(Term::varIndep) : 0;
     }
 
     default int varQuery() {
-        return hasAny(VAR_QUERY) ? subs(VAR_QUERY) : 0;
+        return hasAny(VAR_QUERY) ? sum(Term::varQuery) : 0;
     }
 
     default int varPattern() {
-        return /*hasAny(Op.VAR_PATTERN) ? */subs(VAR_PATTERN); //since pattern vars are not included in structure, dont check it
+        return /*hasAny(Op.VAR_PATTERN) ? */sum(Term::varPattern); //since pattern vars are not included in structure, dont check it
     }
 
 

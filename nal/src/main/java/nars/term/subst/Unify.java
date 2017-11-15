@@ -413,7 +413,7 @@ public abstract class Unify extends Versioning implements Subst {
                 int s = constraints.size();
                 for (int i = 0; i < s; i++) {
                     MatchConstraint cc = constraints.get(i);
-                    //assert(cc!=null);
+                    assert(cc!=null);
                     if (cc.invalid(x, Unify.this))
                         return false;
                 }
@@ -424,7 +424,7 @@ public abstract class Unify extends Versioning implements Subst {
         public boolean constrain(MatchConstraint m) {
 
             if (constraints == null)
-                constraints = new Versioned(Unify.this, 0);
+                constraints = new Versioned(Unify.this, 2);
 
             return constraints.set(m) != null;
         }

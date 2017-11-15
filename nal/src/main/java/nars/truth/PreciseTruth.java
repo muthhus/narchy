@@ -1,5 +1,6 @@
 package nars.truth;
 
+import jcog.Util;
 import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,8 +28,9 @@ public class PreciseTruth implements Truth {
                 "invalid evidence/conf: " + ce;
         float e;
         if (xIsConfOrEvidence) {
-            if (ce > TruthFunctions.MAX_CONF)
-                throw new RuntimeException(ce + " is gte max (" + TruthFunctions.MAX_CONF + ')');
+//            if (ce > TruthFunctions.MAX_CONF)
+//                throw new RuntimeException(ce + " is gte max (" + TruthFunctions.MAX_CONF + ')');
+            ce = Util.min(ce, TruthFunctions.MAX_CONF);
             e = c2wSafe(ce, Param.HORIZON);
         } else {
             e = ce;
@@ -36,7 +38,7 @@ public class PreciseTruth implements Truth {
         this.e = e;
     }
 
-    @NotNull @Override
+    @Override
     public Truth neg() {
         return new PreciseTruth(1f - f, e, false);
     }

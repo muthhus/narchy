@@ -193,7 +193,7 @@ public class Temporalize implements ITemporalize {
      * @param occ    superterm occurrence, may be ETERNAL
      * @param start, end - term-local temporal bounds
      */
-    private void know(@NotNull AbsoluteEvent root, int start, int end) {
+    private void know(AbsoluteEvent root, int start, int end) {
 
 //        if (!x.op().conceptualizable) // || (!term.hasAny(ATOM.bit | INT.bit)))
 //            return; //ignore variable's and completely-variablized's temporalities because it can conflict
@@ -292,7 +292,7 @@ public class Temporalize implements ITemporalize {
                                     //TODO repeat case
                                 }
                                 return true;
-                            }, implDT+implSubj.dtRange());
+                            }, predFromSubj);
                         }
                     }
 
