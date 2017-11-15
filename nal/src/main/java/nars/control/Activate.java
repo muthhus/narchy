@@ -6,18 +6,20 @@ import jcog.list.FasterList;
 import jcog.pri.PLink;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;
+import jcog.pri.Priority;
+import jcog.pri.op.PriForget;
 import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
 import nars.concept.TermLinks;
+import nars.table.TemporalBeliefTable;
 import nars.term.Term;
 import nars.term.Termed;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -62,7 +64,21 @@ public class Activate extends PLink<Concept> implements Termed {
 
 
         final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
-        tasklinks.commit(tasklinks.forget(linkForgetting));
+        long now = nar.time();
+        int dur = nar.dur();
+        tasklinks.commit(PriForget.forget(tasklinks, linkForgetting, Pri.EPSILON, (r)->{
+          return new PriForget<PriReference<Task>>(r) {
+              @Override
+              public void accept(PriReference<Task> b) {
+                  Task t = b.get();
+                  float rate =
+                        t.isBeliefOrGoal() ?
+                              1f - TemporalBeliefTable.temporalTaskPriority(t, now, now, dur) :
+                              1f;
+                  b.priSub(priRemoved * rate);
+              }
+          };
+        }));
         int ntasklinks = tasklinks.size();
         if (ntasklinks == 0) return null;
 

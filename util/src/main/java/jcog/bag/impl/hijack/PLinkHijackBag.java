@@ -79,8 +79,8 @@ public class PLinkHijackBag<X> extends HijackBag<X, PriReference<X>> {
 
 
 
-    @Override
-    public PriForget forget(float avgToBeRemoved) {
-        return new PriForget(avgToBeRemoved);
-    }
+//    @Override
+//    public PriForget forget(float avgToBeRemoved) {
+//        return new PriForget(avgToBeRemoved);
+//    }
 }

@@ -220,8 +220,8 @@ public class Premise  {
         assert(now!=ETERNAL);
 
         if (task.isEternal()) {
-            return ETERNAL;
-            //return now;
+            //return ETERNAL;
+            return now;
         } else {
 
             //return now;

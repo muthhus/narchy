@@ -2,10 +2,12 @@ package nars.experiment.fzero;
 
 import jcog.Util;
 import nars.*;
+import nars.concept.GoalActionAsyncConcept;
 import nars.concept.ScalarConcepts;
 import nars.gui.Vis;
-import nars.util.signal.CameraSensor;
 import nars.op.video.Scale;
+import nars.time.Tense;
+import nars.util.signal.CameraSensor;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -264,25 +266,31 @@ public class FZero extends NAgentX {
     }
 
     public void initBipolar() {
-        actionBipolar($.the("fwd"), (f) -> {
+        GoalActionAsyncConcept[] f = actionBipolar($.the("fwd"), (a) -> {
             //if (f > 0) {
             //accelerator
             //if (f > 0.5f)
-            if (f > 0)
-                fz.vehicleMetrics[0][6] = /*+=*/ (f) * (fwdSpeed);
+            if (a > 0)
+                fz.vehicleMetrics[0][6] = /*+=*/ (a) * (fwdSpeed);
             else
-                fz.vehicleMetrics[0][6] *= 1 - (-f);
+                fz.vehicleMetrics[0][6] *= 1 - (-a);
 //            else {
 //                float brake = 0.5f - f;
 //                fz.vehicleMetrics[0][6] *= (1f - brake);
 //            }
-            return f;
-        });//.resolution.setValue(0.02f);
-
-        actionBipolar($.the("x"), (x) -> {
-            fz.playerAngle += (x) * rotSpeed;
-            return x;
+            return a;
         });
+//        //eternal bias to stop
+//        nar.goal(f[0].term, Tense.Eternal, 0.5f, 0.01f);
+//        nar.goal(f[1].term, Tense.Eternal, 0.5f, 0.01f);
+
+        GoalActionAsyncConcept[] x = actionBipolar($.the("x"), (a) -> {
+            fz.playerAngle += (a) * rotSpeed;
+            return a;
+        });
+//        //eternal bias to stop
+//        nar.goal(x[0].term, Tense.Eternal, 0.5f, 0.01f);
+//        nar.goal(x[1].term, Tense.Eternal, 0.5f, 0.01f);
     }
 
     protected boolean polarized(@NotNull Task task) {

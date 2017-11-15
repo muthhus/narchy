@@ -129,7 +129,12 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
     }
 
     public final Versioned<Y> getOrCreateIfAbsent(X key) {
-        return map.computeIfAbsent(key, this::newEntry);
+        //return map.computeIfAbsent(key, this::newEntry);
+        Versioned<Y> v = map.get(key);
+        if (v!=null) return v;
+        v = newEntry(key);
+        map.put(key, v);
+        return v;
     }
 
     protected Versioned<Y> newEntry(X ignored) {

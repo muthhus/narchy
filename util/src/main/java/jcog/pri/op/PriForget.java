@@ -1,5 +1,6 @@
 package jcog.pri.op;
 
+import jcog.bag.Bag;
 import jcog.pri.Priority;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +46,10 @@ public class PriForget<P extends Priority> implements Consumer<P> {
 
         }
         return null;
+    }
+
+    @Nullable public static Consumer forget(Bag b, float temperature, float priEpsilon, FloatToObjectFunction f) {
+        return forget(b.size(), b.capacity(), b.depressurize(), b.mass(), temperature, priEpsilon, f);
     }
 
     @Override

@@ -76,7 +76,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
         if (size < child.length) {
             child[size++] = n;
 
-            HyperRegion nr = n.region();
+            HyperRegion nr = n.bounds();
             region = region != null ? region.mbr(nr) : nr;
             return size - 1;
         } else {
@@ -96,7 +96,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
 
     @NotNull
     @Override
-    public HyperRegion region() {
+    public HyperRegion bounds() {
         return region;
     }
 
@@ -120,7 +120,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
             //MERGE STAGE:
             for (int i = 0; i < size; i++) {
                 Node ci = child[i];
-                if (ci.region().contains(tRect)) {
+                if (ci.bounds().contains(tRect)) {
                     //check for existing item
                     //                if (ci.contains(t, model))
                     //                    return this; // duplicate detected (subtree not changed)
@@ -204,18 +204,18 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
     }
 
     private void grow(Node node) {
-        region = region.mbr(node.region());
+        region = region.mbr(node.bounds());
     }
 
     private static HyperRegion grow(HyperRegion region, Node node) {
-        return region.mbr(node.region());
+        return region.mbr(node.bounds());
     }
 
     @Override
     public Node<T, ?> remove(final T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
 
         for (int i = 0; i < size; i++) {
-            if (child[i].region().contains(xBounds)) {
+            if (child[i].bounds().contains(xBounds)) {
                 child[i] = child[i].remove(x, xBounds, this, model);
                 if (reportNextSizeDelta(parent)) {
                     if (child[i].size() == 0) {
@@ -235,7 +235,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
             }
 
             Node<T, ?>[] cc = this.child;
-            HyperRegion region = cc[0].region();
+            HyperRegion region = cc[0].bounds();
             for (int i = 1; i < size; i++) {
                 region = grow(region, cc[i]);
             }
@@ -261,12 +261,12 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
         Node<T, ?>[] cc = this.child;
         HyperRegion region = null;
         for (int i = 0; i < size; i++) {
-            if (!found && tRect.intersects(cc[i].region())) {
+            if (!found && tRect.intersects(cc[i].bounds())) {
                 cc[i] = cc[i].update(OLD, NEW, model);
                 found = true;
             }
             if (i == 0) {
-                region = cc[0].region();
+                region = cc[0].bounds();
             } else {
                 region = grow(region, cc[i]);
             }
@@ -296,7 +296,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
 
             short s = this.size;
             for (int i = 0; i < s; i++) {
-                HyperRegion cir = cc[i].region();
+                HyperRegion cir = cc[i].bounds();
                 HyperRegion childMbr = tRect.mbr(cir);
                 final double nodeEnlargement = childMbr.cost() - (cir.cost() + tCost);
                 if (nodeEnlargement < leastEnlargement) {

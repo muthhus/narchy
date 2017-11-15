@@ -2,6 +2,7 @@ package nars.task;
 
 import jcog.decide.DecideRoulette;
 import jcog.decide.DecideSoftmax;
+import nars.Param;
 import nars.Task;
 import nars.truth.PreciseTruth;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
@@ -11,6 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import static nars.truth.TruthFunctions.w2c;
+import static nars.truth.TruthFunctions.w2cSafe;
 
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
@@ -56,7 +58,11 @@ public interface TruthPolation extends Consumer<Tasked> {
         public PreciseTruth truth() {
             if (eviSum > 0) {
                 float f = wFreqSum / eviSum;
-                return new PreciseTruth(f, eviSum, false);
+                float c = w2cSafe(eviSum);
+                if (c < Param.TRUTH_EPSILON)
+                    return null; //high-pass conf filter
+
+                return new PreciseTruth(f, c);
 
             } else {
                 return null;

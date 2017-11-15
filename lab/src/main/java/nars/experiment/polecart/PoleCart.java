@@ -5,9 +5,11 @@ import jcog.Util;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.FloatSupplier;
 import nars.*;
+import nars.concept.GoalActionAsyncConcept;
 import nars.concept.SensorConcept;
 import nars.control.DurService;
 import nars.gui.Vis;
+import nars.time.Tense;
 import nars.util.signal.LivePredictor;
 import spacegraph.SpaceGraph;
 
@@ -132,11 +134,17 @@ public class PoleCart extends NAgentX {
                 new FloatPolarNormalized(()->(float)angleDot)
         ).resolution(0.1f);
 
-        actionBipolar($.the("move"), (a) -> {
-            if (!manualOverride)
-                action = a;
-            return a;
-        });
+        {
+            GoalActionAsyncConcept[] f = actionBipolar($.the("move"), (a) -> {
+                if (!manualOverride)
+                    action = a;
+                return a;
+            });
+            //eternal bias to stop
+            nar.goal(f[0].term, Tense.Eternal, 0.5f, 0.01f);
+            nar.goal(f[1].term, Tense.Eternal, 0.5f, 0.01f);
+        }
+
 //        actionUnipolar($.p("left"), (a) -> {
 //            if (!manualOverride)
 //                action = Util.clampBi((float) (action + a));

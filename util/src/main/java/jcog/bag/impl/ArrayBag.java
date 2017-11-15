@@ -399,13 +399,18 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
                 if (x != null) {
                     Y y = (Y) x;
-
-                    BagSample next = each.next(y);
-                    if (next.remove)
+                    float yp = priUpdate(y);
+                    if (yp!=yp) {
                         remove(key(y));
+                    } else {
 
-                    if (next.stop)
-                        return this;
+                        BagSample next = each.next(y);
+                        if (next.remove)
+                            remove(key(y));
+
+                        if (next.stop)
+                            return this;
+                    }
                 }
 
                 if (items.array() != ii) //resized, due to another thread

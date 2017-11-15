@@ -27,7 +27,7 @@ import static nars.time.Tense.ETERNAL;
 
 public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
-    public static final float baseTaskSize = 0.05f;
+    public static final float baseTaskSize = 0.04f;
     public static final float CROSSHAIR_THICK = 3;
     final Term term;
     final TruthWave beliefs;
@@ -367,15 +367,17 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
             //normalize to range
             //conf = (conf - confMinMax[0]) / (confMinMax[1] - confMinMax[0]);
 
-            /** smudge a low confidence task across more of the frequency range */
-            final float ph = Util.lerp(conf, 0.2f, /* down to */ baseTaskSize / 64f);
+
+            final float ph =
+                    baseTaskSize;
+                    //Util.lerp(conf, 0.2f, /* down to */ baseTaskSize / 64f); //smudge a low confidence task across more of the frequency range
 
             float start, end;
             if (showEternal && eternal) {
                 start = end = nowX;
             } else if (((e <= maxT) && (e >= minT)) || ((s >= minT) && (s <= maxT))) {
                 start = xTime(minT, maxT, (long) s);
-                end = xTime(minT, maxT, (long) e);
+                end = s == e ? start : xTime(minT, maxT, (long) e);
             } else {
                 return;
             }
@@ -383,23 +385,14 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
             //r.renderTask(gl, qua, conf, pw, ph, xStart, xEnd, freq);
 
-            float r, g, b;
-            if (beliefOrGoal) {
-                r = 0.1f + 0.9f * conf;
-                g = 0.4f * conf;
-                b = 0;
-            } else {
-                r = 0;
-                g = 0.1f + 0.9f * conf;
-                b = 0.4f * conf;
-            }
-
-
             float mid = (end + start) / 2f;
-            float pw = baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
-            float W = Math.max((end - start), pw);
-            float alpha = 0.1f + (conf) * 0.4f;
-            gl.glColor4f(r, g, b, alpha); //, 0.7f + 0.2f * q);
+            float W = Util.max((end - start), baseTaskSize/4);
+
+            if (beliefOrGoal) {
+                gl.glColor4f(0f, 0.5f * (1f-conf), 1f * conf, 0.5f);
+            } else {
+                gl.glColor4f(0.5f * (1f-conf),  1f * conf, 0, 0.5f);
+            }
             float y = freq - ph / 2;
             float x = mid - W / 2;
             Draw.rect(gl,
@@ -433,14 +426,10 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
                 return;
             }
 
-            float a =
-                    0.1f + 0.9f * conf;
-            //0.5f + conf * 0.3f;
-            //0.45f + 0.5f * conf;
             if (beliefOrGoal) {
-                gl.glColor4f(0.5f, 0.25f, 0f, a);
+                gl.glColor4f(0f, 0.25f * (1f-conf), 0.25f + 0.75f * conf, 0.8f);
             } else {
-                gl.glColor4f(0f, 0.5f, 0.25f, a);
+                gl.glColor4f(0.25f * (1f-conf),  0.25f + 0.75f * conf, 0f, 0.8f);
             }
 
             //r.renderTask(gl, qua, conf, pw, ph, x, freq);

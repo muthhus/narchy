@@ -616,13 +616,7 @@ public interface Bag<K, V> extends Table<K, V> {
      *  how fast the bag should allow new items. 0.5 is a default value
      */
     default @Nullable Consumer<V> forget(float temperature) {
-        int s = size();
-        if (s > 0) {
-            float p = depressurize();
-            if (p > 0)
-                return PriForget.forget(s, capacity(), p, mass(), temperature, Prioritized.EPSILON, PriForget::new);
-        }
-        return null;
+        return PriForget.forget(this, temperature, Prioritized.EPSILON, PriForget::new);
     }
 
 

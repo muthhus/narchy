@@ -45,7 +45,7 @@ public class ScalarSignal extends Signal implements  DoubleSupplier {
 
 
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Term t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, FloatSupplier resolution) {
+    public ScalarSignal(NAR n, Term t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, FloatSupplier resolution) {
         super(BELIEF, resolution);
 
         pri(()->n.priDefault(BELIEF));
@@ -61,6 +61,7 @@ public class ScalarSignal extends Signal implements  DoubleSupplier {
 //    public void ready() {
 //        this.lastInputTime = nar.time() - minTimeBetweenUpdates;
 //    }
+
 
     /** does not input the task, only generates it.
      *  the time is specified instead of obtained from NAR so that
@@ -95,7 +96,7 @@ public class ScalarSignal extends Signal implements  DoubleSupplier {
             return nextTask;
     }
 
-    protected LongSupplier stamp(Truth currentBelief, @NotNull NAR nar) {
+    protected LongSupplier stamp(Truth currentBelief, NAR nar) {
         return nar.time::nextStamp;
     }
 

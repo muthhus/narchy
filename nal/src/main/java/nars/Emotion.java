@@ -322,12 +322,10 @@ public class Emotion extends ConcurrentMonitorRegistry {
         MetaGoal.learn(MetaGoal.Perceive, t.cause(), cost, nar);
 
         busy(pri, (int) Math.ceil(vol ));
-
-
     }
 
     public void onActivate(Task t, float activation, Concept origin, NAR n) {
-        n.emotion.taskActivations.increment();
+        taskActivations.increment();
 
         short[] effect = t.cause();
         int xl = effect.length;

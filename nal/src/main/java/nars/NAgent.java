@@ -91,7 +91,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
      */
     public float rewardCurrent;
     private Loop loop;
-    public NAR nar;
+    public final NAR nar;
     private int dur;
     private final NALTask happyGoal;
     //final private ConceptFire fireHappy;
@@ -243,8 +243,6 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
      */
     @Override
     protected void start(NAR nar) {
-
-        this.nar = nar;
 
         this.now = nar.time();
 

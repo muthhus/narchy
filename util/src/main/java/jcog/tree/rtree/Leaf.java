@@ -66,7 +66,7 @@ public class Leaf<T> implements Node<T, T> {
         int s = size();
         if (s < 2)
             return 0;
-        double mean = region().center(dim);
+        double mean = bounds().center(dim);
         double sumDiffSq = 0;
         for (int i = 0; i < s; i++) {
             T c = get(i);
@@ -280,7 +280,7 @@ public class Leaf<T> implements Node<T, T> {
 
     /*@NotNull*/
     @Override
-    public HyperRegion region() {
+    public HyperRegion bounds() {
         return region;
     }
 
@@ -315,14 +315,14 @@ public class Leaf<T> implements Node<T, T> {
     public final void classify(final Node<T, T> l1Node, final Node<T, T> l2Node, final T t, Spatialization<T> model) {
 
         final HyperRegion tRect = model.region(t);
-        final HyperRegion l1Region = l1Node.region();
+        final HyperRegion l1Region = l1Node.bounds();
         final HyperRegion l1Mbr = l1Region.mbr(tRect);
 
         double tCost = tRect.cost();
 
         double l1c = l1Mbr.cost();
         final double l1CostInc = Math.max(l1c - (l1Region.cost() + tCost), 0.0);
-        final HyperRegion l2Region = l2Node.region();
+        final HyperRegion l2Region = l2Node.bounds();
         final HyperRegion l2Mbr = l2Region.mbr(tRect);
         double l2c = l2Mbr.cost();
         final double l2CostInc = Math.max(l2c - (l2Region.cost() + tCost), 0.0);

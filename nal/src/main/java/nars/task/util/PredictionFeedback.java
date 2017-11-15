@@ -6,6 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.control.MetaGoal;
 import nars.table.BeliefTable;
+import nars.table.DefaultBeliefTable;
 import nars.task.NALTask;
 import nars.task.SignalTask;
 import nars.truth.Truth;
@@ -17,7 +18,7 @@ public class PredictionFeedback {
 
     final BeliefTable table;
 
-    static final float REWARD_PUNISH_COHERENCE_THRESHOLD = 0.9f;
+
     float strength = 1;
 
     public PredictionFeedback(BeliefTable table) {
@@ -40,38 +41,38 @@ public class PredictionFeedback {
      */
     void feedbackNewBelief(Task y, boolean deleteIfIncoherent, NAR nar) {
 
+        long start = y.start();
+        long end = y.end();
+
+        final SignalTask[] strongestSignal = new SignalTask[1];
+        ((DefaultBeliefTable)table).temporal.whileEach(start, end, (xt) -> {
+            if (xt instanceof SignalTask) {
+                //only looking for SignalTask's that would invalidate this incoming
+                strongestSignal[0] = ((SignalTask)xt);
+                return false;
+            }
+            return true;
+            //TODO early exit with a Predicate form of this query method
+        });
+        SignalTask signal = strongestSignal[0];
+        if (signal==null)
+            return; //just beliefs against beliefs
+
         long when = y.nearestTimeTo(nar.time());
-        Truth x = table.truth(when, nar);
+        int dur = nar.dur();
+        Truth x = signal.truth(when, dur);
         if (x == null)
             return; //nothing to compare it with
 
-        int dur = nar.dur();
-
-        long start = y.start();
-        long end = y.end();
         float yConf = y.conf(when, dur);
-        float yFreq = y.freq();
 
-
-        final boolean[] signalTaskPresent = {false};
-        table.forEachTask(false, start, end, (xt) -> {
-            if (xt instanceof SignalTask) {
-                //only looking for SignalTask's that would invalidate this incoming
-                signalTaskPresent[0] = true; //at least one signal task contributes to the measured value
-            }
-            //TODO early exit with a Predicate form of this query method
-        });
-        if (!signalTaskPresent[0])
-            return; //just beliefs against beliefs
-
-        float coherence = freqCoherence(x.freq(), y.freq());
+        float coherence = coherence(signal, y);
         float confFraction = yConf/x.conf();
+        if (confFraction > 1f)
+            return; //prediction stronger than the sensor value
 
-        if (coherence >= REWARD_PUNISH_COHERENCE_THRESHOLD) {
-            reward(null, strength, y, nar, coherence, confFraction);
-        } else {
-            punish(deleteIfIncoherent, strength, null, y, nar, coherence, confFraction);
-        }
+        absorb(signal, y, nar, coherence, confFraction);
+
     }
 
     /**
@@ -86,67 +87,47 @@ public class PredictionFeedback {
         long end = x.end();
 
         float xConf = x.conf(x.nearestTimeTo(nar.time()), dur);
-        float xFreq = x.freq();
 
-        List<Task> trash = new FasterList();
-
-        table.forEachTask(false, start, end, (y) -> {
+        List<Task> trash = new FasterList(0);
+        ((DefaultBeliefTable)table).temporal.whileEach(start, end, (y) -> {
 
             if (y instanceof SignalTask)
-                return; //ignore previous signaltask
+                return true; //ignore previous signaltask
 
-            float coherence = freqCoherence(xFreq, y.freq());
             float confFraction = y.conf(y.nearestTimeBetween(start, end), dur) / xConf;
+            if (confFraction > 1f)
+                return true; //prediction stronger than the sensor value
 
-            if (coherence >= REWARD_PUNISH_COHERENCE_THRESHOLD) {
-                reward(x, strength, y, nar, coherence, confFraction);
-            } else {
-                punish(deleteIfIncoherent, strength, trash, y, nar, coherence, confFraction);
-            }
+            float coherence = coherence(x, y);
 
+            absorb(x, y, nar, coherence, confFraction);
+            trash.add(y);
+            return true; //continue
         });
 
-        trash.forEach(y -> {
-            ((NALTask) y).delete(x); //forward to the actual sensor reading
-            table.removeTask(y);
-        });
+        trash.forEach(table::removeTask);
     }
 
     /**
      * measures similarity of two frequencies. 0 = dissimilar, 1 = similar
      */
-    static float freqCoherence(float xFreq, float yFreq) {
-        return 1f - Math.abs(xFreq - yFreq);
+    static float coherence(Task actual, Task predict) {
+        float xFreq = actual.freq();
+        float yFreq = predict.freq();
+        float overtime = Math.max(0, predict.range() - actual.range()); //penalize predictions spanning longer than the actual signal because we aren't checking in that time range for accuracy, it could be wrong before and after the signal
+        return 1f - Math.abs(xFreq - yFreq) / (1f + overtime);
         //TruthFunctions.freqSimilarity(xFreq, y.freq());
-
     }
 
-    private void punish(boolean deleteIfIncoherent, float strength, List<Task> trash, Task y, NAR nar, float coherence, float confFraction) {
-        float v = (1f - coherence) * 2f * confFraction /* * (1/headstart) */ * strength;
 
-        if (deleteIfIncoherent) {
-
-            if (trash != null) {
-                trash.add(y);
-            } else {
-                y.delete(); //just delete it if in pre-filter non-deferred trash mode
-            }
-
-        } else {
-            y.setPri(0); //drain priority  TODO maybe transfer it to nearby tasks?
-        }
-
-        MetaGoal.learn(MetaGoal.Inaccurate, y.cause(), v, nar);
-    }
-
-    private void reward(SignalTask x, float strength, Task y, NAR nar, float coherence, float confFraction) {
-        float v = coherence * 2f * confFraction /* * headstart */ * strength;
+    /** rewards/punishes the causes of this task,
+     *  then removes it in favor of a stronger sensor signal  */
+    private void absorb(SignalTask x, Task y, NAR nar, float coherence, float confFraction) {
+        float v = (coherence - 0.5f) * 2f * confFraction /* * headstart */ * strength;
 
         MetaGoal.learn(MetaGoal.Accurate, y.cause(), v, nar);
 
-        if (x!=null)
-            y.meta("@", x); //in case the task gets deleted, the link will point to the sensor value
-
+        ((NALTask)y).delete(x); //forward to the actual sensor reading
     }
 
 }

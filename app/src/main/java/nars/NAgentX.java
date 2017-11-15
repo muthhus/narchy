@@ -184,9 +184,9 @@ abstract public class NAgentX extends NAgent {
 //                    }
 //                })
                 .exe(new MultiExec.
-                            //Intense
-                            CoolNQuiet
-                        (128, THREADS, 64))
+                            Intense
+                            //CoolNQuiet
+                        (256, THREADS, 128))
 
                 .time(clock)
                 .deriverAdd(8)
@@ -195,7 +195,7 @@ abstract public class NAgentX extends NAgent {
                 .deriverAdd("motivation.nal")
                 .deriverAdd("list.nal")
                 .index(
-                        new CaffeineIndex(384 * 1024)
+                        new CaffeineIndex(256 * 1024)
                        // new PriMapTermIndex()
                         //new CaffeineIndex2(64 * 1024)
                         //new CaffeineIndex2(-1)
@@ -210,10 +210,10 @@ abstract public class NAgentX extends NAgent {
 
         n.confMin.set(0.01f);
         n.truthResolution.set(0.01f);
-        n.termVolumeMax.set(28);
+        n.termVolumeMax.set(32);
 
-        n.beliefConfidence(0.75f);
-        n.goalConfidence(0.5f);
+        n.beliefConfidence(0.9f);
+        n.goalConfidence(0.9f);
 
 
         float priFactor = 0.1f;

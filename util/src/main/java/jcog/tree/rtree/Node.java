@@ -66,7 +66,7 @@ public interface Node<L, V> extends Nodelike<L> {
     /**
      * @return Rect - the bounding rectangle for this node
      */
-    /*@NotNull */HyperRegion region();
+    /*@NotNull */HyperRegion bounds();
 
     /**
      * Add t to the index

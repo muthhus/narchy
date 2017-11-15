@@ -27,6 +27,7 @@ import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
+import static nars.truth.TruthFunctions.w2cSafe;
 
 /**
  * Created by me on 9/30/16.
@@ -380,14 +381,14 @@ public interface NAct {
         return addAction(new GoalActionConcept(s, this, update));
     }
 
-    default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        actionBipolarFrequencyDifferential(s, update);
+    default GoalActionAsyncConcept[] actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+        return actionBipolarFrequencyDifferential(s, update);
         //actionBipolarExpectation(s, update);
         //actionBipolarExpectationNormalized(s, update);
         //actionBipolarGreedy(s, update);
         //actionBipolarMutex3(s, update);
     }
-    default void actionBipolarFrequencyDifferential(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+    default GoalActionAsyncConcept[] actionBipolarFrequencyDifferential(@NotNull Term s, @NotNull FloatToFloatFunction update) {
 
         Term pt =
                 $.inh( $.the("\"+\""), s);
@@ -434,6 +435,7 @@ public interface NAct {
                 if (eviSum < curiEvi && cur > 0 && rng.nextFloat() <= cur) {
                     x = (rng.nextFloat() - 0.5f) * 2f;
                     e[0] = e[1] = curiEvi;
+                    eviSum = curiEvi*2;
                     curious = true;
                 } else {
                     curious = false;
@@ -451,14 +453,14 @@ public interface NAct {
 //                float conf = ((y == y) && (eviSum > Pri.EPSILON)) ?
 //                            w2c(eviSum) : 0;
 
-                boolean weak = eviSum < Pri.EPSILON || w2c(eviSum) < confMin;
 
-                float confFeedback =
-                        //Math.max(confMin, weak ? 0 : w2c(eviSum ));
-                        confBase;
+
+
 
                 float yf = (y / 2f)+0.5f; //0..+1
                 if (y == y) {
+                    float confFeedback =
+                            Math.max(confMin, w2cSafe(eviSum)/2 /* avg shared */);
 
                     P = $.t(yf, confFeedback);
                     N = $.t(1-yf, confFeedback);
@@ -469,7 +471,7 @@ public interface NAct {
 
                 PreciseTruth pb = P;
                 PreciseTruth pg =
-                        y==y && (curious) ? P :
+                        curious && y==y ? P :
                                 //$.t(y >= 0 ? yf :  1-yf,
 //                                    //Util.lerp(Math.abs(y), confMin, confBase)
 //                                    confBase
@@ -478,7 +480,7 @@ public interface NAct {
                 CC[0].feedback(pb, pg, n);
                 PreciseTruth nb = N;
                 PreciseTruth ng =
-                        y==y && (curious) ? N :
+                        curious && y==y ? N :
 //                                $.t(y >= 0 ? 1-yf : yf,
 //                                    //Util.lerp(Math.abs(y), confMin, confBase)
 //                                    confBase
@@ -497,7 +499,8 @@ public interface NAct {
         addAction(p);
         addAction(n);
 
-        //return new ArrayIterator<>(p,n);
+        CC[0] = p; CC[1] = n;
+        return CC;
     }
 
 

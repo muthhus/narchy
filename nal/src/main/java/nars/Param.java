@@ -200,7 +200,6 @@ public abstract class Param extends Services<Term, NAR> {
         Believe.want(w, 0.1f);
         Desire.want(w, 0.1f);
         Accurate.want(w, 0.1f);
-        Inaccurate.want(w, -0.05f);
         Answer.want(w, 0.05f);
         Action.want(w, 0.1f);
     }

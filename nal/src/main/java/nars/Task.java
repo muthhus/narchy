@@ -556,7 +556,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
         Task forward = meta("@");
         long s, e;
-        if (forward == null || (forward != answer && forward.conf(s = start(), e = end()) < answer.conf(s, e))) {
+        if (forward == null || (forward != answer && forward.conf(s = start(), e = end(), nar.dur()) < answer.conf(s, e))) {
             meta("@", answer); //forward to the top answer if this ever gets deleted
         }
 
@@ -909,16 +909,17 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
     @Override
     default @Nullable Iterable<? extends ITask> run(NAR n) {
 
+        n.emotion.onInput(this, n);
 
         //invoke possible functor and apply aliases
 
         Term x = term();
 
-
         Term y = x.eval(n.terms.intern());
 
-        Task t = this;
-        if (!x.equals(y)) { //instances could have been substituted and this matters
+        if (!x.equals(y)) {
+
+            //clone a new task because it has changed
 
             Task result;
             if (y instanceof Bool && isQuestOrQuestion()) {
@@ -951,9 +952,11 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
         boolean cmd = isCommand();
 
         if (cmd || (isGoal() && !isEternal())) {
-            Pair<Operator, Term> o = Op.functor(term() /* in case of some instance substutition */, (i) -> {
-                Concept operation = n.concept(i);
-                return operation instanceof Operator ? (Operator) operation : null;
+            //resolve possible functor in goal or command (TODO question functors)
+            //the eval step producing 'y' above will have a reference to any resolved functor concept
+            Pair<Operator, Term> o = Op.functor(y, (i) -> {
+                //Concept operation = n.concept(i);
+                return i instanceof Operator ? (Operator) i : null;
             });
             if (o != null) {
                 try {
@@ -976,13 +979,11 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
         if (!cmd) {
 
-            n.emotion.onInput(t, n);
-
-            Concept c = t.concept(n, true);
+            Concept c = concept(n, true);
             if (c != null) {
 
 
-                c.process(t, n);
+                c.process(this, n);
             }
 
         }

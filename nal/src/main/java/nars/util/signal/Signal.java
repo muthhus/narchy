@@ -59,6 +59,9 @@ public class Signal {
         synchronized (resolution) {
 
             SignalTask last = this.last;
+            if (last == null && nextTruth == null)
+                return null;
+
             @Nullable PreciseTruth tt = nextTruth != null ? nextTruth.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f) : null;
 
 
@@ -109,14 +112,12 @@ public class Signal {
         }
     }
 
-    @Nullable
-    protected SignalTask task(Term term, Truth t, long start, long end, long stamp) {
+    public SignalTask task(Term term, Truth t, long start, long end, long stamp) {
         SignalTask s = new SignalTask(term, punc, t, start, end, stamp);
         s.priMax(pri.asFloat());
         return s;
     }
 
-    @NotNull
     public Signal pri(FloatSupplier p) {
         this.pri = p;
         return this;

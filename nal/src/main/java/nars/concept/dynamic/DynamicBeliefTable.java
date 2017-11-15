@@ -130,7 +130,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             if (s < MAX_TASKS_FOR_COMPLETE_ITERATION)
                 forEachTask(tx);
             else
-                forEachTask(false, start, end, tx); //just the matching subrange, should be cheaper if # of tasks is high
+                forEachTask(true, start, end, tx); //just the matching subrange, should be cheaper if # of tasks is high
 
             if (count[0] > 0) {
                 return (int) (sum[0] / count[0]);
@@ -142,7 +142,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     }
 
     @Override
-    public Task match(long start, long end, @NotNull Term template, NAR nar) {
+    public Task match(long start, long end, Term template, NAR nar) {
         Task x = super.match(start, end, template, nar);
 
 

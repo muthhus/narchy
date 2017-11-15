@@ -21,7 +21,9 @@ import nars.task.Tasked;
 import nars.task.util.TaskRegion;
 import nars.task.util.TimeRange;
 import nars.term.Term;
+import nars.truth.PreciseTruth;
 import nars.truth.Truth;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.LongObjectProcedure;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
@@ -50,11 +52,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * max allowed truths to be truthpolated in one test
      */
-    static final int TRUTHPOLATION_LIMIT = 5;
+    static final int TRUTHPOLATION_LIMIT = 3;
 
-    public static final float PRESENT_AND_FUTURE_BOOST = 1.5f;
+    public static final float PRESENT_AND_FUTURE_BOOST = 4f;
 
-    static final int SCAN_DIVISIONS = 4;
+    static final int SCAN_DIVISIONS = 5;
 
     public static final int MIN_TASKS_PER_LEAF = 2;
     public static final int MAX_TASKS_PER_LEAF = 4;
@@ -112,7 +114,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         final Task ete = eternal != null ? eternal.strongest() : null;
 
         if (start == ETERNAL) {
-            TaskRegion r = ((TaskRegion) tree.root().region());
+            TaskRegion r = ((TaskRegion) tree.root().bounds());
             if (r == null)
                 return ete!=null ? ete.truth() : null;
 
@@ -149,13 +151,15 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 //                }
 
                 //applying eternal should not influence the scan for temporal so it is left null here
-                return Param.truth(ete, start, end, dur, tt);
 
-                //        if (t != null /*&& t.conf() >= confMin*/) {
-                //            return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
-                //        } else {
-                //            return null;
-                //        }
+                PreciseTruth t = Param.truth(ete, start, end, dur, tt);
+                return t;
+
+//                if (t != null /*&& t.conf() >= confMin*/) {
+//                    //return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+//                } else {
+//                    return null;
+//                }
 
             }
         }
@@ -271,7 +275,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 return attempts[0]++ < maxTries;
             };
 
-            TaskRegion bounds = (TaskRegion) (tree.root().region());
+            TaskRegion bounds = (TaskRegion) (tree.root().bounds());
 
             long boundsStart = bounds.start();
             long boundsEnd = bounds.end();
@@ -428,9 +432,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         float inputStrength = inputRegion != null ? taskStrength.floatValueOf(inputRegion) : Float.POSITIVE_INFINITY;
 
         FloatFunction<TaskRegion> leafRegionWeakness =
-                /*new CachedFloatFunction*/(regionWeakness(nar.time(), 1L + Math.round(tableDur())));
+                /*new CachedFloatFunction*/(regionWeakness(nar.time(), nar.dur()));
         FloatFunction<Leaf<TaskRegion>> leafWeakness =
-                L -> leafRegionWeakness.floatValueOf((TaskRegion) L.region());
+                L -> leafRegionWeakness.floatValueOf((TaskRegion) L.bounds());
 
         Top<Leaf<TaskRegion>> mergeVictim = new Top(leafWeakness);
 
@@ -614,11 +618,15 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         return (TaskRegion r) -> {
 
             long regionTime =
-                    //r.mid();
-                    r.furthestTimeTo(when);
+                    r.mid();
+                    //r.furthestTimeTo(when);
             long timeDist = 1 + Math.abs(when - regionTime);
+            if (regionTime >= when-dur)
+                timeDist /= PRESENT_AND_FUTURE_BOOST; //shrink the apparent time if it's present and future
 
-            float antiConf = 1f - (float) (r.coord(true, 2) + r.coord(false, 2)) / 2f;
+            float antiConf = 1f -
+                    (float)r.coord(true, 2); //max
+                    //(float) (r.coord(true, 2) + r.coord(false, 2)) / 2f; //avg
 
             //float span = (float)(1 + r.range(0)/dur); //span becomes less important the further away, more fair to short near-term tasks
 
@@ -632,7 +640,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     public double tableDur() {
-        HyperRegion root = tree.root().region();
+        HyperRegion root = tree.root().bounds();
         if (root == null)
             return 0;
         else
@@ -651,7 +659,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     FloatFunction<Task> taskStrength(@Nullable Term template, long start, long end) {
-        if (template == null || !template.isTemporal()) { //TODO this result can be cached for the entire table once knowing what term it stores
+        if (template == null || !template.isTemporal() || template.equals(template.root())) { //TODO this result can be cached for the entire table once knowing what term it stores
             return taskStrength(start, end);
         } else {
             int tableDur = 1 + (int) (tableDur());
@@ -698,14 +706,21 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         return Streams.stream(taskIterator());
     }
 
-    @Override
-    public void forEach(long minT, long maxT, Consumer<? super Task> each) {
-        tree.intersecting(new TimeRange(minT, maxT), (t) -> {
+    static Predicate<TaskRegion> scanWhile(Predicate<? super Task> each) {
+        return (t) -> {
             Task tt = t.task();
-            if (tt != null)
-                each.accept(tt);
-            return true;
-        });
+            return tt != null ? each.test(tt) : true;
+        };
+    }
+
+    @Override
+    public void whileEach(Predicate<? super Task> each) {
+        tree.intersecting(tree.root().bounds(), scanWhile(each));
+    }
+
+    @Override
+    public void whileEach(long minT, long maxT, Predicate<? super Task> each) {
+        tree.intersecting(new TimeRange(minT, maxT), scanWhile(each));
     }
 
     @Override

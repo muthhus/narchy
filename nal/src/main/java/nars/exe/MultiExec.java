@@ -139,8 +139,8 @@ abstract public class MultiExec extends UniExec {
 
         @Override
         protected WaitStrategy waitStrategy() {
-            return new SleepingWaitStrategy();
-            //return new LiteBlockingWaitStrategy();
+            //return new SleepingWaitStrategy();
+            return new LiteBlockingWaitStrategy();
         }
 
         @Override
@@ -343,17 +343,17 @@ abstract public class MultiExec extends UniExec {
 
     @Override
     public void add(Iterator<? extends ITask> input) {
-        input.forEachRemaining(input());
+        input.forEachRemaining(add());
     }
 
     /** the input procedure according to the current thread */
-    protected Consumer<ITask> input() {
+    protected Consumer<ITask> add() {
         return isWorker(Thread.currentThread()) ? immediate : deferred;
     }
 
     @Override
     public void add(Stream<? extends ITask> input) {
-        input.forEach(input());
+        input.forEach(add());
     }
 
     @Override

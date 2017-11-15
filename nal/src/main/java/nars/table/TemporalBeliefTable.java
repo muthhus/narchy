@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 
@@ -19,8 +20,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
 
     /**
-     * TODO make a version of this which takes as argument min and max (one of which
-     * will be infinity) so it can exit early if it will not rank
+     * range will be between 0 and 1
      */
     static float temporalTaskPriority(Task t, long start, long end, int dur) {
         if (t.isDeleted())
@@ -125,7 +125,12 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public void forEach(long minT, long maxT, Consumer<? super Task> x) {
+        public void whileEach(Predicate<? super Task> each) {
+
+        }
+
+        @Override
+        public void whileEach(long minT, long maxT, Predicate<? super Task> x) {
 
         }
 
@@ -146,11 +151,15 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
     };
 
 
-    /** minT and maxT inclusive */
-    default void forEach(long minT, long maxT, Consumer<? super Task> each) {
-        forEach(x -> {
+    public void whileEach(Predicate<? super Task> each);
+
+    /** minT and maxT inclusive.  while the predicate remains true, it will continue scanning */
+    default void whileEach(long minT, long maxT, Predicate<? super Task> each) {
+        whileEach(x -> {
             if (x.start() >= minT && x.end() <= maxT)
-                each.accept(x);
+                if (!each.test(x))
+                    return false; //stop
+            return true; //continue
         });
     }
 }

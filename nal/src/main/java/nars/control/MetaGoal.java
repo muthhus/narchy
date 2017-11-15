@@ -62,13 +62,9 @@ public enum MetaGoal {
 
     /**
      * pos: prediction confirmed a sensor input
-     */
-    Accurate,
-
-    /**
      * neg: contradicted a sensor input
      */
-    Inaccurate;
+    Accurate;
 
     public interface Revaluator {
         /**

@@ -27,7 +27,8 @@ import static nars.Op.GOAL;
 public class GoalActionAsyncConcept extends ActionConcept {
 
 
-    public final Signal feedBelief, feedGoal;
+    public final Signal feedBelief;
+    @Deprecated public final Signal feedGoal;
 
 
     @NotNull
@@ -116,8 +117,12 @@ public class GoalActionAsyncConcept extends ActionConcept {
                 now;
                 //now+dur/2;
 
+        if (g!=null)
+            fg = feedGoal.task(term, g, goalTime-dur, goalTime, nar.time.nextStamp()); //allow the feedback goal (Ex: curiosity) to override, otherwise use the current goal
+        else
+            fg = null;
         in.input(
-            fg = feedGoal.set(term, g, stamper, goalTime, dur, nar),
+            fg,
             fb = feedBelief.set(term, f, stamper, beliefTime, dur, nar)
         );
 
