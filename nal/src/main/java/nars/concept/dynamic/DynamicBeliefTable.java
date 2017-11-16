@@ -40,7 +40,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
             Task matched = match(input.start(), input.end(), input.term(), nar);
 
-            if (matched != null) {
+            if (matched != null && matched.term().equals(input.term())) {
 
                 if (!(input.isEternal() ^ matched.isEternal())) { //must be of the same temporality
 

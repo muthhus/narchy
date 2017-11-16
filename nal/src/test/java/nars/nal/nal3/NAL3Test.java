@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NAL3Test extends NALTest {
 
-    public static final int cycles = 1500;
+    public static final int cycles = 2500;
 
     @BeforeEach
     public void nal() {
