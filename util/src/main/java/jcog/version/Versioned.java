@@ -58,7 +58,7 @@ public class Versioned<X> extends
      * returns null if the capacity was hit, or some other error
      */
     @Nullable
-    public Versioned<X> set(/*@NotNull*/ X nextValue) {
+    public Versioned<X> set(@NotNull X nextValue) {
 //        if (context.add(this) && add(nextValue)) {
 //            System.out.println("set: " + nextValue);
 //            return this;
