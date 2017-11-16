@@ -44,10 +44,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
                 if (!(input.isEternal() ^ matched.isEternal())) { //must be of the same temporality
 
-                    float inputPri = input.priElseZero();
                     if (PredictionFeedback.absorb(matched, input, nar)) {
-                        float activationApplied = Math.max(0, inputPri - matched.priElseZero());
-                        Tasklinks.linkTask(matched, activationApplied, concept, nar);
+                        Tasklinks.linkTask(matched, matched.priElseZero(), concept, nar);
                         return;
                     }
                 }

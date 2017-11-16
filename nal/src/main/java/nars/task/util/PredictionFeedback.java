@@ -115,13 +115,13 @@ public class PredictionFeedback {
             return false;
 
         //maybe also factor originality to prefer input even if conf is lower but has more originality thus less chance for overlap
-        float confFraction = y.conf(x.start(), x.end(), nar.dur()) / x.conf();
+        float confContention = y.conf(x.start(), x.end(), nar.dur()) * x.conf();
         float coherence = coherence(x, y);
-        float value = (coherence - 0.5f) * 2f * confFraction /* * headstart */ * strength;
+        float value = (coherence - 0.5f) * 2f * confContention /* * headstart */ * strength;
 
         MetaGoal.learn(MetaGoal.Accurate, y.cause(), value, nar);
 
-        if (confFraction <= 1f) {
+        if (confContention <= 1f) {
             ((NALTask) y).delete(x); //forward to the actual sensor reading
             return true;
         } else {
