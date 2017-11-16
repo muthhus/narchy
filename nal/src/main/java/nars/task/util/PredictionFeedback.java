@@ -94,13 +94,14 @@ public class PredictionFeedback {
     }
 
     /**
-     * measures similarity of two frequencies. 0 = dissimilar, 1 = similar
+     * measures frequency similarity of two tasks. -1 = dissimilar .. +1 = similar
+     * also considers the relative task time range
      */
     public static float coherence(Task actual, Task predict) {
         float xFreq = actual.freq();
         float yFreq = predict.freq();
         float overtime = Math.max(0, predict.range() - actual.range()); //penalize predictions spanning longer than the actual signal because we aren't checking in that time range for accuracy, it could be wrong before and after the signal
-        return 1f - Math.abs(xFreq - yFreq) / (1f + overtime);
+        return 2f * ((1f - Math.abs(xFreq - yFreq) / (1f + overtime))-0.5f);
         //TruthFunctions.freqSimilarity(xFreq, y.freq());
     }
 
@@ -115,18 +116,17 @@ public class PredictionFeedback {
             return false;
 
         //maybe also factor originality to prefer input even if conf is lower but has more originality thus less chance for overlap
-        float confContention = y.conf(x.start(), x.end(), nar.dur()) * x.conf();
-        float coherence = coherence(x, y);
-        float value = (coherence - 0.5f) * 2f * confContention /* * headstart */ * strength;
+        float yConf = y.conf(x.start(), x.end(), nar.dur());
+        float xConf = x.conf();
+        if (yConf > xConf)
+            return false;
+
+        float value = coherence(x,y) * yConf/xConf * strength;
 
         MetaGoal.learn(MetaGoal.Accurate, y.cause(), value, nar);
 
-        if (confContention <= 1f) {
-            ((NALTask) y).delete(x); //forward to the actual sensor reading
-            return true;
-        } else {
-            return false;
-        }
+        ((NALTask) y).delete(x); //forward to the actual sensor reading
+        return true;
     }
 
 }

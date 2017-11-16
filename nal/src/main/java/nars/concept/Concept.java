@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public interface Concept extends Termed, Comparable<Termed>, MetaMap {
+public interface Concept extends Termed, MetaMap {
 
 
     Concept[] EmptyArray = new Concept[0];
@@ -164,10 +164,10 @@ public interface Concept extends Termed, Comparable<Termed>, MetaMap {
 
     }
 
-    @Override
-    default int compareTo(/*@NotNull*/ Termed o) {
-        return term().compareTo(o.term());
-    }
+//    @Override
+//    default int compareTo(/*@NotNull*/ Termed o) {
+//        return term().compareTo(o.term());
+//    }
 
 
     /*@NotNull*/ ConceptState state();

@@ -59,22 +59,22 @@ public interface PriMerge extends BiConsumer<Priority, Prioritized> {
      * */
     static float blend(Priority exi, Prioritized inc, PriMerge.PriMergeOp priMerge) {
 
-        float ePri = exi.priElseZero();
+        float ePriBefore = exi.priElseZero();
         float iPri = inc.priElseZero();
 
         float nextPri;
         switch (priMerge) {
             case PLUS:
-                nextPri = ePri + iPri;
+                nextPri = ePriBefore + iPri;
                 break;
             case OR:
-                nextPri = Util.or(ePri,iPri);
+                nextPri = Util.or(ePriBefore,iPri);
                 break;
             case MAX:
-                nextPri = Math.max(ePri, iPri);
+                nextPri = Math.max(ePriBefore, iPri);
                 break;
             case AVG:
-                nextPri = (iPri+ePri)/2f;
+                nextPri = (iPri+ePriBefore)/2f;
                 break;
             //TODO
             //case AND:     .. = ePri * iPri;          break;
@@ -83,19 +83,9 @@ public interface PriMerge extends BiConsumer<Priority, Prioritized> {
                 throw new UnsupportedOperationException();
         }
 
+        float ePriAfter = exi.setPri( nextPri );
 
-        float overflow;
-        if (nextPri > 1f) {
-            overflow = nextPri - 1f;
-            nextPri = 1f;
-        } else {
-            overflow = 0;
-        }
-
-
-        exi.setPri( nextPri );
-
-        return overflow;
+        return iPri - (ePriAfter - ePriBefore);
     }
 
 //    static float dqBlendByPri(@NotNull Budget tgt, @NotNull Budgeted src, float srcScale, boolean addOrAvgPri) {

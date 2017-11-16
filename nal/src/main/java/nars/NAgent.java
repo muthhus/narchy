@@ -1,6 +1,7 @@
 package nars;
 
 import jcog.Util;
+import jcog.constraint.continuous.DoubleVar;
 import jcog.event.On;
 import jcog.exe.Loop;
 import jcog.list.FasterList;
@@ -94,8 +95,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
     public final NAR nar;
     private int dur;
     private final NALTask happyGoal;
-    //final private ConceptFire fireHappy;
-
+    public final FloatParam motivation = new FloatParam(1f, 0f, 1f);
 
     protected NAgent(@NotNull NAR nar) {
         this("", nar);
@@ -252,9 +252,13 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
     }
 
-    private void happy() {
-        happyGoal.priMax(nar.priDefault(GOAL));
+    private void happy(float activation) {
+        happyGoal.priMax(
+            //nar.priDefault(GOAL)
+            activation
+        );
         nar.input(happyGoal);
+        nar.activate(happy, activation);
     }
 
 
@@ -267,7 +271,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
 
         this.now = nar.time();
 
-        happy();
+        happy(motivation.floatValue());
 
         float r = rewardCurrent = act();
 

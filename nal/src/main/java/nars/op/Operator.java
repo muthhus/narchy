@@ -10,6 +10,7 @@ import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,7 @@ import static nars.time.Tense.ETERNAL;
  * <patham9_> 4. the system wont try to execute and pursue things in the current moment which are "sheduled" to be in the future.
  * <patham9_> 5. the system wont pursue a goal it already pursued for the same reason (due to revision, it is related to 1)
  */
-public class Operator extends BaseConcept implements PermanentConcept {
+public class Operator extends BaseConcept implements PermanentConcept, Atomic {
 
     public static final String LOG_FUNCTOR = String.valueOf(Character.valueOf((char) 8594)); //RIGHT ARROW
 
@@ -42,6 +43,16 @@ public class Operator extends BaseConcept implements PermanentConcept {
     public Operator(Atom atom, BiFunction<Task, NAR, Task> execute, NAR n) {
         super(atom, n);
         this.execute = execute;
+    }
+
+    @Override
+    public Term term() {
+        return this;
+    }
+
+    @Override
+    public int opX() {
+        return Atom.AtomString;
     }
 
     /**

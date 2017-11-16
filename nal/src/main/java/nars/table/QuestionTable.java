@@ -109,31 +109,19 @@ public interface QuestionTable extends TaskTable {
 
         @Override
         public void add(/*@NotNull*/ Task t, BaseConcept c, NAR n) {
-            final float[] act = new float[1];
             Task u;
+            float tPri = t.priElseZero();
+
             synchronized (lock) {
                 u = merge(t, t, (prev, next) -> {
-                    if (prev == next)
-                        act[0] = 0;
-                    else {
-                        float pBefore = prev.priElseZero();
-                        float overage = Param.taskMerge.merge(prev, next);
-                        float pAfter = prev.priElseZero();
-                        act[0] = pAfter - pBefore;
-                    }
+                    ((NALTask) prev).causeMerge(next);
                     return prev;
                 });
             }
             if (u != t) {
-                ((NALTask) u).causeMerge(t);
                 t.delete();
-            } else {
-                act[0] = u.priElseZero();
             }
-
-            if (act[0] > Pri.EPSILON) {
-                Tasklinks.linkTask(u, act[0], c, n);
-            }
+            Tasklinks.linkTask(u, tPri, c, n);
         }
 
         @Override

@@ -457,6 +457,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                     if (existing != incoming) {
                         v = merge(existing, incoming, overflow);
                     } else {
+                        if (overflow!=null)
+                            overflow.add(incoming.priElseZero());
                         v = existing;
                     }
                 } else {

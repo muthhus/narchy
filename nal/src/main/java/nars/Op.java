@@ -1377,7 +1377,7 @@ public enum Op {
                 Term s0 = c.sub(0);
                 if (s0.op() == PROD) {
                     Term s1 = c.sub(1);
-                    if (s1 instanceof Atom /*&& s1.op() == ATOM*/) {
+                    if (s1 instanceof Atomic /*&& s1.op() == ATOM*/) {
                         X i = invokes.apply(s1);
                         if (i != null)
                             return Tuples.pair(i, s0);

@@ -28,12 +28,6 @@ import jcog.math.FloatSupplier;
  */
 public class MutableFloat extends Number implements FloatSupplier {
 
-    /**
-     * Required for serialization support.
-     *
-     * @see java.io.Serializable
-     */
-    private static final long serialVersionUID = 5787169186L;
 
     /** The mutable value. */
     private float value;

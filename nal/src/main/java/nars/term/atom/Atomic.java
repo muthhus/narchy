@@ -19,7 +19,9 @@ import java.util.function.Predicate;
 import static java.lang.Integer.MIN_VALUE;
 
 
-/** Base class for Atomic types. */
+/**
+ * Base class for Atomic types.
+ */
 public interface Atomic extends Term {
 
     @Override
@@ -32,7 +34,8 @@ public interface Atomic extends Term {
         return v.test(this);
     }
 
-    @Override default boolean containsRecursively(Term t) {
+    @Override
+    default boolean containsRecursively(Term t) {
         return false;
     }
 
@@ -52,13 +55,19 @@ public interface Atomic extends Term {
 //    }
 
     @Override
-    default boolean isTemporal() { return false; }
+    default boolean isTemporal() {
+        return false;
+    }
 
     @Override
-    default @Nullable Term temporalize(Retemporalize r) { return this; }
+    default @Nullable Term temporalize(Retemporalize r) {
+        return this;
+    }
 
     @Override
-    default int vars() { return 0;     }
+    default int vars() {
+        return 0;
+    }
 
     @Override
     default int varDep() {
@@ -95,26 +104,40 @@ public interface Atomic extends Term {
     /*@NotNull*/
     static Atomic the(String id) {
         int l = id.length();
-        assert(l>0): "attempted zero-length Atomic id";
+        assert (l > 0) : "attempted zero-length Atomic id";
 
         //special cases
-        if (l ==1) {
+        if (l == 1) {
             char c = id.charAt(0);
             switch (c) {
-                case Op.ImdexSym:  return Op.Imdex;
-                case Op.NullSym:  return Op.Null;
-                case Op.TrueSym:  return Op.True;
-                case Op.FalseSym:  return Op.False;
-                case '0': return Int.digits[0];
-                case '1': return Int.digits[1];
-                case '2': return Int.digits[2];
-                case '3': return Int.digits[3];
-                case '4': return Int.digits[4];
-                case '5': return Int.digits[5];
-                case '6': return Int.digits[6];
-                case '7': return Int.digits[7];
-                case '8': return Int.digits[8];
-                case '9': return Int.digits[9];
+                case Op.ImdexSym:
+                    return Op.Imdex;
+                case Op.NullSym:
+                    return Op.Null;
+                case Op.TrueSym:
+                    return Op.True;
+                case Op.FalseSym:
+                    return Op.False;
+                case '0':
+                    return Int.digits[0];
+                case '1':
+                    return Int.digits[1];
+                case '2':
+                    return Int.digits[2];
+                case '3':
+                    return Int.digits[3];
+                case '4':
+                    return Int.digits[4];
+                case '5':
+                    return Int.digits[5];
+                case '6':
+                    return Int.digits[6];
+                case '7':
+                    return Int.digits[7];
+                case '8':
+                    return Int.digits[8];
+                case '9':
+                    return Int.digits[9];
             }
         }
 
@@ -152,23 +175,31 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default boolean ANDrecurse(Predicate<Term> v) { return AND(v); }
+    default boolean ANDrecurse(Predicate<Term> v) {
+        return AND(v);
+    }
 
     @Override
-    default boolean ORrecurse(Predicate<Term> v) { return AND(v); }
+    default boolean ORrecurse(Predicate<Term> v) {
+        return AND(v);
+    }
 
     @Override
     default void append(Appendable w) throws IOException {
         w.append(toString());
     }
 
-    /** number of subterms; for atoms this must be zero */
+    /**
+     * number of subterms; for atoms this must be zero
+     */
     @Override
     default int subs() {
         return 0;
     }
 
-    /** atoms contain no subterms so impossible for anything to fit "inside" it */
+    /**
+     * atoms contain no subterms so impossible for anything to fit "inside" it
+     */
     @Override
     default boolean impossibleSubTermVolume(int otherTermVolume) {
         return true;
@@ -186,7 +217,7 @@ public interface Atomic extends Term {
 
     @Override
     default boolean impossibleSubTermOrEqualityVolume(int otherTermsVolume) {
-        return otherTermsVolume!=1;
+        return otherTermsVolume != 1;
     }
 
     @Override
@@ -200,9 +231,13 @@ public interface Atomic extends Term {
     }
 
 
-    /** default volume = 1 */
+    /**
+     * default volume = 1
+     */
     @Override
-    default int volume() { return 1; }
+    default int volume() {
+        return 1;
+    }
 
     @Override
     default Term sub(int i, Term ifOutOfBounds) {
@@ -241,4 +276,11 @@ public interface Atomic extends Term {
     }
 
 
+    static boolean equals(AtomicConst x, Atomic y) {
+        if (x.hashCode() != y.hashCode())
+            return false;
+
+        return x.opX() == y.opX() && x.toString().equals(y.toString());
+    }
+    
 }

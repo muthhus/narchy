@@ -373,13 +373,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
         Task activated;
-        float activation;
+        float iPri = input.priElseZero();
 
         if ((input.conf() >= 1f) && (cap != 1) && (isEmpty() || (first().conf() < 1f))) {
             //AXIOMATIC/CONSTANT BELIEF/GOAL
             synchronized (this) {
                 addEternalAxiom(input, this, nar);
-                activation = input.priElseZero();
                 activated = input;
             }
         } else {
@@ -393,32 +392,23 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                         return; //so ignore if derived
                     } else {
                         activated = input;
-                        activation = 1f; //full reactivation
                     }
                 } else if (revised.equals(input)) { //HACK todo avoid this duplcate equals which is already known from tryRevision
 
 //                    float maxActivation = 1f - revised.priElseZero();
 //                    activation = Math.min(maxActivation, input.priElseZero()); //absorb up to 1.0 max
-                    float before = revised.priElseZero();
                     revised.priMax(input.priElseZero());
-                    float after = revised.priElseZero();
-
                     activated = revised;
-                    activation = after - before; //use previous value
                     input.delete();
 
-                    if (activation >= Prioritized.EPSILON) {
-                        ((NALTask) revised).causeMerge(input);
-                    } else {
-                        activated = null; //dont bother activating
-                    }
+
+                    ((NALTask) revised).causeMerge(input);
+
                 } else {
                     //a novel revision
                     if (insert(revised)) {
-                        activation = revised.priElseZero();
                         activated = revised;
                     } else {
-                        activation = 0; //couldnt insert the revision
                         activated = null;
                         revised.delete();
                     }
@@ -427,23 +417,19 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                     if (inputIns) {
                         if (activated == null) {
                             activated = input;
-                            activation = input.priElseZero();
                         } else {
                             //revised will be activated, but at least emit a taskProcess for the input task
                             nar.eventTask.emit(input);
                         }
                     } else {
                         activated = null;
-                        activation = 0;
                         input.delete();
                     }
                 }
             } else {
                 if (insert(input)) {
                     activated = input;
-                    activation = input.priElseZero();
                 } else {
-                    activation = 0;
                     activated = null;
                     input.delete();
                 }
@@ -452,7 +438,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
 
         if (activated != null)
-            Tasklinks.linkTask(activated, activation, c, nar);
+            Tasklinks.linkTask(activated, iPri, c, nar);
     }
 
 

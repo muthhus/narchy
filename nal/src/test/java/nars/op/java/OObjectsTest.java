@@ -35,6 +35,7 @@ public class OObjectsTest {
         final SimpleClass x = objs.a("x", SimpleClass.class);
         StringBuilder sb = new StringBuilder();
         n.onTask(sb::append);
+        n.log();
 
         n.input("x(set,(1))! :|:");
         n.run(1);
@@ -45,7 +46,7 @@ public class OObjectsTest {
         n.run(1);
 
         String s = sb.toString();
-        assertTrue(s.contains("x(set,1). 3 %1.0;.90%"), ()->"result: " + s);
+        assertTrue(s.contains("x(set,(1)). 3 %1.0;.90%"), ()->"result: " + s);
         assertTrue(s.contains("x(get,(),1). 4 %1.0;.90%"), ()->"result: " + s);
     }
 

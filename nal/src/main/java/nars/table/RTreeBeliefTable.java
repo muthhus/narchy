@@ -40,6 +40,7 @@ import java.util.stream.Stream;
 
 import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 import static nars.time.Tense.ETERNAL;
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
@@ -51,9 +52,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * max allowed truths to be truthpolated in one test
      */
-    static final int TRUTHPOLATION_LIMIT = 4;
+    static final int TRUTHPOLATION_LIMIT = 3;
 
-    public static final float PRESENT_AND_FUTURE_BOOST = 1.5f;
+    public static final float PRESENT_AND_FUTURE_BOOST = 4f;
 
     static final int SCAN_DIVISIONS = 5;
 
@@ -361,13 +362,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
 
 
+        float activation = x.priElseZero();
+
+
         ObjectBooleanHashMap<Task> changes = new ObjectBooleanHashMap<>();
         ((ConcurrentRTree<TaskRegion>) tree).write(treeRW -> {
 
-            ensureCapacity(treeRW, null, changes, n);
-
-            if (!changes.getIfAbsent(x, true))
-                return; //this can theoretically happen if a duplicate is inserted that the pre-compress just extracted. this catches it
+//            ensureCapacity(treeRW, null, changes, n);
+//
+//            if (!changes.getIfAbsent(x, true))
+//                return; //this can theoretically happen if a duplicate is inserted that the pre-compress just extracted. this catches it
 
             if (treeRW.add(x)) {
                 changes.put(x, true);
@@ -386,10 +390,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             }
         });
 
-        ObjectFloatPair<Task> partialActivation = x.meta("partialActivation");
-        if (partialActivation != null) {
-            assert (x.isDeleted());
-            Tasklinks.linkTask(partialActivation.getOne(), partialActivation.getTwo(), c, n);
+        if (x.isDeleted()) {
+            Task xisting = x.meta("merge");
+            if (xisting != null) {
+                Tasklinks.linkTask(xisting, activation, c, n);
+            }
         }
 
     }
@@ -776,31 +781,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         @Override
         protected void merge(TaskRegion existing, TaskRegion incoming) {
-
-            if (existing == incoming)
-                return; //same instance
-
             Task i = incoming.task();
-
-            float activation = i.priElseZero();
-
-            i.delete();
-
-            if (activation < Prioritized.EPSILON)
-                return;
-
-            //partial activate
             Task e = existing.task();
-            float before = e.priElseZero();
             ((NALTask) e).causeMerge(i);
-            float after = e.priMax(activation);
-            float activationApplied = (after - before);
-
-            if (activationApplied < Prioritized.EPSILON)
-                return;
-
-            i.meta("partialActivation", PrimitiveTuples.pair(existing,activationApplied));
-
+            i.delete();
+            i.meta("merge", e);
         }
 
     }

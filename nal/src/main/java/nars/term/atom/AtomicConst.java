@@ -49,10 +49,7 @@ public abstract class AtomicConst implements Atomic {
             AtomicConst c = (AtomicConst) u;
             return hash == c.hash && Arrays.equals(bytesCached, c.bytesCached);
         } else if (u instanceof Atomic) {
-            if (hash != u.hashCode())
-                return false;
-            Atomic a = (Atomic) u;
-            return opX() == a.opX() && toString().equals(a.toString());
+            return Atomic.equals(this, (Atomic)u);
         }
         return false;
     }
