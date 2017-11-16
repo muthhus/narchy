@@ -122,26 +122,6 @@ public enum TermLinks {
         }
     }
 
-    public static void linkTask(Task t, float activationApplied, NAR nar, Concept cc) {
-
-
-        cc.tasklinks().putAsync(
-                new PLinkUntilDeleted<>(t, activationApplied)
-                //new PLink<>(t, activation)
-        );
-
-        if (activationApplied >= Prioritized.EPSILON_VISIBLE) {
-            nar.eventTask.emit(t);
-        }
-
-        float conceptActivation = activationApplied * nar.evaluate(t.cause());
-
-        nar.emotion.onActivate(t, conceptActivation, cc, nar);
-
-        nar.activate(cc, conceptActivation);
-
-    }
-
     @Nullable
     public static Concept linkTemplate(Term srcTerm, Bag srcTermLinks, Termed target, float priForward, float priReverse, BatchActivation a, NAR nar, MutableFloat refund) {
 
@@ -321,25 +301,4 @@ public enum TermLinks {
         return cost;
     }
 
-    public static void linkTask(Task task, Collection<Concept> targets) {
-        int numSubs = targets.size();
-        if (numSubs == 0)
-            return;
-
-        float tfa = task.priElseZero();
-        float tfaEach = tfa / numSubs;
-
-
-        for (Concept target : targets) {
-
-            target.tasklinks().putAsync(
-                    new PLinkUntilDeleted(task, tfaEach)
-            );
-//                target.termlinks().putAsync(
-//                        new PLink(task.term(), tfaEach)
-//                );
-
-
-        }
-    }
 }

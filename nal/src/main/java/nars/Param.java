@@ -41,10 +41,6 @@ public abstract class Param extends Services<Term, NAR> {
      */
     public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.25f;
 
-    /**
-     * TODO if a task is deleted by this, the system should replace it with a question about the state sometime in the future
-     */
-    public static final boolean DELETE_INACCURATE_PREDICTIONS = true;
 
     public static final FloatParam forgetRate = new FloatParam(PriForget.FORGET_TEMPERATURE_DEFAULT, 0f, 1f);
 
@@ -130,16 +126,12 @@ public abstract class Param extends Services<Term, NAR> {
             //8;
             32;
 
-    /**
-     * derivation severity - how completely confidence is reduced in derivation (default: 1.0)
-     */
-    public final FloatParam deriverity = new FloatParam(1.0f, 0f, 1f);
 
     /**
      * 'time to live', unification steps until unification is stopped
      */
-    public final MutableInteger matchTTLmax = new MutableInteger(256);
-    public final MutableInteger matchTTLmin = new MutableInteger(32);
+    public final MutableInteger matchTTLmax = new MutableInteger(32);
+    public final MutableInteger matchTTLmin = new MutableInteger(16);
 
     /**
      * how much percent of a premise's allocated TTL can be used in the belief matching phase.
@@ -395,10 +387,10 @@ public abstract class Param extends Services<Term, NAR> {
      */
     public static double evi(float evi, long dt, long dur) {
 
-        //return evi / (1.0 + ( ((double)dt) / dur) ); //inverse linear
+        return evi / (1.0 + ( ((double)dt) / dur) ); //inverse linear
 
-        double ddt = dt;
-        return (float) (evi / (1.0 + ddt * ddt / dur)); //inverse square
+        //double ddt = dt;
+        //return (float) (evi / (1.0 + ddt * ddt / dur)); //inverse square
 
         //return evi / Util.sqr( 1f + dt / dur ); //inverse square suck
 

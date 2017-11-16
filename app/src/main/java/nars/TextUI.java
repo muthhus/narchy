@@ -129,8 +129,8 @@ public class TextUI {
                 if (terminal instanceof ANSITerminal)
                     ((ANSITerminal) terminal).setMouseCaptureMode(MouseCaptureMode.CLICK);
 
-                if  (terminal instanceof VirtualTerminal)
-                    ((VirtualTerminal)terminal).addVirtualTerminalListener(new VirtualTerminalListener() {
+                if (terminal instanceof VirtualTerminal)
+                    ((VirtualTerminal) terminal).addVirtualTerminalListener(new VirtualTerminalListener() {
                         @Override
                         public void onFlush() {
 
@@ -188,7 +188,6 @@ public class TextUI {
             st.setWindowPostRenderer(null);
 
             tui.setTheme(st);
-
 
 
             final BasicWindow window = new BasicWindow();
@@ -276,7 +275,7 @@ public class TextUI {
             w.forEach(tui::removeWindow);
 
             synchronized (terminal) {
-                if (thread!=null) {
+                if (thread != null) {
                     thread.interrupt();
                     thread = null;
                 }
@@ -422,17 +421,20 @@ public class TextUI {
             private final StringBuilder sb = new StringBuilder(1024);
 
             protected void update() {
-                if (busy.compareAndSet(false, true)) {
+                com.googlecode.lanterna.gui2.TextGUI gui = getTextGUI();
+                if (gui != null && busy.compareAndSet(false, true)) {
                     nar.stats(sb);
 
                     String s = sb.toString();
                     sb.setLength(0);
                     s.replace('\t', ' ');
 
-                    getTextGUI().getGUIThread().invokeLater(() -> {
+
+                    gui.getGUIThread().invokeLater(() -> {
                         stats.setText(s);
                         busy.set(false);
                     });
+
                 }
             }
 

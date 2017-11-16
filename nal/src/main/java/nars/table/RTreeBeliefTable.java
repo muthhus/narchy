@@ -13,7 +13,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
-import nars.concept.TermLinks;
+import nars.concept.Tasklinks;
 import nars.task.NALTask;
 import nars.task.Revision;
 import nars.task.SignalTask;
@@ -23,7 +23,6 @@ import nars.task.util.TimeRange;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.LongObjectProcedure;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
@@ -52,9 +51,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * max allowed truths to be truthpolated in one test
      */
-    static final int TRUTHPOLATION_LIMIT = 3;
+    static final int TRUTHPOLATION_LIMIT = 4;
 
-    public static final float PRESENT_AND_FUTURE_BOOST = 4f;
+    public static final float PRESENT_AND_FUTURE_BOOST = 1.5f;
 
     static final int SCAN_DIVISIONS = 5;
 
@@ -382,7 +381,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 //full activation
                 float pri = x.pri();
                 if (pri == pri) {
-                    TermLinks.linkTask(x, pri, n, c);
+                    Tasklinks.linkTask(x, pri, c, n);
                 }
             }
         });
@@ -390,7 +389,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         ObjectFloatPair<Task> partialActivation = x.meta("partialActivation");
         if (partialActivation != null) {
             assert (x.isDeleted());
-            TermLinks.linkTask(partialActivation.getOne(), partialActivation.getTwo(), n, c);
+            Tasklinks.linkTask(partialActivation.getOne(), partialActivation.getTwo(), c, n);
         }
 
     }
@@ -432,7 +431,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         float inputStrength = inputRegion != null ? taskStrength.floatValueOf(inputRegion) : Float.POSITIVE_INFINITY;
 
         FloatFunction<TaskRegion> leafRegionWeakness =
-                /*new CachedFloatFunction*/(regionWeakness(nar.time(), nar.dur()));
+                /*new CachedFloatFunction*/(regionWeakness(nar.time(), (long)(1+tableDur()), nar.dur()));
         FloatFunction<Leaf<TaskRegion>> leafWeakness =
                 L -> leafRegionWeakness.floatValueOf((TaskRegion) L.bounds());
 
@@ -613,24 +612,28 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * TODO use the same heuristics as task strength
      */
-    private static FloatFunction<TaskRegion> regionWeakness(long when, long dur) {
+    private static FloatFunction<TaskRegion> regionWeakness(long when, long tableDur, long perceptDur) {
 
         return (TaskRegion r) -> {
 
             long regionTime =
-                    r.mid();
                     //r.furthestTimeTo(when);
-            long timeDist = 1 + Math.abs(when - regionTime);
-            if (regionTime >= when-dur)
+                    r.nearestTimeTo(when);
+
+            float timeDist = (Math.abs(when - regionTime))/((float)perceptDur);
+
+            if (r.start() >= when-perceptDur)
                 timeDist /= PRESENT_AND_FUTURE_BOOST; //shrink the apparent time if it's present and future
 
-            float antiConf = 1f -
+            float conf =
                     (float)r.coord(true, 2); //max
+                    //(float)r.coord(false, 2); //min
                     //(float) (r.coord(true, 2) + r.coord(false, 2)) / 2f; //avg
 
+            float antiConf = 1f - conf;
             //float span = (float)(1 + r.range(0)/dur); //span becomes less important the further away, more fair to short near-term tasks
 
-            return (float) (antiConf * timeDist);
+            return (float) ((antiConf) * (1+timeDist));
         };
     }
 

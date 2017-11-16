@@ -414,10 +414,13 @@ public interface NAct {
             Random rng = n.random();
 
             float confMin = n.confMin.floatValue();
-            float confBase =
+            float eviMin = c2w(confMin);
+            float feedbackConf =
                     //confMin * 4;
                     n.confDefault(GOAL);
-            float curiEvi = c2w(confBase);
+            float curiEvi =
+                    //c2w(confBase);
+                    c2w(confMin * 2);
 
             int ip = p ? 0 : 1;
             CC[ip] = action;
@@ -432,7 +435,7 @@ public interface NAct {
 
                 float eviSum = e[0] + e[1];
                 float cur = curiosity().floatValue();
-                if (eviSum < curiEvi && cur > 0 && rng.nextFloat() <= cur) {
+                if (cur > 0 && rng.nextFloat() <= cur) {
                     x = (rng.nextFloat() - 0.5f) * 2f;
                     e[0] = e[1] = curiEvi;
                     eviSum = curiEvi*2;
@@ -442,13 +445,11 @@ public interface NAct {
                     x = Util.clamp((f[0]-0.5f) - (f[1]-0.5f), -1f, +1f);
                 }
 
-
-
                 float y = update.valueOf(x); //-1..+1
 
 
                 //w2c(Math.abs(y) * c2w(restConf));
-                PreciseTruth N, P;
+                PreciseTruth Nb,Ng, Pb,Pg;
 
 //                float conf = ((y == y) && (eviSum > Pri.EPSILON)) ?
 //                            w2c(eviSum) : 0;
@@ -459,28 +460,32 @@ public interface NAct {
 
                 float yf = (y / 2f)+0.5f; //0..+1
                 if (y == y) {
-                    float confFeedback =
+
+                    Pb = $.t(yf, feedbackConf);
+                    Nb = $.t(1-yf, feedbackConf);
+
+                    float goalConf =
                             Math.max(confMin, w2cSafe(eviSum)/2 /* avg shared */);
 
-                    P = $.t(yf, confFeedback);
-                    N = $.t(1-yf, confFeedback);
+                    Pg = $.t(yf, goalConf);
+                    Ng = $.t(1-yf, goalConf);
                 } else {
-                    P = N = null;
+                    Pb = Nb = Pg = Ng = null;
                 }
 
 
-                PreciseTruth pb = P;
+                PreciseTruth pb = Pb;
                 PreciseTruth pg =
-                        curious && y==y ? P :
+                        (curious || e[0] == 0 /* null input goal */) ? Pg :
                                 //$.t(y >= 0 ? yf :  1-yf,
 //                                    //Util.lerp(Math.abs(y), confMin, confBase)
 //                                    confBase
 //                                    ) : null; //only feedback artificial goal if input goal was null
                         null;
                 CC[0].feedback(pb, pg, n);
-                PreciseTruth nb = N;
+                PreciseTruth nb = Nb;
                 PreciseTruth ng =
-                        curious && y==y ? N :
+                        (curious || e[1] == 0 /* null input goal */) ? Ng :
 //                                $.t(y >= 0 ? 1-yf : yf,
 //                                    //Util.lerp(Math.abs(y), confMin, confBase)
 //                                    confBase

@@ -7,7 +7,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
-import nars.concept.TermLinks;
+import nars.concept.Tasklinks;
 import nars.control.Cause;
 import nars.task.NALTask;
 import nars.task.Revision;
@@ -452,7 +452,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
 
         if (activated != null)
-            TermLinks.linkTask(activated, activation, nar, c);
+            Tasklinks.linkTask(activated, activation, c, nar);
     }
 
 

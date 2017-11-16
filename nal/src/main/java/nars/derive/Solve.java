@@ -54,21 +54,15 @@ abstract public class Solve extends AbstractPred<Derivation> {
                         return false; //double premise requiring a belief, but belief is null
                 }
 
-                float s = d.nar.deriverity.floatValue();
+
 
                 float confMin = d.confMin;
                 if ((t = f.apply(
                         d.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
                         single ? null : beliefProjected ? d.beliefTruth : d.beliefTruthRaw,
-                        d.nar, (s!=1.0 ? Param.TRUTH_EPSILON /* to be safe */ : confMin)
+                        d.nar, confMin
                 )) == null)
                     return false;
-
-                if (s != 1.0) {
-                    float baseConf = single ? d.premiseConfSingle : d.premiseConfDouble;
-                    float newEvi = Util.lerp(s, c2wSafe(baseConf, Param.HORIZON), t.evi());
-                    t = new PreciseTruth(t.freq(), newEvi, false);
-                }
 
 
                 float overlap;

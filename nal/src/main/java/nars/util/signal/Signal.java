@@ -101,7 +101,7 @@ public class Signal {
                 return null;  //dont re-input the task, just stretch it where it is in the temporal belief table
             } else {
                 if (last != null) {
-                    last.end(now-1); //one cycle ago so as not to overlap during the new task's start time
+                    last.end(next!=null ? now-1 : now); //one cycle ago so as not to overlap during the new task's start time
                 }
                 return this.last = next; //new or null input; stretch will be assigned on first insert to the belief table (if this happens)
             }

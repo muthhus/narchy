@@ -3,12 +3,14 @@ package nars.concept.dynamic;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.concept.BaseConcept;
+import nars.concept.Tasklinks;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
+import nars.task.util.PredictionFeedback;
 import nars.term.Term;
 import nars.term.transform.Retemporalize;
 import nars.truth.Truth;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -29,6 +31,31 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         this.term = c;
         this.model = model;
         this.beliefOrGoal = beliefOrGoal;
+    }
+
+    @Override
+    public void add(Task input, BaseConcept concept, NAR nar) {
+
+        if (!input.isInput()) {
+
+            Task matched = match(input.start(), input.end(), input.term(), nar);
+
+            if (matched != null) {
+
+                if (!(input.isEternal() ^ matched.isEternal())) { //must be of the same temporality
+
+                    float inputPri = input.priElseZero();
+                    if (PredictionFeedback.absorb(matched, input, nar)) {
+                        float activationApplied = Math.max(0, inputPri - matched.priElseZero());
+                        Tasklinks.linkTask(matched, activationApplied, concept, nar);
+                        return;
+                    }
+                }
+
+            }
+        }
+
+        super.add(input, concept, nar);
     }
 
     @Nullable

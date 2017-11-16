@@ -2,7 +2,6 @@ package nars.task.util;
 
 import jcog.list.FasterList;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.control.MetaGoal;
 import nars.table.BeliefTable;
@@ -10,52 +9,51 @@ import nars.table.DefaultBeliefTable;
 import nars.task.NALTask;
 import nars.task.SignalTask;
 import nars.truth.Truth;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class PredictionFeedback {
 
-    final BeliefTable table;
+    //final BeliefTable table;
 
 
-    float strength = 1;
+    static final float strength = 1;
 
-    public PredictionFeedback(BeliefTable table) {
+    /*public PredictionFeedback(BeliefTable table) {
         this.table = table;
-    }
+    }*/
 
-    public void accept(@Nullable Task x, NAR nar) {
+    static public void accept(Task x, BeliefTable table, NAR nar) {
         if (x == null)
             return;
 
         if (x instanceof SignalTask) {
-            feedbackNewSignal((SignalTask) x, Param.DELETE_INACCURATE_PREDICTIONS /* TODO make this adjustable threshold */, nar);
+            feedbackNewSignal((SignalTask) x, table, nar);
         } else {
-            feedbackNewBelief(x, Param.DELETE_INACCURATE_PREDICTIONS /* TODO make this adjustable threshold */, nar);
+            feedbackNewBelief(x, table, nar);
         }
     }
 
     /**
      * TODO handle stretched tasks
      */
-    void feedbackNewBelief(Task y, boolean deleteIfIncoherent, NAR nar) {
+    static void feedbackNewBelief(Task y, BeliefTable table, NAR nar) {
 
         long start = y.start();
         long end = y.end();
 
         final SignalTask[] strongestSignal = new SignalTask[1];
-        ((DefaultBeliefTable)table).temporal.whileEach(start, end, (xt) -> {
+        ((DefaultBeliefTable) table).temporal.whileEach(start, end, (xt) -> {
             if (xt instanceof SignalTask) {
                 //only looking for SignalTask's that would invalidate this incoming
-                strongestSignal[0] = ((SignalTask)xt);
+                strongestSignal[0] = ((SignalTask) xt);
                 return false;
             }
             return true;
             //TODO early exit with a Predicate form of this query method
         });
         SignalTask signal = strongestSignal[0];
-        if (signal==null)
+        if (signal == null)
             return; //just beliefs against beliefs
 
         long when = y.nearestTimeTo(nar.time());
@@ -64,44 +62,31 @@ public class PredictionFeedback {
         if (x == null)
             return; //nothing to compare it with
 
-        float yConf = y.conf(when, dur);
-
-        float coherence = coherence(signal, y);
-        float confFraction = yConf/x.conf();
-        if (confFraction > 1f)
-            return; //prediction stronger than the sensor value
-
-        absorb(signal, y, nar, coherence, confFraction);
-
+        absorb(signal, y, nar);
     }
 
     /**
      * punish any held non-signal beliefs during the current signal task which has just been input.
      * time which contradict this sensor reading, and reward those which it supports
      */
-    void feedbackNewSignal(SignalTask x, boolean deleteIfIncoherent, NAR nar) {
+    static void feedbackNewSignal(SignalTask signal, BeliefTable table, NAR nar) {
 
         int dur = nar.dur();
 
-        long start = x.start();
-        long end = x.end();
+        long start = signal.start();
+        long end = signal.end();
 
-        float xConf = x.conf(x.nearestTimeTo(nar.time()), dur);
+        float xConf = signal.conf(signal.nearestTimeTo(nar.time()), dur);
 
         List<Task> trash = new FasterList(0);
-        ((DefaultBeliefTable)table).temporal.whileEach(start, end, (y) -> {
+        ((DefaultBeliefTable) table).temporal.whileEach(start, end, (y) -> {
 
             if (y instanceof SignalTask)
                 return true; //ignore previous signaltask
 
-            float confFraction = y.conf(y.nearestTimeBetween(start, end), dur) / xConf;
-            if (confFraction > 1f)
-                return true; //prediction stronger than the sensor value
+            if (absorb(signal, y, nar))
+                trash.add(y);
 
-            float coherence = coherence(x, y);
-
-            absorb(x, y, nar, coherence, confFraction);
-            trash.add(y);
             return true; //continue
         });
 
@@ -111,7 +96,7 @@ public class PredictionFeedback {
     /**
      * measures similarity of two frequencies. 0 = dissimilar, 1 = similar
      */
-    static float coherence(Task actual, Task predict) {
+    public static float coherence(Task actual, Task predict) {
         float xFreq = actual.freq();
         float yFreq = predict.freq();
         float overtime = Math.max(0, predict.range() - actual.range()); //penalize predictions spanning longer than the actual signal because we aren't checking in that time range for accuracy, it could be wrong before and after the signal
@@ -120,14 +105,28 @@ public class PredictionFeedback {
     }
 
 
-    /** rewards/punishes the causes of this task,
-     *  then removes it in favor of a stronger sensor signal  */
-    private void absorb(SignalTask x, Task y, NAR nar, float coherence, float confFraction) {
-        float v = (coherence - 0.5f) * 2f * confFraction /* * headstart */ * strength;
+    /**
+     * rewards/punishes the causes of this task,
+     * then removes it in favor of a stronger sensor signal
+     * returns whether the 'y' task was absorbed into 'x'
+     */
+    public static boolean absorb(Task x, Task y, NAR nar) {
+        if (x == y)
+            return false;
 
-        MetaGoal.learn(MetaGoal.Accurate, y.cause(), v, nar);
+        //maybe also factor originality to prefer input even if conf is lower but has more originality thus less chance for overlap
+        float confFraction = y.conf(x.start(), x.end(), nar.dur()) / x.conf();
+        float coherence = coherence(x, y);
+        float value = (coherence - 0.5f) * 2f * confFraction /* * headstart */ * strength;
 
-        ((NALTask)y).delete(x); //forward to the actual sensor reading
+        MetaGoal.learn(MetaGoal.Accurate, y.cause(), value, nar);
+
+        if (confFraction <= 1f) {
+            ((NALTask) y).delete(x); //forward to the actual sensor reading
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

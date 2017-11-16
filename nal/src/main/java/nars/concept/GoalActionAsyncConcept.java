@@ -33,7 +33,6 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
     @NotNull
     private final BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor;
-    private final PredictionFeedback beliefFeedback;
     final CauseChannel<ITask> in;
 
     public GoalActionAsyncConcept(@NotNull Term c, @NotNull NAct act, CauseChannel<ITask> cause, @NotNull BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor) {
@@ -60,8 +59,6 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create
-
-        beliefFeedback = new PredictionFeedback(beliefs);
 
     }
 
@@ -118,7 +115,8 @@ public class GoalActionAsyncConcept extends ActionConcept {
                 //now+dur/2;
 
         if (g!=null)
-            fg = feedGoal.task(term, g, goalTime-dur, goalTime, nar.time.nextStamp()); //allow the feedback goal (Ex: curiosity) to override, otherwise use the current goal
+            //fg = feedGoal.task(term, g, goalTime-dur, goalTime, nar.time.nextStamp()); //allow the feedback goal (Ex: curiosity) to override, otherwise use the current goal
+            fg = feedGoal.set(term, g, stamper, goalTime, dur, nar);
         else
             fg = null;
         in.input(
@@ -126,7 +124,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
             fb = feedBelief.set(term, f, stamper, beliefTime, dur, nar)
         );
 
-        beliefFeedback.accept(feedBelief.get() /* in case stretched */, nar);
+        PredictionFeedback.accept(feedBelief.get() /* in case stretched */, beliefs, nar);
     }
 
     //not working yet:

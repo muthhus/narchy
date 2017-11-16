@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 
 import static nars.Op.BELIEF;
-import static nars.concept.TermLinks.linkTask;
+import static nars.concept.Tasklinks.linkTask;
 import static nars.time.Tense.ETERNAL;
 
 /**

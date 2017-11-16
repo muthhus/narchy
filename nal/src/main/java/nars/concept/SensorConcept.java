@@ -29,7 +29,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
-    final PredictionFeedback beliefFeedback;
 
     public SensorConcept(@NotNull Term c, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
         super(c,
@@ -44,8 +43,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
             }
         };
         //((SensorBeliefTable)beliefs).sensor = sensor;
-
-        beliefFeedback = new PredictionFeedback(beliefs);
 
         this.signal = signal;
 
@@ -81,7 +78,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
         //feedback prefilter non-signal beliefs
         if (t.isBelief() && !(t instanceof SignalTask)) {
-            beliefFeedback.accept(t, n);
+            PredictionFeedback.accept(t, beliefs, n);
             if (t.isDeleted())
                 return; //rejected
         }
@@ -90,10 +87,10 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
     @Nullable
-    public Task update(long time, int dur, NAR nar) {
-        Task x = sensor.update(nar, time, dur);
+    public Task update(long time, int dur, NAR n) {
+        Task x = sensor.update(n, time, dur);
 
-        beliefFeedback.accept(sensor.get() /* get() again in case x is stretched it will be null */, nar);
+        PredictionFeedback.accept(sensor.get() /* get() again in case x is stretched it will be null */, beliefs, n);
 
         return x;
     }

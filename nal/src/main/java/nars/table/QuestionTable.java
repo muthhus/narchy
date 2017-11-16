@@ -7,7 +7,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
-import nars.concept.TermLinks;
+import nars.concept.Tasklinks;
 import nars.task.NALTask;
 
 import java.util.Collections;
@@ -132,7 +132,7 @@ public interface QuestionTable extends TaskTable {
             }
 
             if (act[0] > Pri.EPSILON) {
-                TermLinks.linkTask(u, act[0], n, c);
+                Tasklinks.linkTask(u, act[0], c, n);
             }
         }
 
