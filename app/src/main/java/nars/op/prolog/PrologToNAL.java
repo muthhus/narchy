@@ -20,6 +20,8 @@ import java.util.Map;
 
 public class PrologToNAL {
 
+    public static final Term QUESTION_GOAL = $.the("?-");
+
     public static Iterable<nars.term.Term> N(Theory t) {
         return N((Iterable)t);
     }
@@ -43,8 +45,6 @@ public class PrologToNAL {
             Struct s = (Struct) t;
             String name = s.name();
             switch (name) {
-                case "?-": //question goal, just unwrap
-                    return N(s.sub(0));
 
                 case ":-":
                     assert(s.subs()==2);

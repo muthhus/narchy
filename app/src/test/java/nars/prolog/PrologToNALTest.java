@@ -15,7 +15,7 @@ public class PrologToNALTest {
 
     @Test public void testRuleImpl() throws InvalidTheoryException, IOException, URISyntaxException {
 
-        String expected = "add(0,?X,?X) , (add($X,$Y,$Z)==>add(s($X),$Y,s($Z))) , (add(s(s(0)),s(s(0)),$R)==>goal($R))";
+        String expected = "add(0,#X,#X) , (add($X,$Y,$Z)==>add(s($X),$Y,s($Z))) , (add(s(s(0)),s(s(0)),$R)==>goal($R))";
         Iterable<alice.tuprolog.Term> input = Theory.resource(
             "../../../resources/prolog/add.pl"
         );
@@ -35,6 +35,15 @@ public class PrologToNALTest {
         String expected = "((&&,$X,$Y,$Z)==>conj($X,$Y,$Z))";
         Iterable<alice.tuprolog.Term> input = Theory.string(
             "conj(X,Y,Z) :- X, Y, Z."
+        );
+        assertTranslated(expected, input);
+    }
+
+   @Test public void testQuestionGoal() throws InvalidTheoryException, IOException, URISyntaxException {
+
+        String expected = "\"?-\"((isa(your_chair,#X)&&ako(#X,seat)))";
+        Iterable<alice.tuprolog.Term> input = Theory.string(
+            "?- isa(your_chair,X), ako(X,seat)."
         );
         assertTranslated(expected, input);
     }

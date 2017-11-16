@@ -5,6 +5,7 @@
 package nars.control;
 
 import nars.NAR;
+import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
@@ -30,7 +31,7 @@ import static nars.time.Tense.ETERNAL;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public class Premise  {
+public class Premise {
 
     static final Logger logger = LoggerFactory.getLogger(Premise.class);
 
@@ -62,7 +63,8 @@ public class Premise  {
      * <p>
      * returns ttl used, -1 if failed before starting
      */
-    @Nullable public Derivation match(Derivation d, int matchTTL) {
+    @Nullable
+    public Derivation match(Derivation d, int matchTTL) {
 
         NAR n = d.nar;
         n.emotion.conceptFirePremises.increment();
@@ -112,8 +114,9 @@ public class Premise  {
         boolean beliefConceptCanAnswerTaskConcept = false;
 
         if (!taskTerm.equals(beliefTerm)) {
-            boolean beliefHasVars = beliefTerm.vars() > 0;
-            if (taskTerm.vars() > 0 || beliefHasVars) {
+            int var = Op.VAR_QUERY.bit | Op.VAR_DEP.bit | Op.VAR_INDEP.bit;
+            boolean beliefHasVars = beliefTerm.hasAny(var);
+            if (taskTerm.hasAny(var) || beliefHasVars) {
                 Unify u = unify(taskTerm, beliefTerm, n, matchTTL);
                 if (u != null) {
                     if (beliefHasVars) {
@@ -137,11 +140,12 @@ public class Premise  {
 
             Task match;
 
-            if (task.isQuestOrQuestion() && (beliefConceptCanAnswerTaskConcept || beliefConcept.equals(taskConcept))) {
-                final BeliefTable answerTable =
-                        (task.isGoal() || task.isQuest()) ?
-                                beliefConcept.goals() :
-                                beliefConcept.beliefs();
+            if (task.isQuestOrQuestion()) {
+                if ((beliefConceptCanAnswerTaskConcept || beliefConcept.equals(taskConcept))) {
+                    final BeliefTable answerTable =
+                            (task.isGoal() || task.isQuest()) ?
+                                    beliefConcept.goals() :
+                                    beliefConcept.beliefs();
 
 //                            //see if belief unifies with task (in reverse of previous unify)
 //                            if (questionTerm.varQuery() == 0 || (unify((Compound)beliefConcept.term(), questionTerm, nar) == null)) {
@@ -150,16 +154,42 @@ public class Premise  {
 //
 //                            }
 
-                match = answerTable.answer(task.start(), task.end(), dur, task, beliefTerm, n);
-                if (match != null) {
-                    assert (task.isQuest() || match.punc() == BELIEF) : "quest answered with a belief but should be a goal";
+                    match = answerTable.answer(task.start(), task.end(), dur, task, beliefTerm, n);
+                    if (match != null) {
+                        assert (task.isQuest() || match.punc() == BELIEF) : "quest answered with a belief but should be a goal";
 
-                    @Nullable Task answered = task.onAnswered(match, n);
-                    if (answered != null) {
+                        @Nullable Task answered = task.onAnswered(match, n);
+                        if (answered != null) {
 
-                        n.emotion.onAnswer(task, answered);
+                            n.emotion.onAnswer(task, answered);
 
+                        }
                     }
+                } else {
+                    long focus = matchTime(task, now, dur, n);
+                    long focusStart, focusEnd;
+                    if (focus == ETERNAL) {
+                        focusStart = focusEnd = ETERNAL;
+                    } else {
+                        focusStart = focus - dur;
+                        focusEnd = focus + dur;
+                    }
+
+//                boolean tryMatch = true;
+////                if (beliefIsTask && task.punc() == BELIEF && task.during(when)) {
+////                    if (Math.abs(when - now) > 0 /*= dur*/) {
+////                        //try projecting to now (maybe also a future time) because it will be a different time
+////                        when = now;
+////                    } else {
+////                        //leave belief blank. it already matches itself
+////                        tryMatch = false;
+////                    }
+////                }
+//                if (tryMatch) {
+                    match = beliefConcept.beliefs().match(focusStart, focusEnd, beliefTerm, n);
+//                } else {
+//                    match = null;
+//                }
                 }
             } else {
                 long focus = matchTime(task, now, dur, n);
@@ -182,7 +212,7 @@ public class Premise  {
 ////                    }
 ////                }
 //                if (tryMatch) {
-                    match = beliefConcept.beliefs().match(focusStart, focusEnd, beliefTerm, n);
+                match = beliefConcept.beliefs().match(focusStart, focusEnd, beliefTerm, n);
 //                } else {
 //                    match = null;
 //                }
@@ -217,7 +247,7 @@ public class Premise  {
      * temporal focus control: determines when a matching belief or answer should be projected to
      */
     static long matchTime(Task task, long now, int dur, NAR nar) {
-        assert(now!=ETERNAL);
+        assert (now != ETERNAL);
 
         if (task.isEternal()) {
             //return ETERNAL;
