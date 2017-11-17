@@ -82,15 +82,17 @@ public class RTree<T> implements Space<T> {
     @Override
     public boolean add(/*@NotNull*/ final T t) {
         int before = size;
-        Node<T, ?> nextRoot = root.add(t, this, model);
+
+        boolean[] added = new boolean[1];
+        Node<T, ?> nextRoot = root.add(t, this, model, added);
         if (nextRoot != null) {
             this.root = nextRoot;
-            int after = size;
-            assert (after == before || after == before + 1) : "after=" + after + ", before=" + before;
-            return after > before;
-        } else {
-            return false; //duplicate or merged
+            if (added[0]) {
+                this.size++;
+                return true;
+            }
         }
+        return false; //duplicate or merged
     }
 
 
@@ -107,10 +109,13 @@ public class RTree<T> implements Space<T> {
         int before = size;
         if (before == 0)
             return false;
-        root = root.remove(x, xBounds, this, model);
-        int after = size;
-        assert (after == before || after == before - 1): "before: " + before + ", after: " + after;
-        return before > after;
+        boolean[] removed = new boolean[1];
+        root = root.remove(x, xBounds, this, model, removed);
+        if (removed[0]) {
+            size--;
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -215,10 +220,6 @@ public class RTree<T> implements Space<T> {
         return this.root;
     }
 
-    @Override
-    public void reportSizeDelta(int i) {
-        this.size += i;
-    }
 
     @Override
     public boolean contains(T t, Spatialization<T> model) {

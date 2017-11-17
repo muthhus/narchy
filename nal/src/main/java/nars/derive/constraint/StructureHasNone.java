@@ -5,18 +5,19 @@ import nars.term.Term;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
-public final class StructureInclusionConstraint extends MatchConstraint {
+
+public final class StructureHasNone extends MatchConstraint {
 
     private final int structure;
 
-    public StructureInclusionConstraint(Term target, int opVector) {
-        super(target, "StructIncl", $.the(opVector));
+    public StructureHasNone(Term target, int opVector) {
+        super(target, "StructHasNone", $.the(opVector));
         this.structure = opVector;
     }
 
     @Override
     public boolean invalid(@NotNull Term y, @NotNull Unify f) {
-        return !y.hasAny(structure);
+        return y.hasAny(structure);
     }
 
     @Override
@@ -24,3 +25,4 @@ public final class StructureInclusionConstraint extends MatchConstraint {
         return 0.1f;
     }
 }
+

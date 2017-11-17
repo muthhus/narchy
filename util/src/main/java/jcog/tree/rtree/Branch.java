@@ -40,7 +40,6 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
 
     public final Node<T, ?>[] child;
 
-    private short childDiff;
     private HyperRegion region;
     private short size;
 
@@ -48,6 +47,16 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
         this.region = null;
         this.size = 0;
         this.child = new Node[cap];
+    }
+
+    public Branch(int cap, Leaf<T> a, Leaf<T> b) {
+        this(cap);
+        assert (cap >= 2);
+        assert (a != b);
+        child[0] = a;
+        child[1] = b;
+        this.size = 2;
+        this.region = a.region.mbr(b.region);
     }
 
     @Override
@@ -61,18 +70,13 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
         return false;
     }
 
-    @Override
-    public void reportSizeDelta(int i) {
-        childDiff += i;
-    }
-
     /**
      * Add a new node to this branch's list of children
      *
      * @param n node to be added (can be leaf or branch)
      * @return position of the added node
      */
-    public int addChild(@NotNull final Node<T, ?> n) {
+    public int addChild(final Node<T, ?> n) {
         if (size < child.length) {
             child[size++] = n;
 
@@ -106,11 +110,11 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
      * @param t      data entry to add
      * @param parent
      * @param model
+     * @param added
      * @return Node that the entry was added to
      */
     @Override
-    public Node<T, ?> add(final T t, Nodelike<T> parent, Spatialization<T> model) {
-        assert (childDiff == 0);
+    public Node<T, ?> add(final T t, Nodelike<T> parent, Spatialization<T> model, boolean[] added) {
 
         final HyperRegion tRect = model.region(t);
 
@@ -125,9 +129,11 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
                     //                if (ci.contains(t, model))
                     //                    return this; // duplicate detected (subtree not changed)
 
-                    Node<T, ?> m = ci.add(t, null, model);
-                    if (m == null)
+                    Node<T, ?> m = ci.add(t, null, model, null);
+                    if (m == null) {
                         return null; //merged
+                    }
+
                     //                if (reportNextSizeDelta(parent)) {
                     //                    child[i] = m;
                     //                    grow(m); //subtree was changed
@@ -139,13 +145,18 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
                 return this; //done for this stage
         }
 
+        if (added == null)
+            return this; //merge stage only
+
+        assert (!added[0]);
 
         //INSERTION STAGE:
 
         if (size < child.length) {
 
             // no overlapping node - grow
-            grow(addChild(model.newLeaf().add(t, parent, model)));
+            grow(addChild(model.newLeaf().add(t, parent, model, added)));
+            assert (added[0]);
 
             return this;
 
@@ -153,51 +164,51 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
 
             final int bestLeaf = chooseLeaf(t, tRect, parent, model);
 
-            Node<T, ?> nextBest = child[bestLeaf].add(t, this, model);
+            Node<T, ?> nextBest = child[bestLeaf].add(t, this, model, added);
+            assert (added[0]);
+
             if (nextBest == null) {
                 return null; //merged
             }
 
             child[bestLeaf] = nextBest;
 
-            if (reportNextSizeDelta(parent)) {
-                grow(nextBest);
 
-                // optimize on split to remove the extra created branch when there
-                // is space for the children here
-                if (size < child.length && nextBest.size() == 2 &&
+            grow(nextBest);
 
-                        !nextBest.isLeaf()) {
-                    final Branch<T> branch = (Branch<T>) nextBest;
-                    child[bestLeaf] = branch.child[0];
-                    child[size++] = branch.child[1];
-                }
-
-            } else {
-                //? duplicate was found in sub-tree but we checked for duplicates above
-
-
-                if (nextBest.contains(t, model))
-                    return null;
-
-                assert (false) : "what to do with: " + t + " in " + parent;
-                //probably ok, just merged with a subbranch?
-                //return null;
+            // optimize on split to remove the extra created branch when there
+            // is space for the children here
+            if (size < child.length && nextBest.size() == 2 && !nextBest.isLeaf()) {
+                Node<T, ?>[] bc = ((Branch<T>) nextBest).child;
+                child[bestLeaf] = bc[0];
+                child[size++] = bc[1];
             }
+
+//            } else {
+//                //? duplicate was found in sub-tree but we checked for duplicates above
+//
+//
+//                if (nextBest.contains(t, model))
+//                    return null;
+//
+//                assert (false) : "what to do with: " + t + " in " + parent;
+//                //probably ok, just merged with a subbranch?
+//                //return null;
+//            }
 
             return this;
         }
     }
 
-    private boolean reportNextSizeDelta(Nodelike<T> parent) {
-        int x = childDiff;
-        if (x == 0)
-            return false; //nothing changed
-
-        this.childDiff = 0; //clear
-        parent.reportSizeDelta(x);
-        return true;
-    }
+//    private boolean reportNextSizeDelta(Nodelike<T> parent) {
+//        int x = childDiff;
+//        if (x == 0)
+//            return false; //nothing changed
+//
+//        this.childDiff = 0; //clear
+//        parent.reportSizeDelta(x);
+//        return true;
+//    }
 
     private void grow(int i) {
         grow(child[i]);
@@ -212,35 +223,43 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
     }
 
     @Override
-    public Node<T, ?> remove(final T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
+    public Node<T, ?> remove(final T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model, boolean[] removed) {
+
+        assert (removed[0] == false);
 
         for (int i = 0; i < size; i++) {
-            if (child[i].bounds().contains(xBounds)) {
-                child[i] = child[i].remove(x, xBounds, this, model);
-                if (reportNextSizeDelta(parent)) {
+            Node<T, ?> cBefore = child[i];
+            if (cBefore.bounds().contains(xBounds)) {
+
+                Node<T, ?> cAfter = cBefore.remove(x, xBounds, this, model, removed);
+
+                if (removed[0]) {
                     if (child[i].size() == 0) {
                         System.arraycopy(child, i + 1, child, i, size - i - 1);
                         child[--size] = null;
                         if (size > 0) i--;
                     }
+
+                    if (size > 0) {
+
+                        if (size == 1) {
+                            // unsplit branch
+                            return child[0];
+                        }
+
+                        Node<T, ?>[] cc = this.child;
+                        HyperRegion region = cc[0].bounds();
+                        for (int j = 1; j < size; j++) {
+                            region = grow(region, cc[j]);
+                        }
+                        this.region = region;
+                    }
+
+                    break;
                 }
             }
         }
 
-        if (size > 0) {
-
-            if (size == 1) {
-                // unsplit branch
-                return child[0];
-            }
-
-            Node<T, ?>[] cc = this.child;
-            HyperRegion region = cc[0].bounds();
-            for (int i = 1; i < size; i++) {
-                region = grow(region, cc[i]);
-            }
-            this.region = region;
-        }
 
         return this;
     }

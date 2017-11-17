@@ -45,6 +45,10 @@ public class PrologToNAL {
             Struct s = (Struct) t;
             String name = s.name();
             switch (name) {
+                /* "=:=": identity(X,Y) */
+                /* "=\=": --identity(X,Y) */
+                /* "=": unify(X,Y) */
+                /* "<": lessThan(X,Y) etc */
 
                 case ":-":
                     assert(s.subs()==2);

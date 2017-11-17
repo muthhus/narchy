@@ -87,15 +87,21 @@ public final class DynTruth implements Truthed {
             tr0 = tr0.neg();
         }
 
-        Truth tr = tr0.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+        long[] se = Task.range(e);
+        long start = se[0];
+        long end = se[1];
+        long eviRange = end - start;
+        int termRange = c.dtRange();
+
+        float rangeCoherence = eviRange==termRange ? 1f :
+                1f - ((float)Math.abs(eviRange - termRange))/Math.max(eviRange, termRange)/nar.dur();
+
+        Truth tr = tr0.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), rangeCoherence);
         if (tr == null)
             return null;
 
         float priority = budget();
 
-        long[] se = Task.range(e);
-        long start = se[0];
-        long end = se[1];
 
         // then if the term is valid, see if it is valid for a task
         if (!Task.validTaskTerm(c.temporalize(

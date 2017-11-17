@@ -197,15 +197,16 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
                     // there are too many it spams the worker pool
                 if (cleanupPending.compareAndSet(false, true)) {
                     nar.exe.execute(()->{
-                       cleanupPending.set(false);
                        concepts.cleanUp();
+                       cleanupPending.set(false);
                     });
                 } else {
                     return;
                 }
             } else {
-                //what is it?
-                nar.exe.execute(command);
+                //possibly a removal notification (its class will be an anonymous lambda :( ), execute inline immediately
+                command.run();
+                //nar.exe.execute(command);
             }
 
         } else

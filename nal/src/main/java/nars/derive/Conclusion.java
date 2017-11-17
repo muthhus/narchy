@@ -10,8 +10,7 @@ import nars.term.transform.Retemporalize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
+import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -52,7 +51,7 @@ public final class Conclusion extends AbstractPred<Derivation> {
         Term c1 = pattern.eval(d);
 
         int volMax = d.termVolMax;
-        if (c1 == null || !c1.op().conceptualizable || c1.varPattern() > 0 || c1.volume() > volMax)
+        if (c1 == null || !c1.op().conceptualizable || c1.volume() > volMax || c1.hasAny(BOOL,VAR_PATTERN) )
             return false;
 
 //        c1 = c1.eval(p);

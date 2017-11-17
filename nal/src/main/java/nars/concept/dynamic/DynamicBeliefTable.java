@@ -90,11 +90,11 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         }
 
         //still XTERNAL ? try using start..end as a dt
-        if (template.dt() == XTERNAL && template.subs()==2) {
+        if (start!=DTERNAL && template.dt() == XTERNAL && template.subs()==2) {
             template = template.dt((int) (end-start));
         }
 
-        template = template.temporalize(Retemporalize.retemporalizeXTERNALToZero);
+        template = template.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
         if (template == null)
             return null;
 
@@ -143,6 +143,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             final int[] count = {0};
             final long[] sum = {0};
 
+            //TODO roulette sample the different contained values, dont just average them
+
             Consumer<Task> tx = x -> {
                 int xdt = x.dt();
                 if (xdt!=XTERNAL && xdt != DTERNAL) {
@@ -162,8 +164,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             }
         }
 
-        //return DTERNAL;
-        return 0; //parallel
+        return DTERNAL;
     }
 
     @Override

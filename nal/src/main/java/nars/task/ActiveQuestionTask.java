@@ -88,6 +88,7 @@ public class ActiveQuestionTask extends NALTask implements Consumer<Task> {
 
         public MySubUnify(Random r, int ttl) {
             super(null, r, Param.UnificationStackMax, ttl);
+            varSymmetric = false;
         }
 
         @Override

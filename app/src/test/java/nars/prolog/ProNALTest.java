@@ -50,7 +50,7 @@ public class ProNALTest {
                 n.believe(xx.normalize());
             }
         }
-        n.run(2000);
+        n.run(500);
 
         //?- made_of(your_chair,X), colour(X,Colour).
         assertTrue(answers.contains("(colour(wood,brown)&&made_of(your_chair,wood))"));

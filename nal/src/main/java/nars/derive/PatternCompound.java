@@ -10,6 +10,7 @@ import nars.derive.mutate.CommutivePermutations;
 import nars.term.Compound;
 import nars.term.GenericCompoundDT;
 import nars.term.Term;
+import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.Nullable;
@@ -49,11 +50,9 @@ abstract public class PatternCompound extends GenericCompoundDT {
         abstract protected boolean matchEllipsis(TermContainer y, Unify subst);
 
         @Override
-        public final boolean unify(Term y, Unify subst) {
-            return y.hasAll(structureRequired) && op() == y.op() && matchEllipsis(y.subterms(), subst);
+        public final boolean unifySubterms(Term y, Unify u) {
+            return y.hasAll(structureRequired) && matchEllipsis(y.subterms(), u);
         }
-
-
     }
 
 

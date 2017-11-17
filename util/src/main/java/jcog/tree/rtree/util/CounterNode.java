@@ -62,13 +62,13 @@ public final class CounterNode<T> implements Node<T, Object> {
     }
 
     @Override
-    public Node<T, ?> add(T t, Nodelike<T> parent, Spatialization<T> model) {
-        return this.node.add(t, parent!=null ? this : null, model);
+    public Node<T, ?> add(T t, Nodelike<T> parent, Spatialization<T> model, boolean[] added) {
+        return this.node.add(t, parent!=null ? this : null, model, added);
     }
 
     @Override
-    public Node<T, ?> remove(T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
-        return this.node.remove(x, xBounds, this, model);
+    public Node<T, ?> remove(T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model, boolean[] removed) {
+        return this.node.remove(x, xBounds, this, model, removed);
     }
 
     @Override
@@ -130,10 +130,6 @@ public final class CounterNode<T> implements Node<T, Object> {
 //        return node.perimeter(model);
 //    }
 
-    @Override
-    public void reportSizeDelta(int i) {
-        node.reportSizeDelta(i);
-    }
 
     @Override
     public boolean contains(T t, Spatialization<T> model) {

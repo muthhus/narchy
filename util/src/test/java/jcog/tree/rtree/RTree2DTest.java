@@ -20,6 +20,7 @@ package jcog.tree.rtree;
  * #L%
  */
 
+import com.google.common.collect.Iterators;
 import jcog.tree.rtree.point.Double2D;
 import jcog.tree.rtree.rect.RectDouble2D;
 import jcog.tree.rtree.rect.RectFloatND;
@@ -45,13 +46,15 @@ public class RTree2DTest {
 
         for(int i=0; i<10; i++) {
             pTree.add(new Double2D(i, i));
+            assertEquals(i+1, pTree.size());
+            assertEquals(i+1, Iterators.size(pTree.iterator()));
         }
 
         final RectDouble2D rect = new RectDouble2D(new Double2D(2,2), new Double2D(8,8));
         final Double2D[] result = new Double2D[10];
 
         final int n = pTree.containedToArray(rect, result);
-        assertEquals(7, n);
+        assertEquals(7, n, ()->Arrays.toString(result));
 
         for(int i=0; i<n; i++) {
             assertTrue(result[i].x >= 2);

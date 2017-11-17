@@ -7,19 +7,18 @@ import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 
-public final class OpConstraint extends MatchConstraint {
+public final class OpIs extends MatchConstraint {
 
     @NotNull
     private final Op op;
 
-    public OpConstraint(Term target, /*@NotNull*/ Op o) {
-        super(target, "op", $.quote(o.toString()));
+    public OpIs(Term target, /*@NotNull*/ Op o) {
+        super(target, "OpIs", $.quote(o.toString()));
         op = o;
     }
 
     @Override
-    public boolean invalid(@NotNull Term y, @NotNull Unify f) {
-
+    public boolean invalid(Term y, Unify f) {
         return y.op()!=op;
     }
 

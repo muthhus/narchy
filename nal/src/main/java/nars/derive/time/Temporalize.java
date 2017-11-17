@@ -824,46 +824,53 @@ public class Temporalize implements ITemporalize {
 
 
     private Event solveConj(Term a, Time at, Term b, Time bt) {
-        long ata = at.abs();
-        long bta = bt.abs();
 
-        if (ata == ETERNAL || /* && */ bta == ETERNAL) {
-            if (at.offset == DTERNAL || bt.offset == DTERNAL) {
-                //assert(at.offset==bt.offset);
-                Term ce = CONJ.the(DTERNAL, a, b);
-                if (ce instanceof Bool)
-                    return null;
-                return new AbsoluteEvent(ce, ETERNAL);
-            }
-            ata = at.offset; //TODO maybe apply shift, and also needs to affect 'start'
-            bta = bt.offset;// + a.dtRange();
-        } /*else if (ata == ETERNAL ^ bta == ETERNAL) {
-            return null; //one is eternal the other isn't
-        }*/
-
-        Time early = ata < bta ? at : bt;
-        //Time late = ata < bta ? bt : at;
-
-        if (Math.abs(ata - bta) < dur) {
-            //dither
-            //cDur = (int) Math.abs(ata - bta);
-            bta = ata;
-            //late = early;
+        Term newTerm;
+        if (at.base == ETERNAL || bt.base == ETERNAL) {
+            //both eternal or a mix of one eternal and temporal.  the occurrence will be the temporal but the DT will be && (dternal)
+            newTerm = CONJ.the(DTERNAL, a, b);
+            return newTerm.op().conceptualizable ?
+                    new TimeEvent(newTerm, bt.base != ETERNAL ? bt : at) : null;
         } else {
-            //cDur = -1;
+
+            long ata = at.abs();
+            long bta = bt.abs();
+
+
+            if (ata == ETERNAL || /* && */ bta == ETERNAL) {
+                if (at.offset == DTERNAL || bt.offset == DTERNAL) {
+                    //assert(at.offset==bt.offset);
+                    Term ce = CONJ.the(DTERNAL, a, b);
+                    if (ce instanceof Bool)
+                        return null;
+                    return new AbsoluteEvent(ce, ETERNAL);
+                }
+                ata = at.offset; //TODO maybe apply shift, and also needs to affect 'start'
+                bta = bt.offset;// + a.dtRange();
+            } /*else if (ata == ETERNAL ^ bta == ETERNAL) {
+                return null; //one is eternal the other isn't
+            }*/
+
+            Time early = ata < bta ? at : bt;
+            //Time late = ata < bta ? bt : at;
+
+            if (Math.abs(ata - bta) < dur) {
+                //dither
+                //cDur = (int) Math.abs(ata - bta);
+                bta = ata;
+                //late = early;
+            } else {
+                //cDur = -1;
+            }
+
+            newTerm = Op.conjMerge(a, ata, b, bta);
+            return newTerm.op().conceptualizable ?
+                    new TimeEvent(newTerm, early, newTerm.dtRange()) : null;
         }
 
-        Term newTerm = Op.conjMerge(a, ata, b, bta);
-        if (newTerm instanceof Bool)
-            return null;
-//        if (!newTerm.op().conceptualizable) //failed to create conj
-//            return null;
-
-
-        return new TimeEvent(newTerm, early, newTerm.dtRange());
     }
 
-    private static Event solveStatement(Term target, Map<Term, Time> trail, Event ra, Event rb) {
+    static Event solveStatement(Term target, Map<Term, Time> trail, Event ra, Event rb) {
 
         //not overlapping at all, compute point interpolation
         Time as = ra.start(trail);

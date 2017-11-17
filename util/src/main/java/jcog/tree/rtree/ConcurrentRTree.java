@@ -364,11 +364,6 @@ public class ConcurrentRTree<T> extends ReentrantReadWriteLock implements Space<
     }
 
     @Override
-    public void reportSizeDelta(int i) {
-        tree.reportSizeDelta(i);
-    }
-
-    @Override
     public boolean contains(T t, Spatialization<T> model) {
         return tree.contains(t, model);
     }

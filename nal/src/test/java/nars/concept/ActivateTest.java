@@ -124,7 +124,7 @@ public class ActivateTest {
     public void testTemplates3() throws Narsese.NarseseException {
         //layer 3:
         testTemplates("(open(John,door) ==> #x)",
-                "[(open(John,door)==>#1), #1, open, open(John,door), (John,door), John, door]");
+                "[#1, open, John, door, (open(John,door)==>#1), (John,door), open(John,door)]");
     }
 
     @Test

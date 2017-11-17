@@ -339,19 +339,13 @@ public class PremiseRule /*extends GenericCompound*/ {
                     termIsNot(pres, taskPattern, beliefPattern, constraints, X, Op.SetBits);
                     break;
 
-                case "set":
-                    if (taskPattern.equals(X) || beliefPattern.equals(X))
-                        pres.add(new TaskBeliefHas(Op.SetBits, taskPattern.equals(X), beliefPattern.equals(X)));
-                    constraints.add(new OpInConstraint(X, Op.SETi, Op.SETe));
-                    break;
-
-                case "setext": //TODO rename: opSETe
-                    termIs(pres, taskPattern, beliefPattern, constraints, X, Op.SETe);
-                    break;
-
-                case "setint": //TODO rename: opSETi
-                    termIs(pres, taskPattern, beliefPattern, constraints, X, Op.SETi);
-                    break;
+//                case "set":
+//                    if (taskPattern.equals(X) || beliefPattern.equals(X))
+//                        pres.add(new TaskBeliefHas(Op.SetBits, taskPattern.equals(X), beliefPattern.equals(X)));
+//                    constraints.add(new OpInConstraint(X, Op.SETi, Op.SETe));
+//                    break;
+//
+//
                 case "opSECTe":
                     termIs(pres, taskPattern, beliefPattern, constraints, X, Op.SECTe);
                     break;
@@ -374,18 +368,28 @@ public class PremiseRule /*extends GenericCompound*/ {
                     constraints.add(new SubOfConstraint(Y, X, true));
                     break;
 
+                 case "isAny":
+
+                     int struct = 0;
+                     for (int k = 1; k < args.length; k++) {
+                         struct |= Op.the($.unquote(args[k])).bit;
+                     }
+                     assert(struct!=0);
+                     termIsAny(pres, taskPattern, beliefPattern, constraints, X, struct);
+                     break;
+
                  case "is":
                     //TODO make var arg version of this
-                    Op o = Op.the($.unquote(Y));
-                    assert (o != null);
-                    termIs(pres, taskPattern, beliefPattern, constraints, X, o);
+                     Op o = Op.the($.unquote(Y));
+                     assert (o != null);
+                     termIs(pres, taskPattern, beliefPattern, constraints, X, o);
                     break;
 
                 case "has":
                     //TODO make var arg version of this
                     Op oh = Op.the($.unquote(Y));
                     assert (oh != null);
-                    termHas(taskPattern, beliefPattern, pres, constraints, X, oh);
+                    termHasAny(taskPattern, beliefPattern, pres, constraints, X, oh);
                     break;
 
                 case "time":
@@ -652,17 +656,23 @@ public class PremiseRule /*extends GenericCompound*/ {
     }
 
     private static void termIs(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, SortedSet<MatchConstraint> constraints, Term x, Op v) {
-        constraints.add(new OpConstraint(x, v));
-
-
+        constraints.add(new OpIs(x, v));
         includesOp(pres, taskPattern, beliefPattern, x, v);
+    }
+    private static void termIsAny(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, SortedSet<MatchConstraint> constraints, Term x, int struct) {
+        constraints.add(new OpIsAny(x, struct));
+        includesOp(pres, taskPattern, beliefPattern, x, struct);
     }
 
     private static void includesOp(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, Term x, Op o) {
-        boolean inTask = taskPattern.containsRecursively(x);
-        boolean inBelief = beliefPattern.containsRecursively(x);
+        includesOp(pres, taskPattern, beliefPattern, x, o.bit);
+    }
+
+    private static void includesOp(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, Term x, int struct) {
+        boolean inTask = taskPattern.equals(x) || taskPattern.containsRecursively(x);
+        boolean inBelief = beliefPattern.equals(x) || beliefPattern.containsRecursively(x);
         if (inTask || inBelief)
-            pres.add(new TaskBeliefHas(o.bit, inTask, inBelief));
+            pres.add(new TaskBeliefHas(struct, inTask, inBelief));
     }
 
 
@@ -670,14 +680,14 @@ public class PremiseRule /*extends GenericCompound*/ {
         constraints.add(new OpExclusionConstraint(t, structure));
     }
 
-    private static void termHas(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, Op o) {
-        constraints.add(new StructureInclusionConstraint(x, o.bit));
+    private static void termHasAny(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, Op o) {
+        constraints.add(new StructureHasAny(x, o.bit));
 
         includesOp(pres, task, belief, x, o);
     }
 
     private static void termHasNot(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
-        constraints.add(new StructureExclusionConstraint(t, structure));
+        constraints.add(new StructureHasNone(t, structure));
     }
 
     private static void neq(@NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {

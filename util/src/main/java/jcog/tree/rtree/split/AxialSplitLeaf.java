@@ -37,16 +37,18 @@ public final class AxialSplitLeaf<T> implements Split<T> {
 
     @Override
     public Node<T, ?> split(T t, Leaf<T> leaf, Spatialization<T> model) {
-        final Branch<T> pNode = model.newBranch();
 
-        final int nD = model.region(leaf.data[0]).dim(); //TODO builder.dim()
+
+        HyperRegion r = leaf.region;
+
+        final int nD = r.dim();
 
         // choose axis to split
         int axis = 0;
-        double rangeD = leaf.region.range(0);
+        double rangeD = r.range(0);
         for (int d = 1; d < nD; d++) {
             // split along the greatest range extent
-            final double dr = leaf.region.rangeIfFinite(d, 0);
+            final double dr = r.rangeIfFinite(d, 0);
             if (dr > rangeD) {
                 axis = d;
                 rangeD = dr;
@@ -61,39 +63,15 @@ public final class AxialSplitLeaf<T> implements Split<T> {
         Arrays.sort(sortedMbr, Comparator.comparingDouble(o -> o.center(splitDimension)));
 
         // divide sorted leafs
-        final Node<T, T> l1Node = model.newLeaf();
-        transfer(leaf, sortedMbr, l1Node, 0, size / 2, model);
+        final Leaf<T> l1Node = model.transfer(leaf, sortedMbr, 0, size/2);
+        final Leaf<T> l2Node = model.transfer(leaf, sortedMbr, size / 2, size);
 
-        final Node<T, T> l2Node = model.newLeaf();
-        transfer(leaf, sortedMbr, l2Node, size / 2, size, model);
+        leaf.classify(l1Node, l2Node, t, model, new boolean[1] /* dummy */);
 
-        leaf.classify(l1Node, l2Node, t, model);
-
-        pNode.addChild(l1Node);
-        pNode.addChild(l2Node);
-
-        return pNode;
+        return model.newBranch(l1Node, l2Node);
     }
 
 
-    private static <T> void transfer(Leaf<T> leaf, HyperRegion[] sortedSrc, Node<T, ?> target, int from, int to, Spatialization<T> model) {
-
-        for (int j = 0; j < leaf.size; j++) {
-            T jd = leaf.data[j];
-            HyperRegion jr = model.region(jd);
-
-            for (int i = from; i < to; i++) {
-                HyperRegion si = sortedSrc[i];
-
-                if (si!=null && jr.equals(si)) {
-                    target.add(jd, leaf, model);
-                    sortedSrc[i] = null;
-                    break;
-                }
-            }
-        }
-        assert (target.size() == (to - from)) : target.size() + " isnt " + (to - from) + ' ' + Arrays.toString(leaf.data) + " -> " + Arrays.toString(sortedSrc);
-    }
 
 
 }

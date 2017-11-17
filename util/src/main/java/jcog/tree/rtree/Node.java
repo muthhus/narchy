@@ -75,9 +75,10 @@ public interface Node<L, V> extends Nodelike<L> {
      *                  if parent is null, indicates it is in the 'merge attempt' stage
      *                  if parent is non-null, in the 'insertion attempt' stage
      * @param model
+     * @param added
      * @return null if Leaf merged it with existing item
      */
-    @Nullable Node<L, ?> add(/*@NotNull */L l, @Nullable Nodelike<L> parent, /*@NotNull */Spatialization<L> model);
+    Node<L, ?> add(/*@NotNull */L l, @Nullable Nodelike<L> parent, /*@NotNull */Spatialization<L> model, boolean[] added);
 
     /**
      * Remove t from the index
@@ -85,8 +86,9 @@ public interface Node<L, V> extends Nodelike<L> {
      * @param xBounds - the bounds of t which may not necessarily need to be the same as the bounds as model might report it now; for removing a changing value
      * @param parent - the callee which is the parent of this instance
      * @param model
+     * @param removed
      */
-    Node<L, ?> remove(L l, HyperRegion xBounds, Nodelike<L> parent, Spatialization<L> model);
+    Node<L, ?> remove(L l, HyperRegion xBounds, Nodelike<L> parent, Spatialization<L> model, boolean[] removed);
 
     /**
      * update an existing t in the index

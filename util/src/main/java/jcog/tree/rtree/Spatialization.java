@@ -4,6 +4,7 @@ import jcog.tree.rtree.split.AxialSplitLeaf;
 import jcog.tree.rtree.split.LinearSplitLeaf;
 import jcog.tree.rtree.split.QuadraticSplitLeaf;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 public class Spatialization<T> {
@@ -28,12 +29,15 @@ public class Spatialization<T> {
         return region.apply(t);
     }
 
-    public Node<T, T> newLeaf() {
-        return new Leaf(max);
+    public Leaf<T> newLeaf() {
+        return new Leaf<>(max);
     }
 
     public Branch<T> newBranch() {
         return new Branch<>(max);
+    }
+    public Branch<T> newBranch(Leaf<T> a, Leaf<T> b) {
+        return new Branch<>(max, a, b);
     }
 
     public Node<T, ?> split(T t, Leaf<T> leaf) {
@@ -48,6 +52,38 @@ public class Spatialization<T> {
     protected void merge(T existing, T incoming) {
 
     }
+
+    public final Leaf<T> transfer(Leaf<T> leaf, HyperRegion[] sortedMbr, int from, int to) {
+        Leaf<T> l = newLeaf();
+        transfer(leaf, sortedMbr, l, from, to);
+        return l;
+    }
+
+    public void transfer(Leaf<T> leaf, HyperRegion[] sortedSrc, Node<T, ?> target, int from, int to) {
+
+        boolean[] dummy = new boolean[1];
+
+        for (int j = 0; j < leaf.size; j++) {
+            T jd = leaf.data[j];
+            HyperRegion jr = region(jd);
+
+            for (int i = from; i < to; i++) {
+                HyperRegion si = sortedSrc[i];
+
+                if (si!=null && jr.equals(si)) {
+
+                    target.add(jd, leaf, this, dummy);
+                    sortedSrc[i] = null;
+                    break;
+                }
+            }
+        }
+        if (!((target.size() == (to - from)))) {
+            throw new RuntimeException("fix");
+        }
+        assert (target.size() == (to - from)) : target.size() + " isnt " + (to - from) + ' ' + Arrays.toString(leaf.data) + " -> " + Arrays.toString(sortedSrc);
+    }
+
 
     /**
      * Different methods for splitting nodes in an RTree.

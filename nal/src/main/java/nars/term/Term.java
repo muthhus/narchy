@@ -365,16 +365,15 @@ public interface Term extends Termed, Comparable<Termed> {
      * @param ignored the unification context
      * @return whether unification succeeded
      */
-    default boolean unify(/*@NotNull */Term y, Unify u) {
-        if (this == y)
+    default boolean unify(Term y, Unify u) {
+        if (this.equals(y)) {
             return true;
-        else if (y instanceof Variable)
-            return y.unify(this, u);
-        else if (y instanceof AliasConcept.AliasAtom) {
-            Term abbreviated = ((AliasConcept.AliasAtom) y).target;
-            return unify(abbreviated, u);
+        } else if (u.varSymmetric && y instanceof Variable && !(this instanceof Variable)) {
+            return y.unify(this, u); //reverse
+        } else if (y instanceof AliasConcept.AliasAtom) {
+            return unify(((AliasConcept.AliasAtom) y).target, u); //dereference alias
         } else {
-            return equals(y);
+            return false;
         }
     }
 

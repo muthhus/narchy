@@ -251,6 +251,37 @@ public class Builtin {
          */
         nar.on(Functor.f1((Atom) $.the("dropAnySet"), (Term t) -> {
             Op oo = t.op();
+
+            if (oo == INT) {
+                if (t instanceof Int.IntRange) {
+                    //select random location in the int and split either up or down
+                    Int.IntRange i = (Int.IntRange)t;
+                    Random rng = nar.random();
+                    if (i.min+1 == i.max) {
+                        //arity=2
+                        return Int.the(rng.nextBoolean() ? i.min : i.max);
+                    } else if (i.min+2 == i.max) {
+                        //arity=3
+                        switch (rng.nextInt(4)) {
+                            case 0: return Int.the(i.min);
+                            case 1: return Int.range(i.min, i.min+1);
+                            case 2: return Int.range(i.min+1, i.min+2);
+                            case 3: return Int.the(i.max);
+                            default:
+                                throw new UnsupportedOperationException();
+                        }
+                    } else {
+                        int split = rng.nextInt(i.max-i.min-2);
+                        return (rng.nextBoolean()) ?
+                                Int.range(i.min, split+1) :
+                                Int.range(split+1, i.max);
+                    }
+                }
+
+                //cant drop int by itself
+                return Null;
+            }
+
             if (!oo.in(SETi.bit | SETe.bit))
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 

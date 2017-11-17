@@ -809,6 +809,15 @@ public class NAL7Test extends NALTest {
     }
 
     @Test
+    public void testConjInductionEternalTemporal() {
+        test
+                .log()
+                .input("a:x.")
+                .input("a:y. :|:")
+                .mustBelieve(cycles, "(a:x && a:y)", 1f, 0.81f, 0);
+    }
+
+    @Test
     public void testComparison1_Eternal() {
         /* (P ==> M), (S ==> M), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
            (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward) */
@@ -816,7 +825,7 @@ public class NAL7Test extends NALTest {
         test
                 .input("(p ==>+1 m).")
                 .input("(s ==>+4 m).")
-                .mustBelieve(cycles, "(s ==>+3 p).", 1f, 0.45f);
+                .mustBelieve(cycles, "(s ==>+3 p)", 1f, 0.45f);
     }
 
 

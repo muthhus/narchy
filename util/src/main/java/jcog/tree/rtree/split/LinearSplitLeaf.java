@@ -31,6 +31,9 @@ public final class LinearSplitLeaf<T> implements Split<T> {
 
     @Override
     public Node<T, ?> split(T t, Leaf<T> leaf, Spatialization<T> model) {
+
+        boolean[] dummy = new boolean[1];
+
         final Branch<T> pNode = model.newBranch();
         final Node<T, T> l1Node = model.newLeaf();
         final Node<T, T> l2Node = model.newLeaf();
@@ -108,17 +111,17 @@ public final class LinearSplitLeaf<T> implements Split<T> {
         }
 
         // two seeds
-        l1Node.add(data[r1Ext], leaf, model);
-        l2Node.add(data[r2Ext], leaf, model);
+        l1Node.add(data[r1Ext], leaf, model, dummy);
+        l2Node.add(data[r2Ext], leaf, model, dummy);
 
         for (int i = 0; i < size; i++) {
             if ((i != r1Ext) && (i != r2Ext)) {
                 // classify with respect to nodes
-                leaf.classify(l1Node, l2Node, data[i], model);
+                leaf.classify(l1Node, l2Node, data[i], model, dummy);
             }
         }
 
-        leaf.classify(l1Node, l2Node, t, model);
+        leaf.classify(l1Node, l2Node, t, model, dummy);
 
         pNode.addChild(l1Node);
         pNode.addChild(l2Node);

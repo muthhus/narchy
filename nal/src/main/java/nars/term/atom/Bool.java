@@ -83,10 +83,7 @@ abstract public class Bool extends AtomicConst {
 
     @Override
     public final boolean unify(Term y, Unify subst) {
-        if (Param.DEBUG_EXTRA)
-            throw never("unify");
-        else
-            return this == y;
+        return this == y;
     }
 
     @Override

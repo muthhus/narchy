@@ -265,31 +265,34 @@ public interface Compound extends Term, IPair, TermContainer {
      * unification matching entry point (default implementation)
      *
      * @param y     compound to match against (the instance executing this method is considered 'x')
-     * @param subst the substitution context holding the match state
+     * @param u the substitution context holding the match state
      * @return whether match was successful or not, possibly having modified subst regardless
      */
     @Override
-    default boolean unify(/*@NotNull*/ Term ty, /*@NotNull*/ Unify subst) {
+    default boolean unify(/*@NotNull*/ Term ty, /*@NotNull*/ Unify u) {
 
-        if (Term.super.unify(ty, subst))
+        if (Term.super.unify(ty, u))
             return true;
 
         Op op = op();
         if (op != ty.op())
             return false;
 
-        //int xs;
+        return unifySubterms(ty, u);
+    }
+
+    default boolean unifySubterms(Term ty, Unify u) {
         TermContainer xsubs = subterms();
         if ((/*xs = */xsubs.subs()) != ty.subs())
             return false;
 
-        Op st = subst.type;
-        boolean varsPresent =
-            st == null ? (vars()+varPattern()+ty.vars()+ty.varPattern() > 0) : hasAny(st) | ty.hasAny(st);
-        if (!varsPresent)
+
+        Op st = u.type;
+        if (!u.relevantVariables(xsubs, ty))
             return false; //no free vars, the only way unification can proceed is if equal
 
         Compound y = (Compound) ty;
+        TermContainer ysubs = y.subterms();
 //        if (op.temporal) {
 //            int sdur = subst.dur;
 //            if (sdur >= 0) {
@@ -298,23 +301,16 @@ public interface Compound extends Term, IPair, TermContainer {
 //            }
 //        }
 
-        TermContainer ysubs = y.subterms();
 
         if (op() == CONJ) { //non-commutive, temporal CONJ
-            return TermContainer.unifyConj(xsubs, dt(), ysubs, y.dt(), subst);
+            return TermContainer.unifyConj(xsubs, dt(), ysubs, y.dt(), u);
         } else if (isCommutative()) {
-            return xsubs.unifyCommute(ysubs, subst);
+            return xsubs.unifyCommute(ysubs, u);
         } else {
             //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
-            return xsubs.unifyLinear(ysubs, subst);
+            return xsubs.unifyLinear(ysubs, u);
         }
-
-
-        /*} else */
-
-
     }
-
 
 
     @Override
@@ -881,7 +877,9 @@ public interface Compound extends Term, IPair, TermContainer {
 //
             case CONJ:
 
-                if (subs() == 2) {
+                TermContainer tt = subterms();
+                int l = tt.subs();
+                if (l == 2) {
                     int dt = dt();
 
                     switch (dt) {
@@ -895,13 +893,12 @@ public interface Compound extends Term, IPair, TermContainer {
                             break;
                     }
 
-                    return sub(0).dtRange() + (dt) + sub(1).dtRange();
+                    return tt.sub(0).dtRange() + (dt) + tt.sub(1).dtRange();
 
                 } else {
                     int s = 0;
 
-                    TermContainer tt = subterms();
-                    int l = tt.subs();
+
                     for (int i = 0; i < l; i++) {
                         Term x = tt.sub(i);
                         s = Math.max(s, x.dtRange());

@@ -104,13 +104,25 @@ public interface Termlike {
         return (structure() & structuralVector) != 0;
     }
 
+    /** has special handling for VAR_PATTERN */
+    default boolean hasAny(Op... oo) {
+        boolean checkVarPattern = false;
+        int checkStruct = 0;
+        for (Op o : oo) {
+            if (o == VAR_PATTERN)
+                checkVarPattern = true; //check last
+            else
+                checkStruct |= o.bit;
+        }
+        return (checkStruct != 0 && hasAny(checkStruct)) || (checkVarPattern && hasAny(VAR_PATTERN));
+    }
+
     /**
      * tests if contains a term in the structural hash
      * WARNING currently this does not detect presence of pattern variables
      */
     default boolean hasAny(/*@NotNull*/ Op op) {
-        if (op == VAR_PATTERN) return varPattern() > 0;
-        return hasAny(op.bit);
+        return op != VAR_PATTERN ? hasAny(op.bit) : varPattern() > 0;
     }
 
     default boolean hasVarIndep() {

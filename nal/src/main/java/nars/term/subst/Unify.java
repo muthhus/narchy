@@ -10,6 +10,8 @@ import nars.derive.constraint.MatchConstraint;
 import nars.derive.mutate.Termutator;
 import nars.index.term.NewCompound;
 import nars.term.Term;
+import nars.term.Termlike;
+import nars.term.container.TermContainer;
 import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
 import org.jetbrains.annotations.NotNull;
@@ -62,6 +64,8 @@ public abstract class Unify extends Versioning implements Subst {
      */
     public int dur = -1;
 
+    /** whether the variable unification allows to happen in reverse (a variable in Y can unify a constant in X) */
+    public boolean varSymmetric = true;
 
 //    /**
 //     * free variables remaining unassigned, for counting
@@ -318,6 +322,16 @@ public abstract class Unify extends Versioning implements Subst {
         return this.ttl += x;
     }
 
+    public boolean relevantVariables(Termlike xsubs, Termlike ysubs) {
+        return relevantVariables(xsubs) || (varSymmetric && relevantVariables(ysubs));
+    }
+
+    public boolean relevantVariables(Termlike x) {
+        return type == null ?
+                x.varPattern() > 0 || x.hasAny(Op.VAR_DEP.bit | Op.VAR_INDEP.bit | Op.VAR_QUERY.bit) :
+                x.hasAny(type);
+    }
+
     private class ConstrainedVersionMap extends VersionMap<Term, Term> {
         public ConstrainedVersionMap(Versioning versioning, int mapCap) {
             super(versioning, mapCap, 1 /* maybe 2 is necessary for full 2nd-layer unification */);
@@ -413,6 +427,8 @@ public abstract class Unify extends Versioning implements Subst {
                 int s = constraints.size();
                 for (int i = 0; i < s; i++) {
                     MatchConstraint cc = constraints.get(i);
+                    if (cc==null)
+                        throw new RuntimeException("fix");
                     assert(cc!=null);
                     if (cc.invalid(x, Unify.this))
                         return false;

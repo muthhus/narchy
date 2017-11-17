@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
  */
 abstract public class TaskBeliefOccurrence extends AbstractPred<Derivation> {
 
-    TaskBeliefOccurrence(@NotNull String x) {
+    TaskBeliefOccurrence(String x) {
         super(x);
     }
 

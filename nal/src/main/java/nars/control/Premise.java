@@ -197,8 +197,12 @@ public class Premise {
                 if (focus == ETERNAL) {
                     focusStart = focusEnd = ETERNAL;
                 } else {
-                    focusStart = focus - dur;
-                    focusEnd = focus + dur;
+                    focusStart =
+                            //focus - dur;
+                            focus;
+                    focusEnd =
+                            //focus + dur;
+                            focus;
                 }
 
 //                boolean tryMatch = true;
@@ -250,8 +254,7 @@ public class Premise {
         assert (now != ETERNAL);
 
         if (task.isEternal()) {
-            //return ETERNAL;
-            return now;
+            return ETERNAL;
         } else {
 
             //return now;

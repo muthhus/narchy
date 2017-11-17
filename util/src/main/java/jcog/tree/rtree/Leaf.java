@@ -79,7 +79,7 @@ public class Leaf<T> implements Node<T, T> {
 
 
     @Override
-    public Node<T, ?> add(/*@NotNull*/ final T t, Nodelike<T> parent, /*@NotNull*/ Spatialization<T> model) {
+    public Node<T, ?> add(/*@NotNull*/ final T t, Nodelike<T> parent, /*@NotNull*/ Spatialization<T> model, boolean[] added) {
 
         boolean ctm = contains(t, model);
         if (parent != null && !ctm) {
@@ -95,7 +95,8 @@ public class Leaf<T> implements Node<T, T> {
             } else {
                 next = model.split(t, this);
             }
-            parent.reportSizeDelta(+1);
+
+            added[0] = true;
 
             return next;
         } else {
@@ -104,10 +105,6 @@ public class Leaf<T> implements Node<T, T> {
         }
     }
 
-    @Override
-    public void reportSizeDelta(int i) {
-        //safely ignored
-    }
 
     @Override
     public boolean AND(Predicate<T> p) {
@@ -146,7 +143,7 @@ public class Leaf<T> implements Node<T, T> {
 
 
     @Override
-    public Node<T, ?> remove(final T t, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
+    public Node<T, ?> remove(final T t, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model, boolean[] removed) {
 
 
 //        while (i < size && (data[i] != t) && (!data[i].equals(t))) {
@@ -172,23 +169,19 @@ public class Leaf<T> implements Node<T, T> {
         if (i == size)
             return this; //not found
 
-        {
             final int j = i + 1;
-            final int nRemoved = 1; //j - i;
             if (j < size) {
                 final int nRemaining = size - j;
                 System.arraycopy(data, j, data, i, nRemaining);
-                Arrays.fill(data, size - nRemoved, size, null);
+                Arrays.fill(data, size - 1, size, null);
             } else {
                 Arrays.fill(data, i, size, null);
             }
 
-            this.size -= nRemoved;
-            parent.reportSizeDelta(-nRemoved);
+            this.size -= 1;
+            removed[0] = true;
 
             region = this.size > 0 ? HyperRegion.mbr(model.region, data, this.size) : null;
-
-        }
 
         return this;
 
@@ -312,7 +305,7 @@ public class Leaf<T> implements Node<T, T> {
      * @param t      data entry to be added
      * @param model
      */
-    public final void classify(final Node<T, T> l1Node, final Node<T, T> l2Node, final T t, Spatialization<T> model) {
+    public final void classify(final Node<T, T> l1Node, final Node<T, T> l2Node, final T t, Spatialization<T> model, boolean[] added) {
 
         final HyperRegion tRect = model.region(t);
         final HyperRegion l1Region = l1Node.bounds();
@@ -327,27 +320,27 @@ public class Leaf<T> implements Node<T, T> {
         double l2c = l2Mbr.cost();
         final double l2CostInc = Math.max(l2c - (l2Region.cost() + tCost), 0.0);
         if (l2CostInc > l1CostInc) {
-            l1Node.add(t, this, model);
+            l1Node.add(t, this, model, added);
         } else if (Util.equals(l1CostInc, l2CostInc, RTree.EPSILON)) {
             if (l1c < l2c) {
-                l1Node.add(t, this, model);
+                l1Node.add(t, this, model, added);
             } else if (Util.equals(l1c, l2c, RTree.EPSILON)) {
                 final double l1MbrMargin = l1Mbr.perimeter();
                 final double l2MbrMargin = l2Mbr.perimeter();
                 if (l1MbrMargin < l2MbrMargin) {
-                    l1Node.add(t, this, model);
+                    l1Node.add(t, this, model, added);
                 } else if (Util.equals(l1MbrMargin, l2MbrMargin, RTree.EPSILON)) {
                     // break ties with least number
-                    ((l1Node.size() < l2Node.size()) ? l1Node : l2Node).add(t, this, model);
+                    ((l1Node.size() < l2Node.size()) ? l1Node : l2Node).add(t, this, model, added);
 
                 } else {
-                    l2Node.add(t, this, model);
+                    l2Node.add(t, this, model, added);
                 }
             } else {
-                l2Node.add(t, this, model);
+                l2Node.add(t, this, model, added);
             }
         } else {
-            l2Node.add(t, this, model);
+            l2Node.add(t, this, model, added);
         }
 
     }
