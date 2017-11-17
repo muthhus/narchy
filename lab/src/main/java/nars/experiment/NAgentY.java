@@ -77,7 +77,7 @@ abstract public class NAgentY extends NAgentX {
 
         protected RLActionConcept(@NotNull Term term, @NotNull NAR n) {
             super(term, n);
-            this.belief = new Signal(BELIEF, n.truthResolution);
+            this.belief = new Signal(BELIEF, n.freqResolution);
         }
 
         void believe(float freq) {

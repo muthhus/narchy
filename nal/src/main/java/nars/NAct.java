@@ -22,6 +22,7 @@ import java.util.function.BiConsumer;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 
+import static jcog.Util.max;
 import static jcog.Util.unitize;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
@@ -420,11 +421,11 @@ public interface NAct {
                     n.confDefault(GOAL);
             float curiEvi =
                     //c2w(confBase);
-                    c2w(confMin * 2);
+                    eviMin * 2;
 
             int ip = p ? 0 : 1;
             CC[ip] = action;
-            f[ip] = g != null ? g.freq() : 0.5f;
+            f[ip] = g != null ? g.freq() : 0f;
             e[ip] = g != null ? g.evi() : 0f;
 
 
@@ -433,64 +434,64 @@ public interface NAct {
             boolean curious;
             if (!p) {
 
-                float eviSum = e[0] + e[1];
                 float cur = curiosity().floatValue();
                 if (cur > 0 && rng.nextFloat() <= cur) {
                     x = (rng.nextFloat() - 0.5f) * 2f;
                     e[0] = e[1] = curiEvi;
-                    eviSum = curiEvi*2;
                     curious = true;
                 } else {
                     curious = false;
-                    x = Util.clamp((f[0]-0.5f) - (f[1]-0.5f), -1f, +1f);
+                    x = Util.clamp((f[0]) - (f[1]), -1f, +1f);
                 }
 
+                float eviSum = e[0] + e[1];
                 float y = update.valueOf(x); //-1..+1
 
 
                 //w2c(Math.abs(y) * c2w(restConf));
                 PreciseTruth Nb,Ng, Pb,Pg;
 
-//                float conf = ((y == y) && (eviSum > Pri.EPSILON)) ?
-//                            w2c(eviSum) : 0;
-
-
-
-
-
-                float yf = (y / 2f)+0.5f; //0..+1
                 if (y == y) {
+                    //y: (-1..+1)
+                    float yp = y >= 0 ? y : 0;
+                    float yn = y >= 0 ? 0 : -y;
 
-                    Pb = $.t(yf, feedbackConf);
-                    Nb = $.t(1-yf, feedbackConf);
+                    //float yf = (y / 2f)+0.5f; //0..+1
 
-                    float goalConf =
-                            Math.max(confMin, w2cSafe(eviSum)/2 /* avg shared */);
+                    Pb = $.t(yp, feedbackConf);
+                    Nb = $.t(yn, feedbackConf);
 
-                    Pg = $.t(yf, goalConf);
-                    Ng = $.t(1-yf, goalConf);
+                    float eviMax = max(eviMin, max(e[0], e[1]));
+
+                    if (curious) {
+                        e[0] = e[1] = 0; //reset to get full evidence override
+                    }
+                    float g0 = eviMax - e[0];
+                    Pg = g0 >= eviMin ? new PreciseTruth(yp, g0, false) : null;
+                    float g1 = eviMax - e[1];
+                    Ng = g1 >= eviMin ? new PreciseTruth(yn, g1, false) : null;
                 } else {
                     Pb = Nb = Pg = Ng = null;
                 }
 
 
                 PreciseTruth pb = Pb;
-                PreciseTruth pg =
-                        (curious || e[0] == 0 /* null input goal */) ? Pg :
+                PreciseTruth pg = Pg;
+                        //(curious || e[0] < Pg.evi() /* null input goal */) ? Pg :
                                 //$.t(y >= 0 ? yf :  1-yf,
 //                                    //Util.lerp(Math.abs(y), confMin, confBase)
 //                                    confBase
 //                                    ) : null; //only feedback artificial goal if input goal was null
-                        null;
+                        //null;
                 CC[0].feedback(pb, pg, n);
                 PreciseTruth nb = Nb;
-                PreciseTruth ng =
-                        (curious || e[1] == 0 /* null input goal */) ? Ng :
+                PreciseTruth ng = Ng;
+                        //(curious || e[1] < Ng.evi() /* null input goal */) ? Ng :
 //                                $.t(y >= 0 ? 1-yf : yf,
 //                                    //Util.lerp(Math.abs(y), confMin, confBase)
 //                                    confBase
 //                                    ) : null; //only feedback artificial goal if input goal was null
-                        null;
+                        //null;
                 CC[1].feedback(nb, ng, n);
 
 

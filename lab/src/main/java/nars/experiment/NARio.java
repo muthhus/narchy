@@ -180,14 +180,14 @@ public class NARio extends NAgentX {
                 mario.scene.key(Mario.KEY_LEFT, true);
                 mario.scene.key(Mario.KEY_RIGHT, false);
                 mario.scene.key(Mario.KEY_SPEED, x <= -thresh2);
-                return -1;
-                //return x;
+                //return -1;
+                return x;
             } else if (x >= +thresh) {
                 mario.scene.key(Mario.KEY_RIGHT, true);
                 mario.scene.key(Mario.KEY_LEFT, false);
                 mario.scene.key(Mario.KEY_SPEED, x >= +thresh2);
-                return +1;
-                //return x;
+                //return +1;
+                return x;
             } else {
                 mario.scene.key(Mario.KEY_LEFT, false);
                 mario.scene.key(Mario.KEY_RIGHT, false);
@@ -195,7 +195,7 @@ public class NARio extends NAgentX {
                 //return 0f;
                 //return x;
                 //return 0;
-                return 0.5f;
+                return 0f;
                 //return Float.NaN;
             }
         });
@@ -216,7 +216,7 @@ public class NARio extends NAgentX {
                 mario.scene.key(Mario.KEY_JUMP, false);
                 mario.scene.key(Mario.KEY_DOWN, false);
                 //return 0f;
-                return 0.5f;
+                return 0f;
                 //return Float.NaN;
             }
         });/*.forEach(g -> {

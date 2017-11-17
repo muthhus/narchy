@@ -657,9 +657,9 @@ public enum Util {
         return (float) (Math.floor(value / epsilon) * epsilon);
     }
 
-    public static float clampround(float value, float epsilon) {
-        return unitize(round(value, epsilon));
-    }
+//    public static float clampround(float value, float epsilon) {
+//        return unitize(round(value, epsilon));
+//    }
 
     public static int hashFloat(float f, int discretness) {
         return (int) (f * discretness);

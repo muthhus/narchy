@@ -46,7 +46,7 @@ public class ThermostatTest {
                 n.priDefault(BELIEF, 0.2f);
                 n.priDefault(QUESTION, 0.1f);
                 n.priDefault(QUEST, 0.1f);
-                n.truthResolution.set(0.02f);
+                n.freqResolution.set(0.02f);
                 n.termVolumeMax.set(28);
                 n.time.dur(subPeriod/2);
                 //MetaGoal.Desire.want(n.want, 1.5f);

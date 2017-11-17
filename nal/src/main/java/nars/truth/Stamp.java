@@ -342,6 +342,9 @@ public interface Stamp {
 
         //TODO fast impl for simple cases where a.length=1
 
+        if (isCyclic(a))
+            al--;
+
         return overlapFraction(LongSets.immutable.of(a), al, b);
     }
 
@@ -349,19 +352,18 @@ public interface Stamp {
     /** ignores any cyclic element */
     static float overlapFraction(/*@NotNull*/ LongSet aa, int aSize, /*@NotNull*/ long[] b) {
         int common = 0;
+        int bSize = b.length;
         for (long x: b) {
-            if (x!=Long.MAX_VALUE /* cyclic */ && aa.contains(x))
-                common++;
+            if (x != Long.MAX_VALUE) {
+                if (aa.contains(x)) {
+                    common++;
+                }
+            } else {
+                bSize--;
+            }
         }
         if (common == 0)
             return 0f;
-
-        if (aa.contains(Long.MAX_VALUE))
-            aSize--;
-
-        int bSize = b.length;
-        if (isCyclic(b))
-            bSize--;
 
         int denom = (aSize + bSize - common); //denominator excludes one copy of common but includes one too
         assert(denom!=0);

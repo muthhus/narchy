@@ -407,7 +407,7 @@ public class Revision {
         }
 
 
-        Truth finalTruth = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), confMin, 1);
+        Truth finalTruth = rawTruth.dither(nar);
         if (finalTruth == null)
             return null;
 
@@ -516,7 +516,7 @@ public class Revision {
 
     public static boolean equivalent(Task input, Truth output, long start, long end, Term cc, NAR nar) {
         Truth bt = input.truth();
-        if (input.conf() >= output.conf() && Util.equals(input.freq(), output.freq(), nar.truthResolution.asFloat())) {
+        if (input.conf() >= output.conf() && Util.equals(input.freq(), output.freq(), nar.freqResolution.asFloat())) {
             return cc.equals(input.term()) && start == input.start() && end == input.end();
         }
         return false;

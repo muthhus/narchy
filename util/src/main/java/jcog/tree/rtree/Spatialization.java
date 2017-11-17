@@ -72,6 +72,7 @@ public class Spatialization<T> {
 
                 if (si!=null && jr.equals(si)) {
 
+                    dummy[0] = false;
                     target.add(jd, leaf, this, dummy);
                     sortedSrc[i] = null;
                     break;

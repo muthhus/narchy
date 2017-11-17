@@ -206,12 +206,13 @@ public class Implier extends DurService {
             //                }
             //            });
 
-            float truthRes = nar.truthResolution.floatValue();
+            float freqRes = nar.freqResolution.floatValue();
+            float confRes = nar.confResolution.floatValue();
 
             float strength = this.strength.floatValue();
 
             goalTruth.forEach((t, a) -> {
-                @Nullable Truth uu = a.commitSum().ditherFreqConf(truthRes, confMin, 1f);
+                @Nullable Truth uu = a.commitSum().dither(freqRes, confRes, confMin, 1f);
                 if (uu != null) {
                     float c = uu.conf() * strength;
                     if (c >= confMin) {

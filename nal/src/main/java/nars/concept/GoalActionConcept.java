@@ -51,7 +51,7 @@ public class GoalActionConcept extends ActionConcept {
 
         this.curiosity = curiosity;
 
-        this.action = new Signal(GOAL, n.truthResolution).pri(() -> n.priDefault(GOAL));
+        this.action = new Signal(GOAL, n.freqResolution).pri(() -> n.priDefault(GOAL));
         //((SensorBeliefTable) goals).sensor = action;
 
         this.feedback = new Signal(BELIEF, resolution).pri(() -> n.priDefault(BELIEF));

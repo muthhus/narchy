@@ -153,7 +153,7 @@ public class LinkClustering extends DurService {
     protected void run(NAR n, long dt) {
 
         confMin = nar.confMin.floatValue();
-        truthRes = nar.truthResolution.floatValue();
+        truthRes = nar.freqResolution.floatValue();
         dur = nar.dur();
 
         //LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();

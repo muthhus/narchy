@@ -362,8 +362,12 @@ public abstract class Param extends Services<Term, NAR> {
 //    @NotNull public final FloatParam derivedEvidenceGain = new FloatParam(1f, 0f, 4f);
 
 
-    @NotNull
-    public final FloatParam truthResolution = new FloatParam(TRUTH_EPSILON, TRUTH_EPSILON, 1f);
+
+    /** global truth frequency resolution by which reasoning is dithered */
+    public final FloatParam freqResolution = new FloatParam(TRUTH_EPSILON, TRUTH_EPSILON, 1f);
+
+    /** global truth confidence resolution by which reasoning is dithered */
+    public final FloatParam confResolution = new FloatParam(TRUTH_EPSILON, TRUTH_EPSILON, 1f);
 
     /**
      * truth confidence threshold necessary to form tasks

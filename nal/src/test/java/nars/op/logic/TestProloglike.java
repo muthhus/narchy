@@ -37,7 +37,7 @@ public class TestProloglike {
         blue(harley_davidson).
         */
 
-        n.truthResolution.set(0.1f);
+        n.freqResolution.set(0.1f);
         n.believe(
                 "((red($x) && car($x))==>fun($x))",
                 "((blue($x) && bike($x))==>fun($x))",

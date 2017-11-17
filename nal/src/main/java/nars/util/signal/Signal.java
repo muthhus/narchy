@@ -8,7 +8,6 @@ import nars.task.SignalTask;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.LongSupplier;
@@ -62,7 +61,7 @@ public class Signal {
             if (last == null && nextTruth == null)
                 return null;
 
-            @Nullable PreciseTruth tt = nextTruth != null ? nextTruth.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f) : null;
+            @Nullable PreciseTruth tt = nextTruth != null ? nextTruth.dither(nar) : null;
 
 
             SignalTask next;
@@ -74,7 +73,7 @@ public class Signal {
 
                 if (last == null ||
                         last.isDeleted() ||
-                        (!last.truth.equals(tt, nar.truthResolution.floatValue()) ||
+                        (!last.truth.equals(tt, nar.freqResolution.floatValue()) ||
                                 (Param.SIGNAL_LATCH_TIME_MAX != Integer.MAX_VALUE && now - last.start() >= dur * Param.SIGNAL_LATCH_TIME_MAX)
                         )) {
 

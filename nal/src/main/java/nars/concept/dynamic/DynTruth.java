@@ -96,7 +96,7 @@ public final class DynTruth implements Truthed {
         float rangeCoherence = eviRange==termRange ? 1f :
                 1f - ((float)Math.abs(eviRange - termRange))/Math.max(eviRange, termRange)/nar.dur();
 
-        Truth tr = tr0.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), rangeCoherence);
+        Truth tr = tr0.dither(nar, rangeCoherence);
         if (tr == null)
             return null;
 

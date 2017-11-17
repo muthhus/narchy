@@ -1,4 +1,4 @@
-package nars.experiment.polecart;
+package nars.experiment;
 
 import com.google.common.collect.Lists;
 import jcog.Util;
@@ -141,8 +141,8 @@ public class PoleCart extends NAgentX {
                 return a;
             });
             //eternal bias to stop
-            nar.goal(f[0].term, Tense.Eternal, 0.5f, 0.01f);
-            nar.goal(f[1].term, Tense.Eternal, 0.5f, 0.01f);
+            nar.goal(f[0].term, Tense.Eternal, 0f, 0.01f);
+            nar.goal(f[1].term, Tense.Eternal, 0f, 0.01f);
         }
 
 //        actionUnipolar($.p("left"), (a) -> {

@@ -530,7 +530,8 @@ public class Tetris extends NAgentX implements Bitmap2D {
         NAR nn = NAgentX.runRT((n) -> {
             Tetris a = null;
             try {
-                //n.truthResolution.setValue(0.05f);
+                n.freqResolution.set(0.10f);
+                n.confResolution.set(0.02f);
                 a = new Tetris(n, Tetris.tetris_width, Tetris.tetris_height);
 //                a.nar.log();
 
@@ -792,7 +793,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
             NAR n = NARS.tmp();
             n.time.dur(4);
-            n.truthResolution.set(0.1f);
+            n.freqResolution.set(0.1f);
             //new Abbreviation(n, "z", 3, 8, 0.1f, 32);
 
             new Tetris(n, Tetris.tetris_width, Tetris.tetris_height, 1);

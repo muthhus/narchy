@@ -207,7 +207,7 @@ public class NAL6Test extends NALTest {
         TestNAR tester = test;
         tester.believe("<{Tweety} --> [withWings]>"); //en("Tweety has wings.");
         tester.believe("<(&&,<$x --> [chirping]>,<$x --> [withWings]>) ==> <$x --> bird>>"); //en("If something can chirp and has wings, then it is a bird.");
-        tester.mustBelieve(cycles, "<<{Tweety} --> [chirping]> ==> <{Tweety} --> bird>>", 1.00f, 0.81f); //en("If Tweety can chirp, then it is a bird.");
+        tester.mustBelieve(cycles, "<<{Tweety} --> [chirping]> ==> <{Tweety} --> bird>>", 1.00f, 0.73f); //en("If Tweety can chirp, then it is a bird.");
 
     }
 
@@ -222,7 +222,7 @@ public class NAL6Test extends NALTest {
         tester.believe("flyer:Tweety"); //en("Tweety can fly.");
         tester.mustBelieve(cycles*2,
                 "((chirping:Tweety && eatsWorms:Tweety) ==> bird:Tweety)",
-                1.0f, 0.81f); //en("If Tweety can chirp and eats worms, then it is a bird.");
+                1.0f, 0.73f); //en("If Tweety can chirp and eats worms, then it is a bird.");
 
     }
     @Test
@@ -235,7 +235,9 @@ public class NAL6Test extends NALTest {
         tester.believe("flyer:Tweety"); //en("Tweety can fly.");
         tester.mustBelieve(cycles*2,
                 "(([chirping]:Tweety && food(Tweety,worms)) ==> bird:Tweety)",
-                1.0f, 0.81f); //en("If Tweety can chirp and eats worms, then it is a bird.");
+                1.0f,
+                0.73f);
+                //0.81f); //en("If Tweety can chirp and eats worms, then it is a bird.");
 
     }
 
@@ -246,7 +248,7 @@ public class NAL6Test extends NALTest {
         TestNAR tester = test;
         tester.believe("<(&&,<$x --> key>,<$y --> lock>) ==> open($x, $y)>"); //en("Every lock can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
-        tester.mustBelieve(cycles * 2, "<<$1 --> key> ==> open($1, {lock1})>", 1.00f, 0.81f); //en("Lock-1 can be opened by every key.");
+        tester.mustBelieve(cycles * 2, "<<$1 --> key> ==> open($1, {lock1})>", 1.00f, 0.73f); //en("Lock-1 can be opened by every key.");
 
     }
 
@@ -283,7 +285,7 @@ public class NAL6Test extends NALTest {
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
         tester.mustBelieve(cycles, "(&&,<#1 --> key>,open(#1,{lock1}))",
                 1.00f,
-                0.43f
+                0.73f
         ); //en("I guess there is a key that can open Lock-1.");
 
     }
@@ -720,9 +722,9 @@ public class NAL6Test extends NALTest {
                 .believe("num:x", 1.0f, 0.9f)
                 .believe("( num:$1 ==> num($1) )", 1.0f, 0.9f)
                 .ask("num(((x)))")
-                .mustBelieve(cycles * 2, "num(x)", 1.0f, 1.0f, 0.81f, 1.0f)
+                .mustBelieve(cycles * 1, "num(x)", 1.0f, 1.0f, 0.81f, 1.0f)
                 .mustBelieve(cycles * 2, "num((x))", 0.99f, 1.0f, 0.50f, 1.0f)
-                .mustBelieve(cycles * 2, "num(((x)))", 0.99f, 1.0f, 0.25f, 1.0f)
+                .mustBelieve(cycles * 3, "num(((x)))", 0.99f, 1.0f, 0.25f, 1.0f)
         //.mustBelieve(time, "num:((((0))))", 1.0f, 1.0f, 0.81f, 1.0f)
         // ''outputMustContain('<(((0))) --> num>. %1.00;0.26%')
         ;
@@ -735,7 +737,7 @@ public class NAL6Test extends NALTest {
         //B (A ==> C) |- C :post (:t/deduction :order-for-all-same) :pre ((:substitute-if-unifies "$" A B) (:shift-occurrence-forward ==>))
 
 
-        test.nar.truthResolution.set(0.1f);
+        test.nar.freqResolution.set(0.1f);
         test
                 .believe("num(x)", 1.0f, 0.9f)
                 .believe("( num($1) ==> num(($1)) )", 1.0f, 0.9f)

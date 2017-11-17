@@ -23,6 +23,7 @@ package nars.truth;
 import jcog.Texts;
 import jcog.Util;
 import nars.$;
+import nars.NAR;
 import nars.Op;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.*;
 import static nars.truth.TruthFunctions.w2c;
+import static nars.truth.TruthFunctions.w2cSafe;
 
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
@@ -188,20 +190,29 @@ public interface Truth extends Truthed {
 
     static float conf(float c, float epsilon) {
         return clamp(
-                round(c, epsilon), //optimistic
-                //floor(c, epsilon), //conservative
-                epsilon, 1f - epsilon);
+                //ceil(c, epsilon), //optimistic
+                //round(c, epsilon), //semi-optimistic: adds evidence when rounding up, loses evidence when rounding down
+                floor(c, epsilon), //conservative
+                0, 1f - epsilon);
     }
 
 
-    @Nullable default PreciseTruth ditherFreqConf(float resolution, float confMin, float confGain) {
-        float c0 = confGain != 1 ? w2c(evi()) * confGain : conf();
+    @Nullable default PreciseTruth dither(NAR nar) {
+        return dither(nar, 1f);
+    }
+
+    @Nullable default PreciseTruth dither(NAR nar, float confGain) {
+        return dither(nar.freqResolution.floatValue(), nar.confResolution.floatValue(), nar.confMin.floatValue(), confGain);
+    }
+
+    @Nullable default PreciseTruth dither(float freqRes, float confRes, float confMin, float confGain) {
+        float c0 = conf() * confGain;
         if (c0 < confMin)
             return null;
-        float c = conf(c0, resolution); //dither confidence
+        float c = conf(c0, confRes); //dither confidence
         if (c < confMin)
             return null;
-        return new PreciseTruth(freq(freq(), resolution), c);
+        return new PreciseTruth(freq(freq(), freqRes), c);
     }
 
 

@@ -107,7 +107,7 @@ public class OObjectsTest {
         n.priDefault(BELIEF, 0.05f);
         n.priDefault(QUESTION, 0.05f);
         n.priDefault(QUEST, 0.05f);
-        n.truthResolution.set(0.1f);
+        n.freqResolution.set(0.1f);
         n.time.dur(10);
         n.termVolumeMax.set(30);
 

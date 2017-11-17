@@ -96,49 +96,13 @@ abstract public class NAgentX extends NAgent {
         super(id, nar);
     }
 
-//    public static void run(Function<NAR, NAgentX> init, int frames) {
-//        Default nar = NARBuilder.newMultiThreadNAR(3, new FrameTime(), true);
-//        //Default nar = newNAR();
-//        //Default2 nar = newNAR2();
-//
-//        NAgentX a = init.apply(nar);
-//        a.trace = true;
-//
-//
-//        chart(a);
-//
-//        a.run(frames);
-//
-//        print(nar, a);
-//
-//
-//        //((TreeTaskIndex)nar.tasks).tasks.prettyPrint(System.out);
-//
-//    }
-
-//    private static void print(NAR nar, NAgentX a) {
-//        //NAR.printActiveTasks(nar, true);
-//        //NAR.printActiveTasks(nar, false);
-//
-//        nar.forEachTask(x -> {
-//            System.out.println(x);
-//            //if (x.isQuestOrQuestion())
-//            ///System.out.println(x.proof());
-//        });
-//
-//        nar.printConceptStatistics();
-//        new TaskStatistics().add(nar).print(System.out);
-//
-//    }
-
-
     public static NAR runRT(Function<NAR, NAgent> init, float fps) {
         return runRT(init, fps, -1);
     }
 
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
-        return runRT(init, 25, fps, endTime);
+        return runRT(init, 50, fps, endTime);
     }
 
     public static NAR runRT(Function<NAR, NAgent> init, float narFPS, float agentFPS, long endTime) {
@@ -184,9 +148,9 @@ abstract public class NAgentX extends NAgent {
 //                    }
 //                })
                 .exe(new MultiExec.
-                            //Intense
-                            CoolNQuiet
-                        (256, THREADS, 128))
+                            Intense
+                            //CoolNQuiet
+                        (128, THREADS, 512))
 
                 .time(clock)
                 .deriverAdd(8)
@@ -209,8 +173,8 @@ abstract public class NAgentX extends NAgent {
         n.dtMergeOrChoose.set(true);
 
         n.confMin.set(0.01f);
-        n.truthResolution.set(0.01f);
-        n.termVolumeMax.set(32);
+        n.freqResolution.set(0.01f);
+        n.termVolumeMax.set(40);
 
         n.beliefConfidence(0.9f);
         n.goalConfidence(0.9f);
@@ -242,7 +206,7 @@ abstract public class NAgentX extends NAgent {
 //        ), 800, 600);
 
 
-        ConjClustering conjClusterB = new ConjClustering(n, 3, BELIEF, true, 32, 128);
+        ConjClustering conjClusterB = new ConjClustering(n, 4, BELIEF, true, 32, 128);
         ConjClustering conjClusterG = new ConjClustering(n, 2, GOAL, true, 16, 64);
 
 //        n.runLater(() -> {

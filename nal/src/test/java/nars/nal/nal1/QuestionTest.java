@@ -144,7 +144,7 @@ public class QuestionTest {
             d.random().setSeed(seed);
             d.nal(4);
             d.termVolumeMax.set(16);
-            d.truthResolution.set(0.1f);
+            d.freqResolution.set(0.1f);
             return d;
         };
 

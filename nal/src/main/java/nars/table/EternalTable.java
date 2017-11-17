@@ -1,7 +1,6 @@
 package nars.table;
 
 import com.google.common.collect.Streams;
-import jcog.pri.Prioritized;
 import jcog.sort.SortedArray;
 import nars.NAR;
 import nars.Param;
@@ -250,7 +249,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             if (yt == null)
                 continue;
 
-            yt = yt.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+            yt = yt.dither(nar);
             if (yt == null || yt.equals(xt) || yt.equals(newBeliefTruth)) ////avoid a weak or duplicate truth
                 continue;
 

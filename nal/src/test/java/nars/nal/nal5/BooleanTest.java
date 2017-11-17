@@ -44,7 +44,7 @@ public class BooleanTest {
 //        for (int i = 0; i < 2; i++) {
 //            for (int j = 0; j < 2; j++) {
         NAR d = NARS.tmp();
-        d.truthResolution.set(0.05f);
+        d.freqResolution.set(0.05f);
         d.nal(6);
         d.termVolumeMax.set(24);
 

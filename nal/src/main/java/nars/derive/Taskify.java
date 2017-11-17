@@ -53,7 +53,7 @@ public class Taskify extends AbstractPred<Derivation> {
 
         Truth tru = d.concTruth;
         if (tru!=null) {
-            tru = d.concTruth.ditherFreqConf(d.truthResolution, d.confMin, d.concConfFactor);
+            tru = d.concTruth.dither(d.freqRes, d.confRes, d.confMin, d.concConfFactor);
             if (tru == null)
                 return false;
         }
@@ -83,7 +83,7 @@ public class Taskify extends AbstractPred<Derivation> {
             return spam(d, Param.TTL_DERIVE_TASK_FAIL);
         }
 
-        if (same(t, d.task, d.truthResolution) || (d.belief != null && same(t, d.belief, d.truthResolution))) {
+        if (same(t, d.task, d.freqRes) || (d.belief != null && same(t, d.belief, d.freqRes))) {
             //created a duplicate of the task
             return spam(d, Param.TTL_DERIVE_TASK_SAME);
         }

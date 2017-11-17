@@ -21,7 +21,7 @@ public class NAL4MultistepTest extends NALTest {
 
         TestNAR tester = test;
 
-        tester.nar.truthResolution.set(0.1f);
+        tester.nar.freqResolution.set(0.1f);
 
         //tester.log();
 

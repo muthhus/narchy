@@ -151,7 +151,7 @@ public class Deriver extends NARService {
 
     //    public final IterableThreadLocal<Derivation> derivation =
 //            new IterableThreadLocal<>(() -> new Derivation(this));
-    private final ThreadLocal<Derivation> derivation =
+    private static final ThreadLocal<Derivation> derivation =
             ThreadLocal.withInitial(Derivation::new);
 
 }

@@ -4,7 +4,6 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import jcog.Util;
 import jcog.math.CachedFloatFunction;
-import jcog.pri.Prioritized;
 import jcog.sort.Top;
 import jcog.sort.Top2;
 import jcog.sort.TopN;
@@ -25,9 +24,7 @@ import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.LongObjectProcedure;
-import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectBooleanHashMap;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
@@ -221,7 +218,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                         return b;
                 }
 
-                if (Util.equals(a.freq(), b.freq(), nar.truthResolution.asFloat())) {
+                if (Util.equals(a.freq(), b.freq(), nar.freqResolution.asFloat())) {
                     return a; //has higher relevance
                 }
 

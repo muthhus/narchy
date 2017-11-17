@@ -60,7 +60,7 @@ public class ConjClustering extends Causable {
     private final byte punc;
     private final int maxConjSize;
     private long now;
-    private float truthRes, confMin;
+    private float freqRes, confRes, confMin;
     private int volMax;
 
     public ConjClustering(NAR nar, int maxConjSize, byte punc, boolean includeNeg, int centroids, int capacity) {
@@ -95,7 +95,8 @@ public class ConjClustering extends Causable {
         tasksCreated = 0;
 
         now = nar.time();
-        truthRes = nar.truthResolution.floatValue();
+        freqRes = nar.freqResolution.floatValue();
+        confRes = nar.confResolution.floatValue();
         confMin = nar.confMin.floatValue();
         this.volMax = nar.termVolumeMax.intValue();
 
@@ -217,7 +218,7 @@ public class ConjClustering extends Causable {
 
             //TODO discount based on evidential overlap? needs N-way overlapFraction function
 
-            PreciseTruth t = $.t(freq, conf).ditherFreqConf(truthRes, confMin, 1f);
+            PreciseTruth t = $.t(freq, conf).dither(freqRes, confRes, confMin, 1f);
             if (t != null) {
 
                 @Nullable Term conj = Op.conj(pp);

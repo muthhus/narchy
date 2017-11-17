@@ -60,7 +60,7 @@ public class Derivation extends Unify {
 
     private ImmutableMap<Term, Termed> derivationFunctors;
 
-    public float truthResolution;
+    public float freqRes,confRes;
 
 
     /** mutable state */
@@ -227,7 +227,8 @@ public class Derivation extends Unify {
         if (now != this.time) {
             this.time = now;
             this.dur = nar.dur();
-            this.truthResolution = nar.truthResolution.floatValue();
+            this.freqRes = nar.freqResolution.floatValue();
+            this.confRes = nar.confResolution.floatValue();
             this.confMin = nar.confMin.floatValue();
             this.termVolMax = nar.termVolumeMax.intValue();
             //transformsCache.cleanUp();

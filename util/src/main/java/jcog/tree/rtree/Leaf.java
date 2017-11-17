@@ -1,24 +1,24 @@
 package jcog.tree.rtree;
 
-/*
- * #%L
- * Conversant RTree
- * ~~
- * Conversantmedia.com © 2016, Conversant, Inc. Conversant® is a trademark of Conversant, Inc.
- * ~~
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
+        /*
+         * #%L
+         * Conversant RTree
+         * ~~
+         * Conversantmedia.com © 2016, Conversant, Inc. Conversant® is a trademark of Conversant, Inc.
+         * ~~
+         * Licensed under the Apache License, Version 2.0 (the "License");
+         * you may not use this file except in compliance with the License.
+         * You may obtain a copy of the License at
+         *
+         *      http://www.apache.org/licenses/LICENSE-2.0
+         *
+         * Unless required by applicable law or agreed to in writing, software
+         * distributed under the License is distributed on an "AS IS" BASIS,
+         * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+         * See the License for the specific language governing permissions and
+         * limitations under the License.
+         * #L%
+         */
 
 import jcog.Util;
 import jcog.tree.rtree.util.CounterNode;
@@ -169,19 +169,19 @@ public class Leaf<T> implements Node<T, T> {
         if (i == size)
             return this; //not found
 
-            final int j = i + 1;
-            if (j < size) {
-                final int nRemaining = size - j;
-                System.arraycopy(data, j, data, i, nRemaining);
-                Arrays.fill(data, size - 1, size, null);
-            } else {
-                Arrays.fill(data, i, size, null);
-            }
+        final int j = i + 1;
+        if (j < size) {
+            final int nRemaining = size - j;
+            System.arraycopy(data, j, data, i, nRemaining);
+            Arrays.fill(data, size - 1, size, null);
+        } else {
+            Arrays.fill(data, i, size, null);
+        }
 
-            this.size -= 1;
-            removed[0] = true;
+        this.size -= 1;
+        removed[0] = true;
 
-            region = this.size > 0 ? HyperRegion.mbr(model.region, data, this.size) : null;
+        region = this.size > 0 ? HyperRegion.mbr(model.region, data, this.size) : null;
 
         return this;
 
@@ -222,7 +222,6 @@ public class Leaf<T> implements Node<T, T> {
 
         return this;
     }
-
 
 
     @Override
@@ -305,44 +304,52 @@ public class Leaf<T> implements Node<T, T> {
      * @param t      data entry to be added
      * @param model
      */
-    public final void classify(final Node<T, T> l1Node, final Node<T, T> l2Node, final T t, Spatialization<T> model, boolean[] added) {
+    public final void transfer(final Node<T, T> l1Node, final Node<T, T> l2Node, final T t, Spatialization<T> model) {
 
         final HyperRegion tRect = model.region(t);
-        final HyperRegion l1Region = l1Node.bounds();
-        final HyperRegion l1Mbr = l1Region.mbr(tRect);
-
         double tCost = tRect.cost();
 
+        final HyperRegion l1Region = l1Node.bounds();
+        final HyperRegion l1Mbr = l1Region.mbr(tRect);
         double l1c = l1Mbr.cost();
         final double l1CostInc = Math.max(l1c - (l1Region.cost() + tCost), 0.0);
+
         final HyperRegion l2Region = l2Node.bounds();
         final HyperRegion l2Mbr = l2Region.mbr(tRect);
         double l2c = l2Mbr.cost();
         final double l2CostInc = Math.max(l2c - (l2Region.cost() + tCost), 0.0);
-        if (l2CostInc > l1CostInc) {
-            l1Node.add(t, this, model, added);
-        } else if (Util.equals(l1CostInc, l2CostInc, RTree.EPSILON)) {
-            if (l1c < l2c) {
-                l1Node.add(t, this, model, added);
-            } else if (Util.equals(l1c, l2c, RTree.EPSILON)) {
+
+        Node<T, T> target;
+        if (Util.equals(l1CostInc, l2CostInc, RTree.EPSILON)) {
+            if (Util.equals(l1c, l2c, RTree.EPSILON)) {
                 final double l1MbrMargin = l1Mbr.perimeter();
                 final double l2MbrMargin = l2Mbr.perimeter();
-                if (l1MbrMargin < l2MbrMargin) {
-                    l1Node.add(t, this, model, added);
-                } else if (Util.equals(l1MbrMargin, l2MbrMargin, RTree.EPSILON)) {
-                    // break ties with least number
-                    ((l1Node.size() < l2Node.size()) ? l1Node : l2Node).add(t, this, model, added);
-
+                if (Util.equals(l1MbrMargin, l2MbrMargin, RTree.EPSILON)) {
+                    // break tie by preferring the smaller smaller
+                    target = ((l1Node.size() <= l2Node.size()) ? l1Node : l2Node);
+                } else if (l1MbrMargin <= l2MbrMargin) {
+                    target = l1Node;
                 } else {
-                    l2Node.add(t, this, model, added);
+                    target = l2Node;
                 }
             } else {
-                l2Node.add(t, this, model, added);
+                if (l1c <= l2c) {
+                    target = l1Node;
+                } else {
+                    target = l2Node;
+                }
             }
         } else {
-            l2Node.add(t, this, model, added);
+            if (l1CostInc <= l2CostInc) {
+                target = l1Node;
+            } else {
+                target = l2Node;
+            }
         }
 
+        boolean[] added = new boolean[1];
+        target.add(t, this, model, added);
+        assert (added[0]);
     }
 
     @Override

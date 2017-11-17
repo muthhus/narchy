@@ -30,7 +30,7 @@ public class AIMATests {
     @ValueSource(doubles = { 0.01, 0.02, 0.05, 0.1, 0.2, 0.25, 0.5 })
     public void testAIMAExample(double truthRes) throws Narsese.NarseseException {
 
-        n.truthResolution.set((float)truthRes);
+        n.freqResolution.set((float)truthRes);
 
         n.believe("(P ==> Q)",
                 "((L && M) ==> P)",
@@ -47,7 +47,7 @@ public class AIMATests {
     @Test
     public void testWeaponsDomain() throws Narsese.NarseseException {
 
-        n.truthResolution.set(0.02f);
+        n.freqResolution.set(0.02f);
         n.priDefault(QUESTION, 0.5f);
         n.priDefault(BELIEF, 0.3f);
 
