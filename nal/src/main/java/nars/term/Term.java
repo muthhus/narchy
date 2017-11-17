@@ -59,7 +59,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiPredicate;
@@ -528,17 +527,16 @@ public interface Term extends Termed, Comparable<Termed> {
      * GLOBAL TERM COMPARATOR FUNCTION
      */
     @Override
-    default int compareTo(/*@NotNull*/ Termed yy) {
-        if (this == yy) return 0;
+    default int compareTo(/*@NotNull*/ Termed _y) {
+        if (this == _y) return 0;
 
-        Term y = yy.term();
-        if (this.equals(y)) return 0;
+        Term y = _y.term();
+        if (this == y) return 0;
 
         //order first by volume. this is important for conjunctions which rely on volume-dependent ordering for balancing
         //left should be heavier
         //compareTo semantics state that a -1 value means left is less than right. we want the opposite
-        int thisVol = volume();
-        int diff2 = Integer.compare(y.volume(), thisVol);
+        int diff2 = Integer.compare(y.volume(), volume());
         if (diff2 != 0)
             return diff2;
 
@@ -550,30 +548,19 @@ public interface Term extends Termed, Comparable<Termed> {
         if (this instanceof Atomic) {
 
             //assert (y instanceof Atomic) : "because volume should have been determined to be equal";
-        int h = Integer.compare(hashCode(), y.hashCode());
-        if (h != 0)
-            return h;
+            int h = Integer.compare(hashCode(), y.hashCode());
+            if (h != 0)
+                return h;
 
             if (this instanceof AbstractVariable || this instanceof Int) {
                 return 0; //hashcode was all that needed compared
             } else if (this instanceof Int.IntRange) {
                 return Long.compareUnsigned(((Int.IntRange) this).hash64(), ((Int.IntRange) y).hash64());
             } else if (this instanceof Atomic) {
-//                boolean gx = this instanceof UnnormalizedVariable;
-//                boolean gy = y instanceof UnnormalizedVariable;
-//                if (gx && !gy)
-//                    return -1;
-//                if (!gx && gy)
-//                    return +1;
-
-                //if the op is the same, it is required to be a subclass of Atomic
-                //which should have an ordering determined by its toString()
-
                 return Util.compare(
-                        ((Atomic)this).toBytes(),
-                        ((Atomic)y).toBytes()
+                        ((Atomic) this).toBytes(),
+                        ((Atomic) y).toBytes()
                 );
-                //return Hack.compare(toString(), y.toString());
             } else {
                 throw new UnsupportedOperationException("unimplemented comparison: " + this + ' ' + y);
             }
@@ -582,15 +569,8 @@ public interface Term extends Termed, Comparable<Termed> {
         } else {
 
             int c = TermContainer.compare(subterms(), y.subterms());
-            if (c != 0) {
-                return c;
-            } else {
-                return Integer.compare(dt(), y.dt());
-            }
-
+            return c != 0 ? c : Integer.compare(dt(), y.dt());
         }
-
-        //throw new RuntimeException("ordering exception: " + this + ", " + y);
     }
 
     @Override

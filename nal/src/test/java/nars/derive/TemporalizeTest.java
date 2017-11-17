@@ -148,8 +148,9 @@ public class TemporalizeTest {
         Map<Term, Time> h = new HashMap();
         Event s = t.solve($("a"), h);
         assertNotNull(s);
-        assertEquals("a@0", s.toString());
         assertEquals(0, s.start(h).abs());
+        //assertEquals("a@0", s.toString());
+        assertEquals("a@-1->b", s.toString());
     }
 
     @Test

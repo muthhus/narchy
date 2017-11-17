@@ -11,12 +11,24 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class PacMan {
+public class PacmanGame {
 
-	public static final double GHOST_SPEED_SCARED = 0.01;
-	public static final double GHOST_SPEED = 0.02;
-	public static final int UPDATES = -100;
-	int periodMS = 10;
+	public static final double GHOST_SPEED_SCARED = 0.3;
+	public static final float GHOST_SPEED = 0.2f;
+	public static final int UPDATES = -25;
+	public static int periodMS = 100;
+	private final float playerSpeed = GHOST_SPEED;
+
+	public void resetGhosts() {
+
+		ghosts = new Ghost[]{
+				new Ghost(maze, maze.playerStart().x, maze.playerStart().y - 3, Color.red)
+//				,new Ghost(maze, maze.playerStart().x, maze.playerStart().y - 2, Color.red),
+//				new Ghost(maze, maze.playerStart().x + 1, maze.playerStart().y - 2, Color.red),
+//				new Ghost(maze, maze.playerStart().x - 1, maze.playerStart().y - 2, Color.red)
+		};
+
+	}
 
 	static final boolean running = true;
 	public final PacComponent view;
@@ -34,11 +46,11 @@ public class PacMan {
 	CopyOnWriteArrayList<PacComponent.SplashModel> splashes;
 	int fruitTime;
 
-	public PacMan() {
+	public PacmanGame() {
 
 		updates = UPDATES;
 		maze = Maze.create(13, 13);
-		player = new Player(maze, maze.playerStart().x, maze.playerStart().y);
+		player = new Player(maze, maze.playerStart().x, maze.playerStart().y, playerSpeed);
 		keys = new boolean[4];
 		resetGhosts();
 		text = "";
@@ -75,37 +87,30 @@ public class PacMan {
 		frame.pack();
 
 
-
-		new Thread(()-> {
-			long time = 0;
-			while (running) {
-
-				update();
-
-				//do {
-
-					view.repaint();
-
-				Util.sleep(periodMS);
-				//} while (System.currentTimeMillis() - time < 10);
-
-				//time = System.currentTimeMillis();
-
-			}
-		}).start();
-
-	}
-
-	public void resetGhosts() {
-
-		ghosts = new Ghost[]{ new Ghost(maze, maze.playerStart().x, maze.playerStart().y - 3, Color.red),
-				new Ghost(maze, maze.playerStart().x, maze.playerStart().y - 2, Color.red),
-				new Ghost(maze, maze.playerStart().x + 1, maze.playerStart().y - 2, Color.red),
-				new Ghost(maze, maze.playerStart().x - 1, maze.playerStart().y - 2, Color.red)};
+//
+//		new Thread(()-> {
+//			long time = 0;
+//			while (running) {
+//
+//				update();
+//
+//				//do {
+//
+//
+//				Util.sleep(periodMS);
+//				//} while (System.currentTimeMillis() - time < 10);
+//
+//				//time = System.currentTimeMillis();
+//
+//			}
+//		}).start();
 
 	}
+
+
 
 	public void update() {
+		view.repaint();
 
 		if(started) {
 
@@ -123,28 +128,30 @@ public class PacMan {
 
 			ghosts[0].target(new Point((int)player.x, (int)player.y));
 
-			switch(player.dir) {
+			if (ghosts.length > 1) {
+				switch (player.dir) {
 
-			case up:
-				ghosts[1].target(new Point((int)player.x, (int)player.y - 4));
-				break;
+					case up:
+						ghosts[1].target(new Point((int) player.x, (int) player.y - 4));
+						break;
 
-			case down:
-				ghosts[1].target(new Point((int)player.x, (int)player.y + 4));
-				break;
+					case down:
+						ghosts[1].target(new Point((int) player.x, (int) player.y + 4));
+						break;
 
-			case left:
-				ghosts[1].target(new Point((int)player.x - 4, (int)player.y));
-				break;
+					case left:
+						ghosts[1].target(new Point((int) player.x - 4, (int) player.y));
+						break;
 
-			case right:
-				ghosts[1].target(new Point((int)player.x + 4, (int)player.y));
-				break;
+					case right:
+						ghosts[1].target(new Point((int) player.x + 4, (int) player.y));
+						break;
 
+				}
+
+				ghosts[2].target(new Point((int) (3 * player.x - 2 * ghosts[0].x), (int) (3 * player.x - 2 * ghosts[0].x)));
+				ghosts[3].random = true;
 			}
-
-			ghosts[2].target(new Point((int)(3 * player.x - 2 * ghosts[0].x), (int)(3 * player.x - 2 * ghosts[0].x)));
-			ghosts[3].random = true;
 
 			if(player.power == 0)
 				ghostEatCount = 0;
@@ -280,7 +287,7 @@ public class PacMan {
 				if(maze.dotCount == 0) {
 
 					text = "You Won!";
-					PacMan.win();
+					PacmanGame.win();
 
 				}
 
@@ -296,9 +303,11 @@ public class PacMan {
 			player.update();
 
 			if(updates == 100) ghosts[0].free = true;
-			if(updates == 500) ghosts[1].free = true;
-			if(updates == 1000) ghosts[2].free = true;
-			if(updates == 1500) ghosts[3].free = true;
+			if (ghosts.length > 1) {
+				if (updates == 500) ghosts[1].free = true;
+				if (updates == 1000) ghosts[2].free = true;
+				if (updates == 1500) ghosts[3].free = true;
+			}
 
 		} else {
 
@@ -330,7 +339,7 @@ public class PacMan {
 
 	public static void main(String[] args) {
 		
-		PacMan game = new PacMan();
+		PacmanGame game = new PacmanGame();
 
 
 	}

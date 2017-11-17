@@ -17,7 +17,7 @@ http://brian.tannerpages.com
  limitations under the License.
 */
 
-package nars.experiment.tetris.impl;
+package nars.experiment.tetris;
 
 import jcog.Util;
 

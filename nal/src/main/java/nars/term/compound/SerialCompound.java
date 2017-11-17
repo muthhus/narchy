@@ -97,11 +97,6 @@ public class SerialCompound extends DynBytes implements Compound {
     }
 
     @Override
-    public int compareTo(@NotNull Termed y) {
-        throw new UnsupportedOperationException(); //TODO impl in a subclass
-    }
-
-    @Override
     public @NotNull TermContainer subterms() {
         return build().subterms(); //HACK just a temporary way of accessing them
     }

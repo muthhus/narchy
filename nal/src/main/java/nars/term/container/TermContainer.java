@@ -597,11 +597,15 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     static int compare(/*@NotNull*/ TermContainer a, /*@NotNull*/ TermContainer b) {
 
-        if (a.equals(b)) return 0;
-        int diff;
+        if (a == b) return 0;
 
         int s;
+        int diff;
         if ((diff = Integer.compare((s = a.subs()), b.subs())) != 0)
+            return diff;
+        if ((diff = Integer.compare(a.volume(), b.volume())) != 0)
+            return diff;
+        if ((diff = Integer.compare(a.structure(), b.structure())) != 0)
             return diff;
 
         //this inequalVariable stuff is so that the displayed order of variables is in increasing number.  HACK

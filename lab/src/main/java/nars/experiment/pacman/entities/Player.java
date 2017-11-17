@@ -12,11 +12,11 @@ public class Player extends Entity {
 	public int power;
 	public int lives;
 	
-	public Player(Maze maze, int x, int y) {
+	public Player(Maze maze, int x, int y, float speed) {
 		
 		super(maze, x, y);
 		
-		this.speed = 0.035;
+		this.speed = speed;
 		this.lead = 0.4;
 		
 		power = 0;

@@ -1,4 +1,4 @@
-package nars.experiment.fzero;
+package nars.experiment;
 
 import java4k.gradius4k.Gradius4K;
 import nars.$;

@@ -1,4 +1,4 @@
-package nars.experiment.mario;
+package nars.experiment;
 
 import jcog.Util;
 import jcog.math.FloatParam;
@@ -6,6 +6,9 @@ import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
+import nars.experiment.mario.LevelScene;
+import nars.experiment.mario.MarioComponent;
+import nars.experiment.mario.Scene;
 import nars.experiment.mario.sprites.Mario;
 import nars.util.signal.CameraSensor;
 import nars.op.video.PixelBag;

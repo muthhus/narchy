@@ -138,7 +138,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         this.revaluator =
                 new MetaGoal.DefaultRevaluator();
-                //new MetaGoal.DefaultRevaluator.RBMRevaluator(rng);
+                //new MetaGoal.RBMRevaluator(rng);
 
         newCauseChannel("input"); //generic non-self source of input
 

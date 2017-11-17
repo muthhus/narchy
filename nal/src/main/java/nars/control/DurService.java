@@ -24,6 +24,7 @@ abstract public class DurService extends NARService implements Runnable {
     protected final NAR nar;
     private long now;
     final AtomicBoolean busy = new AtomicBoolean(false);
+    private boolean enabled;
 
 
     protected DurService(NAR n, float durs) {
@@ -63,9 +64,16 @@ abstract public class DurService extends NARService implements Runnable {
     }
 
     @Override
-    protected void start(NAR nar) {
+    protected synchronized void start(NAR nar) {
         super.start(nar);
+        enabled = true;
         nar.runLater(this); //initial
+    }
+
+    @Override
+    public synchronized void stop() {
+        enabled = false;
+        super.stop();
     }
 
     @Override
@@ -73,7 +81,7 @@ abstract public class DurService extends NARService implements Runnable {
         //long lastNow = this.now;
         //long now = nar.time();
         //if (now - lastNow >= durations.floatValue() * nar.dur()) {
-        if (busy.compareAndSet(false, true)) {
+        if (enabled && busy.compareAndSet(false, true)) {
 
             long last = this.now;
             long now = nar.time();

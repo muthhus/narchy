@@ -2,11 +2,8 @@ package nars.concept.builder;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
-import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
-import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.PriReference;
-import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -30,6 +27,7 @@ import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -111,15 +109,16 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
 
 
-                        if (validUnwrappableSubterms(subj.subterms())) {
-                            int s = subj.subs();
+                        TermContainer subjsubs = subj.subterms();
+                        if (validUnwrappableSubterms(subjsubs)) {
+                            int s = subjsubs.subs();
                             FasterList<Term> lx = new FasterList(0, new Term[s]);
                             if (subj instanceof Int.IntRange || so == PROD && subj.hasAny(INT)) {
                                 Int.unroll(subj).forEachRemaining(dsi -> lx.add(INH.the(dsi, pred)));
                             }
                             if (so != PROD) {
                                 for (int i = 0; i < s; i++) {
-                                    Term csi = subj.sub(i);
+                                    Term csi = subjsubs.sub(i);
                                     //                                if (csi instanceof Int.IntRange) {
                                     //                                    //TODO??
                                     ////                                    lx.add(
@@ -252,13 +251,13 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
             BeliefTable beliefs = dmt != null ?
                     new DynamicBeliefTable(t, newTemporalBeliefTable(t), dmt, true) :
-                    newBeliefTable(t, true);
+                    beliefTable(t, true);
 
             BeliefTable goals;
             if (goalable(t)) {
                 goals = dmt != null ?
                         new DynamicBeliefTable(t, newTemporalBeliefTable(t), dmt, true) :
-                        newBeliefTable(t, false);
+                        beliefTable(t, false);
             } else {
                 goals = BeliefTable.Empty;
             }
@@ -270,20 +269,15 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     }
 
     @Override
-    public BeliefTable newBeliefTable(Term c, boolean beliefOrGoal) {
+    public BeliefTable beliefTable(Term c, boolean beliefOrGoal) {
         //TemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
         //return new HijackTemporalBeliefTable(tCap);
         //return new RTreeBeliefTable(tCap);
-        if (c.hasAny(Op.VAR_QUERY)) {
+        if (!c.hasAny(Op.VAR_QUERY) && (beliefOrGoal ? c.op().beliefable : goalable(c))) {
+            return new DefaultBeliefTable(newTemporalBeliefTable(c));
+        } else {
             return BeliefTable.Empty;
         }
-
-        Op o = c.op();
-        if (beliefOrGoal ? o.beliefable : goalable(c)) {
-            return new DefaultBeliefTable(newTemporalBeliefTable(c));
-        }
-
-        return BeliefTable.Empty;
     }
 
     @Override
@@ -298,7 +292,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
 
     @Override
-    public QuestionTable newQuestionTable(Term term, boolean questionOrQuest) {
+    public QuestionTable questionTable(Term term, boolean questionOrQuest) {
         Op o = term.op();
         if (questionOrQuest ? o.beliefable : o.goalable) {
             //return new HijackQuestionTable(0, 4);
@@ -330,7 +324,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @Override
     @Nullable
-    public Termed apply(@NotNull Term t, Termed prev) {
+    public Termed apply(Term t, Termed prev) {
         if (prev != null) {
             if (prev instanceof Concept) {
                 Concept c = ((Concept) prev);
@@ -353,11 +347,13 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
         boolean validForTask = Task.validTaskTerm(t, (byte) 0, null /*nar -- checked above */, true);
         Concept c;
-        if (!validForTask) {
-            c = new BaseConcept(t, BeliefTable.Empty, BeliefTable.Empty, QuestionTable.Empty, QuestionTable.Empty,
-                    newLinkBags(t));
-        } else {
+        if (validForTask) {
             c = newTaskConcept(t);
+        } else {
+            //empty belief tables
+            c = new BaseConcept(t,
+                    BeliefTable.Empty, BeliefTable.Empty, QuestionTable.Empty, QuestionTable.Empty,
+                    newLinkBags(t));
         }
 
         c.state(awake);
@@ -404,8 +400,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 ////                return new SynchronizedUnifiedMap(0, loadFactor);
 ////            }
 //        } else {
-            return new UnifiedMap(0, loadFactor);
-            //return new HashMap(0, loadFactor);
+            //return new UnifiedMap(0, loadFactor);
+            return new HashMap(0, loadFactor);
 //        }
 
     }
@@ -414,47 +410,14 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         return nar.exe.concurrent();
     }
 
-    private static class TaskLinkCurveBag extends CurveBag<PriReference<Task>> {
-        public TaskLinkCurveBag(Map sharedMap, Random rng) {
-            super(Param.tasklinkMerge, sharedMap, rng, 0);
-        }
-
-        @Override
-        public void onRemove(PriReference<Task> value) {
-            float p = ((PLinkUntilDeleted) value).priBeforeDeletion;
-            if (p == p) {
-                // this link was deleted due to the referent being deleted,
-                // not because the link was deleted.
-                // so see if a forwarding exists
-
-                Task x = value.get();
-                Task px = x;
-                Task y = null;
-
-                //TODO maybe a hard limit should be here for safety in case anyone wants to create loops of forwarding tasks
-                int hopsRemain = Param.MAX_TASK_FORWARD_HOPS;
-                do {
-                    y = x.meta("@");
-                    if (y != null)
-                        x = y;
-                } while (y != null && --hopsRemain > 0);
-
-                if (x != px && !x.isDeleted()) {
-                    putAsync(new PLinkUntilDeleted<>(x, p));
-                }
-            }
-
-        }
-    }
-
-    private class MyDefaultHijackBag extends DefaultHijackBag {
-        public MyDefaultHijackBag(PriMerge merge) {
-            super(merge, 0, 5);
-        }
-
-        @Override
-        protected Random random() {
-            return nar.random();
-        }
-    }
+//    private class MyDefaultHijackBag extends DefaultHijackBag {
+//        public MyDefaultHijackBag(PriMerge merge) {
+//            super(merge, 0, 5);
+//        }
+//
+//        @Override
+//        protected Random random() {
+//            return nar.random();
+//        }
+//    }
 }

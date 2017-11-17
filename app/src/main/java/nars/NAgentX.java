@@ -138,7 +138,7 @@ abstract public class NAgentX extends NAgent {
 
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
-        return runRT(init, 50, fps, endTime);
+        return runRT(init, 25, fps, endTime);
     }
 
     public static NAR runRT(Function<NAR, NAgent> init, float narFPS, float agentFPS, long endTime) {
@@ -184,8 +184,8 @@ abstract public class NAgentX extends NAgent {
 //                    }
 //                })
                 .exe(new MultiExec.
-                            Intense
-                            //CoolNQuiet
+                            //Intense
+                            CoolNQuiet
                         (256, THREADS, 128))
 
                 .time(clock)

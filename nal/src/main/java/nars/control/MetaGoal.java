@@ -84,7 +84,7 @@ public enum MetaGoal {
 
         float momentum =
 //                    0f;
-                0.99f;
+                0.995f;
 
         @Override
         public void update(FasterList<Cause> causes, float[] goal) {
@@ -130,76 +130,80 @@ public enum MetaGoal {
             }
         }
 
+    }
+
+    /**
+     * uses an RBM as an adaptive associative memory to learn and reinforce the co-occurrences of the causes
+     * the RBM is an unsupervised network to learn and propagate co-occurring value between coherent Causes
+     */
+    public static class RBMRevaluator extends DefaultRevaluator {
+
+        private final Random rng;
+        public double[] next;
+
         /**
-         * uses an RBM as an adaptive associative memory to learn and reinforce the co-occurrences of the causes
-         * the RBM is an unsupervised network to learn and propagate co-occurring value between coherent Causes
+         * learning iterations applied per NAR cycle
          */
-        public static class RBMRevaluator extends DefaultRevaluator {
+        public int learning_iters = 1;
 
-            private final Random rng;
-            public double[] next;
+        public double learning_rate = 0.05f;
 
-            /** learning iterations applied per NAR cycle */
-            public int learning_iters = 2;
+        public double[] cur;
+        public RBM rbm;
 
-            public double learning_rate = 0.01f;
+        /**
+         * hidden to visible neuron ratio
+         */
+        private float hiddenMultipler = 0.5f;
 
-            public double[] cur;
-            public RBM rbm;
+        float rbmStrength = 0.1f;
 
-            /** hidden to visible neuron ratio */
-            private float hiddenMultipler = 0.25f;
-
-            float rbmStrength = 0.1f;
-
-            public RBMRevaluator(Random rng) {
-                this.rng = rng;
-                momentum = 1f - rbmStrength;
-            }
-
-            @Override
-            public void update(FasterList<Cause> causes, float[] goal) {
-                super.update(causes, goal);
-
-                int numCauses = causes.size();
-                if (numCauses < 2)
-                    return;
-
-                if (rbm == null || rbm.n_visible != numCauses) {
-                    int numHidden = Math.round(hiddenMultipler * numCauses);
-
-                    rbm = new RBM(numCauses, numHidden, null, null, null, rng) {
-                        @Override
-                        public double activate(double a) {
-                            return super.activate(a);
-                            //return Util.tanhFast((float) a);
-                            //return Util.sigmoidBipolar((float) a, 5);
-                        }
-                    };
-                    cur = new double[numCauses];
-                    next = new double[numCauses];
-                }
-
-
-                for (int i = 0; i < numCauses; i++)
-                    cur[i] = Util.tanhFast(causes.get(i).value());
-
-                rbm.reconstruct(cur, next);
-                rbm.contrastive_divergence(cur, learning_rate, learning_iters);
-
-                //float momentum = 0.5f;
-                //float noise = 0.1f;
-                for (int i = 0; i < numCauses; i++) {
-                    //float j = Util.tanhFast((float) (cur[i] + next[i]));
-                    float j = /*((rng.nextFloat()-0.5f)*2*noise)*/ +
-                            //((float) (next[i]));
-                            //(float)( Math.abs(next[i]) > Math.abs(cur[i]) ? next[i] : cur[i]);
-                            (float) (cur[i] + rbmStrength * next[i]);
-                    causes.get(i).setValue(j);
-                }
-            }
+        public RBMRevaluator(Random rng) {
+            this.rng = rng;
+            momentum = 1f - rbmStrength;
         }
 
+        @Override
+        public void update(FasterList<Cause> causes, float[] goal) {
+            super.update(causes, goal);
+
+            int numCauses = causes.size();
+            if (numCauses < 2)
+                return;
+
+            if (rbm == null || rbm.n_visible != numCauses) {
+                int numHidden = Math.round(hiddenMultipler * numCauses);
+
+                rbm = new RBM(numCauses, numHidden, null, null, null, rng) {
+                    @Override
+                    public double activate(double a) {
+                        return super.activate(a);
+                        //return Util.tanhFast((float) a);
+                        //return Util.sigmoidBipolar((float) a, 5);
+                    }
+                };
+                cur = new double[numCauses];
+                next = new double[numCauses];
+            }
+
+
+            for (int i = 0; i < numCauses; i++)
+                cur[i] = Util.tanhFast(causes.get(i).value());
+
+            rbm.reconstruct(cur, next);
+            rbm.contrastive_divergence(cur, learning_rate, learning_iters);
+
+            //float momentum = 0.5f;
+            //float noise = 0.1f;
+            for (int i = 0; i < numCauses; i++) {
+                //float j = Util.tanhFast((float) (cur[i] + next[i]));
+                float j = /*((rng.nextFloat()-0.5f)*2*noise)*/ +
+                        //((float) (next[i]));
+                        //(float)( Math.abs(next[i]) > Math.abs(cur[i]) ? next[i] : cur[i]);
+                        (float) (cur[i] + rbmStrength * next[i]);
+                causes.get(i).setValue(j);
+            }
+        }
     }
 
     public static void learn(MetaGoal p, short[] effects, float strength, NAR nar) {
@@ -315,7 +319,7 @@ public enum MetaGoal {
                                 new FloatFirstOrderDifference(n::time, () -> n.emotion.conceptFirePremises.getValue().longValue())
                         ).relax(0.1f)
                 ).in(new FloatNormalized(
-                        n.emotion.busyVol::getSum
+                                n.emotion.busyVol::getSum
                         ).relax(0.1f)
                 );
 

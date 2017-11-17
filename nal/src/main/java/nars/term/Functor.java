@@ -62,11 +62,6 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
         return term.opX();
     }
 
-    @Override
-    public final int compareTo(Termed o) {
-        return term.compareTo(o);
-    }
-
     static Atom fName(String termAtom) {
         return atomOrNull(the(termAtom));
     }

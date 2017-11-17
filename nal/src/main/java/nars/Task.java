@@ -99,9 +99,9 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
                 new BytesHashProvider<>(IO::taskToBytes));
     }
 
-    static boolean validConceptTerm(@Nullable Term t, boolean safe) {
-        return validTaskTerm(t, (byte) 0, null, safe);
-    }
+//    static boolean validConceptTerm(@Nullable Term t, boolean safe) {
+//        return validTaskTerm(t, (byte) 0, null, safe);
+//    }
 
     static boolean validTaskTerm(@Nullable Term t, byte punc, @Nullable NAR nar, boolean safe) {
 

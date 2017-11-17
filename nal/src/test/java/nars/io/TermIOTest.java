@@ -32,7 +32,7 @@ public class TermIOTest {
         assertEqualSerialize($.$(orig).term());
     }
 
-    void assertEqualSerialize(@NotNull Object orig) {
+    static void assertEqualSerialize(@NotNull Object orig) {
         //final IO.DefaultCodec codec = new IO.DefaultCodec(nar.index);
 
 
@@ -133,7 +133,7 @@ public class TermIOTest {
 
     }
 
-    void assertTermEqualSerialize(@NotNull String s) throws Narsese.NarseseException {
+    static void assertTermEqualSerialize( String s) throws Narsese.NarseseException {
         Termed t = $.$(s);
         assertTrue(t.isNormalized());
         assertTrue(t.term().isNormalized());

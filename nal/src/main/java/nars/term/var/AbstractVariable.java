@@ -56,7 +56,7 @@ public abstract class AbstractVariable implements Variable {
         this.id = id;
         byte[] b = new byte[5];
         b[0] = type.id;
-        Util.int2Bytes(id, b, 1);
+        Util.int2Bytes(num, b, 1);
         this.bytesCached = b;
     }
 

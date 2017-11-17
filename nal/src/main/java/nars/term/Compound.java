@@ -954,8 +954,10 @@ public interface Compound extends Term, IPair, TermContainer {
         if (term == null)
             return Null;
 
-        if (!Task.validConceptTerm(term, true))
+        if (!term.op().conceptualizable)
             return Null;
+            //!Task.validConceptTerm(term, true)
+
 
         return term;
     }

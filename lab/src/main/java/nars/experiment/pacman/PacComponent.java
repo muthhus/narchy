@@ -13,15 +13,17 @@ public class PacComponent extends JComponent {
 	 * 
 	 */
 	private static final long serialVersionUID = -7718122113054979140L;
-	PacMan game;
+	PacmanGame game;
 	int size;
 	ArrayList<Splash> splashText;
 	
-	public PacComponent(PacMan g) {
+	public PacComponent(PacmanGame g) {
 		
 		splashText = new ArrayList<>();
 		
 		this.game = g;
+
+		setIgnoreRepaint(true);
 		
 		this.setPreferredSize(new Dimension(400, 400));
 		size = Math.min(Math.round((getWidth()) / (game.maze.width + 3)), Math.round((getHeight()) / (game.maze.height + 5)));

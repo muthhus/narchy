@@ -1,11 +1,11 @@
-package nars.experiment.fzero;
+package nars.experiment;
 
 import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.experiment.pacman.PacMan;
+import nars.experiment.pacman.PacmanGame;
 import nars.term.atom.Atomic;
 import nars.op.video.BufferedImageBitmap2D;
 import nars.op.video.Scale;
@@ -14,12 +14,12 @@ import nars.op.video.SwingBitmap2D;
 
 public class Pacman extends NAgentX {
 
-    private final PacMan g;
+    private final PacmanGame g;
 
     public Pacman(NAR nar)  {
         super("G", nar);
 
-        this.g = new PacMan();
+        this.g = new PacmanGame();
 
 
 //        try {
@@ -46,27 +46,33 @@ public class Pacman extends NAgentX {
             }
 
         actionTriState($.p(id, Atomic.the("x")), (dh) -> {
-            g.keys[0 /* left */] = false;
-            g.keys[1 /* right */] = false;
             switch (dh) {
                 case +1:
                     g.keys[1] = true;
+                    g.keys[0] = false;
                     break;
                 case -1:
                     g.keys[0] = true;
+                    g.keys[1] = false;
+                    break;
+                case 0:
+                    g.keys[0] = g.keys[1] = false;
                     break;
             }
         });
 
        actionTriState($.p(id, Atomic.the("y")), (dh) -> {
-            g.keys[2 /* up */] = false;
-            g.keys[3 /* down */] = false;
             switch (dh) {
                 case +1:
                     g.keys[2] = true;
+                    g.keys[3] = false;
                     break;
                 case -1:
                     g.keys[3] = true;
+                    g.keys[2] = false;
+                    break;
+                case 0:
+                    g.keys[2] = g.keys[3] = false;
                     break;
             }
         });
@@ -80,6 +86,7 @@ public class Pacman extends NAgentX {
     @Override
     protected float act() {
 
+        g.update();
 
         int nextScore = g.score;
 
@@ -98,7 +105,7 @@ public class Pacman extends NAgentX {
             Pacman a = new Pacman(n);
             return a;
 
-        }, 30);
+        }, 1000f/PacmanGame.periodMS);
     }
 
 }

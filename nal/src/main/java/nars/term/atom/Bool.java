@@ -58,20 +58,6 @@ abstract public class Bool extends AtomicConst {
     }
 
     @Override
-    public int compareTo(Termed y) {
-        if (this == y) {
-            return 0;
-        } else {
-            int c = super.compareTo(y);
-            if (c == 0) {
-                throw never("compare as Atom");
-            }
-            return c;
-        }
-    }
-
-
-    @Override
     public final Term eval(TermContext context) {
         return this;
     }

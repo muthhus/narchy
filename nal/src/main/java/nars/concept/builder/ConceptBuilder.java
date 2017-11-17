@@ -21,8 +21,8 @@ public interface ConceptBuilder extends BiFunction<Term, Termed, Termed> {
     @NotNull ConceptState awake();
     @NotNull ConceptState sleep();
 
-    QuestionTable newQuestionTable(Term term, boolean questionOrQuest);
-    BeliefTable newBeliefTable(Term t, boolean beliefOrGoal);
+    QuestionTable questionTable(Term term, boolean questionOrQuest);
+    BeliefTable beliefTable(Term t, boolean beliefOrGoal);
     TemporalBeliefTable newTemporalBeliefTable(Term c);
 
     void start(NAR nar);
@@ -63,12 +63,12 @@ public interface ConceptBuilder extends BiFunction<Term, Termed, Termed> {
         }
 
         @Override
-        public BeliefTable newBeliefTable(Term t, boolean beliefOrGoal) {
+        public BeliefTable beliefTable(Term t, boolean beliefOrGoal) {
             return BeliefTable.Empty;
         }
 
         @Override
-        public QuestionTable newQuestionTable(Term term, boolean questionOrQuest) {
+        public QuestionTable questionTable(Term term, boolean questionOrQuest) {
             return QuestionTable.Empty;
         }
 

@@ -16,7 +16,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  */
-package nars.experiment.tetris.impl;
+package nars.experiment.tetris;
 
 import com.jogamp.opengl.GL2;
 import spacegraph.render.Draw;

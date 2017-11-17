@@ -50,9 +50,9 @@ public class BaseConcept implements Concept {
 
     public BaseConcept(Term term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder conceptBuilder) {
         this(term,
-                beliefs != null ? beliefs : conceptBuilder.newBeliefTable(term, true),
-                goals != null ? goals : conceptBuilder.newBeliefTable(term, false),
-                conceptBuilder.newQuestionTable(term, true), conceptBuilder.newQuestionTable(term, false), conceptBuilder.newLinkBags(term));
+                beliefs != null ? beliefs : conceptBuilder.beliefTable(term, true),
+                goals != null ? goals : conceptBuilder.beliefTable(term, false),
+                conceptBuilder.questionTable(term, true), conceptBuilder.questionTable(term, false), conceptBuilder.newLinkBags(term));
     }
 
     /**
@@ -95,8 +95,8 @@ public class BaseConcept implements Concept {
 
 
     public BaseConcept(Term term,  ConceptBuilder b) {
-        this(term, b.newBeliefTable(term, true), b.newBeliefTable(term, false),
-                b.newQuestionTable(term, true), b.newQuestionTable(term, false),
+        this(term, b.beliefTable(term, true), b.beliefTable(term, false),
+                b.questionTable(term, true), b.questionTable(term, false),
                 b.newLinkBags(term));
     }
 

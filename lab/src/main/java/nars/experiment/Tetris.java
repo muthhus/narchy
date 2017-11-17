@@ -1,13 +1,13 @@
-package nars.experiment.tetris;
+package nars.experiment;
 
 import jcog.math.FloatParam;
 import nars.*;
-import nars.experiment.tetris.impl.TetrisState;
+import nars.experiment.tetris.TetrisState;
 import nars.op.java.OObjects;
 import nars.util.signal.Bitmap2D;
 import nars.util.signal.CameraSensor;
 
-import static nars.experiment.tetris.impl.TetrisState.*;
+import static nars.experiment.tetris.TetrisState.*;
 
 /**
  * Created by me on 7/28/16.

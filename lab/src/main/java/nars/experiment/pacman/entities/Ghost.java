@@ -1,6 +1,6 @@
 package nars.experiment.pacman.entities;
 
-import nars.experiment.pacman.PacMan;
+import nars.experiment.pacman.PacmanGame;
 import nars.experiment.pacman.maze.Maze;
 import nars.experiment.pacman.maze.Maze.Direction;
 
@@ -56,9 +56,9 @@ public class Ghost extends Entity {
 			}
 			
 			if(scared)
-				speed = PacMan.GHOST_SPEED_SCARED;
+				speed = PacmanGame.GHOST_SPEED_SCARED;
 			else
-				speed = PacMan.GHOST_SPEED;
+				speed = PacmanGame.GHOST_SPEED;
 			
 			if( (Math.abs(x - tilex) > 0.8) && (Math.abs(Math.abs(x - Math.floor(x)) - 0.5) > 0.35) ||
 					(Math.abs(y - tiley) > 0.8) && (Math.abs(Math.abs(y - Math.floor(y)) - 0.5) > 0.35) ||
