@@ -24,7 +24,7 @@ public class UnitCompound1Test {
     public void testUnitCompound1() {
         Atomic x = Atomic.the("x");
         UnitCompound1 u = new UnitCompound1(PROD, x);
-        Compound g = new GenericCompound(PROD, new TermVector1(x));
+        Compound g = new CachedCompound(PROD, new TermVector1(x));
         assertEquals(g.hashCode(), u.hashCode());
         assertEquals(u, g);
         assertEquals(g, u);
@@ -64,7 +64,7 @@ public class UnitCompound1Test {
 //        System.out.println(u.sub(0));
         assertEquals(UnitCompound1.class, u.getClass());
 
-        GenericCompound g = new GenericCompound(NEG, new TermVector1(x));
+        CachedCompound g = new CachedCompound(NEG, new TermVector1(x));
         assertNotSame(u, g);
         assertEquals(u, g);
         assertEquals(g, u);

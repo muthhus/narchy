@@ -9,7 +9,7 @@ import nars.derive.match.Ellipsis;
 import nars.index.term.NewCompound;
 import nars.term.Term;
 import nars.term.atom.Bool;
-import nars.term.compound.GenericCompound;
+import nars.term.compound.CachedCompound;
 import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
@@ -127,7 +127,7 @@ public enum The {  ;
                     return new UnitCompound1(o, subterms.get(0));
 
                 default:
-                    return new GenericCompound(o, subterms(subterms));
+                    return new CachedCompound(o, subterms(subterms));
             }
 
         };

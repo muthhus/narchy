@@ -13,7 +13,8 @@ import org.jetbrains.annotations.Nullable;
 import static nars.time.Tense.DTERNAL;
 
 
-public class GenericCompound implements Compound {
+/** on-heap, caches many commonly used methods for fast repeat access while it survives */
+public class CachedCompound implements Compound {
 
     /**
      * subterm vector
@@ -31,31 +32,29 @@ public class GenericCompound implements Compound {
     final int structureCached;
 
     private transient Term rooted = null;
+    private transient Term concepted = null;
 
 
-    public GenericCompound(/*@NotNull*/ Op op, TermContainer subterms) {
+    public CachedCompound(/*@NotNull*/ Op op, TermContainer subterms) {
 
         this.op = op;
 
         this.hash = Util.hashCombine((this.subterms = subterms).hashCode(), op.id);
 
-
         this.structureCached = Compound.super.structure();
+    }
 
-//        //HACK
-//        this.dynamic =
-//                (op() == INH && subOpIs(1,ATOM) && subOpIs(0, PROD)) /* potential function */
-//                        ||
-//                (hasAll(EvalBits) && OR(Termlike::isDynamic)); /* possible function in subterms */
+    @Override public Term root() {
+        return (rooted != null) ? rooted
+                :
+            (this.rooted = Compound.super.root());
     }
 
     @Override
-    public Term root() {
-        if (rooted != null)
-            return rooted;
-
-        Term term = temporalize(Retemporalize.retemporalizeRoot);
-        return rooted = term;
+    public Term conceptual() {
+        return (concepted != null) ? concepted
+                :
+            (this.concepted = Compound.super.conceptual());
     }
 
     @Override
@@ -79,8 +78,6 @@ public class GenericCompound implements Compound {
     public int hashCode() {
         return hash;
     }
-
-
 
 
     @Override
@@ -114,8 +111,8 @@ public class GenericCompound implements Compound {
             return false;
 
         if (Compound.equals(this, (Term) that)) {
-            if (that instanceof GenericCompound) {
-                equivalent((GenericCompound) that);
+            if (that instanceof CachedCompound) {
+                equivalent((CachedCompound) that);
             }
             return true;
         }
@@ -125,7 +122,7 @@ public class GenericCompound implements Compound {
     /**
      * data sharing
      */
-    private void equivalent(GenericCompound that) {
+    private void equivalent(CachedCompound that) {
 //        TermContainer otherSubterms = that.subterms;
 //        TermContainer mySubterms = this.subterms;
 //        if (mySubterms!=otherSubterms) {
@@ -135,10 +132,12 @@ public class GenericCompound implements Compound {
 //                this.subterms = otherSubterms;
 //        }
 
-        if (that.rooted != null && this.rooted!=this)
-            this.rooted = that.rooted;
-        if (this.rooted != null && that.rooted!=that)
-            that.rooted = this.rooted;
+        if (that.rooted != null && this.rooted!=this) this.rooted = that.rooted;
+        if (this.rooted != null && that.rooted!=that) that.rooted = this.rooted;
+
+        if (that.concepted != null && this.concepted!=this) this.concepted = that.concepted;
+        if (this.concepted != null && that.concepted!=that) that.concepted = this.concepted;
+
     }
 
 

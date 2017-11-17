@@ -101,7 +101,7 @@ public interface Termlike {
     }
 
     default boolean hasAny(int structuralVector) {
-        return (structure() & structuralVector) != 0;
+        return Op.hasAny(structure(), structuralVector);
     }
 
     /** has special handling for VAR_PATTERN */

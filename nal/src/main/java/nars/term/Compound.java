@@ -105,6 +105,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
 
+
     //    /*@NotNull*/
 //    default MutableSet<Term> termsToSet(boolean recurse, int inStructure, MutableSet<Term> t) {
 //        if (recurse) {

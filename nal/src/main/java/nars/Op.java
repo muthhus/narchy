@@ -2,7 +2,6 @@ package nars;
 
 
 import jcog.TODO;
-import jcog.Util;
 import jcog.list.FasterList;
 import nars.derive.match.EllipsisMatch;
 import nars.derive.match.Ellipsislike;
@@ -12,7 +11,7 @@ import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.atom.Intlike;
-import nars.term.compound.GenericCompound;
+import nars.term.compound.CachedCompound;
 import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.var.UnnormalizedVariable;
@@ -25,7 +24,6 @@ import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
-import org.eclipse.collections.impl.block.factory.Predicates;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
@@ -627,7 +625,7 @@ public enum Op {
         return false;
     }
 
-    public static final Compound ZeroProduct = new GenericCompound(Op.PROD, TermContainer.NoSubterms);
+    public static final Compound ZeroProduct = new CachedCompound(Op.PROD, TermContainer.NoSubterms);
 
     public static final int StatementBits = Op.or(Op.INH, Op.SIM, Op.IMPL);
 
@@ -973,6 +971,10 @@ public enum Op {
         beliefable = conceptualizable;
 
 
+    }
+
+    public static boolean hasAny(int existing, int possiblyIncluded) {
+        return (existing & possiblyIncluded) != 0;
     }
 
     public static boolean hasAll(int existing, int possiblyIncluded) {
@@ -2013,6 +2015,8 @@ public enum Op {
         }
         return Null; //wasnt contained
     }
+
+
 
 
     /**

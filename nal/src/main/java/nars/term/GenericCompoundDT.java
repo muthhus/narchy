@@ -60,6 +60,27 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
     @Override
+    public int varQuery() {
+        return ref.varQuery();
+    }
+
+    @Override
+    public int varDep() {
+        return ref.varDep();
+    }
+
+    @Override
+    public int varIndep() {
+        return ref.varIndep();
+    }
+
+    @Override
+    public int varPattern() {
+        return ref.varPattern();
+    }
+
+
+    @Override
     public boolean contains(Term t) {
         return ref.subterms().contains(t);
     }

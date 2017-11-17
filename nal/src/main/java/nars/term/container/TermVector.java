@@ -2,6 +2,7 @@ package nars.term.container;
 
 import com.google.common.base.Joiner;
 import jcog.Util;
+import nars.Op;
 import nars.Param;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
@@ -35,6 +36,8 @@ public abstract class TermVector implements TermContainer {
      */
     public final short complexity;
 
+    private final byte varPattern, varDep, varQuery, varIndep;
+
     protected transient boolean normalized;
 
 
@@ -56,25 +59,56 @@ public abstract class TermVector implements TermContainer {
 //                 if (x == null) throw new NullPointerException();
 //         }
 
+        int structure = 0;
+        int vol = 1;
+        int varPattern = 0, varQuery = 0, varDep = 0, varIndep = 0;
+        int hash = 1;
+        for (Term x : terms) {
+            int xstructure = x.structure();
+            structure |= xstructure;
+            if (Op.hasAny(xstructure, Op.VAR_DEP.bit|Op.VAR_QUERY.bit|Op.VAR_INDEP.bit)) {
+                varDep += x.varDep();
+                varIndep += x.varIndep();
+                varQuery += x.varQuery();
+            }
+            varPattern += x.varPattern();
+            vol += x.volume();
+            hash = Util.hashCombine(hash, x.hashCode());
+        }
+        this.hash = hash;
+        this.structure = structure;
+        this.varPattern = (byte)varPattern;
+        this.varDep = (byte)varDep;
+        this.varQuery = (byte)varQuery;
+        this.varIndep = (byte)varIndep;
 
-        this.hash = Terms.hashSubterms(terms);
-
-
-//        final int vD = meta[0];  this.varDeps = (byte)vD;
-//        final int vI = meta[1];  this.varIndeps = (byte)vI;
-//        final int vQ = meta[2];  this.varQuerys = (byte)vQ;
-//        final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
-
-        final int vol = 1 + Util.sum(Term::volume, terms); // meta[0] + 1;
-        this.structure = Util.or(Term::structure, terms); //TermContainer.super.structure();
-
-        int varTot = Util.sum((Term t) -> (t.vars() + t.varPattern()), terms);
+        int varTot = varPattern + varQuery + varDep + varIndep;
         final int cmp = vol - varTot;
         this.complexity = (short) (cmp);
         this.volume = (short) (vol);
 
         this.normalized = varTot == 0;
 
+    }
+
+    @Override
+    public int varQuery() {
+        return varQuery;
+    }
+
+    @Override
+    public int varDep() {
+        return varDep;
+    }
+
+    @Override
+    public int varIndep() {
+        return varIndep;
+    }
+
+    @Override
+    public int varPattern() {
+        return varPattern;
     }
 
     protected void equivalentTo(TermVector that) {

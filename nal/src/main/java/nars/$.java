@@ -20,7 +20,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Int;
-import nars.term.compound.GenericCompound;
+import nars.term.compound.CachedCompound;
 import nars.term.container.TermContainer;
 import nars.term.obj.JsonTerm;
 import nars.term.var.AbstractVariable;
@@ -871,7 +871,7 @@ public enum $ {
     }
 
     public static Term pFast(TermContainer x) {
-        return new GenericCompound(Op.PROD,x);
+        return new CachedCompound(Op.PROD,x);
     }
 
 

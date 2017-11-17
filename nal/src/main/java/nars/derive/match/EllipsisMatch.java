@@ -3,7 +3,7 @@ package nars.derive.match;
 import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.Term;
-import nars.term.compound.GenericCompound;
+import nars.term.compound.CachedCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.Unify;
@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 /**
  * Holds results of an ellipsis match and
 */
-public class EllipsisMatch extends GenericCompound  {
+public class EllipsisMatch extends CachedCompound {
 
     //    public static ArrayEllipsisMatch matchedSubterms(Compound Y, IntObjectPredicate<Term> filter) {
 //        Function<IntObjectPredicate,Term[]> arrayGen =
