@@ -1,5 +1,6 @@
 package nars;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
@@ -18,11 +19,13 @@ import com.googlecode.lanterna.terminal.ansi.TelnetTerminalServer;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminalListener;
-import jcog.bag.impl.PLinkArrayBag;
+import jcog.bag.impl.ArrayBag;
+import jcog.bag.impl.ConcurrentArrayBag;
 import jcog.event.On;
 import jcog.math.FloatParam;
 import jcog.math.MutableInteger;
 import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
 import nars.control.Activate;
@@ -30,6 +33,7 @@ import nars.control.DurService;
 import nars.control.NARService;
 import nars.op.Operator;
 import nars.op.nlp.Hear;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -37,7 +41,6 @@ import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.googlecode.lanterna.gui2.BorderLayout.Location.*;
@@ -109,7 +112,7 @@ public class TextUI {
             synchronized (terminal) {
                 thread = new Thread(this);
                 thread.setUncaughtExceptionHandler((t, e) -> {
-                    end();
+                    stop();
                 });
                 thread.start();
             }
@@ -117,7 +120,7 @@ public class TextUI {
 
         @Override
         protected void stop(NAR nar) {
-            end();
+            stop();
             super.stop(nar);
         }
 
@@ -143,7 +146,7 @@ public class TextUI {
 
                         @Override
                         public void onClose() {
-                            end();
+                            stop();
                         }
 
                         @Override
@@ -156,7 +159,7 @@ public class TextUI {
                 screen.startScreen();
             } catch (IOException e) {
                 logger.warn("{} {}", this, e.getMessage());
-                end();
+                stop();
                 return;
             }
 
@@ -260,7 +263,9 @@ public class TextUI {
             tui.addWindowAndWait(window);
         }
 
-        final synchronized void end() {
+        public final synchronized void stop() {
+
+            super.stop();
 
             if (screen != null) {
                 try {
@@ -271,6 +276,13 @@ public class TextUI {
             }
 
             Collection<Window> w = tui.getWindows();
+            w.forEach(c -> {
+                Component cc = c.getComponent();
+                cc.onRemoved(null);
+                if (cc instanceof Panel) {
+                    ((Panel)cc).removeAllComponents(); //note this may only affect the first layer only
+                }
+            });
             w.forEach(Window::close);
             w.forEach(tui::removeWindow);
 
@@ -383,11 +395,7 @@ public class TextUI {
                 int cols = graphics.getSize().getColumns() - 1;
                 label = TerminalTextUtils.fitString(label, cols);
                 int w = TerminalTextUtils.getColumnWidth(label);
-                while (w < cols) {
-                    label += " ";
-                    w++;
-                }
-                graphics.putString(0, 0, label);
+                graphics.putString(0, 0, Strings.padEnd(label, cols-w, ' '));
             }
         }
 
@@ -442,7 +450,7 @@ public class TextUI {
         }
 
         class BagListBox<X extends Prioritized> extends AbstractListBox {
-            protected final PLinkArrayBag<X> bag;
+            protected final ArrayBag<X,PriReference<X>> bag;
 
 
             protected final AtomicBoolean paused = new AtomicBoolean(false);
@@ -462,7 +470,12 @@ public class TextUI {
                 this.autoupdate = autoupdate;
                 visible.set(capacity);
 
-                bag = new PLinkArrayBag(capacity * 2, PriMerge.replace, new ConcurrentHashMap());
+                bag = new ConcurrentArrayBag<>(PriMerge.replace,capacity * 2) {
+
+                    @Nullable @Override public X key(PriReference<X> x) {
+                        return x.get();
+                    }
+                };
                 update = newGUIUpdate(this::update);
 
             }
@@ -473,10 +486,8 @@ public class TextUI {
 
             public void add(PLink<X> p) {
                 if (bag.put(p) != null) {
-
+                    changed.set(true); //update anyway since merges and forgetting may have shifted ordering
                 }
-
-                changed.set(true); //update anyway since merges and forgetting may have shifted ordering
             }
 
             public void update() {
@@ -489,7 +500,7 @@ public class TextUI {
 
                             next.clear();
                             bag.commit();
-                            bag.forEach(visible.intValue(), t -> next.add(t.get()));
+                            bag.forEach(visible.intValue(), (t) -> next.add(t.get()));
 
                             guiThread.invokeLater(this::render);
                         }
@@ -499,9 +510,9 @@ public class TextUI {
 
             @Override
             public synchronized void onRemoved(Container container) {
+                update.stop();
                 super.onRemoved(container);
                 clearItems();
-                update.stop();
             }
 
             final List<X> next = $.newArrayList();
@@ -530,9 +541,9 @@ public class TextUI {
 
             @Override
             public synchronized void onRemoved(Container container) {
+                onTask.off();
                 super.onRemoved(container);
                 clearItems();
-                onTask.off();
             }
 
             public TaskListBox(int capacity) {

@@ -1,4 +1,4 @@
-package nars.bag;
+package jcog.bag.impl;
 
 import jcog.Util;
 import jcog.bag.Bag;

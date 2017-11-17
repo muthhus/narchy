@@ -9,7 +9,7 @@ import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.bag.ConcurrentArrayBag;
+import jcog.bag.impl.ConcurrentArrayBag;
 import nars.bag.leak.DtLeak;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;

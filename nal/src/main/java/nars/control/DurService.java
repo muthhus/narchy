@@ -16,7 +16,9 @@ abstract public class DurService extends NARService implements Runnable {
 
     static final Logger logger = LoggerFactory.getLogger(DurService.class);
 
-    /** ideal duration multiple to be called, since time after implementation's procedure finished last*/
+    /**
+     * ideal duration multiple to be called, since time after implementation's procedure finished last
+     */
     public final MutableFloat durations;
 
     protected final NAR nar;
@@ -31,21 +33,26 @@ abstract public class DurService extends NARService implements Runnable {
     protected DurService(NAR n, MutableFloat durations) {
         super(n);
         this.durations = durations;
-        this.now = n.time()-1;
+        this.now = n.time() - 1;
         this.nar = n;
     }
 
-    /** simple convenient adapter for Runnable's */
+    /**
+     * simple convenient adapter for Runnable's
+     */
     public static DurService on(NAR nar, Runnable r) {
         return new DurService(nar) {
-            @Override protected void run(NAR n, long dt) {
+            @Override
+            protected void run(NAR n, long dt) {
                 r.run();
             }
         };
     }
+
     public static DurService on(NAR nar, Consumer<NAR> r) {
         return new DurService(nar) {
-            @Override protected void run(NAR n, long dt) {
+            @Override
+            protected void run(NAR n, long dt) {
                 r.accept(n);
             }
         };
@@ -67,12 +74,14 @@ abstract public class DurService extends NARService implements Runnable {
         //long now = nar.time();
         //if (now - lastNow >= durations.floatValue() * nar.dur()) {
         if (busy.compareAndSet(false, true)) {
+
             long last = this.now;
             long now = nar.time();
             int dur = nar.dur();
             long durCycles = Math.round(durations.floatValue() * nar.dur());
+
             try {
-                //TODO instrument here
+
                 long delta = (now - last);
                 if (delta >= durCycles) {
                     try {
@@ -83,19 +92,20 @@ abstract public class DurService extends NARService implements Runnable {
                     this.now = nar.time();
                 } else {
                     //too soon, reschedule
-//                    System.out.println("too early");
                 }
 
             } catch (Exception e) {
                 logger.error("{} {}", this, e);
             } finally {
-                nar.at(this.now + durCycles, this);
                 busy.set(false);
+                nar.at(this.now + durCycles, this);
             }
         }
     }
 
-    /** time (raw cycles, not durations) which elapsed since run was scheduled last */
+    /**
+     * time (raw cycles, not durations) which elapsed since run was scheduled last
+     */
     abstract protected void run(NAR n, long dt);
 
 

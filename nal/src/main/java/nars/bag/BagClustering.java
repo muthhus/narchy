@@ -1,6 +1,7 @@
 package nars.bag;
 
 import jcog.bag.Bag;
+import jcog.bag.impl.ConcurrentArrayBag;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Centroid;
 import jcog.list.FasterList;

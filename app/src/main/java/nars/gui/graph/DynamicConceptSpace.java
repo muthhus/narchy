@@ -10,7 +10,7 @@ import jcog.pri.op.PriMerge;
 import jcog.util.Flip;
 import nars.NAR;
 import nars.Task;
-import nars.bag.ConcurrentArrayBag;
+import jcog.bag.impl.ConcurrentArrayBag;
 import nars.concept.Concept;
 import nars.control.Activate;
 import nars.control.DurService;

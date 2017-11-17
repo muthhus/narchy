@@ -9,7 +9,7 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.IO;
 import nars.Task;
-import nars.bag.ConcurrentArrayBag;
+import jcog.bag.impl.ConcurrentArrayBag;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.index.term.map.MaplikeTermIndex;
