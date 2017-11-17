@@ -271,7 +271,9 @@ public class Builtin {
                                 throw new UnsupportedOperationException();
                         }
                     } else {
-                        int split = rng.nextInt(i.max-i.min-2);
+                        int split =
+                                (i.max + i.min)/2; //midpoint, deterministic
+                                //rng.nextInt(i.max-i.min-2);
                         return (rng.nextBoolean()) ?
                                 Int.range(i.min, split+1) :
                                 Int.range(split+1, i.max);

@@ -42,6 +42,10 @@ public class IntTest {
         n.run(10);
     }
 
+    @Test public void testDiffer() {
+        assertEquals(range(1,2), Op.difference(range(0,2), the(0)));
+    }
+
     @Test
     public void testIntIntersectionReduction() {
         //(P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S | P) --> M), (Belief:Intersection)

@@ -23,9 +23,9 @@
     (C --> A), (C --> B), neq(A,B),is(A,"["),is(B,"[") |- (C --> intersect(A,B)), (Belief:Union)
     (C --> A), (C --> B), neq(A,B),is(A,"["),is(B,"[") |- (C --> differ(A,B)), (Belief:Difference)
 
-    (A --> C), (B --> C), neq(A,B),isAny(A,"{","+"),isAny(B,"{","+") |- (intersect(A,B) --> C), (Belief:Union)
-    (A --> C), (B --> C), neq(A,B),isAny(A,"{","+"),isAny(B,"{","+") |- (union(A,B) --> C), (Belief:Intersection)
-    (A --> C), (B --> C), neq(A,B),isAny(A,"{","+"),isAny(B,"{","+") |- (differ(A,B) --> C), (Belief:Difference)
+    (A --> C), (B --> C), neq(A,B),is(A,"{"),is(B,"{") |- (intersect(A,B) --> C), (Belief:Union)
+    (A --> C), (B --> C), neq(A,B),is(A,"{"),is(B,"{") |- (union(A,B) --> C), (Belief:Intersection)
+    (A --> C), (B --> C), neq(A,B),is(A,"{"),is(B,"{") |- (differ(A,B) --> C), (Belief:Difference)
 
     (A --> C), (B --> C), neq(A,B),is(A,"["),is(B,"[") |- (union(A,B) --> C), (Belief:Union, Goal:Union)
     (A --> C), (B --> C), neq(A,B),is(A,"["),is(B,"[") |- (intersect(A,B) --> C), (Belief:Intersection)
@@ -39,10 +39,8 @@
 //Set Decomposition
 
     (C --> X), (C --> X), isAny(X,"{","[")     |- (C --> dropAnySet(X)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (X --> C), (X --> C), isAny(X,"{","[","+") |- (dropAnySet(X) --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-        //2D:
-        ((X,Y) --> C), ((X,Y) --> C), isAny(X,"{","[","+"),isAny(Y,"{","[","+") |- ((dropAnySet(X),Y) --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-        ((X,Y) --> C), ((X,Y) --> C), isAny(X,"{","[","+"),isAny(Y,"{","[","+") |- ((X,dropAnySet(Y)) --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (X --> C), (X --> C), isAny(X,"{","[") |- (dropAnySet(X) --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+
 
 //Set Un-recurser
     ({ (V-->K), A..* }-->M), M |- ({V} --> (M,K)), (Belief:StructuralDeduction, Goal:StructuralDeduction)

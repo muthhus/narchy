@@ -7,7 +7,6 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -269,23 +268,23 @@ public class Temporalize implements ITemporalize {
 
                     if (implSubj.hasAny(CONJ)) {
 
-                        implSubj.eventsWhile((w,ss) -> {
+                        implSubj.eventsWhile((w, ss) -> {
                             if (!ss.equals(implPred)) {
-                                int t = (int)(-predFromSubj + w);
+                                int t = (int) (-predFromSubj + w);
                                 know(ss, relative(ss, implPred, t));
                                 know(implPred, relative(implPred, ss, -t));
                             } else {
                                 //TODO repeat case
                             }
                             return true;
-                        },0);
+                        }, 0);
                     }
 
                     if (!implSubj.equals(implPred)) {
                         if (implPred.hasAny(CONJ)) {
-                            implPred.eventsWhile((w, pp)-> {
+                            implPred.eventsWhile((w, pp) -> {
                                 if (!pp.equals(implSubj)) {
-                                    int t = (int)  w;
+                                    int t = (int) w;
                                     know(pp, relative(pp, implSubj, t));
                                     know(implSubj, relative(implSubj, pp, -t));
                                 } else {
@@ -320,14 +319,14 @@ public class Temporalize implements ITemporalize {
                     //the raw events
                     final Term[] pa = {null};
                     final long[] pt = {0};
-                    x.eventsWhile((at,a)->{
+                    x.eventsWhile((at, a) -> {
                         know(a, relative(a, x, (int) at)); //link to its position in the super-conj
-                        if (pa[0] !=null) {
-                            know(a, relative(a, pa[0], (int) (at- pt[0]))); //chain to previous
-                            know(pa[0], relative(pa[0], a, (int) (pt[0] -at))); //chain to previous //is this one necessary?
+                        if (pa[0] != null) {
+                            know(a, relative(a, pa[0], (int) (at - pt[0]))); //chain to previous
+                            know(pa[0], relative(pa[0], a, (int) (pt[0] - at))); //chain to previous //is this one necessary?
                         }
                         pa[0] = a;
-                        pt[0] = at+a.dtRange();
+                        pt[0] = at + a.dtRange();
                         return true;
                     }, 0);
 //                    Term pa = null; int pt = 0;
@@ -825,12 +824,21 @@ public class Temporalize implements ITemporalize {
 
     private Event solveConj(Term a, Time at, Term b, Time bt) {
 
-        Term newTerm;
         if (at.base == ETERNAL || bt.base == ETERNAL) {
             //both eternal or a mix of one eternal and temporal.  the occurrence will be the temporal but the DT will be && (dternal)
-            newTerm = CONJ.the(DTERNAL, a, b);
+            int dt;
+            if (at.offset != DTERNAL && bt.offset != DTERNAL) {
+                dt = bt.offset - at.offset;
+            } else {
+                dt = DTERNAL;
+            }
+
+            Term newTerm = CONJ.the(dt, a, b);
+
             return newTerm.op().conceptualizable ?
-                    new TimeEvent(newTerm, bt.base != ETERNAL ? bt : at) : null;
+                    new TimeEvent(newTerm,
+                            bt.base != ETERNAL ? bt : at //the one, if any, with non DTERNAL dt
+                    ) : null;
         } else {
 
             long ata = at.abs();
@@ -863,7 +871,7 @@ public class Temporalize implements ITemporalize {
                 //cDur = -1;
             }
 
-            newTerm = Op.conjMerge(a, ata, b, bta);
+            Term newTerm = Op.conjMerge(a, ata, b, bta);
             return newTerm.op().conceptualizable ?
                     new TimeEvent(newTerm, early, newTerm.dtRange()) : null;
         }

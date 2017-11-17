@@ -2,6 +2,7 @@ package nars.term.atom;
 
 import com.google.common.collect.*;
 import com.google.common.io.ByteArrayDataOutput;
+import jcog.TODO;
 import jcog.Util;
 import jcog.math.Interval;
 import nars.$;
@@ -11,12 +12,10 @@ import nars.index.term.TermContext;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.subst.Unify;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
 import org.eclipse.collections.impl.tuple.Tuples;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -24,6 +23,7 @@ import java.util.function.BiPredicate;
 
 import static com.google.common.collect.BoundType.OPEN;
 import static nars.Op.INT;
+import static nars.Op.Null;
 
 /**
  * 32-bit signed integer
@@ -110,7 +110,7 @@ public class Int implements Intlike {
     }
 
     @Override
-    public /*@NotNull*/ Op op() {
+    public /**/ Op op() {
         return INT;
     }
 
@@ -121,22 +121,22 @@ public class Int implements Intlike {
 
 
 
-    @Override
-    public boolean unify(Term y,  Unify subst) {
-        if (Intlike.super.unify(y, subst))
-            return true;
-        //if (equals(y)) return true;
-        if (y instanceof IntRange) {
-            IntRange ir = (IntRange) y;
-            if (ir.min <= id && ir.max >= id) {
-                //return subst.putXY(y, this); //specialize from the range to this int
-                return true;
-            }
-        }
-        return false;
-    }
+//    @Override
+//    public boolean unify(Term y,  Unify subst) {
+//        if (Intlike.super.unify(y, subst))
+//            return true;
+//        //if (equals(y)) return true;
+//        if (y instanceof IntRange) {
+//            IntRange ir = (IntRange) y;
+//            if (ir.min <= id && ir.max >= id) {
+//                //return subst.putXY(y, this); //specialize from the range to this int
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
-    public static Intlike the(Range<Integer> span) {
+    public static Intlike range(Range<Integer> span) {
         return range(span.lowerEndpoint(), span.upperEndpoint() - ((span.upperBoundType() == OPEN ? 1 : 0)));
     }
 
@@ -160,24 +160,24 @@ public class Int implements Intlike {
             this.hash = Util.hashCombine(INT_RANGE, min, max);
         }
 
-        @Override
-        public boolean unify(Term y, Unify subst) {
-            if (Intlike.super.unify(y, subst)) return true;
-
-            //one way:
-            if (y instanceof IntRange) {
-                IntRange z = (IntRange) y;
-                return z.contains(this);
-            }
-
-//            if (y instanceof Int) {
-//                return intersects((Int)y);
-//            } else if (y instanceof IntRange) {
+//        @Override
+//        public boolean unify(Term y, Unify subst) {
+//            if (Intlike.super.unify(y, subst)) return true;
+//
+//            //one way:
+//            if (y instanceof IntRange) {
 //                IntRange z = (IntRange) y;
-//                return contains(z) || z.contains(this);
+//                return z.contains(this);
 //            }
-            return false;
-        }
+//
+////            if (y instanceof Int) {
+////                return intersects((Int)y);
+////            } else if (y instanceof IntRange) {
+////                IntRange z = (IntRange) y;
+////                return contains(z) || z.contains(this);
+////            }
+//            return false;
+//        }
 
         public boolean intersects(Int y) {
             int i = y.id;
@@ -188,16 +188,20 @@ public class Int implements Intlike {
             return Interval.intersectLength(min, max, y.min, y.max) >= 0;
         }
         public boolean contains(IntRange y) {
-            return (y.min > min) && (y.max < max);
+            return (y.min >= min) && (y.max <= max);
+        }
+        public boolean contains(Int y) {
+            int yy = y.id;
+            return (yy >= min) && (yy <= max);
         }
 
         @Override
-        public @NotNull String toString() {
+        public  String toString() {
             return min + ".." + max;
         }
 
         @Override
-        public /*@NotNull*/ Op op() {
+        public /**/ Op op() {
             return INT;
         }
 
@@ -240,6 +244,23 @@ public class Int implements Intlike {
         @Override
         public Range range() {
             return Range.closed(min, max).canonical(DiscreteDomain.integers());
+        }
+
+        public Term except(Term b) {
+            if (equals(b))
+                return Null;
+            if (b instanceof IntRange) {
+                IntRange bb = (IntRange) b;
+                if (contains(bb)) {
+                    throw new TODO();
+                }
+            } else if (b instanceof Int) {
+                Int bb = (Int)b;
+                if (contains(bb)) {
+                    throw new TODO();
+                }
+            }
+            return Null;
         }
     }
 
@@ -299,7 +320,7 @@ public class Int implements Intlike {
         for (Term f : subs) {
 //        for (int i = 0; i < subCount; i++) {
 //            //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
-//            @NotNull Term f = subs.term(i);
+//             Term f = subs.term(i);
 
             //first subterm: infer location of all inductables
             int ii = i[0]++;
@@ -441,8 +462,8 @@ public class Int implements Intlike {
         return ll;
     }
 
-    @NotNull
-    public static RangeSet<Integer> ranges(@NotNull List<Term> term) {
+    
+    public static RangeSet<Integer> ranges( List<Term> term) {
         TreeRangeSet<Integer> r = TreeRangeSet.create();
         for (Term x : term) {
             if (x instanceof Intlike) {
@@ -454,7 +475,7 @@ public class Int implements Intlike {
     /**
      * unroll IntInterval's
      */
-    public static Iterator<Term> unroll(@NotNull Term cc) {
+    public static Iterator<Term> unroll( Term cc) {
         //assert(!c.hasAny(Op.INT));
             //return Iterators.singletonIterator(c); //no IntInterval's early exit
 
@@ -529,7 +550,7 @@ public class Int implements Intlike {
         }
 
         @Override
-        public @NotNull Term term() {
+        public  Term term() {
             Term cur = i;
             int next = this.i.id + 1;
             if (next >= max)
@@ -549,8 +570,8 @@ public class Int implements Intlike {
 //    private static final int resultLimit = 1;
 //    private static final boolean recurseAllSubstructures = false;
 //
-//    @NotNull
-//    public static TermContainer compress(Op op, int dt, @NotNull TermContainer args) {
+//    
+//    public static TermContainer compress(Op op, int dt,  TermContainer args) {
 //        if (op!=CONJ || !(((dt == DTERNAL) || (dt == 0))) || args.size() < 2 || !args.hasAny(Op.INT))
 //            return args; //early exit condition
 //
@@ -565,8 +586,8 @@ public class Int implements Intlike {
 //    }
 //
 //
-//    @NotNull
-//    public static Set<Term> compress(@NotNull Set<Term> subs, int depthRemain) {
+//    
+//    public static Set<Term> compress( Set<Term> subs, int depthRemain) {
 //
 //        int subCount = subs.size();
 //        if (subCount < 2/* || !subs.hasAny(Op.INT)*/)
@@ -640,7 +661,7 @@ public class Int implements Intlike {
 //        subs.forEach(f -> {
 ////        for (int i = 0; i < subCount; i++) {
 ////            //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
-////            @NotNull Term f = subs.term(i);
+////             Term f = subs.term(i);
 //
 //            //first subterm: infer location of all inductables
 //            int ii = i[0]++;
@@ -753,8 +774,8 @@ public class Int implements Intlike {
 //    }
 //
 //    public
-//    @NotNull
-//    static Set<Term> recompressIfChanged(@NotNull Set<Term> orig, @NotNull Set<Term> newSubs, int depthRemain) {
+//    
+//    static Set<Term> recompressIfChanged( Set<Term> orig,  Set<Term> newSubs, int depthRemain) {
 //        //try {
 //
 //        if (newSubs.equals(orig)) {
@@ -771,7 +792,7 @@ public class Int implements Intlike {
 //
 //
 //    @Nullable
-//    public static IntArrayList ints(@NotNull List<Term> term) {
+//    public static IntArrayList ints( List<Term> term) {
 //        int termSize = term.size();
 //        IntArrayList l = new IntArrayList(termSize);
 //        for (int i = 0; i < termSize; i++)
@@ -783,7 +804,7 @@ public class Int implements Intlike {
 
 //
 //    @Nullable
-//    public static void intOrNull(@NotNull Term term, @NotNull IntArrayList target) {
+//    public static void intOrNull( Term term,  IntArrayList target) {
 //        if (term.op() == INT) {
 //            target.add( ((IntTerm) term).val() );
 //        }
@@ -866,7 +887,7 @@ public class Int implements Intlike {
 ////    }
 //
 //
-//    static boolean compareNonInteger(@NotNull Term x, @NotNull Term y) {
+//    static boolean compareNonInteger( Term x,  Term y) {
 //        if ((x.op() == INT)) {
 //            return (y.op() == INT);
 //        } else if (x instanceof Compound) {
@@ -878,7 +899,7 @@ public class Int implements Intlike {
 //
 //    final static Function<Term, Term> xx = x -> x;
 //
-//    private static boolean equalNonIntegerAtoms(@NotNull TermContainer subs) {
+//    private static boolean equalNonIntegerAtoms( TermContainer subs) {
 //        Term first = subs.sub(0);
 //        int ss = subs.size();
 //        return first.pathsTo(xx, (ByteList p, Term x) -> {
@@ -901,8 +922,8 @@ public class Int implements Intlike {
 //    //return new GenericVariable(varDep ? Op.VAR_DEP : Op.VAR_INDEP, Integer.toString(i));
 //    //}
 //
-//    @NotNull
-//    private static List<IntInterval> features(@NotNull List<Term> nnnt) {
+//    
+//    private static List<IntInterval> features( List<Term> nnnt) {
 //
 //        RangeSet<Integer> intIntervals = ranges(nnnt);
 //

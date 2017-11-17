@@ -268,28 +268,6 @@ public class NAL2Test extends NALTest {
 
     }
 
-    @Test
-    public void testIntRangeStructuralDecomposition() {
-
-        test
-            .nar.believe($.inh(Int.range(1,3), $.the("a")), Tense.Eternal, 1f, 0.9f);
-        test
-            .mustBelieve(cycles, "a:1", 1.0f, 0.81f); //structural decomposition
-
-    }
-
-    @Test
-    public void testIntRangeStructuralDecomposition2d() {
-
-        test
-            .nar.believe(
-                $.inh( $.p(Int.range(1,3), Int.range(1,3)), $.the("a")
-            ), Tense.Eternal, 1f, 0.9f);
-        test
-            .log()
-            .mustBelieve(cycles, "a(2,2)", 1.0f, 0.59f); //structural decomposition
-
-    }
 
 }
 

@@ -64,7 +64,8 @@ public class SubUnify extends Unify {
                     if (
                         //xy.forEachVersioned(parent.xy::tryPut)
                     xy.forEachVersioned((x,y)->{
-                        parent.xy.tryPut(x, y);
+                        if (!parent.putXY(x, y))
+                            return false;
                         //parent.xy.tryPut(y,x);
                         return true;
                     })

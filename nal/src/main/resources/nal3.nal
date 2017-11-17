@@ -5,18 +5,18 @@
 //  corresponds to extensional union, and extensional intersection corresponds
 //  to intensional union.
 
-    (P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
-    (P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S & P) --> M), (Belief:Union)
-    (P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
+    (P --> M), (S --> M), task("."), notSet(S), notSet(P), neq(S,P) |- ((S | P) --> M), (Belief:Intersection)
+    (P --> M), (S --> M), task("."), notSet(S), notSet(P), neq(S,P) |- ((S & P) --> M), (Belief:Union)
+    (P --> M), (S --> M), task("."), notSet(S), notSet(P), neq(S,P) |- ((P ~ S) --> M), (Belief:Difference)
 
-    (M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
-    (M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P | S)), (Belief:Union)
-    (M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P - S)), (Belief:Difference)
+    (M --> P), (M --> S), task("."), notSet(S), notSet(P), neq(S,P) |- (M --> (P & S)), (Belief:Intersection)
+    (M --> P), (M --> S), task("."), notSet(S), notSet(P), neq(S,P) |- (M --> (P | S)), (Belief:Union)
+    (M --> P), (M --> S), task("."), notSet(S), notSet(P), neq(S,P) |- (M --> (P - S)), (Belief:Difference)
 
 //raw product composition, may be redundant because general induction via && does the equivalent
  //    A, B, task("*"), belief("*") |- (A | B), (Belief:Intersection)
  //   A, B, task("*"), belief("*") |- (A & B), (Belief:Union)
-    A, B, task("*"), belief("*"), neqRCom(A,B) |- (A - B), (Belief:Difference)
+    A, B, task("*"), belief("*"), neq(A,B) |- (A - B), (Belief:Difference)
 
 //raw product decomposition ?
 
@@ -41,11 +41,19 @@
 
 //NAL3 single premise decompose
 
-    (S --> M), X, is(S,"|"), subOf(X,S) |- (without(S,X) --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
     (M --> S), X, is(S,"&"), subOf(X,S) |- (M --> without(S,X)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (S --> M), X, is(S,"|"), subOf(X,S) |- (without(S,X) --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-    ((B ~ G) --> S), G, neqRCom(B,S) |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (S --> (B - G)), G, neqRCom(B,S) |- (S --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+        //1D:
+        (X --> C), (X --> C), is(X,"+") |- (dropAnySet(X) --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+        //(Y --> M), (X --> M), is(Y,"+"), is(X,"+") |- (differ(Y,X) --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+
+        //2D:
+        ((X,Y) --> C), ((X,Y) --> C), is(X,"+"),isAny(Y,"+") |- ((dropAnySet(X),Y) --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+        ((X,Y) --> C), ((X,Y) --> C), is(X,"+"),isAny(Y,"+") |- ((X,dropAnySet(Y)) --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+
+    ((B ~ G) --> S), G |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (S --> (B - G)), G |- (S --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 
 //experiment

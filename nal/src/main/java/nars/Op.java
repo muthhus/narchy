@@ -7,7 +7,6 @@ import nars.derive.match.EllipsisMatch;
 import nars.derive.match.Ellipsislike;
 import nars.op.mental.AliasConcept;
 import nars.term.*;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.atom.Int;
@@ -1333,12 +1332,28 @@ public enum Op {
 
     }
 
+    public static Term difference(/*@NotNull*/ Term a, Term b) {
+        Op o = a.op();
+        assert(b.op()== o);
+        return difference(o, a, b);
+    }
+
     /*@NotNull*/
     public static Term difference(/*@NotNull*/ Op o, Term a, Term b) {
         //assert (!o.temporal) : "this impl currently assumes any constructed term will have dt=DTERNAL";
 
         if (a.equals(b))
             return Null; //empty set
+
+        if (o == INT) {
+            if (!(a instanceof Int.IntRange))
+                return Null;
+            else {
+                Term aMinB = ((Int.IntRange) a).except(b);
+                if (a.equals(aMinB))
+                    return Null; //
+            }
+        }
 
 //        //quick test: intersect the mask: if nothing in common, then it's entirely the first term
 //        if ((a.structure() & b.structure()) == 0) {
