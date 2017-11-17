@@ -599,29 +599,23 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
         if (a.equals(b)) return 0;
         int diff;
-//        if ((diff = Integer.compare(a.volume(), b.volume())) != 0)
-//            return diff;
 
         int s;
         if ((diff = Integer.compare((s = a.subs()), b.subs())) != 0)
             return diff;
 
-//        if ((diff = (a.hashCode() - b.hashCode())) != 0)
-//            return diff;
-
-//        if ((diff = Integer.compare(a.structure(), b.structure())) != 0)
-//            return diff;
-
         //this inequalVariable stuff is so that the displayed order of variables is in increasing number.  HACK
-        int inequalVariable = -1; //only need to compare the first non-equal variable term
+        Term inequalVariableX = null, inequalVariableY = null;
 
         for (int i = 0; i < s; i++) {
             Term x = a.sub(i);
             Term y = b.sub(i);
             if (x instanceof Variable && y instanceof Variable) {
-                if (inequalVariable == -1 && !x.equals(y))
-                    inequalVariable = i; //test below; allow differing non-variable terms to determine sort order first
-
+                if (inequalVariableX == null && !x.equals(y)) {
+                    //test after; allow differing non-variable terms to determine sort order first
+                    inequalVariableX = x;
+                    inequalVariableY = y;
+                }
             } else {
                 int d = x.compareTo(y);
                 if (d != 0) {
@@ -631,12 +625,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
 
         //2nd-stage:
-        if (inequalVariable != -1) {
-            return a.sub(inequalVariable).compareTo(b.sub(inequalVariable));
+        if (inequalVariableX != null) {
+            return inequalVariableX.compareTo(inequalVariableY);
+        } else {
+            return 0;
         }
-
-
-        return 0;
     }
 
 

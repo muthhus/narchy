@@ -1,7 +1,6 @@
 package nars.term.atom;
 
 import com.google.common.collect.*;
-import com.google.common.io.ByteArrayDataOutput;
 import jcog.TODO;
 import jcog.Util;
 import jcog.math.Interval;
@@ -31,6 +30,8 @@ import static nars.Op.Null;
 public class Int implements Intlike {
 
 
+    private final byte[] bytesCached;
+
     public static Int the(int i) {
         if (i >= 0 && i < Param.MAX_CACHED_INTS) {
             return digits[i];
@@ -59,18 +60,21 @@ public class Int implements Intlike {
 
 
     Int(int i) {
-        this.id = i;
-    }
 
+        this.id = i;
+
+        byte[] b = new byte[6];
+        b[0] = INT.id;
+        b[1] = 0; //subtype
+        Util.int2Bytes(id, b, 2);
+        this.bytesCached = b;
+    }
 
     @Override
-    public void append(ByteArrayDataOutput out) {
-
-        out.writeByte(INT.id);
-        out.writeByte(0); //subtype
-        out.writeInt(id);
-
+    public byte[] toBytes() {
+        return bytesCached;
     }
+
 
     @Override
     public final Term eval(TermContext context) {
@@ -120,7 +124,6 @@ public class Int implements Intlike {
     }
 
 
-
 //    @Override
 //    public boolean unify(Term y,  Unify subst) {
 //        if (Intlike.super.unify(y, subst))
@@ -149,6 +152,7 @@ public class Int implements Intlike {
 
         public final int min, max;
         private final int hash;
+        private final byte[] bytesCached;
 
         /**
          * from, to - inclusive interval
@@ -158,8 +162,19 @@ public class Int implements Intlike {
             this.min = min;
             this.max = max;
             this.hash = Util.hashCombine(INT_RANGE, min, max);
+
+            byte[] b = new byte[10];
+            b[0] = INT.id;
+            b[1] = 0; //subtype
+            Util.int2Bytes(min, b, 2);
+            Util.int2Bytes(min, b, 6);
+            this.bytesCached = b;
         }
 
+        @Override
+        public byte[] toBytes() {
+            return bytesCached;
+        }
 //        @Override
 //        public boolean unify(Term y, Unify subst) {
 //            if (Intlike.super.unify(y, subst)) return true;
@@ -187,16 +202,18 @@ public class Int implements Intlike {
         public boolean connects(IntRange y) {
             return Interval.intersectLength(min, max, y.min, y.max) >= 0;
         }
+
         public boolean contains(IntRange y) {
             return (y.min >= min) && (y.max <= max);
         }
+
         public boolean contains(Int y) {
             int yy = y.id;
             return (yy >= min) && (yy <= max);
         }
 
         @Override
-        public  String toString() {
+        public String toString() {
             return min + ".." + max;
         }
 
@@ -210,14 +227,6 @@ public class Int implements Intlike {
             return 1;
         }
 
-        @Override
-        public void append(ByteArrayDataOutput out) {
-
-            out.writeByte(INT.id);
-            out.writeByte(1); //subtype
-            out.writeInt(min);
-            out.writeInt(max);
-        }
 
         @Override
         public boolean equals(Object o) {
@@ -234,7 +243,9 @@ public class Int implements Intlike {
             return hash;
         }
 
-        public long hash64() { return (((long)max) << 32) | min; }
+        public long hash64() {
+            return (((long) max) << 32) | min;
+        }
 
         @Override
         public int opX() {
@@ -255,7 +266,7 @@ public class Int implements Intlike {
                     throw new TODO();
                 }
             } else if (b instanceof Int) {
-                Int bb = (Int)b;
+                Int bb = (Int) b;
                 if (contains(bb)) {
                     throw new TODO();
                 }
@@ -272,7 +283,7 @@ public class Int implements Intlike {
                 if (connects(bb))
                     return Int.range(range().intersection(bb.range()));
             } else if (b instanceof Int) {
-                if (intersects((Int)b))
+                if (intersects((Int) b))
                     return b;
             }
 
@@ -449,7 +460,7 @@ public class Int implements Intlike {
         }
     }
 
-    private static List<Intlike> features( List<Term> nnnt) {
+    private static List<Intlike> features(List<Term> nnnt) {
 
         RangeSet<Integer> intIntervals = ranges(nnnt);
 
@@ -478,22 +489,23 @@ public class Int implements Intlike {
         return ll;
     }
 
-    
-    public static RangeSet<Integer> ranges( List<Term> term) {
+
+    public static RangeSet<Integer> ranges(List<Term> term) {
         TreeRangeSet<Integer> r = TreeRangeSet.create();
         for (Term x : term) {
             if (x instanceof Intlike) {
-                r.add(((Intlike)x).range());
+                r.add(((Intlike) x).range());
             }
         }
         return r;
     }
+
     /**
      * unroll IntInterval's
      */
-    public static Iterator<Term> unroll( Term cc) {
+    public static Iterator<Term> unroll(Term cc) {
         //assert(!c.hasAny(Op.INT));
-            //return Iterators.singletonIterator(c); //no IntInterval's early exit
+        //return Iterators.singletonIterator(c); //no IntInterval's early exit
 
 
         Map<ByteList, IntRange> intervals = new HashMap();
@@ -536,7 +548,7 @@ public class Int implements Intlike {
                 for (int i = min1; i <= max1; i++) {
                     for (int j = min2; j <= max2; j++) {
                         Term c1 = cc.transform(e1.getKey(), $.the(i));
-                        Term c2 = c1.transform( e2.getKey(), $.the(j));
+                        Term c2 = c1.transform(e2.getKey(), $.the(j));
                         if (!(c2 instanceof Compound))
                             //throw new RuntimeException("how not transformed to compound");
                             continue;
@@ -562,11 +574,11 @@ public class Int implements Intlike {
         public RotatedInt(int min /* inclusive */, int max /* exclusive */) {
             this.min = min;
             this.max = max;
-            this.i = Int.the((min + max)/2);
+            this.i = Int.the((min + max) / 2);
         }
 
         @Override
-        public  Term term() {
+        public Term term() {
             Term cur = i;
             int next = this.i.id + 1;
             if (next >= max)

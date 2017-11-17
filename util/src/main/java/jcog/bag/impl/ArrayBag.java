@@ -5,6 +5,7 @@ import jcog.bag.Bag;
 import jcog.list.FasterList;
 import jcog.list.table.SortedListTable;
 import jcog.math.AtomicFloat;
+import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
@@ -125,7 +126,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                 return null;
             trash = null;
         } else {
-            s = update(toAdd != null, s, trash = new FasterList(1), update, commit || (s == capacity));
+            s = update(toAdd != null, s, trash = new FasterList(1), update,
+                    commit || (s == capacity) && top() instanceof PLinkUntilDeleted);
         }
 
 

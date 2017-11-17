@@ -932,11 +932,11 @@ public class TemporalTermTest {
         Term y = $("((--,(vy &&+84 happy))&&(happy&|vy))");
         assertEquals(
                 //"(&|,(--,(vy &&+84 happy)),happy,vy)",
-                "((--,(vy &&+84 happy))&&(happy&|vy))",
+                "((--,(vy &&+84 happy))&&(vy&|happy))",
                 y.toString());
         assertEquals(
                 //"(&&,(--,(happy &&+- vy)),happy,vy)",
-                "((--,(happy &&+- vy)) &&+- (happy &&+- vy))",
+                "((--,(vy &&+- happy)) &&+- (vy &&+- happy))",
                 y.conceptual().toString());
 
     }

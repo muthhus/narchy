@@ -42,26 +42,17 @@ public abstract class AtomicConst implements Atomic {
     }
 
     @Override
-    public boolean equals(Object u) {
-        if (this == u) return true;
-
-        if (u instanceof AtomicConst) {
-            AtomicConst c = (AtomicConst) u;
-            return hash == c.hash && Arrays.equals(bytesCached, c.bytesCached);
-        } else if (u instanceof Atomic) {
-            return Atomic.equals(this, (Atomic)u);
-        }
-        return false;
+    public final byte[] toBytes() {
+        return bytesCached;
     }
 
     @Override
-    public void append(ByteArrayDataOutput out) {
-//        out.writeByte(op().id);
-//        byte[] b = bytesCached;
-//        out.writeShort(b.length);
-//        out.write(b);
-        out.write(bytesCached);
+    public boolean equals(Object u) {
+        return (this == u) ||
+               ((u instanceof Atomic) && Atomic.equals(this, (Atomic)u));
     }
+
+
 
     @Override
     public int complexity() {

@@ -1,5 +1,6 @@
 package nars.term.atom;
 
+import com.google.common.io.ByteArrayDataOutput;
 import jcog.Texts;
 import nars.$;
 import nars.Narsese;
@@ -11,12 +12,14 @@ import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.lang.Integer.MIN_VALUE;
+import static nars.Op.INT;
 
 
 /**
@@ -164,6 +167,14 @@ public interface Atomic extends Term {
     @Override
     String toString();
 
+    byte[] toBytes();
+
+    @Override
+    default void append(ByteArrayDataOutput out) {
+        out.write(toBytes());
+    }
+
+
     @Override
     default boolean recurseTerms(BiPredicate<Term, Term> whileTrue, Term parent) {
         return whileTrue.test(this, parent);
@@ -276,11 +287,11 @@ public interface Atomic extends Term {
     }
 
 
-    static boolean equals(AtomicConst x, Atomic y) {
+    static boolean equals(Atomic x, Atomic y) {
         if (x.hashCode() != y.hashCode())
             return false;
 
-        return x.opX() == y.opX() && x.toString().equals(y.toString());
+        return Arrays.equals(x.toBytes(), y.toBytes());
     }
     
 }

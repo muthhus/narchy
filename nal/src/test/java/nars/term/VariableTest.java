@@ -100,10 +100,10 @@ public class VariableTest {
         assertEquals(l2.compareTo(k2), -k2.compareTo(l2));
 
         //HERE IS THE EXCEPTION: non-variable terms need to be compared first, because normalization implicitly involves the subservience of variables to non-variables
-        assertEquals(-1, k1.compareTo(l2));
-        assertEquals(-1, k2.compareTo(l1));
-        assertEquals(+1, l2.compareTo(k1));
-        assertEquals(+1, l1.compareTo(k2));
+        assertEquals(+1, k1.compareTo(l2));
+        assertEquals(+1, k2.compareTo(l1));
+        assertEquals(-1, l2.compareTo(k1));
+        assertEquals(-1, l1.compareTo(k2));
 
 
         testVariableSorting("(($1-->key)&&($2-->lock))", "(($1-->lock)&&($2-->key))");

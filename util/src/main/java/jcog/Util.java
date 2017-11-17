@@ -1902,6 +1902,20 @@ public enum Util {
         }
     }
 
+    public static int compare(byte[] a, byte[] b) {
+        if (a == b) return 0;
+        int al = a.length;
+        int l = Integer.compare(al, b.length);
+        if (l!=0)
+            return l;
+        for (int i = 0; i < al; i++) {
+            int d = a[i] - b[i];
+            if (d!=0)
+                return d;
+        }
+        return 0;
+    }
+
 
 //    public static <T>  Collector<T, ?, List<T>> toListOrNullIfEmpty() {
 //        return new Collectors.CollectorImpl<>((Supplier<List<T>>) ArrayList::new, List::add,

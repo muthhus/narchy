@@ -394,10 +394,8 @@ public class IO {
     }
 
     public static byte[] termToBytes(Term t) {
-        if (t instanceof Atom) {
-            return ((AtomicConst)t).bytesCached;
-        } else if (t instanceof AbstractVariable) {
-            return ((AbstractVariable)t).bytes();
+        if (t instanceof Atomic) {
+            return ((Atomic) t).toBytes();
         }
 
         //bb = ArrayPool.bytes().

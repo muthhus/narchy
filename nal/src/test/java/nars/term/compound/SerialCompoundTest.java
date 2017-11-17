@@ -25,7 +25,7 @@ public class SerialCompoundTest {
 
     }
 
-    public static void assertEqual(String x) throws Narsese.NarseseException {
+    static void assertEqual(String x) throws Narsese.NarseseException {
         assertEqual($(x));
     }
 

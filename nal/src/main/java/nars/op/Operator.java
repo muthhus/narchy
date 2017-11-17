@@ -55,6 +55,11 @@ public class Operator extends BaseConcept implements PermanentConcept, Atomic {
         return Atom.AtomString;
     }
 
+    @Override
+    public byte[] toBytes() {
+        return ((Atom)term).toBytes();
+    }
+
     /**
      * returns the arguments of an operation (task or term)
      */

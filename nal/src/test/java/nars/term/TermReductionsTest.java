@@ -1174,7 +1174,7 @@ public class TermReductionsTest extends NarseseTest {
 
         assertEquals("((ball_right) &&+270 (--,(ball_left)))", c1.toString());
         assertEquals(
-                "(((ball_left)&|(ball_right)) &&+270 (--,(ball_left)))", //ball_right subsumed by the sequence
+                "(((ball_right)&|(ball_left)) &&+270 (--,(ball_left)))", //ball_right subsumed by the sequence
 
                 parallel($("(ball_left)"), $("(ball_right)"), c1)
                         .toString());
@@ -1313,7 +1313,7 @@ public class TermReductionsTest extends NarseseTest {
 
         @NotNull Term x = $("((hear(what)&&(hear(is)&&(hear(is)&&(hear(what)&&(hear(is)&&(hear(is)&&(hear(what)&&(hear(is)&&(hear(is)&&(hear(is)&&hear(what))))))))))) ==>+153 hear(is)).");
         System.out.println(x);
-        assertEquals("((hear(is)&&hear(what)) ==>+153 hear(is))", x.toString());
+        assertEquals("((hear(what)&&hear(is)) ==>+153 hear(is))", x.toString());
 
     }
 
@@ -1365,7 +1365,7 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testConjImplReduction0() throws Narsese.NarseseException {
         assertEquals(
-                "((inside(bob,office)&&inside(john,playground))==>inside(bob,kitchen))",
+                "((inside(john,playground)&&inside(bob,office))==>inside(bob,kitchen))",
                 $("(inside(bob,office) && (inside(john,playground)==>inside(bob,kitchen)))").toString()
         );
     }
@@ -1429,7 +1429,7 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testConjImplReduction1() throws Narsese.NarseseException {
         assertEquals(
-                "((inside(bob,office)&|inside(john,playground))==>inside(bob,kitchen))",
+                "((inside(john,playground)&|inside(bob,office))==>inside(bob,kitchen))",
                 $("(inside(bob,office)&|(inside(john,playground)==>inside(bob,kitchen)))").toString()
         );
     }

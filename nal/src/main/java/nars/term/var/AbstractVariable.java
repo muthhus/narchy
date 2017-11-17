@@ -47,25 +47,22 @@ public abstract class AbstractVariable implements Variable {
         assert(Op.VAR_PATTERN.id - DEP_ORD == 3);
     }
 
-    protected AbstractVariable(/*@NotNull*/ Op type, int id) {
+    private final byte[] bytesCached;
+
+    protected AbstractVariable(/*@NotNull*/ Op type, int num) {
 
 
-        this.id = id << 2 | (type.id-DEP_ORD);
-
-    }
-
-
-
-    @Override
-    public void append(ByteArrayDataOutput out) {
-        out.writeByte(op().id);
-        out.writeInt(id());
-    }
-    public byte[] bytes() {
+        int id = num << 2 | (type.id-DEP_ORD);
+        this.id = id;
         byte[] b = new byte[5];
-        b[0] = op().id;
-        Util.int2Bytes(id(), b, 1);
-        return b;
+        b[0] = type.id;
+        Util.int2Bytes(id, b, 1);
+        this.bytesCached = b;
+    }
+
+
+    public final byte[] toBytes() {
+        return bytesCached;
     }
 
     @Override
@@ -79,14 +76,12 @@ public abstract class AbstractVariable implements Variable {
     public final boolean equals(Object obj) {
         return obj == this ||
                 (obj instanceof AbstractVariable
-                        && ((AbstractVariable) obj).id == id); //hash first, it is more likely to differ
-        //((obj instanceof Variable) && ((Variable)obj).hash == hash);
+                        && ((AbstractVariable) obj).id == id);
     }
 
     static boolean commonalizableVariable(Term x) {
         return x instanceof VarDep || x instanceof VarIndep;
     }
-
 
     @Override
     public final boolean unify(Term y, Unify subst) {

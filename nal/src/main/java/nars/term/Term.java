@@ -22,6 +22,7 @@ package nars.term;
 
 
 import com.google.common.io.ByteArrayDataOutput;
+import jcog.Util;
 import nars.$;
 import nars.IO;
 import nars.Op;
@@ -29,7 +30,6 @@ import nars.Param;
 import nars.index.term.TermContext;
 import nars.op.mental.AliasConcept;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicConst;
 import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
@@ -59,6 +59,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiPredicate;
@@ -132,16 +133,16 @@ public interface Term extends Termed, Comparable<Termed> {
     int hashCode();
 
 
-
     /**
      * BiPredicate param: child,parent
      */
     boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent);
 
-    /** parent compounds must pass the descent filter before ts subterms are visited;
-     *      but if descent filter isnt passed, it will continue to the next sibling:
-     *  whileTrue must remain true after vistiing each subterm otherwise the entire
-     *      iteration terminates
+    /**
+     * parent compounds must pass the descent filter before ts subterms are visited;
+     * but if descent filter isnt passed, it will continue to the next sibling:
+     * whileTrue must remain true after vistiing each subterm otherwise the entire
+     * iteration terminates
      */
     default boolean recurseTerms(Predicate<Term> descendFilter, Predicate<Term> whileTrue, Term parent) {
         return whileTrue.test(this);
@@ -399,9 +400,6 @@ public interface Term extends Termed, Comparable<Termed> {
 //
 
 
-
-
-
     void append(Appendable w) throws IOException;
 
 //    default public void append(Writer w, boolean pretty) throws IOException {
@@ -472,8 +470,6 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
 
-
-
 //    default boolean equalsIgnoringVariables(@NotNull Term other, boolean requireSameTime) {
 //        return (this instanceof Variable) || (other instanceof Variable) || equals(other);
 //    }
@@ -534,6 +530,7 @@ public interface Term extends Termed, Comparable<Termed> {
     @Override
     default int compareTo(/*@NotNull*/ Termed yy) {
         if (this == yy) return 0;
+
         Term y = yy.term();
         if (this.equals(y)) return 0;
 
@@ -549,15 +546,16 @@ public interface Term extends Termed, Comparable<Termed> {
         if (d != 0)
             return d;
 
+
         if (this instanceof Atomic) {
 
             //assert (y instanceof Atomic) : "because volume should have been determined to be equal";
+        int h = Integer.compare(hashCode(), y.hashCode());
+        if (h != 0)
+            return h;
 
-            if ((this instanceof AbstractVariable) /*&& (y instanceof AbstractVariable)*/) {
-                //hashcode serves as the ordering too
-                return Integer.compare(hashCode(), y.hashCode());
-            } else if (this instanceof Int) {
-                return Integer.compare(((Int) this).id, ((Int) y).id);
+            if (this instanceof AbstractVariable || this instanceof Int) {
+                return 0; //hashcode was all that needed compared
             } else if (this instanceof Int.IntRange) {
                 return Long.compareUnsigned(((Int.IntRange) this).hash64(), ((Int.IntRange) y).hash64());
             } else if (this instanceof Atomic) {
@@ -570,7 +568,11 @@ public interface Term extends Termed, Comparable<Termed> {
 
                 //if the op is the same, it is required to be a subclass of Atomic
                 //which should have an ordering determined by its toString()
-                return this.toString().compareTo((/*(Atomic)*/y).toString());
+
+                return Util.compare(
+                        ((Atomic)this).toBytes(),
+                        ((Atomic)y).toBytes()
+                );
                 //return Hack.compare(toString(), y.toString());
             } else {
                 throw new UnsupportedOperationException("unimplemented comparison: " + this + ' ' + y);
@@ -579,12 +581,12 @@ public interface Term extends Termed, Comparable<Termed> {
 
         } else {
 
-
             int c = TermContainer.compare(subterms(), y.subterms());
-            if (c != 0)
+            if (c != 0) {
                 return c;
-
-            return Integer.compare(dt(), y.dt());
+            } else {
+                return Integer.compare(dt(), y.dt());
+            }
 
         }
 
@@ -628,7 +630,7 @@ public interface Term extends Termed, Comparable<Termed> {
             int dt = this.dt();
             if (dt != DTERNAL) {
                 return subterms().sum(Term::eventCount);
-                        //intify((sum, x) -> sum + x.eventCount(), 0);
+                //intify((sum, x) -> sum + x.eventCount(), 0);
             }
         }
 
@@ -777,6 +779,7 @@ public interface Term extends Termed, Comparable<Termed> {
     default Term root() {
         return this;
     }
+
     default boolean equalsRoot(Term x) {
         return equals(x);
     }
@@ -819,7 +822,6 @@ public interface Term extends Termed, Comparable<Termed> {
 
     @Nullable
     Term temporalize(Retemporalize r);
-
 
 
 }
