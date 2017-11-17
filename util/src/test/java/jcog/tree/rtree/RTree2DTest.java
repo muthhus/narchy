@@ -82,7 +82,7 @@ public class RTree2DTest {
             final RectDouble2D searchRect = new RectDouble2D(5, 5, 10, 10);
             List<RectDouble2D> results = new ArrayList();
 
-            rTree.intersecting(searchRect, results::add);
+            rTree.whileEachIntersecting(searchRect, results::add);
             int resultCount = 0;
             for(int i = 0; i < results.size(); i++) {
                 if(results.get(i) != null) {

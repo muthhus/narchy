@@ -415,7 +415,7 @@ public interface NAct {
             Random rng = n.random();
 
             float confMin = n.confMin.floatValue();
-            float eviMin = c2w(confMin);
+            float eviMin = c2w(confMin*2);
             float feedbackConf =
                     //confMin * 4;
                     n.confDefault(GOAL);
@@ -462,37 +462,25 @@ public interface NAct {
                     Nb = $.t(yn, feedbackConf);
 
                     float eviMax = max(eviMin, max(e[0], e[1]));
-
-                    if (curious) {
-                        e[0] = e[1] = 0; //reset to get full evidence override
-                    }
-                    float g0 = eviMax - e[0];
-                    Pg = g0 >= eviMin ? new PreciseTruth(yp, g0, false) : null;
-                    float g1 = eviMax - e[1];
-                    Ng = g1 >= eviMin ? new PreciseTruth(yn, g1, false) : null;
+                    Pg = curious || e[0] == 0 ? new PreciseTruth(yp, eviMax, false) : null;
+                    Ng = curious || e[1] == 0 ? new PreciseTruth(yn, eviMax, false) : null;
+//
+//                    if (curious) {
+//                        e[0] = e[1] = 0; //reset to get full evidence override
+//                    }
+//                    float g0 = eviMax - e[0];
+//                    Pg = g0 >= eviMin ? new PreciseTruth(yp, g0, false) : null;
+//                    float g1 = eviMax - e[1];
+//                    Ng = g1 >= eviMin ? new PreciseTruth(yn, g1, false) : null;
                 } else {
                     Pb = Nb = Pg = Ng = null;
                 }
 
 
-                PreciseTruth pb = Pb;
-                PreciseTruth pg = Pg;
-                        //(curious || e[0] < Pg.evi() /* null input goal */) ? Pg :
-                                //$.t(y >= 0 ? yf :  1-yf,
-//                                    //Util.lerp(Math.abs(y), confMin, confBase)
-//                                    confBase
-//                                    ) : null; //only feedback artificial goal if input goal was null
-                        //null;
-                CC[0].feedback(pb, pg, n);
-                PreciseTruth nb = Nb;
-                PreciseTruth ng = Ng;
-                        //(curious || e[1] < Ng.evi() /* null input goal */) ? Ng :
-//                                $.t(y >= 0 ? 1-yf : yf,
-//                                    //Util.lerp(Math.abs(y), confMin, confBase)
-//                                    confBase
-//                                    ) : null; //only feedback artificial goal if input goal was null
-                        //null;
-                CC[1].feedback(nb, ng, n);
+
+                CC[0].feedback(Pb, Pg, n);
+
+                CC[1].feedback(Nb, Ng, n);
 
 
             }

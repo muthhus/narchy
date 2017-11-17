@@ -23,7 +23,6 @@ package jcog.tree.rtree;
 
 import jcog.list.FasterList;
 import jcog.tree.rtree.util.Stats;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -96,7 +95,6 @@ public interface Space<T> extends Nodelike<T> {
 
     Spatialization<T> model();
 
-    boolean remove(final T x, HyperRegion xBounds);
 
     /**
      * Update entry in tree
@@ -123,10 +121,10 @@ public interface Space<T> extends Nodelike<T> {
 //    }
 
     /** continues finding intersecting regions until the predicate returns false */
-    void intersecting(HyperRegion rect, Predicate<T> t);
+    void whileEachIntersecting(HyperRegion rect, Predicate<T> t);
 
     /** continues finding containing regions until the predicate returns false */
-    void containing(HyperRegion rect, Predicate<T> t);
+    void whileEachContaining(HyperRegion rect, Predicate<T> t);
 
     /**
      * Search for entries intersecting given bounding rect
@@ -166,9 +164,7 @@ public interface Space<T> extends Nodelike<T> {
      * @param x Data entry to be removed
      * @return whether the item was added, or false if it wasn't (ex: duplicate or some other prohibition)
      */
-    default boolean remove(/*@NotNull*/ final T x) {
-        return remove(x, x instanceof HyperRegion ? (HyperRegion)x : model().region(x));
-    }
+    boolean remove(/*@NotNull*/ final T x);
 
 
     /** removes, deferred if necessary until un-busy */
@@ -225,8 +221,6 @@ public interface Space<T> extends Nodelike<T> {
         return l;
     }
 
-    default boolean contains(T tr) {
-        return contains(tr, model());
-    }
 
+    boolean contains(T t);
 }

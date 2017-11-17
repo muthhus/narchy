@@ -30,15 +30,17 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
 
-        float fps = 20f;
+        float fps = 10f;
 
         NAgentX.runRT((n) -> {
 
             FZero a = null;
             try {
-                n.freqResolution.set(0.20f);
-                n.confResolution.set(0.05f);
+                n.freqResolution.set(0.05);
+                n.confResolution.set(0.02f);
                 a = new FZero(n);
+                a.happy.resolution(0.1f);
+
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
             }
@@ -285,17 +287,17 @@ public class FZero extends NAgentX {
 //            }
             return a;
         });
-        //eternal bias to stop
-        nar.goal(f[0].term, Tense.Eternal, 0f, 0.01f);
-        nar.goal(f[1].term, Tense.Eternal, 0f, 0.01f);
+//        //eternal bias to stop
+//        nar.goal(f[0].term, Tense.Eternal, 0f, 0.01f);
+//        nar.goal(f[1].term, Tense.Eternal, 0f, 0.01f);
 
         GoalActionAsyncConcept[] x = actionBipolar($.the("x"), (a) -> {
             fz.playerAngle += (a) * rotSpeed;
             return a;
         });
-        //eternal bias to stop
-        nar.goal(x[0].term, Tense.Eternal, 0f, 0.01f);
-        nar.goal(x[1].term, Tense.Eternal, 0f, 0.01f);
+//        //eternal bias to stop
+//        nar.goal(x[0].term, Tense.Eternal, 0f, 0.01f);
+//        nar.goal(x[1].term, Tense.Eternal, 0f, 0.01f);
     }
 
     protected boolean polarized(@NotNull Task task) {

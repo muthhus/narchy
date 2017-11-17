@@ -65,7 +65,7 @@ public class RTreeNDTest {
             final RectFloatND searchRect = new RectFloatND(new FloatND(5, 5), new FloatND(10, 10));
             List<RectFloatND> results = new ArrayList();
 
-            rTree.intersecting(searchRect, results::add);
+            rTree.whileEachIntersecting(searchRect, results::add);
             int resultCount = 0;
             for (int i = 0; i < results.size(); i++) {
                 if (results.get(i) != null) {
@@ -223,7 +223,7 @@ public class RTreeNDTest {
             final int expectedCount = 9;
             List<RectDouble2D> results = new ArrayList(expectedCount);
 
-            rTree.intersecting(searchRect, results::add);
+            rTree.whileEachIntersecting(searchRect, results::add);
             final int resultCount = results.size();
 
 
@@ -296,7 +296,7 @@ public class RTreeNDTest {
             }
 
             final AtomicInteger visitCount = new AtomicInteger();
-            rTree.containing(searchRect, (n) -> {
+            rTree.whileEachContaining(searchRect, (n) -> {
                 visitCount.incrementAndGet();
                 return true;
             });
@@ -600,7 +600,7 @@ public class RTreeNDTest {
 
         final AtomicInteger hitCount = new AtomicInteger();
         // but 5, 2, 6, 3 must still be found!
-        rTree.containing(search, (closure) -> {
+        rTree.whileEachContaining(search, (closure) -> {
             hitCount.incrementAndGet();
             return true;
         });

@@ -84,11 +84,10 @@ public interface Node<L, V> extends Nodelike<L> {
      * Remove t from the index
      * @param l      - value to remove from index
      * @param xBounds - the bounds of t which may not necessarily need to be the same as the bounds as model might report it now; for removing a changing value
-     * @param parent - the callee which is the parent of this instance
      * @param model
      * @param removed
      */
-    Node<L, ?> remove(L l, HyperRegion xBounds, Nodelike<L> parent, Spatialization<L> model, boolean[] removed);
+    Node<L, ?> remove(L l, HyperRegion xBounds, Spatialization<L> model, boolean[] removed);
 
     /**
      * update an existing t in the index

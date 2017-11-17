@@ -108,7 +108,8 @@ public abstract class SortedArray<E> extends AbstractCollection<E> {
 
     @Override
     public void clear() {
-        this.list = (E[]) ArrayUtils.EMPTY_OBJECT_ARRAY;
+        //this.list = (E[]) ArrayUtils.EMPTY_OBJECT_ARRAY;
+        Arrays.fill(list, null);
         this.size = 0;
     }
 

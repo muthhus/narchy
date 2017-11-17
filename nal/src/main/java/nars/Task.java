@@ -37,6 +37,7 @@ import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 import static nars.truth.TruthFunctions.w2c;
+import static nars.truth.TruthFunctions.w2cSafe;
 import static org.eclipse.collections.impl.tuple.Tuples.twin;
 
 /**
@@ -737,7 +738,8 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.ma
 
     default float conf(long start, long end, long dur) {
         float cw = evi(start, end, dur);
-        return cw == cw ? w2c(cw) : Float.NaN;
+        assert(cw==cw);
+        return cw > 0 ? w2cSafe(cw) : Float.NaN;
     }
 
     default float conf(long when, long dur) {

@@ -18,6 +18,7 @@ public class TopN<E> extends SortedArray<E> implements Consumer<E> {
         this.rank = (x) -> -rank.floatValueOf(x); //descending
     }
 
+
 //    /**
 //     * resets the best values, effectively setting a the minimum entry requirement
 //     * untested

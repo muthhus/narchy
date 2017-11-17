@@ -175,19 +175,19 @@ public class NARio extends NAgentX {
         //actionBipolar($.inh($.the("x"), id), (x) -> {
         actionBipolar($.the("x"), (x) -> {
             float thresh = 0.2f;
-            float thresh2 = 0.9f;
+            float boostThresh = 0.9f;
             if (x <= -thresh) {
                 mario.scene.key(Mario.KEY_LEFT, true);
                 mario.scene.key(Mario.KEY_RIGHT, false);
-                mario.scene.key(Mario.KEY_SPEED, x <= -thresh2);
+                mario.scene.key(Mario.KEY_SPEED, x <= -boostThresh);
                 //return -1;
-                return x;
+                return x <= -boostThresh ? -1 : -boostThresh;
             } else if (x >= +thresh) {
                 mario.scene.key(Mario.KEY_RIGHT, true);
                 mario.scene.key(Mario.KEY_LEFT, false);
-                mario.scene.key(Mario.KEY_SPEED, x >= +thresh2);
+                mario.scene.key(Mario.KEY_SPEED, x >= +boostThresh);
                 //return +1;
-                return x;
+                return x >= +boostThresh ? +1 : +boostThresh;
             } else {
                 mario.scene.key(Mario.KEY_LEFT, false);
                 mario.scene.key(Mario.KEY_RIGHT, false);

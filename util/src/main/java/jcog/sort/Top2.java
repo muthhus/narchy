@@ -29,6 +29,11 @@ public class Top2<T> extends AbstractCollection<T> implements Consumer<T> {
         from.forEach(this::add);
     }
 
+    public void clear() {
+        aa = bb = Float.NEGATIVE_INFINITY;
+        a = b = null;
+    }
+
     /**
      * resets the best values, effectively setting a the minimum entry requirement
      */

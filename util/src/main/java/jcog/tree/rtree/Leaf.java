@@ -71,7 +71,7 @@ public class Leaf<T> implements Node<T, T> {
         for (int i = 0; i < s; i++) {
             T c = get(i);
             if (c == null) continue;
-            double diff = model.region(c).center(dim) - mean;
+            double diff = model.bounds(c).center(dim) - mean;
             sumDiffSq += diff * diff;
         }
         return sumDiffSq / s - 1;
@@ -81,13 +81,14 @@ public class Leaf<T> implements Node<T, T> {
     @Override
     public Node<T, ?> add(/*@NotNull*/ final T t, Nodelike<T> parent, /*@NotNull*/ Spatialization<T> model, boolean[] added) {
 
-        boolean ctm = contains(t, model);
+        final HyperRegion tb = model.bounds(t);
+        boolean ctm = size > 0 && contains(t, tb, model);
+
         if (parent != null && !ctm) {
             Node<T, ?> next;
 
             if (size < model.max) {
-                final HyperRegion tRect = model.region(t);
-                region = region != null ? region.mbr(tRect) : tRect;
+                region = region != null ? region.mbr(tb) : tb;
 
                 data[size++] = t;
 
@@ -125,12 +126,13 @@ public class Leaf<T> implements Node<T, T> {
     }
 
     @Override
-    public boolean contains(T t, Spatialization<T> model) {
-        if (size == 0 || (size > 1 && !region.contains(model.region(t))))
+    public boolean contains(T t, HyperRegion b, Spatialization<T> model) {
+
+        if (!region.contains(b))
             return false;
 
-        T[] data = this.data;
         final int s = size;
+        T[] data = this.data;
         for (int i = 0; i < s; i++) {
             T d = data[i];
             if (t == d || t.equals(d)) {
@@ -143,7 +145,7 @@ public class Leaf<T> implements Node<T, T> {
 
 
     @Override
-    public Node<T, ?> remove(final T t, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model, boolean[] removed) {
+    public Node<T, ?> remove(final T t, HyperRegion xBounds, Spatialization<T> model, boolean[] removed) {
 
 
 //        while (i < size && (data[i] != t) && (!data[i].equals(t))) {
@@ -215,7 +217,7 @@ public class Leaf<T> implements Node<T, T> {
                 data[i] = tnew;
             }
 
-            r = i == 0 ? model.region(data[0]) : r.mbr(model.region(data[i]));
+            r = i == 0 ? model.bounds(data[0]) : r.mbr(model.bounds(data[i]));
         }
 
         this.region = r;
@@ -231,7 +233,7 @@ public class Leaf<T> implements Node<T, T> {
             T[] data = this.data;
             for (int i = 0; i < s; i++) {
                 T d = data[i];
-                if (rect.intersects(model.region(d)) && !t.test(d))
+                if (d!=null && rect.intersects(model.bounds(d)) && !t.test(d))
                     return false;
             }
         }
@@ -245,7 +247,7 @@ public class Leaf<T> implements Node<T, T> {
             T[] data = this.data;
             for (int i = 0; i < s; i++) {
                 T d = data[i];
-                if (rect.contains(model.region(d)) && !t.test(d))
+                if (d!=null && rect.contains(model.bounds(d)) && !t.test(d))
                     return false;
             }
         }
@@ -306,7 +308,7 @@ public class Leaf<T> implements Node<T, T> {
      */
     public final void transfer(final Node<T, T> l1Node, final Node<T, T> l2Node, final T t, Spatialization<T> model) {
 
-        final HyperRegion tRect = model.region(t);
+        final HyperRegion tRect = model.bounds(t);
         double tCost = tRect.cost();
 
         final HyperRegion l1Region = l1Node.bounds();

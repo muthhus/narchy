@@ -1,41 +1,37 @@
 package jcog.tree.rtree;
 
-/*
- * #%L
- * Conversant RTree
- * ~~
- * Conversantmedia.com © 2016, Conversant, Inc. Conversant® is a trademark of Conversant, Inc.
- * ~~
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
+        /*
+         * #%L
+         * Conversant RTree
+         * ~~
+         * Conversantmedia.com © 2016, Conversant, Inc. Conversant® is a trademark of Conversant, Inc.
+         * ~~
+         * Licensed under the Apache License, Version 2.0 (the "License");
+         * you may not use this file except in compliance with the License.
+         * You may obtain a copy of the License at
+         *
+         *      http://www.apache.org/licenses/LICENSE-2.0
+         *
+         * Unless required by applicable law or agreed to in writing, software
+         * distributed under the License is distributed on an "AS IS" BASIS,
+         * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+         * See the License for the specific language governing permissions and
+         * limitations under the License.
+         * #L%
+         */
 
 import jcog.tree.rtree.util.Stats;
-import org.jetbrains.annotations.NotNull;
+import jcog.util.LambdaStampedLock;
 
 import java.util.Iterator;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
  * Created by jcovert on 12/30/15.
  */
-public class ConcurrentRTree<T> extends ReentrantReadWriteLock implements Space<T> {
-
-    static final boolean FAIR_LOCK = false;
+public class ConcurrentRTree<T> extends LambdaStampedLock implements Space<T> {
 
     public final RTree<T> tree;
 
@@ -48,12 +44,12 @@ public class ConcurrentRTree<T> extends ReentrantReadWriteLock implements Space<
 //            toAdd = toRemove = null;
 //        }
 
-    
+
     public ConcurrentRTree(RTree<T> tree) {
-        super(FAIR_LOCK);
+        super();
         this.tree = tree;
     }
-    
+
     @Override
     public Spatialization<T> model() {
         return tree.model();
@@ -68,12 +64,7 @@ public class ConcurrentRTree<T> extends ReentrantReadWriteLock implements Space<
      */
     @Override
     public int containedToArray(HyperRegion rect, T[] t) {
-        readLock().lock();
-        try {
-            return tree.containedToArray(rect, t);
-        } finally {
-            readLock().unlock();
-        }
+        return read(() -> tree.containedToArray(rect, t));
     }
 
     @Override
@@ -88,12 +79,7 @@ public class ConcurrentRTree<T> extends ReentrantReadWriteLock implements Space<
      */
     @Override
     public boolean add(T t) {
-        writeLock().lock();
-        try {
-            return tree.add(t);
-        } finally {
-            writeLock().unlock();
-        }
+        return write(() -> tree.add(t));
     }
 
 //    @Override
@@ -110,81 +96,50 @@ public class ConcurrentRTree<T> extends ReentrantReadWriteLock implements Space<
      * prefer this instead of add() in multithread environments, because it elides what might ordinarily involve a lock wait
      */
     @Override
-    public void addAsync(@NotNull T t) {
+    public void addAsync(T t) {
 //        if (toAdd!=null)
 //            toAdd.accept(t);
 //        else
-            add(t);
+        add(t);
     }
 
     @Override
-    public void removeAsync(@NotNull T t) {
+    public void removeAsync(T t) {
 //        if (toRemove!=null)
 //            toRemove.accept(t);
 //        else
-            remove(t);
+        remove(t);
     }
 
-    /**
-     * Blocking locked remove
-     *
-     * @param x - entry to remove
-     */
-    @Override
-    public boolean remove(T x, HyperRegion xBounds) {
-        writeLock().lock();
-        try {
-            return tree.remove(x, xBounds);
-        } finally {
-            writeLock().unlock();
-        }
-    }
+
 
     @Override
     public boolean remove(T x) {
-        writeLock().lock();
-        try {
-            return tree.remove(x);
-        } finally {
-            writeLock().unlock();
-        }
+        return write(()->tree.remove(x));
     }
 
     public void removeAll(Iterable<? extends T> t) {
-        writeLock().lock();
-        try {
-            t.forEach(this::remove);
-        } finally {
-            writeLock().unlock();
-        }
+        write(()->t.forEach(this::remove));
     }
 
 
     public void read(Consumer<RTree<T>> x) {
-        readLock().lock();
-        try {
-            x.accept(tree);
-        } finally {
-            readLock().unlock();
-        }
+        read(()->x.accept(tree));
     }
 
-    public <Y> Y read(Function<Space<T>,Y> x) {
-        readLock().lock();
-        try {
-            return x.apply(tree);
-        } finally {
-            readLock().unlock();
-        }
+    /** doesnt lock, use at your own risk */
+    public void readDirect(Consumer<RTree<T>> x) {
+        x.accept(tree);
     }
 
     public void write(Consumer<Space<T>> x) {
-        writeLock().lock();
-        try {
+        write(()->x.accept(tree));
+    }
+
+    public void readOptimistic(Consumer<Space<T>> x) {
+        readOptimistic(()->{
             x.accept(tree);
-        } finally {
-            writeLock().unlock();
-        }
+        });
     }
 
     @Override
@@ -192,16 +147,6 @@ public class ConcurrentRTree<T> extends ReentrantReadWriteLock implements Space<
         return tree.bounds(task);
     }
 
-    //    @Override
-//    public void change(T x, T y) {
-//        writeLock().lock();
-//        try {
-//            rTree.remove(x);
-//            rTree.add(y);
-//        } finally {
-//            writeLock().unlock();
-//        }
-//    }
 
     /**
      * Blocking locked update
@@ -211,151 +156,47 @@ public class ConcurrentRTree<T> extends ReentrantReadWriteLock implements Space<
      */
     @Override
     public void replace(T told, T tnew) {
-        writeLock().lock();
-        try {
-            tree.replace(told, tnew);
-        } finally {
-            writeLock().unlock();
-        }
-    }
-
-    /**
-     * Non-blocking locked search
-     *
-     * @param rect - HyperRect to search
-     * @param t    - array to hold results
-     * @return number of entries found or -1 if lock was not acquired
-     */
-    public int trySearch(HyperRegion rect, T[] t) {
-        if (readLock().tryLock()) {
-            try {
-                return tree.containedToArray(rect, t);
-            } finally {
-                readLock().unlock();
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Non-blocking locked add
-     *
-     * @param t - entry to add
-     * @return true if lock was acquired, false otherwise
-     */
-    public boolean tryAdd(T t) {
-        if (writeLock().tryLock()) {
-            try {
-                tree.add(t);
-            } finally {
-                writeLock().unlock();
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Non-blocking locked remove
-     *
-     * @param t - entry to remove
-     * @return true if lock was acquired, false otherwise
-     */
-    public boolean tryRemove(T t) {
-        if (writeLock().tryLock()) {
-            try {
-                tree.remove(t);
-            } finally {
-                writeLock().unlock();
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Non-blocking locked update
-     *
-     * @param told - entry to update
-     * @param tnew - entry with new values
-     * @return true if lock was acquired, false otherwise
-     */
-    public boolean tryUpdate(T told, T tnew) {
-        if (writeLock().tryLock()) {
-            try {
-                tree.replace(told, tnew);
-            } finally {
-                writeLock().unlock();
-            }
-            return true;
-        }
-        return false;
+        write(()->tree.replace(told, tnew));
     }
 
     @Override
     public int size() {
-        return tree.size();
+        return readOptimistic(tree::size);
     }
 
     @Override
     public void clear() {
-        writeLock().lock();
-        try {
-            tree.clear();
-        } finally {
-            writeLock().unlock();
-        }
+        write(tree::clear);
     }
 
     @Override
     public void forEach(Consumer<? super T> consumer) {
-        readLock().lock();
-        try {
-            tree.forEach(consumer);
-        } finally {
-            readLock().unlock();
-        }
+        read(()->tree.forEach(consumer));
     }
 
     @Override
-    public void containing(HyperRegion rect, Predicate<T> t) {
-        readLock().lock();
-        try {
-            tree.containing(rect, t);
-        } finally {
-            readLock().unlock();
-        }
+    public void whileEachContaining(HyperRegion rect, Predicate<T> t) {
+        read(()->tree.whileEachContaining(rect, t));
     }
 
     @Override
-    public void intersecting(HyperRegion rect, Predicate<T> t) {
-        readLock().lock();
-        try {
-            tree.intersecting(rect, t);
-        } finally {
-            readLock().unlock();
-        }
+    public void whileEachIntersecting(HyperRegion rect, Predicate<T> t) {
+        read(()->tree.whileEachIntersecting(rect, t));
     }
 
-
-    @Override
-    public Stream<T> stream() {
+    /** warning: not locked */
+    @Override public Stream<T> stream() {
         return root().stream();
     }
 
-    @Override
-    public Iterator<T> iterator() {
+    /** warning: not locked */
+    @Override public Iterator<T> iterator() {
         return stream().iterator();
     }
 
     @Override
     public Stats stats() {
-        readLock().lock();
-        try {
-            return tree.stats();
-        } finally {
-            readLock().unlock();
-        }
+        return read(tree::stats);
     }
 
     @Override
@@ -364,8 +205,15 @@ public class ConcurrentRTree<T> extends ReentrantReadWriteLock implements Space<
     }
 
     @Override
-    public boolean contains(T t, Spatialization<T> model) {
-        return tree.contains(t, model);
+    public boolean contains(T t, HyperRegion b, Spatialization<T> model) {
+        return read(()->tree.contains(t, b, model));
     }
+
+    @Override
+    public boolean contains(T t) {
+        return read(()->tree.contains(t));
+    }
+
+
 
 }

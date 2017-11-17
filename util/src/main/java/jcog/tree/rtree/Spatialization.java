@@ -4,7 +4,6 @@ import jcog.tree.rtree.split.AxialSplitLeaf;
 import jcog.tree.rtree.split.LinearSplitLeaf;
 import jcog.tree.rtree.split.QuadraticSplitLeaf;
 
-import java.util.Arrays;
 import java.util.function.Function;
 
 public class Spatialization<T> {
@@ -25,7 +24,7 @@ public class Spatialization<T> {
         this.split = split;
     }
 
-    public HyperRegion region(/*@NotNull*/ T t) {
+    public HyperRegion bounds(/*@NotNull*/ T t) {
         return region.apply(t);
     }
 
@@ -45,7 +44,7 @@ public class Spatialization<T> {
     }
 
     public double perimeter(T c) {
-        return region(c).perimeter();
+        return bounds(c).perimeter();
     }
 
     /** called when add encounters an equivalent (but different) instance */
@@ -65,7 +64,7 @@ public class Spatialization<T> {
 
         for (int j = 0; j < leaf.size; j++) {
             T jd = leaf.data[j];
-            HyperRegion jr = region(jd);
+            HyperRegion jr = bounds(jd);
 
             for (int i = from; i < to; i++) {
                 HyperRegion si = sortedSrc[i];

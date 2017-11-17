@@ -67,8 +67,8 @@ public final class CounterNode<T> implements Node<T, Object> {
     }
 
     @Override
-    public Node<T, ?> remove(T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model, boolean[] removed) {
-        return this.node.remove(x, xBounds, this, model, removed);
+    public Node<T, ?> remove(T x, HyperRegion xBounds, Spatialization<T> model, boolean[] removed) {
+        return this.node.remove(x, xBounds, model, removed);
     }
 
     @Override
@@ -130,9 +130,8 @@ public final class CounterNode<T> implements Node<T, Object> {
 //        return node.perimeter(model);
 //    }
 
-
     @Override
-    public boolean contains(T t, Spatialization<T> model) {
-        return node.contains(t, model);
+    public boolean contains(T t, HyperRegion b, Spatialization<T> model) {
+        return node.contains(t, b, model);
     }
 }

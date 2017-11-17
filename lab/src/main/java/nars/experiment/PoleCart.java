@@ -140,9 +140,9 @@ public class PoleCart extends NAgentX {
                     action = a;
                 return a;
             });
-            //eternal bias to stop
-            nar.goal(f[0].term, Tense.Eternal, 0f, 0.01f);
-            nar.goal(f[1].term, Tense.Eternal, 0f, 0.01f);
+//            //eternal bias to stop
+//            nar.goal(f[0].term, Tense.Eternal, 0f, 0.01f);
+//            nar.goal(f[1].term, Tense.Eternal, 0f, 0.01f);
         }
 
 //        actionUnipolar($.p("left"), (a) -> {

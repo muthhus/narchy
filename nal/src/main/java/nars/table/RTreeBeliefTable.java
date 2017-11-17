@@ -49,9 +49,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * max allowed truths to be truthpolated in one test
      */
-    static final int TRUTHPOLATION_LIMIT = 8;
+    static final int TRUTHPOLATION_LIMIT = 3;
 
-    public static final float PRESENT_AND_FUTURE_BOOST = 4f;
+    public static final float PRESENT_AND_FUTURE_BOOST = 2f;
 
     static final int SCAN_DIVISIONS = 5;
 
@@ -252,7 +252,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      */
     private <X extends Collection> X scan(X u, long _start, long _end, int maxAttempts, BiPredicate<X, TimeRange> continueScanning) {
 
-        ((ConcurrentRTree<TaskRegion>) tree).read((RTree<TaskRegion> tree) -> {
+
+        ((ConcurrentRTree<TaskRegion>) tree).readOptimistic((Space<TaskRegion> tree) -> {
+
+            u.clear(); //in case of optimisticRead, if tried twice
 
             int s = tree.size();
             if (s == 0)
@@ -302,10 +305,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
                 if (!leftComplete)
-                    tree.intersecting(r.set(leftStart, leftMid), update);
+                    tree.whileEachIntersecting(r.set(leftStart, leftMid), update);
 
                 if (!rightComplete && !(leftStart == rightMid && leftMid == rightEnd))
-                    tree.intersecting(r.set(rightMid, rightEnd), update);
+                    tree.whileEachIntersecting(r.set(rightMid, rightEnd), update);
 
                 if (attempts[0] >= maxTries || !continueScanning.test(u, r.set(leftStart, rightEnd)))
                     break;
@@ -402,17 +405,19 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         if (size <= cap)
             return true;
 
-        int dur = 1 + (int) (tableDur());
+        //int dur = 1 + (int) (tableDur());
 
         long now = nar.time();
+        int perceptDur = nar.dur();
         FloatFunction<Task> taskStrength =
                 new CachedFloatFunction(
                         //taskStrength(now-dur/2, now+dur/2, dur);
-                        taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, dur)
+                        taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, perceptDur)
                 );
 
         for (int e = 0; treeRW.size() > cap /*&& e < excess*/; e++) {
-            if (!compress(treeRW, e == 0 ? inputRegion : null /** only limit by inputRegion first */, taskStrength, changes, cap, nar))
+            if (!compress(treeRW, e == 0 ? inputRegion : null /** only limit by inputRegion first */, taskStrength, changes, cap,
+                    now, (long)(1+tableDur()), perceptDur, nar))
                 return false;
         }
 
@@ -426,14 +431,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * returns false if the input was rejected as too weak
      */
     /*@NotNull*/
-    private boolean compress(Space<TaskRegion> tree, @Nullable Task inputRegion, FloatFunction<Task> taskStrength, ObjectBooleanHashMap<Task> changes, int cap, NAR nar) {
+    private boolean compress(Space<TaskRegion> tree, @Nullable Task inputRegion, FloatFunction<Task> taskStrength, ObjectBooleanHashMap<Task> changes, int cap, long now, long tableDur, int perceptDur, NAR nar) {
 
         FloatFunction<TaskRegion> weakestTask = (t -> -taskStrength.floatValueOf((Task) t));
 
         float inputStrength = inputRegion != null ? taskStrength.floatValueOf(inputRegion) : Float.POSITIVE_INFINITY;
 
         FloatFunction<TaskRegion> leafRegionWeakness =
-                /*new CachedFloatFunction*/(regionWeakness(nar.time(), (long)(1+tableDur()), nar.dur()));
+                /*new CachedFloatFunction*/(regionWeakness(now, tableDur, perceptDur));
         FloatFunction<Leaf<TaskRegion>> leafWeakness =
                 L -> leafRegionWeakness.floatValueOf((TaskRegion) L.bounds());
 
@@ -720,12 +725,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     @Override
     public void whileEach(Predicate<? super Task> each) {
-        tree.intersecting(tree.root().bounds(), scanWhile(each));
+        tree.whileEachIntersecting(tree.root().bounds(), scanWhile(each));
     }
 
     @Override
     public void whileEach(long minT, long maxT, Predicate<? super Task> each) {
-        tree.intersecting(new TimeRange(minT, maxT), scanWhile(each));
+        tree.whileEachIntersecting(new TimeRange(minT, maxT), scanWhile(each));
     }
 
     @Override
@@ -767,7 +772,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
 
         @Override
-        public final HyperRegion region(TaskRegion taskRegion) {
+        public final HyperRegion bounds(TaskRegion taskRegion) {
             return taskRegion;
         }
 

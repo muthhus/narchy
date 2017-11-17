@@ -105,12 +105,12 @@ public class RTree<T> implements Space<T> {
      * @param xBounds - the bounds of t which may not necessarily need to be the same as the bounds as model might report it now; for removing a changing value
      */
     @Override
-    public boolean remove(final T x, HyperRegion xBounds) {
+    public boolean remove(final T x) {
         int before = size;
         if (before == 0)
             return false;
         boolean[] removed = new boolean[1];
-        root = root.remove(x, xBounds, this, model, removed);
+        root = root.remove(x, model.bounds(x), model, removed);
         if (removed[0]) {
             size--;
             return true;
@@ -157,13 +157,13 @@ public class RTree<T> implements Space<T> {
     }
 
     @Override
-    public void intersecting(HyperRegion rect, Predicate<T> t) {
+    public void whileEachIntersecting(HyperRegion rect, Predicate<T> t) {
         if (size > 0)
             root.intersecting(rect, t, model);
     }
 
     @Override
-    public void containing(HyperRegion rect, final Predicate<T> t) {
+    public void whileEachContaining(HyperRegion rect, final Predicate<T> t) {
         if (size > 0)
             root.containing(rect, t, model);
     }
@@ -220,15 +220,18 @@ public class RTree<T> implements Space<T> {
         return this.root;
     }
 
-
     @Override
-    public boolean contains(T t, Spatialization<T> model) {
-        return root.contains(t, model);
+    public boolean contains(T t, HyperRegion b, Spatialization<T> model) {
+        return root.contains(t, b, model);
+    }
+
+    public boolean contains(T t) {
+        return contains(t, model.bounds(t), model);
     }
 
     @Override
     public HyperRegion bounds(T x) {
-        return model.region(x);
+        return model.bounds(x);
     }
 
 }

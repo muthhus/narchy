@@ -25,7 +25,6 @@ import com.google.common.base.Joiner;
 import jcog.Util;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -40,11 +39,11 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
 
     public final Node<T, ?>[] child;
 
-    private HyperRegion region;
+    private HyperRegion bounds;
     private short size;
 
     public Branch(int cap) {
-        this.region = null;
+        this.bounds = null;
         this.size = 0;
         this.child = new Node[cap];
     }
@@ -56,19 +55,25 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
         child[0] = a;
         child[1] = b;
         this.size = 2;
-        this.region = a.region.mbr(b.region);
+        this.bounds = a.region.mbr(b.region);
     }
 
     @Override
-    public boolean contains(T t, Spatialization<T> model) {
-        if (!region.contains(model.region(t)))
+    public boolean contains(T t, HyperRegion b, Spatialization<T> model) {
+
+        if (!this.bounds.contains(b)) //do pre-test if >2
             return false;
-        for (int i = 0; i < size; i++) {
-            if (child[i].contains(t, model))
+
+        int s = size;
+        Node<T, ?>[] c = this.child;
+        for (int i = 0; i < s; i++) {
+            if (c[i].contains(t, b, model))
                 return true;
         }
+
         return false;
     }
+
 
     /**
      * Add a new node to this branch's list of children
@@ -81,7 +86,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
             child[size++] = n;
 
             HyperRegion nr = n.bounds();
-            region = region != null ? region.mbr(nr) : nr;
+            bounds = bounds != null ? bounds.mbr(nr) : nr;
             return size - 1;
         } else {
             throw new RuntimeException("Too many children");
@@ -89,7 +94,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
     }
 
     @Override
-    public Node<T, ?> get(int i) {
+    public final Node<T, ?> get(int i) {
         return child[i];
     }
 
@@ -98,10 +103,9 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
         return false;
     }
 
-    @NotNull
     @Override
-    public HyperRegion bounds() {
-        return region;
+    public final HyperRegion bounds() {
+        return bounds;
     }
 
     /**
@@ -116,11 +120,11 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
     @Override
     public Node<T, ?> add(final T t, Nodelike<T> parent, Spatialization<T> model, boolean[] added) {
 
-        final HyperRegion tRect = model.region(t);
+        final HyperRegion tRect = model.bounds(t);
 
         Node<T, ?>[] child = this.child;
 
-        if (region.contains(tRect)) {
+        if (bounds.contains(tRect)) {
             //MERGE STAGE:
             for (int i = 0; i < size; i++) {
                 Node ci = child[i];
@@ -215,7 +219,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
     }
 
     private void grow(Node node) {
-        region = region.mbr(node.bounds());
+        bounds = bounds.mbr(node.bounds());
     }
 
     private static HyperRegion grow(HyperRegion region, Node node) {
@@ -223,7 +227,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
     }
 
     @Override
-    public Node<T, ?> remove(final T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model, boolean[] removed) {
+    public Node<T, ?> remove(final T x, HyperRegion xBounds, Spatialization<T> model, boolean[] removed) {
 
         assert (removed[0] == false);
 
@@ -231,7 +235,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
             Node<T, ?> cBefore = child[i];
             if (cBefore.bounds().contains(xBounds)) {
 
-                Node<T, ?> cAfter = cBefore.remove(x, xBounds, this, model, removed);
+                Node<T, ?> cAfter = cBefore.remove(x, xBounds, model, removed);
 
                 if (removed[0]) {
                     if (child[i].size() == 0) {
@@ -252,7 +256,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
                         for (int j = 1; j < size; j++) {
                             region = grow(region, cc[j]);
                         }
-                        this.region = region;
+                        this.bounds = region;
                     }
 
                     break;
@@ -273,7 +277,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
 
     @Override
     public Node<T, ?> update(final T OLD, final T NEW, Spatialization<T> model) {
-        final HyperRegion tRect = model.region(OLD);
+        final HyperRegion tRect = model.bounds(OLD);
 
         //TODO may be able to avoid recomputing bounds if the old was not found
         boolean found = false;
@@ -290,7 +294,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
                 region = grow(region, cc[i]);
             }
         }
-        this.region = region;
+        this.bounds = region;
 
         return this;
 
@@ -391,10 +395,12 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
 
     @Override
     public boolean containing(final HyperRegion rect, final Predicate<T> t, Spatialization<T> model) {
-        if (rect.intersects(region)) {
+        if (rect.intersects(bounds)) {
+            short s = this.size;
             Node[] data = this.child;
-            for (int i = 0; i < size; i++) {
-                if (!data[i].containing(rect, t, model))
+            for (int i = 0; i < s; i++) {
+                Node d = data[i];
+                if (d!=null && !d.containing(rect, t, model))
                     return false;
             }
         }
@@ -403,11 +409,12 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
 
     @Override
     public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
-        if (rect.intersects(region)) {
+        if (rect.intersects(bounds)) {
             short s = this.size;
             Node[] data = this.child;
             for (int i = 0; i < s; i++) {
-                if (!data[i].intersecting(rect, t, model))
+                Node d = data[i];
+                if (d!=null && !d.intersecting(rect, t, model))
                     return false;
             }
         }
@@ -449,7 +456,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
 
     @Override
     public String toString() {
-        return "Branch" + '{' + region + 'x' + size + ":\n\t" + Joiner.on("\n\t").skipNulls().join(child) + "\n}";
+        return "Branch" + '{' + bounds + 'x' + size + ":\n\t" + Joiner.on("\n\t").skipNulls().join(child) + "\n}";
     }
 
 

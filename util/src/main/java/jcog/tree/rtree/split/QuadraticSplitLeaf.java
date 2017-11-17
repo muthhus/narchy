@@ -45,9 +45,9 @@ public final class QuadraticSplitLeaf<T> implements Split<T> {
         int r1Max = 0, r2Max = size - 1;
         T[] data = leaf.data;
         for (int i = 0; i < size; i++) {
-            HyperRegion ii = model.region(data[i]);
+            HyperRegion ii = model.bounds(data[i]);
             for (int j = i + 1; j < size; j++) {
-                HyperRegion jj = model.region(data[j]);
+                HyperRegion jj = model.bounds(data[j]);
                 final HyperRegion mbr = ii.mbr(jj);
                 final double cost = mbr.cost() - (ii.cost() + jj.cost());
                 if (cost > minCost) {
