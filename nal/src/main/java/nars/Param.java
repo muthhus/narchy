@@ -423,8 +423,8 @@ public abstract class Param extends Services<Term, NAR> {
         assert (dur > 0);
 
         TruthPolation t =
-                //new TruthPolation.TruthPolationBasic(start, end, dur);
-                new TruthPolation.TruthPolationConf(start, end, dur);
+                new TruthPolation.TruthPolationBasic(start, end, dur);
+                //new TruthPolation.TruthPolationConf(start, end, dur);
         //new TruthPolation.TruthPolationConf(start, end, dur);
         //new TruthPolation.TruthPolationGreedy(start, end, dur);
         //..SoftMax..

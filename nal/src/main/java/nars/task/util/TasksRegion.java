@@ -68,9 +68,8 @@ public class TasksRegion implements TaskRegion {
 //        }
 
 
-
     @Override
-    public  double coord(boolean maxOrMin, int dimension) {
+    public float coordF(boolean maxOrMin, int dimension) {
         if (maxOrMin) {
             switch (dimension) {
                 case 0: return end;

@@ -273,6 +273,11 @@ public class NALTask extends Pri implements Task {
 
     @Override
     public double coord(boolean maxOrMin, int dimension) {
+        return coordF(maxOrMin, dimension);
+    }
+
+    @Override
+    public float coordF(boolean maxOrMin, int dimension) {
         switch (dimension) {
             case 0:
                 return maxOrMin ? end : start;

@@ -44,16 +44,15 @@ public class TimeRange implements HyperRegion {
     public boolean contains(HyperRegion x) {
         TaskRegion t = (TaskRegion)x;
         return start <= t.start() && end >= t.end();
-
     }
 
     @Override
     public double coord(boolean maxOrMin, int dimension) {
-//            switch (dimension) {
-//                case 0: return maxOrMin ? end : start;
-//            }
         throw new UnsupportedOperationException();
     }
 
-
+    @Override
+    public float coordF(boolean maxOrMin, int dimension) {
+        throw new UnsupportedOperationException();
+    }
 }

@@ -21,6 +21,12 @@ public class PLink<X> extends AbstractPLink<X> {
     }
 
     @Override
+    public boolean isDeleted() {
+        float p = pri;
+        return p!=p; //fast NaN check
+    }
+
+    @Override
     public int hashCode() {
         return id.hashCode();
     }

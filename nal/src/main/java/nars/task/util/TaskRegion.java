@@ -1,5 +1,6 @@
 package nars.task.util;
 
+import jcog.Util;
 import jcog.tree.rtree.HyperRegion;
 import nars.Task;
 import nars.task.Tasked;
@@ -97,6 +98,9 @@ public interface TaskRegion extends HyperRegion, Tasked {
         return 1 + d /* * timeCost()*/ * CONF_SAMENESS_IMPORTANCE;
     }
 
+    default double range(final int dim) {
+        return /*Math.abs*/(coordF(true, dim) - coordF(false, dim));
+    }
 
     @Override
     default int dim() {
@@ -156,20 +160,20 @@ public interface TaskRegion extends HyperRegion, Tasked {
                 } else {
                     return new TasksRegion(
                             Math.min(start(), es), Math.max(end(), ee),
-                            (float) Math.min(coord(false, 1), ef),
-                            (float) Math.max(coord(true, 1), ef),
-                            (float) Math.min(coord(false, 2), ec),
-                            (float) Math.max(coord(true, 2), ec)
+                            Util.min(coordF(false, 1), ef),
+                            Util.max(coordF(true, 1), ef),
+                            Util.min(coordF(false, 2), ec),
+                            Util.max(coordF(true, 2), ec)
                     );
                }
             } else {
                 TaskRegion er = (TaskRegion) r;
                 return new TasksRegion(
                         Math.min(start(), er.start()), Math.max(end(), er.end()),
-                        (float) Math.min(coord(false, 1), er.coord(false, 1)),
-                        (float) Math.max(coord(true, 1), er.coord(true, 1)),
-                        (float) Math.min(coord(false, 2), er.coord(false, 2)),
-                        (float) Math.max(coord(true, 2), er.coord(true, 2))
+                        Util.min(coordF(false, 1), er.coordF(false, 1)),
+                        Util.max(coordF(true, 1), er.coordF(true, 1)),
+                        Util.min(coordF(false, 2), er.coordF(false, 2)),
+                        Util.max(coordF(true, 2), er.coordF(true, 2))
                 );
             }
         }
@@ -179,8 +183,8 @@ public interface TaskRegion extends HyperRegion, Tasked {
     default boolean intersects(HyperRegion x) {
         if (x == this) return true;
         //        for (int i = 0; i < d; i++)
-        //            if (coord(false, i) > x.coord(true, i) ||
-        //                    coord(true, i) < x.coord(false, i))
+        //            if (coordF(false, i) > x.coordF(true, i) ||
+        //                    coordF(true, i) < x.coordF(false, i))
         //                return false;
         //        return true;
         if (x instanceof TimeRange) {
@@ -190,9 +194,9 @@ public interface TaskRegion extends HyperRegion, Tasked {
             TaskRegion t = (TaskRegion) x;
             if ((start() > t.end()) || (end() < t.start()))
                 return false;
-            if ((coord(false, 1) > t.coord(true, 1)) || (coord(true, 1) < t.coord(false, 1)))
+            if ((coordF(false, 1) > t.coordF(true, 1)) || (coordF(true, 1) < t.coordF(false, 1)))
                 return false;
-            return (!(coord(false, 2) > t.coord(true, 2))) && (!(coord(true, 2) < t.coord(false, 2)));
+            return (!(coordF(false, 2) > t.coordF(true, 2))) && (!(coordF(true, 2) < t.coordF(false, 2)));
         }
     }
 
@@ -203,8 +207,8 @@ public interface TaskRegion extends HyperRegion, Tasked {
         //    default boolean contains(HyperRegion<X> x) {
         //        int d = dim();
         //        for (int i = 0; i < d; i++)
-        //            if (coord(false, i) > x.coord(false, i) ||
-        //                    coord(true, i) < x.coord(true, i))
+        //            if (coordF(false, i) > x.coordF(false, i) ||
+        //                    coordF(true, i) < x.coordF(true, i))
         //                return false;
         //        return true;
         //    }
@@ -215,10 +219,18 @@ public interface TaskRegion extends HyperRegion, Tasked {
             TaskRegion t = (TaskRegion) x;
             if ((start() > t.start()) || (end() < t.end()))
                 return false;
-            if ((coord(false, 1) > t.coord(false, 1)) || (coord(true, 1) < t.coord(true, 1)))
+            if ((coordF(false, 1) > t.coordF(false, 1)) || (coordF(true, 1) < t.coordF(true, 1)))
                 return false;
-            return (!(coord(false, 2) > t.coord(false, 2))) && (!(coord(true, 2) < t.coord(true, 2)));
+            return (!(coordF(false, 2) > t.coordF(false, 2))) && (!(coordF(true, 2) < t.coordF(true, 2)));
         }
     }
+
+
+    @Override
+    default double coord(boolean maxOrMin, int dimension) {
+        return coordF(maxOrMin, dimension);
+    }
+
+    float coordF(boolean maxOrMin, int dimension);
 
 }
