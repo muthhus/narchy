@@ -78,10 +78,6 @@ public class Spatialization<T> {
                 }
             }
         }
-        if (!((target.size() == (to - from)))) {
-            throw new RuntimeException("fix");
-        }
-        assert (target.size() == (to - from)) : target.size() + " isnt " + (to - from) + ' ' + Arrays.toString(leaf.data) + " -> " + Arrays.toString(sortedSrc);
     }
 
 

@@ -38,21 +38,21 @@ public abstract class MatchConstraint extends AbstractPred<Derivation> {
         return i == 0 ? a.compareTo(b) : i;
     };
 
-    public static class CompoundConstraint extends AbstractPred<Derivation> {
-
-
-        private final MatchConstraint[] cache;
-
-        public CompoundConstraint(MatchConstraint[] c) {
-            super(/*$.func("MatchConstraint",*/ $.sete(c)/*)*/);
-            this.cache = c;
-        }
-
-        @Override
-        public boolean test(Derivation derivation) {
-            return derivation.constrain(cache);
-        }
-    }
+//    public static class CompoundConstraint extends AbstractPred<Derivation> {
+//
+//
+//        private final MatchConstraint[] cache;
+//
+//        public CompoundConstraint(MatchConstraint[] c) {
+//            super(/*$.func("MatchConstraint",*/ $.sete(c)/*)*/);
+//            this.cache = c;
+//        }
+//
+//        @Override
+//        public boolean test(Derivation derivation) {
+//            return derivation.constrain(cache);
+//        }
+//    }
 
     /**
      * @param targetVariable current value of the target variable (null if none is set)

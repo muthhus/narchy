@@ -59,7 +59,7 @@ abstract public class Causable extends NARService {
      * if true, allows multiple threads to execute on this instance
      */
     public boolean singleton() {
-        return false;
+        return true;
     }
 
     public final int run(NAR n, int iterations) {

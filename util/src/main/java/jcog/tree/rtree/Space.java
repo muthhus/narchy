@@ -156,7 +156,7 @@ public interface Space<T> extends Nodelike<T> {
     boolean add(final T t);
 
     /** adds, deferred if necessary until un-busy */
-    default void addAsync(@NotNull T t) {
+    default void addAsync(T t) {
         throw new UnsupportedOperationException();
     }
 

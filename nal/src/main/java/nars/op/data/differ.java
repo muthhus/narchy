@@ -4,6 +4,8 @@ import nars.Op;
 import nars.term.Functor;
 import nars.term.Term;
 
+import static nars.Op.INT;
+
 /**
  * all X which are in the first term AND not in the second term
  */
@@ -17,7 +19,7 @@ public class differ extends Functor.BinaryFunctor {
 
     @Override
     public boolean validOp(Op o) {
-        return o.commutative;
+        return o.commutative || o == INT;
     }
 
     @Override

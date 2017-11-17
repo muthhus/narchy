@@ -262,6 +262,22 @@ public class Int implements Intlike {
             }
             return Null;
         }
+
+        public Term intersect(Term b) {
+            if (equals(b))
+                return this;
+
+            if (b instanceof IntRange) {
+                IntRange bb = (IntRange) b;
+                if (connects(bb))
+                    return Int.range(range().intersection(bb.range()));
+            } else if (b instanceof Int) {
+                if (intersects((Int)b))
+                    return b;
+            }
+
+            return Null;
+        }
     }
 
 //    public static Term[] intersect(Term[] u) {

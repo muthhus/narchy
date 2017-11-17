@@ -661,6 +661,7 @@ public enum Terms {
         if (a instanceof Term && a.equals(b))
             return (Term) a;
 
+
         Term[] c = TermContainer.intersect(a, b);
         return (c == null || c.length == 0) ? Null : (Compound) (o.the(c));
     }

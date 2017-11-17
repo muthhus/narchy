@@ -560,7 +560,7 @@ public interface Term extends Termed, Comparable<Termed> {
                 return Integer.compare(((Int) this).id, ((Int) y).id);
             } else if (this instanceof Int.IntRange) {
                 return Long.compareUnsigned(((Int.IntRange) this).hash64(), ((Int.IntRange) y).hash64());
-            } else if (this instanceof AtomicConst) {
+            } else if (this instanceof Atomic) {
 //                boolean gx = this instanceof UnnormalizedVariable;
 //                boolean gy = y instanceof UnnormalizedVariable;
 //                if (gx && !gy)

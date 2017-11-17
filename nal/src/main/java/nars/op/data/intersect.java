@@ -4,7 +4,8 @@ import nars.Op;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Terms;
-import org.jetbrains.annotations.NotNull;
+import nars.term.atom.Int;
+import nars.term.atom.Intlike;
 
 public class intersect extends Functor.BinaryFunctor {
 
@@ -20,9 +21,14 @@ public class intersect extends Functor.BinaryFunctor {
     }
 
     @Override
-    public Term apply(@NotNull Term a, @NotNull Term b) {
+    public Term apply(Term a, Term b) {
 //        Op aop = a.op();
 //        if (b.op() == aop)
+
+        if (a instanceof Int.IntRange && b instanceof Intlike) {
+           return ((Int.IntRange)a).intersect(b);
+        }
+
             return Terms.intersect(a.op(), a.subterms(), b.subterms());
 //        else
 //            return null;

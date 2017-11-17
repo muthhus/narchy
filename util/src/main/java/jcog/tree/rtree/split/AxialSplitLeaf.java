@@ -66,9 +66,18 @@ public final class AxialSplitLeaf<T> implements Split<T> {
         final Leaf<T> l1Node = model.transfer(leaf, sortedMbr, 0, size/2);
         final Leaf<T> l2Node = model.transfer(leaf, sortedMbr, size / 2, size);
 
+        if ((l1Node.size()+l2Node.size() != size+0))
+            throw new RuntimeException("fix");
+        assert (l1Node.size()+l2Node.size() == size+0);
+
         leaf.classify(l1Node, l2Node, t, model, new boolean[1] /* dummy */);
 
-        return model.newBranch(l1Node, l2Node);
+        if ((l1Node.size()+l2Node.size() != size+1))
+            throw new RuntimeException("fix");
+        assert (l1Node.size()+l2Node.size() == size+1);
+
+        Branch<T> b = model.newBranch(l1Node, l2Node);
+        return b;
     }
 
 

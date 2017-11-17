@@ -60,6 +60,11 @@ public class Deriver extends NARService {
             }
 
             @Override
+            public boolean singleton() {
+                return true;
+            }
+
+            @Override
             public float value() {
                 return Util.sum(Cause::value, t.causes);
             }
@@ -68,7 +73,7 @@ public class Deriver extends NARService {
     }
 
 
-    protected int run(int toFire) {
+    protected int run(int work) {
 
 
         NAR nar = this.nar;
@@ -79,7 +84,7 @@ public class Deriver extends NARService {
         int ttlMax = nar.matchTTLmax.intValue();
 
 
-        int fireRemain[] = new int[]{toFire};
+        int fireRemain[] = new int[]{work};
         BatchActivation activator = BatchActivation.get();
 
 
@@ -100,7 +105,8 @@ public class Deriver extends NARService {
                                 ttlMin, ttlMax);
 
                         d.derive(deriveTTL);
-                        --fireRemain[0]; //premise completed
+                        if (--fireRemain[0] <= 0) //premise completed
+                            break;
                     }
                 }
             }
@@ -114,7 +120,7 @@ public class Deriver extends NARService {
 
         int derived = d.commit(nar::input);
 
-        return toFire - fireRemain[0];
+        return work - fireRemain[0];
     }
 
 
@@ -145,7 +151,7 @@ public class Deriver extends NARService {
 
     //    public final IterableThreadLocal<Derivation> derivation =
 //            new IterableThreadLocal<>(() -> new Derivation(this));
-    public static final ThreadLocal<Derivation> derivation =
+    private final ThreadLocal<Derivation> derivation =
             ThreadLocal.withInitial(Derivation::new);
 
 }
