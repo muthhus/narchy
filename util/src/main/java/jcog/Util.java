@@ -1661,6 +1661,21 @@ public enum Util {
         return 1.0f - ((1.0f - a) * (1.0f - b));
     }
 
+    public static <X> boolean and(Predicate<X> p, X... xx) {
+        for (X x : xx) {
+            if (!p.test(x))
+                return false;
+        }
+        return true;
+    }
+    public static <X> boolean or(Predicate<X> p, X... xx) {
+        for (X x : xx) {
+            if (p.test(x))
+                return true;
+        }
+        return false;
+    }
+
     /**
      * a and b should be in 0..1.0 unit domain; output will also
      */

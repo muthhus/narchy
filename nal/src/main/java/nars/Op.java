@@ -2,6 +2,7 @@ package nars;
 
 
 import jcog.TODO;
+import jcog.Util;
 import jcog.list.FasterList;
 import nars.derive.match.EllipsisMatch;
 import nars.derive.match.Ellipsislike;
@@ -10,6 +11,7 @@ import nars.term.*;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.atom.Int;
+import nars.term.atom.Intlike;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
@@ -23,6 +25,7 @@ import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
+import org.eclipse.collections.impl.block.factory.Predicates;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
@@ -100,20 +103,20 @@ public enum Op {
     /**
      * extensional difference
      */
-    DIFFe("-", false, 3, Args.Two) {
+    DIFFe("~", false, 3, Args.Two) {
         @Override
         public Term _the(int dt, Term[] u) {
-            return newDiff(this, u);
+            return differ(this, u);
         }
     },
 
     /**
      * intensional difference
      */
-    DIFFi("~", false, 3, Args.Two) {
+    DIFFi("-", false, 3, Args.Two) {
         @Override
         public Term _the(int dt, Term[] u) {
-            return newDiff(this, u);
+            return differ(this, u);
         }
     },
 
@@ -1299,7 +1302,15 @@ public enum Op {
     }
 
 
-    private static Term newDiff(/*@NotNull*/ Op op, Term... t) {
+    private static Term differ(/*@NotNull*/ Op op, Term... t) {
+        if (op == DIFFe && t.length == 2 && t[0] instanceof Int.IntRange && t[1] instanceof Intlike) {
+            return ((Int.IntRange)t[0]).subtract(t[1]);
+        }
+
+        //TODO product 1D, 2D, etc unwrap
+        //if (t.length >= 2 && Util.and((Term tt) -> tt.op() == PROD && tt.subs()==1, t)) {
+            //return $.p(differ())
+        //}
 
         //corresponding set type for reduction:
         Op set = op == DIFFe ? SETe : SETi;
@@ -1308,7 +1319,7 @@ public enum Op {
             case 1:
                 Term single = t[0];
                 if (single instanceof EllipsisMatch) {
-                    return newDiff(op, ((TermContainer) single).arrayShared());
+                    return differ(op, ((TermContainer) single).arrayShared());
                 }
                 return single instanceof Ellipsislike ?
                         new UnitCompound1(op, single) :
@@ -1349,7 +1360,7 @@ public enum Op {
             if (!(a instanceof Int.IntRange))
                 return Null;
             else {
-                Term aMinB = ((Int.IntRange) a).except(b);
+                Term aMinB = ((Int.IntRange) a).subtract(b);
                 if (a.equals(aMinB))
                     return Null; //
             }

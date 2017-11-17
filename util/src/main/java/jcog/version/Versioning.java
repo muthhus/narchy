@@ -44,7 +44,7 @@ public class Versioning<X>
     public final boolean revert(int when) {
 
         int s = size;
-        if (s == 0 || s==when)
+        if (s == 0 || s<=when)
             return false;
 
         int c = s - when;
@@ -56,6 +56,7 @@ public class Versioning<X>
         }
 
         this.size = s;
+        assert(s == when);
         return true;
     }
 

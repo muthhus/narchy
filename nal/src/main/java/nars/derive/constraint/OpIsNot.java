@@ -6,7 +6,7 @@ import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 
-public final class OpExclusionConstraint extends MatchConstraint {
+public final class OpIsNot extends MatchConstraint {
 
     private final int op;
 
@@ -14,8 +14,8 @@ public final class OpExclusionConstraint extends MatchConstraint {
 //        this(o.bit);
 //    }
 
-    public OpExclusionConstraint(Term target, int opVector) {
-        super(target, "opExcl", $.the(opVector));
+    public OpIsNot(Term target, int opVector) {
+        super(target, "opIsNot", $.the(opVector));
         this.op = opVector;
     }
 

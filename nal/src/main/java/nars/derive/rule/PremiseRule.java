@@ -661,23 +661,24 @@ public class PremiseRule /*extends GenericCompound*/ {
     }
     private static void termIsAny(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, SortedSet<MatchConstraint> constraints, Term x, int struct) {
         constraints.add(new OpIsAny(x, struct));
-        includesOp(pres, taskPattern, beliefPattern, x, struct);
+        includesOp(pres, taskPattern, beliefPattern, x, struct, true);
     }
 
     private static void includesOp(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, Term x, Op o) {
-        includesOp(pres, taskPattern, beliefPattern, x, o.bit);
+        includesOp(pres, taskPattern, beliefPattern, x, o.bit, true);
     }
 
-    private static void includesOp(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, Term x, int struct) {
+    private static void includesOp(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, Term x, int struct, boolean includeExclude) {
         boolean inTask = taskPattern.equals(x) || taskPattern.containsRecursively(x);
         boolean inBelief = beliefPattern.equals(x) || beliefPattern.containsRecursively(x);
         if (inTask || inBelief)
-            pres.add(new TaskBeliefHas(struct, inTask, inBelief));
+            pres.add(new TaskBeliefHasOrHasnt(struct, inTask, inBelief, includeExclude));
     }
 
 
-    private static void termIsNot(@NotNull Set<PrediTerm> pres, Term task, Term belief, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
-        constraints.add(new OpExclusionConstraint(t, structure));
+    private static void termIsNot(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, int struct) {
+        constraints.add(new OpIsNot(x, struct));
+        includesOp(pres, taskPattern, beliefPattern, x, struct, false);
     }
 
     private static void termHasAny(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, Op o) {

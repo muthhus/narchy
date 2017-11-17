@@ -246,7 +246,7 @@ public class Int implements Intlike {
             return Range.closed(min, max).canonical(DiscreteDomain.integers());
         }
 
-        public Term except(Term b) {
+        public Term subtract(Term b) {
             if (equals(b))
                 return Null;
             if (b instanceof IntRange) {
