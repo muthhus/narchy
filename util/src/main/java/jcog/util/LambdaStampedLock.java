@@ -2,7 +2,6 @@ package jcog.util;
 
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 

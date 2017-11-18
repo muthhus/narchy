@@ -21,7 +21,6 @@
 package nars.term.var;
 
 
-import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
 import nars.$;
 import nars.Op;

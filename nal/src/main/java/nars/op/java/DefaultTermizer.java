@@ -1,7 +1,7 @@
 package nars.op.java;
 
 import com.google.common.collect.ImmutableSet;
-import jcog.map.CustomConcurrentHashMap;
+import jcog.data.map.CustomConcurrentHashMap;
 import nars.$;
 import nars.Op;
 import nars.term.Term;
@@ -18,7 +18,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static jcog.map.CustomConcurrentHashMap.*;
+import static jcog.data.map.CustomConcurrentHashMap.*;
 
 
 /**

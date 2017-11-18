@@ -1,10 +1,7 @@
 package nars.term.atom;
 
-import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
 import nars.Op;
-
-import java.util.Arrays;
 
 import static java.lang.System.arraycopy;
 

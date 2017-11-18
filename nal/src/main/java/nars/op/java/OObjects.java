@@ -8,7 +8,7 @@ import javassist.util.proxy.ProxyObject;
 import jcog.TODO;
 import jcog.Util;
 import jcog.list.FasterList;
-import jcog.map.CustomConcurrentHashMap;
+import jcog.data.map.CustomConcurrentHashMap;
 import jcog.memoize.SoftMemoize;
 import nars.*;
 import nars.control.CauseChannel;
@@ -39,7 +39,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static jcog.map.CustomConcurrentHashMap.*;
+import static jcog.data.map.CustomConcurrentHashMap.*;
 import static nars.Op.*;
 
 

@@ -1,6 +1,6 @@
 package jcog.math;
 
-import jcog.map.MRUCache;
+import jcog.data.map.MRUCache;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 
 import java.util.Iterator;

@@ -1,12 +1,12 @@
 package nars.bag.leak;
 
 import jcog.bag.Bag;
+import jcog.bag.impl.ConcurrentArrayBag;
 import jcog.math.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Task;
-import jcog.bag.impl.ConcurrentArrayBag;
 import nars.control.Causable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

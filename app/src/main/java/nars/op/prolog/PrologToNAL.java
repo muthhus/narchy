@@ -14,7 +14,6 @@ import nars.term.var.Variable;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 

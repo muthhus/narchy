@@ -1,9 +1,6 @@
 package jcog.version;
 
-import jcog.list.FasterList;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Collection;
 
 /**
  * versioning context that holds versioned instances

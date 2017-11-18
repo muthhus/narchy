@@ -1,6 +1,6 @@
 package jcog.list.table;
 
-import jcog.map.CollectorMap;
+import jcog.data.map.CollectorMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

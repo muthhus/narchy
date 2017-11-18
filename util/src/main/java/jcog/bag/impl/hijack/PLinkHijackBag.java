@@ -2,7 +2,6 @@ package jcog.bag.impl.hijack;
 
 import jcog.bag.impl.HijackBag;
 import jcog.pri.PriReference;
-import jcog.pri.op.PriForget;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 

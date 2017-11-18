@@ -6,7 +6,6 @@ import jcog.list.FasterList;
 import jcog.pri.PLink;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;
-import jcog.pri.Priority;
 import jcog.pri.op.PriForget;
 import nars.$;
 import nars.NAR;

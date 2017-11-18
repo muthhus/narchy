@@ -3,7 +3,6 @@ package nars.term;
 import nars.Op;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;

@@ -1,7 +1,5 @@
 package alice.tuprolog;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * Register for operators
  * Cashes operator by name+type description.

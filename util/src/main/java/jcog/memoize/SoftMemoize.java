@@ -1,6 +1,6 @@
 package jcog.memoize;
 
-import jcog.map.CustomConcurrentHashMap;
+import jcog.data.map.CustomConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;

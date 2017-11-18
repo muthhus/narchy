@@ -9,7 +9,6 @@ import nars.concept.GoalActionAsyncConcept;
 import nars.concept.SensorConcept;
 import nars.control.DurService;
 import nars.gui.Vis;
-import nars.time.Tense;
 import nars.util.signal.LivePredictor;
 import spacegraph.SpaceGraph;
 

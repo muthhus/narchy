@@ -1,10 +1,8 @@
 package nars.table;
 
 import jcog.list.ArrayIterator;
-import jcog.map.MRUCache;
-import jcog.pri.Pri;
+import jcog.data.map.MRUCache;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.Tasklinks;

@@ -1,6 +1,6 @@
 package jcog.math;
 
-import jcog.map.SaneObjectFloatHashMap;
+import jcog.data.map.SaneObjectFloatHashMap;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 
 public class CachedFloatFunction<X> extends SaneObjectFloatHashMap<X> implements FloatFunction<X> {

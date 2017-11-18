@@ -6,7 +6,6 @@ import nars.concept.GoalActionAsyncConcept;
 import nars.concept.ScalarConcepts;
 import nars.gui.Vis;
 import nars.op.video.Scale;
-import nars.time.Tense;
 import nars.util.signal.CameraSensor;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;

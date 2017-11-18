@@ -46,7 +46,7 @@ public class Derivation extends Unify {
 
     public static final Atomic _taskTerm = Atomic.the("_taskTerm");
     public static final Atomic _beliefTerm = Atomic.the("_beliefTerm");
-    private final Functor.LambdaFunctor polarizeFunc;
+
 
     public NAR nar;
 
@@ -175,7 +175,7 @@ public class Derivation extends Unify {
 
         //final Functor substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
 
-        polarizeFunc = Functor.f2("polarize", (subterm, whichTask) -> {
+        Functor.LambdaFunctor polarizeFunc = Functor.f2("polarize", (subterm, whichTask) -> {
             Truth compared;
             if (whichTask.equals(PremiseRule.Task)) {
                 compared = taskTruth;
@@ -188,18 +188,36 @@ public class Derivation extends Unify {
                 return compared.isNegative() ? subterm.neg() : subterm;
         });
 
-
-
-    }
-
-    ImmutableMap<Term, Termed> functors(Termed... t) {
-        java.util.Map<Term, Termed> m = new HashMap(t.length + 2);
-        for (Termed x : t) {
+        Termed[] derivationFunctors = new Termed[]{
+                new uniSubAny(this),
+                polarizeFunc,
+                };
+        Map<Term, Termed> m = new HashMap(derivationFunctors.length + 2);
+        for (Termed x : derivationFunctors) {
             m.put(x.term(), x);
         }
         m.put(_taskTerm, () -> taskTerm);
         m.put(_beliefTerm, () -> beliefTerm);
-        return Maps.immutable.ofMap(m);
+        this.derivationFunctors = Maps.immutable.ofMap(m);
+    }
+
+    /** functors to be inserted in PatternIndex's for direct usage */
+    public static Termed[] ruleFunctors(NAR nar) {
+        return new Termed[]{
+                Subst.the,
+                union.the,
+                differ.the,
+                intersect.the,
+                nar.get(Atomic.the("dropAnyEvent")),
+                nar.get(Atomic.the("dropAnySet")),
+                nar.get(Atomic.the("conjEvent")),
+                nar.get(Atomic.the("conjDropIfEarliest")),
+                nar.get(Atomic.the("ifConjCommNoDepVars")),
+                nar.get(Atomic.the("without")),
+                nar.get(Atomic.the("indicesOf")),
+                nar.get(Atomic.the("substDiff"))
+                /* varIntro(x) has special handling */
+        };
     }
 
     /**
@@ -241,22 +259,7 @@ public class Derivation extends Unify {
         this.clear();
         this.nar = nar;
         this.random = nar.random();
-        this.derivationFunctors = functors(
-                new uniSubAny(this),
-                polarizeFunc,
-                Subst.the,
-                union.the,
-                differ.the,
-                intersect.the,
-                nar.get(Atomic.the("dropAnyEvent")),
-                nar.get(Atomic.the("dropAnySet")),
-                nar.get(Atomic.the("conjEvent")),
-                nar.get(Atomic.the("conjDropIfEarliest")),
-                nar.get(Atomic.the("ifConjCommNoDepVars")),
-                nar.get(Atomic.the("without")),
-                nar.get(Atomic.the("indicesOf")),
-                nar.get(Atomic.the("substDiff"))
-        );
+
     }
 
     /**

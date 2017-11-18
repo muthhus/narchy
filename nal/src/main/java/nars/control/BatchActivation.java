@@ -1,6 +1,6 @@
 package nars.control;
 
-import jcog.map.SaneObjectFloatHashMap;
+import jcog.data.map.SaneObjectFloatHashMap;
 import nars.NAR;
 import nars.concept.Concept;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;

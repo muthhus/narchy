@@ -759,51 +759,56 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     default boolean unifyLinear(TermContainer Y, /*@NotNull*/ Unify u) {
-
-        /**
-         * a branch for comparing a particular permutation, called from the main next()
-         */
         int s = subs();
-        switch (s) {
-            case 0:
-                return true; //shouldnt ever happen
+        for (int i = 0; i < s; i++) {
+            if (!sub(i).unify(Y.sub(i), u))
+                return false;
+        }
+        return true;
 
-            case 1:
-                return sub(0).unify(Y.sub(0), u);
-
-//                case 2: {
+//        /**
+//         * a branch for comparing a particular permutation, called from the main next()
+//         */
+//        switch (s) {
+//            case 0:
+//                return true; //shouldnt ever happen
 //
-//                    int i = u.random.nextInt(1);
-//                    if (u.unify(sub(i), Y.sub(i))) {
-//                        i = 1 - i;
-//                        return u.unify(sub(i), Y.sub(i));
-//                    } else {
+//            case 1:
+//                return sub(0).unify(Y.sub(0), u);
+//
+////                case 2: {
+////
+////                    int i = u.random.nextInt(1);
+////                    if (u.unify(sub(i), Y.sub(i))) {
+////                        i = 1 - i;
+////                        return u.unify(sub(i), Y.sub(i));
+////                    } else {
+////                        return false;
+////                    }
+////                }
+//
+//            default:
+//                //TODO unify variables last after matching all constants by saving them to a secondary list as they are encountered in the below loop
+//
+//                //begin at random offset to shuffle the order of the match sequence
+//                int jj = u.random.nextInt();
+//                int j = Math.abs(jj) % s;
+//                boolean direction = (jj & (1 << 15)) == 0;
+//                for (int i = s - 1; ; ) {
+//                    if (!sub(j).unify(Y.sub(j), u))
 //                        return false;
+//
+//                    if (--i == -1)
+//                        break;
+//
+//                    if (direction) {
+//                        if (++j == s) j = 0;
+//                    } else {
+//                        if (--j == -1) j = s - 1;
 //                    }
 //                }
-
-            default:
-                //TODO unify variables last after matching all constants by saving them to a secondary list as they are encountered in the below loop
-
-                //begin at random offset to shuffle the order of the match sequence
-                int jj = u.random.nextInt();
-                int j = Math.abs(jj) % s;
-                boolean direction = (jj & (1 << 15)) == 0;
-                for (int i = s - 1; ; ) {
-                    if (!sub(j).unify(Y.sub(j), u))
-                        return false;
-
-                    if (--i == -1)
-                        break;
-
-                    if (direction) {
-                        if (++j == s) j = 0;
-                    } else {
-                        if (--j == -1) j = s - 1;
-                    }
-                }
-                return true;
-        }
+//                return true;
+//        }
 
     }
 

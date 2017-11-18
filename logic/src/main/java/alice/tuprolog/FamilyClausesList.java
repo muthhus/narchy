@@ -1,10 +1,10 @@
 package alice.tuprolog;
 
 
-import jcog.TODO;
-import jcog.list.FasterList;
-
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.LinkedList;
 
 /**
  * <code>FamilyClausesList</code> is a common <code>LinkedList</code>

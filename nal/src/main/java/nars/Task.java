@@ -43,7 +43,7 @@ import static org.eclipse.collections.impl.tuple.Tuples.twin;
 /**
  * NAL Task to be processed, consists of a Sentence, stamp, time, and budget.
  */
-public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.map.MetaMap {
+public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.data.map.MetaMap {
 
 
     Task[] EmptyArray = new Task[0];

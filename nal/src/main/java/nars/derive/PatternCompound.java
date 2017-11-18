@@ -10,7 +10,6 @@ import nars.derive.mutate.CommutivePermutations;
 import nars.term.Compound;
 import nars.term.GenericCompoundDT;
 import nars.term.Term;
-import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.Nullable;

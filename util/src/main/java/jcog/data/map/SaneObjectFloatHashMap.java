@@ -1,4 +1,4 @@
-package jcog.map;
+package jcog.data.map;
 
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 

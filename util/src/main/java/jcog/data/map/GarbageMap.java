@@ -1,4 +1,4 @@
-package jcog.map;
+package jcog.data.map;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;

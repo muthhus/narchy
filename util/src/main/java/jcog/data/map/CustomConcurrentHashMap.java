@@ -4,7 +4,7 @@
  * http://creativecommons.org/publicdomain/zero/1.0/
  */
 
-package jcog.map;
+package jcog.data.map;
 
 import sun.misc.Unsafe;
 
@@ -117,7 +117,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class CustomConcurrentHashMap<K, V> extends AbstractMap<K, V>
         implements ConcurrentMap<K, V>, Serializable {
-    private static final long serialVersionUID = 7249069246764182397L;
 
     /*
      * This class uses a similar approach as ConcurrentHashMap, but

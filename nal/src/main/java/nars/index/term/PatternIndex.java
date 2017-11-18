@@ -1,8 +1,10 @@
 package nars.index.term;
 
 import nars.$;
+import nars.NAR;
 import nars.Op;
 import nars.The;
+import nars.control.Derivation;
 import nars.derive.PatternCompound;
 import nars.derive.match.Ellipsis;
 import nars.index.term.map.MapTermIndex;
@@ -31,10 +33,20 @@ public class PatternIndex extends MapTermIndex {
         super(new HashMap<>());
     }
 
+    /**
+     * installs static and NAR-specific functors
+     */
+    public PatternIndex(NAR nar) {
+        this();
+        for (Termed t : Derivation.ruleFunctors(nar)) {
+            set(t);
+        }
+    }
+
     @SuppressWarnings("Java8MapApi")
     @Override
     public Termed get(/*@NotNull*/ Term x, boolean createIfMissing) {
-       if (!x.op().conceptualizable)
+        if (!x.op().conceptualizable)
             return x;
 
         //avoid recursion-caused concurrent modifiation exception
@@ -47,9 +59,9 @@ public class PatternIndex extends MapTermIndex {
         return y;
     }
 
-
     /*@NotNull*/
-    @Deprecated protected Term patternify(/*@NotNull*/ Compound x) {
+    @Deprecated
+    protected Term patternify(/*@NotNull*/ Compound x) {
 
 
         TermContainer s = x.subterms();
@@ -65,7 +77,7 @@ public class PatternIndex extends MapTermIndex {
             bb[i] = b.term();
         }
 
-        if (!changed && Ellipsis.firstEllipsis(s)==null)
+        if (!changed && Ellipsis.firstEllipsis(s) == null)
             return x;
 
         TermContainer v = (changed ? The.subterms(bb.length > 1 && x.op().commutative && (concurrent(x.dt())) ?
@@ -137,12 +149,11 @@ public class PatternIndex extends MapTermIndex {
 
         Term y = x.transform(new PremiseRuleVariableNormalization());
 
-        assert(y!=null);
+        assert (y != null);
 
         return (Compound) get(y, true).term();
 
     }
-
 
 
     public static final class PremiseRuleVariableNormalization extends VariableNormalization {

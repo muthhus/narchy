@@ -1,6 +1,6 @@
 package jcog.memoize;
 
-import jcog.map.MRUCache;
+import jcog.data.map.MRUCache;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;

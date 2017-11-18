@@ -4,10 +4,10 @@ package nars.experiment;
 import jcog.Util;
 import jcog.math.FloatParam;
 import nars.*;
-import nars.util.signal.CameraSensor;
 import nars.op.video.BufferedImageBitmap2D;
 import nars.op.video.Scale;
 import nars.op.video.SwingBitmap2D;
+import nars.util.signal.CameraSensor;
 
 import javax.swing.*;
 import java.awt.*;

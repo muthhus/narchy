@@ -2,7 +2,6 @@ package jcog.bag.impl;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.bag.impl.ArrayBag;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import jcog.util.QueueLock;

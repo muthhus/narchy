@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.lang.Integer.MIN_VALUE;
-import static nars.Op.INT;
 
 
 /**

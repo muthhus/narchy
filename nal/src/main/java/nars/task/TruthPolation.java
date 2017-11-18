@@ -6,7 +6,6 @@ import jcog.decide.DecideSoftmax;
 import nars.Param;
 import nars.Task;
 import nars.truth.PreciseTruth;
-import nars.truth.Truth;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 
 import java.util.Random;

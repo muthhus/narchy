@@ -2,7 +2,7 @@ package nars.concept;
 
 import jcog.bag.Bag;
 import jcog.list.FasterList;
-import jcog.map.CompactArrayMap;
+import jcog.data.map.CompactArrayMap;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;

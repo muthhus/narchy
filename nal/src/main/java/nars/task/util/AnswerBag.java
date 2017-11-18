@@ -1,7 +1,7 @@
 package nars.task.util;
 
 import jcog.bag.impl.PLinkArrayBag;
-import jcog.map.SynchronizedHashMap;
+import jcog.data.map.SynchronizedHashMap;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.NAR;

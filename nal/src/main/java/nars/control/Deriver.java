@@ -35,7 +35,7 @@ public class Deriver extends NARService {
         assert (nal > 0 || additional.length > 0);
 
         return deriver(nar ->
-                PremiseRuleSet.rules(nar, new PatternIndex(),
+                PremiseRuleSet.rules(nar, new PatternIndex(nar),
                         Derivers.defaultRules(nal, additional)
                 ));
     }

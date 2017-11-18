@@ -1,6 +1,7 @@
 package nars.op.mental;
 
 
+import jcog.bag.impl.ConcurrentArrayBag;
 import jcog.math.FloatParam;
 import jcog.math.MutableIntRange;
 import jcog.pri.PLink;
@@ -9,7 +10,6 @@ import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import jcog.bag.impl.ConcurrentArrayBag;
 import nars.bag.leak.DtLeak;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;

@@ -6,7 +6,6 @@ import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
-import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

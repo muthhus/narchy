@@ -2,6 +2,7 @@ package nars.gui.graph;
 
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.bag.impl.ConcurrentArrayBag;
 import jcog.bag.util.Bagregate;
 import jcog.list.FasterList;
 import jcog.math.FloatParam;
@@ -10,7 +11,6 @@ import jcog.pri.op.PriMerge;
 import jcog.util.Flip;
 import nars.NAR;
 import nars.Task;
-import jcog.bag.impl.ConcurrentArrayBag;
 import nars.concept.Concept;
 import nars.control.Activate;
 import nars.control.DurService;

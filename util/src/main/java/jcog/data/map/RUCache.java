@@ -1,4 +1,4 @@
-package jcog.map;
+package jcog.data.map;
 
 import java.util.Map;
 import java.util.WeakHashMap;

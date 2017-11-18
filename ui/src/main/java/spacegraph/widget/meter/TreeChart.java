@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.list.CircularArrayList;
 import jcog.list.FasterList;
-import jcog.map.CustomConcurrentHashMap;
+import jcog.data.map.CustomConcurrentHashMap;
 import jcog.util.Flip;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-import static jcog.map.CustomConcurrentHashMap.*;
+import static jcog.data.map.CustomConcurrentHashMap.*;
 
 /**
  * @author Tadas Subonis <tadas.subonis@gmail.com>

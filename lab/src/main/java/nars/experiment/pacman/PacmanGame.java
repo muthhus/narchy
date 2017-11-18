@@ -1,6 +1,5 @@
 package nars.experiment.pacman;
 
-import jcog.Util;
 import nars.experiment.pacman.entities.Ghost;
 import nars.experiment.pacman.entities.Player;
 import nars.experiment.pacman.maze.Maze;

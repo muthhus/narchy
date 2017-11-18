@@ -2,6 +2,7 @@ package nars.index.term;
 
 import com.google.common.collect.Iterables;
 import jcog.bag.Bag;
+import jcog.bag.impl.ConcurrentArrayBag;
 import jcog.bloom.YesNoMaybe;
 import jcog.pri.PLink;
 import jcog.pri.PriCache;
@@ -9,7 +10,6 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.IO;
 import nars.Task;
-import jcog.bag.impl.ConcurrentArrayBag;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.index.term.map.MaplikeTermIndex;

@@ -11,7 +11,6 @@ import nars.derive.mutate.Termutator;
 import nars.index.term.NewCompound;
 import nars.term.Term;
 import nars.term.Termlike;
-import nars.term.container.TermContainer;
 import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
 import org.jetbrains.annotations.NotNull;

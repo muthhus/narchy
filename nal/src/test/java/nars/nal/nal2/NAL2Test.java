@@ -1,12 +1,9 @@
 package nars.nal.nal2;
 
 
-import nars.$;
 import nars.NAR;
 import nars.NARS;
-import nars.term.atom.Int;
 import nars.test.TestNAR;
-import nars.time.Tense;
 import nars.util.NALTest;
 import org.junit.jupiter.api.Test;
 

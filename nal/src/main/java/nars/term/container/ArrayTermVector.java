@@ -2,7 +2,6 @@ package nars.term.container;
 
 import jcog.list.ArrayIterator;
 import nars.term.Term;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;

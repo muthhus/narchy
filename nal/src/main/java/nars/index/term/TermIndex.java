@@ -47,9 +47,9 @@ public abstract class TermIndex implements TermContext {
      * sets or replaces the existing value, unless the existing value is a PermanentConcept it must not
      * be replaced with a non-Permanent concept
      */
-    public abstract void set(@NotNull Term src, Termed target);
+    public abstract void set(Term src, Termed target);
 
-    public final void set(@NotNull Termed t) {
+    public final void set(Termed t) {
         set(t.term(), t);
     }
 

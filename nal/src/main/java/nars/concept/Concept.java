@@ -21,7 +21,7 @@
 package nars.concept;
 
 import jcog.bag.Bag;
-import jcog.map.MetaMap;
+import jcog.data.map.MetaMap;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;

@@ -2,11 +2,12 @@ package nars.concept;
 
 import jcog.bag.Bag;
 import jcog.list.FasterList;
-import jcog.pri.*;
+import jcog.pri.PLink;
+import jcog.pri.Pri;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
-import nars.Task;
 import nars.control.BatchActivation;
 import nars.term.Term;
 import nars.term.Termed;
@@ -16,7 +17,10 @@ import nars.term.container.TermContainer;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import static java.util.Collections.emptyList;
 import static nars.Op.INT;

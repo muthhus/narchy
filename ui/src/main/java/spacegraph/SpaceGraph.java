@@ -5,7 +5,7 @@ import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
 import jcog.list.FasterList;
-import jcog.map.MRUCache;
+import jcog.data.map.MRUCache;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.input.FPSLook;
 import spacegraph.input.KeyXYZ;

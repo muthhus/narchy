@@ -1,16 +1,12 @@
 package nars.derive;
 
-import jcog.Util;
-import nars.Param;
 import nars.control.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 
 import static nars.Op.*;
-import static nars.truth.TruthFunctions.c2wSafe;
 
 /**
  * Evaluates the truth of a premise

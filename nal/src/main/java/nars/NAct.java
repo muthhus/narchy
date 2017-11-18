@@ -2,7 +2,6 @@ package nars;
 
 import jcog.Util;
 import jcog.math.FloatParam;
-import jcog.pri.Pri;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;
@@ -27,8 +26,6 @@ import static jcog.Util.unitize;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static nars.truth.TruthFunctions.c2w;
-import static nars.truth.TruthFunctions.w2c;
-import static nars.truth.TruthFunctions.w2cSafe;
 
 /**
  * Created by me on 9/30/16.

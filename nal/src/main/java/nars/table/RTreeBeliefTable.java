@@ -37,7 +37,6 @@ import java.util.stream.Stream;
 
 import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 import static nars.time.Tense.ETERNAL;
-import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 

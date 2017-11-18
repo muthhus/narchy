@@ -1,7 +1,6 @@
 package nars;
 
 import jcog.Util;
-import jcog.constraint.continuous.DoubleVar;
 import jcog.event.On;
 import jcog.exe.Loop;
 import jcog.list.FasterList;

@@ -1,4 +1,4 @@
-package jcog.map;
+package jcog.data.map;
 
 import org.jetbrains.annotations.NotNull;
 

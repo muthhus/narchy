@@ -6,7 +6,6 @@ import nars.Op;
 import nars.Param;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
-import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
