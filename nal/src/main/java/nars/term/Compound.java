@@ -132,7 +132,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    default int subtermTimeSafe(Term x) {
+    default int subTimeSafe(Term x) {
         if (equals(x))
             return 0;
 
@@ -166,12 +166,12 @@ public interface Compound extends Term, IPair, TermContainer {
                     return s1offset; //the subject's dtrange + the dt between points to the start of the predicate
                 }
                 if (s0.op() == CONJ) {
-                    int s0d = s0.subtermTimeSafe(x);
+                    int s0d = s0.subTimeSafe(x);
                     if (s0d != DTERNAL)
                         return s0d;
                 }
                 if (s1.op() == CONJ) {
-                    int s1d = s1.subtermTimeSafe(x);
+                    int s1d = s1.subTimeSafe(x);
                     if (s1d != DTERNAL)
                         return s1d + s1offset;
                 }
@@ -196,7 +196,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 int offset = 0;
                 for (int yi = 0; yi < ys; yi++) {
                     Term yyy = yy.sub(reverse ? ((ys - 1) - yi) : yi);
-                    int sdt = yyy.subtermTimeSafe(x);
+                    int sdt = yyy.subTimeSafe(x);
                     if (sdt != DTERNAL)
                         return sdt + offset;
                     offset += idt + yyy.dtRange();

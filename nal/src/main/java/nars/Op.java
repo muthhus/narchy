@@ -1290,7 +1290,7 @@ public enum Op {
 
         Term implPost = implication.sub(1); /* impl postcondition */
 
-        int preInInner = conjInner.subtermTimeSafe(implication.sub(0));
+        int preInInner = conjInner.subTimeSafe(implication.sub(0));
         if (preInInner == DTERNAL)
             preInInner = 0; //HACK
         int d =

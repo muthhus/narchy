@@ -56,7 +56,7 @@ abstract public class DynamicTruthModel {
 
             int dt;
             if (superterm.op() == CONJ) {
-                dt = superterm.subtermTimeSafe(actualSubterm);
+                dt = superterm.subTimeSafe(actualSubterm);
 //                if (dt == DTERNAL) {
 //                    if (sdt != DTERNAL && sdt != XTERNAL) {
 //                        return null; //dt = 0; //TODO maybe this should never happen, and if it does there is an error

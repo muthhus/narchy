@@ -2,12 +2,15 @@ package astar.model;
 
 import astar.Find;
 import astar.Problem;
+import jcog.TODO;
 import jcog.data.graph.hgraph.Edge;
 import jcog.data.graph.hgraph.HashGraph;
 import jcog.data.graph.hgraph.Node;
+import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 
 import java.io.PrintStream;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -16,11 +19,12 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 public class TimeProblem<T,E> extends HashGraph<TimeProblem.Event<T>,E> implements Problem<TimeProblem.Event<T>> {
 
     public static final long ETERNAL = Long.MIN_VALUE;
+    public static final long TIMELESS = Long.MAX_VALUE;
 
     @Override
     public double cost(Event<T> a, Event<T> b) {
         long at, bt;
-        if ((at = a.when()) == Long.MIN_VALUE || (bt = b.when()) == ETERNAL)
+        if ((at = a.start()) == Long.MIN_VALUE || (bt = b.start()) == ETERNAL)
             return Double.POSITIVE_INFINITY;
         else
             return Math.abs(at - bt);
@@ -61,17 +65,22 @@ public class TimeProblem<T,E> extends HashGraph<TimeProblem.Event<T>,E> implemen
             return 1f;
         }
 
-        public long when() {
+        public long start() {
             return id.getTwo();
+        }
+        public long end() {
+            return start();
         }
 
         @Override
         public String toString() {
-            long t = when();
-            if (t == ETERNAL)
+            long s = start();
+            if (s == ETERNAL)
                 return id() + "@ETE";
-            else
-                return id() + "@" + t;
+            else {
+                long e = end();
+                return id() + "@" + (s==e ? s : "[" + s + ".." + e + "]");
+            }
         }
     }
 
@@ -79,11 +88,37 @@ public class TimeProblem<T,E> extends HashGraph<TimeProblem.Event<T>,E> implemen
     public static class Relative<T> extends Event<T> {
 
         public Relative(T id) {
-            super(id, ETERNAL);
+            super(id, TIMELESS);
         }
 
+        @Override
+        public String toString() {
+            return id().toString() + "@?";
+        }
     }
 
+    protected static class Unsolved<X> extends Relative<X> {
+        private final Map<X, LongSet> absolute;
+
+        public Unsolved(X x, Map<X, LongSet> absolute) {
+            super(x);
+            this.absolute = absolute;
+        }
+
+        @Override
+        public long start() {
+            throw new TODO();
+        }
+
+        /* hack */
+        static final String ETERNAL_STRING = Long.toString(ETERNAL);
+
+        @Override
+        public String toString() {
+            return id() + "?" +
+                    (absolute.toString().replace(ETERNAL_STRING, "ETE")); //HACK
+        }
+    }
 
 
 }

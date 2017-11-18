@@ -582,7 +582,7 @@ public class TemporalTermTest {
         Term x = $("((d-->c) ==>-3 (a-->b))");
         assertEquals(0, x.subTime($("(d-->c)")));
         assertEquals(-3, x.subTime($("(a-->b)")));
-        assertEquals(DTERNAL, x.subtermTimeSafe($("a"))); //a is not an event within x
+        assertEquals(DTERNAL, x.subTimeSafe($("a"))); //a is not an event within x
     }
 
     @Test
@@ -593,7 +593,7 @@ public class TemporalTermTest {
         assertEquals(-5, t.subTime($("a")));
         assertEquals(0, t.subTime($("b")));
         assertEquals(5, t.subTime($("c")));
-        assertEquals(DTERNAL, t.subtermTimeSafe($("x")));
+        assertEquals(DTERNAL, t.subTimeSafe($("x")));
     }
 
     @Test

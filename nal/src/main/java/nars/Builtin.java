@@ -381,7 +381,7 @@ public class Builtin {
         }));
 
         nar.on(Functor.f2((Atom) $.the("conjDropIfEarliest"), (Term conj, Term event) -> {
-            if (conj.op() != CONJ || conj.subtermTimeSafe(event) != 0)
+            if (conj.op() != CONJ || conj.subTimeSafe(event) != 0)
                 return Null;
             if (conj.dt() != DTERNAL) {
                 FastList<LongObjectPair<Term>> events = conj.eventList();

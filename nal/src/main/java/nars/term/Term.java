@@ -440,7 +440,7 @@ public interface Term extends Termed, Comparable<Termed> {
      * @param x subterm which must be present
      */
     default int subTime(/*@NotNull*/ Term x) {
-        int d = subtermTimeSafe(x);
+        int d = subTimeSafe(x);
         if (d != DTERNAL)
             return d;
 
@@ -456,7 +456,7 @@ public interface Term extends Termed, Comparable<Termed> {
      * @param dt the current offset in the search
      * @return DTERNAL if the subterm was not found
      */
-    default int subtermTimeSafe(/*@NotNull*/ Term x) {
+    default int subTimeSafe(/*@NotNull*/ Term x) {
         return equals(x) ? 0 : DTERNAL;
     }
 
