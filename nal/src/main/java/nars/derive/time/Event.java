@@ -143,9 +143,9 @@ public abstract class Event implements Comparable<Event> {
     public static String str(Term term, long start, long end) {
         if (start != ETERNAL) {
             if (start != end)
-                return term + ("@[" + ITemporalize.timeStr(start) + ".." + ITemporalize.timeStr(end)) + ']';
+                return term + ("@[" + Temporalize.timeStr(start) + ".." + Temporalize.timeStr(end)) + ']';
             else
-                return term + "@" + ITemporalize.timeStr(start);
+                return term + "@" + Temporalize.timeStr(start);
         } else
             return term + "@ETE";
     }

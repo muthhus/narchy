@@ -33,6 +33,7 @@ import java.util.Map;
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.truth.TruthFunctions.w2c;
+import static nars.truth.TruthFunctions.w2cSafe;
 
 
 /**
@@ -69,6 +70,7 @@ public class Implier extends DurService {
 
     public Implier(NAR n, float relativeTargetDur, Term... seeds) {
         this(n, List.of(seeds), relativeTargetDur);
+        assert(seeds.length > 0);
     }
 
 
@@ -142,7 +144,7 @@ public class Implier extends DurService {
                 if (SGimpl == null)
                     return;
 
-                float implConf = w2c(SGimpl.evi(this.then, dur));
+                float implConf = w2cSafe(SGimpl.evi(this.then, dur));
                 if (implConf < confSubMin)
                     return;
 
@@ -215,15 +217,20 @@ public class Implier extends DurService {
                 @Nullable Truth uu = a.commitSum().dither(freqRes, confRes, confMin, 1f);
                 if (uu != null) {
                     float c = uu.conf() * strength;
+                    NALTask y;
+                    long[] stamp = nar.time.nextInputStamp();
                     if (c >= confMin) {
-                        NALTask y = new NALTask(t, GOAL, uu, then, then, then + dur /* + dur */,
-                                nar.time.nextInputStamp());
-                        y.pri(nar.priDefault(GOAL));
+                        y = new NALTask(t, GOAL, uu, now, then-dur/2, then + dur/2 /* + dur */, stamp);
+                    } else {
+                        y = new NALTask(t, QUEST, null, now, then-dur/2, then + dur/2, stamp);
+                    }
+                    y.pri(nar.priDefault(y.punc));
+
                         //                        if (Param.DEBUG)
                         //                            y.log("")
                         in.input(y);
-                        System.err.println("\t" + y);
-                    }
+                        System.out.println("\t" + y);
+
                 }
             });
 

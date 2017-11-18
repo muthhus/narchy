@@ -12,12 +12,12 @@ public class RelativeEvent extends Event {
     public final Term rel;
     public final int start;
     public final int end;
-    protected final ITemporalize t;
+    protected final Temporalize t;
     final boolean inverts;
     private final boolean self;
 
 
-    protected RelativeEvent(ITemporalize t, Term term, Term relativeTo, int start, int end) {
+    protected RelativeEvent(Temporalize t, Term term, Term relativeTo, int start, int end) {
         super(term);
         assert (start != XTERNAL && end != XTERNAL);
 
@@ -98,9 +98,9 @@ public class RelativeEvent extends Event {
         if (start == DTERNAL) {
             return term + "@:->" + rel;
         } else if (start != end) {
-            return term + "@[" + ITemporalize.timeStr(start) + ".." + ITemporalize.timeStr(end) + "]->" + rel;
+            return term + "@[" + Temporalize.timeStr(start) + ".." + Temporalize.timeStr(end) + "]->" + rel;
         } else {
-            return term + "@" + ITemporalize.timeStr(start) + "->" + rel;
+            return term + "@" + Temporalize.timeStr(start) + "->" + rel;
         }
     }
 

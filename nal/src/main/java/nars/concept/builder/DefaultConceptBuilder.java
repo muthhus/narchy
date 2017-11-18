@@ -43,8 +43,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
         this(
-                new DefaultConceptState("sleep", 64, 64, 16),
-                new DefaultConceptState("awake", 64, 64, 16)
+                new DefaultConceptState("sleep", 64, 64, 8),
+                new DefaultConceptState("awake", 64, 64, 8)
         );
     }
 
@@ -95,8 +95,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
             case INH:
 
-                Term subj = t.sub(0);
-                Term pred = t.sub(1);
+                Term subj = ts.sub(0);
+                Term pred = ts.sub(1);
 
                 Op so = subj.op();
                 Op po = pred.op();

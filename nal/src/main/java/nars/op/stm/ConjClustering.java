@@ -75,9 +75,9 @@ public class ConjClustering extends Causable {
             if (!t.isEternal() && t.punc() == punc && (includeNeg || t.isPositive())) {
                 bag.put(t,
                         t.priElseZero()
-                    //(1f + t.expolarity()) * (1f + t.conf())
+                        //(1f + t.expolarity()) * (1f + t.conf())
                 );
-                        //* (1f + t.priElseZero()));// / t.volume());
+                //* (1f + t.priElseZero()));// / t.volume());
             }
         });
     }
@@ -150,103 +150,100 @@ public class ConjClustering extends Causable {
         final long[] start = {Long.MAX_VALUE};
 
 
-        chunk(group.stream().filter(Objects::nonNull).map(x -> x.id), maxConjSize, volMax).forEach(subs -> {
-            //
-//                    //if temporal clustering is close enough, allow up to maxGroupSize in &&, otherwise lmiit to 2
-//
-//
+        in.input(
+            chunk(group.stream().filter(Objects::nonNull).map(x -> x.id), maxConjSize, volMax).map(subs -> {
 
+                subs.forEach(z -> {
 
-            subs.forEach(z -> {
+                    long zs = z.start();
+                    long ze = z.end();
+                    if (start[0] > zs) start[0] = zs;
+                    if (end[0] < ze) end[0] = ze;
+                    assert (end[0] >= start[0]);
 
-                if (tasksCreated >= taskLimit)
-                    return; //HACK find more direct way of early terminating
-
-
-                long zs = z.start();
-                long ze = z.end();
-                if (start[0] > zs) start[0] = zs;
-                if (end[0] < ze) end[0] = ze;
-                if (end[0] < start[0])
-                    throw new RuntimeException("wtf");
-
-                vv.merge(pair(z.term(), zs), z, (prevZ, newZ) -> {
-                    if (prevZ == null || newZ.conf() > prevZ.conf())
-                        return newZ;
-                    else
-                        return prevZ;
+                    vv.merge(pair(z.term(), zs), z, (prevZ, newZ) -> {
+                        if (prevZ == null || newZ.conf() >= prevZ.conf())
+                            return newZ;
+                        else
+                            return prevZ;
+                    });
                 });
-            });
 
-            int vs = vv.size();
-            if (vs < 2)
-                return;
+                int vs = vv.size();
+                if (vs < 2)
+                    return null;
 
-            Task[] uu = vv.values().toArray(new Task[vs]);
+                Task[] uu = vv.values().toArray(new Task[vs]);
+                vv.clear();
 
-            List<LongObjectPair<Term>> pp = $.newArrayList(uu.length);
-            float freq = 1f;
-            float conf = 1f;
-            float priMax = Float.NEGATIVE_INFINITY;
-            int vol = 0;
-            for (Task x : uu) {
+                List<LongObjectPair<Term>> pp = $.newArrayList(uu.length);
+                float freq = 1f;
+                float conf = 1f;
+                float priMax = Float.NEGATIVE_INFINITY, priMin = Float.POSITIVE_INFINITY;
+                int vol = 0;
+                for (Task x : uu) {
 
-                Truth tx = x.truth();
-                conf *= tx.conf();
-                if (conf < confMin)
-                    return;
+                    Truth tx = x.truth();
+                    conf *= tx.conf();
+                    if (conf < confMin)
+                        return null;
 
-                float p = x.priElseZero();
-                if (p > priMax)
-                    priMax = p;
+                    float p = x.priElseZero();
+                    if (p < priMin) priMin = p;
+                    if (p > priMax) priMax = p;
 
-                Term tt = x.term();
-                vol += tt.volume();
-                if (vol > volMax)
-                    return;
+                    Term tt = x.term();
+                    vol += tt.volume();
+                    if (vol > volMax)
+                        return null;
 
-                float tf = tx.freq();
-                if (tx.isNegative()) {
-                    tt = tt.neg();
-                    freq *= (1f - tf);
-                } else {
-                    freq *= tf;
+                    float tf = tx.freq();
+                    if (tx.isNegative()) {
+                        tt = tt.neg();
+                        freq *= (1f - tf);
+                    } else {
+                        freq *= tf;
+                    }
+
+                    pp.add(pair(x.start(), tt));
                 }
 
-                pp.add(pair(x.start(), tt));
-            }
+                //TODO discount based on evidential overlap? needs N-way overlapFraction function
 
-            //TODO discount based on evidential overlap? needs N-way overlapFraction function
+                PreciseTruth t = $.t(freq, conf).dither(freqRes, confRes, confMin, 1f);
+                if (t != null) {
 
-            PreciseTruth t = $.t(freq, conf).dither(freqRes, confRes, confMin, 1f);
-            if (t != null) {
+                    @Nullable Term conj = Op.conj(pp);
+                    if (!conj.op().conceptualizable) {
+                        return null;
+                    }
 
-                @Nullable Term conj = Op.conj(pp);
-                if (!conj.op().conceptualizable) {
-                    return;
+
+                    @Nullable ObjectBooleanPair<Term> cp = Task.tryContent(conj, punc, true);
+                    if (cp != null) {
+
+
+                        int uuLen = uu.length;
+                        long[] evidence = Stamp.zip(uu, Param.STAMP_CAPACITY);
+                        NALTask m = new STMClusterTask(cp, t, start, end, evidence, punc, now); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+
+                        m.cause = Cause.zip(nar.causeCapacity.intValue(), uu);
+
+                        float pri =
+                                //priMax;
+                                priMin;
+
+                        m.setPri(BudgetFunctions.fund(pri, true, uu));
+                        tasksCreated++;
+                        return m;
+                    }
+
                 }
 
+                return null;
 
-                @Nullable ObjectBooleanPair<Term> cp = Task.tryContent(conj, punc, true);
-                if (cp != null) {
-
-
-                    int uuLen = uu.length;
-                    long[] evidence = Stamp.zip(uu, Param.STAMP_CAPACITY);
-                    NALTask m = new STMClusterTask(cp, t, start, end, evidence, punc, now); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
-
-                    m.cause = Cause.zip(nar.causeCapacity.intValue(), uu);
-
-                    float maxPri = priMax;
-
-                    m.setPri(BudgetFunctions.fund(maxPri, true, uu));
-                    in.input(m);
-                    tasksCreated++;
-                }
-
-            }
-
-        });
+            }).limit(taskLimit)
+        );
 
     }
 

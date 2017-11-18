@@ -270,9 +270,9 @@ public class BaseConcept implements Concept {
             beliefCapacity(be, bt, ge, gt);
 
             if (questions!=null)
-                questions.capacity(p.questionCap(true));
+                questions.capacity(p.questionCap(this,true));
             if (quests!=null)
-                quests.capacity(p.questionCap(false));
+                quests.capacity(p.questionCap(this,false));
 
         }
         return p;

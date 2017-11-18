@@ -2,11 +2,11 @@ package nars.derive.time;
 
 import jcog.math.Interval;
 import jcog.math.random.XorShift128PlusRandom;
+import nars.$;
 import nars.Op;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
-import nars.time.Tense;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,16 +24,14 @@ import static nars.time.Tense.*;
  *
  * @see http://choco-solver.readthedocs.io/en/latest/1_overview.html#directly
  */
-public class Temporalize implements ITemporalize {
+public class Temporalize {
 
     private final static Logger logger = LoggerFactory.getLogger(Temporalize.class);
 
-    private static final Time AMBIENT_EVENT = Time.the(ETERNAL, DTERNAL);
-
     /**
-     * left-aligned earliest event which other terms can relative to
+     * eternity is a virtual event for grounding eternal events so that relative offsets amongst them have a common basis for calculation
      */
-    private static final Time EARLIEST_EVENT = Time.the(ETERNAL, 0);
+    private static final Event ETERNITY = new AbsoluteEvent($.varDep(1), ETERNAL, 0);
 
 
     /**
@@ -115,7 +113,12 @@ public class Temporalize implements ITemporalize {
 
         if (a.base != ETERNAL && b.base != ETERNAL) {
             return (int) (b.abs() - a.abs()); //TODO check for numeric precision loss
-        } else if (a.offset != XTERNAL && b.offset != XTERNAL && a.offset != DTERNAL && b.offset != DTERNAL) {
+        }
+        if ((a.offset == b.offset) && (a.base == ETERNAL || b.base == ETERNAL)) {
+            //both eternal or a mix of one eternal and temporal.  the occurrence will be the temporal but the DT will be && (dternal)
+            return DTERNAL;
+        }
+        if (a.offset != XTERNAL && b.offset != XTERNAL && a.offset != DTERNAL && b.offset != DTERNAL) {
             //if (a.base == ETERNAL || b.base == ETERNAL) {
             return b.offset - a.offset; //relative offsets within a complete or partial eternal context
 //            } else {
@@ -132,6 +135,10 @@ public class Temporalize implements ITemporalize {
             return DTERNAL;
         }
         //throw new UnsupportedOperationException(a + " .. " + b); //maybe just return DTERNAL
+    }
+
+    public static String timeStr(long when) {
+        return when != ETERNAL ? Long.toString(when) : "ETE";
     }
 
 
@@ -175,7 +182,11 @@ public class Temporalize implements ITemporalize {
      * convenience method for testing: assumes start offset of zero, and dtRange taken from term
      */
     public void knowAbsolute(Term term, long when) {
-        knowAbsolute(term, when, when != ETERNAL ? when + term.dtRange() : ETERNAL);
+        if (when == ETERNAL) {
+            knowEternal(term);
+        } else {
+            knowAbsolute(term, when, when + term.dtRange());
+        }
     }
 
     /**
@@ -241,12 +252,16 @@ public class Temporalize implements ITemporalize {
                 Term implSubj = implComponents.sub(0);
                 Term implPred = implComponents.sub(1);
 
-//                if (superterm instanceof AbsoluteEvent) {
-//                    if (((AbsoluteEvent)superterm).start!=ETERNAL)
+                if (superterm instanceof AbsoluteEvent) {
+                    if (((AbsoluteEvent)superterm).start!=ETERNAL) {
+                        know(implSubj, relative(implSubj, superterm.term, implDT == DTERNAL ? DTERNAL : 0));
+                        know(implPred, relative(implPred, implSubj, implDT == DTERNAL ? DTERNAL : (implDT + implSubj.dtRange())));
+                    }
 //                        knowAbsolute(implSubj,
 //                            ((AbsoluteEvent)superterm).start, ((AbsoluteEvent)superterm).end
 //                        );
-//                }
+
+                }
 
                 /*if (!implSubj.equals(implPred))*/
                 if (implDT == DTERNAL) {
@@ -254,8 +269,8 @@ public class Temporalize implements ITemporalize {
                     //just inherit from the parent directly
                     //impl.subterms().forEach(i -> know(i, relative(i, root, 0)));
 
-                    know(implSubj, relative(implSubj, implPred, DTERNAL));
-                    know(implPred, relative(implPred, implSubj, DTERNAL));
+                    know(implSubj, relative(implSubj, implPred, 0));
+                    know(implPred, relative(implPred, implSubj, 0));
 
                 } else {
                     int predFromSubj = implDT + implSubj.dtRange();
@@ -456,7 +471,6 @@ public class Temporalize implements ITemporalize {
 //        return oo.size() > 1 ? oo : null;
 //    }
 
-    @Override
     public Event solve(final Term x, Map<Term, Time> trail) {
         return solve(x, trail, (t) -> true);
     }
@@ -492,12 +506,12 @@ public class Temporalize implements ITemporalize {
                 return null; //cyclic
         }
 
-        if (!x.op().temporal && fullyEternal()) { //*empty(trail) && */x.op() != IMPL && x.dt() != XTERNAL) {
-            //HACK anchor in eternity
-            trail.putIfAbsent(x, EARLIEST_EVENT); //glue
-        } else {
-            trail.putIfAbsent(x, null); //placeholder
-        }
+//        if (!x.op().temporal && fullyEternal()) { //*empty(trail) && */x.op() != IMPL && x.dt() != XTERNAL) {
+//            //HACK anchor in eternity
+//            trail.putIfAbsent(x, EARLIEST_EVENT); //glue
+//        } else {
+        trail.putIfAbsent(x, null); //placeholder
+//        }
 
 
         SortedSet<Event> cc = constraints.get(x);
@@ -705,12 +719,13 @@ public class Temporalize implements ITemporalize {
 //                    }
 
                     Event ea;
-//                    if (dir) {
-//                        //forward
                     if ((ea = solve(t0, trail)) != null) {
 
-                        Event eb;
-                        if ((eb = solve(t1, trail)) != null) {
+                        Time at = ea.start(trail);
+                        if (at != null) {
+
+                            Event eb;
+                            if ((eb = solve(t1, trail)) != null) {
 
 //                    } else {
 //                        //reverse
@@ -720,10 +735,6 @@ public class Temporalize implements ITemporalize {
 //                            return null;
 //                    }
 
-
-                            Time at = ea.start(trail);
-
-                            if (at != null) {
 
                                 Time bt = eb.start(trail);
 
@@ -818,20 +829,15 @@ public class Temporalize implements ITemporalize {
 //            }
 //        }
 
-        return new SolutionEvent(x, ETERNAL);
+        //return new SolutionEvent(x, ETERNAL);
+        return null;
     }
 
 
     private Event solveConj(Term a, Time at, Term b, Time bt) {
 
         if (at.base == ETERNAL || bt.base == ETERNAL) {
-            //both eternal or a mix of one eternal and temporal.  the occurrence will be the temporal but the DT will be && (dternal)
-            int dt;
-            if (at.offset != DTERNAL && bt.offset != DTERNAL) {
-                dt = bt.offset - at.offset;
-            } else {
-                dt = DTERNAL;
-            }
+            int dt = dt(at, bt);
 
             Term newTerm = CONJ.the(dt, a, b);
 
@@ -966,23 +972,30 @@ public class Temporalize implements ITemporalize {
     }
 
 
-    public void knowAmbient(Term t) {
-        know(new AmbientEvent(t), 0, t.dtRange());
+    public void knowEternal(Term t) {
+        know(t, relative(t, ETERNITY, 0));
     }
 
-    final static class AmbientEvent extends AbsoluteEvent {
-        public AmbientEvent(Term t) {
-            super(t, Tense.ETERNAL, Tense.ETERNAL);
-        }
-
-        @Override
-        public Time start(@Nullable Map<Term, Time> ignored) {
-            return AMBIENT_EVENT;
-        }
-
-        @Override
-        public Time end(Map<Term, Time> ignored) {
-            return AMBIENT_EVENT;
-        }
+    /**
+     * warning: for external use only; all internal calls should use solve(target, trail) to prevent stack overflow
+     */
+    public Event solve(Term target) {
+        return solve(target, new HashMap<>(target.volume()));
     }
+
+//    final static class AmbientEvent extends AbsoluteEvent {
+//        public AmbientEvent(Term t) {
+//            super(t, Tense.ETERNAL, Tense.ETERNAL);
+//        }
+//
+//        @Override
+//        public Time start(@Nullable Map<Term, Time> ignored) {
+//            return ETERNITY;
+//        }
+//
+//        @Override
+//        public Time end(Map<Term, Time> ignored) {
+//            return ETERNITY;
+//        }
+//    }
 }

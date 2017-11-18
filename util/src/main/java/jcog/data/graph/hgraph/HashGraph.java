@@ -23,67 +23,91 @@
  */
 package jcog.data.graph.hgraph;
 
+import java.io.PrintStream;
 import java.util.*;
 
 /**
  *
  * @author Thomas Wuerthinger
  */
-public class Graph<N, E> {
+public class HashGraph<N, E> {
 
-    private HashMap<Object, Node<N, E>> nodes;
-    private HashMap<Object, Edge<N, E>> edges;
-    private List<Node<N, E>> nodeList;
+    public Map<Object, Node<N, E>> nodes;
+    protected Map<Object, Edge<N, E>> edges;
 
-    public Graph() {
-        nodes = new HashMap<>();
-        edges = new HashMap<>();
-        nodeList = new ArrayList<>();
+    public HashGraph() {
+        this(new HashMap<>(), new HashMap());
     }
 
-    public Node<N, E> createNode(N data, Object key) {
-        Node<N, E> n = new Node<>(this, data);
-        assert key == null || !nodes.containsKey(key);
-        if (key != null) {
-            nodes.put(key, n);
+    public HashGraph(Map<Object, Node<N, E>> nodes, Map<Object, Edge<N, E>> edges) {
+        this.nodes = nodes;
+        this.edges = edges;
+    }
+
+    public void print() {
+        print(System.out);
+    }
+
+    public void print(PrintStream out) {
+        nodes().forEach((node)->{
+            node.print(out);
+        });
+    }
+
+    public Node<N, E> nodeAdd(N data) {
+        return nodeAdd(data, data);
+    }
+
+    public Node<N, E> nodeAdd(N data, Object key) {
+        int s = nodes.size();
+        Node<N, E> r = nodes.computeIfAbsent(key, (x) -> new Node<>(data));
+        if (nodes.size() > s) {
+            onAdd(r);
         }
-        nodeList.add(n);
-        return n;
+        return r;
     }
 
-    public Edge<N, E> createEdge(Node<N, E> source, Node<N, E> dest, E data, Object key) {
-        Edge<N, E> e = new Edge<>(this, source, dest, data);
-        source.addOutEdge(e);
-        dest.addInEdge(e);
-        if (key != null) {
-            edges.put(key, e);
-        }
-        return e;
+    protected void onAdd(Node<N, E> r) {
+
     }
 
-    public Node<N, E> getNode(Object key) {
+    public Edge<N, E> edgeAdd(Node<N, E> source, E data, Node<N, E> dest) {
+        return edgeAdd(source, data, data, dest);
+    }
+
+    public Edge<N, E> edgeAdd(Node<N, E> source, Object key, E data, Node<N, E> dest) {
+        return edges.computeIfAbsent(key, (x) -> {
+            Edge<N, E> e = new Edge<>(source, dest, data);
+            source.outAdd(e);
+            dest.inAdd(e);
+            return e;
+        });
+    }
+
+    public Node<N, E> node(Object key) {
         return nodes.get(key);
     }
 
-    public Edge<N, E> getEdge(Object key) {
+
+    public Edge<N, E> edge(Object key) {
         return edges.get(key);
     }
 
-    public Collection<Edge<N, E>> getEdges() {
-        return Collections.unmodifiableCollection(edges.values());
+    public Collection<Edge<N, E>> edges() {
+        return edges.values();
     }
 
-    public Collection<Node<N, E>> getNodes() {
-        return Collections.unmodifiableList(nodeList);
+    public Collection<Node<N, E>> nodes() {
+        return nodes.values();
     }
 
-    public void removeEdge(Edge<N, E> e, Object key) {
+    public void edgeRemove(Edge<N, E> e, Object key) {
         assert key == null || edges.containsKey(key);
         if (key != null) {
             edges.remove(key);
         }
-        e.getSource().removeOutEdge(e);
-        e.getDest().removeInEdge(e);
+        e.from.outRemove(e);
+        e.to.inRemove(e);
     }
 
     public class DFSTraversalVisitor {
@@ -109,8 +133,8 @@ public class Graph<N, E> {
     public List<Node<N, E>> getNodesWithInDegree(int x, boolean countSelfLoops) {
 
         List<Node<N, E>> result = new ArrayList<>();
-        for (Node<N, E> n : getNodes()) {
-            if (n.getInDegree(countSelfLoops) == x) {
+        for (Node<N, E> n : nodes()) {
+            if (n.ins(countSelfLoops) == x) {
                 result.add(n);
             }
         }
@@ -122,7 +146,7 @@ public class Graph<N, E> {
     private void markReachable(Node<N, E> startingNode) {
         ArrayList<Node<N, E>> arr = new ArrayList<>();
         arr.add(startingNode);
-        for (Node<N, E> n : getNodes()) {
+        for (Node<N, E> n : nodes()) {
             n.setReachable(false);
         }
         traverseDFS(arr, new DFSTraversalVisitor() {
@@ -140,7 +164,7 @@ public class Graph<N, E> {
             markReachable(startingNode);
         }
 
-        for (Node<N, E> n : getNodes()) {
+        for (Node<N, E> n : nodes()) {
             n.setVisited(false);
             n.setActive(false);
         }
@@ -159,13 +183,14 @@ public class Graph<N, E> {
             current.setActive(false);
 
 
-            for (Edge<N, E> e : current.getOutEdges()) {
-                if (!e.getDest().isVisited()) {
+            for (Edge<N, E> e : current.out()) {
+                if (!e.to.isVisited()) {
 
                     boolean allow = true;
                     if (longestPath) {
-                        for (Node<N, E> pred : e.getDest().getPredecessors()) {
-                            if ((!pred.isVisited() || pred.isActive()) && pred.isReachable()) {
+                        for (Edge<N, E> pred : e.to.in()) {
+                            Node<N, E> p = pred.to;
+                            if ((!p.isVisited() || p.isActive()) && p.isReachable()) {
                                 allow = false;
                                 break;
                             }
@@ -173,10 +198,10 @@ public class Graph<N, E> {
                     }
 
                     if (allow) {
-                        queue.offer(e.getDest());
-                        lastAdded = e.getDest();
-                        e.getDest().setVisited(true);
-                        e.getDest().setActive(true);
+                        queue.offer(e.to);
+                        lastAdded = e.to;
+                        e.to.setVisited(true);
+                        e.to.setActive(true);
                     }
                 }
             }
@@ -189,12 +214,12 @@ public class Graph<N, E> {
     }
 
     public void traverseDFS(DFSTraversalVisitor tv) {
-        traverseDFS(getNodes(), tv);
+        traverseDFS(nodes(), tv);
     }
 
     public void traverseDFS(Collection<Node<N, E>> startingNodes, DFSTraversalVisitor tv) {
 
-        for (Node<N, E> n : getNodes()) {
+        for (Node<N, E> n : nodes()) {
             n.setVisited(false);
             n.setActive(false);
         }
@@ -212,9 +237,9 @@ public class Graph<N, E> {
             n.setActive(true);
             tv.visitNode(n);
 
-            for (Edge<N, E> e : n.getOutEdges()) {
+            for (Edge<N, E> e : n.out()) {
 
-                Node<N, E> next = e.getDest();
+                Node<N, E> next = e.to;
                 if (next.isActive()) {
                     tv.visitEdge(e, true);
                 } else {
@@ -231,13 +256,13 @@ public class Graph<N, E> {
 
     public boolean hasCycles() {
 
-        for (Node<N, E> n : getNodes()) {
+        for (Node<N, E> n : nodes()) {
             n.setVisited(false);
             n.setActive(false);
         }
 
         boolean result = false;
-        for (Node<N, E> n : getNodes()) {
+        for (Node<N, E> n : nodes()) {
             result |= checkCycles(n);
             if (result) {
                 break;
@@ -257,8 +282,9 @@ public class Graph<N, E> {
             n.setVisited(true);
             n.setActive(true);
 
-            for (Node<N, E> succ : n.getSuccessors()) {
-                if (checkCycles(succ)) {
+            for (Edge<N, E> succ : n.out()) {
+                Node<N, E> p = succ.to;
+                if (checkCycles(p)) {
                     return true;
                 }
             }
@@ -275,14 +301,14 @@ public class Graph<N, E> {
 
         StringBuilder s = new StringBuilder();
         s.append("Nodes: ");
-        for (Node<N, E> n : getNodes()) {
+        for (Node<N, E> n : nodes()) {
             s.append(n.toString());
             s.append("\n");
         }
 
         s.append("Edges: ");
 
-        for (Edge<N, E> e : getEdges()) {
+        for (Edge<N, E> e : edges()) {
             s.append(e.toString());
             s.append("\n");
         }

@@ -99,8 +99,8 @@ public interface QuestionTable extends TaskTable {
         @Override
         protected void onEvict(Map.Entry<Task, Task> entry) {
             Task x = entry.getKey();
-            x.delete();
             Task y = entry.getValue();
+            x.delete();
             if (y != x)
                 y.delete();
         }
@@ -150,8 +150,13 @@ public interface QuestionTable extends TaskTable {
         @Override
         public void forEachTask(Consumer<? super Task> x) {
             Task[] t = toArray();
-            for (Task y : t)
-                x.accept(y);
+            for (Task y : t) {
+                if (y.isDeleted()) {
+                    remove(y);
+                } else {
+                    x.accept(y);
+                }
+            }
         }
 
         @Override

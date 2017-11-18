@@ -811,10 +811,21 @@ public class NAL7Test extends NALTest {
     @Test
     public void testConjInductionEternalTemporal() {
         test
+                .input("a:x.")
+                .input("a:y. :|:")
+                .mustBelieve(cycles, "(a:x && a:y)", 1f, 0.81f, 0)
+                .mustNotOutput(cycles, "(a:x &| a:y)", BELIEF, 0f, 1, 0f, 1, (t)->true);
+
+    }
+
+    @Test
+    public void testImplInductionEternalTemporal() {
+        test
                 .log()
                 .input("a:x.")
                 .input("a:y. :|:")
-                .mustBelieve(cycles, "(a:x && a:y)", 1f, 0.81f, 0);
+                .mustBelieve(cycles, "(a:x ==> a:y)", 1f, 0.45f, 0)
+                .mustNotOutput(cycles, "(a:x =|> a:y)", BELIEF, 0f, 1, 0f, 1, (t)->true);
     }
 
     @Test

@@ -81,7 +81,7 @@ public final class DefaultConceptState extends ConceptState {
 
 
     @Override
-    public int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
+    public int beliefCap(BaseConcept concept, boolean beliefOrGoal, boolean eternalOrTemporal) {
         int max, min;
 
         if (beliefOrGoal) {
@@ -91,18 +91,18 @@ public final class DefaultConceptState extends ConceptState {
             max = eternalOrTemporal ? goalsMaxEte : goalsMaxTemp;
             min = eternalOrTemporal ? goalsMinEte : goalsMinTemp;
         }
-        return Util.lerp(Util.unitize((-1 + compoundConcept.complexity()) / 32f), max, min);
+        return Util.lerp(Util.unitize((-1 + concept.complexity()) / 32f), max, min);
         //return (int) Math.ceil(max * Math.min(1f, (1f / (compoundConcept.volume()/ beliefComplexityCapacity))));
     }
 
     @Override
-    public int linkCap(@NotNull Concept c, boolean termOrTask) {
+    public int linkCap(@NotNull Concept concept, boolean termOrTask) {
         if (termOrTask) {
 
-            return termlinksCapacity.valueOf(c.volume());
+            return termlinksCapacity.valueOf(concept.volume());
 
         } else {
-            return tasklinksCapacity.valueOf(c.volume());
+            return tasklinksCapacity.valueOf(concept.volume());
         }
     }
 
@@ -119,8 +119,8 @@ public final class DefaultConceptState extends ConceptState {
     }
 
     @Override
-    public final int questionCap(boolean questionOrQuest) {
-        return questionsMax.intValue();
+    public final int questionCap(BaseConcept concept, boolean questionOrQuest) {
+        return Util.lerp( 1f - Math.min(1f,(((float)concept.volume()) / 32)), 1, questionsMax.intValue());
     }
 
 //        public int getBeliefsCapacity(Termed t);

@@ -30,54 +30,51 @@ package jcog.data.graph.hgraph;
 public class Edge<N, E> {
 
     private E data;
-    private Node<N, E> source;
-    private Node<N, E> dest;
+    public final Node<N, E> from;
+    public final Node<N, E> to;
 
-    protected Edge(Graph<N, E> graph, Node<N, E> source, Node<N, E> dest, E data) {
-        setData(data);
-        this.source = source;
-        this.dest = dest;
-        assert source != null;
-        assert dest != null;
+    protected Edge(Node<N, E> from, Node<N, E> to, E data) {
+        set(data);
+        this.from = from;
+        this.to = to;
+        assert from != null;
+        assert to != null;
     }
 
-    public Node<N, E> getSource() {
-        return source;
+    @Override
+    public int hashCode() {
+        return data.hashCode();
     }
 
-    public Node<N, E> getDest() {
-        return dest;
-    }
-
-    public E getData() {
+    public E get() {
         return data;
     }
 
-    public void setData(E e) {
+    public void set(E e) {
         data = e;
     }
 
     public boolean isSelfLoop() {
-        return source == dest;
+        return from == to;
     }
 
-    public void reverse() {
-
-        // Remove from current source / dest
-        source.removeOutEdge(this);
-        dest.removeInEdge(this);
-
-        Node<N, E> tmp = source;
-        source = dest;
-        dest = tmp;
-
-        // Add to new source / dest
-        source.addOutEdge(this);
-        dest.addInEdge(this);
-    }
+//    public void reverse() {
+//
+//        // Remove from current source / dest
+//        from.outRemove(this);
+//        to.inRemove(this);
+//
+//        Node<N, E> tmp = from;
+//        from = to;
+//        to = tmp;
+//
+//        // Add to new source / dest
+//        from.outAdd(this);
+//        to.inAdd(this);
+//    }
 
     @Override
     public String toString() {
-        return "Edge (" + source + " -- " + dest + "): " + data;
+        return from + " => " + data + " => " + to;
     }
 }

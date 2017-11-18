@@ -25,17 +25,17 @@ public class TemporalizeTest {
     final NAR n = NARS.shell();
 
     @Test
-    public void testAmbientEquivalence() {
+    public void testEternalEquivalence() {
         Temporalize t = new Temporalize();
-        t.knowAmbient($.the("x"));
-        t.knowAmbient($.the("x"));
+        t.knowEternal($.the("x"));
+        t.knowEternal($.the("x"));
         assertEquals(1, t.constraints.get($.the("x")).size());
     }
     @Test
-    public void testAmbientInequivalence() throws Narsese.NarseseException {
+    public void testEternalInequivalence() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
-        t.knowAmbient($.$("(x ==>+1 y)"));
-        t.knowAmbient($.$("(x ==>+2 y)"));
+        t.knowEternal($.$("(x ==>+1 y)"));
+        t.knowEternal($.$("(x ==>+2 y)"));
         assertEquals(2, t.constraints.get($.$("(x==>y)")).size());
     }
 
@@ -363,7 +363,7 @@ public class TemporalizeTest {
         Temporalize t = new Temporalize();
 
 
-        t.knowAmbient($("(((#1-->swimmer)&&(#1-->$2))==>(swan-->$2))"));
+        t.knowEternal($("(((#1-->swimmer)&&(#1-->$2))==>(swan-->$2))"));
 
         System.out.println(t);
         HashMap h = new HashMap();

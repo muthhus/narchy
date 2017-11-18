@@ -18,11 +18,11 @@ public abstract class ConceptState extends Atom {
         super(id);
     }
 
-    public abstract int linkCap(Concept compoundConcept, boolean termOrTask);
+    public abstract int linkCap(Concept concept, boolean termOrTask);
 
-    public abstract int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal);
+    public abstract int beliefCap(BaseConcept concept, boolean beliefOrGoal, boolean eternalOrTemporal);
 
-    public abstract int questionCap(boolean questionOrQuest);
+    public abstract int questionCap(BaseConcept concept, boolean questionOrQuest);
 
 
     public static final ConceptState New = new EmptyConceptState("new");
@@ -35,17 +35,17 @@ public abstract class ConceptState extends Atom {
 
 
         @Override
-        public int linkCap(Concept compoundConcept, boolean termOrTask) {
+        public int linkCap(Concept concept, boolean termOrTask) {
             return 0;
         }
 
         @Override
-        public int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
+        public int beliefCap(BaseConcept concept, boolean beliefOrGoal, boolean eternalOrTemporal) {
             return 0;
         }
 
         @Override
-        public int questionCap(boolean questionOrQuest) {
+        public int questionCap(BaseConcept concept, boolean questionOrQuest) {
             return 0;
         }
     };
@@ -58,17 +58,17 @@ public abstract class ConceptState extends Atom {
         }
 
         @Override
-        public int linkCap(Concept compoundConcept, boolean termOrTask) {
+        public int linkCap(Concept concept, boolean termOrTask) {
             return 0;
         }
 
         @Override
-        public int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
+        public int beliefCap(BaseConcept concept, boolean beliefOrGoal, boolean eternalOrTemporal) {
             return 0;
         }
 
         @Override
-        public int questionCap(boolean questionOrQuest) {
+        public int questionCap(BaseConcept concept, boolean questionOrQuest) {
             return 0;
         }
     }

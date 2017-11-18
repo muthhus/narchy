@@ -23,8 +23,10 @@
  */
 package jcog.data.graph.hgraph;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import com.google.common.collect.Iterables;
+import jcog.list.FasterList;
+
+import java.io.PrintStream;
 import java.util.List;
 
 /**
@@ -34,11 +36,16 @@ import java.util.List;
 public class Node<N, E> {
 
     private N data;
-    private List<Edge<N, E>> inEdges;
-    private List<Edge<N, E>> outEdges;
+    private final List<Edge<N, E>> inEdges;
+    private final List<Edge<N, E>> outEdges;
     private boolean visited;
     private boolean active;
     private boolean reachable;
+
+    @Override
+    public int hashCode() {
+        return data.hashCode();
+    }
 
     protected boolean isVisited() {
         return visited;
@@ -64,17 +71,17 @@ public class Node<N, E> {
         active = b;
     }
 
-    public int getInDegree() {
-        return getInDegree(true);
+    public int ins() {
+        return ins(true);
     }
 
-    public int getInDegree(boolean countSelfLoops) {
+    public int ins(boolean countSelfLoops) {
         if (countSelfLoops) {
             return inEdges.size();
         } else {
             int cnt = 0;
             for (Edge<N, E> e : inEdges) {
-                if (e.getSource() != this) {
+                if (e.from != this) {
                     cnt++;
                 }
             }
@@ -82,74 +89,66 @@ public class Node<N, E> {
         }
     }
 
-    public int getOutDegree() {
+    public int outs() {
         return outEdges.size();
     }
 
-    protected Node(Graph<N, E> graph, N data) {
-        setData(data);
-        inEdges = new ArrayList<>();
-        outEdges = new ArrayList<>();
+    protected Node(N data) {
+        set(data);
+        inEdges = new FasterList<>();
+        outEdges = new FasterList<>();
     }
 
-    protected void addInEdge(Edge<N, E> e) {
+    protected void inAdd(Edge<N, E> e) {
         inEdges.add(e);
     }
 
-    protected void addOutEdge(Edge<N, E> e) {
+    protected void outAdd(Edge<N, E> e) {
         outEdges.add(e);
     }
 
-    protected void removeInEdge(Edge<N, E> e) {
+    protected void inRemove(Edge<N, E> e) {
         //assert inEdges.contains(e);
         inEdges.remove(e);
     }
 
-    protected void removeOutEdge(Edge<N, E> e) {
+    protected void outRemove(Edge<N, E> e) {
         //assert outEdges.contains(e);
         outEdges.remove(e);
     }
 
-    public List<Edge<N, E>> getInEdges() {
-        return Collections.unmodifiableList(inEdges);
+    public List<Edge<N, E>> in() {
+        return (inEdges);
     }
 
-    public List<Edge<N, E>> getOutEdges() {
-        return Collections.unmodifiableList(outEdges);
+    public List<Edge<N, E>> out() {
+        return (outEdges);
     }
 
-    public List<Node<N, E>> getSuccessors() {
-        ArrayList<Node<N, E>> succ = new ArrayList<>();
-        for (Edge<N, E> e : getOutEdges()) {
-            Node<N, E> n = e.getDest();
-            if (!succ.contains(n)) {
-                succ.add(n);
-            }
-        }
-        return succ;
+    public Iterable<N> successors() {
+        return Iterables.transform(out(), e -> e.to.data);
+    }
+    public Iterable<N> predecessors() {
+        return Iterables.transform(in(), e -> e.from.data);
     }
 
-    public List<Node<N, E>> getPredecessors() {
-        ArrayList<Node<N, E>> pred = new ArrayList<>();
-        for (Edge<N, E> e : getInEdges()) {
-            Node<N, E> n = e.getSource();
-            if (!pred.contains(n)) {
-                pred.add(n);
-            }
-        }
-        return pred;
-    }
-
-    public N getData() {
+    public N get() {
         return data;
     }
 
-    public void setData(N d) {
+    public void set(N d) {
         data = d;
     }
 
     @Override
     public String toString() {
-        return "Node: " + data;
+        return data.toString();
+    }
+
+    public void print(PrintStream out) {
+        out.println(data);
+        out().forEach(e -> {
+           out.println("\t" + e);
+        });
     }
 }

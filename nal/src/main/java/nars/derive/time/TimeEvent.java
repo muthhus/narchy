@@ -40,7 +40,7 @@ public class TimeEvent extends Event {
     public String toString() {
        if (dur == 0) {
            if (time.offset==0)
-               return term +"@" + ITemporalize.timeStr(time.base);
+               return term +"@" + Temporalize.timeStr(time.base);
            else
                return term + "@" + time;
        } else {

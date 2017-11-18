@@ -73,14 +73,14 @@ public class TemporalizeDerived extends Temporalize {
 //        }
 
         Term taskTerm = polarizedTaskTerm(task);
-        if (taskTerm.op() != IMPL) {// && (!fullyEternal())) {
+//        if (taskTerm.op() != IMPL) {// && (!fullyEternal())) {
             knowDerivedAbsolute(d,
                     taskTerm,
                     taskStart, taskEnd);
-        } else {
-            //only know an impl as ambient if there is already non-eternal events detected
-            knowDerivedAmbient(d, taskTerm);
-        }
+//        } else {
+//            //only know an impl as ambient if there is already non-eternal events detected
+//            knowDerivedAmbient(d, taskTerm);
+//        }
 
 
 //        if (!task.term().equals(d.beliefTerm)) { //dont re-know the term
@@ -105,13 +105,13 @@ public class TemporalizeDerived extends Temporalize {
 //            }
 
             Term beliefTerm = polarizedTaskTerm(belief);
-            if (beliefTerm.op()!=IMPL) {
+//            if (beliefTerm.op()!=IMPL) {
                 knowDerivedAbsolute(d,
                         beliefTerm,
                         beliefStart, beliefEnd);
-            } else {
-                knowDerivedAmbient(d, beliefTerm);
-            }
+//            } else {
+//                knowDerivedAmbient(d, beliefTerm);
+//            }
 
 
         } else {
@@ -127,15 +127,15 @@ public class TemporalizeDerived extends Temporalize {
         return t.term().negIf(tt != null && tt.isNegative());
     }
 
-    void knowDerivedAmbient(TermContext d, Term x) {
-        knowAmbient(x);
-        if (knowTransformed) {
-            Term y = //x.transform(d);
-                    x.eval(d);
-            if (!y.equals(x) && y.op().conceptualizable)
-                knowAmbient(y);
-        }
-    }
+//    void knowDerivedAmbient(TermContext d, Term x) {
+//        knowAmbient(x);
+//        if (knowTransformed) {
+//            Term y = //x.transform(d);
+//                    x.eval(d);
+//            if (!y.equals(x) && y.op().conceptualizable)
+//                knowAmbient(y);
+//        }
+//    }
 
     void knowDerivedAbsolute(Subst d, Term x, long start, long end) {
 
@@ -291,9 +291,11 @@ public class TemporalizeDerived extends Temporalize {
                 //TODO maybe this should be 'now'
                 //occ[0] = belief.start();
                 //occ[1] = belief.end();
-                occ[0] = occ[1] = d.time;
+                occ[0] = belief.start();
+                occ[1] = belief.end();
             } else /*if (be)*/ {
-                occ[0] = occ[1] = task.start(); //TODO any duration?
+                occ[0] = task.start();
+                occ[1] = task.end();
             }
 
         }
