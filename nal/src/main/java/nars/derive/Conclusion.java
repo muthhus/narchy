@@ -69,15 +69,16 @@ public final class Conclusion extends AbstractPred<Derivation> {
 
             try {
 
-                TemporalizeDerived dt = d.temporalize;
-                if (dt == null) {
-                    d.temporalize = dt = new TemporalizeDerived(d); //cache in derivation
-                }
+//                TemporalizeDerived dt = d.temporalize;
+//                if (dt == null) {
+//                    d.temporalize = dt = new TemporalizeDerived(d); //cache in derivation
+//                }
+//
 
+                DeriveTime dt = new DeriveTime(d);
+                c2 = dt.solve(c1);
 
-                c2 = dt.solve(this, d, c1);
-                if (d.concConfFactor < Param.TRUTH_EPSILON)
-                    return false;
+//                c2 = dt.solve(this, d, c1);
 
             } catch (InvalidTermException t) {
                 if (Param.DEBUG) {
@@ -85,6 +86,9 @@ public final class Conclusion extends AbstractPred<Derivation> {
                 }
                 return false;
             }
+
+            if (d.concConfFactor < Param.TRUTH_EPSILON)
+                return false;
 
             //invalid or impossible temporalization; could not determine temporal attributes. seems this can happen normally
             if (c2 == null || c2.volume() > volMax || !c2.op().conceptualizable/*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {

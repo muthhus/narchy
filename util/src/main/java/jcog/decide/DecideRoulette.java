@@ -107,7 +107,7 @@ public class DecideRoulette<X> extends FasterList<X> {
             return;
         }
 
-        MetalBitSet selected = new MetalBitSet(choices);
+        MetalBitSet selected = MetalBitSet.bits(choices);
 
         final int[] hardLimit = {choices*2};
         IntToFloatFunction cc = ii -> {

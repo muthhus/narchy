@@ -17,7 +17,6 @@ package jcog.bloom;
 
 import jcog.data.bit.MetalBitSet;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -62,7 +61,7 @@ public class LongBitsetBloomFilter {
         n = maxNumEntries;
         m = optimalNumOfBits(maxNumEntries, fpp);
         k = optimalNumOfHashFunctions(maxNumEntries, m);
-        bitSet = new MetalBitSet(m);
+        bitSet = MetalBitSet.bits(m);
     }
 
     // deserialize bloomfilter. see serialize() for the format.
@@ -73,7 +72,7 @@ public class LongBitsetBloomFilter {
         for (int i = 0; i < bitSet.size(); i++) {
             data[i] = bitSet.get(i);
         }
-        this.bitSet = new MetalBitSet(data);
+        this.bitSet = new MetalBitSet.LongArrayBitSet(data);
     }
 
     public void clear() {
@@ -92,7 +91,8 @@ public class LongBitsetBloomFilter {
     }
 
     public long sizeInBytes() {
-        return bitSet.bitSize() / 8;
+        return bitSet instanceof MetalBitSet.LongArrayBitSet ? ((MetalBitSet.LongArrayBitSet)bitSet).bitSize() / 8 :
+                4; //Int
     }
 
     public boolean test(byte[] val) {
@@ -250,21 +250,21 @@ public class LongBitsetBloomFilter {
         return n;
     }
 
-    /**
-     * First 2 entries are expected entries (n) and false positive percentage (fpp). fpp which is a
-     * double is serialized as long. The entries following first 2 entries are the actual bit set.
-     *
-     * @return bloom filter as list of long
-     */
-    public List<Long> serialize() {
-        List<Long> serialized = new ArrayList<>();
-        serialized.add(n);
-        serialized.add(Double.doubleToLongBits(fpp));
-        for (long l : bitSet.getData()) {
-            serialized.add(l);
-        }
-        return serialized;
-    }
+//    /**
+//     * First 2 entries are expected entries (n) and false positive percentage (fpp). fpp which is a
+//     * double is serialized as long. The entries following first 2 entries are the actual bit set.
+//     *
+//     * @return bloom filter as list of long
+//     */
+//    public List<Long> serialize() {
+//        List<Long> serialized = new ArrayList<>();
+//        serialized.add(n);
+//        serialized.add(Double.doubleToLongBits(fpp));
+//        for (long l : bitSet.getData()) {
+//            serialized.add(l);
+//        }
+//        return serialized;
+//    }
 
     /**
      * Check if the specified bloom filter is compatible with the current bloom filter.
@@ -285,7 +285,7 @@ public class LongBitsetBloomFilter {
      * @param that - bloom filter to merge
      */
     public void merge(LongBitsetBloomFilter that) {
-        bitSet.putAll(that.bitSet);
+        ((MetalBitSet.LongArrayBitSet)bitSet).putAll((MetalBitSet.LongArrayBitSet) that.bitSet);
     }
 
 }

@@ -280,12 +280,12 @@ public class HashGraph<N, E> {
         return edges.allMatch(e -> {
 
             Node<N, E> next = outOrIn ? e.to : e.from;
+            if (next.isVisited())
+                return true;
 
             path.add(pair(outOrIn, e));
 
-            boolean kontinue = true;
-
-
+            boolean kontinue;
             if (next.isActive()) {
 
                 kontinue = tv.visitAgain(e, outOrIn);

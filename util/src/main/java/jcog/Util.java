@@ -59,8 +59,10 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.*;
 import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.toList;
 import static jcog.Texts.iPad;
 import static jcog.Texts.n4;
 
@@ -1916,6 +1918,10 @@ public enum Util {
         return 0;
     }
 
+    public static <X> Stream<X> buffer(Stream<X> x) {
+        List<X> buffered = x.collect(toList());
+        return buffered.stream();
+    }
 
 //    public static <T>  Collector<T, ?, List<T>> toListOrNullIfEmpty() {
 //        return new Collectors.CollectorImpl<>((Supplier<List<T>>) ArrayList::new, List::add,

@@ -23,10 +23,15 @@
  */
 package jcog.data.graph.hgraph;
 
+import com.google.common.collect.Iterators;
+import jcog.list.ArrayIterator;
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.stream.Stream;
 
 /**
@@ -35,6 +40,79 @@ import java.util.stream.Stream;
  */
 public class Node<N, E> {
 
+    /** buffers a lazily updated array-backed cache of the values
+     * for fast iteration and streaming */
+    public static class FastIteratingHashSet<X> extends LinkedHashSet<X> {
+
+        Object[] cache = ArrayUtils.EMPTY_OBJECT_ARRAY;
+
+
+        @Override
+        public boolean add(X x) {
+            if (super.add(x)) {
+                cache = null;
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            if (super.remove(o)) {
+                cache = null;
+                return true;
+            }
+            return false;
+        }
+
+
+        protected int update() {
+            int s = size();
+            if (cache == null) {
+                if (s == 0) {
+                    cache = ArrayUtils.EMPTY_OBJECT_ARRAY;
+                } else {
+                    cache = new Object[s];
+                    Iterator<X> xx = super.iterator();
+                    int i = 0;
+                    while (xx.hasNext())
+                        cache[i++] = xx.next();
+                }
+            }
+            return s;
+        }
+
+        @Override
+        public void clear() {
+            super.clear();
+            cache = ArrayUtils.EMPTY_OBJECT_ARRAY;
+        }
+
+        @Override
+        public Iterator<X> iterator() {
+            switch (update()) {
+                case 0:
+                    return Collections.emptyIterator();
+                case 1:
+                    return Iterators.singletonIterator((X)cache[0]);
+                default:
+                    return new ArrayIterator(cache);
+            }
+        }
+
+        @Override
+        public Stream<X> stream() {
+            switch (update()) {
+                case 0:
+                    return Stream.empty();
+                case 1:
+                    return Stream.of((X)cache[0]);
+                default:
+                    return Stream.of(cache).map(x -> (X) x);
+            }
+        }
+    }
+
     private final N data;
     private final Collection<Edge<N, E>> inEdges;
     private final Collection<Edge<N, E>> outEdges;
@@ -42,10 +120,16 @@ public class Node<N, E> {
     private boolean active;
     private boolean reachable;
 
+
+
     protected Node(N data) {
         this.data = data;
-        inEdges = new HashSet<>();
-        outEdges = new HashSet<>();
+        inEdges =
+                new FastIteratingHashSet<>();
+                //new HashSet<>();
+        outEdges =
+                //new HashSet<>();
+                new FastIteratingHashSet<>();
     }
 
     @Override
