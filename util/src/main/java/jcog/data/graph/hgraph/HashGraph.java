@@ -231,7 +231,7 @@ public class HashGraph<N, E> {
     }
 
     public void traverseDFS(Iterable<N> startingNodes, boolean in, boolean out, DFSTraverser<N, E> tv) {
-        traverseDFSNodes(Iterables.transform(startingNodes, this::node), in, out, tv);
+        traverseDFSNodes(Iterables.transform(startingNodes, this::add), in, out, tv);
     }
 
     public synchronized void traverseDFSNodes(Iterable<Node<N, E>> startingNodes, boolean in, boolean out, DFSTraverser<N, E> tv) {

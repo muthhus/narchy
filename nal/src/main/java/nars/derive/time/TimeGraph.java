@@ -15,7 +15,6 @@ import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.transform.Retemporalize;
 import org.eclipse.collections.api.block.predicate.primitive.LongLongPredicate;
-import org.eclipse.collections.api.block.predicate.primitive.LongObjectPredicate;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
 import org.eclipse.collections.impl.factory.primitive.LongSets;
@@ -43,13 +42,7 @@ import static nars.time.Tense.XTERNAL;
  * b) as a general purpose temporal index, ie. as a meta-layer
  * attached to one or more concept belief tables
  * <p>
- * for precision, events with implicit temporal range are
- * represented as a pair of start/stop points.
- * <p>
- * an ETERNITY event can be used as an atemporal reference
- * separate from time=0.
- * <p>
- * likewise, DTERNAL relationships can be maintained separate
+ * DTERNAL relationships can be maintained separate
  * from +0.
  */
 public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
@@ -154,34 +147,35 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
                 int eventDT = eventTerm.dt();
 
                 int s = tt.subs();
-                if (et == TIMELESS) {
-                    //chain the sibling subevents
-                    if (s == 2) {
-                        Term se0 = tt.sub(0);
-                        Event e0 = know(se0);
-                        Term se1 = tt.sub(1);
-                        Event e1 = know(se1);
-                        int dt;
-                        Event earliest;
-                        if (eventDT == DTERNAL) {
-                            dt = DTERNAL;
-                            earliest = e0; //just use the first by default
-                        } else {
-                            long t0 = eventTerm.subTime(se0);
-                            long t1 = eventTerm.subTime(se1);
-                            long ddt = (int) (t1 - t0);
-                            assert (ddt < Integer.MAX_VALUE);
-                            dt = (int) ddt;
-                            earliest = t0 < t1 ? e0 : e1;
-                        }
-                        link(e0, dt, e1);
-                        link(earliest, 0, event);
-
-                    } else {
-                        throw new TODO();
-                    }
-
-                } else if (et == ETERNAL || eventDT == DTERNAL) {
+//                if (et == TIMELESS) {
+//                    //chain the sibling subevents
+//                    if (s == 2) {
+//                        Term se0 = tt.sub(0);
+//                        Event e0 = know(se0);
+//                        Term se1 = tt.sub(1);
+//                        Event e1 = know(se1);
+//                        int dt;
+//                        Event earliest;
+//                        if (eventDT == DTERNAL) {
+//                            dt = DTERNAL;
+//                            earliest = e0; //just use the first by default
+//                        } else {
+//                            long t0 = eventTerm.subTime(se0);
+//                            long t1 = eventTerm.subTime(se1);
+//                            long ddt = (int) (t1 - t0);
+//                            assert (ddt < Integer.MAX_VALUE);
+//                            dt = (int) ddt;
+//                            earliest = t0 < t1 ? e0 : e1;
+//                        }
+//                        link(e0, dt, e1);
+//                        link(earliest, 0, event);
+//
+//                    } else {
+//                        throw new TODO();
+//                    }
+//
+//                } else
+                    if (et == ETERNAL || et == TIMELESS || eventDT == DTERNAL) {
                     //chain the children subevents events
                     for (int i = 0; i < s; i++) {
                         Term rr = tt.sub(i);
@@ -226,11 +220,14 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
 
         TermContainer xx = x.subterms();
         for (Event<Term> r : byTerm.get(x.root())) {
-            Term rt = r.id();
-            if (rt.subterms().equals(xx)) {
-                if (!each.test(r))
-                    return; //done
+            if (r.absolute()) {
+                Term rt = r.id();
+                if (rt.subterms().equals(xx)) {
+                    if (!each.test(r))
+                        return; //done
+                }
             }
+
         }
 
         if (x.subs() == 2) {
@@ -238,15 +235,15 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
             Term b = xx.sub(1);
 
             traverseDFS(Iterables.concat(byTerm.get(a), byTerm.get(b)), true, true,
-                new SolveDeltaTraverser(a, b, (long start, long ddt) -> {
-                assert (ddt < Integer.MAX_VALUE);
-                int dt = (int) ddt;
-                Term y = x.dt(dt);
-                if (y.op().conceptualizable) {
-                    return each.test(start!=TIMELESS && !hasXTERNAL(y) ? new TermEvent(y, start) : new Unsolved(y, absolute));
-                }
-                return true;
-            }));
+                    new SolveDeltaTraverser(a, b, (long start, long ddt) -> {
+                        assert (ddt < Integer.MAX_VALUE);
+                        int dt = (int) ddt;
+                        Term y = x.dt(dt);
+                        if (y.op().conceptualizable) {
+                            return each.test(start != TIMELESS && !hasXTERNAL(y) ? new TermEvent(y, start) : new Unsolved(y, absolute));
+                        }
+                        return true;
+                    }));
         }
 
 
@@ -290,7 +287,7 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
             @Override
             public int dt(Compound x) {
                 int xdt = x.dt();
-                if (xdt ==XTERNAL)
+                if (xdt == XTERNAL)
                     has[0] = true;
                 return xdt; //no change
             }
@@ -313,11 +310,14 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
 
     public void solve(Term x, Predicate<Event<Term>> each) {
         solvable(x, e -> {
-            if (!(e instanceof Unsolved)) {
+            assert(e.id().root().equals(x.root()));
+            if (e instanceof TermEvent) {
                 return each.test(e);
-            } else {
+            } else if (e instanceof Unsolved) {
                 if (!solve((Unsolved) e, each))
                     return false;
+            } else {
+                assert (!(e instanceof Relative));
             }
             return true;
         });
@@ -335,10 +335,8 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
                 return; //done
         }
 
-        if (!x.isTemporal())
-            return; //nothing further to do
 
-        Map<Term, Term> unknowns = new UnifiedMap();
+        Map<Term, Term> xternals = new UnifiedMap();
 
         Map<Term, LongSet> absolute = new UnifiedMap();
         absolute.put(x, EMPTY_LONG_SET);
@@ -346,7 +344,7 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
         final boolean[] clue = {false};
         x.recurseTerms(term -> true, xs -> {
             if (xs.dt() == XTERNAL) {
-                unknowns.put(xs, xs);
+                xternals.put(xs, xs);
             } else {
 
                 absolute.computeIfAbsent(xs, s -> {
@@ -373,18 +371,13 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
             return true;
         }, null);
 
-        if (unknowns.isEmpty()) {
-            if (!clue[0])
-                return; //no temporal basis to compute
+        if (!clue[0])
+            return; //no temporal basis to compute
 
-            if (x.dt() == XTERNAL) {
-                solveDT(x, absolute, each);
-            } else {
-                each.test(new Unsolved(x, absolute));
-            }
-        } else {
+        if (!xternals.isEmpty()) {
+            //resolve any XTERNAL in subterms
             final boolean[] foundAny = {false};
-            unknowns.replaceAll((u, z) -> {
+            xternals.replaceAll((u, z) -> {
                 final Term[] vv = new Term[1];
                 solveDT(u, absolute, (v) -> {
                     vv[0] = v.id(); //ignore the startTime component, although it might provide a clue here
@@ -398,13 +391,19 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
                 }
             });
             if (foundAny[0]) {
-                Term y = x.replace(unknowns);
+                Term y = x.replace(xternals);
                 assert (!(y.equals(x)));
                 if (y.op().conceptualizable)
-                    each.test(new Unsolved(y, absolute));
+                    solvable(y, each); //recurse
             }
         }
 
+
+        if (x.dt() == XTERNAL) {
+            solveDT(x, absolute, each); //resolve any XTERNAL at top-level
+        } else {
+            solve(new Unsolved(x, absolute), each);
+        }
     }
 
     /**
@@ -421,9 +420,16 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
             ((aa.getValue() == EMPTY_LONG_SET) ? targets : sources).add(aaa);
         }
 
+        Term targetTerm = u.id();
+        Relative target = new Relative(targetTerm);
+        add(target); //add the target to the graph
+
+        //find paths from the KNOWN to the UNKNOWN
         sources.forEach(aa ->
-                traverseDFS(Iterables.filter(byTerm.get(aa), Event::absolute), true, true,
-                        new SolveNodeTraverser(targets, each))
+                traverseDFS(
+                        Iterables.filter(byTerm.get(aa), Event::absolute)
+                        , true, true,
+                        new SolveNodeTraverser(Set.of(targetTerm), each))
         );
 
 
@@ -455,8 +461,13 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
         System.out.println();
 
         for (String s : List.of(
-                //"one", "(one &&+1 two)", "(one &&+- two)",
-                "(one ==>+- three)")) {
+                "one",
+                "(one &&+1 two)", "(one &&+- two)",
+                "(two &&+1 three)","(two &&+- three)",
+                "(one ==>+- three)",
+                "(one ==>+- (two &&+1 three))",
+                "(one ==>+- (two &&+- three))"
+        )) {
             Term x = $.$(s);
             System.out.println("SOLVE: " + x);
             t.solve(x, (y) -> {
@@ -566,7 +577,7 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
             if (path.isEmpty())
                 return true;
 
-            System.out.println(path);
+            //System.out.println(path);
 
             Term endTerm = n.get().id();
             boolean endA = a.equals(endTerm);
@@ -580,7 +591,7 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
 
                 if ((endA && startTerm.equals(b)) || (endB && startTerm.equals(a))) {
                     long dt = pathDT(path);
-                    if (endA && dt!=ETERNAL)
+                    if (endA && dt != ETERNAL)
                         dt = -dt; //reverse
 
                     long startTime = startEvent.absolute() ? startEvent.start() : TIMELESS;

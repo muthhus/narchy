@@ -102,19 +102,19 @@ public class TimeProblem<T,E> extends HashGraph<TimeProblem.Event<T>,E> implemen
             this.absolute = absolute;
         }
 
-        @Override
-        public boolean equals(Object other) {
-            throw new RuntimeException();
-        }
-
-        @Override
-        public int hashCode() {
-            throw new RuntimeException();
-        }
+//        @Override
+//        public boolean equals(Object other) {
+//            throw new RuntimeException();
+//        }
+//
+//        @Override
+//        public int hashCode() {
+//            throw new RuntimeException();
+//        }
 
         @Override
         public long start() {
-            throw new TODO();
+            return TIMELESS;
         }
 
         /* hack */
