@@ -122,7 +122,7 @@ public class HashGraph<N, E> {
         }
 
         default Stream<Edge<N, E>> edges(Node<N, E> n, boolean outOrIn) {
-            return n.out();
+            return outOrIn ? n.out() : n.in();
         }
 
     }

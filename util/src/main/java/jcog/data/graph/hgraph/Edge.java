@@ -84,7 +84,11 @@ public class Edge<N, E> {
         return from + " => " + data + " => " + to;
     }
 
-    public Node<N,E> node(boolean outOrIn) {
+    public Node<N,E> to(boolean outOrIn) {
         return outOrIn ? to : from;
+    }
+
+    public Node<N,E> from(boolean outOrIn) {
+        return outOrIn ? from : to;
     }
 }
