@@ -23,25 +23,32 @@
  */
 package jcog.data.graph.hgraph;
 
+import com.google.common.collect.Iterables;
+import jcog.TODO;
+import jcog.list.FasterList;
+import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
+
 import java.io.PrintStream;
 import java.util.*;
+import java.util.stream.Stream;
+
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
- *
  * @author Thomas Wuerthinger
  */
 public class HashGraph<N, E> {
 
-    public Map<Object, Node<N, E>> nodes;
-    protected Map<Object, Edge<N, E>> edges;
+    protected Map<N, Node<N, E>> nodes;
+    //protected Map<E, Edge<N, E>> edges;
 
     public HashGraph() {
         this(new HashMap<>(), new HashMap());
     }
 
-    public HashGraph(Map<Object, Node<N, E>> nodes, Map<Object, Edge<N, E>> edges) {
+    public HashGraph(Map<N, Node<N, E>> nodes, Map<E, Edge<N, E>> edges) {
         this.nodes = nodes;
-        this.edges = edges;
+        //this.edges = edges;
     }
 
     public void print() {
@@ -49,92 +56,98 @@ public class HashGraph<N, E> {
     }
 
     public void print(PrintStream out) {
-        nodes().forEach((node)->{
+        nodes().forEach((node) -> {
             node.print(out);
         });
     }
 
-    public Node<N, E> nodeAdd(N data) {
-        return nodeAdd(data, data);
-    }
-
-    public Node<N, E> nodeAdd(N data, Object key) {
-        int s = nodes.size();
-        Node<N, E> r = nodes.computeIfAbsent(key, (x) -> new Node<>(data));
-        if (nodes.size() > s) {
+    public Node<N, E> add(N key) {
+        final boolean[] created = {false};
+        Node<N, E> r = nodes.computeIfAbsent(key, (x) -> {
+            created[0] = true;
+            return newNode(x);
+        });
+        if (created[0]) {
             onAdd(r);
         }
         return r;
+    }
+
+    protected Node<N, E> newNode(N data) {
+        return new Node<>(data);
     }
 
     protected void onAdd(Node<N, E> r) {
 
     }
 
-    public Edge<N, E> edgeAdd(Node<N, E> source, E data, Node<N, E> dest) {
-        return edgeAdd(source, data, data, dest);
-    }
-
-    public Edge<N, E> edgeAdd(Node<N, E> source, Object key, E data, Node<N, E> dest) {
-        return edges.computeIfAbsent(key, (x) -> {
-            Edge<N, E> e = new Edge<>(source, dest, data);
-            source.outAdd(e);
-            dest.inAdd(e);
-            return e;
-        });
+    public boolean edgeAdd(Node<N, E> from, E data, Node<N, E> to) {
+        Edge<N, E> ee = new Edge<>(from, to, data);
+        if (from.outAdd(ee)) {
+            boolean a = to.inAdd(ee);
+            assert (a);
+            return true;
+        }
+        return false;
     }
 
     public Node<N, E> node(Object key) {
         return nodes.get(key);
     }
 
-
-    public Edge<N, E> edge(Object key) {
-        return edges.get(key);
-    }
-
-    public Collection<Edge<N, E>> edges() {
-        return edges.values();
-    }
-
     public Collection<Node<N, E>> nodes() {
         return nodes.values();
     }
 
-    public void edgeRemove(Edge<N, E> e, Object key) {
-        assert key == null || edges.containsKey(key);
-        if (key != null) {
-            edges.remove(key);
-        }
+    public void edgeRemove(Edge<N, E> e) {
         e.from.outRemove(e);
         e.to.inRemove(e);
     }
 
-    public class DFSTraversalVisitor {
+    @FunctionalInterface
+    public interface DFSTraverser<N, E> {
 
-        public void visitNode(Node<N, E> n) {
-        }
+        /**
+         * path should not be modified by callee. it is left exposed for performance
+         * path boolean is true = OUT, false = IN
+         */
+        boolean visit(Node<N, E> n, FasterList<BooleanObjectPair<Edge<N, E>>> path);
 
-        public boolean visitEdge(Edge<N, E> e, boolean backEdge) {
+        default boolean visitAgain(Edge<N, E> e, boolean outOrIn) {
             return true;
         }
-    }
 
-    public class BFSTraversalVisitor {
-
-        public void visitNode(Node<N, E> n, int depth) {
+        default boolean visit(Edge<N, E> e, boolean outOrIn) {
+            return true;
         }
+
+        default Stream<Edge<N, E>> edges(Node<N, E> n, boolean outOrIn) {
+            return n.out();
+        }
+
     }
 
-    public List<Node<N, E>> getNodesWithInDegree(int x) {
-        return getNodesWithInDegree(x, true);
+    @FunctionalInterface
+    public interface BFSTraverser<N, E> {
+
+        void visitNode(Node<N, E> n, int depth);
     }
 
-    public List<Node<N, E>> getNodesWithInDegree(int x, boolean countSelfLoops) {
+    /**
+     * TODO return zero-copy Iterable
+     */
+    public List<Node<N, E>> nodesWithIns(int x) {
+        return nodesWithIns(x, true);
+    }
+
+    /**
+     * TODO return zero-copy Iterable
+     */
+    public List<Node<N, E>> nodesWithIns(int x, boolean includeSelfLoops) {
 
         List<Node<N, E>> result = new ArrayList<>();
         for (Node<N, E> n : nodes()) {
-            if (n.ins(countSelfLoops) == x) {
+            if (n.ins(includeSelfLoops) == x) {
                 result.add(n);
             }
         }
@@ -146,19 +159,14 @@ public class HashGraph<N, E> {
     private void markReachable(Node<N, E> startingNode) {
         ArrayList<Node<N, E>> arr = new ArrayList<>();
         arr.add(startingNode);
-        for (Node<N, E> n : nodes()) {
-            n.setReachable(false);
-        }
-        traverseDFS(arr, new DFSTraversalVisitor() {
-
-            @Override
-            public void visitNode(Node<N, E> n) {
-                n.setReachable(true);
-            }
+        nodes().forEach(Node::setUnreachable);
+        traverseDFSNodes(arr, false, true, (node, path) -> {
+            node.setReachable();
+            return true;
         });
     }
 
-    public void traverseBFS(Node<N, E> startingNode, BFSTraversalVisitor tv, boolean longestPath) {
+    public void traverseBFS(Node<N, E> startingNode, BFSTraverser tv, boolean longestPath) {
 
         if (longestPath) {
             markReachable(startingNode);
@@ -174,7 +182,7 @@ public class HashGraph<N, E> {
         startingNode.setVisited(true);
         int layer = 0;
         Node<N, E> lastOfLayer = startingNode;
-        Node<N, E> lastAdded = null;
+        final Node[] lastAdded = {null};
 
         while (!queue.isEmpty()) {
 
@@ -183,41 +191,50 @@ public class HashGraph<N, E> {
             current.setActive(false);
 
 
-            for (Edge<N, E> e : current.out()) {
+            current.out().forEach(e -> {
                 if (!e.to.isVisited()) {
 
-                    boolean allow = true;
+                    final boolean[] allow = {true};
                     if (longestPath) {
-                        for (Edge<N, E> pred : e.to.in()) {
+                        e.to.in().allMatch(pred -> {
                             Node<N, E> p = pred.to;
                             if ((!p.isVisited() || p.isActive()) && p.isReachable()) {
-                                allow = false;
-                                break;
+                                allow[0] = false;
+                                return false;
                             }
-                        }
+                            return true;
+                        });
                     }
 
-                    if (allow) {
+                    if (allow[0]) {
                         queue.offer(e.to);
-                        lastAdded = e.to;
+                        lastAdded[0] = e.to;
                         e.to.setVisited(true);
                         e.to.setActive(true);
                     }
                 }
-            }
+            });
 
             if (current == lastOfLayer && !queue.isEmpty()) {
-                lastOfLayer = lastAdded;
+                lastOfLayer = lastAdded[0];
                 layer++;
             }
         }
     }
 
-    public void traverseDFS(DFSTraversalVisitor tv) {
-        traverseDFS(nodes(), tv);
+    public void traverseDFS(DFSTraverser<N, E> tv, Edge<N, E> e, boolean in, boolean out, FasterList<BooleanObjectPair<Edge<N, E>>> path, Edge<N, E> neEdge) {
+        traverseDFSNodes(nodes(), in, out, tv);
     }
 
-    public void traverseDFS(Collection<Node<N, E>> startingNodes, DFSTraversalVisitor tv) {
+    public void traverseDFS(N startingNode, boolean in, boolean out, DFSTraverser<N, E> tv) {
+        traverseDFS(List.of(startingNode), in, out, tv);
+    }
+
+    public void traverseDFS(Iterable<N> startingNodes, boolean in, boolean out, DFSTraverser<N, E> tv) {
+        traverseDFSNodes(Iterables.transform(startingNodes, this::node), in, out, tv);
+    }
+
+    public synchronized void traverseDFSNodes(Iterable<Node<N, E>> startingNodes, boolean in, boolean out, DFSTraverser<N, E> tv) {
 
         for (Node<N, E> n : nodes()) {
             n.setVisited(false);
@@ -225,33 +242,70 @@ public class HashGraph<N, E> {
         }
 
         boolean result = false;
-        for (Node<N, E> n : startingNodes) {
-            traverse(tv, n);
+        FasterList<BooleanObjectPair<Edge<N, E>>> path = new FasterList();
+        for (Node n : startingNodes) {
+            if (!traverse(tv, in, out, n, path))
+                break;
+            assert (path.isEmpty());
         }
     }
 
-    private void traverse(DFSTraversalVisitor tv, Node<N, E> n) {
+    private boolean traverse(DFSTraverser tv, boolean in, boolean out, Node<N, E> n, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
 
-        if (!n.isVisited()) {
-            n.setVisited(true);
-            n.setActive(true);
-            tv.visitNode(n);
+        assert (in || out);
 
-            for (Edge<N, E> e : n.out()) {
+        if (n.activate()) {
 
-                Node<N, E> next = e.to;
-                if (next.isActive()) {
-                    tv.visitEdge(e, true);
-                } else {
-                    if (tv.visitEdge(e, false)) {
-                        traverse(tv, next);
-                    }
-                }
-            }
+            if (!tv.visit(n, path))
+                return false;
+
+            if (out && !traverseDFS(tv, tv.edges(n, true), true, in, out, path))
+                return false;
+
+            if (in && !traverseDFS(tv, tv.edges(n, false), false, in, out, path))
+                return false;
 
             n.setActive(false);
         }
 
+        return true;
+
+    }
+
+    /**
+     * TODO allow the traverser to decide to cut the search entirely, or just proceed no further past the current node
+     */
+    private boolean traverseDFS(DFSTraverser tv, Stream<Edge<N, E>> edges, boolean outOrIn, boolean in, boolean out, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
+
+        return edges.allMatch(e -> {
+
+            Node<N, E> next = outOrIn ? e.to : e.from;
+
+            path.add(pair(outOrIn, e));
+
+            boolean kontinue = true;
+
+
+            if (next.isActive()) {
+
+                kontinue = tv.visitAgain(e, outOrIn);
+
+                //but dont go there, it would be a cycle
+
+            } else {
+
+                if (kontinue = tv.visit(e, outOrIn)) {
+
+                    kontinue = traverse(tv, in, out, next, path);
+
+                }
+
+            }
+
+            path.removeLast();
+
+            return kontinue;
+        });
     }
 
     public boolean hasCycles() {
@@ -261,14 +315,11 @@ public class HashGraph<N, E> {
             n.setActive(false);
         }
 
-        boolean result = false;
         for (Node<N, E> n : nodes()) {
-            result |= checkCycles(n);
-            if (result) {
-                break;
-            }
+            if (checkCycles(n))
+                return true;
         }
-        return result;
+        return false;
     }
 
     private boolean checkCycles(Node<N, E> n) {
@@ -282,12 +333,8 @@ public class HashGraph<N, E> {
             n.setVisited(true);
             n.setActive(true);
 
-            for (Edge<N, E> succ : n.out()) {
-                Node<N, E> p = succ.to;
-                if (checkCycles(p)) {
-                    return true;
-                }
-            }
+            if (n.out().anyMatch(succ -> checkCycles(succ.to)))
+                return true;
 
             n.setActive(false);
 
@@ -296,22 +343,24 @@ public class HashGraph<N, E> {
         return false;
     }
 
+    public Stream<Edge<N,E>> edges() {
+        throw new TODO();
+    }
+
     @Override
     public String toString() {
 
         StringBuilder s = new StringBuilder();
         s.append("Nodes: ");
         for (Node<N, E> n : nodes()) {
-            s.append(n.toString());
-            s.append("\n");
+            s.append(n.toString()).append("\n");
         }
 
         s.append("Edges: ");
 
-        for (Edge<N, E> e : edges()) {
-            s.append(e.toString());
-            s.append("\n");
-        }
+        edges().forEach(e -> {
+            s.append(e.toString()).append("\n");
+        });
 
         return s.toString();
     }

@@ -23,35 +23,41 @@
  */
 package jcog.data.graph.hgraph;
 
+import jcog.Util;
+
 /**
  *
  * @author Thomas Wuerthinger
  */
 public class Edge<N, E> {
 
-    private E data;
+    private final int hash;
+    private final E data;
     public final Node<N, E> from;
     public final Node<N, E> to;
 
-    protected Edge(Node<N, E> from, Node<N, E> to, E data) {
-        set(data);
+    public Edge(Node<N, E> from, Node<N, E> to, E data) {
+        this.data = data;
         this.from = from;
         this.to = to;
-        assert from != null;
-        assert to != null;
+        this.hash = Util.hashCombine(data.hashCode(), from.hashCode(), to.hashCode());
     }
 
     @Override
     public int hashCode() {
-        return data.hashCode();
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Edge)) return false;
+        Edge ee = (Edge) obj;
+        return from == ee.from && to == ee.to && data.equals(ee.data);
     }
 
     public E get() {
         return data;
-    }
-
-    public void set(E e) {
-        data = e;
     }
 
     public boolean isSelfLoop() {
@@ -76,5 +82,9 @@ public class Edge<N, E> {
     @Override
     public String toString() {
         return from + " => " + data + " => " + to;
+    }
+
+    public Node<N,E> node(boolean outOrIn) {
+        return outOrIn ? to : from;
     }
 }

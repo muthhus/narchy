@@ -23,11 +23,11 @@
  */
 package jcog.data.graph.hgraph;
 
-import com.google.common.collect.Iterables;
-import jcog.list.FasterList;
-
 import java.io.PrintStream;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  *
@@ -35,12 +35,18 @@ import java.util.List;
  */
 public class Node<N, E> {
 
-    private N data;
-    private final List<Edge<N, E>> inEdges;
-    private final List<Edge<N, E>> outEdges;
+    private final N data;
+    private final Collection<Edge<N, E>> inEdges;
+    private final Collection<Edge<N, E>> outEdges;
     private boolean visited;
     private boolean active;
     private boolean reachable;
+
+    protected Node(N data) {
+        this.data = data;
+        inEdges = new HashSet<>();
+        outEdges = new HashSet<>();
+    }
 
     @Override
     public int hashCode() {
@@ -58,6 +64,9 @@ public class Node<N, E> {
     protected boolean isReachable() {
         return reachable;
     }
+
+    protected void setReachable() { reachable = true; }
+    protected void setUnreachable() { reachable = false; }
 
     protected void setReachable(boolean b) {
         reachable = b;
@@ -77,34 +86,23 @@ public class Node<N, E> {
 
     public int ins(boolean countSelfLoops) {
         if (countSelfLoops) {
-            return inEdges.size();
+            return (int) in().count();
         } else {
-            int cnt = 0;
-            for (Edge<N, E> e : inEdges) {
-                if (e.from != this) {
-                    cnt++;
-                }
-            }
-            return cnt;
+            return (int) in().filter(e -> e.from!=this).count();
         }
     }
 
     public int outs() {
-        return outEdges.size();
+        return (int) out().count();
     }
 
-    protected Node(N data) {
-        set(data);
-        inEdges = new FasterList<>();
-        outEdges = new FasterList<>();
+
+    protected boolean inAdd(Edge<N, E> e) {
+        return inEdges.add(e);
     }
 
-    protected void inAdd(Edge<N, E> e) {
-        inEdges.add(e);
-    }
-
-    protected void outAdd(Edge<N, E> e) {
-        outEdges.add(e);
+    protected boolean outAdd(Edge<N, E> e) {
+        return outEdges.add(e);
     }
 
     protected void inRemove(Edge<N, E> e) {
@@ -117,27 +115,23 @@ public class Node<N, E> {
         outEdges.remove(e);
     }
 
-    public List<Edge<N, E>> in() {
-        return (inEdges);
+    public Stream<Edge<N, E>> in() {
+        return (inEdges.stream());
     }
 
-    public List<Edge<N, E>> out() {
-        return (outEdges);
+    public Stream<Edge<N, E>> out() {
+        return (outEdges.stream());
     }
 
-    public Iterable<N> successors() {
-        return Iterables.transform(out(), e -> e.to.data);
+    public Stream<N> successors() {
+        return out().map(e -> e.to.data);
     }
-    public Iterable<N> predecessors() {
-        return Iterables.transform(in(), e -> e.from.data);
+    public Stream<N> predecessors() {
+        return in().map(e -> e.from.data);
     }
 
     public N get() {
         return data;
-    }
-
-    public void set(N d) {
-        data = d;
     }
 
     @Override
@@ -150,5 +144,14 @@ public class Node<N, E> {
         out().forEach(e -> {
            out.println("\t" + e);
         });
+    }
+
+    public boolean activate() {
+        if (!isVisited()) {
+            setVisited(true);
+            setActive(true);
+            return true;
+        }
+        return false;
     }
 }

@@ -2,16 +2,21 @@ package nars.derive.time;
 
 import astar.model.TimeProblem;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
+import jcog.TODO;
+import jcog.data.graph.hgraph.Edge;
+import jcog.data.graph.hgraph.HashGraph;
 import jcog.data.graph.hgraph.Node;
+import jcog.list.FasterList;
 import nars.$;
 import nars.Narsese;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.eclipse.collections.api.LazyIterable;
-import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.factory.primitive.LongSets;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
@@ -21,9 +26,10 @@ import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-import static jcog.Texts.n2;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -50,16 +56,28 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
 
     public static class TimeSpan {
         public final long dt;
-        public final float weight;
+        //public final float weight;
 
-        public TimeSpan(long dt, float weight) {
+        public TimeSpan(long dt) {
             this.dt = dt;
-            this.weight = weight;
+            //this.weight = weight;
+            //this.hash = Long.hashCode(dt);
+        }
+
+        @Override
+        public int hashCode() {
+            return Long.hashCode(dt);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return this == obj || ((obj instanceof TimeSpan && dt == ((TimeSpan) obj).dt));
         }
 
         @Override
         public String toString() {
-            return (dt == ETERNAL ? "~" : (dt >= 0 ? ("+"+dt) : ("-"+(-dt)))) + (weight!=1 ? "x" + n2(weight) : "");
+            return (dt == ETERNAL ? "~" : (dt >= 0 ? ("+" + dt) : ("-" + (-dt))));
+            //+ (weight != 1 ? "x" + n2(weight) : "");
         }
     }
 
@@ -82,6 +100,7 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
     public static class TermEvent extends Event<Term> {
         public TermEvent(Term id, long when) {
             super(id, when);
+            assert (when != TIMELESS);
         }
 
         @Override
@@ -103,64 +122,82 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
         return (Event) add(e).get();
     }
 
-    public void link(Event<Term> x, long dt, float weight, Event<Term> y) {
-        link(x, new TimeSpan(dt, weight), y);
+    public void link(Event<Term> x, long dt, Event<Term> y) {
+
+        link(x, new TimeSpan(dt), y);
     }
 
     @Override
     protected void onAdd(Node<Event<Term>, TimeSpan> x) {
-        Event<Term> e = x.get();
-        Term t = e.id.getOne();
+        Event<Term> event = x.get();
+        Term eventTerm = event.id.getOne();
 
-        byTerm.put(t, e);
-        Term tRoot = t.root();
-        if (!tRoot.equals(t))
-            byTerm.put(tRoot, e);
+        byTerm.put(eventTerm, event);
+        Term tRoot = eventTerm.root();
+        if (!tRoot.equals(eventTerm))
+            byTerm.put(tRoot, event);
 
-        switch (t.op()) {
-            case IMPL:
+        switch (eventTerm.op()) {
+            case IMPL: {
 
-                int dt = t.dt();
-                Term subj = t.sub(0);
-                Term pred = t.sub(1);
-                link(know(subj), dt == DTERNAL ? ETERNAL : (dt + subj.dtRange()), 1f, know(pred));
+                int dt = eventTerm.dt();
+                Term subj = eventTerm.sub(0);
+                Term pred = eventTerm.sub(1);
+                link(know(subj), dt == DTERNAL ? ETERNAL : (dt + subj.dtRange()), know(pred));
 
-                break;
+            }
+            break;
             case CONJ:
-                TermContainer tt = t.subterms();
-                if (t.dt() == DTERNAL) {
-                    for (Term u : tt) {
-                        link(know(u), ETERNAL, 1f, e);
-                    }
-                } else {
+                TermContainer tt = eventTerm.subterms();
+                long et = event.start();
 
-                    long et = e.start();
-                    if (et == TIMELESS || et == ETERNAL) {
-                        //only chain sibling events together
-                        int s = tt.subs();
-                        Term pp = tt.sub(0);
-                        Event p = know(pp);
-                        long pt = t.subTime(pp);
-                        for (int i = 1; i < s; i++) {
-                            Term rr = tt.sub(i);
-                            Event r = know(rr);
-                            long rt = t.subTime(rr);
-                            long delta = rt - pt;
-                            //link
-                            link(p, delta, 1f, r);
-                            p = r;
-                            pt = rt;
+                int eventDT = eventTerm.dt();
+
+                int s = tt.subs();
+                if (et == TIMELESS) {
+                    //chain the sibling subevents
+                    if (s == 2) {
+                        Term se0 = tt.sub(0);
+                        Event e0 = know(se0);
+                        Term se1 = tt.sub(1);
+                        Event e1 = know(se1);
+                        int dt;
+                        Event earliest;
+                        if (eventDT == DTERNAL) {
+                            dt = DTERNAL;
+                            earliest = e0; //just use the first by default
+                        } else {
+                            long t0 = eventTerm.subTime(se0);
+                            long t1 = eventTerm.subTime(se1);
+                            long ddt = (int) (t1 - t0);
+                            assert (ddt < Integer.MAX_VALUE);
+                            dt = (int) ddt;
+                            earliest = t0 < t1 ? e0 : e1;
                         }
+                        link(e0, dt, e1);
+                        link(earliest, 0, event);
 
                     } else {
-                        //locate the events absolutely
-                        t.eventsWhile((w, y) -> {
-                            know(y, w);
-                            return true;
-                        }, et, false, false, 0);
+                        throw new TODO();
                     }
 
+                } else if (et == ETERNAL || eventDT == DTERNAL) {
+                    //chain the children subevents events
+                    for (int i = 0; i < s; i++) {
+                        Term rr = tt.sub(i);
+                        Event subEvent = know(rr);
+                        long rt = eventDT == DTERNAL ? ETERNAL : eventTerm.subTime(rr);
+                        link(event, rt, subEvent);
+                    }
+
+                } else {
+                    //locate the events and sub-events absolutely
+                    eventTerm.eventsWhile((w, y) -> {
+                        know(y, w);
+                        return true;
+                    }, et, false, false, 0);
                 }
+
                 break;
         }
 
@@ -194,15 +231,14 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
 
         if (x.subs() == 2) {
             Term a = xx.sub(0);
-            MutableSet<Event<Term>> ae = absolutes(a);
+            Set<Event<Term>> ae = absolutes(a);
             if (!ae.isEmpty()) {
                 Term b = xx.sub(1);
-                MutableSet<Event<Term>> be = absolutes(b);
+                Set<Event<Term>> be = absolutes(b);
                 if (!be.isEmpty()) {
                     //cartesian product of the two, maybe prioritized by least distance?
                     LazyIterable<Pair<Event<Term>, Event<Term>>> matrix = Sets.cartesianProduct(ae, be);
-
-                    matrix.allSatisfy(ab->{
+                    matrix.allSatisfy(ab -> {
 
                         long bt = ab.getTwo().start();
                         long at = ab.getOne().end();
@@ -212,8 +248,8 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
                             dt = DTERNAL;
                         } else {
                             long ddt = bt - at;
-                            assert(Math.abs(ddt) < Integer.MAX_VALUE);
-                            dt = (int)ddt;
+                            assert (Math.abs(ddt) < Integer.MAX_VALUE);
+                            dt = (int) ddt;
                         }
 
                         Term tt = x.dt(dt);
@@ -229,25 +265,40 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
         }
     }
 
-    public MutableSet<Event<Term>> absolutes(Term a) {
+    public Set<Event<Term>> absolutes(Term a) {
         UnifiedSet<Event<Term>> ae = new UnifiedSet();
         solve(a, (e) -> {
-            if (e.start()!=TIMELESS && ae.add(e))
+            if (e.start() != TIMELESS && ae.add(e))
                 return ae.size() < MAX_SUBTERM_SOLUTIONS;
             else
                 return true;
         });
-        return ae;
+        return ae.isEmpty() ? Set.of() : ae;
     }
 
     final static LongSet EMPTY_LONG_SET = LongSets.immutable.empty();
 
-    /** each should only receive Event or Unsolved instances, not Relative's  */
     public void solve(Term x, Predicate<Event<Term>> each) {
+        solvable(x, e -> {
+            if (!(e instanceof Unsolved)) {
+                return each.test(e);
+            } else {
+                if (!solve((Unsolved) e, each))
+                    return false;
+            }
+            return true;
+        });
+    }
+
+
+    /**
+     * each should only receive Event or Unsolved instances, not Relative's
+     */
+    public void solvable(Term x, Predicate<Event<Term>> each) {
 
         //1. check if the term is known directly
         for (Event e : byTerm.get(x)) {
-            if (e.start()!=TIMELESS && !each.test(e))
+            if (e.absolute() && !each.test(e))
                 return; //done
         }
 
@@ -255,7 +306,10 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
             return; //nothing further to do
 
         Map<Term, Term> unknowns = new UnifiedMap();
+
         Map<Term, LongSet> absolute = new UnifiedMap();
+        absolute.put(x, EMPTY_LONG_SET);
+
         final boolean[] clue = {false};
         x.recurseTerms(term -> true, xs -> {
             if (xs.dt() == XTERNAL) {
@@ -267,7 +321,7 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
                     if (xe != null) {
                         LongHashSet l = new LongHashSet();
                         xe.forEach(e -> {
-                            if (!(e instanceof Relative))
+                            if (e.absolute())
                                 l.add(e.start());
                         });
 
@@ -321,8 +375,41 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
             }
         }
 
-
     }
+
+    /**
+     * solves the start time for the given Unsolved event.  returns whether callee should continue iterating
+     */
+    private boolean solve(Unsolved<Term> u, Predicate<Event<Term>> each) {
+
+        Map<Term, LongSet> a = u.absolute;
+
+        Set<Term> targets = new UnifiedSet();
+        List<Term> sources = new FasterList();
+        for (Map.Entry<Term, LongSet> aa : a.entrySet()) {
+            if (aa.getValue() == EMPTY_LONG_SET) {
+                targets.add(aa.getKey());
+            } else {
+                sources.add(aa.getKey());
+            }
+        }
+
+        sources.forEach(aa ->
+            traverseDFS( Iterables.filter(byTerm.get(aa), Event::absolute), true, true, new SolveTraverser(targets) )
+        );
+
+
+        return true;
+    }
+
+//    @Override
+//    protected Node<Event<Term>, TimeSpan> newNode(Event<Term> data) {
+//        if (data instanceof Relative) {
+//            return new RelativeNode(data);
+//        } else {
+//            return super.newNode(data);
+//        }
+//    }
 
     public static void main(String[] args) throws Narsese.NarseseException {
 
@@ -351,4 +438,114 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
 
     }
 
+    protected class SolveTraverser implements DFSTraverser<Event<Term>,TimeSpan> {
+
+        private final Set<Term> targets;
+
+        public SolveTraverser(Set<Term> targets) {
+            this.targets = targets;
+        }
+
+        public Stream<Edge<Event<Term>, TimeSpan>> dynamic(Node<Event<Term>, TimeSpan> n, boolean outOrIn) {
+
+            Term nt = n.get().id();
+            return byTerm.get(nt).stream().filter(e -> !e.absolute()).map(
+                    e -> {
+                        Node<Event<Term>, TimeSpan> that = TimeGraph.this.add(e);
+                        return new Edge<>(
+                                outOrIn ? n : that,
+                                outOrIn ? that : n,
+                                new TimeSpan(0));
+                    }
+            );
+        }
+
+        @Override
+        public Stream<Edge<Event<Term>, TimeSpan>> edges(Node<Event<Term>, TimeSpan> n, boolean outOrIn) {
+            return Stream.concat(n.out(), dynamic(n, outOrIn));
+        }
+
+        @Override
+        public boolean visit(Node<Event<Term>, TimeSpan> n, FasterList<BooleanObjectPair<Edge<Event<Term>, TimeSpan>>> path) {
+            if (path.isEmpty())
+                return true;
+
+            System.out.println(path);
+
+            Term target = n.get().id();
+            if (targets.contains(target)) {
+                boolean outOrIn = path.get(0).getOne();
+                Edge<Event<Term>, TimeSpan> eStart = path.get(0).getTwo();
+                Node<Event<Term>, TimeSpan> nStart = eStart.node(!outOrIn);
+                long t = nStart.get().start();
+                if (t != ETERNAL) {
+                    //compute relative path
+                    boolean dternal = false;
+                    for (int i = 1, pathSize = path.size(); i < pathSize; i++) {
+                        BooleanObjectPair<Edge<Event<Term>, TimeSpan>> r = path.get(i);
+                        TimeSpan span = r.getTwo().get();
+                        if (span.dt == ETERNAL) {
+                            t += 0;
+                            dternal = true;
+                        } else if (t != 0) {
+                            t += span.dt * (outOrIn ? +1 : -1);
+                        }
+                    }
+                }
+                know(target, t);
+            }
+
+            return true;
+        }
+    }
+
+//    private class RelativeNode extends Node<Event<Term>, TimeSpan> {
+//        public RelativeNode(Event<Term> data) {
+//            super(data);
+//        }
+//
+////        final Collection<Edge<Event<Term>, TimeSpan>> outEnhanced = new ForwardingList<>() {
+////            @Override public Iterator<Edge<Event<Term>, TimeSpan>> iterator() {
+////                final Term thisTerm = RelativeNode.this.get().id();
+////                return Iterators.concat(
+////                        Iterators.transform(
+////                            Iterators.filter(byTerm.get(thisTerm).iterator(),
+////                                x -> x.getClass() == Event.class),
+////                            e -> new Edge<>(RelativeNode.this, node(e.id()), TimeSpan.the(0, 1f))
+////                        ),
+////                        RelativeNode.super.out().iterator()
+////                );
+////            }
+////
+////            @Override
+////            protected List<Edge<Event<Term>, TimeSpan>> delegate() {
+////                return (List) RelativeNode.this.out();
+////            }
+////        };
+//
+//        Stream<Edge<Event<Term>, TimeSpan>> dynamic(boolean outOrIn) {
+//
+//            return byTerm.get(RelativeNode.this.get().id()).stream().filter(
+//                    Event::absolute).map(
+//                    e -> {
+//                        Node<Event<Term>, TimeSpan> that = TimeGraph.this.add(e);
+//                        return new Edge<>(
+//                                outOrIn ? RelativeNode.this : that,
+//                                outOrIn ? that : RelativeNode.this,
+//                                new TimeSpan(0,1f));
+//                    }
+//            );
+//        }
+//
+//
+//        @Override
+//        public Stream<Edge<Event<Term>, TimeSpan>> in() {
+//            return Stream.concat(super.in(), dynamic(false));
+//        }
+//
+//        @Override
+//        public Stream<Edge<Event<Term>, TimeSpan>> out() {
+//            return Stream.concat(super.out(), dynamic(true));
+//        }
+//    }
 }

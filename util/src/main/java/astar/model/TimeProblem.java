@@ -30,24 +30,13 @@ public class TimeProblem<T,E> extends HashGraph<TimeProblem.Event<T>,E> implemen
             return Math.abs(at - bt);
     }
 
-    @Override
-    public Iterable<Event<T>> next(Event<T> current) {
-        return node(current).successors();
+    /** TODO stream */
+    @Override public Iterable<Event<T>> next(Event<T> current) {
+        return ()->node(current).successors().iterator();
     }
 
-    public Node<Event<T>, E> add(Event<T> x) {
-        return nodeAdd(x);
-    }
-
-    public Edge<Event<T>, E> link(Event<T> before, E e, Event<T> after) {
+    public boolean link(Event<T> before, E e, Event<T> after) {
         return edgeAdd(add(before), e, add(after));
-    }
-
-    @Override
-    public void print(PrintStream o) {
-        Set<Node> s = new TreeSet<Node>((a,b)-> ((Comparable)(((Event)(a.get())).id())).compareTo((((Event)(b.get())).id())) ); //sort by event
-        s.addAll(nodes());
-        s.forEach(t -> t.print(o));
     }
 
     /** absolutely specified event */
@@ -82,6 +71,10 @@ public class TimeProblem<T,E> extends HashGraph<TimeProblem.Event<T>,E> implemen
                 return id() + "@" + (s==e ? s : "[" + s + ".." + e + "]");
             }
         }
+
+        public boolean absolute() {
+            return true;
+        }
     }
 
     /** floating, but potentially related to one or more absolute event */
@@ -91,6 +84,10 @@ public class TimeProblem<T,E> extends HashGraph<TimeProblem.Event<T>,E> implemen
             super(id, TIMELESS);
         }
 
+        public boolean absolute() {
+            return false;
+        }
+
         @Override
         public String toString() {
             return id().toString() + "@?";
@@ -98,11 +95,21 @@ public class TimeProblem<T,E> extends HashGraph<TimeProblem.Event<T>,E> implemen
     }
 
     protected static class Unsolved<X> extends Relative<X> {
-        private final Map<X, LongSet> absolute;
+        public final Map<X, LongSet> absolute;
 
         public Unsolved(X x, Map<X, LongSet> absolute) {
             super(x);
             this.absolute = absolute;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            throw new RuntimeException();
+        }
+
+        @Override
+        public int hashCode() {
+            throw new RuntimeException();
         }
 
         @Override
@@ -118,6 +125,7 @@ public class TimeProblem<T,E> extends HashGraph<TimeProblem.Event<T>,E> implemen
             return id() + "?" +
                     (absolute.toString().replace(ETERNAL_STRING, "ETE")); //HACK
         }
+
     }
 
 
