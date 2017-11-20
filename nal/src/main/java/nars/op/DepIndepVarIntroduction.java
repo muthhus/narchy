@@ -66,7 +66,13 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             return null;
 
         Op inOp = input.op();
-        List<ByteList> paths = input.pathsTo(selected, inOp.statement ? 2 : 0);
+        List<ByteList> paths = $.newArrayList(1);
+        int minPathLength = inOp.statement ? 2 : 0;
+        input.pathsTo(selected, (path, t) ->  {
+            if (path.size() >= minPathLength)
+                paths.add(path.toImmutable());
+            return true; //TODO may be able to terminate early if we know this is the last one
+        });
         int pSize = paths.size();
         if (pSize == 0)
             return null;
@@ -107,9 +113,9 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         }
 
 
-        @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(0);
-        for (int occurrence = 0; occurrence < pSize; occurrence++) {
-            ByteList p = paths.get(occurrence);
+        ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(0);
+        for (int path = 0; path < pSize; path++) {
+            ByteList p = paths.get(path);
             Term t = null; //root
             int pathLength = p.size();
             for (int i = -1; i < pathLength-1 /* dont include the selected term itself */; i++) {

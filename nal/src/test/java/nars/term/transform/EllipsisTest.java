@@ -317,9 +317,12 @@ public class EllipsisTest {
         String s = "%prefix..*";
         Term t = $(s);
         assertNotNull(t);
-        //assertEquals(s, t.toString());
+        assertEquals(s, t.toString());
         //assertEquals("%prefix", t.target.toString());
-        assertEquals(EllipsisZeroOrMore.class, t.normalize(0).getClass());
+        Term tn = t.normalize(1);
+        assertEquals(EllipsisZeroOrMore.class, tn.getClass());
+        assertEquals("%1..*", tn.toString());
+        assertNotEquals($.varPattern(1), tn);
     }
 
 

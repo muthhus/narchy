@@ -57,11 +57,21 @@ public final class TrieSet<E> implements Set<E> {
     * @param trie
     *        The trie to use as the base.
     */
-   public TrieSet( Trie<E, Object> trie )
+   public TrieSet( TrieSequencer<E> seq )
    {
-      this.trie = trie;
+      this(new Trie(seq) {
+         @Override
+         public TrieMatch defaultMatch() {
+            return TrieMatch.EXACT;
+         }
+      });
       this.trie.setDefaultValue( FLAG_NONE );
-      this.trie.setDefaultMatch( TrieMatch.EXACT );
+   }
+
+   private TrieSet( Trie<E, Object> t )
+   {
+      this.trie = t;
+      this.trie.setDefaultValue( FLAG_NONE );
    }
 
    /**

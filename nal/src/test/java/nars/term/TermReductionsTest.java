@@ -1312,7 +1312,6 @@ public class TermReductionsTest extends NarseseTest {
         //  instead should have been: (busyVol&&busyPri)
 
         @NotNull Term x = $("((hear(what)&&(hear(is)&&(hear(is)&&(hear(what)&&(hear(is)&&(hear(is)&&(hear(what)&&(hear(is)&&(hear(is)&&(hear(is)&&hear(what))))))))))) ==>+153 hear(is)).");
-        System.out.println(x);
         assertEquals("((hear(what)&&hear(is)) ==>+153 hear(is))", x.toString());
 
     }

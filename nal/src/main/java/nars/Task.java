@@ -1,6 +1,5 @@
 package nars;
 
-import jcog.Util;
 import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
 import jcog.list.FasterList;
@@ -16,34 +15,34 @@ import nars.task.util.TaskRegion;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Bool;
-import nars.term.var.AbstractVariable;
+import nars.term.var.VarIndep;
 import nars.time.Tense;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
+import org.eclipse.collections.api.PrimitiveIterable;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.api.tuple.primitive.ByteBytePair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectShortHashMap;
-import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
+import org.eclipse.collections.impl.map.mutable.primitive.ByteByteHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ByteObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.function.BiFunction;
 
 import static java.util.Collections.singleton;
 import static nars.Op.*;
-import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;
 import static nars.truth.TruthFunctions.w2cSafe;
 import static org.eclipse.collections.impl.tuple.Tuples.twin;
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  * NAL Task to be processed, consists of a Sentence, stamp, time, and budget.
@@ -179,48 +178,73 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
                 if (!t.hasAny(Op.StatementBits)) {
                     return fail(t, "InDep variables must be subterms of statements", safe);
                 } else {
-                    //TODO use a byte[] path thing to reduce duplicate work performed in indepValid findPaths
 
-                    ByteHashSet unique = new ByteHashSet(1); //likely only one var indep repeated twice
-                    if (!t.ANDrecurse(
-                            v -> (v.op() != VAR_INDEP) || !unique.add(((AbstractVariable)v).id()) || indepValid(t, v))) {
-                        return fail(t, "unbalanced InDep variable pairing", safe);
-                    }
+
+                    //Trie<ByteList, ByteSet> m = new Trie(Tries.TRIE_SEQUENCER_BYTE_LIST);
+                    SortedSet</* length, */ ByteList> statements = new TreeSet<ByteList>(Comparator.comparingInt(PrimitiveIterable::size));
+                    ByteObjectHashMap<List<ByteList>> indepVarPaths = new ByteObjectHashMap<>();
+                    int visitVector = Op.VAR_INDEP.bit | Op.StatementBits;
+                    t.pathsTo((x) -> x.op().in(visitVector) ? x : null, x -> x.hasAny(visitVector), (path, indepVarOrStatement) -> {
+                        if (path.isEmpty())
+                            return true; //skip the input term
+
+                        if (indepVarOrStatement.op() == VAR_INDEP) {
+                            indepVarPaths.getIfAbsentPut(((byte) ((VarIndep) indepVarOrStatement).id()), FasterList::new).add(path.toImmutable());
+                        } else {
+                            statements.add(path.toImmutable());
+                        }
+//
+//                        Term t = null; //root
+//                        int pathLength = path.size();
+//                        for (int i = -1; i < pathLength - 1 /* dont include the selected term itself */; i++) {
+//                            t = (i == -1) ? comp : t.sub(path.get(i));
+//
+//                            if (t.op().indepVarParent) {
+//                                byte branch = path.get(i + 1); //either 0 or 1
+//                                byte branchBit = (byte) (1 << branch);
+//                                m.addToValue(path.toImmutable(), branchBit); //would be nice: orToValue(..)
+//                                //m.updateValue( , (previous) -> (byte) (previous | branchBit));
+//                            }
+//                        }
+
+                        return true;
+                    });
+
+                    return indepVarPaths.allSatisfy((varPaths) -> {
+                        if (t.op().statement && varPaths.size() > 1) {
+                            return true; //satisfied by >1 distinct paths under a statement root
+                        }
+
+                        ByteByteHashMap count = new ByteByteHashMap();
+                        //byte 1 = which statement path, byte 2 = length down it
+                        int numVarPaths = varPaths.size();
+                        for (byte varPath = 0; varPath < numVarPaths; varPath++) {
+                            ByteList p = varPaths.get(varPath);
+                            int pSize = p.size();
+                            byte statementNum = -1;
+                            nextStatement:
+                            for (ByteList statement : statements) {
+                                statementNum++;
+                                int statementPathLength = statement.size();
+                                if (statementPathLength >= pSize)
+                                    break; //since its sorted we know we dont have to try the remaining paths that go to deeper siblings
+                                for (int i = 0; i < statementPathLength; i++) {
+                                    if (p.get(i) != statement.get(i))
+                                        break nextStatement; //mismatch
+                                }
+                                //match
+                                count.addToValue(varPath, (byte) 1);
+                            }
+                        }
+                        return !count.isEmpty() && count.anySatisfy(b -> b > 1);
+                    });
+
 
                 }
         }
 
 
-
         return true;
-    }
-
-    static boolean indepValid(Term comp, Term target) {
-
-        //works up to 16 subterms (due to the 'short')
-        @Nullable ObjectShortHashMap<ByteList> m = new ObjectShortHashMap<>(2);
-        comp.pathsTo(subterm->subterm.equals(target) ? subterm : null, (path, subterm)->{
-            Term t = null; //root
-            int pathLength = path.size();
-            for (int i = -1; i < pathLength - 1 /* dont include the selected term itself */; i++) {
-                t = (i == -1) ? comp : t.sub(path.get(i));
-
-                if (validIndepVarSuperterm(t.op())) {
-                    byte st = path.get(i + 1);
-                    assert(st < 16);
-                    short inside = (short) (1 << st);
-
-
-                    m.updateValue( path.toImmutable(), inside, (previous) -> (byte) (previous | inside));
-                }
-            }
-
-            return true;
-        });
-
-        assert(!m.isEmpty());
-        return m.anySatisfy(b -> b == 0b11);
-
     }
 
     static boolean fail(@Nullable Term t, String reason, boolean safe) {
@@ -317,7 +341,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
 
 
         if (Task.validTaskTerm(t, punc, null, safe)) {
-            return PrimitiveTuples.pair(t, negated);
+            return pair(t, negated);
         } else {
             return null;
         }
@@ -741,7 +765,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
 
     default float conf(long start, long end, long dur) {
         float cw = evi(start, end, dur);
-        assert(cw==cw);
+        assert (cw == cw);
         return cw > 0 ? w2cSafe(cw) : Float.NaN;
     }
 

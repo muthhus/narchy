@@ -227,14 +227,14 @@ public interface Term extends Termed, Comparable<Termed> {
         return csrc.op().the(csrc.dt(), target);
     }
 
-    default <X> boolean pathsTo(/*@NotNull*/ Function<Term, X> target, /*@NotNull*/ BiPredicate<ByteList, X> receiver) {
+    default <X> boolean pathsTo(/*@NotNull*/ Function<Term, X> target, Predicate<Term> descendIf, /*@NotNull*/ BiPredicate<ByteList, X> receiver) {
         X ss = target.apply(this);
         if (ss != null) {
             if (!receiver.test(EmptyByteList, ss))
                 return false;
         }
-        if (this instanceof Compound) {
-            return pathsTo(new ByteArrayList(0), this.subterms(), target, receiver);
+        if (this.subs() > 0 && descendIf.test(this)) {
+            return pathsTo(new ByteArrayList(0), this.subterms(), descendIf, target, receiver);
         } else {
             return true;
         }
@@ -263,26 +263,27 @@ public interface Term extends Termed, Comparable<Termed> {
         return null;
     }
 
-    static <X> boolean pathsTo(/*@NotNull*/ ByteArrayList p, TermContainer superTerm, /*@NotNull*/ Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
+    static <X> boolean pathsTo(/*@NotNull*/ ByteArrayList p, TermContainer superTerm, Predicate<Term> descendIf,/*@NotNull*/ Function<Term, X> subterm, BiPredicate<ByteList, X> receiver) {
 
 
         int ppp = p.size();
 
         int n = superTerm.subs();
         for (int i = 0; i < n; i++) {
-            Term s = superTerm.sub(i);
-            X ss = subterm.apply(s);
 
             p.add((byte) i);
+
+            Term s = superTerm.sub(i);
+            X ss = subterm.apply(s);
 
             if (ss != null) {
                 if (!receiver.test(p, ss))
                     return false;
             }
-            if (s instanceof Compound) {
-                if (!pathsTo(p, s.subterms(), subterm, receiver))
-                    return false;
-            }
+
+            if (s.subs() > 0 && !pathsTo(p, s.subterms(), descendIf, subterm, receiver))
+                return false;
+
             p.removeAtIndex(ppp);
         }
 
@@ -293,7 +294,7 @@ public interface Term extends Termed, Comparable<Termed> {
     @Nullable
     default Term commonParent(List<ByteList> subpaths) {
         int subpathsSize = subpaths.size();
-        assert (subpathsSize > 0);
+        assert (subpathsSize > 1);
 
         int shortest = Integer.MAX_VALUE;
         for (int i = 0, subpathsSize1 = subpaths.size(); i < subpathsSize1; i++) {
@@ -508,31 +509,35 @@ public interface Term extends Termed, Comparable<Termed> {
         return appendTo;
     }
 
-    /*@NotNull*/
-    default List<ByteList> pathsTo(Term subterm) {
-        return pathsTo(subterm, 0);
-    }
 
-    List<byte[]> ListOfEmptyByteArray = List.of(ArrayUtils.EMPTY_BYTE_ARRAY);
 
-    /*@NotNull*/
-    default List<ByteList> pathsTo(Term subterm, int minLengthOfPathToReturn) {
+    default List<ByteList> pathsTo(Term target, int minLengthOfPathToReturn) {
+
+        if (impossibleSubTerm(target))
+            return List.of();
+
         List<ByteList> list = $.newArrayList(0);
-        pathsTo(
-                (x) -> subterm.equals(x) ? x : null,
-                minLengthOfPathToReturn > 0 ?(l, t) -> {
-                    if (l.size() >= minLengthOfPathToReturn)
-                        list.add(l);
-                    return true;
-                }
+        pathsTo( target, minLengthOfPathToReturn > 0 ?
+                    (l, t) -> {
+                        if (l.size() >= minLengthOfPathToReturn)
+                            list.add(l);
+                        return true;
+                    }
                 :
-                (l, t) -> { list.add(l.toImmutable()); return true; } //simpler version when min=0
+                    (l, t) -> {
+                        //simpler version when min=0
+                        list.add(l.toImmutable());
+                        return true;
+                    }
         );
         return list;
     }
 
-    default boolean pathsTo(/*@NotNull*/ Term subterm, /*@NotNull*/ BiPredicate<ByteList, Term> receiver) {
-        return pathsTo((x) -> subterm.equals(x) ? x : null, receiver);
+    default boolean pathsTo(/*@NotNull*/ Term target, /*@NotNull*/ BiPredicate<ByteList, Term> receiver) {
+        return pathsTo(
+                x -> target.equals(x) ? x : null,
+                x -> !x.impossibleSubTerm(target),
+                receiver);
     }
 
 

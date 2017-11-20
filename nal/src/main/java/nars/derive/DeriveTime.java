@@ -115,7 +115,7 @@ public class DeriveTime extends TimeGraph {
         });
         final int[] remain = {16};
 
-        try {
+//        try {
 
 
             solve(pattern, (solution) -> {
@@ -125,10 +125,10 @@ public class DeriveTime extends TimeGraph {
             });
 
 
-        } catch (Throwable t) {
-            logger.error("temporalize error:\n{} {}\n\t{}", pattern, d, t);
-            return null;
-        }
+//        } catch (Throwable t) {
+//            logger.error("temporalize error:\n{} {}\n\t{}", pattern, d, t);
+//            return null;
+//        }
 
         Event<Term> event = top.the;
         if (event == null)

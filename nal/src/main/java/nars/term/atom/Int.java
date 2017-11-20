@@ -18,7 +18,6 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.BiPredicate;
 
 import static com.google.common.collect.BoundType.OPEN;
 import static nars.Op.INT;
@@ -351,23 +350,20 @@ public class Int implements Intlike {
 
             //first subterm: infer location of all inductables
             int ii = i[0]++;
-            BiPredicate<ByteList, Term> collect = (p, t) -> {
-                if (!p.isEmpty() || (t.op() == INT)) {
-                    Pair<ByteHashSet, List<Term>> c = data.computeIfAbsent(p.toImmutable(), (pp) ->
-                            Tuples.pair(new ByteHashSet(), $.newArrayList(1)));
-                    c.getOne().add((byte) ii);
-                    c.getTwo().add(t);
-                }
+
+            f.pathsTo(x -> x.op() == INT ? x : null, d -> d.hasAny(Op.INT), (p, t) -> {
+
+                Pair<ByteHashSet, List<Term>> c = data.computeIfAbsent(
+                        p.toImmutable(),
+                        (pp) ->
+                                Tuples.pair(new ByteHashSet(1), $.newArrayList(1)));
+                c.getOne().add((byte) ii);
+                c.getTwo().add(t);
+
 
                 return true;
-            };
+            });
 
-            //if (f instanceof Compound) {
-            f.pathsTo(x -> x, collect);
-            /*} else {
-                if (f instanceof IntTerm) //raw atomic int term
-                    data.put(new ByteArrayList(new byte[] {0}), $.newArrayList(f));
-            }*/
         }
 
         Set<Term> result = new TreeSet();//new TreeSet();
@@ -510,7 +506,7 @@ public class Int implements Intlike {
 
         Map<ByteList, IntRange> intervals = new HashMap();
 
-        cc.pathsTo(x -> x instanceof IntRange ? ((IntRange) x) : null, (ByteList p, IntRange x) -> {
+        cc.pathsTo(x -> x instanceof IntRange ? ((IntRange) x) : null, d -> d.hasAny(Op.INT), (ByteList p, IntRange x) -> {
             intervals.put(p.toImmutable(), x);
             return true;
         });

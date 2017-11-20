@@ -385,7 +385,7 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
     public void solve(Term x, Predicate<Event<Term>> each) {
         solvable(x, e -> {
 
-            if (Param.DEBUG) assert (e.id.root().equals(x.root()));
+            //if (Param.DEBUG) assert (e.id.root().equals(x.root()));
 
             if (e instanceof Absolute) {
                 return each.test(e);

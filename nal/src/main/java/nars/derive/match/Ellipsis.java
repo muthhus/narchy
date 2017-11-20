@@ -98,7 +98,8 @@ public abstract class Ellipsis extends UnnormalizedVariable implements Ellipsisl
 
 
     protected Ellipsis(AbstractVariable target, int minArity) {
-        super(VAR_PATTERN, target.toString() + (minArity == 0 ? "..*" : "..+"));
+        super(VAR_PATTERN, target.toString());
+            // + (minArity == 0 ? "..*" : "..+")
         assert(target.op()==VAR_PATTERN); //only VAR_PATTERN for now
         this.minArity = minArity;
     }

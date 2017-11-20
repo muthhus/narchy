@@ -34,8 +34,8 @@ public class TaskRule extends TaskMatch {
     /** mapping of input variables to normalized variables */
     private final Map<Variable, Variable> io;
 
-    private final Compound input;
-    private final Compound id;
+    private final Term input;
+    private final Term id;
 
     public TaskRule(String input, String output, NAR nar) throws Narsese.NarseseException {
         super(nar);
@@ -50,7 +50,7 @@ public class TaskRule extends TaskMatch {
             throw new RuntimeException("output pattern is not compound");
 
         this.io = varNorm.map;
-        this.id = $.impl($.p(this.input, outputRaw, this.output), $.varQuery(0));
+        this.id = $.impl($.p(this.input, outputRaw, this.output), $.varQuery("what")).normalize();
 
 //        setTerm(new TermMatch(input) {
 //

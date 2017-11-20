@@ -616,6 +616,9 @@ public enum Op {
 
     public static final String DISJstr = "||";
 
+    public final boolean indepVarParent;
+    public final boolean depVarParent;
+
     private static boolean conegated(Term a, Term b) {
         Term ua = a.unneg();
         if (ua != a && ua.equals(b)) return true; //co-negation
@@ -936,8 +939,10 @@ public enum Op {
 
         this.var = (type == OpType.Variable);
 
-        this.statement = str.equals("-->") || str.equals("==>") || str.equals("<->");
-        this.temporal = str.equals("&&") || str.equals("==>");
+        boolean isImpl = str.equals("==>");
+        this.statement = str.equals("-->") || isImpl || str.equals("<->");
+        boolean isConj = str.equals("&&");
+        this.temporal = isConj || isImpl;
         //in(or(CONJUNCTION, IMPLICATION, EQUIV));
 
         this.hasNumeric = temporal;
@@ -966,10 +971,12 @@ public enum Op {
         conceptualizable = !(var ||
                 str.equals("+") /* INT */ || str.equals("B") /* Bool */);
 
-        goalable = conceptualizable && !str.equals("==>");
+        goalable = conceptualizable && !isImpl;
 
         beliefable = conceptualizable;
 
+        indepVarParent = isImpl;
+        depVarParent = isConj;
 
     }
 

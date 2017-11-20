@@ -16,6 +16,8 @@
 
 package jcog.tree.perfect;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Arrays;
 
 
@@ -37,7 +39,7 @@ public class PerfectHashMap<T>
    private int min;
    private int size;
    protected T[] values;
-   private static final Object[] empty = new Object[0];
+   private static final Object[] empty = ArrayUtils.EMPTY_OBJECT_ARRAY;
 
    /**
     * Instantiates an Empty PerfectHashMap.

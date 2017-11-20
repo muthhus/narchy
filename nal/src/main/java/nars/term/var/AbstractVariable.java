@@ -200,6 +200,7 @@ public abstract class AbstractVariable implements Variable {
     }
 
     public static AbstractVariable the(/*@NotNull*/ Op type, int id) {
+        assert(id > 0);
         if (id >= Param.MAX_VARIABLE_CACHED_PER_TYPE) {
             return AbstractVariable.vNew(type, id); //for special variables like ellipsis
         } else {

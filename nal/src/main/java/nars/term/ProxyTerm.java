@@ -167,23 +167,6 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
 
 
     @Override
-    @NotNull
-    public List<ByteList> pathsTo(Term subterm, int minLengthOfPathToReturn) {
-        return ref.pathsTo(subterm, minLengthOfPathToReturn);
-    }
-
-    @Override
-    public boolean pathsTo(Term subterm, BiPredicate<ByteList, Term> receiver) {
-        return ref.pathsTo(subterm, receiver);
-    }
-
-    @Override
-    public <X> boolean pathsTo(Function<Term, X> target, BiPredicate<ByteList, X> receiver) {
-        return ref.pathsTo(target, receiver);
-    }
-
-
-    @Override
     public int opX() {
         return ref.opX();
     }

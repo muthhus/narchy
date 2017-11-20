@@ -44,12 +44,12 @@ public class Trie<S, T> implements Map<S, T> {
 
     public final TrieNode<S, T> root;
     public final TrieSequencer<S> sequencer;
-    private TrieMatch defaultMatch = TrieMatch.STARTS_WITH;
 
-    private final SequenceSet sequences;
-    private final ValueCollection values;
-    private final EntrySet entries;
-    public final NodeSet nodes;
+
+//    private final SequenceSet sequences;
+//    private final ValueCollection values;
+//    private final EntrySet entries;
+//    public final NodeSet nodes;
 
     /**
      * Instantiates a new Trie.
@@ -71,10 +71,10 @@ public class Trie<S, T> implements Map<S, T> {
      */
     public Trie(@Nullable TrieSequencer<S> sequencer, T defaultValue) {
         root = new TrieNode<>(null, defaultValue, null, 0, 0, new PerfectHashMap<>());
-        sequences = new SequenceSet(root);
-        values = new ValueCollection(root);
-        entries = new EntrySet(root);
-        nodes = new NodeSet(root);
+//        sequences = new SequenceSet(root);
+//        values = new ValueCollection(root);
+//        entries = new EntrySet(root);
+//        nodes = new NodeSet(root);
         this.sequencer = sequencer!=null ? sequencer : (TrieSequencer)this;
     }
 
@@ -98,7 +98,6 @@ public class Trie<S, T> implements Map<S, T> {
      */
     public Trie<S, T> newEmptyClone() {
         Trie<S, T> t = new Trie<>(sequencer, root.value);
-        t.defaultMatch = defaultMatch;
         return t;
     }
 
@@ -220,7 +219,7 @@ public class Trie<S, T> implements Map<S, T> {
      */
     @Override
     public T get(Object sequence) {
-        return get((S) sequence, defaultMatch);
+        return get((S) sequence, defaultMatch());
     }
 
     /**
@@ -243,7 +242,7 @@ public class Trie<S, T> implements Map<S, T> {
      * @see #has(Object, TrieMatch)
      */
     public boolean has(S sequence) {
-        return hasAfter(root, sequence, defaultMatch);
+        return hasAfter(root, sequence, defaultMatch());
     }
 
     /**
@@ -324,18 +323,8 @@ public class Trie<S, T> implements Map<S, T> {
      *
      * @return The default TrieMatch set on this Trie.
      */
-    public TrieMatch getDefaultMatch() {
-        return defaultMatch;
-    }
-
-    /**
-     * Sets the default TrieMatch used for {@link #has(Object)} and
-     * {@link #get(Object)}.
-     *
-     * @param match The new default TrieMatch to set on this Trie.
-     */
-    public void setDefaultMatch(TrieMatch match) {
-        defaultMatch = match;
+    public TrieMatch defaultMatch() {
+        return TrieMatch.STARTS_WITH;
     }
 
     @Override
@@ -358,7 +347,7 @@ public class Trie<S, T> implements Map<S, T> {
 
     @Override
     public Set<Entry<S, T>> entrySet() {
-        return entries;
+        return new EntrySet(root);
     }
 
     /**
@@ -371,7 +360,7 @@ public class Trie<S, T> implements Map<S, T> {
      * @return The reference to a Set of Entries that matched.
      */
     public Set<Entry<S, T>> entrySet(S sequence) {
-        return entrySet(sequence, defaultMatch);
+        return entrySet(sequence, defaultMatch());
     }
 
     /**
@@ -398,7 +387,7 @@ public class Trie<S, T> implements Map<S, T> {
      * @see #entrySet()
      */
     public Set<TrieNode<S, T>> nodeSet() {
-        return nodes;
+        return new NodeSet(root);
     }
 
     /**
@@ -413,7 +402,7 @@ public class Trie<S, T> implements Map<S, T> {
      * @see #entrySet(Object)
      */
     public Set<TrieNode<S, T>> nodeSet(S sequence) {
-        return nodeSet(sequence, defaultMatch);
+        return nodeSet(sequence, defaultMatch());
     }
 
     /**
@@ -452,7 +441,7 @@ public class Trie<S, T> implements Map<S, T> {
      * @return The reference to a new Iterable.
      */
     public Iterable<TrieNode<S, T>> nodeSetAll(S sequence) {
-        return nodeSetAll(sequence, defaultMatch);
+        return nodeSetAll(sequence, defaultMatch());
 
     }
 
@@ -473,7 +462,7 @@ public class Trie<S, T> implements Map<S, T> {
 
     @Override
     public Set<S> keySet() {
-        return sequences;
+        return new SequenceSet(root);
     }
 
     /**
@@ -487,7 +476,7 @@ public class Trie<S, T> implements Map<S, T> {
      * @return The reference to a Set of keys/sequences that matched.
      */
     public Set<S> keySet(S sequence) {
-        return keySet(sequence, defaultMatch);
+        return keySet(sequence, defaultMatch());
     }
 
     /**
@@ -509,11 +498,11 @@ public class Trie<S, T> implements Map<S, T> {
 
     @Override
     public Collection<T> values() {
-        return values;
+        return new ValueCollection(root);
     }
 
     public Collection<T> values(S sequence) {
-        return values(sequence, defaultMatch);
+        return values(sequence, defaultMatch());
     }
 
     public Collection<T> values(S sequence, TrieMatch match) {
@@ -703,7 +692,7 @@ public class Trie<S, T> implements Map<S, T> {
 
     public class NodeSet extends AbstractSet<TrieNode<S, T>> {
 
-        public final TrieNode<S, T> root;
+        private final TrieNode<S, T> root;
 
         public NodeSet(TrieNode<S, T> root) {
             this.root = root;

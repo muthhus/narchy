@@ -6,20 +6,37 @@ import nars.term.Term;
 import org.eclipse.collections.api.set.primitive.ByteSet;
 import org.eclipse.collections.api.set.primitive.ImmutableByteSet;
 import org.eclipse.collections.impl.factory.primitive.ByteSets;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class CommonVariable extends UnnormalizedVariable {
 
     public final ImmutableByteSet vars;
 
-    CommonVariable(/*@NotNull*/ Op type, byte a, byte b) {
-        this(type, ByteSets.immutable.of(a, b));
-        assert(a!=b);
+    CommonVariable(/*@NotNull*/ Op type, byte x, byte y) {
+        super(type, type.ch + name(x, y));
+        assert(x!=y);
+        assert(x!=0 && y!=0);
+        assert(y < 0);
+        this.vars = ByteSets.immutable.of(x, y);
     }
 
     CommonVariable(/*@NotNull*/ Op type, ImmutableByteSet vars) {
-        super(type, Joiner.on('_').join(vars.collect(b -> Integer.toString(b, 36))) );
+        super(type, type.ch + name(vars));
         this.vars = vars;
+    }
+
+    /** simple name generator */
+    private static String name(byte x, byte y) {
+        return "x" + name(x) + "y" + name(-y);
+    }
+    private static String name(ImmutableByteSet vars) {
+        return String.join("",
+                vars.collect(b -> (b > 0 ? "x" : "y") + name(b)));
+    }
+
+    private static String name(int component) {
+        return Integer.toString(Math.abs(component), 36);
     }
 
     @Override
