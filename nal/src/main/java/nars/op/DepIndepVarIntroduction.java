@@ -1,13 +1,11 @@
 package nars.op;
 
-import jcog.list.FasterList;
 import nars.$;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Terms;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -54,15 +52,14 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     //(t.op()==VAR_INDEP || t.op()==VAR_DEP) ? 0 : 1;
 
-    @Nullable
     @Override
-    protected FasterList<Term> select(Term input) {
-        return Terms.substAllRepeats(input, depIndepFilter, 2);
+    protected List<Term> select(Term input, Random shuffle) {
+        return Terms.substAllRepeats(input, depIndepFilter, 2, shuffle);
     }
 
     @Nullable
     @Override
-    protected Term next(@NotNull Term input, @NotNull Term selected, int order) {
+    protected Term next(Term input, Term selected, int order) {
 
         if (selected.equals(Imdex))
             return null;

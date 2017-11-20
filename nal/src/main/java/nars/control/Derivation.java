@@ -8,7 +8,6 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.derive.PrediTerm;
-import nars.derive.TemporalizeDerived;
 import nars.derive.rule.PremiseRule;
 import nars.op.Subst;
 import nars.op.data.differ;
@@ -128,7 +127,6 @@ public class Derivation extends Unify {
 
     public PrediTerm<Derivation> deriver;
     public boolean single;
-    public TemporalizeDerived temporalize;
     public int parentComplexity;
 
     /**
@@ -286,7 +284,7 @@ public class Derivation extends Unify {
         preToPost.clear();
         //assert(termutes.isEmpty() && preToPost.isEmpty());
         this.forEachMatch = null;
-        this.temporalize = null;
+//        this.temporalize = null;
         this.concTruth = null;
         this.concPunc = 0;
         this.single = false;

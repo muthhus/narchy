@@ -175,11 +175,6 @@ public interface Atomic extends Term {
 
 
     @Override
-    default boolean recurseTerms(BiPredicate<Term, Term> whileTrue, Term parent) {
-        return whileTrue.test(this, parent);
-    }
-
-    @Override
     default void recurseTerms(Consumer<Term> v) {
         v.accept(this);
     }

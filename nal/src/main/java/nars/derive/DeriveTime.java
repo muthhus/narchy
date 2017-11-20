@@ -1,6 +1,8 @@
 package nars.derive;
 
+import jcog.sort.Top;
 import nars.Op;
+import nars.Param;
 import nars.Task;
 import nars.control.Derivation;
 import nars.derive.time.TimeGraph;
@@ -34,7 +36,7 @@ import java.util.function.Predicate;
  */
 public class DeriveTime extends TimeGraph {
 
-    private final static Logger logger = LoggerFactory.getLogger(TemporalizeDerived.class);
+    private final static Logger logger = LoggerFactory.getLogger(DeriveTime.class);
 
     private final Task task, belief;
 
@@ -95,12 +97,30 @@ public class DeriveTime extends TimeGraph {
 
         }
 
-        final TimeGraph.Event<Term>[] se = new TimeGraph.Event[]{null};
+
         Predicate<Event<Term>> filter;
+        Top<Event<Term>> top = new Top<>((f)->{
+            Term t = f.id;
+            float score = 0;
+
+            if (!hasXTERNAL(t))
+                score++;
+
+            long start = f.start();
+            if (start !=TIMELESS) {
+                score++;
+                if (start != ETERNAL)
+                    score++;
+            }
+
+            //return score > 0 ? score * (1f/(1+t.volume())) : 0; //example heuristic
+            return score;
+        });
+        final int[] remain = {16};
         filter = (solution) -> {
             //TODO test equivalence with task and belief terms and occurrences, and continue iterating up to a max # of tries if it produced a useless equivalent result
-            se[0] = solution;
-            return false;
+            top.accept(solution);
+            return remain[0]-- > 0;
         };
 
         try {
@@ -108,17 +128,15 @@ public class DeriveTime extends TimeGraph {
 
             solve(pattern, filter);
 
-            if (se[0] == null) {
-                //failure
-                return null;
-            }
 
         } catch (Throwable t) {
             logger.error("temporalize error:\n{} {}\n\t{}", pattern, d, t);
             return null;
         }
 
-        Event<Term> event = se[0];
+        Event<Term> event = top.the;
+        if (event == null)
+            return null;
 
         Term st = event.id;
         Op eop = st.op();
@@ -130,14 +148,18 @@ public class DeriveTime extends TimeGraph {
         occ[1] = event.end();
 
         boolean te = task.isEternal();
-        if (occ[0] == TIMELESS) {
+        if (occ[0] == TIMELESS || occ[0] == ETERNAL) {
             //couldnt solve the start time, so inherit from task or belief as appropriate
-            if (!te || (belief != null && !belief.isEternal())) {
+            if (!te || belief == null || belief.isEternal()) {
                 occ[0] = occ[1] = task.start();
             } else if (belief != null) {
                 occ[0] = occ[1] = belief.start();
             } else {
-                return null; //no basis
+                if (occ[0] == TIMELESS)
+                    return null; //no basis
+                else {
+                    //its eternal
+                }
             }
         }
 

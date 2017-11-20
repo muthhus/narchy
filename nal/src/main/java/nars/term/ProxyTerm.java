@@ -102,14 +102,7 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     public Term conceptual() {
         return ref.conceptual();
     }
-
-
-    @Override
-    public boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent) {
-        return ref.recurseTerms(whileTrue, parent);
-    }
-
-
+    
     @Override
     public boolean isCommutative() {
         return ref.isCommutative();

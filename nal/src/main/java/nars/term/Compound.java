@@ -102,7 +102,11 @@ public interface Compound extends Term, IPair, TermContainer {
         return Term.opX(op(), subs());
     }
 
-
+    @Override
+    default void recurseTerms(Consumer<Term> v) {
+        v.accept(this);
+        subterms().recurseTerms(v);
+    }
 
 
     //    /*@NotNull*/
@@ -120,16 +124,6 @@ public interface Compound extends Term, IPair, TermContainer {
 //        }
 //        return t;//.toImmutable();
 //    }
-
-
-
-    @Override
-    default boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent) {
-        if (whileTrue.test(this, parent)) {
-            return subterms().recurseSubTerms(whileTrue, this);
-        }
-        return false;
-    }
 
     @Override
     default int subTimeSafe(Term x) {
@@ -215,14 +209,6 @@ public interface Compound extends Term, IPair, TermContainer {
             return subterms().recurseTerms(descendFilter, whileTrue, this);
         }
         return true; //continue
-    }
-
-
-    @Override
-    default void recurseTerms(Consumer<Term> v) {
-        v.accept(this);
-        //subterms().forEach(s -> s.recurseTerms(v));
-        subterms().recurseTerms(v);
     }
 
 

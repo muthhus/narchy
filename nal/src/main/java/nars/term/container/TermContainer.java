@@ -886,25 +886,27 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
     }
 
-    default boolean recurseSubTerms(BiPredicate<Term, Term> whileTrue, Compound parent) {
-        return AND(x -> x.recurseTerms(whileTrue, parent));
-//        int s = subs();
-//        for (int i = 0; i < s; i++) {
-//            if (!sub(i).recurseTerms(whileTrue, parent))
-//                return false;
-//        }
-//        return true;
-    }
+//    default boolean recurseSubTerms(BiPredicate<Term, Term> whileTrue, Compound parent) {
+//        return AND(x -> x.recurseTerms(whileTrue, parent));
+////        int s = subs();
+////        for (int i = 0; i < s; i++) {
+////            if (!sub(i).recurseTerms(whileTrue, parent))
+////                return false;
+////        }
+////        return true;
+//    }
 
 
 
     @Override
     default void recurseTerms(/*@NotNull*/ Consumer<Term> v) {
-        forEach(s -> s.recurseTerms(v));
+        forEach(s -> {
+            s.recurseTerms(v);
+        });
     }
 
     default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, Term parent) {
-        return AND(s -> s.recurseTerms(parentsMust, whileTrue, parent));
+        return AND(s -> whileTrue.test(s) && s.recurseTerms(parentsMust, whileTrue, parent));
     }
 
     default TermContainer reverse() {

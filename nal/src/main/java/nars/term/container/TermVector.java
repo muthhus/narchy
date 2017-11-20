@@ -35,19 +35,27 @@ public abstract class TermVector implements TermContainer {
      */
     public final short complexity;
 
-    private final byte varPattern, varDep, varQuery, varIndep;
+    public final byte varPattern;
+    public final byte varDep;
+    public final byte varQuery;
+    public final byte varIndep;
 
     protected transient boolean normalized;
 
-
-//    /**
-//     * # variables contained, of each type & total
-//     * this means maximum of 127 variables per compound
-//     */
-//    public final byte varQuerys;
-//    public final byte varIndeps;
-//    public final byte varPatterns;
-//    public final byte varDeps;
+    /** copy constructor for fast instantiation */
+    protected TermVector(int hash, int structure,
+                         byte varPattern, byte varDep, byte varQuery, byte varIndep,
+                         short complexity, short volume, boolean normalized) {
+        this.hash = hash;
+        this.structure = structure;
+        this.varPattern = varPattern;
+        this.varDep = varDep;
+        this.varQuery = varQuery;
+        this.varIndep = varIndep;
+        this.complexity = complexity;
+        this.volume = volume;
+        this.normalized = normalized;
+    }
 
     protected TermVector(Term... terms) {
 
@@ -87,7 +95,6 @@ public abstract class TermVector implements TermContainer {
         this.volume = (short) (vol);
 
         this.normalized = varTot == 0;
-
     }
 
     @Override

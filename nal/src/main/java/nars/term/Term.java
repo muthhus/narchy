@@ -133,11 +133,6 @@ public interface Term extends Termed, Comparable<Termed> {
 
 
     /**
-     * BiPredicate param: child,parent
-     */
-    boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent);
-
-    /**
      * parent compounds must pass the descent filter before ts subterms are visited;
      * but if descent filter isnt passed, it will continue to the next sibling:
      * whileTrue must remain true after vistiing each subterm otherwise the entire

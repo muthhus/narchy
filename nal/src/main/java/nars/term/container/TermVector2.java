@@ -1,5 +1,6 @@
 package nars.term.container;
 
+import com.google.common.collect.Iterators;
 import jcog.list.ArrayIterator;
 import nars.Op;
 import nars.term.Term;
@@ -64,7 +65,7 @@ public final class TermVector2 extends TermVector {
     }
 
     @Override
-    public int subs() {
+    public final int subs() {
         return 2;
     }
 
@@ -74,7 +75,7 @@ public final class TermVector2 extends TermVector {
     }
 
     @Override
-    public void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {
+    public void forEach(Consumer<? super Term> action, int start, int stop) {
         if (start == stop) {
             action.accept( start == 0 ? x : y );
         } else if (start == 0 && stop == 1) {
@@ -84,15 +85,11 @@ public final class TermVector2 extends TermVector {
     }
 
     @Override
-    public void forEach(@NotNull Consumer<? super Term> action) {
+    public void forEach(Consumer<? super Term> action) {
         action.accept(x);
         action.accept(y);
     }
 
-    @Override public void recurseTerms(@NotNull Consumer<Term> v) {
-        x.recurseTerms(v);
-        y.recurseTerms(v);
-    }
 
 //    @Override
 //    public boolean isDynamic() {

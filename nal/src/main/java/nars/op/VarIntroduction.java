@@ -1,11 +1,8 @@
 package nars.op;
 
-import jcog.list.FasterList;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,56 +16,45 @@ import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
  */
 public abstract class VarIntroduction {
 
-    static final int maxSubstitutions = 1;
+//    static final int maxSubstitutions = 1;
 
 
-    public Pair<Term, Map<Term, Term>> accept(@NotNull Term x, Random r) {
+    public Pair<Term, Map<Term, Term>> accept(Term x, Random r) {
 
         if (x.volume() < 2 || !x.hasAny(ConjOrStatementBits))
             return null;
 
         boolean inputWasNormalized = x.isNormalized();
 
-        List<Term> selections = select(x);
-        if (selections == null) return null;
-        int sels = selections.size();
-        if (sels == 0) return null;
-
-        if (maxSubstitutions >= sels) {
-            //
-        } else {
-            //choose randomly
-            //assert(maxSubstitutions==1); //only 1 and all (above) at implemented right now
-            Term the = selections.get(r.nextInt(sels));
-            selections = new FasterList();
-            selections.add(the);
-        }
-
-
-        Map<Term, Term> substs = new HashMap<>(1, 1f);
-
-        int varOffset = x.vars(); //ensure the variables dont collide with existing variables
-        boolean found = false;
-        for (int i = 0, selectionsSize = selections.size(); i < selectionsSize; i++) {
-            Term u = selections.get(i);
-            Term v = next(x, u, ++varOffset);
-            if (v != null) {
-                substs.put(u, v);
-                found = true;
-            }
-        }
-        if (!found)
+        List<Term> selections = select(x, r);
+        if (selections.isEmpty())
             return null;
 
 
-        Term y = x.replace(substs);
+//        Map<Term, Term> substs = new HashMap<>(1, 0.9f);
+//
+        int varOffset = x.vars(); //ensure the variables dont collide with existing variables
+//        boolean found = false;
+//        for (int i = 0, selectionsSize = selections.size(); i < selectionsSize; i++) {
+            Term u = selections.get(0);
+            Term v = next(x, u, ++varOffset);
+//            if (v != null) {
+//                substs.put(u, v);
+//                found = true;
+//            }
+//        }
+//        if (!found)
+//            return null;
+
+
+        Term y = x.replace(u, v);
         if (y!=null && !y.equals(x)) {
             if (inputWasNormalized) {
                 y = y.normalize();
                 if (y == null) return null;
             }
 
-            return Tuples.pair(y, substs);
+            return Tuples.pair(y, Map.of(u,v));
         } else {
             return null;
         }
@@ -95,14 +81,13 @@ public abstract class VarIntroduction {
     }
 
 
-    @Nullable
-    abstract protected FasterList<Term> select(Term input);
+    abstract protected List<Term> select(Term input, Random shuffle);
 
 
     /**
      * provides the next terms that will be substituted in separate permutations; return null to prevent introduction
      */
-    abstract protected Term next(@NotNull Term input, @NotNull Term selection, int order);
+    abstract protected Term next(Term input, Term selection, int order);
     /*{
         return $.varQuery("c" + iteration);
     }*/

@@ -129,29 +129,28 @@ abstract public class FastCompound implements Compound {
 
         ObjectByteHashMap<Term> atoms = new ObjectByteHashMap();
 
-        DynBytes skeleton = new DynBytes(256);
+        DynBytes shadow = new DynBytes(256);
         //UncheckedBytes skeleton = new UncheckedBytes(Bytes.wrapForWrite(new byte[256]));
 
 
-        skeleton.writeUnsignedByte(o.ordinal());
-        skeleton.writeUnsignedByte(subs);
+        shadow.writeUnsignedByte(o.ordinal());
+        shadow.writeUnsignedByte(subs);
         final byte[] numAtoms = {0};
         ByteFunction0 nextUniqueAtom = () -> numAtoms[0]++;
         int structure = o.bit, hashCode = 1;
         byte volume = 1;
 
         for (Term x : subterms) {
-            x.recurseTerms((child, parent) -> {
-                skeleton.writeUnsignedByte((byte) child.op().ordinal());
+            x.recurseTerms((child) -> {
+                shadow.writeUnsignedByte((byte) child.op().ordinal());
                 if (child.op().atomic) {
                     int aid = atoms.getIfAbsentPut(child, nextUniqueAtom);
-                    skeleton.writeUnsignedByte((byte) aid);
+                    shadow.writeUnsignedByte((byte) aid);
                 } else {
-                    skeleton.writeUnsignedByte(child.subs());
+                    shadow.writeUnsignedByte(child.subs());
                     //TODO use last bit of the subs byte to indicate presence or absence of subsequent 'dt' value (32 bits)
                 }
-                return true;
-            }, null);
+            });
             structure |= x.structure();
             hashCode = Util.hashCombine(hashCode, x.hashCode());
             volume += x.volume();
@@ -177,7 +176,7 @@ abstract public class FastCompound implements Compound {
             for (ObjectBytePair<Term> p : atoms.keyValuesView()) {
                 a[p.getTwo()] = p.getOne();
             }
-            y = new FastCompoundInstancedAtoms(a, skeleton.toByteArray(), structure, hashCode, volume, normalized);
+            y = new FastCompoundInstancedAtoms(a, shadow.toByteArray(), structure, hashCode, volume, normalized);
         }
 
         return y;

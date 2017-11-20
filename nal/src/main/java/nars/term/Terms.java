@@ -60,7 +60,7 @@ public enum Terms {
     }
 
 
-    public static int hashSubterms( TermContainer container) {
+    public static int hashSubterms(TermContainer container) {
         int h = 1;
         int s = container.subs();
         for (int i = 0; i < s; i++) {
@@ -388,9 +388,6 @@ public enum Terms {
     }
 
 
-
-
-
     public static boolean allNegated(@NotNull TermContainer subterms) {
         return subterms.hasAny(Op.NEG) && subterms.AND((Term t) -> t.op() == NEG);
     }
@@ -469,25 +466,23 @@ public enum Terms {
     /**
      * returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria
      */
-    @Nullable
-    public static FasterList<Term> substAllRepeats(@NotNull Term c, @NotNull ToIntFunction<Term> score, int minCount) {
-        FasterList<Term> oi = getUniqueRepeats(c, score, minCount);
-        if (oi == null || oi.isEmpty())
-            return null;
+    public static List<Term> substAllRepeats(Term c, ToIntFunction<Term> score, int minCount, @Nullable Random shuffle) {
+        FasterList<Term> oi = uniqueRepeats(c, score, minCount);
+        int s;
+        if (oi == null || (s = oi.size())==0)
+            return List.of();
 
-        if (oi.size() > 1) {
+        if (s > 1) {
             //keep only the unique subterms which are not contained by other terms in the list
             //renive terms which are contained by other terms in the list
 
             //oi.sort((a, b) -> Integer.compare(a.volume(), b.volume())); //sorted by volume
 
-            oi.removeIf(b ->
-                    oi.anySatisfy(
-                            a ->
-                                    (a != b) &&
-                                            a.containsRecursively(b)
-                    )
-            );
+            oi.removeIf(bb -> oi.anySatisfyWith((a,b) -> (a != b) && a.containsRecursively(b), bb));
+
+            if (shuffle!=null && oi.size() > 1)
+                Collections.shuffle(oi, shuffle);
+
         }
 
         return oi;
@@ -497,7 +492,7 @@ public enum Terms {
      * returns a list but its contents will be unique
      */
     @Nullable
-    static FasterList<Term> getUniqueRepeats(@NotNull Term c, @NotNull ToIntFunction<Term> score, int minCount) {
+    static FasterList<Term> uniqueRepeats(Term c, ToIntFunction<Term> score, int minCount) {
         HashBag<Term> uniques = Terms.subtermScore(c, score);
         int us = uniques.size();
         if (us == 0)
@@ -518,7 +513,7 @@ public enum Terms {
      * counts the repetition occurrence count of each subterm within a compound
      */
     @NotNull
-    public static HashBag<Term> subtermScore(@NotNull Term c, @NotNull ToIntFunction<Term> score) {
+    public static HashBag<Term> subtermScore(Term c, ToIntFunction<Term> score) {
         HashBag<Term> uniques = new HashBag<>(c.volume() / 2);
 
         c.recurseTerms((Term subterm) -> {
@@ -563,7 +558,7 @@ public enum Terms {
      */
     public static boolean flatten(/*@NotNull*/ Op op, Term[] u, int dt, ObjectByteHashMap<Term> s) {
 
-        assert(u.length>1);
+        assert (u.length > 1);
 
         //sort by volume, decreasing first. necessary for proper subsumption of events into sibling sequence compounds that may contain them
         //may also provide some performance benefit for accelerated early termination in case of invalid construction attempts (ex: co-negation)
@@ -599,7 +594,7 @@ public enum Terms {
 
             if (x == False)
                 return false;
-                //return s.getIfAbsentPut(True, (byte) -1) == (byte) +1; //attempt to mark a False, for the chance it may become inverted and disappear rather than aborting any further construction here
+            //return s.getIfAbsentPut(True, (byte) -1) == (byte) +1; //attempt to mark a False, for the chance it may become inverted and disappear rather than aborting any further construction here
 
             return false; //x must be Null
         }
@@ -687,7 +682,6 @@ public enum Terms {
         }
         return o.the(DTERNAL, t);
     }
-
 
 
 }

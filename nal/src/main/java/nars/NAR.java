@@ -947,11 +947,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         loop.stop();
 
-        //clear();
         super.stop();
-
-//        derivation.forEach(Derivation::clear);
-        //derivation.forEach(c -> c.transformsCache.invalidateAll());
 
         exe.stop();
 

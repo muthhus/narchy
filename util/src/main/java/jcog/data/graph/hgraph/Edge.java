@@ -24,6 +24,7 @@
 package jcog.data.graph.hgraph;
 
 import jcog.Util;
+import org.jetbrains.annotations.Nullable;
 
 /**
  *
@@ -90,5 +91,12 @@ public class Edge<N, E> {
 
     public Node<N,E> from(boolean outOrIn) {
         return outOrIn ? from : to;
+    }
+
+    @Nullable
+    public Node<N, E> other(Node<N, E> x) {
+        if (from == x) return to;
+        else if (to == x) return from;
+        else return null;
     }
 }

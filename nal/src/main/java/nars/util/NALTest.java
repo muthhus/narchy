@@ -6,6 +6,8 @@ import nars.Param;
 import nars.control.MetaGoal;
 import nars.test.TestNAR;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -15,24 +17,21 @@ public abstract class NALTest {
 
     public final NAR nar;
     public final TestNAR test;
-
-    static {
-        Param.ANSWER_REPORTING = false;
-    }
-
-    public MetaGoal.Report metagoals;
+    public final MetaGoal.Report metagoals = new MetaGoal.Report();
 
     protected NALTest() {
-        Param.DEBUG = true;
         test = new TestNAR(nar = nar());
+    }
+
+    @BeforeEach
+    void init() {
+        Param.DEBUG = true;
+        Param.ANSWER_REPORTING = false;
     }
 
     protected NAR nar() {
         return NARS.tmp();
     }
-
-
-
 
 
     @AfterEach
@@ -41,11 +40,8 @@ public abstract class NALTest {
         test.test();
 
         nar.stop();
-        nar.clear();
 
-
-        this.metagoals = new MetaGoal.Report().add(nar.causes);
-        metagoals.print(System.out);
+        metagoals.add(nar.causes).print(System.out);
     }
 
 }

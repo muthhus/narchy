@@ -24,7 +24,6 @@
 package jcog.data.graph.hgraph;
 
 import com.google.common.collect.Iterables;
-import jcog.TODO;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
 
@@ -40,15 +39,13 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 public class HashGraph<N, E> {
 
     protected Map<N, Node<N, E>> nodes;
-    //protected Map<E, Edge<N, E>> edges;
 
     public HashGraph() {
-        this(new HashMap<>(), new HashMap());
+        this(new LinkedHashMap<>(), new LinkedHashMap());
     }
 
     public HashGraph(Map<N, Node<N, E>> nodes, Map<E, Edge<N, E>> edges) {
         this.nodes = nodes;
-        //this.edges = edges;
     }
 
     public void print() {
@@ -56,9 +53,7 @@ public class HashGraph<N, E> {
     }
 
     public void print(PrintStream out) {
-        nodes().forEach((node) -> {
-            node.print(out);
-        });
+        nodes().forEach((node) -> node.print(out));
     }
 
     public Node<N, E> add(N key) {
@@ -99,38 +94,13 @@ public class HashGraph<N, E> {
         return nodes.values();
     }
 
-    public void edgeRemove(Edge<N, E> e) {
-        e.from.outRemove(e);
-        e.to.inRemove(e);
-    }
-
-    @FunctionalInterface
-    public interface DFSTraverser<N, E> {
-
-        /**
-         * path should not be modified by callee. it is left exposed for performance
-         * path boolean is true = OUT, false = IN
-         */
-        boolean visit(Node<N, E> n, FasterList<BooleanObjectPair<Edge<N, E>>> path);
-
-        default boolean visitAgain(Edge<N, E> e, boolean outOrIn) {
+    public boolean edgeRemove(Edge<N, E> e) {
+        if (e.from.outRemove(e)) {
+            boolean removed = e.to.inRemove(e);
+            assert(removed);
             return true;
         }
-
-        default boolean visit(Edge<N, E> e, boolean outOrIn) {
-            return true;
-        }
-
-        default Stream<Edge<N, E>> edges(Node<N, E> n, boolean outOrIn) {
-            return outOrIn ? n.out() : n.in();
-        }
-
-    }
-
-    @FunctionalInterface
-    public interface BFSTraverser<N, E> {
-
-        void visitNode(Node<N, E> n, int depth);
+        return false;
     }
 
     /**
@@ -156,151 +126,132 @@ public class HashGraph<N, E> {
 
     }
 
-    private void markReachable(Node<N, E> startingNode) {
-        ArrayList<Node<N, E>> arr = new ArrayList<>();
-        arr.add(startingNode);
-        nodes().forEach(Node::setUnreachable);
-        traverseDFSNodes(arr, false, true, (node, path) -> {
-            node.setReachable();
-            return true;
-        });
+//    private void markReachable(Node<N, E> startingNode) {
+//        ArrayList<Node<N, E>> arr = new ArrayList<>();
+//        arr.add(startingNode);
+//        nodes().forEach(Node::setUnreachable);
+//        traverseDFSNodes(arr, false, true, (node, path) -> {
+//            node.setReachable();
+//            return true;
+//        });
+//    }
+
+    public void traverseBFS(Node<N, E> startingNode, Search tv, boolean longestPath) {
+
+//        if (longestPath) {
+//            markReachable(startingNode);
+//        }
+
+//        tv.start();
+//        try {
+//
+//            Queue<Node<N, E>> queue = new LinkedList<>();
+//            queue.add(startingNode);
+//            startingNode.setVisited(true);
+//            int layer = 0;
+//            Node<N, E> lastOfLayer = startingNode;
+//            final Node[] lastAdded = {null};
+//
+//            while (!queue.isEmpty()) {
+//
+//                Node<N, E> current = queue.poll();
+//                tv.visitNode(current, layer);
+//                current.setActive(false);
+//
+//
+//                current.out().forEach(e -> {
+//                    if (!e.to.isVisited()) {
+//
+//                        final boolean[] allow = {true};
+//                        if (longestPath) {
+//                            e.to.in().allMatch(pred -> {
+//                                Node<N, E> p = pred.to;
+//                                if ((!p.isVisited() || p.isActive()) && p.isReachable()) {
+//                                    allow[0] = false;
+//                                    return false;
+//                                }
+//                                return true;
+//                            });
+//                        }
+//
+//                        if (allow[0]) {
+//                            queue.offer(e.to);
+//                            lastAdded[0] = e.to;
+//                            e.to.setVisited(true);
+//                            e.to.setActive(true);
+//                        }
+//                    }
+//                });
+//
+//                if (current == lastOfLayer && !queue.isEmpty()) {
+//                    lastOfLayer = lastAdded[0];
+//                    layer++;
+//                }
+//            }
+//        } finally {
+//            tv.stop();
+//        }
     }
 
-    public void traverseBFS(Node<N, E> startingNode, BFSTraverser tv, boolean longestPath) {
-
-        if (longestPath) {
-            markReachable(startingNode);
-        }
-
-        for (Node<N, E> n : nodes()) {
-            n.setVisited(false);
-            n.setActive(false);
-        }
-
-        Queue<Node<N, E>> queue = new LinkedList<>();
-        queue.add(startingNode);
-        startingNode.setVisited(true);
-        int layer = 0;
-        Node<N, E> lastOfLayer = startingNode;
-        final Node[] lastAdded = {null};
-
-        while (!queue.isEmpty()) {
-
-            Node<N, E> current = queue.poll();
-            tv.visitNode(current, layer);
-            current.setActive(false);
 
 
-            current.out().forEach(e -> {
-                if (!e.to.isVisited()) {
-
-                    final boolean[] allow = {true};
-                    if (longestPath) {
-                        e.to.in().allMatch(pred -> {
-                            Node<N, E> p = pred.to;
-                            if ((!p.isVisited() || p.isActive()) && p.isReachable()) {
-                                allow[0] = false;
-                                return false;
-                            }
-                            return true;
-                        });
-                    }
-
-                    if (allow[0]) {
-                        queue.offer(e.to);
-                        lastAdded[0] = e.to;
-                        e.to.setVisited(true);
-                        e.to.setActive(true);
-                    }
-                }
-            });
-
-            if (current == lastOfLayer && !queue.isEmpty()) {
-                lastOfLayer = lastAdded[0];
-                layer++;
-            }
-        }
-    }
-
-    public void traverseDFS(DFSTraverser<N, E> tv, Edge<N, E> e, boolean in, boolean out, FasterList<BooleanObjectPair<Edge<N, E>>> path, Edge<N, E> neEdge) {
-        traverseDFSNodes(nodes(), in, out, tv);
-    }
-
-    public void traverseDFS(N startingNode, boolean in, boolean out, DFSTraverser<N, E> tv) {
+    public void traverseDFS(N startingNode, boolean in, boolean out, Search<N, E> tv) {
         traverseDFS(List.of(startingNode), in, out, tv);
     }
 
-    public void traverseDFS(Iterable<N> startingNodes, boolean in, boolean out, DFSTraverser<N, E> tv) {
+    public void traverseDFS(Iterable<N> startingNodes, boolean in, boolean out, Search<N, E> tv) {
         traverseDFSNodes(Iterables.transform(startingNodes, this::add), in, out, tv);
     }
 
-    public synchronized void traverseDFSNodes(Iterable<Node<N, E>> startingNodes, boolean in, boolean out, DFSTraverser<N, E> tv) {
+    public synchronized void traverseDFSNodes(Iterable<Node<N, E>> startingNodes, boolean in, boolean out, Search<N, E> tv) {
 
-        for (Node<N, E> n : nodes()) {
-            n.setVisited(false);
-            n.setActive(false);
-        }
+        tv.start();
+        try {
 
-        boolean result = false;
-        FasterList<BooleanObjectPair<Edge<N, E>>> path = new FasterList();
-        for (Node n : startingNodes) {
-            if (!traverse(tv, in, out, n, path))
-                break;
-            assert (path.isEmpty());
+            boolean result = false;
+
+            FasterList<BooleanObjectPair<Edge<N, E>>> path = new FasterList();
+
+            for (Node n : startingNodes) {
+                if (!traverse(tv, in, out, n, path))
+                    break;
+                assert (path.isEmpty());
+            }
+
+        } finally {
+            tv.stop();
         }
     }
 
-    private boolean traverse(DFSTraverser tv, boolean in, boolean out, Node<N, E> n, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
+    private boolean traverse(Search tv, boolean in, boolean out, Node<N, E> n, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
 
         assert (in || out);
 
-        if (n.activate()) {
+        if (!tv.visit(n, path))
+            return false;
 
-            if (!tv.visit(n, path))
-                return false;
-
-            if (out && !traverseDFS(tv, tv.edges(n, true), true, in, out, path))
-                return false;
-
-            if (in && !traverseDFS(tv, tv.edges(n, false), false, in, out, path))
-                return false;
-
-            n.setActive(false);
-        }
+        if (!traverseDFS(tv, n, tv.edges(n, in, out), in, out, path))
+            return false;
 
         return true;
-
     }
 
     /**
      * TODO allow the traverser to decide to cut the search entirely, or just proceed no further past the current node
      */
-    private boolean traverseDFS(DFSTraverser tv, Stream<Edge<N, E>> edges, boolean outOrIn, boolean in, boolean out, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
+    private boolean traverseDFS(Search tv, Node<N,E> source, Stream<Edge<N, E>> edges, boolean in, boolean out, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
 
         return edges.allMatch(e -> {
 
-            Node<N, E> next = outOrIn ? e.to : e.from;
-            if (next.isVisited())
+            Node<N, E> next = e.other(source);
+            if (tv.visited(next))
                 return true;
 
-            path.add(pair(outOrIn, e));
+            /** TODO use a stack to eliminate virtual calls */
 
-            boolean kontinue;
-            if (next.isActive()) {
+            path.add(pair(next == e.to, e));
 
-                kontinue = tv.visitAgain(e, outOrIn);
-
-                //but dont go there, it would be a cycle
-
-            } else {
-
-                if (kontinue = tv.visit(e, outOrIn)) {
-
-                    kontinue = traverse(tv, in, out, next, path);
-
-                }
-
-            }
+            boolean kontinue = traverse(tv, in, out, next, path);
 
             path.removeLast();
 
@@ -308,43 +259,43 @@ public class HashGraph<N, E> {
         });
     }
 
-    public boolean hasCycles() {
+//    public boolean hasCycles() {
+//
+//        for (Node<N, E> n : nodes()) {
+//            n.setVisited(false);
+//            n.setActive(false);
+//        }
+//
+//        for (Node<N, E> n : nodes()) {
+//            if (checkCycles(n))
+//                return true;
+//        }
+//        return false;
+//    }
 
-        for (Node<N, E> n : nodes()) {
-            n.setVisited(false);
-            n.setActive(false);
-        }
-
-        for (Node<N, E> n : nodes()) {
-            if (checkCycles(n))
-                return true;
-        }
-        return false;
-    }
-
-    private boolean checkCycles(Node<N, E> n) {
-
-        if (n.isActive()) {
-            return true;
-        }
-
-        if (!n.isVisited()) {
-
-            n.setVisited(true);
-            n.setActive(true);
-
-            if (n.out().anyMatch(succ -> checkCycles(succ.to)))
-                return true;
-
-            n.setActive(false);
-
-        }
-
-        return false;
-    }
+//    private boolean checkCycles(Node<N, E> n) {
+//
+//        if (n.isActive()) {
+//            return true;
+//        }
+//
+//        if (!n.isVisited()) {
+//
+//            n.setVisited(true);
+//            n.setActive(true);
+//
+//            if (n.out().anyMatch(succ -> checkCycles(succ.to)))
+//                return true;
+//
+//            n.setActive(false);
+//
+//        }
+//
+//        return false;
+//    }
 
     public Stream<Edge<N,E>> edges() {
-        throw new TODO();
+        return nodes().stream().flatMap(Node::out);
     }
 
     @Override

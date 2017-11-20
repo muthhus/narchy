@@ -109,7 +109,9 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     @Deprecated /* HACK */
     @Override
     public /*@NotNull*/ TermContainer subterms() {
-        return new TermVector1(sub);
+
+        //return new TermVector1(sub);
+        return new TermVector1(sub, this);
         //return new SubtermView(this);
     }
 

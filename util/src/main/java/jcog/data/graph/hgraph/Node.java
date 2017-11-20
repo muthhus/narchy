@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 /**
@@ -39,6 +40,7 @@ import java.util.stream.Stream;
  * @author Thomas Wuerthinger
  */
 public class Node<N, E> {
+
 
     /** buffers a lazily updated array-backed cache of the values
      * for fast iteration and streaming */
@@ -113,58 +115,42 @@ public class Node<N, E> {
         }
     }
 
-    private final N data;
+    private final static AtomicInteger serials = new AtomicInteger(1);
+
+    public final N id;
+    public final int serial, hash;
     private final Collection<Edge<N, E>> inEdges;
     private final Collection<Edge<N, E>> outEdges;
-    private boolean visited;
-    private boolean active;
-    private boolean reachable;
 
-
-
-    protected Node(N data) {
-        this.data = data;
-        inEdges =
+    protected Node(N id) {
+        this.serial = serials.getAndIncrement();
+        this.id = id;
+        this.inEdges =
                 new FastIteratingHashSet<>();
                 //new HashSet<>();
-        outEdges =
+        this.outEdges =
                 //new HashSet<>();
                 new FastIteratingHashSet<>();
+        this.hash = id.hashCode();
+    }
+
+    public Stream<Edge<N, E>> edges(boolean in, boolean out) {
+        if (out && !in) return out();
+        else if (!out && in) return in();
+        else return Stream.concat(out(), in());
     }
 
     @Override
-    public int hashCode() {
-        return data.hashCode();
+    public final boolean equals(Object obj) {
+        return this == obj;
     }
 
-    protected boolean isVisited() {
-        return visited;
+    @Override
+    public final int hashCode() {
+        return hash;
     }
 
-    protected void setVisited(boolean b) {
-        visited = b;
-    }
-
-    protected boolean isReachable() {
-        return reachable;
-    }
-
-    protected void setReachable() { reachable = true; }
-    protected void setUnreachable() { reachable = false; }
-
-    protected void setReachable(boolean b) {
-        reachable = b;
-    }
-
-    protected boolean isActive() {
-        return active;
-    }
-
-    protected void setActive(boolean b) {
-        active = b;
-    }
-
-    public int ins() {
+    public final int ins() {
         return ins(true);
     }
 
@@ -189,14 +175,14 @@ public class Node<N, E> {
         return outEdges.add(e);
     }
 
-    protected void inRemove(Edge<N, E> e) {
+    protected boolean inRemove(Edge<N, E> e) {
         //assert inEdges.contains(e);
-        inEdges.remove(e);
+        return inEdges.remove(e);
     }
 
-    protected void outRemove(Edge<N, E> e) {
+    protected boolean outRemove(Edge<N, E> e) {
         //assert outEdges.contains(e);
-        outEdges.remove(e);
+        return outEdges.remove(e);
     }
 
     public Stream<Edge<N, E>> in() {
@@ -208,34 +194,23 @@ public class Node<N, E> {
     }
 
     public Stream<N> successors() {
-        return out().map(e -> e.to.data);
+        return out().map(e -> e.to.id);
     }
     public Stream<N> predecessors() {
-        return in().map(e -> e.from.data);
-    }
-
-    public N get() {
-        return data;
+        return in().map(e -> e.from.id);
     }
 
     @Override
     public String toString() {
-        return data.toString();
+        return id.toString();
     }
 
     public void print(PrintStream out) {
-        out.println(data);
+        out.println(id);
         out().forEach(e -> {
            out.println("\t" + e);
         });
     }
 
-    public boolean activate() {
-        if (!isVisited()) {
-            setVisited(true);
-            setActive(true);
-            return true;
-        }
-        return false;
-    }
+
 }

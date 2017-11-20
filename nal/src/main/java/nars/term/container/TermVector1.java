@@ -4,6 +4,7 @@ import com.google.common.collect.Iterators;
 import nars.Op;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
+import nars.term.compound.UnitCompound1;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,10 +17,18 @@ import java.util.function.Predicate;
 /**
  * Size 1 TermVector
  */
-public class TermVector1 extends TermVector {
+public class TermVector1 extends TermVector /*implements Set<Term>*/ {
 
     public final Term sub;
 
+
+    public TermVector1(Term sub, TermVector of) {
+        super(of.hashCodeSubTerms(), of.structure,
+             of.varPattern, of.varDep, of.varQuery, of.varIndep,
+             of.complexity, of.volume, of.normalized
+        );
+        this.sub = sub;
+    }
 
     public TermVector1(Term sub) {
         super(sub);
@@ -38,21 +47,11 @@ public class TermVector1 extends TermVector {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        else if (obj instanceof TermVector) {
-            TermVector t = (TermVector)obj;
-            if (hash!=t.hash || t.subs()!=1)
-                return false;
-
-            if (t.sub(0).equals(sub)) {
-                equivalentTo(t);
-                return true;
-            }
-
-            return false;
-        }
-        else if (obj instanceof TermContainer && hash== obj.hashCode()) {
+        if (obj instanceof TermContainer) {
             TermContainer t = (TermContainer) obj;
-            if (t.subs() == 1 && sub.equals(t.sub(0))) {
+            if (hash == t.hashCodeSubTerms() && t.subs() == 1 && sub.equals(t.sub(0))) {
+                if (t instanceof TermVector)
+                    equivalentTo((TermVector) t);
                 return true;
             }
         }
@@ -64,7 +63,6 @@ public class TermVector1 extends TermVector {
         return c.length == 1 && sub.equals(c[0]);
     }
 
-    @NotNull
     @Override
     public Term[] arrayClone() {
         return new Term[]{sub};
@@ -100,20 +98,16 @@ public class TermVector1 extends TermVector {
     }
 
     @Override
-    public @NotNull Set<Term> toSet(Predicate<Term> ifTrue) {
+    public Set<Term> toSet(Predicate<Term> ifTrue) {
         return ifTrue.test(sub) ? toSet() : Collections.emptySet();
     }
 
-    @NotNull
     @Override
     public String toString() {
         return "(" + sub + ')';
     }
 
-    @Override
-    public void recurseTerms(Consumer<Term> v) {
-        sub.recurseTerms(v);
-    }
+
 
     @Override
     public Iterator<Term> iterator() {

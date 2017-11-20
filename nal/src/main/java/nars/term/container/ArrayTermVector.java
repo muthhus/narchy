@@ -149,11 +149,4 @@ public class ArrayTermVector extends TermVector {
         return true;
     }
 
-    @Override public final void recurseTerms(Consumer<Term> v) {
-        Term[] t = this.terms;
-        for (Term sub : t)
-            sub.recurseTerms(v);
-    }
-
-
 }
