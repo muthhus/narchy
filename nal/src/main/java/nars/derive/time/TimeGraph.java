@@ -2,8 +2,6 @@ package nars.derive.time;
 
 import astar.model.TimeProblem;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import jcog.Util;
 import jcog.data.graph.hgraph.Edge;
@@ -22,7 +20,6 @@ import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
 import org.eclipse.collections.impl.factory.primitive.LongSets;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 
 import java.util.*;
@@ -56,12 +53,12 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
         //public final float weight;
 
         public final static TimeSpan TS_ZERO = new TimeSpan(0);
-//        public final static TimeSpan TS_POS_ONE = new TimeSpan(+1);
+        //        public final static TimeSpan TS_POS_ONE = new TimeSpan(+1);
 //        public final static TimeSpan TS_NEG_ONE = new TimeSpan(-1);
         public final static TimeSpan TS_ETERNAL = new TimeSpan(ETERNAL);
 
         public static TimeSpan the(long dt) {
-            assert(dt!=TIMELESS);
+            assert (dt != TIMELESS);
 
             if (dt == 0) {
                 return TS_ZERO;
@@ -293,10 +290,18 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
             sources.addAll(bTerms);
             Collections.shuffle(sources, random()); //TODO use (possibly biased) roulette sampling
 
+            boolean repeat = a.unneg().equals(b.unneg()); //if true, then we must be careful when trying this in a commutive-like result which would collapse the two terms
+
             traverseDFS(sources, true, true,
                     new SolveDeltaTraverser(a, b, (long start, long ddt) -> {
                         assert (ddt < Integer.MAX_VALUE);
                         int dt = (int) ddt;
+                        if (repeat && (dt == 0 || dt == DTERNAL)) {
+                            //this will result in collapsing the term to just one, with no temporal separation
+                            //this is like an accidental shortcut it has tried - but it is not helpful information for us
+                            //try again
+                            return true;
+                        }
                         Term y = x.dt(dt);
                         if (!(y instanceof Bool)) {
                             return each.test(start != TIMELESS ? new Absolute(y, start) : new Unsolved(y, absolute));
@@ -451,8 +456,13 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
             xternals.replaceAll((u, z) -> {
                 final Term[] vv = new Term[1];
                 solveDT(u, absolute, (v) -> {
-                    vv[0] = v.id; //ignore the startTime component, although it might provide a clue here
-                    return false; //just one for now
+                    Term w = v.id;
+                    if (w.equals(u)) {
+                        return true; //same as input, try again TODO limit here
+                    } else {
+                        vv[0] = w; //ignore the startTime component, although it might provide a clue here
+                        return false; //just one for now
+                    }
                 });
                 if (vv[0] != null) {
                     foundAny[0] = true;
@@ -462,10 +472,15 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
                 }
             });
             if (foundAny[0]) {
-                Term y = x.replace(xternals);
-                assert (!(y.equals(x)));
-                if (!(y instanceof Bool))
-                    solvable(y, each); //recurse
+                x = x.replace(xternals);
+                //assert (!(y.equals(x)));
+                if (x instanceof Bool)
+                    return;
+
+
+//                    solvable(y, each); //recurse
+//                else
+//                    return;
             }
         }
 
@@ -483,7 +498,6 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
     private boolean solve(Unsolved<Term> u, Predicate<Event<Term>> each) {
 
         Map<Term, LongSet> a = u.absolute;
-
 
 
 //        Stream<Event<Term>> src = a.entrySet().stream().flatMap(aa -> {
@@ -505,10 +519,10 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
 //                    Iterables.filter(byTerm.get(aa), Event::absolute));
 
 
-            traverseDFS(
-                    u,
-                    true, true,
-                    new SolveNodeTraverser(a.keySet(), each));
+        traverseDFS(
+                u,
+                true, true,
+                new SolveNodeTraverser(a.keySet(), each));
         //});
 
 
@@ -536,14 +550,14 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
             Term nt = n.id.id;
             return Util.buffer(byTerm.get(nt).stream()
                     .filter(x -> !x.equals(n.id))
-                    .filter(eventFilter).map( e -> {
-                        Node<Event<Term>, TimeSpan> that = TimeGraph.this.node(e);
-                        return new Edge<>(n, that,
+                    .filter(eventFilter).map(e -> {
+                                Node<Event<Term>, TimeSpan> that = TimeGraph.this.node(e);
+                                return new Edge<>(n, that,
 //                                outOrIn ? n : that,
 //                                outOrIn ? that : n,
-                                TS_ZERO);
-                    }
-            ));
+                                        TS_ZERO);
+                            }
+                    ));
         }
 
 
@@ -607,7 +621,7 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
                 Term pathStartTerm = pathStart.getTwo().from(pathStart.getOne()).id.id;
                 if (!each.test(new Absolute(pathStartTerm,
                         pathEndTime == ETERNAL ? ETERNAL :
-                            pathEndTime - pathDT(path))))
+                                pathEndTime - pathDT(path))))
                     return false;
             }
 
@@ -633,6 +647,7 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
 
         @Override
         public boolean visit(Node<Event<Term>, TimeSpan> n, FasterList<BooleanObjectPair<Edge<Event<Term>, TimeSpan>>> path) {
+
             if (path.isEmpty())
                 return true;
 
@@ -643,17 +658,38 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
             boolean endB = b.equals(endTerm);
 
             if (endA || endB) {
-                BooleanObjectPair<Edge<Event<Term>, TimeSpan>> startStep = path.get(0);
+                BooleanObjectPair<Edge<Event<Term>, TimeSpan>> startStep = path.getFirst();
+                BooleanObjectPair<Edge<Event<Term>, TimeSpan>> endStep = path.getLast();
                 Edge<Event<Term>, TimeSpan> startEdge = startStep.getTwo();
+                Edge<Event<Term>, TimeSpan> endEdge = endStep.getTwo();
+
                 Event<Term> startEvent = startEdge.from(startStep.getOne()).id;
+                Event<Term> endEvent = endEdge.to(endStep.getOne()).id;
                 Term startTerm = startEvent.id;
 
                 if ((endA && startTerm.equals(b)) || (endB && startTerm.equals(a))) {
-                    long dt = pathDT(path);
+
+
+                    long startTime = startEvent.absolute() ? startEvent.start() : TIMELESS;
+                    long endTime = endEvent.absolute() ? endEvent.start() : TIMELESS;
+
+                    long dt;
+                    if (startEvent.absolute() && endEvent.absolute()) {
+                        //use the two endpoints and subtract the dt
+
+                        dt = endTime - startTime;
+                    } else {
+
+                        //TODO more rigorous traversal of the dt chain
+                        //compute from one end to the other, summing dt in the correct direction along the way
+                        //special handling for encountered absolute terms and DTERNAL
+
+                        dt = pathDT(path);
+                    }
+
                     if (endA && dt != ETERNAL)
                         dt = -dt; //reverse
 
-                    long startTime = startEvent.absolute() ? startEvent.start() : TIMELESS;
                     if (!each.accept(startTime, dt))
                         return false;
                 }

@@ -223,14 +223,17 @@ public class HashGraph<N, E> {
         }
     }
 
-    private boolean traverse(Search tv, boolean in, boolean out, Node<N, E> n, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
+    private boolean traverse(Search tv, boolean in, boolean out, Node<N, E> next, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
 
         assert (in || out);
 
-        if (!tv.visit(n, path))
+        if (tv.visited(next))
+            return true; //skip
+
+        if (!tv.visit(next, path))
             return false;
 
-        if (!traverseDFS(tv, n, tv.edges(n, in, out), in, out, path))
+        if (!traverseDFS(tv, next, tv.edges(next, in, out), in, out, path))
             return false;
 
         return true;
@@ -244,8 +247,6 @@ public class HashGraph<N, E> {
         return edges.allMatch(e -> {
 
             Node<N, E> next = e.other(source);
-            if (tv.visited(next))
-                return true;
 
             /** TODO use a stack to eliminate virtual calls */
 
