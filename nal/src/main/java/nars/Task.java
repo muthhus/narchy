@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Util;
 import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
 import jcog.list.FasterList;
@@ -24,12 +25,9 @@ import nars.truth.Truthed;
 import org.eclipse.collections.api.PrimitiveIterable;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.api.tuple.primitive.ByteBytePair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.eclipse.collections.impl.map.mutable.primitive.ByteByteHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ByteObjectHashMap;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -181,7 +179,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
 
 
                     //Trie<ByteList, ByteSet> m = new Trie(Tries.TRIE_SEQUENCER_BYTE_LIST);
-                    SortedSet</* length, */ ByteList> statements = new TreeSet<ByteList>(Comparator.comparingInt(PrimitiveIterable::size));
+                    List</* length, */ ByteList> statements = new FasterList<ByteList>();
                     ByteObjectHashMap<List<ByteList>> indepVarPaths = new ByteObjectHashMap<>();
                     int visitVector = Op.VAR_INDEP.bit | Op.StatementBits;
                     t.pathsTo((x) -> x.op().in(visitVector) ? x : null, x -> x.hasAny(visitVector), (path, indepVarOrStatement) -> {
@@ -189,7 +187,9 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
                             return true; //skip the input term
 
                         if (indepVarOrStatement.op() == VAR_INDEP) {
-                            indepVarPaths.getIfAbsentPut(((byte) ((VarIndep) indepVarOrStatement).id()), FasterList::new).add(path.toImmutable());
+                            indepVarPaths.getIfAbsentPut(((byte) ((VarIndep) indepVarOrStatement).id()), FasterList::new).add(
+                                path.toImmutable()
+                            );
                         } else {
                             statements.add(path.toImmutable());
                         }
@@ -210,34 +210,58 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
                         return true;
                     });
 
-                    return indepVarPaths.allSatisfy((varPaths) -> {
-                        if (t.op().statement && varPaths.size() > 1) {
-                            return true; //satisfied by >1 distinct paths under a statement root
-                        }
+                    if (statements.size() > 1) {
+                        Collections.sort(statements, Comparator.comparingInt(PrimitiveIterable::size));
+                    }
+
+                    boolean rootIsStatement = t.op().statement;
+                    if (!indepVarPaths.allSatisfy((varPaths) -> {
 
                         ByteByteHashMap count = new ByteByteHashMap();
+
+
+
                         //byte 1 = which statement path, byte 2 = length down it
                         int numVarPaths = varPaths.size();
                         for (byte varPath = 0; varPath < numVarPaths; varPath++) {
+
+
                             ByteList p = varPaths.get(varPath);
+                            if (rootIsStatement) {
+                                byte branch = p.get(0);
+                                if (Util.branchOr(count, branch)==3)
+                                    return true; //valid
+                            }
+
                             int pSize = p.size();
                             byte statementNum = -1;
+
+
                             nextStatement:
                             for (ByteList statement : statements) {
                                 statementNum++;
                                 int statementPathLength = statement.size();
-                                if (statementPathLength >= pSize)
+                                if (statementPathLength > pSize)
                                     break; //since its sorted we know we dont have to try the remaining paths that go to deeper siblings
+
+                                byte lastBranch = -1;
                                 for (int i = 0; i < statementPathLength; i++) {
-                                    if (p.get(i) != statement.get(i))
+                                    if ((lastBranch = p.get(i)) != statement.get(i))
                                         break nextStatement; //mismatch
                                 }
                                 //match
-                                count.addToValue(varPath, (byte) 1);
+                                if (lastBranch > 0) {
+                                    assert (lastBranch == 0 || lastBranch == 1);
+                                    if (Util.branchOr(count, lastBranch) == 3) {
+                                        return true; //VALID
+                                    }
+                                }
                             }
                         }
-                        return !count.isEmpty() && count.anySatisfy(b -> b > 1);
-                    });
+                        return false;
+                    })) {
+                        return fail(t, "InDep variables must be balanced across a statement", safe);
+                    }
 
 
                 }

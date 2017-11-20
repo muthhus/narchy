@@ -45,6 +45,7 @@ import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.map.mutable.primitive.ByteByteHashMap;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
@@ -1945,6 +1946,11 @@ public enum Util {
                 byte[] xx = x.toArray(); //TODO i want the array zero-copy
                 return ByteLists.immutable.of(ArrayUtils.subarray(xx, a, b));
         }
+    }
+
+    public static byte branchOr(ByteByteHashMap count, byte branch) {
+        byte branchBit = (byte) (1 << branch);
+        return count.updateValue((byte)-1, branchBit, (x) -> (byte) (x | branchBit));
     }
 
 //    public static <T>  Collector<T, ?, List<T>> toListOrNullIfEmpty() {
