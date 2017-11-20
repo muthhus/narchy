@@ -11,8 +11,10 @@ import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
-abstract public class Retemporalize implements CompoundTransform {
+@FunctionalInterface  public interface Retemporalize extends CompoundTransform {
 
+    @Override
+    int dt(Compound x);
 
     public static final Retemporalize retemporalizeAllToDTERNAL = new RetemporalizeAll(DTERNAL);
     public static final Retemporalize retemporalizeAllToXTERNAL = new RetemporalizeAll(XTERNAL);
@@ -35,7 +37,7 @@ abstract public class Retemporalize implements CompoundTransform {
                     return x; //unchanged
                 }
             } else {
-                return super.transform(x, op, dt);
+                return Retemporalize.super.transform(x, op, dt);
             }
         }
 
@@ -49,7 +51,7 @@ abstract public class Retemporalize implements CompoundTransform {
 
     @Nullable
     @Override
-    public Term transform(Compound x, Op op, int dt) {
+    default Term transform(Compound x, Op op, int dt) {
         if (!x.hasAny(TemporalBits)) {
             return x;
         } else {
@@ -58,11 +60,8 @@ abstract public class Retemporalize implements CompoundTransform {
     }
 
 
-    @Override
-    abstract public int dt(Compound x);
-
     @Deprecated
-    public static final class RetemporalizeAll extends Retemporalize {
+    public static final class RetemporalizeAll implements Retemporalize {
 
         final int targetDT;
 
@@ -76,7 +75,7 @@ abstract public class Retemporalize implements CompoundTransform {
         }
     }
 
-    public static final class RetemporalizeFromTo extends Retemporalize {
+    public static final class RetemporalizeFromTo implements Retemporalize {
 
         final int from, to;
 
@@ -92,7 +91,7 @@ abstract public class Retemporalize implements CompoundTransform {
         }
     }
 
-    public static final class RetemporalizeFromToFunc extends Retemporalize {
+    public static final class RetemporalizeFromToFunc implements Retemporalize {
 
         final int from;
         final IntSupplier to;

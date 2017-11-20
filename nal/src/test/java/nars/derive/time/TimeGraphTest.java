@@ -42,7 +42,8 @@ class TimeGraphTest {
 
     @Test
     public void testAtomEvent() throws Narsese.NarseseException {
-        assertSolved(A, "one", "one@1");
+        A.print();
+        assertSolved(A, "one", "one@1", "one@19");
     }
 
     @Test
@@ -82,6 +83,7 @@ class TimeGraphTest {
 
     @Test
     public void testSimpleImplWithOneKnownAbsoluteSubEvent() throws Narsese.NarseseException {
+        A.print();
         assertSolved(A, "(one ==>+- three)",
                 "(one ==>+2 three)@1");
     }
@@ -103,9 +105,9 @@ class TimeGraphTest {
 
     private static final String[] implWithConjPredicateSolutions = {
             //using one@1
-            "(one ==>+1 (two &&+1 three))@ETE",
+            "(one ==>+1 (two &&+1 three))@ETE"
             //using two@20
-            "(one ==>+1 (two &&+1 three))@19"
+            //"(one ==>+1 (two &&+1 three))@19"
     };
 
     @Test

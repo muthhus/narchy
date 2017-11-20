@@ -62,6 +62,11 @@ public interface Atomic extends Term {
     }
 
     @Override
+    default boolean hasXternal() {
+        return false;
+    }
+
+    @Override
     default @Nullable Term temporalize(Retemporalize r) {
         return this;
     }

@@ -25,8 +25,6 @@ import jcog.Util;
 import nars.$;
 import nars.Op;
 import nars.Param;
-import nars.term.Term;
-import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,10 +47,12 @@ public abstract class AbstractVariable implements Variable {
     private final byte[] bytesCached;
 
     protected AbstractVariable(/*@NotNull*/ Op type, int num) {
-
+        assert(num > 0);
+        assert(num < Byte.MAX_VALUE);
 
         int id = num << 2 | (type.id-DEP_ORD);
         this.id = id;
+
         byte[] b = new byte[5];
         b[0] = type.id;
         Util.int2Bytes(num, b, 1);
@@ -65,8 +65,8 @@ public abstract class AbstractVariable implements Variable {
     }
 
     @Override
-    public final int id() {
-        return id >> 2;
+    public final byte id() {
+        return (byte) (id >> 2);
     }
 
     //@Override abstract public boolean equals(Object other);
@@ -78,48 +78,6 @@ public abstract class AbstractVariable implements Variable {
                         && ((AbstractVariable) obj).id == id);
     }
 
-    static boolean commonalizableVariable(Term x) {
-        return x instanceof VarDep || x instanceof VarIndep;
-    }
-
-    @Override
-    public final boolean unify(Term y, Unify subst) {
-
-        //do not test for equality
-        //var pattern will unify anything (below)
-        //see: https://github.com/opennars/opennars/blob/4515f1d8e191a1f097859decc65153287d5979c5/nars_core/nars/language/Variables.java#L18
-        if (commonalizableVariable(this) && commonalizableVariable(y)) {
-            //if ((op().id >= y.op().id)) { //allow indep to subsume dep but not vice versa
-            if (op() == y.op()) {
-
-
-                //TODO check if this is already a common variable containing y
-                return subst.putCommon(this, (AbstractVariable) y);
-
-            } else {
-                return false;
-            }
-        }
-
-        if (!subst.matchType(op())) {
-            return false;
-        } else {
-            return subst.putXY(this, y);
-        }
-
-
-//        if (y instanceof Variable) {
-//            return subst.putXY(this, y);
-//        }
-//
-//        if (subst.matchType(this)
-//                //&& !subst.matchType(y) //note: the !subst.matchType(y) subcondition is an attempt at preventing infinite cycles of variable references
-//                ) {
-//            return subst.putXY(this, y);
-//        }
-//
-//        return false;
-    }
 
     //    @Override
 //    public boolean equals(Object that) {
@@ -156,7 +114,7 @@ public abstract class AbstractVariable implements Variable {
     @NotNull
     @Override
     public String toString() {
-        return op().ch + Integer.toString(id()); //Integer.toString(id);;
+        return op().ch + Byte.toString(id()); //Integer.toString(id);;
     }
 
     /**
@@ -216,7 +174,7 @@ public abstract class AbstractVariable implements Variable {
         //precompute cached variable instances
         for (Op o : new Op[]{Op.VAR_PATTERN, Op.VAR_QUERY, Op.VAR_DEP, Op.VAR_INDEP}) {
             int t = opToVarIndex(o);
-            for (int i = 0; i < Param.MAX_VARIABLE_CACHED_PER_TYPE; i++) {
+            for (int i = 1; i < Param.MAX_VARIABLE_CACHED_PER_TYPE; i++) {
                 varCache[t][i] = vNew(o, i);
             }
         }

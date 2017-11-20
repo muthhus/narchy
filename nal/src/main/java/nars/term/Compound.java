@@ -214,16 +214,12 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default boolean ORrecurse(Predicate<Term> p) {
-        if (p.test(this))
-            return true;
-        return subterms().ORrecurse(p);
+        return p.test(this) || subterms().ORrecurse(p);
     }
 
     @Override
     default boolean ANDrecurse(Predicate<Term> p) {
-        if (!p.test(this))
-            return false;
-        return subterms().ANDrecurse(p);
+        return p.test(this) && subterms().ANDrecurse(p);
     }
 
 

@@ -14,7 +14,7 @@ import static nars.Op.VAR_PATTERN;
  */
 public class EllipsisZeroOrMore extends Ellipsis {
 
-    public EllipsisZeroOrMore(@NotNull AbstractVariable /*Variable*/ name) {
+    public EllipsisZeroOrMore(AbstractVariable /*Variable*/ name) {
         super(name, 0);
     }
 

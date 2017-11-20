@@ -866,11 +866,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     /**
      * match a range of subterms of Y.
+     * WARNING: provides a shared (non-cloned) copy if the entire range is selected
      */
     /*@NotNull*/
     default Term[] toArraySubRange(int from, int to) {
         if (from == 0 && to == subs()) {
-            return arrayClone();
+            return arrayShared();
+                    //arrayClone();
         } else {
 
             int s = to - from;
@@ -900,9 +902,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @Override
     default void recurseTerms(/*@NotNull*/ Consumer<Term> v) {
-        forEach(s -> {
-            s.recurseTerms(v);
-        });
+        forEach(s -> s.recurseTerms(v));
     }
 
     default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, Term parent) {

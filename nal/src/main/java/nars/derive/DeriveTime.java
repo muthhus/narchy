@@ -2,7 +2,6 @@ package nars.derive;
 
 import jcog.sort.Top;
 import nars.Op;
-import nars.Param;
 import nars.Task;
 import nars.control.Derivation;
 import nars.derive.time.TimeGraph;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
-import java.util.function.Predicate;
 
 
 /**
@@ -98,16 +96,15 @@ public class DeriveTime extends TimeGraph {
         }
 
 
-        Predicate<Event<Term>> filter;
-        Top<Event<Term>> top = new Top<>((f)->{
+        Top<Event<Term>> top = new Top<>((f) -> {
             Term t = f.id;
             float score = 0;
 
-            if (!hasXTERNAL(t))
+            if (!t.hasXternal())
                 score++;
 
             long start = f.start();
-            if (start !=TIMELESS) {
+            if (start != TIMELESS) {
                 score++;
                 if (start != ETERNAL)
                     score++;
@@ -117,16 +114,15 @@ public class DeriveTime extends TimeGraph {
             return score;
         });
         final int[] remain = {16};
-        filter = (solution) -> {
-            //TODO test equivalence with task and belief terms and occurrences, and continue iterating up to a max # of tries if it produced a useless equivalent result
-            top.accept(solution);
-            return remain[0]-- > 0;
-        };
 
         try {
 
 
-            solve(pattern, filter);
+            solve(pattern, (solution) -> {
+                //TODO test equivalence with task and belief terms and occurrences, and continue iterating up to a max # of tries if it produced a useless equivalent result
+                top.accept(solution);
+                return remain[0]-- > 0;
+            });
 
 
         } catch (Throwable t) {

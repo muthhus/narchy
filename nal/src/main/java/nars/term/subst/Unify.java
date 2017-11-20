@@ -13,6 +13,7 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -270,15 +271,6 @@ public abstract class Unify extends Versioning implements Subst {
         return t == null ?
                 oy.var : //any variable
                 oy == t; //the specified type
-    }
-
-    public boolean putCommon(AbstractVariable x, AbstractVariable y) {
-
-        Term common = CommonVariable.common(x, y);
-        if (common == null)
-            return false; //could not create common variable
-
-        return putXY(x, common) && putXY(y, common);
     }
 
     @Override

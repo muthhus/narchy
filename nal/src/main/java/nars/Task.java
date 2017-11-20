@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Util;
 import jcog.bloom.StableBloomFilter;
 import jcog.bloom.hash.BytesHashProvider;
 import jcog.list.FasterList;
@@ -15,27 +16,31 @@ import nars.task.util.TaskRegion;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Bool;
+import nars.term.var.AbstractVariable;
 import nars.time.Tense;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
+import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectShortHashMap;
+import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.function.BiFunction;
 
 import static java.util.Collections.singleton;
 import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.XTERNAL;
 import static nars.truth.TruthFunctions.w2c;
 import static nars.truth.TruthFunctions.w2cSafe;
 import static org.eclipse.collections.impl.tuple.Tuples.twin;
@@ -133,7 +138,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
         if (punc == Op.BELIEF || punc == Op.GOAL) {
             if (t.hasVarQuery())
                 return fail(t, "belief or goal with query variable", safe);
-            if (o.temporal && t.dt() == XTERNAL)
+            if (t.hasXternal())
                 return fail(t, "belief/goal content with dt=XTERNAL", safe);
         }
 
@@ -176,9 +181,9 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
                 } else {
                     //TODO use a byte[] path thing to reduce duplicate work performed in indepValid findPaths
 
-                    Set unique = new UnifiedSet(1); //likely only one var indep repeated twice
+                    ByteHashSet unique = new ByteHashSet(1); //likely only one var indep repeated twice
                     if (!t.ANDrecurse(
-                            v -> (v.op() != VAR_INDEP) || !unique.add(v) || indepValid(t, v))) {
+                            v -> (v.op() != VAR_INDEP) || !unique.add(((AbstractVariable)v).id()) || indepValid(t, v))) {
                         return fail(t, "unbalanced InDep variable pairing", safe);
                     }
 
@@ -190,32 +195,30 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
         return true;
     }
 
-    static boolean indepValid(Term comp, Term selected) {
+    static boolean indepValid(Term comp, Term target) {
 
-        List<byte[]> pp = comp.pathsTo(selected);
-
-        int pSize = pp.size();
-        if (pSize == 0)
-            return true; //a compound which didnt contain it
-
-        byte[][] paths = pp.toArray(new byte[pSize][]);
-
-        @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(pSize);
-        for (int occurrence = 0; occurrence < pSize; occurrence++) {
-            byte[] p = paths[occurrence];
+        //works up to 16 subterms (due to the 'short')
+        @Nullable ObjectShortHashMap<ByteList> m = new ObjectShortHashMap<>(2);
+        comp.pathsTo(subterm->subterm.equals(target) ? subterm : null, (path, subterm)->{
             Term t = null; //root
-            int pathLength = p.length;
+            int pathLength = path.size();
             for (int i = -1; i < pathLength - 1 /* dont include the selected term itself */; i++) {
-                t = (i == -1) ? comp : t.sub(p[i]);
-                Op o = t.op();
+                t = (i == -1) ? comp : t.sub(path.get(i));
 
-                if (validIndepVarSuperterm(o)) {
-                    byte inside = (byte) (1 << p[i + 1]);
-                    m.updateValue(t, inside, (previous) -> (byte) (previous | inside));
+                if (validIndepVarSuperterm(t.op())) {
+                    byte st = path.get(i + 1);
+                    assert(st < 16);
+                    short inside = (short) (1 << st);
+
+
+                    m.updateValue( path.toImmutable(), inside, (previous) -> (byte) (previous | inside));
                 }
             }
-        }
 
+            return true;
+        });
+
+        assert(!m.isEmpty());
         return m.anySatisfy(b -> b == 0b11);
 
     }

@@ -63,10 +63,11 @@ public class TimeProblem<T,E> extends HashGraph<TimeProblem.Event<T>,E> /*implem
         @Override
         public final String toString() {
             long s = start();
-            if (s == ETERNAL) {
+
+            if (s == TIMELESS) {
+                return id.toString();
+            } else if (s == ETERNAL) {
                 return id + "@ETE";
-            } else if (s == TIMELESS) {
-                return id + "@?";
             } else {
                 long e = end();
                 return id + "@" + (s == e ? s : "[" + s + ".." + e + "]");

@@ -165,15 +165,10 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
         return ref.structureKey(appendTo);
     }
 
-    @Override
-    @NotNull
-    public List<byte[]> pathsTo(Term subterm) {
-        return ref.pathsTo(subterm);
-    }
 
     @Override
     @NotNull
-    public List<byte[]> pathsTo(Term subterm, int minLengthOfPathToReturn) {
+    public List<ByteList> pathsTo(Term subterm, int minLengthOfPathToReturn) {
         return ref.pathsTo(subterm, minLengthOfPathToReturn);
     }
 
@@ -183,8 +178,8 @@ public class ProxyTerm<T extends Term> implements Term, CompoundDT {
     }
 
     @Override
-    public <X> boolean pathsTo(Function<Term, X> subterm, BiPredicate<ByteList, X> receiver) {
-        return ref.pathsTo(subterm, receiver);
+    public <X> boolean pathsTo(Function<Term, X> target, BiPredicate<ByteList, X> receiver) {
+        return ref.pathsTo(target, receiver);
     }
 
 

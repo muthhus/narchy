@@ -159,16 +159,8 @@ public class PatternIndex extends MapTermIndex {
     public static final class PremiseRuleVariableNormalization extends VariableNormalization {
 
 
-        public static final int ELLIPSIS_ZERO_OR_MORE_ID_OFFSET = 1 * 256;
-        public static final int ELLIPSIS_ONE_OR_MORE_ID_OFFSET = 2 * 256;
-        public static final int ELLIPSIS_TRANSFORM_ID_OFFSET = 3 * 256;
-
         public PremiseRuleVariableNormalization() {
             super(new UnifiedMap<>());
-        }
-
-        public static AbstractVariable varPattern(int i) {
-            return $.v(VAR_PATTERN, i);
         }
 
         /*@NotNull*/
@@ -176,7 +168,6 @@ public class PatternIndex extends MapTermIndex {
         protected Variable newVariable(/*@NotNull*/ Variable x) {
 
 
-            int actualSerial = count;
 
 //            if (x instanceof Ellipsis.EllipsisTransformPrototype) {
 //                //special
@@ -193,9 +184,8 @@ public class PatternIndex extends MapTermIndex {
 //            } else
             if (x instanceof Ellipsis.EllipsisPrototype) {
                 Ellipsis.EllipsisPrototype ep = (Ellipsis.EllipsisPrototype) x;
-                return Ellipsis.EllipsisPrototype.make(actualSerial +
-                                (ep.minArity == 0 ? ELLIPSIS_ZERO_OR_MORE_ID_OFFSET : ELLIPSIS_ONE_OR_MORE_ID_OFFSET) //these need to be distinct
-                        , ep.minArity);
+                int serial = count;
+                return Ellipsis.EllipsisPrototype.make(serial, ep.minArity);
             } else if (x instanceof Ellipsis) {
 
                 return x;

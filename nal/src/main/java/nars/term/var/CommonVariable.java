@@ -1,14 +1,25 @@
 package nars.term.var;
 
+import com.google.common.base.Joiner;
 import nars.Op;
 import nars.term.Term;
+import org.eclipse.collections.api.set.primitive.ByteSet;
+import org.eclipse.collections.api.set.primitive.ImmutableByteSet;
+import org.eclipse.collections.impl.factory.primitive.ByteSets;
 import org.jetbrains.annotations.Nullable;
 
-public final class CommonVariable extends GenericNormalizedVariable {
+public final class CommonVariable extends UnnormalizedVariable {
 
+    public final ImmutableByteSet vars;
 
-    CommonVariable(/*@NotNull*/ Op type, int hash) {
-        super(type, hash);
+    CommonVariable(/*@NotNull*/ Op type, byte a, byte b) {
+        this(type, ByteSets.immutable.of(a, b));
+        assert(a!=b);
+    }
+
+    CommonVariable(/*@NotNull*/ Op type, ImmutableByteSet vars) {
+        super(type, Joiner.on('_').join(vars.collect(b -> Integer.toString(b, 36))) );
+        this.vars = vars;
     }
 
     @Override
@@ -16,36 +27,44 @@ public final class CommonVariable extends GenericNormalizedVariable {
         return Term.opX(op(), 1 /* different from normalized variables with a subOp of 0 */);
     }
 
-
-    @Nullable
-    public static Variable common(AbstractVariable A, AbstractVariable B) {
+    public static Variable common(Variable A, Variable B) {
 
         Op Aop = A.op();
         assert(B.op()==Aop);
 
-        if (A.compareTo(B) < 0) {
-            //swap
-            AbstractVariable C = A;
-            A = B;
-            B = C;
+        boolean aa = A instanceof AbstractVariable;
+        boolean bb = B instanceof AbstractVariable;
+        if (aa && bb) {
+            byte ai = ((AbstractVariable)A).id();
+            byte bi = ((AbstractVariable)B).id();
+            return new CommonVariable(Aop, ai, (byte) -bi);
         }
 
-        int ai = A.id();
-        if (ai >= (1 << 7)) {
-            //TODO support multi-common variables
-            return null;
-        }
-        int bi = B.id();
-        if (bi >= (1 << 7)) {
-            //TODO support multi-common variables
-            return null;
+        if (!aa && bb) {
+            ImmutableByteSet ai = ((CommonVariable)A).vars;
+            byte bi = ((AbstractVariable)B).id();
+            if (ai.contains((byte) -bi))
+                return A;
+            return new CommonVariable(Aop, ai.newWith((byte) -bi));
         }
 
+        if (aa && !bb) {
+            byte ai = ((AbstractVariable)A).id();
+            ImmutableByteSet bi = ((CommonVariable)B).vars;
+            if (bi.contains((byte) ai))
+                return B;
+            return new CommonVariable(Aop, bi.newWith(ai));
+        }
 
+        /*if (!aa && !bb)*/ {
+            ImmutableByteSet ai = ((CommonVariable)A).vars;
+            ImmutableByteSet bi = ((CommonVariable)B).vars;
+            ImmutableByteSet combined = ai.newWithAll(bi);
+            if (combined.equals(ai))
+                return A;
+            return new CommonVariable(Aop, combined);
+        }
 
-        int h = (bi << 8) | ai;
-
-        return new CommonVariable(Aop, h);
     }
 
 //    public boolean common(@NotNull AbstractVariable y) {

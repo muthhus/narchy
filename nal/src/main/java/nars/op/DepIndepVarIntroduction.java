@@ -4,6 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Terms;
+import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.Nullable;
@@ -65,7 +66,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             return null;
 
         Op inOp = input.op();
-        List<byte[]> paths = input.pathsTo(selected, inOp.statement ? 2 : 0);
+        List<ByteList> paths = input.pathsTo(selected, inOp.statement ? 2 : 0);
         int pSize = paths.size();
         if (pSize == 0)
             return null;
@@ -108,15 +109,15 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
         @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(0);
         for (int occurrence = 0; occurrence < pSize; occurrence++) {
-            byte[] p = paths.get(occurrence);
+            ByteList p = paths.get(occurrence);
             Term t = null; //root
-            int pathLength = p.length;
+            int pathLength = p.size();
             for (int i = -1; i < pathLength-1 /* dont include the selected term itself */; i++) {
-                t = (i == -1) ? input : t.sub(p[i]);
+                t = (i == -1) ? input : t.sub(p.get(i));
                 Op o = t.op();
 
                 if (!depOrIndep && validIndepVarSuperterm(o)) {
-                    byte inside = (byte) (1 << p[i + 1]);
+                    byte inside = (byte) (1 << p.get(i + 1));
                     m.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
                 } else if (depOrIndep && validDepVarSuperterm(o)) {
                     m.addToValue(t, (byte) 1);

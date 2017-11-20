@@ -38,7 +38,10 @@ import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.block.function.primitive.DoubleToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
+import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.list.primitive.ImmutableByteList;
 import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
@@ -52,6 +55,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -1921,6 +1925,26 @@ public enum Util {
     public static <X> Stream<X> buffer(Stream<X> x) {
         List<X> buffered = x.collect(toList());
         return buffered.stream();
+    }
+
+    /** creates an immutable sublist from a ByteList, since this isnt implemented yet in Eclipse collections */
+    public static ImmutableByteList subList(ByteList x, int a, int b) {
+        int size = b-a;
+        if (a == 0 && b == x.size())
+            return x.toImmutable();
+
+        switch (size) {
+            case 0: return ByteLists.immutable.empty();
+            case 1: return ByteLists.immutable.of(x.get(a));
+            case 2: return ByteLists.immutable.of(x.get(a++), x.get(a));
+            case 3: return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++));
+            case 4: return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++), x.get(a++));
+            case 5: return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++), x.get(a++), x.get(a++));
+            case 6: return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++), x.get(a++), x.get(a++), x.get(a++));
+            default:
+                byte[] xx = x.toArray(); //TODO i want the array zero-copy
+                return ByteLists.immutable.of(ArrayUtils.subarray(xx, a, b));
+        }
     }
 
 //    public static <T>  Collector<T, ?, List<T>> toListOrNullIfEmpty() {

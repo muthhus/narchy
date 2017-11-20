@@ -24,10 +24,10 @@ public class CommonVariableTest {
     @Test
     public void commonVariableTest1() {
         //same forward and reverse
-        Variable p1p2 = common(p1, p2);
-        Variable p2p1 = common(p2, p1);
-        Variable p1p3 = common(p1, p3);
-        Variable p1p1 = common(p1, p1);
+        Variable p1p2 = CommonVariable.common(p1, p2);
+        Variable p2p1 = CommonVariable.common(p2, p1);
+        Variable p1p3 = CommonVariable.common(p1, p3);
+        Variable p1p1 = CommonVariable.common(p1, p1);
 
         System.out.println(p1p2);
         System.out.println(p2p1);
@@ -43,21 +43,13 @@ public class CommonVariableTest {
     }
 
 
-    static Variable common(Variable v1, Variable v2) {
-        return CommonVariable.common( (AbstractVariable) v1, (AbstractVariable) v2);
-    }
-
     @Disabled
     @Test
     public void CommonVariableOfCommonVariable() {
         //different lengths
 
-        Variable c12 = common(
-                p1,
-                p2);
-        Variable c12_reverse = common(
-                p2,
-                p1);
+        Variable c12 = CommonVariable.common(p1, p2);
+        Variable c12_reverse = CommonVariable.common(p2, p1);
 
         assertEquals(c12, c12_reverse);
         assertEquals(0, c12.compareTo(c12_reverse));

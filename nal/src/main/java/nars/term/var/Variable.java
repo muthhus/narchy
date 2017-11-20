@@ -1,7 +1,9 @@
 package nars.term.var;
 
+import nars.Op;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -17,7 +19,7 @@ public interface Variable extends Atomic {
      * among the other existing variables with the same ID but
      * from other variable op's #$?%
      */
-    int id();
+    byte id();
 
 
     @Override
@@ -56,4 +58,44 @@ public interface Variable extends Atomic {
 //            return null;
 //    }
 
+    static boolean commonalizableVariable(Op x) {
+        return x.in(Op.VAR_DEP.bit | Op.VAR_INDEP.bit);
+    }
+
+    @Override
+    default boolean unify(Term y, Unify u) {
+
+        //do not test for equality
+        //var pattern will unify anything (below)
+        //see: https://github.com/opennars/opennars/blob/4515f1d8e191a1f097859decc65153287d5979c5/nars_core/nars/language/Variables.java#L18
+        Op xOp = op();
+        Op yOp = y.op();
+        if (xOp == yOp && commonalizableVariable(xOp) && commonalizableVariable(yOp)) {
+            //if ((op().id >= y.op().id)) { //allow indep to subsume dep but not vice versa
+
+
+            //TODO check if this is already a common variable containing y
+            Term common = CommonVariable.common(this, (Variable) y);
+
+            if (common == this || common == y)
+                return true; //no change
+
+            return u.putXY(this, common) && u.putXY((Variable) y, common);
+        } else {
+            return u.matchType(xOp) && u.putXY(this, y);
+        }
+
+
+//        if (y instanceof Variable) {
+//            return subst.putXY(this, y);
+//        }
+//
+//        if (subst.matchType(this)
+//                //&& !subst.matchType(y) //note: the !subst.matchType(y) subcondition is an attempt at preventing infinite cycles of variable references
+//                ) {
+//            return subst.putXY(this, y);
+//        }
+//
+//        return false;
+    }
 }

@@ -10,11 +10,9 @@ import jcog.data.graph.hgraph.Search;
 import jcog.list.FasterList;
 import nars.$;
 import nars.Param;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
-import nars.term.transform.Retemporalize;
 import org.eclipse.collections.api.block.predicate.primitive.LongLongPredicate;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
@@ -175,13 +173,32 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
                 Term pred = eventTerm.sub(1);
                 Event<Term> se = know(subj);
                 Event<Term> pe = know(pred);
-                if (dt != XTERNAL)
-                    link(se, dt == DTERNAL ? ETERNAL : (dt + subj.dtRange()), pe);
+                if (dt != XTERNAL) {
 
-                link(se, 0, event);
+                    int st = subj.dtRange();
 
+                    link(se, dt == DTERNAL ? ETERNAL : (dt + st), pe);
+
+//                    if (subj.hasAny(CONJ)) {
+//                        subj.eventsWhile((w, y) -> {
+//                            link(know(y), dt+st+-w, pe);
+//                            return true;
+//                        }, 0, false, false, 0);
+//                    }
+//                    if (pred.hasAny(CONJ)) {
+//                        pred.eventsWhile((w, y) -> {
+//                            link(se, dt+st+w, know(y));
+//                            return true;
+//                        }, 0, false, false, 0);
+//
+//                    }
+
+                }
+
+                //link(se, 0, event);
+
+                break;
             }
-            break;
             case CONJ:
                 TermContainer tt = eventTerm.subterms();
                 long et = event.start();
@@ -229,7 +246,7 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
                         Term rr = tt.sub(i);
                         Event subEvent = know(rr);
                         if (eventDT == DTERNAL) {
-                            link(event, ETERNAL, subEvent);
+                            //link(event, ETERNAL, subEvent);
                         } else {
                             long rt = eventTerm.subTime(rr);
                             link(event, rt, subEvent);
@@ -350,22 +367,7 @@ public class TimeGraph extends TimeProblem<Term, TimeGraph.TimeSpan> {
         return ThreadLocalRandom.current();
     }
 
-    public static boolean hasXTERNAL(Term x) {
-        if (!x.isTemporal())
-            return false;
 
-        boolean[] has = new boolean[1];
-        Term y = x.temporalize(new Retemporalize() {
-            @Override
-            public int dt(Compound x) {
-                int xdt = x.dt();
-                if (xdt == XTERNAL)
-                    has[0] = true;
-                return xdt; //no change
-            }
-        });
-        return has[0];
-    }
 
 //    public Set<Event<Term>> absolutes(Term a) {
 //        UnifiedSet<Event<Term>> ae = new UnifiedSet();

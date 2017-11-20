@@ -10,7 +10,9 @@ import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class Ellipsis extends AbstractVariable implements Ellipsislike {
+import static nars.Op.VAR_PATTERN;
+
+public abstract class Ellipsis extends UnnormalizedVariable implements Ellipsislike {
 
     private final int minArity;
 
@@ -45,7 +47,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 
         public final int minArity;
 
-        public EllipsisPrototype(/*@NotNull*/ Op type, @NotNull UnnormalizedVariable target, int minArity) {
+        public EllipsisPrototype(/*@NotNull*/ Op type,  UnnormalizedVariable target, int minArity) {
             super(type, target
                     + ".." + (minArity == 0 ? '*' : '+'));
             this.minArity = minArity;
@@ -59,9 +61,9 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
             return make(serial, minArity);
         }
 
-        @NotNull
+
         public static Ellipsis make(int serial, int minArity) {
-            @NotNull AbstractVariable v = $.v(Op.VAR_PATTERN, serial);
+            AbstractVariable v = $.v(VAR_PATTERN, serial);
             switch (minArity) {
                 case 0:
                     return new EllipsisZeroOrMore(v);
@@ -96,21 +98,11 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 
 
     protected Ellipsis(AbstractVariable target, int minArity) {
-        this(target, minArity, target.id());
-    }
-
-    protected Ellipsis(AbstractVariable target, int minArity, int id) {
-        super(target.op(), hash(id, minArity));
+        super(VAR_PATTERN, target.toString() + (minArity == 0 ? "..*" : "..+"));
+        assert(target.op()==VAR_PATTERN); //only VAR_PATTERN for now
         this.minArity = minArity;
     }
 
-    private static int hash(int id, int minArity) {
-        //the 31th bit (arbitrarily chosen here) is what will store the 1-bit minArity value. provided id's should all have that bit free
-        if (minArity > 1 || ((id & (1 << 30)) != 0)) throw new UnsupportedOperationException();
-        if (minArity==1)
-            id |= (1 << 30);
-        return id;
-    }
 
     @Override
     public int structure() {
@@ -168,15 +160,6 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
         return collectable >= minArity;
     }
 
-    @Override
-    public Op op() {
-        return Op.VAR_PATTERN;
-    }
-
-    @Override
-    public int varPattern() {
-        return 1;
-    }
 
 //    @Nullable
 //    public static Ellipsis firstEllipsis(@NotNull Term[] xx) {

@@ -15,20 +15,17 @@ import static nars.IO.SPECIAL_OP;
  */
 public class UnnormalizedVariable extends AtomicConst implements Variable {
 
-    @NotNull
     public final Op type;
-    @Deprecated private final String str;
 
     @Override public int opX() { return Term.opX(op(), 10);    }
 
     public UnnormalizedVariable(/*@NotNull*/ Op type, String label) {
         super(type, label);
-        this.str = label;
         this.type = type;
     }
 
     @Override
-    public final int id() {
+    public final byte id() {
         throw new UnsupportedOperationException();
     }
 
@@ -98,16 +95,6 @@ public class UnnormalizedVariable extends AtomicConst implements Variable {
         return $.v(type, serial);
     }
 
-    @NotNull
-    @Override
-    public final String toString() {
-        return str;
-    }
-
-    @Override
-    public boolean unify(Term y,Unify subst) {
-        throw new UnsupportedOperationException();
-    }
 
 //    @Override
 //    public Term evalSafe(TermContext index, int remain) {

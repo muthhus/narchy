@@ -27,6 +27,7 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.Param;
+import nars.derive.time.TimeGraph;
 import nars.index.term.TermContext;
 import nars.op.mental.AliasConcept;
 import nars.term.atom.Atomic;
@@ -68,6 +69,7 @@ import java.util.function.Predicate;
 
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 
 public interface Term extends Termed, Comparable<Termed> {
@@ -156,6 +158,14 @@ public interface Term extends Termed, Comparable<Termed> {
      */
     boolean isTemporal();
 
+    /** whether this term contains any XTERNAL relations */
+    default boolean hasXternal() {
+        if (dt()==XTERNAL) return true;
+
+        TermContainer xs = subterms();
+        return xs.isTemporal() && xs.OR(Term::hasXternal);
+    }
+
     /**
      * returns an int[] path to the first occurrence of the specified subterm
      *
@@ -217,14 +227,14 @@ public interface Term extends Termed, Comparable<Termed> {
         return csrc.op().the(csrc.dt(), target);
     }
 
-    default <X> boolean pathsTo(/*@NotNull*/ Function<Term, X> subterm, /*@NotNull*/ BiPredicate<ByteList, X> receiver) {
-        X ss = subterm.apply(this);
+    default <X> boolean pathsTo(/*@NotNull*/ Function<Term, X> target, /*@NotNull*/ BiPredicate<ByteList, X> receiver) {
+        X ss = target.apply(this);
         if (ss != null) {
             if (!receiver.test(EmptyByteList, ss))
                 return false;
         }
         if (this instanceof Compound) {
-            return pathsTo(new ByteArrayList(0), this.subterms(), subterm, receiver);
+            return pathsTo(new ByteArrayList(0), this.subterms(), target, receiver);
         } else {
             return true;
         }
@@ -281,25 +291,26 @@ public interface Term extends Termed, Comparable<Termed> {
 
 
     @Nullable
-    default Term commonParent(List<byte[]> subpaths) {
+    default Term commonParent(List<ByteList> subpaths) {
         int subpathsSize = subpaths.size();
         assert (subpathsSize > 0);
 
         int shortest = Integer.MAX_VALUE;
         for (int i = 0, subpathsSize1 = subpaths.size(); i < subpathsSize1; i++) {
-            shortest = Math.min(shortest, subpaths.get(i).length);
+            shortest = Math.min(shortest, subpaths.get(i).size());
         }
 
         //find longest common prefix
         int i;
         done:
         for (i = 0; i < shortest; i++) {
-            byte toMatch = 0;
+            byte needs = 0;
             for (int j = 0; j < subpathsSize; j++) {
-                byte[] p = subpaths.get(j);
+                ByteList p = subpaths.get(j);
+                byte pi = p.get(i);
                 if (j == 0) {
-                    toMatch = p[i];
-                } else if (toMatch != p[i]) {
+                    needs = pi;
+                } else if (needs != pi) {
                     break done; //first mismatch, done
                 } //else: continue downwards
             }
@@ -331,8 +342,18 @@ public interface Term extends Termed, Comparable<Termed> {
     @Nullable
     default Term subPath(int n, /*@NotNull*/ byte... path) {
         Term ptr = this;
+        for (byte b : path) {
+            if ((ptr = ptr.sub(b)) == Null)
+                return Null;
+        }
+        return ptr;
+    }
+
+    @Nullable
+    default Term subPath(int n, /*@NotNull*/ ByteList path) {
+        Term ptr = this;
         for (int i = 0; i < n; i++) {
-            if ((ptr = ptr.sub(path[i])) == Null)
+            if ((ptr = ptr.sub(path.get(i))) == Null)
                 return Null;
         }
         return ptr;
@@ -488,21 +509,24 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
     /*@NotNull*/
-    default List<byte[]> pathsTo(Term subterm) {
+    default List<ByteList> pathsTo(Term subterm) {
         return pathsTo(subterm, 0);
     }
 
     List<byte[]> ListOfEmptyByteArray = List.of(ArrayUtils.EMPTY_BYTE_ARRAY);
 
     /*@NotNull*/
-    default List<byte[]> pathsTo(Term subterm, int minLengthOfPathToReturn) {
-        List<byte[]> list = $.newArrayList(0);
+    default List<ByteList> pathsTo(Term subterm, int minLengthOfPathToReturn) {
+        List<ByteList> list = $.newArrayList(0);
         pathsTo(
-                (x) -> x.equals(subterm) ? x : null,
-                (l, t) -> {
-                    if (l.size() >= minLengthOfPathToReturn) list.add(l.toArray());
+                (x) -> subterm.equals(x) ? x : null,
+                minLengthOfPathToReturn > 0 ?(l, t) -> {
+                    if (l.size() >= minLengthOfPathToReturn)
+                        list.add(l);
                     return true;
                 }
+                :
+                (l, t) -> { list.add(l.toImmutable()); return true; } //simpler version when min=0
         );
         return list;
     }

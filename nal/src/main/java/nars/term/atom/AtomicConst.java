@@ -49,6 +49,9 @@ public abstract class AtomicConst implements Atomic {
                ((u instanceof Atomic) && Atomic.equals(this, (Atomic)u));
     }
 
+    @Override public String toString() {
+        return new String(bytesCached, 3, bytesCached.length-3);
+    }
 
 
     @Override

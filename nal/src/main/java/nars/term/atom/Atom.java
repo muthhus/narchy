@@ -70,10 +70,6 @@ public class Atom extends AtomicConst {
         return Op.ATOM;
     }
 
-    @Override public final String toString() {
-        return new String(bytesCached, 3, bytesCached.length-3);
-    }
-
     @Override
     public final int structure() {
         return ATOM.bit;
