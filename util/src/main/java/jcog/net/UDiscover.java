@@ -1,6 +1,7 @@
 package jcog.net;
 
 import jcog.Util;
+import jcog.exe.Loop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,7 @@ import java.util.Arrays;
 /**
  * https://github.com/jackss011/java-netdiscovery-sample
  */
-abstract public class UDiscover<P> extends Thread {
+abstract public class UDiscover<P> extends Loop {
 
     static protected final Logger logger = LoggerFactory.getLogger(UDiscover.class);
 
@@ -22,11 +23,16 @@ abstract public class UDiscover<P> extends Thread {
     final static int port = 6576;
     public static final int MAX_PAYLOAD_ID = 256;
     private final P id;
-    private final int periodMS = 200;
+
     MulticastSocket ms;
+    private DatagramPacket p, q;
+    private InetAddress ia;
+    private byte[] myID;
+    private byte[] theirID;
 
 
-    public UDiscover(P payloadID) {
+    public UDiscover(P payloadID, int periodMS) {
+        super(periodMS);
         this.id = payloadID;
     }
 
@@ -34,69 +40,83 @@ abstract public class UDiscover<P> extends Thread {
     abstract protected void found(P theirs, InetAddress who, int port);
 
     @Override
-    public void run() {
-
-        logger.info("start");
+    protected synchronized void onStart() {
+        super.onStart();
 
         try {
-            InetAddress ia = InetAddress.getByName(address);
+            ia = InetAddress.getByName(address);
 
             ms = new MulticastSocket(port);
+
             ms.setBroadcast(true);
+
             ms.setReuseAddress(true);
 
             //ms.setTrafficClass();
-            ms.setSoTimeout(periodMS);
+            ms.setSoTimeout(periodMS.get() /* assuming it isnt changed while running but the initial value should be reasonable.. */);
             ms.joinGroup(ia);
 
-            byte[] theirID = new byte[MAX_PAYLOAD_ID];
-            byte[] myID = Util.toBytes(id);
-            DatagramPacket p = new DatagramPacket(myID, myID.length, ia, port);
-            DatagramPacket q = new DatagramPacket(theirID, theirID.length);
-
-            for (; ; ) {
-
-                try {
-                    ms.send(p);
-                } catch (IOException e) {
-                    logger.warn("{}", e);
-                }
-                //System.out.println(this + " Sent...");
-
-                Util.sleep(periodMS);
-
-                try {
-                    ms.receive(q);
-                    P theirPayload;
-                    try {
-
-                        int len = q.getLength();
-                        byte[] qd = q.getData();
-                        if (!Arrays.equals(myID, 0, myID.length, qd, 0, len)) {
-                            theirPayload = (P)Util.fromBytes(qd, len, id.getClass());
-                            found( theirPayload, q.getAddress(), q.getPort() );
-                            //System.out.println(this + " recv: " + new String(p.getData()) + " - " + "From: " + p.getAddress());
-                        }
-                        Arrays.fill(qd, (byte)0);
-                    } catch (Exception e) {
-                        logger.error("deserializing {}", e);
-                    }
-                } catch (SocketTimeoutException ignored) {
-
-                }
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            theirID = new byte[MAX_PAYLOAD_ID];
+            myID = Util.toBytes(id);
+            p = new DatagramPacket(myID, myID.length, ia, port);
+            q = new DatagramPacket(theirID, theirID.length);
+        
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
+    }
+
+    @Override
+    public boolean next() {
+
+
+        try {
+
+            try {
+                ms.send(p);
+            } catch (IOException e) {
+                logger.warn("{}", e);
+            }
+            //System.out.println(this + " Sent...");
+
+            try {
+                ms.receive(q);
+                P theirPayload;
+                try {
+
+                    int len = q.getLength();
+                    byte[] qd = q.getData();
+                    if (!Arrays.equals(myID, 0, myID.length, qd, 0, len)) {
+                        theirPayload = (P) Util.fromBytes(qd, len, id.getClass());
+                        found(theirPayload, q.getAddress(), q.getPort());
+                        //System.out.println(this + " recv: " + new String(p.getData()) + " - " + "From: " + p.getAddress());
+                    }
+                    Arrays.fill(qd, (byte) 0);
+                } catch (Exception e) {
+                    logger.error("deserializing {}", e);
+                }
+            } catch (SocketTimeoutException ignored) {
+
+            }
+
+        } catch (Exception e) {
+            logger.error("{} {}", this, e);
+        }
+
+        return true;
+    }
+
+    @Override
+    protected synchronized void onStop() {
+        super.onStop();
         if (ms != null) {
             ms.close();
+            ms = null;
         }
     }
 
-
-//
+    //
 //        class ServerThread extends Thread {
 //            MulticastSocket ms;
 //

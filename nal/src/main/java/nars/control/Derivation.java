@@ -20,6 +20,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.atom.Bool;
 import nars.term.subst.Unify;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -52,6 +53,8 @@ public class Derivation extends Unify {
 
 
     public final ByteShuffler shuffler = new ByteShuffler(64);
+
+    public final BatchActivation activator = new BatchActivation();
 
     /**
      * temporary buffer for derivations before input so they can be merged in case of duplicates
@@ -141,6 +144,7 @@ public class Derivation extends Unify {
     public DeriveTime dtSingle = null, dtDouble = null;
 
 
+
 //    private transient Term[][] currentMatch;
 
 //    public /*static*/ final Cache<Transformation, Term> transformsCache; //works in static mode too
@@ -225,14 +229,33 @@ public class Derivation extends Unify {
      */
     @Override
     public final Termed apply(Term x) {
+        return applyTermIfPossible(x);
+    }
+
+    @Override
+    public final Term applyTermIfPossible(Term x) {
 
         if (x instanceof Atom) {
             Termed f = derivationFunctors.get(x);
             if (f != null)
-                return f;
+                return f.term();
         }
 
-        return super.apply(x);
+        if (x instanceof Bool)//assert (!(x instanceof Bool));
+            return x;
+
+        Term y = xy(x);
+        if (y != null) {
+            return y; //an assigned substitution, whether a variable or other type of term
+        } else {
+            return x;
+        }
+
+//        else if (x.hasAny(substitutionVector)) {
+//            return super.applyTermIfPossible(x);
+//        } else {
+//            return x;
+//        }
     }
 
     public Derivation cycle(NAR nar, PrediTerm<Derivation> deriver) {
@@ -251,7 +274,9 @@ public class Derivation extends Unify {
             this.termVolMax = nar.termVolumeMax.intValue();
             //transformsCache.cleanUp();
         }
+
         this.deriver = deriver;
+
         return this;
     }
 
@@ -481,6 +506,9 @@ public class Derivation extends Unify {
      * called at the end of the cycle, input all generated derivations
      */
     public int commit(Consumer<Collection<DerivedTask>> target) {
+
+        activator.commit(nar);
+
         int s = derivations.size();
         if (s > 0) {
             nar.emotion.taskDerived.increment(s);

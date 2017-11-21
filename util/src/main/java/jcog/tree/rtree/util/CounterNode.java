@@ -25,6 +25,7 @@ import jcog.tree.rtree.Node;
 import jcog.tree.rtree.Nodelike;
 import jcog.tree.rtree.Spatialization;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -35,9 +36,9 @@ import java.util.stream.Stream;
 public final class CounterNode<T> implements Node<T, Object> {
     public static int searchCount;
     public static int bboxEvalCount;
-    private final Node<T, ?> node;
+    private final Node<T, Object> node;
 
-    public CounterNode(final Node<T, ?> node) {
+    public CounterNode(final Node<T, Object> node) {
         this.node = node;
     }
 
@@ -49,6 +50,11 @@ public final class CounterNode<T> implements Node<T, Object> {
     @Override
     public Stream<T> stream() {
         return node.stream();
+    }
+
+    @Override
+    public Iterator<Object> iterateNodes() {
+        return node.iterateNodes();
     }
 
     @Override

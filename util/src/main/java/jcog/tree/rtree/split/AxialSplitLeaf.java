@@ -59,7 +59,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
         final int splitDimension = axis;
 
         short size = leaf.size;
-        final HyperRegion[] sortedMbr = HyperRegion.toArray(leaf.data, size, model.region);
+        final HyperRegion[] sortedMbr = HyperRegion.toArray(leaf.data, size, model.bounds);
         Arrays.sort(sortedMbr, Comparator.comparingDouble(o -> o.center(splitDimension)));
 
         // divide sorted leafs
@@ -67,7 +67,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
         final Leaf<T> l2Node = model.transfer(leaf, sortedMbr, size / 2, size);
 
         if ((l1Node.size()+l2Node.size() != size+0))
-            throw new RuntimeException("fix");
+            throw new RuntimeException("fix: leaf.contains(t)=" + leaf.contains(t, model.bounds(t), model));
         assert (l1Node.size()+l2Node.size() == size+0);
 
         leaf.transfer(l1Node, l2Node, t, model);

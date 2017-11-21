@@ -22,10 +22,13 @@ package jcog.tree.rtree;
 
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Iterators;
 import jcog.Util;
+import jcog.list.ArrayIterator;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -368,8 +371,10 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
 
     @Override
     public boolean AND(Predicate<T> p) {
-        for (int i = 0; i < size; i++) {
-            if (!child[i].AND(p))
+        Node<T, ?>[] c = this.child;
+        short s = this.size;
+        for (int i = 0; i < s; i++) {
+            if (!c[i].AND(p))
                 return false;
         }
         return true;
@@ -387,9 +392,12 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
 
     @Override
     public boolean OR(Predicate<T> p) {
-        for (int i = 0; i < size; i++)
-            if (child[i].OR(p))
+        Node<T, ?>[] c = this.child;
+        int s = size;
+        for (int i = 0; i < s; i++) {
+            if (c[i].OR(p))
                 return true;
+        }
         return false;
     }
 
@@ -426,7 +434,13 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
         return streamNodes().flatMap(Node::stream);
     }
 
-//    @Override
+    @Override
+    public Iterator<Node<T, ?>> iterateNodes() {
+        return ArrayIterator.get(child, size);
+    }
+
+
+    //    @Override
 //    public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
 //        if (!region.intersects(rect) || !t.test(this))
 //            return;
@@ -451,7 +465,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
     public Node<T, ?> instrument() {
         for (int i = 0; i < size; i++)
             child[i] = child[i].instrument();
-        return new CounterNode<>(this);
+        return new CounterNode(this);
     }
 
     @Override

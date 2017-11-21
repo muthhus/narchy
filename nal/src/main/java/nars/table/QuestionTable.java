@@ -130,14 +130,13 @@ public interface QuestionTable extends TaskTable {
 
         @Override
         public Iterator<Task> taskIterator() {
-            Task[] t = toArray();
-            return new ArrayIterator(t);
+            return ArrayIterator.get(toArray());
         }
 
         @Override
         public Stream<Task> stream() {
             Task[] t = toArray();
-            return Stream.of(t);
+            return t.length > 0 ? Stream.of(t) : Stream.empty();
         }
 
         public Task[] toArray() {

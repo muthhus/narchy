@@ -21,10 +21,12 @@ package jcog.tree.rtree;
          */
 
 import jcog.Util;
+import jcog.list.ArrayIterator;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -55,6 +57,16 @@ public class Leaf<T> implements Node<T, T> {
     @Override
     public Stream<T> stream() {
         return streamNodes();
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return iterateNodes();
+    }
+
+    @Override
+    public Iterator<T> iterateNodes() {
+        return ArrayIterator.get(data, size);
     }
 
     @Override
@@ -183,7 +195,7 @@ public class Leaf<T> implements Node<T, T> {
         this.size -= 1;
         removed[0] = true;
 
-        region = this.size > 0 ? HyperRegion.mbr(model.region, data, this.size) : null;
+        region = this.size > 0 ? HyperRegion.mbr(model.bounds, data, this.size) : null;
 
         return this;
 
@@ -356,7 +368,7 @@ public class Leaf<T> implements Node<T, T> {
 
     @Override
     public Node<T, Object> instrument() {
-        return new CounterNode<>(this);
+        return new CounterNode(this);
     }
 
     @Override

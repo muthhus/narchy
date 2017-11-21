@@ -20,7 +20,9 @@ package jcog.tree.rtree;
  * #L%
  */
 
+import com.google.common.primitives.Ints;
 import jcog.list.FasterList;
+import jcog.math.Range;
 import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,9 +47,15 @@ public interface Node<L, V> extends Nodelike<L> {
 
     Stream<L> stream();
 
+    default java.util.Iterator<L> iterator() {
+        return stream().iterator();
+    }
+
     default Stream<V> streamNodes() {
         return IntStream.range(0, size()).mapToObj(this::get);
     }
+
+    java.util.Iterator<V> iterateNodes();
 
 
     default FasterList<V> toList() {
@@ -158,6 +166,8 @@ public interface Node<L, V> extends Nodelike<L> {
      * @return instrumented node wrapper
      */
     Node<L, ?> instrument();
+
+
 
 
 //    default FasterList<V> childMinList(FloatFunction<V> rank, int limit) {

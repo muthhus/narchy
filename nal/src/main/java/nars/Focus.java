@@ -3,92 +3,215 @@ package nars;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
+import jcog.learn.deep.RBM;
+import jcog.list.FasterList;
+import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.PLink;
 import jcog.pri.op.PriMerge;
 import nars.control.Causable;
+import nars.control.Cause;
+import nars.control.MetaGoal;
+import nars.control.Traffic;
 import nars.exe.Exec;
-import nars.term.Term;
 import nars.term.atom.Atomic;
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.util.HashMap;
+import java.util.Random;
+import java.util.function.Consumer;
 
 /**
  * decides mental activity
  */
 public class Focus {
 
-    private final Bag<Causable, ProcLink> can;
-    final ProcLink IDLE;
+    /** temporal granularity unit, in seconds */
+    public static final float JIFFY = 0.001f;
 
-    //final Schedulearn sched = new Schedulearn();
-    public final Exec.Revaluator revaluator =
-            new Exec.DefaultRevaluator();
+    private final Bag<Causable, ProcLink> can;
+
     private final NAR nar;
 
-    //new MetaGoal.RBMRevaluator(rng);
+    public final Exec.Revaluator revaluator;
 
-    public class ProcLink extends PLink<Causable> {
+
+    public class ProcLink extends PLink<Causable> implements Runnable {
 
         public ProcLink(Causable can, float p) {
             super(can, p);
         }
 
-        /**
-         * calculates next suggested work amount
-         */
-        public int nextWork() {
-            return 1;
-        }
-
-        public void work() {
-            work(nextWork());
-        }
-
-        public void work(int amount) {
-            get().run(nar, amount);
+        public final void run() {
+            int iters = Math.max(1, Math.round(JIFFY / id.can.iterationTimeMean()));
+            //int iters = 1;
+            id.run(nar, iters);
         }
 
     }
 
     final static Atomic idleTerm = Atomic.the("idle");
 
+    /**
+     * uses an RBM as an adaptive associative memory to learn and reinforce the co-occurrences of the causes
+     * the RBM is an unsupervised network to learn and propagate co-occurring value between coherent Causes
+     */
+    public static class RBMRevaluator extends DefaultRevaluator {
+
+        private final Random rng;
+        public double[] next;
+
+        /**
+         * learning iterations applied per NAR cycle
+         */
+        public int learning_iters = 1;
+
+        public double learning_rate = 0.05f;
+
+        public double[] cur;
+        public RBM rbm;
+
+        /**
+         * hidden to visible neuron ratio
+         */
+        private float hiddenMultipler = 0.5f;
+
+        float rbmStrength = 0.1f;
+
+        public RBMRevaluator(Random rng) {
+            this.rng = rng;
+            momentum = 1f - rbmStrength;
+        }
+
+        @Override
+        public void update(FasterList<Cause> causes, float[] goal) {
+            super.update(causes, goal);
+
+            int numCauses = causes.size();
+            if (numCauses < 2)
+                return;
+
+            if (rbm == null || rbm.n_visible != numCauses) {
+                int numHidden = Math.round(hiddenMultipler * numCauses);
+
+                rbm = new RBM(numCauses, numHidden, null, null, null, rng) {
+                    @Override
+                    public double activate(double a) {
+                        return super.activate(a);
+                        //return Util.tanhFast((float) a);
+                        //return Util.sigmoidBipolar((float) a, 5);
+                    }
+                };
+                cur = new double[numCauses];
+                next = new double[numCauses];
+            }
+
+
+            for (int i = 0; i < numCauses; i++)
+                cur[i] = Util.tanhFast(causes.get(i).value());
+
+            rbm.reconstruct(cur, next);
+            rbm.contrastive_divergence(cur, learning_rate, learning_iters);
+
+            //float momentum = 0.5f;
+            //float noise = 0.1f;
+            for (int i = 0; i < numCauses; i++) {
+                //float j = Util.tanhFast((float) (cur[i] + next[i]));
+                float j = /*((rng.nextFloat()-0.5f)*2*noise)*/ +
+                        //((float) (next[i]));
+                        //(float)( Math.abs(next[i]) > Math.abs(cur[i]) ? next[i] : cur[i]);
+                        (float) (cur[i] + rbmStrength * next[i]);
+                causes.get(i).setValue(j);
+            }
+        }
+    }
+
+    public static class DefaultRevaluator implements Exec.Revaluator {
+
+        final RecycledSummaryStatistics[] causeSummary = new RecycledSummaryStatistics[MetaGoal.values().length];
+
+        {
+            for (int i = 0; i < causeSummary.length; i++)
+                causeSummary[i] = new RecycledSummaryStatistics();
+        }
+
+        float momentum =
+//                    0f;
+                0.99f;
+
+        @Override
+        public void update(FasterList<Cause> causes, float[] goal) {
+
+            for (RecycledSummaryStatistics r : causeSummary) {
+                r.clear();
+            }
+
+            int cc = causes.size();
+            for (int i = 0, causesSize = cc; i < causesSize; i++) {
+                causes.get(i).commit(causeSummary);
+            }
+
+
+            int goals = goal.length;
+//        float[] goalFactor = new float[goals];
+//        for (int j = 0; j < goals; j++) {
+//            float m = 1;
+//                        // causeSummary[j].magnitude();
+//            //strength / normalization_magnitude
+//            goalFactor[j] = goal[j] / ( Util.equals(m, 0, epsilon) ? 1 : m );
+//        }
+
+            final float momentum = this.momentum;
+            for (int i = 0, causesSize = cc; i < causesSize; i++) {
+                Cause c = causes.get(i);
+
+                Traffic[] cg = c.goalValue;
+
+                //mix the weighted current values of each purpose, each independently normalized against the values (the reason for calculating summary statistics in previous step)
+                float next = 0;
+                for (int j = 0; j < goals; j++) {
+                    next += goal[j] * cg[j].current;
+                }
+
+                float prev = c.value();
+
+//                    0.99f * (1f - Util.unitize(
+//                            Math.abs(next) / (1 + Math.max(Math.abs(next), Math.abs(prev)))));
+
+                //c.setValue(Util.lerp(momentum, next, prev));
+                c.setValue(momentum * prev + (1f - momentum) * next);
+            }
+        }
+
+    }
+
+
     public Focus(NAR n) {
         this.can = new CurveBag(PriMerge.replace, new HashMap(), n.random, 32);
         this.nar = n;
-        IDLE = new ProcLink(new Causable(n) {
 
 
-            @Override
-            public Term term() {
-                return idleTerm;
-            }
-
-            @Override
-            protected int next(NAR n, int iterations) {
-                Util.sleep(5 * iterations);
-                return 0;
-            }
-
-            @Override
-            public float value() {
-                return 0;
-            }
-        }, 1f);
-        can.put(IDLE);
+        this.revaluator =
+                new DefaultRevaluator();
+        //new RBMRevaluator(nar.random());
     }
 
-    public void work() {
-        can.sample().work();
+    public void work(int tasks) {
+        can.sample(tasks, (Consumer<ProcLink>)(ProcLink::run));
     }
+
+    final DescriptiveStatistics values = new DescriptiveStatistics(64);
 
     public synchronized void update(NAR nar) {
         can.commit(c -> {
             Causable cc = c.get();
-            float nextPri = cc.value();
+            float v = cc.value() * 0.1f;
+            values.addValue(v);
+            float nextPri = (float) Util.lerp(v, values.getMin(), values.getMax());
             c.priSet(nextPri);
         });
 
-        can.print();
+//        System.out.println(values);
+//        can.print();
 
         revaluator.update(nar.causes, nar.want);
 
@@ -102,26 +225,12 @@ public class Focus {
 //            }
     }
 
-    public void add(Causable can) {
-        synchronized (can) {
-            if (this.can.size() == 1) {
-                //weaken the idle task
-                IDLE.priSet(0f);
-            }
-
-            //this.can.remove(IDLE.get());
-            this.can.put(new ProcLink(can, 0));
-        }
+    public void add(Causable c) {
+        this.can.put(new ProcLink(c, 0));
     }
 
-    public void remove(Causable can) {
-        synchronized (can) {
-            this.can.remove(can);
-            if (this.can.isEmpty()) {
-                //strengthen the idle task
-                IDLE.priMax(1f);
-            }
-        }
+    public void remove(Causable c) {
+        this.can.remove(c);
     }
 
 }

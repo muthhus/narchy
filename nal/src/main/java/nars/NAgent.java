@@ -10,6 +10,7 @@ import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
+import nars.control.Activate;
 import nars.control.CauseChannel;
 import nars.control.DurService;
 import nars.control.NARService;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -85,7 +87,6 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
     public long now;
 
 
-
     /**
      * range: -1..+1
      */
@@ -127,10 +128,11 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         ) {
 
             List<Termed> extTemplates = null;
+
             @Override
             public List<Termed> templates() {
                 List<Termed> superTemplates = super.templates();
-                if (extTemplates == null || extTemplates.size()!=(superTemplates.size() + actions.size())) {
+                if (extTemplates == null || extTemplates.size() != (superTemplates.size() + actions.size())) {
                     List<Termed> l = $.newArrayList(superTemplates.size() + actions.size());
                     l.addAll(superTemplates);
                     l.addAll(actions.keySet());
@@ -248,13 +250,12 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         super.start(nar);
 
 
-
     }
 
     private void happy(float activation) {
         happyGoal.priMax(
-            //nar.priDefault(GOAL)
-            activation
+                //nar.priDefault(GOAL)
+                activation
         );
         nar.input(happyGoal);
         nar.activate(happy, activation);
@@ -300,6 +301,36 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
             logger.info(summary());
     }
 
+    /** creates an activator specific to this agent context */
+    public Consumer<Predicate<Activate>> fire() {
+        return new Consumer<>() {
+
+            final Concept[] concepts;
+
+            {
+                List<Concept> cc = $.newArrayList();
+                cc.addAll(actions.keySet());
+                cc.addAll(sensors.keySet());
+                cc.add(happy);
+                assert (!cc.isEmpty());
+                concepts = cc.toArray(new Concept[cc.size()]);
+            }
+
+            @Override
+            public void accept(Predicate<Activate> p) {
+                Activate a;
+                do {
+                    int c = nar.random().nextInt(concepts.length);
+                    Concept cc = concepts[c];
+                    a = new Activate(cc, pri(cc));
+                } while (p.test(a));
+            }
+
+            private float pri(Concept cc) {
+                return 1f; //TODO
+            }
+        };
+    }
 
 
     /**
@@ -564,6 +595,7 @@ abstract public class NAgent extends NARService implements NSense, NAct, Runnabl
         protected Stream<ITask> predictions(long now, float prob) {
             return predictors.stream().filter((x) -> nar.random().nextFloat() <= prob).map(x -> x.get().budget(nar));
         }
+
     }
 
 

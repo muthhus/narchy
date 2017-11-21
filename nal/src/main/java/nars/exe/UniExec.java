@@ -3,16 +3,16 @@ package nars.exe;
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
-import jcog.exe.Can;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
+import nars.Param;
 import nars.concept.Concept;
 import nars.control.Activate;
-import nars.control.MetaGoal;
 import nars.task.ITask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -22,11 +22,12 @@ import java.util.stream.Stream;
  */
 public class UniExec extends Exec {
 
+    static final Logger logger = LoggerFactory.getLogger(UniExec.class);
+
     private final int CAPACITY;
 
     protected Bag<Activate, Activate> active;
     //protected Baggie<Concept> active;
-
 
 
     public UniExec(int capacity) {
@@ -54,7 +55,7 @@ public class UniExec extends Exec {
     @Override
     public void fire(Predicate<Activate> each) {
 
-        active.sample( each);
+        active.sample(each);
 
 //        float forgetRate = nar.forgetRate.floatValue();
 //        active.sample(nar.random(), (l) -> {
@@ -72,18 +73,19 @@ public class UniExec extends Exec {
 
         active =
 //                new Baggie(CAPACITY);
-            concurrent() ?
-                //new ConcurrentCurveBag<>(PriMerge.plus, new HashMap<>(), nar.random(), CAPACITY)
-                    //new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), CAPACITY) {
-                    new PriorityHijackBag<Activate,Activate>(CAPACITY, 5) {
+                concurrent() ?
+                        //new ConcurrentCurveBag<>(PriMerge.plus, new HashMap<>(), nar.random(), CAPACITY)
+                        //new ConcurrentArrayBag<ITask,ITask>(this, new ConcurrentHashMap(), CAPACITY) {
+                        new PriorityHijackBag<Activate, Activate>(CAPACITY, 5) {
 
-                        @Override
-                        public Activate key(Activate value) {
-                            return value;
+                            @Override
+                            public Activate key(Activate value) {
+                                return value;
+                            }
                         }
-                    }
                         :
-                new CurveBag<>(PriMerge.plus, new HashMap(), nar.random(), CAPACITY);
+                        new CurveBag<>(PriMerge.plus, new HashMap(CAPACITY),
+                                nar.random(), CAPACITY);
 
         super.start(nar);
 

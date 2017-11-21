@@ -189,7 +189,7 @@ public class UDPeer extends UDP {
             }
         };
 
-        discover = discovery ? new UDiscover<>(new Discoverability(me,addr)) {
+        discover = discovery ? new UDiscover<>(new Discoverability(me, addr), 250) {
             @Override
             protected void found(Discoverability who, InetAddress addr, int port) {
                 if (!them.contains(who.id)) {
@@ -212,13 +212,14 @@ public class UDPeer extends UDP {
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (discover!=null)
-            discover.start();
-    }
 
+    @Override
+    public void stop() {
+        super.stop();
+        if (discover!=null) {
+            discover.stop();
+        }
+    }
 
     protected void onAddRemove(UDProfile p, boolean addedOrRemoved) {
 

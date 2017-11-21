@@ -67,7 +67,7 @@ public class RTree<T> implements Space<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return stream().iterator();
+        return root.iterator();
     }
 
     @Override

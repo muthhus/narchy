@@ -2,13 +2,10 @@ package nars.exe;
 
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import com.conversantmedia.util.concurrent.MultithreadConcurrentQueue;
-import com.lmax.disruptor.*;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
-import jcog.Util;
 import jcog.exe.AffinityExecutor;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.task.ITask;
 import nars.task.NativeTask;
@@ -20,22 +17,23 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.LongPredicate;
 import java.util.stream.Stream;
 
 public class MultiExec extends UniExec {
 
-    public static final Logger logger = LoggerFactory.getLogger(MultiExec.class);
+
+    public static final int WORK_BATCH_SIZE = 2;
+
+
+
+    static final Logger logger = LoggerFactory.getLogger(MultiExec.class);
 
     protected AffinityExecutor exe;
 
     protected int threads;
-    final DisruptorBlockingQueue<ITask> q;
+    final MultithreadConcurrentQueue<ITask> q;
 
     final List<Thread> activeThreads = $.newArrayList();
     LongSet activeThreadIds = new LongHashSet();
@@ -79,19 +77,33 @@ public class MultiExec extends UniExec {
     protected void runner() {
         while (true) {
 
+            float load;
+
             ITask i = q.poll();
             if (i!=null) {
-                i.run(nar);
+                execute(i);
+                load = 0;
+            } else {
+                load = load();
             }
 
-            nar.focus.work();
+            try {
+                nar.focus.work((int)(WORK_BATCH_SIZE*(1f-load)));
+            } catch (Throwable e) {
+                if (Param.DEBUG) {
+                    throw e;
+                } else {
+                    logger.error("{} {}", this, e);
+                }
+            }
         }
     }
 
+
     @Override
     public synchronized void start(NAR nar) {
-        exe.execute(this::runner, threads);
         super.start(nar);
+        exe.execute(this::runner, threads);
     }
 
     @Override

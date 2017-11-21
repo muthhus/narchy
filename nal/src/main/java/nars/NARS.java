@@ -85,24 +85,29 @@ public class NARS {
         return this;
     }
 
-    /** adds a deriver with the standard rules for the given NAL level */
-    public NARS deriverAdd(int nal) {
+
+    /**
+     * adds a deriver with the standard rules for the given range (inclusive) of NAL levels
+     */
+    public NARS deriverAdd(int minLevel, int maxLevel) {
         derivers.add(
-            Deriver.deriver( nal )
+                Deriver.deriver(minLevel, maxLevel)
         );
         return this;
     }
 
-    /** adds a deriver with the provided rulesets */
+    /**
+     * adds a deriver with the provided rulesets
+     */
     public NARS deriverAdd(String... rules) {
         deriverAdd(
-            Deriver.deriver( 0, rules )
+                Deriver.deriver(1, 9, rules)
         );
         return this;
     }
 
 
-    public NARS deriverAdd(Function<NAR,Deriver> dBuilder) {
+    public NARS deriverAdd(Function<NAR, Deriver> dBuilder) {
         this.derivers.add(dBuilder);
         return this;
     }
@@ -123,7 +128,7 @@ public class NARS {
 
         rng = () ->
                 new XoRoShiRo128PlusRandom(1);
-                //new XorShift128PlusRandom(1);
+        //new XorShift128PlusRandom(1);
 
         concepts = DefaultConceptBuilder::new;
 
@@ -173,7 +178,6 @@ public class NARS {
         index = () -> new CaffeineIndex(64 * 1024 /*HACK */);
         return this;
     }
-
 
 
     public static NARS realtime(float durFPS) {
@@ -237,10 +241,10 @@ public class NARS {
             this.nal = nal;
 
             if (nal > 0)
-                deriverAdd(nal);
+                deriverAdd(1, nal);
 
             if (threadSafe)
-                index = () -> new CaffeineIndex(64 * 1024 );
+                index = () -> new CaffeineIndex(64 * 1024);
 
         }
 
@@ -261,6 +265,12 @@ public class NARS {
 
             nar.defaultWants();
 
+            nar.onCycle(() -> {
+
+                int WORK_PER_CYCLE = 2;
+                nar.focus.work(WORK_PER_CYCLE);
+
+            });
         }
     }
 

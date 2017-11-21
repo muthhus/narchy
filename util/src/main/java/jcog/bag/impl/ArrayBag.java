@@ -385,15 +385,15 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
     @Override
     public Bag<X, Y> sample(/*@NotNull*/ Bag.BagCursor<? super Y> each) {
 
-        Random rng = random();
 
+
+        Random rng = random();
 
         newItemsArray:
         while (true) {
-            final Object[] ii = items.array();
+            Object[] ii;
             int s;
-
-            while ((s = Math.min(ii.length, size())) > 0) {
+            while ((s = Math.min((ii = items.array()).length, size())) > 0) {
 
                 int i = sampleStart(rng, s);
 
@@ -414,9 +414,6 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                             return this;
                     }
                 }
-
-                if (items.array() != ii) //resized, due to another thread
-                    continue newItemsArray;
 
             }
 

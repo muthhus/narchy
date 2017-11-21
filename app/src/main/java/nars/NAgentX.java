@@ -6,10 +6,8 @@ import jcog.exe.Loop;
 import jcog.list.FasterList;
 import jcog.math.FloatParam;
 import jcog.pri.mix.control.MixContRL;
-import nars.control.Cause;
-import nars.control.DurService;
-import nars.control.MetaGoal;
-import nars.control.Traffic;
+import nars.control.*;
+import nars.derive.PrediTrie;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
@@ -150,11 +148,14 @@ abstract public class NAgentX extends NAgent {
                 .exe(new MultiExec
                             //Intense
                             //CoolNQuiet
-                        (192, THREADS, 512))
+                        (192, THREADS, 128))
 
                 .time(clock)
-                .deriverAdd(8)
-                .deriverAdd("nal6.nal") //extra NAL6
+                .deriverAdd(1,1)
+                .deriverAdd(2,5)
+                .deriverAdd(6,6)
+                //.deriverAdd(6,6) //extra NAL6
+                .deriverAdd(7,8)
                 .deriverAdd("goal_analogy.nal")
                 .deriverAdd("motivation.nal")
                 .deriverAdd("list.nal")
@@ -171,23 +172,28 @@ abstract public class NAgentX extends NAgent {
         n.defaultWants();
 
         n.dtMergeOrChoose.set(true);
+        n.dtDither.set(1f);
 
         n.confMin.set(0.01f);
         n.freqResolution.set(0.01f);
-        n.termVolumeMax.set(40);
+        n.termVolumeMax.set(36);
 
         n.beliefConfidence(0.9f);
         n.goalConfidence(0.9f);
 
 
-        float priFactor = 0.1f;
+        float priFactor = 0.5f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 1f * priFactor;
 
         NAgent a = init.apply(n);
+
+        new Deriver(a.fire(), Deriver.deriver(6,7).apply(n).deriver, n);
+
         Loop aLoop = a.runFPS(agentFPS);
+
 
         //n.dtDither.setValue(0.25f);
         //n.dtMergeOrChoose.setValue(true);

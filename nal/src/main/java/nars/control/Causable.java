@@ -35,7 +35,10 @@ abstract public class Causable extends NARService {
         can = new MyCan(nar, term().toString());
     }
 
-
+    @Override
+    public String toString() {
+        return can.toString();
+    }
 
     @Override
     protected void start(NAR nar) {

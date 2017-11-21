@@ -266,7 +266,7 @@ public class NARio extends NAgentX {
             NARio x;
             try {
                 x = new NARio(n);
-                new Implier(x, 1);
+                //new Implier(x, 1);
                 //x.durations.setValue(2f);
                 x.trace = true;
 

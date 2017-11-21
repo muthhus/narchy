@@ -42,7 +42,7 @@ public class Line1D {
             Param.DEBUG = true;
 
             NARS nn = new NARS().threadable().nal(8);
-            nn.deriverAdd(8);
+            nn.deriverAdd(1,8);
 //            nn.deriver(
 //                    "B, (A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:DeductionRecursivePB, Goal:DeciDeduction)",
 //                    "B, (--A ==> C), time(urgent),  notImpl(B) |- subIfUnifiesAny(C,A,B,\"$\"), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)",

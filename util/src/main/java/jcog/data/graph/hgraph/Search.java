@@ -1,10 +1,12 @@
 package jcog.data.graph.hgraph;
 
+import jcog.Util;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
 
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toCollection;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
@@ -57,7 +59,8 @@ abstract public class Search<N, E> {
 
         this.at = current;
 
-        return next(current).allMatch(e -> {
+        return next(current)/*collect(toCollection(FasterList::new)).allSatisfy*/
+                .allMatch(e -> {
 
             Node<N, E> next = e.other(this.at);
 

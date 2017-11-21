@@ -9,23 +9,23 @@ import java.util.function.Function;
 public class Spatialization<T> {
 
     public final Split<T> split;
-    public final Function<T, HyperRegion> region;
+    public final Function<T, HyperRegion> bounds;
     public final short max;       // max entries per node
     public final short min;       // least number of entries per node
 
-    public Spatialization(@Deprecated final Function<T, HyperRegion> region, DefaultSplits split, final int min, final int max) {
-        this(region, split.get(), min, max);
+    public Spatialization(@Deprecated final Function<T, HyperRegion> bounds, DefaultSplits split, final int min, final int max) {
+        this(bounds, split.get(), min, max);
     }
 
-    public Spatialization(@Deprecated final Function<T, HyperRegion> region, final Split<T> split, final int min, final int max) {
+    public Spatialization(@Deprecated final Function<T, HyperRegion> bounds, final Split<T> split, final int min, final int max) {
         this.max = (short) max;
         this.min = (short) min;
-        this.region = region;
+        this.bounds = bounds;
         this.split = split;
     }
 
     public HyperRegion bounds(/*@NotNull*/ T t) {
-        return region.apply(t);
+        return bounds.apply(t);
     }
 
     public Leaf<T> newLeaf() {

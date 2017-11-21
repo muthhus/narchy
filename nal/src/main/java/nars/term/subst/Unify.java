@@ -116,7 +116,7 @@ public abstract class Unify extends Versioning implements Subst {
 
     @Nullable
     @Override
-    public Term xy(Term x0) {
+    public final Term xy(Term x0) {
         return xy.get(x0);
 
 //        Term xy = x0, y = null;

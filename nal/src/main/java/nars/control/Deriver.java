@@ -10,7 +10,9 @@ import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternIndex;
 
 import java.io.PrintStream;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -21,6 +23,7 @@ import java.util.stream.Stream;
  */
 public class Deriver extends NARService {
 
+    private final Consumer<Predicate<Activate>> source;
     private float minPremisesPerConcept = 1;
     private float maxPremisesPerConcept = 5;
 
@@ -31,12 +34,15 @@ public class Deriver extends NARService {
                 ), nar);
     }
 
-    public static Function<NAR, Deriver> deriver(int nal, String... additional) {
-        assert (nal > 0 || additional.length > 0);
+    /** loads default deriver rules, specified by a range (inclusive) of levels. this allows creation
+     * of multiple deriver layers each targetting a specific range of the NAL spectrum
+     */
+    public static Function<NAR, Deriver> deriver(int minLevel, int maxLevel, String... additional) {
+        assert ((minLevel <= maxLevel && maxLevel > 0) || additional.length > 0);
 
         return deriver(nar ->
                 PremiseRuleSet.rules(nar, new PatternIndex(nar),
-                        Derivers.defaultRules(nal, additional)
+                        Derivers.standard(minLevel, maxLevel, additional)
                 ));
     }
 
@@ -44,10 +50,14 @@ public class Deriver extends NARService {
     private final NAR nar;
     private final Causable can;
 
+    public Deriver(PrediTerm<Derivation> deriver, NAR nar) {
+        this(nar.exe::fire, deriver, nar);
+    }
 
-    protected Deriver(PrediTerm<Derivation> deriver, NAR nar) {
+    public Deriver(Consumer<Predicate<Activate>> source, PrediTerm<Derivation> deriver, NAR nar) {
         super(nar);
         this.deriver = deriver;
+        this.source = source;
         this.nar = nar;
 
         Try t = (Try) ((AndCondition) (deriver)).cache[((AndCondition) (deriver)).cache.length - 1]; //HACK
@@ -61,7 +71,7 @@ public class Deriver extends NARService {
 
             @Override
             public boolean singleton() {
-                return true;
+                return false;
             }
 
             @Override
@@ -79,19 +89,18 @@ public class Deriver extends NARService {
         NAR nar = this.nar;
         Derivation d = derivation.get().cycle(nar, deriver);
 
-        int matchTTL = Param.TTL_PREMISE_MIN * 6;
+        int matchTTL = Param.TTL_PREMISE_MIN * 4;
         int ttlMin = nar.matchTTLmin.intValue();
         int ttlMax = nar.matchTTLmax.intValue();
 
 
         int fireRemain[] = new int[]{work};
-        BatchActivation activator = BatchActivation.get();
 
 
-        nar.exe.fire(a -> {
+        source.accept(a -> {
 
             int hh = premises(a);
-            Iterable<Premise> h = a.hypothesize(nar, activator, hh);
+            Iterable<Premise> h = a.hypothesize(nar, d.activator, hh);
 
             if (h != null) {
 
@@ -115,8 +124,6 @@ public class Deriver extends NARService {
 
             return fireRemain[0] > 0;
         });
-
-        activator.commit(nar);
 
         int derived = d.commit(nar::input);
 
