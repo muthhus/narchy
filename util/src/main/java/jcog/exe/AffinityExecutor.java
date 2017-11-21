@@ -32,7 +32,7 @@ public class AffinityExecutor implements Executor {
     }
 
     @Override
-    public final void execute(@NotNull Runnable command) {
+    public final void execute(Runnable command) {
         execute(command, 1);
     }
 
@@ -44,7 +44,7 @@ public class AffinityExecutor implements Executor {
 
         Runnable cmd;
 
-        public AffinityThread(@NotNull String name, Runnable cmd) {
+        public AffinityThread(String name, Runnable cmd) {
             super(name);
 
             this.cmd = cmd;

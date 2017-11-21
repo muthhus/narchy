@@ -95,7 +95,7 @@ public class Taskify extends AbstractPred<Derivation> {
 
         assert (priority == priority);
 
-        t.setPri(priority);
+        t.priSet(priority);
 
         if (Param.DEBUG)
             t.log(channel.ruleString);

@@ -503,7 +503,7 @@ public class Revision {
                 Stamp.zip(a.stamp(), b.stamp(), aProp) //get a stamp collecting all evidence from the table, since it all contributes to the result
         );
 
-        t.setPri(Util.lerp(aProp, b.priElseZero(), a.priElseZero()));
+        t.priSet(Util.lerp(aProp, b.priElseZero(), a.priElseZero()));
 
         //t.setPri(a.priElseZero() + b.priElseZero());
 

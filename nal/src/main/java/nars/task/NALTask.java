@@ -247,7 +247,7 @@ public class NALTask extends Pri implements Task {
 
     public Task clone(Term x) {
         Task t = new NALTask(x, punc, truth, creation, start(), end(), stamp);
-        t.setPri(this);
+        t.priSet(this);
         return t;
     }
 

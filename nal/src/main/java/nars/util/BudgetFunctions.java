@@ -249,8 +249,8 @@ public final class BudgetFunctions  {
             //assert (!((aPriNext < 0) || (bPriNext < 0))); //throw new RuntimeException("revision budget underflow");
 
             //apply the changes
-            a.setPri(aPriNext);
-            b.setPri(bPriNext);
+            a.priSet(aPriNext);
+            b.priSet(bPriNext);
         } else if (aExist /*&& !bExist*/) {
             //take from 'a' only
             a.priSub(resultPri);

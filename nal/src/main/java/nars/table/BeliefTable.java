@@ -257,7 +257,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
                 if (a == null)
                     return null;
 
-                a.setPri(answer.priElseZero());
+                a.priSet(answer.priElseZero());
                 if (question != null)
                     ((NALTask)a).cause = Cause.zip(nar.causeCapacity.intValue(), question, answer);
 

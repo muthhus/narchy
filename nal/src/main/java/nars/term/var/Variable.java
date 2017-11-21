@@ -70,7 +70,7 @@ public interface Variable extends Atomic {
         //see: https://github.com/opennars/opennars/blob/4515f1d8e191a1f097859decc65153287d5979c5/nars_core/nars/language/Variables.java#L18
         Op xOp = op();
         Op yOp = y.op();
-        if (xOp == yOp && commonalizableVariable(xOp) && commonalizableVariable(yOp)) {
+        if (xOp==yOp && !this.equals(y) && commonalizableVariable(xOp) && commonalizableVariable(yOp)) {
 
             //TODO check if this is already a common variable containing y
             Term common = CommonVariable.common(this, (Variable) y);

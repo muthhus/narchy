@@ -75,13 +75,13 @@ public class Can {
 
     public final void commit(double iterations) {
         this.iterations.value(iterations);
-        commit();
+//        commit();
     }
 
-    /** called after the iteration variable has been set */
-    public void commit() {
-
-    }
+//    /** called after the iteration variable has been set */
+//    public void commit() {
+//
+//    }
 
     @Override
     public String toString() {

@@ -83,7 +83,7 @@ public interface PriMerge extends BiConsumer<Priority, Prioritized> {
                 throw new UnsupportedOperationException();
         }
 
-        float ePriAfter = exi.setPri( nextPri );
+        float ePriAfter = exi.priSet( nextPri );
 
         return iPri - (ePriAfter - ePriBefore);
     }

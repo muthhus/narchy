@@ -229,7 +229,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
                             ByteList p = varPaths.get(varPath);
                             if (rootIsStatement) {
                                 byte branch = p.get(0);
-                                if (Util.branchOr(count, branch)==3)
+                                if (Util.branchOr((byte)-1, count, branch)==3)
                                     return true; //valid
                             }
 
@@ -244,17 +244,17 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
                                 if (statementPathLength > pSize)
                                     break; //since its sorted we know we dont have to try the remaining paths that go to deeper siblings
 
-                                byte lastBranch = -1;
                                 for (int i = 0; i < statementPathLength; i++) {
-                                    if ((lastBranch = p.get(i)) != statement.get(i))
+                                    if (p.get(i) != statement.get(i))
                                         break nextStatement; //mismatch
                                 }
+
+                                byte lastBranch = p.get(statementPathLength);
+                                assert (lastBranch == 0 || lastBranch == 1): lastBranch + " for path " + p + " while validating term: " + t;
+
                                 //match
-                                if (lastBranch != -1) {
-                                    assert (lastBranch == 0 || lastBranch == 1);
-                                    if (Util.branchOr(count, lastBranch) == 3) {
-                                        return true; //VALID
-                                    }
+                                if (Util.branchOr(statementNum, count, lastBranch) == 3) {
+                                    return true; //VALID
                                 }
                             }
                         }
@@ -325,7 +325,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
                 x.creation(),
                 x.start(), x.end(),
                 x.stamp());
-        y.setPri(x);
+        y.priSet(x);
         //y.meta.putAll(x.meta());
         return y;
     }

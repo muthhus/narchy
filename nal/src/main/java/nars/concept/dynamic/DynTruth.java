@@ -112,7 +112,7 @@ public final class DynTruth implements Truthed {
         NALTask dyn = new NALTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 tr, nar.time(), start, end /*+ dur*/, evidence());
         dyn.cause = cause(nar);
-        dyn.setPri(priority);
+        dyn.priSet(priority);
 
         if (Param.DEBUG)
             dyn.log("Dynamic");

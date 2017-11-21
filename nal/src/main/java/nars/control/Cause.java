@@ -211,7 +211,7 @@ public class Cause implements Comparable<Cause> {
     }
 
 
-    void commit(RecycledSummaryStatistics[] valueSummary) {
+    public void commit(RecycledSummaryStatistics[] valueSummary) {
         for (int i = 0, purposeLength = goalValue.length; i < purposeLength; i++) {
             Traffic p = goalValue[i];
             p.commit();

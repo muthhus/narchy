@@ -233,7 +233,7 @@ public class ConjClustering extends Causable {
                                 //priMax;
                                 priMin;
 
-                        m.setPri(BudgetFunctions.fund(pri, true, uu));
+                        m.priSet(BudgetFunctions.fund(pri, true, uu));
                         tasksCreated++;
                         return m;
                     }

@@ -36,8 +36,8 @@ public class CLink<X extends Priority> extends RoaringBitmap implements Priority
     }
 
     @Override
-    public float setPri(float p) {
-        return ref.setPri(p);
+    public float priSet(float p) {
+        return ref.priSet(p);
     }
 
     @Override

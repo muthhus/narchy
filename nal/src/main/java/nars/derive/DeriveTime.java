@@ -162,11 +162,6 @@ public class DeriveTime extends TimeGraph {
         }
 
 
-        //eternal check: eternals can only be derived from completely eternal premises
-        if (occ[0] == ETERNAL) {
-            if ((!task.isEternal()) && !(belief != null && !belief.isEternal()))
-                throw new RuntimeException("ETERNAL leak");
-        }
 
 
 //        if (occ[0] == ETERNAL && (!te || (belief != null && !belief.isEternal()))) {

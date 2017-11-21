@@ -79,7 +79,7 @@ public class PSink<X extends Priority, Y extends Priority> extends FloatParam im
         if (p >= 0 && g >= 0) {
             float pg = p * g;
             if (pg >= minThresh) {
-                x.setPri(p * g);
+                x.priSet(p * g);
                 Y y = apply(x);
                 target.accept(y);
 //                in.accept(p);

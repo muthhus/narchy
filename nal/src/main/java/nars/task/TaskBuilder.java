@@ -201,7 +201,7 @@ import static nars.time.Tense.*;
         //if quality is not specified (NaN), then this means to assign the default budgeting according to the task's punctuation
         float pp = priElseNeg1();
         if (pp < 0) {
-            setPri(n.priDefault(punc));
+            priSet(n.priDefault(punc));
         }
 
 
@@ -232,7 +232,7 @@ import static nars.time.Tense.*;
         }
 
         NALTask i = new NALTask(term, punc, tFinal, creation, start, end, evidence);
-        i.setPri(this);
+        i.priSet(this);
         //        if (srcCopy == null) {
 //            delete();
 //        } else {
@@ -543,13 +543,13 @@ import static nars.time.Tense.*;
 
     @Override
     @NotNull public TaskBuilder setPriThen(float p) {
-        setPri(p);
+        priSet(p);
         return this;
     }
 
     @NotNull
     public final TaskBuilder pri(@NotNull Prioritized bb) {
-        setPri(bb);
+        priSet(bb);
         return this;
     }
 

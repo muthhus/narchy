@@ -41,7 +41,7 @@ public class NARService extends Services.AbstractService<NAR> implements Termed 
     }
 
     @Override
-    public @NotNull Term term() {
+    public  Term term() {
         return $.p($.quote(getClass().getName()), $.the(System.identityHashCode(this)) );
     }
 

@@ -316,9 +316,9 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
     public boolean relevantVariables(Termlike x) {
-        return type == null ?
-                x.varPattern() > 0 || x.hasAny(Op.VAR_DEP.bit | Op.VAR_INDEP.bit | Op.VAR_QUERY.bit) :
-                x.hasAny(type);
+        return //type == null ?
+                x.varPattern() > 0 || x.hasAny(Op.VAR_DEP.bit | Op.VAR_INDEP.bit | Op.VAR_QUERY.bit);
+                //x.hasAny(type);
     }
 
     private class ConstrainedVersionMap extends VersionMap<Term, Term> {

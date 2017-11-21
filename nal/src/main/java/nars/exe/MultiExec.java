@@ -1,11 +1,14 @@
 package nars.exe;
 
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
+import com.conversantmedia.util.concurrent.MultithreadConcurrentQueue;
 import com.lmax.disruptor.*;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import jcog.Util;
 import jcog.exe.AffinityExecutor;
 import nars.$;
+import nars.NAR;
 import nars.Task;
 import nars.task.ITask;
 import nars.task.NativeTask;
@@ -25,95 +28,83 @@ import java.util.function.Consumer;
 import java.util.function.LongPredicate;
 import java.util.stream.Stream;
 
-abstract public class MultiExec extends UniExec {
+public class MultiExec extends UniExec {
 
     public static final Logger logger = LoggerFactory.getLogger(MultiExec.class);
-    protected final Disruptor<ITask[]> disruptor;
 
-    protected Executor exe;
+    protected AffinityExecutor exe;
 
-    protected RingBuffer<ITask[]> buffer;
     protected int threads;
+    final DisruptorBlockingQueue<ITask> q;
 
+    final List<Thread> activeThreads = $.newArrayList();
+    LongSet activeThreadIds = new LongHashSet();
+    LongPredicate isActiveThreadId = (x)->false;
 
     public MultiExec(int concepts, int threads, int qSize) {
         super(concepts);
 
+        this.q = new DisruptorBlockingQueue<>(qSize);
         this.threads = threads;
 
-        exe = initExe();
-
-        disruptor = new Disruptor(
-                () -> new ITask[1],
-                qSize,
-                exe,
-                ProducerType.MULTI,
-                waitStrategy()
-        );
-
-        initWorkers();
-
-        buffer = disruptor.getRingBuffer();
-
-        disruptor.start();
-    }
-
-
-    abstract protected WaitStrategy waitStrategy();
-
-    protected boolean isWorker(Thread t) {
-        return isActiveThreadId.test(t.getId());
-    }
-
-
-    protected abstract Executor initExe();
-
-    abstract protected void initWorkers();
-
-    final WorkHandler<ITask[]> wh = event -> {
-                ITask e = event[0];
-                event[0] = null;
-                execute(e);
-            };
-
-    public static class Intense extends MultiExec {
-
-        private AffinityExecutor aexe;
-
-        public Intense(int concepts, int threads, int qSize) {
-            super(concepts, threads, qSize);
-        }
-
-        @Override
-        protected WaitStrategy waitStrategy() {
-            return new BusySpinWaitStrategy();
-        }
-
-        @Override
-        protected Executor initExe() {
-            return aexe = new AffinityExecutor() {
+         exe = new AffinityExecutor() {
                 @Override
                 protected void add(AffinityExecutor.AffinityThread at) {
                     super.add(at);
                     register(at);
                 }
             };
-        }
 
-        @Override
-        protected void initWorkers() {
-            WorkHandler[] w = new WorkHandler[threads];
+//         return texe = new ThreadPoolExecutor(threads, threads,
+//                     60L, TimeUnit.SECONDS,
+//                     //new LinkedBlockingQueue<Runnable>(),
+//                     new ArrayBlockingQueue(8),
+//                     r -> {
+//                         Thread t = new Thread(r);
+//                         t.setDaemon(false);
+//                         t.setName("worker" + activeThreads.size());
+//                         register(t);
+//                         return t;
+//                     }, new ThreadPoolExecutor.AbortPolicy()
+//             );
+        deferred = x->{
+            if (x instanceof Task)
+                execute(x);
+            else
+                q.offer(x);
+        };
+    }
 
-            for (int i = 0; i < threads; i++)
-                w[i] = wh;
-            disruptor.handleEventsWithWorkerPool(w);
-            aexe.threads.forEach(this::register);
+
+    protected void runner() {
+        while (true) {
+
+            ITask i = q.poll();
+            if (i!=null) {
+                i.run(nar);
+            }
+
+            nar.focus.work();
         }
     }
 
-    final List<Thread> activeThreads = $.newArrayList();
-    LongSet activeThreadIds = new LongHashSet();
-    LongPredicate isActiveThreadId = (x)->false;
+    @Override
+    public synchronized void start(NAR nar) {
+        exe.execute(this::runner, threads);
+        super.start(nar);
+    }
+
+    @Override
+    public synchronized void stop() {
+        exe.stop();
+        super.stop();
+    }
+
+    protected boolean isWorker(Thread t) {
+        return isActiveThreadId.test(t.getId());
+    }
+
+
 
     /** to be called in initWorkers() impl for each thread constructed */
     protected synchronized void register(Thread t) {
@@ -129,48 +120,37 @@ abstract public class MultiExec extends UniExec {
         }
     }
 
-    public static class CoolNQuiet extends MultiExec {
-
-        private ThreadPoolExecutor texe;
-
-        public CoolNQuiet(int concepts, int threads, int qSize) {
-            super(concepts, threads, qSize);
-        }
-
-        @Override
-        protected WaitStrategy waitStrategy() {
-            //return new SleepingWaitStrategy();
-            return new LiteBlockingWaitStrategy();
-        }
-
-        @Override
-        protected Executor initExe() {
-            //return Executors.newCachedThreadPool();
-            //return texe = ((ThreadPoolExecutor) Executors.newFixedThreadPool(threads));
-
-
-            return texe = new ThreadPoolExecutor(threads, threads,
-                     60L, TimeUnit.SECONDS,
-                     //new LinkedBlockingQueue<Runnable>(),
-                     new ArrayBlockingQueue(8),
-                     r -> {
-                         Thread t = new Thread(r);
-                         t.setDaemon(false);
-                         t.setName("worker" + activeThreads.size());
-                         register(t);
-                         return t;
-                     }, new ThreadPoolExecutor.AbortPolicy()
-             );
-        }
-
-        @Override
-        protected void initWorkers() {
-            WorkHandler<ITask[]>[] w = new WorkHandler[threads];
-            for (int i = 0; i < threads; i++)
-                w[i] = wh;
-            disruptor.handleEventsWithWorkerPool(w);
-        }
-    }
+//    public static class CoolNQuiet extends MultiExec {
+//
+//        private ThreadPoolExecutor texe;
+//
+//        public CoolNQuiet(int concepts, int threads, int qSize) {
+//            super(concepts, threads, qSize);
+//        }
+//
+//        @Override
+//        protected WaitStrategy waitStrategy() {
+//            //return new SleepingWaitStrategy();
+//            return new LiteBlockingWaitStrategy();
+//        }
+//
+//        @Override
+//        protected Executor initExe() {
+//            //return Executors.newCachedThreadPool();
+//            //return texe = ((ThreadPoolExecutor) Executors.newFixedThreadPool(threads));
+//
+//
+//
+//        }
+//
+//        @Override
+//        protected void initWorkers() {
+//            WorkHandler<ITask[]>[] w = new WorkHandler[threads];
+//            for (int i = 0; i < threads; i++)
+//                w[i] = wh;
+//            disruptor.handleEventsWithWorkerPool(w);
+//        }
+//    }
 
 
     @Override
@@ -179,28 +159,8 @@ abstract public class MultiExec extends UniExec {
     }
 
     @Override
-    public synchronized void stop() {
-        disruptor.halt();
-        disruptor.shutdown();
-        super.stop();
-    }
-
-    static final EventTranslatorOneArg<ITask[], ITask> ein =
-            (event, sequence, arg0) ->
-                    event[0] = arg0;
-//    final EventTranslatorOneArg<ITask[], ITask> einCritical =
-//            (event, sequence, y) -> {
-//                ITask x = event[0];
-//                if (x!=null) {
-//                    execute(x);
-//                }
-//                event[0] = y;
-//            };
-
-    @Override
     public float load() {
-        float bufferUsed = ((float) buffer.remainingCapacity()) / buffer.getBufferSize();
-        return Util.sqr(Util.sqr(Util.sqr(1f - bufferUsed)));
+        return ((float) q.size()) / q.capacity();
     }
 
     @Override
@@ -217,129 +177,10 @@ abstract public class MultiExec extends UniExec {
         isActiveThreadId = (x)->false;
     }
 
-    //    class Sub extends UniExec implements Runnable {
-//
-//        public final Logger logger = LoggerFactory.getLogger(Sub.class);
-//
-//        private final SharedCan can;
-//
-//        public Sub(int capacity, SharedCan deriver) {
-//            super(capacity);
-//            this.can = deriver;
-//            start(MultiExec.this.nar);
-//        }
-//
-//        int premiseRemaining, premiseDone;
-//
-//        @Override
-//        public void add(ITask t) {
-//            MultiExec.this.add(t); //to master
-//        }
-//
-//        @Override
-//        public void run() {
-//
-//            BatchActivate ba = BatchActivate.get();
-//
-//            int conc = MultiExec.this.concurrency();
-//            int idle = 0;
-//            while (true) {
-//                try {
-//
-//                    int s = work(conc);
-//
-//                    int p = think(conc);
-//
-//                    if ((s == 0) && (p== 0)) {
-//                        Util.pauseNext(idle++);
-//                    } else {
-//                        ba.commit(nar);
-//                        idle = 0;
-//                    }
-//
-//                } catch (Throwable t) {
-//                    logger.error("{} {}", this, t);
-//                }
-//            }
-//        }
-//
-//        public int think(int conc) {
-//            int p;
-//            if ((p = premiseRemaining = Math.max(1,can.share(1f / conc))) > 0) {
-//                premiseDone = 0;
-//
-//                int loops = 0;
-//
-//
-//                //spread the sampling over N batches for fairness
-//                int batches = 4;
-//                int batchSize = Math.max(8, active.size() / batches);
-//
-//                long start = System.nanoTime();
-//
-//                while (premiseRemaining > 0) {
-//
-//                    int premiseDoneAtStart = premiseDone;
-//
-//                    workRemaining = batchSize;
-//                    active.commit().sample(super::exeSample);
-//
-//                    loops++;
-//
-//                    if (premiseDone == premiseDoneAtStart)
-//                        break; //encountered no premises in this batch that could have been processed
-//                }
-//
-//                long end = System.nanoTime();
-//
-//                //System.err.println(premiseDone + "/" + work + " in " + loops + " loops\tvalue=" + can.value() + " " + n4((end - start) / 1.0E9) + "sec");
-//
-//                can.update(premiseDone, (end - start) / 1.0E9);
-//            }
-//            return p;
-//        }
-//
-//        public int work(int conc) {
-//            int s;
-//            float qs = q.size();
-//            if (qs > 0) {
-//                s = (int) Math.ceil(qs / Math.max(1, (conc - 1)));
-//                for (int i = 0; i < s; i++) {
-//                    ITask k = q.poll();
-//                    if (k != null)
-//                        execute(k);
-//                    else
-//                        break;
-//                }
-//            } else {
-//                s = 0;
-//            }
-//            return s;
-//        }
-//
-//        @Override
-//        protected boolean done(ITask x) {
-//            if (x instanceof Premise) {
-//                premiseDone++;
-//                if (--premiseRemaining <= 0)
-//                    return true;
-//            }
-//
-//            return super.done(x);
-//        }
-//
-//
-//    }
-
 
     final Consumer<ITask> immediate = this::execute;
 
-    final Consumer<ITask> deferred = x->{
-        if (x instanceof Task)
-            execute(x);
-        else
-            buffer.publishEvent(ein, x);
-    };
+    final Consumer<ITask> deferred;
 
     @Override
     public void add(Iterator<? extends ITask> input) {
@@ -361,7 +202,7 @@ abstract public class MultiExec extends UniExec {
         if ((t instanceof Task) || (isWorker(Thread.currentThread()))) {
             execute(t);
         } else {
-            buffer.publishEvent(ein, t);
+            q.offer(t);
         }
     }
 

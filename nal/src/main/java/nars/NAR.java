@@ -7,7 +7,6 @@ import jcog.Util;
 import jcog.event.ListTopic;
 import jcog.event.On;
 import jcog.event.Topic;
-import jcog.exe.Can;
 import jcog.list.FasterList;
 import jcog.math.MutableInteger;
 import jcog.pri.Pri;
@@ -93,7 +92,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final transient Topic<Task> eventTask = new ListTopic<>();
 
 
-    public final MetaGoal.Revaluator revaluator;
     public final Emotion emotion;
 
     public final Time time;
@@ -107,7 +105,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * optional actions whose potential invocation is heuristically controlled
      */
-    public final FasterList<Can> can = new FasterList(8);
+    public final Focus focus;
+
     protected final Random random;
 
 
@@ -127,18 +126,16 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         this.terms = terms;
 
-        this.exe = exe;
-
         this.time = time;
         time.clear();
+
+        this.focus = new Focus(this);
+        this.exe = exe;
+
 
         self = new AtomicReference<>(null);
         setSelf(Param.randomSelf());
 
-
-        this.revaluator =
-                new MetaGoal.DefaultRevaluator();
-                //new MetaGoal.RBMRevaluator(rng);
 
         newCauseChannel("input"); //generic non-self source of input
 
@@ -558,7 +555,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         DiscreteTruth tr = new DiscreteTruth(freq, conf, confMin.floatValue());
 
         Task y = new NALTask(term, punc, tr, time(), start, end, new long[]{time.nextStamp()});
-        y.setPri(pri);
+        y.priSet(pri);
 
         input(y);
 
@@ -961,9 +958,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         time.cycle(this);
 
-        revaluator.update(causes, want);
+        focus.update(this);
 
-        exe.cycle(can);
+        exe.cycle();
 
         if (exe.concurrent()) {
             eventCycle.emitAsync(this, exe);
@@ -979,7 +976,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      *
      * @return total time in seconds elapsed in realtime
      */
-    @NotNull
     public final NAR run(int frames) {
 
         for (; frames > 0; frames--) {
@@ -989,7 +985,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return this;
     }
 
-    @NotNull
     public NAR trace(@NotNull Appendable out, Predicate<String> includeKey) {
         return trace(out, includeKey, null);
     }
@@ -997,7 +992,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /* Print all statically known events (discovered via reflection)
      *  for this reasoner to a stream
      * */
-    @NotNull
+
     public NAR trace(Appendable out, Predicate<String> includeKey, @Nullable Predicate includeValue) {
 
 

@@ -87,11 +87,22 @@ public final class Conclusion extends AbstractPred<Derivation> {
                 }
                 c2 = dt.solve(c1);
 
-                if (d.concOcc[0] > d.concOcc[1]) {
-                    //HACK swap the reversed occ
-                    long x = d.concOcc[0];
-                    d.concOcc[0] = d.concOcc[1];
-                    d.concOcc[1] = x;
+                {
+                    //final sanity tests hack
+
+                    //eternal check: eternals can only be derived from completely eternal premises
+//                    if (occ[0] == ETERNAL) {
+//                        //if ((!d.task.isEternal()) && !(d.belief != null && !d.belief.isEternal()))
+//                        if (!((d.task.isEternal()) || (d.belief != null && d.belief.isEternal())))
+//                            throw new RuntimeException("ETERNAL leak");
+//                    }
+
+                    if (occ[0] > occ[1]) {
+                        //HACK swap the reversed occ
+                        long x = occ[0];
+                        occ[0] = occ[1];
+                        occ[1] = x;
+                    }
                 }
 
 //                c2 = dt.solve(this, d, c1);

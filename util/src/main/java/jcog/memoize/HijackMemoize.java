@@ -95,7 +95,7 @@ public class HijackMemoize<X, Y> extends PriorityHijackBag<X, HijackMemoize.Comp
         }
 
         @Override
-        public float setPri(float p) {
+        public float priSet(float p) {
 //            if (get()!=null)
             float r = this.pri;
             if (r != r)

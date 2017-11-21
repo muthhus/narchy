@@ -1952,9 +1952,9 @@ public enum Util {
         }
     }
 
-    public static byte branchOr(ByteByteHashMap count, byte branch) {
+    public static byte branchOr(byte key, ByteByteHashMap count, byte branch) {
         byte branchBit = (byte) (1 << branch);
-        return count.updateValue((byte)-1, branchBit, (x) -> (byte) (x | branchBit));
+        return count.updateValue(key, branchBit, (x) -> (byte) (x | branchBit));
     }
 
 //    public static <T>  Collector<T, ?, List<T>> toListOrNullIfEmpty() {

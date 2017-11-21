@@ -24,7 +24,7 @@ public class Pri implements Priority {
     }
 
     public Pri(float p) {
-        setPri(p);
+        priSet(p);
     }
 
 
@@ -97,12 +97,12 @@ public class Pri implements Priority {
     }
 
     @Override
-    public final float setPri(float p) {
+    public final float priSet(float p) {
         return this.pri = Util.unitize(p);
     }
 
     public Pri setPriThen(float p) {
-        setPri(p);
+        priSet(p);
         return this;
     }
 

@@ -67,7 +67,7 @@ public class CauseChannel<X extends Priority> extends Cause implements Consumer<
         //traffic.accept(p);
 
         if (preBias != 0 || preAmp != 1) {
-            x.setPri(preBias + p * preAmp);
+            x.priSet(preBias + p * preAmp);
         }
         return true;
     }

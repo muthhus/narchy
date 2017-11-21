@@ -8,6 +8,7 @@ import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.control.Activate;
+import nars.control.MetaGoal;
 import nars.task.ITask;
 
 import java.util.HashMap;
@@ -25,6 +26,8 @@ public class UniExec extends Exec {
 
     protected Bag<Activate, Activate> active;
     //protected Baggie<Concept> active;
+
+
 
     public UniExec(int capacity) {
 
@@ -83,14 +86,15 @@ public class UniExec extends Exec {
                 new CurveBag<>(PriMerge.plus, new HashMap(), nar.random(), CAPACITY);
 
         super.start(nar);
+
     }
 
 
     @Override
-    public void cycle(List<Can> can) {
-        super.cycle(can);
+    public void cycle() {
 
         active.commit(active.forget(nar.forgetRate.floatValue()));
+
     }
 
     @Override

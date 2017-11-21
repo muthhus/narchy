@@ -97,7 +97,7 @@ public class IO {
         long cre = in.readLong();
 
         NALTask mm = new NALTask(term, punc, truth, cre, start, end, evi);
-        mm.setPri(pri);
+        mm.priSet(pri);
         return mm;
     }
 

@@ -32,7 +32,7 @@ public class SimpleGraph1 extends DynamicListSpace<Term,TermWidget<Term>> {
             x.b = 0;
             x.a = 1;
             x.width = 10;
-            x.setPri(0.5f);
+            x.priSet(0.5f);
             x.attraction = 1;
             x.attractionDist = 1;
         });

@@ -267,7 +267,7 @@ public interface Compound extends Term, IPair, TermContainer {
             return false;
 
 
-        Op st = u.type;
+
         if (!u.relevantVariables(xsubs, ty))
             return false; //no free vars, the only way unification can proceed is if equal
 

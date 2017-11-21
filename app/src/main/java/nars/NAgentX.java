@@ -147,8 +147,8 @@ abstract public class NAgentX extends NAgent {
 //                        return true;
 //                    }
 //                })
-                .exe(new MultiExec.
-                            Intense
+                .exe(new MultiExec
+                            //Intense
                             //CoolNQuiet
                         (192, THREADS, 512))
 

@@ -35,12 +35,14 @@ abstract public class Causable extends NARService {
         can = new MyCan(nar, term().toString());
     }
 
+
+
     @Override
     protected void start(NAR nar) {
         super.start(nar);
 
-        synchronized (nar.can) {
-            nar.can.add(can);
+        synchronized (nar.focus) {
+            nar.focus.add(this);
         }
 
     }
@@ -48,8 +50,8 @@ abstract public class Causable extends NARService {
     @Override
     protected void stop(NAR nar) {
 
-        synchronized (nar.can) {
-            boolean removed = nar.can.remove(can);
+        synchronized (nar.focus) {
+            nar.focus.remove(this);
         }
 
         super.stop(nar);
@@ -113,29 +115,29 @@ abstract public class Causable extends NARService {
      */
     public abstract float value();
 
-    public final static class InvokeCause extends NativeTask {
-
-        public final Causable cause;
-        public final int iterations;
-
-        private InvokeCause(Causable cause, int iterations) {
-            assert (iterations > 0);
-            this.cause = cause;
-            this.iterations = iterations;
-        }
-        //TODO deadline? etc
-
-        @Override
-        public String toString() {
-            return cause + ":" + iterations + "x";
-        }
-
-        @Override
-        public @Nullable Iterable<? extends ITask> run(NAR n) {
-            cause.run(n, iterations);
-            return null;
-        }
-    }
+//    public final static class InvokeCause extends NativeTask {
+//
+//        public final Causable cause;
+//        public final int iterations;
+//
+//        private InvokeCause(Causable cause, int iterations) {
+//            assert (iterations > 0);
+//            this.cause = cause;
+//            this.iterations = iterations;
+//        }
+//        //TODO deadline? etc
+//
+//        @Override
+//        public String toString() {
+//            return cause + ":" + iterations + "x";
+//        }
+//
+//        @Override
+//        public @Nullable Iterable<? extends ITask> run(NAR n) {
+//            cause.run(n, iterations);
+//            return null;
+//        }
+//    }
 
     private final class MyCan extends Can {
         private final NAR nar;
@@ -145,11 +147,11 @@ abstract public class Causable extends NARService {
             this.nar = nar;
         }
 
-        @Override
-        public void commit() {
-            int ii = iterations();
-            if (ii > 0)
-                nar.exe.add(new InvokeCause(Causable.this, ii));
-        }
+//        @Override
+//        public void commit() {
+//            int ii = iterations();
+//            if (ii > 0)
+//                nar.exe.add(new InvokeCause(Causable.this, ii));
+//        }
     }
 }

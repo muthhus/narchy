@@ -36,7 +36,7 @@ public abstract class NativeTask implements ITask {
     }
 
     @Override
-    public float setPri(float p) {
+    public float priSet(float p) {
         return 1f; //does nothing
     }
 

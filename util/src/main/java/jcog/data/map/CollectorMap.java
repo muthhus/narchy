@@ -39,15 +39,15 @@ public abstract class CollectorMap<K, V> {
 //     * returns null if successful, non-null if an item was displaced it will be that item
 //     */
 //    @Nullable
-//    protected abstract V addItem(@NotNull V e);
+//    protected abstract V addItem(V e);
 
     /**
      * implementation for removing the value to another collecton (called internally)
      */
     @Nullable
-    protected abstract V removeItem(@NotNull V e);
+    protected abstract V removeItem(V e);
 
-    public final void forEach(@NotNull BiConsumer<K, V> each) {
+    public final void forEach(BiConsumer<K, V> each) {
         map.forEach(each);
     }
 
@@ -64,7 +64,7 @@ public abstract class CollectorMap<K, V> {
 
 
 //    @Nullable
-//    public V put(@NotNull K key, @NotNull V value) {
+//    public V put(K key, V value) {
 //
 //
 //        V removed = map.put(key, value);
@@ -82,7 +82,7 @@ public abstract class CollectorMap<K, V> {
 //    }
 
 //    /** the key of the displaced item needs to be removed from the table sometime after calling this */
-//    public @Nullable V mergeList(@NotNull K key, @NotNull V value, @Nullable V removed) {
+//    public @Nullable V mergeList(K key, V value, @Nullable V removed) {
 //
 //        if (removed != null) {
 //
@@ -134,7 +134,7 @@ public abstract class CollectorMap<K, V> {
 //            throw new RuntimeException("Bag fault while trying to remove key by item value");
 //    }
 
-//    protected final @Nullable V removeKeyForValue(@NotNull V value) {
+//    protected final @Nullable V removeKeyForValue(V value) {
 //        @Nullable K key = key(value);
 //        return key != null ? map.remove(key) : null;
 //    }
@@ -149,20 +149,20 @@ public abstract class CollectorMap<K, V> {
     }
 
     @Nullable
-    public final V get(@NotNull Object key) {
+    public final V get(Object key) {
         return map.get(key);
     }
 //
-//    public final V merge(@NotNull K key, @NotNull V value, @NotNull BiFunction<? super V, ? super V, ? extends V> c) {
+//    public final V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> c) {
 //        return map.merge(key, value, c);
 //    }
 //
-//    public final V compute(@NotNull K key, @NotNull BiFunction<? super K, ? super V, ? extends V> c) {
+//    public final V compute(K key, BiFunction<? super K, ? super V, ? extends V> c) {
 //        return map.compute(key, c);
 //    }
 
 
-    public boolean containsKey(@NotNull K name) {
+    public boolean containsKey(K name) {
         return map.containsKey(name);
     }
 

@@ -16,10 +16,10 @@ public interface Priority extends Prioritized {
      * @param p The new priority
      * @return whether the operation had any effect
      */
-    float setPri(float p);
+    float priSet(float p);
 
-    default void setPri(/*@NotNull*/ Prioritized p) {
-        setPri(p.pri());
+    default void priSet(/*@NotNull*/ Prioritized p) {
+        priSet(p.pri());
     }
 
     /**
@@ -29,11 +29,11 @@ public interface Priority extends Prioritized {
 
 
     default float priMax(float max) {
-        setPri(Math.max(priElseZero(), max)); return pri();
+        priSet(Math.max(priElseZero(), max)); return pri();
     }
 
     default void priMin(float min) {
-        setPri(Math.min(priElseZero(), min));
+        priSet(Math.min(priElseZero(), min));
     }
 
     default float priAdd(float toAdd) {
@@ -49,12 +49,12 @@ public interface Priority extends Prioritized {
             toAdd += e;
         }
 
-        return setPri(toAdd);
+        return priSet(toAdd);
     }
 
     default float priAddAndGetDelta(float toAdd) {
         float before = priElseZero();
-        return setPri(before + notNaN(toAdd)) - before;
+        return priSet(before + notNaN(toAdd)) - before;
     }
 
     default float priSub(float toSubtract) {
@@ -67,7 +67,7 @@ public interface Priority extends Prioritized {
         if (p > 0) {
             float pMin = minFractionRetained * p;
             float pNext = Math.max((p - maxToSubtract), pMin);
-            setPri(pNext);
+            priSet(pNext);
         }
     }
 
@@ -106,7 +106,7 @@ public interface Priority extends Prioritized {
     default float priMult(float factor) {
         float p = pri();
         if (p == p)
-            return setPri(p * /*notNaNOrNeg*/(factor));
+            return priSet(p * /*notNaNOrNeg*/(factor));
         return Float.NaN;
     }
 
@@ -220,7 +220,7 @@ public interface Priority extends Prioritized {
      default Priority priLerp(float target, float speed) {
         float pri = pri();
         if (pri == pri)
-            setPri(lerp(speed, pri, target));
+            priSet(lerp(speed, pri, target));
         return this;
     }
 

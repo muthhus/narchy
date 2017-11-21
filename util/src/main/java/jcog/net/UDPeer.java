@@ -807,7 +807,7 @@ public class UDPeer extends UDP {
 
 
         @Override
-        public float setPri(float p) {
+        public float priSet(float p) {
             return this.pri = Util.unitize(p);
         }
 
