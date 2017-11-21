@@ -1,6 +1,5 @@
 package nars.derive;
 
-import jcog.Util;
 import jcog.pri.Pri;
 import nars.Op;
 import nars.Task;
@@ -129,7 +128,7 @@ public class DeriveTime extends TimeGraph {
 
 
         solve(pattern, false /* take everything */, (solution) -> {
-            assert(solution!=null);
+            assert (solution != null);
             //TODO test equivalence with task and belief terms and occurrences, and continue iterating up to a max # of tries if it produced a useless equivalent result
 
             Event current = best[0];
@@ -162,10 +161,12 @@ public class DeriveTime extends TimeGraph {
             return null;
         }
 
-        //use the graph-computed value:
 
-
-        assert (occ[0] != ETERNAL || (!task.isEternal() && !belief.isEternal()));
+        //eternal check: eternals can only be derived from completely eternal premises
+        if (occ[0] == ETERNAL) {
+            if ((!task.isEternal()) && !(belief != null && !belief.isEternal()))
+                throw new RuntimeException("ETERNAL leak");
+        }
 
 
 //        if (occ[0] == ETERNAL && (!te || (belief != null && !belief.isEternal()))) {
@@ -246,21 +247,32 @@ public class DeriveTime extends TimeGraph {
         Term bt = b.id;
         if (at.hasXternal() && !bt.hasXternal())
             return b;
+        if (bt.hasXternal() && !at.hasXternal())
+            return a;
 
-        long astart = a.start();
         long bstart = b.start();
-        if (astart == TIMELESS && bstart != TIMELESS)
-            return b;
-        if (astart == ETERNAL && bstart != ETERNAL)
-            return b;
+        if (bstart != TIMELESS) {
+            long astart = a.start();
+            if (astart == TIMELESS)
+                return b;
+
+            if (bstart != ETERNAL && astart == ETERNAL) {
+                return b;
+            } else if (astart != ETERNAL && bstart == ETERNAL) {
+                return a;
+            }
+        }
 
         //heuristic: prefer more specific "dense" temporal events rather than sprawling sparse run-on-sentences
         float aSpec = ((float) at.volume()) / at.dtRange();
         float bSpec = ((float) bt.volume()) / bt.dtRange();
         if (bSpec > aSpec)
             return b;
-        else
+        else //if (aSpec < bSpec)
             return a;
+//        else {
+//            //long distToNow = ...
+//        }
 
 //        Term tRoot = at.root();
 //        if (!at.equals(tt)) {

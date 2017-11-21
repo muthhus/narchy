@@ -9,11 +9,12 @@ import jcog.data.graph.hgraph.Node;
 import jcog.data.graph.hgraph.Search;
 import jcog.list.FasterList;
 import nars.$;
+import nars.Op;
 import nars.Task;
-import nars.derive.OccurrenceSolver;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
+import org.apache.commons.math3.exception.MathArithmeticException;
 import org.eclipse.collections.api.block.predicate.primitive.LongLongPredicate;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
@@ -219,22 +220,22 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
                     link(se, dt == DTERNAL ? ETERNAL : (dt + st), pe);
 
 
-                    //this may not be helpful:
-                    if (dt!=DTERNAL) {
-                        if (subj.hasAny(CONJ)) {
-                            subj.eventsWhile((w, y) -> {
-                                link(know(y), dt + st + -w, pe);
-                                return true;
-                            }, 0, false, false, false, 0);
-                        }
-                        if (pred.hasAny(CONJ)) {
-                            pred.eventsWhile((w, y) -> {
-                                link(se, dt + st + w, know(y));
-                                return true;
-                            }, 0, false, false, false, 0);
-
-                        }
-                    }
+//                    //this may not be helpful:
+//                    if (dt!=DTERNAL) {
+//                        if (subj.hasAny(CONJ)) {
+//                            subj.eventsWhile((w, y) -> {
+//                                link(know(y), dt + st + -w, pe);
+//                                return true;
+//                            }, 0, false, false, false, 0);
+//                        }
+//                        if (pred.hasAny(CONJ)) {
+//                            pred.eventsWhile((w, y) -> {
+//                                link(se, dt + st + w, know(y));
+//                                return true;
+//                            }, 0, false, false, false, 0);
+//
+//                        }
+//                    }
 
                 }
 
@@ -296,7 +297,7 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
                         if (eventDT != XTERNAL) {
                             link(event, w,
                                     et != TIMELESS ?
-                                            know(y, w + et) :
+                                            know(y, et==ETERNAL ? ETERNAL : w + et) :
                                             know(y)
                             );
                         } else {
@@ -364,7 +365,20 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
                             //try again
                             return true;
                         }
-                        Term y = x.dt(dt(x, dt));
+
+                        dt = dt(x, dt);
+
+
+                        //CONSTRUCT NEW TERM
+                        Term y;
+                        if (x.op()!=CONJ) {
+                            y = x.dt(dt - a.dtRange());
+                        } else {
+                            y = Op.conjMerge(a, 0, b, dt);
+                        }
+
+
+
                         if (!(y instanceof Bool)) {
 
                             return start != TIMELESS ?
@@ -707,7 +721,11 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
                     if (startTime != TIMELESS || endTime == TIMELESS) {
                         return new long[]{startTime, dt};
                     } else {
-                        return new long[]{endTime - dt, dt};
+
+                        return new long[]{
+                            endTime!=ETERNAL ? endTime - dt : ETERNAL,
+                            dt
+                        };
                     }
                 }
             }
@@ -907,6 +925,13 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
 
         private Absolute(Term t, long startAndEnd) {
             super(t, startAndEnd, startAndEnd);
+
+            final long SAFETY_PAD = 32*1024;
+            if (!((startAndEnd == ETERNAL || startAndEnd > 0 || startAndEnd > ETERNAL + SAFETY_PAD))) //for catching time calculation bugs
+                throw new MathArithmeticException();
+            if (!((startAndEnd < 0 || startAndEnd < TIMELESS - SAFETY_PAD))) //for catching time calculation bugs
+                throw new MathArithmeticException();
+
             this.start = startAndEnd;
         }
 

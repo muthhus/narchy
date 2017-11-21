@@ -87,6 +87,13 @@ public final class Conclusion extends AbstractPred<Derivation> {
                 }
                 c2 = dt.solve(c1);
 
+                if (d.concOcc[0] > d.concOcc[1]) {
+                    //HACK swap the reversed occ
+                    long x = d.concOcc[0];
+                    d.concOcc[0] = d.concOcc[1];
+                    d.concOcc[1] = x;
+                }
+
 //                c2 = dt.solve(this, d, c1);
 
             } catch (InvalidTermException t) {

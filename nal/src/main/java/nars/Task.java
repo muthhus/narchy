@@ -250,7 +250,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
                                         break nextStatement; //mismatch
                                 }
                                 //match
-                                if (lastBranch > 0) {
+                                if (lastBranch != -1) {
                                     assert (lastBranch == 0 || lastBranch == 1);
                                     if (Util.branchOr(count, lastBranch) == 3) {
                                         return true; //VALID

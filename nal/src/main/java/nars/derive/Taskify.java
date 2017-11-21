@@ -63,7 +63,7 @@ public class Taskify extends AbstractPred<Derivation> {
 
             long start = occ[0];
             long end = occ[1];
-            assert (end >= start);
+            assert (end >= start): "task has reversedoccurrence: " + start + ".." + end;
 
 
             long[] evi = d.single ? d.evidenceSingle() : d.evidenceDouble();
