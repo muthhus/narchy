@@ -34,7 +34,7 @@ public enum TermGraph {
     public static AdjGraph<Term, Float> termlink(NAR n, Stream<? extends Termed> it, AdjGraph<Term, Float> g) {
         it.forEach(st -> {
             Term s = st.term();
-            if (!g.addIfNew(s)) {
+            if (g.addIfNew(s)) {
                 Concept c = n.concept(s);
                 c.termlinks().forEach(tl -> {
                     Term t = tl.get();

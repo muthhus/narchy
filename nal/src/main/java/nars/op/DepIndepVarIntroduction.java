@@ -74,7 +74,8 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             return true; //TODO may be able to terminate early if we know this is the last one
         });
         int pSize = paths.size();
-        if (pSize == 0)
+        //if (pSize == 0)
+        if (pSize <= 1)
             return null;
 
         //byte[][] paths = pp.toArray(new byte[pSize][]);

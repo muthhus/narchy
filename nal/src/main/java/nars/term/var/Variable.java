@@ -71,8 +71,6 @@ public interface Variable extends Atomic {
         Op xOp = op();
         Op yOp = y.op();
         if (xOp == yOp && commonalizableVariable(xOp) && commonalizableVariable(yOp)) {
-            //if ((op().id >= y.op().id)) { //allow indep to subsume dep but not vice versa
-
 
             //TODO check if this is already a common variable containing y
             Term common = CommonVariable.common(this, (Variable) y);
@@ -82,6 +80,15 @@ public interface Variable extends Atomic {
 
             return u.putXY(this, common) && (this.equals(y) || u.putXY((Variable) y, common));
         } else {
+            if (y instanceof Variable) {
+                if (xOp.id < yOp.id) {  //only allows indep to subsume dep but not vice versa
+                    if (u.varSymmetric)
+                        return y.unify(this, u);
+                    else
+                        return false;
+                }
+            }
+
             return u.matchType(xOp) && u.putXY(this, y);
         }
 

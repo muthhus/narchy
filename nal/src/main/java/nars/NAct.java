@@ -502,7 +502,10 @@ public interface NAct {
      */
     @NotNull
     default GoalActionConcept actionUnipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+        float confMin = nar().confMin.floatValue() * 2;
+
         final float[] lastValue = {0.5f};
+
         boolean latch = false;
         return action(s, (b, d) -> {
             float o = (d != null) ?
@@ -518,11 +521,12 @@ public interface NAct {
 
             //return $.t(f, nar().confDefault(BELIEF));
 
-            if (f == f)
+            if (f == f) {
                 return $.t(f,
-                        //d!=null ? d.conf() : nar().confMin.floatValue()
-                        nar().confDefault(BELIEF)
+                        d!=null ? d.conf() : confMin
+                        //nar().confDefault(BELIEF)
                 );
+            }
             else
                 return null;
 

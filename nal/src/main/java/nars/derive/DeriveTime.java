@@ -1,9 +1,12 @@
 package nars.derive;
 
+import jcog.Util;
+import jcog.pri.Pri;
 import nars.Op;
 import nars.Task;
 import nars.control.Derivation;
 import nars.derive.time.TimeGraph;
+import nars.task.Revision;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Bool;
@@ -13,8 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
-import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.TIMELESS;
+import static nars.time.Tense.*;
 
 
 /**
@@ -41,7 +43,7 @@ public class DeriveTime extends TimeGraph {
     private final Task task, belief;
 
     protected static final boolean knowTransformed = true;
-    private final int dur;
+    private final int dither;
     private final Derivation d;
 
 
@@ -49,7 +51,7 @@ public class DeriveTime extends TimeGraph {
         this.d = d;
         this.task = d.task;
         this.belief = d.belief; //!d.single ? d.belief : null;
-        this.dur = Math.max(1, Math.round(d.nar.dtDither.floatValue() * d.dur));
+        this.dither = Math.max(1, Math.round(d.nar.dtDither.floatValue() * d.dur));
 
         long taskStart = task.start();
 
@@ -70,6 +72,25 @@ public class DeriveTime extends TimeGraph {
 
     }
 
+    @Override
+    protected int dt(Term t, int dt) {
+        if (dt == DTERNAL)
+            return DTERNAL;
+        if (dt == XTERNAL)
+            return XTERNAL;
+
+        if (dither > 1) {
+
+            if (Math.abs(dt) < dither)
+                return 0; //present moment
+
+            //return Util.round(dt, dither);
+
+        }
+
+        return dt;
+    }
+
     public Term solve(Term pattern) {
 
 //        if (taskStart == ETERNAL && task.isGoal() && belief!=null && !belief.isEternal()) {
@@ -88,8 +109,8 @@ public class DeriveTime extends TimeGraph {
 
             if (!tt.isTemporal()) {
                 //simple case: inherit task directly
-                d.concOcc[0] = task.start();
-                d.concOcc[1] = task.end();
+                occ[0] = task.start();
+                occ[1] = task.end();
                 return pattern;
             }
 
@@ -102,22 +123,19 @@ public class DeriveTime extends TimeGraph {
 
         Event[] best = new Event[1];
 
-        final int[] remain = {8};
+        final int[] triesRemain = {8};
 
 //        try {
 
 
         solve(pattern, false /* take everything */, (solution) -> {
-
+            assert(solution!=null);
             //TODO test equivalence with task and belief terms and occurrences, and continue iterating up to a max # of tries if it produced a useless equivalent result
 
             Event current = best[0];
-            if (current == null) {
-                best[0] = current;
-            } else {
-                best[0] = merge(best[0], solution);
-            }
-            return remain[0]-- > 0;
+            best[0] = (current == null) ? solution : merge(current, solution);
+
+            return triesRemain[0]-- > 0;
         });
 
 
@@ -127,33 +145,28 @@ public class DeriveTime extends TimeGraph {
 //        }
 
         Event event = best[0];
-        if (event == null)
-            return null;
+        if (event == null) {
+            return solveRaw(pattern);
+        }
 
+        occ[0] = event.start();
+        occ[1] = event.end();
         Term st = event.id;
+
+        if (occ[0] == TIMELESS) {
+            return solveRaw(st);
+        }
+
         Op eop = st.op();
         if (!eop.conceptualizable) {
             return null;
         }
 
-        occ[0] = event.start();
-        occ[1] = event.end();
+        //use the graph-computed value:
 
-        boolean te = task.isEternal();
-        if (occ[0] == TIMELESS || occ[0] == ETERNAL) {
-            //couldnt solve the start time, so inherit from task or belief as appropriate
-            if (!te || belief == null || belief.isEternal()) {
-                occ[0] = occ[1] = task.start();
-            } else if (belief != null) {
-                occ[0] = occ[1] = belief.start();
-            } else {
-                if (occ[0] == TIMELESS)
-                    return null; //no basis
-                else {
-                    //its eternal
-                }
-            }
-        }
+
+        assert (occ[0] != ETERNAL || (!task.isEternal() && !belief.isEternal()));
+
 
 //        if (occ[0] == ETERNAL && (!te || (belief != null && !belief.isEternal()))) {
 //            //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
@@ -166,33 +179,6 @@ public class DeriveTime extends TimeGraph {
 ////                return null;
 ////            }
 //
-//            long ts = task.start();
-//            long k;
-//            if (!te && (belief != null && !belief.isEternal())) {
-//
-//                Interval ii = Interval.intersect(ts, task.end(), belief.start(), belief.end());
-//                if (ii == null)
-//                    return null;
-//                occ[0] = ii.a;
-//                occ[1] = ii.b;
-//
-////                Revision.TaskTimeJoint joint = new Revision.TaskTimeJoint(ts, task.end(), belief.start(), belief.end(), d.nar);
-////                occ[0] = joint.unionStart;
-////                occ[1] = joint.unionEnd;
-////                d.concConfFactor *= joint.factor;
-//
-//            } else if (te) {
-//                //TODO maybe this should be 'now'
-//                //occ[0] = belief.start();
-//                //occ[1] = belief.end();
-//                occ[0] = belief.start();
-//                occ[1] = belief.end();
-//            } else /*if (be)*/ {
-//                occ[0] = task.start();
-//                occ[1] = task.end();
-//            }
-//
-//        }
 //
 //        if (occ[0] != ETERNAL && occ[1] < occ[0]) {
 //            if (occ[1] == ETERNAL) {
@@ -208,7 +194,53 @@ public class DeriveTime extends TimeGraph {
         return st;
     }
 
-    /** heuristic for deciding a derivation result from among the calculated options */
+    /**
+     * as a backup option
+     */
+    private Term solveRaw(Term pattern) {
+//        if (!pattern.hasXternal()) {
+//
+//        }
+
+        long[] occ = d.concOcc;
+        boolean te = task.isEternal();
+        //couldnt solve the start time, so inherit from task or belief as appropriate
+        if (!te && (belief != null && !belief.isEternal())) {
+
+            //STRICT
+            {
+//            Interval ii = Interval.intersect(task.start(), task.end(), belief.start(), belief.end());
+//            if (ii == null)
+//                return null; //too distant, evidence lacks
+//
+//            occ[0] = ii.a;
+//            occ[1] = ii.b;
+            }
+
+            {
+                Revision.TaskTimeJoint joint = new Revision.TaskTimeJoint(task.start(), task.end(), belief.start(), belief.end(), d.nar);
+                if (joint.factor <= Pri.EPSILON)
+                    return null;
+
+                occ[0] = joint.unionStart;
+                occ[1] = joint.unionEnd;
+                d.concConfFactor *= joint.factor;
+            }
+
+        } else if (!te || belief == null || belief.isEternal()) {
+            occ[0] = task.start();
+            occ[1] = task.end();
+        } else {
+            occ[0] = belief.start();
+            occ[1] = belief.end();
+        }
+
+        return pattern;
+    }
+
+    /**
+     * heuristic for deciding a derivation result from among the calculated options
+     */
     protected Event merge(Event a, Event b) {
         Term at = a.id;
         Term bt = b.id;
@@ -217,14 +249,14 @@ public class DeriveTime extends TimeGraph {
 
         long astart = a.start();
         long bstart = b.start();
-        if (astart == TIMELESS && bstart!=TIMELESS)
+        if (astart == TIMELESS && bstart != TIMELESS)
             return b;
-        if (astart == ETERNAL && bstart!=ETERNAL)
+        if (astart == ETERNAL && bstart != ETERNAL)
             return b;
 
         //heuristic: prefer more specific "dense" temporal events rather than sprawling sparse run-on-sentences
-        float aSpec = ((float)at.volume())/at.dtRange();
-        float bSpec = ((float)bt.volume())/bt.dtRange();
+        float aSpec = ((float) at.volume()) / at.dtRange();
+        float bSpec = ((float) bt.volume()) / bt.dtRange();
         if (bSpec > aSpec)
             return b;
         else
@@ -261,7 +293,7 @@ public class DeriveTime extends TimeGraph {
     void know(Subst d, Termed x, long start) {
 
         if (x instanceof Task)
-            know((Task)x);
+            know((Task) x);
         else
             know(x.term());
 

@@ -189,6 +189,7 @@ public class BeliefTableTest {
         //this.activeTasks = activeTasks;
         NAR n = NARS.tmp();
 
+        n.time.dur(15);
         n.log();
         n.inputAt(2, "a:x. :|:");
         n.inputAt(10, "a:y. :|:");

@@ -10,6 +10,7 @@ import jcog.data.graph.hgraph.Search;
 import jcog.list.FasterList;
 import nars.$;
 import nars.Task;
+import nars.derive.OccurrenceSolver;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
@@ -138,10 +139,7 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
 
     public Event event(Event e) {
         Node<Event, TimeSpan> existing = node(e);
-        if (existing!=null)
-            return existing.id;
-        else
-            return e;
+        return existing != null ? existing.id : e;
     }
 
     private TimeGraph.Event newEvent(Term t, long start, long end) {
@@ -220,19 +218,23 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
 
                     link(se, dt == DTERNAL ? ETERNAL : (dt + st), pe);
 
-//                    if (subj.hasAny(CONJ)) {
-//                        subj.eventsWhile((w, y) -> {
-//                            link(know(y), dt+st+-w, pe);
-//                            return true;
-//                        }, 0, false, false, 0);
-//                    }
-//                    if (pred.hasAny(CONJ)) {
-//                        pred.eventsWhile((w, y) -> {
-//                            link(se, dt+st+w, know(y));
-//                            return true;
-//                        }, 0, false, false, 0);
-//
-//                    }
+
+                    //this may not be helpful:
+                    if (dt!=DTERNAL) {
+                        if (subj.hasAny(CONJ)) {
+                            subj.eventsWhile((w, y) -> {
+                                link(know(y), dt + st + -w, pe);
+                                return true;
+                            }, 0, false, false, false, 0);
+                        }
+                        if (pred.hasAny(CONJ)) {
+                            pred.eventsWhile((w, y) -> {
+                                link(se, dt + st + w, know(y));
+                                return true;
+                            }, 0, false, false, false, 0);
+
+                        }
+                    }
 
                 }
 
@@ -322,8 +324,6 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
 //
 //    }
 
-    final static int MAX_SUBTERM_SOLUTIONS = 2;
-
     void solveDT(Term x, Map<Term, LongSet> absolute, Predicate<Event> each) {
         assert (x.dt() == XTERNAL);
 
@@ -364,7 +364,7 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
                             //try again
                             return true;
                         }
-                        Term y = x.dt(dt);
+                        Term y = x.dt(dt(x, dt));
                         if (!(y instanceof Bool)) {
 
                             return start != TIMELESS ?
@@ -419,6 +419,13 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
 //        }
     }
 
+    /** preprocess the dt used to construct a new term.
+     *  ex: dithering
+     * */
+    protected int dt(Term t, int dt) {
+        return dt;
+    }
+
 
     protected Random random() {
         return ThreadLocalRandom.current();
@@ -442,26 +449,20 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
         solve(x, true, _each);
     }
 
-    public void solve(Term x, boolean filterTimeless, Predicate<Event> _each) {
+    public void solve(Term x, boolean filterTimeless, Predicate<Event> target) {
 
-        Set<Event> seen = new HashSet();
+         Set<Event> seen = new HashSet();
 
-        solveAll(x, y -> {
+         Predicate<Event> each = y -> {
             if (seen.add(y)) {
-                if (y.start()==TIMELESS && (filterTimeless || x.equals(y)))
-                    return true; //exactly the same as input, dont spam the callee
-                return _each.test(y);
+                if (y.start() == TIMELESS && (filterTimeless || x.equals(y)))
+                    return true;
+                else
+                    return target.test(y);
             } else {
                 return true; //filtered
             }
-        });
-    }
-
-
-    /**
-     * each should only receive Event or Unsolved instances, not Relative's
-     */
-    void solveAll(Term x, Predicate<Event> each) {
+        };
 
         //1. test for existing solutions to the exact term
         for (Event e : byTerm.get(x)) {
@@ -470,25 +471,43 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
         }
 
 
-        Map<Term, Term> xternals = new UnifiedMap();
+        Map<Term, Term> xternalsToSolve;
+        if (x.isTemporal()) {
+            UnifiedMap<Term,Term> xternals = new UnifiedMap(0);
+            x.temporalize(xx -> {
+                int dt = xx.dt();
+                if (dt == XTERNAL)
+                    xternals.put(xx, xx);
 
-        Map<Term, LongSet> absolute = new LinkedHashMap();
+                return dt; //no change
+            });
+            xternalsToSolve = xternals.isEmpty() ? null : xternals;
+        } else {
+            xternalsToSolve = null;
+        }
 
-        x.temporalize(xs -> {
-            int dt = xs.dt();
-            if (dt == XTERNAL) {
-                xternals.put(xs, xs);
-            }
-            return dt; //no change
-        });
+        Map<Term, LongSet> absoluteSeeds = new LinkedHashMap();
+        absolutes(absoluteSeeds, x);
+//        if (absoluteSeeds.size()==1 &&
+//                absoluteSeeds.get(x).isEmpty() &&
+//                xternalsToSolve==null &&
+//                x.dt()!=XTERNAL)
+//            return;
 
-        final boolean clue = absolutes(absolute, x);
 
+        solveAll(x, absoluteSeeds, xternalsToSolve, each);
+    }
+
+
+    /**
+     * each should only receive Event or Unsolved instances, not Relative's
+     */
+    void solveAll(Term x, Map<Term, LongSet> absolute,  @Nullable Map<Term, Term> xternals, Predicate<Event> each) {
 
 //        if (!clue[0])
 //            return; //no temporal basis to compute further
 
-        if (!xternals.isEmpty()) {
+        if (xternals!=null && !xternals.isEmpty()) {
             //resolve any XTERNAL in subterms
             final boolean[] foundAny = {false};
             xternals.replaceAll((u, z) -> {
@@ -531,25 +550,23 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
         }
     }
 
-    protected boolean absolutes(Map<Term, LongSet> absolute, Term x) {
+    protected void absolutes(Map<Term, LongSet> absolute, Term x) {
 
         if (absolute.putIfAbsent(x, EMPTY_LONG_SET) != null)
-            return false; //already processed
-
-        boolean clue[] = {false};
+            return; //already processed
 
         x.eventsWhile((t, xx) -> {
 
             if (!x.equals(xx))
-                clue[0] |= absolutes(absolute, xx);
+                absolutes(absolute, xx);
 
             return true;
 
         }, 0, true, true, true, 0);
 
         if (x.op() == IMPL) {
-            for (Term xx : x.subterms())
-                clue[0] |= absolutes(absolute, xx);
+            absolutes(absolute, x.sub(0));
+            absolutes(absolute, x.sub(1));
         }
 
         Collection<Event> xe = byTerm.get(x);
@@ -561,12 +578,9 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
             });
 
             if (!l.isEmpty()) {
-                clue[0] = true;
                 absolute.put(x, l.toImmutable());
             }
         }
-
-        return clue[0];
 
     }
 

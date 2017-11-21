@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LinkageTest extends NALTest {
 
-    final int runCycles = 100;
+    final int runCycles = 500;
 
 
     public void ProperlyLinkedTest(@NotNull String premise1, @NotNull String premise2) throws Exception {
@@ -149,8 +149,7 @@ public class LinkageTest extends NALTest {
 
     }
 
-    @NotNull
-    public String getTask(byte punc, @NotNull Termed premise1) {
+    String getTask(byte punc, Termed premise1) {
         if (punc == QUESTION) {
             return premise1.toString() + (char) (QUESTION);
         } else {
@@ -158,7 +157,7 @@ public class LinkageTest extends NALTest {
         }
     }
 
-    public boolean linksIndirectly(@NotNull Concept src, @NotNull Concept target, @NotNull NAR nar) {
+    boolean linksIndirectly(@NotNull Concept src, @NotNull Concept target, @NotNull NAR nar) {
 
 
         for (PriReference<Term> entry : src.termlinks()) {

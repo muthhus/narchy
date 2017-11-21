@@ -637,6 +637,7 @@ public class Revision {
         public final long unionEnd;
 
         public TaskTimeJoint(long as, long ae, long bs, long be, NAR nar) {
+            int hd = nar.dur()/2;
             Interval ai = new Interval(as, ae);
             Interval bi = new Interval(bs, be);
 
@@ -649,18 +650,16 @@ public class Revision {
             int bl = (int) bi.length();
             int s = al + bl;
 
-            /** tolerance in cycles to ignore a separation in computing discount - allows smoothing over relatively imperceptible gaps */
-            int tolerance = 0; // nar.dur()/2;
 
             float factor = 1f;
             if (u > s) {
 
                 /** account for how much the merge stretches the truth beyond the range of the inputs */
-                long separation = u - s - tolerance;
+                long separation = u - s;
                 if (separation > 0) {
-                    int shortest = Math.min(al, bl);
-                    if (separation < shortest) {
-                        factor = 1f - separation / ((float) shortest);
+                    int minterval = Math.min(al, bl) + hd; //+hd to pad the attention surrounding point0like events
+                    if (separation < minterval) {
+                        factor = 1f - separation / ((float) minterval);
                     } else {
                         factor = 0; //too separate
                     }

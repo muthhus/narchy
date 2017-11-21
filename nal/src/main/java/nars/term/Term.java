@@ -385,7 +385,7 @@ public interface Term extends Termed, Comparable<Termed> {
     default boolean unify(Term y, Unify u) {
         if (this.equals(y)) {
             return true;
-        } else if (u.varSymmetric && y instanceof Variable && !(this instanceof Variable)) {
+        } else if (y instanceof Variable && !(this instanceof Variable) && u.varSymmetric && u.matchType(y.op())) {
             return y.unify(this, u); //reverse
         } else if (y instanceof AliasConcept.AliasAtom) {
             return unify(((AliasConcept.AliasAtom) y).target, u); //dereference alias

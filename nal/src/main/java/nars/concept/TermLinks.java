@@ -109,7 +109,7 @@ public enum TermLinks {
                 return 3;
 
             case SIM:
-                return 3;
+                return 2;
 
             case INH:
                 return 4;

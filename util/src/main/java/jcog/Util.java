@@ -660,6 +660,11 @@ public enum Util {
         return Math.round(value / epsilon) * epsilon;
     }
 
+    /** rounds x to the nearest multiple of the dither parameter */
+    public static int round(int x, int dither) {
+        return dither * Math.round(((float)x)/dither);
+    }
+
     public static float floor(float value, float epsilon) {
         return (float) (Math.floor(value / epsilon) * epsilon);
     }
