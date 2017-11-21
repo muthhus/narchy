@@ -75,7 +75,16 @@ public final class Conclusion extends AbstractPred<Derivation> {
 //                }
 //
 
-                DeriveTime dt = new DeriveTime(d);
+
+                boolean s = d.single;
+                DeriveTime dt = s ? d.dtSingle : d.dtDouble;
+                if (dt == null) {
+                    dt = new DeriveTime(d, s);
+                    if (s)
+                        d.dtSingle = dt;
+                    else
+                        d.dtDouble = dt;
+                }
                 c2 = dt.solve(c1);
 
 //                c2 = dt.solve(this, d, c1);

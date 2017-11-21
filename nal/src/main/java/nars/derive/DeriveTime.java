@@ -45,7 +45,7 @@ public class DeriveTime extends TimeGraph {
     private final Derivation d;
 
 
-    public DeriveTime(Derivation d) {
+    public DeriveTime(Derivation d, boolean single) {
         this.d = d;
         this.task = d.task;
         this.belief = d.belief; //!d.single ? d.belief : null;
@@ -57,7 +57,7 @@ public class DeriveTime extends TimeGraph {
         know(d, task, taskStart);
 
 
-        if (!d.single && belief != null && !belief.equals(task)) {
+        if (!single && belief != null && !belief.equals(task)) {
 
             long beliefStart = belief.start();
 
@@ -107,7 +107,7 @@ public class DeriveTime extends TimeGraph {
 //        try {
 
 
-        solve(pattern, (solution) -> {
+        solve(pattern, false /* take everything */, (solution) -> {
 
             //TODO test equivalence with task and belief terms and occurrences, and continue iterating up to a max # of tries if it produced a useless equivalent result
 
@@ -208,7 +208,8 @@ public class DeriveTime extends TimeGraph {
         return st;
     }
 
-    private Event merge(Event a, Event b) {
+    /** heuristic for deciding a derivation result from among the calculated options */
+    protected Event merge(Event a, Event b) {
         Term at = a.id;
         Term bt = b.id;
         if (at.hasXternal() && !bt.hasXternal())
@@ -259,8 +260,10 @@ public class DeriveTime extends TimeGraph {
 
     void know(Subst d, Termed x, long start) {
 
-
-        know(x, start);
+        if (x instanceof Task)
+            know((Task)x);
+        else
+            know(x.term());
 
         if (knowTransformed) {
             Term y = //x.transform(d);

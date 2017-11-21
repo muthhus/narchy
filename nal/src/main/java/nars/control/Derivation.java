@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
+import nars.derive.DeriveTime;
 import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.op.Subst;
@@ -137,6 +138,7 @@ public class Derivation extends Unify {
     public float premiseConfSingle;
     public float premiseConfDouble;
     private long[] evidenceDouble, evidenceSingle;
+    public DeriveTime dtSingle = null, dtDouble = null;
 
 
 //    private transient Term[][] currentMatch;
@@ -270,6 +272,8 @@ public class Derivation extends Unify {
         xy.map.clear(); //must also happen to be consistent
         derivedTerm.clear();
         //and any other Versioned or Versioned-containing instances referenced
+
+        dtSingle = dtDouble = null;
 
 //        if (revert(0)) {
             //remove common variable entries because they will just consume memory if retained as empty

@@ -36,6 +36,9 @@ abstract public class Search<N, E> {
     /**
      * path should not be modified by callee. it is left exposed for performance
      * path boolean is true = OUT, false = IN
+     *
+     * TODO combine this with the edges method
+     * return either some edges, no edges, or the cancel (null)
      */
     abstract protected boolean visit(Node<N, E> n, FasterList<BooleanObjectPair<Edge<N, E>>> path);
 

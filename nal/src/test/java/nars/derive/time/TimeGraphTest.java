@@ -4,7 +4,6 @@ import com.google.common.collect.Sets;
 import jcog.math.random.XoRoShiRo128PlusRandom;
 import nars.$;
 import nars.Narsese;
-import nars.term.Term;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +47,7 @@ class TimeGraphTest {
     @Test
     public void testAtomEvent() throws Narsese.NarseseException {
         A.print();
-        assertSolved(A, "one", "one@1", "one@19");
+        assertSolved("one", A, "one@1", "one@19");
     }
 
     @Test
@@ -57,9 +56,8 @@ class TimeGraphTest {
         int nodesBefore = A.nodes().size();
         long edgesBefore = A.edges().count();
 
-        assertSolved(A,
-                "(one &&+1 two)",
-                "(one &&+1 two)@1", "(one &&+1 two)@19");
+        assertSolved("(one &&+1 two)", A,
+                "(one &&+1 two)@[1..2]", "(one &&+1 two)@[19..20]");
 
         int nodesAfter = A.nodes().size();
         long edgesAfter = A.edges().count();
@@ -69,24 +67,23 @@ class TimeGraphTest {
 
     @Test
     public void testSimpleConjWithOneKnownAbsoluteSubEvent2() throws Narsese.NarseseException {
-        assertSolved(A,
-                "(one &&+- two)",
-                "(one &&+1 two)@1", "(one &&+1 two)@19");
+        assertSolved("(one &&+- two)", A,
+                "(one &&+1 two)@[1..2]", "(one &&+1 two)@[19..20]");
     }
 
     @Test
     public void testSimpleConjOfTermsAcrossImpl1() throws Narsese.NarseseException {
 
-        assertSolved(A, "(two &&+1 three)",
-                "(two &&+1 three)@2", "(two &&+1 three)@20");
+        assertSolved("(two &&+1 three)", A,
+                "(two &&+1 three)@[2..3]", "(two &&+1 three)@[20..21]");
     }
     @Test
     public void testSimpleConjOfTermsAcrossImpl2() throws Narsese.NarseseException {
         int nodesBefore = A.nodes().size();
         long edgesBefore = A.edges().count();
 
-        assertSolved(A, "(two &&+- three)",
-                "(two &&+1 three)@2", "(two &&+1 three)@20");
+        assertSolved("(two &&+- three)", A,
+                "(two &&+1 three)@[2..3]", "(two &&+1 three)@[20..21]");
         int nodesAfter = A.nodes().size();
         long edgesAfter = A.edges().count();
 
@@ -95,17 +92,17 @@ class TimeGraphTest {
     @Test
     public void testSimpleImplWithOneKnownAbsoluteSubEvent() throws Narsese.NarseseException {
         A.print();
-        assertSolved(A, "(one ==>+- three)",
-                "(one ==>+2 three)@1");
+        assertSolved("(one ==>+- three)", A,
+                "(one ==>+2 three)");
     }
 
     @Test public void testImplChain1() throws Narsese.NarseseException {
         B.print();
-        assertSolved(B, "(z ==>+- x)", "(z ==>+1 x)@ETE");
+        assertSolved("(z ==>+- x)", B, "(z ==>+1 x)");
     }
 
     @Test public void testImplChain2() throws Narsese.NarseseException {
-        assertSolved(B, "(x ==>+- z)", "(x ==>-1 z)@ETE");
+        assertSolved("(x ==>+- z)", B, "(x ==>-1 z)");
     }
 
 
@@ -116,7 +113,7 @@ class TimeGraphTest {
         cc1.know($.$("(a &&+5 b)"), 1);
         cc1.know($.$("(b &&+5 c)"), 6);
         cc1.print();
-        assertSolved(cc1, "(a &&+- c)",
+        assertSolved("(a &&+- c)", cc1,
                 "(a &&+10 c)@[1..11]");
     }
 
@@ -129,12 +126,12 @@ class TimeGraphTest {
 
     @Test
     public void testImplWithConjPredicate1() throws Narsese.NarseseException {
-        assertSolved(A, "(one ==>+- (two &&+1 three))", implWithConjPredicateSolutions);
+        assertSolved("(one ==>+- (two &&+1 three))", A, implWithConjPredicateSolutions);
     }
 
     @Test
     public void testImplWithConjPredicate2() throws Narsese.NarseseException {
-        assertSolved(A, "(one ==>+- (two &&+- three))", implWithConjPredicateSolutions);
+        assertSolved("(one ==>+- (two &&+- three))", A, implWithConjPredicateSolutions);
     }
 
     final List<Runnable> afterEach = $.newArrayList();
@@ -144,8 +141,16 @@ class TimeGraphTest {
         afterEach.forEach(Runnable::run);
     }
 
-    void assertSolved(TimeGraph t, String inputTerm, String... solutions) {
-        t.solve($.$safe(inputTerm), new ExpectSolutions(solutions));
+    void assertSolved(String inputTerm, TimeGraph t, String... solutions) {
+        ExpectSolutions ee = new ExpectSolutions(solutions);
+
+        //1. get any non-timeless solutions
+        t.solve($.$safe(inputTerm), true, ee);
+
+        //2. if nothing, then settle for the timeless ones
+        if (ee.isEmpty() && solutions.length > 0) {
+            t.solve($.$safe(inputTerm), false, ee);
+        }
     }
 
     private class ExpectSolutions extends TreeSet<String> implements Predicate<TimeGraph.Event> {

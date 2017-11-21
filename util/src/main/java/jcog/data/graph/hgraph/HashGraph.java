@@ -250,8 +250,8 @@ public class HashGraph<N, E> {
      */
     private boolean searchDepthFirst(Search tv, Node<N,E> source, Stream<Edge<N, E>> edges, boolean in, boolean out, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
 
-        return edges.collect(Collectors.toCollection((Supplier<FasterList<Edge<N,E>>>) FasterList::new))
-            .allSatisfy(e -> {
+        FasterList<Edge<N, E>> ee = edges.collect(Collectors.toCollection((Supplier<FasterList<Edge<N, E>>>) FasterList::new));
+        return ee.allSatisfy(e -> {
 
             Node<N, E> next = e.other(source);
 
