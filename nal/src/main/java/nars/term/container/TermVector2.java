@@ -1,6 +1,5 @@
 package nars.term.container;
 
-import com.google.common.collect.Iterators;
 import jcog.list.ArrayIterator;
 import nars.Op;
 import nars.term.Term;

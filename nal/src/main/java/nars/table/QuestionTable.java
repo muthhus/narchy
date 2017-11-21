@@ -1,7 +1,7 @@
 package nars.table;
 
-import jcog.list.ArrayIterator;
 import jcog.data.map.MRUCache;
+import jcog.list.ArrayIterator;
 import nars.NAR;
 import nars.Task;
 import nars.concept.BaseConcept;

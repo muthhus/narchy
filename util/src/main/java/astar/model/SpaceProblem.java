@@ -1,7 +1,7 @@
 package astar.model;
 
-import astar.Solution;
 import astar.Problem;
+import astar.Solution;
 
 import java.util.List;
 

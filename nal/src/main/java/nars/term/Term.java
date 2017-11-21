@@ -27,7 +27,6 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.Param;
-import nars.derive.time.TimeGraph;
 import nars.index.term.TermContext;
 import nars.op.mental.AliasConcept;
 import nars.term.atom.Atomic;

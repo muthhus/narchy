@@ -1,13 +1,9 @@
 package nars.term.var;
 
-import com.google.common.base.Joiner;
 import nars.Op;
 import nars.term.Term;
-import org.eclipse.collections.api.set.primitive.ByteSet;
 import org.eclipse.collections.api.set.primitive.ImmutableByteSet;
 import org.eclipse.collections.impl.factory.primitive.ByteSets;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public final class CommonVariable extends UnnormalizedVariable {
 

@@ -13,7 +13,6 @@ import net.openhft.chronicle.bytes.Bytes;
 import net.openhft.chronicle.bytes.UncheckedBytes;
 import org.eclipse.collections.api.block.function.primitive.ByteFunction0;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
-import org.eclipse.collections.api.block.predicate.primitive.IntIntPredicate;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;

@@ -9,6 +9,9 @@ public interface TraveLog {
     /** returns false if it was already added */
     boolean visit(Node n);
 
+    boolean isVisited(Node n);
+
+
     //TODO: reachable, etc
 
     class IntHashTraveLog implements TraveLog {
@@ -24,6 +27,12 @@ public interface TraveLog {
         public boolean visit(Node n) {
             return visit.add(n.serial);
         }
+
+        @Override
+        public boolean isVisited(Node n) {
+            return visit.contains(n.serial);
+        }
+
     }
 
     /** TODO a bitvector based travelog, with a failsafe max limit  */

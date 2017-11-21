@@ -4,7 +4,6 @@ import com.google.common.collect.Iterators;
 import nars.Op;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
-import nars.term.compound.UnitCompound1;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 

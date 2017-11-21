@@ -1,10 +1,8 @@
 package nars.term;
 
 import nars.$;
-import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

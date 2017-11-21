@@ -24,18 +24,10 @@
 package jcog.data.graph.hgraph;
 
 import com.google.common.collect.Iterables;
-import jcog.Util;
-import jcog.list.FasterList;
-import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
 
 import java.io.PrintStream;
 import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toList;
-import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  * @author Thomas Wuerthinger
@@ -199,73 +191,41 @@ public class HashGraph<N, E> {
 
 
 
-    public boolean searchDepthFirst(N startingNode, boolean in, boolean out, Search<N, E> tv) {
-        return searchDepthFirst(List.of(startingNode), in, out, tv);
+    public boolean dfs(N startingNode, Search<N, E> tv) {
+        return dfs(List.of(startingNode), tv);
     }
 
-    public boolean searchDepthFirst(Iterable<N> startingNodes, boolean in, boolean out, Search<N, E> tv) {
-        return traverseDFSNodes(Iterables.transform(startingNodes, this::add), in, out, tv);
+    public boolean dfs(Iterable<N> startingNodes, Search<N, E> tv) {
+        return dfsNodes(Iterables.transform(startingNodes, this::add), tv);
     }
 
-    public synchronized boolean traverseDFSNodes(Iterable<Node<N, E>> startingNodes, boolean in, boolean out, Search<N, E> tv) {
+    public boolean dfsNodes(Iterable<Node<N, E>> startingNodes, Search<N, E> search) {
 
-        tv.start();
+        search.start();
         try {
 
             boolean result = false;
 
-            FasterList<BooleanObjectPair<Edge<N, E>>> path = new FasterList();
-
             for (Node n : startingNodes) {
-                if (!traverse(tv, in, out, n, path))
+                if (!search.visit(n))
                     return false;
-                assert (path.isEmpty());
             }
 
             return true;
 
         } finally {
-            tv.stop();
+            search.stop();
         }
     }
 
-    private boolean traverse(Search tv, boolean in, boolean out, Node<N, E> next, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
+//    /** dead simple stack-based depth first search */
+//    protected boolean dfs(Search<N, E> search, Node<N,E> n, ) {
+//        return search.visit(n, (s) ->
+//                search.visit(e.path.getLast().getTwo().other(n)));
+//    }
 
-        assert (in || out);
 
-        if (tv.visited(next))
-            return true; //skip
 
-        if (!tv.visit(next, path))
-            return false;
-
-        if (!searchDepthFirst(tv, next, tv.edges(next, in, out), in, out, path))
-            return false;
-
-        return true;
-    }
-
-    /**
-     * TODO allow the traverser to decide to cut the search entirely, or just proceed no further past the current node
-     */
-    private boolean searchDepthFirst(Search tv, Node<N,E> source, Stream<Edge<N, E>> edges, boolean in, boolean out, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
-
-        FasterList<Edge<N, E>> ee = edges.collect(Collectors.toCollection((Supplier<FasterList<Edge<N, E>>>) FasterList::new));
-        return ee.allSatisfy(e -> {
-
-            Node<N, E> next = e.other(source);
-
-            /** TODO use a stack to eliminate virtual calls */
-
-            path.add(pair(next == e.to, e));
-
-            boolean kontinue = traverse(tv, in, out, next, path);
-
-            path.removeLast();
-
-            return kontinue;
-        });
-    }
 
 //    public boolean hasCycles() {
 //

@@ -1,6 +1,5 @@
 package nars.index.term;
 
-import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.The;
@@ -14,13 +13,11 @@ import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.container.TermContainer;
 import nars.term.transform.VariableNormalization;
-import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 
 import java.util.HashMap;
 
-import static nars.Op.VAR_PATTERN;
 import static nars.Op.concurrent;
 
 /**

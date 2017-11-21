@@ -73,9 +73,8 @@ public class AStarGoalFind<F extends Solution> implements GoalFind {
      */
     F search(Problem<F> problem,  F initialNode, F goalNode) {
 
-        final Comparator<F> SEARCH_COMPARATOR = Comparator.comparingDouble((x)->{
-            return x.g() + problem.cost(x, goalNode);
-        });
+        final Comparator<F> SEARCH_COMPARATOR = Comparator.comparingDouble((x)->
+                x.g() + problem.cost(x, goalNode));
 
         IOpenSet<F> openSet = new OpenSet(SEARCH_COMPARATOR);
         openSet.add(initialNode);

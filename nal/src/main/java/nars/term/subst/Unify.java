@@ -11,9 +11,6 @@ import nars.derive.mutate.Termutator;
 import nars.index.term.NewCompound;
 import nars.term.Term;
 import nars.term.Termlike;
-import nars.term.var.AbstractVariable;
-import nars.term.var.CommonVariable;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -295,6 +292,7 @@ public abstract class Unify extends Versioning implements Subst {
 
                 //return y0.equals(y);// || unify(y0, y);
                 return y0.equals(y);
+
         } else /*if (matchType(x0))*/ {
 
             return xy.tryPut(x, y);

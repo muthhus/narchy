@@ -5,6 +5,8 @@ import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
 
 import java.util.stream.Stream;
 
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
+
 /**
  *  a search process instance
  *
@@ -15,7 +17,9 @@ import java.util.stream.Stream;
  */
 abstract public class Search<N, E> {
 
-    final TraveLog log;
+    public final TraveLog log;
+    public final FasterList<BooleanObjectPair<Edge<N, E>>> path = new FasterList();
+    protected Node<N, E> at = null;
 
     protected Search() {
         this(new TraveLog.IntHashTraveLog());
@@ -26,31 +30,65 @@ abstract public class Search<N, E> {
     }
 
     public void start() {
-
+        path.clear();
+        log.clear();
+        at = null;
     }
 
     public void stop() {
-        log.clear();
+
+
     }
 
-    /**
-     * path should not be modified by callee. it is left exposed for performance
-     * path boolean is true = OUT, false = IN
-     *
-     * TODO combine this with the edges method
-     * return either some edges, no edges, or the cancel (null)
-     */
-    abstract protected boolean visit(Node<N, E> n, FasterList<BooleanObjectPair<Edge<N, E>>> path);
 
 
-    protected final boolean visited(Node<N, E> next) {
-        return !log.visit(next);
-    }
+
 
     /**
      * the (set of) edges provided to be traversed in the next exploration iteration.
-     * subclasses may filter, reorder, or grow  */
-    protected Stream<Edge<N,E>> edges(Node<N, E> n, boolean in, boolean out) {
-        return n.edges(in, out);
+     * subclasses may filter, reorder, or grow.
+     * after each call, the state of this instance will have changed appropriately.
+     * the callback recipient can remain stateless
+     * */
+    protected boolean visit(Node<N, E> current) {
+
+        if (!log.visit(current))
+            return true; //skip
+
+        this.at = current;
+
+        return next(current).allMatch(e -> {
+
+            Node<N, E> next = e.other(this.at);
+
+            if (log.isVisited(next))
+                return true; //pre-skip, avoiding some work
+
+            BooleanObjectPair<Edge<N, E>> move = pair(next == e.to, e);
+
+            //push
+            path.add(move);
+
+            //guard
+            if (!next(move, next))
+                return false;
+
+            //recurse
+            if (!visit(next))
+                return false; //leaves path intact on exit
+
+            //pop
+            this.at = current;
+            path.removeLast();
+
+            return true;
+        });
+
     }
+
+    protected Stream<Edge<N, E>> next(Node<N, E> current) {
+        return current.edges(true, true);
+    }
+
+    abstract protected boolean next(BooleanObjectPair<Edge<N, E>> move, Node<N, E> next);
 }

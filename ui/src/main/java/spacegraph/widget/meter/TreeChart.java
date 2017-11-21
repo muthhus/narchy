@@ -2,9 +2,9 @@ package spacegraph.widget.meter;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
+import jcog.data.map.CustomConcurrentHashMap;
 import jcog.list.CircularArrayList;
 import jcog.list.FasterList;
-import jcog.data.map.CustomConcurrentHashMap;
 import jcog.util.Flip;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;

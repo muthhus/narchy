@@ -8,14 +8,10 @@ import nars.term.subst.Unify;
 import nars.term.transform.Retemporalize;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 
