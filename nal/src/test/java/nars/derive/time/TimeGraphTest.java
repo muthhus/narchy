@@ -1,17 +1,12 @@
 package nars.derive.time;
 
-import astar.model.TimeProblem;
 import com.google.common.collect.Sets;
 import jcog.math.random.XoRoShiRo128PlusRandom;
 import nars.$;
 import nars.Narsese;
 import nars.term.Term;
-import nars.time.Tense;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,8 +15,7 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static astar.model.TimeProblem.ETERNAL;
-import static nars.Op.BELIEF;
+import static nars.time.Tense.ETERNAL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TimeGraphTest {
@@ -34,6 +28,17 @@ class TimeGraphTest {
         A.know($.$safe("((one &&+1 two) ==>+1 (three &&+1 four))"), ETERNAL);
         A.know($.$safe("one"), 1);
         A.know($.$safe("two"), 20);
+    }
+    final TimeGraph B; {
+        //               .believe("(y ==>+3 x)")
+        //                .believe("(y ==>+2 z)")
+        //                .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)
+        //                .mustNotOutput(cycles, "(z ==>-1 x)", BELIEF, Tense.ETERNAL)
+        //                .mustBelieve(cycles, "(x ==>-1 z)", 1.00f, 0.45f)
+        //                .mustNotOutput(cycles, "(x ==>+1 z)", BELIEF, Tense.ETERNAL)
+        B = newTimeGraph(1);
+        B.know($.$safe("(y ==>+3 x)"), ETERNAL);
+        B.know($.$safe("(y ==>+2 z)"), ETERNAL);
     }
 
 //    @BeforeEach
@@ -73,12 +78,18 @@ class TimeGraphTest {
     public void testSimpleConjOfTermsAcrossImpl1() throws Narsese.NarseseException {
 
         assertSolved(A, "(two &&+1 three)",
-                "(two &&+1 three)@20");
+                "(two &&+1 three)@2", "(two &&+1 three)@20");
     }
     @Test
     public void testSimpleConjOfTermsAcrossImpl2() throws Narsese.NarseseException {
+        int nodesBefore = A.nodes().size();
+        long edgesBefore = A.edges().count();
+
         assertSolved(A, "(two &&+- three)",
-                "(two &&+1 three)@20");
+                "(two &&+1 three)@2", "(two &&+1 three)@20");
+        int nodesAfter = A.nodes().size();
+        long edgesAfter = A.edges().count();
+
     }
 
     @Test
@@ -89,18 +100,24 @@ class TimeGraphTest {
     }
 
     @Test public void testImplChain1() throws Narsese.NarseseException {
-//               .believe("(y ==>+3 x)")
-//                .believe("(y ==>+2 z)")
-//                .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)
-//                .mustNotOutput(cycles, "(z ==>-1 x)", BELIEF, Tense.ETERNAL)
-//                .mustBelieve(cycles, "(x ==>-1 z)", 1.00f, 0.45f)
-//                .mustNotOutput(cycles, "(x ==>+1 z)", BELIEF, Tense.ETERNAL)
-        TimeGraph b = newTimeGraph(1);
-        b.know($.$("(y ==>+3 x)"), ETERNAL);
-        b.know($.$("(y ==>+2 z)"), ETERNAL);
-        b.print();
-        assertSolved(b, "(z ==>+- x)", "(z ==>+1 x)@ETE");
-        assertSolved(b, "(x ==>+- z)", "(x ==>-1 z)@ETE");
+        B.print();
+        assertSolved(B, "(z ==>+- x)", "(z ==>+1 x)@ETE");
+    }
+
+    @Test public void testImplChain2() throws Narsese.NarseseException {
+        assertSolved(B, "(x ==>+- z)", "(x ==>-1 z)@ETE");
+    }
+
+
+
+    @Test public void testConjChain1() throws Narsese.NarseseException {
+        /** c is the same event, @6 */
+        TimeGraph cc1 = newTimeGraph(1);
+        cc1.know($.$("(a &&+5 b)"), 1);
+        cc1.know($.$("(b &&+5 c)"), 6);
+        cc1.print();
+        assertSolved(cc1, "(a &&+- c)",
+                "(a &&+10 c)@[1..11]");
     }
 
     private static final String[] implWithConjPredicateSolutions = {
@@ -131,7 +148,7 @@ class TimeGraphTest {
         t.solve($.$safe(inputTerm), new ExpectSolutions(solutions));
     }
 
-    private class ExpectSolutions extends TreeSet<String> implements Predicate<TimeProblem.Event<Term>> {
+    private class ExpectSolutions extends TreeSet<String> implements Predicate<TimeGraph.Event> {
 
         final Supplier<String> errorMsg;
         private final String[] solutions;
@@ -148,7 +165,7 @@ class TimeGraphTest {
         }
 
         @Override
-        public boolean test(TimeProblem.Event<Term> termEvent) {
+        public boolean test(TimeGraph.Event termEvent) {
             add(termEvent.toString());
             return true;
         }

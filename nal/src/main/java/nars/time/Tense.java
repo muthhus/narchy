@@ -16,6 +16,8 @@ public enum Tense  {
      * means "always" in Judgment/Question, but "current" in Goal/Quest
      */
     public static final long ETERNAL = Long.MIN_VALUE;
+    public static final long TIMELESS = Long.MAX_VALUE;
+
     public static final long[] ETERNAL_RANGE = {ETERNAL, ETERNAL};
 
 

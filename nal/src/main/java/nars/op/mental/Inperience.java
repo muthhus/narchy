@@ -11,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.transform.CompoundTransform;
+import nars.term.transform.Retemporalize;
 import nars.truth.Truth;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Sets;
@@ -176,8 +177,7 @@ public class Inperience extends LeakBack {
         if (c == null || !c.op().conceptualizable)
             return 0;
 
-        //return (T) normalizedOrNull(t, Retemporalize.retemporalizeXTERNALToDTERNAL);
-        Term r = c.normalize();
+        Term r = c.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL).normalize();
         if (r == null || !r.op().conceptualizable)
             return 0;
 

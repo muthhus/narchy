@@ -687,13 +687,11 @@ public interface Term extends Termed, Comparable<Termed> {
     }
 
     default boolean eventsWhile(LongObjectPredicate<Term> whileEachEvent, long dt) {
-        return eventsWhile(whileEachEvent, dt, true, false, 0);
+        return eventsWhile(whileEachEvent, dt, true, false, false, 0);
     }
 
-    /**
-     * dont call directly
-     */
-    default boolean eventsWhile(LongObjectPredicate<Term> whileEachEvent, long dt, boolean decomposeConjParallel, boolean decomposeConjDTernal, int level) {
+    default boolean eventsWhile(LongObjectPredicate<Term> whileEachEvent, long dt,
+                boolean decomposeConjParallel, boolean decomposeConjDTernal, boolean decomposeXternal, int level) {
         return whileEachEvent.accept(dt, this);
     }
 

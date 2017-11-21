@@ -591,11 +591,11 @@ public class IO {
                      * (--, (&&, --A, --B, .., --Z) )
                      */
 
-                    if (c.dt() == DTERNAL && c.op() == NEG) {
-                        Term x = c.sub(0);
-                        if (x.op() == CONJ) {
-                            if (Terms.allNegated(x.subterms())) {
-                                compoundAppend(Op.DISJstr, x.subterms(), Term::neg, p);
+                    if (c.op() == NEG) {
+                        Term cx = c.sub(0);
+                        if (cx.op() == CONJ && cx.dt() == DTERNAL) { //for DTERNAL only
+                            if (Terms.allNegated(cx.subterms())) {
+                                compoundAppend(Op.DISJstr, cx.subterms(), Term::neg, p);
                                 return;
                             }
                         }

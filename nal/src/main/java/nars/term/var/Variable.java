@@ -80,7 +80,7 @@ public interface Variable extends Atomic {
             if (common == this || common == y)
                 return true; //no change
 
-            return u.putXY(this, common) && u.putXY((Variable) y, common);
+            return u.putXY(this, common) && (this.equals(y) || u.putXY((Variable) y, common));
         } else {
             return u.matchType(xOp) && u.putXY(this, y);
         }

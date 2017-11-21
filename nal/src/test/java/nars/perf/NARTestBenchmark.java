@@ -71,9 +71,10 @@ public class NARTestBenchmark {
 
     public static void main(String[] args) throws RunnerException {
         perf(NARTestBenchmark.class, (x) -> {
-            x.measurementIterations(2);
+            x.measurementIterations(1);
             x.warmupIterations(1);
-            //x.forks(1);
+            //x.jvmArgs("-Xint");
+            x.forks(1);
             x.threads(1);
             x.addProfiler(StackProfiler2.class);
         });

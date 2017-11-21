@@ -1,18 +1,20 @@
 package nars.derive;
 
-import jcog.sort.Top;
 import nars.Op;
 import nars.Task;
 import nars.control.Derivation;
 import nars.derive.time.TimeGraph;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Bool;
 import nars.term.subst.Subst;
-import nars.truth.Truth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
+
+import static nars.time.Tense.ETERNAL;
+import static nars.time.Tense.TIMELESS;
 
 
 /**
@@ -50,21 +52,22 @@ public class DeriveTime extends TimeGraph {
         this.dur = Math.max(1, Math.round(d.nar.dtDither.floatValue() * d.dur));
 
         long taskStart = task.start();
-        long taskEnd = task.end();
 
-        Term taskTerm = polarizedTaskTerm(task);
-        know(d, taskTerm, taskStart, taskEnd);
+        //Term taskTerm = polarizedTaskTerm(task);
+        know(d, task, taskStart);
 
 
-        if (belief != null && !belief.equals(task)) {
+        if (!d.single && belief != null && !belief.equals(task)) {
 
             long beliefStart = belief.start();
-            long beliefEnd = belief.end();
 
-            Term beliefTerm = polarizedTaskTerm(belief);
-            know(d, beliefTerm, beliefStart, beliefEnd);
+            //Term beliefTerm = polarizedTaskTerm(belief);
+            know(d, belief, beliefStart);
 
+        } else if (!task.term().equals(d.beliefTerm)) {
+            know(d, d.beliefTerm, TIMELESS);
         }
+
     }
 
     public Term solve(Term pattern) {
@@ -77,6 +80,7 @@ public class DeriveTime extends TimeGraph {
         long[] occ = d.concOcc;
 
         Term tt = task.term();
+        Term bb = d.beliefTerm;
 
 
         if (d.single) {
@@ -96,33 +100,25 @@ public class DeriveTime extends TimeGraph {
         }
 
 
-        Top<Event<Term>> top = new Top<>((f) -> {
-            Term t = f.id;
-            float score = 0;
+        Event[] best = new Event[1];
 
-            if (!t.hasXternal())
-                score++;
-
-            long start = f.start();
-            if (start != TIMELESS) {
-                score++;
-                if (start != ETERNAL)
-                    score++;
-            }
-
-            //return score > 0 ? score * (1f/(1+t.volume())) : 0; //example heuristic
-            return score;
-        });
-        final int[] remain = {16};
+        final int[] remain = {8};
 
 //        try {
 
 
-            solve(pattern, (solution) -> {
-                //TODO test equivalence with task and belief terms and occurrences, and continue iterating up to a max # of tries if it produced a useless equivalent result
-                top.accept(solution);
-                return remain[0]-- > 0;
-            });
+        solve(pattern, (solution) -> {
+
+            //TODO test equivalence with task and belief terms and occurrences, and continue iterating up to a max # of tries if it produced a useless equivalent result
+
+            Event current = best[0];
+            if (current == null) {
+                best[0] = current;
+            } else {
+                best[0] = merge(best[0], solution);
+            }
+            return remain[0]-- > 0;
+        });
 
 
 //        } catch (Throwable t) {
@@ -130,7 +126,7 @@ public class DeriveTime extends TimeGraph {
 //            return null;
 //        }
 
-        Event<Term> event = top.the;
+        Event event = best[0];
         if (event == null)
             return null;
 
@@ -212,29 +208,65 @@ public class DeriveTime extends TimeGraph {
         return st;
     }
 
-    /**
-     * negate if negated, for precision in discriminating positive/negative
-     */
-    static Term polarizedTaskTerm(Task t) {
-        Truth tt = t.truth();
-        return t.term().negIf(tt != null && tt.isNegative());
+    private Event merge(Event a, Event b) {
+        Term at = a.id;
+        Term bt = b.id;
+        if (at.hasXternal() && !bt.hasXternal())
+            return b;
+
+        long astart = a.start();
+        long bstart = b.start();
+        if (astart == TIMELESS && bstart!=TIMELESS)
+            return b;
+        if (astart == ETERNAL && bstart!=ETERNAL)
+            return b;
+
+        //heuristic: prefer more specific "dense" temporal events rather than sprawling sparse run-on-sentences
+        float aSpec = ((float)at.volume())/at.dtRange();
+        float bSpec = ((float)bt.volume())/bt.dtRange();
+        if (bSpec > aSpec)
+            return b;
+        else
+            return a;
+
+//        Term tRoot = at.root();
+//        if (!at.equals(tt)) {
+//            score++;
+//            if (!tRoot.equals(tt.root()))
+//                score++;
+//        }
+//
+//        if (!at.equals(bb)) {
+//            score++;
+//            if (!tRoot.equals(bb.root()))
+//                score++;
+//        }
+
     }
+
+//    /**
+//     * negate if negated, for precision in discriminating positive/negative
+//     */
+//    static Term polarizedTaskTerm(Task t) {
+//        Truth tt = t.truth();
+//        return t.term().negIf(tt != null && tt.isNegative());
+//    }
 
     @Override
     protected Random random() {
         return d.random;
     }
 
-    void know(Subst d, Term x, long start, long end) {
+    void know(Subst d, Termed x, long start) {
 
 
-        know(x, start, end);
+        know(x, start);
 
         if (knowTransformed) {
             Term y = //x.transform(d);
-                    x.eval(d);
+                    x.term().eval(d);
             if (y != null && !y.equals(x) && !(y instanceof Bool)) {
-                know(y, start, end);
+                know(y, start);
             }
         }
     }

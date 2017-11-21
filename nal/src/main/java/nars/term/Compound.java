@@ -44,7 +44,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -93,7 +92,7 @@ public interface Compound extends Term, IPair, TermContainer {
     TermContainer subterms();
 
     @Override
-    default int hashCodeSubTerms(){
+    default int hashCodeSubTerms() {
         return subterms().hashCode();
     }
 
@@ -223,7 +222,6 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-
     @Override
             /*@NotNull*/
     default ByteList structureKey(ByteArrayList appendTo) {
@@ -246,7 +244,7 @@ public interface Compound extends Term, IPair, TermContainer {
     /**
      * unification matching entry point (default implementation)
      *
-     * @param y     compound to match against (the instance executing this method is considered 'x')
+     * @param y compound to match against (the instance executing this method is considered 'x')
      * @param u the substitution context holding the match state
      * @return whether match was successful or not, possibly having modified subst regardless
      */
@@ -376,10 +374,9 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-
     @Override
     default int intify(IntObjectToIntFunction<Term> reduce, int v) {
-        return subterms().intify(reduce, Term.super.intify(reduce, v) );
+        return subterms().intify(reduce, Term.super.intify(reduce, v));
     }
 
     @Override
@@ -662,39 +659,30 @@ public interface Compound extends Term, IPair, TermContainer {
 
     /* collects any contained events within a conjunction*/
     @Override
-    default boolean eventsWhile(LongObjectPredicate<Term> events, long offset, boolean decomposeConjParallel, boolean decomposeConjDTernal, int level) {
+    default boolean eventsWhile(LongObjectPredicate<Term> events, long offset, boolean decomposeConjParallel, boolean decomposeConjDTernal, boolean decomposeXternal, int level) {
         Op o = op();
         if (o == CONJ) {
             int dt = dt();
 
-            if ((decomposeConjDTernal || dt != DTERNAL) && (decomposeConjParallel || dt != 0) && dt != XTERNAL) {
+            if ((decomposeConjDTernal || dt != DTERNAL) && (decomposeConjParallel || dt != 0) && (decomposeXternal || dt != XTERNAL)) {
 
-                if (dt == DTERNAL)
+                if (dt == DTERNAL || dt == XTERNAL)
                     dt = 0;
 
                 TermContainer tt = subterms();
                 int s = tt.subs();
                 long t = offset;
 
-                //iterate from earliest to latest
                 boolean reverse = dt < 0;
-                if (!reverse) {
-                    for (int i = 0; i < s; i++) {
-                        Term st = tt.sub(i);
-                        if (!st.eventsWhile(events, t, decomposeConjParallel, decomposeConjDTernal, level + 1)) //recurse
-                            return false;
-                        t += dt + st.dtRange();
-                    }
-                } else {
-                    for (int i = s - 1; i >= 0; i--) {
-                        Term st = tt.sub(i);
-                        if (!st.eventsWhile(events, t, decomposeConjParallel, decomposeConjDTernal, level + 1)) //recurse
-                            return false;
-                        t += -dt + st.dtRange();
-                    }
-                }
 
-                //if (dt!=0 || level==0) //allow dt==0 case to proceed below and add the (&| event as well as its components (which are precisely known)
+                for (int i = !reverse ? 0 : s - 1; (!reverse && i < s) || (reverse && i >= 0); i += (!reverse ? +1 : -1)) {
+                    Term st = tt.sub(i);
+                    if (!st.eventsWhile(events, t,
+                            decomposeConjParallel, decomposeConjDTernal, decomposeXternal,
+                            level + 1)) //recurse
+                        return false;
+                    t += (!reverse ? +1 : -1) * dt + st.dtRange();
+                }
                 return true;
             }
 
@@ -919,8 +907,6 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-
-
     @Override
     default Term conceptual() {
 
@@ -938,7 +924,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         if (!term.op().conceptualizable)
             return Null;
-            //!Task.validConceptTerm(term, true)
+        //!Task.validConceptTerm(term, true)
 
 
         return term;

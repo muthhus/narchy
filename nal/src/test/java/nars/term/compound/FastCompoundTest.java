@@ -2,9 +2,11 @@ package nars.term.compound;
 
 import nars.Narsese;
 import nars.term.Compound;
+import nars.term.Term;
 import org.junit.jupiter.api.Test;
 
 import static nars.$.$;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -22,11 +24,18 @@ public class FastCompoundTest {
     public void test1() throws Narsese.NarseseException {
         assertEquivalent("(((x)))");
         assertEquivalent("((x))");
-        assertEquivalent("(((P-->S)))");
+    }
+    @Test
+    public void test2() throws Narsese.NarseseException {
+
         assertEquivalent("(P-->S)");
+        assertEquivalent("(((P-->S)))");
         assertEquivalent("((P-->S))");
         assertEquivalent("(x,y)");
         assertEquivalent("(x,(P-->S))");
+    }
+    @Test
+    public void test2b() throws Narsese.NarseseException {
         assertEquivalent("((P-->S),x)");
 
         assertEquivalent("(((P-->S)),x)");
@@ -38,7 +47,7 @@ public class FastCompoundTest {
     }
 
     @Test
-    public void test2() throws Narsese.NarseseException {
+    public void testComplex() throws Narsese.NarseseException {
         assertEquivalent("(&&,(MedicalCode-->MedicalIntangible),(MedicalIntangible-->#1),(SuperficialAnatomy-->#1),label(MedicalCode,MedicalCode),label(MedicalIntangible,MedicalIntangible),label(SuperficialAnatomy,SuperficialAnatomy))");
     }
 
@@ -61,13 +70,23 @@ public class FastCompoundTest {
         int s = f.subterms().subs();
         assertEquals(c.subterms().subs(), s);
 
+        assertEquals(c.hashCode(), f.hashCode());
 
         for (int i = 0; i < s; i++) {
-            assertEquals(c.subterms().sub(i), f.subterms().sub(i));
-            assertEquals(f.subterms().sub(i), c.subterms().sub(i));
-            assertEquals(-f.subterms().sub(i).compareTo( c.subterms().sub(i) ),
-                         c.subterms().sub(i).compareTo( f.subterms().sub(i) ) );
+            Term ci = c.subterms().sub(i);
+            Term fi = f.subterms().sub(i);
+            assertEquals(ci, fi);
+            assertEquals(fi, ci);
+            assertEquals(fi.subterms(), ci.subterms());
+            assertEquals(ci.subterms(), fi.subterms());
+            assertEquals(fi.hashCode(), ci.hashCode());
+            assertEquals(-fi.compareTo(ci),
+                         ci.compareTo(fi) );
         }
+
+        assertArrayEquals(c.subterms().arrayShared(), f.subterms().arrayShared());
+        assertEquals(c.subterms().hashCodeSubTerms(), f.subterms().hashCodeSubTerms());
+        assertEquals(c.subterms().hashCode(), f.subterms().hashCode());
 
         assertEquals(c.structure(), f.structure());
         assertEquals(c.complexity(), f.complexity());

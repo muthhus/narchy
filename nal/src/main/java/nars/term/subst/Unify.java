@@ -293,8 +293,8 @@ public abstract class Unify extends Versioning implements Subst {
 //                return true;
 //            else
 
-                return y0.equals(y);// || unify(y0, y);
-                //return unify(y, y0); //cross-over
+                //return y0.equals(y);// || unify(y0, y);
+                return y==y0;
         } else /*if (matchType(x0))*/ {
 
             return xy.tryPut(x, y);

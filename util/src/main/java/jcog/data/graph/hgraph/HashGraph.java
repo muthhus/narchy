@@ -24,13 +24,17 @@
 package jcog.data.graph.hgraph;
 
 import com.google.common.collect.Iterables;
+import jcog.Util;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
 
 import java.io.PrintStream;
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
@@ -195,15 +199,15 @@ public class HashGraph<N, E> {
 
 
 
-    public void traverseDFS(N startingNode, boolean in, boolean out, Search<N, E> tv) {
-        traverseDFS(List.of(startingNode), in, out, tv);
+    public boolean searchDepthFirst(N startingNode, boolean in, boolean out, Search<N, E> tv) {
+        return searchDepthFirst(List.of(startingNode), in, out, tv);
     }
 
-    public void traverseDFS(Iterable<N> startingNodes, boolean in, boolean out, Search<N, E> tv) {
-        traverseDFSNodes(Iterables.transform(startingNodes, this::add), in, out, tv);
+    public boolean searchDepthFirst(Iterable<N> startingNodes, boolean in, boolean out, Search<N, E> tv) {
+        return traverseDFSNodes(Iterables.transform(startingNodes, this::add), in, out, tv);
     }
 
-    public synchronized void traverseDFSNodes(Iterable<Node<N, E>> startingNodes, boolean in, boolean out, Search<N, E> tv) {
+    public synchronized boolean traverseDFSNodes(Iterable<Node<N, E>> startingNodes, boolean in, boolean out, Search<N, E> tv) {
 
         tv.start();
         try {
@@ -214,9 +218,11 @@ public class HashGraph<N, E> {
 
             for (Node n : startingNodes) {
                 if (!traverse(tv, in, out, n, path))
-                    break;
+                    return false;
                 assert (path.isEmpty());
             }
+
+            return true;
 
         } finally {
             tv.stop();
@@ -233,7 +239,7 @@ public class HashGraph<N, E> {
         if (!tv.visit(next, path))
             return false;
 
-        if (!traverseDFS(tv, next, tv.edges(next, in, out), in, out, path))
+        if (!searchDepthFirst(tv, next, tv.edges(next, in, out), in, out, path))
             return false;
 
         return true;
@@ -242,9 +248,10 @@ public class HashGraph<N, E> {
     /**
      * TODO allow the traverser to decide to cut the search entirely, or just proceed no further past the current node
      */
-    private boolean traverseDFS(Search tv, Node<N,E> source, Stream<Edge<N, E>> edges, boolean in, boolean out, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
+    private boolean searchDepthFirst(Search tv, Node<N,E> source, Stream<Edge<N, E>> edges, boolean in, boolean out, FasterList<BooleanObjectPair<Edge<N, E>>> path) {
 
-        return edges.allMatch(e -> {
+        return edges.collect(Collectors.toCollection((Supplier<FasterList<Edge<N,E>>>) FasterList::new))
+            .allSatisfy(e -> {
 
             Node<N, E> next = e.other(source);
 

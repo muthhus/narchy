@@ -1628,7 +1628,7 @@ public enum Op {
                     subject.eventsWhile((w, t) -> {
                         se.add(PrimitiveTuples.pair(w, t));
                         return true;
-                    }, 0, true, true, 0);
+                    }, 0, true, true, false, 0);
 
                     MutableSet<LongObjectPair<Term>> pe = new UnifiedSet();
 
@@ -1647,7 +1647,7 @@ public enum Op {
                             pe.add(x);
                         }
                         return true;
-                    }, edt, true, true, 0);
+                    }, edt, true, true, false, 0);
 
                     if (contradiction)
                         return Null;
