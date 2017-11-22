@@ -48,31 +48,8 @@ abstract public class Surface {
             bounds = r;
     }
 
-    public AspectAlign align(Align align, float aspectRatio) {
-        return new AspectAlign(this, align, aspectRatio);
-    }
-
-    public enum Align {
-
-
-        None,
-
-        /**
-         * 1:1, centered
-         */
-        Center,
-
-        /**
-         * 1:1, x=left, y=center
-         */
-        LeftCenter,
-
-        /**
-         * 1:1, x=right, y=center
-         */
-        RightCenter
-
-        //TODO etc...
+    public AspectAlign align(AspectAlign.Align align, float aspectRatio) {
+        return new AspectAlign(this, aspectRatio, align, 1f);
     }
 
 

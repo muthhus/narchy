@@ -5,7 +5,7 @@ import spacegraph.layout.Layout;
 
 import java.util.function.Consumer;
 
-import static spacegraph.Surface.Align.Center;
+import static spacegraph.AspectAlign.Align.Center;
 
 public class AspectAlign extends Layout {
 
@@ -19,20 +19,28 @@ public class AspectAlign extends Layout {
      */
     protected float aspect;
 
+    /**
+     * relative size adjustment uniformly applied to x,y
+     * after the 100% aspect size has been calculated
+     */
+    protected float scale;
+
     public final Surface the;
 
     public AspectAlign(Surface the) {
-        this(the, Center, 1f);
+        this(the, 1f, Center, 1f);
     }
+
 
     public AspectAlign(Surface the, Align a, float w, float h) {
-        this(the, a, h / w);
+        this(the, h / w, a, 1f);
     }
 
-    public AspectAlign(Surface the, Align a, float aspect) {
+    public AspectAlign(Surface the, float aspect, Align a, float scale) {
         this.the = the;
         this.aspect = aspect;
         this.align = a;
+        this.scale = scale;
     }
 
     @Override
@@ -54,32 +62,35 @@ public class AspectAlign extends Layout {
 //
 //        float sx, sy;
 
-        float vw = w(); //TODO factorin scale
-        float vh = h();
-        float tw = vw;
-        float th = vh;
+        //local size
+        final float w = w();
+        final float h = h();
+
+        //target's relative size being computed
+        float tw = w;
+        float th = h;
+
         float aspect = this.aspect;
         if (aspect == aspect /* not NaN */) {
 
-            if (vh > vw) {
-                if (aspect > 1) {
+            if (h >= w) {
+                //if (aspect >= 1) {
                     //taller than wide
-                    tw = vw/aspect;
-                    th = vh;
-                } else {
-                    //wider than tall
-                    tw = vw;
-                    th = vh*aspect;
-                }
+                    tw = w;
+                    th = w * aspect;
+//                } else {
+//                    //wider than tall
+//                    tw = vw;
+//                    th = vh*aspect;
+//                }
             } else {
-                if (aspect > 1) {
-                    //taller than wide
-                    tw = vw;
-                    th = vh/aspect;
-                } else {
-                    tw = vw*aspect;
-                    th = vh;
-                }
+//                if (aspect >= 1) {
+                    th = h;
+                    tw = h/aspect;
+//                } else {
+//                    tw = vw*aspect;
+//                    th = vh;
+//                }
             }
 //            if (vh / vw > aspect) {
 //                //wider, shrink y
@@ -92,19 +103,33 @@ public class AspectAlign extends Layout {
 //            }
         }
 
-        float tx = x(), ty = y();
+        tw *= scale;
+        th *= scale;
+
+        float tx, ty;
         switch (align) {
 
             //TODO others
 
             case Center:
                 //HACK TODO figure this out
-                tx += (vw - tw) / 2f;
-                ty += (vh - th) / 2f;
+                tx = x() + (w - tw) / 2f;
+                ty = y() + (h - th) / 2f;
+                break;
+
+            case RightTop:
+                tx = bounds.max.x - tw;
+                ty = bounds.max.y - th;
+                break;
+            case LeftTop:
+                tx = bounds.min.x;
+                ty = bounds.max.y - th;
                 break;
 
             case None:
             default:
+                tx = x();
+                ty = y();
                 break;
 
         }
@@ -130,5 +155,28 @@ public class AspectAlign extends Layout {
     @Override
     public void forEach(Consumer<Surface> o) {
         o.accept(the);
+    }
+
+    public enum Align {
+
+
+        None,
+
+        /**
+         * 1:1, centered
+         */
+        Center,
+
+        /**
+         * 1:1, x=left, y=center
+         */
+        LeftCenter,
+
+        /**
+         * 1:1, x=right, y=center
+         */
+        RightTop, LeftTop
+
+        //TODO etc...
     }
 }

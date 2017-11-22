@@ -7,6 +7,7 @@ import jcog.event.On;
 import jcog.event.Topic;
 import jcog.tree.rtree.rect.RectFloat2D;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
 import spacegraph.math.v3;
@@ -14,7 +15,11 @@ import spacegraph.phys.util.AnimVector2f;
 import spacegraph.phys.util.AnimVector3f;
 import spacegraph.phys.util.Animated;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
+
+import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 /**
  * orthographic widget adapter. something which goes on the "face" of a HUD ("head"s-up-display)
@@ -59,6 +64,28 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     @Override
     public GL2 gl() {
         return window.gl();
+    }
+
+    final Map<String,Pair<Object,Runnable>> singletons = new HashMap();
+
+
+    @Override public synchronized void the(String key, Object added, Runnable onRemove) {
+
+        Pair<Object,Runnable> removed = null;
+        if (added == null) {
+            assert(onRemove==null);
+            removed = singletons.remove(key);
+        } else {
+            removed = singletons.put(key, pair(added, onRemove));
+        }
+
+        if (removed!=null) {
+            if (removed.getOne() == added) {
+                //same
+            } else {
+                removed.getTwo().run();
+            }
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package spacegraph;
 
 import com.jogamp.opengl.GL2;
 import jcog.event.On;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -23,4 +24,14 @@ public interface SurfaceRoot {
     On onLog(Consumer o);
 
     GL2 gl();
+
+    /**
+     * singleton table.
+     * can provide special handling for lifecycle states of stored entries
+     * by providing a callback which will be invoked when the value is replaced.
+     *
+     * if 'added' == null, it will attempt to remove any set value.
+     */
+    void the(String key, @Nullable Object added, @Nullable Runnable onRemove);
+
 }

@@ -7,13 +7,6 @@ import java.util.function.Consumer;
 
 public class Scale extends Layout {
 
-    /**
-     * not used unless aspect ratio is set to non-NaN value
-     */
-
-    /**
-     * height/width target aspect ratio; if aspect is NaN, no adjustment applied
-     */
     protected float scale;
 
     public final Surface the;

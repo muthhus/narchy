@@ -25,7 +25,7 @@ public class PushButton extends AbstractButton {
     public PushButton(String s) {
         super();
         label = new Label(s);
-        labelWrapper = new AspectAlign(label, Align.Center, 1);
+        labelWrapper = new AspectAlign(label, 1f, AspectAlign.Align.Center, 1);
     }
 
     public PushButton(Consumer<PushButton> onClick) {

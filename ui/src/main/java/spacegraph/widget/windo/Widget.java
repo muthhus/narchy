@@ -5,6 +5,7 @@ import com.jogamp.opengl.GL2;
 import jcog.Texts;
 import jcog.Util;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.AspectAlign;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
@@ -13,14 +14,15 @@ import spacegraph.layout.Stacking;
 import spacegraph.layout.VSplit;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
-import spacegraph.widget.text.Label;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
 import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.console.TextEdit;
+import spacegraph.widget.meta.MetaFrame;
 import spacegraph.widget.slider.BaseSlider;
 import spacegraph.widget.slider.FloatSlider;
 import spacegraph.widget.slider.XYSlider;
+import spacegraph.widget.text.Label;
 
 import java.io.IOException;
 
@@ -127,7 +129,9 @@ abstract public class Widget extends Stacking {
     protected boolean onTouching(Finger finger, v2 hitPoint, short[] buttons) {
         if (finger != null && finger.clickReleased(2)) { //released right button
 
-            root().zoom(cx(), cy(), w(), h());
+
+            new MetaFrame(this);
+
 
         }
         return super.onTouching(finger, hitPoint, buttons);
@@ -183,7 +187,7 @@ abstract public class Widget extends Stacking {
                         new FloatSlider("knob slider", 0.75f, 0, 1).draw(BaseSlider.Knob)
                 ),
                 new XYSlider(),
-                new DummyConsole().align(Align.Center, 1f)
+                new DummyConsole().align(AspectAlign.Align.Center, 1f)
             );
     }
 
