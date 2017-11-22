@@ -6,7 +6,6 @@ import nars.$;
 import nars.NAR;
 import nars.term.Term;
 import nars.term.Termed;
-import org.jetbrains.annotations.NotNull;
 
 public class NARService extends Services.AbstractService<NAR> implements Termed {
 

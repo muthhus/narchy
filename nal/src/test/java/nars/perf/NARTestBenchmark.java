@@ -1,9 +1,12 @@
 package nars.perf;
 
-import nars.The;
+import jcog.Util;
 import nars.nal.nal1.NAL1Test;
-import nars.term.compound.FastCompound;
+import nars.nal.nal6.NAL6Test;
 import org.junit.jupiter.api.Disabled;
+import org.junit.platform.engine.DiscoverySelector;
+import org.junit.platform.engine.discovery.ClassSelector;
+import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
@@ -12,8 +15,9 @@ import org.junit.platform.launcher.listeners.LoggingListener;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
 
+import java.util.function.Function;
+
 import static nars.perf.JmhBenchmark.perf;
-import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
 
 /**
  * Created by me on 4/24/17.
@@ -22,9 +26,10 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass
 @Disabled
 public class NARTestBenchmark {
 
-    static final Class testclass =
-            NAL1Test.class;
-            //NAL6Test.class;
+    static final Class[] tests = {
+            NAL1Test.class,
+            NAL6Test.class
+    };
 
     /**
      * CONTROL
@@ -33,25 +38,28 @@ public class NARTestBenchmark {
     @BenchmarkMode(Mode.AverageTime)
     @Fork(0)
     public void testX() {
-        junit(testclass);
+        junit(tests);
     }
 
 
-    @Benchmark
-    @BenchmarkMode(Mode.AverageTime)
-    @Fork(1)
-    public void testY() {
-        The.Compound.the = FastCompound.FAST_COMPOUND_BUILDER;
-//        Param.SynchronousExecution_Max_CycleTime = 0.0001f;
+//    @Benchmark
+//    @BenchmarkMode(Mode.AverageTime)
+//    @Fork(1)
+//    public void testY() {
+//        The.Compound.the = FastCompound.FAST_COMPOUND_BUILDER;
+////        Param.SynchronousExecution_Max_CycleTime = 0.0001f;
+//
+//        junit(testclass);
+//    }
 
-        junit(testclass);
-    }
-
-    static void junit(Class testclass) {
+    static void junit(Class... testClasses) {
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
                 .selectors(
                         //selectPackage("com.example.mytests"),
-                        selectClass(testclass)
+                        (ClassSelector[])Util.map(
+                                (Function<Class, ClassSelector>) DiscoverySelectors::selectClass,
+                                new ClassSelector[testClasses.length], testClasses)
+
                         //selectClass(FastCompoundNAL1Test.class)
                 )
                 // .filters( includeClassNamePatterns(".*Tests")  )

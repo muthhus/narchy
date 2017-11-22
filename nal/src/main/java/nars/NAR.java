@@ -102,10 +102,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * table of values influencing reasoner heuristics
      */
     public final FasterList<Cause> causes = new FasterList(256);
-    /**
-     * optional actions whose potential invocation is heuristically controlled
-     */
-    public final Focus focus;
 
     protected final Random random;
 
@@ -129,9 +125,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         this.time = time;
         time.clear();
 
-        this.focus = new Focus(this);
         this.exe = exe;
-
 
         self = new AtomicReference<>(null);
         setSelf(Param.randomSelf());
@@ -957,8 +951,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final void cycle() {
 
         time.cycle(this);
-
-        focus.update(this);
 
         exe.cycle();
 

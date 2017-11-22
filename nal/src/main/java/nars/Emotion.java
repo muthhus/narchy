@@ -1,13 +1,14 @@
 package nars;
 
-import com.netflix.servo.monitor.*;
+import com.netflix.servo.monitor.BasicCounter;
+import com.netflix.servo.monitor.Counter;
+import com.netflix.servo.monitor.StepCounter;
 import jcog.meter.event.BufferedFloatGuage;
 import nars.concept.Concept;
 import nars.control.MetaGoal;
 import nars.term.Compound;
 import nars.util.ConcurrentMonitorRegistry;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

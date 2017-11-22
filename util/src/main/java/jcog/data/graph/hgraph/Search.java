@@ -1,12 +1,10 @@
 package jcog.data.graph.hgraph;
 
-import jcog.Util;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
 
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toCollection;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**

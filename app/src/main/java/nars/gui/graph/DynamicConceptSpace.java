@@ -360,10 +360,7 @@ public class DynamicConceptSpace extends DynamicListSpace<Concept, ConceptWidget
 //                    0.3f + 0.2f * p,
 //                    0.9f, conceptWidget.shapeColor);
 
-            if (!showLabel.get())
-                cw.front.hide();
-            else
-                cw.front.scale(1f, 1f);
+            cw.front.visible(showLabel.get());
 
 //            Concept c = cw.id;
 //            if (c != null) {

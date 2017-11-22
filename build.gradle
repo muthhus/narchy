@@ -7,7 +7,7 @@ buildscript {
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
 //        classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.0'
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0-M1'
         classpath 'ca.cutterslade.gradle:gradle-dependency-analyze:1.2.1'
 
     }
@@ -38,8 +38,8 @@ subprojects {
 //    apply plugin: 'com.kncept.junit5.reporter'
     apply plugin: 'org.junit.platform.gradle.plugin'
 
-    sourceCompatibility = 1.9
-    targetCompatibility = 1.9
+    sourceCompatibility = 1.10
+    targetCompatibility = 1.10
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
         options.incremental = true // one flag, and things will get MUCH faster

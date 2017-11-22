@@ -2,9 +2,6 @@ package nars.control;
 
 import jcog.exe.Can;
 import nars.NAR;
-import nars.task.ITask;
-import nars.task.NativeTask;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,26 +35,6 @@ abstract public class Causable extends NARService {
     @Override
     public String toString() {
         return can.toString();
-    }
-
-    @Override
-    protected void start(NAR nar) {
-        super.start(nar);
-
-        synchronized (nar.focus) {
-            nar.focus.add(this);
-        }
-
-    }
-
-    @Override
-    protected void stop(NAR nar) {
-
-        synchronized (nar.focus) {
-            nar.focus.remove(this);
-        }
-
-        super.stop(nar);
     }
 
     /**

@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Services;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
@@ -15,6 +16,7 @@ import nars.control.Traffic;
 import nars.exe.Exec;
 import nars.term.atom.Atomic;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -25,7 +27,9 @@ import java.util.function.Consumer;
  */
 public class Focus {
 
-    /** temporal granularity unit, in seconds */
+    /**
+     * temporal granularity unit, in seconds
+     */
     public static final float JIFFY = 0.001f;
 
     private final Bag<Causable, ProcLink> can;
@@ -193,10 +197,23 @@ public class Focus {
         this.revaluator =
                 new DefaultRevaluator();
         //new RBMRevaluator(nar.random());
+
+        n.serviceAddOrRemove.on((xa) -> {
+            Services.Service<NAR> x = xa.getOne();
+            if (x instanceof Causable) {
+                Causable c = (Causable) x;
+                if (xa.getTwo())
+                    add(c);
+                else
+                    remove(c);
+            }
+        });
+
+        n.onCycle(this::update);
     }
 
     public void work(int tasks) {
-        can.sample(tasks, (Consumer<ProcLink>)(ProcLink::run));
+        can.sample(tasks, (Consumer<ProcLink>) (ProcLink::run));
     }
 
     final DescriptiveStatistics values = new DescriptiveStatistics(64);
@@ -225,11 +242,11 @@ public class Focus {
 //            }
     }
 
-    public void add(Causable c) {
+    private final void add(Causable c) {
         this.can.put(new ProcLink(c, 0));
     }
 
-    public void remove(Causable c) {
+    private final void remove(Causable c) {
         this.can.remove(c);
     }
 

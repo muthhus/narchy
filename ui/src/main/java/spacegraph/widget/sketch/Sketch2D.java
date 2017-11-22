@@ -3,9 +3,6 @@ package spacegraph.widget.sketch;
 import spacegraph.SpaceGraph;
 import spacegraph.widget.windo.Widget;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.min;
-
 /**
  * gesture-aware general-purpose 2d graphical input widgets
  */

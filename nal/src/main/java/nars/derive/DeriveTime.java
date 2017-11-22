@@ -201,7 +201,7 @@ public class DeriveTime extends TimeGraph {
         long[] occ = d.concOcc;
         boolean te = task.isEternal();
         //couldnt solve the start time, so inherit from task or belief as appropriate
-        if (!te && (belief != null && !belief.isEternal())) {
+        if (!d.single && !te && (belief != null && !belief.isEternal())) {
 
             //STRICT
             {
@@ -223,7 +223,7 @@ public class DeriveTime extends TimeGraph {
                 d.concConfFactor *= joint.factor;
             }
 
-        } else if (!te || belief == null || belief.isEternal()) {
+        } else if (d.single || !te || belief == null || belief.isEternal()) {
             occ[0] = task.start();
             occ[1] = task.end();
         } else {

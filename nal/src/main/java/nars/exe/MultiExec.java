@@ -3,10 +3,7 @@ package nars.exe;
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import com.conversantmedia.util.concurrent.MultithreadConcurrentQueue;
 import jcog.exe.AffinityExecutor;
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.task.ITask;
 import nars.task.NativeTask;
 import org.eclipse.collections.api.set.primitive.LongSet;
@@ -38,12 +35,14 @@ public class MultiExec extends UniExec {
     final List<Thread> activeThreads = $.newArrayList();
     LongSet activeThreadIds = new LongHashSet();
     LongPredicate isActiveThreadId = (x)->false;
+    private Focus focus;
 
     public MultiExec(int concepts, int threads, int qSize) {
         super(concepts);
 
         this.q = new DisruptorBlockingQueue<>(qSize);
         this.threads = threads;
+
 
          exe = new AffinityExecutor() {
                 @Override
@@ -88,7 +87,7 @@ public class MultiExec extends UniExec {
             }
 
             try {
-                nar.focus.work((int)(WORK_BATCH_SIZE*(1f-load)));
+                focus.work((int)(WORK_BATCH_SIZE*(1f-load)));
             } catch (Throwable e) {
                 if (Param.DEBUG) {
                     throw e;
@@ -102,6 +101,7 @@ public class MultiExec extends UniExec {
 
     @Override
     public synchronized void start(NAR nar) {
+        this.focus = new Focus(nar);
         super.start(nar);
         exe.execute(this::runner, threads);
     }

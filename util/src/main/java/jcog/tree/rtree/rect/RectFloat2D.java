@@ -159,11 +159,14 @@ public class RectFloat2D implements HyperRegion<Float2D>, Comparable<RectFloat2D
         if (!(o instanceof RectFloat2D)) return false;
 
         RectFloat2D rect2D = (RectFloat2D) o;
+        return equals(rect2D.min.x, rect2D.min.y, rect2D.max.x, rect2D.max.y, epsilon);
+    }
 
-        return Util.equals(min.x, rect2D.min.x, epsilon) &&
-                Util.equals(max.x, rect2D.max.x, epsilon) &&
-                Util.equals(min.y, rect2D.min.y, epsilon) &&
-                Util.equals(max.y, rect2D.max.y, epsilon);
+    public boolean equals(float minX, float minY, float maxX, float maxY, float epsilon) {
+        return Util.equals(min.x, minX, epsilon) &&
+                Util.equals(max.x, maxX, epsilon) &&
+                Util.equals(min.y, minY, epsilon) &&
+                Util.equals(max.y, maxY, epsilon);
     }
 
     @Override

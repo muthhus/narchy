@@ -4,6 +4,7 @@ import jcog.list.FasterList;
 import jcog.math.random.XoRoShiRo128PlusRandom;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
+import nars.control.Causable;
 import nars.control.Deriver;
 import nars.exe.Exec;
 import nars.exe.UniExec;
@@ -35,7 +36,8 @@ public class NARS {
         NAR n = new NAR(index.get(), exe.get(), time, rng.get(), concepts.get());
         init(n);
         derivers.forEach(d -> d.apply(n));
-        after.forEach(x -> x.accept(n));
+        n.time.synch(n);
+        postInit.forEach(x -> x.accept(n));
         n.time.synch(n);
         return n;
     }
@@ -62,7 +64,7 @@ public class NARS {
     /**
      * applied in sequence as final step before returning the NAR
      */
-    protected final List<Consumer<NAR>> after = new FasterList(0);
+    protected final List<Consumer<NAR>> postInit = new FasterList(0);
 
 
     public NARS index(@NotNull TermIndex concepts) {
@@ -170,7 +172,7 @@ public class NARS {
     }
 
     public NARS nal(int nal) {
-        after.add((x) -> x.nal(nal));
+        postInit.add((x) -> x.nal(nal));
         return this;
     }
 
@@ -219,7 +221,7 @@ public class NARS {
      * adds a post-processing step before ready NAR is returned
      */
     public NARS then(Consumer<NAR> n) {
-        after.add(n);
+        postInit.add(n);
         return this;
     }
 
@@ -246,6 +248,15 @@ public class NARS {
             if (threadSafe)
                 index = () -> new CaffeineIndex(64 * 1024);
 
+            postInit.add((n) -> {
+                //HACK dummy Focus - useful only for single threaded testing.  to be moved to a special Testing executor
+                Causable[] can = n.services().filter(Causable.class::isInstance).toArray(Causable[]::new);
+                n.onCycle(() -> {
+                    int WORK_PER_CYCLE = 2;
+                    for (Causable c : can)
+                        c.run(n, WORK_PER_CYCLE);
+                });
+            });
         }
 
         @Override
@@ -265,12 +276,7 @@ public class NARS {
 
             nar.defaultWants();
 
-            nar.onCycle(() -> {
 
-                int WORK_PER_CYCLE = 2;
-                nar.focus.work(WORK_PER_CYCLE);
-
-            });
         }
     }
 

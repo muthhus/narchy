@@ -9,8 +9,8 @@ import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
 import spacegraph.render.Draw;
-import spacegraph.widget.windo.Windo;
 import spacegraph.widget.windo.Widget;
+import spacegraph.widget.windo.Windo;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -192,7 +192,7 @@ public class ZoomOrtho extends Ortho {
                 } else {
                     if (bd[0] == PAN_BUTTON) {
 
-                        cam.add(-dx / scale.x, +dy / scale.y);
+                        cam.add(-dx / scale.x, +dy / scale.x);
                         panStart[0] = mx;
                         panStart[1] = my;
 

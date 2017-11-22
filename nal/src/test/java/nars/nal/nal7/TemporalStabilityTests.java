@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  */
 public class TemporalStabilityTests {
 
-    static final int CYCLES = 500;
+    static final int CYCLES = 2500;
 
 //    static {
 //        Param.DEBUG = true;

@@ -16,7 +16,6 @@
 
 package jcog.data.graph;
 
-import jcog.math.Permutations;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**

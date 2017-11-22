@@ -10,7 +10,6 @@ import nars.experiment.mario.LevelScene;
 import nars.experiment.mario.MarioComponent;
 import nars.experiment.mario.Scene;
 import nars.experiment.mario.sprites.Mario;
-import nars.op.Implier;
 import nars.op.video.PixelBag;
 import nars.util.signal.CameraSensor;
 

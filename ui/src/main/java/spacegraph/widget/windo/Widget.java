@@ -153,18 +153,6 @@ abstract public class Widget extends Stacking {
 
     }
 
-    public static class ScaleDebugLabel extends Label {
-
-        public ScaleDebugLabel() {
-            super();
-        }
-
-        @Override
-        public void paint(GL2 gl) {
-            set(scale.toString());
-            super.paint(gl);
-        }
-    }
 
     public static Layout widgetDemo() {
         return

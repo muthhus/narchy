@@ -27,6 +27,7 @@ class TimeGraphTest {
         A.know($.$safe("((one &&+1 two) ==>+1 (three &&+1 four))"), ETERNAL);
         A.know($.$safe("one"), 1);
         A.know($.$safe("two"), 20);
+        A.print();
     }
     final TimeGraph B; {
         //               .believe("(y ==>+3 x)")

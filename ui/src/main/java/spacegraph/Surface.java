@@ -18,6 +18,7 @@ abstract public class Surface {
 
     /** smallest recognizable dimension change */
     public static final float EPSILON = 0.0001f;
+    private boolean visible = true;
 
     public float x() {
         return bounds.min.x;
@@ -35,18 +36,28 @@ abstract public class Surface {
         return 0.5f * (bounds.min.y + bounds.max.y);
     }
 
-    @Override
-    public String toString() {
-        return super.toString() + "{" +
-                ", bounds=" + bounds +
-                "scale=" + scale +
-                '}';
+//    @Override
+//    public String toString() {
+//        return super.toString() + "{" +
+//                ", bounds=" + bounds +
+//                "scale=" + scale +
+//                '}';
+//    }
+
+    public Surface pos(RectFloat2D r) {
+        RectFloat2D b = this.bounds;
+        if (b == null || !b.equals(r, Surface.EPSILON))
+            this.bounds = r;
+        return this;
+    }
+    public Surface pos(float x1, float y1, float x2, float y2) {
+        RectFloat2D b = this.bounds;
+        if (b ==null || !b.equals(x1, y1, x2, y2, Surface.EPSILON)) {
+            pos(new RectFloat2D(x1, y1, x2, y2));
+        }
+        return this;
     }
 
-    public void pos(RectFloat2D r) {
-        if (bounds == null || !bounds.equals(r, Surface.EPSILON))
-            bounds = r;
-    }
 
     public AspectAlign align(AspectAlign.Align align, float aspectRatio) {
         return new AspectAlign(this, aspectRatio, align, 1f);
@@ -56,7 +67,7 @@ abstract public class Surface {
     /**
      * scale can remain the unit 1 vector, normally
      */
-    public v2 scale = new v2(1, 1); //v2.ONE;
+//    public v2 scale = new v2(1, 1); //v2.ONE;
     public RectFloat2D bounds;
     public Surface parent;
 
@@ -76,16 +87,12 @@ abstract public class Surface {
     /**
      * null parent means it is the root surface
      */
-    public void start(@Nullable Surface parent) {
-        synchronized (this) {
-            this.parent = parent;
-        }
+    public synchronized void start(@Nullable Surface parent) {
+        this.parent = parent;
     }
 
-    public void stop() {
-        synchronized (this) {
-            parent = null;
-        }
+    public synchronized void stop() {
+        parent = null;
     }
 
     public void layout() {
@@ -140,22 +147,11 @@ abstract public class Surface {
 
     public final void render(GL2 gl) {
 
-        float sx = scale.x;
-        if (sx != sx)
-            return; //NaN = invisible
-
-
-//        gl.glPushMatrix();
-
-//        if (tx!=0 || ty!=0)
-//            gl.glTranslatef(tx, ty,  0);
-
-//        if (sx!=1 || sy!=1)
-//            gl.glScalef(sx, sy, 1f);
+        if (!visible)
+            return;
 
         paint(gl);
 
-//        gl.glPopMatrix();
     }
 
 
@@ -164,15 +160,6 @@ abstract public class Surface {
     }
 
 
-    public Surface scale(float x, float y) {
-        scale.set(x, y);
-        return this;
-    }
-
-    public Surface pos(float x1, float y1, float x2, float y2) {
-        pos(new RectFloat2D(x1, y1, x2, y2));
-        return this;
-    }
 
     public boolean onKey(KeyEvent e, boolean pressed) {
         return false;
@@ -185,13 +172,16 @@ abstract public class Surface {
         return false;
     }
 
-    public float radius() {
-        return Math.max(scale.x, scale.y);
-    }
-
     public Surface hide() {
-        scale(Float.NaN, Float.NaN);
+        visible = false;
+        return this;
+    }
+    public Surface show() {
+        visible = true;
         return this;
     }
 
+    public Surface visible(boolean b) {
+        return b ? show() : hide();
+    }
 }

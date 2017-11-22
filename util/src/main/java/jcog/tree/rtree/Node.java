@@ -20,9 +20,7 @@ package jcog.tree.rtree;
  * #L%
  */
 
-import com.google.common.primitives.Ints;
 import jcog.list.FasterList;
-import jcog.math.Range;
 import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.Nullable;
 

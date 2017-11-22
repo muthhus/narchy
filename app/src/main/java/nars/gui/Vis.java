@@ -17,13 +17,13 @@ import spacegraph.audio.WaveCapture;
 import spacegraph.layout.Grid;
 import spacegraph.layout.Stacking;
 import spacegraph.math.Color3f;
-import spacegraph.widget.text.Label;
-import spacegraph.widget.text.LabeledPane;
 import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.console.TextEdit;
 import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meter.Plot2D;
 import spacegraph.widget.slider.FloatSlider;
+import spacegraph.widget.text.Label;
+import spacegraph.widget.text.LabeledPane;
 
 import java.util.List;
 import java.util.Objects;

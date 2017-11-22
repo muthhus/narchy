@@ -78,7 +78,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
         label = new Label(this.term.toString());
         label.color.a(0.5f);
-        label.scale(0.5f, 0.5f);
+        //label.scale(0.5f, 0.5f);
 
         set(label);
 

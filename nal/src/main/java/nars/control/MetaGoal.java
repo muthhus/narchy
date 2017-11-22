@@ -2,12 +2,10 @@ package nars.control;
 
 import com.google.common.collect.TreeBasedTable;
 import jcog.Util;
-import jcog.learn.deep.RBM;
 import jcog.learn.ql.HaiQAgent;
 import jcog.list.FasterList;
 import jcog.math.FloatFirstOrderDifference;
 import jcog.math.FloatNormalized;
-import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.NAgent;
@@ -19,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.Random;
 
 import static jcog.Texts.n4;
 

@@ -15,6 +15,9 @@ package jcog;
 
 import com.google.common.annotations.GwtIncompatible;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import jcog.event.ListTopic;
+import jcog.event.Topic;
+import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +28,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
+
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  * Modifications to guava's ServiceManager
@@ -85,6 +90,7 @@ public class Services<X, C>  {
 
     private final C id;
     private final Executor exe;
+    public final Topic<ObjectBooleanPair<Service<C>>> serviceAddOrRemove = new ListTopic<>();
 
 //    abstract public static class SubService<C,X> extends Services<C,X> implements Service<C> {
 //
@@ -116,15 +122,14 @@ public class Services<X, C>  {
     }
 
     public interface Service<C> {
-        void start(C x, Executor exe);
 
         ServiceState state();
 
-        void stop(C x, Executor exe, @Nullable Runnable afterDelete);
+        void start(Services<?,C> x, Executor exe);
 
-        default void delete() {
+        void stop(Services<?,C> x, Executor exe, @Nullable Runnable afterDelete);
 
-        }
+        default void delete() {        }
 
     }
 
@@ -148,14 +153,15 @@ public class Services<X, C>  {
         }
 
         @Override
-        public final void start(C x, Executor exe) {
+        public final void start(Services<?,C> x, Executor exe) {
             if (compareAndSet(ServiceState.Off, ServiceState.OffToOn)) {
                 exe.execute(() -> {
                     try {
-                        start(x);
+                        start(x.id);
                         assert (
                                 compareAndSet(ServiceState.OffToOn, ServiceState.On)
                         );
+                        x.serviceAddOrRemove.emit(pair(AbstractService.this, true));
                     } catch (Throwable e) {
                         e.printStackTrace();
                         delete();
@@ -170,11 +176,12 @@ public class Services<X, C>  {
         }
 
         @Override
-        public final void stop(C x, Executor exe, @Nullable Runnable afterDelete) {
+        public final void stop(Services<?,C> x, Executor exe, @Nullable Runnable afterDelete) {
             if (compareAndSet(ServiceState.On, ServiceState.OnToOff)) {
                 exe.execute(() -> {
                     try {
-                        stop(x);
+                        x.serviceAddOrRemove.emit(pair(this, false));
+                        stop(x.id);
                         assert (
                                 compareAndSet(ServiceState.OnToOff, ServiceState.Off)
                         );
@@ -252,12 +259,10 @@ public class Services<X, C>  {
 
         if (removed != null) {
             //if start, then start after the previous stopped
-            removed.stop(id, exe, start ? ()->{
-                s.start(id, exe);
-            } : null);
+            removed.stop(this, exe, start ? ()-> s.start(this, exe) : null);
         } else {
             if (start)
-                s.start(id, exe);
+                s.start(this, exe);
         }
 
 
@@ -268,7 +273,7 @@ public class Services<X, C>  {
     public void remove(X serviceID) {
         Service<C> s = services.get(serviceID);
         if (s!=null) {
-            s.stop(this.id, exe, null);
+            s.stop(this, exe, null);
         }
     }
 
@@ -281,13 +286,13 @@ public class Services<X, C>  {
     @CanIgnoreReturnValue
     public Services<X,C> stop() {
         for (Service<C> service : services.values()) {
-            service.stop(id, exe, null);
+            service.stop(this, exe, null);
         }
         return this;
     }
 
     public void delete() {
-        services.values().removeIf(x -> { x.stop(id, exe, ()->{}); return true; });
+        services.values().removeIf(x -> { x.stop(this, exe, ()->{}); return true; });
     }
 
 

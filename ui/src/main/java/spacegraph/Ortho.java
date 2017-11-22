@@ -26,6 +26,7 @@ import static org.eclipse.collections.impl.tuple.Tuples.pair;
  */
 public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyListener, MouseListener {
 
+    protected final AnimVector2f scale;
     boolean visible;
 
     final Finger finger;

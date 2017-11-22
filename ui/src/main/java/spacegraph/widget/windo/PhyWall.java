@@ -200,13 +200,14 @@ public class PhyWall extends Wall {
         }
 
         @Override
-        public void pos(RectFloat2D r) {
+        public Surface pos(RectFloat2D r) {
             RectFloat2D b = this.bounds;
             super.pos(r);
             if (bounds != b) { //if different
                 layout();
                 commitPhysics();
             }
+            return null;
         }
 
         @Override

@@ -94,7 +94,13 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             template = template.dt((int) (end-start));
         }
 
-        template = template.temporalize(Retemporalize.retemporalizeXTERNALToDTERNAL);
+        Retemporalize retemporalizeMode =
+                template.subterms().OR(Term::isTemporal) ?
+                    Retemporalize.retemporalizeXTERNALToZero  //dont unnecessarily attach DTERNALs to temporals
+                        :
+                    Retemporalize.retemporalizeXTERNALToDTERNAL //dont unnecessarily create temporals where DTERNAL could remain
+        ;
+        template = template.temporalize(retemporalizeMode);
         if (template == null)
             return null;
 

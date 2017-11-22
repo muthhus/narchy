@@ -1,30 +1,19 @@
 package nars.exe;
 
 import jcog.Util;
-import jcog.constraint.continuous.exceptions.InternalSolverError;
 import jcog.event.On;
-import jcog.exe.Can;
-import jcog.exe.Schedulearn;
-import jcog.learn.deep.RBM;
 import jcog.list.FasterList;
-import jcog.math.RecycledSummaryStatistics;
 import nars.NAR;
-import nars.NARLoop;
 import nars.Param;
 import nars.concept.Concept;
 import nars.control.Activate;
 import nars.control.Cause;
-import nars.control.MetaGoal;
-import nars.control.Traffic;
 import nars.task.ITask;
-import nars.task.NativeTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Predicate;

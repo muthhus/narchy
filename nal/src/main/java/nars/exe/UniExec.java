@@ -5,7 +5,6 @@ import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
-import nars.Param;
 import nars.concept.Concept;
 import nars.control.Activate;
 import nars.task.ITask;

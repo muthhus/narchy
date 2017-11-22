@@ -113,10 +113,11 @@ public class Wall extends Stacking {
         }
 
         /** affects internal from external action */
-        @Override public void pos(RectFloat2D r) {
+        @Override public Surface pos(RectFloat2D r) {
             cbounds.set(r);
             //super.pos(r);
             layout();
+            return null;
         }
 
         /** affects external from internal action */
