@@ -14,7 +14,7 @@ import spacegraph.render.JoglPhysics;
 import spacegraph.render.JoglSpace;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
-import spacegraph.widget.Label;
+import spacegraph.widget.text.Label;
 
 import java.util.List;
 import java.util.function.Consumer;

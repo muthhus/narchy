@@ -7,7 +7,6 @@ import jcog.list.FasterList;
 import jcog.math.FloatParam;
 import jcog.pri.mix.control.MixContRL;
 import nars.control.*;
-import nars.derive.PrediTrie;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.gui.graph.EdgeDirected;
@@ -46,7 +45,7 @@ import spacegraph.render.Draw;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
 import spacegraph.widget.console.ConsoleTerminal;
-import spacegraph.widget.meta.WindowButton;
+import spacegraph.widget.meta.WindowToggleButton;
 import spacegraph.widget.meter.BitmapMatrixView;
 import spacegraph.widget.meter.Plot2D;
 import spacegraph.widget.meter.TreeChart;
@@ -646,8 +645,8 @@ abstract public class NAgentX extends NAgent {
                             ).forEach(Task::delete);
                         });
                     }),
-                    new WindowButton("top", () -> (new ConsoleTerminal(new nars.TextUI(nar).session(20f)))),
-                    new WindowButton("concept graph", () -> {
+                    new WindowToggleButton("top", () -> (new ConsoleTerminal(new nars.TextUI(nar).session(20f)))),
+                    new WindowToggleButton("concept graph", () -> {
                         SpaceGraph s = new SpaceGraph<>(
                                 new SimpleConceptGraph1(nar,
                                         64, 12)
@@ -663,18 +662,18 @@ abstract public class NAgentX extends NAgent {
                     //new WindowButton("prompt", () -> Vis.newInputEditor(), 300, 60)
 
                     //Vis.beliefCharts(16, nar, a.reward),
-                    new WindowButton("agent", () -> (a)),
+                    new WindowToggleButton("agent", () -> (a)),
                     col(
-                            new WindowButton("actionShort", () -> Vis.beliefCharts(a.nar.dur() * 16, a.actions.keySet(), a.nar)),
-                            new WindowButton("actionMed", () -> Vis.beliefCharts(a.nar.dur() * 64, a.actions.keySet(), a.nar)),
-                            new WindowButton("actionLong", () -> Vis.beliefCharts(a.nar.dur() * 256, a.actions.keySet(), a.nar))
+                            new WindowToggleButton("actionShort", () -> Vis.beliefCharts(a.nar.dur() * 16, a.actions.keySet(), a.nar)),
+                            new WindowToggleButton("actionMed", () -> Vis.beliefCharts(a.nar.dur() * 64, a.actions.keySet(), a.nar)),
+                            new WindowToggleButton("actionLong", () -> Vis.beliefCharts(a.nar.dur() * 256, a.actions.keySet(), a.nar))
                     ),
                     //new WindowButton("predict", () -> Vis.beliefCharts(200, a.predictors, a.nar)),
                     //"agentActions",
                     //"agentPredict",
 
                     a instanceof NAgentX ?
-                            new WindowButton("vision", () -> grid(((NAgentX) a).cam.stream().map(cs ->
+                            new WindowToggleButton("vision", () -> grid(((NAgentX) a).cam.stream().map(cs ->
                                     new AspectAlign(new CameraSensorView(cs, a), Surface.Align.Center, cs.width, cs.height))
                                 .toArray(Surface[]::new))
                             ) : grid()

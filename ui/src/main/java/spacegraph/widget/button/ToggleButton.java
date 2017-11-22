@@ -1,7 +1,6 @@
 package spacegraph.widget.button;
 
 import org.jetbrains.annotations.Nullable;
-import spacegraph.widget.AbstractButton;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

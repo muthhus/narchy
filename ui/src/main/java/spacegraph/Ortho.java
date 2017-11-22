@@ -57,6 +57,11 @@ public class Ortho extends Surface implements SurfaceRoot, WindowListener, KeyLi
     }
 
     @Override
+    public GL2 gl() {
+        return window.gl();
+    }
+
+    @Override
     public On onLog(Consumer o) {
         return logs.on(o);
     }

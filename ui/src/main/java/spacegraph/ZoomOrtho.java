@@ -9,7 +9,7 @@ import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
 import spacegraph.render.Draw;
-import spacegraph.widget.Windo;
+import spacegraph.widget.windo.Windo;
 import spacegraph.widget.windo.Widget;
 
 import java.util.Arrays;
@@ -39,9 +39,13 @@ public class ZoomOrtho extends Ortho {
     final HUD hud = new HUD();
     private int pmx, pmy;
 
+    transient Surface initContent;
+
     public ZoomOrtho(Surface content) {
         super();
-        setSurface(content);
+
+        initContent = content;
+        this.surface = hud;
 
 
 //        this.surface = new Stacking(this.surface, overlay);
@@ -66,8 +70,23 @@ public class ZoomOrtho extends Ortho {
     }
 
     @Override
+    public synchronized void start(SpaceGraph s) {
+
+        setSurface(new Surface() { //dummy HACK
+            @Override
+            protected void paint(GL2 gl) {
+            }
+        });
+
+        super.start(s);
+
+        //call this after the window is ready in case the surface wants early access to the GL context
+        hud.set(initContent); initContent = null;
+    }
+
+    @Override
     public void setSurface(Surface content) {
-        this.surface = hud.set(content);
+        hud.set(content);
     }
 
 //    @Override

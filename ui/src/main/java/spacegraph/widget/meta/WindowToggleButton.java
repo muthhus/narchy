@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 /** toggle button, which when actived, creates a window, and when inactivated destroys it
  *  TODO window width, height parameters
  * */
-public class WindowButton extends CheckBox implements ToggleButton.ToggleAction, WindowListener {
+public class WindowToggleButton extends CheckBox implements ToggleButton.ToggleAction, WindowListener {
 
     private final Supplier spacer;
 
@@ -22,16 +22,16 @@ public class WindowButton extends CheckBox implements ToggleButton.ToggleAction,
 
     SpaceGraph space;
 
-    public WindowButton(String text, Object o) {
+    public WindowToggleButton(String text, Object o) {
         this(text, ()->o);
     }
 
-    public WindowButton(String text, Supplier spacer) {
+    public WindowToggleButton(String text, Supplier spacer) {
         super(text);
         this.spacer = spacer;
         on(this);
     }
-    public WindowButton(String text, Supplier spacer, int w, int h) {
+    public WindowToggleButton(String text, Supplier spacer, int w, int h) {
         this(text, spacer);
         this.width = w; this.height = h;
     }

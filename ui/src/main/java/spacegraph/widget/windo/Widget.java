@@ -13,7 +13,7 @@ import spacegraph.layout.Stacking;
 import spacegraph.layout.VSplit;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
-import spacegraph.widget.Label;
+import spacegraph.widget.text.Label;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
 import spacegraph.widget.console.ConsoleTerminal;

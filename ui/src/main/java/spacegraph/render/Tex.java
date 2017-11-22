@@ -1,4 +1,4 @@
-package spacegraph.video;
+package spacegraph.render;
 
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLProfile;
@@ -6,7 +6,6 @@ import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
 import jcog.tree.rtree.rect.RectFloat2D;
 import spacegraph.Surface;
-import spacegraph.render.Draw;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -27,7 +26,7 @@ public class Tex {
 
 
     final AtomicBoolean textureUpdated = new AtomicBoolean(false);
-    private GLProfile profile;
+    public GLProfile profile;
     private TextureData nextData;
     public int[] array;
     private IntBuffer buffer;
@@ -40,11 +39,11 @@ public class Tex {
     public void paint(GL2 gl, RectFloat2D bounds, float repeatScale) {
 
 
-        if (profile == null)
+        if (profile == null) {
             profile = gl.getGLProfile();
+        }
 
-        if (textureUpdated.compareAndSet(true, false)) {
-
+        if (nextData!=null && textureUpdated.compareAndSet(true, false)) {
 
             if (texture == null) {
                 texture = TextureIO.newTexture(gl, nextData);
@@ -64,28 +63,23 @@ public class Tex {
 
     public void update(BufferedImage iimage) {
 
-        if (profile == null)
-            return;
-
-
-        if (nextData == null || this.src!=iimage) {
-
-            update(((DataBufferInt)(iimage.getRaster().getDataBuffer())).getData(), iimage.getWidth(), iimage.getHeight());
-
+        if (nextData == null || this.src != iimage) {
+            update(((DataBufferInt) (iimage.getRaster().getDataBuffer())).getData(), iimage.getWidth(), iimage.getHeight());
         }
 
         textureUpdated.set(true);
     }
+
     public void update(int[] iimage, int width, int height) {
+
+        this.src = iimage;
+        this.array = iimage;
+        textureUpdated.set(true);
 
         if (profile == null)
             return;
 
-
-        if (nextData == null || this.src!=iimage) {
-
-            this.src = iimage;
-            array = iimage;
+        if (nextData == null || this.src != iimage) {
 
             //buffer = IntBuffer.allocate(pixels);
             buffer = IntBuffer.wrap(array);
@@ -100,7 +94,6 @@ public class Tex {
             );
         }
 
-        textureUpdated.set(true);
     }
 
     public Surface view() {

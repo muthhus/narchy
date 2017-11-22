@@ -1,4 +1,4 @@
-package spacegraph.widget;
+package spacegraph.widget.tab;
 
 import jcog.list.FasterList;
 import spacegraph.Surface;

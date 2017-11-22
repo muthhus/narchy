@@ -4,8 +4,7 @@ import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.AspectAlign;
 import spacegraph.render.Draw;
-import spacegraph.widget.AbstractButton;
-import spacegraph.widget.Label;
+import spacegraph.widget.text.Label;
 
 import java.util.function.Consumer;
 

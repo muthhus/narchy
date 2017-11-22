@@ -1,4 +1,4 @@
-package spacegraph.space;
+package spacegraph.widget.meta;
 
 import jcog.Texts;
 import jcog.list.FasterList;
@@ -7,8 +7,10 @@ import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
-import spacegraph.widget.Label;
-import spacegraph.widget.LabeledPane;
+import spacegraph.space.CrosshairSurface;
+import spacegraph.space.Cuboid;
+import spacegraph.widget.text.Label;
+import spacegraph.widget.text.LabeledPane;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

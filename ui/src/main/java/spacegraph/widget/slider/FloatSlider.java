@@ -7,7 +7,7 @@ import jcog.math.FloatParam;
 import jcog.math.FloatSupplier;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
-import spacegraph.widget.Label;
+import spacegraph.widget.text.Label;
 
 /**
  * Created by me on 11/18/16.

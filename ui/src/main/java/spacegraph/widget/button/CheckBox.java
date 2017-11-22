@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import spacegraph.render.Draw;
-import spacegraph.widget.Label;
+import spacegraph.widget.text.Label;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

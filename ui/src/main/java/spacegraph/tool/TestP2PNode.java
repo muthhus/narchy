@@ -1,4 +1,4 @@
-package spacegraph.space;
+package spacegraph.tool;
 
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
@@ -8,6 +8,8 @@ import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.DistanceConstraint;
 import spacegraph.phys.shape.SimpleBoxShape;
+import spacegraph.space.Cuboid;
+import spacegraph.space.ListSpace;
 import spacegraph.widget.slider.XYSlider;
 
 /**

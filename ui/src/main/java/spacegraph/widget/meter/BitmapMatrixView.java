@@ -5,11 +5,10 @@ import jcog.math.FloatSupplier;
 import jcog.math.tensor.ArrayTensor;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import spacegraph.Surface;
-import spacegraph.video.Tex;
+import spacegraph.render.Tex;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.awt.image.WritableRaster;
 import java.util.function.Supplier;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
@@ -24,13 +23,12 @@ public class BitmapMatrixView extends Surface {
     private final int h;
     private final ViewFunction2D view;
     private BufferedImage buf;
-    private int[] rasInt;
-    private WritableRaster raster;
-    private final Tex tex;
+    private int[] pix;
+    private final Tex bmp;
 
     @Override
     protected void paint(GL2 gl) {
-        tex.paint(gl, bounds);
+        bmp.paint(gl, bounds);
     }
 
 //
@@ -93,7 +91,7 @@ public class BitmapMatrixView extends Surface {
         this.w = w;
         this.h = h;
         this.view = view != null ? view : ((ViewFunction2D) this);
-        this.tex = new Tex();
+        this.bmp = new Tex();
     }
 
 //    public static final ViewFunction1D bipolar1 = (x, gl) -> {
@@ -179,21 +177,20 @@ public class BitmapMatrixView extends Surface {
     public void update() {
         if (buf == null) {
             buf = new BufferedImage(w, h, TYPE_INT_ARGB);
-            raster = buf.getRaster();
-            this.rasInt = ((DataBufferInt)raster.getDataBuffer()).getData();
+            this.pix = ((DataBufferInt)buf.getRaster().getDataBuffer()).getData();
         }
 
-        int i = 0;
-        int[] rr = this.rasInt;
+        int[] pix = this.pix;
         final int h = this.h;
         final int w = this.w;
+        int i = 0;
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                rr[i++] = view.update(x, y);
+                pix[i++] = view.update(x, y);
             }
         }
 
-        tex.update(buf);
+        bmp.update(buf);
     }
 
 

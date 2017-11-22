@@ -1,4 +1,4 @@
-package spacegraph.widget;
+package spacegraph.widget.text;
 
 import spacegraph.Surface;
 import spacegraph.layout.VSplit;

@@ -1,4 +1,4 @@
-package spacegraph.widget;
+package spacegraph.widget.windo;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
@@ -12,13 +12,11 @@ import spacegraph.input.Fingering;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
 import spacegraph.widget.button.PushButton;
-import spacegraph.widget.windo.Wall;
-import spacegraph.widget.windo.Widget;
 
 import java.util.Map;
 
 import static spacegraph.layout.Grid.grid;
-import static spacegraph.widget.Windo.DragEdit.MOVE;
+import static spacegraph.widget.windo.Windo.DragEdit.MOVE;
 
 /**
  * draggable panel

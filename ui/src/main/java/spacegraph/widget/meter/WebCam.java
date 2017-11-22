@@ -1,4 +1,4 @@
-package spacegraph.video;
+package spacegraph.widget.meter;
 
 import boofcv.struct.image.InterleavedU8;
 import com.github.sarxos.webcam.Webcam;
@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.render.Tex;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

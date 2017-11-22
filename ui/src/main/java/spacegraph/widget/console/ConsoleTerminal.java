@@ -16,7 +16,7 @@ import org.eclipse.collections.api.set.primitive.ImmutableCharSet;
 import org.eclipse.collections.impl.factory.primitive.CharSets;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
-import spacegraph.video.Tex;
+import spacegraph.render.Tex;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;

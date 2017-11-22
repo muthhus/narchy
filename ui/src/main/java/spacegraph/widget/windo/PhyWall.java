@@ -22,7 +22,6 @@ import spacegraph.phys.collision.broad.DbvtBroadphase;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.SimpleBoxShape;
 import spacegraph.space.Cuboid;
-import spacegraph.widget.Windo;
 import spacegraph.widget.button.PushButton;
 
 import java.util.Collection;

@@ -60,6 +60,8 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
 
         public static TimeSpan the(long dt) {
             assert (dt != TIMELESS);
+            assert (dt != XTERNAL);
+//            assert (dt != ETERNAL);
 
             if (dt == 0) {
                 return TS_ZERO;
@@ -316,17 +318,6 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
 
     }
 
-//    public void know(Term t, long start, float w) {
-//        if (start != ETERNAL) {
-//            long end = t.dtRange() + start;
-//            if (end == start) {
-//                add(new TimeProblem.Event(t, start));
-//            } else {
-//                link(new TimeProblem.Event(t, start), r(end - start, w), new TimeProblem.Event(t, end));
-//            }
-//        }
-//
-//    }
 
     void solveDT(Term x, Map<Term, LongSet> absolute, Predicate<Event> each) {
         assert (x.dt() == XTERNAL);

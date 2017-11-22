@@ -7,7 +7,6 @@ import jcog.tree.rtree.rect.RectFloat2D;
 import spacegraph.Scale;
 import spacegraph.Surface;
 import spacegraph.layout.Stacking;
-import spacegraph.widget.Windo;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

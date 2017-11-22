@@ -2,7 +2,6 @@ package spacegraph.render;
 
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
-import spacegraph.video.Tex;
 
 /**
  * from: http://www.howtobuildsoftware.com/index.php/how-do/bQ9/opengl-glsl-how-can-i-render-an-infinite-2d-grid-in-glsl

@@ -1,10 +1,11 @@
-package spacegraph.widget;
+package spacegraph.widget.button;
 
 import com.jogamp.opengl.GL2;
 import jcog.tree.rtree.rect.RectFloat2D;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.input.Finger;
 import spacegraph.render.Draw;
+import spacegraph.widget.text.Label;
 import spacegraph.widget.windo.Widget;
 
 /**

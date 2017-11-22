@@ -40,7 +40,7 @@ public class ReflectionSurface<X> extends Grid {
 
     private static void collectServices(Services x, List<Surface> l) {
         x.stream().forEach((s) -> {
-            l.add(new WindowButton(s.toString(), () -> {
+            l.add(new WindowToggleButton(s.toString(), () -> {
                 return new ReflectionSurface(s);
             }));
         });

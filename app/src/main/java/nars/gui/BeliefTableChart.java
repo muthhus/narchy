@@ -14,7 +14,7 @@ import nars.truth.TruthWave;
 import nars.truth.Truthed;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
-import spacegraph.widget.Label;
+import spacegraph.widget.text.Label;
 import spacegraph.widget.windo.Widget;
 
 import java.util.concurrent.atomic.AtomicBoolean;

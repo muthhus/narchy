@@ -1,5 +1,6 @@
 package spacegraph;
 
+import com.jogamp.opengl.GL2;
 import jcog.event.On;
 
 import java.util.function.Consumer;
@@ -20,4 +21,6 @@ public interface SurfaceRoot {
 
     /** receives notifications, logs, etc */
     On onLog(Consumer o);
+
+    GL2 gl();
 }
