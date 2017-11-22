@@ -38,6 +38,7 @@ import static nars.time.Tense.*;
 public class DeriveTime extends TimeGraph {
 
     private final static Logger logger = LoggerFactory.getLogger(DeriveTime.class);
+    public static final int TEMPORAL_ITERATIONS = 16;
 
     private final Task task, belief;
 
@@ -122,7 +123,7 @@ public class DeriveTime extends TimeGraph {
 
         Event[] best = new Event[1];
 
-        final int[] triesRemain = {8};
+        final int[] triesRemain = {TEMPORAL_ITERATIONS};
 
 //        try {
 

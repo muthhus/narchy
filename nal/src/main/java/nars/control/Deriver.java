@@ -25,7 +25,7 @@ public class Deriver extends NARService {
 
     private final Consumer<Predicate<Activate>> source;
     private float minPremisesPerConcept = 1;
-    private float maxPremisesPerConcept = 5;
+    private float maxPremisesPerConcept = 3;
 
     public static Function<NAR, Deriver> deriver(Function<NAR, PremiseRuleSet> rules) {
         return (nar) ->

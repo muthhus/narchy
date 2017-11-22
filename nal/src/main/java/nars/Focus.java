@@ -16,10 +16,10 @@ import nars.control.Traffic;
 import nars.exe.Exec;
 import nars.term.atom.Atomic;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -216,21 +216,23 @@ public class Focus {
         can.sample(tasks, (Consumer<ProcLink>) (ProcLink::run));
     }
 
-    final DescriptiveStatistics values = new DescriptiveStatistics(64);
+    final AtomicBoolean busy = new AtomicBoolean(false);
 
-    public synchronized void update(NAR nar) {
-        can.commit(c -> {
-            Causable cc = c.get();
-            float v = cc.value() * 0.1f;
-            values.addValue(v);
-            float nextPri = (float) Util.lerp(v, values.getMin(), values.getMax());
-            c.priSet(nextPri);
-        });
+    public void update(NAR nar) {
+        if (!busy.compareAndSet(false, true))
+            return;
 
-//        System.out.println(values);
-//        can.print();
+        try {
 
-        revaluator.update(nar.causes, nar.want);
+            can.commit(c -> c.priSet(c.get().value() * 0.5f));
+
+//            System.out.println(values);
+//            can.print();
+
+            revaluator.update(nar.causes, nar.want);
+        } finally {
+            busy.set(false);
+        }
 
         //sched.
 //              try {

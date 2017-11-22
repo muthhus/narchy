@@ -3,6 +3,7 @@ package nars.derive.time;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import jcog.Util;
 import jcog.data.graph.hgraph.Edge;
 import jcog.data.graph.hgraph.HashGraph;
@@ -15,6 +16,7 @@ import nars.Task;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.exception.MathArithmeticException;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.api.tuple.primitive.BooleanObjectPair;
@@ -98,7 +100,10 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
     /**
      * index by term
      */
-    public final Multimap<Term, Event> byTerm = HashMultimap.create();
+    public final Multimap<Term, Event> byTerm = MultimapBuilder
+                    .linkedHashKeys()
+                    .linkedHashSetValues() //maybe use TreeSet values and order them by best first
+                    .build();
 
 
     public TimeGraph() {
@@ -323,10 +328,9 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
         assert (x.dt() == XTERNAL);
 
         TermContainer xx = x.subterms();
-        for (Event r : byTerm.get(x.root())) {
+        for (Event r : new FasterList<Event>(byTerm.get(x.root())) /* copied */) {
             if (r.absolute()) {
-                Term rt = r.id;
-                if (rt.subterms().equals(xx)) {
+                if (r.id.subterms().equals(xx)) {
                     if (!each.test(r))
                         return false; //done
                 }
@@ -345,7 +349,9 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
             List<Event> sources = $.newArrayList(ns);
             sources.addAll(aTerms);
             sources.addAll(bTerms);
-            Collections.shuffle(sources, random()); //TODO use (possibly biased) roulette sampling
+            Collections.shuffle(sources, random());
+            //TODO use (possibly biased) roulette sampling
+            //TODO maybe sort to process smallest terms first
 
             boolean repeat = a.unneg().equals(b.unneg()); //if true, then we must be careful when trying this in a commutive-like result which would collapse the two terms
 
@@ -525,11 +531,15 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
         if (!xternalsToSolve.isEmpty()) {
             //resolve any XTERNAL in subterms
 
-            //solve these from simplest to most complex. the canonical sort order of compounds will naturally descend this way
-            boolean kontinue = Iterators.all(xternalsToSolve.descendingIterator(), u ->
-                solveDT(u, absolute, (v) -> {
+
+            Term[] xx = xternalsToSolve.toArray(new Term[xternalsToSolve.size()]);
+            if (xx.length > 1) //solve these from simplest to most complex. the canonical sort order of compounds will naturally descend this way
+                ArrayUtils.reverse(xx);
+            boolean kontinue = Util.and(xx, u ->
+                solveDT(u, absolute, v -> {
                     Term w = v.id;
-                    assert (!w.equals(u));
+                    if (w.equals(u))
+                        return true; //skip it
 
                     //ignore the startTime component, although it might provide a clue here
                     Term y = x.replace(u, w);
@@ -544,12 +554,12 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
         }
 
 
-        if (x.dt() == XTERNAL) {
-            //solve any XTERNAL at top-level
-            return solveDT(x, absolute, each);
-        } else {
+//        if (x.dt() == XTERNAL) {
+//            //solve any XTERNAL at top-level
+//            return solveDT(x, absolute, each);
+//        } else {
             return solveOccurrence(event(x, TIMELESS), absolute, each);
-        }
+//        }
     }
 
     protected void absolutes(Map<Term, LongSet> absolute, Term x) {

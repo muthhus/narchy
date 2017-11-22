@@ -1672,6 +1672,10 @@ public enum Util {
         return 1.0f - ((1.0f - a) * (1.0f - b));
     }
 
+    public static <X> boolean and(X[] xx, Predicate<X> p) {
+        return and(p, xx);
+    }
+
     public static <X> boolean and(Predicate<X> p, X... xx) {
         for (X x : xx) {
             if (!p.test(x))
@@ -1679,6 +1683,11 @@ public enum Util {
         }
         return true;
     }
+
+    public static <X> boolean or(X[] xx, Predicate<X> p) {
+        return or(p, xx);
+    }
+
     public static <X> boolean or(Predicate<X> p, X... xx) {
         for (X x : xx) {
             if (p.test(x))
