@@ -46,8 +46,8 @@ public class Focus {
         }
 
         public final void run() {
-            //int iters = Math.max(1, Math.round(JIFFY / id.can.iterationTimeMean()));
-            int iters = 1;
+            int iters = Math.max(1, Math.round(JIFFY / id.can.iterationTimeMean()));
+            //int iters = 1;
             id.run(nar, iters);
         }
 

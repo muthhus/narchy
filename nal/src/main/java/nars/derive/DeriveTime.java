@@ -1,5 +1,6 @@
 package nars.derive;
 
+import jcog.math.Interval;
 import jcog.pri.Pri;
 import nars.Op;
 import nars.Task;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
+import static nars.Op.IMPL;
 import static nars.time.Tense.*;
 
 
@@ -162,77 +164,56 @@ public class DeriveTime extends TimeGraph {
             return null;
         }
 
-
-
-
-//        if (occ[0] == ETERNAL && (!te || (belief != null && !belief.isEternal()))) {
-//            //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
-//            //uneternalize/retemporalize:
-//
-////            if (/*(e.term.op() != IMPL) && */
-////                    (task.op() == IMPL) && (belief == null || d.beliefTerm.op() == IMPL)) {
-////                //dont retemporalize a non-implication derived from two implications
-////                //it means that the timing is unknown
-////                return null;
-////            }
-//
-//
-//        if (occ[0] != ETERNAL && occ[1] < occ[0]) {
-//            if (occ[1] == ETERNAL) {
-//                occ[1] = occ[0];
-//            } else {
-//                //HACK swap for order
-//                long t = occ[0];
-//                occ[0] = occ[1];
-//                occ[1] = t;
-//            }
-//        }
-
         return st;
     }
 
     /**
      * as a backup option
      */
-    private Term solveRaw(Term pattern) {
+    private Term solveRaw(Term x) {
 //        if (!pattern.hasXternal()) {
 //
 //        }
 
         long[] occ = d.concOcc;
+        long s, e;
         boolean te = task.isEternal();
         //couldnt solve the start time, so inherit from task or belief as appropriate
         if (!d.single && !te && (belief != null && !belief.isEternal())) {
 
-            //STRICT
-            {
-//            Interval ii = Interval.intersect(task.start(), task.end(), belief.start(), belief.end());
-//            if (ii == null)
-//                return null; //too distant, evidence lacks
+                //STRICT
+                {
+                    Interval ii = Interval.intersect(task.start(), task.end(), belief.start(), belief.end());
+                    if (ii == null)
+                        return null; //too distant, evidence lacks
+
+                    s = ii.a;
+                    e = x.op()!=IMPL ? ii.b : ii.a;
+                }
+
+                {
+//                    Revision.TaskTimeJoint joint = new Revision.TaskTimeJoint(task.start(), task.end(), belief.start(), belief.end(), d.nar);
+//                    if (joint.factor <= Pri.EPSILON)
+//                        return null;
 //
-//            occ[0] = ii.a;
-//            occ[1] = ii.b;
-            }
+//                    occ[0] = joint.unionStart;
+//                    occ[1] = joint.unionEnd;
+//                    d.concConfFactor *= joint.factor;
+                }
 
-            {
-                Revision.TaskTimeJoint joint = new Revision.TaskTimeJoint(task.start(), task.end(), belief.start(), belief.end(), d.nar);
-                if (joint.factor <= Pri.EPSILON)
-                    return null;
-
-                occ[0] = joint.unionStart;
-                occ[1] = joint.unionEnd;
-                d.concConfFactor *= joint.factor;
-            }
 
         } else if (d.single || !te || belief == null || belief.isEternal()) {
-            occ[0] = task.start();
-            occ[1] = task.end();
+            s = task.start();
+            e = task.end();
         } else {
-            occ[0] = belief.start();
-            occ[1] = belief.end();
+            s = belief.start();
+            e = belief.end();
         }
 
-        return pattern;
+        occ[0] = s;
+        occ[1] = x.op()!=IMPL ? e : s;
+
+        return x;
     }
 
     /**

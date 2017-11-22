@@ -719,7 +719,7 @@ public enum Op {
      */
     private static final int ANY_LEVEL = 0;
     public static final int SetBits = or(Op.SETe, Op.SETi);
-    public static final int TemporalBits = or(Op.CONJ, Op.IMPL);
+    public static final int Temporal = or(Op.CONJ, Op.IMPL);
     public static final int VariableBits = or(Op.VAR_PATTERN, Op.VAR_INDEP, Op.VAR_DEP, Op.VAR_QUERY);
     public static final int[] NALLevelEqualAndAbove = new int[8 + 1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
 

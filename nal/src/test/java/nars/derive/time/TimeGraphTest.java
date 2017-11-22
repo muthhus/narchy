@@ -130,6 +130,16 @@ class TimeGraphTest {
         assertSolved("(one ==>+- (two &&+1 three))", A, implWithConjPredicateSolutions);
     }
 
+    @Test public void testDecomposeImplConj() throws Narsese.NarseseException {
+        /*
+          $.02 ((b &&+10 d)==>a). 6 %1.0;.38% {320: 1;2;3;;} (((%1==>%2),(%1==>%2),is(%1,"&&")),((dropAnyEvent(%1) ==>+- %2),((StructuralDeduction-->Belief))))
+            $.06 (((b &&+5 c) &&+5 d) ==>-15 a). 6 %1.0;.42% {94: 1;2;3} ((%1,%2,time(raw),belief(positive),task("."),notImpl(%2),notImpl(%1)),((%2 ==>+- %1),((Induction-->Belief))))
+        */
+        TimeGraph C = newTimeGraph(1);
+        C.know($.$("(((b &&+5 c) &&+5 d) ==>-15 a)"), 6);
+        assertSolved("((b &&+10 d) ==>+- a)", C, "((b &&+10 d) ==>-15 a)");
+    }
+
     @Test
     public void testImplWithConjPredicate2() throws Narsese.NarseseException {
         assertSolved("(one ==>+- (two &&+- three))", A, implWithConjPredicateSolutions);
@@ -187,6 +197,8 @@ class TimeGraphTest {
             }
         };
     }
+
+
 }
 
 //    public static void main(String[] args) throws Narsese.NarseseException {

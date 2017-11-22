@@ -1673,27 +1673,34 @@ public enum Util {
     }
 
     public static <X> boolean and(X[] xx, Predicate<X> p) {
-        return and(p, xx);
-    }
-
-    public static <X> boolean and(Predicate<X> p, X... xx) {
         for (X x : xx) {
             if (!p.test(x))
                 return false;
         }
         return true;
     }
-
-    public static <X> boolean or(X[] xx, Predicate<X> p) {
-        return or(p, xx);
+    public static <X> boolean andReverse(X[] xx, Predicate<X> p) {
+        for (int i = xx.length-1; i >= 0; i--) {
+            if (!p.test(xx[i]))
+                return false;
+        }
+        return true;
     }
 
-    public static <X> boolean or(Predicate<X> p, X... xx) {
+    public static <X> boolean and(Predicate<X> p, X... xx) {
+        return and(xx, p);
+    }
+
+    public static <X> boolean or(X[] xx, Predicate<X> p) {
         for (X x : xx) {
             if (p.test(x))
                 return true;
         }
         return false;
+    }
+
+    public static <X> boolean or(Predicate<X> p, X... xx) {
+        return or(xx, p);
     }
 
     /**

@@ -587,7 +587,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
 
     default boolean isTemporal() {
-        return hasAny(Op.TemporalBits) && OR(Term::isTemporal);
+        return hasAny(Op.Temporal) && OR(Term::isTemporal);
     }
 
 

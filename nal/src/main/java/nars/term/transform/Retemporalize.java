@@ -28,7 +28,7 @@ import static nars.time.Tense.XTERNAL;
         @Override
         public Term transform(Compound x, Op op, int dt) {
             if (op == IMPL) {
-                if (x.dt()!=DTERNAL || x.subterms().hasAny(Op.TemporalBits)) {
+                if (x.dt()!=DTERNAL || x.subterms().hasAny(Op.Temporal)) {
                     //special handling
                     Term subj = x.sub(0).root();
                     Term pred = x.sub(1).root();
@@ -52,7 +52,7 @@ import static nars.time.Tense.XTERNAL;
     @Nullable
     @Override
     default Term transform(Compound x, Op op, int dt) {
-        if (!x.hasAny(TemporalBits)) {
+        if (!x.hasAny(Temporal)) {
             return x;
         } else {
             return CompoundTransform.super.transform(x, op, op.temporal ? dt(x) : DTERNAL);
