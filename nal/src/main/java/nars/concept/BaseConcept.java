@@ -183,8 +183,9 @@ public class BaseConcept implements Concept {
 
 
     @Override
-    public final boolean equals(Object obj) {
-        return this == obj || (obj instanceof Termed && term.equals(((Termed) obj).term()));
+    public boolean equals(Object obj) {
+        return this == obj || term.equals(obj);
+        //return this == obj || (obj instanceof Termed && term.equals(((Termed) obj).term()));
     }
 
     @Override

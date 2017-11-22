@@ -519,11 +519,36 @@ public enum Util {
         return min + Math.round((max - min) * unitize(x));
     }
 
+
+    public static float max(float a, float b, float c) {
+        return Util.max(Util.max(a, b), c);
+    }
+
     /**
      * maximum, simpler and faster than Math.max without its additional tests
      */
     public static float max(float a, float b) {
+        /*Compares two Float objects numerically. There are two ways in which comparisons performed by this method differ from those performed by the Java language numerical comparison operators (<, <=, ==, >=, >) when applied to primitive float values:
+        Float.NaN is considered by this method to be equal to itself and greater than all other float values (including Float.POSITIVE_INFINITY).
+        0.0f is considered by this method to be greater than -0.0f.
+        This ensures that the natural ordering of Float objects imposed by this method is consistent with equals. */
+        //   if (a != a) {
+        //            return a;
+        //        } else if (a == 0.0F && b == 0.0F && (long)Float.floatToRawIntBits(a) == negativeZeroFloatBits) {
+        //            return b;
+        //        } else {
+        //            return a >= b ? a : b;
+        //        }
+//        assert (a == a);
+//        assert (b == b);
         return (a >= b) ? a : b;
+    }
+
+
+    public static float min(float a, float b) {
+//        assert (a == a);
+//        assert (b == b);
+        return (a <= b) ? a : b;
     }
 
     public static float mean(float a, float b) {
@@ -659,9 +684,11 @@ public enum Util {
         return Math.round(value / epsilon) * epsilon;
     }
 
-    /** rounds x to the nearest multiple of the dither parameter */
+    /**
+     * rounds x to the nearest multiple of the dither parameter
+     */
     public static int round(int x, int dither) {
-        return dither * Math.round(((float)x)/dither);
+        return dither * Math.round(((float) x) / dither);
     }
 
     public static float floor(float value, float epsilon) {
@@ -1194,6 +1221,7 @@ public enum Util {
             y += value.applyAsInt(x);
         return y;
     }
+
     public static <X> int or(ToIntFunction<X> value, X... xx) {
         int y = 0;
         for (X x : xx)
@@ -1358,19 +1386,12 @@ public enum Util {
         return true;
     }
 
-    public static float max(float a, float b, float c) {
-        return Math.max(Math.max(a, b), c);
-    }
-
     public static int intFromShorts(short high, short low) {
         return high << 16 | low;
     }
+
     public static short intFromShorts(int x, boolean high) {
         return high ? (short) (x >> 16) : (short) (x & 0xffff);
-    }
-
-    public static float min(float x,float y) {
-        return (x <= y) ? x : y;
     }
 
 
@@ -1679,8 +1700,9 @@ public enum Util {
         }
         return true;
     }
+
     public static <X> boolean andReverse(X[] xx, Predicate<X> p) {
-        for (int i = xx.length-1; i >= 0; i--) {
+        for (int i = xx.length - 1; i >= 0; i--) {
             if (!p.test(xx[i]))
                 return false;
         }
@@ -1933,11 +1955,11 @@ public enum Util {
         if (a == b) return 0;
         int al = a.length;
         int l = Integer.compare(al, b.length);
-        if (l!=0)
+        if (l != 0)
             return l;
         for (int i = 0; i < al; i++) {
             int d = a[i] - b[i];
-            if (d!=0)
+            if (d != 0)
                 return d;
         }
         return 0;
@@ -1948,20 +1970,29 @@ public enum Util {
         return buffered.stream();
     }
 
-    /** creates an immutable sublist from a ByteList, since this isnt implemented yet in Eclipse collections */
+    /**
+     * creates an immutable sublist from a ByteList, since this isnt implemented yet in Eclipse collections
+     */
     public static ImmutableByteList subList(ByteList x, int a, int b) {
-        int size = b-a;
+        int size = b - a;
         if (a == 0 && b == x.size())
             return x.toImmutable();
 
         switch (size) {
-            case 0: return ByteLists.immutable.empty();
-            case 1: return ByteLists.immutable.of(x.get(a));
-            case 2: return ByteLists.immutable.of(x.get(a++), x.get(a));
-            case 3: return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++));
-            case 4: return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++), x.get(a++));
-            case 5: return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++), x.get(a++), x.get(a++));
-            case 6: return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++), x.get(a++), x.get(a++), x.get(a++));
+            case 0:
+                return ByteLists.immutable.empty();
+            case 1:
+                return ByteLists.immutable.of(x.get(a));
+            case 2:
+                return ByteLists.immutable.of(x.get(a++), x.get(a));
+            case 3:
+                return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++));
+            case 4:
+                return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++), x.get(a++));
+            case 5:
+                return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++), x.get(a++), x.get(a++));
+            case 6:
+                return ByteLists.immutable.of(x.get(a++), x.get(a++), x.get(a++), x.get(a++), x.get(a++), x.get(a++));
             default:
                 byte[] xx = x.toArray(); //TODO i want the array zero-copy
                 return ByteLists.immutable.of(ArrayUtils.subarray(xx, a, b));

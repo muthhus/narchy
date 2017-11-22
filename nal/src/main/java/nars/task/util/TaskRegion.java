@@ -202,7 +202,7 @@ public interface TaskRegion extends HyperRegion, Tasked {
 
     @Override
     default boolean contains(HyperRegion x) {
-        if (this.equals(x)) return true;
+        if (x == this) return true;
 
         //    default boolean contains(HyperRegion<X> x) {
         //        int d = dim();

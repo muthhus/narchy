@@ -49,6 +49,8 @@ public class CachedCompound implements Compound {
             (this.rooted = Compound.super.root());
     }
 
+
+
     @Override
     public Term conceptual() {
         return (concepted != null) ? concepted

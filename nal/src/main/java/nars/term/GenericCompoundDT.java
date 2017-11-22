@@ -80,6 +80,19 @@ public class GenericCompoundDT /*extends ProxyTerm<Compound>*/ implements Compou
     }
 
 
+//    @Override
+//    public Term root() {
+//        Term supr = Compound.super.root();
+//        Term rref = ref.root();
+//        if (!supr.equals(rref)) {
+//            System.err.println("differ root than the ref");
+//            //happens if:
+//            //      (x==>x)
+//            //      ((--,x)==>x)
+//        }
+//        return supr;
+//    }
+
     @Override
     public boolean contains(Term t) {
         return ref.subterms().contains(t);

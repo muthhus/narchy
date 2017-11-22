@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -92,7 +93,6 @@ public class ConjClustering extends Causable {
     @Override
     protected int next(NAR nar, int work) {
 
-        tasksCreated = 0;
 
         now = nar.time();
         freqRes = nar.freqResolution.floatValue();
@@ -101,6 +101,7 @@ public class ConjClustering extends Causable {
         this.volMax = nar.termVolumeMax.intValue();
 
         taskLimit = work;
+        tasksCreated = 0;
 
         bag.commitGroups(1, nar, this::conjoin);
 
@@ -136,22 +137,29 @@ public class ConjClustering extends Causable {
                     return group[0];
                 }))
                 .entrySet().stream()
-                .filter(c -> c.getKey() >= 0 && c.getValue().size() > 1) //only batches of >1
-                .map(Map.Entry::getValue); //ignore the -1 discard group
+                .map(c -> {
+                    List<Task> v = c.getValue();
+                    return c.getKey() >= 0 && //only batches of >1
+                            v.size() > 1 ? v : null;  //ignore the -1 discard group
+                })
+                .filter(Objects::nonNull);
 
     }
 
-    private void conjoin(List<VLink<Task>> group, NAR nar) {
+    private void conjoin(Stream<VLink<Task>> group, NAR nar) {
 
         //get only the maximum confidence task for each term at its given starting time
-        Map<ObjectLongPair<Term>, Task> vv = new HashMap();
-
-        final long[] end = {Long.MIN_VALUE};
-        final long[] start = {Long.MAX_VALUE};
 
 
-        in.input(
-            chunk(group.stream().filter(Objects::nonNull).map(x -> x.id), maxConjSize, volMax).map(subs -> {
+        Predicate<Object> kontinue = (l) -> tasksCreated < taskLimit;
+
+        in.input( chunk(group.filter(Objects::nonNull).takeWhile(kontinue)
+            .map(x -> x.id), maxConjSize, volMax).takeWhile(kontinue).map(subs -> {
+
+                Map<ObjectLongPair<Term>, Task> vv = new HashMap<>(subs.size());
+
+                final long[] end = {Long.MIN_VALUE};
+                final long[] start = {Long.MAX_VALUE};
 
                 subs.forEach(z -> {
 
@@ -231,7 +239,8 @@ public class ConjClustering extends Causable {
 
                         float pri =
                                 //priMax;
-                                priMin;
+                                //priMin;
+                                (priMin + priMax)/2f;
 
                         m.priSet(BudgetFunctions.fund(pri, true, uu));
                         tasksCreated++;
@@ -242,7 +251,7 @@ public class ConjClustering extends Causable {
 
                 return null;
 
-            }).limit(taskLimit)
+            }).filter(Objects::nonNull)
         );
 
     }

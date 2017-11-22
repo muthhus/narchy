@@ -3,6 +3,7 @@ package nars.term.transform;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntSupplier;
@@ -11,7 +12,8 @@ import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
-@FunctionalInterface  public interface Retemporalize extends CompoundTransform {
+@FunctionalInterface
+public interface Retemporalize extends CompoundTransform {
 
     @Override
     int dt(Compound x);
@@ -24,27 +26,54 @@ import static nars.time.Tense.XTERNAL;
 
     public static final Retemporalize retemporalizeRoot = new Retemporalize() {
 
-        @Nullable
-        @Override
-        public Term transform(Compound x, Op op, int dt) {
-            if (op == IMPL) {
-                if (x.dt()!=DTERNAL || x.subterms().hasAny(Op.Temporal)) {
-                    //special handling
-                    Term subj = x.sub(0).root();
-                    Term pred = x.sub(1).root();
-                    return IMPL.the(subj.unneg().equals(pred) ? XTERNAL : DTERNAL, subj, pred);
-                } else {
-                    return x; //unchanged
-                }
-            } else {
-                return Retemporalize.super.transform(x, op, dt);
-            }
-        }
-
+//        @Nullable
+//        @Override
+//        public Term transform(Compound x, Op op, int dt) {
+//            switch (op) {
+//                case IMPL: {
+//                    if (x.dt() != DTERNAL || x.subterms().hasAny(Op.Temporal)) {
+//                        //special handling
+//                        Term subj = x.sub(0).root();
+//                        Term pred = x.sub(1).root();
+//                        return IMPL.the(subj.unneg().equals(pred) ? XTERNAL : DTERNAL, subj, pred);
+//                    } else {
+//                        return x; //unchanged
+//                    }
+//                }
+//                case CONJ: {
+//
+//                    else {
+//                        return DTERNAL;
+//                    }
+//                }
+//                break;
+//                default:
+//                    return Retemporalize.super.transform(x, op, dt);
+//            }
+//        }
+//
         @Override
         public int dt(Compound x) {
-            if (x.op() == CONJ && x.subs() == 2) return XTERNAL;
-            else return DTERNAL;
+            TermContainer xs = x.subterms();
+
+            //any inside impl/conjunctions will disqualify the simple DTERNAL root form, but only in the next layer
+
+            switch (x.op()) {
+                case CONJ:
+                    if ((xs.subs()==2) &&
+                            xs.hasAny(Temporal) && xs.OR(y->y.isAny(Temporal)) ||
+                            xs.sub(0).unneg().equals(xs.sub(1).unneg())) {
+                        return XTERNAL;
+                    } else {
+                        return DTERNAL; //simple
+                    }
+                case IMPL:
+                    //impl pred is always non-neg
+                    return xs.hasAny(Temporal) && xs.OR(y->y.isAny(Temporal)) ||
+                           xs.sub(0).unneg().equals(xs.sub(1)) ? XTERNAL : DTERNAL;
+                default:
+                    throw new UnsupportedOperationException();
+            }
         }
     };
 

@@ -931,28 +931,13 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     default boolean equalsRoot(Term x) {
-        if (this == x)
+        if (this.equals(x))
             return true;
 
-        Op op;
-        if ((structure() == x.structure() && volume() == x.volume() && (op = op()) == x.op())) {
-
-            if (op.temporal) {
-                return root().equals(x.root());
-            } else {
-                TermContainer a = subterms();
-                TermContainer b = x.subterms();
-                int aa;
-                if ((aa = a.subs()) == b.subs()) {
-                    for (int i = 0; i < aa; i++) {
-                        if (!a.sub(i).equalsRoot(b.sub(i)))
-                            return false;
-                    }
-                    return true;
-                }
-            }
-        }
-        return false;
+        return
+            (opX() == x.opX() && structure() == x.structure() && volume() == x.volume()) //pre-test
+                &&
+            root().equals(x.root());
     }
 
 

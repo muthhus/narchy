@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -104,7 +105,7 @@ public class BagClustering<X> {
         return bag.size();
     }
 
-    public <Y> void commitGroups(int iter, Y y, BiConsumer<List<VLink<X>>,Y> each) {
+    public <Y> void commitGroups(int iter, Y y, BiConsumer<Stream<VLink<X>>,Y> each) {
         commit(iter, (sorted) -> {
             List<Task> batch = $.newArrayList();
             int current = -1;
@@ -122,7 +123,7 @@ public class BagClustering<X> {
                 if (current != x.centroid) {
                     current = x.centroid;
                     if (bs != -1 && i - bs > 1)
-                        each.accept(sorted.subList(bs, i), y);
+                        each.accept(IntStream.range(bs, i).mapToObj(sorted::get), y);
                     bs = i;
                 }
             }

@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Task Dimension Mapping:
@@ -112,8 +113,8 @@ public class LinkClustering extends DurService {
         }
     }
 
-    protected void linkClustersMulti(List<VLink<Task>> group, NAR nar) {
-        Task[] tasks = group.stream().map(PLink::get).toArray(Task[]::new);
+    protected void linkClustersMulti(Stream<VLink<Task>> group, NAR nar) {
+        Task[] tasks = group.map(PLink::get).toArray(Task[]::new);
 
         Arrays.sort(tasks, Comparators.byIntFunction(Task::hashCode)); //keep them in a canonical ordering for equality testing purposes
 

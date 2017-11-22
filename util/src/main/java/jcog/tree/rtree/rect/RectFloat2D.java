@@ -70,10 +70,10 @@ public class RectFloat2D implements HyperRegion<Float2D>, Comparable<RectFloat2D
     @Override
     public RectFloat2D mbr(final HyperRegion<Float2D> r) {
         final RectFloat2D r2 = (RectFloat2D) r;
-        final float minX = Math.min(min.x, r2.min.x);
-        final float minY = Math.min(min.y, r2.min.y);
-        final float maxX = Math.max(max.x, r2.max.x);
-        final float maxY = Math.max(max.y, r2.max.y);
+        final float minX = Util.min(min.x, r2.min.x);
+        final float minY = Util.min(min.y, r2.min.y);
+        final float maxX = Util.max(max.x, r2.max.x);
+        final float maxY = Util.max(max.y, r2.max.y);
 
         return new RectFloat2D(minX, minY, maxX, maxY);
 

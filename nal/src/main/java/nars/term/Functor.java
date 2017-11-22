@@ -48,7 +48,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
 
 //    @Override
 //    public boolean equals(Object obj) {
-//        return this == obj || obj instanceof Termed && term.equals(obj);
+//        return this == obj || obj instanceof Term && term.equals(obj);
 //    }
 
     @Override
