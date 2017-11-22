@@ -228,19 +228,17 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
 
                     //link(se, (eventDT + st), pe);
 
-                    if (subj.hasAny(CONJ)) {
-                        subj.eventsWhile((w, y) -> {
-                            link(know(y), eventDT + st - w, pe);
-                            return true;
-                        }, 0, true, false, false, 0);
-                    }
-                    if (pred.hasAny(CONJ)) {
-                        pred.eventsWhile((w, y) -> {
-                            link(se, eventDT + st + w, know(y));
-                            return true;
-                        }, 0, true, false, false, 0);
+                    //if (subj.hasAny(CONJ)) {
+                    subj.eventsWhile((w, y) -> {
+                        link(know(y), eventDT + st - w, pe);
+                        return true;
+                    }, 0, true, false, false, 0);
 
-                    }
+                    //if (pred.hasAny(CONJ)) {
+                    pred.eventsWhile((w, y) -> {
+                        link(se, eventDT + st + w, know(y));
+                        return true;
+                    }, 0, true, false, false, 0);
 
                 }
 

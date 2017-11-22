@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
+import static nars.Op.CONJ;
 import static nars.Op.IMPL;
 import static nars.time.Tense.*;
 
@@ -40,14 +41,13 @@ import static nars.time.Tense.*;
 public class DeriveTime extends TimeGraph {
 
     private final static Logger logger = LoggerFactory.getLogger(DeriveTime.class);
-    public static final int TEMPORAL_ITERATIONS = 16;
+    public static final int TEMPORAL_ITERATIONS = 8;
 
     private final Task task, belief;
 
     protected static final boolean knowTransformed = true;
     private final int dither;
     private final Derivation d;
-
 
     public DeriveTime(Derivation d, boolean single) {
         this.d = d;
@@ -127,9 +127,6 @@ public class DeriveTime extends TimeGraph {
 
         final int[] triesRemain = {TEMPORAL_ITERATIONS};
 
-//        try {
-
-
         solve(pattern, false /* take everything */, (solution) -> {
             assert (solution != null);
             //TODO test equivalence with task and belief terms and occurrences, and continue iterating up to a max # of tries if it produced a useless equivalent result
@@ -140,24 +137,19 @@ public class DeriveTime extends TimeGraph {
             return triesRemain[0]-- > 0;
         });
 
-
-//        } catch (Throwable t) {
-//            logger.error("temporalize error:\n{} {}\n\t{}", pattern, d, t);
-//            return null;
-//        }
-
         Event event = best[0];
         if (event == null) {
             return solveRaw(pattern);
         }
 
-        occ[0] = event.start();
-        occ[1] = event.end();
+        long es = event.start();
         Term st = event.id;
-
-        if (occ[0] == TIMELESS) {
+        if (es == TIMELESS) {
             return solveRaw(st);
         }
+        occ[0] = es;
+        occ[1] = event.end();
+
 
         Op eop = st.op();
         if (!eop.conceptualizable) {
@@ -171,34 +163,31 @@ public class DeriveTime extends TimeGraph {
      * as a backup option
      */
     private Term solveRaw(Term x) {
-//        if (!pattern.hasXternal()) {
-//
-//        }
-
         long[] occ = d.concOcc;
         long s, e;
         boolean te = task.isEternal();
         //couldnt solve the start time, so inherit from task or belief as appropriate
         if (!d.single && !te && (belief != null && !belief.isEternal())) {
 
-                //STRICT
-                {
+                //joint is a procedure for extending / blending non-temporal terms.
+                //since conj is temporal use strict
+                boolean strict = x.op()==CONJ;
+
+                if (!strict) {
                     Interval ii = Interval.intersect(task.start(), task.end(), belief.start(), belief.end());
                     if (ii == null)
                         return null; //too distant, evidence lacks
 
                     s = ii.a;
                     e = x.op()!=IMPL ? ii.b : ii.a;
-                }
+                } else {
+                    Revision.TaskTimeJoint joint = new Revision.TaskTimeJoint(task.start(), task.end(), belief.start(), belief.end(), d.nar);
+                    if (joint.factor <= Pri.EPSILON)
+                        return null;
 
-                {
-//                    Revision.TaskTimeJoint joint = new Revision.TaskTimeJoint(task.start(), task.end(), belief.start(), belief.end(), d.nar);
-//                    if (joint.factor <= Pri.EPSILON)
-//                        return null;
-//
-//                    occ[0] = joint.unionStart;
-//                    occ[1] = joint.unionEnd;
-//                    d.concConfFactor *= joint.factor;
+                    s = joint.unionStart;
+                    e = joint.unionEnd;
+                    d.concConfFactor *= joint.factor;
                 }
 
 
@@ -211,7 +200,7 @@ public class DeriveTime extends TimeGraph {
         }
 
         occ[0] = s;
-        occ[1] = x.op()!=IMPL ? e : s;
+        occ[1] = e;
 
         return x;
     }

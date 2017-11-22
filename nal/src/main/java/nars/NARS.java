@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Services;
 import jcog.list.FasterList;
 import jcog.math.random.XoRoShiRo128PlusRandom;
 import nars.concept.builder.ConceptBuilder;
@@ -22,10 +23,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * NAR builder
@@ -250,11 +253,21 @@ public class NARS {
 
             postInit.add((n) -> {
                 //HACK dummy Focus - useful only for single threaded testing.  to be moved to a special Testing executor
-                Causable[] can = n.services().filter(Causable.class::isInstance).toArray(Causable[]::new);
+                List<Causable> can = n.services().map(x -> x instanceof Causable ? ((Causable)x) : null).filter(Objects::nonNull).collect(Collectors.toList());
+                n.serviceAddOrRemove.on((xb)->{
+                    Services.Service<NAR> s = xb.getOne();
+                    if (s instanceof Causable) {
+                        if (xb.getTwo())
+                            can.add((Causable) s);
+                        else
+                            can.remove(s);
+                    }
+                });
                 n.onCycle(() -> {
                     int WORK_PER_CYCLE = 2;
-                    for (Causable c : can)
-                        c.run(n, WORK_PER_CYCLE);
+                    for (int i = 0, canSize = can.size(); i < canSize; i++) {
+                        can.get(i).run(n, WORK_PER_CYCLE);
+                    }
                 });
             });
         }
