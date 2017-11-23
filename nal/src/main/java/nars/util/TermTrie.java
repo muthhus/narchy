@@ -28,7 +28,7 @@ public class TermTrie<K extends Term, V> extends Trie<List<K>, V> implements Tri
         print(System.out);
     }
 
-    public void print(@NotNull PrintStream out) {
+    public void print(PrintStream out) {
         printSummary(this.root, out);
     }
 
@@ -39,7 +39,7 @@ public class TermTrie<K extends Term, V> extends Trie<List<K>, V> implements Tri
 
 
 
-    public static <A, B> void printSummary(@NotNull TrieNode<List<A>, B> node, @NotNull PrintStream out) {
+    public static <A, B> void printSummary(TrieNode<List<A>, B> node, PrintStream out) {
 
         node.forEach(n -> {
             List<A> seq = n.seq();
@@ -65,7 +65,7 @@ public class TermTrie<K extends Term, V> extends Trie<List<K>, V> implements Tri
     //TODO use the compiled rule trie
     @NotNull
     @Deprecated
-    public SummaryStatistics costAnalyze(@NotNull FloatFunction<K> costFn, @Nullable PrintStream o) {
+    public SummaryStatistics costAnalyze(FloatFunction<K> costFn, @Nullable PrintStream o) {
 
         SummaryStatistics termCost = new SummaryStatistics();
         SummaryStatistics sequenceLength = new SummaryStatistics();
@@ -84,11 +84,11 @@ public class TermTrie<K extends Term, V> extends Trie<List<K>, V> implements Tri
         return termCost;
     }
 
-    private static String s(@NotNull SummaryStatistics s) {
+    private static String s(SummaryStatistics s) {
         return s.getSummary().toString().replace('\n', ' ').replace("StatisticalSummaryValues: ", "");
     }
 
-    public static <K, V> void costAnalyze(@NotNull FloatFunction<K> costFn, @NotNull SummaryStatistics termCost, @NotNull SummaryStatistics sequenceLength, @NotNull SummaryStatistics branchFanOut, @NotNull SummaryStatistics endDepth, int[] currentDepth, @NotNull TrieNode<List<K>, V> root) {
+    public static <K, V> void costAnalyze(FloatFunction<K> costFn, SummaryStatistics termCost, SummaryStatistics sequenceLength, SummaryStatistics branchFanOut, SummaryStatistics endDepth, int[] currentDepth, TrieNode<List<K>, V> root) {
 
         int nc = root.childCount();
         if (nc > 0)
@@ -101,11 +101,11 @@ public class TermTrie<K extends Term, V> extends Trie<List<K>, V> implements Tri
 
             //out.print(n.childCount() + "|" + n.getSize() + "  ");
 
-            List<K> sqn = seq.subList(from, n.end());
-            sequenceLength.addValue(sqn.size());
+            int to = n.end();
+            sequenceLength.addValue(to-from);
 
-            for (K k : sqn) {
-                termCost.addValue(costFn.floatValueOf(k));
+            for (int i = from; i < to; i++) {
+                termCost.addValue(costFn.floatValueOf(seq.get(i)));
             }
 
             //indent(from * 4);
@@ -140,7 +140,7 @@ public class TermTrie<K extends Term, V> extends Trie<List<K>, V> implements Tri
 
 
     @Override
-    public int matches(@NotNull List<K> sequenceA, int indexA, @NotNull List<K> sequenceB, int indexB, int count) {
+    public int matches(List<K> sequenceA, int indexA, List<K> sequenceB, int indexB, int count) {
         for (int i = 0; i < count; i++) {
             K a = sequenceA.get(i + indexA);
             K b = sequenceB.get(i + indexB);
@@ -156,16 +156,13 @@ public class TermTrie<K extends Term, V> extends Trie<List<K>, V> implements Tri
 
 
     @Override
-    public int lengthOf(@NotNull List<K> sequence) {
+    public int lengthOf(List<K> sequence) {
         return sequence.size();
     }
 
     @Override
-    public int hashOf(@NotNull List<K> sequence, int index) {
-        //return sequence.get(index).hashCode();
-
-        Term pp = sequence.get(index);
-        return conds.getIfAbsentPutWithKey(pp, (p) -> 1 + conds.size());
+    public int hashOf(List<K> sequence, int index) {
+        return conds.getIfAbsentPut(sequence.get(index), conds::size);
     }
 
 }

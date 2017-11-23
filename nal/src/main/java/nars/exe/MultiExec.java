@@ -24,7 +24,6 @@ public class MultiExec extends UniExec {
     public static final int WORK_BATCH_SIZE = 2;
 
 
-
     static final Logger logger = LoggerFactory.getLogger(MultiExec.class);
 
     protected AffinityExecutor exe;
@@ -34,7 +33,7 @@ public class MultiExec extends UniExec {
 
     final List<Thread> activeThreads = $.newArrayList();
     LongSet activeThreadIds = new LongHashSet();
-    LongPredicate isActiveThreadId = (x)->false;
+    LongPredicate isActiveThreadId = (x) -> false;
     private Focus focus;
 
     public MultiExec(int concepts, int threads, int qSize) {
@@ -44,13 +43,13 @@ public class MultiExec extends UniExec {
         this.threads = threads;
 
 
-         exe = new AffinityExecutor() {
-                @Override
-                protected void add(AffinityExecutor.AffinityThread at) {
-                    super.add(at);
-                    register(at);
-                }
-            };
+        exe = new AffinityExecutor() {
+            @Override
+            protected void add(AffinityExecutor.AffinityThread at) {
+                super.add(at);
+                register(at);
+            }
+        };
 
 //         return texe = new ThreadPoolExecutor(threads, threads,
 //                     60L, TimeUnit.SECONDS,
@@ -64,7 +63,7 @@ public class MultiExec extends UniExec {
 //                         return t;
 //                     }, new ThreadPoolExecutor.AbortPolicy()
 //             );
-        deferred = x->{
+        deferred = x -> {
             if (x instanceof Task)
                 execute(x);
             else
@@ -79,15 +78,18 @@ public class MultiExec extends UniExec {
             float load;
 
             ITask i = q.poll();
-            if (i!=null) {
+            if (i != null) {
                 execute(i);
                 load = 0;
             } else {
                 load = load();
             }
 
+            NARLoop loop = nar.loop;
+            float throttle = loop.throttle.floatValue();
+
             try {
-                focus.work((int)(WORK_BATCH_SIZE*(1f-load)));
+                focus.work((int) (WORK_BATCH_SIZE */*(1f-load)**/loop.throttle.floatValue()));
             } catch (Throwable e) {
                 if (Param.DEBUG) {
                     throw e;
@@ -117,14 +119,15 @@ public class MultiExec extends UniExec {
     }
 
 
-
-    /** to be called in initWorkers() impl for each thread constructed */
+    /**
+     * to be called in initWorkers() impl for each thread constructed
+     */
     protected synchronized void register(Thread t) {
         activeThreads.add(t);
         activeThreadIds = LongSets.mutable.ofAll(activeThreadIds).with(t.getId()).toImmutable();
         long max = activeThreadIds.max();
         long min = activeThreadIds.min();
-        if (max - min == activeThreadIds.size()-1) {
+        if (max - min == activeThreadIds.size() - 1) {
             //contiguous id's, use fast id tester
             isActiveThreadId = (x) -> x >= min && x <= max;
         } else {
@@ -186,7 +189,7 @@ public class MultiExec extends UniExec {
         activeThreads.forEach(Thread::interrupt);
         activeThreads.clear();
         activeThreadIds = new LongHashSet();
-        isActiveThreadId = (x)->false;
+        isActiveThreadId = (x) -> false;
     }
 
 
@@ -199,7 +202,9 @@ public class MultiExec extends UniExec {
         input.forEachRemaining(add());
     }
 
-    /** the input procedure according to the current thread */
+    /**
+     * the input procedure according to the current thread
+     */
     protected Consumer<ITask> add() {
         return isWorker(Thread.currentThread()) ? immediate : deferred;
     }

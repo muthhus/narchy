@@ -170,11 +170,12 @@ public interface Atomic extends Term {
     @Override
     String toString();
 
-    byte[] toBytes();
+    /** byte[] representation */
+    byte[] bytes();
 
     @Override
     default void append(ByteArrayDataOutput out) {
-        out.write(toBytes());
+        out.write(bytes());
     }
 
 
@@ -289,7 +290,7 @@ public interface Atomic extends Term {
         if (x.hashCode() != y.hashCode())
             return false;
 
-        return Arrays.equals(x.toBytes(), y.toBytes());
+        return Arrays.equals(x.bytes(), y.bytes());
     }
     
 }

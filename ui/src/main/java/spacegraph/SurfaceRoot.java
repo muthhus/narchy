@@ -34,4 +34,8 @@ public interface SurfaceRoot {
      */
     void the(String key, @Nullable Object added, @Nullable Runnable onRemove);
 
+    default void the(Class key, @Nullable Object added, @Nullable Runnable onRemove) {
+        the(key.toString(), added, onRemove);
+    }
+
 }

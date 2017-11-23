@@ -206,16 +206,6 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
         }
     }
 
-//    private boolean reportNextSizeDelta(Nodelike<T> parent) {
-//        int x = childDiff;
-//        if (x == 0)
-//            return false; //nothing changed
-//
-//        this.childDiff = 0; //clear
-//        parent.reportSizeDelta(x);
-//        return true;
-//    }
-
     private void grow(int i) {
         grow(child[i]);
     }
@@ -243,7 +233,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
                     if (child[i].size() == 0) {
                         System.arraycopy(child, i + 1, child, i, size - i - 1);
                         child[--size] = null;
-                        if (size > 0) i--;
+                        //if (size > 0) i--;
                     }
 
                     if (size > 0) {
@@ -270,13 +260,6 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
         return this;
     }
 
-//    public int childSize(int i) {
-//        Node<T> cc = child[i];
-//        if (cc == null)
-//            return 0;
-//        return cc.size();
-//    }
-
     @Override
     public Node<T, ?> update(final T OLD, final T NEW, Spatialization<T> model) {
         final HyperRegion tRect = model.bounds(OLD);
@@ -290,11 +273,7 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
                 cc[i] = cc[i].update(OLD, NEW, model);
                 found = true;
             }
-            if (i == 0) {
-                region = cc[0].bounds();
-            } else {
-                region = grow(region, cc[i]);
-            }
+            region = i == 0 ? cc[0].bounds() : grow(region, cc[i]);
         }
         this.bounds = region;
 
@@ -437,21 +416,6 @@ public final class Branch<T> implements Node<T, Node<T, ?>> {
     public Iterator<Node<T, ?>> iterateNodes() {
         return ArrayIterator.get(child, size);
     }
-
-
-    //    @Override
-//    public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
-//        if (!region.intersects(rect) || !t.test(this))
-//            return;
-//
-//        Node<T, ?>[] children = this.child;
-//        short s = this.size;
-//        for (int i = 0; i < s; i++) {
-//            Node<T, ?> c = children[i];
-//            if (c != null)
-//                c.intersectingNodes(rect, t, model);
-//        }
-//    }
 
     @Override
     public void collectStats(Stats stats, int depth) {

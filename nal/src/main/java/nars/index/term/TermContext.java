@@ -11,14 +11,6 @@ import java.util.function.Function;
  */
 public interface TermContext extends Function<Term,Termed> {
 
-    /** if the result is null, return the input */
-    default Termed applyIfPossible(/*@NotNull*/ Term x) {
-        Termed y = apply(x);
-        if (y != null)
-            return y;
-        else
-            return x;
-    }
 
     /** elides superfluous .term() call */
     default Term applyTermIfPossible(/*@NotNull*/ Term x) {

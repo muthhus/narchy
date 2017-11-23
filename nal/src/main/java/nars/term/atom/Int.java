@@ -70,7 +70,7 @@ public class Int implements Intlike {
     }
 
     @Override
-    public byte[] toBytes() {
+    public byte[] bytes() {
         return bytesCached;
     }
 
@@ -171,7 +171,7 @@ public class Int implements Intlike {
         }
 
         @Override
-        public byte[] toBytes() {
+        public byte[] bytes() {
             return bytesCached;
         }
 //        @Override

@@ -397,7 +397,7 @@ public class IO {
 
     public static byte[] termToBytes(Term t) {
         if (t instanceof Atomic) {
-            return ((Atomic) t).toBytes();
+            return ((Atomic) t).bytes();
         }
 
         //bb = ArrayPool.bytes().

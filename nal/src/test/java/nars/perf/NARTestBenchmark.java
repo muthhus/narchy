@@ -3,8 +3,8 @@ package nars.perf;
 import jcog.Util;
 import nars.nal.nal1.NAL1Test;
 import nars.nal.nal6.NAL6Test;
+import nars.nal.nal7.NAL7Test;
 import org.junit.jupiter.api.Disabled;
-import org.junit.platform.engine.DiscoverySelector;
 import org.junit.platform.engine.discovery.ClassSelector;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.Launcher;
@@ -28,7 +28,8 @@ public class NARTestBenchmark {
 
     static final Class[] tests = {
             NAL1Test.class,
-            NAL6Test.class
+            NAL6Test.class,
+            NAL7Test.class
     };
 
     /**
@@ -79,7 +80,7 @@ public class NARTestBenchmark {
 
     public static void main(String[] args) throws RunnerException {
         perf(NARTestBenchmark.class, (x) -> {
-            x.measurementIterations(1);
+            x.measurementIterations(2);
             x.warmupIterations(1);
             //x.jvmArgs("-Xint");
             x.forks(1);

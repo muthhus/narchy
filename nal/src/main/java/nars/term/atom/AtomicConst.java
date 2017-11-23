@@ -39,7 +39,7 @@ public abstract class AtomicConst implements Atomic {
     }
 
     @Override
-    public final byte[] toBytes() {
+    public final byte[] bytes() {
         return bytesCached;
     }
 

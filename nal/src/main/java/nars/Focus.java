@@ -30,7 +30,7 @@ public class Focus {
     /**
      * temporal granularity unit, in seconds
      */
-    public static final float JIFFY = 0.001f;
+    public static final float JIFFY = 0.002f;
 
     private final Bag<Causable, ProcLink> can;
 
@@ -140,7 +140,7 @@ public class Focus {
 
         float momentum =
 //                    0f;
-                0.99f;
+                0.95f;
 
         @Override
         public void update(FasterList<Cause> causes, float[] goal) {

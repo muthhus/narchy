@@ -581,8 +581,8 @@ public interface Term extends Termed, Comparable<Termed> {
                 return Long.compareUnsigned(((Int.IntRange) this).hash64(), ((Int.IntRange) y).hash64());
             } else if (this instanceof Atomic) {
                 return Util.compare(
-                        ((Atomic) this).toBytes(),
-                        ((Atomic) y).toBytes()
+                        ((Atomic) this).bytes(),
+                        ((Atomic) y).bytes()
                 );
             } else {
                 throw new UnsupportedOperationException("unimplemented comparison: " + this + ' ' + y);

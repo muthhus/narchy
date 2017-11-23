@@ -60,7 +60,7 @@ public abstract class AbstractVariable implements Variable {
     }
 
 
-    public final byte[] toBytes() {
+    public final byte[] bytes() {
         return bytesCached;
     }
 

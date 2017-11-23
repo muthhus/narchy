@@ -35,14 +35,14 @@ public class TimeRange implements HyperRegion {
 
     @Override
     public boolean intersects(HyperRegion x) {
-        TaskRegion t = (TaskRegion)x;
+        var t = (TaskRegion)x;
         return start <= t.end() && end >= t.start();
     }
 
 
     @Override
     public boolean contains(HyperRegion x) {
-        TaskRegion t = (TaskRegion)x;
+        var t = (TaskRegion)x;
         return start <= t.start() && end >= t.end();
     }
 

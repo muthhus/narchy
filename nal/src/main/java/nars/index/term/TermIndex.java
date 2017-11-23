@@ -170,34 +170,44 @@ public abstract class TermIndex implements TermContext {
 
     private final TermContext intern = new InterningContext();
 
+
     private class InterningContext implements CompoundTransform {
 
         @Override
         public Termed apply(Term x) {
-            if (!x.op().conceptualizable || x instanceof PermanentConcept)
-                return x; //skip the nonsense
-            else
-                return TermIndex.this.applyIfPossible(x);
+            return applyTermIfPossible(x);
         }
+
 
         @Override
-        public @Nullable Term transform(Compound x, Op op, int dt) {
-            //TODO recurse
-            return TermIndex.this.applyTermIfPossible(x);
+        public Term applyTermIfPossible(Term x) {
+            //only resolve atomics
+            if (!(x instanceof PermanentConcept)) {
+                Op op = x.op();
+                if (op.atomic && op.conceptualizable) {
+                    return TermIndex.this.applyTermIfPossible(x);
+                }
+            }
+
+            return x;
         }
 
-//        @Override
-//        public Term applyTermIfPossible(Term x) {
-//            return x.op().conceptualizable ? //skip the nonsense if it's constant
-//                    CompoundTransform.super.applyTermIfPossible(x) : x;
-//        }
+
+        @Override
+        public @Nullable Term applyTermOrNull(Term x) {
+            throw new UnsupportedOperationException();
+        }
+        
+        @Override
+        public @Nullable Term transform(Compound x, Op op, int dt) {
+            //return TermIndex.this.applyTermIfPossible(x);
+            throw new UnsupportedOperationException();
+        }
+
 
         @Override
         public Term intern(Term x) {
-//            if (x instanceof Compound)
-//                return x.transform(this);
-            if (x.op().conceptualizable) return TermIndex.this.applyTermIfPossible(x);
-            else return x;
+            return applyTermIfPossible(x);
         }
     }
 }

@@ -32,11 +32,9 @@ public class MetaFrame extends Widget {
 
     protected void attach(Widget base) {
         SurfaceRoot r = base.root();
-        r.the("metaframe", this, () -> {
-            close();
-        });
+        r.the(MetaFrame.class, this, this::close);
 
-        base.children.add(0,this);
+        base.children.add(this);
         r.zoom(base.cx(), base.cy(), base.w(), base.h());
     }
 
@@ -46,7 +44,7 @@ public class MetaFrame extends Widget {
             new PushButton("?"), //inspect
             new PushButton("X")  //hide
         );
-        children.add(new AspectAlign(m, 1f, AspectAlign.Align.RightTop, 0.25f ));
+        children.add(new AspectAlign(m, 1f, AspectAlign.Align.RightTop, 0.5f ));
 
         Surface n = grid(
             new Label(base.toString() )

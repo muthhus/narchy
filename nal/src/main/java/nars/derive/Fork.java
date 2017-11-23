@@ -17,11 +17,10 @@ import java.util.function.Function;
  */
 public class Fork extends AbstractPred<Derivation> {
 
-    @NotNull
     public final PrediTerm<Derivation>[] branches;
 
     protected Fork(@NotNull PrediTerm[] actions) {
-        super($.s((Term[]) actions) /* maybe should be a set but prod is faster */);
+        super($.s((Term[]) actions));
         this.branches = actions;
     }
 

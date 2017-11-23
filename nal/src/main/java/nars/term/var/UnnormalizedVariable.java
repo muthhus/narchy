@@ -28,27 +28,15 @@ public class UnnormalizedVariable extends AtomicConst implements Variable {
         throw new UnsupportedOperationException();
     }
 
-    final @Override public boolean equals(Object u) {
-        if (this == u) return true;
-
-//        if (u instanceof AbstractVariable)
-//            if (u.toString().equals(str))
-//                System.out.println(this + " and " + u + " equal by string");
-//            //throw new UnsupportedOperationException();
-//        }
-
-        //prevent comparison with AbstractVariable
-        if (u instanceof UnnormalizedVariable) {
-            return toString().equals(u.toString());
-        }
-
-        return false;
-    }
-
 
     @Override
     public final int complexity() {
         return 0;
+    }
+
+    @Override
+    public float voluplexity() {
+        return 0.5f;
     }
 
     @Override
@@ -100,16 +88,16 @@ public class UnnormalizedVariable extends AtomicConst implements Variable {
 //        throw new UnsupportedOperationException();
 //    }
 
-    @Override
-    public void append(ByteArrayDataOutput out) {
-        out.writeByte(SPECIAL_OP);
-        String s = toString();
-        out.writeShort(s.length());
-        out.write(s.getBytes()); //HACK
-        //byte[] b = bytes();
-        //out.writeShort(b.length);
-
-    }
+//    @Override
+//    public void append(ByteArrayDataOutput out) {
+//        out.writeByte(SPECIAL_OP);
+//        String s = toString();
+//        out.writeShort(s.length());
+//        out.write(s.getBytes()); //HACK
+//        //byte[] b = bytes();
+//        //out.writeShort(b.length);
+//
+//    }
 
 
 }

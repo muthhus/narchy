@@ -56,8 +56,8 @@ public class Operator extends BaseConcept implements PermanentConcept, Atomic {
     }
 
     @Override
-    public byte[] toBytes() {
-        return ((Atom)term).toBytes();
+    public byte[] bytes() {
+        return ((Atom)term).bytes();
     }
 
     /**

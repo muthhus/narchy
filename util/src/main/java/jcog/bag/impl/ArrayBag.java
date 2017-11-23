@@ -11,9 +11,11 @@ import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import jcog.sort.SortedArray;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -181,7 +183,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         if (s == 0)
             return;
         Object[] il = items.list;
-        if (s > 1) { //test again
+        if (s > 1) {
             int[] stack = new int[sortSize(s) /* estimate */];
             qsort(stack, il, 0 /*dirtyStart - 1*/, (s - 1));
 
@@ -827,8 +829,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                 float ci = pCmp((Priority) c[i]);
                 if (cmpGT(ci, cr)) {
                     swap(c, right, i);
-                    float x = cr; /*cr = ci;*/
-                    ci = x;
+                    ci = cr;
                 }
                 if (cmpGT(cl, ci)) {
                     swap(c, i, left);
@@ -867,7 +868,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         }
     }
 
-    public static void swap(Object[] c, int x, int y) {
+    static void swap(Object[] c, int x, int y) {
         Object swap = c[y];
         c[y] = c[x];
         c[x] = swap;

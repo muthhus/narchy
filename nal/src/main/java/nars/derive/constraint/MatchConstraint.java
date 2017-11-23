@@ -32,12 +32,6 @@ public abstract class MatchConstraint extends AbstractPred<Derivation> {
     }
 
 
-    public static final Comparator<MatchConstraint> costComparator = (a, b) -> {
-        if (a.equals(b)) return 0;
-        int i = Float.compare(a.cost(), b.cost());
-        return i == 0 ? a.compareTo(b) : i;
-    };
-
 //    public static class CompoundConstraint extends AbstractPred<Derivation> {
 //
 //
@@ -60,5 +54,5 @@ public abstract class MatchConstraint extends AbstractPred<Derivation> {
      * @param f              match context
      * @return true if match is INVALID, false if VALID (reversed)
      */
-    abstract public boolean invalid(@NotNull Term y, @NotNull Unify f);
+    abstract public boolean invalid(Term y, Unify f);
 }
