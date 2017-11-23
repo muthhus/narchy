@@ -119,7 +119,7 @@ abstract public class Causable extends NARService {
 //        }
 //    }
 
-    private final class MyCan extends Can {
+    private static final class MyCan extends Can {
         private final NAR nar;
 
         public MyCan(NAR nar, String id) {

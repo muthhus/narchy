@@ -31,15 +31,15 @@
  */
 package net.propero.rdp;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
 
 public class WrappedImage {
-    static final Logger logger = Logger.getLogger(WrappedImage.class);
+    static final Logger logger = LoggerFactory.getLogger(WrappedImage.class);
     final BufferedImage bi;
     private final Graphics gfx;
     IndexColorModel cm;
@@ -155,10 +155,10 @@ public class WrappedImage {
             int pix = bi.getRGB(x, y) & 0xFFFFFF;
             int[] vals = {(pix >> 16) & 0xFF, (pix >> 8) & 0xFF, (pix) & 0xFF};
             int out = cm.getDataElement(vals, 0);
-            if (cm.getRGB(out) != bi.getRGB(x, y) && logger.isEnabledFor(Level.INFO))
-                logger.info("Did not get correct colour value for color ("
-                        + Integer.toHexString(pix) + "), got ("
-                        + cm.getRGB(out) + ") instead");
+//            if (cm.getRGB(out) != bi.getRGB(x, y) && logger.isEnabledFor(Level.INFO))
+//                logger.info("Did not get correct colour value for color ("
+//                        + Integer.toHexString(pix) + "), got ("
+//                        + cm.getRGB(out) + ") instead");
             return out;
         }
     }

@@ -29,13 +29,15 @@
  */
 package net.propero.rdp;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
 public abstract class LicenceStore {
 
-    static final Logger logger = Logger.getLogger(LicenceStore.class);
+    static final Logger logger = LoggerFactory.getLogger(LicenceStore.class);
 
     /**
      * Load a licence from a file

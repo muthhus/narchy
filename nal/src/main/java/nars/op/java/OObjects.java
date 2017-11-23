@@ -511,7 +511,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
             MethodHandle mm;
 
-            mm = methodArgCache.apply(Tuples.pair(Tuples.<Class,String>pair(c, method.toString()), types));
+            mm = methodArgCache.apply(Tuples.pair(Tuples.pair(c, method.toString()), types));
             if (mm == null)
                 return;
 
@@ -643,7 +643,7 @@ public class OObjects extends DefaultTermizer implements MethodHandler {
 
     @Nullable
     @Override
-    public final Object invoke(Object obj, Method wrapper, Method wrapped, Object[] args) throws Throwable {
+    public final Object invoke(Object obj, Method wrapper, Method wrapped, Object[] args) {
 
         Object result;
         try {

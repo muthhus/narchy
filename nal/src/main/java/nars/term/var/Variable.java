@@ -78,7 +78,7 @@ public interface Variable extends Atomic {
             if (common == this || common == y)
                 return true; //no change
 
-            return u.putXY(this, common) && u.putXY((Variable) y, common);
+            return u.putXY(this, common) && u.putXY(y, common);
         } else {
             if (y instanceof Variable) {
                 if (xOp.id < yOp.id) {  //only allows indep to subsume dep but not vice versa

@@ -315,7 +315,7 @@ public abstract class Unify extends Versioning implements Subst {
         return relevantVariables(xsubs) || (varSymmetric && relevantVariables(ysubs));
     }
 
-    public boolean relevantVariables(Termlike x) {
+    public static boolean relevantVariables(Termlike x) {
         return //type == null ?
                 x.varPattern() > 0 || x.hasAny(Op.VAR_DEP.bit | Op.VAR_INDEP.bit | Op.VAR_QUERY.bit);
                 //x.hasAny(type);
@@ -356,10 +356,9 @@ public abstract class Unify extends Versioning implements Subst {
 //            }
 //            return false;
 //        }
-
-        @NotNull
+        
         @Override
-        public Versioned newEntry(Term key) {
+        protected Versioned newEntry(Term key) {
             return new ConstrainedVersionedTerm(elementStackSizeDefault);
         }
 

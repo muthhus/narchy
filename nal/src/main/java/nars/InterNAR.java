@@ -97,7 +97,6 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
 
                 if (peer.connected()) {
                     try {
-                        next = next;
                         //if (x!=null) {
                         @Nullable byte[] msg = IO.taskToBytes(next);
                         if (msg != null) {
@@ -148,7 +147,6 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
         if (q == null)
             return;
 
-        answer = answer;
         @Nullable byte[] a = IO.taskToBytes(answer);
         if (a != null) {
             UDPeer.Msg aa = new UDPeer.Msg(TELL.id, ttl(answer), peer.me, null, a);

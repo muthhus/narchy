@@ -1,32 +1,36 @@
 buildscript {
     repositories {
-        mavenLocal()
         mavenCentral()
-        jcenter()
+        mavenLocal()
+//        jcenter()
+//        maven {
+//            url "http://plugins.gradle.org/m2/"
+//        }
+        maven {
+            url "http://plugins.gradle.org/m2/"
+        }
+        maven {
+            url "http://jcenter.bintray.com"
+        }
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
 //        classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.0'
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0-M1'
-//        classpath 'ca.cutterslade.gradle:gradle-dependency-analyze:1.2.1'
+//        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0-M1'
+//        classpath "com.github.ben-manes:gradle-versions-plugin:0.17.0"
+        classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
 
     }
 }
 
-plugins {
-    id 'com.gradle.build-scan' version '1.10.3'
-    id 'com.github.ben-manes.versions' version '0.17.0' //dependencyUpdates
-}
-
-buildScan {
-    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-    licenseAgree = 'yes'
-}
+apply plugin: "com.github.johnrengelman.shadow"
+//buildScan {
+//    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
+//    licenseAgree = 'yes'
+//}
 
 allprojects {
     apply plugin: 'maven'
     apply plugin: 'idea'
-//    apply plugin: 'ca.cutterslade.analyze'
 
     group = 'narchy'
     version = '1.0'
@@ -34,9 +38,18 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'com.github.johnrengelman.shadow'
-//    apply plugin: 'com.kncept.junit5.reporter'
-    apply plugin: 'org.junit.platform.gradle.plugin'
+//    apply plugin: 'org.junit.platform.gradle.plugin'
+//    apply plugin: "com.github.ben-manes.versions"
+    repositories {
+
+        mavenCentral()
+        mavenLocal()
+//        jcenter()
+
+        maven { url "http://repo.maven.apache.org/maven2" }
+        maven { url "http://jcenter.bintray.com" }
+//        maven { url "http://oss.sonatype.org/content/repositories/snapshots" }
+    }
 
     sourceCompatibility = 1.10
     targetCompatibility = 1.10
@@ -50,14 +63,6 @@ subprojects {
             junitXml.enabled = false
             html.enabled = true
         }
-    }
-
-    repositories {
-        mavenLocal()
-
-        maven { url "http://repo.maven.apache.org/maven2" }
-        maven { url "https://jcenter.bintray.com" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }
 
 //    junitHtmlReport {

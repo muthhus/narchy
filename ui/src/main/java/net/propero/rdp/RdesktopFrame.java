@@ -32,7 +32,6 @@ package net.propero.rdp;
 import net.propero.rdp.keymapping.KeyCode_FileBased;
 import net.propero.rdp.menu.RdpMenu;
 import net.propero.rdp.rdp5.cliprdr.ClipChannel;
-import org.apache.log4j.Logger;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -40,8 +39,6 @@ import java.awt.event.*;
 // import javax.swing.Box;
 
 public abstract class RdesktopFrame extends Frame {
-
-    static final Logger logger = Logger.getLogger(RdesktopFrame.class);
 
     public final RdesktopCanvas canvas;
 
@@ -283,7 +280,7 @@ public abstract class RdesktopFrame extends Frame {
 
         @Override
         public void windowLostFocus(WindowEvent e) {
-            logger.info("windowLostFocus");
+//            logger.info("windowLostFocus");
             // lost focus - need clear keys that are down
             canvas.lostFocus();
         }

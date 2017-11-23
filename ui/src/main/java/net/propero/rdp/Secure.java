@@ -33,7 +33,8 @@ package net.propero.rdp;
 import net.propero.rdp.crypto.CryptoException;
 import net.propero.rdp.crypto.RC4;
 import net.propero.rdp.rdp5.VChannels;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -49,7 +50,7 @@ public class Secure {
     /* constants for the secure layer */
     public static final int SEC_ENCRYPT = 0x0008;
     public static final int SEC_LOGON_INFO = 0x0040;
-    static final Logger logger = Logger.getLogger(Secure.class);
+    static final Logger logger = LoggerFactory.getLogger(Secure.class);
     static final int SEC_RANDOM_SIZE = 32;
     static final int SEC_MODULUS_SIZE = 64;
     static final int SEC_MAX_MODULUS_SIZE = 256;

@@ -30,7 +30,7 @@ import static nars.time.Tense.XTERNAL;
  */
 public interface TermContainer extends Termlike, Iterable<Term> {
 
-    /*@NotNull*/ TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[0]);
+    /*@NotNull*/ TermVector NoSubterms = new ArrayTermVector(Term.EmptyArray);
 
 
     //TODO optionally allow atomic structure positions to differ

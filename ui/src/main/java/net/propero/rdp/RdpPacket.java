@@ -32,7 +32,10 @@
 // Created on 03-Sep-2003
 package net.propero.rdp;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public abstract class RdpPacket {
     /* constants for Packet */
@@ -40,7 +43,7 @@ public abstract class RdpPacket {
     public static final int SECURE_HEADER = 2;
     public static final int RDP_HEADER = 3;
     public static final int CHANNEL_HEADER = 4;
-    static final Logger logger = Logger.getLogger(RdpPacket.class);
+    static final Logger logger = LoggerFactory.getLogger(RdpPacket.class);
     protected int mcs = -1;
 
     protected int secure = -1;

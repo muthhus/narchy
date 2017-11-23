@@ -1038,9 +1038,7 @@ public class ISOIOLibrary extends Library{
         
         Struct arg0 = (Struct) in_char.term();
 
-        if(arg0.isVar())
-            throw PrologError.instantiation_error(engine.engine, 2);
-        else if (!arg0.isAtomic()) {
+       if (!arg0.isAtomic()) {
             throw PrologError.type_error(engine.engine, 2, "character", arg0);
         } 
         else {            
@@ -1085,10 +1083,10 @@ public class ISOIOLibrary extends Library{
         
         Number arg0 = (Number) char_code.term();
         
-        if(arg0.isVar()){
-            throw PrologError.instantiation_error(engine.engine, 2);
-        }
-        else if (!arg0.isNumber()) {
+//        if(arg0 instanceof Var){
+//            throw PrologError.instantiation_error(engine.engine, 2);
+//        }
+        if (!arg0.isNumber()) {
             throw PrologError.type_error(engine.engine, 2, "character", arg0);
         } 
         else {

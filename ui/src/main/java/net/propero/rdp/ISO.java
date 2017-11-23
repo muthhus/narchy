@@ -30,14 +30,15 @@
 package net.propero.rdp;
 
 import net.propero.rdp.crypto.CryptoException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 
 public abstract class ISO {
-    static final Logger logger = Logger.getLogger(ISO.class);
+    static final Logger logger = LoggerFactory.getLogger(ISO.class);
     /* this for the ISO Layer */
     private static final int CONNECTION_REQUEST = 0xE0;
     private static final int CONNECTION_CONFIRM = 0xD0;

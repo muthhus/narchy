@@ -30,13 +30,15 @@
 package net.propero.rdp;
 
 import net.propero.rdp.orders.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.image.IndexColorModel;
 import java.io.IOException;
 
+
 public class Orders {
-    static final Logger logger = Logger.getLogger(Orders.class);
+    static final Logger logger = LoggerFactory.getLogger(Orders.class);
     /* RDP_BMPCACHE2_ORDER */
     private static final int ID_MASK = 0x0007;
     private static final int MODE_MASK = 0x0038;

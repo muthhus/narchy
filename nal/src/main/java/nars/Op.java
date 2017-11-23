@@ -1119,7 +1119,7 @@ public enum Op {
 
         int ee = events.size();
         if (ee > 1) {
-            Collections.sort(events);
+            events.sort(LongObjectPair::compareTo);
             ListIterator<LongObjectPair<Term>> ii = events.listIterator();
             long prevtime = ETERNAL;
             while (ii.hasNext()) {
@@ -1149,16 +1149,18 @@ public enum Op {
         }
     }
 
+    private static Term conjSeq(List<LongObjectPair<Term>> events) {
+        return conjSeq(events, 0, events.size());
+    }
+
     /**
      * constructs a correctly merged conjunction from a list of events, in the sublist specified by from..to (inclusive)
      * all of the events should have distinct times before calling here.
      */
-    private static Term conjSeq(List<LongObjectPair<Term>> events) {
+    private static Term conjSeq(List<LongObjectPair<Term>> events, int start, int end) {
 
-        int ee = events.size();
-
-
-        LongObjectPair<Term> first = events.get(0);
+        LongObjectPair<Term> first = events.get(start);
+        int ee = end - start;
         switch (ee) {
             case 0:
                 throw new NullPointerException("should not be called with empty events list");
@@ -1166,21 +1168,21 @@ public enum Op {
                 return first.getTwo();
             case 2:
                 Term left = first.getTwo();
-                LongObjectPair<Term> second = events.get(1);
+                LongObjectPair<Term> second = events.get(end-1);
                 Term right = second.getTwo();
                 return conjSeqFinal(
                         (int) (second.getOne() - first.getOne()),
                         left, right);
         }
 
-        int to = ee - 1;
-        int center = to / 2;
+        int center = start + (end - 1 - start) / 2;
 
-        Term left = conjSeq(events.subList(0, center + 1));
+
+        Term left = conjSeq(events, start, center+1);
         if (left == Null) return Null;
         if (left == False) return False; //early fail shortcut
 
-        Term right = conjSeq(events.subList(center + 1, to + 1));
+        Term right = conjSeq(events, center+1, end);
         if (right == Null) return Null;
         if (right == False) return False; //early fail shortcut
 
@@ -1667,7 +1669,7 @@ public enum Op {
                                     /*subject.dt()!=DTERNAL ? Op.conj(se.toList()) :
                                         CONJ.the(DTERNAL, (Collection)se.collect(x->x.getTwo())),*/
                                     predicate.dt() != DTERNAL ? Op.conj(pe.toList()) :
-                                            CONJ.the(DTERNAL, (Collection) pe.collect(LongObjectPair::getTwo))
+                                            CONJ.the(DTERNAL, pe.collect(LongObjectPair::getTwo))
                             );
                         }
                     }

@@ -187,7 +187,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
                             return true; //skip the input term
 
                         if (indepVarOrStatement.op() == VAR_INDEP) {
-                            indepVarPaths.getIfAbsentPut(((byte) ((VarIndep) indepVarOrStatement).id()), FasterList::new).add(
+                            indepVarPaths.getIfAbsentPut(((VarIndep) indepVarOrStatement).id(), FasterList::new).add(
                                 path.toImmutable()
                             );
                         } else {
@@ -211,7 +211,7 @@ public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion, jcog.da
                     });
 
                     if (statements.size() > 1) {
-                        Collections.sort(statements, Comparator.comparingInt(PrimitiveIterable::size));
+                        statements.sort(Comparator.comparingInt(PrimitiveIterable::size));
                     }
 
                     boolean rootIsStatement = t.op().statement;

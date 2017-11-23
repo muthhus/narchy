@@ -83,11 +83,6 @@ public class ConjClustering extends Causable {
         });
     }
 
-    @Override
-    public boolean singleton() {
-        return true;
-    }
-
     private int tasksCreated, taskLimit;
 
     @Override

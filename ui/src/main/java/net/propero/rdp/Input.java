@@ -33,15 +33,15 @@ package net.propero.rdp;
 import net.propero.rdp.keymapping.KeyCode;
 import net.propero.rdp.keymapping.KeyCode_FileBased;
 import net.propero.rdp.keymapping.KeyMapException;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.event.*;
 import java.util.Vector;
 
 public abstract class Input {
 
-    protected static final Logger logger = Logger.getLogger(Input.class);
+    protected static final Logger logger = LoggerFactory.getLogger(Input.class);
     // Using this flag value (0x0001) seems to do nothing, and after running
     // through other possible values, the RIGHT flag does not appear to be
     // implemented
@@ -95,8 +95,8 @@ public abstract class Input {
         newKeyMapper = k;
         canvas = c;
         rdp = r;
-        if (Options.debug_keyboard)
-            logger.setLevel(Level.DEBUG);
+//        if (Options.debug_keyboard)
+//            logger.setLevel(Level.DEBUG);
         addInputListeners();
         pressedKeys = new Vector();
     }
@@ -119,8 +119,8 @@ public abstract class Input {
 
         canvas = c;
         rdp = r;
-        if (Options.debug_keyboard)
-            logger.setLevel(Level.DEBUG);
+//        if (Options.debug_keyboard)
+//            logger.setLevel(Level.DEBUG);
         addInputListeners();
         pressedKeys = new Vector();
     }

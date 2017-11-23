@@ -177,7 +177,7 @@ public class BagClustering<X> {
 
                     List<VLink<X>> x = sorted.write();
                     x.clear();
-                    bag.forEach((Consumer<VLink<X>>) x::add);
+                    bag.forEach(x::add);
                     x.sort(Comparator.comparingInt(a -> a.centroid));
                     takeSortedClusters.accept(x);
                     sorted.commit();

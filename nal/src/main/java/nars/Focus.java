@@ -15,12 +15,10 @@ import nars.control.MetaGoal;
 import nars.control.Traffic;
 import nars.exe.Exec;
 import nars.term.atom.Atomic;
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 /**
  * decides mental activity
@@ -45,6 +43,7 @@ public class Focus {
             super(can, p);
         }
 
+        @Override
         public final void run() {
             int iters = Math.max(1, Math.round(JIFFY / id.can.iterationTimeMean()));
             //int iters = 1;
@@ -98,12 +97,6 @@ public class Focus {
                 int numHidden = Math.round(hiddenMultipler * numCauses);
 
                 rbm = new RBM(numCauses, numHidden, null, null, null, rng) {
-                    @Override
-                    public double activate(double a) {
-                        return super.activate(a);
-                        //return Util.tanhFast((float) a);
-                        //return Util.sigmoidBipolar((float) a, 5);
-                    }
                 };
                 cur = new double[numCauses];
                 next = new double[numCauses];
@@ -213,7 +206,7 @@ public class Focus {
     }
 
     public void work(int tasks) {
-        can.sample(tasks, (Consumer<ProcLink>) (ProcLink::run));
+        can.sample(tasks, ProcLink::run);
     }
 
     final AtomicBoolean busy = new AtomicBoolean(false);

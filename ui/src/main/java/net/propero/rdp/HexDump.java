@@ -30,17 +30,14 @@
  */
 package net.propero.rdp;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 public class HexDump {
-    static final Logger logger = Logger.getLogger(HexDump.class);
 
     /**
      * Construct a HexDump object, sets logging level to Debug
      */
     public HexDump() {
-        logger.setLevel(Level.DEBUG);
+
     }
 
     /**
@@ -54,8 +51,6 @@ public class HexDump {
         int count = 0;
         String index;
         String number;
-
-        logger.debug(msg);
 
         while (count < data.length) {
             index = Integer.toHexString(count);
@@ -101,7 +96,7 @@ public class HexDump {
                     case (2):
                         break;
                     default:
-                        logger.debug(index);
+//                        logger.debug(index);
                         // out.println("");
                         return;
                 }
@@ -109,7 +104,7 @@ public class HexDump {
                 // out.print(number + " ");
                 count++;
             }
-            logger.debug(index);
+//            logger.debug(index);
             // out.println("");
         }
 

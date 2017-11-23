@@ -29,7 +29,7 @@
  */
 package net.propero.rdp.rdp5.cliprdr;
 
-import org.apache.log4j.Logger;
+
 
 import java.awt.*;
 import java.awt.image.MemoryImageSource;
@@ -41,7 +41,7 @@ import java.io.OutputStream;
 
 public class ClipBMP extends Component {
 
-    protected static final Logger logger = Logger.getLogger(ClipBMP.class);
+    protected static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ClipBMP.class);
     private static final long serialVersionUID = -756738379924520867L;
     // --- Private constants
     private final static int BITMAPFILEHEADER_SIZE = 14;

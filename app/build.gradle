@@ -34,6 +34,9 @@ shadowJar {
     exclude 'com/sun/jna/sunos*'
     exclude 'com/sun/jna/aix*'
     exclude 'Conversant*.png'
+    exclude '/*.txt'
+    exclude '/*.html'
+
 
     mainClassName = 'nars.UI'
 

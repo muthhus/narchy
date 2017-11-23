@@ -3,7 +3,6 @@ package spacegraph.widget.meta;
 import jcog.Services;
 import jcog.list.FasterList;
 import jcog.math.FloatParam;
-import org.apache.commons.lang.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
@@ -68,8 +67,8 @@ public class ReflectionSurface<X> extends Grid {
                         l.add(new MyFloatSlider(p, k));
                     } else if (y instanceof AtomicBoolean) {
                         l.add(new CheckBox(k, (AtomicBoolean) y));
-                    } else if (y instanceof MutableBoolean) {
-                        l.add(new CheckBox(k, (MutableBoolean) y));
+//                    } else if (y instanceof MutableBoolean) {
+//                        l.add(new CheckBox(k, (MutableBoolean) y));
                     } else if (y instanceof Runnable) {
                         l.add(new PushButton(k, (Runnable) y));
                     }

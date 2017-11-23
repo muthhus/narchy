@@ -1,7 +1,6 @@
 package nars.derive;
 
 import nars.control.Derivation;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
@@ -119,7 +118,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
         private final byte puncOverride;
 
 
-        public SolvePuncOverride(Compound i, byte puncOverride, TruthOperator belief, TruthOperator desire, boolean beliefProjected) {
+        public SolvePuncOverride(Term i, byte puncOverride, TruthOperator belief, TruthOperator desire, boolean beliefProjected) {
             super(i, belief, desire, beliefProjected);
             this.puncOverride = puncOverride;
         }
@@ -137,7 +136,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
      */
     public static final class SolvePuncFromTask extends Solve {
 
-        public SolvePuncFromTask(Compound i, TruthOperator belief, TruthOperator desire, boolean beliefProjected) {
+        public SolvePuncFromTask(Term i, TruthOperator belief, TruthOperator desire, boolean beliefProjected) {
             super(i, belief, desire, beliefProjected);
         }
 

@@ -52,6 +52,7 @@ public class LivePredictor {
             }
         }
 
+        @Override
         public double[] predict() {
             return nextPredictions;
         }

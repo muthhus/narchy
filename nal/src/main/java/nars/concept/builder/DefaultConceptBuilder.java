@@ -378,7 +378,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     }
 
     @NotNull
-    public Map newBagMap(int volume) {
+    public static Map newBagMap(int volume) {
         //int defaultInitialCap = 0;
         float loadFactor = 0.75f;
 

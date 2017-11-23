@@ -31,21 +31,22 @@ package net.propero.rdp;
 
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+
 public class RDPClientChooser {
-    static final Logger logger = Logger.getLogger(RDPClientChooser.class);
+    static final Logger logger = LoggerFactory.getLogger(RDPClientChooser.class);
 
     /**
      * Initialise a client chooser, set logging level to DEBUG
      */
     public RDPClientChooser() {
-        logger.setLevel(Level.DEBUG);
+//        logger.setLevel(Level.DEBUG);
         logger.info("RDPClientChooser");
     }
 

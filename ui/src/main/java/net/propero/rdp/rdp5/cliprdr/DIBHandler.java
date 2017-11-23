@@ -32,7 +32,6 @@ package net.propero.rdp.rdp5.cliprdr;
 import net.propero.rdp.Common;
 import net.propero.rdp.RdpPacket;
 import net.propero.rdp.Utilities_Localised;
-import org.apache.log4j.Logger;
 
 import java.awt.*;
 import java.awt.datatransfer.Transferable;
@@ -42,7 +41,7 @@ import java.io.IOException;
 
 public class DIBHandler extends TypeHandler implements ImageObserver {
 
-    protected static Logger logger = Logger.getLogger(DIBHandler.class);
+//    protected static Logger logger = LoggerFactory.getLogger((DIBHandler.class);
 
     @Override
     public boolean formatValid(int format) {

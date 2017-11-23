@@ -31,8 +31,8 @@ package net.propero.rdp;
 
 import net.propero.rdp.crypto.CryptoException;
 import net.propero.rdp.rdp5.VChannels;
-import org.apache.log4j.Logger;
-import org.apache.log4j.NDC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.IndexColorModel;
@@ -64,7 +64,7 @@ public class Rdp {
     public static final int BMPCACHE2_C1_CELLS = 0x78;
     public static final int BMPCACHE2_C2_CELLS = 0x150;
     public static final int BMPCACHE2_NUM_PSTCELLS = 0x9f6;
-    protected static final Logger logger = Logger.getLogger(Rdp.class);
+    protected static final Logger logger = LoggerFactory.getLogger(Rdp.class);
     static final byte[] caps_0x0d = {0x01, 0x00, 0x00, 0x00, 0x09, 0x04, 0x00, 0x00,
             0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -264,21 +264,21 @@ public class Rdp {
         width = data.getLittleEndian16(); // in_uint16_le(s, width);
         height = data.getLittleEndian16(); // in_uint16_le(s, height);
 
-        logger.debug("setting desktop size and bpp to: " + width + 'x' + height
-                + 'x' + bpp);
+//        logger.debug("setting desktop size and bpp to: " + width + 'x' + height
+//                + 'x' + bpp);
 
         /*
          * The server may limit bpp and change the size of the desktop (for
          * example when shadowing another session).
          */
         if (Options.server_bpp != bpp) {
-            logger.warn("colour depth changed from " + Options.server_bpp
-                    + " to " + bpp);
+//            logger.warn("colour depth changed from " + Options.server_bpp
+//                    + " to " + bpp);
             Options.server_bpp = bpp;
         }
         if (Options.width != width || Options.height != height) {
-            logger.warn("screen size changed from " + Options.width + 'x'
-                    + Options.height + " to " + width + 'x' + height);
+//            logger.warn("screen size changed from " + Options.width + 'x'
+//                    + Options.height + " to " + width + 'x' + height);
             Options.width = width;
             Options.height = height;
             // ui_resize_window(); TODO: implement resize thingy
@@ -357,7 +357,7 @@ public class Rdp {
      * @return Code specifying the reason for disconnection
      */
     protected static int processDisconnectPdu(RdpPacket_Localised data) {
-        logger.debug("Received disconnect PDU");
+//        logger.debug("Received disconnect PDU");
         return data.getLittleEndian32();
     }
 
@@ -771,14 +771,14 @@ public class Rdp {
                     logger.debug("Rdp.RDP_PDU_DEMAND_ACTIVE");
                     // get this after licence negotiation, just before the 1st
                     // order...
-                    NDC.push("processDemandActive");
+//                    NDC.push("processDemandActive");
                     this.processDemandActive(data);
                     // can use this to trigger things that have to be done before
                     // 1st order
-                    logger.debug("ready to send (got past licence negotiation)");
+//                    logger.debug("ready to send (got past licence negotiation)");
                     Rdesktop.readytosend = true;
                     frame.triggerReadyToSend();
-                    NDC.pop();
+//                    NDC.pop();
                     deactivated[0] = false;
                     break;
 
@@ -790,10 +790,10 @@ public class Rdp {
 
                 case (Rdp.RDP_PDU_DATA):
                     // all the others should be this
-                    NDC.push("processData");
+//                    NDC.push("processData");
 
                     disc = this.processData(data, ext_disc_reason);
-                    NDC.pop();
+//                    NDC.pop();
                     break;
 
                 case 0:

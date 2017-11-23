@@ -19,11 +19,6 @@ public class TaskFeed extends Causable {
     }
 
     @Override
-    public boolean singleton() {
-        return true;
-    }
-
-    @Override
     protected int next(NAR n, int iterations) {
         return 0;
     }

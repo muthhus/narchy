@@ -34,7 +34,8 @@ import net.propero.rdp.Options;
 import net.propero.rdp.RdesktopException;
 import net.propero.rdp.RdpPacket_Localised;
 import net.propero.rdp.crypto.CryptoException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -61,7 +62,7 @@ public class VChannels {
     public static final int CHANNEL_FLAG_FIRST = 0x01;
     public static final int CHANNEL_FLAG_LAST = 0x02;
     public static final int CHANNEL_FLAG_SHOW_PROTOCOL = 0x10;
-    protected static final Logger logger = Logger.getLogger(VChannels.class);
+    protected static final Logger logger = LoggerFactory.getLogger(VChannels.class);
     private VChannel channels[] = new VChannel[MAX_CHANNELS];
 
     private int num_channels;

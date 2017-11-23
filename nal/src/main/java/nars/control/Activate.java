@@ -65,18 +65,16 @@ public class Activate extends PLink<Concept> implements Termed {
         final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
         long now = nar.time();
         int dur = nar.dur();
-        tasklinks.commit(PriForget.forget(tasklinks, linkForgetting, Pri.EPSILON, (r)->{
-          return new PriForget<PriReference<Task>>(r) {
-              @Override
-              public void accept(PriReference<Task> b) {
-                  Task t = b.get();
-                  float rate =
-                        t.isBeliefOrGoal() ?
-                              1f - TemporalBeliefTable.temporalTaskPriority(t, now, now, dur) :
-                              1f;
-                  b.priSub(priRemoved * rate);
-              }
-          };
+        tasklinks.commit(PriForget.forget(tasklinks, linkForgetting, Pri.EPSILON, (r)-> new PriForget<PriReference<Task>>(r) {
+            @Override
+            public void accept(PriReference<Task> b) {
+                Task t = b.get();
+                float rate =
+                      t.isBeliefOrGoal() ?
+                            1f - TemporalBeliefTable.temporalTaskPriority(t, now, now, dur) :
+                            1f;
+                b.priSub(priRemoved * rate);
+            }
         }));
         int ntasklinks = tasklinks.size();
         if (ntasklinks == 0) return null;
@@ -120,7 +118,7 @@ public class Activate extends PLink<Concept> implements Termed {
     }
 
 
-    private List<Concept> randomTemplateConcepts(List<Concept> tt, Random rng, int count, NAR nar) {
+    private static List<Concept> randomTemplateConcepts(List<Concept> tt, Random rng, int count, NAR nar) {
 
 //            {
 //                //this allows the tasklink, if activated to be inserted to termlinks of this concept

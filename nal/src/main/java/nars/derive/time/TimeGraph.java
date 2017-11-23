@@ -147,7 +147,7 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
         return existing != null ? existing.id : e;
     }
 
-    private TimeGraph.Event newEvent(Term t, long start, long end) {
+    private static TimeGraph.Event newEvent(Term t, long start, long end) {
         assert (!(t instanceof Bool));
 
         if (start == TIMELESS)
@@ -282,26 +282,29 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
 //                } else
 
                 //locate the events and sub-events absolutely
-                if (eventDT == XTERNAL) {
-                    for (Term es : eventTerm.subterms()) {
-                        know(es);
-                    }
-                } else if (eventDT == DTERNAL) {
-                    for (Term es : eventTerm.subterms()) {
-                        know(es); //TODO can these be absolute if the event is?
-                    }
-                } else {
+                switch (eventDT) {
+                    case XTERNAL:
+                        for (Term es : eventTerm.subterms()) {
+                            know(es);
+                        }
+                        break;
+                    case DTERNAL:
 
-                    eventTerm.eventsWhile((w, y) -> {
+                        eventTerm.subterms().forEach(this::know); //TODO can these be absolute if the event is?
+                        break;
+                    default:
 
-                        Event yy = et != TIMELESS ?
-                                know(y, et == ETERNAL ? ETERNAL : w + et) :
-                                know(y);
+                        eventTerm.eventsWhile((w, y) -> {
 
-                        link(event, w, yy);
+                            Event yy = et != TIMELESS ?
+                                    know(y, et == ETERNAL ? ETERNAL : w + et) :
+                                    know(y);
 
-                        return true;
-                    }, 0, true, false, false, 0);
+                            link(event, w, yy);
+
+                            return true;
+                        }, 0, true, false, false, 0);
+                        break;
                 }
 
                 break;

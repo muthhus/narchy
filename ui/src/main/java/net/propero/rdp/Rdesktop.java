@@ -38,10 +38,9 @@ import net.propero.rdp.rdp5.VChannels;
 import net.propero.rdp.rdp5.cliprdr.ClipChannel;
 import net.propero.rdp.rdp5.snd.SoundChannel;
 import net.propero.rdp.tools.SendEvent;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import java.awt.*;
 import java.io.InputStream;
@@ -74,7 +73,7 @@ public class Rdesktop {
     public static final int exDiscReasonLicenseErrClientEncryption = 0x0108;
     public static final int exDiscReasonLicenseCantUpgradeLicense = 0x0109;
     public static final int exDiscReasonLicenseNoRemoteConnections = 0x010a;
-    static final Logger logger = Logger.getLogger("net.propero.rdp");
+    static final Logger logger = LoggerFactory.getLogger("net.propero.rdp");
     static final String keyMapPath = "keymaps/";
     static boolean keep_running;
 
@@ -258,8 +257,8 @@ public class Rdesktop {
         keyMapLocation = "";
         toolFrame = null;
 
-        BasicConfigurator.configure();
-        logger.setLevel(Level.INFO);
+//        BasicConfigurator.configure();
+//        logger.setLevel(Level.INFO);
 
         // Attempt to run a native RDP Client
 
@@ -326,11 +325,11 @@ public class Rdesktop {
                             break;
                         case 2:
                             break;
-                        case 3:
-                            arg = g.getOptarg();
-                            PropertyConfigurator.configure(arg);
-                            logger.info("Log4j using config file " + arg);
-                            break;
+//                        case 3:
+//                            arg = g.getOptarg();
+//                            PropertyConfigurator.configure(arg);
+//                            logger.info("Log4j using config file " + arg);
+//                            break;
                         case 4:
                             showTools = true;
                             break;
@@ -423,35 +422,35 @@ public class Rdesktop {
                         usage();
                     }
                     break;
-                case 'l':
-                    arg = g.getOptarg();
-                    switch (arg.charAt(0)) {
-                        case 'd':
-                        case 'D':
-                            logger.setLevel(Level.DEBUG);
-                            break;
-                        case 'i':
-                        case 'I':
-                            logger.setLevel(Level.INFO);
-                            break;
-                        case 'w':
-                        case 'W':
-                            logger.setLevel(Level.WARN);
-                            break;
-                        case 'e':
-                        case 'E':
-                            logger.setLevel(Level.ERROR);
-                            break;
-                        case 'f':
-                        case 'F':
-                            logger.setLevel(Level.FATAL);
-                            break;
-                        default:
-                            System.err.println(progname + ": Invalid debug level: "
-                                    + arg.charAt(0));
-                            usage();
-                    }
-                    break;
+//                case 'l':
+//                    arg = g.getOptarg();
+//                    switch (arg.charAt(0)) {
+//                        case 'd':
+//                        case 'D':
+//                            logger.setLevel(Level.DEBUG);
+//                            break;
+//                        case 'i':
+//                        case 'I':
+//                            logger.setLevel(Level.INFO);
+//                            break;
+//                        case 'w':
+//                        case 'W':
+//                            logger.setLevel(Level.WARN);
+//                            break;
+//                        case 'e':
+//                        case 'E':
+//                            logger.setLevel(Level.ERROR);
+//                            break;
+//                        case 'f':
+//                        case 'F':
+//                            logger.setLevel(Level.FATAL);
+//                            break;
+//                        default:
+//                            System.err.println(progname + ": Invalid debug level: "
+//                                    + arg.charAt(0));
+//                            usage();
+//                    }
+//                    break;
                 case 'n':
                     Options.hostname = g.getOptarg();
                     break;
@@ -689,7 +688,7 @@ public class Rdesktop {
                         error(e, RdpLayer, window, true);
                     } catch (SocketException s) {
                         if (RdpLayer.isConnected()) {
-                            logger.fatal(s.getClass().getName() + ' '
+                            logger.error(s.getClass().getName() + ' '
                                     + s.getMessage());
                             s.printStackTrace();
                             error(s, RdpLayer, window, true);
@@ -698,7 +697,7 @@ public class Rdesktop {
                     } catch (RdesktopException e) {
                         String msg1 = e.getClass().getName();
                         String msg2 = e.getMessage();
-                        logger.fatal(msg1 + ": " + msg2);
+                        logger.error(msg1 + ": " + msg2);
 
                         e.printStackTrace(System.err);
 
@@ -734,8 +733,7 @@ public class Rdesktop {
                         error(e, RdpLayer, window, true);
                     }
                 } else { // closing bracket to if(!rdp==null)
-                    logger
-                            .fatal("The communications layer could not be initiated!");
+                    logger.error("The communications layer could not be initiated!");
                 }
             }
             Rdesktop.exit(0, RdpLayer, window, true);
@@ -796,7 +794,7 @@ public class Rdesktop {
      */
     public static void customError(String emsg, Rdp RdpLayer,
                                    RdesktopFrame window, boolean sysexit) {
-        logger.fatal(emsg);
+        logger.error(emsg);
         String[] msg = {emsg};
         window.showErrorDialog(msg);
         Rdesktop.exit(0, RdpLayer, window, true);
@@ -821,7 +819,7 @@ public class Rdesktop {
             String msg1 = e.getClass().getName();
             String msg2 = e.getMessage();
 
-            logger.fatal(msg1 + ": " + msg2);
+            logger.error(msg1 + ": " + msg2);
 
             String[] msg = {msg1, msg2};
             window.showErrorDialog(msg);

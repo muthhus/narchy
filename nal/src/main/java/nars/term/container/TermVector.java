@@ -145,6 +145,7 @@ public abstract class TermVector implements TermContainer {
         normalized = true;
     }
 
+    @Override
     public boolean isNormalized() {
         return normalized;
     }

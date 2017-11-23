@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.IntSupplier;
 
-import static nars.Op.*;
+import static nars.Op.Temporal;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -24,9 +24,7 @@ public interface Retemporalize extends CompoundTransform {
     public static final Retemporalize retemporalizeXTERNALToZero = new RetemporalizeFromTo(XTERNAL, 0);
     public static final Retemporalize retemporalizeDTERNALToZero = new RetemporalizeFromTo(DTERNAL, 0);
 
-    public static final Retemporalize retemporalizeRoot = new Retemporalize() {
-
-//        @Nullable
+    //        @Nullable
 //        @Override
 //        public Term transform(Compound x, Op op, int dt) {
 //            switch (op) {
@@ -52,30 +50,28 @@ public interface Retemporalize extends CompoundTransform {
 //            }
 //        }
 //
-        @Override
-        public int dt(Compound x) {
-            TermContainer xs = x.subterms();
+    public static final Retemporalize retemporalizeRoot = x -> {
+                TermContainer xs = x.subterms();
 
-            //any inside impl/conjunctions will disqualify the simple DTERNAL root form, but only in the next layer
+                //any inside impl/conjunctions will disqualify the simple DTERNAL root form, but only in the next layer
 
-            switch (x.op()) {
-                case CONJ:
-                    if ((xs.subs()==2) &&
-                            xs.hasAny(Temporal) && xs.OR(y->y.isAny(Temporal)) ||
-                            xs.sub(0).unneg().equals(xs.sub(1).unneg())) {
-                        return XTERNAL;
-                    } else {
-                        return DTERNAL; //simple
-                    }
-                case IMPL:
-                    //impl pred is always non-neg
-                    return xs.hasAny(Temporal) && xs.OR(y->y.isAny(Temporal)) ||
-                           xs.sub(0).unneg().equals(xs.sub(1)) ? XTERNAL : DTERNAL;
-                default:
-                    throw new UnsupportedOperationException();
-            }
-        }
-    };
+                switch (x.op()) {
+                    case CONJ:
+                        if ((xs.subs()==2) &&
+                                xs.hasAny(Temporal) && xs.OR(y->y.isAny(Temporal)) ||
+                                xs.sub(0).unneg().equals(xs.sub(1).unneg())) {
+                            return XTERNAL;
+                        } else {
+                            return DTERNAL; //simple
+                        }
+                    case IMPL:
+                        //impl pred is always non-neg
+                        return xs.hasAny(Temporal) && xs.OR(y->y.isAny(Temporal)) ||
+                               xs.sub(0).unneg().equals(xs.sub(1)) ? XTERNAL : DTERNAL;
+                    default:
+                        throw new UnsupportedOperationException();
+                }
+            };
 
 
     @Nullable

@@ -98,6 +98,7 @@ public interface TaskRegion extends HyperRegion, Tasked {
         return 1 + d /* * timeCost()*/ * CONF_SAMENESS_IMPORTANCE;
     }
 
+    @Override
     default double range(final int dim) {
         return /*Math.abs*/(coordF(true, dim) - coordF(false, dim));
     }
@@ -231,6 +232,7 @@ public interface TaskRegion extends HyperRegion, Tasked {
         return coordF(maxOrMin, dimension);
     }
 
+    @Override
     float coordF(boolean maxOrMin, int dimension);
 
 }

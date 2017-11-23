@@ -30,7 +30,9 @@
 
 package net.propero.rdp;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,7 +42,7 @@ import java.io.IOException;
 public class PstCache {
 
     public static final int MAX_CELL_SIZE = 0x1000; /* pixels */
-    protected static final Logger logger = Logger.getLogger(PstCache.class);
+    protected static final Logger logger = LoggerFactory.getLogger(PstCache.class);
     static final File[] g_pstcache_fd = new File[8];
     static int g_stamp;
     static int g_pstcache_Bpp;

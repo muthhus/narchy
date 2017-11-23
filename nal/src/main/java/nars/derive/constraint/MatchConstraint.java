@@ -5,9 +5,6 @@ import nars.control.Derivation;
 import nars.derive.AbstractPred;
 import nars.term.Term;
 import nars.term.subst.Unify;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.Comparator;
 
 
 public abstract class MatchConstraint extends AbstractPred<Derivation> {

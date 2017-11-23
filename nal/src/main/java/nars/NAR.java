@@ -229,8 +229,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             //tasklinksCap.accept(c.tasklinks().capacity());
             tasklinkCount.recordValue(c.tasklinks().size());
 
-            if (c instanceof BaseConcept) {
-                BaseConcept tc = (BaseConcept) c;
+            if (c instanceof Concept) {
+                Concept tc = (Concept) c;
                 beliefs.accept(tc.beliefs().size());
                 goals.accept(tc.goals().size());
                 questions.accept(tc.questions().size());

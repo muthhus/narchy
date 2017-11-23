@@ -42,7 +42,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
 
     @Override
     public final byte[] bytes() {
-        return ((Atom) term).bytes();
+        return ((Atomic) term).bytes();
     }
 
 

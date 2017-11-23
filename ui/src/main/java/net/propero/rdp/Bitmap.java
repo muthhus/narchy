@@ -31,7 +31,9 @@
 
 package net.propero.rdp;
 
-import org.apache.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -39,7 +41,7 @@ import java.awt.image.IndexColorModel;
 
 public class Bitmap {
 
-    protected static Logger logger = Logger.getLogger(Bitmap.class);
+    protected static Logger logger = LoggerFactory.getLogger(Bitmap.class);
     private static int bmpCount;
     private final int[] highdata;
     private final int width;

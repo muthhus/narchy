@@ -263,13 +263,6 @@ public class Struct extends Term {
         return true;
     }
 
-    /**
-     * is this term a variable
-     */
-    @Override
-    public boolean isVar() {
-        return false;
-    }
 
 
     // check type services

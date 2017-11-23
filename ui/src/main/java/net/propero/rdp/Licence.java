@@ -32,13 +32,14 @@ package net.propero.rdp;
 
 import net.propero.rdp.crypto.CryptoException;
 import net.propero.rdp.crypto.RC4;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class Licence {
-    static final Logger logger = Logger.getLogger(Licence.class);
+    static final Logger logger = LoggerFactory.getLogger(Licence.class);
     /* constants for the licence negotiation */
     private static final int LICENCE_TOKEN_SIZE = 10;
     private static final int LICENCE_HWID_SIZE = 20;

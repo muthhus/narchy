@@ -53,13 +53,7 @@ public abstract class Term implements Serializable, SubTree {
      * @deprecated Use <tt>instanceof Struct</tt> instead. 
      */
     public abstract boolean isStruct();
-    
-    /**
-     * is this term a variable?
-     * @deprecated Use <tt>instanceof Var</tt> instead. 
-     */
-    public abstract boolean isVar();
-    
+
     /** is this term a null term?*/
     public abstract boolean isEmptyList();
     
@@ -273,12 +267,7 @@ public abstract class Term implements Serializable, SubTree {
         return Parser.parseSingleTerm(st);
     }
     
-    /**
-     * @deprecated Use {@link Term#createTerm(String)} instead.
-     */
-    public static Term parse(String st) {
-        return Term.createTerm(st);
-    }
+
     
     /**
      * Static service to create a Term from a string, providing an
@@ -291,13 +280,7 @@ public abstract class Term implements Serializable, SubTree {
     public static Term createTerm(String st, OperatorManager op) {
         return Parser.parseSingleTerm(st, op);
     }
-    
-    /**
-     * @deprecated Use {@link Term#createTerm(String, OperatorManager)} instead.
-     */
-    public static Term parse(String st, OperatorManager op) {
-        return Term.createTerm(st, op);
-    }
+
     
     /**
      * Gets an iterator providing

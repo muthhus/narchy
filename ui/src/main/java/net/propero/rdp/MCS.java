@@ -31,7 +31,8 @@ package net.propero.rdp;
 
 import net.propero.rdp.crypto.CryptoException;
 import net.propero.rdp.rdp5.VChannels;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -40,7 +41,7 @@ import java.net.InetAddress;
 public class MCS {
     public static final int MCS_GLOBAL_CHANNEL = 1003;
     public static final int MCS_USERCHANNEL_BASE = 1001;
-    static final Logger logger = Logger.getLogger(MCS.class);
+    static final Logger logger = LoggerFactory.getLogger(MCS.class);
     /* this for the MCS Layer */
     private static final int CONNECT_INITIAL = 0x7f65;
 

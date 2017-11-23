@@ -14,6 +14,8 @@ import spacegraph.audio.MaryTTSpeech;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 
+import spacegraph.audio.MaryTTSpeech;
+
 public class NARchy extends NARS {
 
     public static NAR ui() {

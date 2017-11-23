@@ -33,7 +33,8 @@ import net.propero.rdp.*;
 import net.propero.rdp.crypto.CryptoException;
 import net.propero.rdp.rdp5.VChannel;
 import net.propero.rdp.rdp5.VChannels;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -56,7 +57,7 @@ public class ClipChannel extends VChannel implements ClipInterface,
     public static final int CLIPRDR_REQUEST = 0;
     public static final int CLIPRDR_RESPONSE = 1;
     public static final int CLIPRDR_ERROR = 2;
-    protected static final Logger logger = Logger.getLogger(ClipChannel.class);
+    protected static final Logger logger = LoggerFactory.getLogger(ClipChannel.class);
     final Clipboard clipboard;
     // All type handlers available
     final TypeHandlerList allHandlers;

@@ -30,7 +30,8 @@
 package net.propero.rdp.keymapping;
 
 import net.propero.rdp.Options;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.event.KeyEvent;
 import java.io.*;
@@ -43,7 +44,7 @@ public abstract class KeyCode_FileBased {
     public static final int UP = 0;
     public static final int QUIETUP = 2;
     public static final int QUIETDOWN = 3;
-    protected static final Logger logger = Logger.getLogger(KeyCode_FileBased.class);
+    protected static final Logger logger = LoggerFactory.getLogger(KeyCode_FileBased.class);
     final Vector keyMap = new Vector();
     private final Hashtable keysCurrentlyDown = new Hashtable();
     public boolean useLockingKeyState = true;

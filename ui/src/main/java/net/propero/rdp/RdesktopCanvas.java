@@ -33,7 +33,8 @@ package net.propero.rdp;
 import net.propero.rdp.keymapping.KeyCode;
 import net.propero.rdp.keymapping.KeyCode_FileBased;
 import net.propero.rdp.orders.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -44,7 +45,7 @@ import java.awt.image.MemoryImageSource;
 
 public abstract class RdesktopCanvas extends Canvas {
     public static final int ROP2_COPY = 0xc;
-    static final Logger logger = Logger.getLogger(RdesktopCanvas.class);
+    static final Logger logger = LoggerFactory.getLogger(RdesktopCanvas.class);
     private static final int ROP2_XOR = 0x6;
 
     // Graphics backstore_graphics;

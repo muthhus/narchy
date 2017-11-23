@@ -31,13 +31,14 @@ package net.propero.rdp.rdp5;
 
 import net.propero.rdp.*;
 import net.propero.rdp.crypto.CryptoException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public abstract class VChannel {
 
-    protected static Logger logger = Logger.getLogger(VChannel.class);
+    protected static Logger logger = LoggerFactory.getLogger(VChannel.class);
 
     private int mcs_id;
 

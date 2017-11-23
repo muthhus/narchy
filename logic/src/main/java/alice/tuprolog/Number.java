@@ -90,13 +90,7 @@ public abstract class Number extends Term implements Comparable<Number> {
     final public boolean isStruct() {
         return false;
     }
-    
-    /** is this term a variable  */
-    @Override
-    final public boolean isVar() {
-        return false;
-    }
-    
+
     @Override
     final public boolean isEmptyList() {
         return false;

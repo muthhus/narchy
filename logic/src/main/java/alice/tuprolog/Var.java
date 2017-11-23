@@ -259,11 +259,6 @@ public class Var extends Term {
     }
 
     @Override
-    public boolean isVar() {
-        return true;
-    }
-
-    @Override
     public boolean isEmptyList() {
         Term t = term();
         return t != this && t.isEmptyList();

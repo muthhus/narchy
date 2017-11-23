@@ -208,7 +208,7 @@ public class DeriveTime extends TimeGraph {
     /**
      * heuristic for deciding a derivation result from among the calculated options
      */
-    protected Event merge(Event a, Event b) {
+    protected static Event merge(Event a, Event b) {
         Term at = a.id;
         Term bt = b.id;
         if (at.hasXternal() && !bt.hasXternal())

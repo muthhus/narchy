@@ -1,13 +1,10 @@
 package nars.term.var;
 
-import com.google.common.io.ByteArrayDataOutput;
 import nars.$;
 import nars.Op;
 import nars.term.Term;
 import nars.term.atom.AtomicConst;
 import org.jetbrains.annotations.NotNull;
-
-import static nars.IO.SPECIAL_OP;
 
 /**
  * Unnormalized, labeled variable

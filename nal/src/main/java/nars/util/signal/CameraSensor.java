@@ -204,11 +204,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Ite
 //    }
 
     @Override
-    public boolean singleton() {
-        return true;
-    }
-
-    @Override
     public float value() {
         return in.value();
     }

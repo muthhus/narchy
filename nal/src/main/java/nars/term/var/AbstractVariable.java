@@ -60,6 +60,7 @@ public abstract class AbstractVariable implements Variable {
     }
 
 
+    @Override
     public final byte[] bytes() {
         return bytesCached;
     }

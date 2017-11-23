@@ -29,15 +29,18 @@
  */
 package net.propero.rdp;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.IndexColorModel;
 
+;
+
 public class Cache {
 
     private static final int RDPCACHE_COLOURMAPSIZE = 0x06; // unified patch
-    protected static Logger logger = Logger.getLogger(Cache.class);
+    protected static Logger logger = LoggerFactory.getLogger(Cache.class);
     private final Bitmap[][] bitmapcache = new Bitmap[3][600];
 
     private final Cursor[] cursorcache = new Cursor[32];

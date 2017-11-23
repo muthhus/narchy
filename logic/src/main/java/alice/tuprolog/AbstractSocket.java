@@ -27,11 +27,6 @@ public abstract class AbstractSocket extends Term{
 		return false;
 	}
 
-	@Override
-	public boolean isVar() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	@Override
 	public boolean isEmptyList() {
