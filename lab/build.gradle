@@ -1,5 +1,9 @@
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'application'
+
+
 dependencies {
-    compile project(':util')
+
     compile project(':gp')
     compile project(':app')
     compile(group: 'org.reflections', name: 'reflections', version: '0.9.11') {
@@ -8,4 +12,8 @@ dependencies {
     }
     compile group: 'net.java.jinput', name: 'jinput', version: '2.0.7'
     compile group: 'org.jogamp.joal', name: 'joal-main', version: '2.3.2'
+}
+
+shadowJar {
+    mainClassName = 'nars.experiment.Tetris'
 }

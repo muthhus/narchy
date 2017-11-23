@@ -1,11 +1,8 @@
 buildscript {
     repositories {
         mavenCentral()
-        mavenLocal()
+//        mavenLocal()
 //        jcenter()
-//        maven {
-//            url "http://plugins.gradle.org/m2/"
-//        }
         maven {
             url "http://plugins.gradle.org/m2/"
         }
@@ -16,34 +13,41 @@ buildscript {
     dependencies {
 //        classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.0'
 //        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0-M1'
-//        classpath "com.github.ben-manes:gradle-versions-plugin:0.17.0"
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.17.0"
         classpath "com.github.jengelman.gradle.plugins:shadow:2.0.1"
+	//classpath "com.gradle:build-scan-plugin:1.10.2"
 
     }
 }
 
-apply plugin: "com.github.johnrengelman.shadow"
-//buildScan {
-//    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-//    licenseAgree = 'yes'
-//}
+
+
+
+/*
+buildScan {
+    licenseAgreementUrl = 'http://gradle.com/terms-of-service'
+    licenseAgree = 'yes'
+}
+*/
 
 allprojects {
-    apply plugin: 'maven'
-    apply plugin: 'idea'
 
     group = 'narchy'
     version = '1.0'
 }
 
 subprojects {
+    apply plugin: 'idea'
     apply plugin: 'java'
+//    apply plugin: 'maven'
+//    apply plugin: "com.github.johnrengelman.shadow"
+
 //    apply plugin: 'org.junit.platform.gradle.plugin'
 //    apply plugin: "com.github.ben-manes.versions"
     repositories {
 
         mavenCentral()
-        mavenLocal()
+//        mavenLocal()
 //        jcenter()
 
         maven { url "http://repo.maven.apache.org/maven2" }

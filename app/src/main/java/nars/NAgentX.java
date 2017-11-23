@@ -125,7 +125,7 @@ abstract public class NAgentX extends NAgent {
 //        );
 
 
-        int THREADS = 4;
+        int THREADS = Math.max(1,Runtime.getRuntime().availableProcessors()-1);
 
         //Predicate<Activate> randomBool = (a) -> ThreadLocalRandom.current().nextBoolean();
 
