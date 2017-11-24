@@ -132,7 +132,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
                 assert(e!=XTERNAL);
                 Term next = template.dt(e);
 
-                if (next instanceof Bool || next.dt()==XTERNAL) {
+                if (next.subs()==0 /* atomic */ || next.dt()==XTERNAL) {
                     /*if no dt can be calculated, return
                               0 or some non-zero value (ex: 1, end-start, etc) in case of repeating subterms. */
                     int artificialDT = (start!=end && end-start < Integer.MAX_VALUE) ?

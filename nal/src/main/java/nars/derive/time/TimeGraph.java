@@ -347,7 +347,7 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
             }
 
 
-            boolean repeat = a.unneg().equals(b.unneg()); //if true, then we must be careful when trying this in a commutive-like result which would collapse the two terms
+//            boolean repeat = a.unneg().equals(b.unneg()); //if true, then we must be careful when trying this in a commutive-like result which would collapse the two terms
 
             return dfs(sources, new CrossTimeSolver() {
                 @Override
@@ -362,24 +362,7 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
                     long ddt = startDT[1];
                     assert (ddt < Integer.MAX_VALUE);
                     int dt = (int) ddt;
-                    dt = dt(x, dt);
-                    if (repeat && (dt == 0 || dt == DTERNAL)) {
-                        //this will result in collapsing the term to just one, with no temporal separation
-                        //this is like an accidental shortcut it has tried - but it is not helpful information for us
-                        //try again
-                        return true;
-                    }
-
-
-                    //CONSTRUCT NEW TERM
-                    Term y;
-                    if (x.op() != CONJ) {
-                        int xdt = dt != DTERNAL ? dt - a.dtRange() : dt;
-                        y = x.dt(xdt);
-                    } else {
-                        y = Op.conjMerge(a, 0, b, dt);
-                    }
-
+                    Term y = dt(x, dt);
 
                     if (!(y instanceof Bool)) {
 
@@ -442,8 +425,19 @@ public class TimeGraph extends HashGraph<TimeGraph.Event, TimeGraph.TimeSpan> {
      * preprocess the dt used to construct a new term.
      * ex: dithering
      */
-    protected int dt(Term t, int dt) {
-        return dt;
+    protected Term dt(Term x, int dt) {
+
+        //CONSTRUCT NEW TERM
+        Term y;
+        if (x.op() != CONJ) {
+            int xdt = dt != DTERNAL ? dt - x.sub(0).dtRange() : dt;
+            y = x.dt(xdt);
+        } else {
+            y = Op.conjMerge(x.sub(0), 0, x.sub(1), dt);
+        }
+
+
+        return y;
     }
 
 

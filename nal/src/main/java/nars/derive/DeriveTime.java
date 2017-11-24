@@ -74,8 +74,7 @@ public class DeriveTime extends TimeGraph {
 
     }
 
-    @Override
-    protected int dt(Term t, int dt) {
+    int dtDither(int dt) {
         if (dt == DTERNAL)
             return DTERNAL;
         if (dt == XTERNAL)
@@ -91,6 +90,17 @@ public class DeriveTime extends TimeGraph {
         }
 
         return dt;
+    }
+
+    @Override
+    protected Term dt(Term x, int dt) {
+        int ddt = dtDither(dt);
+        Term y = super.dt(x, ddt);
+        if (y instanceof Bool && ddt!=dt) {
+            //the dithered dt has destroyed it, so try the non-dithered (more precise) dt
+            y = super.dt(x, dt);
+        }
+        return y;
     }
 
     public Term solve(Term pattern) {

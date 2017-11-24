@@ -94,9 +94,9 @@ abstract public class DynamicTruthModel {
                 if (nt == null)
                     return null;
 
-                ot = bt.term();
-                if (ot.hasXternal())
-                    throw new RuntimeException("xternal");
+                ot = bt.term().negIf(negated);
+//                if (ot.hasXternal())
+//                    throw new RuntimeException("xternal");
             } else {
                 //truth only
                 bt = null;
@@ -122,17 +122,16 @@ abstract public class DynamicTruthModel {
         }
 
         if (evi) {
-            if (d.e.isEmpty())
-                throw new RuntimeException("no evidence");
+            assert(!d.e.isEmpty());
             if (outputs != null) {
                 d.concrete = superterm.op().the(DT, outputs);
             } else {
                 d.concrete = superterm;
             }
-            if (d.concrete.hasXternal()) {
-                //eval(superterm, beliefOrGoal, start, end, stamp, n); //HACK
-                throw new RuntimeException("xternal");
-            }
+//            if (d.concrete.hasXternal()) {
+//                //eval(superterm, beliefOrGoal, start, end, stamp, n); //HACK
+//                throw new RuntimeException("xternal");
+//            }
         }
 
 //        //if (template instanceof Compound) {
