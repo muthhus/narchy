@@ -6,6 +6,7 @@ import jcog.Util;
 import jcog.math.FloatParam;
 import jcog.math.FloatSupplier;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.AspectAlign;
 import spacegraph.Surface;
 import spacegraph.widget.text.Label;
 
@@ -23,7 +24,7 @@ public class FloatSlider extends BaseSlider {
     public FloatSlider(float v, float min, float max) {
         super((v - min) / (max - min));
 
-        set(label);
+        set(/*new AspectAlign*/(label));
         updateLabel();
 
         this.min = min;

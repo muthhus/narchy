@@ -45,7 +45,7 @@ public interface QuestionTable extends TaskTable {
         }
 
         @Override
-        public Iterator<Task> taskIterator() {
+        public Iterator<Task> iterator() {
             return Collections.emptyIterator();
         }
 
@@ -129,7 +129,7 @@ public interface QuestionTable extends TaskTable {
 
 
         @Override
-        public Iterator<Task> taskIterator() {
+        public Iterator<Task> iterator() {
             return ArrayIterator.get(toArray());
         }
 

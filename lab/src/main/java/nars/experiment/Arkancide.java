@@ -90,6 +90,10 @@ public class Arkancide extends NAgentX {
     }
 
 
+    public Arkancide(NAR nar) throws Narsese.NarseseException {
+        this(nar, true, false);
+    }
+
     public Arkancide(NAR nar, boolean cam, boolean numeric) throws Narsese.NarseseException {
         super("noid", nar);
         //super(nar, HaiQAgent::new);

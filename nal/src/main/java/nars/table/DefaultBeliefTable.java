@@ -19,12 +19,11 @@ import java.util.stream.Stream;
  */
 public class DefaultBeliefTable implements BeliefTable {
 
-    @Nullable public final EternalTable eternal;
+    public final EternalTable eternal;
 
-    @NotNull public final TemporalBeliefTable temporal;
+    public final TemporalBeliefTable temporal;
 
     public DefaultBeliefTable(TemporalBeliefTable t) {
-        super();
         eternal = new EternalTable(0);
         temporal = t;
     }
@@ -59,7 +58,7 @@ public class DefaultBeliefTable implements BeliefTable {
     public final Iterator<Task> iterator() {
         return Iterators.concat(
                 eternal.iterator(),
-                temporal.taskIterator()
+                temporal.iterator()
         );
     }
 

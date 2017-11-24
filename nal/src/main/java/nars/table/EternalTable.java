@@ -158,11 +158,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
     }
 
-    @Override
-    public final Iterator<Task> taskIterator() {
-        return iterator();
-    }
-
     /**
      * for ranking purposes
      */

@@ -13,7 +13,7 @@ import java.util.stream.Stream;
  * holds a set of ranked question/quests tasks
  * top ranking items are stored in the lower indexes so they will be first iterated
  */
-public interface TaskTable  {
+public interface TaskTable extends Iterable<Task> {
 
 
     /**
@@ -22,7 +22,7 @@ public interface TaskTable  {
      * @return: the input task itself, it it was added to the table
      * an existing equivalent task if this was a duplicate
      */
-    void add(@NotNull Task t, BaseConcept c, NAR n);
+    void add(Task t, BaseConcept c, NAR n);
 
 
     int capacity();
@@ -36,12 +36,6 @@ public interface TaskTable  {
     default boolean isEmpty() {
         return size() == 0;
     }
-
-    Iterator<Task> taskIterator();
-
-
-
-
 
 //    @Nullable
 //    default BivariateGridInterpolator getWaveFrequencyConfidenceTime() {
@@ -126,7 +120,7 @@ public interface TaskTable  {
 //        }
 //
 //        @Override
-//        public void remove(@NotNull Task belief, @NotNull NAR nar) {
+//        public void remove(Task belief, NAR nar) {
 //            throw new UnsupportedOperationException();
 //        }
 //
@@ -136,7 +130,7 @@ public interface TaskTable  {
 
 //    /** forcibly remove a held Task
 //     *  should eventually invoke TaskTable.removeTask() */
-//    void remove(@NotNull Task belief, List<Task> displ);
+//    void remove(Task belief, List<Task> displ);
 
 
     //void add(Task incoming, List<Task> displaced);

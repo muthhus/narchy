@@ -30,10 +30,23 @@ public class Label extends Surface {
 
     @Override
     public void paint(GL2 gl) {
+        int len = value.length();
+        if (len == 0) return;
+
+        float charAspect = 1.4f;
+        if (charAspect / len <= h() / w()) {
+            //wider than tall
+            this.fontScaleX = 1f / len;
+            this.fontScaleY = fontScaleX * charAspect;
+        } else {
+            this.fontScaleY = 1f;
+            this.fontScaleX = (fontScaleY/len) / charAspect;
+        }
+
         Draw.bounds(gl, this, this::paintUnit);
     }
 
-    public void paintUnit(GL2 gl) {
+    void paintUnit(GL2 gl) {
 
 
         color.apply(gl);
@@ -43,20 +56,11 @@ public class Label extends Surface {
 
     }
 
-    public void set(String newValue) {
 
-        if (this.value == newValue)
-            return;
+    public void set(String newValue) {
 
         this.value = newValue;
 
-        int len = newValue.length();
-        float ratio = 1f;
-        float fontScaleX = 1f / len;
-        float fontScaleY = ratio * fontScaleX;
-
-        this.fontScaleX = fontScaleX;
-        this.fontScaleY = fontScaleY;
     }
 
     public String value() {

@@ -77,7 +77,7 @@ public class AspectAlign extends Layout {
                 //if (aspect >= 1) {
                     //taller than wide
                     tw = w;
-                    th = w * aspect;
+                    th = w / aspect;
 //                } else {
 //                    //wider than tall
 //                    tw = vw;
@@ -86,7 +86,7 @@ public class AspectAlign extends Layout {
             } else {
 //                if (aspect >= 1) {
                     th = h;
-                    tw = h/aspect;
+                    tw = h * aspect;
 //                } else {
 //                    tw = vw*aspect;
 //                    th = vh;

@@ -1264,8 +1264,10 @@ public enum Draw {
         for (int tries = 0; tries < 2 && lines == null; tries++) {
             try {
                 String font =
+
                         //"meteorology";
-                        "rowmans";
+                        //"rowmans";
+                        "futural";
                 //                lines = Files.readAllLines(
                 //                    Paths.get(
                 //                        Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf").toURI()
@@ -1274,6 +1276,7 @@ public enum Draw {
                 //                );
 
                 lines = new String(Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf").readAllBytes()).split("\n");
+                break;
             } catch (IOException e) {
 
             }

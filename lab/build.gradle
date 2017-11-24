@@ -4,7 +4,7 @@ apply plugin: 'application'
 
 dependencies {
 
-    compile project(':gp')
+    //compile project(':gp')
     compile project(':app')
     compile(group: 'org.reflections', name: 'reflections', version: '0.9.11') {
         exclude(module: 'guava')
@@ -15,5 +15,5 @@ dependencies {
 }
 
 shadowJar {
-    mainClassName = 'nars.experiment.Tetris'
+    mainClassName = 'nars.Lab'
 }

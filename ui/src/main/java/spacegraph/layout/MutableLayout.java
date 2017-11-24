@@ -27,23 +27,25 @@ public class MutableLayout extends Layout {
     }
 
     public Layout set(Surface... next) {
-        if (!equals(this.children, next)) {
-            synchronized (children) {
+        synchronized (children) {
+            if (!equals(this.children, next)) {
                 children.clear();
                 for (Surface c : next) {
                     if (c != null)
                         children.add(c);
                 }
+                layout();
             }
         }
         return this;
     }
 
     public Layout set(List<Surface> next) {
-        if (!equals(this.children, next)) {
-            synchronized (children) {
+        synchronized (children) {
+            if (!equals(this.children, next)) {
                 children.clear();
                 children.addAll(next);
+                layout();
             }
         }
         return this;
@@ -59,6 +61,7 @@ public class MutableLayout extends Layout {
     public void forEach(Consumer<Surface> o) {
         children.forEach(o);
     }
+
     private class Children extends CopyOnWriteArrayList<Surface> {
         @Override
         public boolean add(Surface surface) {

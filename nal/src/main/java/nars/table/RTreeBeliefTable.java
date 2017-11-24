@@ -706,13 +706,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     @Override
-    public Iterator<Task> taskIterator() {
+    public Iterator<Task> iterator() {
         return Iterators.transform(tree.iterator(), Tasked::task);
     }
 
     @Override
     public Stream<Task> stream() {
-        return Streams.stream(taskIterator());
+        return tree.stream().map(TaskRegion::task);
     }
 
     static Predicate<TaskRegion> scanWhile(Predicate<? super Task> each) {

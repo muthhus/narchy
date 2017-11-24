@@ -23,13 +23,7 @@ import static nars.time.Tense.ETERNAL;
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).
  * It should iterate in top-down order (highest ranking first)
  */
-public interface BeliefTable extends TaskTable, Iterable<Task> {
-
-
-    @Override
-    default Iterator<Task> taskIterator() {
-        return iterator();
-    }
+public interface BeliefTable extends TaskTable {
 
     /*@NotNull*/
     BeliefTable Empty = new BeliefTable() {
@@ -68,10 +62,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
         }
 
-        public @Nullable Task match(long start, long end, int dur, NAR nar) {
-            return null;
-        }
-
         @Override
         public float priSum() {
             return 0;
@@ -99,10 +89,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             return null;
         }
 
-
-        public Task matchEternal() {
-            return null;
-        }
 
         @Override
         public void print(/*@NotNull*/ PrintStream out) {
@@ -173,13 +159,13 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         print(System.out);
     }
 
-    /**
-     * simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
-     * returns 0 if no tasks exist
-     */
-    default float coherence() {
-        throw new UnsupportedOperationException("TODO");
-    }
+//    /**
+//     * simple metric that guages the level of inconsistency (ex: variance) aggregated by contained belief states.
+//     * returns 0 if no tasks exist
+//     */
+//    default float coherence() {
+//        throw new UnsupportedOperationException("TODO");
+//    }
 
     default float priSum() {
         return (float) stream().mapToDouble(Prioritized::pri).sum();

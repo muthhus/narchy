@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 public class PushButton extends AbstractButton {
 
     private final Label label;
-    private final AspectAlign labelWrapper;
+
 
     @Nullable private Consumer<PushButton> onClick;
 
@@ -25,7 +25,7 @@ public class PushButton extends AbstractButton {
     public PushButton(String s) {
         super();
         label = new Label(s);
-        labelWrapper = new AspectAlign(label, 1f, AspectAlign.Align.Center, 1);
+        children.add(/*new AspectAlign*/(label));
     }
 
     public PushButton(Consumer<PushButton> onClick) {
@@ -50,18 +50,6 @@ public class PushButton extends AbstractButton {
         this.label.set(s);
     }
 
-    @Override
-    protected void paintContent(GL2 gl, float x, float y, float w, float h) {
-        Draw.bounds(gl, this, labelWrapper::render);
-        //labelWrapper.render(gl);
-    }
-
-    @Override
-    public void doLayout() {
-        //labelWrapper.pos(bounds);
-        //label.pos(bounds);
-        labelWrapper.layout();
-    }
 
     @Override
     protected void onClick() {

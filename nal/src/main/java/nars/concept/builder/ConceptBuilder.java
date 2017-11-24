@@ -17,9 +17,9 @@ import java.util.function.BiFunction;
  */
 public interface ConceptBuilder extends BiFunction<Term, Termed, Termed> {
 
-    @NotNull ConceptState init();
-    @NotNull ConceptState awake();
-    @NotNull ConceptState sleep();
+    ConceptState init();
+    ConceptState awake();
+    ConceptState sleep();
 
     QuestionTable questionTable(Term term, boolean questionOrQuest);
     BeliefTable beliefTable(Term t, boolean beliefOrGoal);
@@ -38,17 +38,17 @@ public interface ConceptBuilder extends BiFunction<Term, Termed, Termed> {
 
 
         @Override
-        public @NotNull ConceptState init() {
+        public ConceptState init() {
             return ConceptState.Abstract;
         }
 
         @Override
-        public @NotNull ConceptState awake() {
+        public ConceptState awake() {
             return ConceptState.Abstract;
         }
 
         @Override
-        public @NotNull ConceptState sleep() {
+        public ConceptState sleep() {
             return ConceptState.Abstract;
         }
 
@@ -73,11 +73,11 @@ public interface ConceptBuilder extends BiFunction<Term, Termed, Termed> {
         }
 
         @Override
-        public Bag[] newLinkBags(@NotNull Term term) {
+        public Bag[] newLinkBags(Term term) {
             return new Bag[] { Bag.EMPTY, Bag.EMPTY };
         }
     };
 
 
-    Bag[] newLinkBags(@NotNull Term term);
+    Bag[] newLinkBags(Term term);
 }

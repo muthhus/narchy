@@ -1,5 +1,6 @@
 package spacegraph.widget.meta;
 
+import com.google.common.collect.Sets;
 import jcog.Services;
 import jcog.list.FasterList;
 import jcog.math.FloatParam;
@@ -9,9 +10,14 @@ import spacegraph.layout.Grid;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
 import spacegraph.widget.slider.FloatSlider;
+import spacegraph.widget.text.LabeledPane;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -19,60 +25,109 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ReflectionSurface<X> extends Grid {
 
-    private final X x;
+    final Set<Object> seen = Sets.newSetFromMap(new IdentityHashMap());
 
-    public ReflectionSurface(@NotNull X x) {
+    /** root */
+    private final X obj;
+
+    final static int MAX_DEPTH = 1;
+
+    public ReflectionSurface(X x) {
         super();
-        this.x = x;
+        this.obj = x;
 
         List<Surface> l = new FasterList();
 
-
-        collectFields(x, l);
-
-        if (x instanceof Services) {
-            collectServices((Services) x, l);
-        }
+        collect(x, l, 0);
 
         set(l);
     }
 
-    private static void collectServices(Services x, List<Surface> l) {
-        x.stream().forEach((s) -> {
-            l.add(new WindowToggleButton(s.toString(), () -> {
-                return new ReflectionSurface(s);
-            }));
-        });
+    private void collect(Object y, List<Surface> l, int depth) {
+        collect(y, l, depth, null);
     }
 
-    public void collectFields(@NotNull X x, List<Surface> l) {
+    private void collect(Object x, List<Surface> target, int depth, String yLabel /* tags*/) {
+
+        if (!seen.add(x))
+            return;
+
+        if (yLabel == null)
+            yLabel = x.toString();
+
+        if (x instanceof Surface) {
+            if (((Surface)x).parent==null) {
+                //l.add(col(new Label(k), (Surface)y));
+                if (yLabel!=null)
+                    target.add(new LabeledPane(yLabel, (Surface)x));
+                else
+                    target.add((Surface) x);
+            }
+            return;
+        }
+
+
+
+        if (x instanceof FloatParam) {
+            target.add(new MyFloatSlider((FloatParam) x, yLabel));
+        } else if (x instanceof AtomicBoolean) {
+            target.add(new CheckBox(yLabel, (AtomicBoolean) x));
+//                    } else if (y instanceof MutableBoolean) {
+//                        l.add(new CheckBox(k, (MutableBoolean) y));
+        } else if (x instanceof Runnable) {
+            target.add(new PushButton(yLabel, (Runnable) x));
+        }
+
+
+        if (depth < MAX_DEPTH) {
+            collectFields(x, target, depth+1);
+
+            if (x instanceof Services) {
+                collectServices((Services) x, target);
+            }
+            if (x instanceof Collection) {
+                collectElements((Collection) x, target, depth+1);
+            }
+        }
+
+    }
+
+    private void collectElements(Collection<?> x, List<Surface> l, int depth) {
+        FasterList<Surface> m = new FasterList();
+        for (Object o : x) {
+            collect(o, m, depth);
+        }
+        if (!m.isEmpty()) {
+            l.add(grid(m));
+        }
+    }
+
+    private static void collectServices(Services x, List<Surface> l) {
+        x.stream().forEach((s) ->
+                l.add(new WindowToggleButton(s.toString(), () -> new ReflectionSurface(s))));
+    }
+
+    public void collectFields(Object x, List<Surface> l, int depth) {
         Class cc = x.getClass();
         for (Field f : cc.getFields()) {
             //SuperReflect.fields(x, (String k, Class c, SuperReflect v) -> {
+            int mods = f.getModifiers();
+            if (Modifier.isStatic(mods))
+                continue;
+            if (!Modifier.isPublic(mods))
+                continue;
+            if (f.getType().isPrimitive())
+                continue;
 
             try {
+
                 //Class c = f.getType();
                 f.trySetAccessible();
+
+
                 Object y = f.get(x);
-
-                if (y instanceof Surface) {
-                    //l.add(col(new Label(k), (Surface)y));
-                    l.add((Surface) y);
-                } else {
-                    String k = f.getName();
-
-                    if (y instanceof FloatParam) {
-                        FloatParam p = (FloatParam) y;
-                        //l.add(new LabeledPane(k, new FloatSlider(p)));
-                        l.add(new MyFloatSlider(p, k));
-                    } else if (y instanceof AtomicBoolean) {
-                        l.add(new CheckBox(k, (AtomicBoolean) y));
-//                    } else if (y instanceof MutableBoolean) {
-//                        l.add(new CheckBox(k, (MutableBoolean) y));
-                    } else if (y instanceof Runnable) {
-                        l.add(new PushButton(k, (Runnable) y));
-                    }
-                }
+                if (y!=null && y != x) //avoid self loop
+                    collect(y, l, depth, f.getName());
 
             } catch (Throwable t) {
                 t.printStackTrace();

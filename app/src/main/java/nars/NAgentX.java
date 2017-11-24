@@ -94,15 +94,11 @@ abstract public class NAgentX extends NAgent {
     }
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps) {
-        return runRT(init, fps, -1);
+        return runRT(init, 50f, fps);
     }
 
 
-    public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
-        return runRT(init, 50, fps, endTime);
-    }
-
-    public static NAR runRT(Function<NAR, NAgent> init, float narFPS, float agentFPS, long endTime) {
+    public static NAR runRT(Function<NAR, NAgent> init, float narFPS, float agentFPS) {
 
 //        Builder.Subterms.the =
 //                //Builder.Subterms.WeakSubtermBuilder.get();
@@ -675,7 +671,7 @@ abstract public class NAgentX extends NAgent {
 
                     a instanceof NAgentX ?
                             new WindowToggleButton("vision", () -> grid(((NAgentX) a).cam.stream().map(cs ->
-                                    new AspectAlign(new CameraSensorView(cs, a), AspectAlign.Align.Center, cs.width, cs.height))
+                                    new AspectAlign(new CameraSensorView(cs, a), AspectAlign.Align.Center, cs.height, cs.width))
                                 .toArray(Surface[]::new))
                             ) : grid()
 

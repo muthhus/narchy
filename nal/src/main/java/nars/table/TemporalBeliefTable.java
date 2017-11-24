@@ -76,11 +76,6 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    default Iterator<Task> iterator() {
-        return taskIterator();
-    }
-
     TemporalBeliefTable Empty = new TemporalBeliefTable() {
 
         @Override
@@ -110,7 +105,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Iterator<Task> taskIterator() {
+        public Iterator<Task> iterator() {
             return Collections.emptyIterator();
         }
 
