@@ -31,10 +31,14 @@ public final class DynTruth implements Truthed {
     public float freq;
     public float conf; //running product
 
-    public DynTruth(FasterList<Task> e) {
+    final Term template;
+    Term concrete = null;
+
+    public DynTruth(Term template, FasterList<Task> e) {
         //this.t = t;
         this.e = e;
         this.truth = null;
+        this.template = template;
     }
 
     public void setTruth(Truthed truth) {
@@ -76,7 +80,9 @@ public final class DynTruth implements Truthed {
     }
 
 
-    NALTask task(/*@NotNull*/ Term c, boolean beliefOrGoal, NAR nar) {
+    NALTask task(boolean beliefOrGoal, NAR nar) {
+
+        Term c = this.concrete;
 
         Truth tr0 = truth();
         if (tr0 == null)
@@ -104,8 +110,7 @@ public final class DynTruth implements Truthed {
 
 
         // then if the term is valid, see if it is valid for a task
-        if (!Task.validTaskTerm(c.temporalize(
-                start == ETERNAL ? Retemporalize.retemporalizeXTERNALToDTERNAL : Retemporalize.retemporalizeXTERNALToZero),
+        if (!Task.validTaskTerm(c,
                 beliefOrGoal ? BELIEF : GOAL, nar, true))
             return null;
 

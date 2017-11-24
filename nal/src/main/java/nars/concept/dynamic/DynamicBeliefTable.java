@@ -1,5 +1,6 @@
 package nars.concept.dynamic;
 
+import jcog.decide.DecideRoulette;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -9,8 +10,12 @@ import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.task.util.PredictionFeedback;
 import nars.term.Term;
+import nars.term.atom.Bool;
 import nars.term.transform.Retemporalize;
 import nars.truth.Truth;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.tuple.primitive.IntFloatPair;
+import org.eclipse.collections.impl.map.mutable.primitive.IntFloatHashMap;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -58,119 +63,121 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Nullable
     protected Task generate(Term template, long start, long end, NAR nar) {
-
-        Term tt = template(template, start, end, nar);
-        if (tt == null)
-            return null;
-
-        DynTruth yy = truth(start, end, tt, true, nar);
-        if (yy == null)
-            return null;
-
-        return yy.task(tt, beliefOrGoal, nar);
+        DynTruth yy = truth(start, end, template, true, nar);
+        return yy != null ? yy.task(beliefOrGoal, nar) : null;
     }
 
     @Override
     public Truth truth(long start, long end, NAR nar) {
-        Term t = template(term, start, end, nar);
-        if (t == null)
-            return null;
-
-
-        DynTruth d = truth(start, end, t, false, nar);
+        DynTruth d = truth(start, end, term, false, nar);
         return Truth.maxConf(d != null ? d.truth() : null,
                 super.truth(start, end, nar) /* includes only non-dynamic beliefs */);
     }
 
-    /** prepare a term, if necessary, for use as template  */
-    private Term template(Term template, long start, long end, NAR nar) {
-        if (template.dt() == XTERNAL) {
-            int newDT = matchDT(template, start, end);
-            template = template.dt(newDT);
-        }
-
-        //still XTERNAL ? try using start..end as a dt
-        if (start!=DTERNAL && template.dt() == XTERNAL && template.subs()==2) {
-            template = template.dt((int) (end-start));
-        }
-
-        Retemporalize retemporalizeMode =
-                template.subterms().OR(Term::isTemporal) ?
-                    Retemporalize.retemporalizeXTERNALToZero  //dont unnecessarily attach DTERNALs to temporals
-                        :
-                    Retemporalize.retemporalizeXTERNALToDTERNAL //dont unnecessarily create temporals where DTERNAL could remain
-        ;
-        template = template.temporalize(retemporalizeMode);
-        if (template == null)
-            return null;
-
-
-        if (!template.conceptual().equals(term))
-            return null; //doesnt correspond to this concept anyway
-
-        return template;
-
-//        if (t2 == null) {
-//
-//
-//
-//            //for some reason, retemporalizing to DTERNAL failed (ex: conj collision)
-//            //so as a backup plan, use dt=+/-1
-//            int dur = nar.dur();
-//            Random rng = nar.random();
-//            t2 = template.temporalize(new Retemporalize.RetemporalizeFromToFunc(XTERNAL,
-//                    () -> rng.nextBoolean() ? +dur : -dur));
+//    /** prepare a term, if necessary, for use as template  */
+//    private Term template(Term template, long start, long end, NAR nar) {
+//        if (template.dt() == XTERNAL) {
+//            int newDT = matchDT(template, start, end);
+//            template = template.dt(newDT);
 //        }
-////        if (t2!=null && t2.dt()==XTERNAL) {
-////            return template(t2, start, end ,nar);//temporary
-////            //throw new RuntimeException("wtf xternal");
-////        }
 //
-//        return t2;
-    }
+//        //still XTERNAL ? try using start..end as a dt
+//        if (start!=DTERNAL && template.dt() == XTERNAL && template.subs()==2) {
+//            template = template.dt((int) (end-start));
+//        }
+//
+//        Retemporalize retemporalizeMode =
+//                template.subterms().OR(Term::isTemporal) ?
+//                    Retemporalize.retemporalizeXTERNALToZero  //dont unnecessarily attach DTERNALs to temporals
+//                        :
+//                    Retemporalize.retemporalizeXTERNALToDTERNAL //dont unnecessarily create temporals where DTERNAL could remain
+//        ;
+//        template = template.temporalize(retemporalizeMode);
+//        if (template == null)
+//            return null;
+//
+//
+//        if (!template.conceptual().equals(term))
+//            return null; //doesnt correspond to this concept anyway
+//
+//        return template;
+//
+////        if (t2 == null) {
+////
+////
+////
+////            //for some reason, retemporalizing to DTERNAL failed (ex: conj collision)
+////            //so as a backup plan, use dt=+/-1
+////            int dur = nar.dur();
+////            Random rng = nar.random();
+////            t2 = template.temporalize(new Retemporalize.RetemporalizeFromToFunc(XTERNAL,
+////                    () -> rng.nextBoolean() ? +dur : -dur));
+////        }
+//////        if (t2!=null && t2.dt()==XTERNAL) {
+//////            return template(t2, start, end ,nar);//temporary
+//////            //throw new RuntimeException("wtf xternal");
+//////        }
+////
+////        return t2;
+//    }
 
 
     @Nullable
     protected DynTruth truth(long start, long end, Term template, boolean evidence, NAR nar) {
-        return model.eval(template, beliefOrGoal, start, end, evidence, nar); //newDyn(evidence);
-    }
+        boolean temporal = template.op().temporal;
+        if (temporal) {
+            int d = template.dt();
+            if (d == XTERNAL || d == DTERNAL) {
+                int e = matchDT(start, end, nar);
+                assert(e!=XTERNAL);
+                Term next = template.dt(e);
 
-    /**
-     * returns an appropriate dt by sampling the existing beliefs
-     * in the table (if any exist).  if no dt can be calculated, return
-     * a standard value (ex: 0 or DTERNAL)
-     */
-    private int matchDT(Term term, long start, long end) {
-
-        //assert (term.op().temporal): term + " is non-temporal but matchDT'd";
-
-        int s = size();
-        if (s > 0) {
-            final int[] count = {0};
-            final long[] sum = {0};
-
-            //TODO roulette sample the different contained values, dont just average them
-
-            Consumer<Task> tx = x -> {
-                int xdt = x.dt();
-                if (xdt!=XTERNAL && xdt != DTERNAL) {
-                    sum[0] += xdt;
-                    count[0]++;
+                if (next instanceof Bool || next.dt()==XTERNAL) {
+                    /*if no dt can be calculated, return
+                              0 or some non-zero value (ex: 1, end-start, etc) in case of repeating subterms. */
+                    int artificialDT = (start!=end && end-start < Integer.MAX_VALUE) ?
+                            ((int)(end-start)) : 1;
+                    next = template.dt(artificialDT);
                 }
-            };
 
-            final int MAX_TASKS_FOR_COMPLETE_ITERATION = 8;
-            if (s < MAX_TASKS_FOR_COMPLETE_ITERATION)
-                forEachTask(tx);
-            else
-                forEachTask(true, start, end, tx); //just the matching subrange, should be cheaper if # of tasks is high
+                if (next instanceof Bool || next.dt()==XTERNAL) {
+                    return null; //give up
+                }
 
-            if (count[0] > 0) {
-                return (int) (sum[0] / count[0]);
+                template = next;
             }
         }
 
-        return DTERNAL;
+        return model.eval(template, beliefOrGoal, start, end, evidence, nar);
+    }
+
+    /**
+     * returns an appropriate dt for the root term
+     * of beliefs held in the table.  returns 0 if no other value can
+     * be computed.
+     */
+    private int matchDT(long start, long end, NAR nar) {
+
+        int s = size();
+        if (s == 0)
+            return 0;
+
+        IntFloatHashMap dtConf = new IntFloatHashMap(s);
+        forEachTask(t->{
+           int tdt = t.dt();
+           if (tdt!=DTERNAL)
+               dtConf.addToValue(tdt, t.conf(start, end)); //maybe evi
+        });
+        int n = dtConf.size();
+        if (n == 0)
+             return 0;
+
+        MutableList<IntFloatPair> ll = dtConf.keyValuesView().toList();
+        if (n == 1)
+            return ll.get(0).getOne();
+
+        int lls = DecideRoulette.decideRoulette(ll.size(), (i)->ll.get(i).getTwo(), nar.random());
+        return ll.get(lls).getOne();
     }
 
     @Override
